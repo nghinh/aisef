@@ -1,10 +1,26 @@
 # AISEF V2 — Architecture RFC
 
-**Status:** proposed, awaiting owner approval. **Supersedes** the proposal documents under
-[`docs/research/v2/`](../research/v2/) for all implementation decisions; those are retained as design history and
-are linked throughout.
+**Status: APPROVED — FROZEN.** Owner decision *AISEF V2 — OWNER ARCHITECTURE FREEZE* (2026-09-21), reviewing
+commit `2fe672c`. **F1–F11 are frozen.** This document is the architecture baseline for Cycle-1 implementation.
+The immutable approval record is
+[`closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json`](../../closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json),
+content-addressed by its `.sha256` sidecar.
+
+**Supersedes** the proposal documents under [`docs/research/v2/`](../research/v2/) for all implementation
+decisions; those are retained as design history and are linked throughout.
 
 **Not implemented.** No V2 code exists. No file under `aisef/` is modified by this RFC.
+
+> **Change rule after freeze.** An implementation bug is fixed in the implementation. A missing test is added. A
+> missing verifier already required by this RFC is added. **A contradiction in a frozen semantic is a STOP.**
+> F1–F11 **MUST NOT** be modified silently; any change requires an `ARCHITECTURE_EXCEPTION` record naming the
+> frozen item, the contradiction, a concrete reproducer, why the implementation cannot conform, the evidence
+> compatibility impact, a proposed replacement, and owner approval. **No architecture exception is approved by
+> default.**
+>
+> **Non-normative preamble.** Everything above the heading *1. Executive architecture decision* is status
+> metadata. The normative body is digested separately (`rfc_normative_digest`) so that recording approval
+> provably changes no normative content.
 
 Normative language: **MUST**, **MUST NOT**, **SHOULD**, **MAY**. A statement without one of these is
 explanatory.

@@ -1,0 +1,1894 @@
+{
+ "manifest": "AISEF V2 — CYCLE-1 IMPLEMENTATION MANIFEST",
+ "generated": "2026-09-21",
+ "architecture_baseline": {
+  "rfc": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
+  "approval_record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+  "approval_record_sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+  "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+  "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+  "frozen_items": [
+   "F1",
+   "F2",
+   "F3",
+   "F4",
+   "F5",
+   "F6",
+   "F7",
+   "F8",
+   "F9",
+   "F10",
+   "F11"
+  ]
+ },
+ "phases": [
+  {
+   "id": "P0",
+   "name": "Freeze / conformance scaffolding",
+   "exit": "architecture baseline mechanically identifiable and protected"
+  },
+  {
+   "id": "P1",
+   "name": "Semantic core",
+   "exit": "polarity, NEG-1/2/3, compiler --check, hash stability, satisfaction mutation"
+  },
+  {
+   "id": "P2",
+   "name": "Probe + admission",
+   "exit": "CAL-1, CAL-2, subject/harness separation, no provider call before admission, PRE_SATISFIED, layout invariance"
+  },
+  {
+   "id": "P3",
+   "name": "Journal / projections",
+   "exit": "unknown-required refusal, time never folded, incremental == full, reference models, projection mutation"
+  },
+  {
+   "id": "P4",
+   "name": "Story / run transaction",
+   "exit": "RUN-1, RUN-2, crash cases, range emptiness, budgets as projections"
+  },
+  {
+   "id": "P5",
+   "name": "Engineering quality / invariants",
+   "exit": "TEST-1, TEST-2, collection-cause classification, vacuity three-valued, I-IX armed and uncontainable"
+  },
+  {
+   "id": "P6",
+   "name": "Orchestration integration / V1 migration",
+   "exit": "single authoritative path, generated migration table, six removal proofs"
+  },
+  {
+   "id": "P7",
+   "name": "Q0-Q3",
+   "exit": "all four rungs green on the exact candidate"
+  },
+  {
+   "id": "P8",
+   "name": "Q4 differential",
+   "exit": "100000/100000, 0 unexplained"
+  },
+  {
+   "id": "P9",
+   "name": "Q5 reproduction",
+   "exit": "reproduction green, tools re-executed"
+  },
+  {
+   "id": "P10",
+   "name": "LedgerLock regression",
+   "exit": "verdicts separate, no generalization claim, no cohort sealed"
+  }
+ ],
+ "work_packages": [
+  {
+   "id": "WP-0.1",
+   "phase": "P0",
+   "objective": "Freeze manifest: make the approved architecture baseline mechanically identifiable.",
+   "rfc_sections": [
+    "status header",
+    "Normative freeze table"
+   ],
+   "frozen_items": [
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F11"
+   ],
+   "v1_defect_families": [],
+   "files_expected": [
+    "validation/v2/freeze_manifest.py",
+    "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json"
+   ],
+   "dependencies": [],
+   "implementation_tasks": [
+    "Recompute rfc_normative_digest and the freeze-table digest from the RFC at HEAD.",
+    "Verify both equal the values in AISEF-V2-RFC-APPROVAL.json.",
+    "Emit a freeze manifest listing F1-F11 with the RFC anchor of each.",
+    "Wire as a CI check that fails on any drift."
+   ],
+   "positive_tests": [
+    "digests recomputed from HEAD equal the approval record",
+    "freeze manifest lists exactly 11 items"
+   ],
+   "adversarial_tests": [
+    "a one-byte edit inside the normative body fails the check",
+    "a status-header edit does NOT fail the check",
+    "a freeze-table row edit fails the check"
+   ],
+   "mutation_targets": [
+    "validation/v2/freeze_manifest.py::normative_digest"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json",
+   "exit_criteria": [
+    "CI fails on normative drift",
+    "CI passes on non-normative preamble edits"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-0.2",
+   "phase": "P0",
+   "objective": "Generated architecture constants/enums catalog with a --check twin.",
+   "rfc_sections": [
+    "4",
+    "10",
+    "10.1",
+    "11",
+    "13",
+    "15.0",
+    "22",
+    "23"
+   ],
+   "frozen_items": [
+    "F2",
+    "F3",
+    "F6",
+    "F7"
+   ],
+   "v1_defect_families": [
+    "FAM-PROSE"
+   ],
+   "files_expected": [
+    "aisef2/arch/enums.py",
+    "validation/v2/gen_arch_catalog.py",
+    "docs/implementation/v2/arch-catalog.md"
+   ],
+   "dependencies": [
+    "WP-0.1"
+   ],
+   "implementation_tasks": [
+    "Generate a catalog of every frozen enum and its members from the source of truth.",
+    "Emit --check mode diffing the committed catalog byte-for-byte.",
+    "Fail closed in BOTH directions: a member present in code but absent from the catalog, and a catalog member no longer in code."
+   ],
+   "positive_tests": [
+    "catalog regenerates byte-identically"
+   ],
+   "adversarial_tests": [
+    "adding an enum member without regenerating fails --check",
+    "removing a member still listed in the catalog fails --check"
+   ],
+   "mutation_targets": [],
+   "fault_injection_targets": [],
+   "evidence_artifact": "docs/implementation/v2/arch-catalog.md + CI --check",
+   "exit_criteria": [
+    "--check green",
+    "bidirectional failure demonstrated in tests"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-0.3",
+   "phase": "P0",
+   "objective": "F1-F11 conformance checks: each frozen item has a mechanical check.",
+   "rfc_sections": [
+    "Normative freeze table"
+   ],
+   "frozen_items": [
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F11"
+   ],
+   "v1_defect_families": [],
+   "files_expected": [
+    "tests/v2/conformance/test_freeze_f1_f11.py",
+    "validation/v2/freeze_conformance.py"
+   ],
+   "dependencies": [
+    "WP-0.1",
+    "WP-0.2"
+   ],
+   "implementation_tasks": [
+    "One check per F item asserting the frozen shape exists with exactly the specified members/fields.",
+    "F items not yet implemented assert PENDING against the manifest, never silently pass."
+   ],
+   "positive_tests": [
+    "all 11 items reported, none silently skipped"
+   ],
+   "adversarial_tests": [
+    "a renamed enum member fails its F check",
+    "an added Owner member fails F3"
+   ],
+   "mutation_targets": [],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/F-CONFORMANCE.json",
+   "exit_criteria": [
+    "11/11 items report a definite state",
+    "no check can pass by absence"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-0.4",
+   "phase": "P0",
+   "objective": "Migration guard protecting V1 frozen evidence.",
+   "rfc_sections": [
+    "31",
+    "34"
+   ],
+   "frozen_items": [],
+   "v1_defect_families": [
+    "FAM-RELEASE",
+    "FAM-IDENTITY"
+   ],
+   "files_expected": [
+    "validation/v2/v1_evidence_guard.py",
+    ".githooks/pre-commit (extend)"
+   ],
+   "dependencies": [
+    "WP-0.1"
+   ],
+   "implementation_tasks": [
+    "Record sha256 of every file under closure-evidence/ excluding closure-evidence/v2/.",
+    "Fail any commit or run that would modify one.",
+    "Explicitly protect the voided W0 record and external-validation directories."
+   ],
+   "positive_tests": [
+    "baseline manifest of V1 evidence hashes recorded"
+   ],
+   "adversarial_tests": [
+    "a simulated edit to closure-evidence/hardening/*.json is rejected",
+    "the voided W0 record cannot be rewritten"
+   ],
+   "mutation_targets": [],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/V1-EVIDENCE-BASELINE.json",
+   "exit_criteria": [
+    "guard rejects every V1 evidence mutation",
+    "guard permits writes under closure-evidence/v2/"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-0.5",
+   "phase": "P0",
+   "objective": "Known-bad fixtures calibrating every Q0 checker.",
+   "rfc_sections": [
+    "27 (Q0)",
+    "9.1"
+   ],
+   "frozen_items": [
+    "F5"
+   ],
+   "v1_defect_families": [
+    "FAM-QUALIFICATION"
+   ],
+   "files_expected": [
+    "tests/v2/fixtures/known_bad/",
+    "validation/v2/checker_calibration.py"
+   ],
+   "dependencies": [
+    "WP-0.3"
+   ],
+   "implementation_tasks": [
+    "For each Q0 checker commit a fixture it MUST reject.",
+    "Assert each checker fails on its fixture and passes on the clean tree.",
+    "A checker whose fixture no longer fails it is itself a Q0 failure."
+   ],
+   "positive_tests": [
+    "every Q0 checker has >=1 committed known-bad fixture"
+   ],
+   "adversarial_tests": [
+    "a checker that always passes is rejected by its calibration"
+   ],
+   "mutation_targets": [
+    "validation/v2/*checker* entrypoints"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json",
+   "exit_criteria": [
+    "100% of Q0 checkers calibrated",
+    "calibration drift fails CI"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-1.1",
+   "phase": "P1",
+   "objective": "BehaviorContract, SubjectAbsence, ContractApproval.",
+   "rfc_sections": [
+    "6",
+    "7"
+   ],
+   "frozen_items": [
+    "F4"
+   ],
+   "v1_defect_families": [
+    "FAM-PROOF-PLACEMENT",
+    "FAM-PROSE"
+   ],
+   "files_expected": [
+    "aisef2/product/contract.py",
+    "aisef2/product/approval.py"
+   ],
+   "dependencies": [
+    "WP-0.3"
+   ],
+   "implementation_tasks": [
+    "Frozen dataclasses for Subject, Polarity, SubjectAbsence, BehaviorContract, ContractApproval.",
+    "contract_hash binds subject_absence.",
+    "Reject compiling a spec from a contract without a valid approval binding both hashes.",
+    "Static check: no kernel module reads Requirement.text / rationale / ownership_rationale."
+   ],
+   "positive_tests": [
+    "contract_hash stable across serialisation round-trips",
+    "approval binds requirement_hash and contract_hash"
+   ],
+   "adversarial_tests": [
+    "editing rationale alone changes contract_hash (bound) and is detected",
+    "an unapproved contract cannot be compiled",
+    "a contract naming a test file is rejected"
+   ],
+   "mutation_targets": [
+    "aisef2/product/contract.py::contract_hash"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P1-CONTRACT-SHAPES.json",
+   "exit_criteria": [
+    "hashes stable and total",
+    "no-prose-control static check green"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-1.2",
+   "phase": "P1",
+   "objective": "ProductProofSpec, the pure contract->spec compiler, semantic_hash, --check round-trip.",
+   "rfc_sections": [
+    "8",
+    "35"
+   ],
+   "frozen_items": [
+    "F4",
+    "F9"
+   ],
+   "v1_defect_families": [
+    "FAM-IDENTITY",
+    "FAM-EVIDENCE-SEMANTICS"
+   ],
+   "files_expected": [
+    "aisef2/product/spec.py",
+    "aisef2/product/compiler.py",
+    "validation/v2/gen_specs.py"
+   ],
+   "dependencies": [
+    "WP-1.1"
+   ],
+   "implementation_tasks": [
+    "Pure compile: ProductProofSpec = f(approved BehaviorContract).",
+    "semantic_hash binds contract semantics + subject_absence + probe identity + probe_digest + input + candidate_expectation.",
+    "--check mode diffing committed specs against a fresh derivation.",
+    "Assert the spec type cannot hold a story id, plan id or parent expectation."
+   ],
+   "positive_tests": [
+    "compile is deterministic across runs and processes",
+    "--check round-trip byte-identical"
+   ],
+   "adversarial_tests": [
+    "a contract edit that leaves the spec unchanged is impossible (hash binds it)",
+    "attempting to set a story field on a spec is a type error",
+    "a drifted committed spec fails --check"
+   ],
+   "mutation_targets": [
+    "aisef2/product/compiler.py::compile_spec",
+    "aisef2/product/spec.py::semantic_hash"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P1-SPEC-COMPILER.json",
+   "exit_criteria": [
+    "--check green",
+    "hash stability proven across processes",
+    "plane separation type-enforced"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-1.3",
+   "phase": "P1",
+   "objective": "Two-axis outcomes and the ContractSatisfaction derivation.",
+   "rfc_sections": [
+    "10",
+    "10.1",
+    "10.2"
+   ],
+   "frozen_items": [
+    "F2"
+   ],
+   "v1_defect_families": [
+    "FAM-OUTCOME",
+    "FAM-TYPED-OUTCOMES",
+    "FAM-PROOF-PLACEMENT"
+   ],
+   "files_expected": [
+    "aisef2/product/outcome.py"
+   ],
+   "dependencies": [
+    "WP-1.2"
+   ],
+   "implementation_tasks": [
+    "ProbeExecutionStatus / BehaviorVerdict with the verdict only constructible inside the EXECUTED variant.",
+    "contract_satisfaction() as a pure derivation; never a stored field.",
+    "INDETERMINATE carries a required typed reason.",
+    "Raise InvariantError if satisfaction is requested for a non-EXECUTED result."
+   ],
+   "positive_tests": [
+    "satisfaction == (verdict == candidate_expectation) for all determinate pairs",
+    "six legal states enumerated and exhaustive"
+   ],
+   "adversarial_tests": [
+    "NEG-1 MUST_NOT_HOLD violated at parent -> UNSATISFIED (never PRE_SATISFIED)",
+    "NEG-2 MUST_NOT_HOLD absent + ABSENCE_IS_DECIDABLE -> SATISFIED",
+    "NEG-3 MUST_NOT_HOLD + REQUIRES_SUBJECT + subject absent -> INDETERMINATE(PRECONDITION_ABSENT)",
+    "constructing a verdict without EXECUTED is impossible",
+    "satisfaction on UNRUNNABLE raises"
+   ],
+   "mutation_targets": [
+    "aisef2/product/outcome.py::contract_satisfaction"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P1-OUTCOME-POLARITY.json",
+   "exit_criteria": [
+    "NEG-1/2/3 green",
+    "mutation of the satisfaction mapping fully killed",
+    "static check: no planning module imports BehaviorVerdict for routing"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-1.4",
+   "phase": "P1",
+   "objective": "Owner taxonomy and the frozen routing tables.",
+   "rfc_sections": [
+    "22",
+    "10"
+   ],
+   "frozen_items": [
+    "F2",
+    "F3"
+   ],
+   "v1_defect_families": [
+    "FAM-RETRY",
+    "FAM-BUDGET",
+    "FAM-OUTCOME"
+   ],
+   "files_expected": [
+    "aisef2/control/owner.py",
+    "aisef2/control/routing.py"
+   ],
+   "dependencies": [
+    "WP-1.3"
+   ],
+   "implementation_tasks": [
+    "Owner as a capped enum; adding a member requires a cited measured defect recorded in the catalog.",
+    "Routing table from (status, verdict, reason) -> (owner, retryable, budget).",
+    "Retryability is read only from the taxonomy; no call site decides it.",
+    "MISSING_CREDENTIAL vs INVALID_CREDENTIAL split, the latter non-retryable."
+   ],
+   "positive_tests": [
+    "every legal outcome state has exactly one routing row"
+   ],
+   "adversarial_tests": [
+    "REFUTED can never route to ENVIRONMENT",
+    "UNRUNNABLE can never route to DEVELOPER",
+    "an outcome with no routing row fails closed, never defaults to DEVELOPER",
+    "INVALID_CREDENTIAL is not retryable"
+   ],
+   "mutation_targets": [
+    "aisef2/control/routing.py::route"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P1-ROUTING-TABLE.json",
+   "exit_criteria": [
+    "routing total over the legal state space",
+    "no did-not-run -> developer edge exists"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-2.1",
+   "phase": "P2",
+   "objective": "Probe protocol and enforcement levels.",
+   "rfc_sections": [
+    "9",
+    "24"
+   ],
+   "frozen_items": [
+    "F5"
+   ],
+   "v1_defect_families": [
+    "FAM-TOOL",
+    "FAM-OUTCOME"
+   ],
+   "files_expected": [
+    "aisef2/probe/protocol.py",
+    "aisef2/probe/python_callable.py"
+   ],
+   "dependencies": [
+    "WP-1.3"
+   ],
+   "implementation_tasks": [
+    "Probe protocol with id, digest, enforcement(), harness_preconditions(), evaluate().",
+    "Observation-harness vs subject split enforced by the API shape.",
+    "One reference probe kind (python_callable) to exercise the protocol.",
+    "Refuse rather than degrade when enforcement is insufficient."
+   ],
+   "positive_tests": [
+    "probe digest stable and bound into the spec",
+    "enforcement level recorded on every result"
+   ],
+   "adversarial_tests": [
+    "missing interpreter/tool -> UNRUNNABLE (harness failure)",
+    "missing subject -> EXECUTED + REFUTED (observation), never UNRUNNABLE",
+    "a probe asked for an unsupported observation class refuses, never degrades",
+    "probe API rejects a developer-authored path"
+   ],
+   "mutation_targets": [
+    "aisef2/probe/protocol.py::classify_failure"
+   ],
+   "fault_injection_targets": [
+    "interpreter absent",
+    "tool absent",
+    "sandbox unavailable",
+    "probe timeout"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P2-PROBE-PROTOCOL.json",
+   "exit_criteria": [
+    "missing-subject vs missing-harness separation proven",
+    "enforcement bound into the result"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-2.2",
+   "phase": "P2",
+   "objective": "ProbeCapabilityCalibration and SpecFalsifiabilityEvidence.",
+   "rfc_sections": [
+    "9.1",
+    "9.1.1",
+    "9.1.2",
+    "27 (Q2)"
+   ],
+   "frozen_items": [
+    "F5"
+   ],
+   "v1_defect_families": [
+    "FAM-JUDGE",
+    "FAM-BENCH"
+   ],
+   "files_expected": [
+    "aisef2/probe/calibration.py",
+    "tests/v2/fixtures/calibration/"
+   ],
+   "dependencies": [
+    "WP-2.1"
+   ],
+   "implementation_tasks": [
+    "Calibration must demonstrate CONTRAST to candidate_expectation, not a fixed verdict.",
+    "ProbeCapabilityCalibration over committed positive AND negative fixtures per observation class.",
+    "SpecFalsifiabilityEvidence interface; explicitly NOT a plan-freeze prerequisite."
+   ],
+   "positive_tests": [
+    "a correct probe passes calibration for its declared classes"
+   ],
+   "adversarial_tests": [
+    "CAL-1 a MUST_NOT_HOLD probe that always returns REFUTED is REJECTED",
+    "a probe that always returns SATISFIED is rejected for MUST_HOLD classes",
+    "CAL-2 no plan-freeze path requires SpecFalsifiabilityEvidence"
+   ],
+   "mutation_targets": [
+    "aisef2/probe/calibration.py::demonstrates_contrast"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P2-CALIBRATION.json",
+   "exit_criteria": [
+    "CAL-1 and CAL-2 green",
+    "contrast rule proven for both polarities"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-2.3",
+   "phase": "P2",
+   "objective": "PlanObligation, StaticPlanAdmissionEngine and StaticPlanAdmissionResult.",
+   "rfc_sections": [
+    "11",
+    "12"
+   ],
+   "frozen_items": [
+    "F6"
+   ],
+   "v1_defect_families": [
+    "FAM-PLAN-OWNERSHIP",
+    "FAM-APPROVAL",
+    "FAM-SCHEDULER"
+   ],
+   "files_expected": [
+    "aisef2/plan/obligation.py",
+    "aisef2/plan/static_admission.py"
+   ],
+   "dependencies": [
+    "WP-2.2"
+   ],
+   "implementation_tasks": [
+    "PlanObligation with ObligationRole and ParentExpectation as a contract-satisfaction expectation.",
+    "Engine implementing the nine static checks; executes NO probes.",
+    "Engine and Result as distinct types; the engine never runs a project's admission in Q0/Q1.",
+    "Check 9 requires ProbeCapabilityCalibration only."
+   ],
+   "positive_tests": [
+    "a well-formed plan is admitted",
+    "result digest stable"
+   ],
+   "adversarial_tests": [
+    "duplicate INTRODUCE ownership for one spec is rejected",
+    "a cyclic dependency DAG is rejected",
+    "a probe whose digest does not match is rejected (scenario D, statically)",
+    "the engine never invents a future story parent SHA",
+    "requiring SpecFalsifiabilityEvidence here would fail CAL-2 and is asserted absent"
+   ],
+   "mutation_targets": [
+    "aisef2/plan/static_admission.py::admit"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P2-STATIC-ADMISSION.json",
+   "exit_criteria": [
+    "9/9 checks implemented",
+    "no probe executes in the engine",
+    "CAL-2 asserted by test"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-2.4",
+   "phase": "P2",
+   "objective": "StoryAdmission and its disposition set.",
+   "rfc_sections": [
+    "13"
+   ],
+   "frozen_items": [
+    "F7"
+   ],
+   "v1_defect_families": [
+    "FAM-PLAN-OWNERSHIP",
+    "FAM-OUTCOME"
+   ],
+   "files_expected": [
+    "aisef2/plan/story_admission.py"
+   ],
+   "dependencies": [
+    "WP-2.3"
+   ],
+   "implementation_tasks": [
+    "Run each obligation's probe at the exact frozen parent SHA (full, never abbreviated).",
+    "Route strictly on ContractSatisfaction.",
+    "Implement the full disposition table incl. typed INDETERMINATE routing.",
+    "A bare INDETERMINATE with no declared routing is PROBE_INVALID, never a developer outcome."
+   ],
+   "positive_tests": [
+    "each row of the RFC disposition table reproduced"
+   ],
+   "adversarial_tests": [
+    "an abbreviated parent SHA is refused",
+    "probe UNRUNNABLE -> PROBE_UNRUNNABLE / ENVIRONMENT",
+    "INVALID_SPEC -> PROBE_INVALID / PLAN|INTEGRATION",
+    "PRESERVE measured UNSATISFIED -> PRECONDITION_BROKEN",
+    "no provider/request may be emitted before story admission (ordering assertion on the event sink)"
+   ],
+   "mutation_targets": [
+    "aisef2/plan/story_admission.py::classify"
+   ],
+   "fault_injection_targets": [
+    "probe unrunnable",
+    "parent checkout failure"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P2-STORY-ADMISSION.json",
+   "exit_criteria": [
+    "disposition table total",
+    "ordering assertion green against the in-memory sink"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-2.5",
+   "phase": "P2",
+   "objective": "PRE_SATISFIED and PLAN_DRIFT semantics.",
+   "rfc_sections": [
+    "14",
+    "29"
+   ],
+   "frozen_items": [
+    "F7"
+   ],
+   "v1_defect_families": [
+    "FAM-PLAN-OWNERSHIP"
+   ],
+   "files_expected": [
+    "aisef2/plan/drift.py"
+   ],
+   "dependencies": [
+    "WP-2.4"
+   ],
+   "implementation_tasks": [
+    "PRE_SATISFIED consumes no developer budget and never requires correct code to be made wrong.",
+    "PLAN_DRIFT attributed through the dependency DAG, else UNATTRIBUTED.",
+    "STORY_ALREADY_SATISFIED still requires independent verification of every obligation."
+   ],
+   "positive_tests": [
+    "a partially pre-satisfied story continues on the remainder"
+   ],
+   "adversarial_tests": [
+    "upstream story implements downstream behaviour early -> PRE_SATISFIED + PLAN_DRIFT (scenario A)",
+    "fully pre-satisfied story -> STORY_ALREADY_SATISFIED, developer call skipped (scenario K)",
+    "PRE_SATISFIED charges no developer budget",
+    "verification is NOT skipped for a fully pre-satisfied story"
+   ],
+   "mutation_targets": [
+    "aisef2/plan/drift.py::attribute"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P2-PLAN-DRIFT.json",
+   "exit_criteria": [
+    "scenarios A and K green",
+    "no developer budget consumed on any PRE_SATISFIED path"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-3.1",
+   "phase": "P3",
+   "objective": "Event envelope and append-only writer.",
+   "rfc_sections": [
+    "20",
+    "20.1"
+   ],
+   "frozen_items": [
+    "F1"
+   ],
+   "v1_defect_families": [
+    "FAM-RELEASE",
+    "FAM-IDENTITY",
+    "FAM-EVIDENCE-SEMANTICS"
+   ],
+   "files_expected": [
+    "aisef2/journal/event.py",
+    "aisef2/journal/writer.py"
+   ],
+   "dependencies": [
+    "WP-1.4"
+   ],
+   "implementation_tasks": [
+    "Event envelope with dense seq == index enforced at assignment, admission, append and decode.",
+    "Append-site validation: JSON-lossless payload, typed payload enums.",
+    "No update and no delete verb on the store API.",
+    "Synchronous fsync at decision boundaries."
+   ],
+   "positive_tests": [
+    "seq == index holds across a long append sequence",
+    "append-site validation rejects a non-lossless payload"
+   ],
+   "adversarial_tests": [
+    "a seq gap on decode is rejected",
+    "the writer API exposes no update/delete (asserted by introspection)",
+    "a payload with an unknown enum member is rejected at append"
+   ],
+   "mutation_targets": [
+    "aisef2/journal/writer.py::append",
+    "aisef2/journal/event.py::validate"
+   ],
+   "fault_injection_targets": [
+    "disk full on append",
+    "fsync failure"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P3-JOURNAL-WRITER.json",
+   "exit_criteria": [
+    "four-layer seq enforcement proven",
+    "no mutation verb exists"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-3.2",
+   "phase": "P3",
+   "objective": "Format compatibility: unknown-required refusal and ignorable events.",
+   "rfc_sections": [
+    "20",
+    "35"
+   ],
+   "frozen_items": [
+    "F1"
+   ],
+   "v1_defect_families": [
+    "FAM-RELEASE"
+   ],
+   "files_expected": [
+    "aisef2/journal/compat.py"
+   ],
+   "dependencies": [
+    "WP-3.1"
+   ],
+   "implementation_tasks": [
+    "A reader meeting an unknown event type WITHOUT ignorable refuses to reconstruct.",
+    "An unknown type WITH ignorable is skipped.",
+    "Format version bump is a writer-side obligation."
+   ],
+   "positive_tests": [
+    "a known log reconstructs"
+   ],
+   "adversarial_tests": [
+    "unknown required type -> refuse to reconstruct (never partial)",
+    "unknown ignorable type -> skipped and reconstruction proceeds",
+    "a newer log read by an older reader cannot produce a silent wrong state"
+   ],
+   "mutation_targets": [
+    "aisef2/journal/compat.py::reconstruct"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P3-FORMAT-COMPAT.json",
+   "exit_criteria": [
+    "refusal proven for unknown-required",
+    "skip proven for ignorable"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-3.3",
+   "phase": "P3",
+   "objective": "Pure-fold projection engine and the from-scratch oracle.",
+   "rfc_sections": [
+    "21"
+   ],
+   "frozen_items": [
+    "F11"
+   ],
+   "v1_defect_families": [
+    "FAM-RECOVERY",
+    "FAM-QUALIFICATION-MEASUREMENT"
+   ],
+   "files_expected": [
+    "aisef2/journal/fold.py",
+    "tests/v2/test_fold_oracle.py"
+   ],
+   "dependencies": [
+    "WP-3.1"
+   ],
+   "implementation_tasks": [
+    "Projection as a pure function of a journal prefix.",
+    "Caches disclaimed: possibly stale (seq says how stale) but never wrong; version mismatch discards.",
+    "From-scratch oracle: incremental state == fold(prefix) at every decision point.",
+    "Static check: no projection module reads Event.time."
+   ],
+   "positive_tests": [
+    "oracle green over generated journals"
+   ],
+   "adversarial_tests": [
+    "a stale cache is never treated as authority",
+    "a version-mismatched cache row is discarded, not migrated",
+    "a projection reading time fails the static check"
+   ],
+   "mutation_targets": [
+    "aisef2/journal/fold.py::fold"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P3-FOLD-ORACLE.json",
+   "exit_criteria": [
+    "incremental == full on every generated journal",
+    "time-not-read check green"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-3.4",
+   "phase": "P3",
+   "objective": "The six control-critical projections.",
+   "rfc_sections": [
+    "21",
+    "29"
+   ],
+   "frozen_items": [
+    "F11"
+   ],
+   "v1_defect_families": [
+    "FAM-BUDGET",
+    "FAM-QUALIFICATION-MEASUREMENT",
+    "FAM-RETRY"
+   ],
+   "files_expected": [
+    "aisef2/journal/projections/"
+   ],
+   "dependencies": [
+    "WP-3.3"
+   ],
+   "implementation_tasks": [
+    "story state, failure owner, budgets, retry target, terminal state, qualification counters.",
+    "Qualification counters include the three PlanQualityPolicy metrics.",
+    "Gate accepts only this closed enum of projection ids."
+   ],
+   "positive_tests": [
+    "each projection folds correctly over reference journals"
+   ],
+   "adversarial_tests": [
+    "a seventh projection cannot be cited by a gate",
+    "budgets derived from the journal cannot disagree with it (no side counter exists)"
+   ],
+   "mutation_targets": [
+    "each of aisef2/journal/projections/*.py"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P3-CONTROL-PROJECTIONS.json",
+   "exit_criteria": [
+    "6/6 implemented",
+    "closed-list enforcement proven",
+    "mutation fully killed"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-3.5",
+   "phase": "P3",
+   "objective": "Independent reference models for the six control-critical projections.",
+   "rfc_sections": [
+    "21",
+    "27 (Q1)"
+   ],
+   "frozen_items": [
+    "F11"
+   ],
+   "v1_defect_families": [
+    "FAM-QUALIFICATION",
+    "FAM-QUALIFICATION-MEASUREMENT"
+   ],
+   "files_expected": [
+    "tests/v2/refmodel/"
+   ],
+   "dependencies": [
+    "WP-3.4"
+   ],
+   "implementation_tasks": [
+    "Implement each reference model from the RFC text, NOT from the projection source.",
+    "Mechanically bar importing aisef2.journal.projections (AST check, as V1 did for the policy model).",
+    "Calibrate each: observed producing the opposite answer on a known input.",
+    "AUTHORSHIP CONSTRAINT: must not be authored in the same work session as WP-3.4."
+   ],
+   "positive_tests": [
+    "reference model and projection agree on reference journals"
+   ],
+   "adversarial_tests": [
+    "the AST check fails if a reference model imports the projection",
+    "an uncalibrated reference model is rejected",
+    "an injected projection defect is caught by the reference model"
+   ],
+   "mutation_targets": [
+    "tests/v2/refmodel/*"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P3-REFERENCE-MODELS.json",
+   "exit_criteria": [
+    "6/6 reference models, all calibrated",
+    "no-import constraint mechanically enforced"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-4.1",
+   "phase": "P4",
+   "objective": "StoryScope with ordered resource ownership.",
+   "rfc_sections": [
+    "17",
+    "17.1",
+    "18"
+   ],
+   "frozen_items": [
+    "F8"
+   ],
+   "v1_defect_families": [
+    "FAM-PROCESS",
+    "FAM-OWNERSHIP"
+   ],
+   "files_expected": [
+    "aisef2/runtime/story_scope.py"
+   ],
+   "dependencies": [
+    "WP-3.4"
+   ],
+   "implementation_tasks": [
+    "Explicit ordered resource stack; reverse-order disposal, each awaited.",
+    "Acquisition while disposing refused (INACTIVE_ACQUIRE).",
+    "Disposal failures emitted as typed events, never swallowed.",
+    "StoryScope owns no journal writer."
+   ],
+   "positive_tests": [
+    "ordered acquire/dispose round-trip"
+   ],
+   "adversarial_tests": [
+    "acquisition during dispose is rejected",
+    "a disposal failure is recorded and can fail DISPOSE",
+    "sibling disposal order is deterministic, not concurrency-dependent",
+    "StoryScope cannot construct a JournalWriter (type/API assertion)"
+   ],
+   "mutation_targets": [
+    "aisef2/runtime/story_scope.py::dispose"
+   ],
+   "fault_injection_targets": [
+    "disposer raises",
+    "disposer hangs"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P4-STORY-SCOPE.json",
+   "exit_criteria": [
+    "ordering deterministic",
+    "no swallowed disposal failure"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-4.2",
+   "phase": "P4",
+   "objective": "Measured process-range emptiness (Linux, macOS, Windows).",
+   "rfc_sections": [
+    "17.1"
+   ],
+   "frozen_items": [
+    "F8"
+   ],
+   "v1_defect_families": [
+    "FAM-PROCESS"
+   ],
+   "files_expected": [
+    "aisef2/runtime/process_range.py"
+   ],
+   "dependencies": [
+    "WP-4.1"
+   ],
+   "implementation_tasks": [
+    "Range ownership, not direct-child handles.",
+    "Emptiness measured: kill(pid,0)/ESRCH on POSIX; Job object emptiness on Windows.",
+    "Graceful-first ladder: cooperative -> grace -> SIGTERM -> grace -> SIGKILL -> unbounded wait.",
+    "Worktree removal blocked until the range is provably empty."
+   ],
+   "positive_tests": [
+    "a normal child tree is reaped and proven empty"
+   ],
+   "adversarial_tests": [
+    "a grandchild holding a write prevents worktree deletion (D-024 reproducer)",
+    "a setsid-escaped child is detected and reported as a residual",
+    "SIGKILL-resistant range blocks rather than timing out silently",
+    "Windows path exercised in CI"
+   ],
+   "mutation_targets": [
+    "aisef2/runtime/process_range.py::wait_empty"
+   ],
+   "fault_injection_targets": [
+    "orphan grandchild",
+    "unresponsive child",
+    "platform without a range owner"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P4-RANGE-EMPTINESS.json",
+   "exit_criteria": [
+    "OS-asserted emptiness on Linux and Windows CI",
+    "D-024 reproducer red before / green after"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-4.3",
+   "phase": "P4",
+   "objective": "RunScope, run lease as outer boundary, RunTerminationSentinel.",
+   "rfc_sections": [
+    "18",
+    "18.1",
+    "19"
+   ],
+   "frozen_items": [
+    "F8"
+   ],
+   "v1_defect_families": [
+    "FAM-RECOVERY",
+    "FAM-IDENTITY"
+   ],
+   "files_expected": [
+    "aisef2/runtime/run_scope.py",
+    "aisef2/runtime/sentinel.py"
+   ],
+   "dependencies": [
+    "WP-4.1"
+   ],
+   "implementation_tasks": [
+    "Begin order: lease -> OPEN sentinel (fsync) -> JournalWriter -> RunSpec -> execution.",
+    "Shutdown: all StoryScopes disposed -> run/dispose-begin -> run/end -> writer closes -> CLEAN -> lease released LAST.",
+    "Writer-close failure or unrecordable CLEAN leaves the sentinel OPEN.",
+    "Next-run preflight reports OPEN-without-CLEAN as TORN.",
+    "No gate may cite the sentinel."
+   ],
+   "positive_tests": [
+    "clean run produces CLEAN and releases the lease last"
+   ],
+   "adversarial_tests": [
+    "RUN-1 crash after durable run/end but before CLEAN -> sentinel OPEN -> next run reports TORN",
+    "RUN-2 second run blocked while the first holds its lease, even with run/end present",
+    "writer-close failure leaves OPEN",
+    "CLEAN write failure leaves OPEN",
+    "a gate citing the sentinel fails a static check"
+   ],
+   "mutation_targets": [
+    "aisef2/runtime/run_scope.py::shutdown",
+    "aisef2/runtime/sentinel.py::mark_clean"
+   ],
+   "fault_injection_targets": [
+    "kill -9 between run/end and CLEAN",
+    "read-only sentinel directory",
+    "lease holder alive"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P4-RUN-LIFETIME.json",
+   "exit_criteria": [
+    "RUN-1 and RUN-2 green",
+    "lease released last proven by ordering assertion"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-4.4",
+   "phase": "P4",
+   "objective": "RunSpec and capability identity grades.",
+   "rfc_sections": [
+    "23",
+    "24"
+   ],
+   "frozen_items": [
+    "F9"
+   ],
+   "v1_defect_families": [
+    "FAM-IDENTITY",
+    "FAM-TOOL"
+   ],
+   "files_expected": [
+    "aisef2/runtime/runspec.py",
+    "aisef2/runtime/capability.py"
+   ],
+   "dependencies": [
+    "WP-4.3"
+   ],
+   "implementation_tasks": [
+    "CapabilityIdentity with VERIFIED / ATTESTED / OPAQUE and the per-grade binding tuple.",
+    "runspec_hash binds every capability tuple, grade and enforcement level.",
+    "aggregate_min_grade computed; OPAQUE barred from Q6 and sealed cohorts.",
+    "Sandbox image digest and probe digest bound (SS-65)."
+   ],
+   "positive_tests": [
+    "runspec_hash stable and total over the capability set"
+   ],
+   "adversarial_tests": [
+    "scenario H: provider implementation changes with an unchanged version string -> detected for VERIFIED, graded ATTESTED otherwise",
+    "an OPAQUE capability blocks Q6 eligibility",
+    "two runs differing only in enforcement level are not comparable",
+    "a version label alone cannot satisfy VERIFIED"
+   ],
+   "mutation_targets": [
+    "aisef2/runtime/runspec.py::runspec_hash"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P4-RUNSPEC-IDENTITY.json",
+   "exit_criteria": [
+    "grades implemented and bound",
+    "OPAQUE Q6 bar enforced mechanically"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-4.5",
+   "phase": "P4",
+   "objective": "Typed retry budgets as projections.",
+   "rfc_sections": [
+    "22",
+    "21"
+   ],
+   "frozen_items": [
+    "F3",
+    "F11"
+   ],
+   "v1_defect_families": [
+    "FAM-RETRY",
+    "FAM-BUDGET"
+   ],
+   "files_expected": [
+    "aisef2/control/budget.py"
+   ],
+   "dependencies": [
+    "WP-3.4",
+    "WP-4.3"
+   ],
+   "implementation_tasks": [
+    "Budgets read only from the journal projection; no side counters anywhere.",
+    "Retry engine reads only owner and retryable.",
+    "Static check: no module maintains a retry counter outside the projection."
+   ],
+   "positive_tests": [
+    "budget spend equals the journal-derived value in all cases"
+   ],
+   "adversarial_tests": [
+    "SS-64 reproducer: a cap reached inside a retried stage cannot fall through to another stage",
+    "D-006 reproducer: credential rejection is not charged to the developer quality budget",
+    "an environment failure never decrements the developer budget",
+    "the side-counter static check fails on an injected counter"
+   ],
+   "mutation_targets": [
+    "aisef2/control/budget.py::charge"
+   ],
+   "fault_injection_targets": [
+    "provider 429 mid-stage",
+    "tool timeout",
+    "reviewer environment failure"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P4-BUDGETS.json",
+   "exit_criteria": [
+    "no side counter exists",
+    "SS-64 and D-006 reproducers green"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-4.6",
+   "phase": "P4",
+   "objective": "Deterministic disposal and interruption closers.",
+   "rfc_sections": [
+    "17.1",
+    "20.2"
+   ],
+   "frozen_items": [
+    "F1",
+    "F8"
+   ],
+   "v1_defect_families": [
+    "FAM-RECOVERY",
+    "FAM-PROCESS"
+   ],
+   "files_expected": [
+    "aisef2/runtime/repair.py"
+   ],
+   "dependencies": [
+    "WP-4.3",
+    "WP-3.2"
+   ],
+   "implementation_tasks": [
+    "Synthetic closers distinguishing OUTCOME_UNKNOWN from NOT_STARTED.",
+    "Closer timestamps reuse the last real event's time -> idempotent repair.",
+    "Every synthetic event marked synthetic.",
+    "Bounded escalating shutdown; a second interrupt abandons AND records that it abandoned."
+   ],
+   "positive_tests": [
+    "repairing the same journal twice is byte-identical"
+   ],
+   "adversarial_tests": [
+    "interrupt mid-tool -> OUTCOME_UNKNOWN, never a gap",
+    "interrupt before dispatch -> NOT_STARTED",
+    "a synthetic closer can never be mistaken for a measurement",
+    "second interrupt during disposal records abandonment"
+   ],
+   "mutation_targets": [
+    "aisef2/runtime/repair.py::closers"
+   ],
+   "fault_injection_targets": [
+    "SIGINT mid-story",
+    "SIGKILL mid-story",
+    "double interrupt"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P4-INTERRUPTION.json",
+   "exit_criteria": [
+    "repair idempotent byte-for-byte",
+    "no interruption leaves an unexplained gap"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-5.1",
+   "phase": "P5",
+   "objective": "Typed TestExecution, TestOutcome, TestSelection.",
+   "rfc_sections": [
+    "15.0"
+   ],
+   "frozen_items": [
+    "F3"
+   ],
+   "v1_defect_families": [
+    "FAM-OUTCOME",
+    "FAM-TYPED-OUTCOMES",
+    "FAM-TOOL"
+   ],
+   "files_expected": [
+    "aisef2/quality/test_execution.py"
+   ],
+   "dependencies": [
+    "WP-1.4"
+   ],
+   "implementation_tasks": [
+    "EXECUTED / UNRUNNABLE with outcome and selection defined only when EXECUTED.",
+    "Collection-cause classification: declared environment dependency -> ENVIRONMENT; project source tree -> DEVELOPER; undeterminable -> INTEGRATION.",
+    "Regression execution uses the identical rules."
+   ],
+   "positive_tests": [
+    "a passing suite yields EXECUTED/PASSED/STORY_TESTS_RAN"
+   ],
+   "adversarial_tests": [
+    "TEST-1 runner missing -> UNRUNNABLE / ENVIRONMENT, never DEVELOPER, never INADEQUATE, never INCOMPLETE",
+    "TEST-2 assertions fail -> EXECUTED/FAILED -> INADEQUATE / DEVELOPER",
+    "collection failure on a declared env dependency -> ENVIRONMENT (SS-81(A) shape)",
+    "collection failure on the project's own tree -> DEVELOPER",
+    "undeterminable collection cause -> INTEGRATION, never DEVELOPER",
+    "NO_STORY_TESTS_MATCHED -> DEVELOPER via the typed value, not prose"
+   ],
+   "mutation_targets": [
+    "aisef2/quality/test_execution.py::classify"
+   ],
+   "fault_injection_targets": [
+    "runner absent",
+    "import error from a third-party dep",
+    "import error from project source",
+    "empty selection"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P5-TEST-EXECUTION.json",
+   "exit_criteria": [
+    "TEST-1 and TEST-2 green",
+    "no did-not-run -> developer edge exists anywhere"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-5.2",
+   "phase": "P5",
+   "objective": "Relevance measurement.",
+   "rfc_sections": [
+    "15.2"
+   ],
+   "frozen_items": [
+    "F3"
+   ],
+   "v1_defect_families": [
+    "FAM-EVIDENCE-SEMANTICS"
+   ],
+   "files_expected": [
+    "aisef2/quality/relevance.py"
+   ],
+   "dependencies": [
+    "WP-5.1"
+   ],
+   "implementation_tasks": [
+    "RELEVANT when >=1 executed story-owned test intersects >=1 executable changed line of the story diff.",
+    "Branch intersection recorded as stronger evidence when instrumentable; never required.",
+    "Capability absent or PARTIAL -> UNMEASURABLE."
+   ],
+   "positive_tests": [
+    "a test touching the diff is RELEVANT"
+   ],
+   "adversarial_tests": [
+    "capability absence yields UNMEASURABLE, never IRRELEVANT",
+    "a change with no instrumentable branch is not penalised",
+    "a non-line-addressable artefact uses its capability-specific measurement or UNMEASURABLE"
+   ],
+   "mutation_targets": [
+    "aisef2/quality/relevance.py::measure"
+   ],
+   "fault_injection_targets": [
+    "coverage tool absent",
+    "coverage tool PARTIAL"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P5-RELEVANCE.json",
+   "exit_criteria": [
+    "UNMEASURABLE never collapses to IRRELEVANT",
+    "branch coverage not required universally"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-5.3",
+   "phase": "P5",
+   "objective": "Candidate-side vacuity control.",
+   "rfc_sections": [
+    "15.1"
+   ],
+   "frozen_items": [
+    "F3"
+   ],
+   "v1_defect_families": [
+    "FAM-EVIDENCE-SEMANTICS"
+   ],
+   "files_expected": [
+    "aisef2/quality/vacuity.py"
+   ],
+   "dependencies": [
+    "WP-5.1"
+   ],
+   "implementation_tasks": [
+    "Neutralise the story's own product hunks in a scratch copy of the candidate; keep test files intact.",
+    "NON_VACUOUS only when all four RFC conditions hold, with conditions 2-3 read from the typed values of WP-5.1.",
+    "Never executes anything at the parent revision."
+   ],
+   "positive_tests": [
+    "a real story test fails under neutralisation -> NON_VACUOUS"
+   ],
+   "adversarial_tests": [
+    "tests pass under neutralisation -> VACUOUS",
+    "collection/import/reconstruction/tool/environment failure -> INDETERMINATE, never NON_VACUOUS",
+    "no parent revision is checked out at any point (invariant IX assertion)"
+   ],
+   "mutation_targets": [
+    "aisef2/quality/vacuity.py::evaluate"
+   ],
+   "fault_injection_targets": [
+    "reconstruction failure",
+    "runner absent during neutralised run"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P5-VACUITY.json",
+   "exit_criteria": [
+    "three-valued result proven",
+    "IX assertion green"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-5.4",
+   "phase": "P5",
+   "objective": "EngineeringTestAdequacy assembly; tdd-chronology as evidence only.",
+   "rfc_sections": [
+    "15",
+    "15.3",
+    "31"
+   ],
+   "frozen_items": [
+    "F3"
+   ],
+   "v1_defect_families": [
+    "FAM-EVIDENCE-SEMANTICS",
+    "FAM-OUTCOME"
+   ],
+   "files_expected": [
+    "aisef2/quality/adequacy.py"
+   ],
+   "dependencies": [
+    "WP-5.2",
+    "WP-5.3"
+   ],
+   "implementation_tasks": [
+    "Two-axis result: execution axis, then outcome defined only when EXECUTED.",
+    "INADEQUATE may block under project policy; INCOMPLETE never blocks and is never charged to the developer.",
+    "UNRUNNABLE produces NO AdequacyOutcome and defers to environment retry.",
+    "process/tdd-chronology recorded, never blocking."
+   ],
+   "positive_tests": [
+    "an adequate story yields ADEQUATE"
+   ],
+   "adversarial_tests": [
+    "UNRUNNABLE mandatory execution is not reported as INCOMPLETE",
+    "INCOMPLETE never blocks and never charges the developer",
+    "tdd-chronology cannot block under any policy setting"
+   ],
+   "mutation_targets": [
+    "aisef2/quality/adequacy.py::assemble"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P5-ADEQUACY.json",
+   "exit_criteria": [
+    "outcome undefined when UNRUNNABLE",
+    "tdd-chronology non-blocking proven"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-5.5",
+   "phase": "P5",
+   "objective": "Invariants I-IX armed and uncontainable.",
+   "rfc_sections": [
+    "4"
+   ],
+   "frozen_items": [
+    "F10"
+   ],
+   "v1_defect_families": [
+    "FAM-OUTCOME",
+    "FAM-JUDGE",
+    "FAM-PROSE"
+   ],
+   "files_expected": [
+    "aisef2/invariants/",
+    "tests/v2/conftest.py"
+   ],
+   "dependencies": [
+    "WP-5.4",
+    "WP-3.4"
+   ],
+   "implementation_tasks": [
+    "Register I-IX with the enforcement mechanism named for each.",
+    "Arm in-process for EVERY test tier before anything else mounts.",
+    "InvariantError carries the owning module and is re-raised by every except boundary.",
+    "Extend the existing V1 invariants registry pattern (aisef/invariants.yaml + rendered-doc sync check)."
+   ],
+   "positive_tests": [
+    "all nine armed in every tier",
+    "registry renders in sync"
+   ],
+   "adversarial_tests": [
+    "an invariant violation escapes a try/except boundary (the required demonstration)",
+    "an invariant with no named mechanism fails registration",
+    "a declared-but-unenforced invariant is rejected"
+   ],
+   "mutation_targets": [
+    "aisef2/invariants/registry.py::arm"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P5-INVARIANTS.json",
+   "exit_criteria": [
+    "9/9 armed in every tier",
+    "escape-through-except demonstrated by test"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-6.1",
+   "phase": "P6",
+   "objective": "Generated V1 proof-mode migration table.",
+   "rfc_sections": [
+    "31"
+   ],
+   "frozen_items": [
+    "F6"
+   ],
+   "v1_defect_families": [
+    "FAM-PLAN-OWNERSHIP",
+    "FAM-PROOF-PLACEMENT"
+   ],
+   "files_expected": [
+    "validation/v2/gen_migration_table.py",
+    "docs/implementation/v2/v1-proofmode-migration.md"
+   ],
+   "dependencies": [
+    "WP-2.3"
+   ],
+   "implementation_tasks": [
+    "Generate CHANGE_REQUIRED / PRESERVE_REQUIRED / NEGATIVE_INVARIANT -> ObligationRole + Polarity + SubjectAbsence.",
+    "--check twin; never hand-written.",
+    "SubjectAbsence is NOT inferred: unmapped cases are reported for human declaration, never defaulted."
+   ],
+   "positive_tests": [
+    "table regenerates byte-identically"
+   ],
+   "adversarial_tests": [
+    "a hand edit to the table fails --check",
+    "an unmapped V1 mode is reported, never silently defaulted",
+    "SubjectAbsence is never inferred from polarity"
+   ],
+   "mutation_targets": [
+    "validation/v2/gen_migration_table.py::derive"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "docs/implementation/v2/v1-proofmode-migration.md + closure-evidence/v2/P6-MIGRATION-TABLE.json",
+   "exit_criteria": [
+    "--check green",
+    "zero silently-defaulted rows"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-6.2",
+   "phase": "P6",
+   "objective": "Wire P1-P5 into the orchestration path; single authoritative path.",
+   "rfc_sections": [
+    "5",
+    "26",
+    "32"
+   ],
+   "frozen_items": [
+    "F1",
+    "F2",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F11"
+   ],
+   "v1_defect_families": [
+    "FAM-JUDGE",
+    "FAM-SCHEDULER",
+    "FAM-IDENTITY"
+   ],
+   "files_expected": [
+    "aisef2/orchestrate/"
+   ],
+   "dependencies": [
+    "WP-6.1",
+    "WP-4.6",
+    "WP-5.5"
+   ],
+   "implementation_tasks": [
+    "Wire contract->spec->probe->admission->story->proof->verification->review->merge->post-merge->disposal.",
+    "Reviewer/security confinement derived from the scope, never a passable parameter.",
+    "Merge conflict -> INTEGRATION; post-merge re-proof incl. affected PRESERVE obligations.",
+    "Old behaviour only behind an explicit compatibility/migration seam."
+   ],
+   "positive_tests": [
+    "an end-to-end story completes through the real path"
+   ],
+   "adversarial_tests": [
+    "scenario L: same spec INTRODUCE in one plan and PRESERVE in another gives identical product verdicts",
+    "a merge conflict is never charged to DEVELOPER",
+    "post-merge regression is INTEGRATION",
+    "an omitted confinement parameter is impossible (derived from scope)"
+   ],
+   "mutation_targets": [
+    "aisef2/orchestrate/story_runner.py"
+   ],
+   "fault_injection_targets": [
+    "provider outage mid-story",
+    "merge conflict",
+    "reviewer environment failure"
+   ],
+   "evidence_artifact": "closure-evidence/v2/P6-ORCHESTRATION.json",
+   "exit_criteria": [
+    "end-to-end path green",
+    "no confinement parameter can be omitted"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "WP-6.3",
+   "phase": "P6",
+   "objective": "Old-path removal proofs.",
+   "rfc_sections": [
+    "31",
+    "32"
+   ],
+   "frozen_items": [
+    "F2",
+    "F6",
+    "F11"
+   ],
+   "v1_defect_families": [
+    "FAM-JUDGE",
+    "FAM-EVIDENCE-SEMANTICS",
+    "FAM-IDENTITY",
+    "FAM-BUDGET"
+   ],
+   "files_expected": [
+    "tests/v2/test_no_dual_authority.py",
+    "validation/v2/old_path_audit.py"
+   ],
+   "dependencies": [
+    "WP-6.2"
+   ],
+   "implementation_tasks": [
+    "Static and runtime proofs that no V1 authority survives."
+   ],
+   "positive_tests": [
+    "the audit enumerates every former authority and its disposition"
+   ],
+   "adversarial_tests": [
+    "no old gate remains authoritative",
+    "no developer test determines ProductProof",
+    "no parent-side developer test execution occurs",
+    "no latest-evidence selection remains (no recency-based choice)",
+    "no side retry counters exist",
+    "every control decision is journal-backed"
+   ],
+   "mutation_targets": [
+    "validation/v2/old_path_audit.py::audit"
+   ],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P6-OLD-PATH-REMOVAL.json",
+   "exit_criteria": [
+    "6/6 removal proofs green",
+    "audit fails closed on any unenumerated authority"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "QP-7",
+   "phase": "P7",
+   "objective": "Q0 -> Q3 on the cycle-1 candidate.",
+   "rfc_sections": [
+    "27"
+   ],
+   "frozen_items": [
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F11"
+   ],
+   "v1_defect_families": [],
+   "files_expected": [
+    "closure-evidence/v2/Q0-Q3/"
+   ],
+   "dependencies": [
+    "WP-6.3"
+   ],
+   "implementation_tasks": [
+    "Run Q0 static integrity, Q1 semantic conformance (incl. test-layout invariance and the six reference models), Q2 adequacy, Q3 fault injection.",
+    "Do not proceed to Q4 if any rung fails."
+   ],
+   "positive_tests": [
+    "Q0-Q3 all green on the exact candidate"
+   ],
+   "adversarial_tests": [
+    "a rung that cannot run reports UNRUNNABLE, never FAILED",
+    "test-layout invariance: permuted test layouts give identical product verdicts"
+   ],
+   "mutation_targets": [],
+   "fault_injection_targets": [
+    "the full fault matrix"
+   ],
+   "evidence_artifact": "closure-evidence/v2/Q0-Q3/SUMMARY.json",
+   "exit_criteria": [
+    "Q0-Q3 green",
+    "zero unaudited mutation survivors",
+    "every probe digest calibrated"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "QP-8",
+   "phase": "P8",
+   "objective": "Q4 fresh 100,000-trace differential on the exact candidate.",
+   "rfc_sections": [
+    "27"
+   ],
+   "frozen_items": [
+    "F1",
+    "F2",
+    "F11"
+   ],
+   "v1_defect_families": [],
+   "files_expected": [
+    "closure-evidence/v2/Q4/"
+   ],
+   "dependencies": [
+    "QP-7"
+   ],
+   "implementation_tasks": [
+    "Fresh 100k run from scratch on the exact candidate; reuse the V1 p12 harness pattern.",
+    "Ten chunks of 10,000; no overlap; none missing; one kernel digest."
+   ],
+   "positive_tests": [
+    "100000/100000 matched"
+   ],
+   "adversarial_tests": [
+    "0 unexplained divergences, 0 invariant violations, 0 exceptions, 0 silent skips"
+   ],
+   "mutation_targets": [],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/Q4/DIFFERENTIAL.json",
+   "exit_criteria": [
+    "exit criteria met exactly",
+    "any kernel change invalidates and requires a fresh run"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "QP-9",
+   "phase": "P9",
+   "objective": "Q5 real-execution reproduction.",
+   "rfc_sections": [
+    "27"
+   ],
+   "frozen_items": [
+    "F1",
+    "F9"
+   ],
+   "v1_defect_families": [],
+   "files_expected": [
+    "closure-evidence/v2/Q5/"
+   ],
+   "dependencies": [
+    "QP-8"
+   ],
+   "implementation_tasks": [
+    "Only the model stream replayed; tools re-executed and diffed; final workspace state compared.",
+    "Request-header class pinning with a bounded drift budget; assertConsumed.",
+    "Determinism by normalization, not a faked clock."
+   ],
+   "positive_tests": [
+    "reproduction green"
+   ],
+   "adversarial_tests": [
+    "a changed request that drives the same call count does not silently pass (bind by request hash)",
+    "a tool-behaviour regression appears as a diff, not a satisfied recording"
+   ],
+   "mutation_targets": [],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/Q5/REPRODUCTION.json",
+   "exit_criteria": [
+    "Q5 green",
+    "no recorded tool result is replayed"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  },
+  {
+   "id": "QP-10",
+   "phase": "P10",
+   "objective": "LedgerLock regression only.",
+   "rfc_sections": [
+    "28",
+    "30"
+   ],
+   "frozen_items": [],
+   "v1_defect_families": [],
+   "files_expected": [
+    "closure-evidence/v2/P10/"
+   ],
+   "dependencies": [
+    "QP-9"
+   ],
+   "implementation_tasks": [
+    "Run LedgerLock as a DEVELOPMENT / REGRESSION benchmark only.",
+    "Record delivery_verdict and plan_quality_verdict separately.",
+    "plan_quality_verdict = NOT_CLAIMED unless thresholds were preregistered.",
+    "Do NOT start a sealed cohort."
+   ],
+   "positive_tests": [
+    "regressions surfaced if present"
+   ],
+   "adversarial_tests": [
+    "the result cannot be cited as a generalization claim (asserted by the verdict recorder)",
+    "LedgerLock cannot be sealed (state machine rejects it)"
+   ],
+   "mutation_targets": [],
+   "fault_injection_targets": [],
+   "evidence_artifact": "closure-evidence/v2/P10/LEDGERLOCK-REGRESSION.json",
+   "exit_criteria": [
+    "verdicts emitted separately",
+    "no generalization claim recorded",
+    "no cohort sealed"
+   ],
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+  }
+ ],
+ "counts": {
+  "implementation_packages": 33,
+  "qualification_packages": 4,
+  "total": 37
+ },
+ "stop_rules": [
+  "F1-F11 appear internally contradictory in actual implementation",
+  "a required RFC state cannot be represented without adding semantics",
+  "an invariant cannot be mechanically enforced as specified",
+  "V1 frozen evidence would need mutation",
+  "a new P0/P1 architecture-level defect is found"
+ ],
+ "parallelism_rule": "Sequential by default for semantic/core phases. Parallel only when the frozen interfaces are already implemented, write scopes are disjoint, evidence scopes are disjoint, and no package depends on another package's unverified semantics. WP-3.5 additionally carries an authorship-independence constraint."
+}
