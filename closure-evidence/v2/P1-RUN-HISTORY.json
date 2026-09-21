@@ -1,0 +1,6 @@
+{
+ "record": "AISEF V2 — P1 RUN HISTORY",
+ "policy": "closure-evidence/v2/V2-RETRY-POLICY.json",
+ "rule": "append-only; every full-suite and CI attempt, failed or not; see validation/v2/run_history.py",
+ "entries": []
+}

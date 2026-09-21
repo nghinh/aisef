@@ -1192,7 +1192,9 @@
     "a grandchild holding a write prevents worktree deletion (D-024 reproducer)",
     "a setsid-escaped child is detected and reported as a residual",
     "SIGKILL-resistant range blocks rather than timing out silently",
-    "Windows path exercised in CI"
+    "Windows path exercised in CI",
+    "WIN-PID-1 (V1-PF-001): a stale parent edge plus PID reuse forms a cycle — traversal terminates, memory stays bounded, and no unrelated process is selected for termination",
+    "WIN-PID-2 (V1-PF-001): a stale parent edge points to a process outside the owned range without forming a cycle — the unrelated process is never selected for termination"
    ],
    "mutation_targets": [
     "aisef2/runtime/process_range.py::wait_empty"
@@ -1205,9 +1207,21 @@
    "evidence_artifact": "closure-evidence/v2/P4-RANGE-EMPTINESS.json",
    "exit_criteria": [
     "OS-asserted emptiness on Linux and Windows CI",
-    "D-024 reproducer red before / green after"
+    "D-024 reproducer red before / green after",
+    "WIN-PID-1 and WIN-PID-2 green as deterministic acceptance cases"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "frozen_acceptance_properties": [
+    "PID equality alone MUST NOT establish ownership. Process ownership must be established using an ownership mechanism robust against PID reuse."
+   ],
+   "resolves_post_freeze_defects": [
+    {
+     "id": "V1-PF-001",
+     "record": "closure-evidence/v2/V1-POST-FREEZE-DEFECTS.json",
+     "authority": "owner decision 'AISEF V2 — OWNER ACCEPTS P0 / AUTHORIZE P1 SEMANTIC CORE' §2",
+     "note": "added as future acceptance obligations only; not implemented before WP-4.2 (P4)"
+    }
+   ]
   },
   {
    "id": "WP-4.3",

@@ -1,0 +1,37 @@
+{
+ "record": "AISEF V2 — RETRY / CI POLICY",
+ "authority": "OWNER DECISION 'AISEF V2 — OWNER ACCEPTS P0 / AUTHORIZE P1 SEMANTIC CORE' §3",
+ "effective_from": "P1",
+ "preregistered": true,
+ "rules": [
+  "A rerun MUST NOT erase a previous failure. Every attempt is preserved (closure-evidence/v2/P1-RUN-HISTORY.json, append-only).",
+  "A retry may satisfy a gate only when the first outcome is deterministically classified as a preregistered retryable class and this policy permits it.",
+  "For every other class a rerun is diagnostic only. A later green attempt does not convert the original failure into an environmental flake.",
+  "A classification must cite its evidence (a log signature, an exit reason); a class chosen because a rerun passed is not a classification."
+ ],
+ "retryable_classes": [
+  "ENVIRONMENT",
+  "PROVIDER"
+ ],
+ "diagnostic_only_classes": [
+  "PRODUCT",
+  "DEVELOPER",
+  "INTEGRATION",
+  "HARNESS",
+  "UNKNOWN"
+ ],
+ "max_gate_retries_per_attempt_chain": 1,
+ "stop_on_recurrence": [
+  "V1-PF-001"
+ ],
+ "known_defect_classifications": {
+  "V1-PF-001": {
+   "class": "PRODUCT",
+   "label": "LATENT PRODUCT DEFECT WITH NONDETERMINISTIC TRIGGER",
+   "not": "CI FLAKE",
+   "rule": "if it recurs before WP-4.2: STOP the current phase gate and report it; do not retry-until-green",
+   "signature": "MemoryError raised inside aisef/clients/base.py::_kill_tree_win32"
+  }
+ },
+ "vocabulary_note": "These are CI-attempt classes, not the frozen F3 Owner set; HARNESS here means the CI/test harness, not an AISEF owner."
+}

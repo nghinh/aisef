@@ -185,9 +185,17 @@ def _packaging_check() -> Checker:
                    ("validation/v2/packaging_check.py",))
 
 
+def _run_history() -> Checker:
+    rh = _load("aisef_v2_run_history", V2 / "run_history.py")
+    policy = json.loads((ROOT / rh.POLICY_REL).read_text(encoding="utf-8"))
+    return Checker("run_history", "P1 retry policy", lambda: rh.check(ROOT),
+                   lambda fx: rh.append_only_problems(fx["versions"]) + rh.entry_problems(fx["versions"][-1], policy),
+                   ("validation/v2/run_history.py",))
+
+
 REGISTRY: list[Callable[[], Checker]] = [
     _freeze_manifest, _v1_evidence_guard, _arch_catalog, _f_conformance, _plan_validate, _plan_docs_check,
-    _state_model_prover, _v2_encoding_scanner, _packaging_check,
+    _state_model_prover, _v2_encoding_scanner, _packaging_check, _run_history,
 ]
 
 

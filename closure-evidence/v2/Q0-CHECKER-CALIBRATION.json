@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 9,
+ "checker_count": 10,
  "uncovered_checker_modules": [],
- "calibrated_count": 9,
- "always_pass_mutants_rejected": 9,
+ "calibrated_count": 10,
+ "always_pass_mutants_rejected": 10,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -142,6 +142,21 @@
    "observed": [
     "aisef2 would ship in the aisef wheel",
     "aisef2.arch would ship in the aisef wheel"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "run_history",
+   "package": "P1 retry policy",
+   "fixture": "tests/v2/fixtures/known_bad/run_history.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "does not extend",
+   "observed": [
+    "history version 2 does not extend version 1: attempts removed or rewritten [1]"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true
