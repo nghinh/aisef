@@ -1,0 +1,715 @@
+{
+ "record": "AISEF V2 — P1 COMPLETION CORRECTION",
+ "id": "P1-COMPLETION-CORRECTION-V2-001",
+ "authority": "AISEF V2 — P1 OWNER REVIEW CORRECTION / ARCHITECTURE EXCEPTION V2-001",
+ "supersedes": {
+  "path": "closure-evidence/v2/P1-COMPLETION.json",
+  "sha256": "e92cb6b7dc632295b3d96872136bf98c1b6f5822dbce029736234e66f31438a5",
+  "verdict_then": "P1 COMPLETE — awaiting owner review",
+  "status_now": "superseded; kept byte-identical as historical evidence of the original candidate"
+ },
+ "original_candidate": {
+  "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+  "tree": "47e9a88b8f07fd5c3721f934af1810a1fa346e4b",
+  "aisef2_tree": "959491f9a2782cb928771de4e290d673edd8556f",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+ },
+ "architecture_exception": {
+  "id": "ARCHITECTURE-EXCEPTION-V2-001",
+  "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+  "sha256": "2de596432375ba874ab17cfd34b507b9606e5af3fa6c88e48184fe7ab87d6d8c",
+  "frozen_item": "F2 — the owner routing table for typed proof outcomes",
+  "status": "APPROVED — APPLIED"
+ },
+ "corrected_candidate": {
+  "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+  "tree": "96e945cd908ba4b4fa9fdf71d58ff6a9b85e3adc",
+  "aisef2_tree": "5b81c5a42d8b597b6e9e4c3415cf7128a8262337",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+ },
+ "f2_semantic_change": {
+  "before": "§10: EXECUTED + INDETERMINATE -> 'PLAN or INTEGRATION, by reason'; implemented as CANDIDATE + INDETERMINATE(PRECONDITION_ABSENT) -> PRECONDITION_ABSENT, PLAN (routing keyed by site PARENT/CANDIDATE)",
+  "after": {
+   "PARENT + INTRODUCE + REQUIRES_SUBJECT + subject absent": "READY; no failure owner; expected pre-state",
+   "PARENT + PRESERVE/VERIFY + required subject absent": "PRECONDITION_BROKEN; PLAN",
+   "CANDIDATE + admitted obligation + required subject absent": "DEVELOPER",
+   "POST_MERGE + subject verified at candidate now absent": "INTEGRATION",
+   "observation harness cannot run (UNRUNNABLE)": "ENVIRONMENT"
+  },
+  "rfc_text": "§10 table (REFUTED and INDETERMINATE owner cells), new §10.3 with class MeasurementPoint and its table, freeze-table F2 row, adversarial cases OWNER-MP-1..4",
+  "code": {
+   "route": "route(result, spec, MeasurementPoint, role=None)",
+   "removed_codes": [
+    "PRECONDITION_ABSENT (-> PLAN at the candidate)"
+   ],
+   "added_codes": [
+    "SUBJECT_ABSENT_AT_CANDIDATE (DEVELOPER)",
+    "PRECONDITION_BROKEN (PLAN, parent)",
+    "POST_MERGE_REGRESSION (INTEGRATION)",
+    "POST_MERGE_SUBJECT_LOST (INTEGRATION)"
+   ],
+   "vocabulary": "MeasurementPoint {PARENT, CANDIDATE, POST_MERGE} added to F2 (aisef2/arch/enums.py, RFC §10.3)"
+  }
+ },
+ "evidence_compatibility_impact": {
+  "is_evidence_compatibility_change": true,
+  "what_changes": "The owner assigned to EXECUTED + INDETERMINATE(PRECONDITION_ABSENT): at the candidate PLAN -> DEVELOPER; post-merge rows added (INTEGRATION, as §26 already stated for regressions); at the parent the obligation role decides READY vs PRECONDITION_BROKEN/PLAN. The rfc_normative_digest and the freeze-table digest change.",
+  "evidence_written_under_the_old_row": "No V2 journal, verdict or failure/observed record exists (the journal is P3), so no recorded failure is re-interpreted. V1 evidence is untouched: V1 routing is separate and frozen.",
+  "superseded_records": "closure-evidence/v2/P1-ROUTING-TABLE.json as committed at 91bb48d (routing under the old row) is historical; P1-COMPLETION.json stays byte-identical and is superseded by P1-COMPLETION-CORRECTION-V2-001.json",
+  "unaffected": "ContractSatisfaction derivation, NEG-1/2/3, semantic_hash and every spec identity (F4), the Owner set (F3), no raw-verdict routing"
+ },
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "AISEF V2 — P1 OWNER REVIEW CORRECTION / ARCHITECTURE EXCEPTION V2-001",
+  "date": "2026-09-21",
+  "terms": [
+   "freeze the measurement-point semantics",
+   "update F2 mechanically",
+   "update its freeze digest / approval lineage through the architecture-exception mechanism",
+   "no new architecture plane or Owner",
+   "do not redesign V2",
+   "do not start P2"
+  ]
+ },
+ "freeze_digests": {
+  "rfc_normative_digest": {
+   "before": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+   "after": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708"
+  },
+  "freeze_table_digest": {
+   "before": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+   "after": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+  },
+  "computed_now": {
+   "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+   "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+  },
+  "approval_lineage": [
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+    "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+    "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+    "frozen_items_changed": [
+     "F2"
+    ],
+    "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+    "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+   }
+  ],
+  "lineage_valid": true,
+  "original_approval_sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a"
+ },
+ "owner_policy_corrections": {
+  "credentials": {
+   "before": {
+    "MISSING_CREDENTIAL": "ENVIRONMENT, retryable",
+    "INVALID_CREDENTIAL": "PROVIDER, not retryable"
+   },
+   "after": {
+    "MISSING_CREDENTIAL": {
+     "owner": "ENVIRONMENT",
+     "retryability": "RESOLVED_BY_POLICY",
+     "budget": "ENVIRONMENT",
+     "rule": "§22 + owner decision (P1 review): a missing credential is execution configuration -> ENVIRONMENT; whether it is retried is the resolved execution policy's decision"
+    },
+    "INVALID_CREDENTIAL": {
+     "owner": "ENVIRONMENT",
+     "retryability": "NOT_RETRYABLE",
+     "budget": null,
+     "rule": "§22: MUST NOT be retryable (D-006); owner decision (P1 review): a rejected, revoked or wrong credential is execution configuration, not provider failure -> ENVIRONMENT"
+    },
+    "PROVIDER_UNAVAILABLE": {
+     "owner": "PROVIDER",
+     "retryability": "RETRYABLE",
+     "budget": "PROVIDER",
+     "rule": "§22 + owner decision (P1 review): a provider owns a failure only through a provider-side code — the provider is unavailable"
+    }
+   }
+  },
+  "retry_policy": {
+   "before": "max_gate_retries_per_attempt_chain = 1 (universal; not owner-approved)",
+   "after": {
+    "source": "the resolved execution policy — RunSpec, project or evaluation configuration; never this file and never the failure taxonomy",
+    "rule": "the taxonomy decides whether an outcome is retryable; how many retries a path allows is resolved per execution path",
+    "approved_counts_by_execution_path": {
+     "phase-gate:local": null,
+     "phase-gate:ci": null
+    },
+    "when_no_approved_count": "stated explicitly (null above): a retry on that path cannot satisfy a gate and is diagnostic only; no default count is introduced"
+   },
+   "revisions": [
+    {
+     "revision": 1,
+     "commit": "9e82537",
+     "authority": "OWNER ACCEPTS P0 / AUTHORIZE P1 §3",
+     "note": "also declared max_gate_retries_per_attempt_chain = 1 as a universal V2 policy — that count was NOT approved by the owner"
+    },
+    {
+     "revision": 2,
+     "authority": "AISEF V2 — P1 OWNER REVIEW CORRECTION §4",
+     "change": "removed the unapproved global cap; retry counts come from the resolved execution policy; no approved count exists for the phase-gate paths and that is recorded as null, not defaulted",
+     "effect_on_recorded_history": "P1 recorded zero retries; no recorded attempt is rewritten or reinterpreted"
+    }
+   ]
+  }
+ },
+ "preserved_p1_choices": [
+  "one IndeterminateReason: PRECONDITION_ABSENT",
+  "minimal ProbeResult core",
+  "human:<name>",
+  "fixture identities as fixture identities",
+  "NEG-1/2/3 behaviour",
+  "ContractSatisfaction derivation",
+  "no raw BehaviorVerdict routing",
+  "V1-PF-001 status (OPEN_IN_V1)"
+ ],
+ "reruns": {
+  "OWNER-MP-1..4": {
+   "OWNER_MP_1_parent_introduce_ready_no_owner": true,
+   "OWNER_MP_2_candidate_subject_absent_developer": true,
+   "OWNER_MP_3_post_merge_subject_lost_integration": true,
+   "OWNER_MP_4_unrunnable_environment_everywhere": true
+  },
+  "CRED-1..4": {
+   "CRED_1_missing_never_developer_budget": true,
+   "CRED_2_invalid_never_developer_or_provider_budget": true,
+   "CRED_3_invalid_not_retryable": true,
+   "CRED_4_provider_outage_distinct": true
+  },
+  "NEG-1/2/3": {
+   "NEG_1_unsatisfied_never_satisfied": true,
+   "NEG_2_satisfied": true,
+   "NEG_3_indeterminate_precondition_absent": true
+  },
+  "routing_table_totality": true,
+  "routing_equals_rfc_10_and_10_3": true,
+  "mutation_affected_routing": {
+   "aisef2/control/owner.py::TAXONOMY": "198/198",
+   "aisef2/control/owner.py::classify": "6/6",
+   "aisef2/control/owner.py::flatten": "16/16",
+   "aisef2/control/routing.py::_EXECUTED": "180/180",
+   "aisef2/control/routing.py::route": "69/69"
+  },
+  "mutation_all_targets": {
+   "targets": 18,
+   "mutants": 604,
+   "killed": 604,
+   "audited": 0
+  },
+  "f_conformance": {
+   "current_phase": "P1",
+   "summary": {
+    "PASS": 4,
+    "PENDING": 7,
+    "FAIL": 0
+   },
+   "items": {
+    "F1": "PENDING",
+    "F2": "PASS",
+    "F3": "PASS",
+    "F4": "PASS",
+    "F5": "PENDING",
+    "F6": "PENDING",
+    "F7": "PASS",
+    "F8": "PENDING",
+    "F9": "PENDING",
+    "F10": "PENDING",
+    "F11": "PENDING"
+   }
+  },
+  "full_suite_local": [
+   {
+    "seq": 21,
+    "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+    "where": "local",
+    "job": null,
+    "package": "V2-001 corrected P1 candidate",
+    "invocation": "python -m unittest discover -s tests",
+    "attempt": 1,
+    "result": "PASS",
+    "tests_run": 3908,
+    "skipped": 20,
+    "failing_tests": [],
+    "classification": null,
+    "retry_permitted": false,
+    "retry_of": null,
+    "gate_effect": "COUNTS",
+    "v1_evidence_changed": false,
+    "detective_guard": "PASS"
+   }
+  ],
+  "ci": {
+   "run_id": 35591415484,
+   "url": "https://github.com/nghinh/aisef/actions/runs/35591415484",
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "attempt": 1,
+   "jobs": [
+    "lint",
+    "wheel",
+    "unit (ubuntu-latest, 3.11)",
+    "unit (ubuntu-latest, 3.12)",
+    "unit (ubuntu-latest, 3.13)",
+    "unit (ubuntu-latest, 3.14)",
+    "unit (windows-latest, 3.11)"
+   ],
+   "all_success_first_attempt": true,
+   "linux_tests": 3905,
+   "windows_tests": 3902,
+   "detective_guard_after_suite": "PASS on every unit job",
+   "wheel_aisef2_exclusion_step": "success",
+   "v1_pf_001_recurred": false,
+   "v1_pf_001_search": "every job log searched for _kill_tree_win32 / MemoryError: 0 lines"
+  },
+  "v1_evidence_byte_identical": true,
+  "plan_validate_zero_problems": true,
+  "v1_pf_001_recurred": false
+ },
+ "exit_checks": [
+  {
+   "check": "plan_validate: zero problems, generated docs in sync",
+   "command": "python -P validation/v2/plan_validate.py --validate --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "generated artefacts in sync"
+  },
+  {
+   "check": "PLANDEP-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 32"
+  },
+  {
+   "check": "PLANDEP-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANDEP-3: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-3",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANDEP-4: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-4",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "freeze manifest: RFC digests equal the end of the approval lineage; every lineage link valid",
+   "command": "python -P validation/v2/freeze_manifest.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "freeze manifest: PASS"
+  },
+  {
+   "check": "architecture catalog --check",
+   "command": "python -P validation/v2/gen_arch_catalog.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "architecture catalog: PASS"
+  },
+  {
+   "check": "F1-F11 conformance at CURRENT_PHASE=P1 (ratchet)",
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "summary {'PASS': 4, 'PENDING': 7, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "check": "Q0 checker calibration",
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "calibrated 16/16; always-PASS mutants rejected 16/16"
+  },
+  {
+   "check": "compiler --check",
+   "command": "python -P validation/v2/gen_specs.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "specs: PASS"
+  },
+  {
+   "check": "P1 evidence records current, every property true",
+   "command": "python -P validation/v2/p1_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p1 evidence: PASS"
+  },
+  {
+   "check": "mutation record current, every target fully killed",
+   "command": "python -P validation/v2/mutation.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "check": "kernel static checks",
+   "command": "python -P validation/v2/kernel_static_checks.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "check": "run history append-only, policy-consistent",
+   "command": "python -P validation/v2/run_history.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "run history: PASS"
+  },
+  {
+   "check": "V1 evidence guard, detective",
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  }
+ ],
+ "run_history": [
+  {
+   "seq": 1,
+   "commit": "9e82537523948f3e2feac3fb96fa3798047a5d65",
+   "where": "local",
+   "job": null,
+   "package": "pre-P1 (owner items 1-3)",
+   "result": "PASS",
+   "tests_run": 3811,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 2,
+   "commit": "4afc9d10b6d48ff754e090aad806f62f7f303522",
+   "where": "local",
+   "job": null,
+   "package": "WP-1.1",
+   "result": "PASS",
+   "tests_run": 3842,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 3,
+   "commit": "ab2fc134b577e41923cc4cfff8a711533d08c8f3",
+   "where": "local",
+   "job": null,
+   "package": "WP-1.2",
+   "result": "PASS",
+   "tests_run": 3861,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 4,
+   "commit": "48226918f621dece1d6392adc0e666dc88d608c6",
+   "where": "local",
+   "job": null,
+   "package": "WP-1.3",
+   "result": "PASS",
+   "tests_run": 3876,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 5,
+   "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+   "where": "local",
+   "job": null,
+   "package": "WP-1.4 (P1 candidate)",
+   "result": "PASS",
+   "tests_run": 3890,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 6,
+   "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+   "where": "ci",
+   "job": "lint",
+   "package": "WP-1.4 (P1 candidate)",
+   "result": "PASS",
+   "tests_run": null,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 7,
+   "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+   "where": "ci",
+   "job": "wheel",
+   "package": "WP-1.4 (P1 candidate)",
+   "result": "PASS",
+   "tests_run": null,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 8,
+   "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.11)",
+   "package": "WP-1.4 (P1 candidate)",
+   "result": "PASS",
+   "tests_run": 3887,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 9,
+   "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.12)",
+   "package": "WP-1.4 (P1 candidate)",
+   "result": "PASS",
+   "tests_run": 3887,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 10,
+   "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.13)",
+   "package": "WP-1.4 (P1 candidate)",
+   "result": "PASS",
+   "tests_run": 3887,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 11,
+   "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.14)",
+   "package": "WP-1.4 (P1 candidate)",
+   "result": "PASS",
+   "tests_run": 3887,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 12,
+   "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+   "where": "ci",
+   "job": "unit (windows-latest, 3.11)",
+   "package": "WP-1.4 (P1 candidate)",
+   "result": "PASS",
+   "tests_run": 3884,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 13,
+   "commit": "e1e313cd9dbd96a19fec7b69812d8c6e4e3e8d28",
+   "where": "local",
+   "job": null,
+   "package": "P1 completion record commit (post-candidate verification)",
+   "result": "PASS",
+   "tests_run": 3890,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 14,
+   "commit": "e1e313cd9dbd96a19fec7b69812d8c6e4e3e8d28",
+   "where": "ci",
+   "job": "wheel",
+   "package": "P1 completion record commit (post-candidate verification)",
+   "result": "PASS",
+   "tests_run": null,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 15,
+   "commit": "e1e313cd9dbd96a19fec7b69812d8c6e4e3e8d28",
+   "where": "ci",
+   "job": "lint",
+   "package": "P1 completion record commit (post-candidate verification)",
+   "result": "PASS",
+   "tests_run": null,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 16,
+   "commit": "e1e313cd9dbd96a19fec7b69812d8c6e4e3e8d28",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.12)",
+   "package": "P1 completion record commit (post-candidate verification)",
+   "result": "PASS",
+   "tests_run": 3887,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 17,
+   "commit": "e1e313cd9dbd96a19fec7b69812d8c6e4e3e8d28",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.14)",
+   "package": "P1 completion record commit (post-candidate verification)",
+   "result": "PASS",
+   "tests_run": 3887,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 18,
+   "commit": "e1e313cd9dbd96a19fec7b69812d8c6e4e3e8d28",
+   "where": "ci",
+   "job": "unit (windows-latest, 3.11)",
+   "package": "P1 completion record commit (post-candidate verification)",
+   "result": "PASS",
+   "tests_run": 3884,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 19,
+   "commit": "e1e313cd9dbd96a19fec7b69812d8c6e4e3e8d28",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.13)",
+   "package": "P1 completion record commit (post-candidate verification)",
+   "result": "PASS",
+   "tests_run": 3887,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 20,
+   "commit": "e1e313cd9dbd96a19fec7b69812d8c6e4e3e8d28",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.11)",
+   "package": "P1 completion record commit (post-candidate verification)",
+   "result": "PASS",
+   "tests_run": 3887,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 21,
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "where": "local",
+   "job": null,
+   "package": "V2-001 corrected P1 candidate",
+   "result": "PASS",
+   "tests_run": 3908,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 22,
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "where": "ci",
+   "job": "lint",
+   "package": "V2-001 corrected P1 candidate",
+   "result": "PASS",
+   "tests_run": null,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 23,
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "where": "ci",
+   "job": "wheel",
+   "package": "V2-001 corrected P1 candidate",
+   "result": "PASS",
+   "tests_run": null,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 24,
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.11)",
+   "package": "V2-001 corrected P1 candidate",
+   "result": "PASS",
+   "tests_run": 3905,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 25,
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.12)",
+   "package": "V2-001 corrected P1 candidate",
+   "result": "PASS",
+   "tests_run": 3905,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 26,
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.13)",
+   "package": "V2-001 corrected P1 candidate",
+   "result": "PASS",
+   "tests_run": 3905,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 27,
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "where": "ci",
+   "job": "unit (ubuntu-latest, 3.14)",
+   "package": "V2-001 corrected P1 candidate",
+   "result": "PASS",
+   "tests_run": 3905,
+   "gate_effect": "COUNTS"
+  },
+  {
+   "seq": 28,
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "where": "ci",
+   "job": "unit (windows-latest, 3.11)",
+   "package": "V2-001 corrected P1 candidate",
+   "result": "PASS",
+   "tests_run": 3902,
+   "gate_effect": "COUNTS"
+  }
+ ],
+ "evidence_artifacts_rule": "sha256 over the committed (LF) bytes",
+ "evidence_artifacts": {
+  "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json": "2de596432375ba874ab17cfd34b507b9606e5af3fa6c88e48184fe7ab87d6d8c",
+  "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+  "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json": "46cfa34dc7d1be476eacfd2b77de5c2fba89e52f3003a129e50989daea7a9849",
+  "closure-evidence/v2/P1-ROUTING-TABLE.json": "78851baaa17526f1d81fad4a066a4aa8e10733e20ba4523165317271c197d875",
+  "closure-evidence/v2/P1-MUTATION.json": "0699f1df91f595cdf8caca2d486cceef07cb654aef48447104cbe67baf953640",
+  "closure-evidence/v2/F-CONFORMANCE.json": "3bc15d963a095aca4d0eb5d9df955143a441605e016708947869a977916461a3",
+  "closure-evidence/v2/V2-RETRY-POLICY.json": "605f6d044d0746812e3b70b909d48cacf0abc0a1e507b8f81cccf67598e255db",
+  "closure-evidence/v2/P1-RUN-HISTORY.json": "1460aa6d2efd2fb7688416e6343a25534ac7e76f1c64eec34b50eb0c9fefe8f1",
+  "closure-evidence/v2/P1-OUTCOME-POLARITY.json": "75a2dc3e109b8a6bd266ba10c734105aaed4390c54a255001e7ab9de24c8abfe",
+  "closure-evidence/v2/P1-CONTRACT-SHAPES.json": "44258486128028e00d5275c182c039b37e60ed4ed25a044aea09d6fbbfa3b560",
+  "closure-evidence/v2/P1-SPEC-COMPILER.json": "e541103de6cb2f6a40d9167a29186f11f5d268b665ddbd33d129f59a6ecfab7f",
+  "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json": "354fef218fb10e5f76ff2998c8faef25adf7e329366876588ae5921f69e862be"
+ },
+ "superseded_artifact_hashes_at_original_candidate": {
+  "closure-evidence/v2/V1-POST-FREEZE-DEFECTS.json": "16d30104cef30de8c219fd59e6e8d84d9c9b066ed80bb2d067d718cae7609356",
+  "closure-evidence/v2/V2-RETRY-POLICY.json": "d04680b2b365791d4b4c24076a50a49f0764af6751fb2d34657bb858c17afadd",
+  "closure-evidence/v2/P1-RUN-HISTORY.json": "8abb1263470f269a9a6e44dea8b87c7cbe43478d1a8b5aaa3751d87d2ee2219d",
+  "closure-evidence/v2/P1-CONTRACT-SHAPES.json": "44258486128028e00d5275c182c039b37e60ed4ed25a044aea09d6fbbfa3b560",
+  "closure-evidence/v2/P1-SPEC-COMPILER.json": "e541103de6cb2f6a40d9167a29186f11f5d268b665ddbd33d129f59a6ecfab7f",
+  "closure-evidence/v2/P1-OUTCOME-POLARITY.json": "75a2dc3e109b8a6bd266ba10c734105aaed4390c54a255001e7ab9de24c8abfe",
+  "closure-evidence/v2/P1-ROUTING-TABLE.json": "5e8dcf202d192db083715ee5bc427322701f682b29e829f7d25767f5810af698",
+  "closure-evidence/v2/P1-MUTATION.json": "360daced308f8b9c53dc66f41ad44eb2fcc788d9004f75c428553346175e10f2",
+  "closure-evidence/v2/F-CONFORMANCE.json": "a12e2bfc9c355d80269d5a764352004cb529bac7460ca048d656886fd24d252d",
+  "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json": "354fef218fb10e5f76ff2998c8faef25adf7e329366876588ae5921f69e862be",
+  "tests/v2/fixtures/p1/corpus/corpus.json": "a52852bdea60541ecb1b8b9199c8f06628381e6321ccedea154f0ed015255b84"
+ },
+ "architecture_exceptions": [
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-001",
+   "status": "APPROVED — APPLIED"
+  }
+ ],
+ "unapproved_architecture_exceptions": [],
+ "stop_rules_triggered": [],
+ "p2_started": false,
+ "verdict": "P1 CORRECTED — READY FOR OWNER ACCEPTANCE"
+}
