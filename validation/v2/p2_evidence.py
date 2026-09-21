@@ -245,8 +245,107 @@ def probe_protocol() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-2.2
+
+CALIBRATION_REL = "closure-evidence/v2/P2-CALIBRATION.json"
+FIXTURES_REL = "tests/v2/fixtures/calibration"
+
+
+def calibration() -> dict:
+    import time
+    from aisef2.arch.enums import BehaviorVerdict as V, Enforcement
+    from aisef2.probe import calibration as cal
+    from aisef2.probe import python_callable as pc
+    from aisef2.probe.protocol import HarnessProbe, Observation, ObservationKind as K
+    fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
+    ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
+    probe = pc.PythonCallableProbe()
+    env = cal.calibration_env(sys.executable)
+    base = ROOT / FIXTURES_REL / "python_callable"
+    committed = json.loads((ROOT / CALIBRATION_REL).read_text(encoding="utf-8")) if (ROOT / CALIBRATION_REL).exists() \
+        else {}
+    kept = {(c["probe_id"], c["probe_digest"], c["observation_class"], c["positive_fixture"], c["negative_fixture"]):
+            c["demonstrated_at"] for c in committed.get("calibrations", [])}
+
+    def clock_for(cls):  # a re-demonstration of an unchanged record keeps its timestamp; anything else is new
+        key = (probe.id, probe.digest, cls, f"{FIXTURES_REL}/python_callable/{cls}/positive",
+               f"{FIXTURES_REL}/python_callable/{cls}/negative")
+        return lambda: kept.get(key, time.time())
+
+    records = [cal.calibrate(probe, cls, base / cls / "positive", base / cls / "negative", env, clock_for(cls),
+                             names=(f"{FIXTURES_REL}/python_callable/{cls}/positive",
+                                    f"{FIXTURES_REL}/python_callable/{cls}/negative"))
+               for cls in pc.CLASSES]
+
+    class Fixed(HarnessProbe):
+        digest, verdict = "f" * 64, None
+
+        def enforcement(self):
+            return Enforcement.PARTIAL
+
+        def harness_preconditions(self):
+            return ("none",)
+
+        def observation_class(self, spec):
+            return probe.observation_class(spec)
+
+        def observe(self, spec, at, env):
+            return Observation(K.OBSERVED, self.verdict)
+
+    def rejection(verdict, name):
+        fixed = type(name, (Fixed,), {"id": f"probe.{name}", "verdict": verdict})()
+        out = {}
+        for cls in pc.CLASSES:
+            try:
+                cal.calibrate(fixed, cls, base / cls / "positive", base / cls / "negative", env, time.time)
+                out[cls] = "QUALIFIED"
+            except cal.NotQualified as e:
+                out[cls] = "REJECTED: " + str(e).split(": ", 1)[1]
+        return out
+    always_refuted, always_satisfied = rejection(V.REFUTED, "always_refuted"), rejection(V.SATISFIED, "always_satisfied")
+    table = {f"{e.value} expected, {o.value} observed": cal.demonstrates_contrast(e, o)
+             for e in (V.SATISFIED, V.REFUTED) for o in V}
+    conformance = fc.evaluate(*fc.load_inputs())
+    f5 = next(x for x in conformance["subchecks"] if x["id"] == "F5.calibration_contracts")
+    plan_sources = sorted((ROOT / "aisef2" / "plan").rglob("*.py")) if (ROOT / "aisef2" / "plan").exists() else []
+    plan_names = sorted({n for p in plan_sources for n, _ in ks._names(ks.ast.parse(p.read_text(encoding="utf-8")))})
+    return {
+        "record": "AISEF V2 — P2 CALIBRATION", "work_package": "WP-2.2", "rfc_sections": ["9.1", "9.1.1", "9.1.2"],
+        "frozen_items": ["F5"],
+        "rule": "a counterexample produces the verdict opposite to candidate_expectation; a ProbeCapabilityCalibration "
+                "exists only when the positive fixture is observed SATISFIED and the negative one REFUTED",
+        "calibrations": [{"probe_id": r.probe_id, "probe_digest": r.probe_digest,
+                          "observation_class": r.observation_class, "positive_fixture": r.positive_fixture,
+                          "negative_fixture": r.negative_fixture, "demonstrated_at": r.demonstrated_at}
+                         for r in records],
+        "contrast_table": table,
+        "CAL_1_always_refuted_probe": always_refuted,
+        "always_satisfied_probe": always_satisfied,
+        "spec_falsifiability": {"mechanisms": list(cal.MECHANISMS),
+                                "plan_freeze_prerequisite": False,
+                                "planning_modules_scanned": [p.relative_to(ROOT).as_posix() for p in plan_sources]},
+        "f5_conformance": {"state": f5["state"], "detail": f5["detail"]},
+        "properties": {
+            "contrast_for_both_polarities": table == {
+                "SATISFIED expected, SATISFIED observed": False, "SATISFIED expected, REFUTED observed": True,
+                "SATISFIED expected, INDETERMINATE observed": False, "REFUTED expected, SATISFIED observed": True,
+                "REFUTED expected, REFUTED observed": False, "REFUTED expected, INDETERMINATE observed": False},
+            "reference_probe_qualified_for_every_class": [r.observation_class for r in records] == list(pc.CLASSES)
+                and all((r.probe_id, r.probe_digest) == (probe.id, probe.digest) for r in records),
+            "CAL_1_always_refuted_prohibition_probe_rejected": all(v.startswith("REJECTED: positive fixture")
+                                                                    for v in always_refuted.values()),
+            "always_satisfied_probe_rejected_for_must_hold": all(v.startswith("REJECTED: negative fixture")
+                                                                  for v in always_satisfied.values()),
+            "spec_falsifiability_not_a_plan_freeze_input": "SpecFalsifiabilityEvidence" not in plan_names
+                and "falsifiability_problems" not in plan_names,
+            "f5_calibration_contracts_equal_rfc": f5["state"] == "PASS",
+        },
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-2.1": ("closure-evidence/v2/P2-PROBE-PROTOCOL.json", probe_protocol, "aisef2/probe/protocol.py"),
+    "WP-2.2": (CALIBRATION_REL, calibration, "aisef2/probe/calibration.py"),
 }
 
 

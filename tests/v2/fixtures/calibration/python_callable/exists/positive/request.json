@@ -1,0 +1,11 @@
+{
+ "subject": {
+  "kind": "python_callable",
+  "locator": "calib_subject:target"
+ },
+ "stimulus": {},
+ "observable": {
+  "condition": "exists"
+ },
+ "subject_absence": "ABSENCE_IS_DECIDABLE"
+}

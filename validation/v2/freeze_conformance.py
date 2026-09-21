@@ -213,6 +213,26 @@ def _protocol_matches_rfc(rfc: RFC, module: str, name: str) -> dict:
     return {"state": PASS, "detail": f"{name} equals the RFC: {len(got)} members, signatures included"}
 
 
+def _calibration_contracts_match_rfc(rfc: RFC) -> dict:
+    """F5's two calibration contracts: both dataclass shapes, in order, and the falsifiability mechanism literal."""
+    names = ("ProbeCapabilityCalibration", "SpecFalsifiabilityEvidence")
+    refs = {n: rfc.dataclasses.get(n) for n in names}
+    m = re.search(r"mechanism: Literal\[(.*?)\]", rfc.section("#### 9.1.2", "**Why the split.**"))
+    mechanisms = re.findall(r'"([a-z_]+)"', m.group(1)) if m else []
+    if not all(refs.values()) or not mechanisms:
+        return {"state": FAIL, "detail": "RFC reference for the calibration contracts could not be extracted"}
+    subs = {n: _fields("aisef2.probe.calibration", n, refs[n]) for n in names}
+    if any(r["state"] is None for r in subs.values()):
+        return {"state": None, "detail": "aisef2.probe.calibration not implemented", "rfc_reference": refs}
+    got = list(getattr(importlib.import_module("aisef2.probe.calibration"), "MECHANISMS", ()))
+    problems = [f"{n}: {r['detail']}" for n, r in subs.items() if r["state"] != PASS]
+    if got != mechanisms:
+        problems.append(f"mechanisms {got} differ from the RFC {mechanisms}")
+    if problems:
+        return {"state": FAIL, "detail": "; ".join(problems), "rfc_reference": refs, "rfc_mechanisms": mechanisms}
+    return {"state": PASS, "detail": "both calibration contracts and the mechanism literal equal the RFC"}
+
+
 def _semantic_hash_binds_subject_absence(rfc: RFC) -> dict:
     """F4 freezes the inputs to semantic_hash *including SubjectAbsence*: two contracts differing only in their
     declaration must compile to different semantic hashes."""
@@ -406,12 +426,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     add("F4", "F4.semantic_hash_binds_subject_absence", "WP-1.2", _semantic_hash_binds_subject_absence(rfc))
     add("F5", "F5.enum.Enforcement", "WP-0.2", V("Enforcement", e.get("Enforcement", []), code))
     add("F5", "F5.probe_protocol", "WP-2.1", _protocol_matches_rfc(rfc, "aisef2.probe.protocol", "Probe"))
-    add("F5", "F5.calibration_contracts", "WP-2.2",
-        _shape("aisef2.probe.calibration", "ProbeCapabilityCalibration",
-               {"ProbeCapabilityCalibration": rfc.dataclasses.get("ProbeCapabilityCalibration"),
-                "SpecFalsifiabilityEvidence": rfc.dataclasses.get("SpecFalsifiabilityEvidence")}
-               if rfc.dataclasses.get("ProbeCapabilityCalibration") and rfc.dataclasses.get("SpecFalsifiabilityEvidence")
-               else None))
+    add("F5", "F5.calibration_contracts", "WP-2.2", _calibration_contracts_match_rfc(rfc))
     for n in ("ObligationRole", "ParentExpectation"):
         add("F6", f"F6.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
     add("F6", "F6.plan_obligation_shape", "WP-2.3",

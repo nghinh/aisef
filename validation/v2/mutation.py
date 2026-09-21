@@ -67,6 +67,9 @@ P2_TARGETS: dict[str, list[str]] = {
     # WP-2.1: the only mapping from an observation to a ProbeResult, and the entry point that binds enforcement
     "aisef2/probe/protocol.py::classify_failure": _PROTOCOL_TESTS,
     "aisef2/probe/protocol.py::run_probe": _PROTOCOL_TESTS,
+    # WP-2.2: contrast to the candidate expectation, and the only way a calibration record is issued
+    "aisef2/probe/calibration.py::demonstrates_contrast": ["tests/v2/p2/test_calibration.py"],
+    "aisef2/probe/calibration.py::calibrate": ["tests/v2/p2/test_calibration.py"],
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}

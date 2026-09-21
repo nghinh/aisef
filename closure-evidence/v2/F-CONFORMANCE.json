@@ -58,15 +58,13 @@
   },
   {
    "id": "F5",
-   "state": "PENDING",
+   "state": "PASS",
    "subchecks": [
     "F5.enum.Enforcement",
     "F5.probe_protocol",
     "F5.calibration_contracts"
    ],
-   "pending_on": [
-    "WP-2.2"
-   ]
+   "pending_on": []
   },
   {
    "id": "F6",
@@ -753,25 +751,8 @@
    "item": "F5",
    "id": "F5.calibration_contracts",
    "implemented_by": "WP-2.2",
-   "state": "PENDING",
-   "detail": "aisef2.probe.calibration.ProbeCapabilityCalibration not implemented",
-   "rfc_reference": {
-    "ProbeCapabilityCalibration": [
-     "probe_id",
-     "probe_digest",
-     "observation_class",
-     "positive_fixture",
-     "negative_fixture",
-     "demonstrated_at"
-    ],
-    "SpecFalsifiabilityEvidence": [
-     "spec_id",
-     "semantic_hash",
-     "mechanism",
-     "counterexample_ref",
-     "observed"
-    ]
-   },
+   "state": "PASS",
+   "detail": "both calibration contracts and the mechanism literal equal the RFC",
    "required_now": false
   },
   {
@@ -931,8 +912,8 @@
   }
  ],
  "summary": {
-  "PASS": 4,
-  "PENDING": 7,
+  "PASS": 5,
+  "PENDING": 6,
   "FAIL": 0
  },
  "ratchet_violations": []

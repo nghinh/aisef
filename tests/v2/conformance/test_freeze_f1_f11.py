@@ -166,6 +166,17 @@ class Conformance(unittest.TestCase):
             self.assertIn("is not a typing.Protocol",
                           self._sub(fc.evaluate(self.rfc, self.code, self.manifest), "F5.probe_protocol")["detail"])
 
+    def test_F5_calibration_contracts_are_compared_field_by_field_with_the_mechanism_literal(self):
+        self.assertEqual(self._sub(self.result, "F5.calibration_contracts")["state"], fc.PASS)
+        for old, new in (("    observation_class: str                  # the class",
+                          "    observation_kind: str                  # the class"),
+                         ('"fixture_construction", "other_qualified"', '"fixture_construction"')):
+            broken = self.rfc.replace(old, new, 1)
+            self.assertNotEqual(broken, self.rfc, "fixture edit did not apply")
+            with self.subTest(edit=new):
+                self.assertEqual(self._sub(fc.evaluate(broken, self.code, self.manifest),
+                                           "F5.calibration_contracts")["state"], fc.FAIL)
+
     # ------------------------------------------------------------------ references really come from the RFC
 
     def test_lifetime_order_reference_is_lease_first_and_lease_last(self):

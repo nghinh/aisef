@@ -3,6 +3,210 @@
  "tool": "validation/v2/mutation.py",
  "targets": [
   {
+   "target": "aisef2/probe/calibration.py::calibrate",
+   "kill_tests": [
+    "tests/v2/p2/test_calibration.py"
+   ],
+   "source_sha256": "0e132dceee30c3d77c90e37a1b4860f5b11a06b4cff7fd5f66ecc0b48734500e",
+   "mutants": 40,
+   "killed": 40,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L117 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L121 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L110 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L115 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L120 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L120 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L120 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L108 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L108 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L108 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L110 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L115 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L120 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L120 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'positive' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 BehaviorVerdict.REFUTED->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L107 BehaviorVerdict.REFUTED->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L108 string 'negative' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L108 BehaviorVerdict.SATISFIED->REFUTED",
+     "killed": true
+    },
+    {
+     "mutant": "L108 BehaviorVerdict.SATISFIED->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L115 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L115 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L111 string ' fixture asks for ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L111 string ', not ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string ' fixture observed ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string ' — no contrast with a ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string ' expectation' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L118 string '@' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L118 string ' is not qualified for ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L118 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string '; ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L113 string 'checkout' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/probe/calibration.py::demonstrates_contrast",
+   "kill_tests": [
+    "tests/v2/p2/test_calibration.py"
+   ],
+   "source_sha256": "0e132dceee30c3d77c90e37a1b4860f5b11a06b4cff7fd5f66ecc0b48734500e",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L72 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L74 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L72 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L74 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L73 string 'a candidate expectation is SATISFIED or REFUTED' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/probe/protocol.py::classify_failure",
    "kill_tests": [
     "tests/v2/p2/test_probe_protocol.py"
