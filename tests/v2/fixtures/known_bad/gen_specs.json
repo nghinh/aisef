@@ -1,0 +1,9 @@
+{
+ "checker": "gen_specs",
+ "package": "WP-1.2",
+ "kind": "drifted_spec",
+ "spec": "BC-NO-TELEMETRY.json",
+ "find": "\"REFUTED\"",
+ "replace": "\"SATISFIED\"",
+ "expect": "spec for BC-NO-TELEMETRY differs from its fresh derivation"
+}

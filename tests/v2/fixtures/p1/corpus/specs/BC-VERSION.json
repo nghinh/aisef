@@ -1,0 +1,26 @@
+{
+ "candidate_expectation": "SATISFIED",
+ "compiler_digest": "f31a4602a61d412d834890f46dcc9ca4d0ce240a106a4772dc9a1e8e7fb8ea76",
+ "compiler_id": "aisef2.product.compiler/1",
+ "contract_id": "BC-VERSION",
+ "id": "PPS-94fce8bd31e58dd3bdf9949ce3abec02bbbfec03162f026f60d4567bbc9e0a6c",
+ "probe_digest": "ca3f07ab47e8a702770085050798289c801784d5763ebd63e95e8344b88bf85c",
+ "probe_id": "fixture.cli_invocation",
+ "probe_input": {
+  "observable": {
+   "matches": "^app \\d+\\.\\d+\\.\\d+$",
+   "stream": "stdout"
+  },
+  "stimulus": {
+   "argv": [
+    "--version"
+   ]
+  },
+  "subject": {
+   "kind": "cli_invocation",
+   "locator": "app.cli:main"
+  },
+  "subject_absence": "REQUIRES_SUBJECT"
+ },
+ "semantic_hash": "ca8924aefa83fea50506086e596639c6e5a81af31ea550f27ebfc0acbd33e28a"
+}

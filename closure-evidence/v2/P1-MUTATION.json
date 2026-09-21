@@ -3,6 +3,146 @@
  "tool": "validation/v2/mutation.py",
  "targets": [
   {
+   "target": "aisef2/product/compiler.py::compile_spec",
+   "kill_tests": [
+    "tests/v2/p1/test_spec_compiler.py"
+   ],
+   "source_sha256": "e9be4b579803fd3add23ce5f8e087ac62bd5259a03ee6377c9995f2a2b33cf82",
+   "mutants": 16,
+   "killed": 16,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L63 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L65 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L69 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L69 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L69 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L69 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'no probe declared for subject kind ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L69 string 'subject' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L70 string 'stimulus' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L70 string 'observable' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L71 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L69 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L69 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L69 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L69 string 'locator' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/compiler.py::expectation_for",
+   "kill_tests": [
+    "tests/v2/p1/test_spec_compiler.py"
+   ],
+   "source_sha256": "e9be4b579803fd3add23ce5f8e087ac62bd5259a03ee6377c9995f2a2b33cf82",
+   "mutants": 13,
+   "killed": 13,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L52 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L54 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L52 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L53 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L54 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L55 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L52 Polarity.MUST_HOLD->MUST_NOT_HOLD",
+     "killed": true
+    },
+    {
+     "mutant": "L53 BehaviorVerdict.SATISFIED->REFUTED",
+     "killed": true
+    },
+    {
+     "mutant": "L53 BehaviorVerdict.SATISFIED->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L54 Polarity.MUST_NOT_HOLD->MUST_HOLD",
+     "killed": true
+    },
+    {
+     "mutant": "L55 BehaviorVerdict.REFUTED->SATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L55 BehaviorVerdict.REFUTED->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'no candidate expectation for polarity ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/product/contract.py::canonical",
    "kill_tests": [
     "tests/v2/p1/test_contract.py"
@@ -274,6 +414,74 @@
     },
     {
      "mutant": "L54 element 1 dropped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/spec.py::semantic_hash",
+   "kill_tests": [
+    "tests/v2/p1/test_spec_compiler.py"
+   ],
+   "source_sha256": "b10b09d5d21cab93d7a4354e46dc4403f57bacf381a33831229ce07990352f61",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L70 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L70 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L70 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L70 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L70 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L70 string 'probe_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L70 string 'probe_digest' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L70 string 'probe_input' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L71 string 'candidate_expectation' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/product/spec.py::spec_id",
+   "kill_tests": [
+    "tests/v2/p1/test_spec_compiler.py"
+   ],
+   "source_sha256": "b10b09d5d21cab93d7a4354e46dc4403f57bacf381a33831229ce07990352f61",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L75 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L75 string 'id' emptied",
      "killed": true
     }
    ]

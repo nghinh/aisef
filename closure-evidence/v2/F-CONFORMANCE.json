@@ -46,18 +46,17 @@
   },
   {
    "id": "F4",
-   "state": "PENDING",
+   "state": "PASS",
    "subchecks": [
     "F4.enum.Polarity",
     "F4.enum.SubjectAbsence",
     "F4.subject_kinds",
     "F4.subject_shape",
     "F4.behavior_contract_shape",
-    "F4.product_proof_spec_shape"
+    "F4.product_proof_spec_shape",
+    "F4.semantic_hash_binds_subject_absence"
    ],
-   "pending_on": [
-    "WP-1.2"
-   ]
+   "pending_on": []
   },
   {
    "id": "F5",
@@ -308,19 +307,16 @@
    "item": "F4",
    "id": "F4.product_proof_spec_shape",
    "implemented_by": "WP-1.2",
-   "state": "PENDING",
-   "detail": "aisef2.product.spec.ProductProofSpec not implemented",
-   "rfc_reference": [
-    "id",
-    "contract_id",
-    "probe_id",
-    "probe_digest",
-    "probe_input",
-    "candidate_expectation",
-    "compiler_id",
-    "compiler_digest",
-    "semantic_hash"
-   ],
+   "state": "PASS",
+   "detail": "ProductProofSpec fields equal the RFC in order (9)",
+   "required_now": false
+  },
+  {
+   "item": "F4",
+   "id": "F4.semantic_hash_binds_subject_absence",
+   "implemented_by": "WP-1.2",
+   "state": "PASS",
+   "detail": "semantic_hash differs for REQUIRES_SUBJECT and ABSENCE_IS_DECIDABLE",
    "required_now": false
   },
   {
@@ -528,8 +524,8 @@
   }
  ],
  "summary": {
-  "PASS": 2,
-  "PENDING": 9,
+  "PASS": 3,
+  "PENDING": 8,
   "FAIL": 0
  },
  "ratchet_violations": []

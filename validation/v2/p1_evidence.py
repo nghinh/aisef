@@ -101,9 +101,77 @@ def contract_shapes() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-1.2
+
+def spec_compiler() -> dict:
+    import os
+    import subprocess
+    from aisef2.arch.enums import BehaviorVerdict, Polarity, SubjectAbsence, SubjectKind
+    from aisef2.product.approval import ContractApproval, Requirement, UnapprovedContract
+    from aisef2.product.compiler import COMPILER_DIGEST, COMPILER_ID, COMPILER_SOURCES, ProbeRef, compile_spec
+    from aisef2.product.contract import BehaviorContract, Subject
+    from aisef2.product.spec import ProductProofSpec
+    gs = _module("aisef_v2_gen_specs", "validation/v2/gen_specs.py")
+    rfc = _rfc()
+    req = Requirement.create(id="R", text="evidence", source="WP-1.2")
+    probes = {SubjectKind.CLI_INVOCATION: ProbeRef("probe.cli", "c" * 64)}
+    base = dict(id="C", requirement_ids=("R",), subject=Subject(SubjectKind.CLI_INVOCATION, "app.cli:main"),
+                stimulus={"argv": ["--quiet"]}, observable={"stream": "stdout"}, polarity=Polarity.MUST_NOT_HOLD,
+                subject_absence=SubjectAbsence.REQUIRES_SUBJECT, rationale="evidence")
+
+    def compiled(probes=probes, **over):
+        c = BehaviorContract.create(**{**base, **over})
+        a = ContractApproval("R", req.requirement_hash, c.id, c.contract_hash, "human:evidence", 0.0, ())
+        return compile_spec(c, requirements={"R": req}, approvals=[a], probes=probes)
+
+    ref = compiled()
+    semantic = {"subject": dict(subject=Subject(SubjectKind.CLI_INVOCATION, "app.cli:x")),
+                "stimulus": dict(stimulus={"argv": []}), "observable": dict(observable={"stream": "stderr"}),
+                "polarity": dict(polarity=Polarity.MUST_HOLD),
+                "subject_absence": dict(subject_absence=SubjectAbsence.ABSENCE_IS_DECIDABLE)}
+    changes = {k: compiled(**v).semantic_hash != ref.semantic_hash for k, v in semantic.items()}
+    changes["probe_digest"] = compiled(probes={SubjectKind.CLI_INVOCATION: ProbeRef("probe.cli", "d" * 64)}
+                                       ).semantic_hash != ref.semantic_hash
+    corpus = gs.derive(ROOT / gs.CORPUS_REL)
+    code = ("import sys, json; sys.path[:0] = [sys.argv[1], sys.argv[1] + '/validation/v2']; import gen_specs;"
+            "print(json.dumps(gen_specs.derive(gen_specs.ROOT / gen_specs.CORPUS_REL), sort_keys=True))")
+    runs = {seed: subprocess.run([sys.executable, "-I", "-c", code, str(ROOT)], capture_output=True, encoding="utf-8",
+                                 env={**os.environ, "PYTHONHASHSEED": seed}, check=True).stdout.strip()
+            for seed in ("0", "1", "2024")}
+    specs = {cid: json.loads(text) for cid, text in corpus.items()}
+    fields = [f.name for f in dataclasses.fields(ProductProofSpec)]
+    return {
+        "record": "AISEF V2 — P1 SPEC COMPILER", "work_package": "WP-1.2", "rfc_sections": ["8", "35"],
+        "compiler": {"id": COMPILER_ID, "digest": COMPILER_DIGEST, "sources": list(COMPILER_SOURCES)},
+        "corpus": {cid: {"spec_id": s["id"], "semantic_hash": s["semantic_hash"],
+                         "candidate_expectation": s["candidate_expectation"],
+                         "subject_absence": s["probe_input"]["subject_absence"]} for cid, s in sorted(specs.items())},
+        "semantic_hash_changes_with": changes,
+        "cross_process": {"seeds": sorted(runs), "identical": len(set(runs.values())) == 1},
+        "properties": {
+            "shape_equals_rfc": fields == rfc.dataclasses.get("ProductProofSpec"),
+            "no_plan_fact": not {"story_id", "plan_id", "expected_parent", "parent_expectation"} & set(fields),
+            "plan_field_is_a_type_error": _raises(lambda: dataclasses.replace(ref, story_id="S"), TypeError),
+            "expectation_follows_polarity": compiled(polarity=Polarity.MUST_HOLD).candidate_expectation
+                                            is BehaviorVerdict.SATISFIED
+                                            and ref.candidate_expectation is BehaviorVerdict.REFUTED,
+            "unapproved_contract_cannot_compile": _raises(lambda: compile_spec(
+                BehaviorContract.create(**base), requirements={"R": req}, approvals=[], probes=probes),
+                UnapprovedContract),
+            "every_semantic_change_changes_semantic_hash": all(changes.values()),
+            "semantic_hash_binds_subject_absence": changes["subject_absence"],
+            "prose_edit_keeps_semantic_hash": compiled(rationale="reworded").semantic_hash == ref.semantic_hash,
+            "deterministic_across_processes": len(set(runs.values())) == 1
+                                              and json.loads(next(iter(runs.values()))) == corpus,
+            "check_round_trip_byte_identical": gs.check() == [],
+        },
+    }
+
+
 #: package -> (record path, builder, module that must exist before the record is built)
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-1.1": ("closure-evidence/v2/P1-CONTRACT-SHAPES.json", contract_shapes, "aisef2/product/contract.py"),
+    "WP-1.2": ("closure-evidence/v2/P1-SPEC-COMPILER.json", spec_compiler, "aisef2/product/compiler.py"),
 }
 
 

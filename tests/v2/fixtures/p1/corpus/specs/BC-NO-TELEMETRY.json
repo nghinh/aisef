@@ -1,0 +1,21 @@
+{
+ "candidate_expectation": "REFUTED",
+ "compiler_digest": "f31a4602a61d412d834890f46dcc9ca4d0ce240a106a4772dc9a1e8e7fb8ea76",
+ "compiler_id": "aisef2.product.compiler/1",
+ "contract_id": "BC-NO-TELEMETRY",
+ "id": "PPS-6c4caa4edae5f7b47e7ee2abf6328c213c035924dc0155596070fd56c7dd7b90",
+ "probe_digest": "77a1145ebe55e2595fc5c1635c77e568f578e9763075dbca513d725ea006abf4",
+ "probe_id": "fixture.file_artifact",
+ "probe_input": {
+  "observable": {
+   "condition": "exists"
+  },
+  "stimulus": {},
+  "subject": {
+   "kind": "file_artifact",
+   "locator": "src/app/telemetry.py"
+  },
+  "subject_absence": "ABSENCE_IS_DECIDABLE"
+ },
+ "semantic_hash": "32e0c2bb54b2cc97a5bb15b8ec1ec5469c7681bf85aa3b305ae72e5d4c77d5a4"
+}

@@ -228,13 +228,26 @@ def _p1_evidence() -> Checker:
                    ("validation/v2/p1_evidence.py",))
 
 
+def _gen_specs() -> Checker:
+    gs = _load("aisef_v2_gen_specs", V2 / "gen_specs.py")
+
+    def bad(fx):
+        with tempfile.TemporaryDirectory() as t:
+            corpus = pathlib.Path(t) / "corpus"
+            shutil.copytree(ROOT / gs.CORPUS_REL, corpus)
+            spec = corpus / "specs" / fx["spec"]
+            spec.write_text(_edit(spec.read_text(encoding="utf-8"), fx), encoding="utf-8")
+            return gs.check(corpus)
+    return Checker("gen_specs", "WP-1.2", lambda: gs.check(), bad, ("validation/v2/gen_specs.py",))
+
+
 REGISTRY: list[Callable[[], Checker]] = [
     _freeze_manifest, _v1_evidence_guard, _arch_catalog, _f_conformance, _plan_validate, _plan_docs_check,
     _state_model_prover, _v2_encoding_scanner, _packaging_check, _run_history,
     _kernel_rule("no_prose_control", "NO_PROSE_CONTROL", "WP-1.1"),
     _kernel_rule("no_raw_verdict_routing", "NO_RAW_VERDICT_ROUTING", "WP-1.3"),
     _kernel_rule("retryable_only_in_taxonomy", "RETRYABLE_ONLY_IN_TAXONOMY", "WP-1.4"),
-    _mutation, _p1_evidence,
+    _mutation, _p1_evidence, _gen_specs,
 ]
 
 

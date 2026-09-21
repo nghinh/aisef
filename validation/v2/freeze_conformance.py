@@ -188,6 +188,33 @@ def _fields(module: str, attr: str, reference: list[str] | None) -> dict:
     return {"state": PASS, "detail": f"{attr} fields equal the RFC in order ({len(got)})"}
 
 
+def _semantic_hash_binds_subject_absence(rfc: RFC) -> dict:
+    """F4 freezes the inputs to semantic_hash *including SubjectAbsence*: two contracts differing only in their
+    declaration must compile to different semantic hashes."""
+    row = next((ln for ln in rfc.section("## Normative freeze table", "## Adversarial").splitlines()
+                if ln.startswith("| **F4**")), "")
+    if "semantic_hash" not in row or "SubjectAbsence" not in row:
+        return {"state": FAIL, "detail": "RFC reference (F4 row naming semantic_hash and SubjectAbsence) not found"}
+    if not symbol_present("aisef2.product.compiler", "compile_spec"):
+        return {"state": None, "detail": "aisef2.product.compiler.compile_spec not implemented"}
+    from aisef2.arch.enums import Polarity, SubjectAbsence, SubjectKind
+    from aisef2.product.approval import ContractApproval, Requirement
+    from aisef2.product.compiler import ProbeRef, compile_spec
+    from aisef2.product.contract import BehaviorContract, Subject
+    req = Requirement.create(id="R", text="conformance", source="F4")
+    hashes = {}
+    for absence in SubjectAbsence:
+        c = BehaviorContract.create(id="C", requirement_ids=("R",), subject=Subject(SubjectKind.FILE_ARTIFACT, "x"),
+                                    stimulus={}, observable={"condition": "exists"}, polarity=Polarity.MUST_NOT_HOLD,
+                                    subject_absence=absence, rationale="F4 conformance")
+        a = ContractApproval("R", req.requirement_hash, "C", c.contract_hash, "human:conformance", 0.0, ())
+        hashes[absence.value] = compile_spec(c, requirements={"R": req}, approvals=[a],
+                                             probes={SubjectKind.FILE_ARTIFACT: ProbeRef("p", "d")}).semantic_hash
+    if len(set(hashes.values())) != len(hashes):
+        return {"state": FAIL, "detail": "semantic_hash does not bind SubjectAbsence", "hashes": hashes}
+    return {"state": PASS, "detail": "semantic_hash differs for REQUIRES_SUBJECT and ABSENCE_IS_DECIDABLE"}
+
+
 def subchecks(rfc: RFC, code) -> list[dict]:
     e = rfc.enums
     V = _vocab
@@ -216,6 +243,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
         _fields("aisef2.product.contract", "BehaviorContract", rfc.dataclasses.get("BehaviorContract")))
     add("F4", "F4.product_proof_spec_shape", "WP-1.2",
         _fields("aisef2.product.spec", "ProductProofSpec", rfc.dataclasses.get("ProductProofSpec")))
+    add("F4", "F4.semantic_hash_binds_subject_absence", "WP-1.2", _semantic_hash_binds_subject_absence(rfc))
     add("F5", "F5.enum.Enforcement", "WP-0.2", V("Enforcement", e.get("Enforcement", []), code))
     add("F5", "F5.probe_protocol", "WP-2.1", _shape("aisef2.probe.protocol", "Probe", rfc.protocols.get("Probe")))
     add("F5", "F5.calibration_contracts", "WP-2.2",

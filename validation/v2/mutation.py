@@ -42,6 +42,11 @@ TARGETS: dict[str, list[str]] = {
     "aisef2/product/contract.py::canonical": _CONTRACT_TESTS,
     "aisef2/product/contract.py::digest": _CONTRACT_TESTS,
     "aisef2/product/contract.py::freeze": _CONTRACT_TESTS,
+    # WP-1.2: the compiler and the spec identities (semantic kill set only; never the committed corpus)
+    "aisef2/product/compiler.py::compile_spec": ["tests/v2/p1/test_spec_compiler.py"],
+    "aisef2/product/compiler.py::expectation_for": ["tests/v2/p1/test_spec_compiler.py"],
+    "aisef2/product/spec.py::semantic_hash": ["tests/v2/p1/test_spec_compiler.py"],
+    "aisef2/product/spec.py::spec_id": ["tests/v2/p1/test_spec_compiler.py"],
 }
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = set()
@@ -76,6 +81,16 @@ def _enum_members(module_src: str, root: pathlib.Path) -> dict[str, list[str]]:
     return out
 
 
+def _inert(func: ast.AST, doc: ast.AST | None) -> set[int]:
+    """Nodes that cannot change behaviour: the docstring and every annotation (postponed, never evaluated)."""
+    inert = [doc] if doc is not None else []
+    a = func.args
+    inert += [x.annotation for x in a.posonlyargs + a.args + a.kwonlyargs + [a.vararg, a.kwarg] if x and x.annotation]
+    inert += [func.returns] if func.returns else []
+    inert += [n.annotation for n in ast.walk(func) if isinstance(n, ast.AnnAssign)]
+    return {id(n) for root in inert for n in ast.walk(root)}
+
+
 def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tuple[str, str]]:
     """(description, mutated module source) for every mutation site inside `func`."""
     tree = ast.parse(module_src)
@@ -85,15 +100,14 @@ def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tup
         raise SystemExit(f"function {func} not found")
     doc = target.body[0] if target.body and isinstance(target.body[0], ast.Expr) \
         and isinstance(target.body[0].value, ast.Constant) and isinstance(target.body[0].value.value, str) else None
-    skip = set(map(id, ast.walk(doc))) if doc else set()  # a docstring cannot change behaviour
+    skip = _inert(target, doc)
     sites = [n for n in ast.walk(target) if n is not target and id(n) not in skip]
     out = []
 
     def emit(desc: str, node: ast.AST, apply) -> None:
         t2 = copy.deepcopy(tree)
         f2 = next(n for n in ast.walk(t2) if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef) and n.name == func)
-        doc2 = f2.body[0] if doc is not None else None
-        skip2 = set(map(id, ast.walk(doc2))) if doc2 is not None else set()
+        skip2 = _inert(f2, f2.body[0] if doc is not None else None)
         twin = [n for n in ast.walk(f2) if n is not f2 and id(n) not in skip2][sites.index(node)]
         if apply(twin, f2) is not False:
             out.append((f"L{getattr(node, 'lineno', target.lineno)} {desc}", ast.unparse(ast.fix_missing_locations(t2))))
