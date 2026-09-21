@@ -64,8 +64,8 @@ ENFORCEMENT = {
 }
 
 
-def _git(*args: str, root: pathlib.Path = ROOT, text: bool = True) -> str | bytes:
-    return subprocess.run(["git", *args], cwd=root, capture_output=True, text=text, check=True).stdout
+def _git(*args: str, root: pathlib.Path = ROOT) -> str:
+    return subprocess.run(["git", *args], cwd=root, capture_output=True, encoding="utf-8", check=True).stdout
 
 
 def tracked_entries(rev: str, root: pathlib.Path = ROOT) -> dict[str, str]:

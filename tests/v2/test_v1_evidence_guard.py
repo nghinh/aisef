@@ -128,7 +128,7 @@ class Preventive(unittest.TestCase):
 
 def _git(root, *args):
     return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t.t", *args], cwd=root,
-                          capture_output=True, text=True, check=True).stdout.strip()
+                          capture_output=True, encoding="utf-8", check=True).stdout.strip()
 
 
 class Detective(unittest.TestCase):

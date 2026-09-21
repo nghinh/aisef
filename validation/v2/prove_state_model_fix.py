@@ -56,7 +56,7 @@ def _tests(tree: ast.AST) -> list[str]:
 
 
 def prove(base: str) -> dict:
-    old_src = subprocess.run(["git", "show", f"{base}:{TARGET}"], cwd=ROOT, capture_output=True, text=True,
+    old_src = subprocess.run(["git", "show", f"{base}:{TARGET}"], cwd=ROOT, capture_output=True, encoding="utf-8",
                              check=True).stdout
     new_src = (ROOT / TARGET).read_text(encoding="utf-8")
     old, new = ast.parse(old_src), ast.parse(new_src)
@@ -64,7 +64,7 @@ def prove(base: str) -> dict:
     new_n, new_removed = _normalise(ast.parse(new_src))
     return {
         "target": TARGET,
-        "base_revision": subprocess.run(["git", "rev-parse", base], cwd=ROOT, capture_output=True, text=True,
+        "base_revision": subprocess.run(["git", "rev-parse", base], cwd=ROOT, capture_output=True, encoding="utf-8",
                                         check=True).stdout.strip(),
         "permitted_differences": ["module docstring", "import tempfile", "value bound to RESULTS"],
         "normalised_from_base": old_removed,
