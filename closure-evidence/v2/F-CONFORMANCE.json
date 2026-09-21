@@ -65,7 +65,6 @@
     "F5.calibration_contracts"
    ],
    "pending_on": [
-    "WP-2.1",
     "WP-2.2"
    ]
   },
@@ -746,15 +745,8 @@
    "item": "F5",
    "id": "F5.probe_protocol",
    "implemented_by": "WP-2.1",
-   "state": "PENDING",
-   "detail": "aisef2.probe.protocol.Probe not implemented",
-   "rfc_reference": [
-    "id",
-    "digest",
-    "enforcement",
-    "harness_preconditions",
-    "evaluate"
-   ],
+   "state": "PASS",
+   "detail": "Probe equals the RFC: 5 members, signatures included",
    "required_now": false
   },
   {

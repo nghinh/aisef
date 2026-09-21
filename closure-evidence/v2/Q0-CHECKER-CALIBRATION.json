@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 19,
+ "checker_count": 20,
  "uncovered_checker_modules": [],
- "calibrated_count": 19,
- "always_pass_mutants_rejected": 19,
+ "calibrated_count": 20,
+ "always_pass_mutants_rejected": 20,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -250,6 +250,21 @@
    "expected": "property contract_hash_binds_subject_absence is false",
    "observed": [
     "WP-1.1: property contract_hash_binds_subject_absence is false"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "p2_evidence",
+   "package": "WP-2.1",
+   "fixture": "tests/v2/fixtures/known_bad/p2_evidence.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "property subject_absence_never_unrunnable is false",
+   "observed": [
+    "WP-2.1: property subject_absence_never_unrunnable is false"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

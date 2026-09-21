@@ -1,0 +1,26 @@
+{
+ "record": "AISEF V2 — P2 RUN HISTORY",
+ "policy": "closure-evidence/v2/V2-RETRY-POLICY.json",
+ "rule": "append-only; every full-suite and CI attempt, failed or not; see validation/v2/run_history.py",
+ "entries": [
+  {
+   "seq": 1,
+   "commit": "4a10c09c62a78690ebf972d95e24f7cfff3e6253",
+   "where": "local",
+   "job": null,
+   "package": "P1 seal commit (post-seal verification)",
+   "invocation": "python -m unittest discover -s tests",
+   "attempt": 1,
+   "result": "PASS",
+   "tests_run": 3926,
+   "skipped": 20,
+   "failing_tests": [],
+   "classification": null,
+   "retry_permitted": false,
+   "retry_of": null,
+   "gate_effect": "COUNTS",
+   "v1_evidence_changed": false,
+   "detective_guard": "PASS"
+  }
+ ]
+}

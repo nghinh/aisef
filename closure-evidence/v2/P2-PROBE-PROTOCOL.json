@@ -1,0 +1,450 @@
+{
+ "record": "AISEF V2 — P2 PROBE PROTOCOL",
+ "work_package": "WP-2.1",
+ "rfc_sections": [
+  "9",
+  "10.2",
+  "24"
+ ],
+ "frozen_items": [
+  "F5"
+ ],
+ "probe": {
+  "id": "probe.python_callable",
+  "digest": "65522e577b6261e0299199cfcb2c75847e560f9783ff2242dea0be7a0e0f469c",
+  "sources": [
+   "probe/protocol.py",
+   "probe/python_callable.py"
+  ],
+  "enforcement": "PARTIAL",
+  "weakest_path": "the subject runs inside the probe's subprocess with the harness user's filesystem and network access; isolation is -I interpreter isolation and a scrubbed environment, not a sandbox",
+  "harness_preconditions": [
+   "interpreter: the ExecutionEnv's Python interpreter exists and executes",
+   "checkout: the revision's checkout is a readable directory",
+   "protocol: the harness subprocess prints READY before touching the subject, then RESULT"
+  ],
+  "observation_classes": [
+   "exists",
+   "returns",
+   "raises"
+  ]
+ },
+ "implementation_notes": {
+  "probe_result_core": "unchanged from P1 (Executed / Unrunnable / InvalidSpec); enforcement is bound by ProbeRecord, which run_probe returns for every evaluation",
+  "api_shape": "a probe reports a typed Observation; protocol.classify_failure alone maps it to a ProbeResult",
+  "second_kind": "a file_artifact prototype written only against the protocol runs in tests/v2/p2/test_probe_protocol.py (SecondKindPrototype); it ships no code"
+ },
+ "residuals": [
+  "probe timeout is UNRUNNABLE / ENVIRONMENT even when the subject is what hangs — RFC §9 lists timeout as a harness failure; a hanging product is therefore not charged to DEVELOPER",
+  "a harness process killed by a signal mid-observation is UNRUNNABLE: the probe cannot tell the subject from the environment killing it",
+  "enforcement PARTIAL: the subject runs inside the probe's subprocess with the harness user's filesystem and network access; isolation is -I interpreter isolation and a scrubbed environment, not a sandbox"
+ ],
+ "acceptance_cases": {
+  "PROBE-ABS-2": {
+   "REQUIRES_SUBJECT, module absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "INDETERMINATE",
+    "reason": "PRECONDITION_ABSENT",
+    "contract_satisfaction": "INDETERMINATE",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "REQUIRES_SUBJECT, attribute absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "INDETERMINATE",
+    "reason": "PRECONDITION_ABSENT",
+    "contract_satisfaction": "INDETERMINATE",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   }
+  },
+  "PROBE-ABS-3": {
+   "positive existence, absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "contract_satisfaction": "UNSATISFIED",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   }
+  },
+  "PROBE-ABS-4": {
+   "negative existence, absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   }
+  },
+  "PROBE-ABS-5": {
+   "must exist": {
+    "status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "contract_satisfaction": "UNSATISFIED",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "must not exist": {
+    "status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   },
+   "requires subject": {
+    "status": "EXECUTED",
+    "behavior_verdict": "INDETERMINATE",
+    "reason": "PRECONDITION_ABSENT",
+    "contract_satisfaction": "INDETERMINATE",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   }
+  }
+ },
+ "fault_injection": {
+  "interpreter absent": {
+   "status": "UNRUNNABLE",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "ENVIRONMENT",
+   "enforcement": "PARTIAL"
+  },
+  "cannot inspect (checkout missing)": {
+   "status": "UNRUNNABLE",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "ENVIRONMENT",
+   "enforcement": "PARTIAL"
+  },
+  "probe timeout": {
+   "status": "UNRUNNABLE",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "ENVIRONMENT",
+   "enforcement": "PARTIAL"
+  },
+  "tool absent (injected: exit 127, no protocol output)": {
+   "status": "UNRUNNABLE",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "ENVIRONMENT",
+   "enforcement": "PARTIAL"
+  },
+  "sandbox cannot execute (injected: PermissionError)": {
+   "status": "UNRUNNABLE",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "ENVIRONMENT",
+   "enforcement": "PARTIAL"
+  },
+  "killed by signal before READY (injected)": {
+   "status": "UNRUNNABLE",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "ENVIRONMENT",
+   "enforcement": "PARTIAL"
+  }
+ },
+ "present_subjects": {
+  "exists": {
+   "status": "EXECUTED",
+   "behavior_verdict": "SATISFIED",
+   "reason": null,
+   "contract_satisfaction": "SATISFIED",
+   "owner_at_candidate": null,
+   "enforcement": "PARTIAL"
+  },
+  "returns 3": {
+   "status": "EXECUTED",
+   "behavior_verdict": "SATISFIED",
+   "reason": null,
+   "contract_satisfaction": "SATISFIED",
+   "owner_at_candidate": null,
+   "enforcement": "PARTIAL"
+  },
+  "returns 4 (wrong)": {
+   "status": "EXECUTED",
+   "behavior_verdict": "REFUTED",
+   "reason": null,
+   "contract_satisfaction": "UNSATISFIED",
+   "owner_at_candidate": "DEVELOPER",
+   "enforcement": "PARTIAL"
+  },
+  "raises ValueError": {
+   "status": "EXECUTED",
+   "behavior_verdict": "SATISFIED",
+   "reason": null,
+   "contract_satisfaction": "SATISFIED",
+   "owner_at_candidate": null,
+   "enforcement": "PARTIAL"
+  },
+  "present, own import fails (REQUIRES_SUBJECT)": {
+   "status": "EXECUTED",
+   "behavior_verdict": "REFUTED",
+   "reason": null,
+   "contract_satisfaction": "UNSATISFIED",
+   "owner_at_candidate": "DEVELOPER",
+   "enforcement": "PARTIAL"
+  },
+  "present, ends the process": {
+   "status": "EXECUTED",
+   "behavior_verdict": "REFUTED",
+   "reason": null,
+   "contract_satisfaction": "UNSATISFIED",
+   "owner_at_candidate": "DEVELOPER",
+   "enforcement": "PARTIAL"
+  },
+  "resolves only outside the revision (REQUIRES_SUBJECT)": {
+   "status": "EXECUTED",
+   "behavior_verdict": "INDETERMINATE",
+   "reason": "PRECONDITION_ABSENT",
+   "contract_satisfaction": "INDETERMINATE",
+   "owner_at_candidate": "DEVELOPER",
+   "enforcement": "PARTIAL"
+  }
+ },
+ "refusals": {
+  "unsupported observation class": {
+   "status": "INVALID_SPEC",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "INTEGRATION",
+   "enforcement": "PARTIAL"
+  },
+  "path locator": {
+   "status": "INVALID_SPEC",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "INTEGRATION",
+   "enforcement": "PARTIAL"
+  },
+  "developer test artefact": {
+   "status": "INVALID_SPEC",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "INTEGRATION",
+   "enforcement": "PARTIAL"
+  },
+  "spec bound to another digest": {
+   "status": "INVALID_SPEC",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "INTEGRATION",
+   "enforcement": "PARTIAL"
+  },
+  "FULL enforcement required": {
+   "status": "UNRUNNABLE",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "ENVIRONMENT",
+   "enforcement": "PARTIAL"
+  }
+ },
+ "layout_invariance": {
+  "no tests": {
+   "exists": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   },
+   "absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "contract_satisfaction": "UNSATISFIED",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "requires absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "INDETERMINATE",
+    "reason": "PRECONDITION_ABSENT",
+    "contract_satisfaction": "INDETERMINATE",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "returns": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   },
+   "raises": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   }
+  },
+  "tests/ at the root": {
+   "exists": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   },
+   "absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "contract_satisfaction": "UNSATISFIED",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "requires absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "INDETERMINATE",
+    "reason": "PRECONDITION_ABSENT",
+    "contract_satisfaction": "INDETERMINATE",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "returns": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   },
+   "raises": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   }
+  },
+  "tests inside the package": {
+   "exists": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   },
+   "absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "contract_satisfaction": "UNSATISFIED",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "requires absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "INDETERMINATE",
+    "reason": "PRECONDITION_ABSENT",
+    "contract_satisfaction": "INDETERMINATE",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "returns": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   },
+   "raises": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   }
+  },
+  "broken tests": {
+   "exists": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   },
+   "absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "contract_satisfaction": "UNSATISFIED",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "requires absent": {
+    "status": "EXECUTED",
+    "behavior_verdict": "INDETERMINATE",
+    "reason": "PRECONDITION_ABSENT",
+    "contract_satisfaction": "INDETERMINATE",
+    "owner_at_candidate": "DEVELOPER",
+    "enforcement": "PARTIAL"
+   },
+   "returns": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   },
+   "raises": {
+    "status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "contract_satisfaction": "SATISFIED",
+    "owner_at_candidate": null,
+    "enforcement": "PARTIAL"
+   }
+  }
+ },
+ "f5_conformance": {
+  "state": "PASS",
+  "detail": "Probe equals the RFC: 5 members, signatures included"
+ },
+ "properties": {
+  "PROBE_ABS_1_harness_failure_is_unrunnable_environment_no_verdict": true,
+  "PROBE_ABS_2_requires_subject_absent_is_indeterminate_precondition_absent": true,
+  "PROBE_ABS_3_positive_existence_absent_is_unsatisfied": true,
+  "PROBE_ABS_4_negative_existence_absent_is_satisfied": true,
+  "PROBE_ABS_5_one_absence_not_forced_to_one_satisfaction": true,
+  "subject_absence_never_unrunnable": true,
+  "present_subject_is_observed": true,
+  "unsupported_class_refused_not_degraded": true,
+  "developer_path_rejected": true,
+  "stale_digest_binding_refused": true,
+  "insufficient_enforcement_refused_not_degraded": true,
+  "enforcement_bound_into_every_result": true,
+  "digest_stable_across_processes": true,
+  "digest_bound_into_the_spec": true,
+  "layout_invariance": true,
+  "f5_probe_protocol_equals_rfc": true
+ }
+}

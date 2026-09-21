@@ -20,6 +20,7 @@ from __future__ import annotations
 import ast
 import dataclasses
 import importlib
+import inspect
 import json
 import pathlib
 import re
@@ -48,6 +49,7 @@ class RFC:
         self.enums: dict[str, list[str]] = {}
         self.dataclasses: dict[str, list[str]] = {}
         self.protocols: dict[str, list[str]] = {}
+        self.protocol_members: dict[str, list[tuple[str, list[str] | None]]] = {}
         for block in re.findall(r"```python\n(.*?)```", self.body, re.S):
             try:
                 tree = ast.parse(block)
@@ -65,6 +67,9 @@ class RFC:
                 elif "Protocol" in bases:
                     self.protocols[n.name] = [s.target.id if isinstance(s, ast.AnnAssign) else s.name
                                               for s in n.body if isinstance(s, ast.AnnAssign | ast.FunctionDef)]
+                    self.protocol_members[n.name] = [
+                        (s.target.id, None) if isinstance(s, ast.AnnAssign) else (s.name, [a.arg for a in s.args.args])
+                        for s in n.body if isinstance(s, ast.AnnAssign | ast.FunctionDef)]
                 elif "dataclass" in decos:
                     self.dataclasses[n.name] = [s.target.id for s in n.body if isinstance(s, ast.AnnAssign)]
 
@@ -186,6 +191,26 @@ def _fields(module: str, attr: str, reference: list[str] | None) -> dict:
         return {"state": FAIL, "detail": f"{attr} fields differ from the RFC", "rfc_reference": reference,
                 "implemented": got}
     return {"state": PASS, "detail": f"{attr} fields equal the RFC in order ({len(got)})"}
+
+
+def _protocol_matches_rfc(rfc: RFC, module: str, name: str) -> dict:
+    """A Protocol shape: attribute and method names in order, and each method's parameters, against the RFC block."""
+    reference = rfc.protocol_members.get(name)
+    if not reference:
+        return {"state": FAIL, "detail": f"RFC reference for {name} could not be extracted"}
+    ref = [[m, p] for m, p in reference]
+    if not symbol_present(module, name):
+        return {"state": None, "detail": f"{module}.{name} not implemented", "rfc_reference": ref}
+    cls = getattr(importlib.import_module(module), name)
+    if not getattr(cls, "_is_protocol", False):
+        return {"state": FAIL, "detail": f"{module}.{name} is not a typing.Protocol", "rfc_reference": ref}
+    got = [[m, None] for m in cls.__dict__.get("__annotations__", {})] + \
+          [[m, list(inspect.signature(v).parameters)] for m, v in cls.__dict__.items()
+           if inspect.isfunction(v) and not m.startswith("_")]
+    if got != ref:
+        return {"state": FAIL, "detail": f"{name} members or signatures differ from the RFC", "rfc_reference": ref,
+                "implemented": got}
+    return {"state": PASS, "detail": f"{name} equals the RFC: {len(got)} members, signatures included"}
 
 
 def _semantic_hash_binds_subject_absence(rfc: RFC) -> dict:
@@ -380,7 +405,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
         _fields("aisef2.product.spec", "ProductProofSpec", rfc.dataclasses.get("ProductProofSpec")))
     add("F4", "F4.semantic_hash_binds_subject_absence", "WP-1.2", _semantic_hash_binds_subject_absence(rfc))
     add("F5", "F5.enum.Enforcement", "WP-0.2", V("Enforcement", e.get("Enforcement", []), code))
-    add("F5", "F5.probe_protocol", "WP-2.1", _shape("aisef2.probe.protocol", "Probe", rfc.protocols.get("Probe")))
+    add("F5", "F5.probe_protocol", "WP-2.1", _protocol_matches_rfc(rfc, "aisef2.probe.protocol", "Probe"))
     add("F5", "F5.calibration_contracts", "WP-2.2",
         _shape("aisef2.probe.calibration", "ProbeCapabilityCalibration",
                {"ProbeCapabilityCalibration": rfc.dataclasses.get("ProbeCapabilityCalibration"),

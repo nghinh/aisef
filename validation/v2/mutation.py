@@ -11,8 +11,11 @@ reason alone, so they are never in a kill set.
 The record binds each target's module source (LF-normalised sha256): editing a target makes the record stale and
 `--check` fails until the mutation run is repeated.
 
-    python -P validation/v2/mutation.py run [target ...]   # run; writes closure-evidence/v2/P1-MUTATION.json
-    python -P validation/v2/mutation.py --check            # record current, every target fully killed or audited
+One record per phase (`RECORDS`): a run writes each target into its phase's record, so a sealed phase's record is
+never rewritten by a later phase's targets.
+
+    python -P validation/v2/mutation.py run [target ...]   # run; writes closure-evidence/v2/P<n>-MUTATION.json
+    python -P validation/v2/mutation.py --check            # every phase record current, every target killed or audited
 """
 
 from __future__ import annotations
@@ -29,12 +32,13 @@ import sys
 import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-OUT_REL = "closure-evidence/v2/P1-MUTATION.json"
+RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json"}
+OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
 #: target "path::function" -> the test files that must kill its mutants (semantic tests only; see module doc).
 _CONTRACT_TESTS = ["tests/v2/p1/test_contract.py"]
-TARGETS: dict[str, list[str]] = {
+P1_TARGETS: dict[str, list[str]] = {
     # WP-1.1: contract_hash and the canonical identity it is made of
     "aisef2/product/contract.py::contract_hash": _CONTRACT_TESTS,
     "aisef2/product/contract.py::content_of": _CONTRACT_TESTS,
@@ -58,6 +62,14 @@ TARGETS: dict[str, list[str]] = {
     "aisef2/control/routing.py::_EXECUTED": ["tests/v2/p1/test_routing.py"],
     "aisef2/control/routing.py::route": ["tests/v2/p1/test_routing.py"],
 }
+_PROTOCOL_TESTS = ["tests/v2/p2/test_probe_protocol.py"]
+P2_TARGETS: dict[str, list[str]] = {
+    # WP-2.1: the only mapping from an observation to a ProbeResult, and the entry point that binds enforcement
+    "aisef2/probe/protocol.py::classify_failure": _PROTOCOL_TESTS,
+    "aisef2/probe/protocol.py::run_probe": _PROTOCOL_TESTS,
+}
+PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS}
+TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
 #: (target, mutant description) -> why the mutant is equivalent. Empty until a survivor is examined by hand.
@@ -236,28 +248,50 @@ def target_problems(t: dict, root: pathlib.Path = ROOT) -> list[str]:
     return out
 
 
-def problems_of(record: dict, root: pathlib.Path = ROOT) -> list[str]:
+def phase_of(target: str) -> str:
+    return next(ph for ph, targets in PHASE_TARGETS.items() if target in targets)
+
+
+def problems_of(record: dict, root: pathlib.Path = ROOT, phase: str = "P1") -> list[str]:
     seen = {t["target"] for t in record["targets"]}
-    out = [f"{t} has no mutation result" for t in TARGETS if t not in seen]
+    out = [f"{t} has no mutation result" for t in PHASE_TARGETS[phase] if t not in seen]
+    out += [f"{t} belongs to {phase_of(t)}, not {phase}" for t in seen if t in TARGETS and phase_of(t) != phase]
     return out + [p for t in record["targets"] for p in target_problems(t, root)]
+
+
+def check(root: pathlib.Path = ROOT) -> list[str]:
+    out = []
+    for phase, rel in RECORDS.items():
+        if not PHASE_TARGETS[phase]:
+            continue
+        path = root / rel
+        out += problems_of(json.loads(path.read_text(encoding="utf-8")), root, phase) if path.exists() \
+            else [f"{rel} is missing"]
+    return out
 
 
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
-    out = ROOT / OUT_REL
     if argv[:1] == ["run"]:
         chosen = argv[1:] or list(TARGETS)
-        record = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {
-            "record": "AISEF V2 — P1 MUTATION", "tool": "validation/v2/mutation.py", "targets": []}
-        kept = [t for t in record["targets"] if t["target"] not in chosen and t["target"] in TARGETS]
-        fresh = [run_target(ROOT, t, TARGETS[t]) for t in chosen]
-        record["targets"] = sorted(kept + fresh, key=lambda t: t["target"])
-        out.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-        for t in fresh:
-            print(f"{t['target']}: {t.get('killed')}/{t.get('mutants')} killed; survivors {t.get('survivors')}"
-                  + (f" ERROR {t['error']}" if t.get("error") else ""))
-    record = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {"targets": []}
-    problems = problems_of(record)
+        for phase, rel in RECORDS.items():
+            mine = [t for t in chosen if t in PHASE_TARGETS[phase]]
+            if not mine:
+                continue
+            out = ROOT / rel
+            record = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {
+                "record": f"AISEF V2 — {phase} MUTATION", "tool": "validation/v2/mutation.py", "targets": []}
+            kept = [t for t in record["targets"] if t["target"] not in mine and t["target"] in PHASE_TARGETS[phase]]
+            fresh = [run_target(ROOT, t, TARGETS[t]) for t in mine]
+            record["targets"] = sorted(kept + fresh, key=lambda t: t["target"])
+            out.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+            for t in fresh:
+                print(f"{t['target']}: {t.get('killed')}/{t.get('mutants')} killed; survivors {t.get('survivors')}"
+                      + (f" ERROR {t['error']}" if t.get("error") else ""))
+        unknown = [t for t in chosen if t not in TARGETS]
+        if unknown:
+            raise SystemExit(f"not a mutation target: {unknown}")
+    problems = check()
     for p in problems:
         print(f"FAIL  {p}")
     print("mutation: " + ("FAIL" if problems else "PASS"))

@@ -1,0 +1,290 @@
+{
+ "record": "AISEF V2 — P2 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/probe/protocol.py::classify_failure",
+   "kill_tests": [
+    "tests/v2/p2/test_probe_protocol.py"
+   ],
+   "source_sha256": "3c124761ec71b67c14702de77b6b1e0d37485e06cd7eb628c90bc3ccdd355d9f",
+   "mutants": 26,
+   "killed": 26,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L143 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L145 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L147 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L149 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L152 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L143 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L146 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L147 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L148 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L149 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L151 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L145 ObservationKind.HARNESS_FAILED->UNSUPPORTED",
+     "killed": true
+    },
+    {
+     "mutant": "L145 ObservationKind.HARNESS_FAILED->SUBJECT_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L145 ObservationKind.HARNESS_FAILED->OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L147 ObservationKind.UNSUPPORTED->HARNESS_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L147 ObservationKind.UNSUPPORTED->SUBJECT_ABSENT",
+     "killed": true
+    },
+    {
+     "mutant": "L147 ObservationKind.UNSUPPORTED->OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L149 ObservationKind.SUBJECT_ABSENT->HARNESS_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L149 ObservationKind.SUBJECT_ABSENT->UNSUPPORTED",
+     "killed": true
+    },
+    {
+     "mutant": "L149 ObservationKind.SUBJECT_ABSENT->OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L150 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L144 string 'a probe reports a typed Observation' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L150 SubjectAbsence.ABSENCE_IS_DECIDABLE->REQUIRES_SUBJECT",
+     "killed": true
+    },
+    {
+     "mutant": "L151 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L150 string 'subject_absence' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/probe/protocol.py::run_probe",
+   "kill_tests": [
+    "tests/v2/p2/test_probe_protocol.py"
+   ],
+   "source_sha256": "3c124761ec71b67c14702de77b6b1e0d37485e06cd7eb628c90bc3ccdd355d9f",
+   "mutants": 39,
+   "killed": 39,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L176 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L178 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L181 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L184 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L196 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L176 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L178 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L181 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L186 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L178 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L178 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L178 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L186 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L189 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L177 string 'not a probe' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L179 string 'a probe runs a ProductProofSpec at a RevisionRef in an ExecutionEnv' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L182 string 'a probe declares its real enforcement level' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L186 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L186 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L186 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L186 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L189 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L194 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L185 string 'the probe input names a developer test artefact ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L185 string '; refused (invariant IX)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L189 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L189 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L194 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L187 string 'the spec is bound to ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L187 string '@' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L187 string ', not ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L188 string '@' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L189 Enforcement.UNAVAILABLE->FULL",
+     "killed": true
+    },
+    {
+     "mutant": "L189 Enforcement.UNAVAILABLE->PARTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L190 string 'enforcement ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L190 string ' cannot honour the required ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L191 string '; refused, not degraded' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L195 string ' returned ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L195 string ', not a ProbeResult' emptied",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

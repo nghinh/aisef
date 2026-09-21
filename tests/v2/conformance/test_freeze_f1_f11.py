@@ -139,6 +139,33 @@ class Conformance(unittest.TestCase):
         self.assertEqual(sub["state"], fc.FAIL)
         self.assertIn("rationale", sub["implemented"])
 
+    def test_F5_probe_protocol_is_compared_member_by_member_with_signatures(self):
+        self.assertEqual(self._sub(self.result, "F5.probe_protocol")["state"], fc.PASS)
+        sig = "def evaluate(self, spec: ProductProofSpec, at: RevisionRef, env: ExecutionEnv) -> ProbeResult: ..."
+        self.assertIn(sig, self.rfc)
+        sub = self._sub(fc.evaluate(self.rfc.replace(sig, sig.replace(", env: ExecutionEnv", "")), self.code,
+                                    self.manifest), "F5.probe_protocol")
+        self.assertEqual(sub["state"], fc.FAIL)
+        self.assertIn(["evaluate", ["self", "spec", "at", "env"]], sub["implemented"])
+        from typing import Protocol
+        from aisef2.probe import protocol
+
+        class Drifted(Protocol):
+            id: str
+            digest: str
+
+            def enforcement(self): ...
+
+            def harness_preconditions(self): ...
+
+            def evaluate(self, spec, at, env, extra_path): ...
+        with mock.patch.object(protocol, "Probe", Drifted):
+            sub = self._sub(fc.evaluate(self.rfc, self.code, self.manifest), "F5.probe_protocol")
+        self.assertEqual(sub["state"], fc.FAIL)
+        with mock.patch.object(protocol, "Probe", type("NotAProtocol", (), {})):
+            self.assertIn("is not a typing.Protocol",
+                          self._sub(fc.evaluate(self.rfc, self.code, self.manifest), "F5.probe_protocol")["detail"])
+
     # ------------------------------------------------------------------ references really come from the RFC
 
     def test_lifetime_order_reference_is_lease_first_and_lease_last(self):

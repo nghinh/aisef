@@ -206,8 +206,7 @@ def _mutation() -> Checker:
     mu = _load("aisef_v2_mutation", V2 / "mutation.py")
 
     def clean():
-        rec = ROOT / mu.OUT_REL
-        return mu.problems_of(json.loads(rec.read_text(encoding="utf-8"))) if rec.exists() else [f"{mu.OUT_REL} missing"]
+        return mu.check(ROOT)
 
     def bad(fx):
         with tempfile.TemporaryDirectory() as t:
@@ -226,6 +225,12 @@ def _p1_evidence() -> Checker:
     ev = _load("aisef_v2_p1_evidence", V2 / "p1_evidence.py")
     return Checker("p1_evidence", "WP-1.1", lambda: ev.check(ROOT), lambda fx: ev.problems_of(fx["record"]),
                    ("validation/v2/p1_evidence.py",))
+
+
+def _p2_evidence() -> Checker:
+    ev = _load("aisef_v2_p2_evidence", V2 / "p2_evidence.py")
+    return Checker("p2_evidence", "WP-2.1", lambda: ev.check(ROOT), lambda fx: ev.problems_of(fx["record"]),
+                   ("validation/v2/p2_evidence.py",))
 
 
 def _gen_specs() -> Checker:
@@ -266,7 +271,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_raw_verdict_routing", "NO_RAW_VERDICT_ROUTING", "WP-1.3"),
     _kernel_rule("retryable_only_in_taxonomy", "RETRYABLE_ONLY_IN_TAXONOMY", "WP-1.4"),
     _kernel_rule("no_verdict_from_absence_declaration", "NO_VERDICT_FROM_ABSENCE_DECLARATION", "P1 hygiene (RFC §10.2)"),
-    _mutation, _p1_evidence, _gen_specs, _plan_semantics, _plan_baseline,
+    _mutation, _p1_evidence, _p2_evidence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 
 
