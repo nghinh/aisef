@@ -4,6 +4,14 @@ Board resolution §13. One authoritative model of the fifteen objects, their pla
 this disagrees with the earlier proposals, this and
 [`AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md`](AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md) govern.
 
+> ## ⚠ Superseded for implementation decisions
+>
+> [`docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md`](../../architecture/AISEF-V2-ARCHITECTURE-RFC.md) is
+> normative. Owner decisions B1–B5 changed three things here: `StaticPlanAdmission` splits into
+> **Engine** (qualified by Q0/Q1) and **Result** (produced by a project at plan time, before plan freeze);
+> `IdentityGrade` has **three** values (`VERIFIED` / `ATTESTED` / `OPAQUE`); and the terminal sink is the
+> **`RunTerminationSentinel`**, which records success rather than failure and may never be cited by a gate.
+
 **Rule for reading it: no cell may be ambiguous.** "May model edit?" and "may developer edit?" are `NO` unless
 stated otherwise, and a `NO` means the system must make it impossible, not merely discouraged.
 

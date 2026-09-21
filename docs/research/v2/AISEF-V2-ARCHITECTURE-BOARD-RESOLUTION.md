@@ -3,7 +3,22 @@
 Response to **AISEF V2 — ARCHITECTURE BOARD RESOLUTION / FINAL DESIGN CORRECTION BEFORE RFC**. One bounded
 design-correction pass. No V2 implementation; no RFC.
 
-This document is **authoritative over the earlier proposals** where they disagree. The earlier documents have
+> ## ⚠ Superseded for implementation decisions
+>
+> The owner has since issued **AISEF V2 — OWNER RESOLUTION OF RFC BLOCKERS** (B1–B5) and authorised the final
+> RFC. [`docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md`](../../architecture/AISEF-V2-ARCHITECTURE-RFC.md) is
+> now normative; this document is design history. The owner decisions changed five things here:
+>
+> | § here | Owner decision | Change |
+> |---|---|---|
+> | §5 vacuity control | **B1 MODIFY** | Not a boolean gate. Typed `NON_VACUOUS` / `VACUOUS` / `INDETERMINATE`; collection, import, reconstruction, tool and environment failures are `INDETERMINATE`, never proof of non-vacuity. Engineering-quality evidence only — SS-81-style false *product* assurance is already structurally removed because developer tests no longer decide product proof. |
+> | §5 relevance | **B2 MODIFY** | "Changed line **and** changed branch" rejected as universal. Typed `RELEVANT` / `IRRELEVANT` / `UNMEASURABLE`; cycle-1 minimum is executed-test ∩ executable changed line. Capability absence is never `IRRELEVANT`. |
+> | §10 identity | **B3 ACCEPT + extend** | Three grades: `VERIFIED` / `ATTESTED` / `OPAQUE`. `OPAQUE` (e.g. dynamic model-combo routes) is barred from Q6, sealed cohorts and generalization claims. Comparability needs identity tuple **and** grade **and** enforcement identity — grade alone is insufficient. |
+> | §8 terminal sink | **B4 ACCEPT + refine** | Renamed `RunTerminationSentinel` and **inverted**: it records *success*. `OPEN` fsync'd before execution; `CLEAN` only after all disposal and a durable `run/end`. Correctness no longer depends on writing a record after a failure. |
+> | §3 / §12 drift | **B5 ACCEPT** | `PlanQualityPolicy` with named thresholds; **no universal framework k%**. `delivery_verdict` and `plan_quality_verdict` are separate and the separation is mandatory. Qualification must preregister thresholds or make no plan-quality claim. |
+> | §2 / §6 admission | normalization | `StaticPlanAdmissionEngine` (qualified by Q0/Q1) is distinct from `StaticPlanAdmissionResult` (produced by a project at plan time). Q0 never executes a project's admission. |
+
+This document was **authoritative over the earlier proposals** where they disagree. The earlier documents have
 been updated and each now points here.
 
 **Disposition: 12 corrections, 12 accepted. Two accepted with a stated qualification (§5, §10), and one

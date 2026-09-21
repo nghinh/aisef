@@ -5,6 +5,16 @@ produce. Objects and ownership are defined in
 [`AISEF-V2-NORMALIZED-METAMODEL.md`](AISEF-V2-NORMALIZED-METAMODEL.md); the corrections this reflects are in
 [`AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md`](AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md).
 
+> ## ⚠ Superseded for implementation decisions
+>
+> [`docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md`](../../architecture/AISEF-V2-ARCHITECTURE-RFC.md) is
+> normative. Owner decisions B1–B5 changed four stations: **S4** produces a `StaticPlanAdmissionResult` from the
+> project's execution of the engine (Q0/Q1 qualify the engine, never run the project's admission); **S6/S18**
+> use the `RunTerminationSentinel`, `OPEN` fsync'd before execution and `CLEAN` only after all disposal and a
+> durable `run/end`; **S10** is typed `ADEQUATE` / `INADEQUATE` / `INCOMPLETE`, where `INCOMPLETE`
+> (`INDETERMINATE` vacuity or `UNMEASURABLE` relevance) never blocks and is never charged to the developer; and
+> **S17/S18** record `delivery_verdict` and `plan_quality_verdict` separately.
+
 **Outcome vocabulary.** `BLOCK` — stops and does not proceed. `RETRY` — may re-attempt against a named budget.
 `SKIP MODEL` — proceeds without any developer model call. `REQUIRE HUMAN` — cannot proceed without a human
 decision. `FAIL ENVIRONMENT` — a typed environment failure, chargeable to no developer or plan budget.
