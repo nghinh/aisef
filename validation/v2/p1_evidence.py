@@ -183,19 +183,29 @@ def outcome_polarity() -> dict:
     def spec(cid):
         return ProductProofSpec.from_json(json.loads((corpus / f"{cid}.json").read_text(encoding="utf-8")))
 
-    def neg(case, cid, observed):
+    def neg(case, cid, observed, observation):
         s = spec(cid)
         sat = contract_satisfaction(observed, s)
         return {"case": case, "contract": cid, "candidate_expectation": s.candidate_expectation.value,
-                "subject_absence": s.probe_input["subject_absence"], "observed_verdict": observed.behavior_verdict.value,
+                "subject_absence": s.probe_input["subject_absence"], "observation": observation,
+                "observed_verdict": observed.behavior_verdict.value,
                 "reason": observed.reason and observed.reason.value, "contract_satisfaction": sat.value}
-    cases = [neg("NEG-1", "BC-QUIET-STDOUT", Executed(V.SATISFIED)),
-             neg("NEG-2", "BC-NO-TELEMETRY", on_subject_absent(spec("BC-NO-TELEMETRY"))),
-             neg("NEG-3", "BC-QUIET-STDOUT", on_subject_absent(spec("BC-QUIET-STDOUT")))]
+
+    # P1 has no probe: the one physical fact "the subject is not there", as the existence observable sees it.
+    absent = V.REFUTED
+    decidable = [spec(c) for c in ("BC-LICENSE", "BC-NO-TELEMETRY")]
+    cases = [neg("NEG-1", "BC-QUIET-STDOUT", Executed(V.SATISFIED), "fixture: the CLI writes to stdout"),
+             neg("NEG-2", "BC-NO-TELEMETRY", on_subject_absent(spec("BC-NO-TELEMETRY"), observed=absent),
+                 "fixture: existence observable over the absent module -> REFUTED"),
+             neg("NEG-3", "BC-QUIET-STDOUT", on_subject_absent(spec("BC-QUIET-STDOUT"), observed=None),
+                 "none: REQUIRES_SUBJECT, the subject is absent")]
+    same_absence = {s.contract_id: contract_satisfaction(on_subject_absent(s, observed=absent), s).value
+                    for s in decidable}
     oracle = fc._satisfaction_matches_rfc(_rfc())
     return {
         "record": "AISEF V2 — P1 OUTCOME POLARITY", "work_package": "WP-1.3", "rfc_sections": ["10", "10.1", "10.2"],
         "neg_cases": cases,
+        "same_absence_by_contract": same_absence,
         "note": "NEG dispositions (READY / PRE_SATISFIED / PRECONDITION_BROKEN) are StoryAdmission's (WP-2.4); "
                 "this record proves the satisfaction each disposition is routed on",
         "rfc_oracle": {"state": oracle["state"], "detail": oracle["detail"], "table": oracle.get("table")},
@@ -212,11 +222,24 @@ def outcome_polarity() -> dict:
                                                             for r in (Unrunnable("x"), InvalidSpec("x"))),
             "satisfaction_equals_rfc_function": oracle["state"] == "PASS",
             "absence_is_an_observation_never_unrunnable": all(
-                on_subject_absent(spec(c)).status is ProbeExecutionStatus.EXECUTED
-                for c in ("BC-QUIET-STDOUT", "BC-NO-TELEMETRY", "BC-VERSION", "BC-LICENSE")),
-            "absence_follows_declaration_not_polarity": on_subject_absent(spec("BC-LICENSE")) == Executed(V.REFUTED)
-                and on_subject_absent(spec("BC-VERSION")) == Executed(V.INDETERMINATE,
-                                                                       IndeterminateReason.PRECONDITION_ABSENT),
+                on_subject_absent(spec(c), observed=seen).status is ProbeExecutionStatus.EXECUTED
+                for c, seen in (("BC-QUIET-STDOUT", None), ("BC-NO-TELEMETRY", absent), ("BC-VERSION", None),
+                                ("BC-LICENSE", absent))),
+            "requires_subject_absent_is_indeterminate_precondition_absent": all(
+                on_subject_absent(spec(c), observed=None) == Executed(V.INDETERMINATE,
+                                                                      IndeterminateReason.PRECONDITION_ABSENT)
+                for c in ("BC-QUIET-STDOUT", "BC-VERSION")),
+            "requires_subject_refuses_a_vacuous_verdict": all(
+                _raises(lambda v=v: on_subject_absent(spec("BC-VERSION"), observed=v), InvariantError) for v in V),
+            "decidable_absence_verdict_is_the_observation": all(
+                on_subject_absent(s, observed=v) == Executed(v) for s in decidable for v in (V.SATISFIED, V.REFUTED)),
+            "decidable_absence_has_no_default_verdict": all(
+                _raises(lambda s=s, v=v: on_subject_absent(s, observed=v), InvariantError)
+                for s in decidable for v in (None, V.INDETERMINATE)),
+            "same_absence_positive_existence_unsatisfied_negative_existence_satisfied":
+                same_absence == {"BC-LICENSE": CS.UNSATISFIED.value, "BC-NO-TELEMETRY": CS.SATISFIED.value},
+            "no_kernel_code_infers_a_verdict_from_the_absence_declaration":
+                ks.check(ROOT, ("NO_VERDICT_FROM_ABSENCE_DECLARATION",)) == [],
             "no_planning_module_routes_on_raw_verdict": ks.check(ROOT, ("NO_RAW_VERDICT_ROUTING",)) == [],
         },
     }
@@ -261,7 +284,7 @@ def routing_table() -> dict:
         if row["satisfaction"]:
             by_key.setdefault((row["point"], row["role"], row["satisfaction"], row["reason"]), set()).add(
                 (row["code"], row["disposition"], row["decided_by"]))
-    absent = on_subject_absent(specs["BC-QUIET-STDOUT"])  # a REQUIRES_SUBJECT contract, subject absent
+    absent = on_subject_absent(specs["BC-QUIET-STDOUT"], observed=None)  # a REQUIRES_SUBJECT contract, subject absent
 
     def at(point, role, result=absent):
         return route(result, specs["BC-QUIET-STDOUT"], point, role)

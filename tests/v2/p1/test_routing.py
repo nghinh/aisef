@@ -129,7 +129,7 @@ class OwnerByMeasurementPoint(unittest.TestCase):
     """OWNER-MP-1..4 (RFC §10.3, ARCHITECTURE-EXCEPTION-V2-001): a REQUIRES_SUBJECT contract, subject absent."""
 
     def setUp(self):
-        self.absent = on_subject_absent(REQUIRES_SUBJECT)
+        self.absent = on_subject_absent(REQUIRES_SUBJECT, observed=None)
         self.assertEqual(self.absent, Executed(I, PA))
 
     def test_OWNER_MP_1_parent_INTRODUCE_is_READY_with_no_failure_owner(self):

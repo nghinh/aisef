@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 18,
+ "checker_count": 19,
  "uncovered_checker_modules": [],
- "calibrated_count": 18,
- "always_pass_mutants_rejected": 18,
+ "calibrated_count": 19,
+ "always_pass_mutants_rejected": 19,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -204,6 +204,21 @@
    "expected": "RETRYABLE_ONLY_IN_TAXONOMY aisef2/plan/bad.py:2",
    "observed": [
     "RETRYABLE_ONLY_IN_TAXONOMY aisef2/plan/bad.py:2 decides retryability outside the taxonomy"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "no_verdict_from_absence_declaration",
+   "package": "P1 hygiene (RFC §10.2)",
+   "fixture": "tests/v2/fixtures/known_bad/no_verdict_from_absence_declaration.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "NO_VERDICT_FROM_ABSENCE_DECLARATION aisef2/product/outcome.py:85",
+   "observed": [
+    "NO_VERDICT_FROM_ABSENCE_DECLARATION aisef2/product/outcome.py:85 a decided BehaviorVerdict in a scope that reads the SubjectAbsence declaration"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

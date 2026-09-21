@@ -8,6 +8,14 @@
   `ContractSatisfaction`, because the raw verdict is polarity-inverted for every negative contract.
 * **RETRYABLE_ONLY_IN_TAXONOMY** (RFC §22, WP-1.4) — retryability is fixed once in `aisef2/control/owner.py`; no
   other kernel module assigns, passes or keys a `retryable` or `retryability`.
+* **NO_VERDICT_FROM_ABSENCE_DECLARATION** (RFC §10.2, P1 hygiene) — a decided verdict is observed, never inferred
+  from `SubjectAbsence`: no kernel scope (a function, or module/class level) that reads the absence declaration —
+  a `SubjectAbsence` member, its value as a string, or the `subject_absence` field — also names
+  `BehaviorVerdict.SATISFIED` or `REFUTED`, directly, by alias, by value lookup or through a module-level name bound
+  to one. Catches the table form, the branch form and the early-return form alike; `INDETERMINATE` stays legal,
+  because REQUIRES_SUBJECT decides INDETERMINATE(PRECONDITION_ABSENT) by itself. Ceiling: a call into another scope
+  that returns a fixed verdict is not seen; `on_subject_absent`'s behavioural tests (and WP-2.1's probe tests) are
+  what cover that.
 
     python -P validation/v2/kernel_static_checks.py            # all rules; exit 1 on any violation
 """
@@ -25,7 +33,68 @@ ROUTING_PACKAGES = ("aisef2/plan/", "aisef2/control/", "aisef2/orchestrate/")
 RAW_VERDICT = {"BehaviorVerdict", "behavior_verdict"}
 TAXONOMY_MODULE = "aisef2/control/owner.py"
 _RETRY_NAMES = {"retryable", "retryability"}
-RULES = ("NO_PROSE_CONTROL", "NO_RAW_VERDICT_ROUTING", "RETRYABLE_ONLY_IN_TAXONOMY")
+RULES = ("NO_PROSE_CONTROL", "NO_RAW_VERDICT_ROUTING", "RETRYABLE_ONLY_IN_TAXONOMY",
+         "NO_VERDICT_FROM_ABSENCE_DECLARATION")
+ABSENCE_MEMBERS = {"REQUIRES_SUBJECT", "ABSENCE_IS_DECIDABLE"}
+ABSENCE_FIELD = "subject_absence"
+DECIDED_VERDICTS = {"SATISFIED", "REFUTED"}
+_SCOPES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)
+
+
+def _scope_nodes(scope: ast.AST):
+    """The nodes of one scope, not descending into nested functions (each is its own scope)."""
+    stack = list(ast.iter_child_nodes(scope))
+    while stack:
+        n = stack.pop()
+        yield n
+        if not isinstance(n, _SCOPES):
+            stack.extend(ast.iter_child_nodes(n))
+
+
+def _verdict_aliases(tree: ast.Module) -> set[str]:
+    out = {"BehaviorVerdict"}
+    for n in ast.walk(tree):
+        if isinstance(n, ast.alias) and n.name.rsplit(".", 1)[-1] == "BehaviorVerdict" and n.asname:
+            out.add(n.asname)
+    return out
+
+
+def _decided_verdict(n: ast.AST, verdicts: set[str], bound: set[str]) -> bool:
+    def is_verdict(v: ast.AST) -> bool:
+        return getattr(v, "id", None) in verdicts or getattr(v, "attr", None) == "BehaviorVerdict"
+
+    def decided(c: ast.AST) -> bool:
+        return isinstance(c, ast.Constant) and c.value in DECIDED_VERDICTS
+    return (isinstance(n, ast.Attribute) and n.attr in DECIDED_VERDICTS and is_verdict(n.value)
+            or isinstance(n, ast.Subscript) and is_verdict(n.value) and decided(n.slice)
+            or isinstance(n, ast.Call) and is_verdict(n.func) and n.args and decided(n.args[0])
+            or isinstance(n, ast.Call) and getattr(n.func, "id", "") == "getattr" and len(n.args) > 1
+            and is_verdict(n.args[0]) and decided(n.args[1])
+            or isinstance(n, ast.Name) and n.id in bound)
+
+
+def _reads_absence_declaration(n: ast.AST) -> bool:
+    """A member (by attribute or value string), or a read of the field (attribute, subscript key, getattr)."""
+    def field(c: ast.AST) -> bool:
+        return isinstance(c, ast.Constant) and c.value == ABSENCE_FIELD
+    return (isinstance(n, ast.Attribute) and n.attr in ABSENCE_MEMBERS | {ABSENCE_FIELD}
+            or isinstance(n, ast.Constant) and n.value in ABSENCE_MEMBERS
+            or isinstance(n, ast.Subscript) and field(n.slice)
+            or isinstance(n, ast.Call) and getattr(n.func, "id", "") == "getattr" and len(n.args) > 1 and field(n.args[1]))
+
+
+def _verdict_from_absence(rel: str, tree: ast.Module) -> list[str]:
+    verdicts = _verdict_aliases(tree)
+    bound = {t.id for n in tree.body if isinstance(n, (ast.Assign, ast.AnnAssign)) and n.value is not None
+             and any(_decided_verdict(v, verdicts, set()) for v in ast.walk(n.value))
+             for t in (n.targets if isinstance(n, ast.Assign) else [n.target]) if isinstance(t, ast.Name)}
+    out = []
+    for scope in [tree, *(n for n in ast.walk(tree) if isinstance(n, _SCOPES))]:
+        nodes = list(_scope_nodes(scope))
+        if any(_reads_absence_declaration(n) for n in nodes):
+            out += [f"NO_VERDICT_FROM_ABSENCE_DECLARATION {rel}:{n.lineno} a decided BehaviorVerdict in a scope that "
+                    "reads the SubjectAbsence declaration" for n in nodes if _decided_verdict(n, verdicts, bound)]
+    return out
 
 
 def _names(node: ast.AST) -> list[tuple[str, int]]:
@@ -79,6 +148,8 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = RULES) -> list[st
             )
             if decided:
                 out.append(f"RETRYABLE_ONLY_IN_TAXONOMY {rel}:{line or '?'} decides retryability outside the taxonomy")
+    if "NO_VERDICT_FROM_ABSENCE_DECLARATION" in rules:
+        out += _verdict_from_absence(rel, tree)
     return sorted(set(out))
 
 

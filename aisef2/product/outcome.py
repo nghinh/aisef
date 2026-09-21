@@ -8,8 +8,10 @@
   the recorded result and the spec's `candidate_expectation`. It is undefined — `InvariantError` — for a probe that
   did not execute. Planning routes on it, never on the raw verdict, which is polarity-inverted for every
   MUST_NOT_HOLD contract.
-* **Subject absence** (§10.2) is decided by the contract's declaration, carried in the spec, never by polarity:
-  `on_subject_absent(spec)` is the only result a probe may report when the subject does not exist.
+* **Subject absence** (§10.2) is governed by the contract's declaration, carried in the spec, never by polarity —
+  and a decided verdict never comes from the declaration alone: `on_subject_absent(spec, observed=...)` is the only
+  result a probe may report when the subject does not exist, and for `ABSENCE_IS_DECIDABLE` its verdict is what the
+  probe observed by evaluating the spec's observable over the absent subject.
 """
 
 from __future__ import annotations
@@ -74,13 +76,19 @@ def contract_satisfaction(result: ProbeResult, spec: ProductProofSpec) -> Contra
             else ContractSatisfaction.UNSATISFIED)
 
 
-def on_subject_absent(spec: ProductProofSpec) -> Executed:
-    """RFC §10.2: what a probe reports when the subject does not exist — decided by the declaration, not polarity.
+def on_subject_absent(spec: ProductProofSpec, *, observed: BehaviorVerdict | None) -> Executed:
+    """RFC §10.2: what a probe reports when the subject does not exist.
 
-    REQUIRES_SUBJECT: the contract cannot be decided -> INDETERMINATE(PRECONDITION_ABSENT), never a vacuous verdict.
-    ABSENCE_IS_DECIDABLE: absence is a completed observation that the behaviour is absent -> REFUTED (§10).
+    REQUIRES_SUBJECT: the contract cannot be decided -> INDETERMINATE(PRECONDITION_ABSENT). A probe offering a verdict
+    anyway would be reporting a vacuous one, so `observed` must be None.
+    ABSENCE_IS_DECIDABLE: absence is a completed observation, and its verdict is `observed` — what the probe saw when it
+    evaluated the spec's observable over the absent subject. The declaration never supplies it: there is no default.
     """
-    return {  # a declaration outside this table fails closed (KeyError), never defaults
-        SubjectAbsence.REQUIRES_SUBJECT: Executed(BehaviorVerdict.INDETERMINATE, IndeterminateReason.PRECONDITION_ABSENT),
-        SubjectAbsence.ABSENCE_IS_DECIDABLE: Executed(BehaviorVerdict.REFUTED),
-    }[SubjectAbsence(spec.probe_input["subject_absence"])]
+    if SubjectAbsence(spec.probe_input["subject_absence"]) is SubjectAbsence.REQUIRES_SUBJECT:
+        if observed is not None:
+            raise InvariantError("REQUIRES_SUBJECT: an absent subject has no verdict; reporting one is vacuous")
+        return Executed(BehaviorVerdict.INDETERMINATE, IndeterminateReason.PRECONDITION_ABSENT)
+    if observed is None or observed is BehaviorVerdict.INDETERMINATE:
+        raise InvariantError("ABSENCE_IS_DECIDABLE: the verdict is what the probe observed on the spec's observable; "
+                             "there is no default")
+    return Executed(observed)

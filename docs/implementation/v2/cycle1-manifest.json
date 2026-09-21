@@ -696,7 +696,7 @@
     "One reference probe kind (python_callable) to exercise the protocol.",
     "Refuse rather than degrade when enforcement is insufficient.",
     "Subject absence follows the spec, never a global missing-path rule (RFC §10.2): REQUIRES_SUBJECT -> EXECUTED + INDETERMINATE(PRECONDITION_ABSENT); ABSENCE_IS_DECIDABLE -> EXECUTED + the verdict the spec's observable implies.",
-    "Narrow the P1 helper aisef2.product.outcome.on_subject_absent: its ABSENCE_IS_DECIDABLE branch returns REFUTED for every spec, which holds for existence observables only; the verdict must come from the spec's observable (PROBE-ABS-5)."
+    "Report subject absence through aisef2.product.outcome.on_subject_absent(spec, observed=...): REQUIRES_SUBJECT takes no observation; ABSENCE_IS_DECIDABLE takes the verdict the probe observed by evaluating the spec's observable over the absent subject (PROBE-ABS-3..5). The helper was corrected in P1 (owner decision 'FINAL P1 HYGIENE BEFORE P2'); kernel static check NO_VERDICT_FROM_ABSENCE_DECLARATION keeps the declaration from supplying a decided verdict."
    ],
    "positive_tests": [
     "probe digest stable and bound into the spec",
