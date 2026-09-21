@@ -1,0 +1,2 @@
+# Shell hooks must keep LF on a Windows autocrlf checkout, or sh reads a stray \r in every command.
+.githooks/* text eol=lf

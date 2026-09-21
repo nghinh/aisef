@@ -369,6 +369,14 @@
      "evidence": "git diff showed +1/-129 lines; the file was restored with git checkout and its blob verified equal to commit 612efce (da27db6b)",
      "classification": "normal implementation defect in V1 test code; not an architecture exception",
      "committed_mutation": "none — no mutated version was ever committed"
+    },
+    {
+     "id": "PLAN-FINDING-002",
+     "found": "2026-09-21, P0 exit verification",
+     "what": "files_expected names '.githooks/pre-commit (extend)', but the repository has never had a .githooks/ directory or any committed hook; there was nothing to extend",
+     "resolution": ".githooks/pre-commit created: it runs the same detective check CI runs (v1_evidence_guard.py --check) at commit time; .gitattributes keeps it LF on Windows checkouts; adversarial tests in tests/v2/test_v1_evidence_guard.py (PreCommitHook) prove a staged V1 change is refused and a V2 change is not",
+     "grade": "opt-in per clone (git config core.hooksPath .githooks); adds no guarantee — the enforcement grade stays DETECTIVE, enforced in CI",
+     "classification": "plan wording error about an existing file; not an architecture exception"
     }
    ]
   },

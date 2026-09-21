@@ -1,0 +1,14 @@
+#!/bin/sh
+# WP-0.4 — refuse a commit while frozen V1 closure evidence differs from its baseline (staged, unstaged or
+# committed). Runs the same detective check CI runs after the suite, just earlier. Opt-in per clone:
+#     git config core.hooksPath .githooks
+# The enforcing layer is CI; this hook only moves the failure to the author's machine.
+cd "$(git rev-parse --show-toplevel)" || exit 1
+# The first interpreter that really runs with -P (Python >= 3.11); skips a Windows Store python3 stub.
+for c in python3 python; do
+    if "$c" -P -c "" >/dev/null 2>&1; then
+        exec "$c" -P validation/v2/v1_evidence_guard.py --check
+    fi
+done
+echo "pre-commit: no Python >= 3.11 found; cannot check V1 closure evidence" >&2
+exit 1

@@ -282,6 +282,16 @@ evidence and never `aisef/`.
 It is also direct evidence that the guard is necessary: until `WP-0.4` lands, the V1 evidence that the freeze
 record binds by hash can be silently rewritten by an ordinary test run.
 
+### 7.2 Finding during P0 exit verification — `PLAN-FINDING-002`
+
+`WP-0.4` lists `.githooks/pre-commit (extend)` among its expected files, but the repository has never had a
+`.githooks/` directory or any committed hook — there was nothing to extend. The hook was **created**: it runs the
+same detective check CI runs (`v1_evidence_guard.py --check`) at commit time, and `.gitattributes` keeps it LF on a
+Windows checkout. Tests prove a staged V1 change is refused and a V2 change is not.
+
+It is opt-in per clone (`git config core.hooksPath .githooks`), so it adds no guarantee: the enforcement grade
+stays **DETECTIVE**, enforced in CI. A plan wording error, not an architecture exception.
+
 ---
 
 ## 8. Final self-review

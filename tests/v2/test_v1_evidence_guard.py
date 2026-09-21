@@ -220,5 +220,48 @@ class Detective(unittest.TestCase):
                 guard.build_baseline(root, close)
 
 
+class PreCommitHook(unittest.TestCase):
+    """`.githooks/pre-commit` runs the detective check at commit time: a V1 change is refused, a V2 change is not."""
+
+    def _hooked_repo(self, t):
+        root, close = Detective._repo(self, t)
+        (root / ".githooks").mkdir()
+        shutil.copy(ROOT / ".githooks" / "pre-commit", root / ".githooks" / "pre-commit")
+        (root / "validation" / "v2").mkdir(parents=True)
+        src = (ROOT / "validation" / "v2" / "v1_evidence_guard.py").read_text(encoding="utf-8")
+        (root / "validation" / "v2" / "v1_evidence_guard.py").write_text(src.replace(guard.V1_CLOSE, close),
+                                                                        encoding="utf-8")
+        _git(root, "add", ".")
+        _git(root, "commit", "-q", "-m", "hook")
+        _git(root, "config", "core.hooksPath", ".githooks")
+        return root
+
+    def _commit(self, root):
+        return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t.t", "commit", "-q", "-m", "x"],
+                              cwd=root, capture_output=True, encoding="utf-8")
+
+    def test_committing_a_v1_evidence_change_is_refused(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = self._hooked_repo(t)
+            head = _git(root, "rev-parse", "HEAD")
+            (root / "closure-evidence/hardening/a.json").write_text('{"a": 9}\n', encoding="utf-8")
+            _git(root, "add", ".")
+            r = self._commit(root)
+            self.assertNotEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertIn("V1 evidence guard (DETECTIVE): FAIL", r.stderr)  # git sends hook stdout to stderr
+            self.assertEqual(_git(root, "rev-parse", "HEAD"), head)
+
+    def test_committing_a_v2_change_is_permitted(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = self._hooked_repo(t)
+            (root / "closure-evidence/v2/anything.json").write_text("{}", encoding="utf-8")
+            _git(root, "add", ".")
+            r = self._commit(root)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_hook_is_committed_with_lf_endings(self):
+        self.assertNotIn(b"\r", (ROOT / ".githooks" / "pre-commit").read_bytes())
+
+
 if __name__ == "__main__":
     unittest.main()
