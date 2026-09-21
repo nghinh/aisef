@@ -21,22 +21,46 @@ machine-readable [`cycle1-manifest.json`](cycle1-manifest.json).
 
 ## 1. Shape of the cycle
 
-**37 packages: 33 implementation (P0–P6) + 4 qualification (P7–P10).** Critical path: **19 packages**.
-F1–F11 coverage: **11/11**, minimum 4 packages per frozen item.
+**37 packages: 33 implementation (P0–P6) + 4 qualification (P7–P10).** F1–F11 coverage: **11/11**, minimum 4
+packages per frozen item.
 
-| phase | packages | exit condition |
-|---|---|---|
-| **P0** Freeze / conformance scaffolding | 5 | the architecture baseline is mechanically identifiable and protected |
-| **P1** Semantic core | 4 | polarity correct, NEG-1/2/3 green, compiler `--check`, hash stability, satisfaction mutation killed |
-| **P2** Probe + admission | 5 | CAL-1, CAL-2, subject/harness separation, no provider call before admission, PRE_SATISFIED, layout invariance |
-| **P3** Journal / projections | 5 | unknown-required refusal, `time` never folded, incremental == full, reference models, projection mutation |
-| **P4** Story / run transaction | 6 | RUN-1, RUN-2, crash cases, measured range emptiness, budgets as projections |
-| **P5** Engineering quality / invariants | 5 | TEST-1, TEST-2, collection-cause classification, three-valued vacuity, I–IX armed and uncontainable |
-| **P6** Orchestration / V1 migration | 3 | single authoritative path, generated migration table, six removal proofs |
-| **P7** Q0→Q3 | 1 | all four rungs green on the exact candidate |
-| **P8** Q4 | 1 | 100 000/100 000, 0 unexplained |
-| **P9** Q5 | 1 | reproduction green, tools re-executed not replayed |
-| **P10** LedgerLock regression | 1 | verdicts separate, no generalization claim, no cohort sealed |
+**Scheduling source of truth.** [`cycle1-manifest.json`](cycle1-manifest.json) is the **only** source of
+scheduling facts. Every table below marked *GENERATED* is rendered from it by
+[`validation/v2/plan_validate.py`](../../../validation/v2/plan_validate.py) and verified by `--check`; editing one
+by hand fails CI (PLANDEP-5). The dependency graph and the traceability matrix are generated in full.
+
+**Phase barriers are strict.** A package is runnable only when its declared dependencies are complete **and** the
+preceding phase is evidence-complete — all of its packages done, all required artefacts present, all exit checks
+green. Parallelism is permitted **within a phase only**. The critical path is a consequence of that ordering, not
+a goal: correctness and evidence ordering have priority over elapsed time.
+
+<!-- GENERATED:phase-table BEGIN — from cycle1-manifest.json; do not hand-edit -->
+
+| phase | packages | barrier | exit condition |
+|---|---|---|---|
+| **P0** Freeze / conformance scaffolding | 5 | — | architecture baseline mechanically identifiable and protected |
+| **P1** Semantic core | 4 | P0 | polarity, NEG-1/2/3, compiler --check, hash stability, satisfaction mutation |
+| **P2** Probe + admission | 5 | P1 | CAL-1, CAL-2, subject/harness separation, no provider call before admission, PRE_SATISFIED, layout invariance |
+| **P3** Journal / projections | 5 | P2 | unknown-required refusal, time never folded, incremental == full, reference models, projection mutation |
+| **P4** Story / run transaction | 6 | P3 | RUN-1, RUN-2, crash cases, range emptiness, budgets as projections |
+| **P5** Engineering quality / invariants | 5 | P4 | TEST-1, TEST-2, collection-cause classification, vacuity three-valued, I-IX armed and uncontainable |
+| **P6** Orchestration integration / V1 migration | 3 | P5 | single authoritative path, generated migration table, six removal proofs |
+| **P7** Q0-Q3 | 1 | P6 | all four rungs green on the exact candidate |
+| **P8** Q4 differential | 1 | P7 | 100000/100000, 0 unexplained |
+| **P9** Q5 reproduction | 1 | P8 | reproduction green, tools re-executed |
+| **P10** LedgerLock regression | 1 | P9 | verdicts separate, no generalization claim, no cohort sealed |
+
+<!-- GENERATED:phase-table END -->
+
+**Critical path under barriers:**
+
+<!-- GENERATED:critical-path BEGIN — from cycle1-manifest.json; do not hand-edit -->
+
+**Length 32 packages.**
+
+`WP-0.1` → `WP-0.4` → `WP-0.2` → `WP-0.3` → `WP-0.5` → `WP-1.1` → `WP-1.2` → `WP-1.3` → `WP-1.4` → `WP-2.1` → `WP-2.2` → `WP-2.3` → `WP-2.4` → `WP-2.5` → `WP-3.1` → `WP-3.3` → `WP-3.4` → `WP-3.5` → `WP-4.1` → `WP-4.3` → `WP-4.6` → `WP-5.1` → `WP-5.3` → `WP-5.4` → `WP-5.5` → `WP-6.1` → `WP-6.2` → `WP-6.3` → `QP-7` → `QP-8` → `QP-9` → `QP-10`
+
+<!-- GENERATED:critical-path END -->
 
 **No package may exit on "the code works."** Every exit criterion in the manifest names an artefact, a green
 adversarial test, or a mechanical check.
@@ -66,12 +90,16 @@ It is touched only in P6, and only to remove authority — never to add it.
 
 ### P0 — Freeze / conformance scaffolding (5 packages)
 
-`WP-0.1` freeze manifest · `WP-0.2` generated enum catalog with a `--check` twin · `WP-0.3` F1–F11 conformance
-checks · `WP-0.4` V1 evidence migration guard · `WP-0.5` known-bad fixtures calibrating every Q0 checker.
+Strictly sequential: **`WP-0.1` → `WP-0.4` → `WP-0.2` → `WP-0.3` → `WP-0.5`.**
 
-The ordering matters: the guard protecting V1 evidence (`WP-0.4`) lands **before** any package can write, and
-checker calibration (`WP-0.5`) lands before any checker is trusted. A Q0 checker that has never been observed
-failing is a cheap, fast, invisible source of false assurance — the gap the adversarial review found.
+`WP-0.1` freeze manifest · `WP-0.4` V1 evidence migration guard · `WP-0.2` generated enum catalog with a
+`--check` twin · `WP-0.3` F1–F11 conformance checks · `WP-0.5` known-bad fixtures calibrating every Q0 checker.
+
+`WP-0.1` is the only package permitted before the guard, because it establishes the freeze identity the guard
+protects. **Every other package — implementation and qualification — has `WP-0.4` as an explicit transitive
+ancestor**, and check C proves it. Checker calibration (`WP-0.5`) closes the phase, so no later package can run
+while any Q0 checker is still uncalibrated. A checker never observed failing is a cheap, fast, invisible source of
+false assurance — the gap the adversarial review found.
 
 ### P1 — Semantic core (4 packages)
 
@@ -143,19 +171,26 @@ generalization claim, and the verdict recorder asserts this. **No sealed cohort 
 
 ## 4. Parallelism
 
-Sequential by default for semantic and core phases. Parallel work is permitted **only** when all four hold:
-frozen interfaces are already implemented; write scopes do not overlap; evidence scopes do not overlap; and no
-package depends on another package's unverified semantics.
+**Within a phase only — never across a barrier.** Parallel work additionally requires all four of: frozen
+interfaces already implemented; disjoint write scopes; disjoint evidence scopes; and no dependency on another
+package's unverified semantics.
 
-Permitted parallel sets, given those conditions:
+The sets below are **derived** from the manifest: packages in the same phase that reach the same scheduling level.
+They are candidates; each still has to satisfy the four conditions above before it actually runs in parallel.
 
-| after | may run in parallel |
-|---|---|
-| `WP-0.1` | `WP-0.2`, `WP-0.4`, `WP-0.5` (disjoint write scopes) |
-| `WP-3.1` | `WP-3.2` alongside `WP-3.3` |
-| `WP-3.4` | `WP-3.5` — **by a different author**, from the RFC text only |
-| `WP-4.1` | `WP-4.2` alongside `WP-4.3`; `WP-4.4` after `WP-4.3` |
-| `WP-5.1` | `WP-5.2` alongside `WP-5.3` |
+<!-- GENERATED:parallel-sets BEGIN — from cycle1-manifest.json; do not hand-edit -->
+
+| phase | level | packages that may run in parallel |
+|---|---|---|
+| P3 | 16 | `WP-3.2`, `WP-3.3` |
+| P4 | 20 | `WP-4.2`, `WP-4.3` |
+| P4 | 21 | `WP-4.4`, `WP-4.5`, `WP-4.6` |
+| P5 | 23 | `WP-5.2`, `WP-5.3` |
+
+<!-- GENERATED:parallel-sets END -->
+
+`WP-3.5` may never run in parallel with `WP-3.4`: it depends on it, and it must be authored independently from the
+RFC text rather than from the projection source.
 
 **Aggressive parallel scheduling is not reintroduced.** Behaviour-aware parallel scheduling remains deferred
 (RFC §33); `FAM-SCHEDULER` is the family parallelism amplifies, and cycle 1 does not take that risk.
@@ -228,6 +263,25 @@ never exists in a production path.
 The probe taxonomy (risk 1) is an open implementation question the RFC already records in §36, not a
 contradiction — but it is the one most likely to become one.
 
+### 7.1 Finding during plan correction — `PLAN-FINDING-001`
+
+Running the full suite while validating this plan **modified a V1 closure-evidence file**:
+`tests/hardening/test_state_model.py` rewrites `closure-evidence/hardening/state-model-results.json` on every
+run, and its content depends on test order — this run dropped the entire `conformance` section (+1/−129 lines).
+
+It was restored with `git checkout`, and its blob verified equal to the file's last intended commit `612efce`
+(`da27db6b`). **No mutated version was ever committed.**
+
+This is a normal implementation defect in V1 *test* code, not an architecture exception. It matters to the plan
+because **`WP-0.4`'s guard would fail every CI run the moment it lands.** The fix is therefore recorded inside
+`WP-0.4` as a discovered prerequisite: redirect that write to a non-evidence scratch path in the same change that
+introduces the guard, with a new adversarial test — *a full-suite run leaves every file under `closure-evidence/`
+outside `v2/` byte-identical* — and a matching exit criterion. The change touches V1 test code only; never V1
+evidence and never `aisef/`.
+
+It is also direct evidence that the guard is necessary: until `WP-0.4` lands, the V1 evidence that the freeze
+record binds by hash can be silently rewritten by an ordinary test run.
+
 ---
 
 ## 8. Final self-review
@@ -239,14 +293,32 @@ Every F1–F11 item maps to implementation packages and to evidence artefacts. C
 [traceability matrix](AISEF-V2-CYCLE1-TRACEABILITY.md) §1, which is derived from the manifest rather than
 hand-written, with a `--check` twin in `WP-0.1`.
 
-### B · Ordering — **PASS**
+### B · Ordering — **PASS** (direction **and** completeness)
 
-Checked mechanically over the manifest: **no package depends on a package in a later phase. 0 violations.**
+**Corrected after owner review.** The original check proved only that no dependency points into a later phase.
+That does not prove that all required dependencies exist, and three were missing: `WP-0.4` was not an ancestor of
+the rest of P0; no phase barrier stopped phase N+1 starting before phase N was evidence-complete; and `WP-6.2`
+could be wired without `WP-2.4` or `WP-2.5`. The prose also claimed `WP-0.5` could run straight after `WP-0.1`
+while the graph said otherwise.
 
-One case was examined closely and is resolved without a violation: `WP-2.4` (P2) asserts that no
+Now checked by [`validation/v2/plan_validate.py`](../../../validation/v2/plan_validate.py), five checks:
+
+| check | proves |
+|---|---|
+| A `dependency_direction` | no dependency points into a later phase |
+| B `phase_barrier_completeness` | every phase's barrier is its predecessor, **and** independently that no package is runnable before its predecessor phase completes |
+| C `guard_ancestry` | every package other than `WP-0.1` and `WP-0.4` has `WP-0.4` as an **explicit** transitive ancestor |
+| D `orchestration_semantics` | `WP-6.2` explicitly requires `WP-2.5` and effectively requires all of P2–P5 |
+| E `qualification_chain` | `QP-7` < `QP-8` < `QP-9` < `QP-10`, with `QP-7` gated on P6 being complete |
+
+Each has a negative fixture (PLANDEP-1..4) that removes one required edge and is proven to fail, plus PLANDEP-5 for
+document drift. Results are in [`AISEF-V2-CYCLE1-DEPENDENCY-GRAPH.md`](AISEF-V2-CYCLE1-DEPENDENCY-GRAPH.md) §6.
+
+One case remains a deliberate design choice rather than a violation: `WP-2.4` (P2) asserts that no
 `provider/request` precedes story admission, while the journal lands in P3. The P2 assertion runs against the
 RFC's `JournalWriter` interface with an in-memory test double and is re-verified against the durable journal by
-`WP-6.3`. A test double introduces no semantics and never exists in a production path.
+`WP-6.3`. A test double introduces no semantics and never exists in a production path. It is recorded in the
+manifest's `additional_constraints` so it is a scheduling fact with a source, not prose.
 
 ### C · Scope — **PASS**
 

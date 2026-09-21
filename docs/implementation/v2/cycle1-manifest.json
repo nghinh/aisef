@@ -25,57 +25,143 @@
   {
    "id": "P0",
    "name": "Freeze / conformance scaffolding",
-   "exit": "architecture baseline mechanically identifiable and protected"
+   "exit": "architecture baseline mechanically identifiable and protected",
+   "barrier": null,
+   "exit_checks": [
+    "freeze manifest digests equal the approval record",
+    "V1 evidence guard rejects every V1 mutation",
+    "enum catalog --check green in both directions",
+    "F1-F11 conformance reports 11 definite states",
+    "every Q0 checker calibrated against a known-bad fixture"
+   ]
   },
   {
    "id": "P1",
    "name": "Semantic core",
-   "exit": "polarity, NEG-1/2/3, compiler --check, hash stability, satisfaction mutation"
+   "exit": "polarity, NEG-1/2/3, compiler --check, hash stability, satisfaction mutation",
+   "barrier": "P0",
+   "exit_checks": [
+    "NEG-1, NEG-2, NEG-3 green",
+    "no planning module imports BehaviorVerdict for routing",
+    "compiler --check round-trip byte-identical",
+    "semantic_hash stable across processes",
+    "satisfaction-mapping mutants fully killed",
+    "routing table total; no did-not-run -> developer edge"
+   ]
   },
   {
    "id": "P2",
    "name": "Probe + admission",
-   "exit": "CAL-1, CAL-2, subject/harness separation, no provider call before admission, PRE_SATISFIED, layout invariance"
+   "exit": "CAL-1, CAL-2, subject/harness separation, no provider call before admission, PRE_SATISFIED, layout invariance",
+   "barrier": "P1",
+   "exit_checks": [
+    "CAL-1 and CAL-2 green",
+    "missing subject vs missing harness separated",
+    "probe UNRUNNABLE -> ENVIRONMENT; INVALID_SPEC -> PLAN/INTEGRATION",
+    "no provider/request before story admission",
+    "scenarios A and K green",
+    "test-layout invariance: product verdicts identical across layouts"
+   ]
   },
   {
    "id": "P3",
    "name": "Journal / projections",
-   "exit": "unknown-required refusal, time never folded, incremental == full, reference models, projection mutation"
+   "exit": "unknown-required refusal, time never folded, incremental == full, reference models, projection mutation",
+   "barrier": "P2",
+   "exit_checks": [
+    "unknown required event refuses reconstruction; ignorable skipped",
+    "no projection reads time",
+    "incremental == full fold on every generated journal",
+    "6/6 reference models agree and are calibrated",
+    "every control-critical projection mutation-tested",
+    "stale cache never treated as authority"
+   ]
   },
   {
    "id": "P4",
    "name": "Story / run transaction",
-   "exit": "RUN-1, RUN-2, crash cases, range emptiness, budgets as projections"
+   "exit": "RUN-1, RUN-2, crash cases, range emptiness, budgets as projections",
+   "barrier": "P3",
+   "exit_checks": [
+    "RUN-1 and RUN-2 green",
+    "acquisition during dispose rejected",
+    "D-024 reproducer red-before/green-after",
+    "writer-close failure and CLEAN failure each leave the sentinel OPEN",
+    "SS-64 and D-006 reproducers green",
+    "range emptiness OS-asserted on Linux and Windows CI"
+   ]
   },
   {
    "id": "P5",
    "name": "Engineering quality / invariants",
-   "exit": "TEST-1, TEST-2, collection-cause classification, vacuity three-valued, I-IX armed and uncontainable"
+   "exit": "TEST-1, TEST-2, collection-cause classification, vacuity three-valued, I-IX armed and uncontainable",
+   "barrier": "P4",
+   "exit_checks": [
+    "TEST-1 and TEST-2 green",
+    "four collection-cause cases green",
+    "vacuity NON_VACUOUS / VACUOUS / INDETERMINATE",
+    "no developer artefact executed at the parent",
+    "an invariant violation demonstrated escaping try/except"
+   ]
   },
   {
    "id": "P6",
    "name": "Orchestration integration / V1 migration",
-   "exit": "single authoritative path, generated migration table, six removal proofs"
+   "exit": "single authoritative path, generated migration table, six removal proofs",
+   "barrier": "P5",
+   "exit_checks": [
+    "migration table --check green with zero defaulted rows",
+    "no old gate remains authoritative",
+    "no developer test determines ProductProof",
+    "no parent-side developer test execution",
+    "no latest-evidence selection",
+    "no side retry counters",
+    "every control decision journal-backed"
+   ]
   },
   {
    "id": "P7",
    "name": "Q0-Q3",
-   "exit": "all four rungs green on the exact candidate"
+   "exit": "all four rungs green on the exact candidate",
+   "barrier": "P6",
+   "exit_checks": [
+    "Q0, Q1, Q2, Q3 green on the exact candidate",
+    "zero unaudited mutation survivors",
+    "every probe digest calibrated"
+   ]
   },
   {
    "id": "P8",
    "name": "Q4 differential",
-   "exit": "100000/100000, 0 unexplained"
+   "exit": "100000/100000, 0 unexplained",
+   "barrier": "P7",
+   "exit_checks": [
+    "100000/100000 matched",
+    "0 unexplained, 0 invariant violations, 0 exceptions, 0 silent skips",
+    "one kernel digest"
+   ]
   },
   {
    "id": "P9",
    "name": "Q5 reproduction",
-   "exit": "reproduction green, tools re-executed"
+   "exit": "reproduction green, tools re-executed",
+   "barrier": "P8",
+   "exit_checks": [
+    "reproduction green",
+    "no recorded tool result replayed",
+    "assertConsumed green"
+   ]
   },
   {
    "id": "P10",
    "name": "LedgerLock regression",
-   "exit": "verdicts separate, no generalization claim, no cohort sealed"
+   "exit": "verdicts separate, no generalization claim, no cohort sealed",
+   "barrier": "P9",
+   "exit_checks": [
+    "delivery_verdict and plan_quality_verdict recorded separately",
+    "no generalization claim recorded",
+    "no cohort sealed"
+   ]
   }
  ],
  "work_packages": [
@@ -161,7 +247,7 @@
     "docs/implementation/v2/arch-catalog.md"
    ],
    "dependencies": [
-    "WP-0.1"
+    "WP-0.4"
    ],
    "implementation_tasks": [
     "Generate a catalog of every frozen enum and its members from the source of truth.",
@@ -210,7 +296,6 @@
     "validation/v2/freeze_conformance.py"
    ],
    "dependencies": [
-    "WP-0.1",
     "WP-0.2"
    ],
    "implementation_tasks": [
@@ -256,23 +341,36 @@
    "implementation_tasks": [
     "Record sha256 of every file under closure-evidence/ excluding closure-evidence/v2/.",
     "Fail any commit or run that would modify one.",
-    "Explicitly protect the voided W0 record and external-validation directories."
+    "Explicitly protect the voided W0 record and external-validation directories.",
+    "DISCOVERED PREREQUISITE (measured 2026-09-21 during plan validation): tests/hardening/test_state_model.py rewrites closure-evidence/hardening/state-model-results.json on every full-suite run, and the content depends on test order (one run dropped the entire 'conformance' section). Redirect that write to a non-evidence scratch path in the same change that introduces the guard; otherwise the guard fails every CI run. This touches V1 TEST code only — never V1 evidence, never aisef/."
    ],
    "positive_tests": [
     "baseline manifest of V1 evidence hashes recorded"
    ],
    "adversarial_tests": [
     "a simulated edit to closure-evidence/hardening/*.json is rejected",
-    "the voided W0 record cannot be rewritten"
+    "the voided W0 record cannot be rewritten",
+    "running the FULL suite leaves every file under closure-evidence/ (excluding v2/) byte-identical"
    ],
    "mutation_targets": [],
    "fault_injection_targets": [],
    "evidence_artifact": "closure-evidence/v2/V1-EVIDENCE-BASELINE.json",
    "exit_criteria": [
     "guard rejects every V1 evidence mutation",
-    "guard permits writes under closure-evidence/v2/"
+    "guard permits writes under closure-evidence/v2/",
+    "a full-suite run produces zero changes under closure-evidence/ outside v2/"
    ],
-   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence."
+   "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
+   "discovered_findings": [
+    {
+     "id": "PLAN-FINDING-001",
+     "found": "2026-09-21, full-suite run during cycle-1 plan correction",
+     "what": "tests/hardening/test_state_model.py writes closure-evidence/hardening/state-model-results.json on every run; order-dependent content",
+     "evidence": "git diff showed +1/-129 lines; the file was restored with git checkout and its blob verified equal to commit 612efce (da27db6b)",
+     "classification": "normal implementation defect in V1 test code; not an architecture exception",
+     "committed_mutation": "none — no mutated version was ever committed"
+    }
+   ]
   },
   {
    "id": "WP-0.5",
@@ -1628,7 +1726,8 @@
    "dependencies": [
     "WP-6.1",
     "WP-4.6",
-    "WP-5.5"
+    "WP-5.5",
+    "WP-2.5"
    ],
    "implementation_tasks": [
     "Wire contract->spec->probe->admission->story->proof->verification->review->merge->post-merge->disposal.",
@@ -1890,5 +1989,65 @@
   "V1 frozen evidence would need mutation",
   "a new P0/P1 architecture-level defect is found"
  ],
- "parallelism_rule": "Sequential by default for semantic/core phases. Parallel only when the frozen interfaces are already implemented, write scopes are disjoint, evidence scopes are disjoint, and no package depends on another package's unverified semantics. WP-3.5 additionally carries an authorship-independence constraint."
+ "scheduling_rules": {
+  "source_of_truth": "docs/implementation/v2/cycle1-manifest.json",
+  "phase_barriers": "strict: a package is runnable only when its declared dependencies are complete AND its phase's barrier phase is evidence-complete",
+  "parallelism": "within a phase only; requires implemented frozen interfaces, disjoint write scopes, disjoint evidence scopes, and no dependency on unverified semantics",
+  "evidence_guard_package": "WP-0.4",
+  "evidence_guard_exempt": [
+   "WP-0.1",
+   "WP-0.4"
+  ],
+  "orchestration": {
+   "package": "WP-6.2",
+   "explicit_prerequisites": [
+    "WP-2.5"
+   ],
+   "phases_required_complete": [
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+   ]
+  },
+  "qualification_chain": [
+   "QP-7",
+   "QP-8",
+   "QP-9",
+   "QP-10"
+  ],
+  "validator": "validation/v2/plan_validate.py",
+  "additional_constraints": [
+   {
+    "rule": "WP-0.4 completes before any package other than WP-0.1 executes",
+    "why": "the V1 evidence guard must exist before there is anything to guard against",
+    "enforced_by": "check C guard_ancestry (explicit transitive ancestry)"
+   },
+   {
+    "rule": "WP-0.5 completes before any Q0 checker is trusted",
+    "why": "an uncalibrated checker is invisible false assurance",
+    "enforced_by": "WP-0.5 is the last package of P0, so the P0 barrier gates every later package"
+   },
+   {
+    "rule": "WP-3.5 is authored after, and independently of, WP-3.4, from the RFC text only",
+    "why": "a reference model written from the projection source is not independent evidence",
+    "enforced_by": "declared dependency (ordering) + AST no-import check (mechanical); authorship independence is procedural"
+   },
+   {
+    "rule": "WP-2.1 prototypes a second probe kind before the rest of P2 builds on it",
+    "why": "if a second kind does not fit the F5-frozen protocol that is a STOP, and should be found early",
+    "enforced_by": "WP-2.1 exit criterion; every later P2 package depends on WP-2.1"
+   },
+   {
+    "rule": "WP-4.2 exercises the Windows path in CI from its first commit",
+    "why": "Windows is a real constraint, established in V1",
+    "enforced_by": "WP-4.2 exit criterion requires OS-asserted emptiness on Linux and Windows CI"
+   },
+   {
+    "rule": "WP-2.4 asserts no provider/request precedes story admission against an in-memory JournalWriter double; WP-6.3 re-verifies against the durable journal",
+    "why": "the journal lands in P3, after P2; a test double adds no semantics and never exists in a production path",
+    "enforced_by": "WP-6.3 removal proof 'every control decision journal-backed'"
+   }
+  ]
+ }
 }

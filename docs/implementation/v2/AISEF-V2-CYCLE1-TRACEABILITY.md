@@ -1,12 +1,12 @@
 # AISEF V2 — Cycle-1 traceability matrix
 
-**Derived from [`cycle1-manifest.json`](cycle1-manifest.json). Do not hand-edit.** WP-0.1 adds a `--check`
-twin so a drifted matrix fails CI — the same discipline the RFC requires of every generated artefact.
+**Generated from [`cycle1-manifest.json`](cycle1-manifest.json) by `validation/v2/plan_validate.py`.**
+Do not hand-edit: `--check` fails on drift.
 
 Architecture baseline: RFC normative digest `8f0d522d9db0322c…`, freeze-table digest
 `c4d9895f921b707c…`, approval record `c23191bd71bc299d…`.
 
-**33 implementation packages + 4 qualification packages = 37. F1–F11 coverage: 11/11.**
+**33 implementation + 4 qualification = 37 packages. F1–F11 coverage: 11/11.**
 
 ---
 
@@ -179,8 +179,8 @@ Architecture baseline: RFC normative digest `8f0d522d9db0322c…`, freeze-table 
 | package | phase | depends on | evidence |
 |---|---|---|---|
 | `WP-0.1` | P0 | — | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
-| `WP-0.2` | P0 | `WP-0.1` | `docs/implementation/v2/arch-catalog.md + CI --check` |
-| `WP-0.3` | P0 | `WP-0.1`, `WP-0.2` | `closure-evidence/v2/F-CONFORMANCE.json` |
+| `WP-0.2` | P0 | `WP-0.4` | `docs/implementation/v2/arch-catalog.md + CI --check` |
+| `WP-0.3` | P0 | `WP-0.2` | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-0.4` | P0 | `WP-0.1` | `closure-evidence/v2/V1-EVIDENCE-BASELINE.json` |
 | `WP-0.5` | P0 | `WP-0.3` | `closure-evidence/v2/Q0-CHECKER-CALIBRATION.json` |
 | `WP-1.1` | P1 | `WP-0.3` | `closure-evidence/v2/P1-CONTRACT-SHAPES.json` |
@@ -209,7 +209,7 @@ Architecture baseline: RFC normative digest `8f0d522d9db0322c…`, freeze-table 
 | `WP-5.4` | P5 | `WP-5.2`, `WP-5.3` | `closure-evidence/v2/P5-ADEQUACY.json` |
 | `WP-5.5` | P5 | `WP-5.4`, `WP-3.4` | `closure-evidence/v2/P5-INVARIANTS.json` |
 | `WP-6.1` | P6 | `WP-2.3` | `docs/implementation/v2/v1-proofmode-migration.md + closure-evidence/v2/P6-MIGRATION-TABLE.json` |
-| `WP-6.2` | P6 | `WP-6.1`, `WP-4.6`, `WP-5.5` | `closure-evidence/v2/P6-ORCHESTRATION.json` |
+| `WP-6.2` | P6 | `WP-6.1`, `WP-4.6`, `WP-5.5`, `WP-2.5` | `closure-evidence/v2/P6-ORCHESTRATION.json` |
 | `WP-6.3` | P6 | `WP-6.2` | `closure-evidence/v2/P6-OLD-PATH-REMOVAL.json` |
 | `QP-7` | P7 | `WP-6.3` | `closure-evidence/v2/Q0-Q3/SUMMARY.json` |
 | `QP-8` | P8 | `QP-7` | `closure-evidence/v2/Q4/DIFFERENTIAL.json` |
@@ -243,18 +243,6 @@ Architecture baseline: RFC normative digest `8f0d522d9db0322c…`, freeze-table 
 | `FAM-TOOL` | `WP-2.1`, `WP-4.4`, `WP-5.1` |
 | `FAM-TYPED-OUTCOMES` | `WP-1.3`, `WP-5.1` |
 
-20 of the 22 registered families are directly addressed by cycle-1 packages. The remainder are
-either measured rather than prevented (`FAM-PROVIDER`, `FAM-MODEL-CAPABILITY`), governed by the
-evaluation-cohort lifecycle which is deferred (`FAM-BENCH`), or addressed by the qualification ladder as a
-whole rather than by one package (`FAM-QUALIFICATION`, `FAM-QUALIFICATION-MEASUREMENT`).
-
----
-
-## 4. Mechanical checks over this matrix
-
-| check | result |
-|---|---|
-| every F1–F11 item has ≥1 package | **PASS** (min 4 packages) |
-| no package depends on a later-phase package | **PASS** |
-| every package has a non-code exit criterion | **PASS** (no package exits on "code works") |
-| critical path length | 19 packages |
+20 of the 22 registered families are directly addressed by cycle-1 packages. The remainder
+are measured rather than prevented (`FAM-PROVIDER`, `FAM-MODEL-CAPABILITY`), governed by the
+evaluation-cohort lifecycle which is deferred (`FAM-BENCH`), or addressed by the ladder as a whole.

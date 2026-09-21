@@ -7,6 +7,29 @@ rewritten** — `WP-0.4` enforces that mechanically.
 Per-package detail is in [`cycle1-manifest.json`](cycle1-manifest.json); the frozen-item mapping is in the
 [traceability matrix](AISEF-V2-CYCLE1-TRACEABILITY.md).
 
+**Phase barriers.** A phase is complete only when every package in it is complete, every required evidence
+artefact exists, and every exit check below is green. **No package of the next phase may start before that.**
+The table is generated from the manifest; every artefact named anywhere in this document is also checked against
+the manifest by `--check`.
+
+<!-- GENERATED:phase-exit-checks BEGIN — from cycle1-manifest.json; do not hand-edit -->
+
+| phase | exit checks — all must be green before the next phase may start |
+|---|---|
+| P0 | freeze manifest digests equal the approval record; V1 evidence guard rejects every V1 mutation; enum catalog --check green in both directions; F1-F11 conformance reports 11 definite states; every Q0 checker calibrated against a known-bad fixture |
+| P1 | NEG-1, NEG-2, NEG-3 green; no planning module imports BehaviorVerdict for routing; compiler --check round-trip byte-identical; semantic_hash stable across processes; satisfaction-mapping mutants fully killed; routing table total; no did-not-run -> developer edge |
+| P2 | CAL-1 and CAL-2 green; missing subject vs missing harness separated; probe UNRUNNABLE -> ENVIRONMENT; INVALID_SPEC -> PLAN/INTEGRATION; no provider/request before story admission; scenarios A and K green; test-layout invariance: product verdicts identical across layouts |
+| P3 | unknown required event refuses reconstruction; ignorable skipped; no projection reads time; incremental == full fold on every generated journal; 6/6 reference models agree and are calibrated; every control-critical projection mutation-tested; stale cache never treated as authority |
+| P4 | RUN-1 and RUN-2 green; acquisition during dispose rejected; D-024 reproducer red-before/green-after; writer-close failure and CLEAN failure each leave the sentinel OPEN; SS-64 and D-006 reproducers green; range emptiness OS-asserted on Linux and Windows CI |
+| P5 | TEST-1 and TEST-2 green; four collection-cause cases green; vacuity NON_VACUOUS / VACUOUS / INDETERMINATE; no developer artefact executed at the parent; an invariant violation demonstrated escaping try/except |
+| P6 | migration table --check green with zero defaulted rows; no old gate remains authoritative; no developer test determines ProductProof; no parent-side developer test execution; no latest-evidence selection; no side retry counters; every control decision journal-backed |
+| P7 | Q0, Q1, Q2, Q3 green on the exact candidate; zero unaudited mutation survivors; every probe digest calibrated |
+| P8 | 100000/100000 matched; 0 unexplained, 0 invariant violations, 0 exceptions, 0 silent skips; one kernel digest |
+| P9 | reproduction green; no recorded tool result replayed; assertConsumed green |
+| P10 | delivery_verdict and plan_quality_verdict recorded separately; no generalization claim recorded; no cohort sealed |
+
+<!-- GENERATED:phase-exit-checks END -->
+
 ---
 
 ## 1. Evidence per phase
