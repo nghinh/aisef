@@ -8,10 +8,13 @@ Owner decision "OWNER ACCEPTS P0 / AUTHORIZE P1" §3 and §5, as mechanism rathe
   into a class the preregistered policy marks retryable (ENVIRONMENT, PROVIDER) **and** the execution path has an
   approved retry count (resolved execution policy; `null` = none approved, never a default); any other case makes
   the rerun diagnostic only, and a later green attempt does not convert the failure;
-* **V1-PF-001 stops the gate** — an attempt attributed to it must carry gate_effect STOP.
+* **V1-PF-001 stops the gate** — an attempt attributed to it must carry gate_effect STOP;
+* **one history per phase, closed by its seal** — once a phase's seal record exists (P1: `P1-FINAL-SEAL.json`), its
+  history must hold exactly the attempt count the seal names: nothing added, nothing removed. New attempts go to the
+  first unsealed phase.
 
-    python -P validation/v2/run_history.py record <field=value> ...   # append one attempt
-    python -P validation/v2/run_history.py --check                    # schema, policy and append-only history
+    python -P validation/v2/run_history.py record [--phase P2] <field=value> ...   # append one attempt
+    python -P validation/v2/run_history.py --check                                 # every phase history
 """
 
 from __future__ import annotations
@@ -24,7 +27,9 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 POLICY_REL = "closure-evidence/v2/V2-RETRY-POLICY.json"
-HISTORY_REL = "closure-evidence/v2/P1-RUN-HISTORY.json"
+HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evidence/v2/P2-RUN-HISTORY.json"}
+SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json"}
+HISTORY_REL = HISTORIES["P1"]
 RESULTS = ("PASS", "FAIL")
 GATE_EFFECTS = ("COUNTS", "DIAGNOSTIC_ONLY", "STOP")
 
@@ -118,31 +123,58 @@ def gate_green(entries: list[dict], commit: str, where: str, job: str | None = N
     return approved is not None and len(failures) <= approved and all(e["retry_permitted"] for e in failures)
 
 
-def committed_versions(root: pathlib.Path = ROOT) -> list[list[dict]]:
-    revs = subprocess.run(["git", "log", "--reverse", "--format=%H", "--", HISTORY_REL], cwd=root,
+def committed_versions(root: pathlib.Path = ROOT, rel: str = HISTORY_REL) -> list[list[dict]]:
+    revs = subprocess.run(["git", "log", "--reverse", "--format=%H", "--", rel], cwd=root,
                           capture_output=True, encoding="utf-8", check=True).stdout.split()
     out = []
     for rev in revs:
-        shown = subprocess.run(["git", "show", f"{rev}:{HISTORY_REL}"], cwd=root, capture_output=True,
-                               encoding="utf-8")
+        shown = subprocess.run(["git", "show", f"{rev}:{rel}"], cwd=root, capture_output=True, encoding="utf-8")
         if shown.returncode == 0:
             out.append(json.loads(shown.stdout)["entries"])
     return out
 
 
+def seal_problems(phase: str, entries: list[dict], seal: dict | None) -> list[str]:
+    """A sealed phase's history holds exactly the attempts its seal counted."""
+    if seal is None:
+        return []
+    sealed = seal["attempt_history"]["total_attempts"]
+    return [] if len(entries) == sealed else \
+        [f"{phase} history is sealed at {sealed} attempts and now has {len(entries)}: attempts added or removed"]
+
+
+def _seal(phase: str, root: pathlib.Path) -> dict | None:
+    rel = SEALS.get(phase)
+    return _load(root / rel) if rel and (root / rel).exists() else None
+
+
+def open_phase(root: pathlib.Path = ROOT) -> str:
+    """The first phase whose history is not sealed: where new attempts go."""
+    return next(ph for ph in HISTORIES if _seal(ph, root) is None)
+
+
 def check(root: pathlib.Path = ROOT) -> list[str]:
     policy = _load(root / POLICY_REL)
-    path = root / HISTORY_REL
-    if not path.exists():
+    if not (root / HISTORY_REL).exists():
         return [f"{HISTORY_REL} is missing"]
-    current = _load(path)["entries"]
-    return entry_problems(current, policy) + append_only_problems(committed_versions(root) + [current])
+    out = []
+    for phase, rel in HISTORIES.items():
+        if not (root / rel).exists():
+            continue
+        current = _load(root / rel)["entries"]
+        out += [f"{phase}: {p}" for p in entry_problems(current, policy)
+                + append_only_problems(committed_versions(root, rel) + [current])]
+        out += seal_problems(phase, current, _seal(phase, root))
+    return out
 
 
-def record(fields: dict, root: pathlib.Path = ROOT) -> dict:
-    path = root / HISTORY_REL
+def record(fields: dict, root: pathlib.Path = ROOT, phase: str | None = None) -> dict:
+    phase = phase or open_phase(root)
+    if _seal(phase, root) is not None:
+        raise SystemExit(f"refusing to record: the {phase} history is sealed ({SEALS[phase]})")
+    path = root / HISTORIES[phase]
     doc = _load(path) if path.exists() else {
-        "record": "AISEF V2 — P1 RUN HISTORY", "policy": POLICY_REL,
+        "record": f"AISEF V2 — {phase} RUN HISTORY", "policy": POLICY_REL,
         "rule": "append-only; every full-suite and CI attempt, failed or not; see validation/v2/run_history.py",
         "entries": []}
     entry = {"seq": len(doc["entries"]) + 1, **fields}
@@ -164,8 +196,11 @@ def _value(v: str):
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     if argv[:1] == ["record"]:
-        fields = dict(a.split("=", 1) for a in argv[1:])
-        entry = record({k: _value(v) for k, v in fields.items()})
+        rest, phase = argv[1:], None
+        if rest[:1] == ["--phase"]:
+            phase, rest = rest[1], rest[2:]
+        fields = dict(a.split("=", 1) for a in rest)
+        entry = record({k: _value(v) for k, v in fields.items()}, phase=phase)
         print(f"recorded attempt {entry['seq']}: {entry['result']} {entry['commit'][:12]} {entry['where']}")
         return 0
     problems = check()

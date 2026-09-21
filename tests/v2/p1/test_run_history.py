@@ -3,6 +3,8 @@
 import importlib.util
 import json
 import pathlib
+import shutil
+import tempfile
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
@@ -72,6 +74,32 @@ class RunHistory(unittest.TestCase):
         self.assertEqual(rh.append_only_problems([[a], [a, b]]), [])
         self.assertTrue(rh.append_only_problems([[a, b], [b]]))
         self.assertTrue(rh.append_only_problems([[a], [{**a, "result": "PASS"}]]))
+
+    def test_a_sealed_history_takes_no_attempt_and_loses_none(self):
+        seal = {"attempt_history": {"total_attempts": 2}}
+        runs = [attempt(1, "PASS"), attempt(2, "PASS")]
+        self.assertEqual(rh.seal_problems("P1", runs, seal), [])
+        self.assertEqual(rh.seal_problems("P1", runs + [attempt(3, "PASS")], None), [])
+        for changed in (runs + [attempt(3, "PASS")], runs[:1]):
+            with self.subTest(n=len(changed)):
+                self.assertRegex(rh.seal_problems("P1", changed, seal)[0], "^P1 history is sealed at 2 attempts")
+
+    def test_the_p1_history_is_sealed_and_new_attempts_go_to_the_next_phase(self):
+        seal = json.loads((ROOT / rh.SEALS["P1"]).read_text(encoding="utf-8"))
+        p1 = json.loads((ROOT / rh.HISTORIES["P1"]).read_text(encoding="utf-8"))["entries"]
+        self.assertEqual(len(p1), seal["attempt_history"]["total_attempts"])
+        self.assertEqual(rh.open_phase(ROOT), "P2")
+        with tempfile.TemporaryDirectory() as d:
+            root = pathlib.Path(d)
+            for rel in (rh.POLICY_REL, rh.HISTORIES["P1"], rh.SEALS["P1"]):
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(ROOT / rel, root / rel)
+            with self.assertRaisesRegex(SystemExit, "the P1 history is sealed"):
+                rh.record({**attempt(1, "PASS"), "seq": None}, root=root, phase="P1")
+            entry = rh.record({k: v for k, v in attempt(1, "PASS").items() if k != "seq"}, root=root)
+            self.assertEqual(entry["seq"], 1)
+            self.assertTrue((root / rh.HISTORIES["P2"]).exists())
+            self.assertEqual(json.loads((root / rh.HISTORIES["P1"]).read_text(encoding="utf-8"))["entries"], p1)
 
     def test_a_pass_that_changed_v1_evidence_is_not_a_pass(self):
         self.assertTrue(rh.entry_problems([attempt(1, "PASS", v1_evidence_changed=True)], POLICY))

@@ -1,0 +1,417 @@
+{
+ "record": "AISEF V2 — P1 FINAL SEAL",
+ "id": "P1-FINAL-SEAL",
+ "authority": "AISEF V2 — FINAL P1 HYGIENE BEFORE P2",
+ "supersedes": [
+  {
+   "path": "closure-evidence/v2/P1-COMPLETION-CORRECTION-V2-001.json",
+   "sha256": "e66f09d386248f9ee6ab758c5373cbad8930fe64581cef08b1d3a29b76cf307a",
+   "verdict_then": "P1 CORRECTED — READY FOR OWNER ACCEPTANCE",
+   "status_now": "superseded; kept byte-identical"
+  },
+  {
+   "path": "closure-evidence/v2/P1-COMPLETION.json",
+   "sha256": "e92cb6b7dc632295b3d96872136bf98c1b6f5822dbce029736234e66f31438a5",
+   "status_now": "superseded by the correction record; kept byte-identical"
+  }
+ ],
+ "p1_baseline": {
+  "original_candidate": {
+   "commit": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+   "tree": "47e9a88b8f07fd5c3721f934af1810a1fa346e4b",
+   "aisef2_tree": "959491f9a2782cb928771de4e290d673edd8556f",
+   "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "corrected_semantic_candidate": {
+   "commit": "0afcfe275eb8466b56b7be160abaddf468ac22b1",
+   "tree": "96e945cd908ba4b4fa9fdf71d58ff6a9b85e3adc",
+   "aisef2_tree": "5b81c5a42d8b597b6e9e4c3415cf7128a8262337",
+   "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "p2_plan_correction": {
+   "commit": "112f1d32d7e78141bec2d26bb146ea9b7ec57afe",
+   "note": "plan only; no P1 code changed"
+  },
+  "final_p1_hygiene_commit": {
+   "commit": "ee7a0def449caf660c72a02f5625de293f9d3690",
+   "tree": "6a1b4819a139276915ab352d10dc7ffc947655fc",
+   "aisef2_tree": "ff14c09265fcae8c90b3eae79d4006aadeb84a83",
+   "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "v1_product_tree_unchanged": true
+ },
+ "helper_correction": {
+  "target": "aisef2/product/outcome.py::on_subject_absent",
+  "before": "on_subject_absent(spec): REQUIRES_SUBJECT -> INDETERMINATE(PRECONDITION_ABSENT); ABSENCE_IS_DECIDABLE -> REFUTED for every spec (a global default)",
+  "after": "on_subject_absent(spec, *, observed): REQUIRES_SUBJECT -> INDETERMINATE(PRECONDITION_ABSENT), an offered verdict refused; ABSENCE_IS_DECIDABLE -> Executed(observed), the verdict the probe observed on the spec's observable; None or INDETERMINATE refused (no default); the one-argument form removed",
+  "rfc": "§10.2 (unchanged)",
+  "regression_cases": {
+   "A / PROBE-ABS-3": "same absence, positive existence contract -> UNSATISFIED",
+   "B / PROBE-ABS-4": "same absence, negative existence contract -> SATISFIED",
+   "C / PROBE-ABS-2": "REQUIRES_SUBJECT -> INDETERMINATE(PRECONDITION_ABSENT); an offered verdict refused",
+   "PROBE-ABS-5": "one absence -> UNSATISFIED / SATISFIED / INDETERMINATE by contract",
+   "D": "the decidable verdict is the observation (both S and R pass through); no default; kernel static check NO_VERDICT_FROM_ABSENCE_DECLARATION clean on aisef2/ and rejects the 112f1d3 helper"
+  },
+  "tests": "tests/v2/p1/test_outcome.py::SubjectAbsenceSemantics (and Polarity for NEG-1..3)",
+  "probe_level_cases": "PROBE-ABS-1..5 at the probe level are WP-2.1's (P2); here they run at helper level",
+  "static_check_ceiling": "a call into another scope returning a fixed verdict is not seen statically; the behavioural tests cover it"
+ },
+ "mutation": {
+  "outcome_targets": {
+   "aisef2/product/outcome.py::__post_init__": "13/13",
+   "aisef2/product/outcome.py::contract_satisfaction": "21/21",
+   "aisef2/product/outcome.py::on_subject_absent": "18/18"
+  },
+  "all_targets": {
+   "targets": 18,
+   "mutants": 612,
+   "killed": 612,
+   "audited": 0
+  }
+ },
+ "checker_calibration": {
+  "calibrated": 19,
+  "checkers": 19
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/P1-RUN-HISTORY.json",
+  "total_attempts": 52,
+  "failed_attempts": 0,
+  "erased_attempts": 0,
+  "retries": 0,
+  "committed_versions_checked": 10,
+  "first_attempt_pass_everywhere": true,
+  "closed": "sealed at total_attempts: run_history.py --check fails if an entry is added or removed",
+  "seal_commit_verification": "the seal cannot contain its own verification; the seal commit's local and CI attempts are the first entries of P2-RUN-HISTORY.json"
+ },
+ "hygiene_commit_verification": {
+  "local": {
+   "tests_run": 3924,
+   "skipped": 20,
+   "result": "PASS"
+  },
+  "ci": {
+   "run": 35607187382,
+   "jobs": [
+    {
+     "job": "lint",
+     "job_id": 106357051271,
+     "tests_run": null,
+     "result": "PASS"
+    },
+    {
+     "job": "wheel",
+     "job_id": 106357050970,
+     "tests_run": null,
+     "result": "PASS"
+    },
+    {
+     "job": "unit (ubuntu-latest, 3.11)",
+     "job_id": 106357051334,
+     "tests_run": 3921,
+     "result": "PASS"
+    },
+    {
+     "job": "unit (ubuntu-latest, 3.12)",
+     "job_id": 106357051258,
+     "tests_run": 3921,
+     "result": "PASS"
+    },
+    {
+     "job": "unit (ubuntu-latest, 3.13)",
+     "job_id": 106357051131,
+     "tests_run": 3921,
+     "result": "PASS"
+    },
+    {
+     "job": "unit (ubuntu-latest, 3.14)",
+     "job_id": 106357051142,
+     "tests_run": 3921,
+     "result": "PASS"
+    },
+    {
+     "job": "unit (windows-latest, 3.11)",
+     "job_id": 106357051186,
+     "tests_run": 3918,
+     "result": "PASS"
+    }
+   ]
+  }
+ },
+ "f1_f11": {
+  "current_phase": "P1",
+  "summary": {
+   "PASS": 4,
+   "PENDING": 7,
+   "FAIL": 0
+  },
+  "items": {
+   "F1": "PENDING",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PENDING",
+   "F6": "PENDING",
+   "F7": "PASS",
+   "F8": "PENDING",
+   "F9": "PENDING",
+   "F10": "PENDING",
+   "F11": "PENDING"
+  }
+ },
+ "rfc_lineage": {
+  "effective": {
+   "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+   "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+  },
+  "links": [
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+    "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+    "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+    "frozen_items_changed": [
+     "F2"
+    ],
+    "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+    "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+   }
+  ],
+  "lineage_valid": true,
+  "rfc_last_changed_by": "0afcfe275eb8466b56b7be160abaddf468ac22b1"
+ },
+ "v1_evidence_identity": {
+  "detective_guard": true,
+  "w0_qualification_byte_identical": true,
+  "w0_sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+ },
+ "v1_pf_001": {
+  "status": "OPEN_IN_V1",
+  "severity": "P0",
+  "v2_resolution_owner": "WP-4.2",
+  "classification": "LATENT PRODUCT DEFECT WITH NONDETERMINISTIC TRIGGER",
+  "recurrences_since_registration": 0,
+  "ci_attempts_searched": 42,
+  "search": "_kill_tree_win32|MemoryError in every CI job log",
+  "reporting": "0 known P0/P1 at the historical V1 freeze; current knowledge includes V1-PF-001 (P0, OPEN_IN_V1)"
+ },
+ "reruns": {
+  "NEG-1..3": {
+   "NEG_1_unsatisfied_never_satisfied": true,
+   "NEG_2_satisfied": true,
+   "NEG_3_indeterminate_precondition_absent": true
+  },
+  "subject_absence": {
+   "absence_is_an_observation_never_unrunnable": true,
+   "requires_subject_absent_is_indeterminate_precondition_absent": true,
+   "requires_subject_refuses_a_vacuous_verdict": true,
+   "decidable_absence_verdict_is_the_observation": true,
+   "decidable_absence_has_no_default_verdict": true,
+   "same_absence_positive_existence_unsatisfied_negative_existence_satisfied": true,
+   "no_kernel_code_infers_a_verdict_from_the_absence_declaration": true
+  },
+  "OWNER-MP-1..4": {
+   "OWNER_MP_1_parent_introduce_ready_no_owner": true,
+   "OWNER_MP_2_candidate_subject_absent_developer": true,
+   "OWNER_MP_3_post_merge_subject_lost_integration": true,
+   "OWNER_MP_4_unrunnable_environment_everywhere": true
+  },
+  "CRED-1..4": {
+   "CRED_1_missing_never_developer_budget": true,
+   "CRED_2_invalid_never_developer_or_provider_budget": true,
+   "CRED_3_invalid_not_retryable": true,
+   "CRED_4_provider_outage_distinct": true
+  },
+  "f2_satisfaction_equals_rfc": true,
+  "f2_routing_equals_rfc": true
+ },
+ "exit_checks": [
+  {
+   "check": "plan_validate: zero problems, generated docs in sync",
+   "command": "python -P validation/v2/plan_validate.py --validate --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "generated artefacts in sync"
+  },
+  {
+   "check": "PLANDEP-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 32"
+  },
+  {
+   "check": "PLANDEP-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANDEP-3: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-3",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANDEP-4: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-4",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANSEM-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANSEM-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANSEM-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANSEM-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 4"
+  },
+  {
+   "check": "PLANDEP-5 and PLANSEM tests",
+   "command": "python -m unittest tests/v2/plan/test_plan_dependencies.py tests/v2/plan/test_plan_semantics.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "OK"
+  },
+  {
+   "check": "outcome / subject-absence / NEG-1..3 / PROBE-ABS-2..5 (helper level) / OWNER-MP-1..4 / CRED-1..4",
+   "command": "python -m unittest tests/v2/p1/test_outcome.py tests/v2/p1/test_routing.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "OK"
+  },
+  {
+   "check": "freeze manifest: RFC digests equal the end of the approval lineage",
+   "command": "python -P validation/v2/freeze_manifest.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "freeze manifest: PASS"
+  },
+  {
+   "check": "architecture catalog --check",
+   "command": "python -P validation/v2/gen_arch_catalog.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "architecture catalog: PASS"
+  },
+  {
+   "check": "F1-F11 conformance at CURRENT_PHASE=P1 (ratchet)",
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "summary {'PASS': 4, 'PENDING': 7, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "check": "Q0 checker calibration",
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "calibrated 19/19; always-PASS mutants rejected 19/19"
+  },
+  {
+   "check": "compiler --check",
+   "command": "python -P validation/v2/gen_specs.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "specs: PASS"
+  },
+  {
+   "check": "P1 evidence records current, every property true",
+   "command": "python -P validation/v2/p1_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p1 evidence: PASS"
+  },
+  {
+   "check": "mutation record current, every target fully killed",
+   "command": "python -P validation/v2/mutation.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "check": "kernel static checks (incl. NO_VERDICT_FROM_ABSENCE_DECLARATION)",
+   "command": "python -P validation/v2/kernel_static_checks.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "check": "run history append-only, policy-consistent, P1 sealed",
+   "command": "python -P validation/v2/run_history.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "run history: PASS"
+  },
+  {
+   "check": "V1 evidence guard, detective",
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  }
+ ],
+ "evidence_artifacts_rule": "sha256 over the committed (LF) bytes",
+ "evidence_artifacts": {
+  "closure-evidence/v2/P1-OUTCOME-POLARITY.json": "09f55499e5e4697517d45c1bd4a759701934fcd91a698a6555834b134c5cca74",
+  "closure-evidence/v2/P1-ROUTING-TABLE.json": "78851baaa17526f1d81fad4a066a4aa8e10733e20ba4523165317271c197d875",
+  "closure-evidence/v2/P1-CONTRACT-SHAPES.json": "44258486128028e00d5275c182c039b37e60ed4ed25a044aea09d6fbbfa3b560",
+  "closure-evidence/v2/P1-SPEC-COMPILER.json": "e541103de6cb2f6a40d9167a29186f11f5d268b665ddbd33d129f59a6ecfab7f",
+  "closure-evidence/v2/P1-MUTATION.json": "3ec7e1c43f2c6f21c99087915a74f1a03dd9a930374a2e87a8567f58ef006f16",
+  "closure-evidence/v2/F-CONFORMANCE.json": "3bc15d963a095aca4d0eb5d9df955143a441605e016708947869a977916461a3",
+  "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json": "230093f8bc4c57bd5560fe9911910fb993f9fe89b4e4d13a24fc8c0206009c32",
+  "closure-evidence/v2/V2-RETRY-POLICY.json": "605f6d044d0746812e3b70b909d48cacf0abc0a1e507b8f81cccf67598e255db",
+  "closure-evidence/v2/P1-RUN-HISTORY.json": "75eb18dac863acf19f85087575e6a5a79f78d7f03c90152f694fbf28a42e4511",
+  "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json": "46cfa34dc7d1be476eacfd2b77de5c2fba89e52f3003a129e50989daea7a9849",
+  "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json": "2de596432375ba874ab17cfd34b507b9606e5af3fa6c88e48184fe7ab87d6d8c",
+  "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+  "closure-evidence/v2/V1-POST-FREEZE-DEFECTS.json": "16d30104cef30de8c219fd59e6e8d84d9c9b066ed80bb2d067d718cae7609356"
+ },
+ "architecture_exceptions": [
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-001",
+   "status": "APPROVED — APPLIED"
+  }
+ ],
+ "unapproved_architecture_exceptions": [],
+ "stop_rules_triggered": [],
+ "p2": {
+  "authorization": "automatic on this seal being green (owner decision §5); WP-2.1 -> WP-2.5; P3 not authorized",
+  "started_at_seal": false
+ },
+ "verdict": "P1 FINAL SEALED"
+}
