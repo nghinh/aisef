@@ -133,6 +133,7 @@ class AppendSiteValidation(unittest.TestCase):
                  (T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": []}, "criteria"),
                  (T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1", ""]}, "criteria"),
                  (T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": "C1"}, "criteria"),
+                 (T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1", "C1"]}, "criteria"),
                  (T.PROBE_EVALUATED, {"story_id": "S1", "criterion_id": "C1", "record": ["x"]}, "record"),
                  (T.FAILURE_OBSERVED, failure("S1", owner="NOBODY"), "owner"),
                  (T.FAILURE_OBSERVED, failure("S1", code="NOPE"), "code"),

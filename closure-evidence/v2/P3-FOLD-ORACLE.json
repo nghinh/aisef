@@ -1,0 +1,74 @@
+{
+ "record": "AISEF V2 — P3 FOLD ORACLE",
+ "work_package": "WP-3.3",
+ "rfc_sections": [
+  "21"
+ ],
+ "frozen_items": [
+  "F11"
+ ],
+ "rule": "every read model is a pure fold of a journal prefix; incremental state == fold(prefix); a cache row is a sealed, checked shortcut, discarded (never migrated) when it no longer describes the journal; a gate never reads a cache; no projection reads time",
+ "oracle": {
+  "generated_runs": 40,
+  "prefixes_checked_per_projection": 1632,
+  "problems_every_prefix": {
+   "story_state": 0,
+   "failure_owner": 0,
+   "budgets": 0,
+   "retry_target": 0,
+   "terminal_state": 0,
+   "qualification_counters": 0
+  },
+  "large_runs": [
+   416,
+   442
+  ],
+  "problems_sampled_every_37": {
+   "story_state": 0,
+   "failure_owner": 0,
+   "budgets": 0,
+   "retry_target": 0,
+   "terminal_state": 0,
+   "qualification_counters": 0
+  }
+ },
+ "FOLD_2_wall_clock_rewritten": {
+  "runs": 15,
+  "control_state_unchanged": 15
+ },
+ "caches": {
+  "how_each_row_was_treated": {
+   "stale row (shorter prefix)": "resumed from the row at 26",
+   "edited state": "row does not match its seal (edited): discarded",
+   "another projection": "row is for story_state: discarded",
+   "version mismatch": "row version 2 is not 1: discarded, not migrated",
+   "head differs": "row head differs from the journal's at its length: discarded — the journal wins",
+   "ahead of the journal": "row covers 54 events; the journal has 53: discarded"
+  },
+  "answer_is_the_journal_fold": {
+   "stale row (shorter prefix)": true,
+   "edited state": true,
+   "version mismatch": true,
+   "head differs": true,
+   "ahead of the journal": true
+  },
+  "ceiling": "a row re-sealed over a wrong state with the right head passes resume's checks (resumed: True); no gate reads a cache — project() folds the journal"
+ },
+ "properties": {
+  "FOLD_1_incremental_equals_full_fold_for_every_prefix": true,
+  "large_generated_journals_sampled": true,
+  "FOLD_2_wall_clock_time_is_not_control_state": true,
+  "empty_and_one_event_journals": true,
+  "replay_twice_identical": true,
+  "interrupted_tail_folds_as_its_complete_prefix": true,
+  "deterministic_serialisation_across_processes": true,
+  "a_step_cannot_change_its_input_state": true,
+  "stale_cache_used_only_as_a_checked_shortcut": true,
+  "PROJ_1_a_row_that_differs_from_the_journal_is_discarded": true,
+  "version_mismatch_discarded_not_migrated": true,
+  "no_gate_reads_a_cache": true,
+  "no_projection_reads_time": true,
+  "authority_incremental_state_is_the_fold": true,
+  "a_refused_event_never_reaches_the_log": true
+ }
+}

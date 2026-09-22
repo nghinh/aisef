@@ -114,8 +114,8 @@ def _strs(v: Any) -> bool:
     return isinstance(v, tuple) and all(_str(x) for x in v)
 
 
-def _nonempty_strs(v: Any) -> bool:
-    return _strs(v) and len(v) > 0
+def _distinct_strs(v: Any) -> bool:
+    return _strs(v) and len(v) > 0 and len(set(v)) == len(v)
 
 
 def _object(v: Any) -> bool:
@@ -203,7 +203,7 @@ SCHEMAS: Mapping[str, Schema] = MappingProxyType({t.value: s for t, s in (
     (EventType.STORY_DISPOSE, Schema({"story_id": _str})),
     (EventType.STORY_END, Schema({"story_id": _str})),
     (EventType.PROBE_EVALUATED, Schema({"story_id": _str, "criterion_id": _str, "record": _object})),
-    (EventType.PROVIDER_REQUEST, Schema({"story_id": _str, "criteria": _nonempty_strs})),
+    (EventType.PROVIDER_REQUEST, Schema({"story_id": _str, "criteria": _distinct_strs})),
     (EventType.FAILURE_OBSERVED, Schema({"story_id": _str, "code": _enum(FailureCode), "owner": _enum(Owner),
                                          "retryable": _bool, "detail": _text}, {"original": _str},
                                         rule=_failure_rule)),

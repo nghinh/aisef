@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 22,
+ "checker_count": 23,
  "uncovered_checker_modules": [],
- "calibrated_count": 22,
- "always_pass_mutants_rejected": 22,
+ "calibrated_count": 23,
+ "always_pass_mutants_rejected": 23,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -234,6 +234,21 @@
    "expected": "RESULT_ONLY_THROUGH_BINDING aisef2/plan/bad.py:2",
    "observed": [
     "RESULT_ONLY_THROUGH_BINDING aisef2/plan/bad.py:2 reads a probe result without its binding (use bound_result)"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "no_time_in_projections",
+   "package": "WP-3.3",
+   "fixture": "tests/v2/fixtures/known_bad/no_time_in_projections.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "NO_TIME_IN_PROJECTIONS aisef2/journal/projections/bad.py:2",
+   "observed": [
+    "NO_TIME_IN_PROJECTIONS aisef2/journal/projections/bad.py:2 a projection reads wall-clock time"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

@@ -18,6 +18,9 @@
   because REQUIRES_SUBJECT decides INDETERMINATE(PRECONDITION_ABSENT) by itself. Ceiling: a call into another scope
   that returns a fixed verdict is not seen; `on_subject_absent`'s behavioural tests (and WP-2.1's probe tests) are
   what cover that.
+* **NO_TIME_IN_PROJECTIONS** (RFC §20.2, §21; WP-3.3) — no projection reads an event's `time`: in
+  `aisef2/journal/fold.py` and `aisef2/journal/projections/`, no attribute or subscript named `time`, no
+  `getattr(x, "time")`, and no import of `time` or `datetime`. Wall-clock time is recorded, never folded.
 * **RESULT_ONLY_THROUGH_BINDING** (PROBE-BIND-1, P2 correction) — a decision never reads a bare probe result: outside
   `aisef2/probe/protocol.py`, which defines `ProbeRecord` and `bound_result`, no kernel module reads an attribute
   named `result` (nor `getattr(x, "result")`). Every read goes through `bound_result(record, spec=, revision=,
@@ -41,8 +44,10 @@ TAXONOMY_MODULE = "aisef2/control/owner.py"
 #: The journal's payload module: it keys `retryable` only to carry the taxonomy's value into failure/observed (§22).
 RETRY_CARRIER_MODULE = "aisef2/journal/event.py"
 _RETRY_NAMES = {"retryable", "retryability"}
+#: the fold engine and every control projection: no wall-clock time (§20.2)
+PROJECTION_MODULES = ("aisef2/journal/fold.py", "aisef2/journal/projections/")
 RULES = ("NO_PROSE_CONTROL", "NO_RAW_VERDICT_ROUTING", "RETRYABLE_ONLY_IN_TAXONOMY",
-         "NO_VERDICT_FROM_ABSENCE_DECLARATION", "RESULT_ONLY_THROUGH_BINDING")
+         "NO_VERDICT_FROM_ABSENCE_DECLARATION", "RESULT_ONLY_THROUGH_BINDING", "NO_TIME_IN_PROJECTIONS")
 BINDING_MODULE = "aisef2/probe/protocol.py"
 ABSENCE_MEMBERS = {"REQUIRES_SUBJECT", "ABSENCE_IS_DECIDABLE"}
 ABSENCE_FIELD = "subject_absence"
@@ -160,6 +165,16 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = RULES) -> list[st
                 out.append(f"RETRYABLE_ONLY_IN_TAXONOMY {rel}:{line or '?'} decides retryability outside the taxonomy")
     if "NO_VERDICT_FROM_ABSENCE_DECLARATION" in rules:
         out += _verdict_from_absence(rel, tree)
+    if "NO_TIME_IN_PROJECTIONS" in rules and rel.startswith(PROJECTION_MODULES):
+        for n in ast.walk(tree):
+            hit = (isinstance(n, ast.Attribute) and n.attr == "time"
+                   or isinstance(n, ast.Subscript) and isinstance(n.slice, ast.Constant) and n.slice.value == "time"
+                   or isinstance(n, ast.Call) and getattr(n.func, "id", "") == "getattr" and len(n.args) > 1
+                   and isinstance(n.args[1], ast.Constant) and n.args[1].value == "time"
+                   or isinstance(n, ast.Import) and any(a.name.split(".")[0] in ("time", "datetime") for a in n.names)
+                   or isinstance(n, ast.ImportFrom) and (n.module or "").split(".")[0] in ("time", "datetime"))
+            if hit:
+                out.append(f"NO_TIME_IN_PROJECTIONS {rel}:{n.lineno} a projection reads wall-clock time")
     if "RESULT_ONLY_THROUGH_BINDING" in rules and rel != BINDING_MODULE:
         for n in ast.walk(tree):
             if isinstance(n, ast.Attribute) and n.attr == "result" or isinstance(n, ast.Call) \

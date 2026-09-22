@@ -1,0 +1,214 @@
+{
+ "record": "AISEF V2 — P3 CONTROL PROJECTIONS",
+ "work_package": "WP-3.4",
+ "rfc_sections": [
+  "17",
+  "21",
+  "22",
+  "29"
+ ],
+ "frozen_items": [
+  "F11"
+ ],
+ "semantics": "docs/implementation/v2/P3-PROJECTION-SEMANTICS.md",
+ "projections": {
+  "story_state": {
+   "version": 1,
+   "module": "aisef2.journal.projections.story_state"
+  },
+  "failure_owner": {
+   "version": 1,
+   "module": "aisef2.journal.projections.failure_owner"
+  },
+  "budgets": {
+   "version": 1,
+   "module": "aisef2.journal.projections.budgets"
+  },
+  "retry_target": {
+   "version": 1,
+   "module": "aisef2.journal.projections.retry_target"
+  },
+  "terminal_state": {
+   "version": 1,
+   "module": "aisef2.journal.projections.terminal_state"
+  },
+  "qualification_counters": {
+   "version": 1,
+   "module": "aisef2.journal.projections.qualification_counters"
+  }
+ },
+ "reference_journal_states": {
+  "story_state": {
+   "S1": {
+    "admitted": true,
+    "attempt": 2,
+    "outcome": "COMMIT",
+    "state": "ENDED"
+   },
+   "S2": {
+    "admitted": false,
+    "attempt": 1,
+    "outcome": "ROLLBACK",
+    "state": "ROLLBACK"
+   }
+  },
+  "failure_owner": {
+   "S1": {
+    "attempt": 2,
+    "begin_seq": 11,
+    "cited": false,
+    "code": null,
+    "failure_seq": null,
+    "observed": {},
+    "owner": null
+   },
+   "S2": {
+    "attempt": 1,
+    "begin_seq": 17,
+    "cited": true,
+    "code": "PLAN_CONTRADICTION",
+    "failure_seq": 19,
+    "observed": {
+     "19": [
+      "PLAN",
+      "PLAN_CONTRADICTION"
+     ]
+    },
+    "owner": "PLAN"
+   }
+  },
+  "budgets": {
+   "admission": {
+    "S1": {
+     "permitted": true,
+     "ready": [
+      "A",
+      "B"
+     ]
+    },
+    "S2": {
+     "permitted": false,
+     "ready": []
+    }
+   },
+   "developer": {
+    "S1": {
+     "criteria": {
+      "A": 1,
+      "B": 2
+     },
+     "requests": 2
+    }
+   },
+   "failures": {
+    "S2": {
+     "19": null
+    }
+   },
+   "retries": {
+    "S1": {
+     "PROVIDER": 1
+    }
+   }
+  },
+  "retry_target": {
+   "S1": {
+    "budget": null,
+    "failure_seq": null
+   },
+   "S2": {
+    "budget": null,
+    "failure_seq": 19
+   }
+  },
+  "terminal_state": {
+   "interrupts": 0,
+   "pending": {
+    "S2": "ROLLBACK"
+   },
+   "run": "ENDED",
+   "stories": {
+    "S1": "COMMIT",
+    "S2": "RUNNING"
+   }
+  },
+  "qualification_counters": {
+   "admissions": {
+    "S1": {
+     "A": "READY",
+     "B": "READY"
+    },
+    "S2": {
+     "C": "PLAN_CONTRADICTION"
+    }
+   },
+   "committed": 1,
+   "drift": {},
+   "failures": {
+    "DEVELOPER": 1,
+    "PLAN": 1,
+    "PROVIDER": 1
+   },
+   "metrics": {
+    "fully_pre_satisfied_stories": 0,
+    "introduce_obligations": 2,
+    "plan_drift": 0,
+    "pre_satisfied_introduce": 0,
+    "pre_satisfied_introduce_ratio": 0.0,
+    "unattributed_plan_drift": 0
+   },
+   "retries": 1,
+   "roles": {
+    "A": "INTRODUCE",
+    "B": "INTRODUCE",
+    "C": "PRESERVE"
+   },
+   "rolled_back": 1
+  }
+ },
+ "reference_journal_state_digests": {
+  "story_state": "67c6e301aeb4aafbdb92c564c5935a5a90bba9db0bc48f7010f86f4e03bb95b4",
+  "failure_owner": "2dd0881e52ccd793a1f1f1134fdb63aa32c6339a837b0266a9e3a6e2f7e89fa7",
+  "budgets": "6f92f627f5a24d301563b5ac392c7481e2ac6fd8b200fa617d2ce35d339d5a4c",
+  "retry_target": "4a60bf4095a2cb316a4df29c5bf6d7511991af79f63d60a616c87874ea040e62",
+  "terminal_state": "c482f8023c3e58c17510ea44e992ca195d97389c13093dc3a01454359d2a63db",
+  "qualification_counters": "f3a81d9131e98b29fdccf606d7e49f517f0358e40c859a49a093dff438647912"
+ },
+ "refusal_samples": {
+  "story_state: commit before admission": "story_state: story/commit for story S1 in state BEGIN: not a §17 transition",
+  "failure_owner: a rollback citing another attempt's failure": "failure_owner: story/rollback for story S1 cites seq 2, not a failure of its attempt 2",
+  "budgets: developer charge on a PRE_SATISFIED criterion": "budgets: provider/request for S1 charges ['A'], not admitted READY (§14: PRE_SATISFIED consumes no developer budget)",
+  "budgets: retry of a non-retryable failure": "budgets: story/retry for S1 cites a non-retryable failure: no budget to charge (§17)",
+  "retry_target: failure of a story never begun": "retry_target: failure/observed for story S1, which has not begun",
+  "terminal_state: an event after run/end": "terminal_state: story/begin after the run is ENDED",
+  "qualification_counters: a second plan freeze": "qualification_counters: a second plan/frozen — a run freezes one plan"
+ },
+ "mutation_by_target": {
+  "aisef2/journal/projections/__init__.py::project": "4/4",
+  "aisef2/journal/projections/budgets.py::Budgets.step": "131/131",
+  "aisef2/journal/projections/failure_owner.py::FailureOwner.step": "96/96",
+  "aisef2/journal/projections/qualification_counters.py::QualificationCounters.step": "101/101",
+  "aisef2/journal/projections/qualification_counters.py::metrics": "25/25",
+  "aisef2/journal/projections/retry_target.py::RetryTarget.step": "34/34",
+  "aisef2/journal/projections/story_state.py::StoryState.step": "110/110",
+  "aisef2/journal/projections/story_state.py::_OUTCOMES": "18/18",
+  "aisef2/journal/projections/story_state.py::_WITHIN": "5/5",
+  "aisef2/journal/projections/terminal_state.py::TerminalState.step": "119/119",
+  "aisef2/journal/projections/terminal_state.py::_OUTCOME": "3/3",
+  "aisef2/journal/projections/terminal_state.py::_RUN": "46/46"
+ },
+ "f11_conformance": {
+  "state": "PASS",
+  "detail": "six projections equal the RFC's closed list in order; read-only registry; a gate reads them by ControlProjection only"
+ },
+ "properties": {
+  "six_of_six_implemented": true,
+  "closed_list_a_seventh_cannot_be_cited": true,
+  "no_side_counter_every_value_is_a_fold": true,
+  "every_rule_sample_refuses": true,
+  "a_story_depends_on_its_own_events_only": true,
+  "generated_runs_fold_through_all_six": true,
+  "mutation_fully_killed": true,
+  "f11_projections_equal_rfc": true
+ }
+}

@@ -112,6 +112,8 @@ P2_TARGETS: dict[str, list[str]] = {
     "aisef2/plan/drift.py::plan_quality": ["tests/v2/p2/test_drift.py"],
 }
 _WRITER_TESTS = ["tests/v2/p3/test_journal_writer.py"]
+_FOLD_TESTS = ["tests/v2/test_fold_oracle.py"]
+_PROJECTION_TESTS = ["tests/v2/p3/test_control_projections.py"]
 P3_TARGETS: dict[str, list[str]] = {
     # WP-3.1: the envelope, append-site validation (with each rule and the citation check), the codec, the writer
     "aisef2/journal/event.py::Event.__post_init__": _WRITER_TESTS,
@@ -128,6 +130,31 @@ P3_TARGETS: dict[str, list[str]] = {
     # WP-3.2: the one reader and a prefix's identity
     "aisef2/journal/compat.py::reconstruct": ["tests/v2/p3/test_format_compat.py", "tests/v2/p3/test_journal_writer.py"],
     "aisef2/journal/compat.py::Journal.head": ["tests/v2/p3/test_format_compat.py"],
+    # WP-3.3: the pure fold, the incremental fold, the oracle, cache rows and the pre-append authority
+    "aisef2/journal/fold.py::fold": _FOLD_TESTS,
+    "aisef2/journal/fold.py::_frozen": _FOLD_TESTS,
+    "aisef2/journal/fold.py::Folder.__init__": _FOLD_TESTS,
+    "aisef2/journal/fold.py::Folder.peek": _FOLD_TESTS,
+    "aisef2/journal/fold.py::Folder.advance": _FOLD_TESTS,
+    "aisef2/journal/fold.py::oracle_problems": _FOLD_TESTS,
+    "aisef2/journal/fold.py::cache_row": _FOLD_TESTS,
+    "aisef2/journal/fold.py::_seal": _FOLD_TESTS,
+    "aisef2/journal/fold.py::resume": _FOLD_TESTS,
+    "aisef2/journal/fold.py::Authority.__init__": _FOLD_TESTS,
+    "aisef2/journal/fold.py::Authority.append": _FOLD_TESTS,
+    "aisef2/journal/projections/__init__.py::project": _FOLD_TESTS,
+    # WP-3.4: every control decision the six projections produce — each step, and the rule tables they read
+    "aisef2/journal/projections/story_state.py::StoryState.step": _PROJECTION_TESTS,
+    "aisef2/journal/projections/story_state.py::_OUTCOMES": _PROJECTION_TESTS,
+    "aisef2/journal/projections/story_state.py::_WITHIN": _PROJECTION_TESTS,
+    "aisef2/journal/projections/failure_owner.py::FailureOwner.step": _PROJECTION_TESTS,
+    "aisef2/journal/projections/budgets.py::Budgets.step": _PROJECTION_TESTS,
+    "aisef2/journal/projections/retry_target.py::RetryTarget.step": _PROJECTION_TESTS,
+    "aisef2/journal/projections/terminal_state.py::TerminalState.step": _PROJECTION_TESTS,
+    "aisef2/journal/projections/terminal_state.py::_RUN": _PROJECTION_TESTS,
+    "aisef2/journal/projections/terminal_state.py::_OUTCOME": _PROJECTION_TESTS,
+    "aisef2/journal/projections/qualification_counters.py::QualificationCounters.step": _PROJECTION_TESTS,
+    "aisef2/journal/projections/qualification_counters.py::metrics": _PROJECTION_TESTS,
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}

@@ -261,9 +261,303 @@ def format_compat() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-3.3
+
+def fold_oracle() -> dict:
+    import dataclasses
+    import random
+    from aisef2.arch.enums import ControlProjection as P, EventType as T
+    from aisef2.journal import fold as fo
+    from aisef2.journal.compat import reconstruct
+    from aisef2.journal.projections import PROJECTIONS, project
+    from aisef2.journal.writer import JournalWriter
+    from aisef2.product.contract import canonical, digest
+    gen = _module("aisef_v2_p3_journal_gen", "tests/v2/p3/journal_gen.py")
+    ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
+    six = list(PROJECTIONS.values())
+    runs = [reconstruct(gen.journal(seed, stories=2 + seed % 4)) for seed in range(40)]
+    prefixes = sum(len(j.events) for j in runs)
+    every_prefix = {p.id: sum(len(fo.oracle_problems(p, j.events)) for j in runs) for p in six}
+    large = [reconstruct(gen.journal(seed, stories=40)) for seed in (101, 202)]
+    sampled = {p.id: sum(len(fo.oracle_problems(p, j.events, every=37)) for j in large) for p in six}
+    fold_2 = []
+    for seed in range(15):
+        rng = random.Random(seed)
+        a = reconstruct(gen.journal(seed))
+        b = reconstruct(gen.journal(seed, times=lambda n, rng=rng: 1.7e9 + rng.uniform(0, 1e6)))
+        fold_2.append(a.head() != b.head() and all(fo.fold(p, a.events) == fo.fold(p, b.events) for p in six))
+    text = gen.journal(5)
+    torn = reconstruct(text[:len(text) - 30])
+    complete = reconstruct(text[:len(text) - 30][:text[:len(text) - 30].rindex("\n") + 1])
+    here = {p.id: digest(fo.fold(p, reconstruct(gen.journal(11)).events)) for p in six}
+    code = ("import sys; sys.path.insert(0, sys.argv[1]); from aisef2.journal.compat import reconstruct; "
+            "from aisef2.journal.fold import fold; from aisef2.journal.projections import PROJECTIONS; "
+            "from aisef2.product.contract import digest; from tests.v2.p3 import journal_gen as g; "
+            "j = reconstruct(g.journal(11)); print({p.id: digest(fold(p, j.events)) for p in PROJECTIONS.values()})")
+    other = subprocess.run([sys.executable, "-c", code, str(ROOT)], capture_output=True, encoding="utf-8",
+                           cwd=str(ROOT)).stdout.strip()
+
+    class Mutating:
+        id, version = "mutating", 1
+
+        def initial(self):
+            return {"n": 0}
+
+        def step(self, state, event):
+            state["n"] += 1
+            return state
+    # caches
+    p = PROJECTIONS[P.BUDGETS]
+    full_text = gen.journal(21)
+    lines = full_text.splitlines(keepends=True)
+    full, half = reconstruct(full_text), reconstruct("".join(lines[:len(lines) // 2]))
+    truth, row = fo.fold(p, full.events), fo.cache_row(p, half)
+    wrong = dataclasses.replace(row, state={**row.state, "retries": {"S1": {"DEVELOPER": 99}}})
+
+    def sealed(r, **over):
+        r = dataclasses.replace(r, **over)
+        return dataclasses.replace(r, digest=fo._seal(r.projection, r.version, r.length, r.head, r.state))
+    cache_cases = {name: fo.resume(p, full, r)[1] for name, r in (
+        ("stale row (shorter prefix)", row), ("edited state", wrong),
+        ("another projection", fo.cache_row(PROJECTIONS[P.STORY_STATE], half)),
+        ("version mismatch", sealed(row, version=2)), ("head differs", sealed(row, head="f" * 64)),
+        ("ahead of the journal", sealed(row, length=full.length + 1)))}
+    cache_answers = {name: fo.resume(p, full, r)[0] == truth for name, r in (
+        ("stale row (shorter prefix)", row), ("edited state", wrong), ("version mismatch", sealed(row, version=2)),
+        ("head differs", sealed(row, head="f" * 64)), ("ahead of the journal", sealed(row, length=full.length + 1)))}
+    forged = sealed(row, state=wrong.state)
+    with _journal_dir() as d:
+        w = JournalWriter(d / "authority.jsonl", clock=lambda: 0.0)
+        authority = fo.Authority(w, six)
+        specs = gen.specs(31)[:60]
+        for type_, data, cites in specs:
+            authority.append(T(type_), data, source_seqs=cites)
+        j = reconstruct((d / "authority.jsonl").read_text(encoding="utf-8"))
+        incremental_is_fold = all(authority.state(q.id) == fo.fold(q, j.events) for q in six)
+        size = (d / "authority.jsonl").stat().st_size
+        refused = _raises(lambda: authority.append(T.STORY_COMMIT, {"story_id": "S-never", "revision": "a" * 40}),
+                          fo.ProjectionError)
+        log_unchanged = (d / "authority.jsonl").stat().st_size == size and len(w.events) == len(specs)
+        w.close()
+    time_clean = ks.check(ROOT, ("NO_TIME_IN_PROJECTIONS",)) == []
+    time_fires = ks.violations("aisef2/journal/projections/bad.py", "def f(e):\n    return e.time\n",
+                               ("NO_TIME_IN_PROJECTIONS",)) != []
+    return {
+        "record": "AISEF V2 — P3 FOLD ORACLE", "work_package": "WP-3.3", "rfc_sections": ["21"],
+        "frozen_items": ["F11"],
+        "rule": "every read model is a pure fold of a journal prefix; incremental state == fold(prefix); a cache row "
+                "is a sealed, checked shortcut, discarded (never migrated) when it no longer describes the journal; a "
+                "gate never reads a cache; no projection reads time",
+        "oracle": {"generated_runs": len(runs), "prefixes_checked_per_projection": prefixes,
+                   "problems_every_prefix": every_prefix, "large_runs": [len(j.events) for j in large],
+                   "problems_sampled_every_37": sampled},
+        "FOLD_2_wall_clock_rewritten": {"runs": len(fold_2), "control_state_unchanged": sum(fold_2)},
+        "caches": {"how_each_row_was_treated": cache_cases, "answer_is_the_journal_fold": cache_answers,
+                   "ceiling": "a row re-sealed over a wrong state with the right head passes resume's checks "
+                              "(resumed: " + str(fo.resume(p, full, forged)[1].startswith("resumed")) + "); no gate "
+                              "reads a cache — project() folds the journal"},
+        "properties": {
+            "FOLD_1_incremental_equals_full_fold_for_every_prefix": all(v == 0 for v in every_prefix.values()),
+            "large_generated_journals_sampled": all(v == 0 for v in sampled.values()) and min(len(j.events)
+                                                                                              for j in large) > 300,
+            "FOLD_2_wall_clock_time_is_not_control_state": all(fold_2),
+            "empty_and_one_event_journals": all(canonical(fo.fold(q, [])) == canonical(q.initial()) for q in six)
+                and all(fo.fold(q, runs[0].events[:1]) == fo.Folder(q).advance(runs[0].events[0]) for q in six),
+            "replay_twice_identical": all(canonical(fo.fold(q, runs[9].events)) == canonical(fo.fold(q, runs[9].events))
+                                          for q in six),
+            "interrupted_tail_folds_as_its_complete_prefix": torn.torn_tail and torn.events == complete.events,
+            "deterministic_serialisation_across_processes": other == str(here),
+            "a_step_cannot_change_its_input_state": _raises(lambda: fo.fold(Mutating(), runs[1].events), TypeError)
+                is not None,
+            "stale_cache_used_only_as_a_checked_shortcut": cache_cases["stale row (shorter prefix)"].startswith(
+                "resumed") and all(cache_answers.values()),
+            "PROJ_1_a_row_that_differs_from_the_journal_is_discarded": all(
+                v.endswith("discarded") or "discarded" in v for k, v in cache_cases.items()
+                if k != "stale row (shorter prefix)"),
+            "version_mismatch_discarded_not_migrated": cache_cases["version mismatch"].endswith("not migrated"),
+            "no_gate_reads_a_cache": "cache" not in inspect.signature(project).parameters
+                and project(full, P.BUDGETS) == truth,
+            "no_projection_reads_time": time_clean and time_fires,
+            "authority_incremental_state_is_the_fold": incremental_is_fold,
+            "a_refused_event_never_reaches_the_log": refused is not None and log_unchanged,
+        },
+    }
+
+
+# --------------------------------------------------------------------------------------- WP-3.4
+
+def control_projections() -> dict:
+    from aisef2.arch.enums import ControlProjection as P
+    from aisef2.journal.fold import ProjectionError, fold
+    from aisef2.journal.projections import PROJECTIONS, project
+    from aisef2.product.contract import digest, plain
+    t = _module("aisef_v2_p3_control_projections", "tests/v2/p3/test_control_projections.py")
+    gen = _module("aisef_v2_p3_journal_gen", "tests/v2/p3/journal_gen.py")
+    mut = json.loads((ROOT / "closure-evidence/v2/P3-MUTATION.json").read_text(encoding="utf-8")) \
+        if (ROOT / "closure-evidence/v2/P3-MUTATION.json").exists() else {"targets": []}
+    reference = t.run(t.plan(A="INTRODUCE", B="INTRODUCE", C="PRESERVE"), t.begin("S1"),
+                      t.admit("S1", {"A": "PRE_SATISFIED", "B": "READY"}), t.drift("S1", "A", []),
+                      t.request("S1", "B"), t.fail("S1", "CONTRACT_UNSATISFIED"), t.fail("S1", "PROVIDER_UNAVAILABLE"),
+                      t.story("retry", "S1", 7), t.story("dispose", "S1"), t.story("end", "S1"), t.begin("S1"),
+                      t.admit("S1", {"A": "READY", "B": "READY"}), t.request("S1", "A", "B"), t.story("commit", "S1"),
+                      t.story("dispose", "S1"), t.story("end", "S1"), t.begin("S2"),
+                      t.admit("S2", {"C": "PLAN_CONTRADICTION"}), t.fail("S2", "PLAN_CONTRADICTION"),
+                      t.story("rollback", "S2", 19), ("run/dispose-begin", {}), ("run/end", {}))
+    states = {k.value: plain(fold(p, reference)) for k, p in PROJECTIONS.items()}
+    samples = {}
+    for name, case, specs in (
+            ("story_state: commit before admission", P.STORY_STATE, (t.begin("S1"), t.story("commit", "S1"))),
+            ("failure_owner: a rollback citing another attempt's failure", P.FAILURE_OWNER,
+             (t.begin("S1"), t.fail("S1"), t.story("retry", "S1", 2), t.story("dispose", "S1"), t.story("end", "S1"),
+              t.begin("S1"), t.story("rollback", "S1", 2))),
+            ("budgets: developer charge on a PRE_SATISFIED criterion", P.BUDGETS,
+             (t.begin("S1"), t.admit("S1", {"A": "PRE_SATISFIED", "B": "READY"}), t.request("S1", "A"))),
+            ("budgets: retry of a non-retryable failure", P.BUDGETS,
+             (t.begin("S1"), t.fail("S1", "INVALID_CREDENTIAL"), t.story("retry", "S1", 2))),
+            ("retry_target: failure of a story never begun", P.RETRY_TARGET, (t.fail("S1"),)),
+            ("terminal_state: an event after run/end", P.TERMINAL_STATE, (("run/end", {}), t.begin("S1"))),
+            ("qualification_counters: a second plan freeze", P.QUALIFICATION_COUNTERS,
+             (t.plan(A="INTRODUCE"), t.plan(A="INTRODUCE")))):
+        samples[name] = _raises(lambda c=case, s=specs: fold(PROJECTIONS[c], t.run(*s)), ProjectionError)
+    independence = t.Independence("test_every_story_folds_alone_to_its_entry_in_the_run")
+    independent = unittest_ok(independence)
+    by_target = {x["target"]: f"{x['killed']}/{x['mutants']}" for x in mut["targets"]
+                 if "/projections/" in x["target"]}
+    f11 = _conformance("F11.projections_implemented")
+    generated = [gen.journal(seed) for seed in range(20)]
+    return {
+        "record": "AISEF V2 — P3 CONTROL PROJECTIONS", "work_package": "WP-3.4", "rfc_sections": ["17", "21", "22", "29"],
+        "frozen_items": ["F11"],
+        "semantics": "docs/implementation/v2/P3-PROJECTION-SEMANTICS.md",
+        "projections": {k.value: {"version": p.version, "module": type(p).__module__} for k, p in PROJECTIONS.items()},
+        "reference_journal_states": states,
+        "reference_journal_state_digests": {k: digest(v) for k, v in states.items()},
+        "refusal_samples": samples,
+        "mutation_by_target": by_target,
+        "f11_conformance": f11,
+        "properties": {
+            "six_of_six_implemented": [k.value for k in PROJECTIONS] == [x.value for x in P],
+            "closed_list_a_seventh_cannot_be_cited": _raises(lambda: project(None, "progress_report"), ProjectionError)
+                is not None and _raises(lambda: _assign(PROJECTIONS, "seventh"), TypeError) is not None,
+            "no_side_counter_every_value_is_a_fold": all(vars(p) == {} for p in PROJECTIONS.values()),
+            "every_rule_sample_refuses": all(v is not None and v.startswith(k.split(":")[0])
+                                             for k, v in samples.items()),
+            "a_story_depends_on_its_own_events_only": independent,
+            "generated_runs_fold_through_all_six": all(fold(p, _reconstruct(text).events) is not None
+                                                        for text in generated for p in PROJECTIONS.values()),
+            "mutation_fully_killed": bool(by_target) and all(a == b for a, b in
+                                                             (v.split("/") for v in by_target.values())),
+            "f11_projections_equal_rfc": f11["state"] == "PASS",
+        },
+    }
+
+
+# --------------------------------------------------------------------------------------- WP-3.5
+
+def reference_models() -> dict:
+    from aisef2.arch.enums import ControlProjection as P
+    from aisef2.journal.compat import reconstruct
+    from aisef2.journal.event import JournalError
+    from aisef2.journal.projections import PROJECTIONS
+    h = _module("aisef_v2_p3_reference_models", "tests/v2/p3/test_reference_models.py")
+    x = _module("aisef_v2_p3_reference_defects", "tests/v2/p3/test_reference_defects.py")
+    gen = _module("aisef_v2_p3_journal_gen", "tests/v2/p3/journal_gen.py")
+    ind = _module("aisef_v2_refmodel_independence", "validation/v2/refmodel_independence.py")
+    mut = json.loads((ROOT / "closure-evidence/v2/P3-MUTATION.json").read_text(encoding="utf-8"))
+    calibration = {pid: h.calibration_problems(model, h.CALIBRATIONS[pid]) for pid, model in h.MODELS.items()}
+    implementation_on_calibration = {
+        pid: [c["name"] for c in h.CALIBRATIONS[pid]
+              if h.projection_answer(PROJECTIONS[P(pid)], reconstruct(h.stored(c["events"])).events)
+              != h.expected_of(c)]
+        for pid in h.MODELS}
+    agreeing = {}
+    for pid, cases in h.CALIBRATIONS.items():
+        answers = {json.dumps(c["events"], sort_keys=True): c["wrong"] for c in cases}
+
+        def mirror(events, answers=answers):
+            got = answers[json.dumps(events, sort_keys=True)]
+            if got == h.REFUSED:
+                raise h.Refused("mirrored")
+            return got
+        agreeing[pid] = len(h.calibration_problems(mirror, cases)) > 0
+    diff = {pid: 0 for pid in h.MODELS}
+    traces = 0
+    for seed in range(120):
+        events = reconstruct(gen.journal(seed, stories=3 + seed % 5)).events
+        traces += 1
+        for pid, model in h.MODELS.items():
+            diff[pid] += h.projection_answer(PROJECTIONS[P(pid)], events) != h.model_answer(model, events)
+    edited = {"compared": 0, "refused_by_both": 0, "divergent": 0}
+    for seed in range(150):
+        try:
+            events = reconstruct(h.text_of(h.mutated(seed))).events
+        except JournalError:
+            continue
+        for pid, model in h.MODELS.items():
+            want, got = h.projection_answer(PROJECTIONS[P(pid)], events), h.model_answer(model, events)
+            edited["compared"] += 1
+            edited["refused_by_both"] += want == got == h.REFUSED
+            edited["divergent"] += want != got
+    injected = {pid: x.divergences(pid, x.defective(pid, step)) for pid, step in x.DEFECTS.items()}
+    clean = {pid: x.divergences(pid, PROJECTIONS[P(pid)], range(0, 200, 7)) for pid in h.MODELS}
+    by_target = {x["target"]: f"{x['killed']}/{x['mutants']}" for x in mut["targets"] if "refmodel" in x["target"]}
+    return {
+        "record": "AISEF V2 — P3 REFERENCE MODELS", "work_package": "WP-3.5", "rfc_sections": ["21", "27 (Q1)"],
+        "frozen_items": ["F11"],
+        "authorship": "authored in a separate work session from the RFC and docs/implementation/v2/"
+                      "P3-PROJECTION-SEMANTICS.md, in a clone holding neither aisef2/journal/fold.py nor "
+                      "aisef2/journal/projections/ (the manifest's WP-3.5 authorship constraint)",
+        "independence_rule": "validation/v2/refmodel_independence.py: stdlib and the package only; no aisef2, no other "
+                             "tests module, no importlib / __import__ / exec / eval / compile",
+        "models": {pid: {"calibration_cases": [c["name"] for c in h.CALIBRATIONS[pid]]} for pid in h.MODELS},
+        "calibration_problems": calibration,
+        "implementation_disagrees_with_calibration": implementation_on_calibration,
+        "differential": {"generated_traces": traces, "divergent_by_model": diff, "edited_traces": edited},
+        "REF_1_injected_defects": {pid: {"defect": x.DEFECTS[pid].__name__, "divergent_traces": n}
+                                   for pid, n in injected.items()},
+        "mutation_by_target": by_target,
+        "properties": {
+            "six_of_six_reference_models": sorted(h.MODELS) == sorted(p.value for p in P),
+            "no_import_constraint_mechanically_enforced": ind.check(ROOT) == []
+                and bool(ind.violations("tests/v2/refmodel/x.py", "import aisef2.journal.projections\n")),
+            "six_of_six_calibrated": all(v == [] for v in calibration.values())
+                and all(len(h.CALIBRATIONS[p]) >= 3 for p in h.MODELS),
+            "the_implementation_reproduces_every_calibration_answer": all(v == [] for v in
+                                                                          implementation_on_calibration.values()),
+            "REF_2_an_always_agree_model_fails_calibration": all(agreeing.values()),
+            "implementation_equals_reference_model_over_generated_traces": all(v == 0 for v in diff.values()),
+            "on_edited_traces_both_refuse_or_agree": edited["divergent"] == 0 and edited["refused_by_both"] > 20,
+            "REF_1_every_injected_projection_defect_is_caught": all(n > 0 for n in injected.values())
+                and all(n == 0 for n in clean.values()),
+            "reference_model_mutation_fully_killed": bool(by_target) and all(
+                a == b for a, b in (v.split("/") for v in by_target.values())),
+        },
+    }
+
+
+def _assign(mapping, key) -> None:
+    mapping[key] = None
+
+
+def _reconstruct(text):
+    from aisef2.journal.compat import reconstruct
+    return reconstruct(text)
+
+
+def unittest_ok(case) -> bool:
+    import unittest
+    result = unittest.TestResult()
+    case.run(result)
+    return result.wasSuccessful() and result.testsRun == 1
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-3.1": ("closure-evidence/v2/P3-JOURNAL-WRITER.json", journal_writer, "aisef2/journal/writer.py"),
     "WP-3.2": ("closure-evidence/v2/P3-FORMAT-COMPAT.json", format_compat, "aisef2/journal/compat.py"),
+    "WP-3.3": ("closure-evidence/v2/P3-FOLD-ORACLE.json", fold_oracle, "aisef2/journal/fold.py"),
+    "WP-3.4": ("closure-evidence/v2/P3-CONTROL-PROJECTIONS.json", control_projections,
+               "aisef2/journal/projections/__init__.py"),
+    "WP-3.5": ("closure-evidence/v2/P3-REFERENCE-MODELS.json", reference_models, "tests/v2/refmodel/__init__.py"),
 }
 
 

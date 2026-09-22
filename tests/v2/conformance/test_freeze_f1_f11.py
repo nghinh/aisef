@@ -105,10 +105,11 @@ class Conformance(unittest.TestCase):
         self.assertIn("could not be extracted", self._sub(r, "F3.owner_set")["detail"])
 
     def test_advancing_the_phase_turns_pending_into_ratchet_failures(self):
-        with mock.patch.object(fc, "CURRENT_PHASE", "P3"):
+        with mock.patch.object(fc, "CURRENT_PHASE", "P4"):
             r = fc.evaluate(self.rfc, self.code, self.manifest)
-        self.assertEqual(self._sub(r, "F11.projections_implemented")["state"], fc.FAIL)
-        self.assertIn("F11.projections_implemented", r["ratchet_violations"])
+        self.assertEqual(self._sub(r, "F8.scopes_and_lifetime_order")["state"], fc.FAIL)
+        self.assertIn("F8.scopes_and_lifetime_order", r["ratchet_violations"])
+        self.assertEqual(self._sub(r, "F11.projections_implemented")["state"], fc.PASS)  # implemented in P3
 
     def test_F6_plan_obligation_is_compared_field_by_field(self):
         self.assertEqual(self._sub(self.result, "F6.plan_obligation_shape")["state"], fc.PASS)

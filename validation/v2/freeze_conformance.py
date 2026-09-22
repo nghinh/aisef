@@ -256,6 +256,38 @@ def _event_envelope_matches_rfc(rfc: RFC) -> dict:
     return {"state": PASS, "detail": f"Event fields, defaults {sorted(got)} and frozenness equal the RFC"}
 
 
+def _projections_match_rfc(rfc: RFC) -> dict:
+    """F11: exactly the RFC's six control-critical projections, as a closed, read-only registry a gate reads by
+    ControlProjection only."""
+    want = rfc.control_projections()
+    if len(want) != 6:
+        return {"state": FAIL, "detail": "RFC reference for the six projections could not be extracted"}
+    if not symbol_present("aisef2.journal.projections", "PROJECTIONS"):
+        return {"state": None, "detail": "aisef2.journal.projections not implemented", "rfc_reference": want}
+    mod = importlib.import_module("aisef2.journal.projections")
+    reg = mod.PROJECTIONS
+    got = [k.value for k in reg]
+    if got != want:
+        return {"state": FAIL, "detail": "the projection registry differs from the RFC's closed list",
+                "rfc_reference": want, "implemented": got}
+    bad = [k.value for k, p in reg.items() if getattr(p, "id", None) != k.value or isinstance(p.version, bool)
+           or not isinstance(p.version, int) or not callable(p.initial) or not callable(p.step)]
+    if bad:
+        return {"state": FAIL, "detail": f"projections without an id, integer version, initial and step: {bad}"}
+    try:
+        reg["seventh"] = None
+        return {"state": FAIL, "detail": "the registry accepts a seventh entry"}
+    except TypeError:
+        pass
+    try:
+        mod.project(None, want[0])
+        return {"state": FAIL, "detail": "project() accepts a projection id that is not a ControlProjection"}
+    except mod.ProjectionError:
+        pass
+    return {"state": PASS, "detail": "six projections equal the RFC's closed list in order; read-only registry; a "
+                                     "gate reads them by ControlProjection only"}
+
+
 def _timeout_semantics_match_rfc(rfc: RFC) -> dict:
     """F5 as amended by ARCHITECTURE-EXCEPTION-V2-002 (§9.2): a harness timeout is UNRUNNABLE; a subject that exceeds
     its bounded observation window is EXECUTED with the verdict the spec's observable assigns — never a default, never
@@ -511,8 +543,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
         _shape("aisef2.invariants.registry", "arm", list(inv) if len(inv) == 9 else None))
     add("F11", "F11.closed_projection_list", "WP-0.2",
         V("ControlProjection", rfc.control_projections(), code, by_value=True))
-    add("F11", "F11.projections_implemented", "WP-3.4",
-        _shape("aisef2.journal.projections", None, rfc.control_projections() or None))
+    add("F11", "F11.projections_implemented", "WP-3.4", _projections_match_rfc(rfc))
     return S
 
 

@@ -118,14 +118,12 @@
   },
   {
    "id": "F11",
-   "state": "PENDING",
+   "state": "PASS",
    "subchecks": [
     "F11.closed_projection_list",
     "F11.projections_implemented"
    ],
-   "pending_on": [
-    "WP-3.4"
-   ]
+   "pending_on": []
   }
  ],
  "subchecks": [
@@ -886,22 +884,14 @@
    "item": "F11",
    "id": "F11.projections_implemented",
    "implemented_by": "WP-3.4",
-   "state": "PENDING",
-   "detail": "aisef2.journal.projections not implemented",
-   "rfc_reference": [
-    "story_state",
-    "failure_owner",
-    "budgets",
-    "retry_target",
-    "terminal_state",
-    "qualification_counters"
-   ],
+   "state": "PASS",
+   "detail": "six projections equal the RFC's closed list in order; read-only registry; a gate reads them by ControlProjection only",
    "required_now": false
   }
  ],
  "summary": {
-  "PASS": 7,
-  "PENDING": 4,
+  "PASS": 8,
+  "PENDING": 3,
   "FAIL": 0
  },
  "ratchet_violations": []
