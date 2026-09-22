@@ -119,6 +119,28 @@ class Oracle(unittest.TestCase):
         self.assertEqual(out, str(here))
 
 
+def tampered(text, how):
+    """A generated journal with one old event edited in place (payload changed, line re-encoded canonically, its chain
+    link left as it was) or deleted."""
+    lines = text.splitlines(keepends=True)
+    n = len(lines) // 3
+    if how == "delete":
+        return "".join(lines[:n] + lines[n + 1:])
+    import json
+    obj = json.loads(lines[n])
+    event = {**obj["event"], "data": {**obj["event"]["data"], "tampered": True}}
+    return "".join(lines[:n] + [canonical({"chain": obj["chain"], "event": event}) + "\n"] + lines[n + 1:])
+
+
+class Tamper(unittest.TestCase):
+    def test_PROJ_2_an_edited_or_deleted_old_event_fails_reconstruction(self):
+        for seed in range(10):
+            text = gen.journal(seed)
+            for how, msg in (("edit", "the chain does not link"), ("delete", "seq == index is broken")):
+                with self.subTest(seed=seed, how=how), self.assertRaisesRegex(JournalError, msg):
+                    reconstruct(tampered(text, how))
+
+
 class Purity(unittest.TestCase):
     def test_a_step_cannot_change_the_state_it_is_given(self):
         class Mutating(Counter):

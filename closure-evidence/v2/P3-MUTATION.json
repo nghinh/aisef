@@ -5014,6 +5014,2582 @@
      "killed": true
     }
    ]
+  },
+  {
+   "target": "tests/v2/refmodel/budgets.py::_walk",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "1817560322e0f76f5cf60cd105deb18be026a4bea331c58356e014878f15490a",
+   "mutants": 66,
+   "killed": 66,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L46 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L20 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L20 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L22 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L20 string 'story/begin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L22 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L25 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L22 string 'story/admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L23 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L24 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L24 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L25 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L26 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L29 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L34 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L24 string 'permitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L24 string 'ready' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L25 string 'provider/request' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L26 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L29 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L34 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L35 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L41 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L24 string 'developer_call_permitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L26 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L26 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L27 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L30 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L30 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L31 string 'requests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L32 string 'criteria' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L34 string 'failure/observed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L35 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L37 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L40 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L41 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L23 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L23 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L23 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L27 LtE->Gt",
+     "killed": true
+    },
+    {
+     "mutant": "L30 string 'requests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L30 string 'criteria' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L39 string 'source_seqs' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L40 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L41 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L41 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L23 string 'READY' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L26 string 'permitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string 'criteria' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'retryable' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L23 string 'dispositions' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L27 string 'criteria' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L27 string 'ready' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string 'criteria' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/budgets.py::model",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "1817560322e0f76f5cf60cd105deb18be026a4bea331c58356e014878f15490a",
+   "mutants": 28,
+   "killed": 27,
+   "survivors": [
+    "L56 True->False"
+   ],
+   "results": [
+    {
+     "mutant": "L59 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L52 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L54 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L54 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L54 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L54 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L52 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string 'retries' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string 'developer' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string 'admission' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string 'failures' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L57 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L56 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'retries' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'developer' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'admission' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'failures' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 True->False",
+     "killed": false
+    },
+    {
+     "mutant": "L53 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L53 string 'data' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/failure_owner.py::_attempts",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "c3d541480d934b59923ea7de90aa76fb0fa5c023b6c1bbcb7a0facb09302d9a4",
+   "mutants": 12,
+   "killed": 12,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L28 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L19 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L22 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L19 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L22 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L24 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L21 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L22 string 'story/begin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L24 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L21 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L22 string 'type' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/failure_owner.py::_read",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "c3d541480d934b59923ea7de90aa76fb0fa5c023b6c1bbcb7a0facb09302d9a4",
+   "mutants": 45,
+   "killed": 45,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L46 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L34 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L36 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L45 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L45 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L45 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L46 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 dict entry 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L36 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L38 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L42 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L45 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L45 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L45 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'attempt' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'begin_seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'observed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'code' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L47 string 'failure_seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L47 string 'cited' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L36 string 'failure/observed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L37 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L38 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L42 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L44 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L44 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L44 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L44 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L36 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L41 string 'source_seqs' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L44 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'code' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L39 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'data' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/failure_owner.py::model",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "c3d541480d934b59923ea7de90aa76fb0fa5c023b6c1bbcb7a0facb09302d9a4",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L55 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L52 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L52 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L53 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L53 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L53 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L53 element 1 dropped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/qualification_counters.py::_COUNTED",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L10 string 'story/commit' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L10 string 'story/rollback' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L10 string 'story/retry' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L10 string 'committed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L10 string 'rolled_back' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L10 string 'retries' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/qualification_counters.py::metrics",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+   "mutants": 30,
+   "killed": 28,
+   "survivors": [
+    "L15 element 0 dropped",
+    "L15 element 1 dropped"
+   ],
+   "results": [
+    {
+     "mutant": "L17 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L17 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L14 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L14 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L15 element 0 dropped",
+     "killed": false
+    },
+    {
+     "mutant": "L15 element 1 dropped",
+     "killed": false
+    },
+    {
+     "mutant": "L18 string 'introduce_obligations' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'pre_satisfied_introduce' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L20 string 'pre_satisfied_introduce_ratio' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L21 string 'fully_pre_satisfied_stories' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L23 string 'plan_drift' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L24 string 'unattributed_plan_drift' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L20 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L14 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L14 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L14 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L15 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L15 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L15 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L24 string 'UNATTRIBUTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L14 string 'INTRODUCE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L15 string 'PRE_SATISFIED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L22 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L22 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L22 string 'PRE_SATISFIED' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/qualification_counters.py::model",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+   "mutants": 78,
+   "killed": 76,
+   "survivors": [
+    "L41 sorted() -> list()",
+    "L44 sorted() -> list()"
+   ],
+   "results": [
+    {
+     "mutant": "L62 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L30 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L30 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L30 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L30 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L30 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L30 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L31 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L31 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L31 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L34 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L62 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L62 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L62 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L62 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L62 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L62 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L31 string 'committed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L31 string 'rolled_back' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L31 string 'retries' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L33 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L33 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L33 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L34 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L35 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L38 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L62 string 'roles' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L62 string 'admissions' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L62 string 'drift' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L62 string 'failures' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L63 string 'metrics' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L34 string 'plan/frozen' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L35 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L38 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L39 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L42 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L46 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L52 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L38 string 'story/admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L39 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L41 sorted() -> list()",
+     "killed": false
+    },
+    {
+     "mutant": "L44 sorted() -> list()",
+     "killed": false
+    },
+    {
+     "mutant": "L52 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L54 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L58 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'roles' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'story/plan-drift' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L53 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L53 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L53 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L53 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L54 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L58 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L60 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'dispositions' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L51 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string 'PRE_SATISFIED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'attributed_to' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L44 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L44 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L45 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L53 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L53 string 'criterion_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L60 string 'failure/observed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L41 string 'dispositions' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L45 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L45 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L45 string 'PRE_SATISFIED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L45 string 'INTRODUCE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L44 string 'dispositions' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'owner' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/retry_target.py::model",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "0e9025ca46915f953fe64df425897c872ca1863f4adafb87143265f0a8ccf0bb",
+   "mutants": 45,
+   "killed": 45,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L30 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L12 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L12 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L12 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L12 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L14 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L18 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L18 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L22 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L22 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L24 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L14 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L16 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L19 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L24 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L14 string 'story/begin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L19 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L19 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L25 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L25 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L28 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L28 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L14 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'failure/observed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L23 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L25 string 'budget' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L25 string 'failure_seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'budget' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L29 string 'failure_seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L15 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L29 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L23 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'retryable' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L15 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L15 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L17 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L17 string 'data' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/story_state.py::_TABLE",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "59ac5ff53206ecdcc648ad5843d3ecd94ab8f4db33812e5fe4c64d3ab02af77d",
+   "mutants": 51,
+   "killed": 48,
+   "survivors": [
+    "L18 False->True",
+    "L19 False->True",
+    "L20 False->True"
+   ],
+   "results": [
+    {
+     "mutant": "L13 string 'story/commit' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L14 string 'story/rollback' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L15 string 'story/retry' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'story/dispose' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L17 string 'story/end' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L18 string 'probe/evaluated' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'provider/request' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L20 string 'failure/observed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L13 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L13 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L13 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L14 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L14 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L14 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L15 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L15 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L15 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L16 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L16 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L16 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L18 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L18 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L18 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L20 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L20 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L20 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L13 string 'COMMIT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L13 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L14 string 'ROLLBACK' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L14 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L15 string 'RETRY' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L15 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'DISPOSE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L17 string 'ENDED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L17 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L18 False->True",
+     "killed": false
+    },
+    {
+     "mutant": "L19 False->True",
+     "killed": false
+    },
+    {
+     "mutant": "L20 False->True",
+     "killed": false
+    },
+    {
+     "mutant": "L13 string 'ACTIVE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'COMMIT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'ROLLBACK' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'RETRY' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L17 string 'DISPOSE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'ACTIVE' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/story_state.py::model",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "59ac5ff53206ecdcc648ad5843d3ecd94ab8f4db33812e5fe4c64d3ab02af77d",
+   "mutants": 91,
+   "killed": 91,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L58 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L28 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L32 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L38 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L40 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L47 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L52 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L54 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L27 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L27 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L27 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L27 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L28 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L32 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L33 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L38 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L40 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L41 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L44 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L47 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L48 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L51 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L51 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L51 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L52 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L54 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L56 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L28 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L28 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L30 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L32 string 'story/begin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L35 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L35 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L35 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L35 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L40 string 'story/admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L41 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L47 string 'story/plan-drift' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L27 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L27 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L28 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L28 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L33 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L33 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L35 string 'state' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L35 string 'attempt' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L35 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L36 string 'outcome' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L35 string 'BEGIN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L35 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L41 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L41 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L43 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L43 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L44 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L45 string 'ACTIVE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L48 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'state' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string 'state' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'story/begin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'story/admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'story/plan-drift' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L33 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L33 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L33 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L35 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L41 string 'BEGIN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L45 string 'state' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'ACTIVE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L48 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L48 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L48 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'outcome' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string 'ENDED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string 'RETRY' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L41 string 'state' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L41 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'state' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'BEGIN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string 'state' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string 'outcome' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L35 string 'attempt' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'state' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'admitted' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/terminal_state.py::_INTERRUPT",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "da06421d0c00009fdc66355384c907fcff05473f29a41d2a1e0812f2dea6c6de",
+   "mutants": 16,
+   "killed": 16,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L24 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L25 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L24 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L24 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L24 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L25 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L25 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L25 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L24 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L24 string 'INTERRUPTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L25 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L25 string 'ABANDONED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L24 string 'RUNNING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L24 string 'DISPOSING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L25 string 'INTERRUPTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L25 string 'DISPOSING' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/terminal_state.py::_OUTCOME",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "da06421d0c00009fdc66355384c907fcff05473f29a41d2a1e0812f2dea6c6de",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L28 string 'story/commit' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'story/rollback' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'story/retry' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'COMMIT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'ROLLBACK' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L28 string 'RETRY' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/terminal_state.py::_RUN",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "da06421d0c00009fdc66355384c907fcff05473f29a41d2a1e0812f2dea6c6de",
+   "mutants": 30,
+   "killed": 30,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L15 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L15 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L16 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L16 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L17 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L18 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L18 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L19 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L20 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L20 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L15 string 'RUNNING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'DISPOSING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L17 string 'DISPOSING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L18 string 'ENDED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'ENDED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L20 string 'ENDED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L15 string 'NOT_STARTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L15 string 'run/begin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'RUNNING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L16 string 'run/dispose-begin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L17 string 'INTERRUPTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L17 string 'run/dispose-begin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L18 string 'RUNNING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L18 string 'run/end' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'DISPOSING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L19 string 'run/end' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L20 string 'INTERRUPTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L20 string 'run/end' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/terminal_state.py::_SETTLED",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "da06421d0c00009fdc66355384c907fcff05473f29a41d2a1e0812f2dea6c6de",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L27 string 'COMMIT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L27 string 'ROLLBACK' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L27 string 'RETRY' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L27 string 'COMMIT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L27 string 'ROLLBACK' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L27 string 'OPEN' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "tests/v2/refmodel/terminal_state.py::model",
+   "kill_tests": [
+    "tests/v2/p3/test_reference_models.py"
+   ],
+   "source_sha256": "da06421d0c00009fdc66355384c907fcff05473f29a41d2a1e0812f2dea6c6de",
+   "mutants": 76,
+   "killed": 76,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L61 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L32 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L32 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L32 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L32 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L32 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L32 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L32 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L32 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L35 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L37 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L61 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L32 string 'NOT_STARTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L34 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L34 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L34 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L34 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L35 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L37 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L39 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L42 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'run' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'interrupts' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'stories' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'pending' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string 'run/interrupted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L38 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L38 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L38 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L39 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L41 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L41 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L41 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L41 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L46 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L34 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L34 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L39 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L39 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L42 string 'run/' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L43 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L46 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L48 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L51 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L38 string 'abandoned' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L39 GtE->Lt",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L45 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L45 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'story/begin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L50 string 'RUNNING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L51 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L53 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L56 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L47 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L48 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L53 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L58 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'RUNNING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'OPEN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L53 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L53 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'story/end' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L58 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string 'OPEN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L53 string 'RUNNING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'story_id' emptied",
+     "killed": true
+    }
+   ]
   }
  ]
 }

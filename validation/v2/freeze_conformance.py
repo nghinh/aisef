@@ -37,7 +37,7 @@ FROZEN_IDS = [f"F{i}" for i in range(1, 12)]
 #: The phase the Cycle-1 implementation has reached. Every sub-check owned by a package in this phase or an earlier
 #: one must PASS. Advanced by one reviewed line at each phase boundary.
 # ponytail: a constant, not a progress database; move it into a progress record if phases start overlapping.
-CURRENT_PHASE = "P2"
+CURRENT_PHASE = "P3"
 
 PASS, FAIL, PENDING = "PASS", "FAIL", "PENDING"
 

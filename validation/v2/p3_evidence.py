@@ -269,6 +269,7 @@ def fold_oracle() -> dict:
     from aisef2.arch.enums import ControlProjection as P, EventType as T
     from aisef2.journal import fold as fo
     from aisef2.journal.compat import reconstruct
+    from aisef2.journal.event import JournalError
     from aisef2.journal.projections import PROJECTIONS, project
     from aisef2.journal.writer import JournalWriter
     from aisef2.product.contract import canonical, digest
@@ -339,6 +340,9 @@ def fold_oracle() -> dict:
                           fo.ProjectionError)
         log_unchanged = (d / "authority.jsonl").stat().st_size == size and len(w.events) == len(specs)
         w.close()
+    ft = _module("aisef_v2_p3_fold_oracle_tests", "tests/v2/test_fold_oracle.py")
+    proj_2 = {how: [_raises(lambda s=seed, h=how: reconstruct(ft.tampered(gen.journal(s), h)), JournalError)
+                    for seed in range(10)] for how in ("edit", "delete")}
     time_clean = ks.check(ROOT, ("NO_TIME_IN_PROJECTIONS",)) == []
     time_fires = ks.violations("aisef2/journal/projections/bad.py", "def f(e):\n    return e.time\n",
                                ("NO_TIME_IN_PROJECTIONS",)) != []
@@ -352,6 +356,7 @@ def fold_oracle() -> dict:
                    "problems_every_prefix": every_prefix, "large_runs": [len(j.events) for j in large],
                    "problems_sampled_every_37": sampled},
         "FOLD_2_wall_clock_rewritten": {"runs": len(fold_2), "control_state_unchanged": sum(fold_2)},
+        "PROJ_2_tampered_old_event": {how: v[0] for how, v in proj_2.items()},
         "caches": {"how_each_row_was_treated": cache_cases, "answer_is_the_journal_fold": cache_answers,
                    "ceiling": "a row re-sealed over a wrong state with the right head passes resume's checks "
                               "(resumed: " + str(fo.resume(p, full, forged)[1].startswith("resumed")) + "); no gate "
@@ -378,6 +383,9 @@ def fold_oracle() -> dict:
             "no_gate_reads_a_cache": "cache" not in inspect.signature(project).parameters
                 and project(full, P.BUDGETS) == truth,
             "no_projection_reads_time": time_clean and time_fires,
+            "PROJ_2_an_edited_or_deleted_old_event_fails_reconstruction":
+                all(m and "the chain does not link" in m for m in proj_2["edit"])
+                and all(m and "seq == index is broken" in m for m in proj_2["delete"]),
             "authority_incremental_state_is_the_fold": incremental_is_fold,
             "a_refused_event_never_reaches_the_log": refused is not None and log_unchanged,
         },
@@ -500,7 +508,11 @@ def reference_models() -> dict:
             edited["divergent"] += want != got
     injected = {pid: x.divergences(pid, x.defective(pid, step)) for pid, step in x.DEFECTS.items()}
     clean = {pid: x.divergences(pid, PROJECTIONS[P(pid)], range(0, 200, 7)) for pid in h.MODELS}
-    by_target = {x["target"]: f"{x['killed']}/{x['mutants']}" for x in mut["targets"] if "refmodel" in x["target"]}
+    mt = _module("aisef_v2_mutation", "validation/v2/mutation.py")
+    refmodel = [x for x in mut["targets"] if "refmodel" in x["target"]]
+    by_target = {x["target"]: {"killed": f"{x['killed']}/{x['mutants']}",
+                               "audited_equivalent": {s: mt.AUDITED[(x["target"], s)] for s in x["survivors"]
+                                                      if (x["target"], s) in mt.AUDITED}} for x in refmodel}
     return {
         "record": "AISEF V2 — P3 REFERENCE MODELS", "work_package": "WP-3.5", "rfc_sections": ["21", "27 (Q1)"],
         "frozen_items": ["F11"],
@@ -529,8 +541,9 @@ def reference_models() -> dict:
             "on_edited_traces_both_refuse_or_agree": edited["divergent"] == 0 and edited["refused_by_both"] > 20,
             "REF_1_every_injected_projection_defect_is_caught": all(n > 0 for n in injected.values())
                 and all(n == 0 for n in clean.values()),
-            "reference_model_mutation_fully_killed": bool(by_target) and all(
-                a == b for a, b in (v.split("/") for v in by_target.values())),
+            # every mutant killed but those audited equivalent in mutation.AUDITED; a stale result fails
+            "reference_model_mutation_killed_or_audited_equivalent": len(refmodel) == sum(
+                "refmodel" in t for t in mt.P3_TARGETS) and all(mt.target_problems(x, ROOT) == [] for x in refmodel),
         },
     }
 

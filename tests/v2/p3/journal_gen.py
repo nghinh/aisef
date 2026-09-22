@@ -145,12 +145,25 @@ def specs(seed: int, *, stories: int = 4, max_attempts: int = 3) -> list[tuple[s
         emit("gate/decision", {"gate": "commit", "passed": all(out[n][1]["passed"] for n in checks),
                                "projections": ["story_state", "budgets", "failure_owner"]}, checks)
     ending = rng.random()
-    if ending < .15:
+    if ending < .15:  # interrupted: then abandoned during disposal, disposed and ended, or ended at once
         emit("run/interrupted", {"abandoned": False})
-        if rng.random() < .5:
+        how = rng.random()
+        if how < .4:
             emit("run/dispose-begin", {})
             emit("run/interrupted", {"abandoned": True})
             return out
+        if how < .7:
+            emit("run/dispose-begin", {})
+        emit("run/end", {})
+        return out
+    if ending < .25:  # interrupted during a normal disposal, and perhaps a second time
+        emit("run/dispose-begin", {})
+        emit("run/interrupted", {"abandoned": False})
+        if rng.random() < .5:
+            emit("run/interrupted", {"abandoned": True})
+            return out
+        emit("run/end", {})
+        return out
     if ending < .8:
         emit("run/dispose-begin", {})
     emit("run/end", {})

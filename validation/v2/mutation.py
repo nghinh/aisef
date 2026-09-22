@@ -114,6 +114,7 @@ P2_TARGETS: dict[str, list[str]] = {
 _WRITER_TESTS = ["tests/v2/p3/test_journal_writer.py"]
 _FOLD_TESTS = ["tests/v2/test_fold_oracle.py"]
 _PROJECTION_TESTS = ["tests/v2/p3/test_control_projections.py"]
+_REFMODEL_TESTS = ["tests/v2/p3/test_reference_models.py"]
 P3_TARGETS: dict[str, list[str]] = {
     # WP-3.1: the envelope, append-site validation (with each rule and the citation check), the codec, the writer
     "aisef2/journal/event.py::Event.__post_init__": _WRITER_TESTS,
@@ -155,13 +156,49 @@ P3_TARGETS: dict[str, list[str]] = {
     "aisef2/journal/projections/terminal_state.py::_OUTCOME": _PROJECTION_TESTS,
     "aisef2/journal/projections/qualification_counters.py::QualificationCounters.step": _PROJECTION_TESTS,
     "aisef2/journal/projections/qualification_counters.py::metrics": _PROJECTION_TESTS,
+    # WP-3.5: the independent reference models — mutated like the projections, killed by their calibration and the
+    # differential (a mutant model that still agrees with the implementation everywhere is a gap in the harness)
+    "tests/v2/refmodel/story_state.py::model": _REFMODEL_TESTS,
+    "tests/v2/refmodel/story_state.py::_TABLE": _REFMODEL_TESTS,
+    "tests/v2/refmodel/failure_owner.py::_attempts": _REFMODEL_TESTS,
+    "tests/v2/refmodel/failure_owner.py::_read": _REFMODEL_TESTS,
+    "tests/v2/refmodel/failure_owner.py::model": _REFMODEL_TESTS,
+    "tests/v2/refmodel/budgets.py::_walk": _REFMODEL_TESTS,
+    "tests/v2/refmodel/budgets.py::model": _REFMODEL_TESTS,
+    "tests/v2/refmodel/retry_target.py::model": _REFMODEL_TESTS,
+    "tests/v2/refmodel/terminal_state.py::model": _REFMODEL_TESTS,
+    "tests/v2/refmodel/terminal_state.py::_RUN": _REFMODEL_TESTS,
+    "tests/v2/refmodel/terminal_state.py::_INTERRUPT": _REFMODEL_TESTS,
+    "tests/v2/refmodel/terminal_state.py::_SETTLED": _REFMODEL_TESTS,
+    "tests/v2/refmodel/terminal_state.py::_OUTCOME": _REFMODEL_TESTS,
+    "tests/v2/refmodel/qualification_counters.py::metrics": _REFMODEL_TESTS,
+    "tests/v2/refmodel/qualification_counters.py::model": _REFMODEL_TESTS,
+    "tests/v2/refmodel/qualification_counters.py::_COUNTED": _REFMODEL_TESTS,
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
-#: (target, mutant description) -> why the mutant is equivalent. Empty until a survivor is examined by hand.
-AUDITED: dict[tuple[str, str], str] = {}
+#: (target, mutant description) -> why the mutant is equivalent, each examined by hand. Only the independent reference
+#: models have entries: their code is not edited to remove a dead field, because its author is not this session.
+_DEAD_FLAG = ("the third field (whether the target state is also the outcome) is read only when the target state is "
+              "not None (model: `if to is not None: ... if is_outcome`); this entry's target is None")
+AUDITED: dict[tuple[str, str], str] = {
+    ("tests/v2/refmodel/story_state.py::_TABLE", "L18 False->True"): _DEAD_FLAG,
+    ("tests/v2/refmodel/story_state.py::_TABLE", "L19 False->True"): _DEAD_FLAG,
+    ("tests/v2/refmodel/story_state.py::_TABLE", "L20 False->True"): _DEAD_FLAG,
+    ("tests/v2/refmodel/budgets.py::model", "L56 True->False"): (
+        "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict "
+        "never decides anything"),
+    ("tests/v2/refmodel/qualification_counters.py::metrics", "L15 element 0 dropped"): (
+        "`pre` is read only through len(pre): a one-element tuple per entry counts the same"),
+    ("tests/v2/refmodel/qualification_counters.py::metrics", "L15 element 1 dropped"): (
+        "`pre` is read only through len(pre): a one-element tuple per entry counts the same"),
+    ("tests/v2/refmodel/qualification_counters.py::model", "L41 sorted() -> list()"): (
+        "`unplanned` is read only for truthiness and inside the refusal message"),
+    ("tests/v2/refmodel/qualification_counters.py::model", "L44 sorted() -> list()"): (
+        "`misplaced` is read only for truthiness and inside the refusal message"),
+}
 #: What a run copies into its scratch tree.
 COPY = ("aisef2", "tests/v2", "validation/v2", "docs/architecture", "docs/implementation/v2", "closure-evidence/v2")
 
@@ -192,8 +229,12 @@ def _enum_members(module_src: str, root: pathlib.Path) -> dict[str, list[str]]:
 
 
 def _inert(func: ast.AST, doc: ast.AST | None) -> set[int]:
-    """Nodes that cannot change behaviour: the docstring and every annotation (postponed, never evaluated)."""
+    """Nodes that cannot change behaviour: the docstring, every annotation (postponed, never evaluated), and the message
+    of a reference model's `raise Refused(...)` — a model answers a state or REFUSED; its refusal text is not part of
+    that answer, and the harness never compares it (P3-PROJECTION-SEMANTICS.md: "raise Refused, any message")."""
     inert = [doc] if doc is not None else []
+    inert += [a for n in ast.walk(func) if isinstance(n, ast.Raise) and isinstance(n.exc, ast.Call)
+              and getattr(n.exc.func, "id", "") == "Refused" for a in [*n.exc.args, *(k.value for k in n.exc.keywords)]]
     a = func.args
     inert += [x.annotation for x in a.posonlyargs + a.args + a.kwonlyargs + [a.vararg, a.kwarg] if x and x.annotation]
     inert += [func.returns] if func.returns else []

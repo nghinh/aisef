@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 23,
+ "checker_count": 24,
  "uncovered_checker_modules": [],
- "calibrated_count": 23,
- "always_pass_mutants_rejected": 23,
+ "calibrated_count": 24,
+ "always_pass_mutants_rejected": 24,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -310,6 +310,21 @@
    "expected": "property JOURNAL_1_a_seq_gap_is_refused_never_partial is false",
    "observed": [
     "WP-3.1: property JOURNAL_1_a_seq_gap_is_refused_never_partial is false"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "refmodel_independence",
+   "package": "WP-3.5",
+   "fixture": "tests/v2/fixtures/known_bad/refmodel_independence.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "REFMODEL_INDEPENDENT tests/v2/refmodel/budgets.py:1 imports aisef2.journal.projections.budgets",
+   "observed": [
+    "REFMODEL_INDEPENDENT tests/v2/refmodel/budgets.py:1 imports aisef2.journal.projections.budgets"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

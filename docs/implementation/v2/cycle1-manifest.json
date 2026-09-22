@@ -1074,7 +1074,16 @@
    ],
    "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
    "evidence_label": "`P3-JOURNAL-WRITER.json`",
-   "evidence_asserts": "`seq == index` at four layers; append-site validation; no update/delete verb exists"
+   "evidence_asserts": "`seq == index` at four layers; append-site validation; no update/delete verb exists",
+   "discovered_findings": [
+    {
+     "id": "P3-FINDING-001",
+     "found": "2026-09-22, WP-3.1 Q0 calibration",
+     "what": "RFC §22 requires every failure/observed to carry a field named `retryable`, but the P1 rule RETRYABLE_ONLY_IN_TAXONOMY forbade any module but aisef2/control/owner.py to key it — no producer of the event could exist",
+     "resolution": "the journal carries owner and retryable from the taxonomy (a call site supplies the code only and is refused if it supplies either); the rule admits one carrier, aisef2/journal/event.py, for the dict-key form only (assigning or passing one is still flagged there, and every other module is unchanged)",
+     "classification": "checker scope completed in P3; no frozen semantics changed"
+    }
+   ]
   },
   {
    "id": "WP-3.2",
@@ -1168,7 +1177,16 @@
    ],
    "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
    "evidence_label": "`P3-FOLD-ORACLE.json`",
-   "evidence_asserts": "incremental state == `fold(prefix)` on every generated journal; no projection reads `time`"
+   "evidence_asserts": "incremental state == `fold(prefix)` on every generated journal; no projection reads `time`",
+   "discovered_findings": [
+    {
+     "id": "P3-FINDING-002",
+     "found": "2026-09-22, WP-3.3 PROJ-1 tests",
+     "what": "a cache row re-sealed over a wrong state with the right head passes any digest check: a digest seal is not a key",
+     "resolution": "no gate reads a cache: projections.project() always folds the journal; fold.resume() serves non-gate reads only, and the from-scratch oracle is what catches a wrong row",
+     "classification": "implementation decision within §21 (caches are never authorities)"
+    }
+   ]
   },
   {
    "id": "WP-3.4",
@@ -1264,7 +1282,16 @@
    ],
    "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
    "evidence_label": "`P3-REFERENCE-MODELS.json`",
-   "evidence_asserts": "6/6 reference models, each calibrated; AST no-import constraint enforced"
+   "evidence_asserts": "6/6 reference models, each calibrated; AST no-import constraint enforced",
+   "discovered_findings": [
+    {
+     "id": "P3-FINDING-003",
+     "found": "2026-09-22, WP-3.5 independent authoring",
+     "what": "the reference-model author, working from the RFC and P3-PROJECTION-SEMANTICS.md without the projection source, reported ambiguities and places weaker than the RFC: a retry could cite an older failure past a newer non-retryable one (the D-006 shape); story/begin during run shutdown; a second interrupt not forced to abandon; PRE_SATISFIED on non-INTRODUCE criteria; drift not scoped to the latest admission; duplicate criteria in a developer request",
+     "resolution": "P3-PROJECTION-SEMANTICS.md amended (section 'Resolved ambiguities'); both implementations updated from the amended text; the differential compares canonical JSON at every prefix",
+     "classification": "normal P3 specification completion; no frozen semantics changed"
+    }
+   ]
   },
   {
    "id": "WP-4.1",

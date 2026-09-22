@@ -10,7 +10,7 @@
  "rule": "every read model is a pure fold of a journal prefix; incremental state == fold(prefix); a cache row is a sealed, checked shortcut, discarded (never migrated) when it no longer describes the journal; a gate never reads a cache; no projection reads time",
  "oracle": {
   "generated_runs": 40,
-  "prefixes_checked_per_projection": 1632,
+  "prefixes_checked_per_projection": 1634,
   "problems_every_prefix": {
    "story_state": 0,
    "failure_owner": 0,
@@ -36,14 +36,18 @@
   "runs": 15,
   "control_state_unchanged": 15
  },
+ "PROJ_2_tampered_old_event": {
+  "edit": "line 10: the chain does not link — an earlier event was edited or removed, or this one was",
+  "delete": "line 10 holds seq 11: seq == index is broken (a gap, a duplicate or a reordering); the journal is refused, never partially read"
+ },
  "caches": {
   "how_each_row_was_treated": {
-   "stale row (shorter prefix)": "resumed from the row at 26",
+   "stale row (shorter prefix)": "resumed from the row at 27",
    "edited state": "row does not match its seal (edited): discarded",
    "another projection": "row is for story_state: discarded",
    "version mismatch": "row version 2 is not 1: discarded, not migrated",
    "head differs": "row head differs from the journal's at its length: discarded — the journal wins",
-   "ahead of the journal": "row covers 54 events; the journal has 53: discarded"
+   "ahead of the journal": "row covers 55 events; the journal has 54: discarded"
   },
   "answer_is_the_journal_fold": {
    "stale row (shorter prefix)": true,
@@ -68,6 +72,7 @@
   "version_mismatch_discarded_not_migrated": true,
   "no_gate_reads_a_cache": true,
   "no_projection_reads_time": true,
+  "PROJ_2_an_edited_or_deleted_old_event_fails_reconstruction": true,
   "authority_incremental_state_is_the_fold": true,
   "a_refused_event_never_reaches_the_log": true
  }

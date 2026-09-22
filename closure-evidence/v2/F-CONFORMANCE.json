@@ -1,7 +1,7 @@
 {
  "record": "AISEF V2 — F1–F11 CONFORMANCE",
  "work_package": "WP-0.3",
- "current_phase": "P2",
+ "current_phase": "P3",
  "reference": "extracted from the RFC normative body; never transcribed",
  "items": [
   {
@@ -189,7 +189,7 @@
    "implemented_by": "WP-3.1",
    "state": "PASS",
    "detail": "Event fields, defaults ['ignorable', 'source_seqs'] and frozenness equal the RFC",
-   "required_now": false
+   "required_now": true
   },
   {
    "item": "F2",
@@ -886,7 +886,7 @@
    "implemented_by": "WP-3.4",
    "state": "PASS",
    "detail": "six projections equal the RFC's closed list in order; read-only registry; a gate reads them by ControlProjection only",
-   "required_now": false
+   "required_now": true
   }
  ],
  "summary": {

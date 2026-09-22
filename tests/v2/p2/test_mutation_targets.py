@@ -23,6 +23,12 @@ class Locator(unittest.TestCase):
         got = [d for d, _ in mu.mutants("def f(x):\n    if x:\n        return None\n    return x\n", "f", {})]
         self.assertEqual([d for d in got if "returns None" in d], ["L4 returns None"])
 
+    def test_a_reference_models_refusal_message_is_not_a_mutation_site(self):
+        src = "def f(x):\n    if x > 1:\n        raise Refused(f'seq {x}: refused ' + 'here')\n    return x\n"
+        got = [d for d, _ in mu.mutants(src, "f", {})]
+        self.assertEqual(sorted(got), sorted(["L2 Gt->LtE", "L2 condition negated", "L4 returns None"]))
+        self.assertTrue(all(k[0].startswith("tests/v2/refmodel/") and v for k, v in mu.AUDITED.items()))
+
     def test_every_target_resolves(self):
         for target in mu.TARGETS:
             rel, func = target.split("::")
