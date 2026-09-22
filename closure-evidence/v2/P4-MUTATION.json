@@ -2267,6 +2267,1085 @@
    ]
   },
   {
+   "target": "aisef2/runtime/process_range.py::ProcessRange._abort",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L340 True->False",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange._close_pipes",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L345 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L345 element 1 dropped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange._signal",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L400 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L402 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L402 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L402 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L402 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L402 string 'signal' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L402 string 'at' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L401 string ': the anchor is reaped; the range is never signalled again' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L402 string 'name' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange.anchor_returncode",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L359 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L359 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L359 IsNot->Is",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange.escaped",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L385 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L387 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L385 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L386 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L385 Is->IsNot",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange.members",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L378 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L380 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L378 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L379 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L378 Is->IsNot",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange.release",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 29,
+   "killed": 29,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L408 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L417 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L421 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L434 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L408 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L411 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L412 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L412 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L412 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L413 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L417 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L421 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L428 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L432 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L433 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L408 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L411 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L416 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L416 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L418 string ': not empty after ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L418 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L423 string 'EXIT\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L433 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L435 string ': processes left the range and are alive: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L419 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L419 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L436 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L436 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L418 string 'stage' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange.start",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 27,
+   "killed": 27,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L301 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L318 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L322 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L301 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L318 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L304 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L304 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L304 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L314 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L314 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L318 string 'STARTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L304 string '-P' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L305 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L307 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L302 string ' is already started' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L312 string '\\nGO\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L320 string ': the target did not start (' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L320 string ' ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L320 string ')' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L311 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L311 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L311 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L311 string 'argv' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L311 string 'cwd' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L312 string 'env' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L312 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L312 IsNot->Is",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 24,
+   "killed": 24,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L364 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L374 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L364 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L365 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L366 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L368 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L365 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L367 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L367 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L368 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L370 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L367 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L368 string 'EXITED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L370 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L371 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L367 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L370 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L370 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L371 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L370 string 'TIMEOUT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L370 string 'CLOSED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L371 string 'CLOSED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L372 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L372 element 1 dropped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L396 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L391 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L393 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L396 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L391 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L393 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L394 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L393 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L393 GtE->Lt",
+     "killed": true
+    },
+    {
+     "mutant": "L394 False->True",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::_Job.controller_stopped",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L232 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L232 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L232 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L232 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L232 string 'TerminateJobObject' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L232 string 'signal' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::_Posix.abort",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L164 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L164 Is->IsNot",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::_Posix.escaped",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L155 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L155 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L154 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L155 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L155 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L155 In->NotIn",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::_Posix.members",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L149 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L149 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L149 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L149 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L149 NotEq->Eq",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::_ps_table",
+   "kill_tests": [
+    "tests/v2/p4/test_process_table.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 19,
+   "killed": 19,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L96 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L93 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L88 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L88 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L88 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L88 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L93 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L88 string 'ps' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L88 string '-A' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L88 string '-o' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L88 string 'pid=,ppid=,pgid=,stat=,command=' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L88 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L88 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L89 string 'replace' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L89 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L93 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L95 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L93 string 'Z' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L95 Gt->LtE",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::descendants",
+   "kill_tests": [
+    "tests/v2/p4/test_process_table.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 19,
+   "killed": 19,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L124 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L111 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L113 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L116 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L116 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L116 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L116 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L116 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L116 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L124 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L111 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L113 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L111 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L111 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L113 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L113 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L113 Gt->LtE",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/process_range.py::targets",
+   "kill_tests": [
+    "tests/v2/p4/test_process_table.py"
+   ],
+   "source_sha256": "2e27a74c4ce71d24b0e5b52099269eefb8e398ef643468c4e2e545184602ad70",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L129 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L129 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L129 In->NotIn",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/range_anchor.py::_die",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "3b64a80c2fbc5f6c01ef2eb4dae60aed6b1acc83cd5c72c9328e714cfaeca1c8",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L29 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L29 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L29 string 'posix' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/range_anchor.py::_subreaper",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "3b64a80c2fbc5f6c01ef2eb4dae60aed6b1acc83cd5c72c9328e714cfaeca1c8",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": [],
+   "strays_reaped": 0,
+   "results": [
+    {
+     "mutant": "L36 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L36 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L41 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L41 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L36 string 'linux' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/runtime/range_anchor.py::main",
+   "kill_tests": [
+    "tests/v2/p4/test_process_range.py"
+   ],
+   "source_sha256": "3b64a80c2fbc5f6c01ef2eb4dae60aed6b1acc83cd5c72c9328e714cfaeca1c8",
+   "mutants": 21,
+   "killed": 21,
+   "survivors": [],
+   "strays_reaped": 6,
+   "results": [
+    {
+     "mutant": "L46 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L52 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L46 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L52 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L63 True->False",
+     "killed": true,
+     "strays_reaped": 2
+    },
+    {
+     "mutant": "L65 condition negated",
+     "killed": true,
+     "strays_reaped": 2
+    },
+    {
+     "mutant": "L67 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'posix' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L52 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L52 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L65 not removed",
+     "killed": true,
+     "strays_reaped": 2
+    },
+    {
+     "mutant": "L67 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'GO' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L67 string 'EXIT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'argv' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'STARTED ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'cwd' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'env' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string 'SPAWN_FAILED ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L62 string 'EXITED ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/runtime/story_scope.py::Directory.__init__",
    "kill_tests": [
     "tests/v2/p4/test_story_scope.py"

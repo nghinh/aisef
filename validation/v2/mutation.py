@@ -27,11 +27,13 @@ import json
 import os
 import pathlib
 import shutil
-import subprocess
+import signal
 import sys
 import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
            "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
@@ -177,6 +179,8 @@ P3_TARGETS: dict[str, list[str]] = {
 }
 _FORMAT2_TESTS = ["tests/v2/p4/test_format2.py"]
 _SCOPE_TESTS = ["tests/v2/p4/test_story_scope.py"]
+_RANGE_TESTS = ["tests/v2/p4/test_process_range.py"]
+_TABLE_TESTS = ["tests/v2/p4/test_process_table.py"]
 P4_TARGETS: dict[str, list[str]] = {
     # WP-4.1: journal format 2 (schemas, the rules over the journal, the reader, the writer) and StoryScope
     **{f"aisef2/journal/format2.py::{f}": _FORMAT2_TESTS for f in (
@@ -186,7 +190,18 @@ P4_TARGETS: dict[str, list[str]] = {
         "CLOSERS", "_GRADE_ORDER", "JournalWriter2.__init__", "JournalWriter2.append", "JournalWriter2.close")},
     **{f"aisef2/runtime/story_scope.py::{f}": _SCOPE_TESTS for f in (
         "StoryScope.acquire", "StoryScope.dispose", "StoryScope._record", "StoryScope._release", "DisposalReport.ok",
-        "Directory.__init__", "Directory.release", "StoryScope.release")},
+        "Directory.__init__", "Directory.release")},
+    # WP-4.2: measured range emptiness — the ownership walk (pure) and the POSIX range; the Windows job adapter
+    # (_Job) and the Linux /proc reader run on CI, not on the developer machine this tool runs on
+    **{f"aisef2/runtime/process_range.py::{f}": _TABLE_TESTS for f in ("descendants", "targets", "_ps_table")},
+    **{f"aisef2/runtime/process_range.py::{f}": _RANGE_TESTS for f in (
+        "_Posix.members", "_Posix.escaped", "_Posix.abort", "ProcessRange.start",
+        "ProcessRange.wait", "ProcessRange.members", "ProcessRange.escaped", "ProcessRange.wait_empty",
+        "ProcessRange._signal", "ProcessRange.release", "ProcessRange._abort", "ProcessRange._close_pipes")},
+    **{f"aisef2/runtime/range_anchor.py::{f}": _RANGE_TESTS for f in ("main", "_die", "_subreaper")},
+    "aisef2/runtime/process_range.py::_Job.controller_stopped": _RANGE_TESTS,
+    "aisef2/runtime/process_range.py::ProcessRange.anchor_returncode": _RANGE_TESTS,
+    "aisef2/runtime/story_scope.py::StoryScope.release": _SCOPE_TESTS,
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
@@ -213,7 +228,8 @@ AUDITED: dict[tuple[str, str], str] = {
         "`misplaced` is read only for truthiness and inside the refusal message"),
 }
 #: What a run copies into its scratch tree.
-COPY = ("aisef2", "tests/v2", "validation/v2", "docs/architecture", "docs/implementation/v2", "closure-evidence/v2")
+COPY = ("aisef2", "tests/v2", "validation/v2", "docs/architecture", "docs/implementation/v2", "closure-evidence/v2",
+        "aisef")  # the frozen V1 tree, read by the WIN-PID red-before reproducers; never a target
 
 _SWAP = {ast.Eq: ast.NotEq, ast.NotEq: ast.Eq, ast.Is: ast.IsNot, ast.IsNot: ast.Is, ast.In: ast.NotIn,
          ast.NotIn: ast.In, ast.Lt: ast.GtE, ast.GtE: ast.Lt, ast.Gt: ast.LtE, ast.LtE: ast.Gt}
@@ -338,18 +354,42 @@ def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tup
 
 
 def _run_tests(root: pathlib.Path, tests: list[str]) -> bool:
-    """True when every kill test passes."""
+    """True when every kill test passes. Each run is a process range (WP-4.2): a timeout takes down the whole tree
+    it started, not only the direct child, and a range that will not empty stops the mutation run
+    (P2-RESIDUAL-ORPHAN-SUBJECT: leaked harness processes had skewed every later measurement)."""
+    from aisef2.runtime.process_range import ProcessRange
     env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
     for rel in tests:
         path = pathlib.PurePosixPath(rel)
         cmd = [sys.executable, "-m", "unittest", "discover", "-s", str(path.parent), "-t", "tests", "-p", path.name]
-        try:
-            r = subprocess.run(cmd, cwd=root, capture_output=True, encoding="utf-8", timeout=TIMEOUT, env=env)
-        except subprocess.TimeoutExpired:
-            return False
-        if r.returncode != 0:
+        r = ProcessRange(f"kill tests {rel}", cmd, cwd=root, env=env).start()
+        code = r.wait(TIMEOUT)
+        r.release()  # RangeNotEmpty / RangeEscaped propagate: never a silent leak
+        if code != 0:
             return False
     return True
+
+
+def _reap_strays(work: pathlib.Path) -> int:
+    """Kill, by group, every process still running from the mutated tree after its kill tests, and count them. A
+    mutant of the range code can break the very containment its tests rely on (a mutated anchor that leaves its
+    group and ignores EOF outlived a P4 run and spun for 40 minutes, skewing every later timeout). POSIX: on Windows
+    the kill tests' own ranges are jobs with no breakaway."""
+    if os.name != "posix":
+        return 0
+    from aisef2.runtime.process_range import process_table
+    marks = {str(work), str(work.resolve())}
+    strays = [p for p in process_table().values()
+              if p.pid != os.getpid() and any(m in p.command for m in marks)]
+    for p in strays:
+        try:
+            if p.group and p.group != os.getpgrp():
+                os.killpg(p.group, signal.SIGKILL)
+            else:
+                os.kill(p.pid, signal.SIGKILL)
+        except OSError:
+            pass  # it exited, or its group went with an earlier one
+    return len(strays)
 
 
 def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
@@ -371,12 +411,17 @@ def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
         for desc, src in mutants(original, func, _enum_members(original, work)):
             path.write_text(src, encoding="utf-8")
             killed = not _run_tests(work, tests)
-            results.append({"mutant": desc, "killed": killed})
+            result = {"mutant": desc, "killed": killed}
+            strays = _reap_strays(work)
+            if strays:
+                result["strays_reaped"] = strays
+            results.append(result)
         path.write_text(original, encoding="utf-8")
     survivors = [r["mutant"] for r in results if not r["killed"]]
     return {"target": target, "kill_tests": tests, "source_sha256": source_digest(original),
             "mutants": len(results), "killed": len(results) - len(survivors),
-            "survivors": survivors, "results": results}
+            "survivors": survivors, "strays_reaped": sum(r.get("strays_reaped", 0) for r in results),
+            "results": results}
 
 
 def target_problems(t: dict, root: pathlib.Path = ROOT) -> list[str]:

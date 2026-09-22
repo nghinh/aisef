@@ -1426,7 +1426,16 @@
      "what": "harness/subject processes orphaned (parent PID 1) and left running: validation/v2/mutation.py stops only its direct child on timeout (subprocess.run(timeout=)), and a harness whose controller dies is not reaped — no process-range containment yet",
      "measured": "10 orphans at ~62% CPU each for 2-3 h (load average 82); local full suite 607 s -> ~1085 s; CI job durations unchanged; no evidence changed; the orphans were stopped by hand",
      "authority": "owner decision 'AISEF V2 — OWNER ACCEPTS P2 / AUTHORIZE P3 RECORD AUTHORITY' §0 (carry forward, without fixing)",
-     "status": "OPEN — not fixed before WP-4.2"
+     "status": "CLOSED in WP-4.2: every mutation kill-test run is a process range (validation/v2/mutation.py::_run_tests), so a timeout or a dead runner takes the whole tree down (PROC-OWN-1); the suite itself runs inside validation/v2/owned_run.py locally and on CI, which fails on any owned residual"
+    }
+   ],
+   "discovered_findings": [
+    {
+     "id": "P4-FINDING-003",
+     "found": "2026-09-22, the first full P4 mutation run (WP-4.2 targets)",
+     "what": "the kill tests of a range-code mutant run that mutated code, so a mutant can defeat the containment the mutation tool relies on: one left a mutated range_anchor.py that had left its group and ignored end of file on stdin; it outlived the run as a session leader re-parented to init (pid and group 51154), spinning at 99% CPU for about 40 minutes from the deleted temp tree, and timeouts of later mutants in that run may have counted as kills because of the load",
+     "resolution": "the stray was identified by its command path and killed by group; validation/v2/mutation.py now reaps, after every mutant, each process still running from the mutated tree (by group) and records the count per mutant and per target (strays_reaped); the P4 mutation run was then repeated in full on the final tree; in the repeated run the same mechanism recurred and was contained: three mutants of range_anchor.main's EOF watchdog loop (L63 True->False, L65 condition negated, L65 not removed) each left two processes running from the mutated tree, all six were reaped, and all three mutants were killed",
+     "classification": "a harness containment gap of the mutation tool (it executes mutated containment code), not a product defect; no frozen semantics changed"
     }
    ]
   },

@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 25,
+ "checker_count": 26,
  "uncovered_checker_modules": [],
- "calibrated_count": 25,
- "always_pass_mutants_rejected": 25,
+ "calibrated_count": 26,
+ "always_pass_mutants_rejected": 26,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -325,6 +325,21 @@
    "expected": "property SCOPE_1_acquire_during_disposal_refused is false",
    "observed": [
     "WP-4.1: property SCOPE_1_acquire_during_disposal_refused is false"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "owned_run",
+   "package": "WP-4.2",
+   "fixture": "tests/v2/fixtures/known_bad/owned_run.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "1 owned process(es) outlived the command",
+   "observed": [
+    "1 owned process(es) outlived the command: [{'pid': 4242, 'command': 'python -I -c <harness> json.loads(sys.stdin.read())'}]"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

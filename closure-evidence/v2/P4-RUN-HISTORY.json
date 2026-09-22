@@ -155,6 +155,26 @@
    "gate_effect": "COUNTS",
    "v1_evidence_changed": false,
    "v1_pf_001_signature_found": false
+  },
+  {
+   "seq": 9,
+   "commit": "affae7dad04a2b8c7e1882fb0a68bba2e4541097",
+   "where": "local",
+   "job": null,
+   "package": "WP-4.1",
+   "invocation": "python -m unittest discover -s tests",
+   "attempt": 1,
+   "result": "PASS",
+   "tests_run": 4203,
+   "skipped": 20,
+   "failing_tests": [],
+   "classification": null,
+   "retry_permitted": false,
+   "retry_of": null,
+   "gate_effect": "COUNTS",
+   "v1_evidence_changed": false,
+   "detective_guard": "PASS",
+   "orphan_processes_after": 0
   }
  ]
 }

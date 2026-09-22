@@ -32,7 +32,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m unittest discover -s tests -q
+      # WP-4.2 / process-leak discipline: the suite runs inside an OS-owned process range; the job fails when an owned
+      # process outlives it (or escapes it), even if every test passed. Measured, never grepped.
+      - run: python -P validation/v2/owned_run.py -- python -m unittest discover -s tests -q
       # WP-0.4 — V1 closure evidence is frozen. The suite arms an in-process guard at discovery; this step is
       # the detective layer and runs AFTER the suite, on every OS, so a test that rewrote V1 evidence by any
       # route (including a subprocess) fails the build. Compares git objects, so Windows autocrlf is safe.
