@@ -297,6 +297,8 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_verdict_from_absence_declaration", "NO_VERDICT_FROM_ABSENCE_DECLARATION", "P1 hygiene (RFC §10.2)"),
     _kernel_rule("result_only_through_binding", "RESULT_ONLY_THROUGH_BINDING", "P2 correction (PROBE-BIND-1)"),
     _kernel_rule("no_time_in_projections", "NO_TIME_IN_PROJECTIONS", "WP-3.3"),
+    _kernel_rule("no_side_retry_counter", "NO_SIDE_RETRY_COUNTER", "WP-4.5"),
+    _kernel_rule("sentinel_is_not_evidence", "SENTINEL_IS_NOT_EVIDENCE", "WP-4.3"),
     _mutation, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 

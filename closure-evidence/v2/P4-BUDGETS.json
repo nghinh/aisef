@@ -1,0 +1,47 @@
+{
+ "record": "AISEF V2 — P4 BUDGETS",
+ "work_package": "WP-4.5",
+ "rfc_sections": [
+  "17",
+  "21",
+  "22"
+ ],
+ "frozen_items": [
+  "F3",
+  "F11"
+ ],
+ "semantics": "docs/implementation/v2/P4-LIFETIME-SEMANTICS.md §6",
+ "authority": "the budgets and retry_target projections of the journal prefix (P3, unchanged) and the resolved retry counts; aisef2/control/budget.py counts nothing",
+ "charged_budget_by_code": {
+  "PROBE_UNRUNNABLE": "ENVIRONMENT",
+  "PROBE_INVALID_SPEC": null,
+  "CONTRACT_UNSATISFIED": "DEVELOPER",
+  "SUBJECT_ABSENT_AT_CANDIDATE": "DEVELOPER",
+  "PRECONDITION_BROKEN": null,
+  "PLAN_CONTRADICTION": null,
+  "POST_MERGE_REGRESSION": null,
+  "POST_MERGE_SUBJECT_LOST": null,
+  "MISSING_CREDENTIAL": "ENVIRONMENT",
+  "INVALID_CREDENTIAL": null,
+  "PROVIDER_UNAVAILABLE": "PROVIDER",
+  "UNKNOWN": null
+ },
+ "cases": {
+  "test_SS_64_a_cap_reached_in_one_budget_stops_there_and_never_falls_through": true,
+  "test_D_006_a_credential_or_environment_rejection_never_consumes_the_developer_budget": true,
+  "test_PRE_SATISFIED_and_PLAN_CONTRADICTION_consume_no_developer_budget": true,
+  "test_only_a_typed_chargeable_outcome_charges_its_declared_budget": true,
+  "test_no_approved_count_is_no_retry_and_no_failure_is_nothing_to_retry": true,
+  "test_the_journal_rebuilt_from_scratch_gives_the_same_budgets_and_the_same_decisions": true,
+  "test_the_budget_module_keeps_no_counter": true
+ },
+ "properties": {
+  "SS_64_cap_never_falls_through": true,
+  "D_006_no_developer_charge_for_credential_or_environment": true,
+  "PRE_SATISFIED_and_PLAN_CONTRADICTION_charge_no_developer_budget": true,
+  "only_typed_chargeable_outcomes_charge_their_budget": true,
+  "budgets_reconstruct_exactly_from_the_journal": true,
+  "no_side_retry_counter": true,
+  "every_case_green": true
+ }
+}

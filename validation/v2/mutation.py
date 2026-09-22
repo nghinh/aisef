@@ -181,6 +181,10 @@ _FORMAT2_TESTS = ["tests/v2/p4/test_format2.py"]
 _SCOPE_TESTS = ["tests/v2/p4/test_story_scope.py"]
 _RANGE_TESTS = ["tests/v2/p4/test_process_range.py"]
 _TABLE_TESTS = ["tests/v2/p4/test_process_table.py"]
+_RUN_TESTS = ["tests/v2/p4/test_run_scope.py"]
+_SPEC_TESTS = ["tests/v2/p4/test_runspec.py"]
+_BUDGET_TESTS = ["tests/v2/p4/test_budgets.py"]
+_INT_TESTS = ["tests/v2/p4/test_interruption.py"]
 P4_TARGETS: dict[str, list[str]] = {
     # WP-4.1: journal format 2 (schemas, the rules over the journal, the reader, the writer) and StoryScope
     **{f"aisef2/journal/format2.py::{f}": _FORMAT2_TESTS for f in (
@@ -202,6 +206,29 @@ P4_TARGETS: dict[str, list[str]] = {
     "aisef2/runtime/process_range.py::_Job.controller_stopped": _RANGE_TESTS,
     "aisef2/runtime/process_range.py::ProcessRange.anchor_returncode": _RANGE_TESTS,
     "aisef2/runtime/story_scope.py::StoryScope.release": _SCOPE_TESTS,
+    # WP-4.3: the lease, the lifetime order, the sentinel
+    **{f"aisef2/runtime/run_scope.py::{f}": _RUN_TESTS for f in (
+        "RunLease.acquire", "RunLease.release", "RunScope.begin", "RunScope.open_stories", "RunScope.shutdown",
+        "RunScope._finish", "RunScope._fail", "RunScope.story")},
+    # appends go on while an interruption closes what is open: the interruption tests kill that too
+    "aisef2/runtime/run_scope.py::RunScope.append": _RUN_TESTS + _INT_TESTS,
+    **{f"aisef2/runtime/sentinel.py::{f}": _RUN_TESTS for f in (
+        "_fsync_dir", "_write", "read", "mark_open", "mark_clean", "residuals", "preflight")},
+    # WP-4.4: identity grades and the RunSpec
+    **{f"aisef2/runtime/capability.py::{f}": _SPEC_TESTS for f in (
+        "CapabilityIdentity.__post_init__", "CapabilityIdentity.content", "CapabilityIdentity.identity",
+        "CapabilityIdentity.resolved", "digest_of", "verified", "attested", "opaque")},
+    **{f"aisef2/runtime/runspec.py::{f}": _SPEC_TESTS for f in (
+        "RunSpec.revision", "RunSpec.resolved", "_is_locator", "runspec_hash", "resolve", "comparable", "q6_eligible")},
+    # WP-4.5: the journal-derived retry decision
+    **{f"aisef2/control/budget.py::{f}": _BUDGET_TESTS for f in ("charge", "developer_spend")},
+    "aisef2/runtime/run_scope.py::RunScope.retry": _BUDGET_TESTS,
+    # WP-4.6: provenance, closers, interruption, repair
+    **{f"aisef2/runtime/tool.py::{f}": _INT_TESTS for f in (
+        "outcome", "ToolCall._data", "ToolCall.dispatch", "ToolCall.finish", "ToolCall.close")},
+    **{f"aisef2/runtime/repair.py::{f}": _INT_TESTS for f in ("closers", "repair", "repair_journal")},
+    **{f"aisef2/runtime/run_scope.py::{f}": _INT_TESTS for f in (
+        "RunScope._now", "RunScope.interrupt", "RunScope._second_interrupt_abandons")},
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}

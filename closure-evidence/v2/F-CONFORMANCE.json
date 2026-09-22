@@ -1,7 +1,7 @@
 {
  "record": "AISEF V2 — F1–F11 CONFORMANCE",
  "work_package": "WP-0.3",
- "current_phase": "P3",
+ "current_phase": "P4",
  "reference": "extracted from the RFC normative body; never transcribed",
  "items": [
   {
@@ -85,24 +85,20 @@
   },
   {
    "id": "F8",
-   "state": "PENDING",
+   "state": "PASS",
    "subchecks": [
     "F8.scopes_and_lifetime_order"
    ],
-   "pending_on": [
-    "WP-4.3"
-   ]
+   "pending_on": []
   },
   {
    "id": "F9",
-   "state": "PENDING",
+   "state": "PASS",
    "subchecks": [
     "F9.enum.IdentityGrade",
     "F9.cited_identities_and_runspec"
    ],
-   "pending_on": [
-    "WP-4.4"
-   ]
+   "pending_on": []
   },
   {
    "id": "F10",
@@ -786,26 +782,9 @@
    "item": "F8",
    "id": "F8.scopes_and_lifetime_order",
    "implemented_by": "WP-4.3",
-   "state": "PENDING",
-   "detail": "aisef2.runtime.run_scope.RunScope not implemented",
-   "rfc_reference": {
-    "begin": [
-     "acquire the **run lease**",
-     "create and **fsync** an `OPEN` `RunTerminationSentinel`",
-     "open the `JournalWriter`",
-     "resolve and freeze `RunSpec`",
-     "normal run execution"
-    ],
-    "shutdown": [
-     "every `StoryScope` disposed",
-     "append and fsync `run/dispose-begin` as appropriate",
-     "append and fsync `run/end`",
-     "**close the `JournalWriter` successfully**",
-     "mark and fsync the sentinel `CLEAN`",
-     "**release the run lease LAST**"
-    ]
-   },
-   "required_now": false
+   "state": "PASS",
+   "detail": "begin (5) and shutdown (6) orders equal the RFC's, declared and executed; the lease is released last; StoryScope owns no journal writer",
+   "required_now": true
   },
   {
    "item": "F9",
@@ -819,23 +798,9 @@
    "item": "F9",
    "id": "F9.cited_identities_and_runspec",
    "implemented_by": "WP-4.4",
-   "state": "PENDING",
-   "detail": "aisef2.runtime.runspec.RunSpec not implemented",
-   "rfc_reference": {
-    "identities": [
-     "semantic_hash",
-     "plan_hash",
-     "parent_sha / candidate_sha",
-     "runspec_hash"
-    ],
-    "RunSpec": [
-     "capabilities",
-     "aggregate_min_grade",
-     "settings",
-     "runspec_hash"
-    ]
-   },
-   "required_now": false
+   "state": "PASS",
+   "detail": "RunSpec and CapabilityIdentity equal the RFC; the four cited identities are bound; the aggregate is the minimum grade; enforcement enters runspec_hash and comparability; OPAQUE bars Q6",
+   "required_now": true
   },
   {
    "item": "F10",
@@ -890,8 +855,8 @@
   }
  ],
  "summary": {
-  "PASS": 8,
-  "PENDING": 3,
+  "PASS": 10,
+  "PENDING": 1,
   "FAIL": 0
  },
  "ratchet_violations": []

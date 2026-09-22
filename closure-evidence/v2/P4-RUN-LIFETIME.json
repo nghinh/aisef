@@ -1,0 +1,58 @@
+{
+ "record": "AISEF V2 — P4 RUN LIFETIME",
+ "work_package": "WP-4.3",
+ "rfc_sections": [
+  "18",
+  "18.1",
+  "19"
+ ],
+ "frozen_items": [
+  "F8"
+ ],
+ "semantics": "docs/implementation/v2/P4-LIFETIME-SEMANTICS.md §4",
+ "begin_order": [
+  "lease",
+  "sentinel OPEN",
+  "journal writer",
+  "RunSpec",
+  "execution"
+ ],
+ "shutdown_order": [
+  "story scopes disposed",
+  "run/dispose-begin",
+  "run/end",
+  "journal writer closed",
+  "sentinel CLEAN",
+  "lease released"
+ ],
+ "lease": "an exclusive non-blocking OS file lock (flock / LockFile), released by the OS with a dead process",
+ "sentinel": "replace-after-fsync: OPEN before the journal opens, CLEAN only after the writer closed; OPEN without CLEAN is TORN at the next preflight, which also names the previous journal's residuals",
+ "f8_conformance": {
+  "state": "PASS",
+  "detail": "begin (5) and shutdown (6) orders equal the RFC's, declared and executed; the lease is released last; StoryScope owns no journal writer"
+ },
+ "cases": {
+  "test_a_clean_run_follows_the_normative_order_and_releases_the_lease_last": true,
+  "test_story_scopes_dispose_before_run_level_finalisation": true,
+  "test_P3_RESIDUAL_DISPOSAL_ORDER_a_successful_shutdown_is_refused_while_a_story_is_open": true,
+  "test_RUN_1_a_process_killed_after_a_durable_run_end_and_before_CLEAN_is_torn": true,
+  "test_RUN_2_a_held_lease_blocks_a_second_run_even_with_run_end_written": true,
+  "test_RUN_3_a_writer_that_fails_to_close_leaves_the_sentinel_open_and_the_lease_still_released_last": true,
+  "test_RUN_4_a_clean_that_cannot_be_recorded_leaves_the_sentinel_open": true,
+  "test_the_lease_is_held_before_any_state_read_and_a_failed_begin_still_releases_it_last": true,
+  "test_the_preflight_names_the_previous_runs_residuals": true,
+  "test_a_sentinel_marks_clean_only_its_own_open_run": true,
+  "test_residuals_of_a_journal_that_cannot_be_read_are_named": true
+ },
+ "properties": {
+  "RUN_1_durable_run_end_without_clean_is_torn": true,
+  "RUN_2_a_held_lease_blocks_a_second_run": true,
+  "RUN_3_writer_close_failure_leaves_open": true,
+  "RUN_4_clean_failure_leaves_open": true,
+  "lease_released_last_on_every_path": true,
+  "P3_RESIDUAL_DISPOSAL_ORDER_enforced": true,
+  "story_scopes_dispose_before_run_finalisation": true,
+  "no_gate_may_cite_the_sentinel": true,
+  "f8_conformance_pass": true
+ }
+}

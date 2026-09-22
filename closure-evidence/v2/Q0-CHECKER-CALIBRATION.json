@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 26,
+ "checker_count": 28,
  "uncovered_checker_modules": [],
- "calibrated_count": 26,
- "always_pass_mutants_rejected": 26,
+ "calibrated_count": 28,
+ "always_pass_mutants_rejected": 28,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -249,6 +249,36 @@
    "expected": "NO_TIME_IN_PROJECTIONS aisef2/journal/projections/bad.py:2",
    "observed": [
     "NO_TIME_IN_PROJECTIONS aisef2/journal/projections/bad.py:2 a projection reads wall-clock time"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "no_side_retry_counter",
+   "package": "WP-4.5",
+   "fixture": "tests/v2/fixtures/known_bad/no_side_retry_counter.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "NO_SIDE_RETRY_COUNTER aisef2/control/engine.py:3",
+   "observed": [
+    "NO_SIDE_RETRY_COUNTER aisef2/control/engine.py:3 counts 'retries' beside the journal (§22: budgets are projections)"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "sentinel_is_not_evidence",
+   "package": "WP-4.3",
+   "fixture": "tests/v2/fixtures/known_bad/sentinel_is_not_evidence.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "SENTINEL_IS_NOT_EVIDENCE aisef2/control/gate.py:1",
+   "observed": [
+    "SENTINEL_IS_NOT_EVIDENCE aisef2/control/gate.py:1 reads the run sentinel, which is not evidence"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

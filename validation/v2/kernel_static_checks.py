@@ -25,6 +25,12 @@
   `aisef2/probe/protocol.py`, which defines `ProbeRecord` and `bound_result`, no kernel module reads an attribute
   named `result` (nor `getattr(x, "result")`). Every read goes through `bound_result(record, spec=, revision=,
   enforcement=)`. The rule also runs over the evidence builders (tests/v2/p2/test_probe_binding.py).
+* **NO_SIDE_RETRY_COUNTER** (RFC §22, WP-4.5) — budgets are projections of the journal, never side counters: outside
+  `aisef2/journal/projections/`, no kernel module counts a retry, attempt, budget, spend or charge — no `+=` / `-=`
+  and no `x = x ± …` whose target (a name, an attribute, or a subscript's container) names one, and no `Counter`
+  bound to one. A counter beside the journal is what disagreed with it in SS-64.
+* **SENTINEL_IS_NOT_EVIDENCE** (RFC §19, WP-4.3) — the RunTerminationSentinel is not evidence and no gate may cite
+  it: only `aisef2/runtime/run_scope.py` (and the sentinel module itself) import `aisef2.runtime.sentinel`.
 
     python -P validation/v2/kernel_static_checks.py            # all rules; exit 1 on any violation
 """
@@ -33,6 +39,7 @@ from __future__ import annotations
 
 import ast
 import pathlib
+import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -47,7 +54,11 @@ _RETRY_NAMES = {"retryable", "retryability"}
 #: the fold engine and every control projection: no wall-clock time (§20.2)
 PROJECTION_MODULES = ("aisef2/journal/fold.py", "aisef2/journal/projections/")
 RULES = ("NO_PROSE_CONTROL", "NO_RAW_VERDICT_ROUTING", "RETRYABLE_ONLY_IN_TAXONOMY",
-         "NO_VERDICT_FROM_ABSENCE_DECLARATION", "RESULT_ONLY_THROUGH_BINDING", "NO_TIME_IN_PROJECTIONS")
+         "NO_VERDICT_FROM_ABSENCE_DECLARATION", "RESULT_ONLY_THROUGH_BINDING", "NO_TIME_IN_PROJECTIONS",
+         "NO_SIDE_RETRY_COUNTER", "SENTINEL_IS_NOT_EVIDENCE")
+_COUNTED = re.compile(r"retr|attempt|budget|spen[dt]|charge", re.IGNORECASE)
+SENTINEL_MODULE = "aisef2.runtime.sentinel"
+SENTINEL_READERS = ("aisef2/runtime/run_scope.py", "aisef2/runtime/sentinel.py")
 BINDING_MODULE = "aisef2/probe/protocol.py"
 ABSENCE_MEMBERS = {"REQUIRES_SUBJECT", "ABSENCE_IS_DECIDABLE"}
 ABSENCE_FIELD = "subject_absence"
@@ -182,7 +193,45 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = RULES) -> list[st
                     and isinstance(n.args[1], ast.Constant) and n.args[1].value == "result":
                 out.append(f"RESULT_ONLY_THROUGH_BINDING {rel}:{n.lineno} reads a probe result without its binding "
                            "(use bound_result)")
+    if "NO_SIDE_RETRY_COUNTER" in rules and not rel.startswith("aisef2/journal/projections/"):
+        out += _side_counters(rel, tree)
+    if "SENTINEL_IS_NOT_EVIDENCE" in rules and rel not in SENTINEL_READERS:
+        for n in ast.walk(tree):
+            if isinstance(n, ast.Import):
+                names = [a.name for a in n.names]
+            elif isinstance(n, ast.ImportFrom):
+                names = [n.module or ""] + [f"{n.module}.{a.name}" for a in n.names]
+            else:
+                continue
+            if any(x == SENTINEL_MODULE or x.startswith(SENTINEL_MODULE + ".") for x in names):
+                out.append(f"SENTINEL_IS_NOT_EVIDENCE {rel}:{n.lineno} reads the run sentinel, which is not evidence")
     return sorted(set(out))
+
+
+def _counted_name(t: ast.AST) -> str | None:
+    """The name a target counts into: a name, an attribute, or the container of a subscript."""
+    while isinstance(t, ast.Subscript):
+        t = t.value
+    name = t.id if isinstance(t, ast.Name) else t.attr if isinstance(t, ast.Attribute) else None
+    return name if name and _COUNTED.search(name) else None
+
+
+def _side_counters(rel: str, tree: ast.AST) -> list[str]:
+    out = []
+    for n in ast.walk(tree):
+        hit = None
+        if isinstance(n, ast.AugAssign) and isinstance(n.op, (ast.Add, ast.Sub)):
+            hit = _counted_name(n.target)
+        elif isinstance(n, ast.Assign) and isinstance(n.value, ast.BinOp) and isinstance(n.value.op, (ast.Add, ast.Sub)):
+            used = {_counted_name(x) for x in ast.walk(n.value) if isinstance(x, (ast.Name, ast.Attribute, ast.Subscript))}
+            hit = next((m for m in map(_counted_name, n.targets) if m and m in used), None)
+        elif isinstance(n, ast.Assign) and isinstance(n.value, ast.Call) \
+                and getattr(n.value.func, "id", getattr(n.value.func, "attr", "")) == "Counter":
+            hit = next((m for m in map(_counted_name, n.targets) if m), None)
+        if hit:
+            out.append(f"NO_SIDE_RETRY_COUNTER {rel}:{n.lineno} counts {hit!r} beside the journal (§22: budgets are "
+                       "projections)")
+    return out
 
 
 def check(root: pathlib.Path = ROOT, rules: tuple[str, ...] = RULES) -> list[str]:

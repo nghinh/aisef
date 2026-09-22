@@ -37,7 +37,7 @@ FROZEN_IDS = [f"F{i}" for i in range(1, 12)]
 #: The phase the Cycle-1 implementation has reached. Every sub-check owned by a package in this phase or an earlier
 #: one must PASS. Advanced by one reviewed line at each phase boundary.
 # ponytail: a constant, not a progress database; move it into a progress record if phases start overlapping.
-CURRENT_PHASE = "P3"
+CURRENT_PHASE = "P4"
 
 PASS, FAIL, PENDING = "PASS", "FAIL", "PENDING"
 
@@ -254,6 +254,92 @@ def _event_envelope_matches_rfc(rfc: RFC) -> dict:
     if cls.__dataclass_params__.frozen is not rfc.dataclass_frozen.get("Event"):
         return {"state": FAIL, "detail": "Event frozenness differs from the RFC"}
     return {"state": PASS, "detail": f"Event fields, defaults {sorted(got)} and frozenness equal the RFC"}
+
+
+def _norm(text: str) -> str:
+    return re.sub(r"[\s`*]", "", text).lower()
+
+
+#: the one noun that names each RFC lifetime step (§18.1); each must occur in the RFC step and in the code's step
+LIFETIME_KEYS = {"begin": ("lease", "open", "journalwriter", "runspec", "execution"),
+                 "shutdown": ("storyscope", "run/dispose-begin", "run/end", "journalwriter", "clean", "lease")}
+
+
+def _lifetime_matches_rfc(rfc: RFC, code) -> dict:
+    """F8: the begin and shutdown orders the RFC states, in order, are the orders RunScope declares and executes; the
+    lease is released last; a StoryScope owns no journal writer."""
+    order = rfc.lifetime_order()
+    if len(order.get("begin", [])) != 5 or len(order.get("shutdown", [])) != 6:
+        return {"state": FAIL, "detail": "RFC reference for the lifetime order could not be extracted"}
+    if code is None:
+        return {"state": FAIL, "detail": "the kernel vocabulary (aisef2.arch.enums) does not load"}
+    if not symbol_present("aisef2.runtime.run_scope", "RunScope"):
+        return {"state": None, "detail": "aisef2.runtime.run_scope.RunScope not implemented", "rfc_reference": order}
+    rs = importlib.import_module("aisef2.runtime.run_scope")
+    declared = {"begin": list(rs.BEGIN_ORDER), "shutdown": list(rs.SHUTDOWN_ORDER)}
+    for part, keys in LIFETIME_KEYS.items():
+        if len(declared[part]) != len(keys):
+            return {"state": FAIL, "detail": f"RunScope declares {len(declared[part])} {part} steps; the RFC has "
+                                             f"{len(keys)}", "rfc_reference": order, "implemented": declared}
+        off = [i for i, k in enumerate(keys) if k not in _norm(order[part][i]) or k not in _norm(declared[part][i])]
+        if off:
+            return {"state": FAIL, "detail": f"{part} steps {off} differ from the RFC's order", "rfc_reference": order,
+                    "implemented": declared}
+    import tempfile
+    from aisef2.arch.enums import Enforcement
+    from aisef2.runtime.capability import verified
+    from aisef2.runtime.runspec import resolve
+    with tempfile.TemporaryDirectory(prefix="aisef2-f8-") as d:
+        run = rs.RunScope(d, "f8", spec=lambda: resolve([verified("kernel", b"f8", Enforcement.FULL)], {}, "0" * 40))
+        run.begin()
+        run.shutdown()
+        executed = run.trace
+    if executed != declared["begin"] + declared["shutdown"]:
+        return {"state": FAIL, "detail": "RunScope does not execute the order it declares", "executed": executed}
+    scope_src = (ROOT / "aisef2/runtime/story_scope.py").read_text(encoding="utf-8")
+    if re.search(r"JournalWriter|aisef2\.journal\.writer|aisef2\.journal\.format2 import .*Writer", scope_src):
+        return {"state": FAIL, "detail": "StoryScope names a journal writer (§18: it emits through the run's journal)"}
+    return {"state": PASS, "detail": "begin (5) and shutdown (6) orders equal the RFC's, declared and executed; the lease "
+                                     "is released last; StoryScope owns no journal writer"}
+
+
+def _runspec_matches_rfc(rfc: RFC) -> dict:
+    """F9: RunSpec and CapabilityIdentity are the RFC's shapes; the four cited identities exist where the RFC puts them;
+    runspec_hash binds grade and enforcement and the aggregate is the minimum grade."""
+    ids = rfc.cited_identities()
+    want = {n: rfc.dataclasses.get(n) for n in ("RunSpec", "CapabilityIdentity")}
+    if len(ids) != 4 or not all(want.values()):
+        return {"state": FAIL, "detail": "RFC reference for the identities and RunSpec could not be extracted"}
+    if not symbol_present("aisef2.runtime.runspec", "RunSpec"):
+        return {"state": None, "detail": "aisef2.runtime.runspec.RunSpec not implemented",
+                "rfc_reference": {"identities": ids, "RunSpec": want["RunSpec"]}}
+    import dataclasses
+    rsp = importlib.import_module("aisef2.runtime.runspec")
+    cap = importlib.import_module("aisef2.runtime.capability")
+    got = {"RunSpec": [f.name for f in dataclasses.fields(rsp.RunSpec)],
+           "CapabilityIdentity": [f.name for f in dataclasses.fields(cap.CapabilityIdentity)]}
+    if got != want:
+        return {"state": FAIL, "detail": "RunSpec / CapabilityIdentity fields differ from the RFC", "rfc_reference": want,
+                "implemented": got}
+    from aisef2.arch.enums import Enforcement as E, EventType as T, IdentityGrade as G
+    from aisef2.journal import event as ev, format2 as f2
+    spec_fields = [f.name for f in dataclasses.fields(importlib.import_module("aisef2.product.spec").ProductProofSpec)]
+    where = {"semantic_hash": "semantic_hash" in spec_fields,
+             "plan_hash": "plan_hash" in ev.SCHEMAS[T.PLAN_FROZEN.value].required,
+             "parent_sha / candidate_sha": ev.SCHEMAS[T.STORY_BEGIN.value].required.get("parent") is ev._sha
+             and ev.SCHEMAS[T.STORY_COMMIT.value].required.get("revision") is ev._sha,
+             "runspec_hash": "runspec_hash" in f2.SCHEMAS[T.RUN_SPEC_RESOLVED.value].required}
+    if sorted(where) != sorted(ids) or not all(where.values()):
+        return {"state": FAIL, "detail": "a cited identity is missing where the RFC puts it", "identities": where}
+    k = cap.verified("kernel", b"f9", E.FULL)
+    a = rsp.resolve([k, cap.opaque("combo", E.FULL, route="r")], {}, "0" * 40)
+    b = rsp.resolve([cap.verified("kernel", b"f9", E.PARTIAL), cap.opaque("combo", E.FULL, route="r")], {}, "0" * 40)
+    if a.aggregate_min_grade is not G.OPAQUE or a.runspec_hash == b.runspec_hash or rsp.comparable(a, b)[0] \
+            or rsp.q6_eligible(a):
+        return {"state": FAIL, "detail": "runspec_hash, the aggregate grade or comparability do not bind what §23 says"}
+    return {"state": PASS, "detail": "RunSpec and CapabilityIdentity equal the RFC; the four cited identities are bound; "
+                                     "the aggregate is the minimum grade; enforcement enters runspec_hash and "
+                                     "comparability; OPAQUE bars Q6"}
 
 
 def _projections_match_rfc(rfc: RFC) -> dict:
@@ -526,15 +612,9 @@ def subchecks(rfc: RFC, code) -> list[dict]:
         _fields("aisef2.plan.obligation", "PlanObligation", rfc.dataclasses.get("PlanObligation")))
     add("F7", "F7.dispositions", "WP-0.2",
         V("StoryAdmissionDisposition", e.get("StoryAdmissionDisposition", []), code))
-    order = rfc.lifetime_order()
-    add("F8", "F8.scopes_and_lifetime_order", "WP-4.3",
-        _shape("aisef2.runtime.run_scope", "RunScope",
-               order if len(order.get("begin", [])) == 5 and len(order.get("shutdown", [])) == 6 else None))
+    add("F8", "F8.scopes_and_lifetime_order", "WP-4.3", _lifetime_matches_rfc(rfc, code))
     add("F9", "F9.enum.IdentityGrade", "WP-0.2", V("IdentityGrade", e.get("IdentityGrade", []), code))
-    ids = rfc.cited_identities()
-    add("F9", "F9.cited_identities_and_runspec", "WP-4.4",
-        _shape("aisef2.runtime.runspec", "RunSpec", {"identities": ids, "RunSpec": rfc.dataclasses.get("RunSpec")}
-               if len(ids) == 4 and rfc.dataclasses.get("RunSpec") else None))
+    add("F9", "F9.cited_identities_and_runspec", "WP-4.4", _runspec_matches_rfc(rfc))
     inv = rfc.invariants()
     add("F10", "F10.invariant_ids", "WP-0.2", V("InvariantId", list(inv), code, by_value=True))
     titles = [f"{k}:{v}" for k, v in inv.items()]

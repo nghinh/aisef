@@ -92,10 +92,10 @@ class Conformance(unittest.TestCase):
     def test_later_phase_symbol_present_without_evaluation_is_FAIL_not_PASS(self):
         real = fc.symbol_present
         with mock.patch.object(fc, "symbol_present",
-                               lambda m, a: True if m == "aisef2.runtime.run_scope" else real(m, a)):
+                               lambda m, a: True if m == "aisef2.invariants.registry" else real(m, a)):
             r = fc.evaluate(self.rfc, self.code, self.manifest)
-        self.assertEqual(self._sub(r, "F8.scopes_and_lifetime_order")["state"], fc.FAIL)
-        self.assertEqual(self._items(r)["F8"], fc.FAIL)
+        self.assertEqual(self._sub(r, "F10.invariants_armed_with_mechanisms")["state"], fc.FAIL)
+        self.assertEqual(self._items(r)["F10"], fc.FAIL)
 
     def test_unextractable_rfc_reference_is_FAIL_never_vacuous_PASS(self):
         broken = self.rfc.replace("class Owner(Enum):", "class OwnerRemoved(Enum):", 1)
@@ -105,11 +105,13 @@ class Conformance(unittest.TestCase):
         self.assertIn("could not be extracted", self._sub(r, "F3.owner_set")["detail"])
 
     def test_advancing_the_phase_turns_pending_into_ratchet_failures(self):
-        with mock.patch.object(fc, "CURRENT_PHASE", "P4"):
+        with mock.patch.object(fc, "CURRENT_PHASE", "P5"):
             r = fc.evaluate(self.rfc, self.code, self.manifest)
-        self.assertEqual(self._sub(r, "F8.scopes_and_lifetime_order")["state"], fc.FAIL)
-        self.assertIn("F8.scopes_and_lifetime_order", r["ratchet_violations"])
+        self.assertEqual(self._sub(r, "F10.invariants_armed_with_mechanisms")["state"], fc.FAIL)
+        self.assertIn("F10.invariants_armed_with_mechanisms", r["ratchet_violations"])
         self.assertEqual(self._sub(r, "F11.projections_implemented")["state"], fc.PASS)  # implemented in P3
+        self.assertEqual(self._sub(r, "F8.scopes_and_lifetime_order")["state"], fc.PASS)  # implemented in P4
+        self.assertEqual(self._sub(r, "F9.cited_identities_and_runspec")["state"], fc.PASS)
 
     def test_F6_plan_obligation_is_compared_field_by_field(self):
         self.assertEqual(self._sub(self.result, "F6.plan_obligation_shape")["state"], fc.PASS)
