@@ -314,7 +314,9 @@ class Writer(Journals, unittest.TestCase):
                 self.assertEqual((w.events, self.size(path)), (before, size))
                 with self.assertRaisesRegex(JournalError, "failed .* and accepts nothing more$"):
                     w.append(T.RUN_END, {})
-                self.assertEqual(wr.JournalWriter(path).events, before)
+                again = wr.JournalWriter(path)  # closed: Windows cannot remove a directory holding an open file
+                self.addCleanup(again.close)
+                self.assertEqual(again.events, before)
 
     def test_a_torn_tail_is_reported_and_never_extended(self):
         w = self.writer()

@@ -139,11 +139,14 @@ def journal_writer() -> dict:
             before, size = wf.events, path.stat().st_size
             with mock.patch.object(wr.os, patch[0], side_effect=patch[1]):
                 first = _raises(lambda wf=wf: wf.append(T.RUN_END, {}), JournalError)
+            again = wr.JournalWriter(path)  # closed: Windows cannot remove a directory holding an open file
+            reopened = again.events == before
+            again.close()
             faults[name] = {"refused": first is not None and first.endswith("the journal did not grow"),
                             "log_unchanged": (wf.events, path.stat().st_size) == (before, size),
                             "writer_poisoned": (_raises(lambda wf=wf: wf.append(T.RUN_END, {}), JournalError) or "")
                             .endswith("accepts nothing more"),
-                            "reopens_to_the_same_events": wr.JournalWriter(path).events == before}
+                            "reopens_to_the_same_events": reopened}
             wf.close()
         wt = writer(d / "torn.jsonl")
         with mock.patch.object(wr.os, "fsync", side_effect=OSError(errno.EIO, "gone")), \
