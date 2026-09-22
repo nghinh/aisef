@@ -1,2 +1,5 @@
 # Shell hooks must keep LF on a Windows autocrlf checkout, or sh reads a stray \r in every command.
 .githooks/* text eol=lf
+
+# Journal lines are canonical LF bytes; a CRLF checkout would make every fixture non-canonical.
+tests/v2/fixtures/journal/* text eol=lf

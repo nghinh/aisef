@@ -233,6 +233,12 @@ def _p2_evidence() -> Checker:
                    ("validation/v2/p2_evidence.py",))
 
 
+def _p3_evidence() -> Checker:
+    ev = _load("aisef_v2_p3_evidence", V2 / "p3_evidence.py")
+    return Checker("p3_evidence", "WP-3.1", lambda: ev.check(ROOT), lambda fx: ev.problems_of(fx["record"]),
+                   ("validation/v2/p3_evidence.py",))
+
+
 def _gen_specs() -> Checker:
     gs = _load("aisef_v2_gen_specs", V2 / "gen_specs.py")
 
@@ -272,7 +278,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("retryable_only_in_taxonomy", "RETRYABLE_ONLY_IN_TAXONOMY", "WP-1.4"),
     _kernel_rule("no_verdict_from_absence_declaration", "NO_VERDICT_FROM_ABSENCE_DECLARATION", "P1 hygiene (RFC §10.2)"),
     _kernel_rule("result_only_through_binding", "RESULT_ONLY_THROUGH_BINDING", "P2 correction (PROBE-BIND-1)"),
-    _mutation, _p1_evidence, _p2_evidence, _gen_specs, _plan_semantics, _plan_baseline,
+    _mutation, _p1_evidence, _p2_evidence, _p3_evidence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 
 

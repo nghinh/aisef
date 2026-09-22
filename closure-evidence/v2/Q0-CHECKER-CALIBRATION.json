@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 21,
+ "checker_count": 22,
  "uncovered_checker_modules": [],
- "calibrated_count": 21,
- "always_pass_mutants_rejected": 21,
+ "calibrated_count": 22,
+ "always_pass_mutants_rejected": 22,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -280,6 +280,21 @@
    "expected": "property subject_absence_never_unrunnable is false",
    "observed": [
     "WP-2.1: property subject_absence_never_unrunnable is false"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "p3_evidence",
+   "package": "WP-3.1",
+   "fixture": "tests/v2/fixtures/known_bad/p3_evidence.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "property JOURNAL_1_a_seq_gap_is_refused_never_partial is false",
+   "observed": [
+    "WP-3.1: property JOURNAL_1_a_seq_gap_is_refused_never_partial is false"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

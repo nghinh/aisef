@@ -49,6 +49,8 @@ class RFC:
         self.body = text[text.index(NORMATIVE_MARK):] if NORMATIVE_MARK in text else ""
         self.enums: dict[str, list[str]] = {}
         self.dataclasses: dict[str, list[str]] = {}
+        self.dataclass_defaults: dict[str, dict[str, str]] = {}
+        self.dataclass_frozen: dict[str, bool] = {}
         self.protocols: dict[str, list[str]] = {}
         self.protocol_members: dict[str, list[tuple[str, list[str] | None]]] = {}
         for block in re.findall(r"```python\n(.*?)```", self.body, re.S):
@@ -73,6 +75,11 @@ class RFC:
                         for s in n.body if isinstance(s, ast.AnnAssign | ast.FunctionDef)]
                 elif "dataclass" in decos:
                     self.dataclasses[n.name] = [s.target.id for s in n.body if isinstance(s, ast.AnnAssign)]
+                    self.dataclass_defaults[n.name] = {s.target.id: ast.unparse(s.value) for s in n.body
+                                                       if isinstance(s, ast.AnnAssign) and s.value is not None}
+                    self.dataclass_frozen[n.name] = any(
+                        k.arg == "frozen" and getattr(k.value, "value", None) is True
+                        for d in n.decorator_list for k in getattr(d, "keywords", []))
 
     def section(self, begin: str, end: str) -> str:
         if begin not in self.body or end not in self.body:
@@ -232,6 +239,21 @@ def _calibration_contracts_match_rfc(rfc: RFC) -> dict:
     if problems:
         return {"state": FAIL, "detail": "; ".join(problems), "rfc_reference": refs, "rfc_mechanisms": mechanisms}
     return {"state": PASS, "detail": "both calibration contracts and the mechanism literal equal the RFC"}
+
+
+def _event_envelope_matches_rfc(rfc: RFC) -> dict:
+    """F1: the `Event` envelope — its field names in order, the RFC's defaults, and frozenness."""
+    base = _fields("aisef2.journal.event", "Event", rfc.dataclasses.get("Event"))
+    if base["state"] != PASS:
+        return base
+    cls = importlib.import_module("aisef2.journal.event").Event
+    want = rfc.dataclass_defaults.get("Event", {})
+    got = {f.name: repr(f.default) for f in dataclasses.fields(cls) if f.default is not dataclasses.MISSING}
+    if got != want:
+        return {"state": FAIL, "detail": "Event defaults differ from the RFC", "rfc_reference": want, "implemented": got}
+    if cls.__dataclass_params__.frozen is not rfc.dataclass_frozen.get("Event"):
+        return {"state": FAIL, "detail": "Event frozenness differs from the RFC"}
+    return {"state": PASS, "detail": f"Event fields, defaults {sorted(got)} and frozenness equal the RFC"}
 
 
 def _timeout_semantics_match_rfc(rfc: RFC) -> dict:
@@ -445,7 +467,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     add("F1", "F1.event_vocabulary", "WP-0.2", V("EventType", rfc.event_types(), code, by_value=True))
     for n in ("Vacuity", "Relevance", "AdequacyOutcome", "TestExecutionStatus", "TestOutcome", "TestSelection"):
         add("F1", f"F1.payload_enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
-    add("F1", "F1.event_envelope", "WP-3.1", _shape("aisef2.journal.event", "Event", rfc.dataclasses.get("Event")))
+    add("F1", "F1.event_envelope", "WP-3.1", _event_envelope_matches_rfc(rfc))
     for n in ("ProbeExecutionStatus", "BehaviorVerdict", "ContractSatisfaction"):
         add("F2", f"F2.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
     add("F2", "F2.enum.MeasurementPoint", "WP-1.4", V("MeasurementPoint", e.get("MeasurementPoint", []), code))

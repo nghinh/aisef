@@ -6,7 +6,7 @@
  "items": [
   {
    "id": "F1",
-   "state": "PENDING",
+   "state": "PASS",
    "subchecks": [
     "F1.event_vocabulary",
     "F1.payload_enum.Vacuity",
@@ -17,9 +17,7 @@
     "F1.payload_enum.TestSelection",
     "F1.event_envelope"
    ],
-   "pending_on": [
-    "WP-3.1"
-   ]
+   "pending_on": []
   },
   {
    "id": "F2",
@@ -191,16 +189,8 @@
    "item": "F1",
    "id": "F1.event_envelope",
    "implemented_by": "WP-3.1",
-   "state": "PENDING",
-   "detail": "aisef2.journal.event.Event not implemented",
-   "rfc_reference": [
-    "seq",
-    "type",
-    "data",
-    "time",
-    "ignorable",
-    "source_seqs"
-   ],
+   "state": "PASS",
+   "detail": "Event fields, defaults ['ignorable', 'source_seqs'] and frozenness equal the RFC",
    "required_now": false
   },
   {
@@ -910,8 +900,8 @@
   }
  ],
  "summary": {
-  "PASS": 6,
-  "PENDING": 5,
+  "PASS": 7,
+  "PENDING": 4,
   "FAIL": 0
  },
  "ratchet_violations": []

@@ -7,7 +7,9 @@
   `aisef2/orchestrate`) never names `BehaviorVerdict` or reads `.behavior_verdict`: it routes on the derived
   `ContractSatisfaction`, because the raw verdict is polarity-inverted for every negative contract.
 * **RETRYABLE_ONLY_IN_TAXONOMY** (RFC §22, WP-1.4) — retryability is fixed once in `aisef2/control/owner.py`; no
-  other kernel module assigns, passes or keys a `retryable` or `retryability`.
+  other kernel module assigns, passes or keys a `retryable` or `retryability`. One carrier (P3): §22 requires every
+  `failure/observed` to carry `retryable`, so `aisef2/journal/event.py` — which fills that field from the taxonomy
+  and refuses it from any call site — may *key* it; it still may not assign or pass one.
 * **NO_VERDICT_FROM_ABSENCE_DECLARATION** (RFC §10.2, P1 hygiene) — a decided verdict is observed, never inferred
   from `SubjectAbsence`: no kernel scope (a function, or module/class level) that reads the absence declaration —
   a `SubjectAbsence` member, its value as a string, or the `subject_absence` field — also names
@@ -36,6 +38,8 @@ PROSE = {"text", "rationale", "ownership_rationale"}
 ROUTING_PACKAGES = ("aisef2/plan/", "aisef2/control/", "aisef2/orchestrate/")
 RAW_VERDICT = {"BehaviorVerdict", "behavior_verdict"}
 TAXONOMY_MODULE = "aisef2/control/owner.py"
+#: The journal's payload module: it keys `retryable` only to carry the taxonomy's value into failure/observed (§22).
+RETRY_CARRIER_MODULE = "aisef2/journal/event.py"
 _RETRY_NAMES = {"retryable", "retryability"}
 RULES = ("NO_PROSE_CONTROL", "NO_RAW_VERDICT_ROUTING", "RETRYABLE_ONLY_IN_TAXONOMY",
          "NO_VERDICT_FROM_ABSENCE_DECLARATION", "RESULT_ONLY_THROUGH_BINDING")
@@ -149,7 +153,8 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = RULES) -> list[st
                 or isinstance(n, (ast.Assign, ast.AugAssign, ast.AnnAssign)) and any(
                     getattr(t, "id", getattr(t, "attr", None)) in _RETRY_NAMES
                     for t in (n.targets if isinstance(n, ast.Assign) else [n.target]))
-                or isinstance(n, ast.Dict) and any(isinstance(k, ast.Constant) and k.value in _RETRY_NAMES for k in n.keys)
+                or isinstance(n, ast.Dict) and rel != RETRY_CARRIER_MODULE
+                and any(isinstance(k, ast.Constant) and k.value in _RETRY_NAMES for k in n.keys)
             )
             if decided:
                 out.append(f"RETRYABLE_ONLY_IN_TAXONOMY {rel}:{line or '?'} decides retryability outside the taxonomy")

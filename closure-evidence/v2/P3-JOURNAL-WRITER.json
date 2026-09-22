@@ -1,0 +1,176 @@
+{
+ "record": "AISEF V2 — P3 JOURNAL WRITER",
+ "work_package": "WP-3.1",
+ "rfc_sections": [
+  "20",
+  "20.1"
+ ],
+ "frozen_items": [
+  "F1"
+ ],
+ "format": {
+  "version": 1,
+  "writable_types": [
+   "failure/observed",
+   "gate/check",
+   "gate/decision",
+   "plan/frozen",
+   "probe/evaluated",
+   "provider/request",
+   "run/begin",
+   "run/dispose-begin",
+   "run/end",
+   "run/interrupted",
+   "story/admitted",
+   "story/begin",
+   "story/commit",
+   "story/dispose",
+   "story/end",
+   "story/plan-drift",
+   "story/retry",
+   "story/rollback"
+  ],
+  "vocabulary_types_without_a_format_1_schema": [
+   "capability/resolved",
+   "invariant/violated",
+   "plan/static-admitted",
+   "proof/verified",
+   "provider/result",
+   "run/spec-resolved",
+   "story/resource-acquired",
+   "story/resource-released",
+   "tests/adequacy",
+   "tool/invoked",
+   "tool/result"
+  ],
+  "storage": "one canonical JSON line per event: {chain, event}; chain_n = sha256(chain_n-1 ‖ event_id_n) from GENESIS; UTF-8, LF",
+  "sample_event_id": "883690ccb0fae2e7cd54e3eec24cf99e0f07d6b3a400520f59d0606dd72bd067"
+ },
+ "writer_surface": [
+  "append",
+  "close",
+  "emit",
+  "events",
+  "head",
+  "path"
+ ],
+ "seq_layers": {
+  "assignment": "append takes no seq; _assign is its only source",
+  "seed_admission": "line 5 holds seq 6: seq == index is broken (a gap, a duplicate or a reordering); the journal is refused, never partially read",
+  "append": "run/end at seq 2, but the journal holds 1 events: seq == index",
+  "decode": "line 6 holds seq 5: seq == index is broken (a gap, a duplicate or a reordering); the journal is refused, never partially read"
+ },
+ "JOURNAL_1_seq_gap": {
+  "gap.jsonl": "line 5 holds seq 6: seq == index is broken (a gap, a duplicate or a reordering); the journal is refused, never partially read",
+  "reordered.jsonl": "line 1 holds seq 2: seq == index is broken (a gap, a duplicate or a reordering); the journal is refused, never partially read"
+ },
+ "JOURNAL_2_duplicate_or_conflicting_identity": {
+  "duplicated line": "line 2 holds seq 1: seq == index is broken (a gap, a duplicate or a reordering); the journal is refused, never partially read",
+  "same seq, other content": "line 1: the chain does not link — an earlier event was edited or removed, or this one was",
+  "same seq twice": "line 2 holds seq 1: seq == index is broken (a gap, a duplicate or a reordering); the journal is refused, never partially read"
+ },
+ "append_site_refusals": {
+  "non-lossless payload (NaN)": "story/begin: data is not JSON-lossless: non-finite numbers have no canonical form",
+  "unknown enum member": "story/admitted: fields of the wrong kind or enum ['dispositions']",
+  "owner supplied by the call site": "failure/observed: owner and retryable come from the taxonomy, never from the call site (§22)",
+  "a foreign error code": "failure/observed: code 'OSError' is not a taxonomy code; a foreign error flattens to UNKNOWN (§22)",
+  "abbreviated parent SHA": "story/begin: fields of the wrong kind or enum ['parent']",
+  "type outside the vocabulary": "an event has a typed EventType",
+  "vocabulary type with no format-1 schema": "tool/invoked has no payload schema in journal format 1; writing it is a format version bump (§35)",
+  "a seventh projection cited by a gate": "gate/decision: fields of the wrong kind or enum ['projections']",
+  "rejected by the pre-append check": "refused by the projections"
+ },
+ "fault_injection": {
+  "disk full on append": {
+   "refused": true,
+   "log_unchanged": true,
+   "writer_poisoned": true,
+   "reopens_to_the_same_events": true
+  },
+  "fsync failure": {
+   "refused": true,
+   "log_unchanged": true,
+   "writer_poisoned": true,
+   "reopens_to_the_same_events": true
+  },
+  "torn tail (truncation also failed)": {
+   "reported": true,
+   "complete_prefix_only": true,
+   "not_extended": true
+  }
+ },
+ "failure_observed_carried_from_the_taxonomy": {
+  "PROBE_UNRUNNABLE": [
+   "ENVIRONMENT",
+   true
+  ],
+  "PROBE_INVALID_SPEC": [
+   "INTEGRATION",
+   false
+  ],
+  "CONTRACT_UNSATISFIED": [
+   "DEVELOPER",
+   true
+  ],
+  "SUBJECT_ABSENT_AT_CANDIDATE": [
+   "DEVELOPER",
+   true
+  ],
+  "PRECONDITION_BROKEN": [
+   "PLAN",
+   false
+  ],
+  "PLAN_CONTRADICTION": [
+   "PLAN",
+   false
+  ],
+  "POST_MERGE_REGRESSION": [
+   "INTEGRATION",
+   false
+  ],
+  "POST_MERGE_SUBJECT_LOST": [
+   "INTEGRATION",
+   false
+  ],
+  "MISSING_CREDENTIAL": [
+   "ENVIRONMENT",
+   true
+  ],
+  "INVALID_CREDENTIAL": [
+   "ENVIRONMENT",
+   false
+  ],
+  "PROVIDER_UNAVAILABLE": [
+   "PROVIDER",
+   true
+  ],
+  "UNKNOWN": [
+   "INTEGRATION",
+   false
+  ]
+ },
+ "f1_conformance": {
+  "state": "PASS",
+  "detail": "Event fields, defaults ['ignorable', 'source_seqs'] and frozenness equal the RFC"
+ },
+ "residuals": [
+  "a tail rewritten together with its chain links is detected only against an anchor held outside the journal (a cache row's head, an evidence record)",
+  "payload schemas exist for the 18 types P3's projections and P2's StoryAdmission write; the other vocabulary types are unwritable until a format bump gives them one"
+ ],
+ "properties": {
+  "seq_layer_assignment": true,
+  "seq_layer_seed_admission": true,
+  "seq_layer_append": true,
+  "seq_layer_decode": true,
+  "seq_equals_index_over_a_long_sequence": true,
+  "no_update_or_delete_verb": true,
+  "every_append_fsyncd": true,
+  "JOURNAL_1_a_seq_gap_is_refused_never_partial": true,
+  "JOURNAL_2_duplicate_or_conflicting_identity_fails_closed": true,
+  "append_site_validation_refuses_before_the_log_grows": true,
+  "fault_injection_leaves_the_log_unchanged": true,
+  "event_identity_deterministic_across_processes": true,
+  "failure_owner_and_retryable_carried_from_the_taxonomy": true,
+  "f1_event_envelope_equals_rfc": true
+ }
+}

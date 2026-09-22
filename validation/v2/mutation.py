@@ -32,7 +32,8 @@ import sys
 import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json"}
+RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
+           "P3": "closure-evidence/v2/P3-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -110,7 +111,22 @@ P2_TARGETS: dict[str, list[str]] = {
     "aisef2/plan/drift.py::budget_problems": ["tests/v2/p2/test_drift.py"],
     "aisef2/plan/drift.py::plan_quality": ["tests/v2/p2/test_drift.py"],
 }
-PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS}
+_WRITER_TESTS = ["tests/v2/p3/test_journal_writer.py"]
+P3_TARGETS: dict[str, list[str]] = {
+    # WP-3.1: the envelope, append-site validation (with each rule and the citation check), the codec, the writer
+    "aisef2/journal/event.py::Event.__post_init__": _WRITER_TESTS,
+    "aisef2/journal/event.py::validate": _WRITER_TESTS,
+    "aisef2/journal/event.py::_cites": _WRITER_TESTS,
+    "aisef2/journal/event.py::_format_rule": _WRITER_TESTS,
+    "aisef2/journal/event.py::_admission_rule": _WRITER_TESTS,
+    "aisef2/journal/event.py::_drift_rule": _WRITER_TESTS,
+    "aisef2/journal/event.py::_failure_rule": _WRITER_TESTS,
+    "aisef2/journal/event.py::carried": _WRITER_TESTS,
+    "aisef2/journal/event.py::decode": _WRITER_TESTS,
+    "aisef2/journal/writer.py::JournalWriter.__init__": _WRITER_TESTS,
+    "aisef2/journal/writer.py::append": _WRITER_TESTS,
+}
+PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}

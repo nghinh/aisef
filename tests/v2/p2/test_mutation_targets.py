@@ -23,8 +23,8 @@ class Locator(unittest.TestCase):
         got = [d for d, _ in mu.mutants("def f(x):\n    if x:\n        return None\n    return x\n", "f", {})]
         self.assertEqual([d for d in got if "returns None" in d], ["L4 returns None"])
 
-    def test_every_p2_target_resolves(self):
-        for target in mu.P2_TARGETS:
+    def test_every_target_resolves(self):
+        for target in mu.TARGETS:
             rel, func = target.split("::")
             with self.subTest(target=target):
                 self.assertIsNotNone(mu._root(ast.parse((ROOT / rel).read_text(encoding="utf-8")), func))

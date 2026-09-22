@@ -1,0 +1,13 @@
+{
+ "checker": "p3_evidence",
+ "package": "WP-3.1",
+ "kind": "evidence_record",
+ "record": {
+  "work_package": "WP-3.1",
+  "properties": {
+   "seq_layer_assignment": true,
+   "JOURNAL_1_a_seq_gap_is_refused_never_partial": false
+  }
+ },
+ "expect": "property JOURNAL_1_a_seq_gap_is_refused_never_partial is false"
+}
