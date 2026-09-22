@@ -381,7 +381,9 @@ class Writer2(Journal2, unittest.TestCase):
         self.assertEqual(fsync.call_count, 1)
         self.assertEqual(w.path, self.path)
         self.assertEqual(w.head, f2.reconstruct(self.text()).head())
-        self.assertEqual(f2.JournalWriter2(self.dir / "empty.jsonl").head, ev.GENESIS)
+        empty = f2.JournalWriter2(self.dir / "empty.jsonl")
+        self.assertEqual(empty.head, ev.GENESIS)
+        empty.close()  # Windows keeps an open file: an unclosed writer breaks the temp directory's cleanup
         with self.assertRaisesRegex(JournalError, "an event has a typed EventType"):
             w.append("run/end", {})
         w.close()

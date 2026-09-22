@@ -1352,6 +1352,13 @@
      "what": "P3's fixture tests/v2/fixtures/journal/version_mismatch.jsonl declares journal_format 2 as its 'future format'. Once format 2 exists, the format-2 reader reads it as a valid format-2 journal; the format-1 reader still refuses it exactly as P3 recorded",
      "resolution": "the compatibility test states it: every other P3 fixture reads identically through both readers; this one is refused by format 1 and read by format 2. No P3 artefact changed",
      "classification": "a consequence of the format bump, not a defect; no frozen semantics changed"
+    },
+    {
+     "id": "P4-FINDING-006",
+     "found": "2026-09-23, CI run 35770769048 on 7f63051, unit (windows-latest, 3.11)",
+     "what": "a format-2 writer opened to read an empty journal's head was never closed, so Windows refused to remove the test's temporary directory (PermissionError WinError 32) and the WP-4.1 evidence property that runs that case read false, which also failed the Q0 calibration of p4_evidence. POSIX removes an open file, so macOS and Linux passed",
+     "resolution": "the writer is closed; the same trap was recorded in P3 (commit fa5175c) and every other writer in the P4 tests was checked (the shared helper closes through addCleanup)",
+     "classification": "HARNESS defect in a P4 test, recorded as FAIL in P4-RUN-HISTORY (not retried); no product code and no frozen semantics changed"
     }
    ]
   },
@@ -1509,7 +1516,16 @@
    ],
    "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
    "evidence_label": "`P4-RUN-LIFETIME.json`",
-   "evidence_asserts": "**RUN-1** and **RUN-2**; writer-close failure leaves `OPEN`; `CLEAN` failure leaves `OPEN`; lease released last"
+   "evidence_asserts": "**RUN-1** and **RUN-2**; writer-close failure leaves `OPEN`; `CLEAN` failure leaves `OPEN`; lease released last",
+   "carried_residuals": [
+    {
+     "id": "P3-RESIDUAL-DISPOSAL-ORDER",
+     "found": "2026-09-22, P3 completion (closure-evidence/v2/P3-COMPLETION.json carried_p4_residuals)",
+     "what": "journal format 1 accepts run/dispose-begin and run/end while a story is still RUNNING or holds a pending outcome; §18's every-story-reported rule is not enforced by the journal",
+     "authority": "owner decision 'AISEF V2 — OWNER ACCEPTS P3 / AUTHORIZE P4' §5 (enforce through P4 lifetime/control semantics; do not rewrite P3 history)",
+     "status": "CLOSED in WP-4.3: RunScope.shutdown refuses a successful shutdown, before anything is written, while any story is not ENDED; an interruption closes and names instead (WP-4.6)"
+    }
+   ]
   },
   {
    "id": "WP-4.4",
@@ -1675,7 +1691,16 @@
      "found": "2026-09-22, P2 V2-002 correction (P2-PROBE-PROTOCOL residual)",
      "what": "a harness process killed by a signal after DISPATCHED is UNRUNNABLE: the probe cannot tell whether the subject or the environment sent the signal; this is not the expiry of the observation window",
      "authority": "owner decision 'AISEF V2 — OWNER ACCEPTS P2 / AUTHORIZE P3 RECORD AUTHORITY' §0 (carry forward, without fixing)",
-     "status": "OPEN — not fixed before WP-4.6"
+     "status": "PARTLY CLOSED in WP-4.6: for every process P4 owns, a signal exit carries its provenance (the range's ledger: CONTROLLER or UNKNOWN) and never becomes an owner; interruption closes OUTCOME_UNKNOWN / NOT_STARTED. The P2 python_callable probe still maps a post-DISPATCHED signal death to UNRUNNABLE -> ENVIRONMENT: an F5 change, proposed as ARCHITECTURE-EXCEPTION-V2-003, not applied"
+    }
+   ],
+   "discovered_findings": [
+    {
+     "id": "P4-FINDING-002",
+     "found": "2026-09-22, WP-4.6 (INTERRUPT-SIG-2), measured on the P3-sealed tree",
+     "what": "the P2 python_callable probe classifies a subject that ends its own process by a signal after DISPATCHED (os.abort -> SIGABRT; os.kill(getpid, SIGTERM)) as UNRUNNABLE -> PROBE_UNRUNNABLE, owner ENVIRONMENT, retryable — the case INTERRUPT-SIG-2 forbids",
+     "resolution": "not changed in P4 (F5, sealed P2 code): docs/implementation/v2/ARCHITECTURE-EXCEPTION-V2-003-PROPOSAL.md",
+     "classification": "architecture exception required (STOP rule of the P4 decision §1)"
     }
    ]
   },
