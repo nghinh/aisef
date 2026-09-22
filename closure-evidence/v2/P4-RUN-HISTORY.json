@@ -390,6 +390,35 @@
    "gate_effect": "COUNTS",
    "v1_evidence_changed": false,
    "v1_pf_001_signature_found": false
+  },
+  {
+   "seq": 18,
+   "commit": "844ffc9fca4fd885101339efb95e52636d8e534c",
+   "where": "local",
+   "job": null,
+   "package": "WP-4.2",
+   "invocation": "python -m unittest discover -s tests",
+   "attempt": 1,
+   "result": "FAIL",
+   "tests_run": 4230,
+   "skipped": 20,
+   "failing_tests": [
+    "test_closure.TestG3Conformance.test_fresh_and_passing_passes_and_prints_days_left"
+   ],
+   "classification": "HARNESS",
+   "classification_evidence": "HARNESS, and not P4's: tests/test_closure.py's G3 conformance fixture built its client runs with a fixed at='2026-09-08T00:00:00+00:00' while dating the report relative to today, so at midnight (the session crossed into 2026-09-23) the client evidence became 15 days old against MAX_AGE_DAYS=14 and the probe returned FAILED: 'claude: evidence is 15 days old (> 14)' — while the freshness the test asserts, '8d left of 14d', was still right. Measured on the P3 baseline 1d22617 exported to a clean tree: the same test fails there today, so no P4 code is involved; the same suite passed on affae7d and cfe14c0 yesterday. The fixture now dates its client runs as old as its table. tests/test_conformance.py holds the same pattern (generated='2026-09-24', at='2026-09-05') and has not lapsed yet.",
+   "known_defect": null,
+   "retry_permitted": false,
+   "retry_of": null,
+   "gate_effect": "COUNTS",
+   "v1_evidence_changed": false,
+   "detective_guard": "PASS",
+   "owned_processes_before": 0,
+   "owned_processes_after": 0,
+   "owned_residual_identities": [],
+   "owned_escaped": 0,
+   "owned_range_mechanism": "posix-session-and-group",
+   "owned_range_released_empty": true
   }
  ]
 }

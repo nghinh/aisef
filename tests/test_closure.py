@@ -629,7 +629,8 @@ class TestG3Conformance(unittest.TestCase):
     def table(self, *, days_old: int = 1, passing: bool = True):
         runs = []
         for client in CF.RELEASE_CLIENTS:
-            run = CF.ClientRun(client=client, version="1.0", at="2026-09-08T00:00:00+00:00")
+            at = (date.today() - timedelta(days=days_old)).isoformat()  # as old as the table: never a fixed date
+            run = CF.ClientRun(client=client, version="1.0", at=f"{at}T00:00:00+00:00")
             for i, (pid, *_rest) in enumerate(CF.PROBES):
                 run.results.append(CF.ProbeResult(pid, passing or i != 0))
             runs.append(run)
