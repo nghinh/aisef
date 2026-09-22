@@ -8,6 +8,9 @@ Protocol. stdin (control): one JSON request line {argv, cwd, env}, then `GO` (th
 its job), later `EXIT`. stdout (report): `STARTED <pid>`, then `EXITED <returncode>` — or `SPAWN_FAILED <error>`.
 The target inherits this process's stderr as its stdout and stderr, and gets no stdin.
 
+Reaping (POSIX): the anchor reaps every child but the target, as init would — on Linux it is a subreaper, so the
+range's orphans become its children, and an unreaped one is a zombie that still answers kill(pid, 0).
+
 Watchdog: end of file on stdin means the controller is gone. On POSIX the anchor kills its own group (itself
 included); on Windows the controller's job handle closed with it and the job killed every member.
 """
@@ -18,6 +21,7 @@ import signal
 import subprocess
 import sys
 import threading
+import time
 
 
 def _say(line: str) -> None:
@@ -29,6 +33,26 @@ def _die() -> None:
     if os.name == "posix":
         os.killpg(os.getpgrp(), signal.SIGKILL)
     os._exit(1)
+
+
+def _reap_adopted(target: int, poll_s: float = 0.02) -> None:
+    """POSIX: reap every child except the target, as init would. On Linux the anchor is a subreaper, so the range's
+    orphans become its children; one left unreaped is a zombie that still answers kill(pid, 0) and keeps its group
+    signalable. The target is never reaped here: its own wait reports its status (EXITED)."""
+    if not hasattr(os, "waitid"):
+        return  # Windows: the job kills and closes every member; nothing re-parents here
+    while True:
+        try:
+            info = os.waitid(os.P_ALL, 0, os.WEXITED | os.WNOWAIT)  # blocks until a child can be waited for
+        except ChildProcessError:
+            info = None  # no child now
+        if info is None or info.si_pid == target:
+            time.sleep(poll_s)
+            continue
+        try:
+            os.waitpid(info.si_pid, 0)
+        except ChildProcessError:
+            pass  # reaped meanwhile
 
 
 def _subreaper() -> None:
@@ -60,6 +84,7 @@ def main() -> None:
     else:
         _say(f"STARTED {proc.pid}")
         threading.Thread(target=lambda: _say(f"EXITED {proc.wait()}")).start()  # the anchor ends by os._exit only
+        threading.Thread(target=_reap_adopted, args=(proc.pid,)).start()
     while True:
         line = sys.stdin.readline()
         if not line:

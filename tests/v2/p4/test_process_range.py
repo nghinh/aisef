@@ -118,6 +118,25 @@ class Range(unittest.TestCase):
         self.assertEqual(r.returncode, 0)
         self.assertTrue(r._anchor.stdin.closed and r._anchor.stdout.closed)  # the pipes go with the anchor
 
+    @unittest.skipUnless(POSIX, "zombies are a POSIX state")
+    def test_an_orphan_the_range_adopts_is_reaped_when_it_dies(self):
+        """Linux: the anchor is a subreaper, so the grandchild re-parents to it when the target exits; killed, it
+        must be reaped at once — a zombie still answers kill(pid, 0) and keeps its group signalable (CI, cfe14c0)."""
+        pid_file = self.dir / "g.pid"
+        r = self.range(lingering(pid_file))
+        grandchild = read_pid(pid_file)
+        self.assertEqual(r.wait(20), 0)  # its parent is gone: the grandchild is an orphan now
+        os.kill(grandchild, signal.SIGKILL)
+        deadline = time.monotonic() + 10
+        while True:
+            try:
+                os.kill(grandchild, 0)
+            except ProcessLookupError:
+                break  # reaped: no zombie left
+            self.assertLess(time.monotonic(), deadline, f"{grandchild} is still a process (a zombie nobody reaps)")
+            time.sleep(0.05)
+        r.release()
+
     def test_a_tree_that_exits_by_itself_is_released_without_a_signal(self):
         self.assertIsNone(ProcessRange("unstarted", [PY]).anchor_returncode)
         r = self.range("import time; time.sleep(0.1)")
@@ -250,7 +269,7 @@ class Range(unittest.TestCase):
             f"        exec({lingering(pid_file) + 'time.sleep(60)'!r})\n")
         with mock.patch.object(mutation, "TIMEOUT", 3):
             t = time.monotonic()
-            self.assertFalse(mutation._run_tests(self.dir, ["tests/hang/test_hang.py"]))
+            self.assertEqual(mutation._run_tests(self.dir, ["tests/hang/test_hang.py"]), (False, 0))
         self.assertLess(time.monotonic() - t, 30)
         self.assertTrue(gone(read_pid(pid_file)), "the kill test's grandchild outlived the runner's timeout")
 
@@ -349,6 +368,27 @@ class Anchor(unittest.TestCase):
                                timeout=30)
         self.assertEqual(out, "")
         self.assertNotEqual(a.returncode, 0)
+
+    @unittest.skipUnless(POSIX, "waitid (POSIX)")
+    def test_the_reaper_reaps_every_child_but_the_target_and_keeps_doing_it(self):
+        code = (f"import json, os, subprocess, sys, threading, time\nsys.path.insert(0, {str(ROOT)!r})\n"
+                "from aisef2.runtime import range_anchor as ra\n"
+                "def gone(pid, within=20):\n"                # WNOWAIT: watching never reaps it here
+                "    end = time.monotonic() + within\n"
+                "    while time.monotonic() < end:\n"
+                "        try:\n"
+                "            os.waitid(os.P_PID, pid, os.WEXITED | os.WNOWAIT | os.WNOHANG)\n"
+                "        except ChildProcessError:\n            return True\n"
+                "        time.sleep(0.02)\n"
+                "    return False\n"
+                "t = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(1.0); raise SystemExit(7)'])\n"
+                "o = subprocess.Popen([sys.executable, '-c', 'pass'])\n"
+                "threading.Thread(target=ra._reap_adopted, args=(t.pid, 0.01), daemon=True).start()\n"
+                "first, status = gone(o.pid), t.wait()\n"    # the target's own wait reports its status
+                "later = subprocess.Popen([sys.executable, '-c', 'pass'])\n"  # adopted after a moment with no child
+                "print(json.dumps([first, status, gone(later.pid)]))\n")
+        out = subprocess.run([PY, "-P", "-c", code], capture_output=True, encoding="utf-8", timeout=90)
+        self.assertEqual(json.loads(out.stdout), [True, 7, True], out.stderr)
 
     def test_the_subreaper_is_asked_for_on_linux_only_and_its_absence_is_tolerated(self):
         from aisef2.runtime import range_anchor as ra

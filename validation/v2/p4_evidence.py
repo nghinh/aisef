@@ -135,7 +135,8 @@ def range_emptiness() -> dict:
         "ownership_mechanism": {
             "posix": "the session and process group of the anchor, the controller's unreaped child: the group id "
                      "cannot be reused while it can be signalled; members measured from /proc (Linux) or ps (macOS); "
-                     "Linux: the anchor is a child subreaper, so orphaned escapees are seen",
+                     "Linux: the anchor is a child subreaper, so orphaned escapees are seen; the anchor reaps every "
+                     "child but its target, as init would, so a killed orphan never lingers as a zombie",
             "windows": "a Job object with KILL_ON_JOB_CLOSE and no breakaway; the anchor is assigned before the target "
                        "starts; members and emptiness from the job's process list",
             "controller_death": "POSIX: the anchor sees end of file on its control pipe and kills its own group; "

@@ -1436,6 +1436,20 @@
      "what": "the kill tests of a range-code mutant run that mutated code, so a mutant can defeat the containment the mutation tool relies on: one left a mutated range_anchor.py that had left its group and ignored end of file on stdin; it outlived the run as a session leader re-parented to init (pid and group 51154), spinning at 99% CPU for about 40 minutes from the deleted temp tree, and timeouts of later mutants in that run may have counted as kills because of the load",
      "resolution": "the stray was identified by its command path and killed by group; validation/v2/mutation.py now reaps, after every mutant, each process still running from the mutated tree (by group) and records the count per mutant and per target (strays_reaped); the P4 mutation run was then repeated in full on the final tree; in the repeated run the same mechanism recurred and was contained: three mutants of range_anchor.main's EOF watchdog loop (L63 True->False, L65 condition negated, L65 not removed) each left two processes running from the mutated tree, all six were reaped, and all three mutants were killed",
      "classification": "a harness containment gap of the mutation tool (it executes mutated containment code), not a product defect; no frozen semantics changed"
+    },
+    {
+     "id": "P4-FINDING-004",
+     "found": "2026-09-22, CI run 35748844850 on cfe14c0 (the first CI run of the suite inside owned_run)",
+     "what": "on Linux the range anchor is a child subreaper but never reaped the orphans it adopted; with the whole suite inside one range, every killed orphan stayed a zombie that still answered kill(pid, 0) and kept its group signalable, and five older process-tree tests failed on all four Linux jobs ('the grandchild survived', 'ProcessLookupError not raised'). macOS has no subreaper, so the local gate could not show it; reproduced in a local Linux container on the exact tree",
+     "resolution": "range_anchor.py reaps every child but its target (waitid WNOWAIT, then waitpid of that pid only), so the target's own status is still reported; new tests: a killed adopted orphan is gone within the bound (red on the cfe14c0 anchor in the Linux container, green after), and the reaper reaps a non-target child and leaves the target's status intact",
+     "classification": "PRODUCT defect in P4 code, recorded as FAIL in P4-RUN-HISTORY (not retried); no frozen semantics changed"
+    },
+    {
+     "id": "P4-FINDING-005",
+     "found": "2026-09-22, CI run 35748844850 on cfe14c0, unit (windows-latest, 3.11)",
+     "what": "the POSIX backend's stage table named signal.SIGKILL in its class body, evaluated at import; Windows has no SIGKILL, so importing process_range raised AttributeError and the Windows suite never started",
+     "resolution": "the stage table is built when a POSIX backend is created; the whole P4 tree was scanned for any other POSIX-only name evaluated at import (none)",
+     "classification": "PRODUCT defect in P4 code, recorded as FAIL in P4-RUN-HISTORY (not retried); no frozen semantics changed"
     }
    ]
   },

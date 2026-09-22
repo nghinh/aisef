@@ -76,7 +76,9 @@ Ownership is established by the operating system, never by PID equality or PID a
   disposed**. While it is unreaped its PID — the group id — cannot be reused, so a signal to the group reaches only
   the range's members. The anchor starts the target, reports its exit status, and watches its control pipe: if the
   controller dies (end of file), the anchor kills its own group. On Linux the anchor is a child subreaper, so a
-  descendant that escapes with `setsid` and is orphaned re-parents to it and is reported as a residual.
+  descendant that escapes with `setsid` and is orphaned re-parents to it and is reported as a residual. The anchor
+  reaps every child except its target, as init would, so an adopted orphan that dies never lingers as a zombie (which
+  would still answer `kill(pid, 0)` and keep its group signalable); the target is reaped only by its own wait.
 * **Windows.** A Job object with `KILL_ON_JOB_CLOSE` and no breakaway. The anchor is assigned to the job before it
   starts the target, so every descendant is a member; if the controller dies, the job closes and kills them.
 * **Emptiness is measured**: POSIX — the live members of the group other than the anchor, from the process table

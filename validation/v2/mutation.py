@@ -198,7 +198,7 @@ P4_TARGETS: dict[str, list[str]] = {
         "_Posix.members", "_Posix.escaped", "_Posix.abort", "ProcessRange.start",
         "ProcessRange.wait", "ProcessRange.members", "ProcessRange.escaped", "ProcessRange.wait_empty",
         "ProcessRange._signal", "ProcessRange.release", "ProcessRange._abort", "ProcessRange._close_pipes")},
-    **{f"aisef2/runtime/range_anchor.py::{f}": _RANGE_TESTS for f in ("main", "_die", "_subreaper")},
+    **{f"aisef2/runtime/range_anchor.py::{f}": _RANGE_TESTS for f in ("main", "_die", "_subreaper", "_reap_adopted")},
     "aisef2/runtime/process_range.py::_Job.controller_stopped": _RANGE_TESTS,
     "aisef2/runtime/process_range.py::ProcessRange.anchor_returncode": _RANGE_TESTS,
     "aisef2/runtime/story_scope.py::StoryScope.release": _SCOPE_TESTS,
@@ -353,25 +353,46 @@ def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tup
     return out
 
 
-def _run_tests(root: pathlib.Path, tests: list[str]) -> bool:
-    """True when every kill test passes. Each run is a process range (WP-4.2): a timeout takes down the whole tree
-    it started, not only the direct child, and a range that will not empty stops the mutation run
-    (P2-RESIDUAL-ORPHAN-SUBJECT: leaked harness processes had skewed every later measurement)."""
+def _kill_leftovers(r, escaped: list[int]) -> int:
+    """What a run left behind when its range would not empty or something escaped it: killed by group, and counted."""
+    pids = [p.pid for p in r.members()] + escaped
+    for pid in pids:
+        try:
+            group = os.getpgid(pid)
+            os.kill(pid, signal.SIGKILL) if group == os.getpgrp() else os.killpg(group, signal.SIGKILL)
+        except OSError:
+            pass  # already gone
+    return len(pids)
+
+
+def _run_tests(root: pathlib.Path, tests: list[str]) -> tuple[bool, int]:
+    """(every kill test passed, processes the harness had to kill). Each run is a process range (WP-4.2): a timeout
+    takes down the whole tree it started, not only the direct child (P2-RESIDUAL-ORPHAN-SUBJECT: leaked harness
+    processes had skewed every later measurement). A mutant of the range code can break that containment — its tests
+    run the mutated code — so a range that will not empty, or that something escaped, fails the run and is cleaned up
+    here instead of leaking into the next mutant."""
     from aisef2.runtime.process_range import ProcessRange
+    from aisef2.runtime.story_scope import Residual
     env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+    leaked = 0
     for rel in tests:
         path = pathlib.PurePosixPath(rel)
         cmd = [sys.executable, "-m", "unittest", "discover", "-s", str(path.parent), "-t", "tests", "-p", path.name]
         r = ProcessRange(f"kill tests {rel}", cmd, cwd=root, env=env).start()
         code = r.wait(TIMEOUT)
-        r.release()  # RangeNotEmpty / RangeEscaped propagate: never a silent leak
+        escaped = [p.pid for p in r.escaped()]  # measured while their parents are alive
+        try:
+            r.release()
+        except Residual:
+            return False, leaked + _kill_leftovers(r, escaped)
         if code != 0:
-            return False
-    return True
+            return False, leaked
+    return True, leaked
 
 
 def _reap_strays(work: pathlib.Path) -> int:
-    """Kill, by group, every process still running from the mutated tree after its kill tests, and count them. A
+    """Kill, by group, every process still running from the mutated tree after its kill tests, and count them (the
+    count also carries what a broken range left behind, see `_run_tests`). A
     mutant of the range code can break the very containment its tests rely on (a mutated anchor that leaves its
     group and ignores EOF outlived a P4 run and spun for 40 minutes, skewing every later timeout). POSIX: on Windows
     the kill tests' own ranges are jobs with no breakaway."""
@@ -405,14 +426,17 @@ def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
                 shutil.copy(src, work / part)
         path = work / rel
         original = path.read_text(encoding="utf-8")
-        if not _run_tests(work, tests):
-            return {"target": target, "error": "kill tests fail on the unmutated tree", "mutants": []}
+        clean, leaked = _run_tests(work, tests)
+        if not clean or leaked:
+            return {"target": target, "error": f"kill tests fail on the unmutated tree (leaked {leaked})",
+                    "mutants": []}
         results = []
         for desc, src in mutants(original, func, _enum_members(original, work)):
             path.write_text(src, encoding="utf-8")
-            killed = not _run_tests(work, tests)
+            passes, leaked = _run_tests(work, tests)
+            killed = not passes
             result = {"mutant": desc, "killed": killed}
-            strays = _reap_strays(work)
+            strays = _reap_strays(work) + leaked
             if strays:
                 result["strays_reaped"] = strays
             results.append(result)

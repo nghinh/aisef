@@ -134,10 +134,11 @@ def targets(table: Mapping[int, Proc], members: Sequence[int]) -> list[int]:
 class _Posix:
     """POSIX: the session and process group of the anchor, which the controller does not reap until disposal."""
 
-    stages = (("cooperative", signal.SIGINT, 0), ("terminate", signal.SIGTERM, 1), ("kill", signal.SIGKILL, None))
-
     def __init__(self) -> None:
         self.group: int | None = None
+        # built here, not in the class body: Windows has no SIGKILL, and this module is imported there too
+        self.stages = (("cooperative", signal.SIGINT, 0), ("terminate", signal.SIGTERM, 1),
+                       ("kill", signal.SIGKILL, None))
 
     def popen_kwargs(self) -> dict:
         return {"start_new_session": True}
