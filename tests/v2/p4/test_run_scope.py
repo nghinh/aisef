@@ -25,7 +25,7 @@ from aisef2.runtime import run_scope as rs, sentinel  # noqa: E402
 from aisef2.runtime.capability import verified  # noqa: E402
 from aisef2.runtime.run_scope import BEGIN_ORDER, SHUTDOWN_ORDER, LeaseHeld, RunScope, ShutdownRefused  # noqa: E402
 from aisef2.runtime.runspec import resolve  # noqa: E402
-from tests.v2.p4.world import SHA, Fake  # noqa: E402
+from tests.v2.p4.world import SHA, Fake, closed_after  # noqa: E402
 
 CLEAN_SHUTDOWN = [*BEGIN_ORDER, *SHUTDOWN_ORDER]
 
@@ -62,9 +62,7 @@ class Lifetime(unittest.TestCase):
         self.root = pathlib.Path(self._d.name)
 
     def run_scope(self, run_id="run-1", **kw):
-        r = RunScope(self.root, run_id, spec=kw.pop("spec", spec), clock=lambda: 1.0, **kw)
-        self.addCleanup(r.lease.release)
-        return r
+        return closed_after(self, RunScope(self.root, run_id, spec=kw.pop("spec", spec), clock=lambda: 1.0, **kw))
 
     def journal(self, r):
         return reconstruct(r.journal_path.read_bytes().decode("utf-8"))
@@ -243,8 +241,8 @@ class Lifetime(unittest.TestCase):
                                          "S1: tool call c1 (pytest) has no result"))
         missing = self.root / "gone.sentinel"
         sentinel.mark_open(missing, "run-x", self.root / "no-journal.jsonl")
-        self.assertEqual(sentinel.preflight(missing).residuals, ("the journal '" + str(self.root / "no-journal.jsonl")
-                                                                  + "' is missing",))
+        self.assertEqual(sentinel.preflight(missing).residuals,
+                         (f"the journal {str(self.root / 'no-journal.jsonl')!r} is missing",))
 
     def test_a_sentinel_marks_clean_only_its_own_open_run(self):
         p = self.root / "s"
@@ -277,11 +275,11 @@ class Lifetime(unittest.TestCase):
 
     def test_files_are_opened_binary(self):
         """Windows' CRT opens low-level files in text mode (LF -> CRLF) unless O_BINARY is set."""
-        opened, real = [], os.open
+        opened, real, native = [], os.open, hasattr(os, "O_BINARY")
 
         def spy(path, flags, mode=0o777):
             opened.append((pathlib.Path(path).name, flags))
-            return real(path, flags & ~0x8000, mode)
+            return real(path, flags if native else flags & ~0x8000, mode)  # on Windows the flag is real, and needed
         with mock.patch.object(os, "O_BINARY", 0x8000, create=True), mock.patch.object(os, "open", spy):
             sentinel.mark_open(self.root / "s", "r1", "j")
             lease = rs.RunLease(self.root / "l")
@@ -292,8 +290,7 @@ class Lifetime(unittest.TestCase):
         self.assertTrue(flags["l"] & 0x8000 and flags["l"] & os.O_CREAT)
 
     def test_a_run_root_is_made_with_its_parents_and_a_story_keeps_its_scope_until_disposed(self):
-        r = RunScope(self.root / "a" / "b", "run-n", spec=spec, clock=lambda: 1.0)
-        self.addCleanup(r.lease.release)
+        r = closed_after(self, RunScope(self.root / "a" / "b", "run-n", spec=spec, clock=lambda: 1.0))
         r.begin()
         self.assertTrue(r.journal_path.exists())
         with self.assertRaisesRegex(Exception, "^run run-n is RUNNING: a RunScope begins once$"):

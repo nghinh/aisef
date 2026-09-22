@@ -7055,46 +7055,46 @@
    "kill_tests": [
     "tests/v2/p4/test_interruption.py"
    ],
-   "source_sha256": "84c773c1382f6d8ab6dd91b6560df75fd860d8b057655ffe211bec12a470b235",
+   "source_sha256": "b9c61ba9f42ba4cf6acd66b409d2483baff74d17fef68cdb63f2055770bb4ccb",
    "mutants": 9,
    "killed": 9,
    "survivors": [],
    "strays_reaped": 0,
    "results": [
     {
-     "mutant": "L64 returns None",
+     "mutant": "L65 returns None",
      "killed": true
     },
     {
-     "mutant": "L63 False->True",
+     "mutant": "L64 False->True",
      "killed": true
     },
     {
-     "mutant": "L64 dict entry 0 dropped",
+     "mutant": "L65 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L64 dict entry 1 dropped",
+     "mutant": "L65 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L64 dict entry 2 dropped",
+     "mutant": "L65 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L64 dict entry 3 dropped",
+     "mutant": "L65 dict entry 3 dropped",
      "killed": true
     },
     {
-     "mutant": "L64 string 'story_id' emptied",
+     "mutant": "L65 string 'story_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L64 string 'call_id' emptied",
+     "mutant": "L65 string 'call_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L64 string 'synthetic' emptied",
+     "mutant": "L65 string 'synthetic' emptied",
      "killed": true
     }
    ]
@@ -7104,134 +7104,134 @@
    "kill_tests": [
     "tests/v2/p4/test_interruption.py"
    ],
-   "source_sha256": "84c773c1382f6d8ab6dd91b6560df75fd860d8b057655ffe211bec12a470b235",
+   "source_sha256": "b9c61ba9f42ba4cf6acd66b409d2483baff74d17fef68cdb63f2055770bb4ccb",
    "mutants": 31,
    "killed": 31,
    "survivors": [],
    "strays_reaped": 0,
    "results": [
     {
-     "mutant": "L95 condition negated",
+     "mutant": "L96 condition negated",
      "killed": true
     },
     {
-     "mutant": "L97 condition negated",
+     "mutant": "L98 condition negated",
      "killed": true
     },
     {
-     "mutant": "L107 returns None",
+     "mutant": "L108 returns None",
      "killed": true
     },
     {
-     "mutant": "L95 In->NotIn",
+     "mutant": "L96 In->NotIn",
      "killed": true
     },
     {
-     "mutant": "L97 Eq->NotEq",
+     "mutant": "L98 Eq->NotEq",
      "killed": true
     },
     {
-     "mutant": "L106 string 'CLOSED' emptied",
+     "mutant": "L107 string 'CLOSED' emptied",
      "killed": true
     },
     {
-     "mutant": "L95 element 0 dropped",
+     "mutant": "L96 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L95 element 1 dropped",
+     "mutant": "L96 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L97 string 'PENDING' emptied",
+     "mutant": "L98 string 'PENDING' emptied",
      "killed": true
     },
     {
-     "mutant": "L95 string 'DONE' emptied",
+     "mutant": "L96 string 'DONE' emptied",
      "killed": true
     },
     {
-     "mutant": "L95 string 'CLOSED' emptied",
+     "mutant": "L96 string 'CLOSED' emptied",
      "killed": true
     },
     {
-     "mutant": "L99 dict entry 0 dropped",
+     "mutant": "L100 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L99 dict entry 1 dropped",
+     "mutant": "L100 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L99 dict entry 2 dropped",
+     "mutant": "L100 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L99 dict entry 3 dropped",
+     "mutant": "L100 dict entry 3 dropped",
      "killed": true
     },
     {
-     "mutant": "L103 dict entry 0 dropped",
+     "mutant": "L104 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L103 dict entry 1 dropped",
+     "mutant": "L104 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L103 dict entry 2 dropped",
+     "mutant": "L104 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L103 dict entry 3 dropped",
+     "mutant": "L104 dict entry 3 dropped",
      "killed": true
     },
     {
-     "mutant": "L99 string 'outcome' emptied",
+     "mutant": "L100 string 'outcome' emptied",
      "killed": true
     },
     {
-     "mutant": "L99 string 'signal' emptied",
+     "mutant": "L100 string 'signal' emptied",
      "killed": true
     },
     {
-     "mutant": "L99 string 'provenance' emptied",
+     "mutant": "L100 string 'provenance' emptied",
      "killed": true
     },
     {
-     "mutant": "L100 string 'detail' emptied",
+     "mutant": "L101 string 'detail' emptied",
      "killed": true
     },
     {
-     "mutant": "L100 string 'interrupted before dispatch' emptied",
+     "mutant": "L101 string 'interrupted before dispatch' emptied",
      "killed": true
     },
     {
-     "mutant": "L100 True->False",
+     "mutant": "L101 True->False",
      "killed": true
     },
     {
-     "mutant": "L103 string 'outcome' emptied",
+     "mutant": "L104 string 'outcome' emptied",
      "killed": true
     },
     {
-     "mutant": "L103 string 'signal' emptied",
+     "mutant": "L104 string 'signal' emptied",
      "killed": true
     },
     {
-     "mutant": "L103 string 'provenance' emptied",
+     "mutant": "L104 string 'provenance' emptied",
      "killed": true
     },
     {
-     "mutant": "L104 string 'detail' emptied",
+     "mutant": "L105 string 'detail' emptied",
      "killed": true
     },
     {
-     "mutant": "L104 string 'interrupted after dispatch: what the tool did is not known' emptied",
+     "mutant": "L105 string 'interrupted after dispatch: what the tool did is not known' emptied",
      "killed": true
     },
     {
-     "mutant": "L104 True->False",
+     "mutant": "L105 True->False",
      "killed": true
     }
    ]
@@ -7241,62 +7241,62 @@
    "kill_tests": [
     "tests/v2/p4/test_interruption.py"
    ],
-   "source_sha256": "84c773c1382f6d8ab6dd91b6560df75fd860d8b057655ffe211bec12a470b235",
+   "source_sha256": "b9c61ba9f42ba4cf6acd66b409d2483baff74d17fef68cdb63f2055770bb4ccb",
    "mutants": 13,
    "killed": 13,
    "survivors": [],
    "strays_reaped": 0,
    "results": [
     {
-     "mutant": "L67 condition negated",
+     "mutant": "L68 condition negated",
      "killed": true
     },
     {
-     "mutant": "L74 returns None",
+     "mutant": "L75 returns None",
      "killed": true
     },
     {
-     "mutant": "L67 NotEq->Eq",
+     "mutant": "L68 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L73 string 'DISPATCHED' emptied",
+     "mutant": "L74 string 'DISPATCHED' emptied",
      "killed": true
     },
     {
-     "mutant": "L67 string 'PENDING' emptied",
+     "mutant": "L68 string 'PENDING' emptied",
      "killed": true
     },
     {
-     "mutant": "L71 dict entry 0 dropped",
+     "mutant": "L72 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L71 dict entry 1 dropped",
+     "mutant": "L72 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L71 dict entry 2 dropped",
+     "mutant": "L72 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L71 string 'story_id' emptied",
+     "mutant": "L72 string 'story_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L71 string 'call_id' emptied",
+     "mutant": "L72 string 'call_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L72 string 'tool' emptied",
+     "mutant": "L73 string 'tool' emptied",
      "killed": true
     },
     {
-     "mutant": "L68 string 'call ' emptied",
+     "mutant": "L69 string 'call ' emptied",
      "killed": true
     },
     {
-     "mutant": "L68 string ' is ' emptied",
+     "mutant": "L69 string ' is ' emptied",
      "killed": true
     }
    ]
@@ -7306,54 +7306,54 @@
    "kill_tests": [
     "tests/v2/p4/test_interruption.py"
    ],
-   "source_sha256": "84c773c1382f6d8ab6dd91b6560df75fd860d8b057655ffe211bec12a470b235",
+   "source_sha256": "b9c61ba9f42ba4cf6acd66b409d2483baff74d17fef68cdb63f2055770bb4ccb",
    "mutants": 11,
    "killed": 11,
    "survivors": [],
    "strays_reaped": 0,
    "results": [
     {
-     "mutant": "L78 condition negated",
+     "mutant": "L79 condition negated",
      "killed": true
     },
     {
-     "mutant": "L83 condition negated",
+     "mutant": "L84 condition negated",
      "killed": true
     },
     {
-     "mutant": "L88 condition negated",
+     "mutant": "L89 condition negated",
      "killed": true
     },
     {
-     "mutant": "L91 returns None",
+     "mutant": "L92 returns None",
      "killed": true
     },
     {
-     "mutant": "L78 NotEq->Eq",
+     "mutant": "L79 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L83 Is->IsNot",
+     "mutant": "L84 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L88 Is->IsNot",
+     "mutant": "L89 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L90 string 'DONE' emptied",
+     "mutant": "L91 string 'DONE' emptied",
      "killed": true
     },
     {
-     "mutant": "L78 string 'DISPATCHED' emptied",
+     "mutant": "L79 string 'DISPATCHED' emptied",
      "killed": true
     },
     {
-     "mutant": "L79 string 'call ' emptied",
+     "mutant": "L80 string 'call ' emptied",
      "killed": true
     },
     {
-     "mutant": "L79 string ' is ' emptied",
+     "mutant": "L80 string ' is ' emptied",
      "killed": true
     }
    ]
@@ -7363,9 +7363,9 @@
    "kill_tests": [
     "tests/v2/p4/test_interruption.py"
    ],
-   "source_sha256": "84c773c1382f6d8ab6dd91b6560df75fd860d8b057655ffe211bec12a470b235",
-   "mutants": 66,
-   "killed": 66,
+   "source_sha256": "b9c61ba9f42ba4cf6acd66b409d2483baff74d17fef68cdb63f2055770bb4ccb",
+   "mutants": 68,
+   "killed": 68,
    "survivors": [],
    "strays_reaped": 0,
    "results": [
@@ -7374,19 +7374,19 @@
      "killed": true
     },
     {
-     "mutant": "L42 condition negated",
+     "mutant": "L43 condition negated",
      "killed": true
     },
     {
-     "mutant": "L45 condition negated",
+     "mutant": "L46 condition negated",
      "killed": true
     },
     {
-     "mutant": "L47 condition negated",
+     "mutant": "L48 condition negated",
      "killed": true
     },
     {
-     "mutant": "L49 returns None",
+     "mutant": "L50 returns None",
      "killed": true
     },
     {
@@ -7402,39 +7402,39 @@
      "killed": true
     },
     {
-     "mutant": "L43 returns None",
+     "mutant": "L44 returns None",
      "killed": true
     },
     {
-     "mutant": "L45 And swapped",
+     "mutant": "L46 And swapped",
      "killed": true
     },
     {
-     "mutant": "L46 returns None",
+     "mutant": "L47 returns None",
      "killed": true
     },
     {
-     "mutant": "L47 And swapped",
+     "mutant": "L48 And swapped",
      "killed": true
     },
     {
-     "mutant": "L48 returns None",
+     "mutant": "L49 returns None",
      "killed": true
     },
     {
-     "mutant": "L49 dict entry 0 dropped",
+     "mutant": "L50 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L49 dict entry 1 dropped",
+     "mutant": "L50 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L49 dict entry 2 dropped",
+     "mutant": "L50 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L49 dict entry 3 dropped",
+     "mutant": "L50 dict entry 3 dropped",
      "killed": true
     },
     {
@@ -7474,59 +7474,63 @@
      "killed": true
     },
     {
-     "mutant": "L43 dict entry 0 dropped",
+     "mutant": "L43 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L43 dict entry 1 dropped",
+     "mutant": "L44 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L43 dict entry 2 dropped",
+     "mutant": "L44 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L43 dict entry 3 dropped",
+     "mutant": "L44 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 IsNot->Is",
+     "mutant": "L44 dict entry 3 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 Lt->GtE",
+     "mutant": "L46 IsNot->Is",
      "killed": true
     },
     {
-     "mutant": "L47 Is->IsNot",
+     "mutant": "L46 Lt->GtE",
      "killed": true
     },
     {
-     "mutant": "L47 IsNot->Is",
+     "mutant": "L48 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L47 Lt->GtE",
+     "mutant": "L48 IsNot->Is",
      "killed": true
     },
     {
-     "mutant": "L49 string 'outcome' emptied",
+     "mutant": "L48 Lt->GtE",
      "killed": true
     },
     {
-     "mutant": "L49 string 'signal' emptied",
+     "mutant": "L50 string 'outcome' emptied",
      "killed": true
     },
     {
-     "mutant": "L49 string 'provenance' emptied",
+     "mutant": "L50 string 'signal' emptied",
      "killed": true
     },
     {
-     "mutant": "L50 string 'detail' emptied",
+     "mutant": "L50 string 'provenance' emptied",
      "killed": true
     },
     {
-     "mutant": "L50 conditional negated",
+     "mutant": "L51 string 'detail' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L51 conditional negated",
      "killed": true
     },
     {
@@ -7566,39 +7570,43 @@
      "killed": true
     },
     {
-     "mutant": "L43 string 'outcome' emptied",
+     "mutant": "L43 IsNot->Is",
      "killed": true
     },
     {
-     "mutant": "L43 string 'signal' emptied",
+     "mutant": "L44 string 'outcome' emptied",
      "killed": true
     },
     {
-     "mutant": "L43 string 'provenance' emptied",
+     "mutant": "L44 string 'signal' emptied",
      "killed": true
     },
     {
-     "mutant": "L44 string 'detail' emptied",
+     "mutant": "L44 string 'provenance' emptied",
      "killed": true
     },
     {
-     "mutant": "L44 string 'terminated with its job by the controller (TerminateJobObject)' emptied",
+     "mutant": "L45 string 'detail' emptied",
      "killed": true
     },
     {
-     "mutant": "L46 string 'the tool died by a signal' emptied",
+     "mutant": "L45 string 'terminated with its job by the controller (TerminateJobObject)' emptied",
      "killed": true
     },
     {
-     "mutant": "L48 string \"the range died by a signal before the tool's status was reported\" emptied",
+     "mutant": "L47 string 'the tool died by a signal' emptied",
      "killed": true
     },
     {
-     "mutant": "L50 IsNot->Is",
+     "mutant": "L49 string \"the range died by a signal before the tool's status was reported\" emptied",
      "killed": true
     },
     {
-     "mutant": "L50 string 'exit status not reported' emptied",
+     "mutant": "L51 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L51 string 'exit status not reported' emptied",
      "killed": true
     },
     {
@@ -7614,7 +7622,7 @@
      "killed": true
     },
     {
-     "mutant": "L50 string 'exit status ' emptied",
+     "mutant": "L51 string 'exit status ' emptied",
      "killed": true
     },
     {

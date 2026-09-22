@@ -38,6 +38,14 @@ class Journal2:
         return pathlib.Path(path or self.path).read_bytes().decode("utf-8")
 
 
+def closed_after(test, run):
+    """Register a run's cleanup: the lease released and its journal writer closed, whatever the test does with it.
+    Windows cannot remove a temporary directory whose journal is still open."""
+    test.addCleanup(run.lease.release)
+    test.addCleanup(lambda: run._writer.close() if run._writer is not None else None)
+    return run
+
+
 def emitter(w):
     """StoryScope's emit, as RunScope hands it one: the run's journal, never a writer of its own."""
     return lambda t, data, source_seqs=(): w.append(t, data, source_seqs=source_seqs)

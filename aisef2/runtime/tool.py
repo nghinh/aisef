@@ -39,7 +39,8 @@ def outcome(returncode: int | None, anchor_returncode: int | None, ledger: Seque
                 "detail": f"{detail}: {name}, {'sent by the controller' if mine else 'not sent by the controller'}"}
     if returncode == 0:
         return {"outcome": O.COMPLETED.value, "signal": 0, "provenance": S.NONE.value, "detail": ""}
-    if backend.controller_stopped(returncode, ledger):
+    # a stop takes the anchor with the range, so the tool's own status may never have been reported: ask about both
+    if backend.controller_stopped(returncode if returncode is not None else anchor_returncode, ledger):
         return {"outcome": O.SIGNALLED.value, "signal": 9, "provenance": S.CONTROLLER.value,
                 "detail": "terminated with its job by the controller (TerminateJobObject)"}
     if returncode is not None and returncode < 0:

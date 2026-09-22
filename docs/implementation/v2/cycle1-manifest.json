@@ -1525,6 +1525,15 @@
      "authority": "owner decision 'AISEF V2 — OWNER ACCEPTS P3 / AUTHORIZE P4' §5 (enforce through P4 lifetime/control semantics; do not rewrite P3 history)",
      "status": "CLOSED in WP-4.3: RunScope.shutdown refuses a successful shutdown, before anything is written, while any story is not ENDED; an interruption closes and names instead (WP-4.6)"
     }
+   ],
+   "discovered_findings": [
+    {
+     "id": "P4-FINDING-008",
+     "found": "2026-09-23, CI run 35781643118 on 224caa4, unit (windows-latest, 3.11)",
+     "what": "three test-side defects that only Windows shows: the WP-4.3..4.6 tests left a run's journal writer open, so its temporary directory could not be removed (22 cleanup errors, which also failed the Q0 calibration of p4_evidence); the O_BINARY spies stripped the flag before calling the real os.open, and on Windows that flag is real, so the repaired journal came back as CRLF; and two expectations were POSIX-shaped (a ledger naming SIGKILL, which Windows cannot name, and a message built with str() where the code uses repr())",
+     "resolution": "a shared helper closes every run's writer and releases its lease on cleanup; the spies strip the flag only where the platform does not have it; the outcome table uses a signal every platform names, and the message expectation uses repr",
+     "classification": "HARNESS defects in P4 tests, recorded with the same FAIL attempt (not retried); no product code involved"
+    }
    ]
   },
   {
@@ -1701,6 +1710,13 @@
      "what": "the P2 python_callable probe classifies a subject that ends its own process by a signal after DISPATCHED (os.abort -> SIGABRT; os.kill(getpid, SIGTERM)) as UNRUNNABLE -> PROBE_UNRUNNABLE, owner ENVIRONMENT, retryable — the case INTERRUPT-SIG-2 forbids",
      "resolution": "not changed in P4 (F5, sealed P2 code): docs/implementation/v2/ARCHITECTURE-EXCEPTION-V2-003-PROPOSAL.md",
      "classification": "architecture exception required (STOP rule of the P4 decision §1)"
+    },
+    {
+     "id": "P4-FINDING-007",
+     "found": "2026-09-23, CI run 35781643118 on 224caa4, unit (windows-latest, 3.11)",
+     "what": "on Windows a controller's stop is TerminateJobObject, which takes the anchor down with the range, so the tool's own exit status is never reported; outcome() asked the job adapter about that status alone, saw None and returned FAILED with provenance NONE — a controller stop that INTERRUPT-SIG-1 requires to be SIGNALLED / CONTROLLER. POSIX reports the target's own signal exit, so macOS and Linux passed",
+     "resolution": "outcome() asks the adapter about the tool's status and, when that was never reported, about the anchor's; the outcome table pins both (a job stop read from the anchor's status, and a job exit code without the stop in the ledger still FAILED)",
+     "classification": "PRODUCT defect in P4 code, recorded as FAIL in P4-RUN-HISTORY (not retried); no frozen semantics changed"
     }
    ]
   },

@@ -25,7 +25,7 @@ from aisef2.journal.format2 import reconstruct  # noqa: E402
 from aisef2.journal.projections import PROJECTIONS  # noqa: E402
 from aisef2.runtime.run_scope import RetryRefused, RunScope  # noqa: E402
 from tests.v2.p4.test_run_scope import spec  # noqa: E402
-from tests.v2.p4.world import SHA  # noqa: E402
+from tests.v2.p4.world import SHA, closed_after  # noqa: E402
 
 LIMITS = {Owner.PROVIDER: 2, Owner.DEVELOPER: 3, Owner.ENVIRONMENT: 1}
 
@@ -34,8 +34,7 @@ class Budgets(unittest.TestCase):
     def setUp(self):
         self._d = tempfile.TemporaryDirectory(prefix="aisef2-budget-")
         self.addCleanup(self._d.cleanup)
-        self.run = RunScope(self._d.name, "run-b", spec=spec, clock=lambda: 1.0)
-        self.addCleanup(self.run.lease.release)
+        self.run = closed_after(self, RunScope(self._d.name, "run-b", spec=spec, clock=lambda: 1.0))
         self.run.begin()
         self.run.append(T.PLAN_FROZEN, {"plan_id": "PLAN-B", "plan_hash": "b" * 64,
                                         "roles": {"C1": "INTRODUCE", "C2": "INTRODUCE"}})

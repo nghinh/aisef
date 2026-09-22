@@ -32,7 +32,7 @@ from aisef2.runtime.process_range import BACKEND, JOB_EXIT_CODE, _Job, _Posix  #
 from aisef2.runtime.run_scope import RunScope  # noqa: E402
 from aisef2.runtime.tool import ToolCall, outcome  # noqa: E402
 from tests.v2.p4.test_run_scope import plan, spec  # noqa: E402
-from tests.v2.p4.world import SHA, Fake  # noqa: E402
+from tests.v2.p4.world import SHA, Fake, closed_after  # noqa: E402
 
 PY = sys.executable
 POSIX = os.name == "posix"
@@ -49,8 +49,7 @@ class Interruption(unittest.TestCase):
         self._d = tempfile.TemporaryDirectory(prefix="aisef2-int-")
         self.addCleanup(self._d.cleanup)
         self.root = pathlib.Path(self._d.name)
-        self.run = RunScope(self.root, "run-i", spec=spec, clock=lambda: 1.0)
-        self.addCleanup(self.run.lease.release)
+        self.run = closed_after(self, RunScope(self.root, "run-i", spec=spec, clock=lambda: 1.0))
         self.run.begin()
         plan(self.run)
         self.run.append(T.STORY_BEGIN, {"story_id": "S1", "parent": SHA})
@@ -97,20 +96,24 @@ class Interruption(unittest.TestCase):
         self.assertEqual(call.range.ledger, [])
 
     def test_the_outcome_table(self):
-        kill = [{"stage": "kill", "signal": "SIGKILL"}]
+        term = [{"stage": "terminate", "signal": "SIGTERM"}]  # a signal every platform names
+        sig = int(signal.SIGTERM)
         none = {"signal": 0, "provenance": "NONE"}
         self.assertEqual(outcome(0, 0, []), {"outcome": "COMPLETED", **none, "detail": ""})
         self.assertEqual(outcome(2, 0, []), {"outcome": "FAILED", **none, "detail": "exit status 2"})
         self.assertEqual(outcome(None, None, []), {"outcome": "FAILED", **none, "detail": "exit status not reported"})
-        self.assertEqual(outcome(-9, 0, kill), {"outcome": "SIGNALLED", "signal": 9, "provenance": "CONTROLLER",
-                                                "detail": "the tool died by a signal: SIGKILL, sent by the controller"})
-        self.assertEqual(outcome(-9, 0, []), {"outcome": "SIGNALLED", "signal": 9, "provenance": "UNKNOWN",
-                                              "detail": "the tool died by a signal: SIGKILL, not sent by the controller"})
-        self.assertEqual(outcome(None, -9, kill), {
-            "outcome": "SIGNALLED", "signal": 9, "provenance": "CONTROLLER",
-            "detail": "the range died by a signal before the tool's status was reported: SIGKILL, sent by the controller"})
-        self.assertEqual(outcome(None, -9, [])["provenance"], "UNKNOWN")
-        self.assertEqual(outcome(None, 0, kill)["outcome"], "FAILED")  # the anchor exited: no signal to name
+        self.assertEqual(outcome(-sig, 0, term), {
+            "outcome": "SIGNALLED", "signal": sig, "provenance": "CONTROLLER",
+            "detail": "the tool died by a signal: SIGTERM, sent by the controller"})
+        self.assertEqual(outcome(-sig, 0, []), {
+            "outcome": "SIGNALLED", "signal": sig, "provenance": "UNKNOWN",
+            "detail": "the tool died by a signal: SIGTERM, not sent by the controller"})
+        self.assertEqual(outcome(None, -sig, term), {
+            "outcome": "SIGNALLED", "signal": sig, "provenance": "CONTROLLER",
+            "detail": "the range died by a signal before the tool's status was reported: SIGTERM, sent by the "
+                      "controller"})
+        self.assertEqual(outcome(None, -sig, [])["provenance"], "UNKNOWN")
+        self.assertEqual(outcome(None, 0, term)["outcome"], "FAILED")  # the anchor exited: no signal to name
         self.assertEqual(outcome(-99, 0, [])["detail"], "the tool died by a signal: signal 99, not sent by the controller")
 
     def test_a_job_stop_is_the_controllers_only_with_its_stop_in_the_ledger(self):
@@ -120,10 +123,12 @@ class Interruption(unittest.TestCase):
                    "detail": "terminated with its job by the controller (TerminateJobObject)"}
         self.assertEqual(outcome(JOB_EXIT_CODE, None, job, _Job), stopped)
         self.assertEqual(outcome(JOB_EXIT_CODE, None, [], _Job)["outcome"], "FAILED")  # a tool's own exit status
-        self.assertEqual(outcome(JOB_EXIT_CODE, None, [{"stage": "kill", "signal": "SIGKILL"}], _Job)["outcome"],
+        self.assertEqual(outcome(JOB_EXIT_CODE, None, [{"stage": "terminate", "signal": "SIGTERM"}], _Job)["outcome"],
                          "FAILED")
         self.assertEqual(outcome(JOB_EXIT_CODE + 1, None, job, _Job)["outcome"], "FAILED")
         self.assertEqual(outcome(JOB_EXIT_CODE, None, job, _Posix)["outcome"], "FAILED")  # POSIX: only signal exits
+        self.assertEqual(outcome(None, JOB_EXIT_CODE, job, _Job), stopped)  # the anchor went with the job it reported
+        self.assertEqual(outcome(None, JOB_EXIT_CODE, [], _Job)["outcome"], "FAILED")
         self.assertIs(BACKEND, _Posix if POSIX else _Job)
 
     def test_a_call_is_dispatched_and_finished_once_and_returns_what_it_wrote(self):
@@ -200,8 +205,7 @@ class Interruption(unittest.TestCase):
         self.assertEqual(released, [("session", "FAILED", False), ("wt", "RELEASED", False)])  # still evidence
         self.assertLess(kinds(self.run).index("story/resource-released"), kinds(self.run).index("run/dispose-begin"))
         self.assertEqual(sentinel.read(self.run.sentinel_path)["state"], "OPEN")
-        nxt = RunScope(self.root, "run-2", spec=spec)
-        self.addCleanup(nxt.lease.release)
+        nxt = closed_after(self, RunScope(self.root, "run-2", spec=spec))
         pre = nxt.begin()
         self.assertEqual(pre.previous, "TORN")
         self.assertEqual(pre.residuals, ("S1: SESSION session FAILED: OSError: already closed",))
@@ -259,7 +263,8 @@ class Repair(unittest.TestCase):
 
     def died(self, interrupted=False, stories=()):
         """A run whose process died mid-story: a finished tool, a dispatched one, an open request, held resources."""
-        run = RunScope(self.root, "run-r", spec=spec, clock=iter(float(n) for n in range(100)).__next__)
+        run = closed_after(self, RunScope(self.root, "run-r", spec=spec,
+                                          clock=iter(float(n) for n in range(100)).__next__))
         run.begin()
         plan(run)
         run.append(T.STORY_BEGIN, {"story_id": "S1", "parent": SHA})
@@ -329,11 +334,11 @@ class Repair(unittest.TestCase):
         with mock.patch.object(rp, "repair", lambda t: "changed\n" + t), \
                 self.assertRaisesRegex(rp.RepairError, "^repair would change an existing event$"):
             rp.repair_journal(path)
-        opened, real = [], os.open
+        opened, real, native = [], os.open, hasattr(os, "O_BINARY")
 
         def spy(p, flags, mode=0o777):
             opened.append(flags)
-            return real(p, flags & ~0x8000, mode)
+            return real(p, flags if native else flags & ~0x8000, mode)  # on Windows the flag is real, and needed
         with mock.patch.object(os, "O_BINARY", 0x8000, create=True), mock.patch.object(os, "open", spy):
             self.assertIs(rp.repair_journal(path), True)
         self.assertTrue(opened[0] & 0x8000 and opened[0] & os.O_TRUNC and opened[0] & os.O_CREAT)
@@ -440,8 +445,7 @@ class RealSignals(unittest.TestCase):
         j = reconstruct(path.read_bytes().decode("utf-8"))
         self.assertEqual([e.type for e in j.events[-4:]], ["tool/result", "story/resource-released",
                                                            "run/interrupted", "run/end"])
-        nxt = RunScope(self.root, "run-n", spec=spec)
-        self.addCleanup(nxt.lease.release)
+        nxt = closed_after(self, RunScope(self.root, "run-n", spec=spec))
         pre = nxt.begin()
         self.assertEqual(pre.previous, "TORN")
         self.assertEqual(pre.residuals, ("S1: PROCESS_RANGE tool c1 RESIDUAL: not released: the run ended without "
