@@ -1382,7 +1382,17 @@
     }
    ],
    "evidence_label": "`P4-RANGE-EMPTINESS.json`",
-   "evidence_asserts": "D-024 reproducer red-before / green-after; OS-asserted emptiness on **Linux and Windows CI**; escaped children reported as residuals"
+   "evidence_asserts": "D-024 reproducer red-before / green-after; OS-asserted emptiness on **Linux and Windows CI**; escaped children reported as residuals",
+   "carried_residuals": [
+    {
+     "id": "P2-RESIDUAL-ORPHAN-SUBJECT",
+     "found": "2026-09-22, P2 V2-002 correction (mutation runs of the python_callable targets)",
+     "what": "harness/subject processes orphaned (parent PID 1) and left running: validation/v2/mutation.py stops only its direct child on timeout (subprocess.run(timeout=)), and a harness whose controller dies is not reaped — no process-range containment yet",
+     "measured": "10 orphans at ~62% CPU each for 2-3 h (load average 82); local full suite 607 s -> ~1085 s; CI job durations unchanged; no evidence changed; the orphans were stopped by hand",
+     "authority": "owner decision 'AISEF V2 — OWNER ACCEPTS P2 / AUTHORIZE P3 RECORD AUTHORITY' §0 (carry forward, without fixing)",
+     "status": "OPEN — not fixed before WP-4.2"
+    }
+   ]
   },
   {
    "id": "WP-4.3",
@@ -1599,7 +1609,16 @@
    ],
    "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
    "evidence_label": "`P4-INTERRUPTION.json`",
-   "evidence_asserts": "repairing the same journal twice is byte-identical; no interruption leaves a gap; abandonment recorded"
+   "evidence_asserts": "repairing the same journal twice is byte-identical; no interruption leaves a gap; abandonment recorded",
+   "carried_residuals": [
+    {
+     "id": "P2-RESIDUAL-SIGNAL-SOURCE",
+     "found": "2026-09-22, P2 V2-002 correction (P2-PROBE-PROTOCOL residual)",
+     "what": "a harness process killed by a signal after DISPATCHED is UNRUNNABLE: the probe cannot tell whether the subject or the environment sent the signal; this is not the expiry of the observation window",
+     "authority": "owner decision 'AISEF V2 — OWNER ACCEPTS P2 / AUTHORIZE P3 RECORD AUTHORITY' §0 (carry forward, without fixing)",
+     "status": "OPEN — not fixed before WP-4.6"
+    }
+   ]
   },
   {
    "id": "WP-5.1",

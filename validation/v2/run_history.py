@@ -9,7 +9,7 @@ Owner decision "OWNER ACCEPTS P0 / AUTHORIZE P1" §3 and §5, as mechanism rathe
   approved retry count (resolved execution policy; `null` = none approved, never a default); any other case makes
   the rerun diagnostic only, and a later green attempt does not convert the failure;
 * **V1-PF-001 stops the gate** — an attempt attributed to it must carry gate_effect STOP;
-* **one history per phase, closed by its seal** — once a phase's seal record exists (P1: `P1-FINAL-SEAL.json`), its
+* **one history per phase, closed by its seal** — once a phase's seal record exists (`P<n>-FINAL-SEAL.json`), its
   history must hold exactly the attempt count the seal names: nothing added, nothing removed. New attempts go to the
   first unsealed phase.
 
@@ -27,8 +27,9 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 POLICY_REL = "closure-evidence/v2/V2-RETRY-POLICY.json"
-HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evidence/v2/P2-RUN-HISTORY.json"}
-SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json"}
+HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evidence/v2/P2-RUN-HISTORY.json",
+             "P3": "closure-evidence/v2/P3-RUN-HISTORY.json"}
+SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence/v2/P2-FINAL-SEAL.json"}
 HISTORY_REL = HISTORIES["P1"]
 RESULTS = ("PASS", "FAIL")
 GATE_EFFECTS = ("COUNTS", "DIAGNOSTIC_ONLY", "STOP")
