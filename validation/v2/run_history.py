@@ -28,8 +28,9 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 POLICY_REL = "closure-evidence/v2/V2-RETRY-POLICY.json"
 HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evidence/v2/P2-RUN-HISTORY.json",
-             "P3": "closure-evidence/v2/P3-RUN-HISTORY.json"}
-SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence/v2/P2-FINAL-SEAL.json"}
+             "P3": "closure-evidence/v2/P3-RUN-HISTORY.json", "P4": "closure-evidence/v2/P4-RUN-HISTORY.json"}
+SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence/v2/P2-FINAL-SEAL.json",
+         "P3": "closure-evidence/v2/P3-FINAL-SEAL.json"}
 HISTORY_REL = HISTORIES["P1"]
 RESULTS = ("PASS", "FAIL")
 GATE_EFFECTS = ("COUNTS", "DIAGNOSTIC_ONLY", "STOP")
