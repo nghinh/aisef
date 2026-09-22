@@ -208,8 +208,62 @@ def journal_writer() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-3.2
+
+def format_compat() -> dict:
+    from aisef2.journal.compat import UnknownRequiredEvent, reconstruct
+    from aisef2.journal.event import FORMAT, SCHEMAS, JournalError
+    fx = _module("aisef_v2_p3_journal_fixtures", "tests/v2/p3/journal_fixtures.py")
+    outcomes, silent_wrong = {}, []
+    for name, (text, (expected, _)) in fx.FIXTURES.items():
+        committed = (fx.DIR / f"{name}.jsonl").read_bytes().decode("utf-8")
+        try:
+            j = reconstruct(committed)
+            outcomes[name] = {"expected": expected, "read": "OK", "known_seqs": [e.seq for e in j.events],
+                              "skipped": list(j.skipped), "torn_tail": j.torn_tail, "equals_build": committed == text}
+            if not all(e.type in SCHEMAS and not e.ignorable for e in j.events) or \
+                    sorted([e.seq for e in j.events] + list(j.skipped)) != list(range(j.length)):
+                silent_wrong.append(name)
+        except JournalError as err:
+            outcomes[name] = {"expected": expected, "read": "REFUSED", "refusal": type(err).__name__, "reason": str(err),
+                              "equals_build": committed == text}
+    o = outcomes
+    return {
+        "record": "AISEF V2 — P3 FORMAT COMPATIBILITY", "work_package": "WP-3.2", "rfc_sections": ["20", "35"],
+        "frozen_items": ["F1"],
+        "format": FORMAT,
+        "rule": "unknown type without ignorable -> refuse to reconstruct (never partial); unknown ignorable -> skip, "
+                "seq kept, never folded; a known type is always validated and never ignorable; the format is declared "
+                "once, in run/begin at seq 0; a torn tail is reported and never decoded; a reader never negotiates",
+        "fixtures": outcomes,
+        "properties": {
+            "committed_fixtures_equal_the_build": all(v["equals_build"] for v in o.values())
+                and sorted(p.stem for p in fx.DIR.glob("*.jsonl")) == sorted(fx.FIXTURES),
+            "every_fixture_reads_as_expected": all(
+                (v["read"] == "REFUSED") is (v["expected"] == "REFUSE") for v in o.values()),
+            "FORMAT_1_unknown_required_refuses_reconstruction": all(
+                o[n].get("refusal") == UnknownRequiredEvent.__name__
+                for n in ("unknown_required", "mixed_stream_new_required")),
+            "FORMAT_2_unknown_ignorable_skipped_and_reconstruction_continues":
+                (o["unknown_ignorable"].get("skipped"), o["unknown_ignorable"].get("known_seqs")) == ([2], [0, 1, 3, 4])
+                and o["mixed_stream_new_ignorable"].get("skipped") == [1, 3],
+            "malformed_known_type_refused": o["malformed_known"]["read"] == "REFUSED",
+            "version_or_schema_mismatch_refused": all(o[n]["read"] == "REFUSED"
+                                                      for n in ("version_mismatch", "newer_schema_field")),
+            "mixed_old_new_stream": [o[n]["read"] for n in ("mixed_stream_second_declaration",
+                                                            "mixed_stream_new_required", "mixed_stream_new_ignorable")]
+                == ["REFUSED", "REFUSED", "OK"],
+            "a_known_type_marked_ignorable_is_refused_not_skipped": o["known_type_marked_ignorable"]["read"] == "REFUSED",
+            "torn_tail_reported_never_decoded": o["torn_tail"].get("torn_tail") is True
+                and o["torn_tail"].get("known_seqs") == [0, 1],
+            "no_newer_log_produces_a_silent_wrong_state": silent_wrong == [],
+        },
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-3.1": ("closure-evidence/v2/P3-JOURNAL-WRITER.json", journal_writer, "aisef2/journal/writer.py"),
+    "WP-3.2": ("closure-evidence/v2/P3-FORMAT-COMPAT.json", format_compat, "aisef2/journal/compat.py"),
 }
 
 

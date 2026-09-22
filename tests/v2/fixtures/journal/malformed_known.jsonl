@@ -1,0 +1,2 @@
+{"chain":"703ab9b57c4250897bfb971d837c7e4fb1356e3322f2ddf80fa9186069bd4cec","event":{"data":{"journal_format":1,"run_id":"fixture"},"ignorable":false,"seq":0,"source_seqs":[],"time":0.0,"type":"run/begin"}}
+{"chain":"2b27de53ca047ae2d10628a9239bbc322ca415d1f45d5c9dfe4578822cac8abe","event":{"data":{"parent":"cccccccccccc","story_id":"S1"},"ignorable":false,"seq":1,"source_seqs":[],"time":1.0,"type":"story/begin"}}

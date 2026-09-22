@@ -3,6 +3,171 @@
  "tool": "validation/v2/mutation.py",
  "targets": [
   {
+   "target": "aisef2/journal/compat.py::Journal.head",
+   "kill_tests": [
+    "tests/v2/p3/test_format_compat.py"
+   ],
+   "source_sha256": "524c3693e1bf2679bd8e786df459f956623ac8945f77b6027dcdb5c3ff7cea9e",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L43 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L45 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L42 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L43 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L45 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L42 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L43 LtE->Gt",
+     "killed": true
+    },
+    {
+     "mutant": "L43 LtE->Gt",
+     "killed": true
+    },
+    {
+     "mutant": "L44 string 'no prefix of length ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L44 string ' in a journal of ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/journal/compat.py::reconstruct",
+   "kill_tests": [
+    "tests/v2/p3/test_format_compat.py",
+    "tests/v2/p3/test_journal_writer.py"
+   ],
+   "source_sha256": "524c3693e1bf2679bd8e786df459f956623ac8945f77b6027dcdb5c3ff7cea9e",
+   "mutants": 25,
+   "killed": 25,
+   "survivors": [],
+   "results": [
+    {
+     "mutant": "L53 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L72 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L53 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L56 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L58 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L58 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L58 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L58 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L58 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L58 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L62 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string '\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L62 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L65 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L72 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L72 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L72 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string 'a journal is read as text' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L68 string 'seq ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L68 string ': unknown event type ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L68 string ' is not marked ignorable — this reader refuses to reconstruct the journal (§20.4)' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/journal/event.py::Event.__post_init__",
    "kill_tests": [
     "tests/v2/p3/test_journal_writer.py"

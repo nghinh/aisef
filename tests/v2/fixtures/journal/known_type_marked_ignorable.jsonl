@@ -1,0 +1,3 @@
+{"chain":"703ab9b57c4250897bfb971d837c7e4fb1356e3322f2ddf80fa9186069bd4cec","event":{"data":{"journal_format":1,"run_id":"fixture"},"ignorable":false,"seq":0,"source_seqs":[],"time":0.0,"type":"run/begin"}}
+{"chain":"cca8d120f9deb126e41ff72d392f03b62b59f37c381e65c37eb742425a54a13d","event":{"data":{"parent":"cccccccccccccccccccccccccccccccccccccccc","story_id":"S1"},"ignorable":false,"seq":1,"source_seqs":[],"time":1.0,"type":"story/begin"}}
+{"chain":"99f1663bdaeaf63bebaff7cab1d0598af9bdd54143d6c81b9880da228abe4a53","event":{"data":{"code":"PROBE_UNRUNNABLE","detail":"interpreter absent","owner":"ENVIRONMENT","retryable":true,"story_id":"S1"},"ignorable":true,"seq":2,"source_seqs":[],"time":2.0,"type":"failure/observed"}}

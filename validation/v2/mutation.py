@@ -125,6 +125,9 @@ P3_TARGETS: dict[str, list[str]] = {
     "aisef2/journal/event.py::decode": _WRITER_TESTS,
     "aisef2/journal/writer.py::JournalWriter.__init__": _WRITER_TESTS,
     "aisef2/journal/writer.py::append": _WRITER_TESTS,
+    # WP-3.2: the one reader and a prefix's identity
+    "aisef2/journal/compat.py::reconstruct": ["tests/v2/p3/test_format_compat.py", "tests/v2/p3/test_journal_writer.py"],
+    "aisef2/journal/compat.py::Journal.head": ["tests/v2/p3/test_format_compat.py"],
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
