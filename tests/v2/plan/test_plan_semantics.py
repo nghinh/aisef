@@ -85,7 +85,8 @@ class ArchitectureBaseline(unittest.TestCase):
         self.assertEqual(pv.check_g_baseline(m), [])
         ab = m["architecture_baseline"]
         self.assertEqual([a["record"] for a in ab["amendments"]],
-                         ["closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json"])
+                         ["closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+                          "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json"])
         self.assertEqual(ab["original_rfc_normative_digest"],
                          "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f")
 

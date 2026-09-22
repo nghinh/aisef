@@ -23,12 +23,14 @@ from aisef2.arch.enums import (  # noqa: E402
 )
 from aisef2.errors import InvariantError  # noqa: E402
 from aisef2.probe.protocol import (  # noqa: E402
+    ProbeMetadata, ProbeRegistry, bound_result,
     ExecutionEnv, HarnessProbe, Observation, ObservationKind, Probe, ProbeRecord, RevisionRef, classify_failure,
     run_probe,
 )
 from aisef2.product.outcome import (  # noqa: E402
     Executed, IndeterminateReason, InvalidSpec, Unrunnable, contract_satisfaction,
 )
+from aisef2.product.contract import digest  # noqa: E402
 from aisef2.product.spec import ProductProofSpec  # noqa: E402
 
 S, R, I = BehaviorVerdict.SATISFIED, BehaviorVerdict.REFUTED, BehaviorVerdict.INDETERMINATE
@@ -60,8 +62,6 @@ class Fake(HarnessProbe):
     def harness_preconditions(self):
         return ("nothing",)
 
-    def observation_class(self, spec):
-        return "any"
 
     def observe(self, spec, at, env):
         self.calls += 1
@@ -78,11 +78,11 @@ class FileArtifactProbe(HarnessProbe):
     def harness_preconditions(self):
         return ("checkout: the revision's checkout is a readable directory",)
 
-    def observation_class(self, spec):
+    def asks(self, spec):
         return "exists" if dict(spec.probe_input["observable"]) == {"condition": "exists"} else None
 
     def observe(self, spec, at, env):
-        if self.observation_class(spec) is None:
+        if self.asks(spec) is None:
             return Observation(K.UNSUPPORTED, detail="only exists")
         if not os.path.isdir(at.root):
             return Observation(K.HARNESS_FAILED, detail="cannot inspect: no checkout")
@@ -93,6 +93,13 @@ class FileArtifactProbe(HarnessProbe):
 
 
 AT = RevisionRef(SHA, os.path.abspath("checkout"))
+
+
+def record(**over):
+    s = spec()
+    fields = dict(spec_id=s.id, semantic_hash=s.semantic_hash, probe_id=Fake.id, probe_digest=Fake.digest,
+                  revision=SHA, enforcement=Enforcement.PARTIAL, result=Executed(S))
+    return ProbeRecord.create(**{**fields, **over})
 ENV = ExecutionEnv(sys.executable, 5, Enforcement.PARTIAL)
 
 
@@ -120,6 +127,110 @@ class ObservationShape(unittest.TestCase):
             self.assertIs(Observation(K.SUBJECT_ABSENT, v).verdict, v)
         with self.assertRaisesRegex(InvariantError, "typed kind"):
             Observation("OBSERVED", S)
+
+
+class SubjectDeadline(unittest.TestCase):
+    """RFC §9.2 (ARCHITECTURE-EXCEPTION-V2-002): a subject that exceeds its window is observed, never a harness failure."""
+
+    def test_an_expired_window_carries_the_specs_verdict_and_has_no_default(self):
+        for v in (None, I):
+            with self.subTest(verdict=v), self.assertRaisesRegex(InvariantError, "there is no default$"):
+                Observation(K.SUBJECT_DEADLINE, v)
+        self.assertIs(Observation(K.SUBJECT_DEADLINE, S).verdict, S)
+
+    def test_TIME_5_a_subject_deadline_is_EXECUTED_with_whatever_verdict_the_spec_assigned(self):
+        for absence in (REQUIRES, DECIDABLE):
+            for v in (S, R):
+                with self.subTest(absence=absence, verdict=v):
+                    r = classify_failure(spec(absence=absence), Observation(K.SUBJECT_DEADLINE, v, "window expired"))
+                    self.assertEqual(r, Executed(v))
+                    self.assertIsNot(r.status, ProbeExecutionStatus.UNRUNNABLE)
+
+    def test_TIME_1_a_harness_timeout_is_UNRUNNABLE(self):
+        self.assertEqual(classify_failure(spec(), Observation(K.HARNESS_FAILED, detail="harness timeout")),
+                         Unrunnable("harness timeout"))
+
+
+class Binding(unittest.TestCase):
+    """PROBE-BIND-1/2: a decision reads a result only from a sealed record bound to its spec, revision and level."""
+
+    def test_PROBE_BIND_1_a_bare_result_is_never_read(self):
+        for bare in (Executed(S), Unrunnable("x"), InvalidSpec("y"), None, "EXECUTED"):
+            with self.subTest(bare=bare), self.assertRaisesRegex(InvariantError, "^a decision reads a ProbeRecord, "
+                                                                                 "never a bare ProbeResult$"):
+                bound_result(bare, spec=spec(), revision=SHA, enforcement=Enforcement.PARTIAL)
+
+    def test_a_record_releases_its_result_only_for_its_spec_revision_and_level(self):
+        rec, s = record(), spec()
+        self.assertEqual(bound_result(rec, spec=s, revision=SHA, enforcement=Enforcement.PARTIAL), Executed(S))
+        other = spec(locator="src/app/other.py")
+        with self.assertRaisesRegex(InvariantError, f"^the record answers {s.id}, not {other.id}$"):
+            bound_result(rec, spec=other, revision=SHA, enforcement=Enforcement.PARTIAL)
+        with self.assertRaisesRegex(InvariantError, f"^the record was measured at {SHA[:12]}, not {'f' * 12}$"):
+            bound_result(rec, spec=s, revision="f" * 40, enforcement=Enforcement.PARTIAL)
+
+    def test_PROBE_BIND_2_enforcement_changes_identity_and_blocks_reuse(self):
+        partial, full = record(enforcement=Enforcement.PARTIAL), record(enforcement=Enforcement.FULL)
+        self.assertNotEqual(partial.record_digest, full.record_digest)
+        self.assertNotEqual(partial.comparability, full.comparability)
+        with self.assertRaisesRegex(InvariantError, "^the record ran under PARTIAL, not FULL: not comparable"):
+            bound_result(partial, spec=spec(), revision=SHA, enforcement=Enforcement.FULL)
+        with self.assertRaisesRegex(InvariantError, "^the record ran under FULL, not PARTIAL: not comparable"):
+            bound_result(full, spec=spec(), revision=SHA, enforcement=Enforcement.PARTIAL)
+
+    def test_a_sealed_record_cannot_lose_or_swap_its_binding(self):
+        rec = record()
+        for field, value in (("enforcement", Enforcement.FULL), ("result", Executed(R)), ("revision", "f" * 40),
+                             ("probe_digest", "e" * 64), ("spec_id", "PPS-other")):
+            with self.subTest(field=field), self.assertRaisesRegex(InvariantError, "an edited record is a new record$"):
+                dataclasses.replace(rec, **{field: value})
+        self.assertRegex(rec.record_digest, "^[0-9a-f]{64}$")
+        self.assertEqual(record(), rec)
+        self.assertEqual(rec.comparability, record(revision="f" * 40, result=Executed(R)).comparability)
+        self.assertNotEqual(rec.comparability, record(probe_digest="e" * 64).comparability)
+        self.assertNotEqual(rec.comparability, record(semantic_hash="h" * 64).comparability)
+        self.assertNotEqual(rec.comparability, record(probe_id="probe.other").comparability)
+        # the identity is named, not positional: persisted evidence compares it across versions
+        self.assertEqual(rec.comparability, digest({"semantic_hash": rec.semantic_hash, "probe_id": rec.probe_id,
+                                                    "probe_digest": rec.probe_digest,
+                                                    "enforcement": rec.enforcement}))
+
+
+class Registry(unittest.TestCase):
+    """PROBE-META-1: observation classes come from harness metadata keyed by probe identity and digest."""
+
+    def test_the_class_is_the_registered_metadatas_for_that_exact_digest(self):
+        reg = ProbeRegistry([ProbeMetadata("probe.fake", "f" * 64, lambda s: "exists")])
+        self.assertEqual(reg.observation_class("probe.fake", "f" * 64, spec()), "exists")
+        self.assertIsNone(reg.observation_class("probe.fake", "e" * 64, spec()))
+        self.assertIsNone(reg.observation_class("probe.other", "f" * 64, spec()))
+        self.assertIsNone(ProbeRegistry().observation_class("probe.fake", "f" * 64, spec()))
+
+    def test_a_registry_holds_typed_metadata_once_per_digest(self):
+        m = ProbeMetadata("probe.fake", "f" * 64, lambda s: "exists")
+        with self.assertRaisesRegex(InvariantError, "registered twice$"):
+            ProbeRegistry([m, m])
+        with self.assertRaisesRegex(InvariantError, "^the registry holds ProbeMetadata$"):
+            ProbeRegistry([("probe.fake", "f" * 64)])
+
+    def test_PROBE_META_1_a_protocol_only_probe_runs_without_the_base_class(self):
+        class Bare:  # satisfies the frozen Probe protocol; inherits nothing from the harness
+            id, digest = "probe.bare", "b" * 64
+
+            def enforcement(self):
+                return Enforcement.PARTIAL
+
+            def harness_preconditions(self):
+                return ()
+
+            def evaluate(self, spec, at, env):
+                return Executed(R)
+        probe = Bare()
+        self.assertIsInstance(probe, Probe)
+        self.assertNotIsInstance(probe, HarnessProbe)
+        rec = run_probe(probe, spec(probe=("probe.bare", "b" * 64)), AT, ENV)
+        self.assertEqual(bound_result(rec, spec=spec(probe=("probe.bare", "b" * 64)), revision=SHA,
+                                      enforcement=Enforcement.PARTIAL), Executed(R))
 
 
 class ClassifyFailure(unittest.TestCase):
@@ -229,9 +340,9 @@ class RunProbe(unittest.TestCase):
 
     def test_a_record_holds_a_typed_result_and_level(self):
         with self.assertRaisesRegex(InvariantError, "typed ProbeResult"):
-            ProbeRecord("s", "h", "p", "d", SHA, Enforcement.FULL, S)
+            record(result=S)
         with self.assertRaisesRegex(InvariantError, "enforcement level"):
-            ProbeRecord("s", "h", "p", "d", SHA, "FULL", Executed(S))
+            record(enforcement="FULL")
 
 
 class ApiShape(unittest.TestCase):

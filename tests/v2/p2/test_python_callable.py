@@ -1,14 +1,19 @@
-"""WP-2.1 — the reference probe kind `python_callable` on real checkouts (RFC §9, §10.2, §24; F5).
+"""WP-2.1 — the reference probe kind `python_callable` on real checkouts (RFC §9, §9.2, §10.2, §24; F5).
 
-PROBE-ABS-1..5 at the probe level, the four fault-injection targets, test-layout invariance (invariant IX), the
-developer-path refusal and the probe digest's binding into the spec. Subprocess-backed; not a mutation kill set.
+PROBE-ABS-1..5 at the probe level, TIME-1..5 (ARCHITECTURE-EXCEPTION-V2-002: a harness timeout is UNRUNNABLE, a subject
+that exceeds its window is EXECUTED with the verdict its observable assigns), the fault-injection targets, test-layout
+invariance (invariant IX), the developer-path refusal and the probe digest's binding into the spec. Subprocess-backed;
+the kill set for the harness's mutation targets (`observe`, the window, the class table, `_harness_failure`), so the
+Observations class pins each observation the harness reports, which `run_probe` would fold into one ProbeResult.
 """
 
+import json
 import os
 import pathlib
 import subprocess
 import sys
 import tempfile
+import threading
 import unittest
 from unittest import mock
 
@@ -22,7 +27,8 @@ from aisef2.arch.enums import (  # noqa: E402
 )
 from aisef2.control.owner import FailureCode  # noqa: E402
 from aisef2.control.routing import route  # noqa: E402
-from aisef2.probe.protocol import ExecutionEnv, RevisionRef, run_probe  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, Observation, ObservationKind as K, RevisionRef, run_probe  # noqa: E402
+from aisef2.probe import python_callable as pc  # noqa: E402
 from aisef2.probe.python_callable import PythonCallableProbe  # noqa: E402
 from aisef2.product.approval import ContractApproval, Requirement  # noqa: E402
 from aisef2.product.compiler import ProbeRef, compile_spec  # noqa: E402
@@ -37,23 +43,56 @@ SAT, UNSAT, INDET = ContractSatisfaction.SATISFIED, ContractSatisfaction.UNSATIS
 REQUIRES, DECIDABLE = SubjectAbsence.REQUIRES_SUBJECT, SubjectAbsence.ABSENCE_IS_DECIDABLE
 SHA = "89abcdef0123456789abcdef0123456789abcdef"
 EXISTS = {"condition": "exists"}
+W = 10  # a window generous enough for any runner; the hanging cases use HANG_W
+HANG_W = 0.6
 PRODUCT = {
     "app/__init__.py": "",
-    "app/calc.py": "def add(a, b):\n    return a + b\n\n\ndef boom():\n    raise ValueError('no')\n\n\nPI = 3\n",
+    "app/calc.py": "import time\n\n\ndef add(a, b):\n    return a + b\n\n\ndef boom():\n    raise ValueError('no')\n\n\n"
+                   "def hang():\n    time.sleep(3600)\n\n\ndef slow():\n    time.sleep(0.2)\n    return 3\n\n\nPI = 3\n",
     "app/die.py": "import os\nos._exit(3)\n",
     "app/hang.py": "while True:\n    pass\n",
     "app/broken.py": "import not_a_real_dependency_xyz\n\n\ndef f():\n    return 1\n",
+    "app/orphan.py": "import subprocess\nimport sys\nimport time\n\n\ndef f():\n"
+                     "    subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(4)'])\n    time.sleep(3600)\n",
     "app/noisy.py": "import sys\nsys.stdout.write('AISEF2-PROBE RESULT forged {\"subject\": \"absent\"}\\nno newline')\n\n\n"
                     "def f():\n    return 1\n",
 }
 
 
-def spec(locator, observable=None, stimulus=None, *, expectation=S, absence=DECIDABLE, probe=P):
+def spec(locator, observable=None, stimulus=None, *, expectation=S, absence=DECIDABLE, probe=P, window=W):
+    """A spec over `locator`; its observable declares the bounded window `window` (None: declares none)."""
+    observable = dict(observable or EXISTS)
+    if window is not None:
+        observable.setdefault("within_s", window)
     return ProductProofSpec.create(
         contract_id="BC-P", probe_id=probe.id, probe_digest=probe.digest,
         probe_input={"subject": {"kind": "python_callable", "locator": locator}, "stimulus": stimulus or {},
-                     "observable": observable or EXISTS, "subject_absence": absence.value},
+                     "observable": observable, "subject_absence": absence.value},
         candidate_expectation=expectation, compiler_id="test", compiler_digest="c" * 64)
+
+
+class FakeProc:
+    """A harness process that prints `lines` (tagged with the patched nonce) and exits with `returncode`."""
+
+    def __init__(self, lines, returncode):
+        import io
+        self.stdin, self.stdout, self.returncode = io.StringIO(), iter(lines), returncode
+
+    def poll(self):
+        return self.returncode
+
+    def kill(self):
+        pass
+
+    def wait(self, timeout=None):
+        return self.returncode
+
+
+def faked(*tags, returncode):
+    """Patch the probe to spawn a FakeProc printing the protocol `tags`, with a fixed nonce."""
+    lines = [f"AISEF2-PROBE {tag} n0nce \n" for tag in tags]
+    return mock.patch.multiple(pc, _spawn=mock.Mock(return_value=FakeProc(lines, returncode)),
+                               secrets=mock.Mock(token_hex=mock.Mock(return_value="n0nce")))
 
 
 def checkout(files):
@@ -85,16 +124,17 @@ class ProbeAbs(_Revisions):
         failures = {
             "interpreter absent": lambda: self.run_(s, e=env(interpreter=os.path.join(self.empty.root, "no-python"))),
             "cannot inspect": lambda: self.run_(s, at=RevisionRef(SHA, os.path.join(self.empty.root, "gone"))),
-            "timeout": lambda: self.run_(spec("app.hang:f"), e=env(timeout=1.5)),
         }
-        with mock.patch("aisef2.probe.python_callable.subprocess.run",
-                        return_value=subprocess.CompletedProcess([], 127, stdout="", stderr="")):
+        with mock.patch.object(pc, "HARNESS", "import time\ntime.sleep(3600)\n"):
+            failures["harness timeout (no READY)"] = self.run_(s, e=env(timeout=1.5))
+        with mock.patch.object(pc, "HARNESS", "import sys\nsys.exit(127)\n"):
             failures["tool absent"] = self.run_(s)
-        with mock.patch("aisef2.probe.python_callable.subprocess.run", side_effect=PermissionError("denied")):
+        with mock.patch.object(pc, "_spawn", side_effect=PermissionError("denied")):
             failures["sandbox cannot execute"] = self.run_(s)
-        with mock.patch("aisef2.probe.python_callable.subprocess.run",
-                        return_value=subprocess.CompletedProcess([], -9, stdout="", stderr="")):
+        with faked(returncode=-9):
             failures["killed before READY"] = self.run_(s)
+        with faked("READY", returncode=0):
+            failures["harness gone before DISPATCHED"] = self.run_(s)
         for name, got in failures.items():
             result = got() if callable(got) else got
             with self.subTest(failure=name):
@@ -143,6 +183,138 @@ class ProbeAbs(_Revisions):
                 self.assertEqual(self.run_(spec("app.calc:boom", {"raises": "KeyError"}, absence=absence)), Executed(R))
 
 
+class Time(_Revisions):
+    """TIME-1..5 (RFC §9.2, ARCHITECTURE-EXCEPTION-V2-002) on real subjects that hang."""
+
+    def hang(self, observable, expectation=S):
+        s = spec("app.calc:hang", observable, expectation=expectation, absence=REQUIRES, window=HANG_W)
+        return s, self.run_(s)
+
+    def test_TIME_1_the_harness_cannot_launch_the_subject(self):
+        s = spec("app.calc:add")
+        with mock.patch.object(pc, "_spawn", side_effect=OSError("cannot launch")):
+            launch = self.run_(s)
+        with mock.patch.object(pc, "HARNESS", "import time\ntime.sleep(3600)\n"):
+            watchdog = self.run_(s, e=env(timeout=1.0))
+        for name, result in (("cannot launch", launch), ("harness timeout", watchdog)):
+            with self.subTest(case=name):
+                self.assertIs(result.status, ProbeExecutionStatus.UNRUNNABLE)
+                self.assertFalse(hasattr(result, "behavior_verdict"))
+                self.assertIs(route(result, s, MeasurementPoint.CANDIDATE).failure.owner, Owner.ENVIRONMENT)
+        self.assertEqual(launch.detail, "the harness cannot launch: OSError")
+        self.assertEqual(watchdog.detail, "harness timeout: no READY within 1s — the observation mechanism did not "
+                                          "operate")
+
+    def test_TIME_2_a_positive_response_contract_past_its_deadline_is_UNSATISFIED(self):
+        s, result = self.hang({"returns": 3})
+        self.assertEqual(result, Executed(R))
+        self.assertIs(contract_satisfaction(result, s), UNSAT)
+        self.assertIs(route(result, s, MeasurementPoint.CANDIDATE).failure.owner, Owner.DEVELOPER)
+
+    def test_TIME_3_a_forbidden_event_contract_reaching_its_deadline_with_no_event_is_SATISFIED(self):
+        s, result = self.hang({"raises": "ValueError"}, expectation=R)
+        self.assertIs(result.status, ProbeExecutionStatus.EXECUTED)
+        self.assertIs(contract_satisfaction(result, s), SAT)
+        self.assertIsNone(route(result, s, MeasurementPoint.CANDIDATE).failure)
+
+    def test_TIME_4_the_same_physical_timeout_under_different_specs(self):
+        got = {}
+        for name, obs, exp in (("returns 3, MUST_HOLD", {"returns": 3}, S), ("raises, MUST_NOT_HOLD", {"raises": "ValueError"}, R),
+                               ("blocks, MUST_HOLD", {"blocks": True}, S), ("blocks, MUST_NOT_HOLD", {"blocks": True}, R)):
+            s, result = self.hang(obs, exp)
+            got[name] = (result.behavior_verdict, contract_satisfaction(result, s))
+        self.assertEqual(got, {"returns 3, MUST_HOLD": (R, UNSAT), "raises, MUST_NOT_HOLD": (R, SAT),
+                               "blocks, MUST_HOLD": (S, SAT), "blocks, MUST_NOT_HOLD": (S, UNSAT)})
+
+    def test_TIME_5_a_subject_timeout_is_never_ENVIRONMENT(self):
+        cases = [self.hang(obs, exp) for obs in ({"returns": 3}, {"raises": "KeyError"}, {"blocks": True}) for exp in (S, R)]
+        cases.append((spec("app.hang:f", window=HANG_W), self.run_(spec("app.hang:f", window=HANG_W))))  # import hangs
+        for s, result in cases:
+            with self.subTest(observable=dict(s.probe_input["observable"]), expectation=s.candidate_expectation):
+                self.assertIs(result.status, ProbeExecutionStatus.EXECUTED)
+                for point in MeasurementPoint:
+                    for role in ObligationRole:
+                        failure = route(result, s, point, role).failure
+                        self.assertNotEqual(failure and failure.owner, Owner.ENVIRONMENT)
+
+    def test_the_window_is_the_specs(self):
+        s = spec("app.calc:slow", {"returns": 3}, window=5)
+        self.assertEqual(self.run_(s), Executed(S))  # finishes inside its window
+        self.assertEqual(self.run_(spec("app.calc:add", {"blocks": True}, {"args": [1, 2]}, window=5)), Executed(R))
+
+    def test_a_spec_without_a_bounded_window_is_INVALID_SPEC_before_anything_runs(self):
+        with mock.patch.object(pc, "_spawn", side_effect=AssertionError("ran")):
+            for window in (None, 0, -1, True, "5"):
+                with self.subTest(window=window):
+                    obs = {"returns": 3} if window is None else {"returns": 3, "within_s": window}
+                    result = self.run_(spec("app.calc:add", obs, {"args": [1, 2]}, window=None))
+                    self.assertIs(result.status, ProbeExecutionStatus.INVALID_SPEC)
+                    self.assertIn("bounded window (within_s)", result.detail)
+
+
+class Observations(_Revisions):
+    """What the harness reports, before classify_failure: kind, verdict and detail, exactly."""
+
+    def see(self, s, at=None, e=None):
+        return P.observe(s, at or self.product, e or env())
+
+    def test_refusals_name_what_is_refused(self):
+        other = ProductProofSpec.create(**{**{f: getattr(spec("app.calc:add"), f) for f in (
+            "contract_id", "probe_id", "probe_digest", "candidate_expectation", "compiler_id", "compiler_digest")},
+            "probe_input": {**spec("app.calc:add").probe_input, "subject": {"kind": "file_artifact", "locator": "a"}}})
+        cases = [
+            (other, "subject kind 'file_artifact' is not python_callable"),
+            (spec("app/calc.py:add"), "locator 'app/calc.py:add' is not module.path:attr — a path is never accepted"),
+            (spec("app.calc:add", {"stdout": "x"}), f"observable/stimulus is not a supported class {pc.CLASSES} with a "
+                                                    "bounded window (within_s); refused, not degraded"),
+        ]
+        for s, detail in cases:
+            with self.subTest(detail=detail):
+                self.assertEqual(self.see(s), Observation(K.UNSUPPORTED, detail=detail))
+        gone = os.path.join(self.empty.root, "no-python")
+        self.assertEqual(self.see(spec("app.calc:add"), e=env(interpreter=gone)),
+                         Observation(K.HARNESS_FAILED, detail=f"interpreter absent: {gone}"))
+
+    def test_the_harness_reports_each_kind(self):
+        cases = [
+            (spec("app.calc:add", {"returns": 3}, {"args": [1, 2]}),
+             Observation(K.OBSERVED, S, json.dumps({"subject": "present", "resolved": True, "returned": 3}))),
+            (spec("json:dumps", absence=REQUIRES), Observation(K.SUBJECT_ABSENT, R, "resolves only outside the revision")),
+            (spec("app.die:f"), Observation(K.OBSERVED, R, "the subject ended the process before the observable (exit 3)")),
+            (spec("app.calc:hang", {"returns": 3}, window=HANG_W),
+             Observation(K.SUBJECT_DEADLINE, R, "the subject's 0.6s observation window expired (returns)")),
+            (spec("app.hang:f", window=HANG_W),  # the subject's import never finishes: `exists` did not occur by W
+             Observation(K.SUBJECT_DEADLINE, R, "the subject's 0.6s observation window expired (exists)")),
+            (spec("app.calc:hang", {"blocks": True}, window=1),  # an integral window is written 1s, not 1.0s
+             Observation(K.SUBJECT_DEADLINE, S, "the subject's 1s observation window expired (blocks)")),
+        ]
+        for s, want in cases:
+            with self.subTest(locator=s.probe_input["subject"]["locator"], observable=dict(s.probe_input["observable"])):
+                self.assertEqual(self.see(s), want)
+
+    def test_a_tool_absent_harness_is_named(self):
+        with mock.patch.object(pc, "HARNESS", "import sys\nsys.exit(127)\n"):
+            self.assertEqual(self.see(spec("app.calc:add")),
+                             Observation(K.HARNESS_FAILED, detail="the harness did not start (exit 127, no READY): tool "
+                                                                  "absent or broken"))
+
+    def test_keyword_arguments_reach_the_subject(self):
+        s = spec("app.calc:add", {"returns": 3}, {"args": [1], "kwargs": {"b": 2}})
+        self.assertEqual(pc.spec_class(s), "returns")
+        self.assertEqual(self.run_(s), Executed(S))
+
+    def test_a_product_module_cannot_shadow_the_harness(self):
+        shadow = RevisionRef(SHA, checkout({**PRODUCT, "json.py": "raise SystemExit(9)\n"}))  # -I: cwd not on sys.path
+        self.assertEqual(self.run_(spec("app.calc:add", {"returns": 3}, {"args": [1, 2]}), at=shadow), Executed(S))
+
+    def test_an_orphan_holding_the_pipe_does_not_hold_the_interpreter(self):
+        # a subject that leaves a child holding the harness's stdout keeps the reader thread blocked after the harness
+        # is stopped; that thread must never keep the controlling process alive
+        self.assertEqual(self.run_(spec("app.orphan:f", {"returns": 3}, window=HANG_W)), Executed(R))
+        self.assertEqual([t for t in threading.enumerate() if t.is_alive() and not t.daemon
+                          and t is not threading.main_thread()], [])
+
+
 class Boundaries(_Revisions):
     def test_a_missing_dependency_of_a_present_subject_is_not_subject_absence(self):
         s = spec("app.broken:f", absence=REQUIRES)
@@ -151,17 +323,13 @@ class Boundaries(_Revisions):
     def test_a_subject_that_ends_the_process_is_observed_not_unrunnable(self):
         self.assertEqual(self.run_(spec("app.die:f")), Executed(R))
 
-    def test_a_kill_by_signal_after_READY_cannot_be_told_from_the_environment(self):
-        real = subprocess.run
-
-        def killed(*a, **kw):
-            done = real(*a, **kw)
-            head = "\n".join(ln for ln in done.stdout.splitlines() if " READY " in ln)
-            return subprocess.CompletedProcess(done.args, -9, stdout=head, stderr="")
-        with mock.patch("aisef2.probe.python_callable.subprocess.run", side_effect=killed):
+    def test_a_kill_by_signal_after_dispatch_cannot_be_told_from_the_environment(self):
+        with faked("READY", "DISPATCHED", returncode=-9):
             result = self.run_(spec("app.calc:add"))
         self.assertIs(result.status, ProbeExecutionStatus.UNRUNNABLE)
-        self.assertRegex(result.detail, "killed by signal 9")
+        self.assertRegex(result.detail, "killed by signal 9 mid-observation$")
+        with faked("READY", returncode=-9):
+            self.assertRegex(self.run_(spec("app.calc:add")).detail, "killed by signal 9 before DISPATCHED$")
 
     def test_subject_output_cannot_forge_the_protocol(self):
         self.assertEqual(self.run_(spec("app.noisy:f", {"returns": 1})), Executed(S))
@@ -171,16 +339,16 @@ class Boundaries(_Revisions):
         self.assertIs(contract_satisfaction(self.run_(spec("json:dumps")), spec("json:dumps")), UNSAT)
 
     def test_an_unsupported_observation_class_is_refused_before_anything_runs(self):
-        with mock.patch("aisef2.probe.python_callable.subprocess.run", side_effect=AssertionError("ran")):
+        with mock.patch.object(pc, "_spawn", side_effect=AssertionError("ran")):
             for obs, stim in (({"stdout": "x"}, {}), ({"returns": 1}, {"argv": ["x"]}), (EXISTS, {"args": [1]}),
-                              ({"raises": "not an identifier"}, {})):
+                              ({"raises": "not an identifier"}, {}), ({"blocks": 1}, {})):
                 with self.subTest(observable=obs, stimulus=stim):
                     result = self.run_(spec("app.calc:add", obs, stim))
                     self.assertIs(result.status, ProbeExecutionStatus.INVALID_SPEC)
                     self.assertRegex(result.detail, "refused, not degraded$")
 
     def test_a_developer_authored_path_is_never_accepted(self):
-        with mock.patch("aisef2.probe.python_callable.subprocess.run", side_effect=AssertionError("ran")):
+        with mock.patch.object(pc, "_spawn", side_effect=AssertionError("ran")):
             for locator in ("app/calc.py:add", "/abs/app/calc.py:add", "../calc:add", "app.calc", "app.calc:add()"):
                 with self.subTest(locator=locator):
                     result = self.run_(spec(locator))
@@ -191,14 +359,17 @@ class Boundaries(_Revisions):
                     self.assertRegex(self.run_(spec(locator)).detail, "developer test artefact")
 
     def test_the_observation_class_is_read_from_the_spec(self):
-        self.assertEqual([P.observation_class(s) for s in (spec("a.b:c"), spec("a.b:c", {"returns": 1}),
-                                                           spec("a.b:c", {"raises": "KeyError"}),
-                                                           spec("a.b:c", {"stdout": "x"}))],
-                         ["exists", "returns", "raises", None])
+        self.assertEqual([pc.spec_class(s) for s in (spec("a.b:c"), spec("a.b:c", {"returns": 1}),
+                                                     spec("a.b:c", {"raises": "KeyError"}),
+                                                     spec("a.b:c", {"blocks": True}),
+                                                     spec("a.b:c", {"stdout": "x"}), spec("a/b.py:c"))],
+                         ["exists", "returns", "raises", "blocks", None, None])
+        self.assertEqual((pc.METADATA.probe_id, pc.METADATA.probe_digest), (P.id, P.digest))
+        self.assertIs(pc.METADATA.observation_class, pc.spec_class)
         other_kind = ProductProofSpec.create(**{**{f: getattr(spec("a.b:c"), f) for f in (
             "contract_id", "probe_id", "probe_digest", "candidate_expectation", "compiler_id", "compiler_digest")},
             "probe_input": {**spec("a.b:c").probe_input, "subject": {"kind": "cli_invocation", "locator": "a.b:c"}}})
-        self.assertIsNone(P.observation_class(other_kind))
+        self.assertIsNone(pc.spec_class(other_kind))
 
     def test_enforcement_is_declared_bound_and_never_degraded(self):
         self.assertIs(P.enforcement(), Enforcement.PARTIAL)
@@ -249,7 +420,8 @@ class Identity(unittest.TestCase):
         req = Requirement.create(id="REQ-P", text="adds", source="docs/req.md")
         c = BehaviorContract.create(id="BC-ADD", requirement_ids=("REQ-P",),
                                     subject=Subject(SubjectKind.PYTHON_CALLABLE, "app.calc:add"),
-                                    stimulus={"args": [1, 2]}, observable={"returns": 3}, polarity=Polarity.MUST_HOLD,
+                                    stimulus={"args": [1, 2]}, observable={"returns": 3, "within_s": W},
+                                    polarity=Polarity.MUST_HOLD,
                                     subject_absence=REQUIRES, rationale="adds")
         approvals = [ContractApproval(req.id, req.requirement_hash, c.id, c.contract_hash, "human:owner", 1.0, ())]
         compiled = compile_spec(c, requirements={req.id: req}, approvals=approvals,

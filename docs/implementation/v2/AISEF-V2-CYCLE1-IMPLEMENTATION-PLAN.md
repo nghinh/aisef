@@ -7,8 +7,8 @@
 
 **Architecture baseline — frozen.**
 [`docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md`](../../architecture/AISEF-V2-ARCHITECTURE-RFC.md), approved at commit `2fe672c`. Approval record
-[`closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json`](../../../closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json), content-addressed `c23191bd71bc299d…`, amended by [`AISEF-V2-RFC-AMENDMENT-V2-001.json`](../../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json) (`eaeb3130e2eefe9a…`, changes F2).
-Current RFC normative digest `564057137d0f5cd3…`; freeze-table digest `6ea7e312e15acc02…` (originally `8f0d522d9db0322c…` / `c4d9895f921b707c…`). **F1–F11 frozen.**
+[`closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json`](../../../closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json), content-addressed `c23191bd71bc299d…`, amended by [`AISEF-V2-RFC-AMENDMENT-V2-001.json`](../../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json) (`eaeb3130e2eefe9a…`, changes F2); [`AISEF-V2-RFC-AMENDMENT-V2-002.json`](../../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json) (`eb1b9f1108fcf68a…`, changes F5).
+Current RFC normative digest `1133dd2de2fd9f8e…`; freeze-table digest `529f5986520e82b7…` (originally `8f0d522d9db0322c…` / `c4d9895f921b707c…`). **F1–F11 frozen.**
 
 <!-- GENERATED:architecture-baseline END -->
 

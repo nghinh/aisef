@@ -5,7 +5,8 @@
  },
  "stimulus": {},
  "observable": {
-  "condition": "exists"
+  "condition": "exists",
+  "within_s": 5
  },
  "subject_absence": "ABSENCE_IS_DECIDABLE"
 }

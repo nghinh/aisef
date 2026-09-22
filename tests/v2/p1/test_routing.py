@@ -43,6 +43,7 @@ EXPECTED = {  # code -> (owner, retryability): the taxonomy, pinned
     FailureCode.CONTRACT_UNSATISFIED: (Owner.DEVELOPER, RT),
     FailureCode.SUBJECT_ABSENT_AT_CANDIDATE: (Owner.DEVELOPER, RT),
     FailureCode.PRECONDITION_BROKEN: (Owner.PLAN, NR),
+    FailureCode.PLAN_CONTRADICTION: (Owner.PLAN, NR),  # P2 owner review: owner PLAN, never retryable, no budget
     FailureCode.POST_MERGE_REGRESSION: (Owner.INTEGRATION, NR),
     FailureCode.POST_MERGE_SUBJECT_LOST: (Owner.INTEGRATION, NR),
     FailureCode.MISSING_CREDENTIAL: (Owner.ENVIRONMENT, BP),
@@ -69,6 +70,7 @@ class Taxonomy(unittest.TestCase):
 
     def test_every_code_has_exactly_its_pinned_owner_and_retryability(self):
         self.assertEqual(set(TAXONOMY), set(FailureCode))
+        self.assertEqual(set(EXPECTED), set(FailureCode))
         for code, (own, retry) in EXPECTED.items():
             with self.subTest(code=code.value):
                 c = classify(code)

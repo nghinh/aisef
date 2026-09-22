@@ -26,7 +26,8 @@ from aisef2.plan.obligation import (  # noqa: E402
     EXPECTED_AT_PARENT, NOT_PREREGISTERED, Plan, PlanError, PlanObligation, PlanQualityPolicy,
 )
 from aisef2.probe.calibration import ProbeCapabilityCalibration  # noqa: E402
-from aisef2.probe.python_callable import PythonCallableProbe  # noqa: E402
+from aisef2.probe.protocol import HarnessProbe, Probe, ProbeMetadata, ProbeRegistry  # noqa: E402
+from aisef2.probe.python_callable import METADATA, PythonCallableProbe, spec_class  # noqa: E402
 from aisef2.product.approval import ContractApproval, Requirement  # noqa: E402
 from aisef2.product.compiler import ProbeRef, compile_spec  # noqa: E402
 from aisef2.product.contract import BehaviorContract, Subject  # noqa: E402
@@ -38,6 +39,7 @@ _s.loader.exec_module(ks)
 P = PythonCallableProbe()
 BASELINE = "0123456789abcdef0123456789abcdef01234567"
 ENGINE = sa.StaticPlanAdmissionEngine()
+REGISTRY = ProbeRegistry([METADATA])
 
 
 def world(*, extra_requirement=False, drop_approval_for=None, catalogue=None, calibrated=("exists", "returns")):
@@ -48,11 +50,11 @@ def world(*, extra_requirement=False, drop_approval_for=None, catalogue=None, ca
     contracts = {c.id: c for c in (
         BehaviorContract.create(id="BC-ADD", requirement_ids=("REQ-1",),
                                 subject=Subject(SubjectKind.PYTHON_CALLABLE, "app.calc:add"), stimulus={"args": [1, 2]},
-                                observable={"returns": 3}, polarity=Polarity.MUST_HOLD,
+                                observable={"returns": 3, "within_s": 5}, polarity=Polarity.MUST_HOLD,
                                 subject_absence=SubjectAbsence.REQUIRES_SUBJECT, rationale="adds"),
         BehaviorContract.create(id="BC-NO-TEL", requirement_ids=("REQ-2",),
                                 subject=Subject(SubjectKind.PYTHON_CALLABLE, "app.telemetry:send"), stimulus={},
-                                observable={"condition": "exists"}, polarity=Polarity.MUST_NOT_HOLD,
+                                observable={"condition": "exists", "within_s": 5}, polarity=Polarity.MUST_NOT_HOLD,
                                 subject_absence=SubjectAbsence.ABSENCE_IS_DECIDABLE, rationale="forbidden"))}
     approvals = tuple(ContractApproval(rid, reqs[rid].requirement_hash, c.id, c.contract_hash, "human:owner", 1.0, ())
                       for c in contracts.values() for rid in c.requirement_ids if c.id != drop_approval_for)
@@ -64,7 +66,8 @@ def world(*, extra_requirement=False, drop_approval_for=None, catalogue=None, ca
         s = compile_spec(c, requirements=reqs, approvals=all_approvals, probes=refs)
         specs[s.id] = s
     cals = tuple(ProbeCapabilityCalibration(P.id, P.digest, cls, "fx/pos", "fx/neg", 1.0) for cls in calibrated)
-    inputs = sa.AdmissionInputs(reqs, contracts, approvals, specs, catalogue or {SubjectKind.PYTHON_CALLABLE: P}, cals)
+    inputs = sa.AdmissionInputs(reqs, contracts, approvals, specs, catalogue or {SubjectKind.PYTHON_CALLABLE: P}, cals,
+                                REGISTRY)
     by_contract = {s.contract_id: s.id for s in specs.values()}
     return inputs, by_contract
 
@@ -180,6 +183,13 @@ class Admission(unittest.TestCase):
         self.assertIn(f"story S1 asserts incompatible parent expectations ['SATISFIED_AT_PARENT', "
                       f"'UNSATISFIED_AT_PARENT'] for spec {SPEC['BC-ADD']}",
                       failing(ENGINE.admit(plan(same_story), INPUTS))["contradictions"])
+        conflicts = (ob("C1", "BC-ADD", "S2", Role.INTRODUCE), ob("C2", "BC-ADD", "S2", Role.PRESERVE),
+                     ob("C3", "BC-NO-TEL", "S1", Role.INTRODUCE), ob("C4", "BC-NO-TEL", "S1", Role.PRESERVE))
+        self.assertEqual([p for p in failing(ENGINE.admit(plan(conflicts), INPUTS))["contradictions"]
+                          if "incompatible" in p],
+                         [f"story {st} asserts incompatible parent expectations ['SATISFIED_AT_PARENT', "
+                          f"'UNSATISFIED_AT_PARENT'] for spec {SPEC[c]}" for st, c in (("S1", "BC-NO-TEL"),
+                                                                                       ("S2", "BC-ADD"))])
         unordered = GOOD[:2] + (ob("C3", "BC-ADD", "S2", Role.PRESERVE), ob("C4", "BC-NO-TEL", "S2", Role.INTRODUCE))
         self.assertEqual(failing(ENGINE.admit(plan(unordered), INPUTS))["contradictions"],
                          [f"story S2 PRESERVEs spec {SPEC['BC-ADD']} without being ordered after story S1, which "
@@ -230,12 +240,23 @@ class Admission(unittest.TestCase):
             dataclasses.replace(c, probe_digest="e" * 64) for c in INPUTS.calibrations))
         self.assertEqual(len(failing(ENGINE.admit(plan(), wrong_digest))["probe_calibration"]), 2)
 
-        class Blind(PythonCallableProbe):
-            def observation_class(self, spec):
-                return None
-        blind = dataclasses.replace(INPUTS, catalogue={SubjectKind.PYTHON_CALLABLE: Blind()})
+        blind = dataclasses.replace(INPUTS, registry=ProbeRegistry([ProbeMetadata(P.id, P.digest, lambda spec: None)]))
         self.assertIn(f"spec {SPEC['BC-ADD']}: {P.id} does not support the observation it asks for",
                       failing(ENGINE.admit(plan(), blind))["probe_calibration"])
+        unregistered = dataclasses.replace(INPUTS, registry=ProbeRegistry())
+        self.assertEqual(len(failing(ENGINE.admit(plan(), unregistered))["probe_calibration"]), 2)
+
+    def test_PROBE_META_1_a_protocol_only_probe_is_admitted(self):
+        class Bare:
+            """The frozen Probe protocol only: no harness base class, no class-reporting method."""
+            id, digest = P.id, P.digest
+            enforcement, harness_preconditions, evaluate = P.enforcement, P.harness_preconditions, P.evaluate
+        self.assertIsInstance(Bare(), Probe)
+        self.assertNotIsInstance(Bare(), HarnessProbe)
+        self.assertFalse(hasattr(Bare(), "observation_class"))
+        bare = dataclasses.replace(INPUTS, catalogue={SubjectKind.PYTHON_CALLABLE: Bare()})
+        self.assertTrue(ENGINE.admit(plan(), bare).admitted)
+        self.assertEqual(spec_class(INPUTS.specs[SPEC["BC-ADD"]]), "returns")
 
     def test_a_plan_that_is_not_admitted_cannot_freeze(self):
         inputs, _ = world(extra_requirement=True)
@@ -323,7 +344,7 @@ class StaticOnly(unittest.TestCase):
     def test_the_engine_never_invents_a_parent_sha(self):
         self.assertEqual(list(inspect.signature(ENGINE.admit).parameters), ["plan", "inputs"])
         self.assertEqual([f.name for f in dataclasses.fields(sa.AdmissionInputs)],
-                         ["requirements", "contracts", "approvals", "specs", "catalogue", "calibrations"])
+                         ["requirements", "contracts", "approvals", "specs", "catalogue", "calibrations", "registry"])
         text = repr(ENGINE.admit(plan(), INPUTS))
         self.assertEqual(set(re.findall(r"\b[0-9a-f]{40}\b", text)) - {BASELINE}, set())
 

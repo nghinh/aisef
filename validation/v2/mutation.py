@@ -63,11 +63,25 @@ P1_TARGETS: dict[str, list[str]] = {
     "aisef2/control/routing.py::route": ["tests/v2/p1/test_routing.py"],
 }
 _PROTOCOL_TESTS = ["tests/v2/p2/test_probe_protocol.py"]
+_HARNESS_TESTS = ["tests/v2/p2/test_python_callable.py"]
 _ADMISSION_TESTS = ["tests/v2/p2/test_static_admission.py"]
 P2_TARGETS: dict[str, list[str]] = {
     # WP-2.1: the only mapping from an observation to a ProbeResult, and the entry point that binds enforcement
     "aisef2/probe/protocol.py::classify_failure": _PROTOCOL_TESTS,
     "aisef2/probe/protocol.py::run_probe": _PROTOCOL_TESTS,
+    # P2 correction (V2-002): no default verdict for an expired window; the sealed record and the only read of its
+    # result (PROBE-BIND-1/2); the class a spec asks for is harness metadata (PROBE-META-1)
+    "aisef2/probe/protocol.py::Observation.__post_init__": _PROTOCOL_TESTS,
+    "aisef2/probe/protocol.py::ProbeRecord.__post_init__": _PROTOCOL_TESTS,
+    "aisef2/probe/protocol.py::comparability": _PROTOCOL_TESTS,
+    "aisef2/probe/protocol.py::bound_result": _PROTOCOL_TESTS,
+    "aisef2/probe/protocol.py::ProbeRegistry.observation_class": _PROTOCOL_TESTS,
+    # the reference harness: the watchdog/window split (TIME-1..5) and the per-class meaning of an expired window
+    "aisef2/probe/python_callable.py::observe": _HARNESS_TESTS,
+    "aisef2/probe/python_callable.py::window_of": _HARNESS_TESTS,
+    "aisef2/probe/python_callable.py::observation_class": _HARNESS_TESTS,
+    "aisef2/probe/python_callable.py::ON_DEADLINE": _HARNESS_TESTS,
+    "aisef2/probe/python_callable.py::_harness_failure": _HARNESS_TESTS,
     # WP-2.2: contrast to the candidate expectation, and the only way a calibration record is issued
     "aisef2/probe/calibration.py::demonstrates_contrast": ["tests/v2/p2/test_calibration.py"],
     "aisef2/probe/calibration.py::calibrate": ["tests/v2/p2/test_calibration.py"],
@@ -143,7 +157,13 @@ def _inert(func: ast.AST, doc: ast.AST | None) -> set[int]:
 
 def _root(tree: ast.Module, name: str) -> tuple[ast.AST, set[int]] | None:
     """A function named `name` (minus its docstring and annotations), or the value of a module-level assignment
-    to `name` — so a routing table or a taxonomy held as data is a mutation target like a function is."""
+    to `name` — so a routing table or a taxonomy held as data is a mutation target like a function is. `Class.method`
+    names the method of that class when one module has several methods of the same name."""
+    owner, _, name = name.rpartition(".")
+    if owner:
+        tree = next((n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == owner), None)
+        if tree is None:
+            return None
     for n in ast.walk(tree):
         if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef) and n.name == name:
             doc = n.body[0] if n.body and isinstance(n.body[0], ast.Expr) and isinstance(n.body[0].value, ast.Constant) \
@@ -209,7 +229,8 @@ def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tup
             emit("condition negated", node, lambda n, _f: setattr(n, "test", ast.UnaryOp(ast.Not(), n.test)))
         elif isinstance(node, ast.IfExp):
             emit("conditional negated", node, lambda n, _f: setattr(n, "test", ast.UnaryOp(ast.Not(), n.test)))
-        elif isinstance(node, ast.Return) and node.value is not None:
+        elif isinstance(node, ast.Return) and node.value is not None \
+                and not (isinstance(node.value, ast.Constant) and node.value.value is None):  # else: no change
             emit("returns None", node, lambda n, _f: setattr(n, "value", ast.Constant(None)))
         elif isinstance(node, ast.Call) and getattr(node.func, "id", "") in ("sorted", "tuple") and len(node.args) == 1:
             emit(f"{node.func.id}() -> list()", node, lambda n, _f: setattr(n, "func", ast.Name("list", ast.Load())))

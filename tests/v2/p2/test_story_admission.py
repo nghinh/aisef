@@ -25,7 +25,9 @@ from aisef2.control.routing import UnroutableOutcome  # noqa: E402
 from aisef2.errors import InvariantError  # noqa: E402
 from aisef2.plan import story_admission as sa  # noqa: E402
 from aisef2.plan.obligation import EXPECTED_AT_PARENT, NOT_PREREGISTERED, Plan, PlanObligation  # noqa: E402
-from aisef2.probe.protocol import ExecutionEnv, HarnessProbe, Observation, ObservationKind as K, RevisionRef  # noqa: E402
+from aisef2.probe.protocol import (  # noqa: E402
+    ExecutionEnv, HarnessProbe, Observation, ObservationKind as K, ProbeRecord, RevisionRef,
+)
 from aisef2.product.outcome import Executed, IndeterminateReason, InvalidSpec, Unrunnable  # noqa: E402
 from aisef2.product.spec import ProductProofSpec  # noqa: E402
 
@@ -60,16 +62,19 @@ class Fake(HarnessProbe):
     def harness_preconditions(self):
         return ("none",)
 
-    def observation_class(self, spec):
-        return "exists"
-
     def observe(self, spec, at, env):
         return self.seen[spec.id]
 
 
+def record(s, result, *, revision=PARENT.sha, enforcement=Enforcement.PARTIAL):
+    return ProbeRecord.create(spec_id=s.id, semantic_hash=s.semantic_hash, probe_id=s.probe_id,
+                              probe_digest=s.probe_digest, revision=revision, enforcement=enforcement, result=result)
+
+
 def decide(role, result, expectation=S, expected=None, committed=False):
     s = spec("x", expectation)
-    return sa.classify(ob("C", s, "S1", role, expected), result, s, committed)
+    return sa.classify(ob("C", s, "S1", role, expected), record(s, result), s, revision=PARENT.sha,
+                       enforcement=Enforcement.PARTIAL, introducer_committed=committed)
 
 
 class Table(unittest.TestCase):
@@ -93,6 +98,7 @@ class Table(unittest.TestCase):
                 self.assertRegex(d.rule, "§1[03]")
         self.assertEqual(decide(Role.PRESERVE, Executed(R)).rule,
                          "§13: PRESERVE expecting SATISFIED_AT_PARENT, measured UNSATISFIED")
+        self.assertIs(decide(Role.PRESERVE, Executed(R)).failure.code, FailureCode.PRECONDITION_BROKEN)
         self.assertEqual(decide(Role.INTRODUCE, Executed(I, PA)).rule,
                          routing._EXECUTED[(MeasurementPoint.PARENT, ContractSatisfaction.INDETERMINATE, PA,
                                             Role.INTRODUCE)][3])
@@ -133,12 +139,44 @@ class Table(unittest.TestCase):
 
     def test_a_preserve_that_contradicts_the_plans_own_record_is_PLAN_CONTRADICTION(self):
         d = decide(Role.PRESERVE, Executed(R), committed=True)
-        self.assertEqual((d.disposition, d.failure, d.satisfaction),
-                         (D.PLAN_CONTRADICTION, None, ContractSatisfaction.UNSATISFIED))
-        self.assertIn("already committed", d.rule)
+        self.assertEqual((d.disposition, d.failure.code, d.satisfaction),
+                         (D.PLAN_CONTRADICTION, FailureCode.PLAN_CONTRADICTION, ContractSatisfaction.UNSATISFIED))
+        self.assertEqual(d.rule, "§13: a PRESERVE measured UNSATISFIED whose introducing story already committed")
         for role, result in ((Role.PRESERVE, Executed(S)), (Role.INTRODUCE, Executed(R)), (Role.VERIFY, Executed(R))):
             with self.subTest(role=role):
                 self.assertIsNot(decide(role, result, committed=True).disposition, D.PLAN_CONTRADICTION)
+
+    def test_PLAN_OWNER_1_a_plan_contradiction_always_carries_PLAN(self):
+        for expectation in (S, R):
+            with self.subTest(expectation=expectation):
+                d = decide(Role.PRESERVE, Executed(R if expectation is S else S), expectation, committed=True)
+                self.assertEqual((d.disposition, d.failure.owner), (D.PLAN_CONTRADICTION, Owner.PLAN))
+
+    def test_PLAN_OWNER_2_a_plan_contradiction_consumes_no_retry_budget(self):
+        failure = decide(Role.PRESERVE, Executed(R), committed=True).failure
+        self.assertIs(failure.retryability, Retryability.NOT_RETRYABLE)
+        self.assertIsNone(failure.budget)  # owner PLAN; no DEVELOPER, ENVIRONMENT or PROVIDER budget is charged
+        self.assertNotIn(failure.budget, (Owner.DEVELOPER, Owner.ENVIRONMENT, Owner.PROVIDER))
+
+    def test_PROBE_BIND_1_a_bare_result_is_never_classified(self):
+        s = spec("x")
+        with self.assertRaisesRegex(InvariantError, "^a decision reads a ProbeRecord, never a bare ProbeResult$"):
+            sa.classify(ob("C", s, "S1", Role.INTRODUCE), Executed(R), s, revision=PARENT.sha,
+                        enforcement=Enforcement.PARTIAL, introducer_committed=False)
+        other = spec("y")
+        for rec, msg in ((record(other, Executed(R)), f"answers {other.id}, not {s.id}"),
+                         (record(s, Executed(R), revision="0" * 40), "measured at 000000000000")):
+            with self.subTest(msg=msg), self.assertRaisesRegex(InvariantError, msg):
+                sa.classify(ob("C", s, "S1", Role.INTRODUCE), rec, s, revision=PARENT.sha,
+                            enforcement=Enforcement.PARTIAL, introducer_committed=False)
+
+    def test_PROBE_BIND_2_a_record_under_other_enforcement_is_not_reused(self):
+        s = spec("x")
+        partial = record(s, Executed(R))
+        with self.assertRaisesRegex(InvariantError, "ran under PARTIAL, not FULL: not comparable"):
+            sa.classify(ob("C", s, "S1", Role.INTRODUCE), partial, s, revision=PARENT.sha,
+                        enforcement=Enforcement.FULL, introducer_committed=False)
+        self.assertNotEqual(partial.comparability, record(s, Executed(R), enforcement=Enforcement.FULL).comparability)
 
     def test_an_indeterminate_with_no_declared_routing_is_PROBE_INVALID_never_developer(self):
         key = (MeasurementPoint.PARENT, ContractSatisfaction.INDETERMINATE, PA, Role.INTRODUCE)
@@ -198,6 +236,17 @@ class Story(unittest.TestCase):
                        {self.a.id: Observation(K.OBSERVED, R)}, committed=frozenset({"S1"}))
         self.assertEqual([x.decision.disposition for x in r.obligations], [D.PLAN_CONTRADICTION])
         self.assertFalse(r.admitted)
+
+    def test_a_plan_contradiction_permits_no_developer_call(self):
+        r = self.admit([ob("C1", self.a, "S1", Role.INTRODUCE), ob("C3", self.a, "S2", Role.PRESERVE, deps=("C1",)),
+                        ob("C4", self.b, "S2", Role.INTRODUCE)],
+                       {self.a.id: Observation(K.OBSERVED, R), self.b.id: Observation(K.OBSERVED, R)},
+                       committed=frozenset({"S1"}))
+        self.assertEqual([x.decision.disposition for x in r.obligations], [D.PLAN_CONTRADICTION, D.READY])
+        self.assertEqual((r.admitted, r.developer_call_permitted), (False, False))
+        with self.assertRaisesRegex(InvariantError, "story/admitted has not permitted one"):
+            sa.request_developer(self.sink, "S2")
+        self.assertNotIn(EventType.PROVIDER_REQUEST, [t for t, _ in self.sink.events])
 
     def test_only_this_storys_obligations_run(self):
         seen = {self.a.id: Observation(K.OBSERVED, R), self.b.id: Observation(K.OBSERVED, S)}

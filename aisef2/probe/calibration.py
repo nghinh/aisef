@@ -25,7 +25,7 @@ from typing import Callable
 
 from aisef2.arch.enums import BehaviorVerdict, Enforcement
 from aisef2.errors import InvariantError
-from aisef2.probe.protocol import ExecutionEnv, HarnessProbe, RevisionRef, run_probe
+from aisef2.probe.protocol import ExecutionEnv, Probe, ProbeRegistry, RevisionRef, bound_result, run_probe
 from aisef2.product.outcome import Executed
 from aisef2.product.spec import ProductProofSpec
 
@@ -85,7 +85,7 @@ def falsifiability_problems(evidence: SpecFalsifiabilityEvidence, spec: ProductP
     return out
 
 
-def fixture_spec(probe: HarnessProbe, fixture: pathlib.Path) -> ProductProofSpec:
+def fixture_spec(probe: Probe, fixture: pathlib.Path) -> ProductProofSpec:
     """The spec a fixture's request describes, bound to `probe`. It answers no contract: its expectation is a carrier."""
     request = json.loads((fixture / "request.json").read_text(encoding="utf-8"))
     return ProductProofSpec.create(contract_id=f"CALIBRATION:{fixture.name}", probe_id=probe.id,
@@ -94,24 +94,27 @@ def fixture_spec(probe: HarnessProbe, fixture: pathlib.Path) -> ProductProofSpec
                                    compiler_digest="0" * 64)
 
 
-def calibrate(probe: HarnessProbe, observation_class: str, positive: pathlib.Path, negative: pathlib.Path,
-              env: ExecutionEnv, clock: Callable[[], float], names: tuple[str, str] | None = None
-              ) -> ProbeCapabilityCalibration:
+def calibrate(probe: Probe, observation_class: str, positive: pathlib.Path, negative: pathlib.Path,
+              env: ExecutionEnv, clock: Callable[[], float], *, registry: ProbeRegistry,
+              names: tuple[str, str] | None = None) -> ProbeCapabilityCalibration:
     """§9.1.1: run `probe` on both committed fixtures; issue a record only if both contrasts are demonstrated.
 
     The positive fixture must be observed SATISFIED — the counterexample for a REFUTED expectation — and the negative
-    one REFUTED — the counterexample for a SATISFIED expectation. `names` are the committed fixture paths recorded.
+    one REFUTED — the counterexample for a SATISFIED expectation. The observation class each fixture asks for is the
+    harness registry's (PROBE-META-1), and each result is read through its bound record (PROBE-BIND-1). `names` are
+    the committed fixture paths recorded.
     """
-    seen = {}
     problems = []
     for side, fixture, counter_for in (("positive", positive, BehaviorVerdict.REFUTED),
                                        ("negative", negative, BehaviorVerdict.SATISFIED)):
         spec = fixture_spec(probe, fixture)
-        if probe.observation_class(spec) != observation_class:
-            problems.append(f"{side} fixture asks for {probe.observation_class(spec)!r}, not {observation_class!r}")
+        asked = registry.observation_class(probe.id, probe.digest, spec)
+        if asked != observation_class:
+            problems.append(f"{side} fixture asks for {asked!r}, not {observation_class!r}")
             continue
-        result = run_probe(probe, spec, RevisionRef(FIXTURE_REVISION, str((fixture / "checkout").resolve())), env).result
-        seen[side] = result
+        at = RevisionRef(FIXTURE_REVISION, str((fixture / "checkout").resolve()))
+        result = bound_result(run_probe(probe, spec, at, env), spec=spec, revision=at.sha,
+                              enforcement=probe.enforcement())
         if not isinstance(result, Executed) or not demonstrates_contrast(counter_for, result.behavior_verdict):
             problems.append(f"{side} fixture observed {result} — no contrast with a {counter_for.value} expectation")
     if problems:

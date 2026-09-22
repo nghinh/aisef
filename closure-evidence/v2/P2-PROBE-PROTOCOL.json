@@ -11,7 +11,7 @@
  ],
  "probe": {
   "id": "probe.python_callable",
-  "digest": "65522e577b6261e0299199cfcb2c75847e560f9783ff2242dea0be7a0e0f469c",
+  "digest": "27785f8af066298cee1098bedf981d4cc1e9f9000a29105f748c586ae5f3dc73",
   "sources": [
    "probe/protocol.py",
    "probe/python_callable.py"
@@ -19,24 +19,32 @@
   "enforcement": "PARTIAL",
   "weakest_path": "the subject runs inside the probe's subprocess with the harness user's filesystem and network access; isolation is -I interpreter isolation and a scrubbed environment, not a sandbox",
   "harness_preconditions": [
-   "interpreter: the ExecutionEnv's Python interpreter exists and executes",
+   "interpreter: the ExecutionEnv's Python interpreter exists and launches",
    "checkout: the revision's checkout is a readable directory",
-   "protocol: the harness subprocess prints READY before touching the subject, then RESULT"
+   "protocol: the harness prints READY, then DISPATCHED before touching the subject, within the harness watchdog (ExecutionEnv.timeout_s)"
   ],
   "observation_classes": [
    "exists",
    "returns",
-   "raises"
-  ]
+   "raises",
+   "blocks"
+  ],
+  "verdict_when_the_window_expires": {
+   "exists": "REFUTED",
+   "returns": "REFUTED",
+   "raises": "REFUTED",
+   "blocks": "SATISFIED"
+  }
  },
  "implementation_notes": {
-  "probe_result_core": "unchanged from P1 (Executed / Unrunnable / InvalidSpec); enforcement is bound by ProbeRecord, which run_probe returns for every evaluation",
+  "probe_result_core": "unchanged from P1 (Executed / Unrunnable / InvalidSpec). run_probe returns a sealed ProbeRecord (spec, semantic hash, probe id and digest, revision, enforcement, result; record_digest binds all of them); a decision reads the result only through bound_result(record, spec=, revision=, enforcement=) — PROBE-BIND-1/2, static rule RESULT_ONLY_THROUGH_BINDING",
   "api_shape": "a probe reports a typed Observation; protocol.classify_failure alone maps it to a ProbeResult",
+  "observation_class": "harness metadata: a ProbeRegistry of ProbeMetadata keyed by (probe id, digest); a probe need only satisfy the frozen Probe protocol (PROBE-META-1) — the protocol is unchanged",
+  "timeout": "RFC §9.2 (V2-002). The harness watchdog (ExecutionEnv.timeout_s) runs until the harness reports DISPATCHED: its expiry, a launch failure or a lost protocol is HARNESS_FAILED -> UNRUNNABLE / ENVIRONMENT (TIME-1). From DISPATCHED the spec's own window runs (observable.within_s: required, positive, finite); its expiry is SUBJECT_DEADLINE -> EXECUTED with the verdict the observation class assigns to a window in which nothing arrived: exists / returns / raises -> REFUTED (the awaited fact did not occur), blocks -> SATISFIED (the call was still running). A spec with no bounded window is INVALID_SPEC before anything runs",
   "second_kind": "a file_artifact prototype written only against the protocol runs in tests/v2/p2/test_probe_protocol.py (SecondKindPrototype); it ships no code"
  },
  "residuals": [
-  "probe timeout is UNRUNNABLE / ENVIRONMENT even when the subject is what hangs — RFC §9 lists timeout as a harness failure; a hanging product is therefore not charged to DEVELOPER",
-  "a harness process killed by a signal mid-observation is UNRUNNABLE: the probe cannot tell the subject from the environment killing it",
+  "a harness process killed by a signal after DISPATCHED is UNRUNNABLE: the probe cannot tell the subject from the environment killing it. This is not the expiry of the observation window (§9.2), which the harness itself measures",
   "enforcement PARTIAL: the subject runs inside the probe's subprocess with the harness user's filesystem and network access; isolation is -I interpreter isolation and a scrubbed environment, not a sandbox"
  ],
  "acceptance_cases": {
@@ -122,13 +130,16 @@
    "owner_at_candidate": "ENVIRONMENT",
    "enforcement": "PARTIAL"
   },
-  "probe timeout": {
+  "harness timeout: no READY (injected: the harness sleeps)": {
    "status": "UNRUNNABLE",
    "behavior_verdict": null,
    "reason": null,
    "contract_satisfaction": null,
    "owner_at_candidate": "ENVIRONMENT",
-   "enforcement": "PARTIAL"
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "ENVIRONMENT"
+   ]
   },
   "tool absent (injected: exit 127, no protocol output)": {
    "status": "UNRUNNABLE",
@@ -136,15 +147,21 @@
    "reason": null,
    "contract_satisfaction": null,
    "owner_at_candidate": "ENVIRONMENT",
-   "enforcement": "PARTIAL"
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "ENVIRONMENT"
+   ]
   },
-  "sandbox cannot execute (injected: PermissionError)": {
+  "the harness cannot launch (injected: PermissionError)": {
    "status": "UNRUNNABLE",
    "behavior_verdict": null,
    "reason": null,
    "contract_satisfaction": null,
    "owner_at_candidate": "ENVIRONMENT",
-   "enforcement": "PARTIAL"
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "ENVIRONMENT"
+   ]
   },
   "killed by signal before READY (injected)": {
    "status": "UNRUNNABLE",
@@ -152,8 +169,93 @@
    "reason": null,
    "contract_satisfaction": null,
    "owner_at_candidate": "ENVIRONMENT",
-   "enforcement": "PARTIAL"
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "ENVIRONMENT"
+   ]
+  },
+  "harness gone before DISPATCHED (injected)": {
+   "status": "UNRUNNABLE",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "ENVIRONMENT",
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "ENVIRONMENT"
+   ]
   }
+ },
+ "subject_deadline": {
+  "returns 3, MUST_HOLD": {
+   "status": "EXECUTED",
+   "behavior_verdict": "REFUTED",
+   "reason": null,
+   "contract_satisfaction": "UNSATISFIED",
+   "owner_at_candidate": "DEVELOPER",
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "DEVELOPER",
+    "INTEGRATION",
+    "none"
+   ]
+  },
+  "raises ValueError, MUST_NOT_HOLD": {
+   "status": "EXECUTED",
+   "behavior_verdict": "REFUTED",
+   "reason": null,
+   "contract_satisfaction": "SATISFIED",
+   "owner_at_candidate": null,
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "none"
+   ]
+  },
+  "blocks, MUST_HOLD": {
+   "status": "EXECUTED",
+   "behavior_verdict": "SATISFIED",
+   "reason": null,
+   "contract_satisfaction": "SATISFIED",
+   "owner_at_candidate": null,
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "none"
+   ]
+  },
+  "blocks, MUST_NOT_HOLD": {
+   "status": "EXECUTED",
+   "behavior_verdict": "SATISFIED",
+   "reason": null,
+   "contract_satisfaction": "UNSATISFIED",
+   "owner_at_candidate": "DEVELOPER",
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "DEVELOPER",
+    "INTEGRATION",
+    "none"
+   ]
+  },
+  "exists, the subject's import never finishes": {
+   "status": "EXECUTED",
+   "behavior_verdict": "REFUTED",
+   "reason": null,
+   "contract_satisfaction": "UNSATISFIED",
+   "owner_at_candidate": "DEVELOPER",
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "DEVELOPER",
+    "INTEGRATION",
+    "none"
+   ]
+  }
+ },
+ "binding": {
+  "bare_result_refused": true,
+  "kernel_reads_results_only_through_the_binding": true,
+  "evidence_builders_read_results_only_through_the_binding": true,
+  "enforcement_changes_the_comparability_identity": true,
+  "a_PARTIAL_record_is_refused_under_FULL": true,
+  "an_edited_record_is_refused": true
  },
  "present_subjects": {
   "exists": {
@@ -215,6 +317,14 @@
  },
  "refusals": {
   "unsupported observation class": {
+   "status": "INVALID_SPEC",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "INTEGRATION",
+   "enforcement": "PARTIAL"
+  },
+  "no bounded observation window": {
    "status": "INVALID_SPEC",
    "behavior_verdict": null,
    "reason": null,
@@ -429,8 +539,21 @@
   "state": "PASS",
   "detail": "Probe equals the RFC: 5 members, signatures included"
  },
+ "f5_timeout_conformance": {
+  "state": "PASS",
+  "detail": "harness timeout -> UNRUNNABLE; subject deadline -> EXECUTED with the spec's verdict, no default (§9.2)"
+ },
  "properties": {
   "PROBE_ABS_1_harness_failure_is_unrunnable_environment_no_verdict": true,
+  "TIME_1_harness_cannot_launch_or_times_out_is_unrunnable_environment": true,
+  "TIME_2_positive_response_past_its_deadline_is_executed_unsatisfied": true,
+  "TIME_3_forbidden_event_absent_at_the_deadline_is_executed_per_the_negative_spec": true,
+  "TIME_4_one_physical_timeout_different_satisfaction_by_spec": true,
+  "TIME_5_subject_timeout_never_environment": true,
+  "no_bounded_window_is_invalid_spec_before_running": true,
+  "PROBE_BIND_1_a_bare_result_reaches_no_decision": true,
+  "PROBE_BIND_2_enforcement_is_part_of_the_bound_identity": true,
+  "PROBE_META_1_observation_class_is_harness_metadata": true,
   "PROBE_ABS_2_requires_subject_absent_is_indeterminate_precondition_absent": true,
   "PROBE_ABS_3_positive_existence_absent_is_unsatisfied": true,
   "PROBE_ABS_4_negative_existence_absent_is_satisfied": true,
@@ -445,6 +568,7 @@
   "digest_stable_across_processes": true,
   "digest_bound_into_the_spec": true,
   "layout_invariance": true,
-  "f5_probe_protocol_equals_rfc": true
+  "f5_probe_protocol_equals_rfc": true,
+  "f5_timeout_semantics_equal_rfc": true
  }
 }

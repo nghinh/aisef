@@ -9,7 +9,7 @@
   "F6"
  ],
  "engine": {
-  "digest": "eb9df71edd3e0d606c8790eea0b61832c17cb835062b1e056a5fea1a203215fa",
+  "digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
   "sources": [
    "plan/static_admission.py",
    "plan/obligation.py"
@@ -28,7 +28,7 @@
  },
  "well_formed_plan": {
   "admitted": true,
-  "result_digest": "249d62b87d2194455a39f622f66742096309a10315c2809ed657817f7419b2fd",
+  "result_digest": "00f933840bf3ebca3452819f58cbf6fc83edd0ada967aed24412b1bb3dad754c",
   "checks_passed": [
    "requirement_coverage",
    "contract_spec_integrity",
@@ -75,9 +75,27 @@
   ],
   "9 a missing probe calibration": [
    "probe_calibration"
+  ],
+  "9 a probe the harness registry does not know": [
+   "probe_calibration"
+  ]
+ },
+ "protocol_only_probe": {
+  "admitted": true,
+  "checks_passed": [
+   "requirement_coverage",
+   "contract_spec_integrity",
+   "ownership",
+   "dependency_dag",
+   "contradictions",
+   "proof_capability",
+   "traceability",
+   "plan_structure",
+   "probe_calibration"
   ]
  },
  "implementation_notes": {
+  "observation_class": "check 9 asks the harness registry (AdmissionInputs.registry, keyed by probe id and digest) which class a spec needs — never the probe's class hierarchy (PROBE-META-1)",
   "depends_on": "criterion ids that must complete first (board resolution §1); the story order is induced from them",
   "role_expectation_pairs": "a pair outside RFC §13's table (e.g. INTRODUCE with SATISFIED_AT_PARENT) has no StoryAdmission row; check 5 rejects it — fail closed, no meaning derived",
   "freeze": "require_admitted re-derives admission at freeze time; a stored result is never taken on trust"
@@ -94,6 +112,7 @@
   "no_probe_executes_in_the_engine": true,
   "no_future_parent_sha_invented": true,
   "CAL_2_no_plan_freeze_path_needs_spec_falsifiability": true,
+  "PROBE_META_1_protocol_only_probe_admitted": true,
   "planning_code_never_names_the_raw_verdict": true,
   "f6_plan_obligation_equals_rfc": true
  }

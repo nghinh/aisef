@@ -4,10 +4,10 @@
  "rfc": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
  "approval_record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
  "approval_record_sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
- "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
- "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a",
- "approved_rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
- "approved_freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a",
+ "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+ "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114",
+ "approved_rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+ "approved_freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114",
  "approval_lineage": [
   {
    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
@@ -24,6 +24,16 @@
    ],
    "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
    "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+  },
+  {
+   "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+   "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f",
+   "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+   "frozen_items_changed": [
+    "F5"
+   ],
+   "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+   "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114"
   }
  ],
  "reviewed_commit": "2fe672c7ecdefa349e08353fa9bd67d627077d6e",
@@ -54,8 +64,8 @@
   },
   {
    "id": "F5",
-   "row_sha256": "9e67f78a1529d4b437fad27806e545799f3e552985c0163d52ee5846f13d7bac",
-   "item": "`Probe` protocol: observation-harness / subject split, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)*",
+   "row_sha256": "5c1bf5f75fcb569908893539c7787a228cc865d18d87ee8408a67cd161742ec5",
+   "item": "`Probe` protocol: observation-harness / subject split, **including harness timeout vs subject observation deadline (§9.2)** *(amended — V2-002)*, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)*",
    "why": "The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified"
   },
   {

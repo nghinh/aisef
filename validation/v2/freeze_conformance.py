@@ -25,6 +25,7 @@ import json
 import pathlib
 import re
 import sys
+from types import SimpleNamespace
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 RFC_REL = "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md"
@@ -233,6 +234,43 @@ def _calibration_contracts_match_rfc(rfc: RFC) -> dict:
     return {"state": PASS, "detail": "both calibration contracts and the mechanism literal equal the RFC"}
 
 
+def _timeout_semantics_match_rfc(rfc: RFC) -> dict:
+    """F5 as amended by ARCHITECTURE-EXCEPTION-V2-002 (§9.2): a harness timeout is UNRUNNABLE; a subject that exceeds
+    its bounded observation window is EXECUTED with the verdict the spec's observable assigns — never a default, never
+    UNRUNNABLE. The reference is §9.2's own text; the implementation is exercised through the protocol."""
+    section = rfc.section("### 9.2 Harness timeout vs subject observation deadline", "## 10. Two-axis")
+    needed = ("`UNRUNNABLE`, owner **`ENVIRONMENT`**", "⇒ **`EXECUTED`**", "subject timeout ⇒ `REFUTED`",
+              "`INVALID_SPEC`")
+    if not section or not all(n in section for n in needed):
+        return {"state": FAIL, "detail": "RFC reference (§9.2 harness timeout vs subject deadline) could not be extracted"}
+    if not symbol_present("aisef2.probe.protocol", "ObservationKind"):
+        return {"state": None, "detail": "aisef2.probe.protocol not implemented"}
+    from aisef2.arch.enums import BehaviorVerdict as V, ProbeExecutionStatus as PES
+    from aisef2.probe import protocol as P
+    kinds = {k.name for k in P.ObservationKind}
+    if "SUBJECT_DEADLINE" not in kinds:
+        return {"state": FAIL, "detail": "the protocol cannot express a subject observation deadline"}
+    spec = SimpleNamespace(probe_input={"subject_absence": "REQUIRES_SUBJECT"})
+    problems = []
+    for missing in (None, V.INDETERMINATE):
+        try:
+            P.Observation(P.ObservationKind.SUBJECT_DEADLINE, missing)
+            problems.append(f"a subject deadline accepts {missing!r} (a default verdict)")
+        except P.InvariantError:
+            pass
+    for v in (V.SATISFIED, V.REFUTED):
+        r = P.classify_failure(spec, P.Observation(P.ObservationKind.SUBJECT_DEADLINE, v))
+        if r.status is not PES.EXECUTED or r.behavior_verdict is not v:
+            problems.append(f"a subject deadline with verdict {v.value} became {r}")
+    if P.classify_failure(spec, P.Observation(P.ObservationKind.HARNESS_FAILED, detail="t")).status \
+            is not PES.UNRUNNABLE:
+        problems.append("a harness timeout is not UNRUNNABLE")
+    if problems:
+        return {"state": FAIL, "detail": "; ".join(problems)}
+    return {"state": PASS, "detail": "harness timeout -> UNRUNNABLE; subject deadline -> EXECUTED with the spec's "
+                                     "verdict, no default (§9.2)"}
+
+
 def _semantic_hash_binds_subject_absence(rfc: RFC) -> dict:
     """F4 freezes the inputs to semantic_hash *including SubjectAbsence*: two contracts differing only in their
     declaration must compile to different semantic hashes."""
@@ -426,6 +464,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     add("F4", "F4.semantic_hash_binds_subject_absence", "WP-1.2", _semantic_hash_binds_subject_absence(rfc))
     add("F5", "F5.enum.Enforcement", "WP-0.2", V("Enforcement", e.get("Enforcement", []), code))
     add("F5", "F5.probe_protocol", "WP-2.1", _protocol_matches_rfc(rfc, "aisef2.probe.protocol", "Probe"))
+    add("F5", "F5.harness_timeout_vs_subject_deadline", "WP-2.1", _timeout_semantics_match_rfc(rfc))
     add("F5", "F5.calibration_contracts", "WP-2.2", _calibration_contracts_match_rfc(rfc))
     for n in ("ObligationRole", "ParentExpectation"):
         add("F6", f"F6.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))

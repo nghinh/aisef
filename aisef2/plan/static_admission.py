@@ -23,7 +23,7 @@ from aisef2.arch.enums import ObligationRole, SubjectKind
 from aisef2.errors import InvariantError
 from aisef2.plan.obligation import EXPECTED_AT_PARENT, Plan, PlanError, PlanObligation
 from aisef2.probe.calibration import ProbeCapabilityCalibration, calibration_for
-from aisef2.probe.protocol import HarnessProbe
+from aisef2.probe.protocol import Probe, ProbeRegistry
 from aisef2.product.approval import ContractApproval, Requirement, require_approved
 from aisef2.product.compiler import ProbeRef, compile_spec
 from aisef2.product.contract import BehaviorContract, ContractError, content_of, digest
@@ -42,13 +42,16 @@ def _engine_digest() -> str:
 
 @dataclass(frozen=True, slots=True)
 class AdmissionInputs:
-    """Everything the engine may read. Committed objects only: no revision other than the plan's baseline."""
+    """Everything the engine may read. Committed objects only: no revision other than the plan's baseline. The
+    catalogue holds any objects satisfying the frozen `Probe` protocol; what observation class a spec asks of a probe
+    is the harness registry's (PROBE-META-1), never a probe base class's."""
     requirements: Mapping[str, Requirement]
     contracts: Mapping[str, BehaviorContract]
     approvals: tuple[ContractApproval, ...]
     specs: Mapping[str, ProductProofSpec]
-    catalogue: Mapping[SubjectKind, HarnessProbe]
+    catalogue: Mapping[SubjectKind, Probe]
     calibrations: tuple[ProbeCapabilityCalibration, ...]
+    registry: ProbeRegistry
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,7 +89,7 @@ def _spec_of(o: PlanObligation, inputs: AdmissionInputs) -> ProductProofSpec | N
     return inputs.specs.get(o.product_proof_spec_id)
 
 
-def _probes_by_id(inputs: AdmissionInputs) -> dict[str, HarnessProbe]:
+def _probes_by_id(inputs: AdmissionInputs) -> dict[str, Probe]:
     return {p.id: p for p in inputs.catalogue.values()}
 
 
@@ -258,7 +261,7 @@ def check_probe_calibration(plan: Plan, inputs: AdmissionInputs) -> list[str]:
         probe = probes.get(spec.probe_id) if spec else None
         if probe is None or probe.digest != spec.probe_digest:
             continue  # unresolved: checks 6 and 8 say so
-        cls = probe.observation_class(spec)
+        cls = inputs.registry.observation_class(probe.id, probe.digest, spec)
         if cls is None:
             out.append(f"spec {sid}: {probe.id} does not support the observation it asks for")
         elif calibration_for(inputs.calibrations, probe.id, probe.digest, cls) is None:

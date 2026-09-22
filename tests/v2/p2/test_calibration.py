@@ -22,7 +22,10 @@ from aisef2.probe.calibration import (  # noqa: E402
     CONTRAST, FIXTURE_REVISION, MECHANISMS, NotQualified, ProbeCapabilityCalibration, SpecFalsifiabilityEvidence,
     calibrate, calibration_for, demonstrates_contrast, falsifiability_problems, fixture_spec,
 )
-from aisef2.probe.protocol import ExecutionEnv, HarnessProbe, Observation, ObservationKind  # noqa: E402
+from aisef2.probe.protocol import (  # noqa: E402
+    ExecutionEnv, HarnessProbe, Observation, ObservationKind, Probe, ProbeMetadata, ProbeRegistry,
+)
+from aisef2.product.outcome import Executed  # noqa: E402
 from aisef2.product.spec import ProductProofSpec  # noqa: E402
 
 S, R, I = BehaviorVerdict.SATISFIED, BehaviorVerdict.REFUTED, BehaviorVerdict.INDETERMINATE
@@ -41,9 +44,6 @@ class Looks(HarnessProbe):
 
     def harness_preconditions(self):
         return ("checkout",)
-
-    def observation_class(self, spec):
-        return "exists" if dict(spec.probe_input["observable"]) == {"condition": "exists"} else None
 
     def observe(self, spec, at, env):
         present = os.path.exists(os.path.join(at.root, spec.probe_input["subject"]["locator"]))
@@ -72,6 +72,29 @@ class CannotLook(Looks):
         return Observation(ObservationKind.HARNESS_FAILED, detail="no harness")
 
 
+class BareLooks:
+    """PROBE-META-1: satisfies the frozen Probe protocol, inherits nothing from the harness, returns results itself."""
+    id, digest = "probe.bare_looks", "3" * 64
+
+    def enforcement(self):
+        return Enforcement.PARTIAL
+
+    def harness_preconditions(self):
+        return ("checkout",)
+
+    def evaluate(self, spec, at, env):
+        return Executed(S if os.path.exists(os.path.join(at.root, spec.probe_input["subject"]["locator"])) else R)
+
+
+def exists_class(spec):
+    """Harness metadata for the fixture probes: the `exists` class, or None."""
+    return "exists" if dict(spec.probe_input["observable"]) == {"condition": "exists"} else None
+
+
+REGISTRY = ProbeRegistry([ProbeMetadata(p.id, p.digest, exists_class)
+                          for p in (Looks, AlwaysRefuted, AlwaysSatisfied, CannotLook, BareLooks)])
+
+
 class _Fixtures(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.TemporaryDirectory()
@@ -88,8 +111,8 @@ class _Fixtures(unittest.TestCase):
             (d / "checkout" / "LICENSE").write_text("MIT\n", encoding="utf-8")
         return d
 
-    def cal(self, probe, cls="exists", pos=None, neg=None):
-        return calibrate(probe, cls, pos or self.pos, neg or self.neg, ENV, lambda: 1234.5)
+    def cal(self, probe, cls="exists", pos=None, neg=None, registry=REGISTRY):
+        return calibrate(probe, cls, pos or self.pos, neg or self.neg, ENV, lambda: 1234.5, registry=registry)
 
 
 class Contrast(unittest.TestCase):
@@ -119,7 +142,8 @@ class Calibrate(_Fixtures):
         rec = self.cal(Looks())
         self.assertEqual(rec, ProbeCapabilityCalibration("probe.looks", "1" * 64, "exists", str(self.pos),
                                                          str(self.neg), 1234.5))
-        named = calibrate(Looks(), "exists", self.pos, self.neg, ENV, lambda: 7, names=("fx/pos", "fx/neg"))
+        named = calibrate(Looks(), "exists", self.pos, self.neg, ENV, lambda: 7, registry=REGISTRY,
+                          names=("fx/pos", "fx/neg"))
         self.assertEqual((named.positive_fixture, named.negative_fixture, named.demonstrated_at), ("fx/pos", "fx/neg", 7.0))
 
     def test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected(self):
@@ -160,6 +184,22 @@ class Calibrate(_Fixtures):
         self.assertEqual((s.probe_id, s.probe_digest, s.contract_id), ("probe.looks", "1" * 64, "CALIBRATION:positive"))
         self.assertEqual(dict(s.probe_input["observable"]), {"condition": "exists"})
         self.assertEqual(FIXTURE_REVISION, "0" * 40)
+
+
+class Metadata(_Fixtures):
+    """PROBE-META-1: the class comes from harness metadata keyed by probe identity and digest, never from inheritance."""
+
+    def test_a_protocol_only_probe_is_calibrated(self):
+        probe = BareLooks()
+        self.assertIsInstance(probe, Probe)
+        self.assertNotIsInstance(probe, HarnessProbe)
+        rec = self.cal(probe)
+        self.assertEqual((rec.probe_id, rec.probe_digest, rec.observation_class), (probe.id, probe.digest, "exists"))
+
+    def test_an_unregistered_probe_or_digest_is_not_qualified(self):
+        for registry in (ProbeRegistry(), ProbeRegistry([ProbeMetadata(BareLooks.id, "4" * 64, exists_class)])):
+            with self.subTest(registry=registry), self.assertRaisesRegex(NotQualified, "asks for None, not 'exists'"):
+                self.cal(BareLooks(), registry=registry)
 
 
 class Records(_Fixtures):

@@ -35,6 +35,7 @@ class FailureCode(Enum):
     CONTRACT_UNSATISFIED = "CONTRACT_UNSATISFIED"
     SUBJECT_ABSENT_AT_CANDIDATE = "SUBJECT_ABSENT_AT_CANDIDATE"
     PRECONDITION_BROKEN = "PRECONDITION_BROKEN"
+    PLAN_CONTRADICTION = "PLAN_CONTRADICTION"
     POST_MERGE_REGRESSION = "POST_MERGE_REGRESSION"
     POST_MERGE_SUBJECT_LOST = "POST_MERGE_SUBJECT_LOST"
     MISSING_CREDENTIAL = "MISSING_CREDENTIAL"
@@ -74,6 +75,10 @@ TAXONOMY: dict[FailureCode, Classification] = {c.code: c for c in (
     Classification(FailureCode.PRECONDITION_BROKEN, Owner.PLAN, retryability=N,
                    rule="§10.3, §13: PARENT, PRESERVE or VERIFY over a required subject that is absent -> "
                         "PRECONDITION_BROKEN, PLAN; §14: a hard plan blocker"),
+    Classification(FailureCode.PLAN_CONTRADICTION, Owner.PLAN, retryability=N,
+                   rule="§13: the parent cannot be reconciled with the plan's own record (a PRESERVE measured "
+                        "UNSATISFIED whose introducing story committed) -> PLAN; §14: a hard plan blocker; owner "
+                        "decision (P2 review): never retryable, so it consumes no budget"),
     Classification(FailureCode.POST_MERGE_REGRESSION, Owner.INTEGRATION, retryability=N,
                    rule="§26, §10.3: POST_MERGE, UNSATISFIED -> a regression after merge, INTEGRATION"),
     Classification(FailureCode.POST_MERGE_SUBJECT_LOST, Owner.INTEGRATION, retryability=N,

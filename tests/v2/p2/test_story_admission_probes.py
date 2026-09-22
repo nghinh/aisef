@@ -31,7 +31,7 @@ S, R = BehaviorVerdict.SATISFIED, BehaviorVerdict.REFUTED
 def spec(locator, observable, stimulus=None, *, expectation=S, absence=SubjectAbsence.REQUIRES_SUBJECT):
     return ProductProofSpec.create(contract_id=f"BC-{locator}", probe_id=P.id, probe_digest=P.digest,
                                    probe_input={"subject": {"kind": "python_callable", "locator": locator},
-                                                "stimulus": stimulus or {}, "observable": observable,
+                                                "stimulus": stimulus or {}, "observable": {**observable, "within_s": 10},
                                                 "subject_absence": absence.value},
                                    candidate_expectation=expectation, compiler_id="t", compiler_digest="c" * 64)
 

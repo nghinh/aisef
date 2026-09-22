@@ -16,6 +16,10 @@
   because REQUIRES_SUBJECT decides INDETERMINATE(PRECONDITION_ABSENT) by itself. Ceiling: a call into another scope
   that returns a fixed verdict is not seen; `on_subject_absent`'s behavioural tests (and WP-2.1's probe tests) are
   what cover that.
+* **RESULT_ONLY_THROUGH_BINDING** (PROBE-BIND-1, P2 correction) — a decision never reads a bare probe result: outside
+  `aisef2/probe/protocol.py`, which defines `ProbeRecord` and `bound_result`, no kernel module reads an attribute
+  named `result` (nor `getattr(x, "result")`). Every read goes through `bound_result(record, spec=, revision=,
+  enforcement=)`. The rule also runs over the evidence builders (tests/v2/p2/test_probe_binding.py).
 
     python -P validation/v2/kernel_static_checks.py            # all rules; exit 1 on any violation
 """
@@ -34,7 +38,8 @@ RAW_VERDICT = {"BehaviorVerdict", "behavior_verdict"}
 TAXONOMY_MODULE = "aisef2/control/owner.py"
 _RETRY_NAMES = {"retryable", "retryability"}
 RULES = ("NO_PROSE_CONTROL", "NO_RAW_VERDICT_ROUTING", "RETRYABLE_ONLY_IN_TAXONOMY",
-         "NO_VERDICT_FROM_ABSENCE_DECLARATION")
+         "NO_VERDICT_FROM_ABSENCE_DECLARATION", "RESULT_ONLY_THROUGH_BINDING")
+BINDING_MODULE = "aisef2/probe/protocol.py"
 ABSENCE_MEMBERS = {"REQUIRES_SUBJECT", "ABSENCE_IS_DECIDABLE"}
 ABSENCE_FIELD = "subject_absence"
 DECIDED_VERDICTS = {"SATISFIED", "REFUTED"}
@@ -150,6 +155,13 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = RULES) -> list[st
                 out.append(f"RETRYABLE_ONLY_IN_TAXONOMY {rel}:{line or '?'} decides retryability outside the taxonomy")
     if "NO_VERDICT_FROM_ABSENCE_DECLARATION" in rules:
         out += _verdict_from_absence(rel, tree)
+    if "RESULT_ONLY_THROUGH_BINDING" in rules and rel != BINDING_MODULE:
+        for n in ast.walk(tree):
+            if isinstance(n, ast.Attribute) and n.attr == "result" or isinstance(n, ast.Call) \
+                    and getattr(n.func, "id", "") == "getattr" and len(n.args) > 1 \
+                    and isinstance(n.args[1], ast.Constant) and n.args[1].value == "result":
+                out.append(f"RESULT_ONLY_THROUGH_BINDING {rel}:{n.lineno} reads a probe result without its binding "
+                           "(use bound_result)")
     return sorted(set(out))
 
 

@@ -11,6 +11,10 @@ content-addressed by its `.sha256` sidecar.
 approval lineage is
 [`closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json`](../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json).
 
+**Amended by `ARCHITECTURE-EXCEPTION-V2-002`** (owner decision *AISEF V2 — P2 OWNER REVIEW CORRECTION*,
+2026-09-22): F5 distinguishes a harness timeout from a subject observation deadline (§9.2). Approval lineage:
+[`closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json`](../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json).
+
 **Supersedes** the proposal documents under [`docs/research/v2/`](../research/v2/) for all implementation
 decisions; those are retained as design history and are linked throughout.
 
@@ -300,9 +304,12 @@ budget.**
 
 - A probe **MUST** declare its **observation harness** — what must function for it to look at all — separately
   from its **subject**, which is what it looks at.
-- Failure of the observation harness (interpreter missing, sandbox unavailable, tool absent, probe timeout)
-  **MUST** produce `UNRUNNABLE`.
+- Failure of the observation harness — the interpreter cannot launch, a required probe tool is unavailable, the
+  sandbox is unavailable, or the probe/watchdog infrastructure itself fails or times out before it obtains an
+  observation — **MUST** produce `UNRUNNABLE` *(amended — V2-002)*.
 - Absence of the subject **MUST NOT** produce `UNRUNNABLE`. It is an observation.
+- Expiry of the subject's bounded observation window **MUST NOT** produce `UNRUNNABLE`. It is an observation
+  (§9.2) *(amended — V2-002)*.
 - A probe **MUST** declare its real `enforcement()` level and **MUST** refuse a request it cannot honour rather
   than degrade silently.
 - Probes are harness-owned. The probe API **MUST NOT** accept a developer-authored path (invariant IX).
@@ -360,6 +367,23 @@ class SpecFalsifiabilityEvidence:
 plan freeze*, while also stating that most such records are produced by `StoryAdmission`, which only runs
 *after* plan freeze. That was circular and impossible (case **CAL-2**). Probe-level calibration is available
 before a plan exists; spec-level falsifiability belongs to qualification, not to admission.
+
+### 9.2 Harness timeout vs subject observation deadline *(amended — ARCHITECTURE-EXCEPTION-V2-002)*
+
+A timeout of the **observation harness** and a deadline reached by the **subject** are different facts.
+
+- **Harness failure or harness timeout.** The observation mechanism itself cannot operate or cannot obtain an
+  observation — the interpreter cannot launch, a required probe tool is unavailable, the sandbox is unavailable,
+  the probe or watchdog infrastructure fails. ⇒ `UNRUNNABLE`, owner **`ENVIRONMENT`**, no `BehaviorVerdict`.
+- **Subject observation deadline.** The harness dispatched the subject and observed it, but the subject did not
+  complete or emit the expected observation within the bounded observation window the `ProductProofSpec` declares.
+  ⇒ **`EXECUTED`**. The `BehaviorVerdict` **MUST** be the one the spec's observable assigns to an expired window.
+- There **MUST NOT** be a global rule *subject timeout ⇒ `REFUTED`*, and **MUST NOT** be *subject timeout ⇒
+  `UNRUNNABLE`*. A subject timeout **MUST NEVER** become `ENVIRONMENT` merely because a timeout occurred.
+- A `ProductProofSpec` whose observable cannot assign semantics to its bounded observation window is
+  `INVALID_SPEC`, and **SHOULD** be rejected as early as possible — at `StaticPlanAdmission` (§12), before any
+  probe runs.
+- No new `Owner`, no new architecture plane.
 
 ---
 
@@ -1352,7 +1376,8 @@ relative to the product tree and how a probe change is re-proved affordably.
 
 Frozen means: changing it later invalidates evidence written under it. Each **MUST** have owner sign-off before
 implementation begins. Items marked *(adjusted)* changed mechanically as a consequence of owner decisions B1–B5;
-**no new freeze item was added**. Items marked *(amended — V2-001)* changed through `ARCHITECTURE-EXCEPTION-V2-001`.
+**no new freeze item was added**. Items marked *(amended — V2-001)* changed through `ARCHITECTURE-EXCEPTION-V2-001`;
+items marked *(amended — V2-002)* changed through `ARCHITECTURE-EXCEPTION-V2-002`.
 
 | # | Frozen item | Why evidence compatibility requires it |
 |---|---|---|
@@ -1360,7 +1385,7 @@ implementation begins. Items marked *(adjusted)* changed mechanically as a conse
 | **F2** | `ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table **keyed by `MeasurementPoint` (§10.3)** *(amended — V2-001)*, **and the `ContractSatisfaction` derivation** *(adjusted)* | Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it |
 | **F3** | The `Owner` set — capped; a new member requires a cited measured defect | Budgets and retries derive from it |
 | **F4** | `BehaviorContract` → `ProductProofSpec` compiler contract and the inputs to `semantic_hash`, **including `SubjectAbsence`** *(adjusted)* | It is what `--check` compares against and what makes product evidence survive re-planning. Absence semantics change what a spec means when the subject is missing |
-| **F5** | `Probe` protocol: observation-harness / subject split, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)* | The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified |
+| **F5** | `Probe` protocol: observation-harness / subject split, **including harness timeout vs subject observation deadline (§9.2)** *(amended — V2-002)*, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)* | The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified |
 | **F6** | `PlanObligation` shape, `ObligationRole`, and `ParentExpectation` **expressed as a contract-satisfaction expectation, never a raw verdict** *(adjusted)* | The planning plane's vocabulary. Raw-verdict expectations are polarity-inverted for every negative contract |
 | **F7** | `StoryAdmissionDisposition` set | Gate ordering and budget routing depend on it |
 | **F8** | `RunScope` / `StoryScope` ownership split, the disposal ordering contract, and the **run lease / sentinel / journal lifetime order — lease acquired first and released last** *(adjusted)* | Re-parenting resources later invalidates every disposal record; the lifetime order defines both what TORN means and when a second run may acquire ownership |
@@ -1412,6 +1437,21 @@ implementation failed to establish the subject the proof requires. Never `PLAN`.
 
 **OWNER-MP-4 · the probe's observation harness cannot inspect the subject.** ⇒ `UNRUNNABLE`, **`ENVIRONMENT`**, at
 every measurement point.
+
+### Harness timeout vs subject observation deadline *(amended — V2-002)*
+
+**TIME-1 · the harness cannot launch the subject.** ⇒ `UNRUNNABLE` / **`ENVIRONMENT`**, no verdict.
+
+**TIME-2 · the subject launches; a positive response contract exceeds its deadline.** ⇒ `EXECUTED`; contract
+**`UNSATISFIED`**.
+
+**TIME-3 · the subject launches; a forbidden-event contract reaches its deadline with no event.** ⇒ `EXECUTED`;
+contract satisfaction according to that negative spec — the forbidden event was not observed, so **`SATISFIED`**.
+
+**TIME-4 · the same physical subject timeout under different specs** may yield different `ContractSatisfaction`:
+each spec's observable, polarity and window decide it.
+
+**TIME-5 · a subject timeout MUST NEVER become `ENVIRONMENT`** merely because a timeout occurred.
 
 ### Calibration
 

@@ -271,6 +271,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_raw_verdict_routing", "NO_RAW_VERDICT_ROUTING", "WP-1.3"),
     _kernel_rule("retryable_only_in_taxonomy", "RETRYABLE_ONLY_IN_TAXONOMY", "WP-1.4"),
     _kernel_rule("no_verdict_from_absence_declaration", "NO_VERDICT_FROM_ABSENCE_DECLARATION", "P1 hygiene (RFC §10.2)"),
+    _kernel_rule("result_only_through_binding", "RESULT_ONLY_THROUGH_BINDING", "P2 correction (PROBE-BIND-1)"),
     _mutation, _p1_evidence, _p2_evidence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 

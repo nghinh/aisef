@@ -35,7 +35,7 @@ REV0, REV1 = "a0" * 20, "a1" * 20
 def spec(name, returns, args):
     return ProductProofSpec.create(contract_id=f"BC-{name}", probe_id=P.id, probe_digest=P.digest,
                                    probe_input={"subject": {"kind": "python_callable", "locator": f"app.calc:{name}"},
-                                                "stimulus": {"args": args}, "observable": {"returns": returns},
+                                                "stimulus": {"args": args}, "observable": {"returns": returns, "within_s": 10},
                                                 "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
                                    candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="t",
                                    compiler_digest="c" * 64)

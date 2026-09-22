@@ -13,10 +13,18 @@
     "frozen_items_changed": [
      "F2"
     ]
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+    "frozen_items_changed": [
+     "F5"
+    ]
    }
   ],
-  "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
-  "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a",
+  "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+  "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114",
   "original_rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
   "original_freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
   "frozen_items": [
@@ -718,7 +726,8 @@
     "interpreter absent",
     "tool absent",
     "sandbox unavailable",
-    "probe timeout"
+    "harness timeout before the subject is dispatched (TIME-1)",
+    "subject observation window expires (TIME-2..5: EXECUTED, verdict per spec)"
    ],
    "evidence_artifact": "closure-evidence/v2/P2-PROBE-PROTOCOL.json",
    "exit_criteria": [
@@ -795,6 +804,17 @@
      "what": "the plan equated every missing subject with an executed REFUTED observation, collapsing the RFC's REQUIRES_SUBJECT / ABSENCE_IS_DECIDABLE distinction (manifest adversarial test, traceability, hand-written evidence-plan row)",
      "resolution": "replaced by PROBE-ABS-1..5 using the existing RFC semantics; evidence-plan rows now generated from the manifest; plan_validate check F (PLANSEM-1..2) fails on the simplification",
      "classification": "plan defect against the frozen RFC; no RFC change, no architecture exception, no scheduling change"
+    },
+    {
+     "id": "ARCHITECTURE-EXCEPTION-V2-002",
+     "found": "2026-09-22, P2 owner review",
+     "what": "the frozen §9 bullet listed 'probe timeout' as a harness failure (UNRUNNABLE); read literally, a subject that hangs is charged to ENVIRONMENT. The plan's fault target 'probe timeout' carried the same ambiguity",
+     "resolution": "owner-approved exception: a harness timeout (the observation mechanism cannot obtain an observation) is UNRUNNABLE / ENVIRONMENT; a subject that exceeds the spec's bounded observation window is EXECUTED with the verdict the spec's observable assigns (RFC §9.2, TIME-1..5); the fault target is split accordingly",
+     "records": [
+      "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+      "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json"
+     ],
+     "classification": "approved architecture exception (F5); no phase, dependency or scope change"
     }
    ]
   },

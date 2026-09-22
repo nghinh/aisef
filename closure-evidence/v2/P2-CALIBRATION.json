@@ -13,27 +13,35 @@
  "calibrations": [
   {
    "probe_id": "probe.python_callable",
-   "probe_digest": "65522e577b6261e0299199cfcb2c75847e560f9783ff2242dea0be7a0e0f469c",
+   "probe_digest": "27785f8af066298cee1098bedf981d4cc1e9f9000a29105f748c586ae5f3dc73",
    "observation_class": "exists",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/exists/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/exists/negative",
-   "demonstrated_at": 1789998700.810616
+   "demonstrated_at": 1790026315.0684721
   },
   {
    "probe_id": "probe.python_callable",
-   "probe_digest": "65522e577b6261e0299199cfcb2c75847e560f9783ff2242dea0be7a0e0f469c",
+   "probe_digest": "27785f8af066298cee1098bedf981d4cc1e9f9000a29105f748c586ae5f3dc73",
    "observation_class": "returns",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/returns/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/returns/negative",
-   "demonstrated_at": 1789998700.86339
+   "demonstrated_at": 1790026315.124505
   },
   {
    "probe_id": "probe.python_callable",
-   "probe_digest": "65522e577b6261e0299199cfcb2c75847e560f9783ff2242dea0be7a0e0f469c",
+   "probe_digest": "27785f8af066298cee1098bedf981d4cc1e9f9000a29105f748c586ae5f3dc73",
    "observation_class": "raises",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/raises/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/raises/negative",
-   "demonstrated_at": 1789998700.915427
+   "demonstrated_at": 1790026315.178349
+  },
+  {
+   "probe_id": "probe.python_callable",
+   "probe_digest": "27785f8af066298cee1098bedf981d4cc1e9f9000a29105f748c586ae5f3dc73",
+   "observation_class": "blocks",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/negative",
+   "demonstrated_at": 1790026315.743443
   }
  ],
  "contrast_table": {
@@ -47,12 +55,20 @@
  "CAL_1_always_refuted_probe": {
   "exists": "REJECTED: positive fixture observed Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None) — no contrast with a REFUTED expectation",
   "returns": "REJECTED: positive fixture observed Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None) — no contrast with a REFUTED expectation",
-  "raises": "REJECTED: positive fixture observed Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None) — no contrast with a REFUTED expectation"
+  "raises": "REJECTED: positive fixture observed Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None) — no contrast with a REFUTED expectation",
+  "blocks": "REJECTED: positive fixture observed Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None) — no contrast with a REFUTED expectation"
  },
  "always_satisfied_probe": {
   "exists": "REJECTED: negative fixture observed Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None) — no contrast with a SATISFIED expectation",
   "returns": "REJECTED: negative fixture observed Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None) — no contrast with a SATISFIED expectation",
-  "raises": "REJECTED: negative fixture observed Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None) — no contrast with a SATISFIED expectation"
+  "raises": "REJECTED: negative fixture observed Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None) — no contrast with a SATISFIED expectation",
+  "blocks": "REJECTED: negative fixture observed Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None) — no contrast with a SATISFIED expectation"
+ },
+ "PROBE_META_1_protocol_only_probe": {
+  "exists": "QUALIFIED",
+  "returns": "QUALIFIED",
+  "raises": "QUALIFIED",
+  "blocks": "QUALIFIED"
  },
  "spec_falsifiability": {
   "mechanisms": [
@@ -78,6 +94,8 @@
   "reference_probe_qualified_for_every_class": true,
   "CAL_1_always_refuted_prohibition_probe_rejected": true,
   "always_satisfied_probe_rejected_for_must_hold": true,
+  "PROBE_META_1_protocol_only_probe_calibrated": true,
+  "blocks_class_calibrated": true,
   "spec_falsifiability_not_a_plan_freeze_input": true,
   "f5_calibration_contracts_equal_rfc": true
  }

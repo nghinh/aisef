@@ -5,7 +5,8 @@
  },
  "stimulus": {},
  "observable": {
-  "raises": "ValueError"
+  "raises": "ValueError",
+  "within_s": 5
  },
  "subject_absence": "REQUIRES_SUBJECT"
 }

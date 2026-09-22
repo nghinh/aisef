@@ -38,6 +38,12 @@
    "budget": null,
    "rule": "§10.3, §13: PARENT, PRESERVE or VERIFY over a required subject that is absent -> PRECONDITION_BROKEN, PLAN; §14: a hard plan blocker"
   },
+  "PLAN_CONTRADICTION": {
+   "owner": "PLAN",
+   "retryability": "NOT_RETRYABLE",
+   "budget": null,
+   "rule": "§13: the parent cannot be reconciled with the plan's own record (a PRESERVE measured UNSATISFIED whose introducing story committed) -> PLAN; §14: a hard plan blocker; owner decision (P2 review): never retryable, so it consumes no budget"
+  },
   "POST_MERGE_REGRESSION": {
    "owner": "INTEGRATION",
    "retryability": "NOT_RETRYABLE",

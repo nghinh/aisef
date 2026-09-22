@@ -30,11 +30,14 @@ SHA = "89abcdef0123456789abcdef0123456789abcdef"
 #: The fixture product every WP-2.1 observation runs against (the same shape the tests use).
 PRODUCT = {
     "app/__init__.py": "",
-    "app/calc.py": "def add(a, b):\n    return a + b\n\n\ndef boom():\n    raise ValueError('no')\n",
+    "app/calc.py": "import time\n\n\ndef add(a, b):\n    return a + b\n\n\ndef boom():\n    raise ValueError('no')\n\n\n"
+                   "def hang():\n    time.sleep(3600)\n",
     "app/die.py": "import os\nos._exit(3)\n",
     "app/hang.py": "while True:\n    pass\n",
     "app/broken.py": "import not_a_real_dependency_xyz\n\n\ndef f():\n    return 1\n",
 }
+#: Every evidence spec's observation window (`observable.within_s`); HANG is the short one TIME-2..5 let expire.
+WINDOW, HANG = 10, 0.6
 LAYOUTS = {
     "no tests": {},
     "tests/ at the root": {"tests/__init__.py": "", "tests/test_calc.py": "from app.calc import add\n"},
@@ -69,19 +72,26 @@ def _checkout(files: dict):
         yield d
 
 
-def _outcome(record, spec) -> dict:
-    from aisef2.arch.enums import MeasurementPoint, ObligationRole, ProbeExecutionStatus
+def _outcome(record, spec, *, everywhere=False) -> dict:
+    """The outcome of one evaluation, read through its binding to this spec, SHA and the reference probe's PARTIAL
+    enforcement (PROBE-BIND-1). `everywhere` adds every owner any measurement point or role routes it to."""
+    from aisef2.arch.enums import Enforcement, MeasurementPoint, ObligationRole, ProbeExecutionStatus
     from aisef2.control.routing import route
+    from aisef2.probe.protocol import bound_result
     from aisef2.product.outcome import contract_satisfaction
-    r = record.result
+    r = bound_result(record, spec=spec, revision=SHA, enforcement=Enforcement.PARTIAL)
     executed = r.status is ProbeExecutionStatus.EXECUTED
     routed = route(r, spec, MeasurementPoint.CANDIDATE, ObligationRole.INTRODUCE)
-    return {"status": r.status.value,
-            "behavior_verdict": r.behavior_verdict.value if executed else None,
-            "reason": r.reason.value if executed and r.reason else None,
-            "contract_satisfaction": contract_satisfaction(r, spec).value if executed else None,
-            "owner_at_candidate": routed.failure.owner.value if routed.failure else None,
-            "enforcement": record.enforcement.value}
+    out = {"status": r.status.value,
+           "behavior_verdict": r.behavior_verdict.value if executed else None,
+           "reason": r.reason.value if executed and r.reason else None,
+           "contract_satisfaction": contract_satisfaction(r, spec).value if executed else None,
+           "owner_at_candidate": routed.failure.owner.value if routed.failure else None,
+           "enforcement": record.enforcement.value}
+    if everywhere:
+        out["owners_anywhere"] = sorted({f.owner.value if (f := route(r, spec, p, role).failure) else "none"
+                                         for p in MeasurementPoint for role in ObligationRole})
+    return out
 
 
 # --------------------------------------------------------------------------------------- WP-2.1
@@ -89,28 +99,36 @@ def _outcome(record, spec) -> dict:
 def probe_protocol() -> dict:
     from aisef2.arch.enums import (BehaviorVerdict as V, Enforcement, Polarity, ProbeExecutionStatus as PES,
                                    SubjectAbsence as SA, SubjectKind)
+    import dataclasses
+    from aisef2.errors import InvariantError
     from aisef2.probe import python_callable as pc
-    from aisef2.probe.protocol import ExecutionEnv, RevisionRef, run_probe
+    from aisef2.probe.protocol import (ExecutionEnv, HarnessProbe, ProbeRecord, ProbeRegistry, RevisionRef,
+                                       bound_result, run_probe)
     from aisef2.product.approval import ContractApproval, Requirement
     from aisef2.product.compiler import ProbeRef, compile_spec
     from aisef2.product.contract import BehaviorContract, Subject
+    from aisef2.product.outcome import Executed
     from aisef2.product.spec import ProductProofSpec
     fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
+    ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
+    tp = _module("aisef_v2_p2_python_callable", "tests/v2/p2/test_python_callable.py")  # its FakeProc injector
     probe = pc.PythonCallableProbe()
     exists = {"condition": "exists"}
 
-    def spec(locator, observable=None, stimulus=None, *, expectation=V.SATISFIED, absence=SA.ABSENCE_IS_DECIDABLE):
+    def spec(locator, observable=None, stimulus=None, *, expectation=V.SATISFIED, absence=SA.ABSENCE_IS_DECIDABLE,
+             window=WINDOW):
+        observed = dict(observable or exists) | ({} if window is None else {"within_s": window})
         return ProductProofSpec.create(
             contract_id="BC-EVIDENCE", probe_id=probe.id, probe_digest=probe.digest,
             probe_input={"subject": {"kind": "python_callable", "locator": locator}, "stimulus": stimulus or {},
-                         "observable": observable or exists, "subject_absence": absence.value},
+                         "observable": observed, "subject_absence": absence.value},
             candidate_expectation=expectation, compiler_id="evidence", compiler_digest="e" * 64)
 
     def env(timeout=20.0, required=Enforcement.PARTIAL, interpreter=sys.executable):
         return ExecutionEnv(interpreter, timeout, required)
 
-    def run(s, root, e=None):
-        return _outcome(run_probe(probe, s, RevisionRef(SHA, root), e or env()), s)
+    def run(s, root, e=None, *, everywhere=False):
+        return _outcome(run_probe(probe, s, RevisionRef(SHA, root), e or env()), s, everywhere=everywhere)
 
     with _checkout(PRODUCT) as product, _checkout({"README.md": "no product yet\n"}) as empty:
         abs_cases = {
@@ -128,16 +146,32 @@ def probe_protocol() -> dict:
         faults = {
             "interpreter absent": run(s, product, env(interpreter=os.path.join(empty, "no-python"))),
             "cannot inspect (checkout missing)": run(s, os.path.join(empty, "gone")),
-            "probe timeout": run(spec("app.hang:f"), product, env(timeout=1.5)),
         }
-        injected = {"tool absent (injected: exit 127, no protocol output)":
-                        dict(return_value=subprocess.CompletedProcess([], 127, stdout="", stderr="")),
-                    "sandbox cannot execute (injected: PermissionError)": dict(side_effect=PermissionError("denied")),
-                    "killed by signal before READY (injected)":
-                        dict(return_value=subprocess.CompletedProcess([], -9, stdout="", stderr=""))}
-        for name, kw in injected.items():
-            with mock.patch("aisef2.probe.python_callable.subprocess.run", **kw):
-                faults[name] = run(s, product)
+        injected = {  # (patch, env): each fault lands before the subject is dispatched
+            "harness timeout: no READY (injected: the harness sleeps)":
+                (mock.patch.object(pc, "HARNESS", "import time\ntime.sleep(3600)\n"), env(timeout=1.5)),
+            "tool absent (injected: exit 127, no protocol output)":
+                (mock.patch.object(pc, "HARNESS", "import sys\nsys.exit(127)\n"), None),
+            "the harness cannot launch (injected: PermissionError)":
+                (mock.patch.object(pc, "_spawn", side_effect=PermissionError("denied")), None),
+            "killed by signal before READY (injected)": (tp.faked(returncode=-9), None),
+            "harness gone before DISPATCHED (injected)": (tp.faked("READY", returncode=0), None),
+        }
+        for name, (patch, e) in injected.items():
+            with patch:
+                faults[name] = run(s, product, e, everywhere=True)
+
+        def hang(observable, expectation):
+            return run(spec("app.calc:hang", observable, expectation=expectation, absence=SA.REQUIRES_SUBJECT,
+                            window=HANG), product, everywhere=True)
+        deadline = {  # one physical event — the subject is still running when its window closes — under five specs
+            "returns 3, MUST_HOLD": hang({"returns": 3}, V.SATISFIED),
+            "raises ValueError, MUST_NOT_HOLD": hang({"raises": "ValueError"}, V.REFUTED),
+            "blocks, MUST_HOLD": hang({"blocks": True}, V.SATISFIED),
+            "blocks, MUST_NOT_HOLD": hang({"blocks": True}, V.REFUTED),
+            "exists, the subject's import never finishes": run(spec("app.hang:f", window=HANG), product,
+                                                               everywhere=True),
+        }
         present = {
             "exists": run(spec("app.calc:add"), product),
             "returns 3": run(spec("app.calc:add", {"returns": 3}, {"args": [1, 2]}), product),
@@ -148,9 +182,11 @@ def probe_protocol() -> dict:
             "resolves only outside the revision (REQUIRES_SUBJECT)": run(spec("json:dumps", absence=SA.REQUIRES_SUBJECT),
                                                                          product),
         }
-        with mock.patch("aisef2.probe.python_callable.subprocess.run", side_effect=AssertionError("ran")):
+        with mock.patch.object(pc, "_spawn", side_effect=AssertionError("ran")):
             refused = {
                 "unsupported observation class": run(spec("app.calc:add", {"stdout": "x"}), product),
+                "no bounded observation window": run(spec("app.calc:add", {"returns": 3}, {"args": [1, 2]},
+                                                          window=None), product),
                 "path locator": run(spec("app/calc.py:add"), product),
                 "developer test artefact": run(spec("tests.test_calc:test_add"), product),
                 "spec bound to another digest": run(ProductProofSpec.create(**{
@@ -182,8 +218,31 @@ def probe_protocol() -> dict:
                             probes={SubjectKind.PYTHON_CALLABLE: ProbeRef(probe.id, probe.digest)})
     conformance = fc.evaluate(*fc.load_inputs())
     f5 = next(x for x in conformance["subchecks"] if x["id"] == "F5.probe_protocol")
+    f5_time = next(x for x in conformance["subchecks"] if x["id"] == "F5.harness_timeout_vs_subject_deadline")
+    # PROBE-BIND: a record is the only carrier of a result a decision may read
+    bound = ProbeRecord.create(spec_id=s.id, semantic_hash=s.semantic_hash, probe_id=probe.id, probe_digest=probe.digest,
+                               revision=SHA, enforcement=Enforcement.PARTIAL, result=Executed(V.SATISFIED))
+    full = ProbeRecord.create(**{**{f: getattr(bound, f) for f in ("spec_id", "semantic_hash", "probe_id",
+                                                                  "probe_digest", "revision", "result")},
+                                 "enforcement": Enforcement.FULL})
+    builders = sorted((ROOT / "validation" / "v2").glob("*.py"))
+    binding = {
+        "bare_result_refused": _raises_invariant(lambda: bound_result(Executed(V.SATISFIED), spec=s, revision=SHA,
+                                                                      enforcement=Enforcement.PARTIAL), InvariantError),
+        "kernel_reads_results_only_through_the_binding": ks.check(ROOT, ("RESULT_ONLY_THROUGH_BINDING",)) == [],
+        "evidence_builders_read_results_only_through_the_binding": [
+            v for p in builders for v in ks.violations(p.relative_to(ROOT).as_posix(), p.read_text(encoding="utf-8"),
+                                                       ("RESULT_ONLY_THROUGH_BINDING",))] == [],
+        "enforcement_changes_the_comparability_identity": bound.comparability != full.comparability
+            and bound.record_digest != full.record_digest,
+        "a_PARTIAL_record_is_refused_under_FULL": _raises_invariant(
+            lambda: bound_result(bound, spec=s, revision=SHA, enforcement=Enforcement.FULL), InvariantError),
+        "an_edited_record_is_refused": _raises_invariant(
+            lambda: dataclasses.replace(bound, enforcement=Enforcement.FULL), InvariantError),
+    }
 
-    every = [o for group in (abs_cases, {"faults": faults}, {"present": present}, {"refused": refused}, layouts)
+    every = [o for group in (abs_cases, {"faults": faults}, {"deadline": deadline}, {"present": present},
+                             {"refused": refused}, layouts)
              for o in group.values() for o in o.values()]
     first = next(iter(layouts.values()))
     e, i, u = PES.EXECUTED.value, "INDETERMINATE", PES.UNRUNNABLE.value
@@ -193,31 +252,75 @@ def probe_protocol() -> dict:
         "probe": {"id": probe.id, "digest": probe.digest, "sources": list(pc.PROBE_SOURCES),
                   "enforcement": probe.enforcement().value, "weakest_path": pc.WEAKEST_PATH,
                   "harness_preconditions": list(probe.harness_preconditions()),
-                  "observation_classes": list(pc.CLASSES)},
+                  "observation_classes": list(pc.CLASSES),
+                  "verdict_when_the_window_expires": {c: v.value for c, v in pc.ON_DEADLINE.items()}},
         "implementation_notes": {
-            "probe_result_core": "unchanged from P1 (Executed / Unrunnable / InvalidSpec); enforcement is bound by "
-                                 "ProbeRecord, which run_probe returns for every evaluation",
+            "probe_result_core": "unchanged from P1 (Executed / Unrunnable / InvalidSpec). run_probe returns a sealed "
+                                 "ProbeRecord (spec, semantic hash, probe id and digest, revision, enforcement, "
+                                 "result; record_digest binds all of them); a decision reads the result only through "
+                                 "bound_result(record, spec=, revision=, enforcement=) — PROBE-BIND-1/2, static rule "
+                                 "RESULT_ONLY_THROUGH_BINDING",
             "api_shape": "a probe reports a typed Observation; protocol.classify_failure alone maps it to a ProbeResult",
+            "observation_class": "harness metadata: a ProbeRegistry of ProbeMetadata keyed by (probe id, digest); a "
+                                 "probe need only satisfy the frozen Probe protocol (PROBE-META-1) — the protocol is "
+                                 "unchanged",
+            "timeout": "RFC §9.2 (V2-002). The harness watchdog (ExecutionEnv.timeout_s) runs until the harness "
+                       "reports DISPATCHED: its expiry, a launch failure or a lost protocol is HARNESS_FAILED -> "
+                       "UNRUNNABLE / ENVIRONMENT (TIME-1). From DISPATCHED the spec's own window runs "
+                       "(observable.within_s: required, positive, finite); its expiry is SUBJECT_DEADLINE -> EXECUTED "
+                       "with the verdict the observation class assigns to a window in which nothing arrived: "
+                       "exists / returns / raises -> REFUTED (the awaited fact did not occur), blocks -> SATISFIED "
+                       "(the call was still running). A spec with no bounded window is INVALID_SPEC before anything "
+                       "runs",
             "second_kind": "a file_artifact prototype written only against the protocol runs in "
                            "tests/v2/p2/test_probe_protocol.py (SecondKindPrototype); it ships no code",
         },
         "residuals": [
-            "probe timeout is UNRUNNABLE / ENVIRONMENT even when the subject is what hangs — RFC §9 lists timeout as a "
-            "harness failure; a hanging product is therefore not charged to DEVELOPER",
-            "a harness process killed by a signal mid-observation is UNRUNNABLE: the probe cannot tell the subject "
-            "from the environment killing it",
+            "a harness process killed by a signal after DISPATCHED is UNRUNNABLE: the probe cannot tell the subject "
+            "from the environment killing it. This is not the expiry of the observation window (§9.2), which the "
+            "harness itself measures",
             "enforcement PARTIAL: " + pc.WEAKEST_PATH,
         ],
         "acceptance_cases": abs_cases,
         "fault_injection": faults,
+        "subject_deadline": deadline,
+        "binding": binding,
         "present_subjects": present,
         "refusals": refused,
         "layout_invariance": layouts,
         "f5_conformance": {"state": f5["state"], "detail": f5["detail"]},
+        "f5_timeout_conformance": {"state": f5_time["state"], "detail": f5_time["detail"]},
         "properties": {
             "PROBE_ABS_1_harness_failure_is_unrunnable_environment_no_verdict": all(
                 o["status"] == u and o["behavior_verdict"] is None and o["owner_at_candidate"] == "ENVIRONMENT"
                 for o in faults.values()),
+            "TIME_1_harness_cannot_launch_or_times_out_is_unrunnable_environment": all(
+                faults[k]["status"] == u and faults[k]["behavior_verdict"] is None
+                and faults[k]["owners_anywhere"] == ["ENVIRONMENT"]
+                for k in ("harness timeout: no READY (injected: the harness sleeps)",
+                          "the harness cannot launch (injected: PermissionError)")),
+            "TIME_2_positive_response_past_its_deadline_is_executed_unsatisfied":
+                (deadline["returns 3, MUST_HOLD"]["status"], deadline["returns 3, MUST_HOLD"]["contract_satisfaction"])
+                == (e, "UNSATISFIED"),
+            "TIME_3_forbidden_event_absent_at_the_deadline_is_executed_per_the_negative_spec":
+                (deadline["raises ValueError, MUST_NOT_HOLD"]["status"],
+                 deadline["raises ValueError, MUST_NOT_HOLD"]["contract_satisfaction"]) == (e, "SATISFIED"),
+            "TIME_4_one_physical_timeout_different_satisfaction_by_spec":
+                {k: o["contract_satisfaction"] for k, o in deadline.items()} == {
+                    "returns 3, MUST_HOLD": "UNSATISFIED", "raises ValueError, MUST_NOT_HOLD": "SATISFIED",
+                    "blocks, MUST_HOLD": "SATISFIED", "blocks, MUST_NOT_HOLD": "UNSATISFIED",
+                    "exists, the subject's import never finishes": "UNSATISFIED"},
+            "TIME_5_subject_timeout_never_environment": all(
+                o["status"] == e and "ENVIRONMENT" not in o["owners_anywhere"] for o in deadline.values()),
+            "no_bounded_window_is_invalid_spec_before_running":
+                refused["no bounded observation window"]["status"] == "INVALID_SPEC",
+            "PROBE_BIND_1_a_bare_result_reaches_no_decision": binding["bare_result_refused"]
+                and binding["kernel_reads_results_only_through_the_binding"]
+                and binding["evidence_builders_read_results_only_through_the_binding"],
+            "PROBE_BIND_2_enforcement_is_part_of_the_bound_identity": binding["enforcement_changes_the_comparability_identity"]
+                and binding["a_PARTIAL_record_is_refused_under_FULL"] and binding["an_edited_record_is_refused"],
+            "PROBE_META_1_observation_class_is_harness_metadata": not hasattr(HarnessProbe, "observation_class")
+                and ProbeRegistry([pc.METADATA]).observation_class(probe.id, probe.digest, s) == "exists",
             "PROBE_ABS_2_requires_subject_absent_is_indeterminate_precondition_absent": all(
                 (o["status"], o["behavior_verdict"], o["reason"]) == (e, i, "PRECONDITION_ABSENT")
                 for o in abs_cases["PROBE-ABS-2"].values()),
@@ -241,6 +344,7 @@ def probe_protocol() -> dict:
             "digest_bound_into_the_spec": (compiled.probe_id, compiled.probe_digest) == (probe.id, probe.digest),
             "layout_invariance": all(v == first for v in layouts.values()) and len(layouts) == len(LAYOUTS),
             "f5_probe_protocol_equals_rfc": f5["state"] == "PASS",
+            "f5_timeout_semantics_equal_rfc": f5_time["state"] == "PASS",
         },
     }
 
@@ -256,10 +360,12 @@ def calibration() -> dict:
     from aisef2.arch.enums import BehaviorVerdict as V, Enforcement
     from aisef2.probe import calibration as cal
     from aisef2.probe import python_callable as pc
-    from aisef2.probe.protocol import HarnessProbe, Observation, ObservationKind as K
+    from aisef2.probe.protocol import HarnessProbe, Observation, ObservationKind as K, Probe, ProbeMetadata, ProbeRegistry
     fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
     ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
     probe = pc.PythonCallableProbe()
+    registry = ProbeRegistry([pc.METADATA, *(ProbeMetadata(f"probe.{n}", "f" * 64, pc.spec_class)
+                                             for n in ("always_refuted", "always_satisfied"))])
     env = cal.calibration_env(sys.executable)
     base = ROOT / FIXTURES_REL / "python_callable"
     committed = json.loads((ROOT / CALIBRATION_REL).read_text(encoding="utf-8")) if (ROOT / CALIBRATION_REL).exists() \
@@ -273,7 +379,7 @@ def calibration() -> dict:
         return lambda: kept.get(key, time.time())
 
     records = [cal.calibrate(probe, cls, base / cls / "positive", base / cls / "negative", env, clock_for(cls),
-                             names=(f"{FIXTURES_REL}/python_callable/{cls}/positive",
+                             registry=registry, names=(f"{FIXTURES_REL}/python_callable/{cls}/positive",
                                     f"{FIXTURES_REL}/python_callable/{cls}/negative"))
                for cls in pc.CLASSES]
 
@@ -286,23 +392,36 @@ def calibration() -> dict:
         def harness_preconditions(self):
             return ("none",)
 
-        def observation_class(self, spec):
-            return probe.observation_class(spec)
-
         def observe(self, spec, at, env):
             return Observation(K.OBSERVED, self.verdict)
 
-    def rejection(verdict, name):
-        fixed = type(name, (Fixed,), {"id": f"probe.{name}", "verdict": verdict})()
+    class ProtocolOnly:
+        """PROBE-META-1: the frozen Probe protocol and nothing else — no harness base class, no class-reporting
+        method. It carries the reference probe's identity, so the registry entry for that identity serves it."""
+        id, digest = probe.id, probe.digest
+
+        def enforcement(self):
+            return probe.enforcement()
+
+        def harness_preconditions(self):
+            return probe.harness_preconditions()
+
+        def evaluate(self, spec, at, env):
+            return probe.evaluate(spec, at, env)
+
+    def outcome(p):
         out = {}
         for cls in pc.CLASSES:
             try:
-                cal.calibrate(fixed, cls, base / cls / "positive", base / cls / "negative", env, time.time)
+                cal.calibrate(p, cls, base / cls / "positive", base / cls / "negative", env, time.time, registry=registry)
                 out[cls] = "QUALIFIED"
             except cal.NotQualified as e:
                 out[cls] = "REJECTED: " + str(e).split(": ", 1)[1]
         return out
-    always_refuted, always_satisfied = rejection(V.REFUTED, "always_refuted"), rejection(V.SATISFIED, "always_satisfied")
+    always_refuted = outcome(type("always_refuted", (Fixed,), {"id": "probe.always_refuted", "verdict": V.REFUTED})())
+    always_satisfied = outcome(type("always_satisfied", (Fixed,), {"id": "probe.always_satisfied",
+                                                                   "verdict": V.SATISFIED})())
+    protocol_only = outcome(ProtocolOnly())
     table = {f"{e.value} expected, {o.value} observed": cal.demonstrates_contrast(e, o)
              for e in (V.SATISFIED, V.REFUTED) for o in V}
     conformance = fc.evaluate(*fc.load_inputs())
@@ -321,6 +440,7 @@ def calibration() -> dict:
         "contrast_table": table,
         "CAL_1_always_refuted_probe": always_refuted,
         "always_satisfied_probe": always_satisfied,
+        "PROBE_META_1_protocol_only_probe": protocol_only,
         "spec_falsifiability": {"mechanisms": list(cal.MECHANISMS),
                                 "plan_freeze_prerequisite": False,
                                 "planning_modules_scanned": [p.relative_to(ROOT).as_posix() for p in plan_sources]},
@@ -336,6 +456,10 @@ def calibration() -> dict:
                                                                     for v in always_refuted.values()),
             "always_satisfied_probe_rejected_for_must_hold": all(v.startswith("REJECTED: negative fixture")
                                                                   for v in always_satisfied.values()),
+            "PROBE_META_1_protocol_only_probe_calibrated": isinstance(ProtocolOnly(), Probe)
+                and not isinstance(ProtocolOnly(), HarnessProbe)
+                and protocol_only == {cls: "QUALIFIED" for cls in pc.CLASSES},
+            "blocks_class_calibrated": "blocks" in [r.observation_class for r in records],
             "spec_falsifiability_not_a_plan_freeze_input": "SpecFalsifiabilityEvidence" not in plan_names
                 and "falsifiability_problems" not in plan_names,
             "f5_calibration_contracts_equal_rfc": f5["state"] == "PASS",
@@ -350,6 +474,7 @@ def static_admission() -> dict:
     import re
     from aisef2.arch.enums import ObligationRole as Role, ParentExpectation as PE, SubjectKind
     from aisef2.plan import static_admission as sa
+    from aisef2.probe.protocol import HarnessProbe, Probe, ProbeRegistry
     from aisef2.probe.python_callable import PythonCallableProbe
     fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
     ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
@@ -361,6 +486,13 @@ def static_admission() -> dict:
 
     class Moved(PythonCallableProbe):
         digest = "d" * 64
+
+    class ProtocolOnly:
+        """PROBE-META-1: the frozen Probe protocol only — no harness base class, no class-reporting method."""
+        id, digest = w.P.id, w.P.digest
+        enforcement, harness_preconditions, evaluate = w.P.enforcement, w.P.harness_preconditions, w.P.evaluate
+    protocol_only = engine.admit(plan(), dataclasses.replace(inputs, catalogue={SubjectKind.PYTHON_CALLABLE:
+                                                                                ProtocolOnly()}))
     cases = {
         "1 an approved requirement with no contract": failed(plan(), w.world(extra_requirement=True)[0]),
         "2 a committed spec that is not the derivation": failed(
@@ -378,6 +510,8 @@ def static_admission() -> dict:
         "7 a contract without approval": failed(plan(), w.world(drop_approval_for="BC-NO-TEL")[0]),
         "8 an orphan obligation": failed(plan(good + (ob("C5", "PPS-nowhere", "S3", Role.VERIFY),))),
         "9 a missing probe calibration": failed(plan(), w.world(calibrated=("exists",))[0]),
+        "9 a probe the harness registry does not know": failed(plan(), dataclasses.replace(inputs,
+                                                                                          registry=ProbeRegistry())),
     }
     want = {"1 an approved requirement with no contract": ["requirement_coverage"],
             "2 a committed spec that is not the derivation": ["contract_spec_integrity"],
@@ -389,11 +523,13 @@ def static_admission() -> dict:
                                                                               "proof_capability"],
             "7 a contract without approval": ["contract_spec_integrity", "traceability"],
             "8 an orphan obligation": ["plan_structure"],
-            "9 a missing probe calibration": ["probe_calibration"]}
+            "9 a missing probe calibration": ["probe_calibration"],
+            "9 a probe the harness registry does not know": ["probe_calibration"]}
     good_result = engine.admit(plan(), inputs)
     calls = []
     with mock.patch.object(PythonCallableProbe, "observe", side_effect=lambda *a: calls.append("observe")), \
-            mock.patch("subprocess.run", side_effect=lambda *a, **k: calls.append("subprocess")):
+            mock.patch("subprocess.run", side_effect=lambda *a, **k: calls.append("subprocess")), \
+            mock.patch("subprocess.Popen", side_effect=lambda *a, **k: calls.append("subprocess")):
         engine.admit(plan(), inputs)
     shas = set(re.findall(r"\b[0-9a-f]{40}\b", repr(good_result))) - {w.BASELINE}
     plan_names = sorted({n for p in sorted((ROOT / "aisef2" / "plan").rglob("*.py"))
@@ -409,7 +545,11 @@ def static_admission() -> dict:
         "well_formed_plan": {"admitted": good_result.admitted, "result_digest": good_result.result_digest,
                              "checks_passed": [c.name for c in good_result.checks if c.passed]},
         "adversarial": cases,
+        "protocol_only_probe": {"admitted": protocol_only.admitted,
+                                "checks_passed": [c.name for c in protocol_only.checks if c.passed]},
         "implementation_notes": {
+            "observation_class": "check 9 asks the harness registry (AdmissionInputs.registry, keyed by probe id and "
+                                 "digest) which class a spec needs — never the probe's class hierarchy (PROBE-META-1)",
             "depends_on": "criterion ids that must complete first (board resolution §1); the story order is induced "
                           "from them",
             "role_expectation_pairs": "a pair outside RFC §13's table (e.g. INTRODUCE with SATISFIED_AT_PARENT) has no "
@@ -429,7 +569,9 @@ def static_admission() -> dict:
                 sa.require_admitted(plan(), inputs).admitted
                 and not {"SpecFalsifiabilityEvidence", "falsifiability_problems"} & set(plan_names)
                 and [f.name for f in dataclasses.fields(sa.AdmissionInputs)] ==
-                ["requirements", "contracts", "approvals", "specs", "catalogue", "calibrations"],
+                ["requirements", "contracts", "approvals", "specs", "catalogue", "calibrations", "registry"],
+            "PROBE_META_1_protocol_only_probe_admitted": protocol_only.admitted
+                and isinstance(ProtocolOnly(), Probe) and not isinstance(ProtocolOnly(), HarnessProbe),
             "planning_code_never_names_the_raw_verdict": ks.check(ROOT, ("NO_RAW_VERDICT_ROUTING",)) == [],
             "f6_plan_obligation_equals_rfc": f6["state"] == "PASS",
         },
@@ -440,8 +582,8 @@ def static_admission() -> dict:
 
 def story_admission() -> dict:
     import itertools
-    from aisef2.arch.enums import (BehaviorVerdict as V, EventType, MeasurementPoint, ObligationRole as Role,
-                                   StoryAdmissionDisposition as D)
+    from aisef2.arch.enums import (BehaviorVerdict as V, Enforcement, EventType, MeasurementPoint, Owner,
+                                   ObligationRole as Role, StoryAdmissionDisposition as D)
     from aisef2.control import routing
     from aisef2.errors import InvariantError
     from aisef2.plan import story_admission as sa
@@ -507,6 +649,30 @@ def story_admission() -> dict:
     early = sa.ordering_problems([(EventType.PROVIDER_REQUEST, {"story_id": "S1"}),
                                   (EventType.STORY_ADMITTED, {"story_id": "S1", "developer_call_permitted": True})])
     abbreviated = _raises_invariant(lambda: RevisionRef("0f1e2d3c4b5a", os.path.abspath("x")), InvariantError)
+    contradiction = t.decide(Role.PRESERVE, Executed(V.REFUTED), committed=True).failure
+    st = t.Story()
+    st.setUp()
+    blocked = st.admit([t.ob("C1", st.a, "S1", Role.INTRODUCE), t.ob("C3", st.a, "S2", Role.PRESERVE, deps=("C1",)),
+                        t.ob("C4", st.b, "S2", Role.INTRODUCE)],
+                       {st.a.id: t.Observation(t.K.OBSERVED, V.REFUTED), st.b.id: t.Observation(t.K.OBSERVED, V.REFUTED)},
+                       committed=frozenset({"S1"}))
+    plan_contradiction = {
+        "owner": contradiction.owner.value, "retryability": contradiction.retryability.value,
+        "budget_charged": contradiction.budget.value if contradiction.budget else None,
+        "dispositions": [o.decision.disposition.value for o in blocked.obligations],
+        "story_admitted": blocked.admitted, "developer_call_permitted": blocked.developer_call_permitted,
+        "developer_request_refused": _raises_invariant(lambda: sa.request_developer(st.sink, "S2"), InvariantError),
+        "provider_requests": sum(1 for e, _ in st.sink.events if e is EventType.PROVIDER_REQUEST)}
+    s = t.spec("x")
+
+    def classified(record, enforcement=Enforcement.PARTIAL):
+        return lambda: sa.classify(t.ob("C", s, "S1", Role.INTRODUCE), record, s, revision=t.PARENT.sha,
+                                   enforcement=enforcement, introducer_committed=False)
+    binding = {"bare_result_refused": _raises_invariant(classified(Executed(V.REFUTED)), InvariantError),
+               "record_for_another_parent_refused": _raises_invariant(
+                   classified(t.record(s, Executed(V.REFUTED), revision="0" * 40)), InvariantError),
+               "PARTIAL_record_under_FULL_refused": _raises_invariant(
+                   classified(t.record(s, Executed(V.REFUTED)), Enforcement.FULL), InvariantError)}
     conformance = fc.evaluate(*fc.load_inputs())
     f7 = next(x for x in conformance["subchecks"] if x["id"] == "F7.dispositions")
     return {
@@ -514,8 +680,11 @@ def story_admission() -> dict:
         "frozen_items": ["F7"],
         "rfc_rows": rfc_rows, "bare_indeterminate": bare, "neg_cases": neg, "real_parent": real,
         "fault_injection": faults,
-        "open_items": ["§22 names no failure code for PLAN_CONTRADICTION: it blocks the story and charges no owner; an "
-                       "owner, if any, is the owner's decision"],
+        "plan_contradiction": plan_contradiction,
+        "binding": binding,
+        "owner_decisions": ["PLAN_CONTRADICTION (P2 owner review): owner PLAN, never retryable, developer budget 0 — "
+                            "an owner does not imply a retry budget is consumed (FailureCode.PLAN_CONTRADICTION in "
+                            "the F3 taxonomy; PLAN-OWNER-1/2)"],
         "f7_conformance": {"state": f7["state"], "detail": f7["detail"]},
         "properties": {
             "every_rfc_row_reproduced": [v["disposition"] for v in rfc_rows.values()] == [
@@ -540,6 +709,15 @@ def story_admission() -> dict:
                 "PRESERVE, regressed": ["PRECONDITION_BROKEN"], "INTRODUCE forbidden module, present": ["READY"],
                 "INTRODUCE forbidden module, absent": ["PRE_SATISFIED"]},
             "abbreviated_parent_sha_refused": abbreviated,
+            "PLAN_OWNER_1_plan_contradiction_carries_PLAN": plan_contradiction["owner"] == Owner.PLAN.value
+                and rfc_rows["PRESERVE measured UNSATISFIED, introducing story committed"]["owner"] == "PLAN",
+            "PLAN_OWNER_2_plan_contradiction_consumes_no_budget": plan_contradiction == {
+                "owner": "PLAN", "retryability": "NOT_RETRYABLE", "budget_charged": None,
+                "dispositions": ["PLAN_CONTRADICTION", "READY"], "story_admitted": False,
+                "developer_call_permitted": False, "developer_request_refused": True, "provider_requests": 0},
+            "PROBE_BIND_1_story_admission_refuses_a_bare_result": binding["bare_result_refused"]
+                and binding["record_for_another_parent_refused"],
+            "PROBE_BIND_2_story_admission_refuses_other_enforcement": binding["PARTIAL_record_under_FULL_refused"],
             "no_provider_request_before_admission": refused_before and early != [] and sink.events == (),
             "routes_on_satisfaction_never_the_raw_verdict": ks.check(ROOT, ("NO_RAW_VERDICT_ROUTING",)) == [],
             "f7_dispositions_equal_rfc": f7["state"] == "PASS",

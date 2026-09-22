@@ -7,7 +7,7 @@
 * **The disposition table** (`classify`) is §13's, row for row. A typed INDETERMINATE keeps its declared row; one with
   no declared routing is PROBE_INVALID, never a developer outcome. PLAN_CONTRADICTION is raised when the parent
   cannot be reconciled with the plan's own record: a PRESERVE measured UNSATISFIED whose introducing story already
-  committed (§13's example). §22 names no failure code for PLAN_CONTRADICTION, so none is charged: it blocks.
+  committed (§13's example): owner PLAN, never retryable, so it charges no budget at all (PLAN-OWNER-1/2).
 * **No developer call before admission** (§13). Every evaluation and the admission itself are emitted to a sink;
   `ordering_problems` fails any `provider/request` that is not preceded by this story's `story/admitted` permitting
   it, and `request_developer` refuses to emit one. A developer call is permitted when the story is admitted and at
@@ -27,7 +27,7 @@ from aisef2.control.owner import Classification, FailureCode, classify as owner_
 from aisef2.control.routing import STORY_ADMISSION, UnroutableOutcome, route
 from aisef2.errors import InvariantError
 from aisef2.plan.obligation import Plan, PlanObligation
-from aisef2.probe.protocol import ExecutionEnv, HarnessProbe, ProbeRecord, RevisionRef, run_probe
+from aisef2.probe.protocol import ExecutionEnv, Probe, ProbeRecord, RevisionRef, bound_result, run_probe
 from aisef2.product.contract import plain
 from aisef2.product.outcome import InvalidSpec, contract_satisfaction
 from aisef2.product.spec import ProductProofSpec
@@ -71,9 +71,12 @@ class StoryAdmissionResult:
     developer_call_permitted: bool
 
 
-def classify(obligation: PlanObligation, result, spec: ProductProofSpec, introducer_committed: bool) -> Decision:
-    """§13: the disposition of one obligation from its probe result at the parent. Routes on satisfaction only; owners
-    are the F2 routing table's at MeasurementPoint.PARENT."""
+def classify(obligation: PlanObligation, record: ProbeRecord, spec: ProductProofSpec, *, revision: str,
+             enforcement: Enforcement, introducer_committed: bool) -> Decision:
+    """§13: the disposition of one obligation from its probe record at the parent. The result is read only through the
+    record's binding to this spec, this parent and this enforcement level (PROBE-BIND-1/2). Routes on satisfaction
+    only; owners are the F2 routing table's at MeasurementPoint.PARENT."""
+    result = bound_result(record, spec=spec, revision=revision, enforcement=enforcement)
     try:
         routed = route(result, spec, MeasurementPoint.PARENT, obligation.role)
     except UnroutableOutcome:
@@ -94,7 +97,7 @@ def classify(obligation: PlanObligation, result, spec: ProductProofSpec, introdu
         raise UnroutableOutcome(f"§13 has no row for {obligation.role.value} expecting "
                                 f"{obligation.expected_parent.value} measured {satisfaction.value}")
     if row is D.PRECONDITION_BROKEN and introducer_committed:
-        return Decision(D.PLAN_CONTRADICTION, None, satisfaction,
+        return Decision(D.PLAN_CONTRADICTION, owner_of(FailureCode.PLAN_CONTRADICTION), satisfaction,
                         "§13: a PRESERVE measured UNSATISFIED whose introducing story already committed")
     failure = owner_of(FailureCode.PRECONDITION_BROKEN) if row is D.PRECONDITION_BROKEN else None
     return Decision(row, failure, satisfaction, f"§13: {obligation.role.value} expecting "
@@ -137,7 +140,7 @@ def request_developer(sink: MemorySink, story_id: str, data: Mapping | None = No
 
 
 def admit_story(plan: Plan, story_id: str, parent: RevisionRef, *, specs: Mapping[str, ProductProofSpec],
-                probes: Mapping[str, HarnessProbe], env: ExecutionEnv, committed_stories: frozenset[str],
+                probes: Mapping[str, Probe], env: ExecutionEnv, committed_stories: frozenset[str],
                 sink: MemorySink) -> StoryAdmissionResult:
     """Run every obligation of `story_id` at `parent` and emit its dispositions. Nothing is routed on a raw verdict."""
     if not isinstance(parent, RevisionRef):
@@ -150,10 +153,15 @@ def admit_story(plan: Plan, story_id: str, parent: RevisionRef, *, specs: Mappin
     for o in mine:
         spec = specs[o.product_proof_spec_id]
         probe = probes.get(spec.probe_id)
-        record = run_probe(probe, spec, parent, env) if probe is not None else ProbeRecord(
-            spec.id, spec.semantic_hash, spec.probe_id, spec.probe_digest, parent.sha, Enforcement.UNAVAILABLE,
-            InvalidSpec(f"probe {spec.probe_id} is not in the harness catalogue"))
-        decision = classify(o, record.result, spec, introducer.get(o.product_proof_spec_id) in committed_stories)
+        if probe is not None:
+            record, level = run_probe(probe, spec, parent, env), probe.enforcement()
+        else:
+            level = Enforcement.UNAVAILABLE
+            record = ProbeRecord.create(spec_id=spec.id, semantic_hash=spec.semantic_hash, probe_id=spec.probe_id,
+                                        probe_digest=spec.probe_digest, revision=parent.sha, enforcement=level,
+                                        result=InvalidSpec(f"probe {spec.probe_id} is not in the harness catalogue"))
+        decision = classify(o, record, spec, revision=parent.sha, enforcement=level,
+                            introducer_committed=introducer.get(o.product_proof_spec_id) in committed_stories)
         sink.emit(EventType.PROBE_EVALUATED, {"story_id": story_id, "criterion_id": o.criterion_id,
                                               "record": plain(record)})
         admissions.append(ObligationAdmission(o.criterion_id, record, decision))
