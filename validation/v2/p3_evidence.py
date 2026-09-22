@@ -95,10 +95,10 @@ def journal_writer() -> dict:
             layer_append = _raises(lambda: w2.append(T.RUN_END, {}), JournalError)
         w2.close()
         lines = (d / "long.jsonl").read_text(encoding="utf-8").splitlines(keepends=True)
-        (d / "gap.jsonl").write_text("".join(lines[:5] + lines[6:]), encoding="utf-8")
+        (d / "gap.jsonl").write_bytes("".join(lines[:5] + lines[6:]).encode("utf-8"))  # bytes: no CRLF on Windows
         layer_seed = _raises(lambda: wr.JournalWriter(d / "gap.jsonl"), JournalError)
         layer_decode = _raises(lambda: ev.decode(lines[5].rstrip("\n"), 6, ev.GENESIS), JournalError)
-        (d / "reordered.jsonl").write_text("".join([lines[0], lines[2], lines[1]] + lines[3:]), encoding="utf-8")
+        (d / "reordered.jsonl").write_bytes("".join([lines[0], lines[2], lines[1]] + lines[3:]).encode("utf-8"))
         journal_1 = {name: _raises(lambda n=name: reconstruct((d / n).read_text(encoding="utf-8")), JournalError)
                      for name in ("gap.jsonl", "reordered.jsonl")}
         conflicting = lines[1].replace('"c1"', '"cX"')
@@ -154,7 +154,7 @@ def journal_writer() -> dict:
             _raises(lambda: wt.append(T.RUN_END, {}), JournalError)
         wt.close()
         text = (d / "torn.jsonl").read_text(encoding="utf-8")
-        (d / "torn.jsonl").write_text(text[:len(text) - 7], encoding="utf-8")
+        (d / "torn.jsonl").write_bytes(text[:len(text) - 7].encode("utf-8"))
         torn = reconstruct((d / "torn.jsonl").read_text(encoding="utf-8"))
         faults["torn tail (truncation also failed)"] = {
             "reported": torn.torn_tail, "complete_prefix_only": len(torn.events) == 1,

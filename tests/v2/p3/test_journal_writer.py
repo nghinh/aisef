@@ -421,5 +421,22 @@ class Writer(Journals, unittest.TestCase):
             wr.JournalWriter(self.path)
 
 
+class WindowsTextMode(unittest.TestCase):
+    def test_the_writer_evidence_holds_where_text_files_are_written_with_crlf(self):
+        # Windows' text mode writes CRLF, so a journal the evidence writes as text is not canonical there and is refused
+        # for that reason instead of the one the evidence names (CI run 35698648555). Journals are written as bytes.
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("aisef_v2_p3_evidence_crlf", ROOT / "validation/v2/p3_evidence.py")
+        evidence = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(evidence)
+        real = pathlib.Path.write_text
+
+        def crlf(path, data, encoding=None, errors=None, newline=None):
+            return real(path, data.replace("\n", "\r\n"), encoding=encoding, errors=errors, newline="")
+        with mock.patch.object(pathlib.Path, "write_text", crlf):
+            properties = evidence.journal_writer()["properties"]
+        self.assertEqual([k for k, v in properties.items() if not v], [])
+
+
 if __name__ == "__main__":
     unittest.main()
