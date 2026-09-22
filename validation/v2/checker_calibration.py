@@ -239,6 +239,12 @@ def _p3_evidence() -> Checker:
                    ("validation/v2/p3_evidence.py",))
 
 
+def _p4_evidence() -> Checker:
+    ev = _load("aisef_v2_p4_evidence", V2 / "p4_evidence.py")
+    return Checker("p4_evidence", "WP-4.1", lambda: ev.check(ROOT), lambda fx: ev.problems_of(fx["record"]),
+                   ("validation/v2/p4_evidence.py",))
+
+
 def _refmodel_independence() -> Checker:
     ri = _load("aisef_v2_refmodel_independence", V2 / "refmodel_independence.py")
     return Checker("refmodel_independence", "WP-3.5", lambda: ri.check(ROOT),
@@ -285,7 +291,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_verdict_from_absence_declaration", "NO_VERDICT_FROM_ABSENCE_DECLARATION", "P1 hygiene (RFC §10.2)"),
     _kernel_rule("result_only_through_binding", "RESULT_ONLY_THROUGH_BINDING", "P2 correction (PROBE-BIND-1)"),
     _kernel_rule("no_time_in_projections", "NO_TIME_IN_PROJECTIONS", "WP-3.3"),
-    _mutation, _p1_evidence, _p2_evidence, _p3_evidence, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
+    _mutation, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 
 

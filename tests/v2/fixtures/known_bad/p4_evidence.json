@@ -1,0 +1,13 @@
+{
+ "checker": "p4_evidence",
+ "package": "WP-4.1",
+ "kind": "evidence_record",
+ "record": {
+  "work_package": "WP-4.1",
+  "properties": {
+   "story_scope_owns_no_journal_writer": true,
+   "SCOPE_1_acquire_during_disposal_refused": false
+  }
+ },
+ "expect": "property SCOPE_1_acquire_during_disposal_refused is false"
+}

@@ -33,7 +33,7 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
-           "P3": "closure-evidence/v2/P3-MUTATION.json"}
+           "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -175,7 +175,20 @@ P3_TARGETS: dict[str, list[str]] = {
     "tests/v2/refmodel/qualification_counters.py::model": _REFMODEL_TESTS,
     "tests/v2/refmodel/qualification_counters.py::_COUNTED": _REFMODEL_TESTS,
 }
-PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS}
+_FORMAT2_TESTS = ["tests/v2/p4/test_format2.py"]
+_SCOPE_TESTS = ["tests/v2/p4/test_story_scope.py"]
+P4_TARGETS: dict[str, list[str]] = {
+    # WP-4.1: journal format 2 (schemas, the rules over the journal, the reader, the writer) and StoryScope
+    **{f"aisef2/journal/format2.py::{f}": _FORMAT2_TESTS for f in (
+        "validate", "_cites", "_attempt", "_open_acquisitions", "_acquired", "_released", "_capability", "_spec",
+        "_invoked", "_tool_result", "_provider_result", "_tool_result_rule", "_provider_result_rule",
+        "_synthetic_only_true", "_format_rule", "_str_map", "declared_format", "reconstruct", "DISPOSAL_RANK",
+        "CLOSERS", "_GRADE_ORDER", "JournalWriter2.__init__", "JournalWriter2.append", "JournalWriter2.close")},
+    **{f"aisef2/runtime/story_scope.py::{f}": _SCOPE_TESTS for f in (
+        "StoryScope.acquire", "StoryScope.dispose", "StoryScope._record", "StoryScope._release", "DisposalReport.ok",
+        "Directory.__init__", "Directory.release", "StoryScope.release")},
+}
+PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}

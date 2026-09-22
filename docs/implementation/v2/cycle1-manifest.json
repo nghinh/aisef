@@ -1344,7 +1344,16 @@
    ],
    "rollback_rule": "Revert this package's commits. No downstream package may have consumed its evidence artifact; if one has, revert that package too. No V1 artefact is touched, so rollback can never affect V1 evidence.",
    "evidence_label": "`P4-STORY-SCOPE.json`",
-   "evidence_asserts": "acquisition during dispose rejected; disposal failure recorded, never swallowed; deterministic sibling order"
+   "evidence_asserts": "acquisition during dispose rejected; disposal failure recorded, never swallowed; deterministic sibling order",
+   "discovered_findings": [
+    {
+     "id": "P4-FINDING-001",
+     "found": "2026-09-22, WP-4.1 format-2 compatibility tests",
+     "what": "P3's fixture tests/v2/fixtures/journal/version_mismatch.jsonl declares journal_format 2 as its 'future format'. Once format 2 exists, the format-2 reader reads it as a valid format-2 journal; the format-1 reader still refuses it exactly as P3 recorded",
+     "resolution": "the compatibility test states it: every other P3 fixture reads identically through both readers; this one is refused by format 1 and read by format 2. No P3 artefact changed",
+     "classification": "a consequence of the format bump, not a defect; no frozen semantics changed"
+    }
+   ]
   },
   {
    "id": "WP-4.2",
