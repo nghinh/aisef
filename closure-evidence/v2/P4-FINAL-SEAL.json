@@ -1,0 +1,520 @@
+{
+ "record": "AISEF V2 — P4 FINAL SEAL",
+ "id": "P4-FINAL-SEAL",
+ "authority": "AISEF V2 — OWNER DECISION ON ARCHITECTURE EXCEPTION V2-003 (owner decision, 2026-09-23) §19, on 'AISEF V2 — OWNER ACCEPTS P3 / AUTHORIZE P4 STORY / RUN TRANSACTION' (2026-09-22)",
+ "owner_acceptance": "pending: this seal makes P4 ready for owner acceptance; P5 is NOT authorized by it",
+ "correction_record": {
+  "path": "closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json",
+  "sha256": "9f850db370399e1adc3098cf35f0fa570e4e8a81840693626d1452d8b11d700a",
+  "committed_in": "95f8da64c6841952298c86453feae386c9dfcf47",
+  "verdict": "P4 CORRECTED / READY FOR OWNER ACCEPTANCE"
+ },
+ "historical_stop_record": {
+  "path": "closure-evidence/v2/P4-COMPLETION.json",
+  "sha256": "18864746d3592e9a62cb08abd27aff45e1db1257740cff4db36efe7dac2e50d6",
+  "verdict": "P4 STOPPED — ARCHITECTURE EXCEPTION REQUIRED (V2-003); everything else green",
+  "committed_in": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0",
+  "kept": "byte-identical"
+ },
+ "p4_candidate": {
+  "original": "d234be9181254021cc2fea4ba0379422cbd54348",
+  "corrected": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+  "tree": "c14973c3acd5b660855d66f38bee182620a23481",
+  "aisef2_tree": "2e082bef0fb9039335c01926cc9772915b0a2a24",
+  "runtime_tree": "0f985de12d6145e538871ea4b1cb34e54b38ea1b",
+  "probe_tree": "2fac3d0a5d7ec7b148796b17841691534f49c5ad",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "aisef2_and_reference_models_unchanged_since": true
+ },
+ "p4_evidence": {
+  "P4-STORY-SCOPE": {
+   "path": "closure-evidence/v2/P4-STORY-SCOPE.json",
+   "sha256": "df763f9695ba11801c2b7b2294c11194f8e44a01491f43b31f7b583ead32acfd",
+   "every_property_true": true
+  },
+  "P4-RANGE-EMPTINESS": {
+   "path": "closure-evidence/v2/P4-RANGE-EMPTINESS.json",
+   "sha256": "4633f9bca36afe3c1d3c5431c82c7d04e7e6269d5d7bd547260a408b90f833dc",
+   "every_property_true": true
+  },
+  "P4-RUN-LIFETIME": {
+   "path": "closure-evidence/v2/P4-RUN-LIFETIME.json",
+   "sha256": "1e4583ed24eda67eaee967b7f919ce37062c5958522e23ffda482cdeaa05fa59",
+   "every_property_true": true
+  },
+  "P4-RUNSPEC-IDENTITY": {
+   "path": "closure-evidence/v2/P4-RUNSPEC-IDENTITY.json",
+   "sha256": "286d598289e763dfb20e5143df888429b88eddd5e2cb1b76125e463bfa4c5bb4",
+   "every_property_true": true
+  },
+  "P4-BUDGETS": {
+   "path": "closure-evidence/v2/P4-BUDGETS.json",
+   "sha256": "2f7fb39b4b5e9362454cb3f588fd9407e2cac22a6dbce25f51a9341d6792cf2f",
+   "every_property_true": true
+  },
+  "P4-INTERRUPTION": {
+   "path": "closure-evidence/v2/P4-INTERRUPTION.json",
+   "sha256": "4da0a9188287c5ea65b93c283b1b470495b6c1ffedeccd2efe5f6b61b959ac84",
+   "every_property_true": true
+  }
+ },
+ "lifetime_semantics": {
+  "path": "docs/implementation/v2/P4-LIFETIME-SEMANTICS.md",
+  "sha256": "56090b62263084901af521cf51d8981cc5829f64f2dcffa55e83d30292240d98"
+ },
+ "architecture_lineage": {
+  "links": [
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+    "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+    "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+    "frozen_items_changed": [
+     "F2"
+    ],
+    "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+    "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+    "frozen_items_changed": [
+     "F5"
+    ],
+    "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+    "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "sha256": "b8f618a235e7f508d70547ccc4cc6c79c7651df5d9e03c5ba3378c0c09fb3cfb",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+    "frozen_items_changed": [
+     "F1",
+     "F2",
+     "F5"
+    ],
+    "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
+    "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7"
+   }
+  ],
+  "lineage_valid": true,
+  "ends_at": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+  "effective": {
+   "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
+   "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7"
+  },
+  "equals_lineage_end": true,
+  "exception_v2_003": {
+   "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+   "sha256": "8dcc296574f9978d28822bff51ecd94dadf005c31ffb98e2b8da308765f0c2f9",
+   "status": "APPROVED — APPLIED"
+  },
+  "rfc_last_changed_by": "2f7f93bca745fb3eee73ea3e603498e695522e8d"
+ },
+ "freeze_manifest": {
+  "path": "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json",
+  "sha256": "f2a5ec927889238360ae088c328049bf67de8c6a6b2a57e5e0ef0fb86c272c8f"
+ },
+ "probe_identity": {
+  "before": "27785f8af066298cee1098bedf981d4cc1e9f9000a29105f748c586ae5f3dc73",
+  "after": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+  "after_first_applied": "07281265f698ed00765119f27a0800e86c3c1807c6bf60428a112ed55fecca12",
+  "note": "the first applied form of §9.3 (digest 07281265…) carried a dead operand in _watch's end-of-protocol branch (`elif ended or tag == \"EOF\"`, the second operand unreachable); the corrected candidate removed it rather than audit a kernel mutant (tests/v2/p2/test_mutation_targets.py: only reference models are audited), so the probe digest changed once more to c335293e…; calibration was re-established by execution for it and every python_callable.py mutation target re-measured"
+ },
+ "mutation": {
+  "path": "closure-evidence/v2/P4-MUTATION.json",
+  "sha256": "9b7c040eb7083839af61dafb08a562407cc12eecd3b2e1164288085fb127cb4b",
+  "targets": 98,
+  "mutants": 1590,
+  "killed": 1590,
+  "audited_equivalent": {},
+  "all_phases": {
+   "P1": {
+    "targets": 18,
+    "mutants": 761,
+    "killed": 761,
+    "survivors": 0
+   },
+   "P2": {
+    "targets": 41,
+    "mutants": 1211,
+    "killed": 1211,
+    "survivors": 0
+   },
+   "P3": {
+    "targets": 52,
+    "mutants": 1738,
+    "killed": 1730,
+    "survivors": 8
+   },
+   "P4": {
+    "targets": 98,
+    "mutants": 1590,
+    "killed": 1590,
+    "survivors": 0
+   }
+  }
+ },
+ "checker_calibration": {
+  "calibrated": 30,
+  "checkers": 30
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/P4-RUN-HISTORY.json",
+  "sha256_at_seal": "0d07360ceadb1144a9effdeec989c65ce6bf652443357b1a4a58818378a7da1c",
+  "total_attempts": 89,
+  "failed_attempts": 19,
+  "failed": [
+   {
+    "seq": 13,
+    "commit": "cfe14c03ec5b",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 14,
+    "commit": "cfe14c03ec5b",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 15,
+    "commit": "cfe14c03ec5b",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 16,
+    "commit": "cfe14c03ec5b",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 17,
+    "commit": "cfe14c03ec5b",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 18,
+    "commit": "844ffc9fca4f",
+    "job": null,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 26,
+    "commit": "7f63051368e5",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 42,
+    "commit": "224caa466148",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 61,
+    "commit": "2f7f93bca745",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 62,
+    "commit": "2f7f93bca745",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 63,
+    "commit": "2f7f93bca745",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 64,
+    "commit": "2f7f93bca745",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 65,
+    "commit": "2f7f93bca745",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 68,
+    "commit": "a4136fba6a9b",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 69,
+    "commit": "a4136fba6a9b",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 70,
+    "commit": "a4136fba6a9b",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 71,
+    "commit": "a4136fba6a9b",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 72,
+    "commit": "a4136fba6a9b",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 73,
+    "commit": "e137aa36dae4",
+    "job": null,
+    "classification": "HARNESS"
+   }
+  ],
+  "erased_attempts": 0,
+  "retries": 0,
+  "committed_versions_checked": 12,
+  "gate_green": {
+   "f870196bfab2": true,
+   "95f8da64c684": true
+  },
+  "closed": "sealed at total_attempts: run_history.py --check fails if an entry is added or removed",
+  "seal_commit_verification": "the seal cannot contain its own verification; the seal commit's local and CI attempts are the first entries of P5-RUN-HISTORY.json"
+ },
+ "owned_processes": {
+  "at_the_corrected_candidate": {
+   "local": {
+    "after": 0,
+    "escaped": [],
+    "mechanism": "posix-session-and-group"
+   },
+   "unit (ubuntu-latest, 3.11)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": null
+   },
+   "unit (ubuntu-latest, 3.12)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": null
+   },
+   "unit (ubuntu-latest, 3.13)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": null
+   },
+   "unit (ubuntu-latest, 3.14)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": null
+   },
+   "unit (windows-latest, 3.11)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": null
+   }
+  },
+  "linux_zero_residual": true,
+  "windows_zero_residual": true
+ },
+ "f1_f11": {
+  "current_phase": "P4",
+  "summary": {
+   "PASS": 10,
+   "PENDING": 1,
+   "FAIL": 0
+  },
+  "items": {
+   "F1": "PASS",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PASS",
+   "F6": "PASS",
+   "F7": "PASS",
+   "F8": "PASS",
+   "F9": "PASS",
+   "F10": "PENDING",
+   "F11": "PASS"
+  }
+ },
+ "v1_evidence_identity": {
+  "detective_guard": true,
+  "guard": {
+   "path": "validation/v2/v1_evidence_guard.py",
+   "sha256": "2a3135e9669101894f8b334f5fa15d7fb73ed3435e5d79c50fdf3cd451148ede"
+  },
+  "baseline": {
+   "path": "closure-evidence/v2/V1-EVIDENCE-BASELINE.json",
+   "sha256": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb"
+  },
+  "w0_qualification_byte_identical": true,
+  "w0_sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_unchanged": true
+ },
+ "v1_pf_001": {
+  "status": "CLOSED IN V2 BY WP-4.2 (WIN-PID-1/2); V1 code frozen and unchanged",
+  "recurrences_in_p4": 0,
+  "ci_attempts_searched": 77,
+  "search": "_kill_tree_win32|MemoryError in every CI job log"
+ },
+ "exit_checks": [
+  {
+   "check": "plan_validate: zero problems, generated docs in sync",
+   "command": "python -P validation/v2/plan_validate.py --validate --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "generated artefacts in sync"
+  },
+  {
+   "check": "freeze manifest: RFC digests equal the end of the approval lineage",
+   "command": "python -P validation/v2/freeze_manifest.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "freeze manifest: PASS"
+  },
+  {
+   "check": "architecture catalog --check",
+   "command": "python -P validation/v2/gen_arch_catalog.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "architecture catalog: PASS"
+  },
+  {
+   "check": "F1-F11 conformance at CURRENT_PHASE=P4 (ratchet)",
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "summary {'PASS': 10, 'PENDING': 1, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "check": "Q0 checker calibration",
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "calibrated 30/30; always-PASS mutants rejected 30/30"
+  },
+  {
+   "check": "compiler --check",
+   "command": "python -P validation/v2/gen_specs.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "specs: PASS"
+  },
+  {
+   "check": "P1 evidence records current",
+   "command": "python -P validation/v2/p1_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p1 evidence: PASS"
+  },
+  {
+   "check": "P2 evidence records current",
+   "command": "python -P validation/v2/p2_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p2 evidence: PASS"
+  },
+  {
+   "check": "P3 evidence records current",
+   "command": "python -P validation/v2/p3_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p3 evidence: PASS"
+  },
+  {
+   "check": "P4 evidence records current",
+   "command": "python -P validation/v2/p4_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p4 evidence: PASS"
+  },
+  {
+   "check": "mutation records current (P1-P4); every target killed or its survivor audited",
+   "command": "python -P validation/v2/mutation.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "check": "kernel static checks",
+   "command": "python -P validation/v2/kernel_static_checks.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "check": "reference models import nothing of the implementation",
+   "command": "python -P validation/v2/refmodel_independence.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "refmodel independence: PASS"
+  },
+  {
+   "check": "run history: P1-P4 append-only, policy-consistent",
+   "command": "python -P validation/v2/run_history.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "run history: PASS"
+  },
+  {
+   "check": "V1 evidence guard, detective",
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  }
+ ],
+ "architecture_exceptions": [
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-001",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-002",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-003",
+   "status": "APPROVED — APPLIED"
+  }
+ ],
+ "unapproved_architecture_exceptions": [],
+ "stop_rules_triggered": [],
+ "p5": {
+  "authorization": "NOT AUTHORIZED: owner review of this seal first",
+  "started_at_seal": false
+ },
+ "verdict": "P4 FINAL SEALED"
+}
