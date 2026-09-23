@@ -155,3 +155,35 @@ counter; static check NO_SIDE_RETRY_COUNTER refuses one anywhere in `aisef2/` ou
   the last real event's `time`. A repaired journal has nothing open, so repairing it again adds nothing; repairing
   the same journal twice gives the same bytes. Repair never touches the sentinel: the run stays `TORN`.
 * No path creates a sequence gap: closers are appended; a torn tail was never an event.
+
+## INV-MUTATION-AUTHORITY *(standing invariant, owner, 2026-09-24 — enforcement documentation; no RFC text is changed)*
+
+> Mutation, fault injection, test failure, probe result, or implementation-under-test output MUST NOT expand
+> host-side destructive authority.
+>
+> Authority to kill, delete, clean, release, terminate, or mutate external resources MUST come exclusively from an
+> independently established controller view.
+>
+> The implementation-under-test may REDUCE confidence to RESIDUAL_OWNERSHIP_UNKNOWN. It may NEVER expand destructive
+> authority.
+
+Origin: P4-FINDING-011 (2026-09-23) — a mutant of `_Posix.escaped` reported every process on the host as escaped,
+and the mutation runner, trusting that report, signalled them all. Enforcement:
+
+* runtime — `validation/v2/cleanup_authority.py` is the only way the mutation runner signals a process. A pid, a
+  group or a stray that code under mutation *reports* is a claim: it is signalled only once the authority's own
+  reading of the host proves it the runner's (parent chain to the runner, born after the boundary in the table's own
+  clock; a group only through its leader; a claimed pid only as a proved member of a controller-created group —
+  `prove_member`). Anything else is RESIDUAL_OWNERSHIP_UNKNOWN: no action, the step fails. MUT-SAFE-1..8,
+  MUT-AUTH-NEG-2 (`tests/v2/p4/test_mutation_safety.py`).
+* static — `validation/v2/destructive_authority.py` discovers every destructive call site under `aisef2/`,
+  `validation/v2/` and `tests/v2/` (signals, job termination, path removal, shell-level equivalents) and requires
+  one row of `validation/v2/destructive_sites.json` per site, declaring a narrow authority source
+  (`CONTROLLER_CREATED_HANDLE`, `CONTROLLER_CREATED_PID`, `CONTROLLER_CREATED_PROCESS_GROUP`,
+  `INDEPENDENT_HOST_TABLE`, `SCOPE_OWNED_PATH`, `TEST_CREATED_HANDLE`, `TEST_CREATED_PATH`, `DELEGATION`,
+  `GUARD_NEGATIVE_PROBE`, `LIVENESS_PROBE_SIGNAL_0`, `COLLECTION_METHOD`) whose derivation shape the checker
+  validates. A site without a row, a row without a site, a derivation that no longer matches its class, an ambiguous
+  target, or a destructive API outside the taxonomy fails the check, closed. Q0-calibrated with MUT-AUTH-NEG-1.
+* the range itself (§3) signals only the group it created and the anchor it holds; a scope (§4) removes only the
+  directories it registered; a test signals only the processes it started and removes only the paths it made.
+

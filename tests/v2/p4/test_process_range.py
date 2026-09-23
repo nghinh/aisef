@@ -26,6 +26,9 @@ from aisef2.runtime import process_range as pr  # noqa: E402
 from aisef2.runtime.process_range import Proc, ProcessRange, RangeNotEmpty  # noqa: E402
 from aisef2.runtime.story_scope import Directory, StoryScope  # noqa: E402
 from tests.v2.p4.world import Journal2, emitter, released  # noqa: E402
+if str(ROOT / "validation" / "v2") not in sys.path:
+    sys.path.insert(1, str(ROOT / "validation" / "v2"))
+import cleanup_authority as ca  # noqa: E402  — INV-MUTATION-AUTHORITY: a claimed pid is proved before it is signalled
 
 PY = sys.executable
 POSIX = os.name == "posix"
@@ -126,10 +129,14 @@ class Range(unittest.TestCase):
         """Linux: the anchor is a subreaper, so the grandchild re-parents to it when the target exits; killed, it
         must be reaped at once — a zombie still answers kill(pid, 0) and keeps its group signalable (CI, cfe14c0)."""
         pid_file = self.dir / "g.pid"
+        boundary = ca.establish(self.dir)  # INV-MUTATION-AUTHORITY: what the subject writes is a claim, not permission
         r = self.range(lingering(pid_file))
-        grandchild = read_pid(pid_file)
+        grandchild = read_pid(pid_file)  # claimed by the subject's pid file: a lookup key only
         self.assertEqual(r.wait(20), 0)  # its parent is gone: the grandchild is an orphan now
-        os.kill(grandchild, signal.SIGKILL)
+        proof = ca.signal_member(boundary, grandchild, r._anchor.pid)  # proved in the range's group, born after the
+        #                                                               boundary — else refused, and this test fails
+        self.assertEqual([s["id"] for s in proof.signalled], [grandchild],
+                         f"RESIDUAL_OWNERSHIP_UNKNOWN: the claimed pid was not proved the range's: {proof.unproven}")
         deadline = time.monotonic() + 10
         while True:
             try:

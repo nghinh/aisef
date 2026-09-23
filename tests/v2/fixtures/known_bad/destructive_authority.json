@@ -1,0 +1,24 @@
+{
+ "checker": "destructive_authority",
+ "package": "P4 post-seal hygiene (INV-MUTATION-AUTHORITY)",
+ "kind": "tree",
+ "files": {
+  "aisef2/__init__.py": "",
+  "tests/v2/__init__.py": "",
+  "tests/v2/p9/__init__.py": "",
+  "tests/v2/p9/test_bad.py": "import os\nimport pathlib\nimport signal\nimport unittest\n\n\nclass Bad(unittest.TestCase):\n    def test_kills_what_the_subject_reported(self):\n        pid = int(pathlib.Path('/tmp/subject.pid').read_text())  # written by the implementation under test\n        os.kill(pid, signal.SIGKILL)\n"
+ },
+ "ledger": [
+  {
+   "path": "tests/v2/p9/test_bad.py",
+   "scope": "Bad.test_kills_what_the_subject_reported",
+   "callable": "os.kill",
+   "target": "pid",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "claims the pid is a handle the test created \u2014 it is a number the subject wrote",
+   "enforcement": "static"
+  }
+ ],
+ "expect": "is not bound in its scope to a handle the test created"
+}

@@ -203,6 +203,26 @@ def _kernel_rule(name: str, rule: str, package: str) -> Callable[[], Checker]:
     return make
 
 
+def _destructive_authority() -> Checker:
+    """INV-MUTATION-AUTHORITY, static half: every destructive call site is ledgered with an authority source whose
+    derivation the checker validates. Known bad (MUT-AUTH-NEG-1): a kill of a pid read from subject output, with a
+    ledger row claiming a test-created handle — the claimed derivation is rejected."""
+    da = _load("aisef_v2_destructive_authority", V2 / "destructive_authority.py")
+
+    def bad(fx):
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t)
+            for rel, text in fx["files"].items():
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                (root / rel).write_text(text, encoding="utf-8")
+            for scope in da.SCOPES:
+                (root / scope).mkdir(parents=True, exist_ok=True)
+            (root / da.LEDGER_REL).write_text(json.dumps({"sites": fx["ledger"]}), encoding="utf-8")
+            return da.check(root)
+    return Checker("destructive_authority", "P4 post-seal hygiene (INV-MUTATION-AUTHORITY)", lambda: da.check(ROOT), bad,
+                   ("validation/v2/destructive_authority.py",))
+
+
 def _cleanup_authority() -> Checker:
     """P4-FINDING-011: the mutation runner's only way to signal a process. Clean: on this host, a child the runner
     starts after its boundary is selectable (dry run). Known bad: a report naming processes that are not the runner's
@@ -333,7 +353,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_side_retry_counter", "NO_SIDE_RETRY_COUNTER", "WP-4.5"),
     _kernel_rule("sentinel_is_not_evidence", "SENTINEL_IS_NOT_EVIDENCE", "WP-4.3"),
     _kernel_rule("one_signal_authority", "ONE_SIGNAL_AUTHORITY", "P4 correction (V2-003, RFC §9.3)"),
-    _mutation, _cleanup_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
+    _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 
 

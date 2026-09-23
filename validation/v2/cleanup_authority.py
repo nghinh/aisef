@@ -11,9 +11,17 @@ table, that it belongs to the boundary the runner established before its worker 
   created, and only members of the leader's session can join it.
 
 Anything else is RESIDUAL_OWNERSHIP_UNKNOWN: it is not signalled, and the caller fails its target. A leaked test
-process is preferable to signalling an unrelated process of the user. The invariant:
+process is preferable to signalling an unrelated process of the user. The invariant (INV-MUTATION-AUTHORITY, owner, 2026-09-24):
 
-    MUTATED CODE CAN REDUCE TEST CORRECTNESS, BUT CAN NEVER EXPAND THE RUNNER'S HOST CLEANUP AUTHORITY.
+    Mutation, fault injection, test failure, probe result, or implementation-under-test output MUST NOT expand
+    host-side destructive authority. Authority to kill, delete, clean, release, terminate, or mutate external
+    resources MUST come exclusively from an independently established controller view.
+
+    The implementation-under-test may REDUCE confidence to RESIDUAL_OWNERSHIP_UNKNOWN. It may NEVER expand
+    destructive authority. (MUTATED CODE CAN REDUCE TEST CORRECTNESS, BUT CAN NEVER EXPAND THE RUNNER'S HOST
+    CLEANUP AUTHORITY.)
+
+The static half is `destructive_authority.py`: every destructive call site is ledgered with its authority source.
 """
 
 from __future__ import annotations
@@ -142,6 +150,43 @@ def strays(boundary: Boundary, table: dict[int, Host] | None = None) -> list[Hos
     marks = {boundary.root, os.path.realpath(boundary.root)}
     return sorted((p for p in table.values() if p.pid != os.getpid() and any(m in p.command for m in marks)),
                   key=lambda p: p.pid)
+
+
+def prove_member(boundary: Boundary, pid: int, group: int, table: dict[int, Host] | None = None) -> Host | None:
+    """A pid CLAIMED by a subject or a fixture (a pid file, a report) is a lookup key, never permission. It is the
+    runner's only when, in this module's own table, it sits in `group` — a group the controller created, whose
+    leader is proved the runner's — and was born no earlier than the boundary (a reused pid is not it)."""
+    table = host_table() if table is None else table
+    mine = owned(boundary, table)
+    leader, member = mine.get(group), table.get(pid)
+    if leader is None or leader.pgid != leader.pid or member is None:
+        return None
+    if member.pgid != group or member.born < boundary.since - _SLACK_S:
+        return None
+    return member
+
+
+def signal_member(boundary: Boundary, pid: int, group: int, sig=None, dry_run: bool = False,
+                  table: dict[int, Host] | None = None) -> Report:
+    """Signal one claimed pid, only once `prove_member` has proved it; refuse otherwise (INV-MUTATION-AUTHORITY)."""
+    sig = getattr(signal, "SIGKILL", signal.SIGTERM) if sig is None else sig
+    table = host_table() if table is None else table
+    report = Report()
+    member = prove_member(boundary, pid, group, table)
+    if member is None:
+        why = ("not in the host table" if pid not in table else
+               "not a member of a group the controller created, or born before the boundary")
+        report.unproven.append({"kind": "pid", "id": int(pid), "why": why})
+        return report
+    proof = {"pid": member.pid, "ppid": member.ppid, "pgid": member.pgid, "born": member.born,
+             "runner": boundary.runner, "since": boundary.since, "command": member.command[:120]}
+    if not dry_run:
+        try:
+            os.kill(member.pid, sig)
+        except OSError:
+            pass  # already gone
+    report.signalled.append({"kind": "pid", "id": member.pid, "proof": proof})
+    return report
 
 
 def signal_owned(boundary: Boundary, pids=(), groups=(), sig=None, dry_run: bool = False,

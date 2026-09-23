@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 30,
+ "checker_count": 31,
  "uncovered_checker_modules": [],
- "calibrated_count": 30,
- "always_pass_mutants_rejected": 30,
+ "calibrated_count": 31,
+ "always_pass_mutants_rejected": 31,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -330,6 +330,21 @@
     "group 300: born before the boundary or not a descendant of the runner",
     "group 400: born before the boundary or not a descendant of the runner",
     "pid 1: born before the boundary or not a descendant of the runner"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "destructive_authority",
+   "package": "P4 post-seal hygiene (INV-MUTATION-AUTHORITY)",
+   "fixture": "tests/v2/fixtures/known_bad/destructive_authority.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "is not bound in its scope to a handle the test created",
+   "observed": [
+    "tests/v2/p9/test_bad.py:10 [Bad.test_kills_what_the_subject_reported] os.kill(pid): target 'pid' is not bound in its scope to a handle the test created (('Popen(', 'ProcessRange(', 'CreateJobObjectW('))"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

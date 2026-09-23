@@ -156,8 +156,49 @@ class CleanupAuthority(unittest.TestCase):
         self.assertIn(("group", self.mine.pid), self.sent)
 
 
+    def test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission(self):
+        """INV-MUTATION-AUTHORITY, MUT-AUTH-NEG-2: a pid that a subject or a fixture wrote out (a pid file, a report)
+        names the canary — an unrelated process — or a reused pid. The authority refuses: no signal is emitted, the
+        canary lives. Only a pid proved in a group the controller created, born after the boundary, is signalled."""
+        claimed = self.canary.pid  # "the subject says this is its grandchild": unrelated in fact
+        for group in (self.mine.pid, self.canary.pid, os.getpid()):
+            report = self.ca.signal_member(self.boundary, claimed, group, table=self.table)
+            self.assertEqual(report.signalled, [])
+            self.assertTrue(report.residual_ownership_unknown)
+        reused = max(self.table) + 12345  # a pid nobody holds: a claim that outlived its process
+        report = self.ca.signal_member(self.boundary, reused, self.mine.pid, table=self.table)
+        self.assertEqual((report.signalled, report.unproven[0]["why"]), ([], "not in the host table"))
+        self.assertEqual(self.sent, [])
+        self.assertIsNone(self.canary.poll())
+        # the positive edge: a member of a group the controller created (a leader it started in its own session,
+        # and that leader's child), born after the boundary, is proved and signalled — the child's pid is taken from
+        # the authority's own table (children of the leader), never from anything the child wrote
+        leader = subprocess.Popen([sys.executable, "-c", "import subprocess, sys, time\n"
+                                   "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'])\n"
+                                   "time.sleep(60)"], start_new_session=True, stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.addCleanup(lambda: self.ca.signal_owned(self.boundary, groups=[leader.pid]))  # proved, by the authority
+        time.sleep(0.6)
+        table = self.ca.host_table()
+        self.owned = set(self.ca.owned(self.boundary, table))  # the spy's owned set, re-read with the leader's child
+        children = [p.pid for p in table.values() if p.ppid == leader.pid]
+        self.assertEqual(len(children), 1, children)
+        report = self.ca.signal_member(self.boundary, children[0], leader.pid, table=table)
+        self.assertEqual([x["id"] for x in report.signalled], [children[0]])
+        self.assertEqual(report.signalled[0]["proof"]["pgid"], leader.pid)
+
+    def test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number(self):
+        """A pgid equal to some pid is not a group the controller created: the leader itself must be proved."""
+        report = self.ca.signal_member(self.boundary, self.mine.pid, self.canary.pid, table=self.table)
+        self.assertEqual(report.signalled, [])
+        report = self.ca.signal_member(self.boundary, self.mine.pid, self.mine.pid, dry_run=True, table=self.table)
+        self.assertEqual([x["id"] for x in report.signalled], [self.mine.pid])
+        self.assertEqual(self.sent, [])
+
+
 class DependencyBoundary(unittest.TestCase):
-    """MUT-SAFE-8: the authority is stdlib only, and the runner signals nothing itself."""
+    """MUT-SAFE-8 (INV-MUTATION-AUTHORITY, static half): the authority is stdlib only, and the runner signals nothing
+    itself; the destructive-call-site ledger and its checker are validation/v2/destructive_authority.py."""
 
     def test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it(self):
         tree = ast.parse(AUTHORITY.read_text(encoding="utf-8"))
