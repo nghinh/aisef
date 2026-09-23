@@ -265,7 +265,7 @@ class PythonCallableProbe(HarnessProbe):
             tag, body = _next(lines, nonce, time.monotonic() + _DRAIN_S)
         if tag == "RESULT":
             pass
-        elif ended or tag == "EOF":
+        elif ended:
             return _after_dispatch(run, _ended_without_result(run))
         else:  # the window closed with the process still running
             return _after_dispatch(run, Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],

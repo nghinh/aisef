@@ -37,7 +37,7 @@
   },
   {
    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
-   "sha256": "cfaebe353ef7a69f8f357f514932cd25cef585373252dc2e9f58126117e12d09",
+   "sha256": "b8f618a235e7f508d70547ccc4cc6c79c7651df5d9e03c5ba3378c0c09fb3cfb",
    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
    "frozen_items_changed": [
     "F1",

@@ -11,7 +11,7 @@
  ],
  "probe": {
   "id": "probe.python_callable",
-  "digest": "07281265f698ed00765119f27a0800e86c3c1807c6bf60428a112ed55fecca12",
+  "digest": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
   "sources": [
    "probe/protocol.py",
    "probe/python_callable.py"

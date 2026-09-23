@@ -218,7 +218,7 @@
   },
   "mutation_runner": {
    "path": "validation/v2/mutation.py",
-   "sha256": "da226df2cca6fbeb0f0b8bfa07183d8f54409c6b3920b070efdd7282d8787dfa",
+   "sha256": "77784dfa50c3cfcef47eccc08af9a31b80ed661d7cf0e3415f857dbc800c233d",
    "own_signal_calls": 0
   },
   "tests": {
@@ -239,17 +239,17 @@
    "test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set": "PASSED",
    "test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it": "PASSED"
   },
-  "summary": "============================== 8 passed in 10.38s ==============================",
+  "summary": "============================== 8 passed in 10.44s ==============================",
   "syscalls_spied": true
  },
  "old_mutant_safe_reproduction": {
   "mutant": "L155 Eq->NotEq",
-  "processes_the_mutant_reported_as_escaped": 651,
+  "processes_the_mutant_reported_as_escaped": 664,
   "canary_among_them": true,
-  "login_session_agents_among_them": 600,
+  "login_session_agents_among_them": 610,
   "selected_by_the_authority": [],
   "selection_within_owned_set": true,
-  "refused": 1302,
+  "refused": 1328,
   "canary_alive_after": true,
   "dry_run": true
  },

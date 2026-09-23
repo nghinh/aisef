@@ -7,7 +7,8 @@
  },
  "exception": {
   "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
-  "sha256": "ac5134b7b225e7b8ea73c8f273a1f195c5f0c50e7fcb39d2b5fa1f75c5d4cafe"
+  "sha256": "8dcc296574f9978d28822bff51ecd94dadf005c31ffb98e2b8da308765f0c2f9",
+  "note": "re-bound after the exception record's probe digest 'after' value was revised to c335293e… (the dead operand of _watch removed at the corrected candidate); the RFC text and its digests are unchanged by that revision"
  },
  "frozen_items_changed": [
   "F1",

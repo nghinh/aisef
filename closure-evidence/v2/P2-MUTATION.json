@@ -4084,11 +4084,12 @@
    "kill_tests": [
     "tests/v2/p2/test_python_callable.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 12,
    "killed": 12,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L70 string 'exists' emptied",
@@ -4145,11 +4146,12 @@
    "kill_tests": [
     "tests/v2/p2/test_python_callable.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 2,
    "killed": 2,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L66 string 'probe/protocol.py' emptied",
@@ -4167,7 +4169,7 @@
     "tests/v2/p2/test_python_callable.py",
     "tests/v2/p2/test_signal_provenance.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 7,
    "killed": 7,
    "survivors": [],
@@ -4210,7 +4212,7 @@
     "tests/v2/p2/test_python_callable.py",
     "tests/v2/p2/test_signal_provenance.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 29,
    "killed": 29,
    "survivors": [],
@@ -4340,7 +4342,7 @@
    "kill_tests": [
     "tests/v2/p2/test_python_callable.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 22,
    "killed": 22,
    "survivors": [],
@@ -4442,7 +4444,7 @@
    "kill_tests": [
     "tests/v2/p2/test_python_callable.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 1,
    "killed": 1,
    "survivors": [],
@@ -4461,7 +4463,7 @@
     "tests/v2/p2/test_python_callable.py",
     "tests/v2/p2/test_signal_provenance.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 5,
    "killed": 5,
    "survivors": [],
@@ -4496,12 +4498,10 @@
     "tests/v2/p2/test_python_callable.py",
     "tests/v2/p2/test_signal_provenance.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
-   "mutants": 61,
-   "killed": 60,
-   "survivors": [
-    "L268 string 'EOF' emptied"
-   ],
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
+   "mutants": 58,
+   "killed": 58,
+   "survivors": [],
    "strays_reaped": 0,
    "killed_by_timeout": 8,
    "results": [
@@ -4620,10 +4620,6 @@
      "killed": true
     },
     {
-     "mutant": "L268 Or swapped",
-     "killed": true
-    },
-    {
      "mutant": "L269 returns None",
      "killed": true
     },
@@ -4637,10 +4633,6 @@
     },
     {
      "mutant": "L261 string 'observable' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L268 Eq->NotEq",
      "killed": true
     },
     {
@@ -4666,10 +4658,6 @@
     {
      "mutant": "L279 ObservationKind.OBSERVED->NON_CONTROLLER_SIGNAL",
      "killed": true
-    },
-    {
-     "mutant": "L268 string 'EOF' emptied",
-     "killed": false
     },
     {
      "mutant": "L277 ObservationKind.SUBJECT_ABSENT->HARNESS_FAILED",
@@ -4780,7 +4768,7 @@
    "kill_tests": [
     "tests/v2/p2/test_python_callable.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 42,
    "killed": 42,
    "survivors": [],
@@ -4962,7 +4950,7 @@
    "kill_tests": [
     "tests/v2/p2/test_python_callable.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 98,
    "killed": 98,
    "survivors": [],
@@ -5374,7 +5362,7 @@
    "kill_tests": [
     "tests/v2/p2/test_python_callable.py"
    ],
-   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "source_sha256": "8b4fdc41160fdcf806c42e7e8e88ee5ec5ae1162b1130ea5f33d1d97f15051b1",
    "mutants": 8,
    "killed": 8,
    "survivors": [],

@@ -80,7 +80,9 @@
   "what_changes": "The outcome of a post-dispatch signal: UNRUNNABLE/ENVIRONMENT (retryable) -> either an interruption with no result (the controller's own signal) or EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL) -> INTEGRATION, never retried. python_callable.py and probe/protocol.py change, so probe_digest changes and every spec bound to the old digest is refused (INVALID_SPEC, scenario D) until it is recompiled.",
   "probe_digest": {
    "before": "27785f8af066298cee1098bedf981d4cc1e9f9000a29105f748c586ae5f3dc73",
-   "after": "07281265f698ed00765119f27a0800e86c3c1807c6bf60428a112ed55fecca12"
+   "after": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "after_first_applied": "07281265f698ed00765119f27a0800e86c3c1807c6bf60428a112ed55fecca12",
+   "note": "the first applied form of §9.3 (digest 07281265…) carried a dead operand in _watch's end-of-protocol branch (`elif ended or tag == \"EOF\"`, the second operand unreachable); the corrected candidate removed it rather than audit a kernel mutant (tests/v2/p2/test_mutation_targets.py: only reference models are audited), so the probe digest changed once more to c335293e…; calibration was re-established by execution for it and every python_callable.py mutation target re-measured"
   },
   "calibration": "every ProbeCapabilityCalibration bound to the old digest is historical; calibration is re-established by execution for the new digest (never by copying a record and editing it)",
   "evidence_written_under_the_old_wording": "P1, P2 and P3 seals stay untouched and remain evidence of what those phases delivered under their then-current architecture identity. The current P2 evidence records that name the probe digest (P2-CALIBRATION.json, P2-PROBE-PROTOCOL.json) are recomputed; their before/after sha256 are recorded in closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json. V1 evidence is untouched.",

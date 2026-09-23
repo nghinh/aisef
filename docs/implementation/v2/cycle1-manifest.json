@@ -24,7 +24,7 @@
    },
    {
     "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
-    "sha256": "cfaebe353ef7a69f8f357f514932cd25cef585373252dc2e9f58126117e12d09",
+    "sha256": "b8f618a235e7f508d70547ccc4cc6c79c7651df5d9e03c5ba3378c0c09fb3cfb",
     "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
     "frozen_items_changed": [
      "F1",
@@ -1479,7 +1479,7 @@
      "id": "P4-FINDING-011",
      "class": "HARNESS_SAFETY",
      "severity": "P0",
-     "status": "CLOSED — safety gate passed (closure-evidence/v2/P4-FINDING-011-SAFETY.json sha256 2719bee1cb679abbc4966592e87c16f1318d927429cc8923d082669c50626ae8): MUT-SAFE-1..8 green with spied syscalls; the 15:38 mutant reproduced safely against the live host, its report refused; the canary alive; the live mutation runs (A3, B3, W, M, O) completed with the fixed runner — every signal recorded with its proof, no candidate of unknown ownership; no launchd-owned process of the user signalled by any Python process since; the login session undisturbed",
+     "status": "CLOSED — safety gate passed (closure-evidence/v2/P4-FINDING-011-SAFETY.json sha256 f49216ac30946bb19bc6a98facbd2936d686b11a81026ffe371854e264312c10): MUT-SAFE-1..8 green with spied syscalls; the 15:38 mutant reproduced safely against the live host, its report refused; the canary alive; the live mutation runs (A3, B3, W, M, O) completed with the fixed runner — every signal recorded with its proof, no candidate of unknown ownership; no launchd-owned process of the user signalled by any Python process since; the login session undisturbed",
      "found": "2026-09-23 15:38:28, during the V2-003 mutation re-run of aisef2/runtime/process_range.py::_Posix.escaped",
      "what": "The host did NOT reboot (uptime unbroken since 2026-09-20; loginwindow and WindowServer untouched; no panic, no JetsamEvent). The unified log records 170 user processes exited due to SIGKILL 'sent by Python[93138]' within 0.5 s — Dock, Finder, Chrome, Chrome Remote Desktop host, Claude and every launchd-owned agent of the user — which, seen through Remote Desktop, looked like a restart. Python 93138 was the kill-test process of that mutation run; its work tree was still on disk (written 15:38:22) with the mutant in flight: in _Posix.escaped, `p.group == self.group` turned into `!=`, so escaped() reported (nearly) every process on the host as having left the range. PROC-OWN-1 loads validation/v2/mutation.py inside the kill-test process and runs its _run_tests there, so the runner's cleanup (_kill_leftovers) ran with the mutated module as its view of the host, trusted that report, and signalled every reported group. The runner's cleanup authority could be expanded by the code under mutation.",
      "measured_innocent": "memory pressure (no JetsamEvent report, 82% free afterwards), disk at 96% (the runner's own 9 GB snapshot copies, since deleted — 47 GB free), thermal (no warning recorded), the session's watcher script (never reached its stop step), the 14:44 EPERM deaths (P4-FINDING-010, killed only the runs).",
