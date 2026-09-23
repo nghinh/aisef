@@ -1,8 +1,10 @@
 """SIG-PROBE-3 — ARCHITECTURE-EXCEPTION-V2-003: a subject that aborts its own process (RFC §9.3).
 
 Kept apart from test_signal_provenance.py on purpose: `os.abort()` ends the process by SIGABRT, and macOS raises a
-crash-reporter dialog for every such exit. This module is in no mutation kill set (SIG-PROBE-4 and the faked ranges
-exercise the same code path), so a full suite run aborts a subject twice and a mutation run never does.
+crash-reporter dialog ("Python quit unexpectedly") for every such exit. This module is in no mutation kill set
+(SIG-PROBE-4 and the faked ranges exercise the same code path), and on macOS it runs only when AISEF_ABORT_SUBJECT=1
+is set — Linux CI runs it on every push, so the case is measured at every gate without a dialog on the developer's
+machine (the machine-wide alternative, `defaults write com.apple.CrashReporter DialogType none`, is the owner's call).
 """
 
 import os
@@ -26,6 +28,8 @@ NCS = IndeterminateReason.NON_CONTROLLER_SIGNAL
 
 
 @unittest.skipUnless(os.name == "posix", "a process that ends itself by a signal (POSIX; Windows has no signal exit)")
+@unittest.skipIf(sys.platform == "darwin" and os.environ.get("AISEF_ABORT_SUBJECT") != "1",
+                 "SIGABRT raises the macOS crash-reporter dialog: set AISEF_ABORT_SUBJECT=1 to run it here (Linux CI does)")
 class Abort(unittest.TestCase):
     def test_SIG_PROBE_3_a_subject_that_aborts_is_executed_and_indeterminate(self):
         at = RevisionRef(SHA, checkout({"app/__init__.py": "", "app/abort.py": "import os\n\n\ndef f():\n    os.abort()\n"}))
