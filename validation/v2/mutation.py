@@ -251,6 +251,11 @@ NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
 _DEAD_FLAG = ("the third field (whether the target state is also the outcome) is read only when the target state is "
               "not None (model: `if to is not None: ... if is_outcome`); this entry's target is None")
 AUDITED: dict[tuple[str, str], str] = {
+    ("aisef2/probe/python_callable.py::_watch", "L268 string 'EOF' emptied"): (
+        "`elif ended or tag == \"EOF\"`: the second operand is reached only when `ended` is false, i.e. the first tag was "
+        "not EOF and no drain ran, so `tag` is unchanged and never EOF there — a dead operand. It is not removed now "
+        "because any edit to python_callable.py changes the probe digest (F4) and would void the twelve "
+        "python_callable.py mutation results measured on 2026-09-23 for a no-op; it goes with the next probe change"),
     ("tests/v2/refmodel/story_state.py::_TABLE", "L18 False->True"): _DEAD_FLAG,
     ("tests/v2/refmodel/story_state.py::_TABLE", "L19 False->True"): _DEAD_FLAG,
     ("tests/v2/refmodel/story_state.py::_TABLE", "L20 False->True"): _DEAD_FLAG,

@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 28,
+ "checker_count": 30,
  "uncovered_checker_modules": [],
- "calibrated_count": 28,
- "always_pass_mutants_rejected": 28,
+ "calibrated_count": 30,
+ "always_pass_mutants_rejected": 30,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -284,6 +284,22 @@
    "always_pass_mutant_rejected_by_calibration": true
   },
   {
+   "checker": "one_signal_authority",
+   "package": "P4 correction (V2-003, RFC §9.3)",
+   "fixture": "tests/v2/fixtures/known_bad/one_signal_authority.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "ONE_SIGNAL_AUTHORITY aisef2/probe/python_callable.py:6",
+   "observed": [
+    "ONE_SIGNAL_AUTHORITY aisef2/probe/python_callable.py:6 keeps a signal ledger of its own; there is one authority for controller signal provenance (§9.3)",
+    "ONE_SIGNAL_AUTHORITY aisef2/probe/python_callable.py:9 signals a process itself; stopping a process and recording what was sent belongs to the owned process range (§9.3)"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
    "checker": "mutation",
    "package": "WP-1.1",
    "fixture": "tests/v2/fixtures/known_bad/mutation.json",
@@ -295,6 +311,25 @@
    "observed": [
     "aisef2/cal/m.py::positive: unaudited survivor 'L2 returns None'",
     "aisef2/cal/m.py::positive: unaudited survivor 'L2 Gt->LtE'"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "cleanup_authority",
+   "package": "P4 correction (P4-FINDING-011)",
+   "fixture": "tests/v2/fixtures/known_bad/cleanup_authority.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "born before the boundary or not a descendant of the runner",
+   "observed": [
+    "group 1: born before the boundary or not a descendant of the runner",
+    "group 50: born before the boundary or not a descendant of the runner",
+    "group 300: born before the boundary or not a descendant of the runner",
+    "group 400: born before the boundary or not a descendant of the runner",
+    "pid 1: born before the boundary or not a descendant of the runner"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true
@@ -429,7 +464,7 @@
    "rejects_for_the_expected_reason": true,
    "expected": "BASELINE: plan cites rfc_normative_digest",
    "observed": [
-    "BASELINE: plan cites rfc_normative_digest 8f0d522d9db0322c…, the approved lineage ends at 1133dd2de2fd9f8e…"
+    "BASELINE: plan cites rfc_normative_digest 8f0d522d9db0322c…, the approved lineage ends at 7abda8ecf8352dd9…"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

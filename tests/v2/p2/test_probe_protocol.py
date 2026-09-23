@@ -114,6 +114,23 @@ class ObservationShape(unittest.TestCase):
                     Observation(kind)
                 self.assertIsNone(Observation(kind, detail="x").verdict)
 
+    def test_a_non_controller_signal_carries_no_verdict_says_why_and_is_indeterminate(self):
+        """§9.3 (V2-003): an exit by a signal the controller did not send is not an observation of the subject —
+        no verdict, a reason — and the only mapping classifies it EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL),
+        beside HARNESS_FAILED -> UNRUNNABLE and UNSUPPORTED -> INVALID_SPEC."""
+        for v in (S, R, I):
+            with self.assertRaisesRegex(InvariantError, "carries no verdict"):
+                Observation(K.NON_CONTROLLER_SIGNAL, v, "signal 6")
+        with self.assertRaisesRegex(InvariantError, "says why"):
+            Observation(K.NON_CONTROLLER_SIGNAL)
+        s = spec()
+        self.assertEqual(classify_failure(s, Observation(K.NON_CONTROLLER_SIGNAL, detail="signal 6")),
+                         Executed(I, IndeterminateReason.NON_CONTROLLER_SIGNAL))
+        self.assertIs(classify_failure(s, Observation(K.HARNESS_FAILED, detail="x")).status,
+                      ProbeExecutionStatus.UNRUNNABLE)
+        self.assertIs(classify_failure(s, Observation(K.UNSUPPORTED, detail="x")).status,
+                      ProbeExecutionStatus.INVALID_SPEC)
+
     def test_an_observed_subject_is_decided(self):
         for v in (None, I):
             with self.subTest(verdict=v), self.assertRaisesRegex(InvariantError, "SATISFIED or REFUTED"):

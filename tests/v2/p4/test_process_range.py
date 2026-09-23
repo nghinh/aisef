@@ -71,8 +71,11 @@ def lingering(pid_file: pathlib.Path, seconds: float = 60.0, writes_into: pathli
     work = (f"d = pathlib.Path({str(writes_into)!r})\n"
             f"end = time.time() + {seconds}\n"
             "while time.time() < end:\n"
-            "    d.mkdir(parents=True, exist_ok=True)\n"
-            "    (d / f'f{time.time_ns()}').write_text('x')\n"
+            "    try:\n"
+            "        d.mkdir(parents=True, exist_ok=True)\n"
+            "        (d / f'f{time.time_ns()}').write_text('x')\n"
+            "    except OSError:\n"
+            "        pass  # Windows: a write into a directory being removed fails; a real writer keeps going\n"
             "    time.sleep(0.005)\n") if writes_into else f"time.sleep({seconds})\n"
     grandchild = f"import os, pathlib, time\npathlib.Path({str(pid_file)!r}).write_text(str(os.getpid()))\n" + work
     return (f"import subprocess, sys, time, pathlib\n"

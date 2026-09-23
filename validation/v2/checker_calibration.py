@@ -22,6 +22,7 @@ import pathlib
 import shutil
 import subprocess
 import sys
+import time
 import tempfile
 from dataclasses import dataclass, replace
 from typing import Callable
@@ -202,6 +203,38 @@ def _kernel_rule(name: str, rule: str, package: str) -> Callable[[], Checker]:
     return make
 
 
+def _cleanup_authority() -> Checker:
+    """P4-FINDING-011: the mutation runner's only way to signal a process. Clean: on this host, a child the runner
+    starts after its boundary is selectable (dry run). Known bad: a report naming processes that are not the runner's
+    — launchd, a shell, a child born before the boundary, a launchd-owned agent — is refused for the named reason."""
+    ca = _load("aisef_v2_cleanup_authority", V2 / "cleanup_authority.py")
+
+    def clean():
+        if not ca.POSIX:
+            return []
+        boundary = ca.establish(ROOT)
+        child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"], stdin=subprocess.DEVNULL,
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            time.sleep(0.2)
+            report = ca.signal_owned(boundary, pids=[child.pid], dry_run=True)
+        finally:
+            child.kill()
+            child.wait()
+        return [f"unproven: {u}" for u in report.unproven] + (
+            [] if [x["id"] for x in report.signalled] == [child.pid] else ["the runner's own child was not selected"])
+
+    def bad(fx):
+        table = {row[0]: ca.Host(*row) for row in fx["table"]}
+        boundary = ca.Boundary(**fx["boundary"])
+        report = ca.signal_owned(boundary, pids=fx["reported"]["pids"], groups=fx["reported"]["groups"], dry_run=True,
+                                 table=table)
+        return [f"{u['kind']} {u['id']}: {u['why']}" for u in report.unproven] + [
+            f"selected a process that is not the runner's: {x['id']}" for x in report.signalled]
+    return Checker("cleanup_authority", "P4 correction (P4-FINDING-011)", clean, bad,
+                   ("validation/v2/cleanup_authority.py",))
+
+
 def _mutation() -> Checker:
     mu = _load("aisef_v2_mutation", V2 / "mutation.py")
 
@@ -300,7 +333,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_side_retry_counter", "NO_SIDE_RETRY_COUNTER", "WP-4.5"),
     _kernel_rule("sentinel_is_not_evidence", "SENTINEL_IS_NOT_EVIDENCE", "WP-4.3"),
     _kernel_rule("one_signal_authority", "ONE_SIGNAL_AUTHORITY", "P4 correction (V2-003, RFC §9.3)"),
-    _mutation, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
+    _mutation, _cleanup_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 
 

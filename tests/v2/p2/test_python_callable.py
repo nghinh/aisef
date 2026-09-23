@@ -14,6 +14,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from unittest import mock
 
@@ -34,6 +35,7 @@ from aisef2.product.approval import ContractApproval, Requirement  # noqa: E402
 from aisef2.product.compiler import ProbeRef, compile_spec  # noqa: E402
 from aisef2.product.contract import BehaviorContract, Subject  # noqa: E402
 from aisef2.probe.protocol import ProbeInterrupted  # noqa: E402
+from aisef2.runtime.process_range import RangeError  # noqa: E402
 from aisef2.product.outcome import Executed, IndeterminateReason, contract_satisfaction  # noqa: E402
 from aisef2.product.spec import ProductProofSpec  # noqa: E402
 
@@ -355,6 +357,71 @@ class Boundaries(_Revisions):
             before = self.run_(spec("app.calc:add"))
         self.assertIs(before.status, ProbeExecutionStatus.UNRUNNABLE)
         self.assertRegex(before.detail, "killed by signal 9 before DISPATCHED$")
+
+    def test_an_exit_status_never_reported_is_a_harness_failure_not_a_verdict(self):
+        """After DISPATCHED the process ended but the range cannot say how (no status within the collection wait):
+        the observation mechanism failed — UNRUNNABLE, with the reason — never a verdict and never a signal case."""
+        with faked("READY", "DISPATCHED", returncode=None):
+            result = self.run_(spec("app.calc:add"))
+        self.assertIs(result.status, ProbeExecutionStatus.UNRUNNABLE)
+        self.assertEqual(result.detail, "the harness process ended and its exit status was never reported")
+
+    def test_a_range_that_refuses_to_start_is_a_launch_failure(self):
+        """RangeError from the P4 range (no anchor, a bad request) is the harness failing to launch, like OSError."""
+        with refuses(RangeError("no anchor")):
+            result = self.run_(spec("app.calc:add"))
+        self.assertIs(result.status, ProbeExecutionStatus.UNRUNNABLE)
+        self.assertEqual(result.detail, "the harness cannot launch: RangeError")
+
+    def test_the_range_and_its_request_are_named_for_the_probe(self):
+        """The range is named for the spec it observes (its residual messages say which probe leaked) and the
+        request file lives in a directory named for the probe (what a leak on disk belongs to)."""
+        s = spec("app.calc:add")
+        with faked("READY", "DISPATCHED", returncode=0):
+            self.run_(s)
+            name, argv = pc.ProcessRange.call_args.args[:2]
+        self.assertEqual(name, f"probe {s.id}")
+        self.assertTrue(pathlib.Path(argv[-1]).parent.name.startswith("aisef2-probe-"), argv[-1])
+
+    def test_a_result_written_just_before_exit_is_drained_not_lost(self):
+        """The anchor reports the exit while the harness's last line is still in the pipe: the exit is the end of the
+        protocol (V2-003), so the reader drains for a bounded time before concluding the subject ended without a
+        RESULT — the same exit must not read as 'ended before the observable'."""
+        dispatched = threading.Event()
+
+        class LateResult(FakeRange):
+            def __init__(self):
+                super().__init__([], 0)
+
+                def lines():
+                    for tag in ("READY", "DISPATCHED"):
+                        yield f"AISEF2-PROBE {tag} n0nce \n"
+                    dispatched.set()
+                    time.sleep(0.3)  # the exit is reported first; the RESULT is still on its way
+                    yield 'AISEF2-PROBE RESULT n0nce {"resolved": true}\n'  # the subject exists: SATISFIED
+                self.output = lines()
+
+            def wait(self, timeout=None):
+                dispatched.wait(5)
+                return 0
+        with mock.patch.multiple(pc, ProcessRange=mock.Mock(return_value=LateResult()),
+                                 secrets=mock.Mock(token_hex=mock.Mock(return_value="n0nce"))):
+            result = self.run_(spec("app.calc:add"))
+        self.assertEqual(result, Executed(S))  # without the drain: REFUTED, 'ended the process before the observable'
+
+    def test_the_protocol_readers_never_hold_the_interpreter_open(self):
+        """Both reader threads are daemon threads: a controller that dies with a pipe still open is not kept alive by
+        its own probe's readers (§17.1: a leak is never silent, and never the reader's)."""
+        started = []
+        real = threading.Thread
+
+        class Spy(real):
+            def __init__(self, *a, **kw):
+                started.append(kw.get("daemon"))
+                super().__init__(*a, **kw)
+        with faked("READY", "DISPATCHED", returncode=0), mock.patch.object(pc.threading, "Thread", Spy):
+            self.run_(spec("app.calc:add"))
+        self.assertEqual(started, [True, True])
 
     def test_subject_output_cannot_forge_the_protocol(self):
         self.assertEqual(self.run_(spec("app.noisy:f", {"returns": 1})), Executed(S))
