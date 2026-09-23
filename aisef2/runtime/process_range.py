@@ -158,8 +158,12 @@ class _Posix:
     def signal(self, sig) -> None:
         try:
             os.killpg(self.group, sig)
-        except ProcessLookupError:
-            pass  # the group is already empty (the anchor, unreaped, still pins its id)
+        except (ProcessLookupError, PermissionError):
+            # ESRCH: the group is already empty (the anchor, unreaped, still pins its id). EPERM: macOS answers it
+            # when no member could be signalled — every one already exiting or a zombie (XNU killpg1: nfound == 0);
+            # a member of another user cannot be in this session's group. Either way nothing was there to signal,
+            # and what the range holds is still measured by wait_empty, never assumed from this answer.
+            pass
 
     def abort(self, anchor: subprocess.Popen) -> None:
         if anchor.poll() is None:
@@ -353,6 +357,11 @@ class ProcessRange:
     @property
     def group(self) -> int | None:
         return self._os.group if isinstance(self._os, _Posix) else None
+
+    @property
+    def output(self):
+        """The stream carrying the target's stdout and stderr, when the range was started with output=PIPE."""
+        return None if self._anchor is None else self._anchor.stderr
 
     @property
     def anchor_returncode(self) -> int | None:

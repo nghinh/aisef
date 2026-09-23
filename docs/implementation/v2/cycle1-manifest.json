@@ -21,10 +21,20 @@
     "frozen_items_changed": [
      "F5"
     ]
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "sha256": "cfaebe353ef7a69f8f357f514932cd25cef585373252dc2e9f58126117e12d09",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+    "frozen_items_changed": [
+     "F1",
+     "F2",
+     "F5"
+    ]
    }
   ],
-  "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
-  "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114",
+  "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
+  "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7",
   "original_rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
   "original_freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
   "frozen_items": [
@@ -1457,6 +1467,45 @@
      "what": "the POSIX backend's stage table named signal.SIGKILL in its class body, evaluated at import; Windows has no SIGKILL, so importing process_range raised AttributeError and the Windows suite never started",
      "resolution": "the stage table is built when a POSIX backend is created; the whole P4 tree was scanned for any other POSIX-only name evaluated at import (none)",
      "classification": "PRODUCT defect in P4 code, recorded as FAIL in P4-RUN-HISTORY (not retried); no frozen semantics changed"
+    },
+    {
+     "id": "P4-FINDING-010",
+     "found": "2026-09-23 14:44:46, two V2-003 mutation runs (range and probe targets) died in the same second",
+     "what": "both runners failed inside ProcessRange.release with PermissionError from os.killpg. XNU's killpg answers EPERM, not ESRCH, when no member of the group could be signalled — every one already exiting or a zombie (killpg1, nfound == 0). The range code treated only ESRCH as 'already empty', so an external event that took the runners' child ranges down at one instant (the runners themselves survived long enough to print the traceback) turned into an unhandled exception and the loss of both runs' results",
+     "resolution": "_Posix.signal treats EPERM like ESRCH — nothing was there to signal — and emptiness is still measured by wait_empty afterwards, so a group that persists is RangeNotEmpty, never a silent success (test: a_group_the_kernel_says_has_nobody_left_to_signal_is_measured_not_assumed). The mutation runner now writes its record after every target, so a run that dies keeps what it measured. The external trigger was not identified from the system log; it is not a product fact",
+     "classification": "PRODUCT defect in P4 range code (macOS signal semantics), found by the V2-003 mutation runs; no frozen semantics changed"
+    },
+    {
+     "id": "P4-FINDING-011",
+     "class": "HARNESS_SAFETY",
+     "severity": "P0",
+     "status": "OPEN until the safety gate of the owner decision of 2026-09-23 passes (MUT-SAFE-1..8 green, the old mutant reproduced safely, the canary survives, no cleanup authority depends on mutated code, the live mutation runs A/B complete with zero unrelated targets, no further session disruption)",
+     "found": "2026-09-23 15:38:28, during the V2-003 mutation re-run of aisef2/runtime/process_range.py::_Posix.escaped",
+     "what": "The host did NOT reboot (uptime unbroken since 2026-09-20; loginwindow and WindowServer untouched; no panic, no JetsamEvent). The unified log records 170 user processes exited due to SIGKILL 'sent by Python[93138]' within 0.5 s — Dock, Finder, Chrome, Chrome Remote Desktop host, Claude and every launchd-owned agent of the user — which, seen through Remote Desktop, looked like a restart. Python 93138 was the kill-test process of that mutation run; its work tree was still on disk (written 15:38:22) with the mutant in flight: in _Posix.escaped, `p.group == self.group` turned into `!=`, so escaped() reported (nearly) every process on the host as having left the range. PROC-OWN-1 loads validation/v2/mutation.py inside the kill-test process and runs its _run_tests there, so the runner's cleanup (_kill_leftovers) ran with the mutated module as its view of the host, trusted that report, and signalled every reported group. The runner's cleanup authority could be expanded by the code under mutation.",
+     "measured_innocent": "memory pressure (no JetsamEvent report, 82% free afterwards), disk at 96% (the runner's own 9 GB snapshot copies, since deleted — 47 GB free), thermal (no warning recorded), the session's watcher script (never reached its stop step), the 14:44 EPERM deaths (P4-FINDING-010, killed only the runs).",
+     "resolution": "validation/v2/cleanup_authority.py (stdlib only; imports nothing from aisef2 nor mutation.py) is the runner's only way to signal a process: before a target's first worker the runner establishes its Boundary (its pid, a birth floor, the work root); a candidate reported by code under mutation — member, escapee, stray, group — is signalled only when the authority's own reading of the host table proves it: parent chain to the runner AND born after the boundary; a group only through its leader, proved the same way. Anything else is RESIDUAL_OWNERSHIP_UNKNOWN: not signalled, and the target fails (error in the record; a leaked test process is preferable). mutation.py has no kill/killpg call of its own any more; every signal is recorded with its proof in the mutant's result ('cleanup'). Tests: tests/v2/p4/test_mutation_safety.py MUT-SAFE-1..8 (spied os.kill/os.killpg; a canary born before the boundary survives every case; the 15:38 mutant is executed for real and cannot expand the selection; the dependency boundary is checked statically).",
+     "invariant": "mutation result cannot expand cleanup authority: MUTATED CODE CAN REDUCE TEST CORRECTNESS, BUT CAN NEVER EXPAND THE RUNNER'S HOST CLEANUP AUTHORITY",
+     "temp_trees_deleted": {
+      "root": "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T",
+      "count": 13,
+      "verified": "each under the runner's TMP root, each a mutation work tree (tree/aisef2), no process had a file open under it (lsof +D); deleted by exact path",
+      "paths": [
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmp27o5v9n3",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmp4358oj9j",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmp64t79smu",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmp7c8v83o9",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpbp0t1p5b",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpcbmlcl4f",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpcfej9pdo",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmphu8z49ln",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpj_7uw7af",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmplisdkpem",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpmyzvzp8a",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpnuc416x3",
+       "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpyqy_5yww"
+      ]
+     },
+     "classification": "verifier containment defect (mutation runner), found by the V2-003 mutation re-run; no F1–F11 semantics changed, no architecture exception required; the owner decision names it P0"
     }
    ]
   },
@@ -1700,7 +1749,12 @@
      "found": "2026-09-22, P2 V2-002 correction (P2-PROBE-PROTOCOL residual)",
      "what": "a harness process killed by a signal after DISPATCHED is UNRUNNABLE: the probe cannot tell whether the subject or the environment sent the signal; this is not the expiry of the observation window",
      "authority": "owner decision 'AISEF V2 — OWNER ACCEPTS P2 / AUTHORIZE P3 RECORD AUTHORITY' §0 (carry forward, without fixing)",
-     "status": "PARTLY CLOSED in WP-4.6: for every process P4 owns, a signal exit carries its provenance (the range's ledger: CONTROLLER or UNKNOWN) and never becomes an owner; interruption closes OUTCOME_UNKNOWN / NOT_STARTED. The P2 python_callable probe still maps a post-DISPATCHED signal death to UNRUNNABLE -> ENVIRONMENT: an F5 change, proposed as ARCHITECTURE-EXCEPTION-V2-003, not applied"
+     "status": "CLOSED. For every process P4 owns, a signal exit carries its provenance (the range's ledger: CONTROLLER or UNKNOWN) and never becomes an owner; interruption closes OUTCOME_UNKNOWN / NOT_STARTED. The P2 probe path is closed by ARCHITECTURE-EXCEPTION-V2-003, APPROVED and APPLIED (owner decision, 2026-09-23): after DISPATCHED the controller's own signal ledger decides — its own signal is an interruption with no result, a signal it did not send is EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL), owner INTEGRATION, never retried. Regression cases SIG-PROBE-1..10; before DISPATCHED V2-002 is unchanged",
+     "closed_by": {
+      "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+      "amendment": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+      "correction_record": "closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json"
+     }
     }
    ],
    "discovered_findings": [
@@ -1717,6 +1771,13 @@
      "what": "on Windows a controller's stop is TerminateJobObject, which takes the anchor down with the range, so the tool's own exit status is never reported; outcome() asked the job adapter about that status alone, saw None and returned FAILED with provenance NONE — a controller stop that INTERRUPT-SIG-1 requires to be SIGNALLED / CONTROLLER. POSIX reports the target's own signal exit, so macOS and Linux passed",
      "resolution": "outcome() asks the adapter about the tool's status and, when that was never reported, about the anchor's; the outcome table pins both (a job stop read from the anchor's status, and a job exit code without the stop in the ledger still FAILED)",
      "classification": "PRODUCT defect in P4 code, recorded as FAIL in P4-RUN-HISTORY (not retried); no frozen semantics changed"
+    },
+    {
+     "id": "P4-FINDING-009",
+     "found": "2026-09-23, implementing ARCHITECTURE-EXCEPTION-V2-003 (measured, not reasoned)",
+     "what": "the first implementation checked the controller's ledger only when the subject's process ended by a signal. Measured with a real controller stop: the cooperative SIGINT of the range's ladder surfaces inside the subject as KeyboardInterrupt, the harness catches it and reports a well-formed RESULT, and the probe read that as the subject's own behaviour — a controller's decision became a product verdict (REFUTED -> DEVELOPER at the candidate), the very substitution V2-003 exists to remove",
+     "resolution": "the ledger is consulted on every post-dispatch path, not only on a signal exit: nothing observed after DISPATCHED survives this controller's own stop (_after_dispatch). SIG-PROBE-2 is the real reproducer and the F5 conformance sub-check exercises both paths",
+     "classification": "an implementation defect caught before any commit; no frozen semantics changed beyond the approved V2-003 amendment"
     }
    ]
   },

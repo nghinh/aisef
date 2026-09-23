@@ -33,12 +33,14 @@ from aisef2.probe.python_callable import PythonCallableProbe  # noqa: E402
 from aisef2.product.approval import ContractApproval, Requirement  # noqa: E402
 from aisef2.product.compiler import ProbeRef, compile_spec  # noqa: E402
 from aisef2.product.contract import BehaviorContract, Subject  # noqa: E402
+from aisef2.probe.protocol import ProbeInterrupted  # noqa: E402
 from aisef2.product.outcome import Executed, IndeterminateReason, contract_satisfaction  # noqa: E402
 from aisef2.product.spec import ProductProofSpec  # noqa: E402
 
 P = PythonCallableProbe()
 S, R, I = BehaviorVerdict.SATISFIED, BehaviorVerdict.REFUTED, BehaviorVerdict.INDETERMINATE
 PA = IndeterminateReason.PRECONDITION_ABSENT
+NCS = IndeterminateReason.NON_CONTROLLER_SIGNAL
 SAT, UNSAT, INDET = ContractSatisfaction.SATISFIED, ContractSatisfaction.UNSATISFIED, ContractSatisfaction.INDETERMINATE
 REQUIRES, DECIDABLE = SubjectAbsence.REQUIRES_SUBJECT, SubjectAbsence.ABSENCE_IS_DECIDABLE
 SHA = "89abcdef0123456789abcdef0123456789abcdef"
@@ -71,28 +73,39 @@ def spec(locator, observable=None, stimulus=None, *, expectation=S, absence=DECI
         candidate_expectation=expectation, compiler_id="test", compiler_digest="c" * 64)
 
 
-class FakeProc:
-    """A harness process that prints `lines` (tagged with the patched nonce) and exits with `returncode`."""
+class FakeRange:
+    """A process range whose target prints `lines` (tagged with the patched nonce) and ends with `returncode`;
+    `ledger` is what the controller signalled — the one authority on provenance (§9.3, V2-003)."""
 
-    def __init__(self, lines, returncode):
-        import io
-        self.stdin, self.stdout, self.returncode = io.StringIO(), iter(lines), returncode
+    def __init__(self, lines, returncode, ledger=()):
+        self.output, self.returncode, self.ledger = iter(lines), returncode, list(ledger)
+        self.released = False
 
-    def poll(self):
-        return self.returncode
-
-    def kill(self):
-        pass
+    def start(self):
+        return self
 
     def wait(self, timeout=None):
         return self.returncode
 
+    def release(self):
+        self.released = True
 
-def faked(*tags, returncode):
-    """Patch the probe to spawn a FakeProc printing the protocol `tags`, with a fixed nonce."""
+
+def faked(*tags, returncode, ledger=()):
+    """Patch the probe to run a FakeRange printing the protocol `tags`, with a fixed nonce."""
     lines = [f"AISEF2-PROBE {tag} n0nce \n" for tag in tags]
-    return mock.patch.multiple(pc, _spawn=mock.Mock(return_value=FakeProc(lines, returncode)),
+    return mock.patch.multiple(pc, ProcessRange=mock.Mock(return_value=FakeRange(lines, returncode, ledger)),
                                secrets=mock.Mock(token_hex=mock.Mock(return_value="n0nce")))
+
+
+def refuses(error):
+    """Patch the probe so starting a range fails: the harness cannot launch."""
+    return mock.patch.object(pc, "ProcessRange", mock.Mock(return_value=mock.Mock(start=mock.Mock(side_effect=error))))
+
+
+def never_runs():
+    """Patch the probe so building a range at all is a test failure: nothing may run."""
+    return mock.patch.object(pc, "ProcessRange", side_effect=AssertionError("ran"))
 
 
 def checkout(files):
@@ -129,7 +142,7 @@ class ProbeAbs(_Revisions):
             failures["harness timeout (no READY)"] = self.run_(s, e=env(timeout=1.5))
         with mock.patch.object(pc, "HARNESS", "import sys\nsys.exit(127)\n"):
             failures["tool absent"] = self.run_(s)
-        with mock.patch.object(pc, "_spawn", side_effect=PermissionError("denied")):
+        with refuses(PermissionError("denied")):
             failures["sandbox cannot execute"] = self.run_(s)
         with faked(returncode=-9):
             failures["killed before READY"] = self.run_(s)
@@ -192,7 +205,7 @@ class Time(_Revisions):
 
     def test_TIME_1_the_harness_cannot_launch_the_subject(self):
         s = spec("app.calc:add")
-        with mock.patch.object(pc, "_spawn", side_effect=OSError("cannot launch")):
+        with refuses(OSError("cannot launch")):
             launch = self.run_(s)
         with mock.patch.object(pc, "HARNESS", "import time\ntime.sleep(3600)\n"):
             watchdog = self.run_(s, e=env(timeout=1.0))
@@ -243,7 +256,7 @@ class Time(_Revisions):
         self.assertEqual(self.run_(spec("app.calc:add", {"blocks": True}, {"args": [1, 2]}, window=5)), Executed(R))
 
     def test_a_spec_without_a_bounded_window_is_INVALID_SPEC_before_anything_runs(self):
-        with mock.patch.object(pc, "_spawn", side_effect=AssertionError("ran")):
+        with never_runs():
             for window in (None, 0, -1, True, "5"):
                 with self.subTest(window=window):
                     obs = {"returns": 3} if window is None else {"returns": 3, "within_s": window}
@@ -323,13 +336,25 @@ class Boundaries(_Revisions):
     def test_a_subject_that_ends_the_process_is_observed_not_unrunnable(self):
         self.assertEqual(self.run_(spec("app.die:f")), Executed(R))
 
-    def test_a_kill_by_signal_after_dispatch_cannot_be_told_from_the_environment(self):
-        with faked("READY", "DISPATCHED", returncode=-9):
+    def test_a_signal_after_dispatch_is_split_by_provenance(self):
+        """§9.3 (V2-003): the ledger decides, not the signal number. The old rule — every post-DISPATCH signal is
+        UNRUNNABLE / ENVIRONMENT — is gone; before DISPATCHED nothing changed (V2-002)."""
+        with faked("READY", "DISPATCHED", returncode=-9):  # the controller signalled nothing
             result = self.run_(spec("app.calc:add"))
-        self.assertIs(result.status, ProbeExecutionStatus.UNRUNNABLE)
-        self.assertRegex(result.detail, "killed by signal 9 mid-observation$")
-        with faked("READY", returncode=-9):
-            self.assertRegex(self.run_(spec("app.calc:add")).detail, "killed by signal 9 before DISPATCHED$")
+        self.assertEqual(result, Executed(I, NCS))
+        self.assertIsNot(route(result, spec("app.calc:add"), MeasurementPoint.CANDIDATE).failure.owner,
+                         Owner.ENVIRONMENT)
+        ladder = [{"stage": "terminate", "signal": "SIGTERM"}, {"stage": "kill", "signal": "SIGKILL"}]
+        with faked("READY", "DISPATCHED", returncode=-9, ledger=ladder):
+            with self.assertRaises(ProbeInterrupted) as stopped:  # the same exit, the controller's own signal
+                self.run_(spec("app.calc:add"))
+        self.assertEqual((stopped.exception.signal, stopped.exception.stage), (9, "kill"))
+        self.assertEqual(stopped.exception.detail, "the controller stopped this observation (terminate, kill): what "
+                                                   "the subject did is not known")  # the ledger, stage by stage
+        with faked("READY", returncode=-9):  # before DISPATCHED: the observation mechanism failed
+            before = self.run_(spec("app.calc:add"))
+        self.assertIs(before.status, ProbeExecutionStatus.UNRUNNABLE)
+        self.assertRegex(before.detail, "killed by signal 9 before DISPATCHED$")
 
     def test_subject_output_cannot_forge_the_protocol(self):
         self.assertEqual(self.run_(spec("app.noisy:f", {"returns": 1})), Executed(S))
@@ -339,7 +364,7 @@ class Boundaries(_Revisions):
         self.assertIs(contract_satisfaction(self.run_(spec("json:dumps")), spec("json:dumps")), UNSAT)
 
     def test_an_unsupported_observation_class_is_refused_before_anything_runs(self):
-        with mock.patch.object(pc, "_spawn", side_effect=AssertionError("ran")):
+        with never_runs():
             for obs, stim in (({"stdout": "x"}, {}), ({"returns": 1}, {"argv": ["x"]}), (EXISTS, {"args": [1]}),
                               ({"raises": "not an identifier"}, {}), ({"blocks": 1}, {})):
                 with self.subTest(observable=obs, stimulus=stim):
@@ -348,7 +373,7 @@ class Boundaries(_Revisions):
                     self.assertRegex(result.detail, "refused, not degraded$")
 
     def test_a_developer_authored_path_is_never_accepted(self):
-        with mock.patch.object(pc, "_spawn", side_effect=AssertionError("ran")):
+        with never_runs():
             for locator in ("app/calc.py:add", "/abs/app/calc.py:add", "../calc:add", "app.calc", "app.calc:add()"):
                 with self.subTest(locator=locator):
                     result = self.run_(spec(locator))
@@ -415,6 +440,25 @@ class Identity(unittest.TestCase):
         out = subprocess.run([sys.executable, "-P", "-c", code, str(ROOT)], capture_output=True, encoding="utf-8", check=True)
         self.assertEqual(out.stdout.strip(), P.digest)
         self.assertRegex(P.digest, "^[0-9a-f]{64}$")
+
+    def test_the_digest_covers_exactly_the_sources_it_names(self):
+        """A source dropped from the identity would let the probe change while its digest did not (§35, V2-003)."""
+        import hashlib
+        self.assertEqual(tuple(pc.PROBE_SOURCES), ("probe/protocol.py", "probe/python_callable.py"))
+
+        def digest_of(files):  # the composition, stated here rather than taken from the module
+            h = hashlib.sha256()
+            for rel, data in files:
+                h.update(rel.encode() + b"\0" + data + b"\0")
+            return h.hexdigest()
+        files = [(rel, (ROOT / "aisef2" / rel).read_bytes().replace(b"\r\n", b"\n")) for rel in pc.PROBE_SOURCES]
+        self.assertEqual(digest_of(files), P.digest)
+        for i, (rel, data) in enumerate(files):
+            with self.subTest(source=rel):
+                changed = list(files)
+                changed[i] = (rel, data + b"# changed\n")
+                self.assertNotEqual(digest_of(changed), P.digest)
+                self.assertNotEqual(digest_of(files[:i] + files[i + 1:]), P.digest)
 
     def test_the_digest_is_bound_into_the_spec_and_a_stale_binding_is_refused(self):
         req = Requirement.create(id="REQ-P", text="adds", source="docs/req.md")

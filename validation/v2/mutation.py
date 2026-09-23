@@ -27,13 +27,15 @@ import json
 import os
 import pathlib
 import shutil
-import signal
 import sys
 import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+if str(pathlib.Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(1, str(pathlib.Path(__file__).resolve().parent))
+import cleanup_authority as ca  # noqa: E402  — the runner's only way to signal a process (P4-FINDING-011)
 RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
            "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
@@ -59,14 +61,16 @@ P1_TARGETS: dict[str, list[str]] = {
     "aisef2/product/outcome.py::on_subject_absent": ["tests/v2/p1/test_outcome.py"],
     "aisef2/product/outcome.py::__post_init__": ["tests/v2/p1/test_outcome.py"],
     # WP-1.4: the taxonomy and the routing table are data; both are mutated like functions
-    "aisef2/control/owner.py::TAXONOMY": ["tests/v2/p1/test_routing.py"],
+    "aisef2/control/owner.py::TAXONOMY": ["tests/v2/p1/test_routing.py", "tests/v2/p2/test_signal_provenance.py"],
     "aisef2/control/owner.py::classify": ["tests/v2/p1/test_routing.py"],
     "aisef2/control/owner.py::flatten": ["tests/v2/p1/test_routing.py"],
-    "aisef2/control/routing.py::_EXECUTED": ["tests/v2/p1/test_routing.py"],
-    "aisef2/control/routing.py::route": ["tests/v2/p1/test_routing.py"],
+    "aisef2/control/routing.py::_EXECUTED": ["tests/v2/p1/test_routing.py", "tests/v2/p2/test_signal_provenance.py"],
+    "aisef2/control/routing.py::route": ["tests/v2/p1/test_routing.py", "tests/v2/p2/test_signal_provenance.py"],
 }
 _PROTOCOL_TESTS = ["tests/v2/p2/test_probe_protocol.py"]
 _HARNESS_TESTS = ["tests/v2/p2/test_python_callable.py"]
+#: the provenance split is measured by both: the harness's own cases and SIG-PROBE-1..10 (V2-003)
+_SIGNAL_TESTS = ["tests/v2/p2/test_python_callable.py", "tests/v2/p2/test_signal_provenance.py"]
 _ADMISSION_TESTS = ["tests/v2/p2/test_static_admission.py"]
 P2_TARGETS: dict[str, list[str]] = {
     # WP-2.1: the only mapping from an observation to a ProbeResult, and the entry point that binds enforcement
@@ -85,6 +89,14 @@ P2_TARGETS: dict[str, list[str]] = {
     "aisef2/probe/python_callable.py::observation_class": _HARNESS_TESTS,
     "aisef2/probe/python_callable.py::ON_DEADLINE": _HARNESS_TESTS,
     "aisef2/probe/python_callable.py::_harness_failure": _HARNESS_TESTS,
+    # V2-003 (§9.3): the provenance split — the controller's own ledger decides, never the signal number
+    "aisef2/probe/python_callable.py::_after_dispatch": _SIGNAL_TESTS,
+    "aisef2/probe/python_callable.py::_ended_without_result": _SIGNAL_TESTS,
+    "aisef2/probe/python_callable.py::_signal_of": _SIGNAL_TESTS,
+    # §35: the probe's identity — a source dropped here would reuse an old digest, and with it an old semantic_hash
+    "aisef2/probe/python_callable.py::PROBE_SOURCES": _HARNESS_TESTS,
+    "aisef2/probe/python_callable.py::_probe_digest": _HARNESS_TESTS,
+    "aisef2/probe/python_callable.py::_watch": _SIGNAL_TESTS,
     # WP-2.2: contrast to the candidate expectation, and the only way a calibration record is issued
     "aisef2/probe/calibration.py::demonstrates_contrast": ["tests/v2/p2/test_calibration.py"],
     "aisef2/probe/calibration.py::calibrate": ["tests/v2/p2/test_calibration.py"],
@@ -380,24 +392,14 @@ def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tup
     return out
 
 
-def _kill_leftovers(r, escaped: list[int]) -> int:
-    """What a run left behind when its range would not empty or something escaped it: killed by group, and counted."""
-    pids = [p.pid for p in r.members()] + escaped
-    for pid in pids:
-        try:
-            group = os.getpgid(pid)
-            os.kill(pid, signal.SIGKILL) if group == os.getpgrp() else os.killpg(group, signal.SIGKILL)
-        except OSError:
-            pass  # already gone
-    return len(pids)
-
-
-def _run_tests(root: pathlib.Path, tests: list[str]) -> tuple[bool, int]:
-    """(every kill test passed, processes the harness had to kill). Each run is a process range (WP-4.2): a timeout
+def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> tuple[bool, int]:
+    """(every kill test passed, processes the runner had to signal). Each run is a process range (WP-4.2): a timeout
     takes down the whole tree it started, not only the direct child (P2-RESIDUAL-ORPHAN-SUBJECT: leaked harness
     processes had skewed every later measurement). A mutant of the range code can break that containment — its tests
     run the mutated code — so a range that will not empty, or that something escaped, fails the run and is cleaned up
-    here instead of leaking into the next mutant."""
+    here. P4-FINDING-011: what the range REPORTS (members, escapees, its group) is never permission; only
+    `cleanup_authority` decides what is signalled, from its own reading of the host, and a candidate it cannot prove
+    the runner's is RESIDUAL_OWNERSHIP_UNKNOWN — left alone, and the target fails."""
     from aisef2.runtime.process_range import ProcessRange
     from aisef2.runtime.story_scope import Residual
     env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
@@ -407,37 +409,46 @@ def _run_tests(root: pathlib.Path, tests: list[str]) -> tuple[bool, int]:
         cmd = [sys.executable, "-m", "unittest", "discover", "-s", str(path.parent), "-t", "tests", "-p", path.name]
         r = ProcessRange(f"kill tests {rel}", cmd, cwd=root, env=env).start()
         code = r.wait(TIMEOUT)
-        escaped = [p.pid for p in r.escaped()]  # measured while their parents are alive
+        escaped = [p.pid for p in r.escaped()]  # reported while their parents are alive — checked, never trusted
         try:
             r.release()
         except Residual:
-            return False, leaked + _kill_leftovers(r, escaped)
+            reported = [p.pid for p in r.members()] + escaped
+            anchor = getattr(getattr(r, "_anchor", None), "pid", None)
+            report = ca.signal_owned(boundary, pids=reported, groups=[anchor] if anchor else ())
+            _CLEANUP.extend(report.signalled)
+            if report.residual_ownership_unknown:
+                raise ca.Unproven(f"{rel}: {report.unproven}") from None
+            return False, leaked + len(report.signalled)
+        if code is None:
+            _TIMED_OUT.append(rel)  # a kill by timeout is a kill, and the record says so (load can cause one)
+            return False, leaked
         if code != 0:
             return False, leaked
     return True, leaked
 
 
-def _reap_strays(work: pathlib.Path) -> int:
-    """Kill, by group, every process still running from the mutated tree after its kill tests, and count them (the
-    count also carries what a broken range left behind, see `_run_tests`). A
-    mutant of the range code can break the very containment its tests rely on (a mutated anchor that leaves its
-    group and ignores EOF outlived a P4 run and spun for 40 minutes, skewing every later timeout). POSIX: on Windows
-    the kill tests' own ranges are jobs with no breakaway."""
+#: kill-test runs the current mutant ended by timeout (drained per mutant into its result)
+_TIMED_OUT: list[str] = []
+#: every signal the runner sent for the current mutant, each with the authority's proof (drained into its result)
+_CLEANUP: list[dict] = []
+
+
+def _reap_strays(work: pathlib.Path, boundary: ca.Boundary) -> int:
+    """Signal, by group, every process still running from the mutated tree after its kill tests, and count them (the
+    count also carries what a broken range left behind, see `_run_tests`). A mutant of the range code can break the
+    very containment its tests rely on (a mutated anchor that leaves its group and ignores EOF outlived a P4 run and
+    spun for 40 minutes, skewing every later timeout). Candidates come from the authority's own host table, and each is
+    signalled only with its proof (P4-FINDING-011); one it cannot prove is RESIDUAL_OWNERSHIP_UNKNOWN. POSIX: on
+    Windows the kill tests' own ranges are jobs with no breakaway."""
     if os.name != "posix":
         return 0
-    from aisef2.runtime.process_range import process_table
-    marks = {str(work), str(work.resolve())}
-    strays = [p for p in process_table().values()
-              if p.pid != os.getpid() and any(m in p.command for m in marks)]
-    for p in strays:
-        try:
-            if p.group and p.group != os.getpgrp():
-                os.killpg(p.group, signal.SIGKILL)
-            else:
-                os.kill(p.pid, signal.SIGKILL)
-        except OSError:
-            pass  # it exited, or its group went with an earlier one
-    return len(strays)
+    found = ca.strays(boundary)
+    report = ca.signal_owned(boundary, pids=[p.pid for p in found], groups=sorted({p.pgid for p in found}))
+    _CLEANUP.extend(report.signalled)
+    if report.residual_ownership_unknown:
+        raise ca.Unproven(f"strays of {work}: {report.unproven}")
+    return len(report.signalled)
 
 
 def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
@@ -453,26 +464,42 @@ def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
                 shutil.copy(src, work / part)
         path = work / rel
         original = path.read_text(encoding="utf-8")
-        clean, leaked = _run_tests(work, tests)
+        boundary = ca.establish(work)  # P4-FINDING-011: the runner's own ownership boundary, before any worker
+        try:
+            clean, leaked = _run_tests(work, tests, boundary)
+        except ca.Unproven as e:
+            return {"target": target, "error": f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN}: {e}", "mutants": []}
         if not clean or leaked:
             return {"target": target, "error": f"kill tests fail on the unmutated tree (leaked {leaked})",
                     "mutants": []}
         results = []
         for desc, src in mutants(original, func, _enum_members(original, work)):
             path.write_text(src, encoding="utf-8")
-            passes, leaked = _run_tests(work, tests)
+            _TIMED_OUT.clear()
+            _CLEANUP.clear()
+            try:
+                passes, leaked = _run_tests(work, tests, boundary)
+                strays = _reap_strays(work, boundary) + leaked
+            except ca.Unproven as e:
+                path.write_text(original, encoding="utf-8")
+                return {"target": target, "error": f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN} at mutant {desc!r}: {e}",
+                        "mutants": [], "cleanup": list(_CLEANUP)}
             killed = not passes
             result = {"mutant": desc, "killed": killed}
-            strays = _reap_strays(work) + leaked
+            if _TIMED_OUT:
+                result["timed_out"] = list(_TIMED_OUT)  # killed by the clock, not by an assertion: named, so a
+                #                                          loaded machine cannot pass off a timeout as evidence
             if strays:
                 result["strays_reaped"] = strays
+            if _CLEANUP:
+                result["cleanup"] = list(_CLEANUP)  # each signal with the authority's proof of ownership
             results.append(result)
         path.write_text(original, encoding="utf-8")
     survivors = [r["mutant"] for r in results if not r["killed"]]
     return {"target": target, "kill_tests": tests, "source_sha256": source_digest(original),
             "mutants": len(results), "killed": len(results) - len(survivors),
             "survivors": survivors, "strays_reaped": sum(r.get("strays_reaped", 0) for r in results),
-            "results": results}
+            "killed_by_timeout": sum(1 for r in results if r.get("timed_out")), "results": results}
 
 
 def target_problems(t: dict, root: pathlib.Path = ROOT) -> list[str]:
@@ -527,12 +554,14 @@ def main(argv: list[str] | None = None) -> int:
             record = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {
                 "record": f"AISEF V2 — {phase} MUTATION", "tool": "validation/v2/mutation.py", "targets": []}
             kept = [t for t in record["targets"] if t["target"] not in mine and t["target"] in PHASE_TARGETS[phase]]
-            fresh = [run_target(ROOT, t, TARGETS[t]) for t in mine]
-            record["targets"] = sorted(kept + fresh, key=lambda t: t["target"])
-            out.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-            for t in fresh:
+            fresh = []
+            for target in mine:  # the record is written after every target: a run that dies keeps what it measured
+                t = run_target(ROOT, target, TARGETS[target])
+                fresh.append(t)
+                record["targets"] = sorted(kept + fresh, key=lambda x: x["target"])
+                out.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
                 print(f"{t['target']}: {t.get('killed')}/{t.get('mutants')} killed; survivors {t.get('survivors')}"
-                      + (f" ERROR {t['error']}" if t.get("error") else ""))
+                      + (f" ERROR {t['error']}" if t.get("error") else ""), flush=True)
         unknown = [t for t in chosen if t not in TARGETS]
         if unknown:
             raise SystemExit(f"not a mutation target: {unknown}")

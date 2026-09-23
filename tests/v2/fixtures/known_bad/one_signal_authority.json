@@ -1,0 +1,9 @@
+{
+ "checker": "one_signal_authority",
+ "package": "P4 correction (V2-003, RFC §9.3)",
+ "kind": "kernel_source",
+ "rule": "ONE_SIGNAL_AUTHORITY",
+ "path": "aisef2/probe/python_callable.py",
+ "source": "import os\n\n\nclass Probe:\n    def __init__(self):\n        self.ledger = []\n\n    def stop(self, proc):\n        os.kill(proc.pid, 9)\n        self.ledger.append('kill')\n",
+ "expect": "ONE_SIGNAL_AUTHORITY aisef2/probe/python_callable.py:6"
+}

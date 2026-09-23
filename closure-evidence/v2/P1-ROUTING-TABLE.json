@@ -56,6 +56,12 @@
    "budget": null,
    "rule": "§10.3 (V2-001): POST_MERGE, a subject verified at the candidate is gone -> INTEGRATION"
   },
+  "NON_CONTROLLER_SIGNAL": {
+   "owner": "INTEGRATION",
+   "retryability": "NOT_RETRYABLE",
+   "budget": null,
+   "rule": "§9.3, §10.3 (V2-003): the probe executed and the subject's process ended by a signal the controller did not send. The evidence establishes only that the controller did not send it — not whether the product, the operating system, a resource limit or another actor did — so DEVELOPER would invent product causality and ENVIRONMENT would repeat the defect V2-003 removes; INTEGRATION is the fail-closed owner of an executed proof whose causal reading cannot be established, and it is never retryable: a retry would measure the same thing"
+  },
   "MISSING_CREDENTIAL": {
    "owner": "ENVIRONMENT",
    "retryability": "RESOLVED_BY_POLICY",
@@ -3553,7 +3559,7 @@
  ],
  "rfc_table_comparison": {
   "state": "PASS",
-  "detail": "equals the RFC §10 and §10.3 tables on 39 (point, outcome, role) rows, polarity-symmetric"
+  "detail": "equals the RFC §10 and §10.3 tables on 48 (point, outcome, role) rows, polarity-symmetric"
  },
  "properties": {
   "routing_total_over_legal_space": true,

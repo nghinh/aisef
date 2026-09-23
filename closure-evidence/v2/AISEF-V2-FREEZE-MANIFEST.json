@@ -4,10 +4,10 @@
  "rfc": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
  "approval_record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
  "approval_record_sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
- "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
- "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114",
- "approved_rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
- "approved_freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114",
+ "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
+ "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7",
+ "approved_rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
+ "approved_freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7",
  "approval_lineage": [
   {
    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
@@ -34,20 +34,32 @@
    ],
    "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
    "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114"
+  },
+  {
+   "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+   "sha256": "cfaebe353ef7a69f8f357f514932cd25cef585373252dc2e9f58126117e12d09",
+   "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+   "frozen_items_changed": [
+    "F1",
+    "F2",
+    "F5"
+   ],
+   "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
+   "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7"
   }
  ],
  "reviewed_commit": "2fe672c7ecdefa349e08353fa9bd67d627077d6e",
  "frozen_items": [
   {
    "id": "F1",
-   "row_sha256": "b0b1b6d6914cda85c16ebc9538a8408e7360752dbdf880ca54987460329eb24b",
-   "item": "`Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted)*",
+   "row_sha256": "c7ef7e857d4dbafa17d8b0ed39f0d619a5c834f7f09460c74f17338f19cbc9b0",
+   "item": "`Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted; a payload enum gained one member — V2-003)*",
    "why": "Every journal is written under them; a payload enum change re-interprets existing events"
   },
   {
    "id": "F2",
-   "row_sha256": "e33271cd13c7752c6f2fe154cb827f9ee46586ac27d38257f9577470ab4188ca",
-   "item": "`ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table **keyed by `MeasurementPoint` (§10.3)** *(amended — V2-001)*, **and the `ContractSatisfaction` derivation** *(adjusted)*",
+   "row_sha256": "d129883bfdf9ce3ab795efdaf144e3d3af231f128c73bc62f1b5de78f0ada803",
+   "item": "`ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table **keyed by `MeasurementPoint` (§10.3)** *(amended — V2-001, V2-003)*, **and the `ContractSatisfaction` derivation** *(adjusted)*",
    "why": "Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it"
   },
   {
@@ -64,8 +76,8 @@
   },
   {
    "id": "F5",
-   "row_sha256": "5c1bf5f75fcb569908893539c7787a228cc865d18d87ee8408a67cd161742ec5",
-   "item": "`Probe` protocol: observation-harness / subject split, **including harness timeout vs subject observation deadline (§9.2)** *(amended — V2-002)*, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)*",
+   "row_sha256": "92ba9a46280167855e2adb8c552062325432593b3a7e75f0ce3383a4a2483735",
+   "item": "`Probe` protocol: observation-harness / subject split, **including harness timeout vs subject observation deadline (§9.2) and signal provenance after dispatch (§9.3)** *(amended — V2-002, V2-003)*, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)*",
    "why": "The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified"
   },
   {

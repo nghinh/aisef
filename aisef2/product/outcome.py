@@ -28,6 +28,9 @@ from aisef2.product.spec import ProductProofSpec
 class IndeterminateReason(Enum):
     """Why an EXECUTED probe could not decide (§10: "a reason is REQUIRED"). Named by the RFC, §10.2."""
     PRECONDITION_ABSENT = "PRECONDITION_ABSENT"
+    #: §9.3 (ARCHITECTURE-EXCEPTION-V2-003): the harness dispatched the subject and the process then ended by a signal
+    #: the controller did not send. What is known is exactly that — not who sent it — so the name says no more.
+    NON_CONTROLLER_SIGNAL = "NON_CONTROLLER_SIGNAL"
 
 
 @dataclass(frozen=True, slots=True)

@@ -4031,6 +4031,49 @@
    ]
   },
   {
+   "target": "aisef2/probe/python_callable.py::_after_dispatch",
+   "kill_tests": [
+    "tests/v2/p2/test_python_callable.py",
+    "tests/v2/p2/test_signal_provenance.py"
+   ],
+   "source_sha256": "1b34ae2b1a5cdeb522263d7dcf31ebbc2e7579c7073925b03aaa0e3b4016ce9f",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L327 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L327 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L328 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L326 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L329 string 'the controller stopped this observation (' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L329 string '): what the subject did is not known' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L329 string ', ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/probe/python_callable.py::_harness_failure",
    "kill_tests": [
     "tests/v2/p2/test_python_callable.py"

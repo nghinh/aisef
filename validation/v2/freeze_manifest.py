@@ -23,9 +23,11 @@ MANIFEST_REL = "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json"
 #: Approved amendments, oldest first — the architecture-exception mechanism. Each binds the record it amends (by
 #: sha256), its exception record (by sha256) and before/after digests. The original approval record never changes.
 AMENDMENTS = ("closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
-              "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json")
+              "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+              "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json")
 EXCEPTIONS = ("closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
-              "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json")
+              "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+              "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json")
 #: Every file the baseline is identified from.
 BASELINE_FILES = (RFC_REL, APPROVAL_REL, MANIFEST_REL, *AMENDMENTS, *EXCEPTIONS)
 

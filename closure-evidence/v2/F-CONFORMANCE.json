@@ -61,6 +61,7 @@
     "F5.enum.Enforcement",
     "F5.probe_protocol",
     "F5.harness_timeout_vs_subject_deadline",
+    "F5.signal_provenance_after_dispatch",
     "F5.calibration_contracts"
    ],
    "pending_on": []
@@ -294,7 +295,7 @@
    "id": "F2.owner_routing_table",
    "implemented_by": "WP-1.4",
    "state": "PASS",
-   "detail": "equals the RFC §10 and §10.3 tables on 39 (point, outcome, role) rows, polarity-symmetric",
+   "detail": "equals the RFC §10 and §10.3 tables on 48 (point, outcome, role) rows, polarity-symmetric",
    "table": [
     [
      "§10.3",
@@ -480,6 +481,87 @@
      "§10.3",
      "POST_MERGE",
      "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "VERIFY",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "INTRODUCE",
+     "INTEGRATION",
+     "STORY_ADMISSION",
+     "PROBE_INVALID"
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "PRESERVE",
+     "INTEGRATION",
+     "STORY_ADMISSION",
+     "PROBE_INVALID"
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "VERIFY",
+     "INTEGRATION",
+     "STORY_ADMISSION",
+     "PROBE_INVALID"
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "INTRODUCE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "PRESERVE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "VERIFY",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "INTRODUCE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "PRESERVE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
      "VERIFY",
      "INTEGRATION",
      null,
@@ -736,6 +818,14 @@
    "implemented_by": "WP-2.1",
    "state": "PASS",
    "detail": "harness timeout -> UNRUNNABLE; subject deadline -> EXECUTED with the spec's verdict, no default (§9.2)",
+   "required_now": true
+  },
+  {
+   "item": "F5",
+   "id": "F5.signal_provenance_after_dispatch",
+   "implemented_by": "WP-2.1",
+   "state": "PASS",
+   "detail": "the same signal exit is an interruption when this controller's ledger holds it and EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL) when it does not",
    "required_now": true
   },
   {

@@ -29,6 +29,10 @@
   `aisef2/journal/projections/`, no kernel module counts a retry, attempt, budget, spend or charge — no `+=` / `-=`
   and no `x = x ± …` whose target (a name, an attribute, or a subscript's container) names one, and no `Counter`
   bound to one. A counter beside the journal is what disagreed with it in SS-64.
+* **ONE_SIGNAL_AUTHORITY** (RFC §9.3, V2-003) — a probe observes; it never signals a process itself and never keeps
+  a signal ledger of its own. The owned process range (§17.1) is the single authority on what the controller sent,
+  so a probe cannot grow a second, disagreeing account of provenance.
+
 * **SENTINEL_IS_NOT_EVIDENCE** (RFC §19, WP-4.3) — the RunTerminationSentinel is not evidence and no gate may cite
   it: only `aisef2/runtime/run_scope.py` (and the sentinel module itself) import `aisef2.runtime.sentinel`.
 
@@ -53,9 +57,13 @@ RETRY_CARRIER_MODULE = "aisef2/journal/event.py"
 _RETRY_NAMES = {"retryable", "retryability"}
 #: the fold engine and every control projection: no wall-clock time (§20.2)
 PROJECTION_MODULES = ("aisef2/journal/fold.py", "aisef2/journal/projections/")
+#: §9.3 (V2-003): one authority for controller signal provenance. A probe observes; stopping processes and recording
+#: what was sent is the owned process range's (aisef2/runtime/process_range.py), never a probe's own second mechanism.
+PROBE_PACKAGE = "aisef2/probe/"
+SIGNALLING = {"kill", "killpg", "terminate", "send_signal", "raise_signal"}
 RULES = ("NO_PROSE_CONTROL", "NO_RAW_VERDICT_ROUTING", "RETRYABLE_ONLY_IN_TAXONOMY",
          "NO_VERDICT_FROM_ABSENCE_DECLARATION", "RESULT_ONLY_THROUGH_BINDING", "NO_TIME_IN_PROJECTIONS",
-         "NO_SIDE_RETRY_COUNTER", "SENTINEL_IS_NOT_EVIDENCE")
+         "NO_SIDE_RETRY_COUNTER", "SENTINEL_IS_NOT_EVIDENCE", "ONE_SIGNAL_AUTHORITY")
 _COUNTED = re.compile(r"retr|attempt|budget|spen[dt]|charge", re.IGNORECASE)
 SENTINEL_MODULE = "aisef2.runtime.sentinel"
 SENTINEL_READERS = ("aisef2/runtime/run_scope.py", "aisef2/runtime/sentinel.py")
@@ -195,6 +203,16 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = RULES) -> list[st
                            "(use bound_result)")
     if "NO_SIDE_RETRY_COUNTER" in rules and not rel.startswith("aisef2/journal/projections/"):
         out += _side_counters(rel, tree)
+    if "ONE_SIGNAL_AUTHORITY" in rules and rel.startswith(PROBE_PACKAGE):
+        for n in ast.walk(tree):
+            if isinstance(n, ast.Call) and getattr(n.func, "attr", getattr(n.func, "id", "")) in SIGNALLING:
+                out.append(f"ONE_SIGNAL_AUTHORITY {rel}:{n.lineno} signals a process itself; stopping a process and "
+                           "recording what was sent belongs to the owned process range (§9.3)")
+            if isinstance(n, (ast.Assign, ast.AnnAssign)) and any(
+                    getattr(t, "attr", getattr(t, "id", "")) == "ledger"
+                    for t in (n.targets if isinstance(n, ast.Assign) else [n.target])):
+                out.append(f"ONE_SIGNAL_AUTHORITY {rel}:{n.lineno} keeps a signal ledger of its own; there is one "
+                           "authority for controller signal provenance (§9.3)")
     if "SENTINEL_IS_NOT_EVIDENCE" in rules and rel not in SENTINEL_READERS:
         for n in ast.walk(tree):
             if isinstance(n, ast.Import):

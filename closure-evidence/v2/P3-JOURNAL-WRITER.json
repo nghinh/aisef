@@ -132,6 +132,10 @@
    "INTEGRATION",
    false
   ],
+  "NON_CONTROLLER_SIGNAL": [
+   "INTEGRATION",
+   false
+  ],
   "MISSING_CREDENTIAL": [
    "ENVIRONMENT",
    true

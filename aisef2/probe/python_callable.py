@@ -46,14 +46,21 @@ import queue
 import re
 import secrets
 import subprocess
+import tempfile
 import threading
 import time
 
 from aisef2.arch.enums import BehaviorVerdict, Enforcement
 from aisef2.probe.protocol import (
-    ExecutionEnv, HarnessProbe, Observation, ObservationKind, ProbeMetadata, RevisionRef,
+    ExecutionEnv, HarnessProbe, Observation, ObservationKind, ProbeInterrupted, ProbeMetadata, RevisionRef,
 )
+from aisef2.runtime.process_range import ProcessRange, RangeError
 from aisef2.product.spec import ProductProofSpec
+
+_GRACE_S = (1.0, 1.0)   # the range's graceful-first ladder when the observation is over
+_WAIT_S = 30.0          # bounded: a range that will not empty is a residual, never an endless wait
+_COLLECT_S = 5.0        # how long the anchor is given to report the target's exit status
+_DRAIN_S = 2.0          # after the process ends, how long a line it already wrote is still waited for
 
 PROBE_ID = "probe.python_callable"
 PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py")
@@ -133,7 +140,7 @@ def _plain(value):
 #: The harness script. Probe-owned; runs in `-I` mode with the checkout on sys.path; never names a developer file.
 HARNESS = r'''
 import importlib, json, os, sys
-req = json.loads(sys.stdin.read())
+req = json.loads(open(sys.argv[1], encoding="utf-8").read())
 nonce, root = req["nonce"], os.path.realpath(req["root"])
 sys.path[:0] = [p for p in (root, os.path.join(root, "src")) if os.path.isdir(p)]
 out = sys.stdout
@@ -185,6 +192,12 @@ class PythonCallableProbe(HarnessProbe):
     id = PROBE_ID
     digest = DIGEST
 
+    def __init__(self, on_range=None) -> None:
+        """`on_range` is called with the process range as soon as it starts — harness-owned, not part of the frozen
+        `Probe` protocol (PROBE-META-1). A run uses it to acquire the range into the story's StoryScope, so an
+        interruption disposes it through P4's ownership and its ledger records what the controller sent (§9.3)."""
+        self._on_range = on_range
+
     def enforcement(self) -> Enforcement:
         return Enforcement.PARTIAL
 
@@ -216,48 +229,65 @@ class PythonCallableProbe(HarnessProbe):
         stim = dict(pi["stimulus"])
         request = {"mark": _MARK, "nonce": nonce, "root": at.root, "locator": subject["locator"], "cls": cls,
                    "args": list(stim.get("args", [])), "kwargs": dict(stim.get("kwargs", {}))}
-        try:
-            proc = _spawn([env.interpreter, "-I", "-c", HARNESS], at.root, _scrubbed_env())
-        except OSError as e:
-            return Observation(ObservationKind.HARNESS_FAILED, detail=f"the harness cannot launch: {type(e).__name__}")
+        with tempfile.TemporaryDirectory(prefix="aisef2-probe-") as work:
+            ask = os.path.join(work, "request.json")
+            pathlib.Path(ask).write_text(json.dumps(_plain(request)), encoding="utf-8")
+            # the harness runs inside a P4 process range: its ledger is the one authority on what this controller
+            # signalled, and disposal takes the whole tree down, not only the direct child (§9.3, V2-003)
+            run = ProcessRange(f"probe {spec.id}", [env.interpreter, "-I", "-c", HARNESS, ask], cwd=at.root,
+                               env=_scrubbed_env(), output=subprocess.PIPE, grace_s=_GRACE_S, wait_s=_WAIT_S)
+            try:
+                run.start()
+                if self._on_range is not None:
+                    self._on_range(run)
+            except (RangeError, OSError) as e:
+                return Observation(ObservationKind.HARNESS_FAILED, detail=f"the harness cannot launch: "
+                                                                         f"{type(e).__name__}")
+            try:
+                return self._watch(run, nonce, cls, pi, env)
+            finally:
+                run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+
+    def _watch(self, run, nonce: str, cls: str, pi, env) -> Observation:
+        """Read the harness protocol: READY and DISPATCHED under the harness watchdog, then the subject's own window."""
         lines: queue.Queue = queue.Queue()
-        threading.Thread(target=_pump, args=(proc.stdout, lines), daemon=True).start()
-        try:
-            proc.stdin.write(json.dumps(_plain(request)))
-            proc.stdin.close()
-        except OSError:
-            pass  # the process is already gone; what it printed decides below
+        threading.Thread(target=_pump, args=(run.output, lines), daemon=True).start()
+        threading.Thread(target=_exited, args=(run, lines), daemon=True).start()
         watchdog = time.monotonic() + env.timeout_s
         for expected in ("READY", "DISPATCHED"):
             tag, _ = _next(lines, nonce, watchdog)
             if tag != expected:
-                return _harness_failure(proc, tag, expected, env.timeout_s)
+                return _harness_failure(run, tag, expected, env.timeout_s)
         window = window_of(pi["observable"])
         tag, body = _next(lines, nonce, time.monotonic() + window)
-        if tag == "TIMEOUT":
-            _stop(proc)
-            return Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
-                               detail=f"the subject's {window:g}s observation window expired ({cls})")
-        code = _stop(proc)
-        if tag != "RESULT" and code is not None and code < 0:
-            return Observation(ObservationKind.HARNESS_FAILED, detail=f"the harness process was killed by signal "
-                                                                     f"{-code} mid-observation")
-        if tag != "RESULT":
-            return Observation(ObservationKind.OBSERVED, BehaviorVerdict.REFUTED,
-                               detail=f"the subject ended the process before the observable (exit {code})")
+        ended = tag == "EOF"
+        if ended:  # the process ended: a line it wrote just before may still be in the pipe
+            tag, body = _next(lines, nonce, time.monotonic() + _DRAIN_S)
+        if tag == "RESULT":
+            pass
+        elif ended or tag == "EOF":
+            return _after_dispatch(run, _ended_without_result(run))
+        else:  # the window closed with the process still running
+            return _after_dispatch(run, Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
+                                                    detail=f"the subject's {window:g}s observation window expired "
+                                                           f"({cls})"))
         facts = json.loads(body)
         if facts.get("subject") == "absent":
             # every observable here is positive, so over an absent subject it is not observed
-            return Observation(ObservationKind.SUBJECT_ABSENT, BehaviorVerdict.REFUTED, detail=facts.get("note", ""))
-        return Observation(ObservationKind.OBSERVED, verdict_of(cls, pi["observable"], facts), detail=json.dumps(facts))
+            return _after_dispatch(run, Observation(ObservationKind.SUBJECT_ABSENT, BehaviorVerdict.REFUTED,
+                                                    detail=facts.get("note", "")))
+        return _after_dispatch(run, Observation(ObservationKind.OBSERVED, verdict_of(cls, pi["observable"], facts),
+                                                detail=json.dumps(facts)))
 
 
 METADATA = ProbeMetadata(PROBE_ID, DIGEST, spec_class)
 
 
-def _spawn(argv: list[str], cwd: str, env: dict) -> subprocess.Popen:
-    return subprocess.Popen(argv, cwd=cwd, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                            stderr=subprocess.DEVNULL, text=True, encoding="utf-8", errors="replace")
+def _exited(run, lines: queue.Queue) -> None:
+    """End the protocol when the target's process ends. The range's output pipe stays open while the anchor lives, so
+    the end of the harness's output is its exit, as the anchor reports it — never the closing of the pipe."""
+    run.wait(None)
+    lines.put(None)
 
 
 def _pump(stream, lines: queue.Queue) -> None:
@@ -287,18 +317,46 @@ def _next(lines: queue.Queue, nonce: str, until: float) -> tuple[str, str]:
             return parts[1], parts[3] if len(parts) == 4 else ""
 
 
-def _stop(proc) -> int | None:
-    """Stop the harness process if it still runs; its exit status, or None if it cannot be collected."""
-    if proc.poll() is None:
-        proc.kill()
-    try:
-        return proc.wait(timeout=10)
-    except subprocess.TimeoutExpired:
-        return None
+def _after_dispatch(run, observation: Observation) -> Observation:
+    """§9.3 (ARCHITECTURE-EXCEPTION-V2-003), CASE A. Nothing observed after DISPATCHED survives this controller's own
+    stop: if its signal ledger holds a signal, the observation was interrupted, whatever the harness managed to report
+    before it died — a cooperative SIGINT, for instance, surfaces inside the subject as KeyboardInterrupt, and reading
+    that as the subject's own behaviour would charge a controller's decision to the product. An interruption is not a
+    measurement: no `ProbeResult`, no verdict, no owner. The ledger is the authority, never the signal number."""
+    stages = [s["stage"] for s in run.ledger]
+    if not stages:
+        return observation
+    raise ProbeInterrupted(f"the controller stopped this observation ({', '.join(stages)}): what the subject did is "
+                           "not known", signal=_signal_of(run.returncode), stage=stages[-1])
 
 
-def _harness_failure(proc, tag: str, expected: str, timeout_s: float) -> Observation:
-    code = _stop(proc)
+def _ended_without_result(run) -> Observation:
+    """§9.3, CASES B and C after DISPATCHED: how the harness's process ended, when this controller did not stop it.
+
+    * it ended by a signal: the controller did not send it, and nothing here knows who did — EXECUTED +
+      INDETERMINATE(NON_CONTROLLER_SIGNAL), never UNRUNNABLE and never a verdict (CASE B);
+    * it ended by an exit status: the subject ended the process before the observable — an observation, REFUTED;
+    * its status was never reported: the observation mechanism cannot say what happened — UNRUNNABLE.
+    """
+    code = run.wait(_COLLECT_S)
+    if code is None:
+        return Observation(ObservationKind.HARNESS_FAILED,
+                           detail="the harness process ended and its exit status was never reported")
+    if code < 0:
+        return Observation(ObservationKind.NON_CONTROLLER_SIGNAL,
+                           detail=f"the process ended by signal {-code} after DISPATCHED, and this controller's "
+                                  "signal ledger is empty: it did not send it")
+    return Observation(ObservationKind.OBSERVED, BehaviorVerdict.REFUTED,
+                       detail=f"the subject ended the process before the observable (exit {code})")
+
+
+def _signal_of(code: int | None) -> int | None:
+    return -code if code is not None and code < 0 else None
+
+
+def _harness_failure(run, tag: str, expected: str, timeout_s: float) -> Observation:
+    """Before DISPATCHED the observation mechanism itself failed: UNRUNNABLE, unchanged by V2-003 (V2-002, CASE C)."""
+    code = run.wait(_COLLECT_S)
     if tag == "TIMEOUT":
         detail = f"harness timeout: no {expected} within {timeout_s:g}s — the observation mechanism did not operate"
     elif code is not None and code < 0:

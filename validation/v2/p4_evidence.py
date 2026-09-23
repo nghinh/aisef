@@ -330,8 +330,9 @@ def interruption() -> dict:
                              "they are not part of this record, which is rebuilt identically on Windows",
         "live_cases": live, "repair_cases": rep,
         "residuals_closed": {"P2-RESIDUAL-SIGNAL-SOURCE": "for every process P4 owns (tools in ranges): provenance "
-                                                          "recorded, a signal exit never an owner; the P2 probe harness "
-                                                          "is not P4-owned — see the P4 report",
+                                                          "recorded, a signal exit never an owner; the P2 probe path is "
+                                                          "closed by ARCHITECTURE-EXCEPTION-V2-003 (RFC §9.3): the "
+                                                          "harness runs in a range whose ledger decides — SIG-PROBE-1..10",
                              "P3-RESIDUAL-DISPOSAL-ORDER": "WP-4.3: a successful shutdown is refused while a story is "
                                                            "open; an interruption closes and names instead"},
         "properties": {

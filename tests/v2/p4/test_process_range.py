@@ -269,7 +269,8 @@ class Range(unittest.TestCase):
             f"        exec({lingering(pid_file) + 'time.sleep(60)'!r})\n")
         with mock.patch.object(mutation, "TIMEOUT", 3):
             t = time.monotonic()
-            self.assertEqual(mutation._run_tests(self.dir, ["tests/hang/test_hang.py"]), (False, 0))
+            self.assertEqual(mutation._run_tests(self.dir, ["tests/hang/test_hang.py"], mutation.ca.establish(self.dir)),
+                             (False, 0))
         self.assertLess(time.monotonic() - t, 30)
         self.assertTrue(gone(read_pid(pid_file)), "the kill test's grandchild outlived the runner's timeout")
 
@@ -318,6 +319,33 @@ class Range(unittest.TestCase):
             self.assertLess(time.monotonic() - t, 1.5)
         r.release()
         self.assertIs(r.wait_empty(0.0), True)
+
+    @unittest.skipUnless(POSIX, "killpg is POSIX")
+    def test_a_group_the_kernel_says_has_nobody_left_to_signal_is_measured_not_assumed(self):
+        """macOS answers EPERM (not ESRCH) to killpg when every member is already exiting or a zombie (XNU killpg1
+        with nfound == 0). Measured on 2026-09-23: two mutation runs died at once on it. The answer means nothing was
+        there to signal; whether the range is empty is still measured, so a group that persists is a residual."""
+        r = self.range("import time\nend = time.time() + 120\nwhile time.time() < end: time.sleep(0.05)")
+        self.assertIsNone(r.wait(0.2))
+        real, answered = os.killpg, []
+
+        def eperm_once(group, sig):
+            answered.append(sig)
+            if len(answered) == 1:
+                real(group, signal.SIGKILL)  # the members go away, as they were doing
+                raise PermissionError(1, "Operation not permitted")
+            return real(group, sig)
+        with mock.patch.object(pr.os, "killpg", eperm_once):
+            r.release()  # no exception: the group was measured empty after the answer
+        self.assertEqual(r.members(), [])
+        self.assertTrue(r._reaped)
+        self.assertEqual([s["stage"] for s in r.ledger][:1], ["cooperative"])  # the attempt is still in the ledger
+        stuck = ProcessRange("stuck", [PY, "-c", "import time; time.sleep(0.05)"], grace_s=(0.1, 0.1), wait_s=0.3).start()
+        stuck.wait(20)
+        with mock.patch.object(ProcessRange, "members", lambda self: [Proc(4243, 1, None, None, "persisting")]), \
+                mock.patch.object(pr.os, "killpg", mock.Mock(side_effect=PermissionError(1, "denied"))), \
+                self.assertRaises(RangeNotEmpty):
+            stuck.release()  # a group that persists after that answer is a residual, never a silent success
 
     @unittest.skipUnless(POSIX, "the escape report reads the POSIX process table")
     def test_escapees_are_reported_in_pid_order(self):

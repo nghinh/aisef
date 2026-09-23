@@ -385,6 +385,28 @@ A timeout of the **observation harness** and a deadline reached by the **subject
   probe runs.
 - No new `Owner`, no new architecture plane.
 
+### 9.3 Signal provenance after dispatch *(amended — ARCHITECTURE-EXCEPTION-V2-003)*
+
+A process that ends by a signal says **what** happened, never **who** did it. The controller knows one thing
+mechanically: whether *it* sent that signal. Its own signal ledger (the owned process range, §17.1) is the single
+authority; the signal number is not.
+
+- **Before `DISPATCHED`.** The observation mechanism failed before it could observe the subject ⇒ `UNRUNNABLE`,
+  owner **`ENVIRONMENT`**, no `BehaviorVerdict`. Unchanged by this amendment (§9.2).
+- **After `DISPATCHED`, the controller's ledger holds the terminating signal.** The controller stopped its own
+  observation: an **interruption**, not a measurement. No `ProbeResult`, no `BehaviorVerdict` and no owner **MUST**
+  be produced; the operation closes through the interruption path (§20.2) — `OUTCOME_UNKNOWN` once dispatched — and
+  the provenance is kept in the journal.
+- **After `DISPATCHED`, the ledger does not hold it.** The harness observed that the subject's process ended by a
+  signal the controller did not send ⇒ **`EXECUTED`** + `INDETERMINATE(NON_CONTROLLER_SIGNAL)`.
+  - It **MUST NOT** be `UNRUNNABLE` and **MUST NOT** be `ENVIRONMENT` merely because the process exited by a signal.
+  - There **MUST NOT** be a global rule *signal exit ⇒ `REFUTED`*: the evidence does not say the subject refuted the
+    contract, only that the observation was spoiled.
+  - The reason is named for what is known — the controller did not send it — and **MUST NOT** claim the subject sent
+    it: the operating system, a resource limit or another actor are not excluded.
+- One authority: a probe **MUST NOT** keep a second signal ledger, PID tree or interruption state machine.
+- No new `Owner`, no new `ProbeExecutionStatus`, no new `BehaviorVerdict`, no new architecture plane.
+
 ---
 
 ## 10. Two-axis proof outcomes
@@ -469,7 +491,12 @@ absent package, but a test that imports that package cannot be collected and is 
 `AC-STORY-01-01-4/-5` were `REQUIRES_SUBJECT` prohibitions over a subject the story was to create, so they
 resolve to `INDETERMINATE(PRECONDITION_ABSENT)` — decided by the contract's declaration, not by any file.
 
-### 10.3 Owner routing by measurement point *(amended — ARCHITECTURE-EXCEPTION-V2-001)*
+A second typed reason is named by §9.3 *(ARCHITECTURE-EXCEPTION-V2-003)*: `NON_CONTROLLER_SIGNAL` — the harness
+dispatched the subject and the process then ended by a signal the controller did not send. Like
+`PRECONDITION_ABSENT` it is a member of `IndeterminateReason`, never free text, and it carries explicit routing
+(§10.3); it is never inferred from a signal number.
+
+### 10.3 Owner routing by measurement point *(amended — ARCHITECTURE-EXCEPTION-V2-001, V2-003)*
 
 The same observation means different things depending on where it is measured (§26). Owner routing **MUST** be
 keyed on the typed measurement point and, at the parent, on the obligation role (§11). It **MUST NOT** be inferred
@@ -491,6 +518,7 @@ class MeasurementPoint(Enum):
 | CANDIDATE | `INDETERMINATE(PRECONDITION_ABSENT)` | any admitted | the implementation did not establish the subject the contract requires | DEVELOPER |
 | POST_MERGE | `UNSATISFIED` | any | a regression after merge (§26) | INTEGRATION |
 | POST_MERGE | `INDETERMINATE(PRECONDITION_ABSENT)` | any | a subject verified at the candidate is gone after merge | INTEGRATION |
+| any | `INDETERMINATE(NON_CONTROLLER_SIGNAL)` | any | executed, then a signal the controller did not send: the behavioural truth cannot be derived and no cause may be invented — never retried, no budget charged, and at the parent PROBE_INVALID | INTEGRATION |
 | any | probe `UNRUNNABLE` | any | the observation harness cannot run | ENVIRONMENT |
 
 - `SATISFIED` at the candidate or after merge is not a failure.
@@ -1377,15 +1405,16 @@ relative to the product tree and how a probe change is re-proved affordably.
 Frozen means: changing it later invalidates evidence written under it. Each **MUST** have owner sign-off before
 implementation begins. Items marked *(adjusted)* changed mechanically as a consequence of owner decisions B1–B5;
 **no new freeze item was added**. Items marked *(amended — V2-001)* changed through `ARCHITECTURE-EXCEPTION-V2-001`;
-items marked *(amended — V2-002)* changed through `ARCHITECTURE-EXCEPTION-V2-002`.
+items marked *(amended — V2-002)* changed through `ARCHITECTURE-EXCEPTION-V2-002`; items marked *(V2-003)* through
+`ARCHITECTURE-EXCEPTION-V2-003`.
 
 | # | Frozen item | Why evidence compatibility requires it |
 |---|---|---|
-| **F1** | `Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted)* | Every journal is written under them; a payload enum change re-interprets existing events |
-| **F2** | `ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table **keyed by `MeasurementPoint` (§10.3)** *(amended — V2-001)*, **and the `ContractSatisfaction` derivation** *(adjusted)* | Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it |
+| **F1** | `Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted; a payload enum gained one member — V2-003)* | Every journal is written under them; a payload enum change re-interprets existing events |
+| **F2** | `ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table **keyed by `MeasurementPoint` (§10.3)** *(amended — V2-001, V2-003)*, **and the `ContractSatisfaction` derivation** *(adjusted)* | Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it |
 | **F3** | The `Owner` set — capped; a new member requires a cited measured defect | Budgets and retries derive from it |
 | **F4** | `BehaviorContract` → `ProductProofSpec` compiler contract and the inputs to `semantic_hash`, **including `SubjectAbsence`** *(adjusted)* | It is what `--check` compares against and what makes product evidence survive re-planning. Absence semantics change what a spec means when the subject is missing |
-| **F5** | `Probe` protocol: observation-harness / subject split, **including harness timeout vs subject observation deadline (§9.2)** *(amended — V2-002)*, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)* | The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified |
+| **F5** | `Probe` protocol: observation-harness / subject split, **including harness timeout vs subject observation deadline (§9.2) and signal provenance after dispatch (§9.3)** *(amended — V2-002, V2-003)*, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)* | The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified |
 | **F6** | `PlanObligation` shape, `ObligationRole`, and `ParentExpectation` **expressed as a contract-satisfaction expectation, never a raw verdict** *(adjusted)* | The planning plane's vocabulary. Raw-verdict expectations are polarity-inverted for every negative contract |
 | **F7** | `StoryAdmissionDisposition` set | Gate ordering and budget routing depend on it |
 | **F8** | `RunScope` / `StoryScope` ownership split, the disposal ordering contract, and the **run lease / sentinel / journal lifetime order — lease acquired first and released last** *(adjusted)* | Re-parenting resources later invalidates every disposal record; the lifetime order defines both what TORN means and when a second run may acquire ownership |

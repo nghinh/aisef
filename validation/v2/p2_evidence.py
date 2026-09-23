@@ -96,6 +96,30 @@ def _outcome(record, spec, *, everywhere=False) -> dict:
 
 # --------------------------------------------------------------------------------------- WP-2.1
 
+def _signal_provenance(tp, run, s, product) -> dict:
+    """§9.3 (ARCHITECTURE-EXCEPTION-V2-003), measured through the probe: one physical exit, three provenances.
+
+    The signal number is held constant; only this controller's own signal ledger differs. P2-RESIDUAL-SIGNAL-SOURCE
+    is closed here: a post-dispatch signal exit is no longer UNRUNNABLE / ENVIRONMENT."""
+    from aisef2.probe.protocol import ProbeInterrupted
+    sig = 15
+    out = {}
+    with tp.faked("READY", "DISPATCHED", returncode=-sig, ledger=[]):
+        out["after DISPATCHED, the controller's ledger empty"] = run(s, product, everywhere=True)
+    with tp.faked("READY", "DISPATCHED", returncode=-sig,
+                  ledger=[{"stage": "terminate", "signal": "SIGTERM"}]):
+        try:
+            made = run(s, product, everywhere=True)
+            out["after DISPATCHED, the controller stopped it"] = {"produced_a_result": made}
+        except ProbeInterrupted as stop:
+            out["after DISPATCHED, the controller stopped it"] = {
+                "produced_a_result": None, "interrupted": True, "stage": stop.stage, "signal": stop.signal,
+                "detail": stop.detail}
+    with tp.faked(returncode=-9):
+        out["before DISPATCHED (V2-002, unchanged)"] = run(s, product, everywhere=True)
+    return out
+
+
 def probe_protocol() -> dict:
     from aisef2.arch.enums import (BehaviorVerdict as V, Enforcement, Polarity, ProbeExecutionStatus as PES,
                                    SubjectAbsence as SA, SubjectKind)
@@ -111,7 +135,7 @@ def probe_protocol() -> dict:
     from aisef2.product.spec import ProductProofSpec
     fc = _module("aisef_v2_freeze_conformance", "validation/v2/freeze_conformance.py")
     ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
-    tp = _module("aisef_v2_p2_python_callable", "tests/v2/p2/test_python_callable.py")  # its FakeProc injector
+    tp = _module("aisef_v2_p2_python_callable", "tests/v2/p2/test_python_callable.py")  # its fake-range injector
     probe = pc.PythonCallableProbe()
     exists = {"condition": "exists"}
 
@@ -143,6 +167,7 @@ def probe_protocol() -> dict:
                             "requires subject": run(spec("app.telemetry:send", absence=SA.REQUIRES_SUBJECT), product)},
         }
         s = spec("app.calc:add")
+        provenance = _signal_provenance(tp, run, s, product)  # §9.3, V2-003
         faults = {
             "interpreter absent": run(s, product, env(interpreter=os.path.join(empty, "no-python"))),
             "cannot inspect (checkout missing)": run(s, os.path.join(empty, "gone")),
@@ -153,7 +178,7 @@ def probe_protocol() -> dict:
             "tool absent (injected: exit 127, no protocol output)":
                 (mock.patch.object(pc, "HARNESS", "import sys\nsys.exit(127)\n"), None),
             "the harness cannot launch (injected: PermissionError)":
-                (mock.patch.object(pc, "_spawn", side_effect=PermissionError("denied")), None),
+                (tp.refuses(PermissionError("denied")), None),
             "killed by signal before READY (injected)": (tp.faked(returncode=-9), None),
             "harness gone before DISPATCHED (injected)": (tp.faked("READY", returncode=0), None),
         }
@@ -182,7 +207,7 @@ def probe_protocol() -> dict:
             "resolves only outside the revision (REQUIRES_SUBJECT)": run(spec("json:dumps", absence=SA.REQUIRES_SUBJECT),
                                                                          product),
         }
-        with mock.patch.object(pc, "_spawn", side_effect=AssertionError("ran")):
+        with tp.never_runs():
             refused = {
                 "unsupported observation class": run(spec("app.calc:add", {"stdout": "x"}), product),
                 "no bounded observation window": run(spec("app.calc:add", {"returns": 3}, {"args": [1, 2]},
@@ -276,11 +301,9 @@ def probe_protocol() -> dict:
                            "tests/v2/p2/test_probe_protocol.py (SecondKindPrototype); it ships no code",
         },
         "residuals": [
-            "a harness process killed by a signal after DISPATCHED is UNRUNNABLE: the probe cannot tell the subject "
-            "from the environment killing it. This is not the expiry of the observation window (§9.2), which the "
-            "harness itself measures",
             "enforcement PARTIAL: " + pc.WEAKEST_PATH,
         ],
+        "signal_provenance": provenance,
         "acceptance_cases": abs_cases,
         "fault_injection": faults,
         "subject_deadline": deadline,
@@ -291,6 +314,13 @@ def probe_protocol() -> dict:
         "f5_conformance": {"state": f5["state"], "detail": f5["detail"]},
         "f5_timeout_conformance": {"state": f5_time["state"], "detail": f5_time["detail"]},
         "properties": {
+            "SIG_PROBE_the_same_signal_exit_splits_by_provenance": (
+                provenance["after DISPATCHED, the controller's ledger empty"]["status"] == "EXECUTED"
+                and provenance["after DISPATCHED, the controller's ledger empty"]["reason"] == "NON_CONTROLLER_SIGNAL"
+                and provenance["after DISPATCHED, the controller stopped it"]["produced_a_result"] is None
+                and provenance["before DISPATCHED (V2-002, unchanged)"]["status"] == "UNRUNNABLE"),
+            "SIG_PROBE_a_non_controller_signal_is_never_environment": (
+                provenance["after DISPATCHED, the controller's ledger empty"]["owners_anywhere"] == ["INTEGRATION"]),
             "PROBE_ABS_1_harness_failure_is_unrunnable_environment_no_verdict": all(
                 o["status"] == u and o["behavior_verdict"] is None and o["owner_at_candidate"] == "ENVIRONMENT"
                 for o in faults.values()),

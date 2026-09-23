@@ -143,9 +143,12 @@ counter; static check NO_SIDE_RETRY_COUNTER refuses one anywhere in `aisef2/` ou
   `run/dispose-begin`, `run/end`; the writer closes; the sentinel stays `OPEN`; the lease is released last. A second
   SIGINT during disposal abandons: every resource left is named `RESIDUAL`, `run/interrupted {abandoned: true}` is
   written and nothing follows it.
-* **The P2 probe path is outside P4.** The `python_callable` probe (P2, F5) still classifies a harness killed by a
-  signal after `DISPATCHED` as `UNRUNNABLE` → ENVIRONMENT, whoever sent the signal. Changing that is an F5 change:
-  proposed as ARCHITECTURE-EXCEPTION-V2-003 (`ARCHITECTURE-EXCEPTION-V2-003-PROPOSAL.md`), not applied.
+* **The P2 probe path, corrected by ARCHITECTURE-EXCEPTION-V2-003** (RFC §9.3, approved 2026-09-23). The
+  `python_callable` harness now runs inside a P4 process range, and that range's ledger is the one authority on what
+  the controller sent. After `DISPATCHED`: the ledger holds the signal → the controller stopped its own observation,
+  an interruption (`ProbeInterrupted`, raised, never a `ProbeResult`); it does not → `EXECUTED` +
+  `INDETERMINATE(NON_CONTROLLER_SIGNAL)`, owner INTEGRATION, never retried. Before `DISPATCHED` V2-002 is unchanged.
+  A probe never signals a process itself and never keeps its own ledger (static rule ONE_SIGNAL_AUTHORITY).
 * **Repair** (`aisef2.runtime.repair`), for a journal whose writer died: drop a torn tail (never an event); close
   every open operation `OUTCOME_UNKNOWN`; name every unreleased resource `RESIDUAL`; then `run/interrupted`
   (`abandoned` iff the run was already interrupted) and, unless abandoned, `run/end` — all `synthetic: true`, all at

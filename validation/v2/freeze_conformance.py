@@ -483,6 +483,61 @@ def _satisfaction_matches_rfc(rfc: RFC) -> dict:
             "table": table}
 
 
+class _StillRange:
+    """A finished process range for the F5 §9.3 check: one exit status, and the ledger of what the controller sent."""
+
+    def __init__(self, returncode, ledger):
+        self.returncode, self.ledger = returncode, list(ledger)
+
+    def wait(self, timeout=None):
+        return self.returncode
+
+
+def _signal_provenance_matches_rfc(rfc: RFC) -> dict:
+    """F5 as amended by ARCHITECTURE-EXCEPTION-V2-003 (§9.3): after DISPATCHED the controller's own signal ledger
+    decides, never the signal number. The controller's own signal is an interruption with no result; a signal it did
+    not send is EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL) — never UNRUNNABLE, never ENVIRONMENT, never a
+    verdict. The reference is §9.3's own text; the implementation is exercised on both paths (SIG-PROBE-8, -10)."""
+    section = rfc.section("### 9.3 Signal provenance after dispatch", "## 10. Two-axis")
+    needed = ("the controller's ledger holds the terminating signal", "an **interruption**, not a measurement",
+              "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`", "**MUST NOT** be `UNRUNNABLE`",
+              "**MUST NOT** keep a second signal ledger")
+    if not section or not all(n in section for n in needed):
+        return {"state": FAIL, "detail": "RFC reference (§9.3 signal provenance after dispatch) could not be extracted"}
+    if not symbol_present("aisef2.probe.python_callable", "_after_dispatch"):
+        return {"state": None, "detail": "the reference probe's post-dispatch path is not implemented"}
+    from aisef2.arch.enums import ProbeExecutionStatus as PES
+    from aisef2.probe import protocol as P, python_callable as pc
+    from aisef2.product import outcome as O
+    spec = SimpleNamespace(probe_input={"subject_absence": "REQUIRES_SUBJECT"})
+    problems, sig = [], -15
+    if "NON_CONTROLLER_SIGNAL" not in {k.name for k in P.ObservationKind}:
+        return {"state": FAIL, "detail": "the protocol cannot express a signal the controller did not send"}
+    try:  # the same exit status the controller did not cause: an observation, indeterminate, with a typed reason
+        observation = pc._ended_without_result(_StillRange(sig, []))
+        result = P.classify_failure(spec, observation)
+        if observation.kind is not P.ObservationKind.NON_CONTROLLER_SIGNAL or observation.verdict is not None:
+            problems.append(f"a signal the controller did not send was observed as {observation.kind.value}")
+        if (result.status, getattr(result, "reason", None)) != (PES.EXECUTED, O.IndeterminateReason.NON_CONTROLLER_SIGNAL):
+            problems.append(f"a signal the controller did not send became {result}")
+    except P.ProbeInterrupted:
+        problems.append("a signal the controller did not send was read as an interruption")
+    stopped = _StillRange(sig, [{"stage": "terminate", "signal": "SIGTERM"}])
+    for what, offered in (("a signal exit", None), ("a completed observation", P.Observation(
+            P.ObservationKind.OBSERVED, __import__("aisef2.arch.enums", fromlist=["x"]).BehaviorVerdict.REFUTED,
+            detail="{}"))):
+        try:  # the same exit status, this controller's own signal: an interruption, and no result at all
+            made = pc._after_dispatch(stopped, offered if offered is not None
+                                      else pc._ended_without_result(stopped))
+            problems.append(f"the controller's own stop produced a result from {what}: {made.kind.value}")
+        except P.ProbeInterrupted:
+            pass
+    if problems:
+        return {"state": FAIL, "detail": "signal provenance differs from RFC §9.3", "problems": problems}
+    return {"state": PASS, "detail": "the same signal exit is an interruption when this controller's ledger holds it "
+                                     "and EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL) when it does not"}
+
+
 def _routing_matches_rfc(rfc: RFC) -> dict:
     """F2 freezes the owner routing table, keyed by measurement point since ARCHITECTURE-EXCEPTION-V2-001.
 
@@ -510,7 +565,9 @@ def _routing_matches_rfc(rfc: RFC) -> dict:
     owners = {o.value for o in Owner}
     hold, hold_not = SimpleNamespace(candidate_expectation=V.SATISFIED), SimpleNamespace(candidate_expectation=V.REFUTED)
     pa = O.Executed(V.INDETERMINATE, O.IndeterminateReason.PRECONDITION_ABSENT)
+    ncs = O.Executed(V.INDETERMINATE, O.IndeterminateReason.NON_CONTROLLER_SIGNAL)  # §9.3, V2-003
     outcome_of = {"`INDETERMINATE(PRECONDITION_ABSENT)`": [pa], "`UNSATISFIED`": [O.Executed(V.REFUTED)],
+                  "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`": [ncs],
                   "`SATISFIED`, `UNSATISFIED`": [O.Executed(V.SATISFIED), O.Executed(V.REFUTED)],
                   "probe `UNRUNNABLE`": [O.Unrunnable("x")]}
     roles_of = {"INTRODUCE": [ObligationRole.INTRODUCE],
@@ -605,6 +662,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     add("F5", "F5.enum.Enforcement", "WP-0.2", V("Enforcement", e.get("Enforcement", []), code))
     add("F5", "F5.probe_protocol", "WP-2.1", _protocol_matches_rfc(rfc, "aisef2.probe.protocol", "Probe"))
     add("F5", "F5.harness_timeout_vs_subject_deadline", "WP-2.1", _timeout_semantics_match_rfc(rfc))
+    add("F5", "F5.signal_provenance_after_dispatch", "WP-2.1", _signal_provenance_matches_rfc(rfc))
     add("F5", "F5.calibration_contracts", "WP-2.2", _calibration_contracts_match_rfc(rfc))
     for n in ("ObligationRole", "ParentExpectation"):
         add("F6", f"F6.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))

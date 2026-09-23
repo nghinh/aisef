@@ -46,6 +46,8 @@ EXPECTED = {  # code -> (owner, retryability): the taxonomy, pinned
     FailureCode.PLAN_CONTRADICTION: (Owner.PLAN, NR),  # P2 owner review: owner PLAN, never retryable, no budget
     FailureCode.POST_MERGE_REGRESSION: (Owner.INTEGRATION, NR),
     FailureCode.POST_MERGE_SUBJECT_LOST: (Owner.INTEGRATION, NR),
+    # V2-003: executed, then a signal the controller did not send — the cause is not established, so INTEGRATION
+    FailureCode.NON_CONTROLLER_SIGNAL: (Owner.INTEGRATION, NR),
     FailureCode.MISSING_CREDENTIAL: (Owner.ENVIRONMENT, BP),
     FailureCode.INVALID_CREDENTIAL: (Owner.ENVIRONMENT, NR),
     FailureCode.PROVIDER_UNAVAILABLE: (Owner.PROVIDER, RT),

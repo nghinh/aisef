@@ -18,6 +18,7 @@ INDETERMINATE reason alone. At the parent the obligation role (§11, F6) decides
 | POST_MERGE | SATISFIED | any | nothing to charge |
 | POST_MERGE | UNSATISFIED | any | POST_MERGE_REGRESSION — INTEGRATION |
 | POST_MERGE | INDETERMINATE(PRECONDITION_ABSENT) | any | POST_MERGE_SUBJECT_LOST — INTEGRATION |
+| any | INDETERMINATE(NON_CONTROLLER_SIGNAL) | any | NON_CONTROLLER_SIGNAL — INTEGRATION, never retried (V2-003) |
 
 Anything outside these rows — an untyped result, point or role, a parent PRECONDITION_ABSENT without a role, an
 INDETERMINATE reason with no row — **fails closed** with `UnroutableOutcome`: never defaulted, never DEVELOPER.
@@ -54,6 +55,12 @@ class Route:
 _P, _C, _M = MeasurementPoint.PARENT, MeasurementPoint.CANDIDATE, MeasurementPoint.POST_MERGE
 _S, _U, _I = ContractSatisfaction.SATISFIED, ContractSatisfaction.UNSATISFIED, ContractSatisfaction.INDETERMINATE
 _PA = IndeterminateReason.PRECONDITION_ABSENT
+_NCS = IndeterminateReason.NON_CONTROLLER_SIGNAL
+#: §9.3 (V2-003): the probe executed; the subject's process ended by a signal the controller did not send. The reason
+#: routes to one owner at every measurement point — INTEGRATION, never retryable — because the evidence says only who
+#: did *not* send the signal. Still measurement-point aware (V2-001): each point keeps its own row and its own rule.
+_V3 = "§9.3, §10.3 (V2-003): executed, then a signal the controller did not send — the behavioural truth the "\
+      "contract needs cannot be derived, and no cause may be invented"
 _ADMISSION = STORY_ADMISSION
 
 #: (point, satisfaction, reason, role or None for any role) -> (failure code, disposition, decided_by, rule)
@@ -69,14 +76,20 @@ _EXECUTED: dict[tuple, tuple[FailureCode | None, StoryAdmissionDisposition | Non
     (_P, _I, _PA, ObligationRole.VERIFY): (FailureCode.PRECONDITION_BROKEN,
                                            StoryAdmissionDisposition.PRECONDITION_BROKEN, _ADMISSION,
                                            "§10.3, §13: a behaviour cannot be verified over a subject that is gone"),
+    (_P, _I, _NCS, None): (FailureCode.NON_CONTROLLER_SIGNAL, StoryAdmissionDisposition.PROBE_INVALID, _ADMISSION,
+                           _V3 + " — at the parent it fails closed as PROBE_INVALID, so no story is admitted on it"),
     (_C, _S, None, None): (None, None, None, "§10.3: SATISFIED at the candidate is not a failure"),
     (_C, _U, None, None): (FailureCode.CONTRACT_UNSATISFIED, None, None, "§10.3: UNSATISFIED at the candidate"),
     (_C, _I, _PA, None): (FailureCode.SUBJECT_ABSENT_AT_CANDIDATE, None, None,
                           "§10.3 (V2-001): the admitted implementation did not establish the subject"),
+    (_C, _I, _NCS, None): (FailureCode.NON_CONTROLLER_SIGNAL, None, None,
+                           _V3 + " — the product criterion is not proved, and no developer budget is charged"),
     (_M, _S, None, None): (None, None, None, "§10.3: SATISFIED after merge is not a failure"),
     (_M, _U, None, None): (FailureCode.POST_MERGE_REGRESSION, None, None, "§10.3, §26: a regression after merge"),
     (_M, _I, _PA, None): (FailureCode.POST_MERGE_SUBJECT_LOST, None, None,
                           "§10.3 (V2-001): a subject verified at the candidate is gone after merge"),
+    (_M, _I, _NCS, None): (FailureCode.NON_CONTROLLER_SIGNAL, None, None,
+                           _V3 + " — a regression after merge is never inferred without evidence"),
 }
 
 

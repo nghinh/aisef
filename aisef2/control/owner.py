@@ -38,6 +38,7 @@ class FailureCode(Enum):
     PLAN_CONTRADICTION = "PLAN_CONTRADICTION"
     POST_MERGE_REGRESSION = "POST_MERGE_REGRESSION"
     POST_MERGE_SUBJECT_LOST = "POST_MERGE_SUBJECT_LOST"
+    NON_CONTROLLER_SIGNAL = "NON_CONTROLLER_SIGNAL"
     MISSING_CREDENTIAL = "MISSING_CREDENTIAL"
     INVALID_CREDENTIAL = "INVALID_CREDENTIAL"
     PROVIDER_UNAVAILABLE = "PROVIDER_UNAVAILABLE"
@@ -83,6 +84,13 @@ TAXONOMY: dict[FailureCode, Classification] = {c.code: c for c in (
                    rule="§26, §10.3: POST_MERGE, UNSATISFIED -> a regression after merge, INTEGRATION"),
     Classification(FailureCode.POST_MERGE_SUBJECT_LOST, Owner.INTEGRATION, retryability=N,
                    rule="§10.3 (V2-001): POST_MERGE, a subject verified at the candidate is gone -> INTEGRATION"),
+    Classification(FailureCode.NON_CONTROLLER_SIGNAL, Owner.INTEGRATION, retryability=N,
+                   rule="§9.3, §10.3 (V2-003): the probe executed and the subject's process ended by a signal the "
+                        "controller did not send. The evidence establishes only that the controller did not send it — "
+                        "not whether the product, the operating system, a resource limit or another actor did — so "
+                        "DEVELOPER would invent product causality and ENVIRONMENT would repeat the defect V2-003 "
+                        "removes; INTEGRATION is the fail-closed owner of an executed proof whose causal reading "
+                        "cannot be established, and it is never retryable: a retry would measure the same thing"),
     Classification(FailureCode.MISSING_CREDENTIAL, Owner.ENVIRONMENT, retryability=P,
                    rule="§22 + owner decision (P1 review): a missing credential is execution configuration -> "
                         "ENVIRONMENT; whether it is retried is the resolved execution policy's decision"),

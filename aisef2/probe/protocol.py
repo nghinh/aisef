@@ -40,7 +40,9 @@ from typing import Callable, ClassVar, Iterable, Protocol, runtime_checkable
 from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence
 from aisef2.errors import InvariantError
 from aisef2.product.contract import _SEAL, content_of, digest, names_test_artefact
-from aisef2.product.outcome import RESULT_TYPES, Executed, InvalidSpec, ProbeResult, Unrunnable, on_subject_absent
+from aisef2.product.outcome import (
+    RESULT_TYPES, Executed, IndeterminateReason, InvalidSpec, ProbeResult, Unrunnable, on_subject_absent,
+)
 from aisef2.product.spec import ProductProofSpec
 
 FULL_SHA = re.compile(r"[0-9a-f]{40}")
@@ -83,6 +85,9 @@ class ObservationKind(Enum):
     SUBJECT_ABSENT = "SUBJECT_ABSENT"   # it looked; the subject is not there (§10.2)
     SUBJECT_DEADLINE = "SUBJECT_DEADLINE"  # it dispatched the subject; the spec's observation window expired (§9.2)
     OBSERVED = "OBSERVED"               # it looked at the subject and decided
+    #: §9.3 (V2-003): it dispatched the subject and the process then ended by a signal the controller did not send.
+    #: It carries no verdict: the observation was spoiled, and by what is not known -> EXECUTED + INDETERMINATE.
+    NON_CONTROLLER_SIGNAL = "NON_CONTROLLER_SIGNAL"
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,7 +104,8 @@ class Observation:
     def __post_init__(self) -> None:
         if not isinstance(self.kind, ObservationKind):
             raise InvariantError("an observation has a typed kind")
-        if self.kind in (ObservationKind.HARNESS_FAILED, ObservationKind.UNSUPPORTED):
+        if self.kind in (ObservationKind.HARNESS_FAILED, ObservationKind.UNSUPPORTED,
+                         ObservationKind.NON_CONTROLLER_SIGNAL):
             if self.verdict is not None:
                 raise InvariantError(f"{self.kind.value} carries no verdict: the probe did not observe the subject")
             if not self.detail:
@@ -111,6 +117,17 @@ class Observation:
                                  "— SATISFIED or REFUTED; there is no default")
         elif self.kind is ObservationKind.SUBJECT_ABSENT and self.verdict not in (None, *self.DECIDED):
             raise InvariantError("an observation over an absent subject is SATISFIED, REFUTED or none")
+
+
+class ProbeInterrupted(Exception):
+    """§9.3 (V2-003): the controller stopped the observation — its own signal ledger holds the signal that ended the
+    subject's process. That is an interruption, not a measurement: there is no `ProbeResult`, no verdict and no owner.
+    It is raised, never returned, so nothing downstream can mistake it for evidence; the caller closes the operation
+    through the P4 interruption path (OUTCOME_UNKNOWN when it was dispatched), keeping the provenance."""
+
+    def __init__(self, detail: str, *, signal: int | None = None, stage: str | None = None) -> None:
+        super().__init__(detail)
+        self.detail, self.signal, self.stage = detail, signal, stage
 
 
 @runtime_checkable
@@ -148,6 +165,8 @@ def classify_failure(spec: ProductProofSpec, observation: Observation) -> ProbeR
     """RFC §9, §10.2: the only mapping from what a probe saw to a `ProbeResult`.
 
     HARNESS_FAILED -> UNRUNNABLE; UNSUPPORTED -> INVALID_SPEC; OBSERVED -> EXECUTED + the observed verdict;
+    NON_CONTROLLER_SIGNAL -> EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL) (§9.3, V2-003): the probe dispatched and
+    the process then ended by a signal its controller did not send — never UNRUNNABLE, never a verdict;
     SUBJECT_ABSENT -> `on_subject_absent`: REQUIRES_SUBJECT drops whatever the probe offered (no vacuous verdict),
     ABSENCE_IS_DECIDABLE takes the observable's verdict over the absent subject; SUBJECT_DEADLINE -> EXECUTED + the
     verdict the spec's observable assigns to an expired window (§9.2) — never UNRUNNABLE.
@@ -158,6 +177,8 @@ def classify_failure(spec: ProductProofSpec, observation: Observation) -> ProbeR
         return Unrunnable(observation.detail)
     if observation.kind is ObservationKind.UNSUPPORTED:
         return InvalidSpec(observation.detail)
+    if observation.kind is ObservationKind.NON_CONTROLLER_SIGNAL:
+        return Executed(BehaviorVerdict.INDETERMINATE, IndeterminateReason.NON_CONTROLLER_SIGNAL)
     if observation.kind is ObservationKind.SUBJECT_ABSENT:
         decidable = SubjectAbsence(spec.probe_input["subject_absence"]) is SubjectAbsence.ABSENCE_IS_DECIDABLE
         return on_subject_absent(spec, observed=observation.verdict if decidable else None)
