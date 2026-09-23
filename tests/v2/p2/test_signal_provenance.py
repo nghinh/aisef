@@ -236,7 +236,7 @@ class Budgets(unittest.TestCase):
         from tests.v2.p4.test_run_scope import plan, spec as run_spec
         with tempfile.TemporaryDirectory(prefix="aisef2-ncs-") as d:
             run = RunScope(d, "run-ncs", spec=run_spec, clock=lambda: 1.0)
-            self.addCleanup(run.lease.release)
+            self.addCleanup(lambda: (run._writer.close(), run.lease.release()))  # before the directory goes: Windows
             run.begin()
             plan(run)
             run.append(T.STORY_BEGIN, {"story_id": "S1", "parent": PARENT})
@@ -252,6 +252,7 @@ class Budgets(unittest.TestCase):
             self.assertIsNone(charge.budget)
             self.assertIn("not retryable", charge.reason)
             run._writer.close()
+            run.lease.release()
 
 
 if __name__ == "__main__":

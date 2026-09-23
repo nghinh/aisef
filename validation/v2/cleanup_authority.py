@@ -26,14 +26,16 @@ import time
 
 POSIX = os.name == "posix"
 RESIDUAL_OWNERSHIP_UNKNOWN = "RESIDUAL_OWNERSHIP_UNKNOWN"
-_SLACK_S = 1.0  # `ps` reports a start time to the second
+_SLACK_S = 0.5  # births are whole seconds in the table's own clock; the boundary is read in that same clock
 
 
 @dataclasses.dataclass(frozen=True)
 class Boundary:
-    """What the runner owns: everything born after `since` whose parent chain reaches `runner`."""
+    """What the runner owns: everything born after `since` whose parent chain reaches `runner`. `since` is the birth,
+    in the host table's own clock, of the reader that established the boundary — the same clock every candidate's
+    birth is read in, so no wall-clock drift can move the line (Linux derives births from a boot time that jitters)."""
     runner: int
-    since: float  # epoch seconds
+    since: float  # epoch seconds, as the host table reports births
     root: str  # the work tree the workers run from (for stray discovery by command line)
 
 
@@ -61,19 +63,29 @@ class Unproven(Exception):
 
 
 def establish(root) -> Boundary:
-    """Call before spawning the first worker of a target: the birth floor is now."""
-    return Boundary(os.getpid(), time.time(), str(root))
+    """Call before spawning the first worker of a target: the birth floor is the birth of this call's own table
+    reader, in the table's clock (falls back to the wall clock only when the reader did not list itself)."""
+    table, reader = _read()
+    since = table[reader].born if reader in table else time.time()
+    return Boundary(os.getpid(), since, str(root))
 
 
 def host_table() -> dict[int, Host]:
-    """This module's own reading of the host: pid, ppid, pgid, start time, command (POSIX `ps`; zombies included, a
-    zombie leader still pins its group id)."""
+    """This module's own reading of the host: pid, ppid, pgid, start time, command. POSIX: `ps`, zombies included (a
+    zombie leader still pins its group id). Windows: Win32_Process through PowerShell — pid, parent, creation time,
+    command; there is no process group, so a group is never provable there (pgid -1)."""
+    return _read()[0]
+
+
+def _read() -> tuple[dict[int, Host], int]:
+    """(table, pid of the reader process that produced it — it lists itself, and its birth dates the reading)."""
     if not POSIX:
-        return {}
-    r = subprocess.run(["ps", "-A", "-o", "pid=,ppid=,pgid=,lstart=,command="], capture_output=True,
-                       encoding="utf-8", errors="replace", check=True)
+        return _windows_table()
+    proc = subprocess.Popen(["ps", "-A", "-o", "pid=,ppid=,pgid=,lstart=,command="], stdout=subprocess.PIPE,
+                            encoding="utf-8", errors="replace")
+    stdout, _ = proc.communicate()
     out = {}
-    for line in r.stdout.splitlines():
+    for line in stdout.splitlines():
         f = line.split(None, 8)  # pid ppid pgid Www Mmm dd HH:MM:SS yyyy command
         if len(f) < 8:
             continue
@@ -82,7 +94,26 @@ def host_table() -> dict[int, Host]:
         except ValueError:
             continue
         out[int(f[0])] = Host(int(f[0]), int(f[1]), int(f[2]), born, f[8] if len(f) > 8 else "")
-    return out
+    return out, proc.pid
+
+
+def _windows_table() -> tuple[dict[int, Host], int]:
+    script = ("Get-CimInstance Win32_Process | ForEach-Object { '{0}|{1}|{2}|{3}' -f $_.ProcessId, $_.ParentProcessId, "
+              "[int64]((Get-Date $_.CreationDate).ToUniversalTime() - (Get-Date '1970-01-01')).TotalSeconds, $_.CommandLine }")
+    try:
+        proc = subprocess.Popen(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                                stdout=subprocess.PIPE, encoding="utf-8", errors="replace")
+        stdout, _ = proc.communicate(timeout=60)
+    except (OSError, subprocess.TimeoutExpired):
+        return {}, -1  # nothing provable: every candidate is RESIDUAL_OWNERSHIP_UNKNOWN
+    out = {}
+    for line in stdout.splitlines():
+        f = line.split("|", 3)
+        try:
+            out[int(f[0])] = Host(int(f[0]), int(f[1]), -1, float(f[2]), f[3] if len(f) > 3 else "")
+        except (ValueError, IndexError):
+            continue
+    return out, proc.pid
 
 
 def owned(boundary: Boundary, table: dict[int, Host] | None = None) -> dict[int, Host]:
@@ -113,10 +144,11 @@ def strays(boundary: Boundary, table: dict[int, Host] | None = None) -> list[Hos
                   key=lambda p: p.pid)
 
 
-def signal_owned(boundary: Boundary, pids=(), groups=(), sig=signal.SIGKILL, dry_run: bool = False,
+def signal_owned(boundary: Boundary, pids=(), groups=(), sig=None, dry_run: bool = False,
                  table: dict[int, Host] | None = None) -> Report:
     """Signal the candidates this module can prove are the runner's; refuse the rest. `pids` and `groups` are what
     code under mutation reported — never trusted, only checked. `dry_run` proves the selection without sending."""
+    sig = getattr(signal, "SIGKILL", signal.SIGTERM) if sig is None else sig  # Windows has no SIGKILL
     table = host_table() if table is None else table
     mine = owned(boundary, table)
     report = Report()
