@@ -291,7 +291,8 @@ def _identity(mechanism: Mechanism, root: pathlib.Path) -> str:
         path = root / STATIC_CHECKS_REL
     else:
         path = root / target
-    return f"{mechanism.id} {mechanism.ref} {hashlib.sha256(path.read_bytes()).hexdigest()}"
+    content = path.read_bytes().replace(b"\r\n", b"\n")   # the same identity on every checkout (Windows CRLF)
+    return f"{mechanism.id} {mechanism.ref} {hashlib.sha256(content).hexdigest()}"
 
 
 def mechanism_digest(registry: tuple[Invariant, ...] = REGISTRY, root: pathlib.Path = ROOT) -> str:

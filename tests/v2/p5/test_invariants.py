@@ -677,12 +677,10 @@ def _closure(module: str) -> set[str]:
 class TypedOwnership(unittest.TestCase):
     def setUp(self):
         self._d = tempfile.TemporaryDirectory(prefix="aisef2-inv-")
+        self.addCleanup(self._d.cleanup)   # registered first: runs last, after the run's journal writer is closed (Windows)
         self.run = closed_after(self, RunScope(self._d.name, "run-iv", spec=run_spec, clock=lambda: 1.0))
         self.run.begin()
         self.run.append(T.PLAN_FROZEN, {"plan_id": "PLAN-IV", "plan_hash": "b" * 64, "roles": {"C1": "INTRODUCE"}})
-
-    def tearDown(self):
-        self._d.cleanup()
 
     def attempt(self, story):
         self.run.append(T.STORY_BEGIN, {"story_id": story, "parent": SHA})

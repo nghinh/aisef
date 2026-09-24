@@ -223,7 +223,7 @@
    "kill_tests": [
     "tests/v2/p5/test_invariants.py"
    ],
-   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "source_sha256": "2932ec292168b92f641e43dfbe8c2e03533b58b2cee56d2fe54eaa5513d158a7",
    "mutants": 22,
    "killed": 22,
    "survivors": [],
@@ -325,7 +325,7 @@
    "kill_tests": [
     "tests/v2/p5/test_invariants.py"
    ],
-   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "source_sha256": "2932ec292168b92f641e43dfbe8c2e03533b58b2cee56d2fe54eaa5513d158a7",
    "mutants": 5,
    "killed": 5,
    "survivors": [],
@@ -359,7 +359,7 @@
    "kill_tests": [
     "tests/v2/p5/test_invariants.py"
    ],
-   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "source_sha256": "2932ec292168b92f641e43dfbe8c2e03533b58b2cee56d2fe54eaa5513d158a7",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
@@ -367,19 +367,19 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L356 condition negated",
+     "mutant": "L357 condition negated",
      "killed": true
     },
     {
-     "mutant": "L361 returns None",
+     "mutant": "L362 returns None",
      "killed": true
     },
     {
-     "mutant": "L356 not removed",
+     "mutant": "L357 not removed",
      "killed": true
     },
     {
-     "mutant": "L357 string ' is not a tier' emptied",
+     "mutant": "L358 string ' is not a tier' emptied",
      "killed": true
     }
    ]
@@ -389,7 +389,7 @@
    "kill_tests": [
     "tests/v2/p5/test_invariants.py"
    ],
-   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "source_sha256": "2932ec292168b92f641e43dfbe8c2e03533b58b2cee56d2fe54eaa5513d158a7",
    "mutants": 51,
    "killed": 51,
    "survivors": [],
@@ -397,207 +397,207 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L304 condition negated",
+     "mutant": "L305 condition negated",
      "killed": true
     },
     {
-     "mutant": "L307 condition negated",
+     "mutant": "L308 condition negated",
      "killed": true
     },
     {
-     "mutant": "L309 condition negated",
+     "mutant": "L310 condition negated",
      "killed": true
     },
     {
-     "mutant": "L311 condition negated",
+     "mutant": "L312 condition negated",
      "killed": true
     },
     {
-     "mutant": "L325 condition negated",
+     "mutant": "L326 condition negated",
      "killed": true
     },
     {
-     "mutant": "L331 condition negated",
+     "mutant": "L332 condition negated",
      "killed": true
     },
     {
-     "mutant": "L334 condition negated",
+     "mutant": "L335 condition negated",
      "killed": true
     },
     {
-     "mutant": "L339 returns None",
+     "mutant": "L340 returns None",
      "killed": true
     },
     {
-     "mutant": "L302 True->False",
+     "mutant": "L303 True->False",
      "killed": true
     },
     {
-     "mutant": "L304 not removed",
+     "mutant": "L305 not removed",
      "killed": true
     },
     {
-     "mutant": "L309 NotEq->Eq",
+     "mutant": "L310 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L311 NotEq->Eq",
+     "mutant": "L312 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L314 condition negated",
+     "mutant": "L315 condition negated",
      "killed": true
     },
     {
-     "mutant": "L316 condition negated",
+     "mutant": "L317 condition negated",
      "killed": true
     },
     {
-     "mutant": "L318 condition negated",
+     "mutant": "L319 condition negated",
      "killed": true
     },
     {
-     "mutant": "L325 Or swapped",
+     "mutant": "L326 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L328 condition negated",
+     "mutant": "L329 condition negated",
      "killed": true
     },
     {
-     "mutant": "L336 condition negated",
+     "mutant": "L337 condition negated",
      "killed": true
     },
     {
-     "mutant": "L306 conditional negated",
+     "mutant": "L307 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L314 NotEq->Eq",
+     "mutant": "L315 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L316 not removed",
+     "mutant": "L317 not removed",
      "killed": true
     },
     {
-     "mutant": "L318 NotEq->Eq",
+     "mutant": "L319 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L325 not removed",
+     "mutant": "L326 not removed",
      "killed": true
     },
     {
-     "mutant": "L328 not removed",
+     "mutant": "L329 not removed",
      "killed": true
     },
     {
-     "mutant": "L336 Or swapped",
+     "mutant": "L337 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L305 string 'the registry is a tuple of invariants, closed at registration' emptied",
+     "mutant": "L306 string 'the registry is a tuple of invariants, closed at registration' emptied",
      "killed": true
     },
     {
-     "mutant": "L307 not removed",
+     "mutant": "L308 not removed",
      "killed": true
     },
     {
-     "mutant": "L308 string 'an entry is not one of the nine typed invariants (unknown invariant)' emptied",
+     "mutant": "L309 string 'an entry is not one of the nine typed invariants (unknown invariant)' emptied",
      "killed": true
     },
     {
-     "mutant": "L310 string 'duplicate invariant ids' emptied",
+     "mutant": "L311 string 'duplicate invariant ids' emptied",
      "killed": true
     },
     {
-     "mutant": "L318 tuple() -> list()",
+     "mutant": "L319 tuple() -> list()",
      "killed": true
     },
     {
-     "mutant": "L326 string 'InvariantError must derive from BaseException and not from Exception (§4)' emptied",
+     "mutant": "L327 string 'InvariantError must derive from BaseException and not from Exception (§4)' emptied",
      "killed": true
     },
     {
-     "mutant": "L336 not removed",
+     "mutant": "L337 not removed",
      "killed": true
     },
     {
-     "mutant": "L336 NotEq->Eq",
+     "mutant": "L337 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L312 string 'the registry holds exactly I..IX in order; got ' emptied",
+     "mutant": "L313 string 'the registry holds exactly I..IX in order; got ' emptied",
      "killed": true
     },
     {
-     "mutant": "L332 string 'tests live outside every tier, unarmed: ' emptied",
+     "mutant": "L333 string 'tests live outside every tier, unarmed: ' emptied",
      "killed": true
     },
     {
-     "mutant": "L332 string ' (' emptied",
+     "mutant": "L333 string ' (' emptied",
      "killed": true
     },
     {
-     "mutant": "L332 string ' director' emptied",
+     "mutant": "L333 string ' director' emptied",
      "killed": true
     },
     {
-     "mutant": "L333 string ')' emptied",
+     "mutant": "L334 string ')' emptied",
      "killed": true
     },
     {
-     "mutant": "L315 string ': title ' emptied",
+     "mutant": "L316 string ': title ' emptied",
      "killed": true
     },
     {
-     "mutant": "L315 string ' is not the frozen ' emptied",
+     "mutant": "L316 string ' is not the frozen ' emptied",
      "killed": true
     },
     {
-     "mutant": "L317 string ' has no enforcement mechanism: a documented intention, not an invariant' emptied",
+     "mutant": "L318 string ' has no enforcement mechanism: a documented intention, not an invariant' emptied",
      "killed": true
     },
     {
-     "mutant": "L319 string ' is declared but not armed in every tier: ' emptied",
+     "mutant": "L320 string ' is declared but not armed in every tier: ' emptied",
      "killed": true
     },
     {
-     "mutant": "L329 string 'tier ' emptied",
+     "mutant": "L330 string 'tier ' emptied",
      "killed": true
     },
     {
-     "mutant": "L329 string ' does not arm I..IX in its package __init__' emptied",
+     "mutant": "L330 string ' does not arm I..IX in its package __init__' emptied",
      "killed": true
     },
     {
-     "mutant": "L333 conditional negated",
+     "mutant": "L334 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L337 string ' drifted from the registry (regenerate it: python -P validation/v2/invariants_doc.py)' emptied",
+     "mutant": "L338 string ' drifted from the registry (regenerate it: python -P validation/v2/invariants_doc.py)' emptied",
      "killed": true
     },
     {
-     "mutant": "L333 Eq->NotEq",
+     "mutant": "L334 Eq->NotEq",
      "killed": true
     },
     {
-     "mutant": "L333 string 'y' emptied",
+     "mutant": "L334 string 'y' emptied",
      "killed": true
     },
     {
-     "mutant": "L333 string 'ies' emptied",
+     "mutant": "L334 string 'ies' emptied",
      "killed": true
     },
     {
-     "mutant": "L336 string 'utf-8' emptied",
+     "mutant": "L337 string 'utf-8' emptied",
      "killed": true
     },
     {
-     "mutant": "L320 NotIn->In",
+     "mutant": "L321 NotIn->In",
      "killed": true
     }
    ]
@@ -607,7 +607,7 @@
    "kill_tests": [
     "tests/v2/p5/test_invariants.py"
    ],
-   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "source_sha256": "2932ec292168b92f641e43dfbe8c2e03533b58b2cee56d2fe54eaa5513d158a7",
    "mutants": 9,
    "killed": 9,
    "survivors": [],
@@ -615,39 +615,39 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L370 condition negated",
+     "mutant": "L371 condition negated",
      "killed": true
     },
     {
-     "mutant": "L370 Or swapped",
+     "mutant": "L371 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L370 not removed",
+     "mutant": "L371 not removed",
      "killed": true
     },
     {
-     "mutant": "L370 not removed",
+     "mutant": "L371 not removed",
      "killed": true
     },
     {
-     "mutant": "L371 string 'invariant ' emptied",
+     "mutant": "L372 string 'invariant ' emptied",
      "killed": true
     },
     {
-     "mutant": "L371 string ' is not armed in this process: its enforcement mechanism is absent, so nothing it guards may proceed (§4)' emptied",
+     "mutant": "L372 string ' is not armed in this process: its enforcement mechanism is absent, so nothing it guards may proceed (§4)' emptied",
      "killed": true
     },
     {
-     "mutant": "L370 In->NotIn",
+     "mutant": "L371 In->NotIn",
      "killed": true
     },
     {
-     "mutant": "L373 string 'value' emptied",
+     "mutant": "L374 string 'value' emptied",
      "killed": true
     },
     {
-     "mutant": "L371 string 'value' emptied",
+     "mutant": "L372 string 'value' emptied",
      "killed": true
     }
    ]
@@ -657,7 +657,7 @@
    "kill_tests": [
     "tests/v2/p5/test_invariants.py"
    ],
-   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "source_sha256": "2932ec292168b92f641e43dfbe8c2e03533b58b2cee56d2fe54eaa5513d158a7",
    "mutants": 48,
    "killed": 48,
    "survivors": [],
@@ -863,7 +863,7 @@
    "kill_tests": [
     "tests/v2/p5/test_invariants.py"
    ],
-   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "source_sha256": "2932ec292168b92f641e43dfbe8c2e03533b58b2cee56d2fe54eaa5513d158a7",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
