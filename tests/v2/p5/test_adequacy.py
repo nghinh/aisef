@@ -34,6 +34,9 @@ NONE = TestExecution(X.EXECUTED, TO.PASSED, TS.NO_STORY_TESTS_MATCHED, Owner.DEV
 NC_DEV = TestExecution(X.EXECUTED, TO.PASSED, TS.STORY_TESTS_NOT_COLLECTABLE, Owner.DEVELOPER, "import app.missing: project source")
 NC_INT = TestExecution(X.EXECUTED, TO.PASSED, TS.STORY_TESTS_NOT_COLLECTABLE, Owner.INTEGRATION, "import zzz: cause undeterminable")
 UNRUN = unrunnable("the interpreter is absent")
+REG_NONE = TestExecution(X.EXECUTED, TO.PASSED, TS.NO_STORY_TESTS_MATCHED, Owner.DEVELOPER, "no regression test matched")
+REG_NC_DEV = TestExecution(X.EXECUTED, TO.PASSED, TS.STORY_TESTS_NOT_COLLECTABLE, Owner.DEVELOPER, "import app.missing: project source")
+REG_NC_INT = TestExecution(X.EXECUTED, TO.PASSED, TS.STORY_TESTS_NOT_COLLECTABLE, Owner.INTEGRATION, "import zzz: cause undeterminable")
 RED_GREEN = {"process/tdd-chronology": "RED_THEN_GREEN", "red_at": "p1", "green_at": "c1"}
 GREEN_ONLY = {"process/tdd-chronology": "GREEN_ONLY", "violated": True}
 
@@ -71,7 +74,7 @@ class Cases(unittest.TestCase):
         a = assemble(RAN_OK, V.NON_VACUOUS, R.RELEVANT, RAN_OK)
         self.assertEqual((a.outcome, a.owner, a.may_block, a.developer_chargeable), (A.ADEQUATE, None, False, False))
         self.assertEqual(a.adequacy, EngineeringTestAdequacy(RAN_OK, V.NON_VACUOUS, R.RELEVANT, RAN_OK, None, A.ADEQUATE))
-        self.assertEqual(a.reason, "ADEQUATE: the story's tests ran and passed, NON_VACUOUS, RELEVANT, the regressions executed and passed")
+        self.assertEqual(a.reason, "ADEQUATE: the story's tests ran and passed, NON_VACUOUS, RELEVANT, the regressions ran and passed")
 
     def test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries(self):
         a = assemble(UNRUN, None, None, RAN_OK)
@@ -192,7 +195,9 @@ class Exhaustive(unittest.TestCase):
     def defect(x, v, r, g) -> bool:
         return (x.outcome is TO.FAILED or x.selection is TS.NO_STORY_TESTS_MATCHED
                 or (x.selection is TS.STORY_TESTS_NOT_COLLECTABLE and x.owner_on_failure is Owner.DEVELOPER)
-                or v is V.VACUOUS or (r is R.IRRELEVANT and x.selection is TS.STORY_TESTS_RAN) or g.outcome is TO.FAILED)
+                or v is V.VACUOUS or (r is R.IRRELEVANT and x.selection is TS.STORY_TESTS_RAN) or g.outcome is TO.FAILED
+                or g.selection is TS.NO_STORY_TESTS_MATCHED
+                or (g.selection is TS.STORY_TESTS_NOT_COLLECTABLE and g.owner_on_failure is Owner.DEVELOPER))
 
     def test_assembly_is_total_and_follows_the_precedence(self):
         seen = {None: 0, A.INADEQUATE: 0, A.INCOMPLETE: 0, A.ADEQUATE: 0}
@@ -205,14 +210,17 @@ class Exhaustive(unittest.TestCase):
                 self.assertIs(a.owner, Owner.ENVIRONMENT)
             elif self.defect(x, v, r, g):
                 self.assertIs(a.outcome, A.INADEQUATE, (x, v, r, g))
-            elif v is V.INDETERMINATE or r is R.UNMEASURABLE:
+            elif v is V.INDETERMINATE or r is R.UNMEASURABLE or g.selection is TS.STORY_TESTS_NOT_COLLECTABLE:
                 self.assertIs(a.outcome, A.INCOMPLETE, (x, v, r, g))
+                if g.selection is TS.STORY_TESTS_NOT_COLLECTABLE:
+                    self.assertIs(g.owner_on_failure, Owner.INTEGRATION)          # the DEVELOPER-typed one is a defect above
             else:
                 self.assertIs(a.outcome, A.ADEQUATE, (x, v, r, g))
-                self.assertEqual((x.outcome, v, r, g.outcome), (TO.PASSED, V.NON_VACUOUS, R.RELEVANT, TO.PASSED))   # positively
+                self.assertEqual((x.outcome, v, r, g.outcome, g.selection),
+                                 (TO.PASSED, V.NON_VACUOUS, R.RELEVANT, TO.PASSED, TS.STORY_TESTS_RAN))   # positively
             self.assertEqual((a.adequacy.execution, a.adequacy.vacuity, a.adequacy.relevance, a.adequacy.regressions,
                               a.adequacy.sensitivity), (x, v, r, g, None))
-        self.assertEqual(seen, {None: 9 + 36, A.INADEQUATE: 260, A.INCOMPLETE: 24, A.ADEQUATE: 4})
+        self.assertEqual(seen, {None: 9 + 36, A.INADEQUATE: 274, A.INCOMPLETE: 13, A.ADEQUATE: 1})
         self.assertEqual(sum(seen.values()), 333)
 
     def test_owner_blocking_and_charge_are_read_from_the_typed_facts_only(self):
@@ -223,21 +231,38 @@ class Exhaustive(unittest.TestCase):
             self.assertEqual(a.owner is Owner.DEVELOPER, a.outcome is A.INADEQUATE)
             if a.outcome in (A.INCOMPLETE, A.ADEQUATE):
                 self.assertIs(a.owner, None)
-            if x.owner_on_failure is Owner.INTEGRATION and not self.defect(x, v, r, g):
+            if Owner.INTEGRATION in (x.owner_on_failure, g.owner_on_failure) and not self.defect(x, v, r, g):
                 self.assertIsNot(a.owner, Owner.DEVELOPER)          # INTEGRATION is never converted into DEVELOPER
             fabricated = Assembly(a.adequacy, None, "INADEQUATE: fabricated prose")                       # prose decides nothing
             self.assertEqual(verdict(a)[:-1], verdict(fabricated)[:-1])
         self.assertEqual([may_block(o) for o in (A.INADEQUATE, A.INCOMPLETE, A.ADEQUATE, None)], [True, False, False, False])
 
-    def test_regression_selection_values_other_than_FAILED_are_not_in_the_frozen_lists(self):
-        """§15.3 names only FAILED regressions as a defect and no regression gap: a regression selection that matched
-        nothing, or could not be collected, with PASSED regressions, assembles to ADEQUATE by 'otherwise' (recorded on
-        the regressions execution itself; reported to the owner as an observed gap, not resolved here)."""
-        for g in (TestExecution(X.EXECUTED, TO.PASSED, TS.NO_STORY_TESTS_MATCHED, Owner.DEVELOPER, "no regression matched"),
-                  TestExecution(X.EXECUTED, TO.PASSED, TS.STORY_TESTS_NOT_COLLECTABLE, Owner.DEVELOPER, "regression import broke"),
-                  TestExecution(X.EXECUTED, TO.PASSED, TS.STORY_TESTS_NOT_COLLECTABLE, Owner.INTEGRATION, "undeterminable")):
-            a = assemble(RAN_OK, V.NON_VACUOUS, R.RELEVANT, g)
-            self.assertEqual((a.outcome, a.owner, a.adequacy.regressions), (A.ADEQUATE, None, g))
+    def test_ADEQ_R_the_regression_dimension_follows_the_same_typed_rules(self):
+        """The owner's ruling on the regression dimension (RFC §15 `regressions`, §15.0 rule 5): UNRUNNABLE => None;
+        FAILED, NO_STORY_TESTS_MATCHED, NOT_COLLECTABLE typed DEVELOPER => INADEQUATE / DEVELOPER; NOT_COLLECTABLE typed
+        INTEGRATION => INCOMPLETE, no developer charge, non-blocking; PASSED + STORY_TESTS_RAN => satisfied."""
+        a = assemble(RAN_OK, V.NON_VACUOUS, R.RELEVANT, REG_NONE)
+        self.assertEqual((a.outcome, a.owner, a.may_block, a.developer_chargeable), (A.INADEQUATE, Owner.DEVELOPER, True, True))
+        self.assertEqual(a.reason, "INADEQUATE: no regression test matched the regression selection")
+        a = assemble(RAN_OK, V.NON_VACUOUS, R.RELEVANT, REG_NC_DEV)
+        self.assertEqual((a.outcome, a.owner, a.may_block, a.developer_chargeable), (A.INADEQUATE, Owner.DEVELOPER, True, True))
+        self.assertEqual(a.reason, "INADEQUATE: the regressions could not be collected for a cause typed as the developer's")
+        a = assemble(RAN_OK, V.NON_VACUOUS, R.RELEVANT, REG_NC_INT)
+        self.assertEqual((a.outcome, a.owner, a.may_block, a.developer_chargeable), (A.INCOMPLETE, None, False, False))
+        self.assertEqual(a.reason, "INCOMPLETE (reduced engineering-quality coverage, never blocking, charged to nobody): the "
+                                   "regressions could not be collected, owner INTEGRATION: import zzz: cause undeterminable")
+        a = assemble(RAN_OK, V.INDETERMINATE, R.UNMEASURABLE, REG_NC_INT)          # every gap is named, none charged
+        self.assertEqual((a.outcome, a.owner), (A.INCOMPLETE, None))
+        self.assertEqual(a.reason, "INCOMPLETE (reduced engineering-quality coverage, never blocking, charged to nobody): vacuity is "
+                                   "INDETERMINATE; relevance is UNMEASURABLE; the regressions could not be collected, owner "
+                                   "INTEGRATION: import zzz: cause undeterminable")
+        failed = TestExecution(X.EXECUTED, TO.FAILED, TS.STORY_TESTS_NOT_COLLECTABLE, Owner.INTEGRATION, "one file ran and failed")
+        a = assemble(RAN_OK, V.NON_VACUOUS, R.RELEVANT, failed)                    # a regression that ran and FAILED is a defect
+        self.assertEqual((a.outcome, a.owner, a.reason), (A.INADEQUATE, Owner.DEVELOPER, "INADEQUATE: regressions executed and failed"))
+        for g in (REG_NONE, REG_NC_DEV, REG_NC_INT):                                # availability first, on the story side too
+            self.assertEqual((assemble(UNRUN, None, None, g).outcome, assemble(UNRUN, None, None, g).owner), (None, Owner.ENVIRONMENT))
+        a = assemble(RAN_OK, V.NON_VACUOUS, R.RELEVANT, RAN_OK)
+        self.assertEqual((a.outcome, a.adequacy.regressions.selection), (A.ADEQUATE, TS.STORY_TESTS_RAN))
 
 
 class Shape(unittest.TestCase):
@@ -307,28 +332,29 @@ class Shape(unittest.TestCase):
         self.refuses(NC_INT, V.INDETERMINATE, R.IRRELEVANT, RAN_OK, None, A.INADEQUATE)
         for args in ((RAN_BAD, V.NON_VACUOUS, R.RELEVANT, RAN_OK), (NONE, V.INDETERMINATE, R.RELEVANT, RAN_OK),
                      (NC_DEV, V.INDETERMINATE, R.RELEVANT, RAN_OK), (RAN_OK, V.VACUOUS, R.RELEVANT, RAN_OK),
-                     (RAN_OK, V.NON_VACUOUS, R.IRRELEVANT, RAN_OK), (RAN_OK, V.NON_VACUOUS, R.RELEVANT, RAN_BAD)):
+                     (RAN_OK, V.NON_VACUOUS, R.IRRELEVANT, RAN_OK), (RAN_OK, V.NON_VACUOUS, R.RELEVANT, RAN_BAD),
+                     (RAN_OK, V.NON_VACUOUS, R.RELEVANT, REG_NONE), (RAN_OK, V.NON_VACUOUS, R.RELEVANT, REG_NC_DEV)):
             EngineeringTestAdequacy(*args, None, A.INADEQUATE)
             self.refuses(*args, None, A.INCOMPLETE,                     # a defect is never hidden by INCOMPLETE
                          msg="a developer-owned defect is INADEQUATE; a secondary gap never hides it (§15.3)")
             self.refuses(*args, None, A.ADEQUATE)
         # INCOMPLETE needs a gap and no defect
         self.refuses(RAN_OK, V.NON_VACUOUS, R.RELEVANT, RAN_OK, None, A.INCOMPLETE,
-                     msg="INCOMPLETE is exactly an INDETERMINATE vacuity or an UNMEASURABLE relevance (§15.3)")
+                     msg="INCOMPLETE is exactly an INDETERMINATE vacuity, an UNMEASURABLE relevance, or a regression selection "
+                         "not collected for a cause that is not the developer's (§15.3)")
         for args in ((RAN_OK, V.INDETERMINATE, R.RELEVANT, RAN_OK), (RAN_OK, V.NON_VACUOUS, R.UNMEASURABLE, RAN_OK),
-                     (NC_INT, V.INDETERMINATE, R.IRRELEVANT, RAN_OK)):
+                     (NC_INT, V.INDETERMINATE, R.IRRELEVANT, RAN_OK), (RAN_OK, V.NON_VACUOUS, R.RELEVANT, REG_NC_INT)):
             EngineeringTestAdequacy(*args, None, A.INCOMPLETE)
             self.refuses(*args, None, A.ADEQUATE)
             self.refuses(*args, None, A.INADEQUATE)
         # ADEQUATE is constructed positively: each conjunct, violated alone, is refused
         EngineeringTestAdequacy(RAN_OK, V.NON_VACUOUS, R.RELEVANT, RAN_OK, None, A.ADEQUATE)
-        reg_none = TestExecution(X.EXECUTED, TO.PASSED, TS.NO_STORY_TESTS_MATCHED, Owner.DEVELOPER, "no regression matched")
-        EngineeringTestAdequacy(RAN_OK, V.NON_VACUOUS, R.RELEVANT, reg_none, None, A.ADEQUATE)
         for args in ((RAN_BAD, V.NON_VACUOUS, R.RELEVANT, RAN_OK), (RAN_OK, V.VACUOUS, R.RELEVANT, RAN_OK),
                      (RAN_OK, V.INDETERMINATE, R.RELEVANT, RAN_OK), (RAN_OK, V.NON_VACUOUS, R.IRRELEVANT, RAN_OK),
-                     (RAN_OK, V.NON_VACUOUS, R.UNMEASURABLE, RAN_OK), (RAN_OK, V.NON_VACUOUS, R.RELEVANT, RAN_BAD)):
+                     (RAN_OK, V.NON_VACUOUS, R.UNMEASURABLE, RAN_OK), (RAN_OK, V.NON_VACUOUS, R.RELEVANT, RAN_BAD),
+                     (RAN_OK, V.NON_VACUOUS, R.RELEVANT, REG_NONE), (RAN_OK, V.NON_VACUOUS, R.RELEVANT, REG_NC_INT)):
             self.refuses(*args, None, A.ADEQUATE, msg="ADEQUATE is constructed positively: the story's tests passed, "
-                                                       "NON_VACUOUS, RELEVANT, the regressions passed (§15.3)")
+                                                       "NON_VACUOUS, RELEVANT, the regressions ran and passed (§15.3)")
 
 
 # ------------------------------------------------------------------------------------------------ mechanical separations
@@ -481,6 +507,17 @@ class ForReal(unittest.TestCase):
         self.assertEqual((a.adequacy.execution.selection, a.adequacy.execution.owner_on_failure), (TS.STORY_TESTS_NOT_COLLECTABLE, Owner.INTEGRATION))
         self.assertEqual((a.outcome, a.owner, a.adequacy.vacuity, a.may_block, a.developer_chargeable),
                          (A.INCOMPLETE, None, V.INDETERMINATE, False, False))
+
+    def test_ADEQ_R_for_real_regression_selection_and_collection_by_their_typed_owner(self):
+        a = self.run_({"tests/test_calc.py": TEST_ADD, "tests/test_other.py": "from app import missing\n" + REG_OK}, patch(OLD, NEW, "app/calc.py"))
+        self.assertEqual((a.adequacy.regressions.selection, a.adequacy.regressions.owner_on_failure), (TS.STORY_TESTS_NOT_COLLECTABLE, Owner.DEVELOPER))
+        self.assertEqual((a.outcome, a.owner), (A.INADEQUATE, Owner.DEVELOPER))
+        a = self.run_({"tests/test_calc.py": TEST_ADD, "tests/test_other.py": "import unittest\n"}, patch(OLD, NEW, "app/calc.py"))
+        self.assertEqual((a.adequacy.regressions.selection, a.outcome, a.owner), (TS.NO_STORY_TESTS_MATCHED, A.INADEQUATE, Owner.DEVELOPER))
+        a = self.run_({"tests/test_calc.py": TEST_ADD, "tests/test_other.py": "import zzz_neither_declared_nor_project\n" + REG_OK}, patch(OLD, NEW, "app/calc.py"))
+        self.assertEqual((a.adequacy.regressions.selection, a.adequacy.regressions.owner_on_failure), (TS.STORY_TESTS_NOT_COLLECTABLE, Owner.INTEGRATION))
+        self.assertEqual((a.outcome, a.owner, a.may_block, a.developer_chargeable), (A.INCOMPLETE, None, False, False))
+        self.assertEqual((a.adequacy.vacuity, a.adequacy.relevance), (V.NON_VACUOUS, R.RELEVANT))   # the story side is clean
 
     def test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE(self):
         a = self.run_({"tests/test_calc.py": TEST_GONE}, patch(NEW_LEGACY, NEW, "app/calc.py"))

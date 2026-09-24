@@ -301,11 +301,12 @@ def adequacy() -> dict:
     real = cases(t, "ForReal", "test_ADEQ_1_for_real", "test_ADEQ_2_for_real_the_story_runner_cannot_execute",
                  "test_ADEQ_3_for_real_the_regression_runner_cannot_execute", "test_ADEQ_4_and_10_for_real",
                  "test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner",
+                 "test_ADEQ_R_for_real_regression_selection_and_collection_by_their_typed_owner",
                  "test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE",
                  "test_ADEQ_17_for_real_a_tests_only_diff_is_INADEQUATE_by_the_frozen_rules")
     whole = cases(t, "Exhaustive", "test_assembly_is_total_and_follows_the_precedence",
                   "test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
-                  "test_regression_selection_values_other_than_FAILED_are_not_in_the_frozen_lists")
+                  "test_ADEQ_R_the_regression_dimension_follows_the_same_typed_rules")
     shape = cases(t, "Shape", "test_the_fields_are_the_rfcs", "test_typed_executions_and_no_sensitivity",
                   "test_UNRUNNABLE_story_execution_carries_nothing_measured_and_no_outcome",
                   "test_EXECUTED_story_execution_carries_typed_measurements_of_tests_that_ran",
@@ -327,9 +328,11 @@ def adequacy() -> dict:
                   "precedence": ["1 mandatory execution availability: story UNRUNNABLE or regressions UNRUNNABLE => outcome "
                                  "None, owner the typed ENVIRONMENT the execution carries",
                                  "2 developer-owned defects (§15.3) => INADEQUATE / DEVELOPER: FAILED, NO_STORY_TESTS_MATCHED, "
-                                 "NOT_COLLECTABLE typed DEVELOPER, VACUOUS, IRRELEVANT of tests that ran, regressions FAILED",
-                                 "3 secondary gaps => INCOMPLETE / nobody / never blocks: INDETERMINATE vacuity, UNMEASURABLE relevance",
-                                 "4 ADEQUATE constructed positively: story tests PASSED, NON_VACUOUS, RELEVANT, regressions PASSED"],
+                                 "NOT_COLLECTABLE typed DEVELOPER, VACUOUS, IRRELEVANT of tests that ran; and under the same typed "
+                                 "rules for the regressions: FAILED, NO_STORY_TESTS_MATCHED, NOT_COLLECTABLE typed DEVELOPER",
+                                 "3 secondary gaps => INCOMPLETE / nobody / never blocks: INDETERMINATE vacuity, UNMEASURABLE "
+                                 "relevance, regressions NOT_COLLECTABLE typed INTEGRATION",
+                                 "4 ADEQUATE constructed positively: story tests PASSED, NON_VACUOUS, RELEVANT, regressions RAN and PASSED"],
                   "blocking": "may_block(outcome) states what §15.3 permits (INADEQUATE MAY, INCOMPLETE MUST NOT); no policy "
                               "object in aisef2 decides adequacy blocking at this commit",
                   "chronology": "process/tdd-chronology: a read-only copy on the Assembly, read for nothing"},
@@ -355,11 +358,14 @@ def adequacy() -> dict:
                 and whole["test_owner_blocking_and_charge_are_read_from_the_typed_facts_only"],
             "INTEGRATION_never_converted_to_DEVELOPER": adeq(7) and real["test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner"],
             "no_failure_code_required": "FailureCode" not in names and "emit" not in names,
+            "regression_dimension_same_typed_rules": whole["test_ADEQ_R_the_regression_dimension_follows_the_same_typed_rules"]
+                and real["test_ADEQ_R_for_real_regression_selection_and_collection_by_their_typed_owner"],
         },
-        "observed_gap": {"regression_selection_not_FAILED": "§15.3 names only FAILED regressions as a defect and no regression "
-                         "gap: PASSED regressions whose selection matched nothing or could not be collected assemble to "
-                         "ADEQUATE by 'otherwise' (recorded on the regressions execution; reported to the owner, not resolved)",
-                         "pinned_by": "Exhaustive.test_regression_selection_values_other_than_FAILED_are_not_in_the_frozen_lists"},
+        "regression_dimension": {"ruling": "owner ruling after the WP-5.4 exit report (RFC §15 `regressions`: same typed rules; "
+                                 "§15.0 rule 5): UNRUNNABLE => None; FAILED, NO_STORY_TESTS_MATCHED, NOT_COLLECTABLE typed "
+                                 "DEVELOPER => INADEQUATE / DEVELOPER; NOT_COLLECTABLE typed INTEGRATION => INCOMPLETE, no "
+                                 "developer charge, non-blocking; PASSED + STORY_TESTS_RAN => satisfied",
+                                 "pinned_by": "Exhaustive.test_ADEQ_R_the_regression_dimension_follows_the_same_typed_rules"},
     }
 
 

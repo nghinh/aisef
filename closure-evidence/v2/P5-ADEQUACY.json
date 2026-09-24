@@ -7,9 +7,9 @@
   "inputs": "typed facts only: WP-5.1 TestExecution for the story's tests and for the regressions, WP-5.3 Vacuity, WP-5.2 Relevance; process/tdd-chronology recorded verbatim when supplied",
   "precedence": [
    "1 mandatory execution availability: story UNRUNNABLE or regressions UNRUNNABLE => outcome None, owner the typed ENVIRONMENT the execution carries",
-   "2 developer-owned defects (§15.3) => INADEQUATE / DEVELOPER: FAILED, NO_STORY_TESTS_MATCHED, NOT_COLLECTABLE typed DEVELOPER, VACUOUS, IRRELEVANT of tests that ran, regressions FAILED",
-   "3 secondary gaps => INCOMPLETE / nobody / never blocks: INDETERMINATE vacuity, UNMEASURABLE relevance",
-   "4 ADEQUATE constructed positively: story tests PASSED, NON_VACUOUS, RELEVANT, regressions PASSED"
+   "2 developer-owned defects (§15.3) => INADEQUATE / DEVELOPER: FAILED, NO_STORY_TESTS_MATCHED, NOT_COLLECTABLE typed DEVELOPER, VACUOUS, IRRELEVANT of tests that ran; and under the same typed rules for the regressions: FAILED, NO_STORY_TESTS_MATCHED, NOT_COLLECTABLE typed DEVELOPER",
+   "3 secondary gaps => INCOMPLETE / nobody / never blocks: INDETERMINATE vacuity, UNMEASURABLE relevance, regressions NOT_COLLECTABLE typed INTEGRATION",
+   "4 ADEQUATE constructed positively: story tests PASSED, NON_VACUOUS, RELEVANT, regressions RAN and PASSED"
   ],
   "blocking": "may_block(outcome) states what §15.3 permits (INADEQUATE MAY, INCOMPLETE MUST NOT); no policy object in aisef2 decides adequacy blocking at this commit",
   "chronology": "process/tdd-chronology: a read-only copy on the Assembly, read for nothing"
@@ -42,10 +42,11 @@
   "product_proof_journal_and_budget_unreachable": true,
   "owner_from_typed_facts_never_from_prose": true,
   "INTEGRATION_never_converted_to_DEVELOPER": true,
-  "no_failure_code_required": true
+  "no_failure_code_required": true,
+  "regression_dimension_same_typed_rules": true
  },
- "observed_gap": {
-  "regression_selection_not_FAILED": "§15.3 names only FAILED regressions as a defect and no regression gap: PASSED regressions whose selection matched nothing or could not be collected assemble to ADEQUATE by 'otherwise' (recorded on the regressions execution; reported to the owner, not resolved)",
-  "pinned_by": "Exhaustive.test_regression_selection_values_other_than_FAILED_are_not_in_the_frozen_lists"
+ "regression_dimension": {
+  "ruling": "owner ruling after the WP-5.4 exit report (RFC §15 `regressions`: same typed rules; §15.0 rule 5): UNRUNNABLE => None; FAILED, NO_STORY_TESTS_MATCHED, NOT_COLLECTABLE typed DEVELOPER => INADEQUATE / DEVELOPER; NOT_COLLECTABLE typed INTEGRATION => INCOMPLETE, no developer charge, non-blocking; PASSED + STORY_TESTS_RAN => satisfied",
+  "pinned_by": "Exhaustive.test_ADEQ_R_the_regression_dimension_follows_the_same_typed_rules"
  }
 }

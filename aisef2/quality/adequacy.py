@@ -14,15 +14,17 @@ the regressions, WP-5.3's `Vacuity`, WP-5.2's `Relevance`):
    charge, no developer retry charge, not INADEQUATE, not INCOMPLETE, not ADEQUATE.
 2. **Developer-owned engineering defects (§15.3)** ⇒ INADEQUATE, owner DEVELOPER: the story's tests EXECUTED and
    FAILED; NO_STORY_TESTS_MATCHED; STORY_TESTS_NOT_COLLECTABLE whose typed owner is DEVELOPER; VACUOUS; IRRELEVANT;
-   regressions EXECUTED and FAILED. IRRELEVANT is a measurement *of the story tests that executed* (§15.2), so it is
+   and, under the same typed rules for the regression execution (§15 `regressions`, §15.0 rule 5), regressions
+   FAILED, a regression selection that matched nothing, a regression collection failure typed DEVELOPER. IRRELEVANT is a measurement *of the story tests that executed* (§15.2), so it is
    a defect only when the story's tests actually ran (STORY_TESTS_RAN); when they did not, the selection's own typed
    classification governs — a collection failure whose typed owner is INTEGRATION is never charged to the developer
    (§15.0 rule 4), and nothing is read from prose to decide it. VACUOUS needs no such guard: the shape refuses a
    vacuity value for tests that did not run (§15.1).
 3. **Optional / secondary measurement gaps** ⇒ INCOMPLETE, no owner, never blocking, never charged: INDETERMINATE
-   vacuity or UNMEASURABLE relevance, and nothing else.
+   vacuity, UNMEASURABLE relevance, or a regression selection not collected for a cause typed INTEGRATION (reduced
+   regression coverage; a DEVELOPER-typed one is a defect above), and nothing else.
 4. **Otherwise ADEQUATE**, constructed positively: the story's tests passed, NON_VACUOUS, RELEVANT, the regressions
-   passed. The shape checks that construction on every ADEQUATE it accepts.
+   ran and passed. The shape checks that construction on every ADEQUATE it accepts.
 
 A hard defect dominates a secondary gap: FAILED tests with UNMEASURABLE relevance are INADEQUATE, failed regressions
 with INDETERMINATE vacuity are INADEQUATE. `process/tdd-chronology` (V1's RED→GREEN check) is recorded when supplied
@@ -47,7 +49,9 @@ _RAN, _NONE_MATCHED, _NOT_COLLECTABLE = (TestSelection.STORY_TESTS_RAN, TestSele
 
 
 def _defects(execution: TestExecution, vacuity: Vacuity, relevance: Relevance, regressions: TestExecution) -> list[str]:
-    """§15.3's INADEQUATE triggers present in the typed facts (empty: none)."""
+    """§15.3's INADEQUATE triggers present in the typed facts (empty: none). The regression execution is read under the
+    same typed rules as the story's own (§15 `regressions`, §15.0 rule 5; owner ruling on the WP-5.4 regression
+    dimension): FAILED, a selector that matched nothing, a collection failure typed DEVELOPER."""
     out = []
     if execution.outcome is TestOutcome.FAILED:
         out.append("the story's tests executed and failed")
@@ -61,24 +65,33 @@ def _defects(execution: TestExecution, vacuity: Vacuity, relevance: Relevance, r
         out.append("the story's tests are IRRELEVANT: none touches the story's change")
     if regressions.outcome is TestOutcome.FAILED:
         out.append("regressions executed and failed")
+    if regressions.selection is _NONE_MATCHED:
+        out.append("no regression test matched the regression selection")
+    if regressions.selection is _NOT_COLLECTABLE and regressions.owner_on_failure is Owner.DEVELOPER:
+        out.append("the regressions could not be collected for a cause typed as the developer's")
     return out
 
 
-def _gaps(vacuity: Vacuity, relevance: Relevance) -> list[str]:
-    """§15.3's INCOMPLETE triggers present: the optional / secondary measurements only (empty: none)."""
+def _gaps(vacuity: Vacuity, relevance: Relevance, regressions: TestExecution) -> list[str]:
+    """§15.3's INCOMPLETE triggers present (empty: none): the optional / secondary measurements, and a regression
+    selection that could not be collected for a cause that is not the developer's (reduced regression coverage,
+    charged to nobody). Read only after `_defects`, so the developer-typed collection failure never lands here."""
     out = []
     if vacuity is Vacuity.INDETERMINATE:
         out.append("vacuity is INDETERMINATE")
     if relevance is Relevance.UNMEASURABLE:
         out.append("relevance is UNMEASURABLE")
+    if regressions.selection is _NOT_COLLECTABLE:
+        out.append(f"the regressions could not be collected, owner {regressions.owner_on_failure.value}: {regressions.reason}")
     return out
 
 
 def _adequate(execution: TestExecution, vacuity: Vacuity, relevance: Relevance, regressions: TestExecution) -> bool:
     """ADEQUATE constructed positively: the story's tests passed, NON_VACUOUS (which the shape ties to the tests having
-    run), RELEVANT, the regressions passed."""
+    run), RELEVANT, the regressions ran and passed."""
     return (execution.outcome is TestOutcome.PASSED and vacuity is Vacuity.NON_VACUOUS
-            and relevance is Relevance.RELEVANT and regressions.outcome is TestOutcome.PASSED)
+            and relevance is Relevance.RELEVANT and regressions.outcome is TestOutcome.PASSED
+            and regressions.selection is _RAN)
 
 
 @dataclass(frozen=True)
@@ -119,12 +132,13 @@ class EngineeringTestAdequacy:
         elif self.outcome is AdequacyOutcome.INCOMPLETE:
             if defects:
                 raise InvariantError("a developer-owned defect is INADEQUATE; a secondary gap never hides it (§15.3)")
-            if not _gaps(self.vacuity, self.relevance):
-                raise InvariantError("INCOMPLETE is exactly an INDETERMINATE vacuity or an UNMEASURABLE relevance (§15.3)")
+            if not _gaps(self.vacuity, self.relevance, self.regressions):
+                raise InvariantError("INCOMPLETE is exactly an INDETERMINATE vacuity, an UNMEASURABLE relevance, or a regression "
+                                     "selection not collected for a cause that is not the developer's (§15.3)")
         elif self.outcome is AdequacyOutcome.ADEQUATE:
             if not _adequate(self.execution, self.vacuity, self.relevance, self.regressions):
                 raise InvariantError("ADEQUATE is constructed positively: the story's tests passed, NON_VACUOUS, "
-                                     "RELEVANT, the regressions passed (§15.3)")
+                                     "RELEVANT, the regressions ran and passed (§15.3)")
         else:
             raise InvariantError("both mandatory executions EXECUTED: the AdequacyOutcome is defined (§15.3)")
 
@@ -186,7 +200,7 @@ def assemble(execution: TestExecution, vacuity: Vacuity | None, relevance: Relev
     if defects:
         adequacy = EngineeringTestAdequacy(execution, vacuity, relevance, regressions, None, AdequacyOutcome.INADEQUATE)
         return Assembly(adequacy, chronology, "INADEQUATE: " + "; ".join(defects))
-    gaps = _gaps(vacuity, relevance)
+    gaps = _gaps(vacuity, relevance, regressions)
     if gaps:
         adequacy = EngineeringTestAdequacy(execution, vacuity, relevance, regressions, None, AdequacyOutcome.INCOMPLETE)
         note = ("" if execution.selection is _RAN else
@@ -195,4 +209,4 @@ def assemble(execution: TestExecution, vacuity: Vacuity | None, relevance: Relev
                                               "charged to nobody): " + "; ".join(gaps) + note)
     adequacy = EngineeringTestAdequacy(execution, vacuity, relevance, regressions, None, AdequacyOutcome.ADEQUATE)
     return Assembly(adequacy, chronology, "ADEQUATE: the story's tests ran and passed, NON_VACUOUS, RELEVANT, the "
-                                          "regressions executed and passed")
+                                          "regressions ran and passed")
