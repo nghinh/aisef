@@ -1,0 +1,31 @@
+{
+ "record": "AISEF V2 — P5 RELEVANCE",
+ "work_package": "WP-5.2",
+ "rfc": "§15.2 (F1 payload enum Relevance: RELEVANT, IRRELEVANT, UNMEASURABLE; §24 capability levels)",
+ "implementation": "aisef2/quality/relevance.py",
+ "measurement": {
+  "line-addressable": "a .py artefact: executable lines of its own code objects, required capability line-coverage",
+  "non-line-addressable": "any other artefact: artefact-access (the case opened it), no line approximation",
+  "branch": "branch-coverage arcs from a changed executable line, recorded as stronger evidence, never required",
+  "runner": "the harness-owned unittest runner under --measure: sys.settrace + threading.settrace + an open() audit hook, per case; it declares FULL, PARTIAL (a case replaced the tracer) or UNAVAILABLE (no --measure); the pytest adapter declares nothing"
+ },
+ "properties": {
+  "REL_1_typed_and_real": true,
+  "REL_2_typed_and_real": true,
+  "REL_3_typed_and_real": true,
+  "REL_4_typed_and_real": true,
+  "REL_5_typed_and_real": true,
+  "REL_6_typed_and_real": true,
+  "REL_7_typed_and_real": true,
+  "REL_8_typed_and_real": true,
+  "capability_absence_is_UNMEASURABLE_never_IRRELEVANT": true,
+  "branch_coverage_never_required": true,
+  "non_line_addressable_uses_its_own_measurement_or_UNMEASURABLE": true,
+  "test_layout_invariance": true,
+  "no_execution_no_relevance_success": true,
+  "developer_test_files_are_not_the_product_change": true,
+  "story_diff_and_executable_lines_are_typed": true,
+  "threads_are_measured": true,
+  "no_product_verdict_reached": true
+ }
+}

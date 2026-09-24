@@ -36,10 +36,11 @@ import sys
 import tempfile
 import threading
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import Callable, Mapping, Sequence
 from xml.etree import ElementTree
 
-from aisef2.arch.enums import Owner, TestExecutionStatus, TestOutcome, TestSelection
+from aisef2.arch.enums import Enforcement, Owner, TestExecutionStatus, TestOutcome, TestSelection
 from aisef2.errors import InvariantError
 from aisef2.runtime.process_range import ProcessRange, RangeError
 
@@ -50,6 +51,10 @@ _TIMEOUT_S = 600.0
 #: what a collection failure's cause can be, as an adapter reports it — the classifier reads nothing else
 IMPORT, SYNTAX, OTHER = "IMPORT", "SYNTAX", "OTHER"
 CASE_OUTCOMES = ("passed", "failed", "error", "skipped")
+#: The measurements the harness-owned runner can take (WP-5.2 names which one an artefact needs)
+LINE_COVERAGE, ARTEFACT_ACCESS, BRANCH_COVERAGE = "line-coverage", "artefact-access", "branch-coverage"
+MEASURE = "--measure"   # the runner target flag that turns the measurements on
+_NOTHING: Mapping = MappingProxyType({})
 
 
 def _norm(path: str) -> str:
@@ -117,6 +122,12 @@ class CollectionError:
 class ResultSet:
     cases: tuple[Case, ...]
     collection_errors: tuple[CollectionError, ...]
+    #: What the runner measured while each case ran, under the capability level it declares for each measurement
+    #: (RFC §24: FULL, PARTIAL or UNAVAILABLE — never a silent degradation). WP-5.1 reads none of these; WP-5.2 does.
+    capabilities: Mapping[str, Enforcement] = _NOTHING      # measurement name -> declared level
+    lines: Mapping[str, Mapping[str, frozenset[int]]] = _NOTHING   # case id -> candidate path -> executed lines
+    accessed: Mapping[str, frozenset[str]] = _NOTHING       # case id -> candidate paths the case opened
+    arcs: Mapping[str, Mapping[str, frozenset[tuple[int, int]]]] = _NOTHING  # case id -> path -> (from, to) lines
 
 
 @dataclass(frozen=True)
@@ -242,11 +253,48 @@ class Runner:
 
 
 _UNITTEST_RUNNER = r'''
-import importlib, json, os, sys, traceback, unittest
+import importlib, json, os, sys, threading, traceback, unittest
 out, targets = sys.argv[1], sys.argv[2:]
+measure = "--measure" in targets
+targets = [t for t in targets if t != "--measure"]
 cases, errors = [], []
 loader = unittest.TestLoader()
 suite = unittest.TestSuite()
+ROOT = os.getcwd() + os.sep
+current = [None]                 # the case running now: what the tracer and the audit hook attribute to
+lines, accessed, arcs = {}, {}, {}
+partial = [False]                # set when a case replaced the tracer: the measurement is PARTIAL, never silently FULL
+
+def inside(filename):
+    return filename.startswith(ROOT) and "__pycache__" not in filename
+
+def local(frame, event, arg):
+    if event == "line" and current[0] is not None:
+        rel_path = frame.f_code.co_filename[len(ROOT):].replace(os.sep, "/")
+        lines.setdefault(current[0], {}).setdefault(rel_path, set()).add(frame.f_lineno)
+        last = _last.get(id(frame))
+        if last is not None and last != frame.f_lineno:
+            arcs.setdefault(current[0], {}).setdefault(rel_path, set()).add((last, frame.f_lineno))
+        _last[id(frame)] = frame.f_lineno
+    elif event == "return":
+        _last.pop(id(frame), None)
+    return local
+
+_last = {}
+
+def tracer(frame, event, arg):
+    return local if event == "call" and inside(frame.f_code.co_filename) else None
+
+def audit(event, args):
+    if event == "open" and current[0] is not None and args and isinstance(args[0], (str, bytes, os.PathLike)):
+        path = os.path.abspath(os.fsdecode(args[0]))
+        if inside(path):
+            accessed.setdefault(current[0], set()).add(path[len(ROOT):].replace(os.sep, "/"))
+
+if measure:
+    sys.addaudithook(audit)
+    threading.settrace(tracer)
+    sys.settrace(tracer)
 
 def rel(path):
     try:
@@ -295,6 +343,13 @@ class Result(unittest.TestResult):
     def startTest(self, test):
         super().startTest(test)
         self._mark(test, "passed")
+        current[0] = test.id()
+    def stopTest(self, test):
+        super().stopTest(test)
+        if measure and sys.gettrace() is not tracer:
+            partial[0] = True  # the case replaced the tracer: what ran meanwhile was not observed
+            sys.settrace(tracer)
+        current[0] = None
     def addError(self, test, err):
         super().addError(test, err)
         self._mark(test, "error")
@@ -313,9 +368,17 @@ class Result(unittest.TestResult):
 
 result = Result()
 suite.run(result)
+if measure:
+    sys.settrace(None)
+    threading.settrace(None)
 cases = list(result.seen.values())
+level = ("PARTIAL" if partial[0] else "FULL") if measure else "UNAVAILABLE"
+capabilities = {"line-coverage": level, "artefact-access": level, "branch-coverage": level}
 with open(out, "w", encoding="utf-8") as f:
-    json.dump({"cases": cases, "collection_errors": errors}, f)
+    json.dump({"cases": cases, "collection_errors": errors, "capabilities": capabilities,
+               "lines": {c: {p: sorted(v) for p, v in m.items()} for c, m in lines.items()},
+               "accessed": {c: sorted(v) for c, v in accessed.items()},
+               "arcs": {c: {p: sorted(v) for p, v in m.items()} for c, m in arcs.items()}}, f)
 sys.exit(0 if result.wasSuccessful() else 1)
 '''
 
@@ -324,7 +387,13 @@ def _read_unittest(path: pathlib.Path) -> ResultSet:
     d = json.loads(path.read_text(encoding="utf-8"))
     return ResultSet(tuple(Case(c["id"], c["path"], c["outcome"]) for c in d["cases"]),
                      tuple(CollectionError(e["path"], e["kind"], e.get("module"), e.get("detail", ""))
-                           for e in d["collection_errors"]))
+                           for e in d["collection_errors"]),
+                     MappingProxyType({k: Enforcement(v) for k, v in d.get("capabilities", {}).items()}),
+                     MappingProxyType({c: MappingProxyType({p: frozenset(v) for p, v in m.items()})
+                                       for c, m in d.get("lines", {}).items()}),
+                     MappingProxyType({c: frozenset(v) for c, v in d.get("accessed", {}).items()}),
+                     MappingProxyType({c: MappingProxyType({p: frozenset(map(tuple, v)) for p, v in m.items()})
+                                       for c, m in d.get("arcs", {}).items()}))
 
 
 _IMPORT_ERROR = re.compile(r"(?:ModuleNotFoundError|ImportError): (?:No module named|cannot import name .+? from) '([^']+)'")

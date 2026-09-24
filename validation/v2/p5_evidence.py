@@ -138,8 +138,77 @@ def test_execution() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-5.2
+
+def relevance() -> dict:
+    t = _module("aisef_v2_p5_test_relevance", "tests/v2/p5/test_relevance.py")
+    typed = cases(t, "Typed", "test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+                  "test_REL_2_measured_story_tests_with_zero_intersection_are_IRRELEVANT",
+                  "test_REL_3_coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT",
+                  "test_REL_4_coverage_capability_PARTIAL_is_UNMEASURABLE",
+                  "test_REL_5_branch_evidence_is_recorded_when_present_and_never_required",
+                  "test_REL_6_a_non_line_addressable_artefact_uses_its_own_measurement",
+                  "test_REL_7_a_non_line_addressable_artefact_without_a_capability_is_UNMEASURABLE",
+                  "test_REL_8_the_same_coverage_under_another_test_layout_is_the_same_result",
+                  "test_a_test_that_did_not_execute_establishes_nothing",
+                  "test_the_developers_own_test_file_is_not_the_product_change",
+                  "test_one_unmeasurable_artefact_never_hides_behind_the_others",
+                  "test_the_result_shape_refuses_every_contradiction", "test_nothing_here_reaches_the_product_verdict")
+    parse = cases(t, "Parsing", "test_a_unified_diff_becomes_candidate_line_numbers",
+                  "test_executable_lines_are_the_code_objects_own")
+    real = cases(t, "ForReal", "test_REL_1_for_real", "test_REL_2_for_real",
+                 "test_REL_3_for_real_the_runner_without_the_capability_declares_it",
+                 "test_REL_4_for_real_a_test_that_replaces_the_tracer_makes_the_measurement_PARTIAL",
+                 "test_REL_5_for_real_branch_evidence_is_recorded_and_the_value_is_the_lines",
+                 "test_REL_6_for_real_an_accessed_data_file", "test_REL_7_for_real_no_capability_for_the_data_file",
+                 "test_REL_8_for_real_the_same_tests_in_another_layout", "test_product_code_run_in_a_thread_is_measured")
+    rel = lambda n: typed[f"test_REL_{n}_" + {  # noqa: E731
+        1: "an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+        2: "measured_story_tests_with_zero_intersection_are_IRRELEVANT",
+        3: "coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT", 4: "coverage_capability_PARTIAL_is_UNMEASURABLE",
+        5: "branch_evidence_is_recorded_when_present_and_never_required",
+        6: "a_non_line_addressable_artefact_uses_its_own_measurement",
+        7: "a_non_line_addressable_artefact_without_a_capability_is_UNMEASURABLE",
+        8: "the_same_coverage_under_another_test_layout_is_the_same_result"}[n]]
+    real_of = {1: "test_REL_1_for_real", 2: "test_REL_2_for_real",
+               3: "test_REL_3_for_real_the_runner_without_the_capability_declares_it",
+               4: "test_REL_4_for_real_a_test_that_replaces_the_tracer_makes_the_measurement_PARTIAL",
+               5: "test_REL_5_for_real_branch_evidence_is_recorded_and_the_value_is_the_lines",
+               6: "test_REL_6_for_real_an_accessed_data_file", 7: "test_REL_7_for_real_no_capability_for_the_data_file",
+               8: "test_REL_8_for_real_the_same_tests_in_another_layout"}
+    return {
+        "record": "AISEF V2 — P5 RELEVANCE",
+        "work_package": "WP-5.2",
+        "rfc": "§15.2 (F1 payload enum Relevance: RELEVANT, IRRELEVANT, UNMEASURABLE; §24 capability levels)",
+        "implementation": "aisef2/quality/relevance.py",
+        "measurement": {"line-addressable": "a .py artefact: executable lines of its own code objects, required "
+                        "capability line-coverage", "non-line-addressable": "any other artefact: artefact-access (the "
+                        "case opened it), no line approximation", "branch": "branch-coverage arcs from a changed "
+                        "executable line, recorded as stronger evidence, never required",
+                        "runner": "the harness-owned unittest runner under --measure: sys.settrace + threading.settrace "
+                                  "+ an open() audit hook, per case; it declares FULL, PARTIAL (a case replaced the "
+                                  "tracer) or UNAVAILABLE (no --measure); the pytest adapter declares nothing"},
+        "properties": {
+            **{f"REL_{n}_typed_and_real": rel(n) and real[real_of[n]] for n in range(1, 9)},
+            "capability_absence_is_UNMEASURABLE_never_IRRELEVANT": rel(3) and rel(4) and rel(7)
+                and typed["test_one_unmeasurable_artefact_never_hides_behind_the_others"]
+                and typed["test_the_result_shape_refuses_every_contradiction"],
+            "branch_coverage_never_required": rel(5) and real[real_of[5]],
+            "non_line_addressable_uses_its_own_measurement_or_UNMEASURABLE": rel(6) and rel(7),
+            "test_layout_invariance": rel(8) and real[real_of[8]],
+            "no_execution_no_relevance_success": typed["test_a_test_that_did_not_execute_establishes_nothing"],
+            "developer_test_files_are_not_the_product_change": typed["test_the_developers_own_test_file_is_not_the_product_change"],
+            "story_diff_and_executable_lines_are_typed": parse["test_a_unified_diff_becomes_candidate_line_numbers"]
+                and parse["test_executable_lines_are_the_code_objects_own"],
+            "threads_are_measured": real["test_product_code_run_in_a_thread_is_measured"],
+            "no_product_verdict_reached": typed["test_nothing_here_reaches_the_product_verdict"],
+        },
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-5.1": ("closure-evidence/v2/P5-TEST-EXECUTION.json", test_execution, "aisef2/quality/test_execution.py"),
+    "WP-5.2": ("closure-evidence/v2/P5-RELEVANCE.json", relevance, "aisef2/quality/relevance.py"),
 }
 
 

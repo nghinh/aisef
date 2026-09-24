@@ -244,13 +244,19 @@ P4_TARGETS: dict[str, list[str]] = {
         "RunScope._now", "RunScope.interrupt", "RunScope._second_interrupt_abandons")},
 }
 _EXEC_TESTS = ["tests/v2/p5/test_test_execution.py"]
+_REL_TESTS = ["tests/v2/p5/test_relevance.py"]
 P5_TARGETS: dict[str, list[str]] = {
     # WP-5.1: the typed shape, the only mapping from a runner's report, the cause classification, the adapters
     **{f"aisef2/quality/test_execution.py::{f}": _EXEC_TESTS for f in (
         "classify", "_cause_owner", "_owner_for", "unrunnable", "TestExecution.__post_init__", "DeveloperTests.owns",
         "DeveloperTests.__post_init__", "CollectionError.__post_init__", "Case.__post_init__", "_read_unittest",
         "_read_junit", "_norm", "project_top_level")},
+    # WP-5.2: the story diff, what is line-addressable, the executable lines, the shape, the only measurement
+    **{f"aisef2/quality/relevance.py::{f}": _REL_TESTS for f in (
+        "measure", "story_diff", "line_addressable", "executable_lines", "RelevanceResult.__post_init__",
+        "ChangedArtefact.__post_init__")},
 }
+P5_TARGETS["aisef2/quality/test_execution.py::_read_unittest"] = _EXEC_TESTS + _REL_TESTS  # it reads the measurement too
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
