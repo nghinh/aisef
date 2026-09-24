@@ -2374,6 +2374,1286 @@
    ]
   },
   {
+   "target": "aisef2/quality/vacuity.py::Hunk.side",
+   "kill_tests": [
+    "tests/v2/p5/test_vacuity.py"
+   ],
+   "source_sha256": "34cc15bca57a827c02b4f83a817399d4c5baded7bcc95ff733c63893d9aa8512",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L64 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string ' ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/vacuity.py::VacuityResult.__post_init__",
+   "kill_tests": [
+    "tests/v2/p5/test_vacuity.py"
+   ],
+   "source_sha256": "34cc15bca57a827c02b4f83a817399d4c5baded7bcc95ff733c63893d9aa8512",
+   "mutants": 37,
+   "killed": 37,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L224 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L228 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L231 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L234 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L224 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L226 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L228 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L231 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L234 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L226 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L226 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L227 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L228 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L228 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L231 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L231 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L234 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string 'vacuity is one of NON_VACUOUS, VACUOUS, INDETERMINATE (§15.1)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L226 TestExecutionStatus.EXECUTED->UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L227 TestSelection.STORY_TESTS_RAN->NO_STORY_TESTS_MATCHED",
+     "killed": true
+    },
+    {
+     "mutant": "L227 TestSelection.STORY_TESTS_RAN->STORY_TESTS_NOT_COLLECTABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L228 Vacuity.NON_VACUOUS->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L228 Vacuity.NON_VACUOUS->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L228 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L229 string \"NON_VACUOUS is exactly an attributed assertion failure of an intended story-owned test in a neutralised tree where the story's tests executed (§15.1, all four conditions)\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L231 Vacuity.VACUOUS->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L231 Vacuity.VACUOUS->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L231 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L232 string \"VACUOUS is exactly the story's tests executing and passing without the story's product change (§15.1)\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L234 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L234 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L235 string 'INDETERMINATE attributes nothing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L228 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L231 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L231 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L228 TestOutcome.FAILED->PASSED",
+     "killed": true
+    },
+    {
+     "mutant": "L231 TestOutcome.PASSED->FAILED",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/vacuity.py::_reverse",
+   "kill_tests": [
+    "tests/v2/p5/test_vacuity.py"
+   ],
+   "source_sha256": "34cc15bca57a827c02b4f83a817399d4c5baded7bcc95ff733c63893d9aa8512",
+   "mutants": 19,
+   "killed": 19,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L150 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L158 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L149 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L155 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L148 string '\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L149 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L154 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L158 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L152 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L153 string '+' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L155 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L157 string '-' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L158 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L158 string '\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L158 string '\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L158 not removed",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/vacuity.py::evaluate",
+   "kill_tests": [
+    "tests/v2/p5/test_vacuity.py"
+   ],
+   "source_sha256": "34cc15bca57a827c02b4f83a817399d4c5baded7bcc95ff733c63893d9aa8512",
+   "mutants": 84,
+   "killed": 84,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L247 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L258 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L261 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L266 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L270 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L275 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L278 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L282 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L244 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L244 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L245 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L247 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L249 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L253 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L258 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L259 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L261 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L262 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L267 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L271 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L274 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L275 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L276 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L279 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L247 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L247 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L248 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L248 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L254 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L256 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L256 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L258 TestExecutionStatus.EXECUTED->UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L261 TestSelection.STORY_TESTS_RAN->NO_STORY_TESTS_MATCHED",
+     "killed": true
+    },
+    {
+     "mutant": "L261 TestSelection.STORY_TESTS_RAN->STORY_TESTS_NOT_COLLECTABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L275 TestOutcome.PASSED->FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L282 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L282 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L283 string 'the neutralised run failed only in story-owned tests that were not intended: not attributable' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L247 TestExecutionStatus.EXECUTED->UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L247 TestSelection.STORY_TESTS_RAN->NO_STORY_TESTS_MATCHED",
+     "killed": true
+    },
+    {
+     "mutant": "L247 TestSelection.STORY_TESTS_RAN->STORY_TESTS_NOT_COLLECTABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L248 TestOutcome.PASSED->FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L249 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L249 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L250 string \"the story's tests do not execute and pass at the candidate: there is no counterfactual to attribute\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L259 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L259 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L262 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L262 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L265 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L267 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L267 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L269 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L271 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L271 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L276 Vacuity.VACUOUS->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L276 Vacuity.VACUOUS->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L279 Vacuity.NON_VACUOUS->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L279 Vacuity.NON_VACUOUS->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L245 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L245 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L251 string 'aisef2-vacuity-' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L252 string 'tree' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L254 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L254 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L260 string 'the runner could not execute in the neutralised tree: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L260 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L263 string \"the story's tests did not actually execute in the neutralised tree: \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L263 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L265 string 'skipped' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L268 string ' intended story-owned test(s) did not execute in the neutralised tree' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L269 string 'error' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L272 string ' intended story-owned test(s) ended in an exception, not an assertion: the cause is not established' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L274 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L277 string \" intended story-owned test(s) still pass without the story's product change\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L280 string \" intended story-owned test(s) fail by assertion once the story's product change is neutralised (\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L281 string ')' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L246 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L255 string 'the neutralised tree could not be reconstructed deterministically: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L265 string 'skipped' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L274 string 'failed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L246 string 'passed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L255 string '; ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L281 string ', ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/vacuity.py::file_patches",
+   "kill_tests": [
+    "tests/v2/p5/test_vacuity.py"
+   ],
+   "source_sha256": "34cc15bca57a827c02b4f83a817399d4c5baded7bcc95ff733c63893d9aa8512",
+   "mutants": 108,
+   "killed": 108,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L140 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L84 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L88 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L97 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L104 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L126 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L129 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L140 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L88 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L89 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L92 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L92 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L92 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L92 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L97 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L101 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L101 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L101 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L101 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L104 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L106 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L128 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L128 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L128 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L128 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L131 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L89 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L97 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L97 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L98 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L101 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L104 LtE->Gt",
+     "killed": true
+    },
+    {
+     "mutant": "L104 LtE->Gt",
+     "killed": true
+    },
+    {
+     "mutant": "L107 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L110 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string '\\\\' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L129 string '+' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L131 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L133 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L138 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L138 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L89 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L89 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L90 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L98 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string '--- ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L112 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L131 string '-' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L133 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L91 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L99 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L99 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L99 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L99 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L107 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'a/' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L110 string '+++ ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L113 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L116 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L119 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L133 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L133 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L134 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L134 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L134 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L134 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L134 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L134 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L136 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L99 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L111 string 'b/' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string 'Binary files ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L113 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L116 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L119 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L123 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L133 string ' ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L134 string ' ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L113 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L113 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string ' and ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L122 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L122 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L123 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L117 string 'a/' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L118 string 'b/' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L119 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L123 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L124 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L117 string '--- ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L118 string '+++ ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L121 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L123 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L123 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string ' differ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L123 string '\\\\' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'Binary files ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/vacuity.py::neutralise",
+   "kill_tests": [
+    "tests/v2/p5/test_vacuity.py"
+   ],
+   "source_sha256": "34cc15bca57a827c02b4f83a817399d4c5baded7bcc95ff733c63893d9aa8512",
+   "mutants": 44,
+   "killed": 44,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L210 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L172 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L172 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L172 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L172 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L175 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L182 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L186 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L190 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L193 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L201 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L205 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L194 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L201 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L205 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L210 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L210 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L174 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L184 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L182 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L208 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L182 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L182 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L191 string ': the patch carries no reconstructible content for it' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L197 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L197 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string '\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L202 string ': not a file at the candidate' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L204 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L206 string ': a hunk does not match the candidate at its position' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L182 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L195 string ': a deleted file whose patch is not a plain removal' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L182 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L194 string '+' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L194 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L194 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string '\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L182 string '.' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L182 string '/' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L198 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L198 element 1 dropped",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "validation/v2/destructive_authority.py::_alias",
    "kill_tests": [
     "tests/v2/p0/test_destructive_authority.py"

@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 32,
+ "checker_count": 33,
  "uncovered_checker_modules": [],
- "calibrated_count": 32,
- "always_pass_mutants_rejected": 32,
+ "calibrated_count": 33,
+ "always_pass_mutants_rejected": 33,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -295,6 +295,22 @@
    "observed": [
     "ONE_SIGNAL_AUTHORITY aisef2/probe/python_callable.py:6 keeps a signal ledger of its own; there is one authority for controller signal provenance (§9.3)",
     "ONE_SIGNAL_AUTHORITY aisef2/probe/python_callable.py:9 signals a process itself; stopping a process and recording what was sent belongs to the owned process range (§9.3)"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "candidate_only_execution",
+   "package": "WP-5.3 (invariant IX)",
+   "fixture": "tests/v2/fixtures/known_bad/candidate_only_execution.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "CANDIDATE_ONLY_EXECUTION aisef2/quality/vacuity.py:4",
+   "observed": [
+    "CANDIDATE_ONLY_EXECUTION aisef2/quality/vacuity.py:4 names 'parent': developer artefacts execute at the candidate only, never at a parent revision (IX)",
+    "CANDIDATE_ONLY_EXECUTION aisef2/quality/vacuity.py:5 names 'parent': developer artefacts execute at the candidate only, never at a parent revision (IX)"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

@@ -379,6 +379,96 @@
    "authority_source": "TEST_CREATED_PATH",
    "justification": "d = project(files): the candidate tree run_ makes for one real measured run",
    "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "ForReal.story",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project(files): the candidate tree one vacuity experiment starts from",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "ForReal.test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "scratch.parent",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "scratch = Path(tempfile.mkdtemp(...)) / 'tree': the scratch root the test makes to inspect the neutralised tree",
+   "enforcement": "static: bound from tempfile.mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "parent",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "parent = <candidate>-parent, a directory the test creates (parent.mkdir()) to stand for an unrunnable parent revision that must never be read",
+   "enforcement": "static: the function creates it with parent.mkdir("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d2",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d2 = project({...}): a second candidate tree for the run beside the fake parent",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_neutralisation_touches_exactly_the_story_product_artefacts",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree whose neutralisation is measured file by file",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_neutralisation_touches_exactly_the_story_product_artefacts",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "scratch.parent",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "scratch = Path(tempfile.mkdtemp(...)) / 'tree': the scratch root holding the three neutralised trees",
+   "enforcement": "static: bound from tempfile.mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_a_baseline_that_does_not_pass_has_no_counterfactual",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree of the baseline cases",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree that carries the symbolic link",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "scratch.parent",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "scratch = Path(tempfile.mkdtemp(...)) / 'tree': the scratch root of the copy",
+   "enforcement": "static: bound from tempfile.mkdtemp("
   }
  ]
 }

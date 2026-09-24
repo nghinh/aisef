@@ -257,6 +257,10 @@ P5_TARGETS: dict[str, list[str]] = {
         "ChangedArtefact.__post_init__")},
 }
 P5_TARGETS["aisef2/quality/test_execution.py::_read_unittest"] = _EXEC_TESTS + _REL_TESTS  # it reads the measurement too
+_VAC_TESTS = ["tests/v2/p5/test_vacuity.py"]
+# WP-5.3: the only vacuity mapping, the deterministic reconstruction, the typed patch, the shape
+P5_TARGETS.update({f"aisef2/quality/vacuity.py::{f}": _VAC_TESTS for f in (
+    "evaluate", "neutralise", "_reverse", "file_patches", "VacuityResult.__post_init__", "Hunk.side")})
 # WP52-001: the destructive-site checker's discovery of callables handed over by reference, and the ledger check
 P5_TARGETS.update({f"validation/v2/destructive_authority.py::{f}": ["tests/v2/p0/test_destructive_authority.py"]
                    for f in ("discover", "_references", "_destructive_ref", "_aliases", "_alias", "check")})

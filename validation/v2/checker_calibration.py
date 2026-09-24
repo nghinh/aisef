@@ -359,6 +359,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_side_retry_counter", "NO_SIDE_RETRY_COUNTER", "WP-4.5"),
     _kernel_rule("sentinel_is_not_evidence", "SENTINEL_IS_NOT_EVIDENCE", "WP-4.3"),
     _kernel_rule("one_signal_authority", "ONE_SIGNAL_AUTHORITY", "P4 correction (V2-003, RFC §9.3)"),
+    _kernel_rule("candidate_only_execution", "CANDIDATE_ONLY_EXECUTION", "WP-5.3 (invariant IX)"),
     _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _p5_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 

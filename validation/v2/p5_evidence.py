@@ -222,9 +222,67 @@ def relevance() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-5.3
+
+def vacuity() -> dict:
+    t = _module("aisef_v2_p5_test_vacuity", "tests/v2/p5/test_vacuity.py")
+    vac = cases(t, "ForReal", "test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
+                "test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
+                "test_VAC_3_a_tree_that_cannot_be_reconstructed_is_INDETERMINATE",
+                "test_VAC_4_a_runner_unavailable_in_the_neutralised_run_is_INDETERMINATE",
+                "test_VAC_5_a_story_test_that_no_longer_imports_is_INDETERMINATE",
+                "test_VAC_6_intended_story_tests_that_do_not_actually_run_are_INDETERMINATE",
+                "test_VAC_7_a_failure_not_attributable_to_the_neutralisation_is_INDETERMINATE",
+                "test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS",
+                "test_VAC_9_a_pure_deletion_the_patch_carries_is_reconstructed_and_classified_from_execution",
+                "test_VAC_10_a_deletion_the_patch_does_not_carry_is_INDETERMINATE",
+                "test_VAC_11_moving_the_developer_tests_does_not_change_the_result",
+                "test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed")
+    typed = cases(t, "Typed", "test_the_patch_is_typed_per_file", "test_reverse_application_is_exact_or_refused",
+                  "test_neutralisation_touches_exactly_the_story_product_artefacts",
+                  "test_the_result_shape_refuses_every_contradiction", "test_a_baseline_that_does_not_pass_has_no_counterfactual",
+                  "test_invariant_IX_is_structural")
+    return {
+        "record": "AISEF V2 — P5 VACUITY",
+        "work_package": "WP-5.3",
+        "rfc": "§15.1 (F1 payload enum Vacuity: NON_VACUOUS, VACUOUS, INDETERMINATE); invariant IX",
+        "implementation": "aisef2/quality/vacuity.py",
+        "model": {"reconstruction": "a copy of the candidate (.git and caches aside) minus the story's added product "
+                  "files, with every other story product hunk reverse-applied exactly at its candidate position; a "
+                  "deleted product file rebuilt from the content the patch carries; test files the story owns and "
+                  "everything outside the story diff copied untouched",
+                  "attribution": "per intended case (story-owned, passed at the candidate): 'failed' in the "
+                  "neutralised run attributes; 'error', a skip, a missing case or a collection failure does not",
+                  "parent": "no parameter, no path, no git: the runner's cwd is the controller's scratch copy "
+                  "(kernel rule CANDIDATE_ONLY_EXECUTION, invariant IX)"},
+        "properties": {
+            **{f"VAC_{n}": vac[k] for n, k in ((1, "test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS"),
+                                                 (2, "test_VAC_2_a_story_test_that_still_passes_is_VACUOUS"),
+                                                 (3, "test_VAC_3_a_tree_that_cannot_be_reconstructed_is_INDETERMINATE"),
+                                                 (4, "test_VAC_4_a_runner_unavailable_in_the_neutralised_run_is_INDETERMINATE"),
+                                                 (5, "test_VAC_5_a_story_test_that_no_longer_imports_is_INDETERMINATE"),
+                                                 (6, "test_VAC_6_intended_story_tests_that_do_not_actually_run_are_INDETERMINATE"),
+                                                 (7, "test_VAC_7_a_failure_not_attributable_to_the_neutralisation_is_INDETERMINATE"),
+                                                 (8, "test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS"),
+                                                 (9, "test_VAC_9_a_pure_deletion_the_patch_carries_is_reconstructed_and_classified_from_execution"),
+                                                 (10, "test_VAC_10_a_deletion_the_patch_does_not_carry_is_INDETERMINATE"),
+                                                 (11, "test_VAC_11_moving_the_developer_tests_does_not_change_the_result"),
+                                                 (12, "test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed"))},
+            "three_valued_result_proven": all(vac.values()) and typed["test_the_result_shape_refuses_every_contradiction"],
+            "INDETERMINATE_never_NON_VACUOUS": all(vac[k] for k in vac if any(f"VAC_{n}_" in k for n in (3, 4, 5, 6, 7, 10)))
+                and typed["test_a_baseline_that_does_not_pass_has_no_counterfactual"],
+            "neutralisation_touches_only_story_product_artefacts": typed["test_neutralisation_touches_exactly_the_story_product_artefacts"],
+            "reconstruction_is_exact_or_refused": typed["test_reverse_application_is_exact_or_refused"] and typed["test_the_patch_is_typed_per_file"],
+            "invariant_IX_no_parent_execution": typed["test_invariant_IX_is_structural"]
+                and vac["test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed"],
+        },
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-5.1": ("closure-evidence/v2/P5-TEST-EXECUTION.json", test_execution, "aisef2/quality/test_execution.py"),
     "WP-5.2": ("closure-evidence/v2/P5-RELEVANCE.json", relevance, "aisef2/quality/relevance.py"),
+    "WP-5.3": ("closure-evidence/v2/P5-VACUITY.json", vacuity, "aisef2/quality/vacuity.py"),
 }
 
 
