@@ -335,6 +335,18 @@ def _refmodel_independence() -> Checker:
                    lambda fx: ri.violations(fx["path"], fx["source"]), ("validation/v2/refmodel_independence.py",))
 
 
+def _migration_table() -> Checker:
+    gm = _load("aisef_v2_gen_migration_table", V2 / "gen_migration_table.py")
+
+    def bad(fx):
+        table = gm.generate(ROOT)
+        texts = {rel: (ROOT / rel).read_text(encoding="utf-8") for rel in (gm.TABLE_REL, gm.DOC_REL)}
+        texts[fx["path"]] = _edit(texts[fx["path"]], fx)
+        return gm.compare(table, texts[gm.TABLE_REL], texts[gm.DOC_REL])
+    return Checker("migration_table", "WP-6.1 (RFC §31 generated, --checked)", lambda: gm.check(ROOT), bad,
+                   ("validation/v2/gen_migration_table.py",))
+
+
 def _gen_specs() -> Checker:
     gs = _load("aisef_v2_gen_specs", V2 / "gen_specs.py")
 
@@ -382,6 +394,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_developer_artefact_at_parent", "NO_DEVELOPER_ARTEFACT_AT_PARENT", "WP-5.5 (invariant IX)"),
     _except_boundaries, _invariants_doc,
     _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _p5_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
+    _migration_table,
 ]
 
 

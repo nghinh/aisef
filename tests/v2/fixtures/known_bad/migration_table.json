@@ -1,0 +1,9 @@
+{
+ "checker": "migration_table",
+ "package": "WP-6.1 (RFC §31 generated, --checked)",
+ "kind": "hand_edit",
+ "path": "docs/implementation/v2/v1-proofmode-migration.md",
+ "find": "| PRESERVE | SATISFIED_AT_PARENT | MUST_NOT_HOLD | HUMAN_DECLARATION_REQUIRED |",
+ "replace": "| PRESERVE | SATISFIED_AT_PARENT | MUST_NOT_HOLD | ABSENCE_IS_DECIDABLE |",
+ "expect": "docs/implementation/v2/v1-proofmode-migration.md drifted from its generator"
+}

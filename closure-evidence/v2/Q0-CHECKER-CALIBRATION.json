@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 36,
+ "checker_count": 37,
  "uncovered_checker_modules": [],
- "calibrated_count": 36,
- "always_pass_mutants_rejected": 36,
+ "calibrated_count": 37,
+ "always_pass_mutants_rejected": 37,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -557,6 +557,21 @@
    "expected": "BASELINE: plan cites rfc_normative_digest",
    "observed": [
     "BASELINE: plan cites rfc_normative_digest 8f0d522d9db0322c…, the approved lineage ends at 7abda8ecf8352dd9…"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "migration_table",
+   "package": "WP-6.1 (RFC §31 generated, --checked)",
+   "fixture": "tests/v2/fixtures/known_bad/migration_table.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "docs/implementation/v2/v1-proofmode-migration.md drifted from its generator",
+   "observed": [
+    "docs/implementation/v2/v1-proofmode-migration.md drifted from its generator: hand-edited or stale"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

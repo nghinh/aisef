@@ -1,0 +1,2626 @@
+{
+ "record": "AISEF V2 — P6 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "validation/v2/gen_migration_table.py::_loss_code",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 17,
+   "killed": 17,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L248 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L250 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L252 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L248 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L249 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L250 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L251 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L252 string 'V1_NO_SOURCE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L248 ObligationRole.VERIFY->INTRODUCE",
+     "killed": true
+    },
+    {
+     "mutant": "L248 ObligationRole.VERIFY->PRESERVE",
+     "killed": true
+    },
+    {
+     "mutant": "L249 string 'V1_HAS_NO_UNCONSTRAINED_PARENT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L250 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L250 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L251 string 'V1_COULD_NOT_INTRODUCE_A_PROHIBITION' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L250 ObligationRole.INTRODUCE->PRESERVE",
+     "killed": true
+    },
+    {
+     "mutant": "L250 ObligationRole.INTRODUCE->VERIFY",
+     "killed": true
+    },
+    {
+     "mutant": "L250 Polarity.MUST_NOT_HOLD->MUST_HOLD",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::_unknown",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 35,
+   "killed": 35,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L176 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 7 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 8 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 9 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 10 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 11 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 12 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 13 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 14 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 dict entry 15 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L176 string 'v1_mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L176 string 'source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L176 string 'transition' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L176 string 'definition' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L176 string 'expected_parent' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L177 string 'obligation_role' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L177 string 'polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L177 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L178 string 'obligation_role_source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L178 string 'polarity_source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L178 string 'subject_absence_source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L179 string 'status' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L179 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L179 string 'missing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L180 string 'derivation' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L180 string 'rationale_ref' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L180 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L180 string 'unknown' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::check",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L601 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L606 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L601 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L597 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L597 string 'generation refused: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L603 string 'committed ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L605 string ' is not JSON' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::cited",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L143 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L143 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L143 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L142 string ' ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::compare",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 13,
+   "killed": 13,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L578 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L582 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L586 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L578 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L580 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L582 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L584 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L580 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L584 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L579 string ' is missing: run the generator' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L583 string ' is missing: run the generator' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L581 string ' drifted from its generator: hand-edited or stale' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L585 string ' drifted from its generator: hand-edited or stale' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::declared",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L164 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L166 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L168 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L164 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L165 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L166 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L167 string 'a SubjectAbsence declaration is a SubjectAbsence member, not ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::derive",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 107,
+   "killed": 107,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L233 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L190 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L192 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L196 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L201 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L188 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L192 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L195 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L195 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L195 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L195 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L201 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L209 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L209 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L209 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L196 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L196 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L201 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L201 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L209 string 'obligation_role' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L209 string 'polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L209 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 7 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 8 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 9 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 10 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 11 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 12 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 13 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 14 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 15 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L201 string 'GREEN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L212 string 'v1_mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L212 string 'source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L213 string 'transition' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L214 string 'definition' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L216 string 'expected_parent' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L216 string 'obligation_role' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L216 string 'polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L217 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L218 string 'obligation_role_source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L218 string 'polarity_source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L219 string 'subject_absence_source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L220 string 'status' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L221 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L221 string 'missing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L222 string 'derivation' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L231 string 'rationale_ref' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L213 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L213 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L213 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L214 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L214 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L214 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L219 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L220 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L221 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L222 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L222 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L222 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L193 string 'neither a Mode member of the V1 kernel nor an entry of the alias table' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L206 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L206 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L206 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L212 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L213 string 'parent' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L213 string 'candidate' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L213 string 'source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L214 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L214 string 'quote' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L215 string 'source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string 'obligation_role' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string 'polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L227 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L227 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L197 string \" is a Mode member without a transition in EXPECTED, without a cited definition, or its citation is not on the kernel's definition line\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L202 string ': EXPECTED transition ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L202 string ' is not a V1 transition (<RED|GREEN> -> GREEN)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L212 string '::Mode.' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L212 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L213 string '::EXPECTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L215 string ' module docstring, the ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L215 string ' line' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string 'EXPECTED[' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string '] = ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string ': parent ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string ' -> ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L224 string '; the role whose EXPECTED_AT_PARENT is that (§11) -> ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string 'the kernel defines ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string \" as '\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string \"' -> \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string ' -> ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L226 string \"; V1 never verified a criterion's test against it\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L227 string 'from an explicit typed declaration' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L228 string 'V1 declared none; nothing here infers it (not from polarity, name, transition, wording, history or a default)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L212 string ' (alias ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L212 string ')' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::inventory",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 221,
+   "killed": 221,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L431 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L441 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L445 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L364 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L364 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L364 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L364 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L366 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L366 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L366 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L369 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L375 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L375 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L378 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L388 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L388 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L391 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L401 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L401 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L403 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L411 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L411 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L413 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L426 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L426 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L426 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L437 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L437 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L445 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L445 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L372 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L381 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L399 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L403 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L406 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L411 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L411 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L412 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L412 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L412 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L412 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L413 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L415 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L372 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L391 string '.json' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L398 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L399 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L406 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L412 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L412 string 'key' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L412 string 'value' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L412 string 'occurrences' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L412 string 'evidence_value' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L413 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L413 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L415 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L418 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L427 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L427 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L427 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L427 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L427 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L432 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L432 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L432 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L432 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L438 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L438 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L438 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L438 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L439 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L439 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L440 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L370 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L370 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L370 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L370 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L370 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L372 string 'Mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L376 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L379 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L379 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L379 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L379 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L379 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L399 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L404 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L404 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L404 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L404 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L413 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L413 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L413 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L413 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L415 string 'proof_mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L418 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L420 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L427 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L427 string 'where' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L427 string 'record' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L428 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L429 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L427 string 'policy_record' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L428 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L429 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L432 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L432 string 'where' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L432 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L433 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L432 string 'grammar' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L433 string \"V1's plan parser folds the mode token to upper case before the kernel; a case-folded spelling is neither a mode value nor an alias of this table\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L436 string 'inventory: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L436 string '::ac_proof with its case folding is not where the citation says' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L438 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L438 string 'name' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L438 string 'target' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L438 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L438 string 'alias' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L442 string 'inventory: V1 proof modes appear inside the V2 kernel: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L443 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L443 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L368 string '::' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L370 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L370 string 'where' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L370 string 'members' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L370 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L371 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L370 string 'enum' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L371 string \"the V1 kernel's proof-mode enum: the migration input\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L373 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L373 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L373 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L373 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L373 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L377 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L379 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L379 string 'where' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L379 string 'carries' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L379 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L380 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L379 string 'constant' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L382 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L382 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L382 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L382 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L398 string 'record' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L399 string 'POLICY' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L400 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L400 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L400 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L404 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L404 string 'token' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L404 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L404 string 'carried_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L404 string 'token' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L407 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L407 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L407 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L407 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L407 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L407 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L413 string 'proof_mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L413 string 'mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L414 string 'a serialized V1 proof mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L418 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L418 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L420 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L429 string 'a policy record naming the active modes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L430 string 'a policy record from before the per-criterion modes (the superseded whole-story policy)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L432 string '::ac_proof' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L439 string 'aisef2' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L370 string '::' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L373 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L373 string 'where' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L373 string 'members' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L373 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L374 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L373 string 'enum' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L374 string 'an enum named like a mode with no proof-mode member (name collision)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L377 string 'Mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L379 string '::' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L380 string 'a kernel table keyed by Mode members' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L380 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L382 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L382 string 'where' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L382 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L383 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L382 string 'constant' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L383 string \"a constant of the kernel's obligation module that names no Mode member (story types, owner routing)\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L405 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L405 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L407 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L407 string 'token' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L407 string 'where' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L407 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L408 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L408 string 'files' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L407 string 'token' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L408 string 'a member of a V1 enum that is not the proof-mode enum' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L410 string 'inventory: token ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L410 string ' (' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L410 string ' files) matches no classification rule' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L416 string 'a proof_mode value the V1 kernel does not know: V1 refused it (PLAN_METADATA_MISSING); nothing to migrate' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L418 string 'expected_transition' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L420 string 'mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L443 string 'classification' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L373 string '::' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L380 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L380 string ': the transition input' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L382 string '::' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L395 string 'inventory: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L395 string ' is not JSON' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L405 string 'path' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L405 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L405 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L419 string 'derived from the mode by EXPECTED; not an input' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L380 string 'EXPECTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L421 string \"a different 'mode' vocabulary (not a proof mode)\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L423 string 'inventory: evidence value ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L423 string '=' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L423 string ' matches no classification rule' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::loss_report",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 37,
+   "killed": 37,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L276 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L269 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L269 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L269 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L269 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L269 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L270 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L270 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L270 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L268 string 'v1_mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L268 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L269 string 'code' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L269 string 'dimension' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L269 string 'affects' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L269 string 'V1_NO_SUBJECT_ABSENCE_DECLARATION' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L269 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L270 string 'code' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L270 string 'dimension' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L270 string 'affects' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L270 string 'V1_POLARITY_UNVERIFIED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L270 string 'polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L272 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L272 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L272 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L275 string 'statement' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L271 string 'loss' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L272 string 'code' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L272 string 'dimension' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L273 string 'affects' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L272 string 'obligation_role+polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L275 string 'code' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L268 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L273 string '+' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L273 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L273 string 'obligation_role' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L273 string 'polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L273 string 'loss' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::problems",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 86,
+   "killed": 86,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L486 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L509 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L483 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L483 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L483 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L486 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L487 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L490 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L492 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L501 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L503 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L505 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L507 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L482 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L483 string 'obligation_role' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L483 string 'polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L484 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L485 string 'rows' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L486 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L486 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L490 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L492 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L497 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L499 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L501 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L503 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L505 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L507 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L489 string 'v1_mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L490 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L490 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L497 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L499 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L501 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L501 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L503 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L505 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L505 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L482 string 'inventory_problems' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L487 string 'the table has no rows' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L490 string 'status' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L492 string 'reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L495 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L497 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L497 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L499 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L499 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L499 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L507 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L491 string 'row ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L491 string ': status ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L491 string ' is neither MAPPED nor UNMAPPED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L493 string 'row ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L493 string ': unknown V1 mode — no mapping and no default; declare it or remove it from the input' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L497 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L497 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L497 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L501 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L501 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L501 string 'subject_absence_source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L502 string 'row ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L502 string ': subject_absence ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L502 string ' was not declared: inferred or defaulted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L503 string 'status' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L504 string 'row ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L504 string ': MAPPED while ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L504 string ' still need a declaration' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L505 string 'status' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L506 string 'row ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L506 string ': UNMAPPED although every dimension holds a V2 value' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L508 string 'row ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L508 string \": 'missing' \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L508 string \" does not match the row's own fields \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L498 string 'row ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L498 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L498 string ' = ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L498 string ' has no typed source: a silently defaulted value' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L500 string 'row ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L500 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L500 string ' = ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L500 string ' is not a V2 value' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L507 string 'missing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L491 string 'status' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L497 string '_source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L502 string 'subject_absence' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L508 string 'missing' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::read_v1",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 31,
+   "killed": 31,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L116 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L121 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L127 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L137 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L116 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L121 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L123 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L127 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L130 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L132 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L132 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L137 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L132 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L117 string ' is missing: no V1 kernel to read' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L120 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L122 string ' has no Mode enum' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L123 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L125 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L128 string ' has no EXPECTED transition table' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L120 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L126 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L132 string 'Mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L134 string ': EXPECTED is not keyed by Mode members with string transitions' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L120 string 'Mode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string 'EXPECTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L137 string 'utf-8' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::resolve",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 11,
+   "killed": 11,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L152 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L154 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L152 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L153 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L154 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L156 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L158 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L156 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L157 string 'alias ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L157 string ' -> ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L157 string ': the target is not a V1 mode' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::without_v1_source",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 15,
+   "killed": 15,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L244 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L238 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L238 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L242 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L242 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L238 string 'obligation_role' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L238 string 'polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L242 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L242 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L243 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L243 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L243 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L243 string 'obligation_role' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L243 string 'polarity' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L243 string 'loss' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/gen_migration_table.py::write",
+   "kill_tests": [
+    "tests/v2/test_migration_table.py"
+   ],
+   "source_sha256": "ec3a817d499db2f78fb5a4625e0cdfe8f9a7e947dd7549ed2ad244c255056e0f",
+   "mutants": 14,
+   "killed": 14,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L612 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L617 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L613 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L614 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L614 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L614 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L614 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L614 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L614 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L614 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L614 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L615 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L615 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L616 string 'utf-8' emptied",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

@@ -38,7 +38,7 @@ if str(pathlib.Path(__file__).resolve().parent) not in sys.path:
 import cleanup_authority as ca  # noqa: E402  — the runner's only way to signal a process (P4-FINDING-011)
 RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
            "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json",
-           "P5": "closure-evidence/v2/P5-MUTATION.json"}
+           "P5": "closure-evidence/v2/P5-MUTATION.json", "P6": "closure-evidence/v2/P6-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -283,7 +283,16 @@ P5_TARGETS.update({f"validation/v2/except_boundaries.py::{f}": _INV_TESTS for f 
 # WP52-001: the destructive-site checker's discovery of callables handed over by reference, and the ledger check
 P5_TARGETS.update({f"validation/v2/destructive_authority.py::{f}": ["tests/v2/p0/test_destructive_authority.py"]
                    for f in ("discover", "_references", "_destructive_ref", "_aliases", "_alias", "check")})
-PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS}
+# WP-6.1: the generated V1 proof-mode migration table — derivation, alias resolution, the declaration-only path to
+# SubjectAbsence, the inventory's classification, and the --check that refuses drift, a hand edit, an unknown mode
+# or a defaulted row. Kill tests are self-contained (fake roots): the repository-level tests live in
+# tests/v2/test_migration_table_repo.py and are not kill tests (the runner's tree copy holds no V1 evidence).
+_MIG_TESTS = ["tests/v2/test_migration_table.py"]
+P6_TARGETS: dict[str, list[str]] = {f"validation/v2/gen_migration_table.py::{f}": _MIG_TESTS for f in (
+    "derive", "resolve", "declared", "cited", "read_v1", "_unknown", "without_v1_source", "_loss_code", "loss_report",
+    "inventory", "problems", "compare", "check", "write")}
+PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
+                 "P6": P6_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
