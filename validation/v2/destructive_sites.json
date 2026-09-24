@@ -469,6 +469,16 @@
    "authority_source": "TEST_CREATED_PATH",
    "justification": "scratch = Path(tempfile.mkdtemp(...)) / 'tree': the scratch root of the copy",
    "enforcement": "static: bound from tempfile.mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_adequacy.py",
+   "scope": "ForReal.run_",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project(files): the candidate tree one end-to-end adequacy assembly starts from",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
   }
  ]
 }

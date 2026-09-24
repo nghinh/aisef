@@ -279,10 +279,95 @@ def vacuity() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-5.4
+
+def adequacy() -> dict:
+    import ast
+    t = _module("aisef_v2_p5_test_adequacy", "tests/v2/p5/test_adequacy.py")
+    typed = cases(t, "Cases", "test_ADEQ_1_all_green_is_ADEQUATE",
+                  "test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
+                  "test_ADEQ_3_regression_UNRUNNABLE_has_no_outcome_and_keeps_the_environment_owner",
+                  "test_ADEQ_4_the_story_tests_FAILED_is_INADEQUATE_DEVELOPER",
+                  "test_ADEQ_5_NO_STORY_TESTS_MATCHED_is_INADEQUATE_DEVELOPER",
+                  "test_ADEQ_6_a_developer_caused_collection_failure_is_INADEQUATE_DEVELOPER",
+                  "test_ADEQ_7_an_integration_owned_collection_failure_is_never_charged_to_the_developer",
+                  "test_ADEQ_8_VACUOUS_is_INADEQUATE_DEVELOPER", "test_ADEQ_9_IRRELEVANT_is_INADEQUATE_DEVELOPER",
+                  "test_ADEQ_10_regressions_FAILED_is_INADEQUATE_DEVELOPER",
+                  "test_ADEQ_11_INDETERMINATE_vacuity_alone_is_INCOMPLETE_non_blocking_uncharged",
+                  "test_ADEQ_12_UNMEASURABLE_relevance_alone_is_INCOMPLETE_non_blocking_uncharged",
+                  "test_ADEQ_13_FAILED_with_UNMEASURABLE_is_INADEQUATE_the_hard_defect_dominates",
+                  "test_ADEQ_14_regressions_FAILED_with_INDETERMINATE_is_INADEQUATE",
+                  "test_ADEQ_15_opposite_TDD_chronology_with_identical_typed_inputs_is_the_identical_result")
+    real = cases(t, "ForReal", "test_ADEQ_1_for_real", "test_ADEQ_2_for_real_the_story_runner_cannot_execute",
+                 "test_ADEQ_3_for_real_the_regression_runner_cannot_execute", "test_ADEQ_4_and_10_for_real",
+                 "test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner",
+                 "test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE",
+                 "test_ADEQ_17_for_real_a_tests_only_diff_is_INADEQUATE_by_the_frozen_rules")
+    whole = cases(t, "Exhaustive", "test_assembly_is_total_and_follows_the_precedence",
+                  "test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
+                  "test_regression_selection_values_other_than_FAILED_are_not_in_the_frozen_lists")
+    shape = cases(t, "Shape", "test_the_fields_are_the_rfcs", "test_typed_executions_and_no_sensitivity",
+                  "test_UNRUNNABLE_story_execution_carries_nothing_measured_and_no_outcome",
+                  "test_EXECUTED_story_execution_carries_typed_measurements_of_tests_that_ran",
+                  "test_UNRUNNABLE_regressions_carry_no_outcome",
+                  "test_both_EXECUTED_the_outcome_is_defined_and_is_what_the_facts_assemble_to")
+    sep = cases(t, "Separation", "test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
+                "test_no_prose_is_read_for_control_and_no_side_state_exists",
+                "test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any")
+    src = ast.parse((ROOT / "aisef2/quality/adequacy.py").read_text(encoding="utf-8"))
+    names = {n.id for n in ast.walk(src) if isinstance(n, ast.Name)} | {n.attr for n in ast.walk(src) if isinstance(n, ast.Attribute)}
+    adeq = lambda n: typed[next(k for k in typed if k.startswith(f"test_ADEQ_{n}_"))]  # noqa: E731
+    return {
+        "record": "AISEF V2 — P5 ADEQUACY",
+        "work_package": "WP-5.4",
+        "rfc": "§15, §15.3 (F1 payload enum AdequacyOutcome: ADEQUATE, INADEQUATE, INCOMPLETE); §31 process/tdd-chronology",
+        "implementation": "aisef2/quality/adequacy.py",
+        "model": {"inputs": "typed facts only: WP-5.1 TestExecution for the story's tests and for the regressions, WP-5.3 "
+                  "Vacuity, WP-5.2 Relevance; process/tdd-chronology recorded verbatim when supplied",
+                  "precedence": ["1 mandatory execution availability: story UNRUNNABLE or regressions UNRUNNABLE => outcome "
+                                 "None, owner the typed ENVIRONMENT the execution carries",
+                                 "2 developer-owned defects (§15.3) => INADEQUATE / DEVELOPER: FAILED, NO_STORY_TESTS_MATCHED, "
+                                 "NOT_COLLECTABLE typed DEVELOPER, VACUOUS, IRRELEVANT of tests that ran, regressions FAILED",
+                                 "3 secondary gaps => INCOMPLETE / nobody / never blocks: INDETERMINATE vacuity, UNMEASURABLE relevance",
+                                 "4 ADEQUATE constructed positively: story tests PASSED, NON_VACUOUS, RELEVANT, regressions PASSED"],
+                  "blocking": "may_block(outcome) states what §15.3 permits (INADEQUATE MAY, INCOMPLETE MUST NOT); no policy "
+                              "object in aisef2 decides adequacy blocking at this commit",
+                  "chronology": "process/tdd-chronology: a read-only copy on the Assembly, read for nothing"},
+        "properties": {
+            **{f"ADEQ_{n}": adeq(n) for n in range(1, 16)},
+            "ADEQ_16": real["test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE"],
+            "ADEQ_17": real["test_ADEQ_17_for_real_a_tests_only_diff_is_INADEQUATE_by_the_frozen_rules"],
+            "ADEQ_for_real_through_WP_5_1_to_5_3": all(real.values()),
+            "UNRUNNABLE_produces_no_AdequacyOutcome": adeq(2) and adeq(3)
+                and shape["test_UNRUNNABLE_story_execution_carries_nothing_measured_and_no_outcome"]
+                and shape["test_UNRUNNABLE_regressions_carry_no_outcome"],
+            "INCOMPLETE_never_blocks_never_charges_the_developer": adeq(7) and adeq(11) and adeq(12)
+                and whole["test_owner_blocking_and_charge_are_read_from_the_typed_facts_only"]
+                and sep["test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any"],
+            "hard_defect_dominates_secondary_gap": adeq(13) and adeq(14),
+            "precedence_total_over_333_well_formed_inputs": whole["test_assembly_is_total_and_follows_the_precedence"],
+            "shape_refuses_every_contradiction": all(shape.values()),
+            "tdd_chronology_recorded_never_consulted": adeq(15),
+            "product_proof_journal_and_budget_unreachable": sep["test_no_path_reaches_a_product_proof_a_journal_or_a_budget"]
+                and not names & {"ProductProofSpec", "ProbeResult", "CandidateProof", "VerifiedProof", "BehaviorVerdict",
+                                 "ContractSatisfaction", "FailureCode", "EventType"},
+            "owner_from_typed_facts_never_from_prose": sep["test_no_prose_is_read_for_control_and_no_side_state_exists"]
+                and whole["test_owner_blocking_and_charge_are_read_from_the_typed_facts_only"],
+            "INTEGRATION_never_converted_to_DEVELOPER": adeq(7) and real["test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner"],
+            "no_failure_code_required": "FailureCode" not in names and "emit" not in names,
+        },
+        "observed_gap": {"regression_selection_not_FAILED": "§15.3 names only FAILED regressions as a defect and no regression "
+                         "gap: PASSED regressions whose selection matched nothing or could not be collected assemble to "
+                         "ADEQUATE by 'otherwise' (recorded on the regressions execution; reported to the owner, not resolved)",
+                         "pinned_by": "Exhaustive.test_regression_selection_values_other_than_FAILED_are_not_in_the_frozen_lists"},
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-5.1": ("closure-evidence/v2/P5-TEST-EXECUTION.json", test_execution, "aisef2/quality/test_execution.py"),
     "WP-5.2": ("closure-evidence/v2/P5-RELEVANCE.json", relevance, "aisef2/quality/relevance.py"),
     "WP-5.3": ("closure-evidence/v2/P5-VACUITY.json", vacuity, "aisef2/quality/vacuity.py"),
+    "WP-5.4": ("closure-evidence/v2/P5-ADEQUACY.json", adequacy, "aisef2/quality/adequacy.py"),
 }
 
 

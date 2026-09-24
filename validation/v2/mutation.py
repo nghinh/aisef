@@ -261,6 +261,11 @@ _VAC_TESTS = ["tests/v2/p5/test_vacuity.py"]
 # WP-5.3: the only vacuity mapping, the deterministic reconstruction, the typed patch, the shape
 P5_TARGETS.update({f"aisef2/quality/vacuity.py::{f}": _VAC_TESTS for f in (
     "evaluate", "neutralise", "_reverse", "file_patches", "VacuityResult.__post_init__", "Hunk.side")})
+_ADQ_TESTS = ["tests/v2/p5/test_adequacy.py"]
+# WP-5.4: the only assembly, its precedence lists, the positive construction, the shape, the owner read from typed facts
+P5_TARGETS.update({f"aisef2/quality/adequacy.py::{f}": _ADQ_TESTS for f in (
+    "assemble", "_defects", "_gaps", "_adequate", "EngineeringTestAdequacy.__post_init__", "Assembly.__post_init__",
+    "Assembly.owner", "Assembly.developer_chargeable", "may_block")})
 # WP52-001: the destructive-site checker's discovery of callables handed over by reference, and the ledger check
 P5_TARGETS.update({f"validation/v2/destructive_authority.py::{f}": ["tests/v2/p0/test_destructive_authority.py"]
                    for f in ("discover", "_references", "_destructive_ref", "_aliases", "_alias", "check")})

@@ -3,6 +3,832 @@
  "tool": "validation/v2/mutation.py",
  "targets": [
   {
+   "target": "aisef2/quality/adequacy.py::Assembly.__post_init__",
+   "kill_tests": [
+    "tests/v2/p5/test_adequacy.py"
+   ],
+   "source_sha256": "b899b3f525b62b85abebad1e62275e4633d125e04fd093dcfbff3601011b3b24",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L147 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L147 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L148 string 'chronology' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/adequacy.py::Assembly.developer_chargeable",
+   "kill_tests": [
+    "tests/v2/p5/test_adequacy.py"
+   ],
+   "source_sha256": "b899b3f525b62b85abebad1e62275e4633d125e04fd093dcfbff3601011b3b24",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L171 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L171 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L171 Owner.DEVELOPER->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L171 Owner.DEVELOPER->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L171 Owner.DEVELOPER->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L171 Owner.DEVELOPER->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L171 Owner.DEVELOPER->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L171 Owner.DEVELOPER->INTEGRATION",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/adequacy.py::Assembly.owner",
+   "kill_tests": [
+    "tests/v2/p5/test_adequacy.py"
+   ],
+   "source_sha256": "b899b3f525b62b85abebad1e62275e4633d125e04fd093dcfbff3601011b3b24",
+   "mutants": 17,
+   "killed": 17,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L158 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L160 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L162 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L158 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L159 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L160 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L161 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L162 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L162 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L162 Owner.DEVELOPER->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L162 Owner.DEVELOPER->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L162 Owner.DEVELOPER->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L162 Owner.DEVELOPER->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L162 Owner.DEVELOPER->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L162 Owner.DEVELOPER->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L162 AdequacyOutcome.INADEQUATE->ADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L162 AdequacyOutcome.INADEQUATE->INCOMPLETE",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/adequacy.py::EngineeringTestAdequacy.__post_init__",
+   "kill_tests": [
+    "tests/v2/p5/test_adequacy.py"
+   ],
+   "source_sha256": "b899b3f525b62b85abebad1e62275e4633d125e04fd093dcfbff3601011b3b24",
+   "mutants": 57,
+   "killed": 57,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L96 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L98 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L100 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L105 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L107 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L110 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L116 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L96 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L98 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L100 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L101 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L105 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L110 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L111 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L116 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L117 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L119 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L96 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L96 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L101 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L105 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L105 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L107 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L107 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L111 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L116 AdequacyOutcome.INADEQUATE->ADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L116 AdequacyOutcome.INADEQUATE->INCOMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L117 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L119 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L120 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L122 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L124 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L97 string 'an adequacy is assembled from typed executions (§15.0)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L99 string 'sensitivity evidence is deferred from cycle 1 (§33): nothing may claim it' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L101 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L101 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L101 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string 'an EXECUTED story execution carries a typed Vacuity and a typed Relevance (§15)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L107 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L108 string \"NON_VACUOUS and VACUOUS are said of story tests that actually ran (§15.1 conditions 2–3; WP-5.3's baseline): tests that did not run have INDETERMINATE vacuity\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 AdequacyOutcome.INCOMPLETE->ADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L119 AdequacyOutcome.INCOMPLETE->INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L122 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L124 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L125 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L102 string 'UNRUNNABLE story execution: no vacuity, no relevance, no AdequacyOutcome — an environment outcome, never a quality result (§15.0 rule 1, §15.3)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string 'UNRUNNABLE regression execution: no AdequacyOutcome — an environment outcome under the same typed rules (§15.0 rule 5, §15.3)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L118 string 'INADEQUATE names a developer-owned defect of §15.3; the typed facts carry none' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L124 AdequacyOutcome.ADEQUATE->INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L124 AdequacyOutcome.ADEQUATE->INCOMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L125 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L121 string 'a developer-owned defect is INADEQUATE; a secondary gap never hides it (§15.3)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L123 string 'INCOMPLETE is exactly an INDETERMINATE vacuity or an UNMEASURABLE relevance (§15.3)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L129 string 'both mandatory executions EXECUTED: the AdequacyOutcome is defined (§15.3)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string \"ADEQUATE is constructed positively: the story's tests passed, NON_VACUOUS, RELEVANT, the regressions passed (§15.3)\" emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/adequacy.py::_adequate",
+   "kill_tests": [
+    "tests/v2/p5/test_adequacy.py"
+   ],
+   "source_sha256": "b899b3f525b62b85abebad1e62275e4633d125e04fd093dcfbff3601011b3b24",
+   "mutants": 12,
+   "killed": 12,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L80 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L80 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L80 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L80 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L80 TestOutcome.PASSED->FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L80 Vacuity.NON_VACUOUS->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L80 Vacuity.NON_VACUOUS->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Relevance.RELEVANT->IRRELEVANT",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Relevance.RELEVANT->UNMEASURABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L81 TestOutcome.PASSED->FAILED",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/adequacy.py::_defects",
+   "kill_tests": [
+    "tests/v2/p5/test_adequacy.py"
+   ],
+   "source_sha256": "b899b3f525b62b85abebad1e62275e4633d125e04fd093dcfbff3601011b3b24",
+   "mutants": 35,
+   "killed": 35,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L52 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L54 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L56 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L58 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L60 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L62 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L64 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L52 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L54 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L56 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L58 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L60 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L62 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L52 TestOutcome.FAILED->PASSED",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L58 Vacuity.VACUOUS->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L58 Vacuity.VACUOUS->INDETERMINATE",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L62 TestOutcome.FAILED->PASSED",
+     "killed": true
+    },
+    {
+     "mutant": "L53 string \"the story's tests executed and failed\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string \"no story test matched the story's declared tests\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.DEVELOPER->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.DEVELOPER->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.DEVELOPER->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.DEVELOPER->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.DEVELOPER->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L56 Owner.DEVELOPER->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string \"the story's tests could not be collected for a cause typed as the developer's\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string \"the story's tests are VACUOUS: they pass without the story's product change\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Relevance.IRRELEVANT->RELEVANT",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Relevance.IRRELEVANT->UNMEASURABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string \"the story's tests are IRRELEVANT: none touches the story's change\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L63 string 'regressions executed and failed' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/adequacy.py::_gaps",
+   "kill_tests": [
+    "tests/v2/p5/test_adequacy.py"
+   ],
+   "source_sha256": "b899b3f525b62b85abebad1e62275e4633d125e04fd093dcfbff3601011b3b24",
+   "mutants": 11,
+   "killed": 11,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L70 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L72 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L74 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Vacuity.INDETERMINATE->NON_VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Vacuity.INDETERMINATE->VACUOUS",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Relevance.UNMEASURABLE->RELEVANT",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Relevance.UNMEASURABLE->IRRELEVANT",
+     "killed": true
+    },
+    {
+     "mutant": "L71 string 'vacuity is INDETERMINATE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L73 string 'relevance is UNMEASURABLE' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/adequacy.py::assemble",
+   "kill_tests": [
+    "tests/v2/p5/test_adequacy.py"
+   ],
+   "source_sha256": "b899b3f525b62b85abebad1e62275e4633d125e04fd093dcfbff3601011b3b24",
+   "mutants": 28,
+   "killed": 28,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L177 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L181 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L186 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L190 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L197 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L177 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L179 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L181 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L183 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L188 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L194 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L192 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L196 AdequacyOutcome.ADEQUATE->INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L196 AdequacyOutcome.ADEQUATE->INCOMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L197 string \"ADEQUATE: the story's tests ran and passed, NON_VACUOUS, RELEVANT, the regressions executed and passed\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L187 AdequacyOutcome.INADEQUATE->ADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L187 AdequacyOutcome.INADEQUATE->INCOMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L191 AdequacyOutcome.INCOMPLETE->ADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L191 AdequacyOutcome.INCOMPLETE->INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L192 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L179 string \"the story's tests could not execute: an environment outcome, no AdequacyOutcome — \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L183 string 'the regressions could not execute: an environment outcome, no AdequacyOutcome — ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L188 string 'INADEQUATE: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L193 string \"; the story's tests were not collected, owner \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L193 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L194 string 'INCOMPLETE (reduced engineering-quality coverage, never blocking, charged to nobody): ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L188 string '; ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L195 string '; ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/quality/adequacy.py::may_block",
+   "kill_tests": [
+    "tests/v2/p5/test_adequacy.py"
+   ],
+   "source_sha256": "b899b3f525b62b85abebad1e62275e4633d125e04fd093dcfbff3601011b3b24",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L135 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L135 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L135 AdequacyOutcome.INADEQUATE->ADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L135 AdequacyOutcome.INADEQUATE->INCOMPLETE",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/quality/relevance.py::ChangedArtefact.__post_init__",
    "kill_tests": [
     "tests/v2/p5/test_relevance.py"
