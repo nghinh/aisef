@@ -5,7 +5,12 @@
     resources MUST come exclusively from an independently established controller view.
 
 Every call under aisef2/, validation/v2/ and tests/v2/ that signals a process, terminates a job or removes a path is
-discovered mechanically (AST, never grep) and must be bound by one row of `destructive_sites.json`. A row is not an
+discovered mechanically (AST, never grep) and must be bound by one row of `destructive_sites.json` — and so is every
+destructive callable handed over *by reference* to a cleanup or callback registration (`addCleanup(shutil.rmtree, d)`,
+`partial(os.kill, pid)`, `stack.callback(...)`, `atexit.register(...)`, `weakref.finalize(...)`), through an alias
+bound in the same scope (`callback = os.kill; register(callback, pid)`) or called through one (`callback(pid)`)
+(WP52-001): the action still happens, so the site does not disappear from the authority model. The registrars are a
+closed taxonomy; a destructive reference handed to any other call, or passed by keyword, fails closed. A row is not an
 allowlist entry: it declares the site's *authority source* — one of a closed set of narrow classes — and the checker
 validates, as far as the source allows statically, that the target is still derived that way (a handle the controller
 created, a pid taken from such a handle, a group the controller created, the authority's own host table, a path the
@@ -40,6 +45,11 @@ SHELL_DESTRUCTIVE = ("kill", "pkill", "killall", "rm", "rmdir", "taskkill")
 SPAWNERS = {"run", "Popen", "call", "check_call", "check_output", "system"}
 #: process/host APIs the taxonomy does not model: their presence fails the check, closed
 UNSUPPORTED_IMPORTS = {"psutil"}
+#: callback registrations the harness models: registrar -> (index of the callable, index of the target it is given)
+REGISTRARS = {"addCleanup": (0, 1), "callback": (0, 1), "partial": (0, 1), "register": (0, 1), "finalize": (1, 2)}
+DESTRUCTIVE_MODULES = ("os", "shutil", "signal")
+#: destructive callables that also exist as methods (Popen.kill, Path.unlink, ...): the receiver is then the target
+METHOD_FORMS = {"kill", "terminate", "send_signal", "unlink", "remove", "rmdir"}
 #: the closed set of authority sources a row may declare (§4: no KNOWN_SAFE, ALLOWLISTED, LEGACY, TRUSTED)
 AUTHORITY_SOURCES = {
     "CONTROLLER_CREATED_HANDLE": "a Popen / job handle the controller itself created, still held",
@@ -113,14 +123,82 @@ def _shell_destructive(call: ast.Call) -> str | None:
     return None
 
 
+def _aliases(tree: ast.Module, parents: dict) -> dict[tuple[int, str], str]:
+    """Every `callback = os.kill` in the module, keyed by (id of the enclosing function, class or module, name):
+    the destructive callable the name stands for in that scope. Computed once per module."""
+    out = {}
+    for n in ast.walk(tree):
+        if not isinstance(n, ast.Assign):
+            continue
+        v = n.value
+        if isinstance(v, ast.Attribute) and v.attr in CALLABLES and isinstance(v.value, ast.Name) \
+                and v.value.id in DESTRUCTIVE_MODULES:
+            func, cls, _ = _enclosing(n, parents)
+            if func is None and cls is not None:
+                continue  # a class-level name: visible neither in its methods nor at module level
+            holder = func if func is not None else tree
+            for t in n.targets:
+                if isinstance(t, ast.Name):
+                    out[(id(holder), t.id)] = ast.unparse(v)
+    return out
+
+
+def _alias(name: str | None, holders: list, aliases: dict) -> str | None:
+    """The destructive callable `name` stands for in the enclosing function, class or module, if any."""
+    for holder in holders:
+        found = aliases.get((id(holder), name))
+        if found:
+            return found
+    return None
+
+
+def _destructive_ref(expr: ast.AST, holders: list, aliases: dict) -> tuple[str, str | None] | None:
+    """A destructive callable passed by reference (not called): `shutil.rmtree` / `os.kill`, a bound method `c.kill`
+    (its receiver is the target), or a name aliased to one in the enclosing scopes. -> (callable text, receiver)."""
+    if isinstance(expr, ast.Attribute) and expr.attr in CALLABLES:
+        if isinstance(expr.value, ast.Name) and expr.value.id in DESTRUCTIVE_MODULES:
+            return ast.unparse(expr), None
+        return ast.unparse(expr), ast.unparse(expr.value)
+    if isinstance(expr, ast.Name):
+        aliased = _alias(expr.id, holders, aliases)
+        if aliased:
+            return f"{expr.id}={aliased}", None
+    return None
+
+
+def _references(node: ast.Call, name: str | None, holders: list, aliases: dict) -> list[tuple[str, str, str]]:
+    """Destructive callables handed to this call by reference -> (callable text, target text, kind); kind is
+    'callback_unmodelled' when the registrar is outside REGISTRARS or the callable travels by keyword (fail closed)."""
+    out = []
+    for i, arg in enumerate(node.args):
+        ref = _destructive_ref(arg, holders, aliases)
+        if ref is None:
+            continue
+        callable_, receiver = ref
+        kind = CALLABLES[callable_.split("=")[-1].split(".")[-1]]
+        if name in REGISTRARS and REGISTRARS[name][0] == i:
+            j = REGISTRARS[name][1]
+            target = receiver or (ast.unparse(node.args[j]) if len(node.args) > j else "")
+            out.append((f"{name}->{callable_}", target, kind))
+        else:
+            out.append((f"{name}->{callable_}", receiver or "", "callback_unmodelled"))
+    for kw in node.keywords:
+        ref = _destructive_ref(kw.value, holders, aliases)
+        if ref is not None:
+            out.append((f"{name}->{kw.arg}={ref[0]}", ref[1] or "", "callback_unmodelled"))
+    return out
+
+
 def discover(root: pathlib.Path = ROOT) -> tuple[list[Site], list[str]]:
-    """Every destructive call site under the scopes, and the problems discovery itself raises (unsupported APIs)."""
+    """Every destructive call site under the scopes — direct calls, calls through an alias, and destructive callables
+    handed over by reference — and the problems discovery itself raises (unsupported APIs)."""
     sites, problems = [], []
     for base in SCOPES:
-        for p in sorted((root / base).rglob("*.py")):
-            rel = str(p.relative_to(root)).replace("\\", "/")
+        for p in (root / base).rglob("*.py"):
+            rel = p.relative_to(root).as_posix()
             tree = ast.parse(p.read_text(encoding="utf-8"), filename=rel)
             parents = _parents(tree)
+            aliases = _aliases(tree, parents)
             for node in ast.walk(tree):
                 if isinstance(node, (ast.Import, ast.ImportFrom)):
                     mods = [a.name for a in node.names] if isinstance(node, ast.Import) else [node.module or ""]
@@ -133,13 +211,20 @@ def discover(root: pathlib.Path = ROOT) -> tuple[list[Site], list[str]]:
                 f = node.func
                 name = f.attr if isinstance(f, ast.Attribute) else f.id if isinstance(f, ast.Name) else None
                 func, cls, scope = _enclosing(node, parents)
+                holders = [h for h in (func, tree) if h is not None]  # a class-level name is not visible in a method
+                for callable_, target, kind in _references(node, name, holders, aliases):
+                    sites.append(Site(rel, scope, callable_, target, node, kind, func, cls, tree, parents))
+                aliased = _alias(name, holders, aliases) if isinstance(f, ast.Name) and name not in CALLABLES else None
+                if aliased:  # `callback(pid)` where `callback = os.kill`: the direct call, through its alias
+                    sites.append(Site(rel, scope, f"{name}={aliased}", ast.unparse(node.args[0]) if node.args else "",
+                                      node, CALLABLES[aliased.split(".")[-1]], func, cls, tree, parents))
+                    continue
                 if name in CALLABLES:
                     kind = CALLABLES[name]
                     if name == "remove" and isinstance(f, ast.Attribute) and isinstance(f.value, ast.Subscript):
                         kind = "collection"  # list.remove on an in-memory value: declared, never a host resource
-                    if isinstance(f, ast.Attribute) and name in ("kill", "terminate", "send_signal", "unlink",
-                                                                 "remove", "rmdir") \
-                            and not (isinstance(f.value, ast.Name) and f.value.id in ("os", "shutil", "signal")):
+                    if isinstance(f, ast.Attribute) and name in METHOD_FORMS \
+                            and not (isinstance(f.value, ast.Name) and f.value.id in DESTRUCTIVE_MODULES):
                         target = ast.unparse(f.value)  # a method: the receiver is the target
                     else:
                         target = ast.unparse(node.args[0]) if node.args else ""
@@ -148,6 +233,8 @@ def discover(root: pathlib.Path = ROOT) -> tuple[list[Site], list[str]]:
                     shell = _shell_destructive(node)
                     if shell:
                         sites.append(Site(rel, scope, "shell:" + shell, "", node, "shell", func, cls, tree, parents))
+    sites.sort(key=lambda s: (s.path, s.node.lineno))  # one order, whatever the file system's or the walk's
+    problems.sort()
     return sites, problems
 
 
@@ -390,6 +477,9 @@ def check(root: pathlib.Path = ROOT) -> list[str]:
         if s.kind == "shell":
             problems.append(f"{s.path}:{s.node.lineno}: a shell-level destructive command ({s.callable}) has no "
                             "statically verifiable authority — fail closed")
+        if s.kind == "callback_unmodelled":
+            problems.append(f"{s.path}:{s.node.lineno}: a destructive callable handed by reference to a registration "
+                            f"the taxonomy does not model ({s.callable}) — its target cannot be derived; fail closed")
         problems += validate(s, row, root, by_key)
     for k, r in by_key.items():
         if k not in seen:

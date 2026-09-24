@@ -158,6 +158,39 @@ class Typed(unittest.TestCase):
         tests_only = StoryDiff((ChangedArtefact("tests/test_calc.py", frozenset({6, 7})),))
         self.assertIs(self.m(rs(lines={T1.id: {"tests/test_calc.py": {6, 7}}}), diff=tests_only).relevance, R.IRRELEVANT)
 
+    def test_REL_DEL_1_a_pure_executable_deletion_is_UNMEASURABLE_not_IRRELEVANT(self):
+        deletion = StoryDiff((ChangedArtefact("app/calc.py", frozenset(), 4),))      # mul and sign removed, nothing added
+        r = self.m(rs(lines={T1.id: {"app/calc.py": {1, 2}}}), diff=deletion)          # the test ran and executed what is left
+        self.assertIs(r.relevance, R.UNMEASURABLE)
+        self.assertIsNot(r.relevance, R.IRRELEVANT)
+        self.assertEqual(r.unmeasured, (("app/calc.py", "4 executable line(s) removed with nothing added: no candidate line "
+                                         "carries the deletion, so the candidate-side line measurement cannot observe it "
+                                         "(\u00a715.2 defines no deletion capability)"),))
+        gone = StoryDiff((ChangedArtefact("app/gone.py", frozenset(), 3),))            # a deleted file
+        r = self.m(rs(lines={T1.id: {"app/calc.py": {1, 2}}}), diff=gone)
+        self.assertEqual((r.relevance, r.unmeasured[0][0]), (R.UNMEASURABLE, "app/gone.py"))
+        self.assertIn("deleted at the candidate", r.unmeasured[0][1])
+        gone_data = StoryDiff((ChangedArtefact("app/gone.json", frozenset(), 1),))     # a deleted non-line-addressable file
+        r = self.m(rs(accessed={T1.id: {"app/data.json"}}), diff=gone_data)
+        self.assertEqual((r.relevance, r.unmeasured[0][0]), (R.UNMEASURABLE, "app/gone.json"))
+        mixed = StoryDiff((ChangedArtefact("app/calc.py", frozenset({5, 6}), 2),))     # a removal hunk and an addition hunk
+        self.assertIs(self.m(rs(lines={T1.id: {"app/calc.py": {5, 6}}}), diff=mixed).relevance, R.RELEVANT)   # the addition intersects
+        self.assertIs(self.m(rs(lines={T1.id: {"app/calc.py": {1, 2}}}), diff=mixed).relevance, R.UNMEASURABLE)  # the removal is unobservable
+
+    def test_REL_DEL_2_and_3_ordinary_modifications_are_measured(self):
+        modification = StoryDiff((ChangedArtefact("app/calc.py", frozenset({6}), 0),))
+        self.assertIs(self.m(rs(lines={T1.id: {"app/calc.py": {1, 2}}}), diff=modification).relevance, R.IRRELEVANT)  # REL-DEL-2
+        self.assertIs(self.m(rs(lines={T1.id: {"app/calc.py": {5, 6}}}), diff=modification).relevance, R.RELEVANT)    # REL-DEL-3
+
+    def test_REL_DEL_4_a_tests_only_diff_is_measured_empty_and_is_not_a_deletion(self):
+        tests_only = StoryDiff((ChangedArtefact("tests/test_calc.py", frozenset({6, 7})),))
+        r = self.m(rs(lines={T1.id: {"tests/test_calc.py": {6, 7}, "app/calc.py": {1, 2}}}), diff=tests_only)
+        self.assertEqual((r.relevance, r.unmeasured, r.intersections), (R.IRRELEVANT, (), ()))  # measurable, empty product change
+        self.assertEqual(r.reason, "1 executed story-owned test(s) measured; none intersects the change")
+        deletion = StoryDiff((ChangedArtefact("app/calc.py", frozenset(), 4),))
+        self.assertIs(self.m(rs(lines={T1.id: {"app/calc.py": {1, 2}}}), diff=deletion).relevance, R.UNMEASURABLE)
+        self.assertIs(self.m(rs(caps=(None, None, None)), diff=tests_only).relevance, R.IRRELEVANT)  # no product artefact needs a capability
+
     def test_one_unmeasurable_artefact_never_hides_behind_the_others(self):
         two = StoryDiff((ChangedArtefact("app/calc.py", frozenset({5, 6})), ChangedArtefact("app/data.json", frozenset({1}))))
         r = self.m(rs(caps=("FULL", "UNAVAILABLE", "FULL"), lines={T1.id: {"app/calc.py": {1, 2}}}), diff=two)
@@ -184,6 +217,10 @@ class Typed(unittest.TestCase):
             ChangedArtefact("/abs/a.py", frozenset({1}))
         with self.assertRaisesRegex(InvariantError, "positive candidate line numbers"):
             ChangedArtefact("a.py", frozenset({0}))
+        with self.assertRaisesRegex(InvariantError, "removed lines are counted"):
+            ChangedArtefact("a.py", frozenset({1}), -1)
+        with self.assertRaisesRegex(InvariantError, "changes something"):
+            ChangedArtefact("a.py", frozenset())
 
     def test_reasons_are_the_measured_facts(self):
         self.assertEqual(self.m(rs(lines={T1.id: {"app/calc.py": {5, 6}}})).reason,
@@ -210,11 +247,16 @@ class Parsing(unittest.TestCase):
                "diff --git a/gone.py b/gone.py\n--- a/gone.py\n+++ /dev/null\n@@ -1 +0,0 @@\n-x = 1\n"
                "diff --git a/new.txt b/new.txt\n--- /dev/null\n+++ b/new.txt\n@@ -0,0 +1,2 @@\n+a\n+b\n")
         d = story_diff(git)
-        self.assertEqual([(a.path, sorted(a.lines)) for a in d.artefacts], [("app/calc.py", [2, 3, 4]), ("new.txt", [1, 2])])
+        self.assertEqual([(a.path, sorted(a.lines), a.removed) for a in d.artefacts],
+                         [("app/calc.py", [2, 3, 4], 0), ("gone.py", [], 1), ("new.txt", [1, 2], 0)])  # a deleted file is an artefact
         self.assertEqual(story_diff(""), StoryDiff(()))
         unordered = patch("x\n", "y\n", "z/last.py") + patch("x\n", "y\n", "a/first.py") + "--- b.txt\n+++ b.txt\n@@ -1 +1 @@\n-x\n+y\n"
         self.assertEqual([a.path for a in story_diff(unordered).artefacts], ["a/first.py", "b.txt", "z/last.py"])  # canonical order
-        self.assertEqual(story_diff(patch("a\nb\n", "b\n", "x.py")), StoryDiff((ChangedArtefact("x.py", frozenset()),)))  # a deletion
+        self.assertEqual(story_diff(patch("a\nb\n", "b\n", "x.py")), StoryDiff((ChangedArtefact("x.py", frozenset(), 1),)))  # a deletion
+        self.assertEqual(story_diff(patch("a\nb\nc\n", "a\nB\nc\n", "m.py")), StoryDiff((ChangedArtefact("m.py", frozenset({2}), 0),)))
+        mixed = patch("a\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\n", "a\nc\nd\ne\nf\ng\nh\ni\nj\nK\nk\n", "m.py")  # a removal hunk and an addition hunk
+        (a,) = story_diff(mixed).artefacts
+        self.assertEqual((sorted(a.lines), a.removed), ([10], 1))
 
     def test_executable_lines_are_the_code_objects_own(self):
         d = project({"m.py": '"""doc"""\nimport os\n\n\ndef f(x):\n    # comment\n    if x:\n        return 1\n    return 2\n'})
@@ -287,6 +329,19 @@ class ForReal(unittest.TestCase):
         rep, b = self.run_({"tests/unit/__init__.py": "", "tests/unit/test_calculator.py": TEST_MUL.replace("class T", "class Calc")}, story=moved)
         self.assertEqual((a.relevance, {(i.path, i.lines) for i in a.intersections}), (b.relevance, {(i.path, i.lines) for i in b.intersections}))
         self.assertNotEqual([i.case_id for i in a.intersections], [i.case_id for i in b.intersections])
+
+    def test_REL_DEL_1_for_real_the_story_deletes_executable_code_and_its_test_verifies_the_deletion(self):
+        deleted = story_diff(patch(CALC_NEW, CALC_OLD, "app/calc.py"))            # parent had mul and sign; the candidate has not
+        (artefact,) = deleted.artefacts
+        self.assertEqual((artefact.lines, artefact.removed), (frozenset(), 10))
+        verifies = ("import unittest\nfrom app import calc\n\n\nclass T(unittest.TestCase):\n    def test_gone(self):\n"
+                    "        self.assertFalse(hasattr(calc, 'mul'))\n        self.assertEqual(calc.add(1, 2), 3)\n")
+        rep, r = self.run_({"app/calc.py": CALC_OLD, "tests/test_calc.py": verifies}, diff=deleted)
+        self.assertEqual(rep.result_set.capabilities[te.LINE_COVERAGE], E.FULL)     # the capability is there and FULL
+        self.assertTrue(rep.result_set.lines["tests.test_calc.T.test_gone"]["app/calc.py"])  # the test executed candidate lines
+        self.assertIs(r.relevance, R.UNMEASURABLE)                                    # yet the deletion has no line to intersect
+        self.assertIsNot(r.relevance, R.IRRELEVANT)
+        self.assertEqual(r.unmeasured[0][0], "app/calc.py")
 
     def test_product_code_run_in_a_thread_is_measured(self):
         threaded = HEAD.replace("import unittest", "import threading, unittest") + (

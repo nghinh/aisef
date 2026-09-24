@@ -153,7 +153,10 @@ def relevance() -> dict:
                   "test_a_test_that_did_not_execute_establishes_nothing",
                   "test_the_developers_own_test_file_is_not_the_product_change",
                   "test_one_unmeasurable_artefact_never_hides_behind_the_others",
-                  "test_the_result_shape_refuses_every_contradiction", "test_nothing_here_reaches_the_product_verdict")
+                  "test_the_result_shape_refuses_every_contradiction", "test_nothing_here_reaches_the_product_verdict",
+                  "test_REL_DEL_1_a_pure_executable_deletion_is_UNMEASURABLE_not_IRRELEVANT",
+                  "test_REL_DEL_2_and_3_ordinary_modifications_are_measured",
+                  "test_REL_DEL_4_a_tests_only_diff_is_measured_empty_and_is_not_a_deletion")
     parse = cases(t, "Parsing", "test_a_unified_diff_becomes_candidate_line_numbers",
                   "test_executable_lines_are_the_code_objects_own")
     real = cases(t, "ForReal", "test_REL_1_for_real", "test_REL_2_for_real",
@@ -161,7 +164,8 @@ def relevance() -> dict:
                  "test_REL_4_for_real_a_test_that_replaces_the_tracer_makes_the_measurement_PARTIAL",
                  "test_REL_5_for_real_branch_evidence_is_recorded_and_the_value_is_the_lines",
                  "test_REL_6_for_real_an_accessed_data_file", "test_REL_7_for_real_no_capability_for_the_data_file",
-                 "test_REL_8_for_real_the_same_tests_in_another_layout", "test_product_code_run_in_a_thread_is_measured")
+                 "test_REL_8_for_real_the_same_tests_in_another_layout", "test_product_code_run_in_a_thread_is_measured",
+                 "test_REL_DEL_1_for_real_the_story_deletes_executable_code_and_its_test_verifies_the_deletion")
     rel = lambda n: typed[f"test_REL_{n}_" + {  # noqa: E731
         1: "an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
         2: "measured_story_tests_with_zero_intersection_are_IRRELEVANT",
@@ -202,7 +206,19 @@ def relevance() -> dict:
                 and parse["test_executable_lines_are_the_code_objects_own"],
             "threads_are_measured": real["test_product_code_run_in_a_thread_is_measured"],
             "no_product_verdict_reached": typed["test_nothing_here_reaches_the_product_verdict"],
+            "REL_DEL_1_pure_deletion_UNMEASURABLE_never_IRRELEVANT_typed_and_real":
+                typed["test_REL_DEL_1_a_pure_executable_deletion_is_UNMEASURABLE_not_IRRELEVANT"]
+                and real["test_REL_DEL_1_for_real_the_story_deletes_executable_code_and_its_test_verifies_the_deletion"],
+            "REL_DEL_2_3_ordinary_modifications_IRRELEVANT_or_RELEVANT": typed["test_REL_DEL_2_and_3_ordinary_modifications_are_measured"],
+            "REL_DEL_4_tests_only_diff_IRRELEVANT_by_a_possible_measurement_and_distinct_from_deletion":
+                typed["test_REL_DEL_4_a_tests_only_diff_is_measured_empty_and_is_not_a_deletion"],
         },
+        "deletion_rationale": "WP52-002: a removal-only hunk or a deleted file leaves no candidate line or file for the "
+                              "cycle-1 candidate-side measurement to observe and §15.2 defines no deletion-specific "
+                              "capability, so a pure deletion is UNMEASURABLE (measurement inability), never "
+                              "IRRELEVANT; a tests-only diff has an empty product change set that the required "
+                              "measurement fully covers and proves empty, so it is IRRELEVANT by the frozen "
+                              "definition, and it is not a deletion",
     }
 
 

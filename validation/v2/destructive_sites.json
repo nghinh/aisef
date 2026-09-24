@@ -2,7 +2,7 @@
  "record": "AISEF V2 — DESTRUCTIVE-CALL-SITE LEDGER (INV-MUTATION-AUTHORITY)",
  "authority": "owner authorization 'AISEF V2 — POST-SEAL HYGIENE / INV-MUTATION-AUTHORITY ENFORCEMENT' (2026-09-24) §4",
  "checker": "validation/v2/destructive_authority.py",
- "rule": "every destructive call site under aisef2/, validation/v2/ and tests/v2/ has exactly one row; a row declares the authority source the target is derived from, and the checker validates that derivation — the ledger is not an allowlist",
+ "rule": "every destructive call site under aisef2/, validation/v2/ and tests/v2/ has exactly one row; a row declares the authority source the target is derived from, and the checker validates that derivation — the ledger is not an allowlist; a destructive callable handed by reference to a cleanup/callback registration (addCleanup, ExitStack.callback, partial, register, finalize) is a site like a call is (WP52-001)",
  "authority_sources": [
   "CONTROLLER_CREATED_HANDLE",
   "CONTROLLER_CREATED_PID",
@@ -299,6 +299,86 @@
    "authority_source": "TEST_CREATED_PATH",
    "justification": "the probe file this test writes under closure-evidence/v2 and removes again",
    "enforcement": "static: the function writes probe before unlinking it"
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "Shape.test_project_top_level_names_packages_and_modules_at_the_root_and_under_src",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree this test makes for project_top_level; removed by the cleanup it registers",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "RealRunner.run_",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project(files): the candidate tree run_ makes for one real run; removed by the cleanup it registers",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "empty",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "empty = project({}): an empty tree whose non-existent interpreter path stands for an absent interpreter",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "PytestAdapter.test_the_junit_result_set_is_read_typed",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = tempfile.mkdtemp(): the directory holding the junit fixture file the test writes",
+   "enforcement": "static: bound from tempfile.mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "PytestAdapter.test_pytest_for_real",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree pytest runs at",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_relevance.py",
+   "scope": "Typed.setUp",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "self.d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "self.d = project({}): the candidate tree every typed relevance case measures against",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_relevance.py",
+   "scope": "Parsing.test_executable_lines_are_the_code_objects_own",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the tree whose executable lines are analysed",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_relevance.py",
+   "scope": "ForReal.run_",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project(files): the candidate tree run_ makes for one real measured run",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
   }
  ]
 }

@@ -257,6 +257,9 @@ P5_TARGETS: dict[str, list[str]] = {
         "ChangedArtefact.__post_init__")},
 }
 P5_TARGETS["aisef2/quality/test_execution.py::_read_unittest"] = _EXEC_TESTS + _REL_TESTS  # it reads the measurement too
+# WP52-001: the destructive-site checker's discovery of callables handed over by reference, and the ledger check
+P5_TARGETS.update({f"validation/v2/destructive_authority.py::{f}": ["tests/v2/p0/test_destructive_authority.py"]
+                   for f in ("discover", "_references", "_destructive_ref", "_aliases", "_alias", "check")})
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.

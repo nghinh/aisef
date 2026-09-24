@@ -26,6 +26,10 @@
   "developer_test_files_are_not_the_product_change": true,
   "story_diff_and_executable_lines_are_typed": true,
   "threads_are_measured": true,
-  "no_product_verdict_reached": true
- }
+  "no_product_verdict_reached": true,
+  "REL_DEL_1_pure_deletion_UNMEASURABLE_never_IRRELEVANT_typed_and_real": true,
+  "REL_DEL_2_3_ordinary_modifications_IRRELEVANT_or_RELEVANT": true,
+  "REL_DEL_4_tests_only_diff_IRRELEVANT_by_a_possible_measurement_and_distinct_from_deletion": true
+ },
+ "deletion_rationale": "WP52-002: a removal-only hunk or a deleted file leaves no candidate line or file for the cycle-1 candidate-side measurement to observe and §15.2 defines no deletion-specific capability, so a pure deletion is UNMEASURABLE (measurement inability), never IRRELEVANT; a tests-only diff has an empty product change set that the required measurement fully covers and proves empty, so it is IRRELEVANT by the frozen definition, and it is not a deletion"
 }
