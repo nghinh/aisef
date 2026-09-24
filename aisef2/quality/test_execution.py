@@ -35,7 +35,7 @@ import subprocess
 import sys
 import tempfile
 import threading
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Callable, Mapping, Sequence
 from xml.etree import ElementTree
@@ -124,10 +124,12 @@ class ResultSet:
     collection_errors: tuple[CollectionError, ...]
     #: What the runner measured while each case ran, under the capability level it declares for each measurement
     #: (RFC §24: FULL, PARTIAL or UNAVAILABLE — never a silent degradation). WP-5.1 reads none of these; WP-5.2 does.
-    capabilities: Mapping[str, Enforcement] = _NOTHING      # measurement name -> declared level
-    lines: Mapping[str, Mapping[str, frozenset[int]]] = _NOTHING   # case id -> candidate path -> executed lines
-    accessed: Mapping[str, frozenset[str]] = _NOTHING       # case id -> candidate paths the case opened
-    arcs: Mapping[str, Mapping[str, frozenset[tuple[int, int]]]] = _NOTHING  # case id -> path -> (from, to) lines
+    # (factories, not defaults: Python 3.11's dataclasses reject a mappingproxy default as mutable — it is hashable
+    # only from 3.12 — which failed the 3.11 CI jobs of bf1f633 at import)
+    capabilities: Mapping[str, Enforcement] = field(default_factory=lambda: _NOTHING)  # measurement name -> level
+    lines: Mapping[str, Mapping[str, frozenset[int]]] = field(default_factory=lambda: _NOTHING)  # case -> path -> lines
+    accessed: Mapping[str, frozenset[str]] = field(default_factory=lambda: _NOTHING)  # case -> paths the case opened
+    arcs: Mapping[str, Mapping[str, frozenset[tuple[int, int]]]] = field(default_factory=lambda: _NOTHING)  # case -> path -> (from, to)
 
 
 @dataclass(frozen=True)

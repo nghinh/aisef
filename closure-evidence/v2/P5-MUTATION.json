@@ -663,7 +663,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
@@ -693,7 +693,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 10,
    "killed": 10,
    "survivors": [],
@@ -747,7 +747,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 13,
    "killed": 13,
    "survivors": [],
@@ -813,7 +813,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
@@ -843,7 +843,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 57,
    "killed": 57,
    "survivors": [],
@@ -851,31 +851,27 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L156 condition negated",
-     "killed": true
-    },
-    {
      "mutant": "L158 condition negated",
      "killed": true
     },
     {
-     "mutant": "L167 condition negated",
+     "mutant": "L160 condition negated",
      "killed": true
     },
     {
-     "mutant": "L170 condition negated",
+     "mutant": "L169 condition negated",
      "killed": true
     },
     {
-     "mutant": "L156 not removed",
+     "mutant": "L172 condition negated",
      "killed": true
     },
     {
-     "mutant": "L158 Is->IsNot",
+     "mutant": "L158 not removed",
      "killed": true
     },
     {
-     "mutant": "L159 condition negated",
+     "mutant": "L160 Is->IsNot",
      "killed": true
     },
     {
@@ -883,31 +879,71 @@
      "killed": true
     },
     {
-     "mutant": "L164 condition negated",
+     "mutant": "L163 condition negated",
      "killed": true
     },
     {
-     "mutant": "L167 Or swapped",
+     "mutant": "L166 condition negated",
      "killed": true
     },
     {
-     "mutant": "L170 Is->IsNot",
+     "mutant": "L169 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L171 condition negated",
+     "mutant": "L172 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L174 condition negated",
+     "mutant": "L173 condition negated",
      "killed": true
     },
     {
-     "mutant": "L158 TestExecutionStatus.UNRUNNABLE->EXECUTED",
+     "mutant": "L176 condition negated",
      "killed": true
     },
     {
-     "mutant": "L159 Or swapped",
+     "mutant": "L160 TestExecutionStatus.UNRUNNABLE->EXECUTED",
+     "killed": true
+    },
+    {
+     "mutant": "L161 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L163 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L166 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L169 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L169 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L172 TestSelection.STORY_TESTS_NOT_COLLECTABLE->STORY_TESTS_RAN",
+     "killed": true
+    },
+    {
+     "mutant": "L172 TestSelection.STORY_TESTS_NOT_COLLECTABLE->NO_STORY_TESTS_MATCHED",
+     "killed": true
+    },
+    {
+     "mutant": "L173 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L176 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L159 string 'a test execution has a typed status' emptied",
      "killed": true
     },
     {
@@ -915,167 +951,131 @@
      "killed": true
     },
     {
-     "mutant": "L164 not removed",
+     "mutant": "L161 IsNot->Is",
      "killed": true
     },
     {
-     "mutant": "L167 not removed",
+     "mutant": "L163 Owner.ENVIRONMENT->PLAN",
      "killed": true
     },
     {
-     "mutant": "L167 not removed",
+     "mutant": "L163 Owner.ENVIRONMENT->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L170 TestSelection.STORY_TESTS_NOT_COLLECTABLE->STORY_TESTS_RAN",
+     "mutant": "L163 Owner.ENVIRONMENT->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L170 TestSelection.STORY_TESTS_NOT_COLLECTABLE->NO_STORY_TESTS_MATCHED",
+     "mutant": "L163 Owner.ENVIRONMENT->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L171 NotIn->In",
+     "mutant": "L163 Owner.ENVIRONMENT->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L174 IsNot->Is",
+     "mutant": "L163 Owner.ENVIRONMENT->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L157 string 'a test execution has a typed status' emptied",
+     "mutant": "L170 string 'EXECUTED carries a typed outcome and a typed selection (§15.0)' emptied",
      "killed": true
     },
     {
-     "mutant": "L159 IsNot->Is",
+     "mutant": "L173 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L159 IsNot->Is",
+     "mutant": "L173 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L161 Owner.ENVIRONMENT->PLAN",
+     "mutant": "L162 string 'UNRUNNABLE: outcome and selection are defined only when EXECUTED (§15.0)' emptied",
      "killed": true
     },
     {
-     "mutant": "L161 Owner.ENVIRONMENT->DEVELOPER",
+     "mutant": "L164 string 'UNRUNNABLE is owner ENVIRONMENT and nothing else — never DEVELOPER (§15.0 rule 1, INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)' emptied",
      "killed": true
     },
     {
-     "mutant": "L161 Owner.ENVIRONMENT->PROVIDER",
+     "mutant": "L167 string 'UNRUNNABLE says why' emptied",
      "killed": true
     },
     {
-     "mutant": "L161 Owner.ENVIRONMENT->REVIEW",
+     "mutant": "L173 Owner.DEVELOPER->PLAN",
      "killed": true
     },
     {
-     "mutant": "L161 Owner.ENVIRONMENT->SECURITY",
+     "mutant": "L173 Owner.DEVELOPER->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L161 Owner.ENVIRONMENT->INTEGRATION",
+     "mutant": "L173 Owner.DEVELOPER->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L168 string 'EXECUTED carries a typed outcome and a typed selection (§15.0)' emptied",
+     "mutant": "L173 Owner.DEVELOPER->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L171 element 0 dropped",
+     "mutant": "L173 Owner.DEVELOPER->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L171 element 1 dropped",
+     "mutant": "L173 Owner.DEVELOPER->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L160 string 'UNRUNNABLE: outcome and selection are defined only when EXECUTED (§15.0)' emptied",
+     "mutant": "L173 Owner.INTEGRATION->PLAN",
      "killed": true
     },
     {
-     "mutant": "L162 string 'UNRUNNABLE is owner ENVIRONMENT and nothing else — never DEVELOPER (§15.0 rule 1, INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)' emptied",
+     "mutant": "L173 Owner.INTEGRATION->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L165 string 'UNRUNNABLE says why' emptied",
+     "mutant": "L173 Owner.INTEGRATION->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.DEVELOPER->PLAN",
+     "mutant": "L173 Owner.INTEGRATION->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.DEVELOPER->ENVIRONMENT",
+     "mutant": "L173 Owner.INTEGRATION->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.DEVELOPER->PROVIDER",
+     "mutant": "L173 Owner.INTEGRATION->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.DEVELOPER->REVIEW",
+     "mutant": "L174 string 'STORY_TESTS_NOT_COLLECTABLE is owned by DEVELOPER (project source) or INTEGRATION (undeterminable); the environment-dependency shape is UNRUNNABLE (§15.0 rule 4)' emptied",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.DEVELOPER->SECURITY",
+     "mutant": "L177 string ' + ' emptied",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.DEVELOPER->INTEGRATION",
+     "mutant": "L177 string ' is owned by ' emptied",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.INTEGRATION->PLAN",
+     "mutant": "L178 string ', not ' emptied",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.INTEGRATION->DEVELOPER",
+     "mutant": "L178 string ' (§15.0)' emptied",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.INTEGRATION->ENVIRONMENT",
+     "mutant": "L178 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L171 Owner.INTEGRATION->PROVIDER",
-     "killed": true
-    },
-    {
-     "mutant": "L171 Owner.INTEGRATION->REVIEW",
-     "killed": true
-    },
-    {
-     "mutant": "L171 Owner.INTEGRATION->SECURITY",
-     "killed": true
-    },
-    {
-     "mutant": "L172 string 'STORY_TESTS_NOT_COLLECTABLE is owned by DEVELOPER (project source) or INTEGRATION (undeterminable); the environment-dependency shape is UNRUNNABLE (§15.0 rule 4)' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L175 string ' + ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L175 string ' is owned by ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L176 string ', not ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L176 string ' (§15.0)' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L176 conditional negated",
-     "killed": true
-    },
-    {
-     "mutant": "L176 string 'nobody' emptied",
+     "mutant": "L178 string 'nobody' emptied",
      "killed": true
     }
    ]
@@ -1085,7 +1085,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 74,
    "killed": 74,
    "survivors": [],
@@ -1093,23 +1093,15 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L231 condition negated",
-     "killed": true
-    },
-    {
      "mutant": "L233 condition negated",
      "killed": true
     },
     {
-     "mutant": "L242 returns None",
+     "mutant": "L235 condition negated",
      "killed": true
     },
     {
-     "mutant": "L231 Eq->NotEq",
-     "killed": true
-    },
-    {
-     "mutant": "L232 returns None",
+     "mutant": "L244 returns None",
      "killed": true
     },
     {
@@ -1117,7 +1109,11 @@
      "killed": true
     },
     {
-     "mutant": "L236 condition negated",
+     "mutant": "L234 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L235 Eq->NotEq",
      "killed": true
     },
     {
@@ -1125,47 +1121,43 @@
      "killed": true
     },
     {
-     "mutant": "L240 returns None",
+     "mutant": "L240 condition negated",
      "killed": true
     },
     {
-     "mutant": "L242 element 0 dropped",
+     "mutant": "L242 returns None",
      "killed": true
     },
     {
-     "mutant": "L242 element 1 dropped",
+     "mutant": "L244 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L232 element 0 dropped",
+     "mutant": "L244 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L232 element 1 dropped",
+     "mutant": "L234 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L235 element 0 dropped",
+     "mutant": "L234 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L235 element 1 dropped",
+     "mutant": "L237 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L235 element 0 dropped",
+     "mutant": "L237 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L235 element 1 dropped",
+     "mutant": "L237 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L236 And swapped",
-     "killed": true
-    },
-    {
-     "mutant": "L237 returns None",
+     "mutant": "L237 element 1 dropped",
      "killed": true
     },
     {
@@ -1177,11 +1169,107 @@
      "killed": true
     },
     {
-     "mutant": "L240 element 0 dropped",
+     "mutant": "L240 And swapped",
      "killed": true
     },
     {
-     "mutant": "L240 element 1 dropped",
+     "mutant": "L241 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L242 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L242 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L244 Owner.INTEGRATION->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L244 Owner.INTEGRATION->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L244 Owner.INTEGRATION->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L244 Owner.INTEGRATION->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L244 Owner.INTEGRATION->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L244 Owner.INTEGRATION->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L244 string 'the cause of the collection failure could not be determined' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L234 Owner.DEVELOPER->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L234 Owner.DEVELOPER->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L234 Owner.DEVELOPER->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L234 Owner.DEVELOPER->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L234 Owner.DEVELOPER->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L234 Owner.DEVELOPER->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L234 string \"a syntax error in the developer's own test file\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L237 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L237 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L238 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L239 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L239 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L240 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L241 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L241 element 1 dropped",
      "killed": true
     },
     {
@@ -1209,163 +1297,67 @@
      "killed": true
     },
     {
-     "mutant": "L242 string 'the cause of the collection failure could not be determined' emptied",
+     "mutant": "L236 string '.' emptied",
      "killed": true
     },
     {
-     "mutant": "L232 Owner.DEVELOPER->PLAN",
+     "mutant": "L239 Owner.ENVIRONMENT->PLAN",
      "killed": true
     },
     {
-     "mutant": "L232 Owner.DEVELOPER->ENVIRONMENT",
+     "mutant": "L239 Owner.ENVIRONMENT->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L232 Owner.DEVELOPER->PROVIDER",
+     "mutant": "L239 Owner.ENVIRONMENT->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L232 Owner.DEVELOPER->REVIEW",
+     "mutant": "L239 Owner.ENVIRONMENT->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L232 Owner.DEVELOPER->SECURITY",
+     "mutant": "L239 Owner.ENVIRONMENT->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L232 Owner.DEVELOPER->INTEGRATION",
+     "mutant": "L239 Owner.ENVIRONMENT->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L232 string \"a syntax error in the developer's own test file\" emptied",
+     "mutant": "L241 Owner.DEVELOPER->PLAN",
      "killed": true
     },
     {
-     "mutant": "L235 In->NotIn",
+     "mutant": "L241 Owner.DEVELOPER->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L235 In->NotIn",
+     "mutant": "L241 Owner.DEVELOPER->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L236 not removed",
+     "mutant": "L241 Owner.DEVELOPER->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L237 element 0 dropped",
+     "mutant": "L241 Owner.DEVELOPER->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L237 element 1 dropped",
+     "mutant": "L241 Owner.DEVELOPER->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L238 not removed",
+     "mutant": "L242 string 'import of ' emptied",
      "killed": true
     },
     {
-     "mutant": "L239 element 0 dropped",
+     "mutant": "L242 string ' failed: ' emptied",
      "killed": true
     },
     {
-     "mutant": "L239 element 1 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L240 Owner.INTEGRATION->PLAN",
-     "killed": true
-    },
-    {
-     "mutant": "L240 Owner.INTEGRATION->DEVELOPER",
-     "killed": true
-    },
-    {
-     "mutant": "L240 Owner.INTEGRATION->ENVIRONMENT",
-     "killed": true
-    },
-    {
-     "mutant": "L240 Owner.INTEGRATION->PROVIDER",
-     "killed": true
-    },
-    {
-     "mutant": "L240 Owner.INTEGRATION->REVIEW",
-     "killed": true
-    },
-    {
-     "mutant": "L240 Owner.INTEGRATION->SECURITY",
-     "killed": true
-    },
-    {
-     "mutant": "L234 string '.' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L237 Owner.ENVIRONMENT->PLAN",
-     "killed": true
-    },
-    {
-     "mutant": "L237 Owner.ENVIRONMENT->DEVELOPER",
-     "killed": true
-    },
-    {
-     "mutant": "L237 Owner.ENVIRONMENT->PROVIDER",
-     "killed": true
-    },
-    {
-     "mutant": "L237 Owner.ENVIRONMENT->REVIEW",
-     "killed": true
-    },
-    {
-     "mutant": "L237 Owner.ENVIRONMENT->SECURITY",
-     "killed": true
-    },
-    {
-     "mutant": "L237 Owner.ENVIRONMENT->INTEGRATION",
-     "killed": true
-    },
-    {
-     "mutant": "L239 Owner.DEVELOPER->PLAN",
-     "killed": true
-    },
-    {
-     "mutant": "L239 Owner.DEVELOPER->ENVIRONMENT",
-     "killed": true
-    },
-    {
-     "mutant": "L239 Owner.DEVELOPER->PROVIDER",
-     "killed": true
-    },
-    {
-     "mutant": "L239 Owner.DEVELOPER->REVIEW",
-     "killed": true
-    },
-    {
-     "mutant": "L239 Owner.DEVELOPER->SECURITY",
-     "killed": true
-    },
-    {
-     "mutant": "L239 Owner.DEVELOPER->INTEGRATION",
-     "killed": true
-    },
-    {
-     "mutant": "L240 string 'import of ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L240 string ' failed: ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L240 string \" a declared environment dependency and the project's own tree — cause undeterminable\" emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L237 string 'import of ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L237 string ' failed: a declared environment dependency' emptied",
+     "mutant": "L242 string \" a declared environment dependency and the project's own tree — cause undeterminable\" emptied",
      "killed": true
     },
     {
@@ -1373,19 +1365,27 @@
      "killed": true
     },
     {
-     "mutant": "L239 string \" failed: the project's own source tree\" emptied",
+     "mutant": "L239 string ' failed: a declared environment dependency' emptied",
      "killed": true
     },
     {
-     "mutant": "L240 conditional negated",
+     "mutant": "L241 string 'import of ' emptied",
      "killed": true
     },
     {
-     "mutant": "L240 string 'both' emptied",
+     "mutant": "L241 string \" failed: the project's own source tree\" emptied",
      "killed": true
     },
     {
-     "mutant": "L240 string 'neither' emptied",
+     "mutant": "L242 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L242 string 'both' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L242 string 'neither' emptied",
      "killed": true
     }
    ]
@@ -1395,7 +1395,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 5,
    "killed": 5,
    "survivors": [],
@@ -1429,7 +1429,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 25,
    "killed": 25,
    "survivors": [],
@@ -1437,19 +1437,11 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L180 condition negated",
-     "killed": true
-    },
-    {
      "mutant": "L182 condition negated",
      "killed": true
     },
     {
-     "mutant": "L180 Is->IsNot",
-     "killed": true
-    },
-    {
-     "mutant": "L181 returns None",
+     "mutant": "L184 condition negated",
      "killed": true
     },
     {
@@ -1461,51 +1453,19 @@
      "killed": true
     },
     {
-     "mutant": "L180 TestSelection.NO_STORY_TESTS_MATCHED->STORY_TESTS_RAN",
+     "mutant": "L184 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L180 TestSelection.NO_STORY_TESTS_MATCHED->STORY_TESTS_NOT_COLLECTABLE",
+     "mutant": "L185 returns None",
      "killed": true
     },
     {
-     "mutant": "L181 Owner.DEVELOPER->PLAN",
+     "mutant": "L182 TestSelection.NO_STORY_TESTS_MATCHED->STORY_TESTS_RAN",
      "killed": true
     },
     {
-     "mutant": "L181 Owner.DEVELOPER->ENVIRONMENT",
-     "killed": true
-    },
-    {
-     "mutant": "L181 Owner.DEVELOPER->PROVIDER",
-     "killed": true
-    },
-    {
-     "mutant": "L181 Owner.DEVELOPER->REVIEW",
-     "killed": true
-    },
-    {
-     "mutant": "L181 Owner.DEVELOPER->SECURITY",
-     "killed": true
-    },
-    {
-     "mutant": "L181 Owner.DEVELOPER->INTEGRATION",
-     "killed": true
-    },
-    {
-     "mutant": "L182 TestSelection.STORY_TESTS_RAN->NO_STORY_TESTS_MATCHED",
-     "killed": true
-    },
-    {
-     "mutant": "L182 TestSelection.STORY_TESTS_RAN->STORY_TESTS_NOT_COLLECTABLE",
-     "killed": true
-    },
-    {
-     "mutant": "L183 conditional negated",
-     "killed": true
-    },
-    {
-     "mutant": "L183 Is->IsNot",
+     "mutant": "L182 TestSelection.NO_STORY_TESTS_MATCHED->STORY_TESTS_NOT_COLLECTABLE",
      "killed": true
     },
     {
@@ -1533,7 +1493,47 @@
      "killed": true
     },
     {
-     "mutant": "L183 TestOutcome.FAILED->PASSED",
+     "mutant": "L184 TestSelection.STORY_TESTS_RAN->NO_STORY_TESTS_MATCHED",
+     "killed": true
+    },
+    {
+     "mutant": "L184 TestSelection.STORY_TESTS_RAN->STORY_TESTS_NOT_COLLECTABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L185 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L185 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L185 Owner.DEVELOPER->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L185 Owner.DEVELOPER->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L185 Owner.DEVELOPER->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L185 Owner.DEVELOPER->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L185 Owner.DEVELOPER->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L185 Owner.DEVELOPER->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L185 TestOutcome.FAILED->PASSED",
      "killed": true
     }
    ]
@@ -1543,7 +1543,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 42,
    "killed": 42,
    "survivors": [],
@@ -1551,71 +1551,35 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L425 returns None",
+     "mutant": "L427 returns None",
      "killed": true
     },
     {
-     "mutant": "L407 element 0 dropped",
+     "mutant": "L409 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L407 element 1 dropped",
+     "mutant": "L409 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L407 element 0 dropped",
+     "mutant": "L409 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L407 element 1 dropped",
+     "mutant": "L409 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L412 condition negated",
+     "mutant": "L414 condition negated",
      "killed": true
     },
     {
-     "mutant": "L408 string 'testcase' emptied",
+     "mutant": "L410 string 'testcase' emptied",
      "killed": true
     },
     {
-     "mutant": "L412 And swapped",
-     "killed": true
-    },
-    {
-     "mutant": "L415 condition negated",
-     "killed": true
-    },
-    {
-     "mutant": "L422 conditional negated",
-     "killed": true
-    },
-    {
-     "mutant": "L425 tuple() -> list()",
-     "killed": true
-    },
-    {
-     "mutant": "L425 tuple() -> list()",
-     "killed": true
-    },
-    {
-     "mutant": "L409 string '/' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L410 string 'name' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L411 string 'error' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L412 IsNot->Is",
-     "killed": true
-    },
-    {
-     "mutant": "L412 In->NotIn",
+     "mutant": "L414 And swapped",
      "killed": true
     },
     {
@@ -1623,99 +1587,135 @@
      "killed": true
     },
     {
-     "mutant": "L422 IsNot->Is",
+     "mutant": "L424 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L422 string 'error' emptied",
+     "mutant": "L427 tuple() -> list()",
      "killed": true
     },
     {
-     "mutant": "L422 conditional negated",
+     "mutant": "L427 tuple() -> list()",
      "killed": true
     },
     {
-     "mutant": "L412 string 'collection failure' emptied",
+     "mutant": "L411 string '/' emptied",
      "killed": true
     },
     {
-     "mutant": "L417 Or swapped",
+     "mutant": "L412 string 'name' emptied",
      "killed": true
     },
     {
-     "mutant": "L422 IsNot->Is",
+     "mutant": "L413 string 'error' emptied",
      "killed": true
     },
     {
-     "mutant": "L422 string 'failed' emptied",
+     "mutant": "L414 IsNot->Is",
      "killed": true
     },
     {
-     "mutant": "L423 conditional negated",
+     "mutant": "L414 In->NotIn",
      "killed": true
     },
     {
-     "mutant": "L409 string 'file' emptied",
+     "mutant": "L419 condition negated",
      "killed": true
     },
     {
-     "mutant": "L412 string 'message' emptied",
+     "mutant": "L424 IsNot->Is",
      "killed": true
     },
     {
-     "mutant": "L413 string 'unicode' emptied",
+     "mutant": "L424 string 'error' emptied",
      "killed": true
     },
     {
-     "mutant": "L413 string 'text' emptied",
+     "mutant": "L424 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L417 In->NotIn",
+     "mutant": "L414 string 'collection failure' emptied",
      "killed": true
     },
     {
-     "mutant": "L417 In->NotIn",
+     "mutant": "L419 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L423 IsNot->Is",
+     "mutant": "L424 IsNot->Is",
      "killed": true
     },
     {
-     "mutant": "L423 string 'skipped' emptied",
+     "mutant": "L424 string 'failed' emptied",
      "killed": true
     },
     {
-     "mutant": "L423 string 'passed' emptied",
+     "mutant": "L425 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L424 string '::' emptied",
+     "mutant": "L411 string 'file' emptied",
      "killed": true
     },
     {
-     "mutant": "L424 string '::' emptied",
+     "mutant": "L414 string 'message' emptied",
      "killed": true
     },
     {
-     "mutant": "L417 string 'SyntaxError' emptied",
+     "mutant": "L415 string 'unicode' emptied",
      "killed": true
     },
     {
-     "mutant": "L417 string 'IndentationError' emptied",
+     "mutant": "L415 string 'text' emptied",
      "killed": true
     },
     {
-     "mutant": "L422 string 'failure' emptied",
+     "mutant": "L419 In->NotIn",
      "killed": true
     },
     {
-     "mutant": "L423 string 'skipped' emptied",
+     "mutant": "L419 In->NotIn",
      "killed": true
     },
     {
-     "mutant": "L424 string 'classname' emptied",
+     "mutant": "L425 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L425 string 'skipped' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L425 string 'passed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L426 string '::' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L426 string '::' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L419 string 'SyntaxError' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L419 string 'IndentationError' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L424 string 'failure' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L425 string 'skipped' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L426 string 'classname' emptied",
      "killed": true
     }
    ]
@@ -1726,7 +1726,7 @@
     "tests/v2/p5/test_test_execution.py",
     "tests/v2/p5/test_relevance.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 29,
    "killed": 29,
    "survivors": [],
@@ -1734,27 +1734,19 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L388 returns None",
+     "mutant": "L390 returns None",
      "killed": true
     },
     {
-     "mutant": "L388 tuple() -> list()",
+     "mutant": "L390 tuple() -> list()",
      "killed": true
     },
     {
-     "mutant": "L389 tuple() -> list()",
+     "mutant": "L391 tuple() -> list()",
      "killed": true
     },
     {
-     "mutant": "L387 string 'utf-8' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L391 element 0 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L391 element 1 dropped",
+     "mutant": "L389 string 'utf-8' emptied",
      "killed": true
     },
     {
@@ -1766,11 +1758,11 @@
      "killed": true
     },
     {
-     "mutant": "L394 element 0 dropped",
+     "mutant": "L395 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L394 element 1 dropped",
+     "mutant": "L395 element 1 dropped",
      "killed": true
     },
     {
@@ -1782,71 +1774,79 @@
      "killed": true
     },
     {
-     "mutant": "L388 string 'id' emptied",
+     "mutant": "L398 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L388 string 'path' emptied",
+     "mutant": "L398 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L388 string 'outcome' emptied",
+     "mutant": "L390 string 'id' emptied",
      "killed": true
     },
     {
-     "mutant": "L388 string 'cases' emptied",
+     "mutant": "L390 string 'path' emptied",
      "killed": true
     },
     {
-     "mutant": "L389 string 'path' emptied",
+     "mutant": "L390 string 'outcome' emptied",
      "killed": true
     },
     {
-     "mutant": "L389 string 'kind' emptied",
+     "mutant": "L390 string 'cases' emptied",
      "killed": true
     },
     {
-     "mutant": "L389 string 'module' emptied",
+     "mutant": "L391 string 'path' emptied",
      "killed": true
     },
     {
-     "mutant": "L389 string 'detail' emptied",
+     "mutant": "L391 string 'kind' emptied",
      "killed": true
     },
     {
-     "mutant": "L390 string 'collection_errors' emptied",
+     "mutant": "L391 string 'module' emptied",
      "killed": true
     },
     {
-     "mutant": "L392 element 0 dropped",
+     "mutant": "L391 string 'detail' emptied",
      "killed": true
     },
     {
-     "mutant": "L392 element 1 dropped",
+     "mutant": "L392 string 'collection_errors' emptied",
      "killed": true
     },
     {
-     "mutant": "L395 element 0 dropped",
+     "mutant": "L394 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L395 element 1 dropped",
+     "mutant": "L394 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L391 string 'capabilities' emptied",
+     "mutant": "L397 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L393 string 'lines' emptied",
+     "mutant": "L397 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L394 string 'accessed' emptied",
+     "mutant": "L393 string 'capabilities' emptied",
      "killed": true
     },
     {
-     "mutant": "L396 string 'arcs' emptied",
+     "mutant": "L395 string 'lines' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L396 string 'accessed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L398 string 'arcs' emptied",
      "killed": true
     }
    ]
@@ -1856,7 +1856,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 69,
    "killed": 69,
    "survivors": [],
@@ -1864,11 +1864,7 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L195 condition negated",
-     "killed": true
-    },
-    {
-     "mutant": "L198 condition negated",
+     "mutant": "L197 condition negated",
      "killed": true
     },
     {
@@ -1880,27 +1876,27 @@
      "killed": true
     },
     {
-     "mutant": "L212 condition negated",
+     "mutant": "L204 condition negated",
      "killed": true
     },
     {
-     "mutant": "L219 condition negated",
+     "mutant": "L214 condition negated",
      "killed": true
     },
     {
-     "mutant": "L223 returns None",
+     "mutant": "L221 condition negated",
      "killed": true
     },
     {
-     "mutant": "L195 not removed",
+     "mutant": "L225 returns None",
      "killed": true
     },
     {
-     "mutant": "L196 returns None",
+     "mutant": "L197 not removed",
      "killed": true
     },
     {
-     "mutant": "L199 returns None",
+     "mutant": "L198 returns None",
      "killed": true
     },
     {
@@ -1908,235 +1904,239 @@
      "killed": true
     },
     {
-     "mutant": "L202 Is->IsNot",
-     "killed": true
-    },
-    {
      "mutant": "L203 returns None",
      "killed": true
     },
     {
-     "mutant": "L209 conditional negated",
+     "mutant": "L204 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L215 condition negated",
+     "mutant": "L205 returns None",
      "killed": true
     },
     {
-     "mutant": "L217 returns None",
+     "mutant": "L211 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L220 returns None",
+     "mutant": "L217 condition negated",
      "killed": true
     },
     {
-     "mutant": "L209 TestOutcome.FAILED->PASSED",
+     "mutant": "L219 returns None",
      "killed": true
     },
     {
-     "mutant": "L209 TestOutcome.PASSED->FAILED",
+     "mutant": "L222 returns None",
      "killed": true
     },
     {
-     "mutant": "L214 element 0 dropped",
+     "mutant": "L211 TestOutcome.FAILED->PASSED",
      "killed": true
     },
     {
-     "mutant": "L214 element 1 dropped",
+     "mutant": "L211 TestOutcome.PASSED->FAILED",
      "killed": true
     },
     {
-     "mutant": "L215 Is->IsNot",
+     "mutant": "L216 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L216 returns None",
+     "mutant": "L216 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L223 TestExecutionStatus.EXECUTED->UNRUNNABLE",
+     "mutant": "L217 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L223 TestSelection.NO_STORY_TESTS_MATCHED->STORY_TESTS_RAN",
+     "mutant": "L218 returns None",
      "killed": true
     },
     {
-     "mutant": "L223 TestSelection.NO_STORY_TESTS_MATCHED->STORY_TESTS_NOT_COLLECTABLE",
+     "mutant": "L225 TestExecutionStatus.EXECUTED->UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L223 Owner.DEVELOPER->PLAN",
+     "mutant": "L225 TestSelection.NO_STORY_TESTS_MATCHED->STORY_TESTS_RAN",
      "killed": true
     },
     {
-     "mutant": "L223 Owner.DEVELOPER->ENVIRONMENT",
+     "mutant": "L225 TestSelection.NO_STORY_TESTS_MATCHED->STORY_TESTS_NOT_COLLECTABLE",
      "killed": true
     },
     {
-     "mutant": "L223 Owner.DEVELOPER->PROVIDER",
+     "mutant": "L225 Owner.DEVELOPER->PLAN",
      "killed": true
     },
     {
-     "mutant": "L223 Owner.DEVELOPER->REVIEW",
+     "mutant": "L225 Owner.DEVELOPER->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L223 Owner.DEVELOPER->SECURITY",
+     "mutant": "L225 Owner.DEVELOPER->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L223 Owner.DEVELOPER->INTEGRATION",
+     "mutant": "L225 Owner.DEVELOPER->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L199 string 'the test runner did not finish within the harness deadline' emptied",
+     "mutant": "L225 Owner.DEVELOPER->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L201 string 'the test runner ended by a signal before reporting a result set' emptied",
+     "mutant": "L225 Owner.DEVELOPER->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L207 NotEq->Eq",
+     "mutant": "L201 string 'the test runner did not finish within the harness deadline' emptied",
      "killed": true
     },
     {
-     "mutant": "L208 In->NotIn",
+     "mutant": "L203 string 'the test runner ended by a signal before reporting a result set' emptied",
      "killed": true
     },
     {
-     "mutant": "L215 Owner.ENVIRONMENT->PLAN",
+     "mutant": "L209 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L215 Owner.ENVIRONMENT->DEVELOPER",
+     "mutant": "L210 In->NotIn",
      "killed": true
     },
     {
-     "mutant": "L215 Owner.ENVIRONMENT->PROVIDER",
+     "mutant": "L217 Owner.ENVIRONMENT->PLAN",
      "killed": true
     },
     {
-     "mutant": "L215 Owner.ENVIRONMENT->REVIEW",
+     "mutant": "L217 Owner.ENVIRONMENT->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L215 Owner.ENVIRONMENT->SECURITY",
+     "mutant": "L217 Owner.ENVIRONMENT->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L215 Owner.ENVIRONMENT->INTEGRATION",
+     "mutant": "L217 Owner.ENVIRONMENT->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L217 TestExecutionStatus.EXECUTED->UNRUNNABLE",
+     "mutant": "L217 Owner.ENVIRONMENT->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L217 TestSelection.STORY_TESTS_NOT_COLLECTABLE->STORY_TESTS_RAN",
+     "mutant": "L217 Owner.ENVIRONMENT->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L217 TestSelection.STORY_TESTS_NOT_COLLECTABLE->NO_STORY_TESTS_MATCHED",
+     "mutant": "L219 TestExecutionStatus.EXECUTED->UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L220 TestExecutionStatus.EXECUTED->UNRUNNABLE",
+     "mutant": "L219 TestSelection.STORY_TESTS_NOT_COLLECTABLE->STORY_TESTS_RAN",
      "killed": true
     },
     {
-     "mutant": "L220 TestSelection.STORY_TESTS_RAN->NO_STORY_TESTS_MATCHED",
+     "mutant": "L219 TestSelection.STORY_TESTS_NOT_COLLECTABLE->NO_STORY_TESTS_MATCHED",
      "killed": true
     },
     {
-     "mutant": "L220 TestSelection.STORY_TESTS_RAN->STORY_TESTS_NOT_COLLECTABLE",
+     "mutant": "L222 TestExecutionStatus.EXECUTED->UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L224 string \"none of the story's declared tests \" emptied",
+     "mutant": "L222 TestSelection.STORY_TESTS_RAN->NO_STORY_TESTS_MATCHED",
      "killed": true
     },
     {
-     "mutant": "L224 string ' ran (' emptied",
+     "mutant": "L222 TestSelection.STORY_TESTS_RAN->STORY_TESTS_NOT_COLLECTABLE",
      "killed": true
     },
     {
-     "mutant": "L224 string ' test(s) in the result set)' emptied",
+     "mutant": "L226 string \"none of the story's declared tests \" emptied",
      "killed": true
     },
     {
-     "mutant": "L196 string 'the configured test runner could not be launched: ' emptied",
+     "mutant": "L226 string ' ran (' emptied",
      "killed": true
     },
     {
-     "mutant": "L196 Or swapped",
+     "mutant": "L226 string ' test(s) in the result set)' emptied",
      "killed": true
     },
     {
-     "mutant": "L204 conditional negated",
+     "mutant": "L198 string 'the configured test runner could not be launched: ' emptied",
      "killed": true
     },
     {
-     "mutant": "L207 string 'skipped' emptied",
+     "mutant": "L198 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L208 element 0 dropped",
+     "mutant": "L206 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L208 element 1 dropped",
+     "mutant": "L209 string 'skipped' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L220 string ' could not be collected: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L223 TestSelection.STORY_TESTS_RAN->NO_STORY_TESTS_MATCHED",
+     "killed": true
+    },
+    {
+     "mutant": "L223 TestSelection.STORY_TESTS_RAN->STORY_TESTS_NOT_COLLECTABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L224 string ' story-owned test(s) ran; ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L224 string ' failed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L199 string 'no process' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L205 string 'the test runner reported no result set (exit ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L205 string '): ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L206 string 'no output' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 string 'failed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 string 'error' emptied",
      "killed": true
     },
     {
      "mutant": "L218 string ' could not be collected: ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L221 TestSelection.STORY_TESTS_RAN->NO_STORY_TESTS_MATCHED",
-     "killed": true
-    },
-    {
-     "mutant": "L221 TestSelection.STORY_TESTS_RAN->STORY_TESTS_NOT_COLLECTABLE",
-     "killed": true
-    },
-    {
-     "mutant": "L222 string ' story-owned test(s) ran; ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L222 string ' failed' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L197 string 'no process' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L203 string 'the test runner reported no result set (exit ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L203 string '): ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L204 string 'no output' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L208 string 'failed' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L208 string 'error' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L216 string ' could not be collected: ' emptied",
      "killed": true
     }
    ]
@@ -2146,7 +2146,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 11,
    "killed": 11,
    "survivors": [],
@@ -2154,31 +2154,23 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L502 returns None",
+     "mutant": "L504 returns None",
      "killed": true
     },
     {
-     "mutant": "L494 element 0 dropped",
+     "mutant": "L496 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L494 element 1 dropped",
+     "mutant": "L496 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L495 condition negated",
+     "mutant": "L497 condition negated",
      "killed": true
     },
     {
-     "mutant": "L495 not removed",
-     "killed": true
-    },
-    {
-     "mutant": "L498 condition negated",
-     "killed": true
-    },
-    {
-     "mutant": "L494 string 'src' emptied",
+     "mutant": "L497 not removed",
      "killed": true
     },
     {
@@ -2186,15 +2178,23 @@
      "killed": true
     },
     {
-     "mutant": "L500 Eq->NotEq",
+     "mutant": "L496 string 'src' emptied",
      "killed": true
     },
     {
-     "mutant": "L500 string '.py' emptied",
+     "mutant": "L502 condition negated",
      "killed": true
     },
     {
-     "mutant": "L498 string '__init__.py' emptied",
+     "mutant": "L502 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L502 string '.py' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L500 string '__init__.py' emptied",
      "killed": true
     }
    ]
@@ -2204,7 +2204,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "2f93b4d90543b1b19ca31265352b48f26af80b30b8d5f1198131119cea081ca3",
+   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
    "mutants": 8,
    "killed": 8,
    "survivors": [],
@@ -2212,35 +2212,35 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L188 returns None",
+     "mutant": "L190 returns None",
      "killed": true
     },
     {
-     "mutant": "L188 TestExecutionStatus.UNRUNNABLE->EXECUTED",
+     "mutant": "L190 TestExecutionStatus.UNRUNNABLE->EXECUTED",
      "killed": true
     },
     {
-     "mutant": "L188 Owner.ENVIRONMENT->PLAN",
+     "mutant": "L190 Owner.ENVIRONMENT->PLAN",
      "killed": true
     },
     {
-     "mutant": "L188 Owner.ENVIRONMENT->DEVELOPER",
+     "mutant": "L190 Owner.ENVIRONMENT->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L188 Owner.ENVIRONMENT->PROVIDER",
+     "mutant": "L190 Owner.ENVIRONMENT->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L188 Owner.ENVIRONMENT->REVIEW",
+     "mutant": "L190 Owner.ENVIRONMENT->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L188 Owner.ENVIRONMENT->SECURITY",
+     "mutant": "L190 Owner.ENVIRONMENT->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L188 Owner.ENVIRONMENT->INTEGRATION",
+     "mutant": "L190 Owner.ENVIRONMENT->INTEGRATION",
      "killed": true
     }
    ]
