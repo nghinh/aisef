@@ -33,6 +33,10 @@
   a signal ledger of its own. The owned process range (§17.1) is the single authority on what the controller sent,
   so a probe cannot grow a second, disagreeing account of provenance.
 
+* **NO_DEVELOPER_ARTEFACT_AT_PARENT** (invariant IX, WP-5.5) — across the whole kernel: no module imports the frozen
+  V1 kernel (`aisef`), so no V1 gate — the RED-at-parent check included — is authoritative in V2; and a module that
+  runs developer artefacts (imports `aisef2.quality`) is under CANDIDATE_ONLY_EXECUTION's name ban too, wherever it
+  sits: it names no parent revision, so no developer test is run, imported or collected at one.
 * **SENTINEL_IS_NOT_EVIDENCE** (RFC §19, WP-4.3) — the RunTerminationSentinel is not evidence and no gate may cite
   it: only `aisef2/runtime/run_scope.py` (and the sentinel module itself) import `aisef2.runtime.sentinel`.
 
@@ -63,7 +67,8 @@ PROBE_PACKAGE = "aisef2/probe/"
 SIGNALLING = {"kill", "killpg", "terminate", "send_signal", "raise_signal"}
 RULES = ("NO_PROSE_CONTROL", "NO_RAW_VERDICT_ROUTING", "RETRYABLE_ONLY_IN_TAXONOMY",
          "NO_VERDICT_FROM_ABSENCE_DECLARATION", "RESULT_ONLY_THROUGH_BINDING", "NO_TIME_IN_PROJECTIONS",
-         "NO_SIDE_RETRY_COUNTER", "SENTINEL_IS_NOT_EVIDENCE", "ONE_SIGNAL_AUTHORITY", "CANDIDATE_ONLY_EXECUTION")
+         "NO_SIDE_RETRY_COUNTER", "SENTINEL_IS_NOT_EVIDENCE", "ONE_SIGNAL_AUTHORITY", "CANDIDATE_ONLY_EXECUTION",
+         "NO_DEVELOPER_ARTEFACT_AT_PARENT")
 #: invariant IX (WP-5.3): engineering-quality code executes developer artefacts at the candidate only — it names no
 #: parent revision, resolves no path against one, and never drives git to reach one
 QUALITY_PACKAGE = "aisef2/quality/"
@@ -226,6 +231,23 @@ def violations(rel: str, source: str, rules: tuple[str, ...] = RULES) -> list[st
             elif isinstance(n, ast.Constant) and isinstance(n.value, str) and (n.value.split()[:1] == ["git"] or n.value == "checkout"):
                 out.append(f"CANDIDATE_ONLY_EXECUTION {rel}:{n.lineno} drives git ({n.value!r}): no revision but the "
                            "candidate is ever reached (IX)")
+    if "NO_DEVELOPER_ARTEFACT_AT_PARENT" in rules:
+        runs_developer_artefacts = False
+        for n in ast.walk(tree):
+            names = [a.name for a in n.names] if isinstance(n, ast.Import) else [n.module or ""] if isinstance(n, ast.ImportFrom) else []
+            for name in names:
+                if name == "aisef" or name.startswith("aisef."):
+                    out.append(f"NO_DEVELOPER_ARTEFACT_AT_PARENT {rel}:{n.lineno} imports the frozen V1 kernel ({name}): no "
+                               "V1 gate, the RED-at-parent check included, is authoritative in V2 (IX)")
+                if name.startswith("aisef2.quality"):
+                    runs_developer_artefacts = True
+        if runs_developer_artefacts and not rel.startswith(QUALITY_PACKAGE):
+            for n in ast.walk(tree):
+                name = n.arg if isinstance(n, (ast.arg, ast.keyword)) else n.id if isinstance(n, ast.Name) else None
+                if name and PARENT_NAMES.search(name):
+                    out.append(f"NO_DEVELOPER_ARTEFACT_AT_PARENT {rel}:{n.lineno} runs developer artefacts (imports "
+                               f"aisef2.quality) and names {name!r}: none is executed, imported or collected at a parent "
+                               "revision (IX)")
     if "SENTINEL_IS_NOT_EVIDENCE" in rules and rel not in SENTINEL_READERS:
         for n in ast.walk(tree):
             if isinstance(n, ast.Import):

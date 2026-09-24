@@ -369,11 +369,123 @@ def adequacy() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-5.5
+
+def invariants() -> dict:
+    import importlib
+    from aisef2.errors import InvariantError
+    from aisef2.invariants import registry as reg
+    t = _module("aisef_v2_p5_test_invariants", "tests/v2/p5/test_invariants.py")
+    registry = cases(t, "Registry", "test_the_nine_are_registered_with_frozen_titles_and_resolved_mechanisms",
+                     "test_INV_REG_1_an_invariant_without_a_mechanism_is_refused",
+                     "test_INV_REG_2_an_invariant_missing_from_one_tier_is_refused",
+                     "test_INV_REG_3_an_invariant_declared_but_not_armed_is_refused",
+                     "test_unknown_duplicate_omitted_or_retitled_invariants_are_refused",
+                     "test_INV_MECH_1_a_mechanism_that_resolves_nowhere_is_refused",
+                     "test_registry_and_document_drift_is_refused",
+                     "test_the_document_renders_typed_identifiers_never_read_for_control",
+                     "test_InvariantError_is_structurally_uncatchable_by_except_Exception_and_names_its_module")
+    arming = cases(t, "Arming", "test_every_tier_arms_all_nine_before_its_first_test_module",
+                   "test_arming_is_idempotent_and_fails_closed_without_touching_the_armed_state",
+                   "test_a_runtime_guard_refuses_to_work_in_an_unarmed_process")
+    escape = cases(t, "Uncontainable", "test_INV_EXC_1_raised_inside_except_Exception_it_escapes",
+                   "test_INV_EXC_2_nested_broad_catches_all_let_it_escape",
+                   "test_the_violation_escapes_the_kernels_own_boundaries", "test_the_audit_holds_over_the_whole_kernel",
+                   "test_the_audit_flags_every_swallowing_pattern_and_accepts_every_re_raise",
+                   "test_the_hierarchy_is_part_of_the_audit")
+    one = cases(t, "RequirementAuthority", "test_INV_I_1_no_kernel_control_path_reads_requirement_text",
+                "test_INV_I_2_an_unapproved_contract_cannot_become_product_truth",
+                "test_INV_I_3_changing_a_requirement_or_contract_hash_invalidates_the_binding",
+                "test_INV_I_4_an_artefacts_self_claims_grant_no_authority")
+    two = cases(t, "SemanticDeterminism", "test_INV_II_1_developer_test_topology_is_not_an_input_of_the_product_verdict",
+                "test_INV_II_2_wall_clock_time_does_not_control_verdicts_or_projections",
+                "test_INV_II_3_component_import_order_does_not_alter_the_fold",
+                "test_INV_II_4_the_same_frozen_inputs_give_the_same_run_identity")
+    three = cases(t, "IndependentEvidence", "test_INV_III_1_the_implementer_cannot_manufacture_a_sealed_record",
+                  "test_INV_III_2_the_verifier_scope_is_independently_acquired",
+                  "test_INV_III_3_confinement_is_not_a_passable_parameter",
+                  "test_INV_III_4_developer_tests_cannot_certify_product_proof")
+    four = cases(t, "TypedOwnership", "test_INV_IV_no_owner_consumes_another_owners_budget",
+                 "test_INV_IV_INCOMPLETE_and_UNRUNNABLE_never_charge_the_developer",
+                 "test_INV_IV_retry_reads_typed_fields_only_and_keeps_no_counter")
+    five = cases(t, "ReproducibleQualification", "test_INV_V_comparability_rejects_every_identity_mismatch")
+    six = cases(t, "ImmutableProvenance", "test_INV_VI_abbreviated_shas_are_rejected_where_full_identity_is_required",
+                "test_INV_VI_mutable_labels_cannot_replace_immutable_ids", "test_INV_VI_the_journal_is_append_only",
+                "test_INV_VI_frozen_artefact_drift_is_detected", "test_INV_VI_verdict_identity_fields_are_immutable")
+    seven = cases(t, "NoProseControl", "test_INV_PROSE_1_hostile_external_strings_never_become_control_values",
+                  "test_INV_VII_an_external_owner_in_a_journal_payload_is_refused", "test_INV_VII_the_static_guards_stand")
+    eight = cases(t, "MemoryIsContext", "test_INV_MEM_1_agent_or_context_text_cannot_enter_an_evidence_field",
+                  "test_the_boundary_inspects_no_model_and_fails_closed")
+    nine = cases(t, "NoDeveloperArtefactAtParent", "test_INV_PARENT_1_parent_developer_test_execution_is_refused_statically",
+                 "test_INV_PARENT_1_the_apis_are_structurally_candidate_only",
+                 "test_the_only_counterfactual_is_candidate_side_vacuity")
+    authority = cases(t, "MutationAuthority", "test_INV_MUTATION_AUTHORITY_destructive_sites_of_the_invariant_code_are_ledgered")
+    registered = reg.register()
+    for tier in reg.Tier:
+        importlib.import_module(tier.value.replace("/", "."))
+    armed = reg.armed()
+    eb = _module("aisef_v2_except_boundaries", "validation/v2/except_boundaries.py")
+    audit = eb.audit(ROOT)
+    return {
+        "record": "AISEF V2 — P5 INVARIANTS",
+        "work_package": "WP-5.5",
+        "rfc": "§4 (F10: InvariantId I..IX, the frozen titles, every one armed with a named mechanism); §31",
+        "implementation": "aisef2/invariants/registry.py, aisef2/invariants/evidence.py, aisef2/errors.py, "
+                          "validation/v2/except_boundaries.py, kernel rule NO_DEVELOPER_ARTEFACT_AT_PARENT",
+        "registry": {"invariants": [i.id.value for i in registered.invariants],
+                     "mechanisms": {i.id.value: [f"{m.id} ({m.kind.value}) {m.ref}" for m in i.mechanisms] for i in registered.invariants},
+                     "uncontainable": [f"{m.id} ({m.kind.value}) {m.ref}" for m in reg.UNCONTAINABLE],
+                     "tiers": [t.value for t in reg.Tier], "registry_digest": registered.digest,
+                     "mechanism_digest": registered.mechanism_digest, "document": reg.DOC_REL},
+        "arming": {t.value: sorted(i.value for i in armed.get(t, ())) for t in reg.Tier},
+        "except_boundaries": {"counts": audit["counts"], "problems": audit["problems"],
+                              "invariant_error_base": [c.__name__ for c in InvariantError.__mro__[1:-1]]},
+        "properties": {
+            "I_to_IX_registered_with_resolved_mechanisms": registry["test_the_nine_are_registered_with_frozen_titles_and_resolved_mechanisms"]
+                and [i.id.value for i in registered.invariants] == ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"],
+            "registration_fails_closed": all(registry[k] for k in registry if "refused" in k),
+            "INV_REG_1": registry["test_INV_REG_1_an_invariant_without_a_mechanism_is_refused"],
+            "INV_REG_2": registry["test_INV_REG_2_an_invariant_missing_from_one_tier_is_refused"],
+            "INV_REG_3": registry["test_INV_REG_3_an_invariant_declared_but_not_armed_is_refused"],
+            "INV_MECH_1": registry["test_INV_MECH_1_a_mechanism_that_resolves_nowhere_is_refused"],
+            "registry_docs_synchronized": registry["test_registry_and_document_drift_is_refused"],
+            "armed_in_every_tier_before_the_tier_mounts": arming["test_every_tier_arms_all_nine_before_its_first_test_module"]
+                and all(set(armed.get(t, ())) == set(reg.InvariantId) for t in reg.Tier),
+            "runtime_guards_fail_closed_unarmed": arming["test_a_runtime_guard_refuses_to_work_in_an_unarmed_process"],
+            "INV_EXC_1": escape["test_INV_EXC_1_raised_inside_except_Exception_it_escapes"],
+            "INV_EXC_2": escape["test_INV_EXC_2_nested_broad_catches_all_let_it_escape"],
+            "violation_escapes_the_kernels_own_boundaries": escape["test_the_violation_escapes_the_kernels_own_boundaries"],
+            "except_boundary_audit_clean": escape["test_the_audit_holds_over_the_whole_kernel"] and audit["problems"] == []
+                and set(audit["counts"]) <= {eb.RERAISES, eb.STRUCTURAL},
+            "audit_flags_every_swallowing_pattern": escape["test_the_audit_flags_every_swallowing_pattern_and_accepts_every_re_raise"]
+                and escape["test_the_hierarchy_is_part_of_the_audit"],
+            "InvariantError_uncatchable_by_except_Exception": issubclass(InvariantError, BaseException)
+                and not issubclass(InvariantError, Exception)
+                and registry["test_InvariantError_is_structurally_uncatchable_by_except_Exception_and_names_its_module"],
+            **{f"INV_I_{n}": one[k] for n, k in enumerate(one, 1)},
+            **{f"INV_II_{n}": two[k] for n, k in enumerate(two, 1)},
+            **{f"INV_III_{n}": three[k] for n, k in enumerate(three, 1)},
+            "INV_IV_cross_charge_impossible": all(four.values()),
+            "INV_V_comparability_rejects_mismatch": all(five.values()),
+            "INV_VI_immutable_provenance": all(six.values()),
+            "INV_PROSE_1": seven["test_INV_PROSE_1_hostile_external_strings_never_become_control_values"],
+            "INV_VII_no_prose_control": all(seven.values()),
+            "INV_MEM_1": eight["test_INV_MEM_1_agent_or_context_text_cannot_enter_an_evidence_field"],
+            "INV_VIII_evidence_origin_boundary": all(eight.values()),
+            "INV_PARENT_1": nine["test_INV_PARENT_1_parent_developer_test_execution_is_refused_statically"]
+                and nine["test_INV_PARENT_1_the_apis_are_structurally_candidate_only"],
+            "INV_IX_candidate_only": all(nine.values()),
+            "INV_MUTATION_AUTHORITY_intact": all(authority.values()),
+        },
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-5.1": ("closure-evidence/v2/P5-TEST-EXECUTION.json", test_execution, "aisef2/quality/test_execution.py"),
     "WP-5.2": ("closure-evidence/v2/P5-RELEVANCE.json", relevance, "aisef2/quality/relevance.py"),
     "WP-5.3": ("closure-evidence/v2/P5-VACUITY.json", vacuity, "aisef2/quality/vacuity.py"),
     "WP-5.4": ("closure-evidence/v2/P5-ADEQUACY.json", adequacy, "aisef2/quality/adequacy.py"),
+    "WP-5.5": ("closure-evidence/v2/P5-INVARIANTS.json", invariants, "aisef2/invariants/registry.py"),
 }
 
 

@@ -64,9 +64,12 @@ P1_TARGETS: dict[str, list[str]] = {
     # WP-1.4: the taxonomy and the routing table are data; both are mutated like functions
     "aisef2/control/owner.py::TAXONOMY": ["tests/v2/p1/test_routing.py", "tests/v2/p2/test_signal_provenance.py"],
     "aisef2/control/owner.py::classify": ["tests/v2/p1/test_routing.py"],
-    "aisef2/control/owner.py::flatten": ["tests/v2/p1/test_routing.py"],
+    "aisef2/control/owner.py::flatten": ["tests/v2/p1/test_routing.py", "tests/v2/p5/test_invariants.py"],  # + INV-PROSE-1
     "aisef2/control/routing.py::_EXECUTED": ["tests/v2/p1/test_routing.py", "tests/v2/p2/test_signal_provenance.py"],
     "aisef2/control/routing.py::route": ["tests/v2/p1/test_routing.py", "tests/v2/p2/test_signal_provenance.py"],
+    # WP-5.5: the non-raising lookup story admission reads (§4: no boundary catches UnroutableOutcome)
+    "aisef2/control/routing.py::row_for": ["tests/v2/p1/test_routing.py", "tests/v2/p2/test_signal_provenance.py",
+                                           "tests/v2/p2/test_story_admission.py"],
 }
 _PROTOCOL_TESTS = ["tests/v2/p2/test_probe_protocol.py"]
 _HARNESS_TESTS = ["tests/v2/p2/test_python_callable.py"]
@@ -206,7 +209,7 @@ P4_TARGETS: dict[str, list[str]] = {
         "_synthetic_only_true", "_format_rule", "_str_map", "declared_format", "reconstruct", "DISPOSAL_RANK",
         "CLOSERS", "_GRADE_ORDER", "JournalWriter2.__init__", "JournalWriter2.append", "JournalWriter2.close")},
     **{f"aisef2/runtime/story_scope.py::{f}": _SCOPE_TESTS for f in (
-        "StoryScope.acquire", "StoryScope.dispose", "StoryScope._record", "StoryScope._release", "DisposalReport.ok",
+        "StoryScope.acquire", "StoryScope.dispose", "StoryScope._record", "DisposalReport.ok",
         "Directory.__init__", "Directory.release")},
     # WP-4.2: measured range emptiness — the ownership walk (pure) and the POSIX range; the Windows job adapter
     # (_Job) and the Linux /proc reader run on CI, not on the developer machine this tool runs on
@@ -219,6 +222,8 @@ P4_TARGETS: dict[str, list[str]] = {
     "aisef2/runtime/process_range.py::_Job.controller_stopped": _RANGE_TESTS,
     "aisef2/runtime/process_range.py::ProcessRange.anchor_returncode": _RANGE_TESTS,
     "aisef2/runtime/story_scope.py::StoryScope.release": _SCOPE_TESTS,
+    # WP-5.5: the invariant violation crosses the release thread (INV-EXC through the kernel's own boundary)
+    "aisef2/runtime/story_scope.py::StoryScope._release": _SCOPE_TESTS + ["tests/v2/p5/test_invariants.py"],
     # WP-4.3: the lease, the lifetime order, the sentinel
     **{f"aisef2/runtime/run_scope.py::{f}": _RUN_TESTS for f in (
         "RunLease.acquire", "RunLease.release", "RunScope.begin", "RunScope.open_stories", "RunScope.shutdown",
@@ -266,6 +271,15 @@ _ADQ_TESTS = ["tests/v2/p5/test_adequacy.py"]
 P5_TARGETS.update({f"aisef2/quality/adequacy.py::{f}": _ADQ_TESTS for f in (
     "assemble", "_defects", "_gaps", "_adequate", "EngineeringTestAdequacy.__post_init__", "Assembly.__post_init__",
     "Assembly.owner", "Assembly.developer_chargeable", "may_block")})
+_INV_TESTS = ["tests/v2/p5/test_invariants.py"]
+# WP-5.5: registration (fail closed), tier arming, mechanism resolution, the runtime guard; the evidence-origin
+# boundary; the except-boundary audit
+P5_TARGETS.update({f"aisef2/invariants/registry.py::{f}": _INV_TESTS for f in (
+    "register", "arm", "resolve", "_load_script", "require_armed", "_arms", "test_directories")})
+P5_TARGETS.update({f"aisef2/invariants/evidence.py::{f}": _INV_TESTS for f in ("admit", "harness_records")})
+P5_TARGETS.update({f"validation/v2/except_boundaries.py::{f}": _INV_TESTS for f in (
+    "audit_source", "_disposition", "_could_hold", "_resolve", "_caught", "_reraises_all", "_is_invariant_reraise",
+    "audit", "check")})
 # WP52-001: the destructive-site checker's discovery of callables handed over by reference, and the ledger check
 P5_TARGETS.update({f"validation/v2/destructive_authority.py::{f}": ["tests/v2/p0/test_destructive_authority.py"]
                    for f in ("discover", "_references", "_destructive_ref", "_aliases", "_alias", "check")})

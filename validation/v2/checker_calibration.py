@@ -203,6 +203,25 @@ def _kernel_rule(name: str, rule: str, package: str) -> Callable[[], Checker]:
     return make
 
 
+def _except_boundaries() -> Checker:
+    eb = _load("aisef_v2_except_boundaries", V2 / "except_boundaries.py")
+    return Checker("except_boundaries", "WP-5.5 (RFC §4 uncontainable)", lambda: eb.check(ROOT),
+                   lambda fx: eb.violations(fx["path"], fx["source"]), ("validation/v2/except_boundaries.py",))
+
+
+def _invariants_doc() -> Checker:
+    idoc = _load("aisef_v2_invariants_doc", V2 / "invariants_doc.py")
+
+    def bad(fx):
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t)
+            (root / fx["path"]).parent.mkdir(parents=True, exist_ok=True)
+            (root / fx["path"]).write_text(_edit((ROOT / fx["path"]).read_text(encoding="utf-8"), fx), encoding="utf-8")
+            return idoc.check(root)
+    return Checker("invariants_doc", "WP-5.5 (F10 registry/docs sync)", lambda: idoc.check(ROOT), bad,
+                   ("validation/v2/invariants_doc.py",))
+
+
 def _destructive_authority() -> Checker:
     """INV-MUTATION-AUTHORITY, static half: every destructive call site is ledgered with an authority source whose
     derivation the checker validates. Known bad (MUT-AUTH-NEG-1): a kill of a pid read from subject output, with a
@@ -360,6 +379,8 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("sentinel_is_not_evidence", "SENTINEL_IS_NOT_EVIDENCE", "WP-4.3"),
     _kernel_rule("one_signal_authority", "ONE_SIGNAL_AUTHORITY", "P4 correction (V2-003, RFC §9.3)"),
     _kernel_rule("candidate_only_execution", "CANDIDATE_ONLY_EXECUTION", "WP-5.3 (invariant IX)"),
+    _kernel_rule("no_developer_artefact_at_parent", "NO_DEVELOPER_ARTEFACT_AT_PARENT", "WP-5.5 (invariant IX)"),
+    _except_boundaries, _invariants_doc,
     _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _p5_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 

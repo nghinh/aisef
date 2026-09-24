@@ -3,6 +3,892 @@
  "tool": "validation/v2/mutation.py",
  "targets": [
   {
+   "target": "aisef2/invariants/evidence.py::admit",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "889b74ed22eeca41ac80e7b38be1e542615f84faf1a99acf82f0925a2dd0329a",
+   "mutants": 31,
+   "killed": 31,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L50 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L53 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L57 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L53 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L49 InvariantId.VIII->I",
+     "killed": true
+    },
+    {
+     "mutant": "L49 InvariantId.VIII->II",
+     "killed": true
+    },
+    {
+     "mutant": "L49 InvariantId.VIII->III",
+     "killed": true
+    },
+    {
+     "mutant": "L49 InvariantId.VIII->IV",
+     "killed": true
+    },
+    {
+     "mutant": "L49 InvariantId.VIII->V",
+     "killed": true
+    },
+    {
+     "mutant": "L49 InvariantId.VIII->VI",
+     "killed": true
+    },
+    {
+     "mutant": "L49 InvariantId.VIII->VII",
+     "killed": true
+    },
+    {
+     "mutant": "L49 InvariantId.VIII->IX",
+     "killed": true
+    },
+    {
+     "mutant": "L51 string 'context from ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L51 string ' is never evidence (VIII): only harness-produced typed records enter an evidence field' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string ' is not a harness-produced typed record: an evidence field admits only those, never text, a mapping, a list or a look-alike (VIII)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L52 InvariantId.VIII->I",
+     "killed": true
+    },
+    {
+     "mutant": "L52 InvariantId.VIII->II",
+     "killed": true
+    },
+    {
+     "mutant": "L52 InvariantId.VIII->III",
+     "killed": true
+    },
+    {
+     "mutant": "L52 InvariantId.VIII->IV",
+     "killed": true
+    },
+    {
+     "mutant": "L52 InvariantId.VIII->V",
+     "killed": true
+    },
+    {
+     "mutant": "L52 InvariantId.VIII->VI",
+     "killed": true
+    },
+    {
+     "mutant": "L52 InvariantId.VIII->VII",
+     "killed": true
+    },
+    {
+     "mutant": "L52 InvariantId.VIII->IX",
+     "killed": true
+    },
+    {
+     "mutant": "L56 InvariantId.VIII->I",
+     "killed": true
+    },
+    {
+     "mutant": "L56 InvariantId.VIII->II",
+     "killed": true
+    },
+    {
+     "mutant": "L56 InvariantId.VIII->III",
+     "killed": true
+    },
+    {
+     "mutant": "L56 InvariantId.VIII->IV",
+     "killed": true
+    },
+    {
+     "mutant": "L56 InvariantId.VIII->V",
+     "killed": true
+    },
+    {
+     "mutant": "L56 InvariantId.VIII->VI",
+     "killed": true
+    },
+    {
+     "mutant": "L56 InvariantId.VIII->VII",
+     "killed": true
+    },
+    {
+     "mutant": "L56 InvariantId.VIII->IX",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/invariants/evidence.py::harness_records",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "889b74ed22eeca41ac80e7b38be1e542615f84faf1a99acf82f0925a2dd0329a",
+   "mutants": 16,
+   "killed": 16,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L43 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 7 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 8 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 9 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 10 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 11 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 12 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 13 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 14 dropped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/invariants/registry.py::_arms",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "mutants": 22,
+   "killed": 22,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L255 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L263 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L255 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L256 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L258 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L263 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L254 string '__init__.py' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L256 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L258 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L260 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L258 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L259 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L260 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L262 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L258 string 'arm' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L260 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L261 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L262 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L257 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L258 string 'id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L260 string 'Tier' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L258 string 'attr' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/invariants/registry.py::_load_script",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L203 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L208 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L203 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L205 string 'aisef2_invariants_' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L204 string ' does not exist' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/invariants/registry.py::arm",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L356 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L361 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L356 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L357 string ' is not a tier' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/invariants/registry.py::register",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "mutants": 51,
+   "killed": 51,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L304 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L307 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L309 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L311 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L325 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L331 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L334 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L339 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L302 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L304 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L309 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L311 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L314 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L316 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L318 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L325 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L328 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L336 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L306 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L314 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L316 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L318 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L325 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L328 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L336 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L305 string 'the registry is a tuple of invariants, closed at registration' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L307 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L308 string 'an entry is not one of the nine typed invariants (unknown invariant)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L310 string 'duplicate invariant ids' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L318 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L326 string 'InvariantError must derive from BaseException and not from Exception (§4)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L336 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L336 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L312 string 'the registry holds exactly I..IX in order; got ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L332 string 'tests live outside every tier, unarmed: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L332 string ' (' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L332 string ' director' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L333 string ')' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L315 string ': title ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L315 string ' is not the frozen ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L317 string ' has no enforcement mechanism: a documented intention, not an invariant' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L319 string ' is declared but not armed in every tier: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L329 string 'tier ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L329 string ' does not arm I..IX in its package __init__' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L333 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L337 string ' drifted from the registry (regenerate it: python -P validation/v2/invariants_doc.py)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L333 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L333 string 'y' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L333 string 'ies' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L336 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L320 NotIn->In",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/invariants/registry.py::require_armed",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L370 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L370 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L370 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L370 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L371 string 'invariant ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L371 string ' is not armed in this process: its enforcement mechanism is absent, so nothing it guards may proceed (§4)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L370 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L373 string 'value' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L371 string 'value' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/invariants/registry.py::resolve",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "mutants": 48,
+   "killed": 48,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L213 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L216 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L218 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L228 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L236 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L238 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L213 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L215 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L215 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L215 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L216 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L218 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L227 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L228 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L229 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L232 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L234 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L236 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L213 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L213 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L215 string ':' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L216 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L216 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L216 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L218 MechanismKind.CODE->STATIC_RULE",
+     "killed": true
+    },
+    {
+     "mutant": "L218 MechanismKind.CODE->CHECKER",
+     "killed": true
+    },
+    {
+     "mutant": "L224 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L228 MechanismKind.STATIC_RULE->CODE",
+     "killed": true
+    },
+    {
+     "mutant": "L228 MechanismKind.STATIC_RULE->CHECKER",
+     "killed": true
+    },
+    {
+     "mutant": "L229 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L232 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string '.' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L224 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L229 string 'kernel_static_checks' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L214 string ' is not a typed mechanism' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L217 string ': reference ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L217 string ' is not <target>:<name>' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L237 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L237 string ':' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L237 string ' resolves nowhere' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L230 string ': static rules live in kernel_static_checks, not ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L233 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L233 string ' is not a rule of ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L222 string ': module ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L222 string ' does not import: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string ':' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string ' resolves nowhere' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/invariants/registry.py::test_directories",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "c367abe6bdf40432b3e0cfafeca37420c6453b4380a5b8d05b835dcd81750546",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L249 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L246 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L247 string 'test_*.py' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L246 string 'test_*.py' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
    "target": "aisef2/quality/adequacy.py::Assembly.__post_init__",
    "kill_tests": [
     "tests/v2/p5/test_adequacy.py"
@@ -5443,6 +6329,796 @@
     },
     {
      "mutant": "L220 string '.' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/except_boundaries.py::_caught",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "40a3897ed065a7722aac1704468e2d96e5931a609431bcd8b405efa6d489650b",
+   "mutants": 11,
+   "killed": 11,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L69 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L71 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L74 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L69 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L70 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L73 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L75 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L73 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L74 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L74 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L73 Is->IsNot",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/except_boundaries.py::_could_hold",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "40a3897ed065a7722aac1704468e2d96e5931a609431bcd8b405efa6d489650b",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L38 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L38 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L39 Or swapped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/except_boundaries.py::_disposition",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "40a3897ed065a7722aac1704468e2d96e5931a609431bcd8b405efa6d489650b",
+   "mutants": 42,
+   "killed": 42,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L92 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L94 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L97 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L106 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L108 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L92 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L93 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L94 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L95 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L97 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L98 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L102 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L104 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L107 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L108 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L108 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L93 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L93 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L95 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L95 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L98 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L98 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L102 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L103 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L95 string 'BARE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L95 string 'bare except does not re-raise InvariantError' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L98 string 'UNKNOWN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'HOLDS' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L98 string 'except ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L98 string ': a catch pattern the audit does not model; it could hold an InvariantError' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'UNKNOWN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'except ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string ': could hold an InvariantError (' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string ') and does not re-raise it' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'except ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string ' cannot be resolved to an exception class; it could hold an InvariantError' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string ', ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/except_boundaries.py::_is_invariant_reraise",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "40a3897ed065a7722aac1704468e2d96e5931a609431bcd8b405efa6d489650b",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L86 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L86 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L86 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'InvariantError' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/except_boundaries.py::_reraises_all",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "40a3897ed065a7722aac1704468e2d96e5931a609431bcd8b405efa6d489650b",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L81 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L81 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Is->IsNot",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/except_boundaries.py::_resolve",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "40a3897ed065a7722aac1704468e2d96e5931a609431bcd8b405efa6d489650b",
+   "mutants": 18,
+   "killed": 18,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L50 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L55 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L57 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L50 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L52 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L54 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L55 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L57 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L63 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L55 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L60 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L49 string '.' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L54 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string '.' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string '.' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L60 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L52 Is->IsNot",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/except_boundaries.py::audit",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "40a3897ed065a7722aac1704468e2d96e5931a609431bcd8b405efa6d489650b",
+   "mutants": 26,
+   "killed": 26,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L154 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L165 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L154 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L159 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L159 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L159 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L159 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L160 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L165 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L165 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L165 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L154 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L162 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L162 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L165 string 'boundaries' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L165 string 'problems' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L166 string 'counts' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L155 string 'InvariantError must derive from BaseException and not from Exception: an `except Exception` boundary could hold it' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L160 string '*.py' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L162 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L162 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L166 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L162 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L166 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L166 string 'disposition' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L166 string 'disposition' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/except_boundaries.py::audit_source",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "40a3897ed065a7722aac1704468e2d96e5931a609431bcd8b405efa6d489650b",
+   "mutants": 57,
+   "killed": 57,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L134 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L115 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L117 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L134 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L134 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L127 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L117 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L117 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L118 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L123 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L125 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L127 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L132 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L120 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L120 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L127 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L121 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L126 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L127 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L127 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 string 'path' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L121 string 'line' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L121 string 'catches' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L122 string 'disposition' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L121 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string 'contextlib.suppress' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string 'suppress' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'path' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'line' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'catches' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L131 string 'disposition' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L131 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L121 string '<bare>' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L124 string 'EXCEPT_BOUNDARY ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L124 string ':' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L124 string ' ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'suppress(' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string ')' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L131 string 'HOLDS' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L133 string 'EXCEPT_BOUNDARY ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L133 string ':' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L133 string ' suppress(' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L133 string ') would swallow an InvariantError' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string ', ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L133 string ', ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "validation/v2/except_boundaries.py::check",
+   "kill_tests": [
+    "tests/v2/p5/test_invariants.py"
+   ],
+   "source_sha256": "40a3897ed065a7722aac1704468e2d96e5931a609431bcd8b405efa6d489650b",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L170 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L170 string 'problems' emptied",
      "killed": true
     }
    ]

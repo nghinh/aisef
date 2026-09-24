@@ -95,6 +95,20 @@ _EXECUTED: dict[tuple, tuple[FailureCode | None, StoryAdmissionDisposition | Non
 
 def route(result: ProbeResult | None, spec: ProductProofSpec, point: MeasurementPoint,
           role: ObligationRole | None = None) -> Route:
+    """The route of a typed outcome; UnroutableOutcome (fail closed) when the table has no row for it."""
+    routed = row_for(result, spec, point, role)
+    if routed is None:
+        satisfaction = contract_satisfaction(result, spec)
+        raise UnroutableOutcome(f"no routing row for {point.value} {satisfaction.value} with reason "
+                                f"{result.reason!r} and role {role!r}")
+    return routed
+
+
+def row_for(result: ProbeResult | None, spec: ProductProofSpec, point: MeasurementPoint,
+            role: ObligationRole | None = None) -> Route | None:
+    """The route of a typed outcome, or None when the table declares no row for it — a typed absence a caller with
+    its own rule for undeclared routing (§13: PROBE_INVALID) reads without catching anything. An untyped point, role
+    or result is still refused: that is an invariant violation, never an absence."""
     if not isinstance(point, MeasurementPoint):
         raise UnroutableOutcome(f"unknown measurement point {point!r}")
     if role is not None and not isinstance(role, ObligationRole):
@@ -111,7 +125,6 @@ def route(result: ProbeResult | None, spec: ProductProofSpec, point: Measurement
     row = _EXECUTED.get((point, satisfaction, result.reason, role)) or \
         _EXECUTED.get((point, satisfaction, result.reason, None))
     if row is None:
-        raise UnroutableOutcome(f"no routing row for {point.value} {satisfaction.value} with reason "
-                                f"{result.reason!r} and role {role!r}")
+        return None
     code, disposition, decided_by, rule = row
     return Route(None if code is None else classify(code), decided_by, disposition, rule)

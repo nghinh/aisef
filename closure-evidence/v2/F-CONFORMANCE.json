@@ -1,7 +1,7 @@
 {
  "record": "AISEF V2 — F1–F11 CONFORMANCE",
  "work_package": "WP-0.3",
- "current_phase": "P4",
+ "current_phase": "P5",
  "reference": "extracted from the RFC normative body; never transcribed",
  "items": [
   {
@@ -103,15 +103,13 @@
   },
   {
    "id": "F10",
-   "state": "PENDING",
+   "state": "PASS",
    "subchecks": [
     "F10.invariant_ids",
     "F10.invariant_titles",
     "F10.invariants_armed_with_mechanisms"
    ],
-   "pending_on": [
-    "WP-5.5"
-   ]
+   "pending_on": []
   },
   {
    "id": "F11",
@@ -912,8 +910,7 @@
    "item": "F10",
    "id": "F10.invariants_armed_with_mechanisms",
    "implemented_by": "WP-5.5",
-   "state": "PENDING",
-   "detail": "aisef2.invariants.registry.arm not implemented",
+   "state": "PASS",
    "rfc_reference": [
     "I",
     "II",
@@ -925,7 +922,82 @@
     "VIII",
     "IX"
    ],
-   "required_now": false
+   "mechanisms": {
+    "I": [
+     "aisef2.product.approval:require_approved",
+     "aisef2.product.approval:binding_problems",
+     "kernel_static_checks:NO_PROSE_CONTROL",
+     "aisef2.probe.protocol:ProbeRecord"
+    ],
+    "II": [
+     "aisef2.probe.protocol:run_probe",
+     "kernel_static_checks:NO_TIME_IN_PROJECTIONS",
+     "aisef2.journal.fold:fold",
+     "kernel_static_checks:ONE_SIGNAL_AUTHORITY",
+     "aisef2.probe.protocol:ExecutionEnv",
+     "aisef2.runtime.runspec:runspec_hash"
+    ],
+    "III": [
+     "aisef2.runtime.story_scope:StoryScope",
+     "aisef2.probe.protocol:bound_result",
+     "kernel_static_checks:RESULT_ONLY_THROUGH_BINDING",
+     "aisef2.probe.protocol:ExecutionEnv",
+     "aisef2.quality.adequacy:assemble"
+    ],
+    "IV": [
+     "aisef2.control.owner:classify",
+     "aisef2.control.budget:charge",
+     "kernel_static_checks:RETRYABLE_ONLY_IN_TAXONOMY",
+     "kernel_static_checks:NO_SIDE_RETRY_COUNTER",
+     "aisef2.quality.adequacy:assemble"
+    ],
+    "V": [
+     "aisef2.runtime.runspec:comparable",
+     "aisef2.runtime.runspec:runspec_hash",
+     "aisef2.runtime.capability:CapabilityIdentity",
+     "aisef2.runtime.runspec:RunSpec.resolved"
+    ],
+    "VI": [
+     "aisef2.probe.protocol:RevisionRef",
+     "aisef2.runtime.runspec:resolve",
+     "aisef2.journal.format2:JournalWriter2",
+     "aisef2.probe.protocol:ProbeRecord",
+     "aisef2.product.spec:ProductProofSpec",
+     "validation/v2/freeze_manifest.py:check"
+    ],
+    "VII": [
+     "aisef2.control.owner:flatten",
+     "aisef2.control.owner:classify",
+     "kernel_static_checks:NO_PROSE_CONTROL",
+     "kernel_static_checks:NO_RAW_VERDICT_ROUTING",
+     "aisef2.quality.test_execution:classify"
+    ],
+    "VIII": [
+     "aisef2.invariants.evidence:admit",
+     "aisef2.invariants.evidence:EvidenceField",
+     "aisef2.journal.event:Event"
+    ],
+    "IX": [
+     "kernel_static_checks:CANDIDATE_ONLY_EXECUTION",
+     "kernel_static_checks:NO_DEVELOPER_ARTEFACT_AT_PARENT",
+     "aisef2.product.contract:names_test_artefact",
+     "aisef2.probe.protocol:run_probe",
+     "aisef2.quality.vacuity:evaluate"
+    ]
+   },
+   "tiers": [
+    "tests/v2",
+    "tests/v2/conformance",
+    "tests/v2/p0",
+    "tests/v2/p1",
+    "tests/v2/p2",
+    "tests/v2/p3",
+    "tests/v2/p4",
+    "tests/v2/p5",
+    "tests/v2/plan"
+   ],
+   "detail": "I..IX registered with 43 resolved mechanisms and armed in 9 of 9 tiers",
+   "required_now": true
   },
   {
    "item": "F11",
@@ -945,8 +1017,8 @@
   }
  ],
  "summary": {
-  "PASS": 10,
-  "PENDING": 1,
+  "PASS": 11,
+  "PENDING": 0,
   "FAIL": 0
  },
  "ratchet_violations": []

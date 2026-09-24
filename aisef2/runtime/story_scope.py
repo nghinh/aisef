@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from typing import Callable, Protocol
 
 from aisef2.arch.enums import EventType as T
+from aisef2.errors import InvariantError
 from aisef2.journal.event import Event, JournalError
 from aisef2.journal.format2 import DISPOSAL_RANK, ReleaseStatus as S, ResourceKind as K
 
@@ -97,6 +98,8 @@ class StoryScope:
         try:
             acquired = self._emit(T.STORY_RESOURCE_ACQUIRED, {"story_id": self.story_id, "resource": resource.name,
                                                               "kind": kind.value})
+        except InvariantError:
+            raise
         except BaseException:
             self._release(resource)
             raise
@@ -153,6 +156,9 @@ class StoryScope:
             try:
                 resource.release()
                 box["status"] = (S.RELEASED, "")
+            except InvariantError as e:  # uncontainable (§4): carried across the thread and re-raised by the caller
+                box["invariant"] = e
+                raise
             except Residual as e:
                 box["status"] = (S.RESIDUAL, str(e))
             except Exception as e:
@@ -164,6 +170,8 @@ class StoryScope:
         t = threading.Thread(target=run, name=f"release {resource.name}", daemon=True)
         t.start()
         t.join(self._timeout)
+        if "invariant" in box:
+            raise box["invariant"]
         if t.is_alive():
             return S.RESIDUAL, f"not released: the release was still running after {self._timeout:g}s"
         return box["status"]

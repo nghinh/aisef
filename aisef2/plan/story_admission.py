@@ -24,7 +24,7 @@ from aisef2.arch.enums import (
     ProbeExecutionStatus, StoryAdmissionDisposition,
 )
 from aisef2.control.owner import Classification, FailureCode, classify as owner_of
-from aisef2.control.routing import STORY_ADMISSION, UnroutableOutcome, route
+from aisef2.control.routing import STORY_ADMISSION, UnroutableOutcome, row_for
 from aisef2.errors import InvariantError
 from aisef2.plan.obligation import Plan, PlanObligation
 from aisef2.probe.protocol import ExecutionEnv, Probe, ProbeRecord, RevisionRef, bound_result, run_probe
@@ -77,10 +77,7 @@ def classify(obligation: PlanObligation, record: ProbeRecord, spec: ProductProof
     record's binding to this spec, this parent and this enforcement level (PROBE-BIND-1/2). Routes on satisfaction
     only; owners are the F2 routing table's at MeasurementPoint.PARENT."""
     result = bound_result(record, spec=spec, revision=revision, enforcement=enforcement)
-    try:
-        routed = route(result, spec, MeasurementPoint.PARENT, obligation.role)
-    except UnroutableOutcome:
-        routed = None
+    routed = row_for(result, spec, MeasurementPoint.PARENT, obligation.role)  # None: no declared routing (§13 below)
     if result.status is ProbeExecutionStatus.UNRUNNABLE:
         return Decision(D.PROBE_UNRUNNABLE, routed.failure, None, "§13: probe UNRUNNABLE -> PROBE_UNRUNNABLE, owner "
                                                                   "ENVIRONMENT")

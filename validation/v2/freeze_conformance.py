@@ -37,7 +37,7 @@ FROZEN_IDS = [f"F{i}" for i in range(1, 12)]
 #: The phase the Cycle-1 implementation has reached. Every sub-check owned by a package in this phase or an earlier
 #: one must PASS. Advanced by one reviewed line at each phase boundary.
 # ponytail: a constant, not a progress database; move it into a progress record if phases start overlapping.
-CURRENT_PHASE = "P4"
+CURRENT_PHASE = "P5"
 
 PASS, FAIL, PENDING = "PASS", "FAIL", "PENDING"
 
@@ -183,6 +183,35 @@ def _shape(module: str, attr: str | None, reference) -> dict:
     return {"state": FAIL, "rfc_reference": reference,
             "detail": f"{module}{'.' + attr if attr else ''} exists but no conformance comparison has been written for "
                       "it — presence without evaluation is never a pass"}
+
+
+def _invariants_armed(reference: list[str] | None) -> dict:
+    """F10 (WP-5.5): I..IX registered with resolved mechanisms and armed in every test tier — evaluated by
+    registering the registry (which fails closed on any defect) and importing every tier package, then reading
+    what is armed. Never a pass by presence."""
+    if not reference:
+        return {"state": FAIL, "detail": "RFC reference for the invariant set could not be extracted"}
+    if not symbol_present("aisef2.invariants.registry", "arm"):
+        return {"state": None, "detail": "aisef2.invariants.registry.arm not implemented", "rfc_reference": reference}
+    reg = importlib.import_module("aisef2.invariants.registry")
+    try:
+        registered = reg.register()
+    except reg.RegistrationError as e:
+        return {"state": FAIL, "detail": f"registration refused: {e}", "rfc_reference": reference}
+    ids = [i.id.value for i in registered.invariants]
+    if ids != reference:
+        return {"state": FAIL, "detail": "the registry's invariants differ from the RFC's", "rfc_reference": reference,
+                "implemented": ids}
+    for tier in reg.Tier:
+        importlib.import_module(tier.value.replace("/", "."))
+    armed = reg.armed()
+    unarmed = [t.value for t in reg.Tier if set(armed.get(t, ())) != set(reg.InvariantId)]
+    if unarmed:
+        return {"state": FAIL, "detail": f"not armed in every tier: {unarmed}", "rfc_reference": reference}
+    mechanisms = {i.id.value: [m.ref for m in i.mechanisms] for i in registered.invariants}
+    return {"state": PASS, "rfc_reference": reference, "mechanisms": mechanisms, "tiers": [t.value for t in reg.Tier],
+            "detail": f"I..IX registered with {sum(len(v) for v in mechanisms.values())} resolved mechanisms and armed "
+                      f"in {len(armed)} of {len(reg.Tier)} tiers"}
 
 
 def _fields(module: str, attr: str, reference: list[str] | None) -> dict:
@@ -677,8 +706,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     add("F10", "F10.invariant_ids", "WP-0.2", V("InvariantId", list(inv), code, by_value=True))
     titles = [f"{k}:{v}" for k, v in inv.items()]
     add("F10", "F10.invariant_titles", "WP-0.2", V("__invariant_titles__", titles, code, by_value=True))
-    add("F10", "F10.invariants_armed_with_mechanisms", "WP-5.5",
-        _shape("aisef2.invariants.registry", "arm", list(inv) if len(inv) == 9 else None))
+    add("F10", "F10.invariants_armed_with_mechanisms", "WP-5.5", _invariants_armed(list(inv) if len(inv) == 9 else None))
     add("F11", "F11.closed_projection_list", "WP-0.2",
         V("ControlProjection", rfc.control_projections(), code, by_value=True))
     add("F11", "F11.projections_implemented", "WP-3.4", _projections_match_rfc(rfc))

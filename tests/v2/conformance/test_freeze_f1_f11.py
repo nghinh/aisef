@@ -1,6 +1,7 @@
 """WP-0.3 — F1–F11 conformance: definite states, RFC-extracted references, and no pass by absence."""
 
 import copy
+import importlib
 import importlib.util
 import pathlib
 import unittest
@@ -90,12 +91,18 @@ class Conformance(unittest.TestCase):
         self.assertNotIn(fc.PASS, {i["state"] for i in r["items"]})
 
     def test_later_phase_symbol_present_without_evaluation_is_FAIL_not_PASS(self):
-        real = fc.symbol_present
-        with mock.patch.object(fc, "symbol_present",
-                               lambda m, a: True if m == "aisef2.invariants.registry" else real(m, a)):
+        # presence alone never passes: the shape helper says so of any symbol that has no comparison written for it
+        shape = fc._shape("aisef2.invariants.registry", "arm", ["I", "II"])
+        self.assertEqual(shape["state"], fc.FAIL)
+        self.assertIn("presence without evaluation is never a pass", shape["detail"])
+        # and F10's real evaluation refuses a registry that cannot be registered: never a pass by presence either
+        reg = importlib.import_module("aisef2.invariants.registry")
+        with mock.patch.object(reg, "register", side_effect=reg.RegistrationError("I has no enforcement mechanism")):
             r = fc.evaluate(self.rfc, self.code, self.manifest)
-        self.assertEqual(self._sub(r, "F10.invariants_armed_with_mechanisms")["state"], fc.FAIL)
-        self.assertEqual(self._items(r)["F10"], fc.FAIL)
+        sub = self._sub(r, "F10.invariants_armed_with_mechanisms")
+        self.assertEqual((sub["state"], self._items(r)["F10"]), (fc.FAIL, fc.FAIL))
+        self.assertIn("registration refused: I has no enforcement mechanism", sub["detail"])
+        self.assertEqual(self._sub(self.result, "F10.invariants_armed_with_mechanisms")["state"], fc.PASS)
 
     def test_unextractable_rfc_reference_is_FAIL_never_vacuous_PASS(self):
         broken = self.rfc.replace("class Owner(Enum):", "class OwnerRemoved(Enum):", 1)
@@ -105,10 +112,13 @@ class Conformance(unittest.TestCase):
         self.assertIn("could not be extracted", self._sub(r, "F3.owner_set")["detail"])
 
     def test_advancing_the_phase_turns_pending_into_ratchet_failures(self):
-        with mock.patch.object(fc, "CURRENT_PHASE", "P5"):
+        real = fc.symbol_present   # the P5 shape absent while CURRENT_PHASE is P5: a ratchet failure, never PENDING
+        with mock.patch.object(fc, "symbol_present",
+                               lambda m, a: False if m == "aisef2.invariants.registry" else real(m, a)):
             r = fc.evaluate(self.rfc, self.code, self.manifest)
         self.assertEqual(self._sub(r, "F10.invariants_armed_with_mechanisms")["state"], fc.FAIL)
         self.assertIn("F10.invariants_armed_with_mechanisms", r["ratchet_violations"])
+        self.assertEqual(r["summary"]["PENDING"], 0)
         self.assertEqual(self._sub(r, "F11.projections_implemented")["state"], fc.PASS)  # implemented in P3
         self.assertEqual(self._sub(r, "F8.scopes_and_lifetime_order")["state"], fc.PASS)  # implemented in P4
         self.assertEqual(self._sub(r, "F9.cited_identities_and_runspec")["state"], fc.PASS)

@@ -759,6 +759,7 @@ def story_admission() -> dict:
 
 def plan_drift() -> dict:
     from aisef2.arch.enums import ContractSatisfaction as CS, EventType
+    from aisef2.errors import InvariantError
     from aisef2.plan import drift as dr
     from aisef2.plan import story_admission as sa
     from aisef2.plan.obligation import PlanQualityPolicy
@@ -775,7 +776,7 @@ def plan_drift() -> dict:
         if adm.developer_call_permitted:
             sa.request_developer(sink, "S2", {"criteria": list(cont.developer_work)})
         else:
-            refused = _raises_invariant(lambda: sa.request_developer(sink, "S2"), Exception)
+            refused = _raises_invariant(lambda: sa.request_developer(sink, "S2"), InvariantError)
         return {"dispositions": {o.criterion_id: o.decision.disposition.value for o in adm.obligations},
                 "developer_call_permitted": adm.developer_call_permitted,
                 "already_satisfied": cont.already_satisfied, "developer_work": list(cont.developer_work),
