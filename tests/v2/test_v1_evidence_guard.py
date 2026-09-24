@@ -19,6 +19,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 _NAME = "aisef_v2_v1_evidence_guard"
@@ -126,9 +127,42 @@ class Preventive(unittest.TestCase):
             os.close(fd)
 
 
+#: The throwaway repository owns its lifecycle: `git commit` runs `git maintenance run --auto --detach` by default, and
+#: a detached gc can still be writing .git/objects when TemporaryDirectory cleanup starts (CI of 61ec78b, unit ubuntu
+#: 3.12: "Directory not empty: .git/objects", classified HARNESS). gc.auto=0 leaves the gc task nothing to do;
+#: gc.autoDetach=false keeps whatever maintenance runs a synchronous child (`--no-detach`, measured with GIT_TRACE).
+GIT_NO_DETACH = ("-c", "gc.auto=0", "-c", "gc.autoDetach=false")
+
+
 def _git(root, *args):
-    return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t.t", *args], cwd=root,
+    return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t.t", *GIT_NO_DETACH, *args], cwd=root,
                           capture_output=True, encoding="utf-8", check=True).stdout.strip()
+
+
+class ThrowawayRepositoryLifecycle(unittest.TestCase):
+    """No detached git maintenance may outlive the throwaway repository (the HARNESS failure of CI run 35933198231).
+    Deterministic: the invocation is inspected, and git itself reports the configuration it will honour."""
+
+    def test_every_git_invocation_carries_the_anti_detach_configuration(self):
+        seen = []
+
+        def fake_run(argv, **kw):
+            seen.append(list(argv))
+            return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+        with mock.patch.object(subprocess, "run", fake_run):
+            _git("/nowhere", "commit", "-q", "-m", "x")
+        (argv,) = seen
+        pairs = set(zip(argv, argv[1:], strict=False))
+        self.assertEqual(argv[0], "git")
+        self.assertIn(("-c", "gc.auto=0"), pairs)
+        self.assertIn(("-c", "gc.autoDetach=false"), pairs)
+        self.assertLess(argv.index("gc.autoDetach=false"), argv.index("commit"))  # configuration, not a commit argument
+
+    def test_git_reports_the_configuration_inside_the_throwaway_repository(self):
+        with tempfile.TemporaryDirectory() as t:
+            _git(t, "init", "-q")
+            self.assertEqual(_git(t, "config", "--get", "gc.auto"), "0")
+            self.assertEqual(_git(t, "config", "--get", "gc.autoDetach"), "false")
 
 
 class Detective(unittest.TestCase):

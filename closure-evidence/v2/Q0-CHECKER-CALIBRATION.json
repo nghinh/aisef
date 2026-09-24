@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 31,
+ "checker_count": 32,
  "uncovered_checker_modules": [],
- "calibrated_count": 31,
- "always_pass_mutants_rejected": 31,
+ "calibrated_count": 32,
+ "always_pass_mutants_rejected": 32,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -405,6 +405,21 @@
    "expected": "property SCOPE_1_acquire_during_disposal_refused is false",
    "observed": [
     "WP-4.1: property SCOPE_1_acquire_during_disposal_refused is false"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "p5_evidence",
+   "package": "WP-5.1",
+   "fixture": "tests/v2/fixtures/known_bad/p5_evidence.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "property no_did_not_run_to_developer_edge_exists_anywhere is false",
+   "observed": [
+    "WP-5.1: property no_did_not_run_to_developer_edge_exists_anywhere is false"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

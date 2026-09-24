@@ -37,7 +37,8 @@ if str(pathlib.Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(1, str(pathlib.Path(__file__).resolve().parent))
 import cleanup_authority as ca  # noqa: E402  — the runner's only way to signal a process (P4-FINDING-011)
 RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
-           "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json"}
+           "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json",
+           "P5": "closure-evidence/v2/P5-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -242,7 +243,15 @@ P4_TARGETS: dict[str, list[str]] = {
     **{f"aisef2/runtime/run_scope.py::{f}": _INT_TESTS for f in (
         "RunScope._now", "RunScope.interrupt", "RunScope._second_interrupt_abandons")},
 }
-PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS}
+_EXEC_TESTS = ["tests/v2/p5/test_test_execution.py"]
+P5_TARGETS: dict[str, list[str]] = {
+    # WP-5.1: the typed shape, the only mapping from a runner's report, the cause classification, the adapters
+    **{f"aisef2/quality/test_execution.py::{f}": _EXEC_TESTS for f in (
+        "classify", "_cause_owner", "_owner_for", "unrunnable", "TestExecution.__post_init__", "DeveloperTests.owns",
+        "DeveloperTests.__post_init__", "CollectionError.__post_init__", "Case.__post_init__", "_read_unittest",
+        "_read_junit", "_norm", "project_top_level")},
+}
+PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}

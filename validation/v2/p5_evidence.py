@@ -1,0 +1,187 @@
+"""P5 evidence records — computed from the code, never written by hand, with a --check twin (the P3/P4 contract).
+
+Each record carries `properties`, named facts measured on the implementation by running the named test case (the test
+is the measurement); `--check` re-derives every record and fails if it differs from the committed one or if any
+property is false. Records hold outcomes only — never a pid, a path, a duration or a wall-clock time — so a rebuild
+is byte-identical on Linux, macOS and Windows (Q0 rebuilds them on every CI job).
+
+    python -P validation/v2/p5_evidence.py            # write every record whose package is implemented
+    python -P validation/v2/p5_evidence.py --check    # fail on drift or on a false property
+"""
+
+from __future__ import annotations
+
+import importlib.util
+import json
+import pathlib
+import sys
+import unittest
+from typing import Callable
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+
+def _module(name: str, rel: str):
+    if name in sys.modules:
+        return sys.modules[name]
+    spec = importlib.util.spec_from_file_location(name, ROOT / rel)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def passed(case: unittest.TestCase) -> bool:
+    """The named test ran and passed (a skip is not a pass)."""
+    result = unittest.TestResult()
+    case.run(result)
+    return result.wasSuccessful() and result.testsRun == 1 and not result.skipped
+
+
+def cases(module, cls: str, *names: str) -> dict[str, bool]:
+    return {n: passed(getattr(module, cls)(n)) for n in names}
+
+
+# --------------------------------------------------------------------------------------- WP-5.1
+
+def test_execution() -> dict:
+    from aisef2.arch.enums import Owner
+    from aisef2.quality import test_execution as te
+    t = _module("aisef_v2_p5_test_test_execution", "tests/v2/p5/test_test_execution.py")
+    shape = cases(t, "Shape", "test_the_fields_are_the_rfcs",
+                  "test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner",
+                  "test_EXECUTED_owner_follows_outcome_and_selection",
+                  "test_typed_inputs_refuse_untyped_causes_and_absolute_paths")
+    rules = cases(t, "Classify", "test_TEST_1_a_missing_runner_is_UNRUNNABLE_ENVIRONMENT_with_no_outcome_and_no_selection",
+                  "test_TEST_2_failing_assertions_are_EXECUTED_FAILED_STORY_TESTS_RAN_DEVELOPER",
+                  "test_a_passing_suite_is_EXECUTED_PASSED_STORY_TESTS_RAN_with_no_owner",
+                  "test_rule_4_collection_cause_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+                  "test_rule_4_collection_cause_in_the_projects_own_tree_is_DEVELOPER",
+                  "test_rule_4_undeterminable_collection_cause_is_INTEGRATION_never_DEVELOPER",
+                  "test_rule_3_no_story_test_matched_is_DEVELOPER_by_the_typed_value_and_distinct_from_UNRUNNABLE",
+                  "test_rule_5_regressions_use_the_identical_rules", "test_no_did_not_run_to_developer_edge_exists",
+                  "test_a_story_file_the_runner_could_not_collect_is_never_hidden_by_the_story_files_that_ran",
+                  "test_the_outcome_is_the_storys_tests_never_another_files")
+    real = cases(t, "RealRunner", "test_a_passing_suite_yields_EXECUTED_PASSED_STORY_TESTS_RAN", "test_TEST_2_for_real",
+                 "test_TEST_1_for_real_the_configured_runner_is_absent",
+                 "test_a_runner_that_crashes_before_reporting_is_UNRUNNABLE",
+                 "test_collection_failure_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+                 "test_collection_failure_on_the_projects_own_tree_is_DEVELOPER",
+                 "test_undeterminable_collection_cause_is_INTEGRATION",
+                 "test_an_empty_selection_is_NO_STORY_TESTS_MATCHED_DEVELOPER",
+                 "test_a_directory_target_is_discovered_and_a_node_id_selects_one_test",
+                 "test_the_harness_deadline_is_UNRUNNABLE_and_the_range_is_released",
+                 "test_the_candidate_is_the_only_tree_execute_knows",
+                 "test_the_result_set_is_typed_and_carries_the_collection_detail")
+    adapter = cases(t, "PytestAdapter", "test_the_junit_result_set_is_read_typed")
+    return {
+        "record": "AISEF V2 — P5 TEST EXECUTION",
+        "work_package": "WP-5.1",
+        "rfc": "§15.0 (F1 payload enums TestExecutionStatus, TestOutcome, TestSelection; F3 owners)",
+        "implementation": "aisef2/quality/test_execution.py",
+        "runners": {"unittest": "harness-owned, stdlib alone, run with -E -s -c inside an owned process range",
+                    "pytest": "read through its junit result set (xunit1)"},
+        "taxonomy": "unchanged: FailureCode (carried by failure/observed, F1 by the V2-003 reading) gains no member in "
+                    "WP-5.1; the engineering-quality codes are proposed under ARCHITECTURE EXCEPTION V2-004 for the "
+                    "owner's decision before WP-5.4 wires TestExecution into routing and budgets",
+        "properties": {
+            "TEST_1_missing_runner_UNRUNNABLE_ENVIRONMENT_no_outcome_no_selection":
+                rules["test_TEST_1_a_missing_runner_is_UNRUNNABLE_ENVIRONMENT_with_no_outcome_and_no_selection"]
+                and real["test_TEST_1_for_real_the_configured_runner_is_absent"],
+            "TEST_2_failing_assertions_EXECUTED_FAILED_INADEQUATE_owner_DEVELOPER":
+                rules["test_TEST_2_failing_assertions_are_EXECUTED_FAILED_STORY_TESTS_RAN_DEVELOPER"]
+                and real["test_TEST_2_for_real"],
+            "passing_suite_EXECUTED_PASSED_STORY_TESTS_RAN":
+                rules["test_a_passing_suite_is_EXECUTED_PASSED_STORY_TESTS_RAN_with_no_owner"]
+                and real["test_a_passing_suite_yields_EXECUTED_PASSED_STORY_TESTS_RAN"],
+            "collection_cause_declared_environment_dependency_UNRUNNABLE_ENVIRONMENT_SS81A":
+                rules["test_rule_4_collection_cause_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT"]
+                and real["test_collection_failure_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT"],
+            "collection_cause_project_source_DEVELOPER":
+                rules["test_rule_4_collection_cause_in_the_projects_own_tree_is_DEVELOPER"]
+                and real["test_collection_failure_on_the_projects_own_tree_is_DEVELOPER"],
+            "collection_cause_undeterminable_INTEGRATION_never_DEVELOPER":
+                rules["test_rule_4_undeterminable_collection_cause_is_INTEGRATION_never_DEVELOPER"]
+                and real["test_undeterminable_collection_cause_is_INTEGRATION"],
+            "collection_cause_syntax_error_in_the_developers_file_DEVELOPER":
+                rules["test_rule_4_collection_cause_in_the_projects_own_tree_is_DEVELOPER"],
+            "NO_STORY_TESTS_MATCHED_DEVELOPER_by_the_typed_value_distinct_from_UNRUNNABLE":
+                rules["test_rule_3_no_story_test_matched_is_DEVELOPER_by_the_typed_value_and_distinct_from_UNRUNNABLE"]
+                and real["test_an_empty_selection_is_NO_STORY_TESTS_MATCHED_DEVELOPER"],
+            "regression_execution_uses_the_identical_rules": rules["test_rule_5_regressions_use_the_identical_rules"],
+            "story_collection_failure_never_hidden_by_story_tests_that_ran_rule_4_before_rule_2":
+                rules["test_a_story_file_the_runner_could_not_collect_is_never_hidden_by_the_story_files_that_ran"]
+                and real["test_the_result_set_is_typed_and_carries_the_collection_detail"],
+            "outcome_is_the_storys_own_tests_never_another_files":
+                rules["test_the_outcome_is_the_storys_tests_never_another_files"],
+            "no_did_not_run_to_developer_edge_exists_anywhere":
+                rules["test_no_did_not_run_to_developer_edge_exists"]
+                and shape["test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner"],
+            "UNRUNNABLE_is_never_INADEQUATE_or_INCOMPLETE_downstream":
+                shape["test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner"],
+            "shape_is_the_rfcs_and_typed": shape["test_the_fields_are_the_rfcs"]
+                and shape["test_EXECUTED_owner_follows_outcome_and_selection"]
+                and shape["test_typed_inputs_refuse_untyped_causes_and_absolute_paths"],
+            "runner_crash_before_reporting_UNRUNNABLE": real["test_a_runner_that_crashes_before_reporting_is_UNRUNNABLE"],
+            "harness_deadline_UNRUNNABLE_and_range_released":
+                real["test_the_harness_deadline_is_UNRUNNABLE_and_the_range_is_released"],
+            "selection_by_directory_and_by_node_id": real["test_a_directory_target_is_discovered_and_a_node_id_selects_one_test"],
+            "pytest_result_set_read_typed": adapter["test_the_junit_result_set_is_read_typed"],
+            "no_parent_revision_reaches_execution_IX": real["test_the_candidate_is_the_only_tree_execute_knows"],
+            "unrunnable_owner_is_environment_by_the_typed_value": te.unrunnable("r").owner_on_failure is Owner.ENVIRONMENT
+                and te.unrunnable("r").outcome is None and te.unrunnable("r").selection is None,
+            "classifier_reads_typed_causes_never_prose": te.CollectionError.__post_init__ is not None
+                and "IMPORT" in te.__dict__ and all(k in ("IMPORT", "SYNTAX", "OTHER") for k in (te.IMPORT, te.SYNTAX, te.OTHER)),
+        },
+    }
+
+
+BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
+    "WP-5.1": ("closure-evidence/v2/P5-TEST-EXECUTION.json", test_execution, "aisef2/quality/test_execution.py"),
+}
+
+
+def render(record: dict) -> str:
+    return json.dumps(record, indent=1, ensure_ascii=False) + "\n"
+
+
+def problems_of(record: dict) -> list[str]:
+    props = record.get("properties") or {}
+    out = [] if props else [f"{record.get('work_package')}: record carries no properties"]
+    return out + [f"{record.get('work_package')}: property {k} is false" for k, v in props.items() if v is not True]
+
+
+def check(root: pathlib.Path = ROOT) -> list[str]:
+    out = []
+    for rel, build, needs in BUILDERS.values():
+        if not (root / needs).exists():
+            continue
+        fresh = build()
+        out += problems_of(fresh)
+        committed = root / rel
+        if not committed.exists():
+            out.append(f"{rel} is missing")
+        elif committed.read_text(encoding="utf-8") != render(fresh):
+            out.append(f"{rel} is stale: regenerate it")
+    return out
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    if "--check" in argv:
+        problems = check()
+        for p in problems:
+            print(f"FAIL  {p}")
+        print("p5 evidence: " + ("FAIL" if problems else "PASS"))
+        return 1 if problems else 0
+    for rel, build, needs in BUILDERS.values():
+        if (ROOT / needs).exists():
+            (ROOT / rel).write_text(render(build()), encoding="utf-8")
+            print(f"wrote {rel}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

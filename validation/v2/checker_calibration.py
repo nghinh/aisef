@@ -298,6 +298,12 @@ def _p4_evidence() -> Checker:
                    ("validation/v2/p4_evidence.py",))
 
 
+def _p5_evidence() -> Checker:
+    ev = _load("aisef_v2_p5_evidence", V2 / "p5_evidence.py")
+    return Checker("p5_evidence", "WP-5.1", lambda: ev.check(ROOT), lambda fx: ev.problems_of(fx["record"]),
+                   ("validation/v2/p5_evidence.py",))
+
+
 def _owned_run() -> Checker:
     ow = _load("aisef_v2_owned_run", V2 / "owned_run.py")
     return Checker("owned_run", "WP-4.2", lambda: ow.check(ROOT), lambda fx: ow.problems_of(fx["measurement"]),
@@ -353,7 +359,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_side_retry_counter", "NO_SIDE_RETRY_COUNTER", "WP-4.5"),
     _kernel_rule("sentinel_is_not_evidence", "SENTINEL_IS_NOT_EVIDENCE", "WP-4.3"),
     _kernel_rule("one_signal_authority", "ONE_SIGNAL_AUTHORITY", "P4 correction (V2-003, RFC §9.3)"),
-    _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
+    _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _p5_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
 ]
 
 
