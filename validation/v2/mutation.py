@@ -299,6 +299,28 @@ P6_TARGETS.update({f"aisef2/journal/format3.py::{f}": _FMT3_TESTS for f in (
     "_budget_owner", "_checks", "_execution", "_format_rule", "_static_admission_rule", "_verified_payload_rule",
     "_adequacy_rule", "_failure_schema", "SCHEMAS", "_static_admitted", "_story_active", "_verified", "verified_proof",
     "_cites", "validate", "declared_format", "reconstruct", "JournalWriter3.append")})
+# WP-6.2: the single authoritative orchestration path (aisef2/orchestrate). Every stage module is killed by the
+# per-stage tests; the runner's two path functions by the real-path cases (ORCH-1..16, ORCH-SCHEMA-1..10) as well.
+_ORCH_STAGES = ["tests/v2/test_p6_stages.py"]
+_ORCH_PATH = [*_ORCH_STAGES, "tests/v2/test_p6_orchestration.py"]
+P6_TARGETS.update({f"aisef2/orchestrate/{m}::{f}": _ORCH_STAGES for m, fs in (
+    ("adapters.py", ("Implemented.__post_init__", "Finding.blocks", "ReadOnlyScope.read", "ReadOnlyScope.files",
+                     "confine", "unconfine", "Merge.__post_init__")),
+    ("gate.py", ("PROJECTIONS", "check", "decision")),
+    ("merge.py", ("merge", "affected_preserve", "reprove")),
+    ("proof.py", ("Ranged.__init__", "Party.__init__", "Party.run", "prove", "obligations_of")),
+    ("quality.py", ("payload", "assess")),
+    ("review.py", ("_result", "review")),
+    ("seam.py", ("SeamRefusal.__init__", "resolve", "admit_legacy")),
+    ("security.py", ("scan",)),
+    ("story_runner.py", ("StoryResult.committed", "StoryResult.revision", "_Held.__init__", "_Held.__call__",
+                         "_Held.release", "_committed", "_freeze_plan", "_fail", "_probe")),
+    ("workspace.py", ("_NO_BACKGROUND_GIT", "git", "_sha", "Scratch.__init__", "Scratch.release", "Checkout.__init__",
+                      "Checkout.release", "GitWorkspace.scratch", "GitWorkspace.checkout", "GitWorkspace.move",
+                      "GitWorkspace.diff", "GitMerger.base", "GitMerger.merge", "GitMerger.revert", "commit_all")),
+) for f in fs})
+P6_TARGETS.update({f"aisef2/orchestrate/story_runner.py::{f}": _ORCH_PATH for f in ("run_story", "_attempt")})
+P6_TARGETS["aisef2/journal/format3.py::verified_payload"] = [*_FMT3_TESTS, *_ORCH_STAGES]
 for _t in ("aisef2/journal/projections/budgets.py::Budgets.step", "aisef2/journal/projections/story_state.py::StoryState.step",
            "aisef2/journal/projections/story_state.py::_WITHIN", "aisef2/journal/projections/story_state.py::_OUTCOMES",
            "tests/v2/refmodel/budgets.py::_walk", "tests/v2/refmodel/budgets.py::model",

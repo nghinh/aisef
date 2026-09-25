@@ -230,6 +230,22 @@ def verified_proof(event: Event, prior: Sequence[Event]) -> dict:
             "verifier_result": b, "agreement": event.data["agreement"], "verdict": event.data.get("verdict")}
 
 
+def verified_payload(*, story_id: str, criterion_id: str, spec_id: str, semantic_hash: str, candidate: str,
+                     implementer: Mapping, verifier: Mapping) -> dict:
+    """The `proof/verified` payload for two sealed probe records (their plain form), computed the way `_verified`
+    reads it back: agreement is whether the two results are equal, and the verdict is set only when they agree and
+    carry one. Control never reads the verdict from here — it routes on the bound result (§10.1); this only carries
+    what the records say into the journal (§16)."""
+    a, b = implementer["result"], verifier["result"]
+    agreement = a == b
+    verdict = a.get("behavior_verdict") if agreement and isinstance(a, Mapping) else None
+    payload = {"story_id": story_id, "criterion_id": criterion_id, "spec_id": spec_id, "semantic_hash": semantic_hash,
+               "candidate": candidate, "agreement": agreement}
+    if verdict is not None:
+        payload["verdict"] = verdict
+    return payload
+
+
 def _cites(event: Event, cite: ev.Cite | None, prior: Sequence[Event]) -> None:
     if cite is None:
         if event.source_seqs:

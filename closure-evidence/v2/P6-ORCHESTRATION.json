@@ -1,0 +1,927 @@
+{
+ "record": "AISEF V2 — P6 ORCHESTRATION (the single authoritative story path)",
+ "work_package": "WP-6.2",
+ "rfc": "§5, §13–§17, §20.1, §22, §25, §26, §31 (as amended by ARCHITECTURE-EXCEPTION-V2-005)",
+ "implementation": {
+  "aisef2/orchestrate/adapters.py": "1a62777b7bb1192aece22b3deba62727bae33676f8748d327bfc3aa749913bcd",
+  "aisef2/orchestrate/gate.py": "1174867c246d7f71e2c5ce7bca241bd09ea375d17d5632c79c37ef7cb2dcf0ff",
+  "aisef2/orchestrate/merge.py": "2a6a4af092f878539f1a7ad7fb2c98cca8534c27db9b23228fb54d55b237c7ae",
+  "aisef2/orchestrate/proof.py": "c870ec47d5c661249e1da432412ba0e874e1b8f12dd4625a7cc3839da67e1138",
+  "aisef2/orchestrate/quality.py": "31a5691c9ea7e212e1c9b1bcaaa80857a86e91249cc2e5b3d176d23382c0697e",
+  "aisef2/orchestrate/review.py": "e69618688509735fd241f507f44a58d8e7730ab7a940a2b810039cefcc073f20",
+  "aisef2/orchestrate/seam.py": "433b966d97b8b2b86d58765d320c02105f4365ed79d603ca5d33862c6775948f",
+  "aisef2/orchestrate/security.py": "d30b41638f3aafbeb0d25e2fea28f797fe1644f94ba8960b837827bcf9935798",
+  "aisef2/orchestrate/story_runner.py": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+  "aisef2/orchestrate/workspace.py": "2ac065d34411b010e26a91ad1fb6fdeb3bf7975847941c43e9485eab3b86c8da"
+ },
+ "path": {
+  "entry": "aisef2/orchestrate/story_runner.py::run_story",
+  "signature": [
+   "run",
+   "plan",
+   "story_id",
+   "inputs",
+   "adapters",
+   "policy"
+  ],
+  "stages": [
+   "S1:admission",
+   "S1:developer",
+   "S1:proof:C1",
+   "S1:quality",
+   "S1:review",
+   "S1:security",
+   "S1:merge",
+   "S1:post-merge:C1"
+  ],
+  "trace": {
+   "committed": true,
+   "attempts": [
+    "COMMIT"
+   ],
+   "event_types": [
+    "run/begin",
+    "capability/resolved",
+    "run/spec-resolved",
+    "plan/frozen",
+    "story/begin",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "probe/evaluated",
+    "story/admitted",
+    "story/resource-released",
+    "gate/check",
+    "provider/request",
+    "provider/result",
+    "gate/check",
+    "story/resource-acquired",
+    "story/resource-released",
+    "probe/evaluated",
+    "story/resource-acquired",
+    "story/resource-released",
+    "probe/evaluated",
+    "proof/verified",
+    "gate/check",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "tests/adequacy",
+    "story/resource-released",
+    "story/resource-released",
+    "story/resource-released",
+    "gate/check",
+    "provider/request",
+    "provider/result",
+    "gate/check",
+    "story/resource-acquired",
+    "tool/invoked",
+    "tool/result",
+    "story/resource-released",
+    "gate/check",
+    "gate/check",
+    "story/resource-acquired",
+    "story/resource-released",
+    "probe/evaluated",
+    "story/resource-acquired",
+    "story/resource-released",
+    "probe/evaluated",
+    "proof/verified",
+    "gate/check",
+    "gate/decision",
+    "story/commit",
+    "story/dispose",
+    "story/resource-released",
+    "story/resource-released",
+    "story/resource-released",
+    "story/end"
+   ],
+   "story_gate_rows": [
+    [
+     "S1:admission",
+     true
+    ],
+    [
+     "S1:developer",
+     true
+    ],
+    [
+     "S1:proof:C1",
+     true
+    ],
+    [
+     "S1:quality",
+     true
+    ],
+    [
+     "S1:review",
+     true
+    ],
+    [
+     "S1:security",
+     true
+    ],
+    [
+     "S1:merge",
+     true
+    ],
+    [
+     "S1:post-merge:C1",
+     true
+    ]
+   ],
+   "decision_cites_every_row": true,
+   "resources_acquired": [
+    "scratch-S1",
+    "wt-S1",
+    "verifier-wt-S1",
+    "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [admission 1]",
+    "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [C1/CANDIDATE implementer]",
+    "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [C1/CANDIDATE verifier]",
+    "tests S1 [tests 1]",
+    "tests S1 [tests 2]",
+    "tests S1 [tests 3]",
+    "tool scan-S1#1",
+    "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [C1/POST_MERGE implementer]",
+    "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [C1/POST_MERGE verifier]"
+   ],
+   "resources_released": [
+    [
+     "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [admission 1]",
+     "RELEASED"
+    ],
+    [
+     "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [C1/CANDIDATE implementer]",
+     "RELEASED"
+    ],
+    [
+     "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [C1/CANDIDATE verifier]",
+     "RELEASED"
+    ],
+    [
+     "tests S1 [tests 3]",
+     "RELEASED"
+    ],
+    [
+     "tests S1 [tests 2]",
+     "RELEASED"
+    ],
+    [
+     "tests S1 [tests 1]",
+     "RELEASED"
+    ],
+    [
+     "tool scan-S1#1",
+     "RELEASED"
+    ],
+    [
+     "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [C1/POST_MERGE implementer]",
+     "RELEASED"
+    ],
+    [
+     "probe PPS-70b9d0e7c24e3ee127e6d2f9d9b5b8085bbcca90714f0b7856e794e4f18580b0 [C1/POST_MERGE verifier]",
+     "RELEASED"
+    ],
+    [
+     "verifier-wt-S1",
+     "RELEASED"
+    ],
+    [
+     "wt-S1",
+     "RELEASED"
+    ],
+    [
+     "scratch-S1",
+     "RELEASED"
+    ]
+   ],
+   "provider_requests": [
+    "DEVELOPER",
+    "REVIEW"
+   ],
+   "proofs": [
+    [
+     "C1",
+     true,
+     "SATISFIED"
+    ],
+    [
+     "C1",
+     true,
+     "SATISFIED"
+    ]
+   ],
+   "adequacy": [
+    [
+     "ADEQUATE",
+     null
+    ]
+   ],
+   "budgets": {
+    "format": 3,
+    "developer": {
+     "S1": {
+      "criteria": {
+       "C1": 1
+      },
+      "requests": 1
+     }
+    },
+    "review": {
+     "S1": {
+      "criteria": {
+       "C1": 1
+      },
+      "requests": 1
+     }
+    },
+    "security": {},
+    "retries": {}
+   },
+   "story_state": {
+    "admitted": true,
+    "attempt": 1,
+    "outcome": "COMMIT",
+    "state": "ENDED"
+   }
+  }
+ },
+ "static": {
+  "v1_imports": [],
+  "failure_codes_emitted": [
+   "PROVIDER_UNAVAILABLE",
+   "UNKNOWN",
+   "VERIFIER_DISAGREEMENT",
+   "PROBE_MISMATCH",
+   "MERGE_CONFLICT",
+   "TESTS_UNRUNNABLE",
+   "TESTS_INADEQUATE",
+   "REVIEW_FINDING",
+   "SECURITY_FINDING",
+   "CAPABILITY_UNRUNNABLE",
+   "RESOURCE_ACQUISITION_FAILED"
+  ],
+  "v2_005_codes_emitted": [
+   "CAPABILITY_UNRUNNABLE",
+   "MERGE_CONFLICT",
+   "PROBE_MISMATCH",
+   "RESOURCE_ACQUISITION_FAILED",
+   "REVIEW_FINDING",
+   "SECURITY_FINDING",
+   "TESTS_INADEQUATE",
+   "TESTS_UNRUNNABLE",
+   "VERIFIER_DISAGREEMENT"
+  ],
+  "seam": {
+   "module": "aisef2/orchestrate/seam.py",
+   "entry": "admit_legacy",
+   "before_the_story_begins": true,
+   "refuses": "HUMAN_DECLARATION_REQUIRED"
+  },
+  "confinement": {
+   "derived_by": "aisef2/orchestrate/adapters.py::confine(story_id, checkout)",
+   "parameters": [
+    "story_id",
+    "checkout"
+   ],
+   "confinement_like_parameters_in_api": []
+  },
+  "run_story_signature": [
+   "run",
+   "plan",
+   "story_id",
+   "inputs",
+   "adapters",
+   "policy"
+  ]
+ },
+ "invariants": {
+  "root_tier_armed": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ],
+  "kernel_static_rules": [],
+  "except_boundaries_in_orchestrate": {
+   "count": 10,
+   "dispositions": [
+    "STRUCTURAL"
+   ],
+   "problems": []
+  },
+  "destructive_sites_in_orchestrate": [],
+  "destructive_authority_problems": [],
+  "p5_sealed_records": [
+   "P5-ADEQUACY.json",
+   "P5-INVARIANTS.json",
+   "P5-RELEVANCE.json",
+   "P5-TEST-EXECUTION.json",
+   "P5-VACUITY.json"
+  ]
+ },
+ "cases": {
+  "orchestration": {
+   "ORCH-1": true,
+   "ORCH-2": true,
+   "ORCH-2b": true,
+   "ORCH-3": true,
+   "ORCH-4": true,
+   "ORCH-5": true,
+   "ORCH-6": true,
+   "ORCH-7": true,
+   "ORCH-8": true,
+   "ORCH-9": true,
+   "ORCH-10": true,
+   "ORCH-11": true,
+   "ORCH-12": true,
+   "ORCH-13": true,
+   "ORCH-14": true,
+   "ORCH-15": true,
+   "ORCH-16": true
+  },
+  "schema": {
+   "ORCH-SCHEMA-1": true,
+   "ORCH-SCHEMA-2": true,
+   "ORCH-SCHEMA-3": true,
+   "ORCH-SCHEMA-4": true,
+   "ORCH-SCHEMA-5": true,
+   "ORCH-SCHEMA-6": true,
+   "ORCH-SCHEMA-7": true,
+   "ORCH-SCHEMA-7b": true,
+   "ORCH-SCHEMA-8": true,
+   "ORCH-SCHEMA-9": true,
+   "ORCH-SCHEMA-10": true
+  },
+  "structural": {
+   "single_path": true,
+   "verifier_independence": true,
+   "journal_authority": true,
+   "root_tier_and_static_rules": true
+  }
+ },
+ "stage_tests": {
+  "count": 39,
+  "passed": 39,
+  "failed": []
+ },
+ "mutation_by_target": {
+  "aisef2/journal/format3.py::verified_payload": {
+   "phase": "P6",
+   "mutants": 26,
+   "killed": 26,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/adapters.py::Finding.blocks": {
+   "phase": "P6",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/adapters.py::Implemented.__post_init__": {
+   "phase": "P6",
+   "mutants": 27,
+   "killed": 27,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/adapters.py::Merge.__post_init__": {
+   "phase": "P6",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/adapters.py::ReadOnlyScope.files": {
+   "phase": "P6",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/adapters.py::ReadOnlyScope.read": {
+   "phase": "P6",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/adapters.py::confine": {
+   "phase": "P6",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/adapters.py::unconfine": {
+   "phase": "P6",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/gate.py::PROJECTIONS": {
+   "phase": "P6",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/gate.py::check": {
+   "phase": "P6",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/gate.py::decision": {
+   "phase": "P6",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/merge.py::affected_preserve": {
+   "phase": "P6",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/merge.py::merge": {
+   "phase": "P6",
+   "mutants": 36,
+   "killed": 36,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/merge.py::reprove": {
+   "phase": "P6",
+   "mutants": 27,
+   "killed": 27,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/proof.py::Party.__init__": {
+   "phase": "P6",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/proof.py::Party.run": {
+   "phase": "P6",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/proof.py::Ranged.__init__": {
+   "phase": "P6",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/proof.py::obligations_of": {
+   "phase": "P6",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/proof.py::prove": {
+   "phase": "P6",
+   "mutants": 77,
+   "killed": 77,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/quality.py::assess": {
+   "phase": "P6",
+   "mutants": 58,
+   "killed": 58,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/quality.py::payload": {
+   "phase": "P6",
+   "mutants": 26,
+   "killed": 26,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/review.py::_result": {
+   "phase": "P6",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/review.py::review": {
+   "phase": "P6",
+   "mutants": 119,
+   "killed": 119,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/seam.py::SeamRefusal.__init__": {
+   "phase": "P6",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/seam.py::admit_legacy": {
+   "phase": "P6",
+   "mutants": 11,
+   "killed": 11,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/seam.py::resolve": {
+   "phase": "P6",
+   "mutants": 18,
+   "killed": 18,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/security.py::scan": {
+   "phase": "P6",
+   "mutants": 132,
+   "killed": 132,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
+   "phase": "P6",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
+   "phase": "P6",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__call__": {
+   "phase": "P6",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__init__": {
+   "phase": "P6",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.release": {
+   "phase": "P6",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::_attempt": {
+   "phase": "P6",
+   "mutants": 272,
+   "killed": 272,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::_committed": {
+   "phase": "P6",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::_fail": {
+   "phase": "P6",
+   "mutants": 34,
+   "killed": 34,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::_freeze_plan": {
+   "phase": "P6",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::_probe": {
+   "phase": "P6",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/story_runner.py::run_story": {
+   "phase": "P6",
+   "mutants": 11,
+   "killed": 11,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::Checkout.__init__": {
+   "phase": "P6",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::Checkout.release": {
+   "phase": "P6",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.base": {
+   "phase": "P6",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.merge": {
+   "phase": "P6",
+   "mutants": 46,
+   "killed": 46,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.revert": {
+   "phase": "P6",
+   "mutants": 15,
+   "killed": 15,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.checkout": {
+   "phase": "P6",
+   "mutants": 16,
+   "killed": 16,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.diff": {
+   "phase": "P6",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.move": {
+   "phase": "P6",
+   "mutants": 13,
+   "killed": 13,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.scratch": {
+   "phase": "P6",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::Scratch.__init__": {
+   "phase": "P6",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::Scratch.release": {
+   "phase": "P6",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT": {
+   "phase": "P6",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::_sha": {
+   "phase": "P6",
+   "mutants": 13,
+   "killed": 13,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::commit_all": {
+   "phase": "P6",
+   "mutants": 19,
+   "killed": 19,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/orchestrate/workspace.py::git": {
+   "phase": "P6",
+   "mutants": 12,
+   "killed": 12,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  }
+ },
+ "properties": {
+  "ORCH_1_to_16_pass_through_the_real_path": true,
+  "ORCH_SCHEMA_1_to_10_pass": true,
+  "single_path_no_V1_authority": true,
+  "normal_path_commits_and_disposes": true,
+  "no_provider_request_before_admission": true,
+  "decision_cites_every_gate_row": true,
+  "post_merge_reproof_before_commit": true,
+  "verifier_independent_identical_instrument": true,
+  "confinement_derived_never_a_parameter": true,
+  "seam_explicit_before_the_story_and_refuses_undeclared_rows": true,
+  "all_nine_V2_005_codes_reachable_from_the_path": true,
+  "no_code_outside_the_taxonomy": true,
+  "root_tier_arms_I_to_IX": true,
+  "kernel_static_rules_hold": true,
+  "except_boundaries_audited": true,
+  "no_destructive_site_in_orchestrate": true,
+  "P5_sealed_records_untouched": true,
+  "every_stage_test_passes": true,
+  "mutation_every_orchestration_target_measured_current_no_unaudited_survivor": true
+ }
+}

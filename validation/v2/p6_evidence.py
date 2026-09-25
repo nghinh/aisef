@@ -60,7 +60,13 @@ V2_005_TARGET_MODULES = ("aisef2/control/owner.py", "aisef2/journal/event.py", "
                          "aisef2/runtime/sentinel.py", "aisef2/runtime/repair.py")
 
 
-def _mutation_by_target() -> dict:
+#: The orchestration path (WP-6.2) and the one format-3 function it added.
+ORCHESTRATION_TARGET_MODULES = tuple(f"aisef2/orchestrate/{m}.py" for m in (
+    "adapters", "gate", "merge", "proof", "quality", "review", "seam", "security", "story_runner", "workspace"))
+
+
+def _mutation_by_target(modules: tuple[str, ...] = V2_005_TARGET_MODULES, functions: tuple[str, ...] = ()) -> dict:
+    """Every mutation record's targets in `modules` (or the named `functions`), with currency and audited survivors."""
     mt = _module("aisef_v2_mutation", "validation/v2/mutation.py")
     out = {}
     for phase, rel in mt.RECORDS.items():
@@ -68,7 +74,7 @@ def _mutation_by_target() -> dict:
         if not p.exists():
             continue
         for t in json.loads(p.read_text(encoding="utf-8"))["targets"]:
-            if t["target"].split("::")[0] in V2_005_TARGET_MODULES:
+            if t["target"].split("::")[0] in modules or t["target"] in functions:
                 survivors = list(t.get("survivors") or [])
                 unaudited = [m for m in survivors if (t["target"], m) not in mt.AUDITED]
                 out[t["target"]] = {"phase": phase, "mutants": t.get("mutants"), "killed": t.get("killed"),
@@ -204,8 +210,209 @@ def v2_005_schema() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-6.2 / orchestration
+
+#: The owner's required cases (WP-6.2 authorization §19) and the ten typed states of V2-005 §18, each measured by the
+#: real-path test that implements it (tests/v2/test_p6_orchestration.py).
+ORCH_CASES = {
+    "ORCH-1": "test_ORCH_1_an_end_to_end_story_completes_through_the_real_path",
+    "ORCH-2": "test_ORCH_2_a_developer_outage_mid_story_is_a_typed_PROVIDER_failure_with_no_cross_charge",
+    "ORCH-2b": "test_ORCH_2b_a_reviewer_outage_stays_PROVIDER",
+    "ORCH-3": "test_ORCH_3_an_admission_refusal_makes_no_provider_request",
+    "ORCH-4": "test_ORCH_4_pre_satisfied_obligations_skip_the_developer_and_the_candidate_is_still_verified",
+    "ORCH-5": "test_ORCH_5_and_SCHEMA_1_a_verifier_disagreement_is_VERIFIER_DISAGREEMENT_INTEGRATION_and_stops",
+    "ORCH-6": "test_ORCH_6_and_SCHEMA_9_a_reviewer_environment_failure_is_CAPABILITY_UNRUNNABLE_ENVIRONMENT_never_DEVELOPER",
+    "ORCH-7": "test_ORCH_7_and_SCHEMA_8_a_scanner_that_ran_and_found_is_EXECUTED_and_SECURITY_FINDING",
+    "ORCH-8": "test_ORCH_8_and_SCHEMA_3_a_merge_conflict_is_MERGE_CONFLICT_INTEGRATION_with_zero_developer_charge",
+    "ORCH-9": "test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back",
+    "ORCH-10": "test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back",
+    "ORCH-11": "test_ORCH_11_scenario_L_INTRODUCE_PRESERVE_and_VERIFY_give_the_identical_product_verdict",
+    "ORCH-12": "test_ORCH_12_a_reviewer_confinement_parameter_is_impossible_by_API_shape",
+    "ORCH-13": "test_ORCH_13_the_seam_refuses_a_HUMAN_DECLARATION_REQUIRED_row_before_any_provider_execution",
+    "ORCH-14": "test_ORCH_14_a_change_of_engineering_adequacy_leaves_the_product_proof_unchanged",
+    "ORCH-15": "test_ORCH_15_only_an_explicit_immutable_reference_selects_evidence",
+    "ORCH-16": "test_ORCH_16_retry_state_derives_solely_from_the_journal_projection",
+}
+ORCH_SCHEMA_CASES = {
+    "ORCH-SCHEMA-1": "test_ORCH_5_and_SCHEMA_1_a_verifier_disagreement_is_VERIFIER_DISAGREEMENT_INTEGRATION_and_stops",
+    "ORCH-SCHEMA-2": "test_ORCH_SCHEMA_2_a_probe_mismatch_is_PROBE_MISMATCH_and_never_a_proof",
+    "ORCH-SCHEMA-3": "test_ORCH_8_and_SCHEMA_3_a_merge_conflict_is_MERGE_CONFLICT_INTEGRATION_with_zero_developer_charge",
+    "ORCH-SCHEMA-4": "test_ORCH_SCHEMA_4_tests_that_cannot_run_are_TESTS_UNRUNNABLE_with_no_developer_charge",
+    "ORCH-SCHEMA-5": "test_ORCH_SCHEMA_5_INADEQUATE_under_a_blocking_policy_is_TESTS_INADEQUATE_owned_by_DEVELOPER",
+    "ORCH-SCHEMA-6": "test_ORCH_SCHEMA_6_an_integration_owned_INCOMPLETE_collection_is_recorded_only",
+    "ORCH-SCHEMA-7": "test_ORCH_SCHEMA_7_a_review_request_charges_the_REVIEW_budget_and_blocks_only_with_corroboration",
+    "ORCH-SCHEMA-7b": "test_ORCH_SCHEMA_7b_a_corroborated_review_finding_is_REVIEW_FINDING_owned_by_REVIEW",
+    "ORCH-SCHEMA-8": "test_ORCH_7_and_SCHEMA_8_a_scanner_that_ran_and_found_is_EXECUTED_and_SECURITY_FINDING",
+    "ORCH-SCHEMA-9": "test_ORCH_6_and_SCHEMA_9_a_reviewer_environment_failure_is_CAPABILITY_UNRUNNABLE_ENVIRONMENT_never_DEVELOPER",
+    "ORCH-SCHEMA-10": "test_ORCH_SCHEMA_10_a_resource_that_cannot_be_acquired_is_RESOURCE_ACQUISITION_FAILED",
+}
+STRUCTURAL_CASES = {
+    "single_path": "test_SINGLE_PATH_one_entry_and_no_V1_authority",
+    "verifier_independence": "test_VERIFIER_INDEPENDENCE_its_own_checkout_and_the_identical_instrument",
+    "journal_authority": "test_JOURNAL_AUTHORITY_the_decision_cites_every_check_row_of_the_story_gate",
+    "root_tier_and_static_rules": "test_ROOT_tier_arms_I_to_IX_and_the_static_rules_hold_over_the_package",
+}
+CONFINEMENT_WORDS = ("readonly", "read_only", "sandbox", "allow_write", "confinement", "writable")
+
+
+def _orchestrate_static() -> dict:
+    """What the package's source says, by AST: imports of the frozen kernel, the codes it can emit, the seam's place,
+    the confinement API's shape, and each module's digest."""
+    import ast
+    import inspect
+    from aisef2.control.owner import FailureCode, V2_005_CODES
+    from aisef2.orchestrate import adapters, seam, story_runner
+    mt = _module("aisef_v2_mutation", "validation/v2/mutation.py")
+    modules, v1_imports, codes = {}, [], set()
+    for rel in ORCHESTRATION_TARGET_MODULES:
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        tree = ast.parse(text)
+        modules[rel] = mt.source_digest(text)
+        for n in ast.walk(tree):
+            if isinstance(n, ast.Import):
+                v1_imports += [f"{rel}: {a.name}" for a in n.names if a.name == "aisef" or a.name.startswith("aisef.")]
+            elif isinstance(n, ast.ImportFrom) and n.module and (n.module == "aisef" or n.module.startswith("aisef.")):
+                v1_imports.append(f"{rel}: {n.module}")
+            elif isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name) and n.value.id == "FailureCode":
+                codes.add(n.attr)
+    run_story_src = inspect.getsource(story_runner.run_story)
+    parameters = sorted({f"{m.__name__.rsplit('.', 1)[-1]}.{name}.{p}" for m in (story_runner, adapters)
+                         for name, f in inspect.getmembers(m, inspect.isfunction) for p in inspect.signature(f).parameters
+                         if any(w in p for w in CONFINEMENT_WORDS)})
+    return {
+        "modules": modules,
+        "v1_imports": v1_imports,
+        "failure_codes_emitted": sorted(codes, key=[c.value for c in FailureCode].index),
+        "v2_005_codes_emitted": sorted(c for c in V2_005_CODES if c in codes),
+        "seam": {"module": "aisef2/orchestrate/seam.py", "entry": "admit_legacy",
+                 "before_the_story_begins": run_story_src.index("admit_legacy") < run_story_src.index("_freeze_plan")
+                 and "admit_legacy" in run_story_src.split("\n")[2],
+                 "refuses": seam.HUMAN_DECLARATION_REQUIRED},
+        "confinement": {"derived_by": "aisef2/orchestrate/adapters.py::confine(story_id, checkout)",
+                        "parameters": list(inspect.signature(adapters.confine).parameters),
+                        "confinement_like_parameters_in_api": parameters},
+        "run_story_signature": list(inspect.signature(story_runner.run_story).parameters),
+    }
+
+
+def _orchestrate_trace() -> dict:
+    """The normal path, run once for real (ORCH-1's fixture): the journal's event types in order, the story gate's
+    rows, the resources acquired and released — outcomes only, no sha, no path."""
+    e2e = _module("aisef_v2_test_p6_orchestration", "tests/v2/test_p6_orchestration.py")
+    from aisef2.arch.enums import ControlProjection as P
+    case = e2e.Orchestration("test_ORCH_1_an_end_to_end_story_completes_through_the_real_path")
+    case.setUp()
+    try:
+        r = case.story(case.s1_plan(), "S1", case.s1_dev())
+        events = list(case.run.events)
+        checks = [(e.data["check"], e.data["passed"]) for e in events if e.type == "gate/check"]
+        decision = [e for e in events if e.type == "gate/decision"][-1]
+        budgets = case.run.state(P.BUDGETS)
+        return {"committed": r.committed, "attempts": [a.outcome for a in r.attempts],
+                "event_types": [e.type for e in events],
+                "story_gate_rows": checks,
+                "decision_cites_every_row": list(decision.source_seqs) == [e.seq for e in events if e.type == "gate/check"],
+                "resources_acquired": [e.data["resource"] for e in events if e.type == "story/resource-acquired"],
+                "resources_released": [(e.data["resource"], e.data["status"]) for e in events
+                                       if e.type == "story/resource-released"],
+                "provider_requests": [e.data["budget_owner"] for e in events if e.type == "provider/request"],
+                "proofs": [(e.data["criterion_id"], e.data["agreement"], e.data.get("verdict")) for e in events
+                           if e.type == "proof/verified"],
+                "adequacy": [(e.data["outcome"], e.data["owner"]) for e in events if e.type == "tests/adequacy"],
+                "budgets": json.loads(json.dumps({k: budgets[k] for k in ("format", "developer", "review", "security", "retries")},
+                                                 default=dict)),
+                "story_state": dict(case.run.state(P.STORY_STATE)["S1"])}
+    finally:
+        case.doCleanups()
+
+
+def orchestration() -> dict:
+    from aisef2.arch.enums import InvariantId
+    from aisef2.invariants.registry import Tier, armed
+    e2e = _module("aisef_v2_test_p6_orchestration", "tests/v2/test_p6_orchestration.py")
+    stages = _module("aisef_v2_test_p6_stages", "tests/v2/test_p6_stages.py")
+    orch = {k: passed(e2e.Orchestration(n)) for k, n in ORCH_CASES.items()}
+    schema = {k: passed(e2e.Orchestration(n)) for k, n in ORCH_SCHEMA_CASES.items()}
+    structural = {k: passed(e2e.Orchestration(n)) for k, n in STRUCTURAL_CASES.items()}
+    stage_results = {}
+    for name, cls in sorted(vars(stages).items()):
+        if isinstance(cls, type) and issubclass(cls, unittest.TestCase) and cls.__module__ == stages.__name__ \
+                and name not in ("Journal",):
+            for t in unittest.TestLoader().getTestCaseNames(cls):
+                stage_results[f"{name}.{t}"] = passed(cls(t))
+    ks = _module("aisef_v2_kernel_static_checks", "validation/v2/kernel_static_checks.py")
+    eb = _module("aisef_v2_except_boundaries", "validation/v2/except_boundaries.py")
+    da = _module("aisef_v2_destructive_authority", "validation/v2/destructive_authority.py")
+    p5 = _module("aisef_v2_p5_evidence", "validation/v2/p5_evidence.py")
+    static = _orchestrate_static()
+    audit = eb.audit(ROOT)
+    mine = [b for b in audit["boundaries"] if b["path"].startswith("aisef2/orchestrate/")]
+    destructive = da.check(ROOT)
+    sites, _ = da.discover(ROOT)
+    trace = _orchestrate_trace()
+    mutation = _mutation_by_target(ORCHESTRATION_TARGET_MODULES, ("aisef2/journal/format3.py::verified_payload",))
+    return {
+        "record": "AISEF V2 — P6 ORCHESTRATION (the single authoritative story path)",
+        "work_package": "WP-6.2",
+        "rfc": "§5, §13–§17, §20.1, §22, §25, §26, §31 (as amended by ARCHITECTURE-EXCEPTION-V2-005)",
+        "implementation": static["modules"],
+        "path": {"entry": "aisef2/orchestrate/story_runner.py::run_story", "signature": static["run_story_signature"],
+                 "stages": [c for c, _ in trace["story_gate_rows"]], "trace": trace},
+        "static": {k: v for k, v in static.items() if k != "modules"},
+        "invariants": {"root_tier_armed": sorted(i.value for i in armed().get(Tier.ROOT, ())),
+                       "kernel_static_rules": ks.check(ROOT),
+                       "except_boundaries_in_orchestrate": {"count": len(mine),
+                                                            "dispositions": sorted({b["disposition"] for b in mine}),
+                                                            "problems": audit["problems"]},
+                       "destructive_sites_in_orchestrate": [f"{s.path}:{s.node.lineno}" for s in sites
+                                                            if s.path.startswith("aisef2/orchestrate/")],
+                       "destructive_authority_problems": destructive,
+                       "p5_sealed_records": sorted(pathlib.Path(k).name for k in p5.sealed(ROOT))},
+        "cases": {"orchestration": orch, "schema": schema, "structural": structural},
+        "stage_tests": {"count": len(stage_results), "passed": sum(stage_results.values()),
+                        "failed": sorted(k for k, v in stage_results.items() if not v)},
+        "mutation_by_target": mutation,
+        "properties": {
+            "ORCH_1_to_16_pass_through_the_real_path": all(orch.values()) and len(orch) == 17,
+            "ORCH_SCHEMA_1_to_10_pass": all(schema.values()) and len(schema) == 11,
+            "single_path_no_V1_authority": structural["single_path"] and static["v1_imports"] == []
+                and static["run_story_signature"] == ["run", "plan", "story_id", "inputs", "adapters", "policy"],
+            "normal_path_commits_and_disposes": trace["committed"] and trace["attempts"] == ["COMMIT"]
+                and trace["story_state"]["state"] == "ENDED"
+                and all(s == "RELEASED" for _, s in trace["resources_released"])
+                and len(trace["resources_acquired"]) == len(trace["resources_released"]),
+            "no_provider_request_before_admission": trace["event_types"].index("story/admitted")
+                < trace["event_types"].index("provider/request"),
+            "decision_cites_every_gate_row": trace["decision_cites_every_row"] and structural["journal_authority"],
+            "post_merge_reproof_before_commit": trace["event_types"].index("story/commit")
+                > max(i for i, t in enumerate(trace["event_types"]) if t == "proof/verified"),
+            "verifier_independent_identical_instrument": structural["verifier_independence"],
+            "confinement_derived_never_a_parameter": static["confinement"]["confinement_like_parameters_in_api"] == []
+                and static["confinement"]["parameters"] == ["story_id", "checkout"] and orch["ORCH-12"],
+            "seam_explicit_before_the_story_and_refuses_undeclared_rows": static["seam"]["before_the_story_begins"]
+                and orch["ORCH-13"],
+            "all_nine_V2_005_codes_reachable_from_the_path": len(static["v2_005_codes_emitted"]) == 9,
+            "no_code_outside_the_taxonomy": all(c in {x.value for x in __import__("aisef2.control.owner", fromlist=["FailureCode"]).FailureCode}
+                                                for c in static["failure_codes_emitted"]),
+            "root_tier_arms_I_to_IX": set(armed().get(Tier.ROOT, ())) == set(InvariantId) and structural["root_tier_and_static_rules"],
+            "kernel_static_rules_hold": ks.check(ROOT) == [],
+            "except_boundaries_audited": audit["problems"] == [] and len(mine) > 0,
+            "no_destructive_site_in_orchestrate": destructive == []
+                and not any(s.path.startswith("aisef2/orchestrate/") for s in sites),
+            "P5_sealed_records_untouched": p5.check(ROOT) == [],
+            "every_stage_test_passes": stage_results and all(stage_results.values()),
+            "mutation_every_orchestration_target_measured_current_no_unaudited_survivor": bool(mutation) and all(
+                m["current"] and not m["error"] and isinstance(m["mutants"], int) and m["mutants"] > 0
+                and m["unaudited"] == [] for m in mutation.values())
+                and set(mutation) >= {t for t in _module("aisef_v2_mutation", "validation/v2/mutation.py").P6_TARGETS
+                                      if t.split("::")[0] in ORCHESTRATION_TARGET_MODULES},
+        },
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-6.2/V2-005": ("closure-evidence/v2/P6-V2-005-SCHEMA.json", v2_005_schema, "aisef2/journal/format3.py"),
+    "WP-6.2/ORCH": ("closure-evidence/v2/P6-ORCHESTRATION.json", orchestration, "aisef2/orchestrate/story_runner.py"),
 }
 
 

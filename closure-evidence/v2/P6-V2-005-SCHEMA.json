@@ -423,6 +423,16 @@
    "error": null,
    "current": true
   },
+  "aisef2/journal/format3.py::verified_payload": {
+   "phase": "P6",
+   "mutants": 26,
+   "killed": 26,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
   "aisef2/journal/format3.py::verified_proof": {
    "phase": "P6",
    "mutants": 24,
