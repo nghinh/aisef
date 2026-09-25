@@ -17,6 +17,7 @@ import ast
 import hashlib
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -63,9 +64,17 @@ def stub_reads(ctx):
     return CL.Probed(Outcome.PASSED if text else Outcome.FAILED, "read the evidence")
 
 
+#: Every git the tests run is told not to spawn background work: `git commit` otherwise starts a detached
+#: `git maintenance run --auto` (git >= 2.47; `git gc --auto` before) that writes into `.git` while the test is
+#: already removing its temporary repository (measured on CI: `OSError: [Errno 39] Directory not empty: '.../.git'`
+#: from TemporaryDirectory.cleanup, ubuntu 3.14, candidate 175ba3a).
+_NO_BACKGROUND_GIT = {"GIT_CONFIG_COUNT": "2", "GIT_CONFIG_KEY_0": "maintenance.auto", "GIT_CONFIG_VALUE_0": "false",
+                      "GIT_CONFIG_KEY_1": "gc.auto", "GIT_CONFIG_VALUE_1": "0"}
+
+
 def git(root: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-C", str(root), *args], capture_output=True,
-                          text=True, encoding="utf-8", errors="replace")
+                          text=True, encoding="utf-8", errors="replace", env={**os.environ, **_NO_BACKGROUND_GIT})
 
 
 def crit(cid: str, probe: str, **kw) -> dict:
