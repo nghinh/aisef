@@ -324,10 +324,10 @@ def fold_oracle() -> dict:
     cache_cases = {name: fo.resume(p, full, r)[1] for name, r in (
         ("stale row (shorter prefix)", row), ("edited state", wrong),
         ("another projection", fo.cache_row(PROJECTIONS[P.STORY_STATE], half)),
-        ("version mismatch", sealed(row, version=2)), ("head differs", sealed(row, head="f" * 64)),
+        ("version mismatch", sealed(row, version=row.version + 1)), ("head differs", sealed(row, head="f" * 64)),
         ("ahead of the journal", sealed(row, length=full.length + 1)))}
     cache_answers = {name: fo.resume(p, full, r)[0] == truth for name, r in (
-        ("stale row (shorter prefix)", row), ("edited state", wrong), ("version mismatch", sealed(row, version=2)),
+        ("stale row (shorter prefix)", row), ("edited state", wrong), ("version mismatch", sealed(row, version=row.version + 1)),
         ("head differs", sealed(row, head="f" * 64)), ("ahead of the journal", sealed(row, length=full.length + 1)))}
     forged = sealed(row, state=wrong.state)
     with _journal_dir() as d:
@@ -467,8 +467,8 @@ def control_projections() -> dict:
 
 def reference_models() -> dict:
     from aisef2.arch.enums import ControlProjection as P
-    from aisef2.journal.compat import reconstruct
     from aisef2.journal.event import JournalError
+    from aisef2.journal.format3 import reconstruct  # every format, each read as written (V2-005 calibration cases)
     from aisef2.journal.projections import PROJECTIONS
     h = _module("aisef_v2_p3_reference_models", "tests/v2/p3/test_reference_models.py")
     x = _module("aisef_v2_p3_reference_defects", "tests/v2/p3/test_reference_defects.py")

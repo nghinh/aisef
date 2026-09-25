@@ -1,4 +1,6 @@
-"""Projection 1 — story state: §17's lifecycle per story and attempt (P3-PROJECTION-SEMANTICS.md §1)."""
+"""Projection 1 — story state (version 2): §17's lifecycle per story and attempt (P3-PROJECTION-SEMANTICS.md §1).
+Version 2 (V2-005, journal format 3) admits the newly representable `proof/verified` and `tests/adequacy` inside an
+ACTIVE attempt; the lifecycle itself is unchanged."""
 
 from __future__ import annotations
 
@@ -9,14 +11,14 @@ _OUTCOMES = {T.STORY_COMMIT.value: ("COMMIT", ("ACTIVE",)), T.STORY_ROLLBACK.val
              T.STORY_RETRY.value: ("RETRY", ("BEGIN", "ACTIVE"))}
 #: types that leave the state unchanged, and the states they may occur in (None: any, once the story began)
 _WITHIN = {T.PROBE_EVALUATED.value: ("BEGIN", "ACTIVE"), T.PROVIDER_REQUEST.value: ("ACTIVE",),
-           T.FAILURE_OBSERVED.value: None}
+           T.PROOF_VERIFIED.value: ("ACTIVE",), T.TESTS_ADEQUACY.value: ("ACTIVE",), T.FAILURE_OBSERVED.value: None}
 _NAMED = {T.STORY_BEGIN.value, T.STORY_ADMITTED.value, T.STORY_DISPOSE.value, T.STORY_END.value,
           T.STORY_PLAN_DRIFT.value, *_OUTCOMES, *_WITHIN}
 
 
 class StoryState:
     id = ControlProjection.STORY_STATE.value
-    version = 1
+    version = 2
 
     def initial(self):
         return {}

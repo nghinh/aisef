@@ -15,7 +15,9 @@
     "F1.payload_enum.TestExecutionStatus",
     "F1.payload_enum.TestOutcome",
     "F1.payload_enum.TestSelection",
-    "F1.event_envelope"
+    "F1.event_envelope",
+    "F1.failure_taxonomy",
+    "F1.journal_format_3"
    ],
    "pending_on": []
   },
@@ -184,6 +186,22 @@
    "implemented_by": "WP-3.1",
    "state": "PASS",
    "detail": "Event fields, defaults ['ignorable', 'source_seqs'] and frozenness equal the RFC",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.failure_taxonomy",
+   "implemented_by": "WP-6.2",
+   "state": "PASS",
+   "detail": "FailureCode equals the RFC §22.1 table: 22 codes, each with its owner and retryability; 13 carried by formats 1 and 2, 9 by format 3 only",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.journal_format_3",
+   "implemented_by": "WP-6.2",
+   "state": "PASS",
+   "detail": "format 3 carries a schema for all 29 event types; provider/request requires budget_owner under format 3 only; formats 1 (18) and 2 (25) unchanged",
    "required_now": true
   },
   {

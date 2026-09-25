@@ -31,6 +31,16 @@ TAXONOMY = {
     "INVALID_CREDENTIAL": ("ENVIRONMENT", False),
     "PROVIDER_UNAVAILABLE": ("PROVIDER", True),
     "UNKNOWN": ("INTEGRATION", False),
+    # ARCHITECTURE-EXCEPTION-V2-005 (owner resolution §7) — journal format 3 only
+    "VERIFIER_DISAGREEMENT": ("INTEGRATION", False),
+    "PROBE_MISMATCH": ("INTEGRATION", False),
+    "MERGE_CONFLICT": ("INTEGRATION", False),
+    "TESTS_UNRUNNABLE": ("ENVIRONMENT", True),
+    "TESTS_INADEQUATE": ("DEVELOPER", True),
+    "REVIEW_FINDING": ("REVIEW", True),
+    "SECURITY_FINDING": ("SECURITY", True),
+    "CAPABILITY_UNRUNNABLE": ("ENVIRONMENT", True),
+    "RESOURCE_ACQUISITION_FAILED": ("ENVIRONMENT", True),
 }
 #: RFC §13 — dispositions that block a story's admission.
 BLOCKING = frozenset({"PRECONDITION_BROKEN", "PLAN_CONTRADICTION", "PROBE_UNRUNNABLE", "PROBE_INVALID"})
@@ -38,11 +48,12 @@ SHA = "a" * 40
 
 
 class Run:
-    """A calibration journal under construction. Every method appends one format-1 event and returns its seq."""
+    """A calibration journal under construction. Every method appends one event and returns its seq. The journal
+    declares format 1 unless told otherwise; a format-3 run's provider requests name their `budget_owner`."""
 
-    def __init__(self):
+    def __init__(self, journal_format=1):
         self.events = []
-        self.add("run/begin", {"journal_format": 1, "run_id": "refmodel-calibration"})
+        self.add("run/begin", {"journal_format": journal_format, "run_id": "refmodel-calibration"})
 
     def add(self, type_, data, cites=()):
         seq = len(self.events)
@@ -70,8 +81,35 @@ class Run:
             data["original"] = "OSError"
         return self.add("failure/observed", data)
 
-    def request(self, story, criteria):
-        return self.add("provider/request", {"story_id": story, "criteria": criteria})
+    def request(self, story, criteria, budget_owner=None):
+        data = {"story_id": story, "criteria": criteria}
+        if budget_owner is not None:
+            data["budget_owner"] = budget_owner
+        return self.add("provider/request", data)
+
+    def probe(self, story, criterion, verdict="SATISFIED"):
+        """A `probe/evaluated` carrying a sealed-shaped record of the story's criterion (§10.1)."""
+        record = {"spec_id": f"PPS-{criterion}", "semantic_hash": "c" * 64, "probe_id": "probe.x", "probe_digest": "d" * 64,
+                  "revision": SHA, "enforcement": "FULL", "result": {"behavior_verdict": verdict, "reason": None},
+                  "record_digest": "e" * 64}
+        return self.add("probe/evaluated", {"story_id": story, "criterion_id": criterion, "record": record})
+
+    def proof(self, story, criterion, verdict="SATISFIED"):
+        """A format-3 `proof/verified` (V2-005 §3) citing two probe records of the story's criterion, both emitted here."""
+        cites = [self.probe(story, criterion, verdict), self.probe(story, criterion, verdict)]
+        return self.add("proof/verified", {"story_id": story, "criterion_id": criterion, "spec_id": f"PPS-{criterion}",
+                                           "semantic_hash": "c" * 64, "candidate": SHA, "agreement": True,
+                                           "verdict": verdict}, cites)
+
+    def adequacy(self, story, outcome="ADEQUATE"):
+        """A format-3 `tests/adequacy` (V2-005 §4) with both mandatory executions EXECUTED and PASSED."""
+        ran = {"status": "EXECUTED", "outcome": "PASSED", "selection": "STORY_TESTS_RAN", "owner_on_failure": None,
+               "reason": None}
+        inadequate = outcome == "INADEQUATE"
+        return self.add("tests/adequacy", {"story_id": story, "execution": ran, "vacuity": "NON_VACUOUS",
+                                           "relevance": "RELEVANT", "regressions": ran, "outcome": outcome,
+                                           "owner": "DEVELOPER" if inadequate else None, "may_block": inadequate,
+                                           "developer_chargeable": inadequate})
 
     def drift(self, story, criterion, candidates):
         return self.add("story/plan-drift", {"story_id": story, "criterion_id": criterion, "spec_id": f"PPS-{criterion}",

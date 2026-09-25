@@ -5,12 +5,19 @@ is the measurement); `--check` re-derives every record and fails if it differs f
 property is false. Records hold outcomes only — never a pid, a path, a duration or a wall-clock time — so a rebuild
 is byte-identical on Linux, macOS and Windows (Q0 rebuilds them on every CI job).
 
-    python -P validation/v2/p5_evidence.py            # write every record whose package is implemented
+Once P5 is sealed (`closure-evidence/v2/P5-FINAL-SEAL.json` binds each record by sha256), a record is a historical
+measurement: `--check` verifies it by identity against the seal and reads its properties, and never re-derives or
+rewrites it — a later phase's kernel grows the except-boundary count and changes mechanism sources, so a re-derivation
+at a later HEAD could never be byte-identical (ARCHITECTURE-EXCEPTION-V2-005, owner §15: P5 evidence files are not
+mutated). Regeneration refuses a sealed record.
+
+    python -P validation/v2/p5_evidence.py            # write every unsealed record whose package is implemented
     python -P validation/v2/p5_evidence.py --check    # fail on drift or on a false property
 """
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import pathlib
@@ -499,10 +506,36 @@ def problems_of(record: dict) -> list[str]:
     return out + [f"{record.get('work_package')}: property {k} is false" for k, v in props.items() if v is not True]
 
 
+SEAL_REL = "closure-evidence/v2/P5-FINAL-SEAL.json"
+
+
+def sealed(root: pathlib.Path = ROOT) -> dict[str, str]:
+    """record path -> the sha256 the P5 seal binds it to; empty before the seal exists."""
+    p = root / SEAL_REL
+    if not p.exists():
+        return {}
+    seal = json.loads(p.read_bytes().replace(b"\r\n", b"\n"))
+    return {v["path"]: v["sha256"] for v in seal["p5_evidence"].values()}
+
+
+def _lf_sha(path: pathlib.Path) -> str:
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
 def check(root: pathlib.Path = ROOT) -> list[str]:
     out = []
+    bound = sealed(root)
     for rel, build, needs in BUILDERS.values():
         if not (root / needs).exists():
+            continue
+        if rel in bound:  # sealed: identity against the seal, properties as recorded; never re-derived
+            committed = root / rel
+            if not committed.exists():
+                out.append(f"{rel} is missing")
+            elif _lf_sha(committed) != bound[rel]:
+                out.append(f"{rel} differs from the sha256 bound by {SEAL_REL}: a sealed record is never rewritten")
+            else:
+                out += problems_of(json.loads(committed.read_text(encoding="utf-8")))
             continue
         fresh = build()
         out += problems_of(fresh)
@@ -522,8 +555,11 @@ def main(argv: list[str] | None = None) -> int:
             print(f"FAIL  {p}")
         print("p5 evidence: " + ("FAIL" if problems else "PASS"))
         return 1 if problems else 0
+    bound = sealed()
     for rel, build, needs in BUILDERS.values():
-        if (ROOT / needs).exists():
+        if rel in bound:
+            print(f"sealed  {rel}: bound by {SEAL_REL}; not regenerated")
+        elif (ROOT / needs).exists():
             (ROOT / rel).write_text(render(build()), encoding="utf-8")
             print(f"wrote {rel}")
     return 0

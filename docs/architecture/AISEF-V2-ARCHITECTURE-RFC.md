@@ -15,6 +15,11 @@ approval lineage is
 2026-09-22): F5 distinguishes a harness timeout from a subject observation deadline (§9.2). Approval lineage:
 [`closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json`](../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json).
 
+**Amended by `ARCHITECTURE-EXCEPTION-V2-005`** (owner decision *AISEF V2 — OWNER RESOLUTION OF WP-6.2 SCHEMA STOP /
+ARCHITECTURE EXCEPTION V2-005*, 2026-09-25): F1 — journal format 3 with a schema for every event type, nine typed
+failure codes (§22.1) and `provider/request.budget_owner`; formats 1 and 2 unchanged. Approval lineage:
+[`closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json`](../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json).
+
 **Supersedes** the proposal documents under [`docs/research/v2/`](../research/v2/) for all implementation
 decisions; those are retained as design history and are linked throughout.
 
@@ -803,7 +808,7 @@ least one **executable changed line** of the story diff.
 - **Capability absence MUST NOT be converted into `IRRELEVANT`.**
 - Mutation/sensitivity evidence **MAY** supersede this heuristic when it lands (§33).
 
-### 15.3 Outcome
+### 15.3 Outcome *(amended — ARCHITECTURE-EXCEPTION-V2-005)*
 
 Evaluated **only** when `execution.status is EXECUTED` (and likewise for `regressions`).
 
@@ -818,12 +823,21 @@ Evaluated **only** when `execution.status is EXECUTED` (and likewise for `regres
 When `execution.status is UNRUNNABLE` the gate produces **no** `AdequacyOutcome`: it emits an environment
 failure with owner `ENVIRONMENT` and defers to the environment retry policy (§22).
 
+*(amended — ARCHITECTURE-EXCEPTION-V2-005)* The assembled `EngineeringTestAdequacy` is journaled as `tests/adequacy`
+(journal format 3, §20.1), serialising the typed result with its two-axis semantics: `UNRUNNABLE` carries no outcome
+and the environment provenance the execution carries; `INADEQUATE` is typed `DEVELOPER`; `INCOMPLETE` is
+non-blocking and non-chargeable; `ADEQUATE` is positive. The journal codes are exactly `TESTS_UNRUNNABLE`
+(`ENVIRONMENT`, retryable) when a mandatory execution is `UNRUNNABLE`, and `TESTS_INADEQUATE` (`DEVELOPER`,
+retryable) when `INADEQUATE` blocks under project policy. An integration-owned `INCOMPLETE` collection result is
+recorded in `tests/adequacy` and gate evidence only: it is never a `failure/observed`, never a rollback or a retry
+by itself, and never a `FailureCode`.
+
 `process/tdd-chronology` (V1's RED→GREEN check) is **recorded evidence only**. It **MUST NOT** block. An
 organisation **MAY** enforce it as policy; AISEF's product verdict **MUST NOT** consult it.
 
 ---
 
-## 16. CandidateProof and VerifiedProof
+## 16. CandidateProof and VerifiedProof *(amended — ARCHITECTURE-EXCEPTION-V2-005)*
 
 ```python
 @dataclass(frozen=True)
@@ -856,6 +870,14 @@ Independence **MUST** be all three of:
 
 A `STORY_ALREADY_SATISFIED` story **MUST** still produce `VerifiedProof` for every obligation.
 
+*(amended — ARCHITECTURE-EXCEPTION-V2-005)* `VerifiedProof` is journaled as `proof/verified` (journal format 3, §20.1)
+losslessly: the spec identity (`spec_id`, `semantic_hash`), the candidate identity, the implementer's and the
+verifier's result identity and evidence, `agreement`, and `verdict` only when there is agreement. The event **MAY**
+carry the two results as citations of the immutable `probe/evaluated` records they were sealed in, when exact
+reconstruction from those records is mechanically proven. Rule 2's mismatch is journaled as `failure/observed`
+`PROBE_MISMATCH` (`INTEGRATION`, not retryable); rule 3's disagreement as `VERIFIER_DISAGREEMENT` (`INTEGRATION`,
+not retryable). Neither is ever flattened to `UNKNOWN`.
+
 ---
 
 ## 17. Story Transaction
@@ -873,7 +895,7 @@ Lifecycle: `BEGIN → ACTIVE → (COMMIT | ROLLBACK | RETRY) → DISPOSE → END
 - **RETRY** — permitted only against the budget named by the failure's typed outcome (§22).
 - **DISPOSE** — see §18.
 
-### 17.1 Resource ordering
+### 17.1 Resource ordering *(amended — ARCHITECTURE-EXCEPTION-V2-005)*
 
 `StoryScope` **MUST** hold an **explicit ordered resource stack**, disposed in reverse acquisition order, each
 release awaited. Sibling disposal order **MUST NOT** be left to concurrency — the external study found exactly
@@ -891,6 +913,9 @@ Required ordering: **processes reaped and the range proved empty → sandbox →
 - Teardown **MUST** be graceful-first: cooperative signal → bounded grace → SIGTERM → grace → SIGKILL →
   **unbounded wait**. A range that will not empty after SIGKILL is a fact to block on and report.
 - Residuals that could not be released **MUST** be named, and the next run's preflight **MUST** report them.
+- *(amended — ARCHITECTURE-EXCEPTION-V2-005)* A resource the scope could not acquire is journaled as `failure/observed`
+  `RESOURCE_ACQUISITION_FAILED` (`ENVIRONMENT`, retryable), from the typed acquisition outcome, never from stderr
+  text.
 
 ---
 
@@ -997,7 +1022,7 @@ Normative properties:
 6. **Writes MUST be synchronous at decision boundaries.** Write-behind is not acceptable for a record whose gaps
    are the SS-96 condition.
 
-### 20.1 Vocabulary
+### 20.1 Vocabulary *(amended — ARCHITECTURE-EXCEPTION-V2-005)*
 
 **Run:** `run/begin`, `run/spec-resolved`, `run/dispose-begin`, `run/interrupted`, `run/end`.
 **Plan:** `plan/static-admitted`, `plan/frozen`.
@@ -1009,6 +1034,17 @@ Normative properties:
 
 `gate/check` **MUST** be one row per check. A summary-only record is prohibited. `gate/decision` **MUST** cite
 its inputs by `seq`.
+
+*(amended — ARCHITECTURE-EXCEPTION-V2-005)* **Journal format 3** carries a schema for every one of the 29 types above,
+each derived from the frozen typed objects of this document: `plan/static-admitted` from
+`StaticPlanAdmissionResult` (§12), `proof/verified` from `VerifiedProof` (§16), `tests/adequacy` from
+`EngineeringTestAdequacy` (§15), and `invariant/violated` from the invariant id, its owning module and a
+diagnostic context that is evidence only, never routing. A format-3 `provider/request` **MUST** carry
+`budget_owner: Owner` — in cycle 1 `DEVELOPER`, `REVIEW` or `SECURITY` — and budgets charge exactly that owner;
+nothing defaults it. A format-3 `failure/observed` carries any code of §22.1; formats 1 and 2 carry only the codes
+they were written with. Formats 1 and 2 remain supported exactly as written: a format-2 journal is neither
+rewritten nor read under format-3 semantics, and a reader **MUST** refuse a format it does not know. No prose
+field is a control input.
 
 ### 20.2 Interruption
 
@@ -1044,7 +1080,7 @@ is required for all projections and is asserted in the test suite and sampled in
 
 ---
 
-## 22. Typed Owner, retry and budget model
+## 22. Typed Owner, retry and budget model *(amended — ARCHITECTURE-EXCEPTION-V2-005)*
 
 ```python
 class Owner(Enum):
@@ -1064,6 +1100,43 @@ class Owner(Enum):
   happened; a projection cannot disagree with its own log.
 - **No value from outside the AISEF taxonomy may become a control code.** A non-AISEF error **MUST** flatten to
   `UNKNOWN`, with the original retained as data.
+- *(amended — ARCHITECTURE-EXCEPTION-V2-005)* A failure is charged only to its own owner's budget, and a retry is decided from
+  the typed `owner` and `retryable` alone: a review or security failure never charges the developer, and a
+  provider failure keeps owner `PROVIDER`.
+
+### 22.1 Failure taxonomy *(amended — ARCHITECTURE-EXCEPTION-V2-005)*
+
+`FailureCode` is exactly the following set. Each code has one owner, one retryability and one budget (its owner's,
+when retryable), fixed here and nowhere else; no call site overrides them and no code is derived from prose. The
+`formats` column is the first journal format that may carry the code: formats 1 and 2 carry only the codes marked
+`1`; format 3 carries them all.
+
+| code | owner | retryability | formats |
+|---|---|---|---|
+| `PROBE_UNRUNNABLE` | `ENVIRONMENT` | `RETRYABLE` | 1 |
+| `PROBE_INVALID_SPEC` | `INTEGRATION` | `NOT_RETRYABLE` | 1 |
+| `CONTRACT_UNSATISFIED` | `DEVELOPER` | `RETRYABLE` | 1 |
+| `SUBJECT_ABSENT_AT_CANDIDATE` | `DEVELOPER` | `RETRYABLE` | 1 |
+| `PRECONDITION_BROKEN` | `PLAN` | `NOT_RETRYABLE` | 1 |
+| `PLAN_CONTRADICTION` | `PLAN` | `NOT_RETRYABLE` | 1 |
+| `POST_MERGE_REGRESSION` | `INTEGRATION` | `NOT_RETRYABLE` | 1 |
+| `POST_MERGE_SUBJECT_LOST` | `INTEGRATION` | `NOT_RETRYABLE` | 1 |
+| `NON_CONTROLLER_SIGNAL` | `INTEGRATION` | `NOT_RETRYABLE` | 1 (V2-003) |
+| `MISSING_CREDENTIAL` | `ENVIRONMENT` | `RESOLVED_BY_POLICY` | 1 |
+| `INVALID_CREDENTIAL` | `ENVIRONMENT` | `NOT_RETRYABLE` | 1 |
+| `PROVIDER_UNAVAILABLE` | `PROVIDER` | `RETRYABLE` | 1 |
+| `UNKNOWN` | `INTEGRATION` | `NOT_RETRYABLE` | 1 |
+| `VERIFIER_DISAGREEMENT` | `INTEGRATION` | `NOT_RETRYABLE` | 3 (V2-005) |
+| `PROBE_MISMATCH` | `INTEGRATION` | `NOT_RETRYABLE` | 3 (V2-005) |
+| `MERGE_CONFLICT` | `INTEGRATION` | `NOT_RETRYABLE` | 3 (V2-005) |
+| `TESTS_UNRUNNABLE` | `ENVIRONMENT` | `RETRYABLE` | 3 (V2-005) |
+| `TESTS_INADEQUATE` | `DEVELOPER` | `RETRYABLE` | 3 (V2-005) |
+| `REVIEW_FINDING` | `REVIEW` | `RETRYABLE` | 3 (V2-005) |
+| `SECURITY_FINDING` | `SECURITY` | `RETRYABLE` | 3 (V2-005) |
+| `CAPABILITY_UNRUNNABLE` | `ENVIRONMENT` | `RETRYABLE` | 3 (V2-005) |
+| `RESOURCE_ACQUISITION_FAILED` | `ENVIRONMENT` | `RETRYABLE` | 3 (V2-005) |
+
+A tenth V2-005 code, a new `Owner`, a new event type or a seventh projection is a STOP, not an extension.
 
 ---
 
@@ -1127,7 +1200,7 @@ principle: a boundary an ordinary tool call defeats is not a control, it is a fa
 
 ---
 
-## 25. Reviewer and security isolation
+## 25. Reviewer and security isolation *(amended — ARCHITECTURE-EXCEPTION-V2-005)*
 
 - Reviewer and security capabilities **MUST** run in read-only scopes whose confinement is **derived from the
   scope**, not passed as an omittable parameter. An optional policy parameter means every caller is a place the
@@ -1139,12 +1212,22 @@ principle: a boundary an ordinary tool call defeats is not a control, it is a fa
 - **A scanner that executed and produced findings is `EXECUTED`.** It **MUST NOT** be recorded `UNRUNNABLE`.
   This is SS-92's shape and §10's two-axis rule prevents it.
 - A blocking decision **MUST NOT** rest on a model reviewer alone (D-002).
+- *(amended — ARCHITECTURE-EXCEPTION-V2-005)* A reviewer's call is journaled as `provider/request` with `budget_owner: REVIEW`,
+  its answer as `provider/result`, and each finding as a `gate/check` row; a blocking `REVIEW_FINDING` (`REVIEW`,
+  retryable) requires corroborated authority — a model review alone is never the sole blocking authority. A
+  reviewer outage stays `PROVIDER_UNAVAILABLE` (owner `PROVIDER`); a review or security capability that cannot run
+  for a local or environment reason is `CAPABILITY_UNRUNNABLE` (`ENVIRONMENT`, retryable).
+- *(amended — ARCHITECTURE-EXCEPTION-V2-005)* A scanner is journaled as `tool/invoked` and `tool/result` with `gate/check`
+  rows, charged to the `SECURITY` budget; a scanner that executed and found is `EXECUTED`, and its blocking finding
+  is `SECURITY_FINDING` (`SECURITY`, retryable), typed from the adapter's result, never parsed from scanner text.
 
 ---
 
-## 26. Merge and post-merge proof
+## 26. Merge and post-merge proof *(amended — ARCHITECTURE-EXCEPTION-V2-005)*
 
-- A merge conflict is owner `INTEGRATION`, never `DEVELOPER`.
+- A merge conflict is owner `INTEGRATION`, never `DEVELOPER`. *(amended — ARCHITECTURE-EXCEPTION-V2-005)* It is journaled as
+  `failure/observed` `MERGE_CONFLICT` (`INTEGRATION`, not retryable), from the typed merge outcome, never from
+  stderr text.
 - After merge, the story's obligations **MUST** be re-proved at the merged revision, together with every
   `PRESERVE` obligation of prior stories the merge could affect. A regression is owner `INTEGRATION`.
 - **The measurement point MUST be chosen per claim and recorded in the verdict.** Post-merge is valid for
@@ -1354,7 +1437,7 @@ architecture exists to prevent.
 
 ---
 
-## 35. Compatibility and versioning
+## 35. Compatibility and versioning *(amended — ARCHITECTURE-EXCEPTION-V2-005)*
 
 - **Journal format.** Adding a **required** event type or payload field is a **format version bump** and is a
   writer-side obligation. Adding an `ignorable` event type is not. A reader meeting an unknown required type
@@ -1369,6 +1452,9 @@ architecture exists to prevent.
   make this affordable is an implementation question (§36, Q4).
 - **Frozen artefacts.** A frozen artefact **MUST NOT** change without its manifest changing in the same commit,
   enforced by a commit-time guard and a CI check.
+- *(amended — ARCHITECTURE-EXCEPTION-V2-005)* **Journal format 3** (§20.1) is the third journal format. Every earlier format
+  stays readable and writable exactly as it was; a reader **MUST** read a journal under the format it declares and
+  **MUST** refuse one format's semantics under another's; old journals are never migrated or auto-upgraded.
 
 ---
 
@@ -1406,11 +1492,11 @@ Frozen means: changing it later invalidates evidence written under it. Each **MU
 implementation begins. Items marked *(adjusted)* changed mechanically as a consequence of owner decisions B1–B5;
 **no new freeze item was added**. Items marked *(amended — V2-001)* changed through `ARCHITECTURE-EXCEPTION-V2-001`;
 items marked *(amended — V2-002)* changed through `ARCHITECTURE-EXCEPTION-V2-002`; items marked *(V2-003)* through
-`ARCHITECTURE-EXCEPTION-V2-003`.
+`ARCHITECTURE-EXCEPTION-V2-003`; items marked *(V2-005)* through `ARCHITECTURE-EXCEPTION-V2-005`.
 
 | # | Frozen item | Why evidence compatibility requires it |
 |---|---|---|
-| **F1** | `Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted; a payload enum gained one member — V2-003)* | Every journal is written under them; a payload enum change re-interprets existing events |
+| **F1** | `Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted; a payload enum gained one member — V2-003; `FailureCode` gained the nine members of §22.1, journal format 3 carries a schema for every event type and `provider/request.budget_owner` — V2-005)* | Every journal is written under them; a payload enum change re-interprets existing events |
 | **F2** | `ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table **keyed by `MeasurementPoint` (§10.3)** *(amended — V2-001, V2-003)*, **and the `ContractSatisfaction` derivation** *(adjusted)* | Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it |
 | **F3** | The `Owner` set — capped; a new member requires a cited measured defect | Budgets and retries derive from it |
 | **F4** | `BehaviorContract` → `ProductProofSpec` compiler contract and the inputs to `semantic_hash`, **including `SubjectAbsence`** *(adjusted)* | It is what `--check` compares against and what makes product evidence survive re-planning. Absence semantics change what a spec means when the subject is missing |

@@ -1,4 +1,5 @@
-"""Reference model 1 — `story_state` (version 1): §17's lifecycle per story. Spec: P3-PROJECTION-SEMANTICS.md §1.
+"""Reference model 1 — `story_state` (version 2): §17's lifecycle per story. Spec: P3-PROJECTION-SEMANTICS.md §1
+(version 2 admits `proof/verified` and `tests/adequacy` inside an ACTIVE attempt — V2-005).
 
 Shape of this model: one table says, for each story event, the lifecycle states it is legal in and the state it moves
 the story to; begin, admission and plan drift, whose rules also read `outcome` or `admitted`, are spelled out below.
@@ -17,6 +18,8 @@ _TABLE = {
     "story/end": (frozenset({"DISPOSE"}), "ENDED", False),
     "probe/evaluated": (_OPEN, None, False),
     "provider/request": (frozenset({"ACTIVE"}), None, False),
+    "proof/verified": (frozenset({"ACTIVE"}), None, False),    # V2-005 (format 3): verified at the candidate
+    "tests/adequacy": (frozenset({"ACTIVE"}), None, False),    # V2-005 (format 3): engineering quality, recorded
     "failure/observed": (_ANY, None, False),   # a post-merge failure follows ENDED
 }
 
@@ -113,6 +116,36 @@ def _calibration():
     r.request("S1", ["C1"])
     out.append(r.case("no developer call precedes the admission (§13)", "REFUSED",
                       {"S1": _st("BEGIN", 1, None, None)}))             # defect: provider/request legal in BEGIN
+
+    r = Run(journal_format=3)
+    r.begin("S1")
+    r.admit("S1", {"C1": "READY"})
+    r.adequacy("S1")
+    r.adequacy("S1", "INADEQUATE")
+    out.append(r.case("an adequacy record belongs to an ACTIVE attempt and moves it nowhere (V2-005)",
+                      {"S1": _st("ACTIVE", 1, True, None)},
+                      "REFUSED"))                                       # defect: the new type is unknown to the lifecycle
+
+    r = Run(journal_format=3)
+    r.begin("S1")
+    r.adequacy("S1")
+    out.append(r.case("no adequacy is recorded before the attempt is admitted (V2-005)", "REFUSED",
+                      {"S1": _st("BEGIN", 1, None, None)}))             # defect: tests/adequacy legal in BEGIN
+
+    r = Run(journal_format=3)
+    r.begin("S1")
+    r.admit("S1", {"C1": "READY"})
+    r.proof("S1", "C1")
+    r.commit("S1")
+    out.append(r.case("a verified proof belongs to the ACTIVE attempt it was measured in and moves it nowhere (V2-005)",
+                      {"S1": _st("COMMIT", 1, True, "COMMIT")},
+                      "REFUSED"))                                       # defect: proof/verified unknown to the lifecycle
+
+    r = Run(journal_format=3)
+    r.begin("S1")
+    r.proof("S1", "C1")  # the records at the parent are legal in BEGIN; a proof of the candidate is not
+    out.append(r.case("nothing is verified before the attempt is admitted (V2-005)", "REFUSED",
+                      {"S1": _st("BEGIN", 1, None, None)}))             # defect: proof/verified legal in BEGIN
 
     r = Run()
     r.begin("S1")

@@ -1,0 +1,13 @@
+{
+ "checker": "p6_evidence",
+ "package": "WP-6.2",
+ "kind": "evidence_record",
+ "record": {
+  "work_package": "WP-6.2",
+  "properties": {
+   "FMT3_1_every_event_type_has_a_schema": true,
+   "FMT3_6_format_3_provider_request_requires_budget_owner": false
+  }
+ },
+ "expect": "property FMT3_6_format_3_provider_request_requires_budget_owner is false"
+}

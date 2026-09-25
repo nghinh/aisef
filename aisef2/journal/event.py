@@ -13,6 +13,8 @@
   event_id_n)` from `GENESIS`. Editing or removing an old event breaks every later link; the last link, `head`, is the
   journal's identity for a prefix. Ceiling: a tail rewritten together with its links is caught only against an anchor
   held outside the journal (a cache row, an evidence record) — `head` is what such anchors bind.
+* **Historical code set.** `failure/observed` under format 1 (and format 2, which reuses this schema) admits exactly
+  the codes the formats were written with (`FORMAT_2_CODES`); the nine V2-005 codes are format 3's (§35, FMT3-5).
 """
 
 from __future__ import annotations
@@ -27,7 +29,7 @@ from types import MappingProxyType
 from typing import Any, Callable, Mapping, Sequence
 
 from aisef2.arch.enums import ControlProjection, EventType, ObligationRole, Owner, StoryAdmissionDisposition
-from aisef2.control.owner import TAXONOMY, FailureCode
+from aisef2.control.owner import FORMAT_2_CODES, TAXONOMY, FailureCode
 from aisef2.plan.drift import UNATTRIBUTED
 from aisef2.plan.story_admission import BLOCKING
 from aisef2.product.contract import ContractError, canonical, freeze
@@ -127,6 +129,11 @@ def _enum(e) -> Callable[[Any], bool]:
     return lambda v: isinstance(v, str) and v in values
 
 
+def _codes(names: frozenset[str]) -> Callable[[Any], bool]:
+    """A FailureCode member whose name is in `names`: the code set a journal format was written with."""
+    return lambda v: isinstance(v, str) and v in names and v in {c.value for c in FailureCode}
+
+
 def _enums(e) -> Callable[[Any], bool]:
     one = _enum(e)
     return lambda v: isinstance(v, tuple) and len(v) > 0 and all(one(x) for x in v)
@@ -204,7 +211,7 @@ SCHEMAS: Mapping[str, Schema] = MappingProxyType({t.value: s for t, s in (
     (EventType.STORY_END, Schema({"story_id": _str})),
     (EventType.PROBE_EVALUATED, Schema({"story_id": _str, "criterion_id": _str, "record": _object})),
     (EventType.PROVIDER_REQUEST, Schema({"story_id": _str, "criteria": _distinct_strs})),
-    (EventType.FAILURE_OBSERVED, Schema({"story_id": _str, "code": _enum(FailureCode), "owner": _enum(Owner),
+    (EventType.FAILURE_OBSERVED, Schema({"story_id": _str, "code": _codes(FORMAT_2_CODES), "owner": _enum(Owner),
                                          "retryable": _bool, "detail": _text}, {"original": _str},
                                         rule=_failure_rule)),
     (EventType.GATE_CHECK, Schema({"gate": _str, "check": _str, "passed": _bool, "detail": _text})),

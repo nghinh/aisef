@@ -19,6 +19,10 @@
     "a retry's next begin is a new, unadmitted attempt",
     "an attempt is admitted once",
     "no developer call precedes the admission (§13)",
+    "an adequacy record belongs to an ACTIVE attempt and moves it nowhere (V2-005)",
+    "no adequacy is recorded before the attempt is admitted (V2-005)",
+    "a verified proof belongs to the ACTIVE attempt it was measured in and moves it nowhere (V2-005)",
+    "nothing is verified before the attempt is admitted (V2-005)",
     "a blocked story still records its drift (§14)",
     "no drift before the attempt's admission",
     "a blocked story makes no developer call",
@@ -46,7 +50,11 @@
     "a retry charges one budget: its cited (latest) failure's owner",
     "a new attempt is admitted again before the developer is called",
     "developer consumption accumulates across attempts; begin drops the attempt's failures",
-    "a retry citing an earlier attempt's failure refuses"
+    "a retry citing an earlier attempt's failure refuses",
+    "a format-3 request is charged to its budget_owner: REVIEW and SECURITY never touch the developer",
+    "a format-3 DEVELOPER request is still charged READY criteria only (§14)",
+    "a security request before the attempt's admission is refused",
+    "a review request names criteria of the story's admission only"
    ]
   },
   "retry_target": {
@@ -153,13 +161,13 @@
  },
  "mutation_by_target": {
   "tests/v2/refmodel/budgets.py::_walk": {
-   "killed": "66/66",
+   "killed": "92/92",
    "audited_equivalent": {}
   },
   "tests/v2/refmodel/budgets.py::model": {
-   "killed": "27/28",
+   "killed": "43/44",
    "audited_equivalent": {
-    "L56 True->False": "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict never decides anything"
+    "L75 True->False": "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict never decides anything"
    }
   },
   "tests/v2/refmodel/failure_owner.py::_attempts": {
@@ -197,11 +205,13 @@
    "audited_equivalent": {}
   },
   "tests/v2/refmodel/story_state.py::_TABLE": {
-   "killed": "48/51",
+   "killed": "58/63",
    "audited_equivalent": {
-    "L18 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
     "L19 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
-    "L20 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
+    "L20 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "L21 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "L22 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "L23 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
    }
   },
   "tests/v2/refmodel/story_state.py::model": {

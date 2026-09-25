@@ -224,16 +224,18 @@ class Caches(unittest.TestCase):
         # ... so a gate never reads a cache: project() folds the journal, and the oracle catches the row
         self.assertEqual(project(self.full, P.BUDGETS), self.truth)
         self.assertNotEqual(forged.state, fo.fold(self.p, self.half.events))
-        version = dataclasses.replace(row, version=2)
-        version = dataclasses.replace(version, digest=fo._seal(row.projection, 2, row.length, row.head, row.state))
+        other_version = row.version + 1
+        version = dataclasses.replace(row, version=other_version)
+        version = dataclasses.replace(version, digest=fo._seal(row.projection, other_version, row.length, row.head,
+                                                               row.state))
         self.assertEqual(fo.resume(self.p, self.full, version),
-                         (self.truth, "row version 2 is not 1: discarded, not migrated"))
+                         (self.truth, f"row version {other_version} is not {row.version}: discarded, not migrated"))
         moved = dataclasses.replace(row, head="f" * 64)
-        moved = dataclasses.replace(moved, digest=fo._seal(row.projection, 1, row.length, "f" * 64, row.state))
+        moved = dataclasses.replace(moved, digest=fo._seal(row.projection, row.version, row.length, "f" * 64, row.state))
         self.assertEqual(fo.resume(self.p, self.full, moved),
                          (self.truth, "row head differs from the journal's at its length: discarded — the journal wins"))
         ahead = dataclasses.replace(row, length=self.full.length + 1)
-        ahead = dataclasses.replace(ahead, digest=fo._seal(row.projection, 1, ahead.length, row.head, row.state))
+        ahead = dataclasses.replace(ahead, digest=fo._seal(row.projection, row.version, ahead.length, row.head, row.state))
         self.assertEqual(fo.resume(self.p, self.full, ahead)[1],
                          f"row covers {ahead.length} events; the journal has {self.full.length}: discarded")
 

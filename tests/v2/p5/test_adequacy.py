@@ -425,7 +425,8 @@ class Separation(unittest.TestCase):
             src = p.read_text(encoding="utf-8")
             if "AdequacyOutcome" in src and any(isinstance(n, ast.Name) and n.id == "AdequacyOutcome" for n in ast.walk(ast.parse(src))):
                 users.add(p.relative_to(ROOT).as_posix())
-        self.assertEqual(users, {"aisef2/arch/enums.py", "aisef2/quality/adequacy.py"})   # no policy object exists yet
+        # no policy object exists: the enum's only other user is the format-3 tests/adequacy schema (V2-005), a shape
+        self.assertEqual(users, {"aisef2/arch/enums.py", "aisef2/quality/adequacy.py", "aisef2/journal/format3.py"})
         body = next(n for n in self.tree.body if isinstance(n, ast.FunctionDef) and n.name == "may_block")
         read = {n.id for s in body.body for n in ast.walk(s) if isinstance(n, ast.Name)} - {"outcome", "AdequacyOutcome"}
         self.assertEqual(read, set())                                                   # blocking permission reads the outcome alone

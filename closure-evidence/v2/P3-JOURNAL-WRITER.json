@@ -151,6 +151,42 @@
   "UNKNOWN": [
    "INTEGRATION",
    false
+  ],
+  "VERIFIER_DISAGREEMENT": [
+   "INTEGRATION",
+   false
+  ],
+  "PROBE_MISMATCH": [
+   "INTEGRATION",
+   false
+  ],
+  "MERGE_CONFLICT": [
+   "INTEGRATION",
+   false
+  ],
+  "TESTS_UNRUNNABLE": [
+   "ENVIRONMENT",
+   true
+  ],
+  "TESTS_INADEQUATE": [
+   "DEVELOPER",
+   true
+  ],
+  "REVIEW_FINDING": [
+   "REVIEW",
+   true
+  ],
+  "SECURITY_FINDING": [
+   "SECURITY",
+   true
+  ],
+  "CAPABILITY_UNRUNNABLE": [
+   "ENVIRONMENT",
+   true
+  ],
+  "RESOURCE_ACQUISITION_FAILED": [
+   "ENVIRONMENT",
+   true
   ]
  },
  "f1_conformance": {

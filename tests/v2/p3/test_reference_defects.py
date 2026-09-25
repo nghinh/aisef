@@ -13,7 +13,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.arch.enums import ControlProjection as P  # noqa: E402
-from aisef2.journal.compat import reconstruct  # noqa: E402
+from aisef2.journal.format3 import reconstruct  # noqa: E402 — every format, each read as written (V2-005)
 from aisef2.journal.event import JournalError  # noqa: E402
 from aisef2.journal.projections import PROJECTIONS  # noqa: E402
 from tests.v2.p3 import journal_gen as gen  # noqa: E402

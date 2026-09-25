@@ -1,4 +1,14 @@
-# ARCHITECTURE-EXCEPTION-V2-004 — PROPOSED, NOT APPLIED
+# ARCHITECTURE-EXCEPTION-V2-004 — SUPERSEDED / NOT APPLIED
+
+**Status (2026-09-25):** SUPERSEDED by `ARCHITECTURE-EXCEPTION-V2-005` (owner resolution *AISEF V2 — OWNER RESOLUTION
+OF WP-6.2 SCHEMA STOP / ARCHITECTURE EXCEPTION V2-005*, 2026-09-25). This proposal was never applied: no amendment
+record V2-004 exists and nothing in the taxonomy was changed under it. V2-005 narrows its tests semantics — an
+integration-owned `INCOMPLETE` collection result is not a `FailureCode`, and `TESTS_NOT_COLLECTABLE_UNDETERMINED` is not
+added — and covers every path the WP-6.2 schema-fit audit found non-representable. The text below is kept as design
+history, exactly as proposed.
+
+---
+
 
 **Status:** proposed by the P5 implementation (WP-5.1, 2026-09-24) under the owner's "P5 ENTRY HARNESS CORRECTION /
 RESUME WP-5.1" §7; awaiting an owner decision. Nothing in the taxonomy was changed: WP-5.1 ships with `FailureCode`

@@ -4163,68 +4163,98 @@
   {
    "target": "aisef2/runtime/repair.py::closers",
    "kill_tests": [
-    "tests/v2/p4/test_interruption.py"
+    "tests/v2/p4/test_interruption.py",
+    "tests/v2/test_v2_005.py"
    ],
-   "source_sha256": "005b0b6e65d963304754364185eaabae02ffd6dc11649ae0d56db55d0f1f0f98",
-   "mutants": 107,
-   "killed": 107,
+   "source_sha256": "d13c1bf901c5cff36f6cba2228eb395842f6219611b74a672bf84181a36179ee",
+   "mutants": 109,
+   "killed": 109,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
-    {
-     "mutant": "L36 condition negated",
-     "killed": true
-    },
     {
      "mutant": "L39 condition negated",
      "killed": true
     },
     {
-     "mutant": "L65 condition negated",
+     "mutant": "L43 condition negated",
      "killed": true
     },
     {
-     "mutant": "L67 returns None",
+     "mutant": "L69 condition negated",
      "killed": true
     },
     {
-     "mutant": "L36 Or swapped",
+     "mutant": "L71 returns None",
      "killed": true
     },
     {
-     "mutant": "L39 In->NotIn",
+     "mutant": "L39 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L40 returns None",
+     "mutant": "L43 In->NotIn",
      "killed": true
     },
     {
-     "mutant": "L44 condition negated",
+     "mutant": "L44 returns None",
      "killed": true
     },
     {
-     "mutant": "L51 condition negated",
+     "mutant": "L48 condition negated",
      "killed": true
     },
     {
-     "mutant": "L55 sorted() -> list()",
+     "mutant": "L55 condition negated",
      "killed": true
     },
     {
-     "mutant": "L63 Gt->LtE",
+     "mutant": "L59 sorted() -> list()",
      "killed": true
     },
     {
-     "mutant": "L65 not removed",
+     "mutant": "L67 Gt->LtE",
      "killed": true
     },
     {
-     "mutant": "L36 not removed",
+     "mutant": "L69 not removed",
      "killed": true
     },
     {
-     "mutant": "L36 NotEq->Eq",
+     "mutant": "L39 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L39 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L48 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L68 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L68 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L68 element 2 dropped",
      "killed": true
     },
     {
@@ -4236,123 +4266,39 @@
      "killed": true
     },
     {
-     "mutant": "L44 And swapped",
+     "mutant": "L40 string 'repair writes format-2 closers for a format-2 journal and format-3 closers for a format-3 journal; a format-1 journal is read, never extended' emptied",
      "killed": true
     },
     {
-     "mutant": "L51 And swapped",
+     "mutant": "L43 string 'run' emptied",
      "killed": true
     },
     {
-     "mutant": "L64 element 0 dropped",
+     "mutant": "L43 string 'ENDED' emptied",
      "killed": true
     },
     {
-     "mutant": "L64 element 1 dropped",
+     "mutant": "L43 string 'ABANDONED' emptied",
      "killed": true
     },
     {
-     "mutant": "L64 element 2 dropped",
+     "mutant": "L46 string 'call_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L37 string 'repair writes format-2 closers; a format-1 journal is read, never extended' emptied",
+     "mutant": "L46 Eq->NotEq",
      "killed": true
     },
     {
-     "mutant": "L39 string 'run' emptied",
+     "mutant": "L48 Eq->NotEq",
      "killed": true
     },
     {
-     "mutant": "L39 string 'ENDED' emptied",
+     "mutant": "L48 NotIn->In",
      "killed": true
     },
     {
-     "mutant": "L39 string 'ABANDONED' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L42 string 'call_id' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L42 Eq->NotEq",
-     "killed": true
-    },
-    {
-     "mutant": "L44 Eq->NotEq",
-     "killed": true
-    },
-    {
-     "mutant": "L44 NotIn->In",
-     "killed": true
-    },
-    {
-     "mutant": "L49 Eq->NotEq",
-     "killed": true
-    },
-    {
-     "mutant": "L51 Eq->NotEq",
-     "killed": true
-    },
-    {
-     "mutant": "L51 NotIn->In",
-     "killed": true
-    },
-    {
-     "mutant": "L63 string 'interrupts' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L64 dict entry 0 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L64 dict entry 1 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L66 element 0 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L66 element 1 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L66 element 2 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L36 string 'journal_format' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L45 element 0 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L45 element 1 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L45 element 2 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L52 element 0 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L52 element 1 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L52 element 2 dropped",
-     "killed": true
-    },
-    {
-     "mutant": "L55 string 'story_id' emptied",
+     "mutant": "L53 Eq->NotEq",
      "killed": true
     },
     {
@@ -4360,243 +4306,307 @@
      "killed": true
     },
     {
-     "mutant": "L57 Or swapped",
+     "mutant": "L55 NotIn->In",
      "killed": true
     },
     {
-     "mutant": "L59 element 0 dropped",
+     "mutant": "L67 string 'interrupts' emptied",
      "killed": true
     },
     {
-     "mutant": "L59 element 1 dropped",
+     "mutant": "L68 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L59 element 2 dropped",
+     "mutant": "L68 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L64 string 'abandoned' emptied",
+     "mutant": "L70 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L64 string 'synthetic' emptied",
+     "mutant": "L70 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L64 True->False",
+     "mutant": "L70 element 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L66 dict entry 0 dropped",
+     "mutant": "L39 string 'journal_format' emptied",
      "killed": true
     },
     {
-     "mutant": "L44 string 'call_id' emptied",
+     "mutant": "L49 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 dict entry 0 dropped",
+     "mutant": "L49 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 dict entry 1 dropped",
+     "mutant": "L49 element 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 dict entry 2 dropped",
+     "mutant": "L56 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 dict entry 3 dropped",
+     "mutant": "L56 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 dict entry 4 dropped",
+     "mutant": "L56 element 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 dict entry 5 dropped",
+     "mutant": "L59 string 'story_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L45 dict entry 6 dropped",
+     "mutant": "L59 Eq->NotEq",
      "killed": true
     },
     {
-     "mutant": "L52 dict entry 0 dropped",
+     "mutant": "L61 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L52 dict entry 1 dropped",
+     "mutant": "L63 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L52 dict entry 2 dropped",
+     "mutant": "L63 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L52 dict entry 3 dropped",
+     "mutant": "L63 element 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L59 dict entry 0 dropped",
+     "mutant": "L68 string 'abandoned' emptied",
      "killed": true
     },
     {
-     "mutant": "L59 dict entry 1 dropped",
+     "mutant": "L68 string 'synthetic' emptied",
      "killed": true
     },
     {
-     "mutant": "L59 dict entry 2 dropped",
+     "mutant": "L68 True->False",
      "killed": true
     },
     {
-     "mutant": "L59 dict entry 3 dropped",
+     "mutant": "L70 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L59 dict entry 4 dropped",
+     "mutant": "L48 string 'call_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L59 dict entry 5 dropped",
+     "mutant": "L49 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L66 string 'synthetic' emptied",
+     "mutant": "L49 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L66 True->False",
+     "mutant": "L49 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 string 'story_id' emptied",
+     "mutant": "L49 dict entry 3 dropped",
      "killed": true
     },
     {
-     "mutant": "L45 string 'call_id' emptied",
+     "mutant": "L49 dict entry 4 dropped",
      "killed": true
     },
     {
-     "mutant": "L46 string 'outcome' emptied",
+     "mutant": "L49 dict entry 5 dropped",
      "killed": true
     },
     {
-     "mutant": "L46 string 'signal' emptied",
+     "mutant": "L49 dict entry 6 dropped",
      "killed": true
     },
     {
-     "mutant": "L46 string 'provenance' emptied",
+     "mutant": "L56 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L47 string 'synthetic' emptied",
+     "mutant": "L56 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L47 string 'detail' emptied",
+     "mutant": "L56 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L46 string 'OUTCOME_UNKNOWN' emptied",
+     "mutant": "L56 dict entry 3 dropped",
      "killed": true
     },
     {
-     "mutant": "L46 string 'NONE' emptied",
+     "mutant": "L63 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L47 True->False",
+     "mutant": "L63 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L47 string 'the run ended without its result (repair)' emptied",
+     "mutant": "L63 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L52 string 'story_id' emptied",
+     "mutant": "L63 dict entry 3 dropped",
      "killed": true
     },
     {
-     "mutant": "L52 string 'outcome' emptied",
+     "mutant": "L63 dict entry 4 dropped",
      "killed": true
     },
     {
-     "mutant": "L53 string 'synthetic' emptied",
+     "mutant": "L63 dict entry 5 dropped",
      "killed": true
     },
     {
-     "mutant": "L53 string 'detail' emptied",
+     "mutant": "L70 string 'synthetic' emptied",
      "killed": true
     },
     {
-     "mutant": "L52 string 'OUTCOME_UNKNOWN' emptied",
+     "mutant": "L70 True->False",
      "killed": true
     },
     {
-     "mutant": "L53 True->False",
+     "mutant": "L49 string 'story_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L53 string 'the run ended without its result (repair)' emptied",
+     "mutant": "L49 string 'call_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L60 string 'story_id' emptied",
+     "mutant": "L50 string 'outcome' emptied",
      "killed": true
     },
     {
-     "mutant": "L60 string 'resource' emptied",
+     "mutant": "L50 string 'signal' emptied",
      "killed": true
     },
     {
-     "mutant": "L60 string 'kind' emptied",
+     "mutant": "L50 string 'provenance' emptied",
      "killed": true
     },
     {
-     "mutant": "L60 string 'status' emptied",
+     "mutant": "L51 string 'synthetic' emptied",
      "killed": true
     },
     {
-     "mutant": "L61 string 'detail' emptied",
+     "mutant": "L51 string 'detail' emptied",
      "killed": true
     },
     {
-     "mutant": "L61 string 'synthetic' emptied",
+     "mutant": "L50 string 'OUTCOME_UNKNOWN' emptied",
      "killed": true
     },
     {
-     "mutant": "L60 string 'RESIDUAL' emptied",
+     "mutant": "L50 string 'NONE' emptied",
      "killed": true
     },
     {
-     "mutant": "L61 string 'not released: the run ended without disposing it (repair)' emptied",
+     "mutant": "L51 True->False",
      "killed": true
     },
     {
-     "mutant": "L61 True->False",
+     "mutant": "L51 string 'the run ended without its result (repair)' emptied",
      "killed": true
     },
     {
-     "mutant": "L45 string 'story_id' emptied",
+     "mutant": "L56 string 'story_id' emptied",
      "killed": true
     },
     {
-     "mutant": "L45 string 'call_id' emptied",
+     "mutant": "L56 string 'outcome' emptied",
      "killed": true
     },
     {
-     "mutant": "L52 string 'story_id' emptied",
+     "mutant": "L57 string 'synthetic' emptied",
      "killed": true
     },
     {
-     "mutant": "L60 string 'resource' emptied",
+     "mutant": "L57 string 'detail' emptied",
      "killed": true
     },
     {
-     "mutant": "L60 string 'kind' emptied",
+     "mutant": "L56 string 'OUTCOME_UNKNOWN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'the run ended without its result (repair)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'resource' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'kind' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'status' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string 'detail' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string 'synthetic' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'RESIDUAL' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string 'not released: the run ended without disposing it (repair)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L65 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L49 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L49 string 'call_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'resource' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'kind' emptied",
      "killed": true
     }
    ]
@@ -4604,76 +4614,78 @@
   {
    "target": "aisef2/runtime/repair.py::repair",
    "kill_tests": [
-    "tests/v2/p4/test_interruption.py"
+    "tests/v2/p4/test_interruption.py",
+    "tests/v2/test_v2_005.py"
    ],
-   "source_sha256": "005b0b6e65d963304754364185eaabae02ffd6dc11649ae0d56db55d0f1f0f98",
+   "source_sha256": "d13c1bf901c5cff36f6cba2228eb395842f6219611b74a672bf84181a36179ee",
    "mutants": 16,
    "killed": 16,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L78 condition negated",
+     "mutant": "L82 condition negated",
      "killed": true
     },
     {
-     "mutant": "L91 returns None",
+     "mutant": "L95 returns None",
      "killed": true
     },
     {
-     "mutant": "L82 element 0 dropped",
+     "mutant": "L86 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L82 element 1 dropped",
+     "mutant": "L86 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L82 element 0 dropped",
+     "mutant": "L86 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L82 element 1 dropped",
+     "mutant": "L86 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L83 element 0 dropped",
+     "mutant": "L87 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L83 element 1 dropped",
+     "mutant": "L87 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L83 element 2 dropped",
+     "mutant": "L87 element 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L84 False->True",
+     "mutant": "L88 False->True",
      "killed": true
     },
     {
-     "mutant": "L79 string 'the journal holds unknown ignorable events ' emptied",
+     "mutant": "L83 string 'the journal holds unknown ignorable events ' emptied",
      "killed": true
     },
     {
-     "mutant": "L79 string ': repair extends only a journal it can read in full' emptied",
+     "mutant": "L83 string ': repair extends only a journal it can read in full' emptied",
      "killed": true
     },
     {
-     "mutant": "L81 not removed",
+     "mutant": "L85 not removed",
      "killed": true
     },
     {
-     "mutant": "L75 string 'the journal does not reconstruct, so it cannot be repaired: ' emptied",
+     "mutant": "L79 string 'the journal does not reconstruct, so it cannot be repaired: ' emptied",
      "killed": true
     },
     {
-     "mutant": "L76 string '\\n' emptied",
+     "mutant": "L80 string '\\n' emptied",
      "killed": true
     },
     {
-     "mutant": "L81 string 'synthetic' emptied",
+     "mutant": "L85 string 'synthetic' emptied",
      "killed": true
     }
    ]
@@ -4681,80 +4693,82 @@
   {
    "target": "aisef2/runtime/repair.py::repair_journal",
    "kill_tests": [
-    "tests/v2/p4/test_interruption.py"
+    "tests/v2/p4/test_interruption.py",
+    "tests/v2/test_v2_005.py"
    ],
-   "source_sha256": "005b0b6e65d963304754364185eaabae02ffd6dc11649ae0d56db55d0f1f0f98",
+   "source_sha256": "d13c1bf901c5cff36f6cba2228eb395842f6219611b74a672bf84181a36179ee",
    "mutants": 17,
    "killed": 17,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L100 condition negated",
+     "mutant": "L104 condition negated",
      "killed": true
     },
     {
-     "mutant": "L102 condition negated",
+     "mutant": "L106 condition negated",
      "killed": true
     },
     {
-     "mutant": "L114 returns None",
+     "mutant": "L118 returns None",
      "killed": true
     },
     {
-     "mutant": "L100 Eq->NotEq",
+     "mutant": "L104 Eq->NotEq",
      "killed": true
     },
     {
-     "mutant": "L101 returns None",
+     "mutant": "L105 returns None",
      "killed": true
     },
     {
-     "mutant": "L102 not removed",
+     "mutant": "L106 not removed",
      "killed": true
     },
     {
-     "mutant": "L108 condition negated",
+     "mutant": "L112 condition negated",
      "killed": true
     },
     {
-     "mutant": "L114 True->False",
+     "mutant": "L118 True->False",
      "killed": true
     },
     {
-     "mutant": "L98 string 'utf-8' emptied",
+     "mutant": "L102 string 'utf-8' emptied",
      "killed": true
     },
     {
-     "mutant": "L101 False->True",
+     "mutant": "L105 False->True",
      "killed": true
     },
     {
-     "mutant": "L108 NotEq->Eq",
+     "mutant": "L112 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L103 string 'repair would change an existing event' emptied",
+     "mutant": "L107 string 'repair would change an existing event' emptied",
      "killed": true
     },
     {
-     "mutant": "L104 string '.repair' emptied",
+     "mutant": "L108 string '.repair' emptied",
      "killed": true
     },
     {
-     "mutant": "L107 string 'utf-8' emptied",
+     "mutant": "L111 string 'utf-8' emptied",
      "killed": true
     },
     {
-     "mutant": "L105 string 'O_BINARY' emptied",
+     "mutant": "L109 string 'O_BINARY' emptied",
      "killed": true
     },
     {
-     "mutant": "L109 string 'short write to ' emptied",
+     "mutant": "L113 string 'short write to ' emptied",
      "killed": true
     },
     {
-     "mutant": "L102 string '\\n' emptied",
+     "mutant": "L106 string '\\n' emptied",
      "killed": true
     }
    ]
@@ -4764,11 +4778,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 5,
    "killed": 5,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L71 condition negated",
@@ -4797,11 +4812,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 6,
    "killed": 6,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L83 condition negated",
@@ -4834,11 +4850,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L275 string 'FAILED' emptied",
@@ -4863,11 +4880,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L262 string 'ENDED' emptied",
@@ -4892,11 +4910,12 @@
    "kill_tests": [
     "tests/v2/p4/test_interruption.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 3,
    "killed": 3,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L139 returns None",
@@ -4917,11 +4936,12 @@
    "kill_tests": [
     "tests/v2/p4/test_interruption.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 2,
    "killed": 2,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L251 condition negated",
@@ -4939,11 +4959,12 @@
     "tests/v2/p4/test_run_scope.py",
     "tests/v2/p4/test_interruption.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 10,
    "killed": 10,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L144 condition negated",
@@ -4992,11 +5013,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 20,
    "killed": 20,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L111 condition negated",
@@ -5085,11 +5107,12 @@
    "kill_tests": [
     "tests/v2/p4/test_interruption.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 44,
    "killed": 44,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L210 condition negated",
@@ -5274,11 +5297,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 6,
    "killed": 6,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L176 returns None",
@@ -5311,11 +5335,12 @@
    "kill_tests": [
     "tests/v2/p4/test_budgets.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 5,
    "killed": 5,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L159 condition negated",
@@ -5344,11 +5369,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 12,
    "killed": 12,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L180 condition negated",
@@ -5405,11 +5431,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "6863814ec6c2a392f5a682f986ab60083c5a36bf9861cf88ef83b47b8170a4f4",
+   "source_sha256": "4d9d1a2b13d0e8c117f41d31642cb9557272e1fe75a0b05ad9441389a3228c92",
    "mutants": 6,
    "killed": 6,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L169 condition negated",
@@ -5957,11 +5984,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "651fbc25ce6ca4e071ec84924ee4f2c62bb402ec7caac2a9ecf2f4032f1d210c",
+   "source_sha256": "d083b7ae8de925524e2a997592196d310bf7a7b57e28721d395ea1b942ed13bd",
    "mutants": 3,
    "killed": 3,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L38 condition negated",
@@ -5982,11 +6010,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "651fbc25ce6ca4e071ec84924ee4f2c62bb402ec7caac2a9ecf2f4032f1d210c",
+   "source_sha256": "d083b7ae8de925524e2a997592196d310bf7a7b57e28721d395ea1b942ed13bd",
    "mutants": 8,
    "killed": 8,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L53 condition negated",
@@ -6027,11 +6056,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "651fbc25ce6ca4e071ec84924ee4f2c62bb402ec7caac2a9ecf2f4032f1d210c",
+   "source_sha256": "d083b7ae8de925524e2a997592196d310bf7a7b57e28721d395ea1b942ed13bd",
    "mutants": 12,
    "killed": 12,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L81 condition negated",
@@ -6088,11 +6118,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "651fbc25ce6ca4e071ec84924ee4f2c62bb402ec7caac2a9ecf2f4032f1d210c",
+   "source_sha256": "d083b7ae8de925524e2a997592196d310bf7a7b57e28721d395ea1b942ed13bd",
    "mutants": 6,
    "killed": 6,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L74 dict entry 0 dropped",
@@ -6125,11 +6156,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "651fbc25ce6ca4e071ec84924ee4f2c62bb402ec7caac2a9ecf2f4032f1d210c",
+   "source_sha256": "d083b7ae8de925524e2a997592196d310bf7a7b57e28721d395ea1b942ed13bd",
    "mutants": 16,
    "killed": 16,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L115 condition negated",
@@ -6202,11 +6234,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "651fbc25ce6ca4e071ec84924ee4f2c62bb402ec7caac2a9ecf2f4032f1d210c",
+   "source_sha256": "d083b7ae8de925524e2a997592196d310bf7a7b57e28721d395ea1b942ed13bd",
    "mutants": 14,
    "killed": 14,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L64 condition negated",
@@ -6271,11 +6304,12 @@
    "kill_tests": [
     "tests/v2/p4/test_run_scope.py"
    ],
-   "source_sha256": "651fbc25ce6ca4e071ec84924ee4f2c62bb402ec7caac2a9ecf2f4032f1d210c",
+   "source_sha256": "d083b7ae8de925524e2a997592196d310bf7a7b57e28721d395ea1b942ed13bd",
    "mutants": 55,
    "killed": 55,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
      "mutant": "L109 returns None",
@@ -6310,7 +6344,7 @@
      "killed": true
     },
     {
-     "mutant": "L106 Eq->NotEq",
+     "mutant": "L106 GtE->Lt",
      "killed": true
     },
     {

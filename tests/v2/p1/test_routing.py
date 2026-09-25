@@ -52,6 +52,16 @@ EXPECTED = {  # code -> (owner, retryability): the taxonomy, pinned
     FailureCode.INVALID_CREDENTIAL: (Owner.ENVIRONMENT, NR),
     FailureCode.PROVIDER_UNAVAILABLE: (Owner.PROVIDER, RT),
     FailureCode.UNKNOWN: (Owner.INTEGRATION, NR),
+    # ARCHITECTURE-EXCEPTION-V2-005 (owner resolution §7): the exact nine, journal format 3 only
+    FailureCode.VERIFIER_DISAGREEMENT: (Owner.INTEGRATION, NR),
+    FailureCode.PROBE_MISMATCH: (Owner.INTEGRATION, NR),
+    FailureCode.MERGE_CONFLICT: (Owner.INTEGRATION, NR),
+    FailureCode.TESTS_UNRUNNABLE: (Owner.ENVIRONMENT, RT),
+    FailureCode.TESTS_INADEQUATE: (Owner.DEVELOPER, RT),
+    FailureCode.REVIEW_FINDING: (Owner.REVIEW, RT),
+    FailureCode.SECURITY_FINDING: (Owner.SECURITY, RT),
+    FailureCode.CAPABILITY_UNRUNNABLE: (Owner.ENVIRONMENT, RT),
+    FailureCode.RESOURCE_ACQUISITION_FAILED: (Owner.ENVIRONMENT, RT),
 }
 REQUIRES_SUBJECT = SPECS["BC-QUIET-STDOUT"]  # MUST_NOT_HOLD, REQUIRES_SUBJECT
 

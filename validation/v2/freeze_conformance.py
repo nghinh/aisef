@@ -371,6 +371,65 @@ def _runspec_matches_rfc(rfc: RFC) -> dict:
                                      "comparability; OPAQUE bars Q6"}
 
 
+def _failure_taxonomy_matches_rfc(rfc: RFC) -> dict:
+    """F1 (V2-005): FailureCode is exactly the RFC §22.1 table, in order — one owner and one retryability per code,
+    fixed in the taxonomy; formats 1 and 2 carry only the codes the table marks with first format 1."""
+    rows = re.findall(r"^\| `([A-Z_]+)` \| `([A-Z]+)` \| `([A-Z_]+)` \| (\d)", rfc.section("### 22.1", "## 23."), re.M)
+    if not rows:
+        return {"state": FAIL, "detail": "RFC §22.1 failure taxonomy table could not be extracted"}
+    if not symbol_present("aisef2.control.owner", "V2_005_CODES"):
+        return {"state": None, "detail": "aisef2.control.owner does not carry the V2-005 taxonomy", "rfc_reference": rows}
+    ow = importlib.import_module("aisef2.control.owner")
+    problems = []
+    if [c.value for c in ow.FailureCode] != [c for c, *_ in rows]:
+        problems.append(f"FailureCode members differ from §22.1: implemented {[c.value for c in ow.FailureCode]}")
+    got = {c.value: (k.owner.value, k.retryability.value) for c, k in ow.TAXONOMY.items()}
+    problems += [f"{c}: RFC ({o}, {r}), implemented {got.get(c)}" for c, o, r, _ in rows if got.get(c) != (o, r)]
+    first = {c: f for c, _, _, f in rows}
+    if set(ow.FORMAT_2_CODES) != {c for c, f in first.items() if f == "1"}:
+        problems.append("FORMAT_2_CODES is not exactly the codes §22.1 marks with first format 1")
+    if set(ow.V2_005_CODES) != {c for c, f in first.items() if f == "3"}:
+        problems.append("V2_005_CODES is not exactly the codes §22.1 marks with first format 3")
+    if set(ow.FORMAT_2_CODES) & set(ow.V2_005_CODES) or set(ow.FORMAT_2_CODES) | set(ow.V2_005_CODES) != set(got):
+        problems.append("FORMAT_2_CODES and V2_005_CODES do not partition FailureCode")
+    if problems:
+        return {"state": FAIL, "detail": "the failure taxonomy differs from RFC §22.1", "problems": problems}
+    return {"state": PASS, "detail": f"FailureCode equals the RFC §22.1 table: {len(rows)} codes, each with its owner and "
+                                     f"retryability; {len(ow.FORMAT_2_CODES)} carried by formats 1 and 2, "
+                                     f"{len(ow.V2_005_CODES)} by format 3 only"}
+
+
+def _journal_format_3_matches_rfc(rfc: RFC) -> dict:
+    """F1 (V2-005): journal format 3 carries a schema for every event type of §20.1; a format-3 provider/request
+    requires budget_owner; formats 1 and 2 are unchanged (18 and 25 writable types, no budget_owner)."""
+    want = rfc.event_types()
+    if len(want) != 29:
+        return {"state": FAIL, "detail": f"RFC §20.1 names {len(want)} event types, not 29"}
+    if not symbol_present("aisef2.journal.format3", "SCHEMAS"):
+        return {"state": None, "detail": "aisef2.journal.format3 not implemented", "rfc_reference": want}
+    ev = importlib.import_module("aisef2.journal.event")
+    f2 = importlib.import_module("aisef2.journal.format2")
+    f3 = importlib.import_module("aisef2.journal.format3")
+    problems = []
+    if sorted(f3.SCHEMAS) != sorted(want) or sorted(f3.WRITABLE) != sorted(want):
+        problems.append(f"format 3 schemas {sorted(set(want) - set(f3.SCHEMAS))} missing, {sorted(set(f3.SCHEMAS) - set(want))} extra")
+    if (f3.FORMAT, tuple(f3.KNOWN_FORMATS)) != (3, (1, 2, 3)):
+        problems.append(f"format 3 declares {f3.FORMAT}, knows {f3.KNOWN_FORMATS}")
+    if "budget_owner" not in f3.SCHEMAS["provider/request"].required:
+        problems.append("a format-3 provider/request does not require budget_owner")
+    if (len(ev.SCHEMAS), len(f2.WRITABLE)) != (18, 25):
+        problems.append(f"formats 1 and 2 changed: {len(ev.SCHEMAS)} and {len(f2.WRITABLE)} writable types")
+    if "budget_owner" in ev.SCHEMAS["provider/request"].required or "budget_owner" in f2.SCHEMAS.get(
+            "provider/request", ev.SCHEMAS["provider/request"]).required:
+        problems.append("a format-1 or format-2 provider/request requires budget_owner")
+    if not all(callable(getattr(f3, n, None)) for n in ("reconstruct", "validate", "verified_proof", "declared_format")):
+        problems.append("format 3 lacks reconstruct / validate / verified_proof / declared_format")
+    if problems:
+        return {"state": FAIL, "detail": "journal format 3 differs from RFC §20.1 / §35", "problems": problems}
+    return {"state": PASS, "detail": "format 3 carries a schema for all 29 event types; provider/request requires "
+                                     "budget_owner under format 3 only; formats 1 (18) and 2 (25) unchanged"}
+
+
 def _projections_match_rfc(rfc: RFC) -> dict:
     """F11: exactly the RFC's six control-critical projections, as a closed, read-only registry a gate reads by
     ControlProjection only."""
@@ -672,6 +731,8 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     for n in ("Vacuity", "Relevance", "AdequacyOutcome", "TestExecutionStatus", "TestOutcome", "TestSelection"):
         add("F1", f"F1.payload_enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
     add("F1", "F1.event_envelope", "WP-3.1", _event_envelope_matches_rfc(rfc))
+    add("F1", "F1.failure_taxonomy", "WP-6.2", _failure_taxonomy_matches_rfc(rfc))
+    add("F1", "F1.journal_format_3", "WP-6.2", _journal_format_3_matches_rfc(rfc))
     for n in ("ProbeExecutionStatus", "BehaviorVerdict", "ContractSatisfaction"):
         add("F2", f"F2.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))
     add("F2", "F2.enum.MeasurementPoint", "WP-1.4", V("MeasurementPoint", e.get("MeasurementPoint", []), code))

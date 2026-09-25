@@ -8,1050 +8,2563 @@
     "tests/v2/p1/test_routing.py",
     "tests/v2/p2/test_signal_provenance.py"
    ],
-   "source_sha256": "d26681b20a662de754287ad49df76d9a70abbd9ed40b5bcf3b11ad48bf96a569",
-   "mutants": 260,
-   "killed": 260,
+   "source_sha256": "a7b218f54bada6811441fc088aaae9a018fa2e6cfe73e3a5dd10f1b291d02ec6",
+   "mutants": 638,
+   "killed": 638,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L62 element 0 dropped",
+     "mutant": "L88 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 1 dropped",
+     "mutant": "L88 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 2 dropped",
+     "mutant": "L88 element 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 3 dropped",
+     "mutant": "L88 element 3 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 4 dropped",
+     "mutant": "L88 element 4 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 5 dropped",
+     "mutant": "L88 element 5 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 6 dropped",
+     "mutant": "L88 element 6 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 7 dropped",
+     "mutant": "L88 element 7 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 8 dropped",
+     "mutant": "L88 element 8 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 9 dropped",
+     "mutant": "L88 element 9 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 10 dropped",
+     "mutant": "L88 element 10 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 11 dropped",
+     "mutant": "L88 element 11 dropped",
      "killed": true
     },
     {
-     "mutant": "L62 element 12 dropped",
+     "mutant": "L88 element 12 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->PROBE_INVALID_SPEC",
+     "mutant": "L88 element 13 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->CONTRACT_UNSATISFIED",
+     "mutant": "L88 element 14 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L88 element 15 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->PRECONDITION_BROKEN",
+     "mutant": "L88 element 16 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->PLAN_CONTRADICTION",
+     "mutant": "L88 element 17 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->POST_MERGE_REGRESSION",
+     "mutant": "L88 element 18 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L88 element 19 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->NON_CONTROLLER_SIGNAL",
+     "mutant": "L88 element 20 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->MISSING_CREDENTIAL",
+     "mutant": "L88 element 21 dropped",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->INVALID_CREDENTIAL",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->PROVIDER_UNAVAILABLE",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L63 FailureCode.PROBE_UNRUNNABLE->UNKNOWN",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L63 Owner.ENVIRONMENT->PLAN",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L63 Owner.ENVIRONMENT->DEVELOPER",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L63 Owner.ENVIRONMENT->PROVIDER",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L63 Owner.ENVIRONMENT->REVIEW",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L63 Owner.ENVIRONMENT->SECURITY",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L63 Owner.ENVIRONMENT->INTEGRATION",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->PROBE_UNRUNNABLE",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->CONTRACT_UNSATISFIED",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->PRECONDITION_BROKEN",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->PLAN_CONTRADICTION",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->POST_MERGE_REGRESSION",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->NON_CONTROLLER_SIGNAL",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->MISSING_CREDENTIAL",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->INVALID_CREDENTIAL",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->PROVIDER_UNAVAILABLE",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L66 FailureCode.PROBE_INVALID_SPEC->UNKNOWN",
+     "mutant": "L89 FailureCode.PROBE_UNRUNNABLE->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L66 Owner.INTEGRATION->PLAN",
+     "mutant": "L89 Owner.ENVIRONMENT->PLAN",
      "killed": true
     },
     {
-     "mutant": "L66 Owner.INTEGRATION->DEVELOPER",
+     "mutant": "L89 Owner.ENVIRONMENT->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L66 Owner.INTEGRATION->ENVIRONMENT",
+     "mutant": "L89 Owner.ENVIRONMENT->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L66 Owner.INTEGRATION->PROVIDER",
+     "mutant": "L89 Owner.ENVIRONMENT->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L66 Owner.INTEGRATION->REVIEW",
+     "mutant": "L89 Owner.ENVIRONMENT->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L66 Owner.INTEGRATION->SECURITY",
+     "mutant": "L89 Owner.ENVIRONMENT->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->PROBE_UNRUNNABLE",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->PROBE_INVALID_SPEC",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->PRECONDITION_BROKEN",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->PLAN_CONTRADICTION",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->POST_MERGE_REGRESSION",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->NON_CONTROLLER_SIGNAL",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->MISSING_CREDENTIAL",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->INVALID_CREDENTIAL",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->PROVIDER_UNAVAILABLE",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L70 FailureCode.CONTRACT_UNSATISFIED->UNKNOWN",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L70 Owner.DEVELOPER->PLAN",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L70 Owner.DEVELOPER->ENVIRONMENT",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L70 Owner.DEVELOPER->PROVIDER",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L70 Owner.DEVELOPER->REVIEW",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L70 Owner.DEVELOPER->SECURITY",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L70 Owner.DEVELOPER->INTEGRATION",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PROBE_UNRUNNABLE",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PROBE_INVALID_SPEC",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->CONTRACT_UNSATISFIED",
+     "mutant": "L92 FailureCode.PROBE_INVALID_SPEC->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PRECONDITION_BROKEN",
+     "mutant": "L92 Owner.INTEGRATION->PLAN",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PLAN_CONTRADICTION",
+     "mutant": "L92 Owner.INTEGRATION->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->POST_MERGE_REGRESSION",
+     "mutant": "L92 Owner.INTEGRATION->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L92 Owner.INTEGRATION->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->NON_CONTROLLER_SIGNAL",
+     "mutant": "L92 Owner.INTEGRATION->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->MISSING_CREDENTIAL",
+     "mutant": "L92 Owner.INTEGRATION->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->INVALID_CREDENTIAL",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PROVIDER_UNAVAILABLE",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L73 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->UNKNOWN",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L73 Owner.DEVELOPER->PLAN",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L73 Owner.DEVELOPER->ENVIRONMENT",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L73 Owner.DEVELOPER->PROVIDER",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L73 Owner.DEVELOPER->REVIEW",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L73 Owner.DEVELOPER->SECURITY",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L73 Owner.DEVELOPER->INTEGRATION",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->PROBE_UNRUNNABLE",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->PROBE_INVALID_SPEC",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->CONTRACT_UNSATISFIED",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->PLAN_CONTRADICTION",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->POST_MERGE_REGRESSION",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->NON_CONTROLLER_SIGNAL",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->MISSING_CREDENTIAL",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->INVALID_CREDENTIAL",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->PROVIDER_UNAVAILABLE",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L76 FailureCode.PRECONDITION_BROKEN->UNKNOWN",
+     "mutant": "L96 FailureCode.CONTRACT_UNSATISFIED->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L76 Owner.PLAN->DEVELOPER",
+     "mutant": "L96 Owner.DEVELOPER->PLAN",
      "killed": true
     },
     {
-     "mutant": "L76 Owner.PLAN->ENVIRONMENT",
+     "mutant": "L96 Owner.DEVELOPER->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L76 Owner.PLAN->PROVIDER",
+     "mutant": "L96 Owner.DEVELOPER->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L76 Owner.PLAN->REVIEW",
+     "mutant": "L96 Owner.DEVELOPER->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L76 Owner.PLAN->SECURITY",
+     "mutant": "L96 Owner.DEVELOPER->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L76 Owner.PLAN->INTEGRATION",
+     "mutant": "L96 Owner.DEVELOPER->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->PROBE_UNRUNNABLE",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->PROBE_INVALID_SPEC",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->CONTRACT_UNSATISFIED",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->PRECONDITION_BROKEN",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->POST_MERGE_REGRESSION",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->NON_CONTROLLER_SIGNAL",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->MISSING_CREDENTIAL",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->INVALID_CREDENTIAL",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->PROVIDER_UNAVAILABLE",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L79 FailureCode.PLAN_CONTRADICTION->UNKNOWN",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L79 Owner.PLAN->DEVELOPER",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L79 Owner.PLAN->ENVIRONMENT",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L79 Owner.PLAN->PROVIDER",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L79 Owner.PLAN->REVIEW",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L79 Owner.PLAN->SECURITY",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L79 Owner.PLAN->INTEGRATION",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->PROBE_UNRUNNABLE",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->PROBE_INVALID_SPEC",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->CONTRACT_UNSATISFIED",
+     "mutant": "L99 FailureCode.SUBJECT_ABSENT_AT_CANDIDATE->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L99 Owner.DEVELOPER->PLAN",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->PRECONDITION_BROKEN",
+     "mutant": "L99 Owner.DEVELOPER->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->PLAN_CONTRADICTION",
+     "mutant": "L99 Owner.DEVELOPER->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L99 Owner.DEVELOPER->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->NON_CONTROLLER_SIGNAL",
+     "mutant": "L99 Owner.DEVELOPER->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->MISSING_CREDENTIAL",
+     "mutant": "L99 Owner.DEVELOPER->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->INVALID_CREDENTIAL",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->PROVIDER_UNAVAILABLE",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L83 FailureCode.POST_MERGE_REGRESSION->UNKNOWN",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L83 Owner.INTEGRATION->PLAN",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L83 Owner.INTEGRATION->DEVELOPER",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L83 Owner.INTEGRATION->ENVIRONMENT",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L83 Owner.INTEGRATION->PROVIDER",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L83 Owner.INTEGRATION->REVIEW",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L83 Owner.INTEGRATION->SECURITY",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->PROBE_UNRUNNABLE",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->PROBE_INVALID_SPEC",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->CONTRACT_UNSATISFIED",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->PRECONDITION_BROKEN",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->PLAN_CONTRADICTION",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->POST_MERGE_REGRESSION",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->NON_CONTROLLER_SIGNAL",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->MISSING_CREDENTIAL",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->INVALID_CREDENTIAL",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->PROVIDER_UNAVAILABLE",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L85 FailureCode.POST_MERGE_SUBJECT_LOST->UNKNOWN",
+     "mutant": "L102 FailureCode.PRECONDITION_BROKEN->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L85 Owner.INTEGRATION->PLAN",
+     "mutant": "L102 Owner.PLAN->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L85 Owner.INTEGRATION->DEVELOPER",
+     "mutant": "L102 Owner.PLAN->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L85 Owner.INTEGRATION->ENVIRONMENT",
+     "mutant": "L102 Owner.PLAN->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L85 Owner.INTEGRATION->PROVIDER",
+     "mutant": "L102 Owner.PLAN->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L85 Owner.INTEGRATION->REVIEW",
+     "mutant": "L102 Owner.PLAN->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L85 Owner.INTEGRATION->SECURITY",
+     "mutant": "L102 Owner.PLAN->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->PROBE_UNRUNNABLE",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->PROBE_INVALID_SPEC",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->CONTRACT_UNSATISFIED",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->PRECONDITION_BROKEN",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->PLAN_CONTRADICTION",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->POST_MERGE_REGRESSION",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->MISSING_CREDENTIAL",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->INVALID_CREDENTIAL",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->PROVIDER_UNAVAILABLE",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L87 FailureCode.NON_CONTROLLER_SIGNAL->UNKNOWN",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L87 Owner.INTEGRATION->PLAN",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L87 Owner.INTEGRATION->DEVELOPER",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L87 Owner.INTEGRATION->ENVIRONMENT",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L87 Owner.INTEGRATION->PROVIDER",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L87 Owner.INTEGRATION->REVIEW",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L87 Owner.INTEGRATION->SECURITY",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->PROBE_UNRUNNABLE",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->PROBE_INVALID_SPEC",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->CONTRACT_UNSATISFIED",
+     "mutant": "L105 FailureCode.PLAN_CONTRADICTION->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L105 Owner.PLAN->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->PRECONDITION_BROKEN",
+     "mutant": "L105 Owner.PLAN->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->PLAN_CONTRADICTION",
+     "mutant": "L105 Owner.PLAN->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->POST_MERGE_REGRESSION",
+     "mutant": "L105 Owner.PLAN->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L105 Owner.PLAN->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->NON_CONTROLLER_SIGNAL",
+     "mutant": "L105 Owner.PLAN->INTEGRATION",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->INVALID_CREDENTIAL",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->PROVIDER_UNAVAILABLE",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L94 FailureCode.MISSING_CREDENTIAL->UNKNOWN",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L94 Owner.ENVIRONMENT->PLAN",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L94 Owner.ENVIRONMENT->DEVELOPER",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L94 Owner.ENVIRONMENT->PROVIDER",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L94 Owner.ENVIRONMENT->REVIEW",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L94 Owner.ENVIRONMENT->SECURITY",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L94 Owner.ENVIRONMENT->INTEGRATION",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->PROBE_UNRUNNABLE",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->PROBE_INVALID_SPEC",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->CONTRACT_UNSATISFIED",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->PRECONDITION_BROKEN",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->PLAN_CONTRADICTION",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->POST_MERGE_REGRESSION",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->NON_CONTROLLER_SIGNAL",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->MISSING_CREDENTIAL",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->PROVIDER_UNAVAILABLE",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L97 FailureCode.INVALID_CREDENTIAL->UNKNOWN",
+     "mutant": "L109 FailureCode.POST_MERGE_REGRESSION->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L97 Owner.ENVIRONMENT->PLAN",
+     "mutant": "L109 Owner.INTEGRATION->PLAN",
      "killed": true
     },
     {
-     "mutant": "L97 Owner.ENVIRONMENT->DEVELOPER",
+     "mutant": "L109 Owner.INTEGRATION->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L97 Owner.ENVIRONMENT->PROVIDER",
+     "mutant": "L109 Owner.INTEGRATION->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L97 Owner.ENVIRONMENT->REVIEW",
+     "mutant": "L109 Owner.INTEGRATION->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L97 Owner.ENVIRONMENT->SECURITY",
+     "mutant": "L109 Owner.INTEGRATION->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L97 Owner.ENVIRONMENT->INTEGRATION",
+     "mutant": "L109 Owner.INTEGRATION->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->PROBE_UNRUNNABLE",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->PROBE_INVALID_SPEC",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->CONTRACT_UNSATISFIED",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->PRECONDITION_BROKEN",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->PLAN_CONTRADICTION",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->POST_MERGE_REGRESSION",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->NON_CONTROLLER_SIGNAL",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->MISSING_CREDENTIAL",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->INVALID_CREDENTIAL",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L100 FailureCode.PROVIDER_UNAVAILABLE->UNKNOWN",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L100 Owner.PROVIDER->PLAN",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L100 Owner.PROVIDER->DEVELOPER",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L100 Owner.PROVIDER->ENVIRONMENT",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L100 Owner.PROVIDER->REVIEW",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L100 Owner.PROVIDER->SECURITY",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L100 Owner.PROVIDER->INTEGRATION",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->PROBE_UNRUNNABLE",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->PROBE_INVALID_SPEC",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->CONTRACT_UNSATISFIED",
+     "mutant": "L111 FailureCode.POST_MERGE_SUBJECT_LOST->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L111 Owner.INTEGRATION->PLAN",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->PRECONDITION_BROKEN",
+     "mutant": "L111 Owner.INTEGRATION->DEVELOPER",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->PLAN_CONTRADICTION",
+     "mutant": "L111 Owner.INTEGRATION->ENVIRONMENT",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->POST_MERGE_REGRESSION",
+     "mutant": "L111 Owner.INTEGRATION->PROVIDER",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L111 Owner.INTEGRATION->REVIEW",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->NON_CONTROLLER_SIGNAL",
+     "mutant": "L111 Owner.INTEGRATION->SECURITY",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->MISSING_CREDENTIAL",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->INVALID_CREDENTIAL",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L103 FailureCode.UNKNOWN->PROVIDER_UNAVAILABLE",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L103 Owner.INTEGRATION->PLAN",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L103 Owner.INTEGRATION->DEVELOPER",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L103 Owner.INTEGRATION->ENVIRONMENT",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L103 Owner.INTEGRATION->PROVIDER",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L103 Owner.INTEGRATION->REVIEW",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L103 Owner.INTEGRATION->SECURITY",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L64 string '§10, §10.3: the observation harness cannot run -> ENVIRONMENT (the only probe outcome that may route there)' emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L67 string '§10: INVALID_SPEC -> PLAN / INTEGRATION. INTEGRATION: §12 checks 2, 6 and 9 establish contract->spec integrity and probe availability before plan freeze, so a spec that reaches a probe unevaluable is a harness integration fault; §14: PROBE_INVALID is a hard blocker' emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L71 string '§10.3: CANDIDATE, UNSATISFIED -> DEVELOPER; §10.1: failure is ContractSatisfaction UNSATISFIED, never a raw verdict' emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L74 string '§10.3 (V2-001): CANDIDATE, admitted obligation, required subject absent -> DEVELOPER: the admitted implementation did not establish the subject the proof requires' emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L77 string '§10.3, §13: PARENT, PRESERVE or VERIFY over a required subject that is absent -> PRECONDITION_BROKEN, PLAN; §14: a hard plan blocker' emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L80 string \"§13: the parent cannot be reconciled with the plan's own record (a PRESERVE measured UNSATISFIED whose introducing story committed) -> PLAN; §14: a hard plan blocker; owner decision (P2 review): never retryable, so it consumes no budget\" emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L84 string '§26, §10.3: POST_MERGE, UNSATISFIED -> a regression after merge, INTEGRATION' emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L86 string '§10.3 (V2-001): POST_MERGE, a subject verified at the candidate is gone -> INTEGRATION' emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L88 string \"§9.3, §10.3 (V2-003): the probe executed and the subject's process ended by a signal the controller did not send. The evidence establishes only that the controller did not send it — not whether the product, the operating system, a resource limit or another actor did — so DEVELOPER would invent product causality and ENVIRONMENT would repeat the defect V2-003 removes; INTEGRATION is the fail-closed owner of an executed proof whose causal reading cannot be established, and it is never retryable: a retry would measure the same thing\" emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L95 string \"§22 + owner decision (P1 review): a missing credential is execution configuration -> ENVIRONMENT; whether it is retried is the resolved execution policy's decision\" emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L98 string '§22: MUST NOT be retryable (D-006); owner decision (P1 review): a rejected, revoked or wrong credential is execution configuration, not provider failure -> ENVIRONMENT' emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L101 string '§22 + owner decision (P1 review): a provider owns a failure only through a provider-side code — the provider is unavailable' emptied",
+     "mutant": "L113 FailureCode.NON_CONTROLLER_SIGNAL->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L104 string '§22: a non-AISEF error flattens to UNKNOWN; §15: cause undetermined -> INTEGRATION, never DEVELOPER' emptied",
+     "mutant": "L113 Owner.INTEGRATION->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L113 Owner.INTEGRATION->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L113 Owner.INTEGRATION->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L113 Owner.INTEGRATION->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L113 Owner.INTEGRATION->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L113 Owner.INTEGRATION->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L120 FailureCode.MISSING_CREDENTIAL->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L120 Owner.ENVIRONMENT->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L120 Owner.ENVIRONMENT->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L120 Owner.ENVIRONMENT->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L120 Owner.ENVIRONMENT->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L120 Owner.ENVIRONMENT->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L120 Owner.ENVIRONMENT->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 FailureCode.INVALID_CREDENTIAL->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Owner.ENVIRONMENT->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Owner.ENVIRONMENT->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Owner.ENVIRONMENT->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Owner.ENVIRONMENT->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Owner.ENVIRONMENT->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Owner.ENVIRONMENT->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L126 FailureCode.PROVIDER_UNAVAILABLE->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L126 Owner.PROVIDER->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L126 Owner.PROVIDER->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L126 Owner.PROVIDER->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L126 Owner.PROVIDER->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L126 Owner.PROVIDER->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L126 Owner.PROVIDER->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 FailureCode.UNKNOWN->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Owner.INTEGRATION->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Owner.INTEGRATION->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Owner.INTEGRATION->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Owner.INTEGRATION->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Owner.INTEGRATION->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Owner.INTEGRATION->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L133 FailureCode.VERIFIER_DISAGREEMENT->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L133 Owner.INTEGRATION->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L133 Owner.INTEGRATION->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L133 Owner.INTEGRATION->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L133 Owner.INTEGRATION->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L133 Owner.INTEGRATION->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L133 Owner.INTEGRATION->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 FailureCode.PROBE_MISMATCH->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Owner.INTEGRATION->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Owner.INTEGRATION->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Owner.INTEGRATION->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Owner.INTEGRATION->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Owner.INTEGRATION->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Owner.INTEGRATION->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 FailureCode.MERGE_CONFLICT->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Owner.INTEGRATION->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Owner.INTEGRATION->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Owner.INTEGRATION->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Owner.INTEGRATION->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Owner.INTEGRATION->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Owner.INTEGRATION->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L142 FailureCode.TESTS_UNRUNNABLE->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L142 Owner.ENVIRONMENT->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L142 Owner.ENVIRONMENT->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L142 Owner.ENVIRONMENT->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L142 Owner.ENVIRONMENT->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L142 Owner.ENVIRONMENT->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L142 Owner.ENVIRONMENT->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L145 FailureCode.TESTS_INADEQUATE->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Owner.DEVELOPER->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Owner.DEVELOPER->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Owner.DEVELOPER->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Owner.DEVELOPER->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Owner.DEVELOPER->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Owner.DEVELOPER->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L148 FailureCode.REVIEW_FINDING->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L148 Owner.REVIEW->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L148 Owner.REVIEW->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L148 Owner.REVIEW->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L148 Owner.REVIEW->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L148 Owner.REVIEW->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L148 Owner.REVIEW->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L151 FailureCode.SECURITY_FINDING->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L151 Owner.SECURITY->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L151 Owner.SECURITY->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L151 Owner.SECURITY->ENVIRONMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L151 Owner.SECURITY->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L151 Owner.SECURITY->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L151 Owner.SECURITY->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L154 FailureCode.CAPABILITY_UNRUNNABLE->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L154 Owner.ENVIRONMENT->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L154 Owner.ENVIRONMENT->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L154 Owner.ENVIRONMENT->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L154 Owner.ENVIRONMENT->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L154 Owner.ENVIRONMENT->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L154 Owner.ENVIRONMENT->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L157 FailureCode.RESOURCE_ACQUISITION_FAILED->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L157 Owner.ENVIRONMENT->PLAN",
+     "killed": true
+    },
+    {
+     "mutant": "L157 Owner.ENVIRONMENT->DEVELOPER",
+     "killed": true
+    },
+    {
+     "mutant": "L157 Owner.ENVIRONMENT->PROVIDER",
+     "killed": true
+    },
+    {
+     "mutant": "L157 Owner.ENVIRONMENT->REVIEW",
+     "killed": true
+    },
+    {
+     "mutant": "L157 Owner.ENVIRONMENT->SECURITY",
+     "killed": true
+    },
+    {
+     "mutant": "L157 Owner.ENVIRONMENT->INTEGRATION",
+     "killed": true
+    },
+    {
+     "mutant": "L90 string '§10, §10.3: the observation harness cannot run -> ENVIRONMENT (the only probe outcome that may route there)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L93 string '§10: INVALID_SPEC -> PLAN / INTEGRATION. INTEGRATION: §12 checks 2, 6 and 9 establish contract->spec integrity and probe availability before plan freeze, so a spec that reaches a probe unevaluable is a harness integration fault; §14: PROBE_INVALID is a hard blocker' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L97 string '§10.3: CANDIDATE, UNSATISFIED -> DEVELOPER; §10.1: failure is ContractSatisfaction UNSATISFIED, never a raw verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L100 string '§10.3 (V2-001): CANDIDATE, admitted obligation, required subject absent -> DEVELOPER: the admitted implementation did not establish the subject the proof requires' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string '§10.3, §13: PARENT, PRESERVE or VERIFY over a required subject that is absent -> PRECONDITION_BROKEN, PLAN; §14: a hard plan blocker' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string \"§13: the parent cannot be reconciled with the plan's own record (a PRESERVE measured UNSATISFIED whose introducing story committed) -> PLAN; §14: a hard plan blocker; owner decision (P2 review): never retryable, so it consumes no budget\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L110 string '§26, §10.3: POST_MERGE, UNSATISFIED -> a regression after merge, INTEGRATION' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string '§10.3 (V2-001): POST_MERGE, a subject verified at the candidate is gone -> INTEGRATION' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L114 string \"§9.3, §10.3 (V2-003): the probe executed and the subject's process ended by a signal the controller did not send. The evidence establishes only that the controller did not send it — not whether the product, the operating system, a resource limit or another actor did — so DEVELOPER would invent product causality and ENVIRONMENT would repeat the defect V2-003 removes; INTEGRATION is the fail-closed owner of an executed proof whose causal reading cannot be established, and it is never retryable: a retry would measure the same thing\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L121 string \"§22 + owner decision (P1 review): a missing credential is execution configuration -> ENVIRONMENT; whether it is retried is the resolved execution policy's decision\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L124 string '§22: MUST NOT be retryable (D-006); owner decision (P1 review): a rejected, revoked or wrong credential is execution configuration, not provider failure -> ENVIRONMENT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string '§22 + owner decision (P1 review): a provider owns a failure only through a provider-side code — the provider is unavailable' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string '§22: a non-AISEF error flattens to UNKNOWN; §15: cause undetermined -> INTEGRATION, never DEVELOPER' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L134 string '§16 rule 3 (V2-005): implementer and verifier disagree -> INDETERMINATE, INTEGRATION, stop; never arbitrated, never rerun until agreement, never flattened to UNKNOWN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L137 string '§16 rule 2 (V2-005): the two results do not share probe_id, probe_digest and semantic_hash — a harness integrity failure, not a statement about the product; never flattened to UNKNOWN' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L140 string '§26 (V2-005): a merge conflict is INTEGRATION, never DEVELOPER; no developer budget; from the typed merge outcome, never from stderr text' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L143 string '§15.3 (V2-005): a mandatory developer-test execution is UNRUNNABLE -> no AdequacyOutcome, an environment failure with its own provenance; the environment retry policy applies' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L146 string '§15.3 (V2-005): INADEQUATE under a blocking project policy -> DEVELOPER, the developer quality budget; INCOMPLETE is never a failure code (recorded in tests/adequacy only)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L149 string '§25 (V2-005): a corroborated reviewer finding -> REVIEW; a model review alone is never the sole blocking authority (D-002)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L152 string \"§25 (V2-005): a scanner that executed and produced a typed blocking finding -> SECURITY; the code comes from the adapter's typed result, never from scanner text\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L155 string '§25 (V2-005): a review or security capability that cannot run for a local or environment reason -> ENVIRONMENT; a provider outage stays PROVIDER_UNAVAILABLE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L158 string '§17.1 (V2-005): a StoryScope or controller resource the harness could not acquire -> ENVIRONMENT; never derived from stderr text' emptied",
      "killed": true
     }
    ]
@@ -1061,34 +2574,35 @@
    "kill_tests": [
     "tests/v2/p1/test_routing.py"
    ],
-   "source_sha256": "d26681b20a662de754287ad49df76d9a70abbd9ed40b5bcf3b11ad48bf96a569",
+   "source_sha256": "a7b218f54bada6811441fc088aaae9a018fa2e6cfe73e3a5dd10f1b291d02ec6",
    "mutants": 6,
    "killed": 6,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L111 condition negated",
+     "mutant": "L165 condition negated",
      "killed": true
     },
     {
-     "mutant": "L113 returns None",
+     "mutant": "L167 returns None",
      "killed": true
     },
     {
-     "mutant": "L111 Or swapped",
+     "mutant": "L165 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L111 not removed",
+     "mutant": "L165 not removed",
      "killed": true
     },
     {
-     "mutant": "L111 NotIn->In",
+     "mutant": "L165 NotIn->In",
      "killed": true
     },
     {
-     "mutant": "L112 string ' is not a typed failure code; flatten it to UNKNOWN first' emptied",
+     "mutant": "L166 string ' is not a typed failure code; flatten it to UNKNOWN first' emptied",
      "killed": true
     }
    ]
@@ -1097,85 +2611,122 @@
    "target": "aisef2/control/owner.py::flatten",
    "kill_tests": [
     "tests/v2/p1/test_routing.py",
-    "tests/v2/p5/test_invariants.py"
+    "tests/v2/p5/test_invariants.py",
+    "tests/v2/test_v2_005.py"
    ],
-   "source_sha256": "d26681b20a662de754287ad49df76d9a70abbd9ed40b5bcf3b11ad48bf96a569",
-   "mutants": 18,
-   "killed": 18,
+   "source_sha256": "a7b218f54bada6811441fc088aaae9a018fa2e6cfe73e3a5dd10f1b291d02ec6",
+   "mutants": 27,
+   "killed": 27,
    "survivors": [],
    "strays_reaped": 0,
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L118 returns None",
+     "mutant": "L172 returns None",
      "killed": true
     },
     {
-     "mutant": "L118 conditional negated",
+     "mutant": "L172 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L118 element 0 dropped",
+     "mutant": "L172 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L118 element 1 dropped",
+     "mutant": "L172 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L118 element 0 dropped",
+     "mutant": "L172 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L118 element 1 dropped",
+     "mutant": "L172 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->PROBE_UNRUNNABLE",
+     "mutant": "L172 FailureCode.UNKNOWN->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->PROBE_INVALID_SPEC",
+     "mutant": "L172 FailureCode.UNKNOWN->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->CONTRACT_UNSATISFIED",
+     "mutant": "L172 FailureCode.UNKNOWN->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L172 FailureCode.UNKNOWN->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->PRECONDITION_BROKEN",
+     "mutant": "L172 FailureCode.UNKNOWN->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->PLAN_CONTRADICTION",
+     "mutant": "L172 FailureCode.UNKNOWN->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->POST_MERGE_REGRESSION",
+     "mutant": "L172 FailureCode.UNKNOWN->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L172 FailureCode.UNKNOWN->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->NON_CONTROLLER_SIGNAL",
+     "mutant": "L172 FailureCode.UNKNOWN->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->MISSING_CREDENTIAL",
+     "mutant": "L172 FailureCode.UNKNOWN->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->INVALID_CREDENTIAL",
+     "mutant": "L172 FailureCode.UNKNOWN->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L118 FailureCode.UNKNOWN->PROVIDER_UNAVAILABLE",
+     "mutant": "L172 FailureCode.UNKNOWN->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L172 FailureCode.UNKNOWN->VERIFIER_DISAGREEMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L172 FailureCode.UNKNOWN->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L172 FailureCode.UNKNOWN->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L172 FailureCode.UNKNOWN->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L172 FailureCode.UNKNOWN->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L172 FailureCode.UNKNOWN->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L172 FailureCode.UNKNOWN->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L172 FailureCode.UNKNOWN->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L172 FailureCode.UNKNOWN->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     }
    ]

@@ -694,7 +694,10 @@ class TypedOwnership(unittest.TestCase):
     def test_INV_IV_no_owner_consumes_another_owners_budget(self):
         limits = {o: 5 for o in Owner}
         by_owner = {o: [c for c, k in TAXONOMY.items() if k.owner is o] for o in Owner}
-        self.assertEqual({o.value for o, codes in by_owner.items() if not codes}, {"REVIEW", "SECURITY"})  # no code charges them
+        # V2-005 §7: REVIEW and SECURITY are each charged by exactly one typed code; every owner is charged by some code
+        self.assertEqual({o.value for o, codes in by_owner.items() if not codes}, set())
+        self.assertEqual({o.value: [c.value for c in codes] for o, codes in by_owner.items() if o in (Owner.REVIEW, Owner.SECURITY)},
+                         {"REVIEW": ["REVIEW_FINDING"], "SECURITY": ["SECURITY_FINDING"]})
         for n, (owner, codes) in enumerate(by_owner.items()):
             for code in codes:
                 story = f"S-{n}-{code.value}"

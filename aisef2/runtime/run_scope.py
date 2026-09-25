@@ -28,7 +28,7 @@ from aisef2.arch.enums import ControlProjection as P, EventType as T
 from aisef2.control import budget
 from aisef2.journal.event import Event, JournalError
 from aisef2.journal.fold import Authority
-from aisef2.journal.format2 import FORMAT, JournalWriter2
+from aisef2.journal.format3 import FORMAT, JournalWriter3
 from aisef2.journal.projections import PROJECTIONS
 from aisef2.runtime import sentinel
 from aisef2.runtime.story_scope import DisposalReport, StoryScope
@@ -98,7 +98,7 @@ class RunScope:
         self.trace: list[str] = []
         self.preflight: sentinel.Preflight | None = None
         self.spec: Any = None
-        self._writer: JournalWriter2 | None = None
+        self._writer: JournalWriter3 | None = None
         self._authority: Authority | None = None
         self._scopes: dict[str, StoryScope] = {}
         self._calls: list = []          # tool calls, so an interruption can close the unfinished ones
@@ -118,7 +118,7 @@ class RunScope:
             self.journal_path.parent.mkdir(exist_ok=True)  # the root exists: it holds the lease
             sentinel.mark_open(self.sentinel_path, self.run_id, self.journal_path)
             self.trace.append("sentinel OPEN")
-            self._writer = JournalWriter2(self.journal_path, clock=self._now)
+            self._writer = JournalWriter3(self.journal_path, clock=self._now)  # format 3 (V2-005)
             self._authority = Authority(self._writer, PROJECTIONS.values())
             self._authority.append(T.RUN_BEGIN, {"journal_format": FORMAT, "run_id": self.run_id})
             self.trace.append("journal writer")

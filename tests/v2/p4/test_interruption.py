@@ -25,8 +25,9 @@ if str(ROOT) not in sys.path:
 
 from aisef2.arch.enums import EventType as T  # noqa: E402
 from aisef2.journal.event import JournalError  # noqa: E402
-from aisef2.journal import format2 as f2  # noqa: E402
-from aisef2.journal.format2 import ResourceKind as K, reconstruct  # noqa: E402
+from aisef2.journal import format3 as f3  # noqa: E402
+from aisef2.journal.format2 import ResourceKind as K  # noqa: E402
+from aisef2.journal.format3 import reconstruct  # noqa: E402 — every format, each read as written
 from aisef2.runtime import repair as rp, sentinel  # noqa: E402
 from aisef2.runtime.process_range import BACKEND, JOB_EXIT_CODE, _Job, _Posix  # noqa: E402
 from aisef2.runtime.run_scope import RunScope  # noqa: E402
@@ -170,7 +171,7 @@ class Interruption(unittest.TestCase):
         running.dispatch()
         self.run.append(T.STORY_ADMITTED, {"story_id": "S1", "parent": SHA, "admitted": True,
                                            "developer_call_permitted": True, "dispositions": {"C1": "READY"}})
-        req = self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"]})
+        req = self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"], "budget_owner": "DEVELOPER"})
         target = running.range.target_pid
         self.run.interrupt()
         results = {e.data["call_id"]: e for e in self.run.events if e.type == T.TOOL_RESULT.value}
@@ -278,7 +279,7 @@ class Repair(unittest.TestCase):
                                    "provenance": "NONE", "synthetic": False, "detail": ""}, source_seqs=(done.seq,))
         run.append(T.STORY_ADMITTED, {"story_id": "S1", "parent": SHA, "admitted": True,
                                       "developer_call_permitted": True, "dispositions": {"C1": "READY"}})
-        run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"]})
+        run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"], "budget_owner": "DEVELOPER"})
         run.append(T.TOOL_INVOKED, {"story_id": "S1", "call_id": "c1", "tool": "pytest"})
         if interrupted:
             run.append(T.RUN_INTERRUPTED, {"abandoned": False})
@@ -357,7 +358,7 @@ class Repair(unittest.TestCase):
         last = run.events[-1]
         run._writer.close()
         req = next(e for e in run.events if e.type == T.PROVIDER_REQUEST.value)
-        w = f2.JournalWriter2(run.journal_path)  # a closer already written, later on the clock than any real event
+        w = f3.JournalWriter3(run.journal_path)  # a closer already written, later on the clock than any real event
         w.append(T.PROVIDER_RESULT, {"story_id": "S1", "outcome": "OUTCOME_UNKNOWN", "synthetic": True, "detail": ""},
                  source_seqs=(req.seq,), time=last.time + 50)
         w.close()

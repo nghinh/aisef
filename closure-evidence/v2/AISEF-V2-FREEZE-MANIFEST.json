@@ -4,10 +4,10 @@
  "rfc": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
  "approval_record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
  "approval_record_sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
- "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
- "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7",
- "approved_rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
- "approved_freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7",
+ "rfc_normative_digest": "eea2e10fa0b40cf9e04da3282441e485883df146ddff70ee5ad9949f32f7574a",
+ "freeze_table_digest": "92605a0ea18da992efeab69357ebbfaa9c898b5f17ad75e172864874df70c688",
+ "approved_rfc_normative_digest": "eea2e10fa0b40cf9e04da3282441e485883df146ddff70ee5ad9949f32f7574a",
+ "approved_freeze_table_digest": "92605a0ea18da992efeab69357ebbfaa9c898b5f17ad75e172864874df70c688",
  "approval_lineage": [
   {
    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
@@ -46,14 +46,24 @@
    ],
    "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
    "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7"
+  },
+  {
+   "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",
+   "sha256": "9b8636a22875c14211ef6fb974ef9c03f39600721aa8cf9020c7d41a37b6dad1",
+   "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json",
+   "frozen_items_changed": [
+    "F1"
+   ],
+   "rfc_normative_digest": "eea2e10fa0b40cf9e04da3282441e485883df146ddff70ee5ad9949f32f7574a",
+   "freeze_table_digest": "92605a0ea18da992efeab69357ebbfaa9c898b5f17ad75e172864874df70c688"
   }
  ],
  "reviewed_commit": "2fe672c7ecdefa349e08353fa9bd67d627077d6e",
  "frozen_items": [
   {
    "id": "F1",
-   "row_sha256": "c7ef7e857d4dbafa17d8b0ed39f0d619a5c834f7f09460c74f17338f19cbc9b0",
-   "item": "`Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted; a payload enum gained one member — V2-003)*",
+   "row_sha256": "27c00d53fb8655a75666e34d3195570cb48c38d552b78c0264c02cca420617f0",
+   "item": "`Event` envelope, the event vocabulary, **and the typed enumerations carried in event payloads** *(adjusted; a payload enum gained one member — V2-003; `FailureCode` gained the nine members of §22.1, journal format 3 carries a schema for every event type and `provider/request.budget_owner` — V2-005)*",
    "why": "Every journal is written under them; a payload enum change re-interprets existing events"
   },
   {

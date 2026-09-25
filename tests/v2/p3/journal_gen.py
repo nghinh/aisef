@@ -1,10 +1,13 @@
-"""Seeded generator of valid format-1 runs, for the fold oracle (WP-3.3) and the reference-model differential (WP-3.5).
+"""Seeded generator of valid format-1 runs — and, with `journal_format=3`, format-3 runs (V2-005) — for the fold
+oracle (WP-3.3) and the reference-model differential (WP-3.5).
 
 A run is built from its own small model of RFC §17 (never from the projections): a frozen plan, stories that begin,
 are admitted (or blocked) at the parent, drift, call the developer on READY criteria only, fail, and end in commit,
 rollback or retry — retries start a new attempt — interleaved, with post-merge failures, gate rows, interrupts and
 abandonment. Owner and retryable come from the taxonomy (`event.carried`). `journal(seed)` returns stored text: read
-it with `compat.reconstruct`, which validates every event.
+it with `compat.reconstruct` (format 1) or `format3.reconstruct` (any format), which validate every event. A format-3
+run names a `budget_owner` on every provider request (DEVELOPER on READY criteria; REVIEW and SECURITY on any
+criterion of the admission), draws its failures from the whole taxonomy, and records the odd invariant violation.
 """
 
 import random
@@ -18,7 +21,12 @@ BLOCKED = {"PRECONDITION_BROKEN": "PRECONDITION_BROKEN", "PLAN_CONTRADICTION": "
            "PROBE_UNRUNNABLE": "PROBE_UNRUNNABLE", "PROBE_INVALID": "PROBE_INVALID_SPEC"}
 ACTIVE_FAILURES = ("CONTRACT_UNSATISFIED", "SUBJECT_ABSENT_AT_CANDIDATE", "PROVIDER_UNAVAILABLE", "PROBE_UNRUNNABLE",
                    "INVALID_CREDENTIAL", "MISSING_CREDENTIAL", "UNKNOWN")
+#: V2-005 codes: journal format 3 only
+ACTIVE_FAILURES_3 = ACTIVE_FAILURES + ("VERIFIER_DISAGREEMENT", "PROBE_MISMATCH", "MERGE_CONFLICT", "TESTS_UNRUNNABLE",
+                                       "TESTS_INADEQUATE", "REVIEW_FINDING", "SECURITY_FINDING", "CAPABILITY_UNRUNNABLE",
+                                       "RESOURCE_ACQUISITION_FAILED")
 POST_MERGE = ("POST_MERGE_REGRESSION", "POST_MERGE_SUBJECT_LOST")
+BUDGET_OWNERS = ("DEVELOPER", "DEVELOPER", "DEVELOPER", "REVIEW", "SECURITY")
 
 
 def _text(specs, times):
@@ -30,15 +38,18 @@ def _text(specs, times):
     return "".join(out)
 
 
-def specs(seed: int, *, stories: int = 4, max_attempts: int = 3) -> list[tuple[str, dict, tuple[int, ...]]]:
+def specs(seed: int, *, stories: int = 4, max_attempts: int = 3,
+          journal_format: int = 1) -> list[tuple[str, dict, tuple[int, ...]]]:
     rng = random.Random(seed)
     out: list[tuple[str, dict, tuple[int, ...]]] = []
+    three = journal_format == 3
+    active_failures = ACTIVE_FAILURES_3 if three else ACTIVE_FAILURES
 
     def emit(type_, data, cites=()):
         out.append((type_, data, tuple(cites)))
         return len(out) - 1
 
-    emit("run/begin", {"journal_format": 1, "run_id": f"gen-{seed}"})
+    emit("run/begin", {"journal_format": journal_format, "run_id": f"gen-{seed}"})
     roles = {f"C{s}.{k}": rng.choice(ROLES) for s in range(1, stories + 1) for k in range(1, rng.randint(1, 3) + 1)}
     emit("plan/frozen", {"plan_id": f"PLAN-{seed}", "plan_hash": "e" * 64, "roles": roles})
     live = {f"S{s}": {"phase": "new", "attempt": 0, "failures": []} for s in range(1, stories + 1)}
@@ -97,7 +108,8 @@ def specs(seed: int, *, stories: int = 4, max_attempts: int = 3) -> list[tuple[s
             emit("story/admitted", {"story_id": sid, "parent": SHA, "admitted": not blocked,
                                     "developer_call_permitted": not blocked and bool(ready), "dispositions": d})
             st.update(ready=ready, permitted=not blocked and bool(ready), pre=[c for c, v in d.items()
-                                                                              if v == "PRE_SATISFIED"])
+                                                                              if v == "PRE_SATISFIED"],
+                      admitted_criteria=sorted(d))
             if blocked:
                 for c in [c for c, v in d.items() if v == "PRE_SATISFIED"]:  # a blocked story still records drift
                     if rng.random() < .5:
@@ -118,10 +130,15 @@ def specs(seed: int, *, stories: int = 4, max_attempts: int = 3) -> list[tuple[s
                                           "attributed_to": cands[0] if len(cands) == 1 else "UNATTRIBUTED",
                                           "candidates": cands})
             elif st["permitted"] and r < .55:
-                emit("provider/request", {"story_id": sid,
-                                          "criteria": sorted(rng.sample(st["ready"], rng.randint(1, len(st["ready"]))))})
+                owner = rng.choice(BUDGET_OWNERS) if three else "DEVELOPER"
+                pool = st["ready"] if owner == "DEVELOPER" else st["admitted_criteria"]
+                emit("provider/request", {"story_id": sid, "criteria": sorted(rng.sample(pool, rng.randint(1, len(pool)))),
+                                          **({"budget_owner": owner} if three else {})})
+            elif three and r < .58:
+                emit("invariant/violated", {"invariant": rng.choice("I II III IV V VI VII VIII IX".split()),
+                                            "module": "tests.v2.p3.journal_gen", "context": {"seq_hint": len(out)}})
             elif r < .72:
-                fail(sid, rng.choice(ACTIVE_FAILURES))
+                fail(sid, rng.choice(active_failures))
             elif r < .78:
                 emit("gate/check", {"gate": "commit", "check": f"{sid}-proof", "passed": rng.random() < .8,
                                     "detail": ""})
@@ -170,7 +187,7 @@ def specs(seed: int, *, stories: int = 4, max_attempts: int = 3) -> list[tuple[s
     return out
 
 
-def journal(seed: int, *, stories: int = 4, times=None, **kw) -> str:
+def journal(seed: int, *, stories: int = 4, times=None, **kw) -> str:  # kw: max_attempts, journal_format
     """Stored text of run `seed`; `times` maps n -> the event's wall-clock time (default: n)."""
     s = specs(seed, stories=stories, **kw)
     return _text(s, [float(n) if times is None else float(times(n)) for n in range(len(s))])

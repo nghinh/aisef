@@ -80,7 +80,7 @@ class Registry(unittest.TestCase):
         self.assertEqual([k.value for k in PROJECTIONS], [p.value for p in P])
         for k, p in PROJECTIONS.items():
             with self.subTest(projection=k.value):
-                self.assertEqual((p.id, p.version), (k.value, 1))
+                self.assertEqual((p.id, p.version), (k.value, 2 if k in (P.BUDGETS, P.STORY_STATE) else 1))  # V2-005
                 self.assertEqual(vars(p), {})  # no side counter: every value is a fold of the journal
         with self.assertRaises(TypeError):
             PROJECTIONS[P.BUDGETS] = None
@@ -123,7 +123,8 @@ class Independence(unittest.TestCase):
         keyed = {P.STORY_STATE: lambda st, s, m: st.get(s), P.FAILURE_OWNER: lambda st, s, m: back(st.get(s), m),
                  P.RETRY_TARGET: lambda st, s, m: back(st.get(s), m),
                  P.BUDGETS: lambda st, s, m: {k: ({str(m[int(q)]): v for q, v in st[k][s].items()}
-                                                  if k == "failures" and s in st[k] else st[k].get(s)) for k in st},
+                                                  if k == "failures" and s in st[k] else st[k].get(s))
+                                              for k in st if k != "format"},  # the run's format is not a story's
                  P.TERMINAL_STATE: lambda st, s, m: (st["stories"].get(s), st["pending"].get(s)),
                  P.QUALIFICATION_COUNTERS: lambda st, s, m: (st["admissions"].get(s), st["drift"].get(s))}
         identity = range(10 ** 4)
@@ -239,7 +240,7 @@ class Budgets(_Case):
         a = (begin("S1"), admit("S1", {"C": "READY", "D": "READY", "E": "PRE_SATISFIED"}))
         got = self.state(*a, request("S1", "C"), request("S1", "C", "D"))
         self.assertEqual(got["developer"], {"S1": {"requests": 2, "criteria": {"C": 2, "D": 1}}})
-        self.assertEqual(got["admission"], {"S1": {"permitted": True, "ready": ["C", "D"]}})
+        self.assertEqual(got["admission"], {"S1": {"permitted": True, "ready": ["C", "D"], "criteria": ["C", "D", "E"]}})
         self.refused(*a, request("S1", "C", "E"), msg=r"^budgets: provider/request for S1 charges \['E'\], not admitted "
                                                       r"READY \(§14: PRE_SATISFIED consumes no developer budget\)$")
         self.refused(begin("S1"), request("S1", "C"), msg="^budgets: provider/request for S1, whose admission permits "
@@ -266,9 +267,10 @@ class Budgets(_Case):
                                                               "of its attempt$")
 
     def test_the_initial_state(self):
-        self.assertEqual(self.state(), {"retries": {}, "developer": {}, "admission": {}, "failures": {}})
+        self.assertEqual(self.state(), {"format": 1, "retries": {}, "developer": {}, "review": {}, "security": {},
+                                        "admission": {}, "failures": {}})
         self.assertEqual(self.state(begin("S1"), admit("S1", {"C": "READY"}), begin("S2"))["admission"],
-                         {"S1": {"permitted": True, "ready": ["C"]}})
+                         {"S1": {"permitted": True, "ready": ["C"], "criteria": ["C"]}})
 
 
 class RetryTarget(_Case):

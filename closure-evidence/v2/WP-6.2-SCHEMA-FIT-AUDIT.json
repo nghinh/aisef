@@ -1,0 +1,527 @@
+{
+ "record": "AISEF V2 — WP-6.2 PRE-CODE SCHEMA-FIT AUDIT",
+ "authority": "AISEF V2 — WP-6.2 EXECUTION AUTHORIZATION §2 (owner, 2026-09-25)",
+ "candidate_audited": "116b92a39ef5bff2846ab8978550276f446d8a5d (WP-6.1 candidate; the frozen vocabulary at HEAD)",
+ "read_only": true,
+ "measured": {
+  "event_types": 29,
+  "writable_in_format_2": 25,
+  "event_types_without_any_schema": [
+   "plan/static-admitted",
+   "proof/verified",
+   "tests/adequacy",
+   "invariant/violated"
+  ],
+  "failure_codes_by_owner": {
+   "PLAN": [
+    "PLAN_CONTRADICTION",
+    "PRECONDITION_BROKEN"
+   ],
+   "DEVELOPER": [
+    "CONTRACT_UNSATISFIED",
+    "SUBJECT_ABSENT_AT_CANDIDATE"
+   ],
+   "ENVIRONMENT": [
+    "INVALID_CREDENTIAL",
+    "MISSING_CREDENTIAL",
+    "PROBE_UNRUNNABLE"
+   ],
+   "PROVIDER": [
+    "PROVIDER_UNAVAILABLE"
+   ],
+   "REVIEW": [],
+   "SECURITY": [],
+   "INTEGRATION": [
+    "NON_CONTROLLER_SIGNAL",
+    "POST_MERGE_REGRESSION",
+    "POST_MERGE_SUBJECT_LOST",
+    "PROBE_INVALID_SPEC",
+    "UNKNOWN"
+   ]
+  },
+  "owners_with_no_code": [
+   "REVIEW",
+   "SECURITY"
+  ],
+  "taxonomy": {
+   "PROBE_UNRUNNABLE": {
+    "owner": "ENVIRONMENT",
+    "retryability": "RETRYABLE",
+    "budget": "ENVIRONMENT"
+   },
+   "PROBE_INVALID_SPEC": {
+    "owner": "INTEGRATION",
+    "retryability": "NOT_RETRYABLE",
+    "budget": null
+   },
+   "CONTRACT_UNSATISFIED": {
+    "owner": "DEVELOPER",
+    "retryability": "RETRYABLE",
+    "budget": "DEVELOPER"
+   },
+   "SUBJECT_ABSENT_AT_CANDIDATE": {
+    "owner": "DEVELOPER",
+    "retryability": "RETRYABLE",
+    "budget": "DEVELOPER"
+   },
+   "PRECONDITION_BROKEN": {
+    "owner": "PLAN",
+    "retryability": "NOT_RETRYABLE",
+    "budget": null
+   },
+   "PLAN_CONTRADICTION": {
+    "owner": "PLAN",
+    "retryability": "NOT_RETRYABLE",
+    "budget": null
+   },
+   "POST_MERGE_REGRESSION": {
+    "owner": "INTEGRATION",
+    "retryability": "NOT_RETRYABLE",
+    "budget": null
+   },
+   "POST_MERGE_SUBJECT_LOST": {
+    "owner": "INTEGRATION",
+    "retryability": "NOT_RETRYABLE",
+    "budget": null
+   },
+   "NON_CONTROLLER_SIGNAL": {
+    "owner": "INTEGRATION",
+    "retryability": "NOT_RETRYABLE",
+    "budget": null
+   },
+   "MISSING_CREDENTIAL": {
+    "owner": "ENVIRONMENT",
+    "retryability": "RESOLVED_BY_POLICY",
+    "budget": "ENVIRONMENT"
+   },
+   "INVALID_CREDENTIAL": {
+    "owner": "ENVIRONMENT",
+    "retryability": "NOT_RETRYABLE",
+    "budget": null
+   },
+   "PROVIDER_UNAVAILABLE": {
+    "owner": "PROVIDER",
+    "retryability": "RETRYABLE",
+    "budget": "PROVIDER"
+   },
+   "UNKNOWN": {
+    "owner": "INTEGRATION",
+    "retryability": "NOT_RETRYABLE",
+    "budget": null
+   }
+  },
+  "journal_behaviour": {
+   "rollback_without_failure_refused": "JournalError: story/rollback cites exactly one failure/observed",
+   "rollback_citing_a_failure_accepted": null,
+   "provider_request_is_a_developer_charge": {
+    "criteria": {
+     "C1": 1
+    },
+    "requests": 1
+   },
+   "provider_request_for_a_non_ready_criterion_refused": "ProjectionError: budgets: provider/request for S1 charges ['C2'], not admitted READY (§14: PRE_SATISFIED consumes no developer budget)",
+   "failure_for_a_story_that_never_began_refused": "ProjectionError: story_state: failure/observed for story S0 in state None: not a §17 transition",
+   "failure_after_commit_accepted": null,
+   "unschematised_type_refused_at_append": "JournalError: proof/verified has no payload schema in journal format 2; writing it is a format version bump (§35)",
+   "tests_adequacy_refused_at_append": "JournalError: tests/adequacy has no payload schema in journal format 2; writing it is a format version bump (§35)",
+   "foreign_code_refused": "JournalError: failure/observed: code 'MERGE_CONFLICT' is not a taxonomy code; a foreign error flattens to UNKNOWN (§22)",
+   "unknown_needs_original": "JournalError: failure/observed: a foreign error flattens to UNKNOWN and keeps its original as data; only UNKNOWN carries one (§22)",
+   "gate_decision_cites_gate_checks_only": "JournalError: gate/decision cites [4]: not a gate/check with the same gate"
+  }
+ },
+ "fit_table": [
+  {
+   "path": "run begin / RunSpec / capabilities / shutdown / interruption",
+   "needs": [
+    "run/begin",
+    "capability/resolved",
+    "run/spec-resolved",
+    "run/dispose-begin",
+    "run/end",
+    "run/interrupted"
+   ],
+   "verdict": "FITS",
+   "how": "P4 RunScope, unchanged"
+  },
+  {
+   "path": "plan frozen (identity of the plan the run executes)",
+   "needs": [
+    "plan/frozen"
+   ],
+   "verdict": "FITS",
+   "how": "format-1 schema {plan_id, plan_hash, roles}"
+  },
+  {
+   "path": "plan static admission record",
+   "needs": [
+    "plan/static-admitted"
+   ],
+   "verdict": "FITS_VIA_TYPED_COMPOSITION",
+   "how": "no schema in any format; not required by the WP-6.2 path: StaticPlanAdmission is a plan-time record, re-derived by require_admitted at freeze, and plan/frozen carries the frozen identity"
+  },
+  {
+   "path": "story begin / admission / probe records at the parent / plan drift",
+   "needs": [
+    "story/begin",
+    "story/admitted",
+    "probe/evaluated",
+    "story/plan-drift"
+   ],
+   "verdict": "FITS",
+   "how": "P2/P3 schemas; admit_story emits them"
+  },
+  {
+   "path": "admission refusal (PRECONDITION_BROKEN, PLAN_CONTRADICTION, PROBE_UNRUNNABLE, PROBE_INVALID)",
+   "needs": [
+    "story/admitted{admitted:false}",
+    "failure/observed",
+    "story/rollback"
+   ],
+   "verdict": "FITS",
+   "how": "codes PRECONDITION_BROKEN (PLAN, N), PLAN_CONTRADICTION (PLAN, N), PROBE_UNRUNNABLE (ENVIRONMENT, R), PROBE_INVALID_SPEC (INTEGRATION, N); story/rollback cites the failure; story_state allows ROLLBACK from BEGIN"
+  },
+  {
+   "path": "resources of the story scope",
+   "needs": [
+    "story/resource-acquired",
+    "story/resource-released"
+   ],
+   "verdict": "FITS",
+   "how": "P4 StoryScope"
+  },
+  {
+   "path": "developer provider call and its result",
+   "needs": [
+    "provider/request",
+    "provider/result"
+   ],
+   "verdict": "FITS",
+   "how": "provider/request {story_id, criteria} charges the developer budget per READY criterion (§14); provider/result COMPLETED/FAILED/OUTCOME_UNKNOWN cites it"
+  },
+  {
+   "path": "provider outage mid-story",
+   "needs": [
+    "provider/result{FAILED}",
+    "failure/observed",
+    "story/retry|rollback"
+   ],
+   "verdict": "FITS",
+   "how": "PROVIDER_UNAVAILABLE (PROVIDER, R): the retry charges the PROVIDER budget (budget.charge), never DEVELOPER; MISSING_CREDENTIAL / INVALID_CREDENTIAL (ENVIRONMENT) for credentials"
+  },
+  {
+   "path": "developer tool execution (a tool that fails or dies)",
+   "needs": [
+    "tool/invoked",
+    "tool/result"
+   ],
+   "verdict": "FITS",
+   "how": "P4 ToolCall; a tool exit status is a fact, never an owner: product truth is measured at the candidate"
+  },
+  {
+   "path": "candidate proof (implementer) and independent verification (verifier), agreement",
+   "needs": [
+    "probe/evaluated x2",
+    "proof/verified"
+   ],
+   "verdict": "FITS_VIA_TYPED_COMPOSITION",
+   "how": "proof/verified has no schema in any format (measured: refused at append). The two ProbeRecords are journaled as probe/evaluated (typed: spec_id, semantic_hash, probe id/digest, revision, enforcement, result); agreement and verdict are derivable from those typed records; the commit decision is gate/check rows (one per obligation, `check` = the criterion id, `passed` = agreement and verdict == expectation) and a gate/decision citing them by seq. No prose is read. A dedicated VerifiedProof event stays unavailable."
+  },
+  {
+   "path": "candidate proof failure (contract unsatisfied / subject absent / harness cannot run / non-controller signal)",
+   "needs": [
+    "failure/observed",
+    "story/rollback|retry"
+   ],
+   "verdict": "FITS",
+   "how": "CONTRACT_UNSATISFIED (DEVELOPER, R), SUBJECT_ABSENT_AT_CANDIDATE (DEVELOPER, R), PROBE_UNRUNNABLE (ENVIRONMENT, R), NON_CONTROLLER_SIGNAL (INTEGRATION, N), PROBE_INVALID_SPEC (INTEGRATION, N) via routing.route"
+  },
+  {
+   "path": "verifier disagreement => INDETERMINATE / INTEGRATION / stop",
+   "needs": [
+    "failure/observed{INTEGRATION, not retryable}",
+    "story/rollback"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "FailureCode VERIFIER_DISAGREEMENT (owner INTEGRATION, NOT_RETRYABLE) — RFC §16 rule 3",
+   "why_no_existing_code_fits": "the INTEGRATION codes are PROBE_INVALID_SPEC (not evaluable by this probe), POST_MERGE_* (another measurement point), NON_CONTROLLER_SIGNAL (a typed probe reason) and UNKNOWN (a flattened non-AISEF error that must carry `original`): each would overload an unrelated code and silently convert a typed disagreement into another failure class; without a failure/observed the story cannot ROLLBACK (measured: refused) and the run cannot shut down with the story open"
+  },
+  {
+   "path": "instrument identity mismatch between implementer and verifier records (PROBE_MISMATCH, §16 rule 2)",
+   "needs": [
+    "failure/observed{INTEGRATION}"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "FailureCode PROBE_MISMATCH (owner INTEGRATION, NOT_RETRYABLE) — RFC §16 names it as a harness integrity failure",
+   "why_no_existing_code_fits": "same as verifier disagreement"
+  },
+  {
+   "path": "engineering-quality checks (EngineeringTestAdequacy) — recorded",
+   "needs": [
+    "tests/adequacy"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "a payload schema for tests/adequacy (F1 vocabulary member with no schema in format 1 or 2; measured: refused at append) — the format bump V2-004 names",
+   "why_no_existing_code_fits": "gate/check carries one bool per row: the three-valued AdequacyOutcome, the typed TestExecution axes, Vacuity and Relevance would be flattened into booleans or moved into `detail` prose — a silent conversion, and prose as the only carrier"
+  },
+  {
+   "path": "engineering-quality checks — UNRUNNABLE execution => environment failure (§15.3)",
+   "needs": [
+    "failure/observed{ENVIRONMENT, retryable}"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "FailureCode TESTS_UNRUNNABLE (ENVIRONMENT, RESOLVED_BY_POLICY) — V2-004 member 1",
+   "why_no_existing_code_fits": "PROBE_UNRUNNABLE is the observation harness of a ProductProofSpec probe; developer tests are not a probe (invariant III): overloading"
+  },
+  {
+   "path": "engineering-quality checks — INADEQUATE => DEVELOPER (where policy permits blocking, §15.3)",
+   "needs": [
+    "failure/observed{DEVELOPER}"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "FailureCode TESTS_INADEQUATE (DEVELOPER, RESOLVED_BY_POLICY) — V2-004 member 2; and TESTS_NOT_COLLECTABLE_UNDETERMINED (INTEGRATION, NOT_RETRYABLE) — V2-004 member 3",
+   "why_no_existing_code_fits": "CONTRACT_UNSATISFIED / SUBJECT_ABSENT_AT_CANDIDATE are product-proof codes (§10.3): using them for a developer-test outcome lets developer tests reach the product-proof owner row — exactly what §8/§15 forbid"
+  },
+  {
+   "path": "reviewer (model) request and result",
+   "needs": [
+    "provider/request",
+    "provider/result"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "a representation of a non-developer provider call: provider/request has no role field and the frozen budgets projection charges every provider/request to the developer per READY criterion (measured)",
+   "why_no_existing_code_fits": "journaling a reviewer call as provider/request cross-charges the developer budget (drops owner information); not journaling it leaves a control input un-backed"
+  },
+  {
+   "path": "reviewer blocking finding => owner REVIEW",
+   "needs": [
+    "failure/observed{REVIEW}"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "any FailureCode owned by REVIEW (the taxonomy has none; measured)",
+   "why_no_existing_code_fits": "no code carries owner REVIEW; a model review alone may not block (§25), so the typed REVIEW-owned outcome that may be recorded is undefined in the taxonomy"
+  },
+  {
+   "path": "reviewer environment failure => ENVIRONMENT, never DEVELOPER (ORCH-6)",
+   "needs": [
+    "failure/observed{ENVIRONMENT}"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "an ENVIRONMENT code for a review/security capability that cannot run (e.g. REVIEW_UNRUNNABLE, ENVIRONMENT, retryable)",
+   "why_no_existing_code_fits": "PROBE_UNRUNNABLE names the ProductProofSpec observation harness; MISSING/INVALID_CREDENTIAL fit only a credential failure: a reviewer that cannot launch would overload PROBE_UNRUNNABLE"
+  },
+  {
+   "path": "security scanner executes and finds issues => EXECUTED, never UNRUNNABLE (ORCH-7); findings => owner SECURITY",
+   "needs": [
+    "tool/invoked",
+    "tool/result",
+    "failure/observed{SECURITY}"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "any FailureCode owned by SECURITY (the taxonomy has none; measured)",
+   "why_no_existing_code_fits": "the execution itself fits (tool/invoked + tool/result COMPLETED/FAILED is EXECUTED, not UNRUNNABLE); the typed outcome of the findings has no code, so the story cannot stop on them with an owner"
+  },
+  {
+   "path": "merge (the merged revision)",
+   "needs": [
+    "story/commit{revision}"
+   ],
+   "verdict": "FITS",
+   "how": "story/commit carries the full merged SHA"
+  },
+  {
+   "path": "merge conflict => INTEGRATION, zero developer charge (ORCH-8)",
+   "needs": [
+    "failure/observed{INTEGRATION}",
+    "story/rollback"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "FailureCode MERGE_CONFLICT (owner INTEGRATION; retryability an owner decision) — RFC §26",
+   "why_no_existing_code_fits": "POST_MERGE_REGRESSION / POST_MERGE_SUBJECT_LOST describe a probe outcome after a merge that succeeded; UNKNOWN requires a flattened foreign error; a merge conflict is a typed AISEF condition with no code (measured: a foreign code string is refused at append)"
+  },
+  {
+   "path": "post-merge re-proof of the merged story and affected prior PRESERVE obligations; regression => INTEGRATION",
+   "needs": [
+    "probe/evaluated",
+    "failure/observed{POST_MERGE_REGRESSION|POST_MERGE_SUBJECT_LOST}",
+    "gate/check",
+    "gate/decision"
+   ],
+   "verdict": "FITS",
+   "how": "records carry the merged revision (typed); the codes exist (INTEGRATION, N); a failure/observed after story/commit is accepted (measured) so the regression is attributed to the merged story's attempt; a prior story's obligation is re-proved under the merged story's id (a failure for a story that never began is refused — measured)"
+  },
+  {
+   "path": "environment failure while acquiring a scope resource (worktree, sandbox)",
+   "needs": [
+    "failure/observed{ENVIRONMENT}"
+   ],
+   "verdict": "DOES_NOT_FIT",
+   "missing": "an ENVIRONMENT code for a resource the harness could not acquire (story/resource-released covers releases only)",
+   "why_no_existing_code_fits": "only credential codes and PROBE_UNRUNNABLE are ENVIRONMENT-owned: overloading"
+  },
+  {
+   "path": "integration failure from a foreign error (an OSError from git, an unexpected exception)",
+   "needs": [
+    "failure/observed{UNKNOWN}"
+   ],
+   "verdict": "FITS",
+   "how": "owner.flatten -> UNKNOWN (INTEGRATION, N) with `original` retained — its defined meaning"
+  },
+  {
+   "path": "control decisions (commit gate, post-merge gate, migration seam refusal)",
+   "needs": [
+    "gate/check",
+    "gate/decision"
+   ],
+   "verdict": "FITS",
+   "how": "one gate/check row per check (typed passed), gate/decision cites the rows by seq and names the projections it read; a decision cannot cite anything but gate/check rows (measured)"
+  },
+  {
+   "path": "HUMAN_DECLARATION_REQUIRED migration row => refusal before any provider request (ORCH-13)",
+   "needs": [
+    "gate/check",
+    "gate/decision"
+   ],
+   "verdict": "FITS_VIA_TYPED_COMPOSITION",
+   "how": "the seam refuses before plan/frozen; the refusal is journal-backed as gate rows; no story begins, no provider/request exists"
+  },
+  {
+   "path": "retry / rollback decisions from typed owner + retryability + budgets projection",
+   "needs": [
+    "story/retry",
+    "story/rollback"
+   ],
+   "verdict": "FITS",
+   "how": "RunScope.retry -> budget.charge (journal only); NO_SIDE_RETRY_COUNTER"
+  },
+  {
+   "path": "invariant violation",
+   "needs": [],
+   "verdict": "FITS",
+   "how": "not journaled: InvariantError escapes (uncontainable) and the run-lifetime / TORN semantics apply (owner §3); invariant/violated stays unschematised and unused"
+  }
+ ],
+ "summary": {
+  "FITS": [
+   "run begin / RunSpec / capabilities / shutdown / interruption",
+   "plan frozen (identity of the plan the run executes)",
+   "story begin / admission / probe records at the parent / plan drift",
+   "admission refusal (PRECONDITION_BROKEN, PLAN_CONTRADICTION, PROBE_UNRUNNABLE, PROBE_INVALID)",
+   "resources of the story scope",
+   "developer provider call and its result",
+   "provider outage mid-story",
+   "developer tool execution (a tool that fails or dies)",
+   "candidate proof failure (contract unsatisfied / subject absent / harness cannot run / non-controller signal)",
+   "merge (the merged revision)",
+   "post-merge re-proof of the merged story and affected prior PRESERVE obligations; regression => INTEGRATION",
+   "integration failure from a foreign error (an OSError from git, an unexpected exception)",
+   "control decisions (commit gate, post-merge gate, migration seam refusal)",
+   "retry / rollback decisions from typed owner + retryability + budgets projection",
+   "invariant violation"
+  ],
+  "FITS_VIA_TYPED_COMPOSITION": [
+   "plan static admission record",
+   "candidate proof (implementer) and independent verification (verifier), agreement",
+   "HUMAN_DECLARATION_REQUIRED migration row => refusal before any provider request (ORCH-13)"
+  ],
+  "DOES_NOT_FIT": [
+   "verifier disagreement => INDETERMINATE / INTEGRATION / stop",
+   "instrument identity mismatch between implementer and verifier records (PROBE_MISMATCH, §16 rule 2)",
+   "engineering-quality checks (EngineeringTestAdequacy) — recorded",
+   "engineering-quality checks — UNRUNNABLE execution => environment failure (§15.3)",
+   "engineering-quality checks — INADEQUATE => DEVELOPER (where policy permits blocking, §15.3)",
+   "reviewer (model) request and result",
+   "reviewer blocking finding => owner REVIEW",
+   "reviewer environment failure => ENVIRONMENT, never DEVELOPER (ORCH-6)",
+   "security scanner executes and finds issues => EXECUTED, never UNRUNNABLE (ORCH-7); findings => owner SECURITY",
+   "merge conflict => INTEGRATION, zero developer charge (ORCH-8)",
+   "environment failure while acquiring a scope resource (worktree, sandbox)"
+  ]
+ },
+ "conclusion": "STOP BEFORE IMPLEMENTATION: required paths do not fit the current frozen vocabulary.",
+ "missing_representations": [
+  {
+   "kind": "FailureCode",
+   "name": "VERIFIER_DISAGREEMENT",
+   "owner": "INTEGRATION",
+   "retryability": "NOT_RETRYABLE",
+   "rfc": "§16 rule 3"
+  },
+  {
+   "kind": "FailureCode",
+   "name": "PROBE_MISMATCH",
+   "owner": "INTEGRATION",
+   "retryability": "NOT_RETRYABLE",
+   "rfc": "§16 rule 2"
+  },
+  {
+   "kind": "FailureCode",
+   "name": "MERGE_CONFLICT",
+   "owner": "INTEGRATION",
+   "retryability": "owner decision",
+   "rfc": "§26"
+  },
+  {
+   "kind": "FailureCode",
+   "name": "TESTS_UNRUNNABLE",
+   "owner": "ENVIRONMENT",
+   "retryability": "RESOLVED_BY_POLICY",
+   "rfc": "§15.3; V2-004"
+  },
+  {
+   "kind": "FailureCode",
+   "name": "TESTS_INADEQUATE",
+   "owner": "DEVELOPER",
+   "retryability": "RESOLVED_BY_POLICY",
+   "rfc": "§15.3; V2-004"
+  },
+  {
+   "kind": "FailureCode",
+   "name": "TESTS_NOT_COLLECTABLE_UNDETERMINED",
+   "owner": "INTEGRATION",
+   "retryability": "NOT_RETRYABLE",
+   "rfc": "§15.0 rule 4; V2-004"
+  },
+  {
+   "kind": "FailureCode",
+   "name": "(a REVIEW-owned code)",
+   "owner": "REVIEW",
+   "retryability": "owner decision",
+   "rfc": "§22 (Owner set), §25"
+  },
+  {
+   "kind": "FailureCode",
+   "name": "(a SECURITY-owned code)",
+   "owner": "SECURITY",
+   "retryability": "owner decision",
+   "rfc": "§22 (Owner set), §25"
+  },
+  {
+   "kind": "FailureCode",
+   "name": "(an ENVIRONMENT code for a review/security capability or a scope resource that cannot run)",
+   "owner": "ENVIRONMENT",
+   "retryability": "owner decision",
+   "rfc": "§25, §17.1"
+  },
+  {
+   "kind": "payload schema",
+   "name": "tests/adequacy",
+   "rfc": "§15, §20.1, §35 (format bump)"
+  },
+  {
+   "kind": "payload schema",
+   "name": "proof/verified",
+   "rfc": "§16, §20.1 (representable meanwhile as probe/evaluated x2 + gate rows)"
+  },
+  {
+   "kind": "payload field or event",
+   "name": "the role of a provider/request (developer vs reviewer), or a separate review event",
+   "rfc": "§25; the budgets projection (F11) reads provider/request as a developer charge"
+  }
+ ],
+ "v2_004": {
+  "status": "PROPOSED — NOT APPROVED — NOT APPLIED — NOT CONSUMED",
+  "necessary_for_wp_6_2": true,
+  "sufficient_for_wp_6_2": false,
+  "reasoning": "V2-004 (three TESTS_* codes bound to a format-3 tests/adequacy schema) covers exactly the engineering-quality paths (three of the DOES_NOT_FIT rows). The verifier-disagreement, probe-mismatch, merge-conflict, review/security-owned and environment-acquisition paths, and the reviewer provider-request role, are outside it and need their own owner decision (a broader exception, or a cycle-1 scoping ruling that keeps review/security outcomes non-blocking and non-journaled)."
+ }
+}

@@ -65,6 +65,18 @@ State: `{story_id: {"state": S, "attempt": n, "admitted": bool | null, "outcome"
 
 Anything else for one of these types refuses.
 
+### 1.1 `story_state` (version 2 — ARCHITECTURE-EXCEPTION-V2-005, journal format 3)
+
+Version 2 keeps every rule of version 1 and adds two rows; nothing else changes, and a format-1 or format-2 journal
+folds to exactly the version-1 state.
+
+| event | allowed when | effect |
+|---|---|---|
+| `proof/verified` | `ACTIVE` | none |
+| `tests/adequacy` | `ACTIVE` | none |
+
+`invariant/violated` is not named by any projection: every projection ignores it (its context is evidence only).
+
 ## 2. `failure_owner` (version 1)
 
 The owner of the failure that decided a story's current attempt (§17: a rollback's recorded owner is the owner of the
@@ -106,6 +118,29 @@ initially all four `{}`. `ready` is sorted. A failure's entry is the budget a re
   failure the retry engine read through `retry_target`, so a retry can never reach past a newer, non-retryable failure
   to charge an older one's budget — and its entry is not null (a retry is permitted only against the budget named by
   the failure's typed outcome, §17). Else `retries[story][that owner]` += 1.
+
+### 3.1 `budgets` (version 2 — ARCHITECTURE-EXCEPTION-V2-005, journal format 3)
+
+State: `{"format": n | null, "retries": …, "developer": …, "review": {story: {"requests": n, "criteria": {criterion: n}}},
+"security": {same shape}, "admission": {story: {"permitted": bool, "ready": [criterion, …], "criteria": [criterion, …]}},
+"failures": …}`. `format` is null until `run/begin` records the journal's declared `journal_format`; `criteria` is every
+criterion of the admission, sorted; `retries`, `developer` and `failures` are as in version 1.
+
+* `provider/request` — the budget it charges is decided by the journal's declared format:
+  * formats 1 and 2 (`format` < 3): every request is the developer's, exactly as in version 1 (the frozen semantics of
+    those formats; a `budget_owner` field cannot occur there — their schema refuses it).
+  * format 3: `budget_owner` **must** be one of `DEVELOPER`, `REVIEW`, `SECURITY`; a request without it, or with any
+    other value, refuses — nothing defaults it.
+  * `DEVELOPER`: the version-1 rule (admission exists, is `permitted`, every criterion is `ready`), charged to
+    `developer[story]`.
+  * `REVIEW` / `SECURITY`: refuses unless `admission[story]` exists and every criterion in `criteria` is in its
+    `criteria` (a reviewer or scanner may examine any admitted criterion, READY or PRE_SATISFIED); charged to
+    `review[story]` / `security[story]` with the same `{requests, criteria}` shape. It never touches `developer`.
+* `failure/observed` and `story/retry`: unchanged — a retry charges the cited failure's own owner (`REVIEW` and
+  `SECURITY` are charged only by `REVIEW_FINDING` and `SECURITY_FINDING`, RFC §22.1).
+
+A format-1 journal folds to the version-1 state plus `"format": 1, "review": {}, "security": {}` and each admission's
+`criteria`.
 
 ## 4. `retry_target` (version 1)
 

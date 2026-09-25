@@ -31,10 +31,18 @@
      "F2",
      "F5"
     ]
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",
+    "sha256": "9b8636a22875c14211ef6fb974ef9c03f39600721aa8cf9020c7d41a37b6dad1",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json",
+    "frozen_items_changed": [
+     "F1"
+    ]
    }
   ],
-  "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
-  "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7",
+  "rfc_normative_digest": "eea2e10fa0b40cf9e04da3282441e485883df146ddff70ee5ad9949f32f7574a",
+  "freeze_table_digest": "92605a0ea18da992efeab69357ebbfaa9c898b5f17ad75e172864874df70c688",
   "original_rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
   "original_freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
   "frozen_items": [

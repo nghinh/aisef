@@ -45,7 +45,7 @@
    "stale row (shorter prefix)": "resumed from the row at 27",
    "edited state": "row does not match its seal (edited): discarded",
    "another projection": "row is for story_state: discarded",
-   "version mismatch": "row version 2 is not 1: discarded, not migrated",
+   "version mismatch": "row version 3 is not 2: discarded, not migrated",
    "head differs": "row head differs from the journal's at its length: discarded — the journal wins",
    "ahead of the journal": "row covers 55 events; the journal has 54: discarded"
   },

@@ -10,8 +10,10 @@
 
 `repair(text)` is a pure function: the complete lines, unchanged byte for byte (a torn tail was never an event and is
 dropped), then the closers. A repaired journal has nothing open, so repairing it again adds nothing; the same journal
-repaired twice gives the same bytes. Only format 2 is repaired: a format-1 journal is read, never extended. Repair never
-touches the sentinel — the run stays TORN — and never creates a sequence gap.
+repaired twice gives the same bytes. Formats 2 and 3 are repaired (V2-005): every closer type has the same schema in
+both formats, so the closers are validated once, under the format-3 rules, and the journal keeps the format it
+declares; a format-1 journal is read, never extended. Repair never touches the sentinel — the run stays TORN — and
+never creates a sequence gap.
 """
 
 from __future__ import annotations
@@ -22,19 +24,21 @@ from typing import Sequence
 
 from aisef2.arch.enums import ControlProjection as P, EventType as T
 from aisef2.journal import format2 as f2
+from aisef2.journal import format3 as f3
 from aisef2.journal.event import Event, JournalError, carried, encode, link
 from aisef2.journal.fold import fold
 from aisef2.journal.projections import PROJECTIONS
 
 
 class RepairError(JournalError):
-    """The journal cannot be repaired (it is not format 2, or it does not reconstruct)."""
+    """The journal cannot be repaired (it is format 1, or it does not reconstruct)."""
 
 
 def closers(events: Sequence[Event]) -> list[tuple[T, dict, tuple[int, ...]]]:
     """What `events` leaves open, as (type, payload, cites) — empty when the run already ended or was abandoned."""
-    if not events or events[0].data["journal_format"] != f2.FORMAT:
-        raise RepairError("repair writes format-2 closers; a format-1 journal is read, never extended")
+    if not events or events[0].data["journal_format"] not in (f2.FORMAT, f3.FORMAT):
+        raise RepairError("repair writes format-2 closers for a format-2 journal and format-3 closers for a format-3 "
+                          "journal; a format-1 journal is read, never extended")
     terminal = fold(PROJECTIONS[P.TERMINAL_STATE], events)
     if terminal["run"] in ("ENDED", "ABANDONED"):
         return []
@@ -70,7 +74,7 @@ def closers(events: Sequence[Event]) -> list[tuple[T, dict, tuple[int, ...]]]:
 def repair(text: str) -> str:
     """`text` with a torn tail dropped and the closers appended. Pure and idempotent."""
     try:
-        journal = f2.reconstruct(text)
+        journal = f3.reconstruct(text)  # formats 1, 2 and 3, each read as written
     except JournalError as e:
         raise RepairError(f"the journal does not reconstruct, so it cannot be repaired: {e}") from None
     complete = text[:text.rfind("\n") + 1]
@@ -82,7 +86,7 @@ def repair(text: str) -> str:
     prev, lines = journal.head(), []
     for event_type, data, cites in closers(events):  # computed in full before the loop extends `events`
         event = Event(len(events), event_type.value, carried(event_type.value, data), when, False, cites)
-        f2.validate(event, events)
+        f3.validate(event, events)  # the closer schemas are the same objects in formats 2 and 3 (test_v2_005)
         events.append(event)
         prev = link(prev, event)
         lines.append(encode(event, prev))

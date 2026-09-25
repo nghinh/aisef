@@ -288,9 +288,27 @@ P5_TARGETS.update({f"validation/v2/destructive_authority.py::{f}": ["tests/v2/p0
 # or a defaulted row. Kill tests are self-contained (fake roots): the repository-level tests live in
 # tests/v2/test_migration_table_repo.py and are not kill tests (the runner's tree copy holds no V1 evidence).
 _MIG_TESTS = ["tests/v2/test_migration_table.py"]
+_V2_005 = "tests/v2/test_v2_005.py"  # ARCHITECTURE-EXCEPTION-V2-005: kills the format-3 semantics of the targets it changed
 P6_TARGETS: dict[str, list[str]] = {f"validation/v2/gen_migration_table.py::{f}": _MIG_TESTS for f in (
     "derive", "resolve", "declared", "cited", "read_v1", "_unknown", "without_v1_source", "_loss_code", "loss_report",
     "inventory", "problems", "compare", "check", "write")}
+# WP-6.2 under ARCHITECTURE-EXCEPTION-V2-005: journal format 3 — the schema catalog, its rules, the format dispatch,
+# the writer; the taxonomy, projection and reference-model targets it changed are re-run in their own phase's record
+_FMT3_TESTS = ["tests/v2/test_v2_005.py", "tests/v2/p3/test_reference_models.py"]
+P6_TARGETS.update({f"aisef2/journal/format3.py::{f}": _FMT3_TESTS for f in (
+    "_budget_owner", "_checks", "_execution", "_format_rule", "_static_admission_rule", "_verified_payload_rule",
+    "_adequacy_rule", "_failure_schema", "SCHEMAS", "_static_admitted", "_story_active", "_verified", "verified_proof",
+    "_cites", "validate", "declared_format", "reconstruct", "JournalWriter3.append")})
+for _t in ("aisef2/journal/projections/budgets.py::Budgets.step", "aisef2/journal/projections/story_state.py::StoryState.step",
+           "aisef2/journal/projections/story_state.py::_WITHIN", "aisef2/journal/projections/story_state.py::_OUTCOMES",
+           "tests/v2/refmodel/budgets.py::_walk", "tests/v2/refmodel/budgets.py::model",
+           "tests/v2/refmodel/story_state.py::_TABLE", "tests/v2/refmodel/story_state.py::model"):
+    P3_TARGETS[_t] = [*P3_TARGETS[_t], _V2_005]
+for _t in ("aisef2/runtime/repair.py::closers", "aisef2/runtime/repair.py::repair", "aisef2/runtime/repair.py::repair_journal",
+           "aisef2/runtime/sentinel.py::residuals"):
+    P4_TARGETS[_t] = [*P4_TARGETS[_t], _V2_005]
+for _t in ("aisef2/control/owner.py::TAXONOMY", "aisef2/control/owner.py::classify", "aisef2/control/owner.py::flatten"):
+    P1_TARGETS[_t] = [*P1_TARGETS[_t], _V2_005]
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
                  "P6": P6_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
@@ -301,10 +319,12 @@ NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
 _DEAD_FLAG = ("the third field (whether the target state is also the outcome) is read only when the target state is "
               "not None (model: `if to is not None: ... if is_outcome`); this entry's target is None")
 AUDITED: dict[tuple[str, str], str] = {
-    ("tests/v2/refmodel/story_state.py::_TABLE", "L18 False->True"): _DEAD_FLAG,
     ("tests/v2/refmodel/story_state.py::_TABLE", "L19 False->True"): _DEAD_FLAG,
     ("tests/v2/refmodel/story_state.py::_TABLE", "L20 False->True"): _DEAD_FLAG,
-    ("tests/v2/refmodel/budgets.py::model", "L56 True->False"): (
+    ("tests/v2/refmodel/story_state.py::_TABLE", "L21 False->True"): _DEAD_FLAG,   # V2-005 rows: proof/verified,
+    ("tests/v2/refmodel/story_state.py::_TABLE", "L22 False->True"): _DEAD_FLAG,   # tests/adequacy — target None
+    ("tests/v2/refmodel/story_state.py::_TABLE", "L23 False->True"): _DEAD_FLAG,
+    ("tests/v2/refmodel/budgets.py::model", "L75 True->False"): (
         "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict "
         "never decides anything"),
     ("tests/v2/refmodel/qualification_counters.py::metrics", "L15 element 0 dropped"): (

@@ -3,8 +3,8 @@
 **Generated from [`cycle1-manifest.json`](cycle1-manifest.json) by `validation/v2/plan_validate.py`.**
 Do not hand-edit: `--check` fails on drift.
 
-Architecture baseline: RFC normative digest `7abda8ecf8352dd9…`, freeze-table digest
-`333b3175f39a26d5…`, approval record `c23191bd71bc299d…` amended by `AISEF-V2-RFC-AMENDMENT-V2-001.json`, `AISEF-V2-RFC-AMENDMENT-V2-002.json`, `AISEF-V2-RFC-AMENDMENT-V2-003.json`.
+Architecture baseline: RFC normative digest `eea2e10fa0b40cf9…`, freeze-table digest
+`92605a0ea18da992…`, approval record `c23191bd71bc299d…` amended by `AISEF-V2-RFC-AMENDMENT-V2-001.json`, `AISEF-V2-RFC-AMENDMENT-V2-002.json`, `AISEF-V2-RFC-AMENDMENT-V2-003.json`, `AISEF-V2-RFC-AMENDMENT-V2-005.json`.
 
 **33 implementation + 4 qualification = 37 packages. F1–F11 coverage: 11/11.**
 

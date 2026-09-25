@@ -1,0 +1,774 @@
+{
+ "record": "AISEF V2 — P6 V2-005 SCHEMA (journal format 3, the nine codes, budget_owner)",
+ "work_package": "WP-6.2",
+ "rfc": "§15.3, §16, §17.1, §20.1, §22, §22.1, §25, §26, §35 as amended by ARCHITECTURE-EXCEPTION-V2-005 (F1)",
+ "implementation": "aisef2/journal/format3.py; aisef2/control/owner.py (+9 codes, FORMAT_2_CODES, V2_005_CODES); aisef2/journal/event.py (formats 1 and 2 carry their historical code set); aisef2/journal/projections/budgets.py v2, story_state.py v2; tests/v2/refmodel (independent); aisef2/runtime (run_scope writes format 3; sentinel and repair read every format as written)",
+ "format_3": {
+  "version": 3,
+  "known_formats": [
+   1,
+   2,
+   3
+  ],
+  "schemas": 29,
+  "writable": 29,
+  "event_types": 29,
+  "new_schemas": [
+   "invariant/violated",
+   "plan/static-admitted",
+   "proof/verified",
+   "tests/adequacy"
+  ],
+  "re_declared": [
+   "failure/observed",
+   "provider/request",
+   "run/begin"
+  ],
+  "provider_request_requires_budget_owner": true,
+  "budget_owners": [
+   "DEVELOPER",
+   "REVIEW",
+   "SECURITY"
+  ],
+  "format_1_writable": 18,
+  "format_2_writable": 25
+ },
+ "failure_taxonomy": {
+  "codes": 22,
+  "historical_formats_1_and_2": [
+   "CONTRACT_UNSATISFIED",
+   "INVALID_CREDENTIAL",
+   "MISSING_CREDENTIAL",
+   "NON_CONTROLLER_SIGNAL",
+   "PLAN_CONTRADICTION",
+   "POST_MERGE_REGRESSION",
+   "POST_MERGE_SUBJECT_LOST",
+   "PRECONDITION_BROKEN",
+   "PROBE_INVALID_SPEC",
+   "PROBE_UNRUNNABLE",
+   "PROVIDER_UNAVAILABLE",
+   "SUBJECT_ABSENT_AT_CANDIDATE",
+   "UNKNOWN"
+  ],
+  "v2_005_format_3_only": {
+   "VERIFIER_DISAGREEMENT": {
+    "owner": "INTEGRATION",
+    "retryable": false,
+    "budget": null
+   },
+   "PROBE_MISMATCH": {
+    "owner": "INTEGRATION",
+    "retryable": false,
+    "budget": null
+   },
+   "MERGE_CONFLICT": {
+    "owner": "INTEGRATION",
+    "retryable": false,
+    "budget": null
+   },
+   "TESTS_UNRUNNABLE": {
+    "owner": "ENVIRONMENT",
+    "retryable": true,
+    "budget": "ENVIRONMENT"
+   },
+   "TESTS_INADEQUATE": {
+    "owner": "DEVELOPER",
+    "retryable": true,
+    "budget": "DEVELOPER"
+   },
+   "REVIEW_FINDING": {
+    "owner": "REVIEW",
+    "retryable": true,
+    "budget": "REVIEW"
+   },
+   "SECURITY_FINDING": {
+    "owner": "SECURITY",
+    "retryable": true,
+    "budget": "SECURITY"
+   },
+   "CAPABILITY_UNRUNNABLE": {
+    "owner": "ENVIRONMENT",
+    "retryable": true,
+    "budget": "ENVIRONMENT"
+   },
+   "RESOURCE_ACQUISITION_FAILED": {
+    "owner": "ENVIRONMENT",
+    "retryable": true,
+    "budget": "ENVIRONMENT"
+   }
+  }
+ },
+ "projections": {
+  "story_state": 2,
+  "failure_owner": 1,
+  "budgets": 2,
+  "retry_target": 1,
+  "terminal_state": 1,
+  "qualification_counters": 1
+ },
+ "lineage": {
+  "links": [
+   "AISEF-V2-RFC-APPROVAL.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-001.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-002.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-003.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-005.json"
+  ],
+  "frozen_items_changed_by_v2_005": [
+   "F1"
+  ],
+  "exception_status": "APPROVED — APPLIED",
+  "v2_004": "SUPERSEDED — NEVER APPLIED",
+  "schema_fit_audit_sha256": "0dba31654c9142698a06de3c1f1ac7ecdc244f0c06b89e9ee6e9d866857cd763",
+  "f_conformance": {
+   "F1.failure_taxonomy": "PASS",
+   "F1.journal_format_3": "PASS"
+  },
+  "p5_records_sealed": [
+   "P5-ADEQUACY.json",
+   "P5-INVARIANTS.json",
+   "P5-RELEVANCE.json",
+   "P5-TEST-EXECUTION.json",
+   "P5-VACUITY.json"
+  ]
+ },
+ "mutation_by_target": {
+  "aisef2/control/owner.py::TAXONOMY": {
+   "phase": "P1",
+   "mutants": 638,
+   "killed": 638,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/control/owner.py::classify": {
+   "phase": "P1",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/control/owner.py::flatten": {
+   "phase": "P1",
+   "mutants": 27,
+   "killed": 27,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/event.py::Event.__post_init__": {
+   "phase": "P3",
+   "mutants": 38,
+   "killed": 38,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/event.py::_admission_rule": {
+   "phase": "P3",
+   "mutants": 24,
+   "killed": 24,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/event.py::_cites": {
+   "phase": "P3",
+   "mutants": 22,
+   "killed": 22,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/event.py::_drift_rule": {
+   "phase": "P3",
+   "mutants": 14,
+   "killed": 14,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/event.py::_failure_rule": {
+   "phase": "P3",
+   "mutants": 47,
+   "killed": 47,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/event.py::_format_rule": {
+   "phase": "P3",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/event.py::carried": {
+   "phase": "P3",
+   "mutants": 51,
+   "killed": 51,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/event.py::decode": {
+   "phase": "P3",
+   "mutants": 34,
+   "killed": 34,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/event.py::validate": {
+   "phase": "P3",
+   "mutants": 66,
+   "killed": 66,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::JournalWriter3.append": {
+   "phase": "P6",
+   "mutants": 27,
+   "killed": 27,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::SCHEMAS": {
+   "phase": "P6",
+   "mutants": 86,
+   "killed": 86,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_adequacy_rule": {
+   "phase": "P6",
+   "mutants": 68,
+   "killed": 68,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_budget_owner": {
+   "phase": "P6",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_checks": {
+   "phase": "P6",
+   "mutants": 45,
+   "killed": 45,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_cites": {
+   "phase": "P6",
+   "mutants": 30,
+   "killed": 30,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_execution": {
+   "phase": "P6",
+   "mutants": 61,
+   "killed": 61,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_failure_schema": {
+   "phase": "P6",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_format_rule": {
+   "phase": "P6",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_static_admission_rule": {
+   "phase": "P6",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_static_admitted": {
+   "phase": "P6",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_story_active": {
+   "phase": "P6",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_verified": {
+   "phase": "P6",
+   "mutants": 99,
+   "killed": 99,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::_verified_payload_rule": {
+   "phase": "P6",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::declared_format": {
+   "phase": "P6",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::reconstruct": {
+   "phase": "P6",
+   "mutants": 38,
+   "killed": 38,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::validate": {
+   "phase": "P6",
+   "mutants": 38,
+   "killed": 38,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/format3.py::verified_proof": {
+   "phase": "P6",
+   "mutants": 24,
+   "killed": 24,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/projections/budgets.py::Budgets.step": {
+   "phase": "P3",
+   "mutants": 169,
+   "killed": 169,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/projections/story_state.py::StoryState.step": {
+   "phase": "P3",
+   "mutants": 110,
+   "killed": 110,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/projections/story_state.py::_OUTCOMES": {
+   "phase": "P3",
+   "mutants": 18,
+   "killed": 18,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/journal/projections/story_state.py::_WITHIN": {
+   "phase": "P3",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/repair.py::closers": {
+   "phase": "P4",
+   "mutants": 109,
+   "killed": 109,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/repair.py::repair": {
+   "phase": "P4",
+   "mutants": 16,
+   "killed": 16,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/repair.py::repair_journal": {
+   "phase": "P4",
+   "mutants": 17,
+   "killed": 17,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunLease.acquire": {
+   "phase": "P4",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunLease.release": {
+   "phase": "P4",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope._fail": {
+   "phase": "P4",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope._finish": {
+   "phase": "P4",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope._now": {
+   "phase": "P4",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope._second_interrupt_abandons": {
+   "phase": "P4",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope.append": {
+   "phase": "P4",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope.begin": {
+   "phase": "P4",
+   "mutants": 20,
+   "killed": 20,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope.interrupt": {
+   "phase": "P4",
+   "mutants": 44,
+   "killed": 44,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope.open_stories": {
+   "phase": "P4",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope.retry": {
+   "phase": "P4",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope.shutdown": {
+   "phase": "P4",
+   "mutants": 12,
+   "killed": 12,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/run_scope.py::RunScope.story": {
+   "phase": "P4",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/sentinel.py::_fsync_dir": {
+   "phase": "P4",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/sentinel.py::_write": {
+   "phase": "P4",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/sentinel.py::mark_clean": {
+   "phase": "P4",
+   "mutants": 12,
+   "killed": 12,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/sentinel.py::mark_open": {
+   "phase": "P4",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/sentinel.py::preflight": {
+   "phase": "P4",
+   "mutants": 16,
+   "killed": 16,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/sentinel.py::read": {
+   "phase": "P4",
+   "mutants": 14,
+   "killed": 14,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/sentinel.py::residuals": {
+   "phase": "P4",
+   "mutants": 55,
+   "killed": 55,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "tests/v2/refmodel/budgets.py::_walk": {
+   "phase": "P3",
+   "mutants": 92,
+   "killed": 92,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "tests/v2/refmodel/budgets.py::model": {
+   "phase": "P3",
+   "mutants": 44,
+   "killed": 43,
+   "survivors": 1,
+   "audited_equivalent": 1,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "tests/v2/refmodel/story_state.py::_TABLE": {
+   "phase": "P3",
+   "mutants": 63,
+   "killed": 58,
+   "survivors": 5,
+   "audited_equivalent": 5,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "tests/v2/refmodel/story_state.py::model": {
+   "phase": "P3",
+   "mutants": 91,
+   "killed": 91,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  }
+ },
+ "properties": {
+  "FMT3_1_every_event_type_has_a_schema": true,
+  "FMT3_2_missing_schema_fails_catalog_check": true,
+  "FMT3_3_format_1_and_2_journals_read_identically": true,
+  "FMT3_4_missing_required_field_refused_before_log_growth": true,
+  "FMT3_5_no_format_read_under_another_formats_semantics": true,
+  "FMT3_6_format_3_provider_request_requires_budget_owner": true,
+  "FMT3_7_format_2_evidence_never_rewritten_or_upgraded": true,
+  "FMT3_8_invariant_violated_context_affects_no_projection": true,
+  "proof_verified_lossless_from_two_cited_sealed_records": true,
+  "tests_adequacy_is_the_typed_two_axis_assembly": true,
+  "plan_static_admitted_once_per_plan": true,
+  "exactly_nine_new_codes_no_tenth": true,
+  "one_owner_one_retryability_one_budget_per_code": true,
+  "no_call_site_override_no_prose_code": true,
+  "old_formats_refuse_the_nine": true,
+  "F1_failure_taxonomy_subcheck_pins_the_table": true,
+  "budgets_v2_charges_budget_owner_never_defaults": true,
+  "review_and_security_never_charge_the_developer": true,
+  "reference_models_agree_on_format_3_traces": true,
+  "story_state_v2_active_only": true,
+  "runtime_writes_format_3_reads_and_repairs_every_format": true,
+  "lineage_V2_003_to_V2_005_F1_only": true,
+  "V2_004_superseded_never_applied": true,
+  "P5_sealed_records_identity_verified_not_rewritten": true,
+  "mutation_every_v2_005_target_measured_current_no_unaudited_survivor": true
+ }
+}

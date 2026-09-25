@@ -85,6 +85,60 @@
    "retryability": "NOT_RETRYABLE",
    "budget": null,
    "rule": "§22: a non-AISEF error flattens to UNKNOWN; §15: cause undetermined -> INTEGRATION, never DEVELOPER"
+  },
+  "VERIFIER_DISAGREEMENT": {
+   "owner": "INTEGRATION",
+   "retryability": "NOT_RETRYABLE",
+   "budget": null,
+   "rule": "§16 rule 3 (V2-005): implementer and verifier disagree -> INDETERMINATE, INTEGRATION, stop; never arbitrated, never rerun until agreement, never flattened to UNKNOWN"
+  },
+  "PROBE_MISMATCH": {
+   "owner": "INTEGRATION",
+   "retryability": "NOT_RETRYABLE",
+   "budget": null,
+   "rule": "§16 rule 2 (V2-005): the two results do not share probe_id, probe_digest and semantic_hash — a harness integrity failure, not a statement about the product; never flattened to UNKNOWN"
+  },
+  "MERGE_CONFLICT": {
+   "owner": "INTEGRATION",
+   "retryability": "NOT_RETRYABLE",
+   "budget": null,
+   "rule": "§26 (V2-005): a merge conflict is INTEGRATION, never DEVELOPER; no developer budget; from the typed merge outcome, never from stderr text"
+  },
+  "TESTS_UNRUNNABLE": {
+   "owner": "ENVIRONMENT",
+   "retryability": "RETRYABLE",
+   "budget": "ENVIRONMENT",
+   "rule": "§15.3 (V2-005): a mandatory developer-test execution is UNRUNNABLE -> no AdequacyOutcome, an environment failure with its own provenance; the environment retry policy applies"
+  },
+  "TESTS_INADEQUATE": {
+   "owner": "DEVELOPER",
+   "retryability": "RETRYABLE",
+   "budget": "DEVELOPER",
+   "rule": "§15.3 (V2-005): INADEQUATE under a blocking project policy -> DEVELOPER, the developer quality budget; INCOMPLETE is never a failure code (recorded in tests/adequacy only)"
+  },
+  "REVIEW_FINDING": {
+   "owner": "REVIEW",
+   "retryability": "RETRYABLE",
+   "budget": "REVIEW",
+   "rule": "§25 (V2-005): a corroborated reviewer finding -> REVIEW; a model review alone is never the sole blocking authority (D-002)"
+  },
+  "SECURITY_FINDING": {
+   "owner": "SECURITY",
+   "retryability": "RETRYABLE",
+   "budget": "SECURITY",
+   "rule": "§25 (V2-005): a scanner that executed and produced a typed blocking finding -> SECURITY; the code comes from the adapter's typed result, never from scanner text"
+  },
+  "CAPABILITY_UNRUNNABLE": {
+   "owner": "ENVIRONMENT",
+   "retryability": "RETRYABLE",
+   "budget": "ENVIRONMENT",
+   "rule": "§25 (V2-005): a review or security capability that cannot run for a local or environment reason -> ENVIRONMENT; a provider outage stays PROVIDER_UNAVAILABLE"
+  },
+  "RESOURCE_ACQUISITION_FAILED": {
+   "owner": "ENVIRONMENT",
+   "retryability": "RETRYABLE",
+   "budget": "ENVIRONMENT",
+   "rule": "§17.1 (V2-005): a StoryScope or controller resource the harness could not acquire -> ENVIRONMENT; never derived from stderr text"
   }
  },
  "retry_count": "not in the taxonomy — the resolved execution policy (RunSpec / project / evaluation configuration) supplies it",

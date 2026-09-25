@@ -20,7 +20,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.arch.enums import Enforcement, EventType as T  # noqa: E402
-from aisef2.journal.format2 import ResourceKind as K, reconstruct  # noqa: E402
+from aisef2.journal.format2 import ResourceKind as K  # noqa: E402
+from aisef2.journal.format3 import reconstruct  # noqa: E402 — every format, each read as written
 from aisef2.runtime import run_scope as rs, sentinel  # noqa: E402
 from aisef2.runtime.capability import verified  # noqa: E402
 from aisef2.runtime.run_scope import BEGIN_ORDER, SHUTDOWN_ORDER, LeaseHeld, RunScope, ShutdownRefused  # noqa: E402
@@ -313,7 +314,7 @@ class Lifetime(unittest.TestCase):
         one = JournalWriter(self.root / "one.jsonl", clock=lambda: 0.0)
         one.append(T.RUN_BEGIN, {"journal_format": 1, "run_id": "r"})
         one.append(T.STORY_BEGIN, {"story_id": "S1", "parent": SHA})
-        one.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"]})
+        one.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"]})  # a format-1 request names no owner
         one.close()  # format 1 has no provider/result: its requests are never residuals
         self.assertEqual(sentinel.residuals((self.root / "one.jsonl").read_text(encoding="utf-8")), ())
         r = self.run_scope()
@@ -322,7 +323,7 @@ class Lifetime(unittest.TestCase):
         r.append(T.STORY_BEGIN, {"story_id": "S1", "parent": SHA})
         r.append(T.STORY_ADMITTED, {"story_id": "S1", "parent": SHA, "admitted": True,
                                     "developer_call_permitted": True, "dispositions": {"C1": "READY"}})
-        req = r.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"]})
+        req = r.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"], "budget_owner": "DEVELOPER"})
         inv = r.append(T.TOOL_INVOKED, {"story_id": "S1", "call_id": "c1", "tool": "pytest"})
         r.append(T.TOOL_RESULT, {"story_id": "S1", "call_id": "c1", "outcome": "COMPLETED", "signal": 0,
                                  "provenance": "NONE", "synthetic": False, "detail": ""}, source_seqs=(inv.seq,))

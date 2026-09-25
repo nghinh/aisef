@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 37,
+ "checker_count": 38,
  "uncovered_checker_modules": [],
- "calibrated_count": 37,
- "always_pass_mutants_rejected": 37,
+ "calibrated_count": 38,
+ "always_pass_mutants_rejected": 38,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -556,7 +556,7 @@
    "rejects_for_the_expected_reason": true,
    "expected": "BASELINE: plan cites rfc_normative_digest",
    "observed": [
-    "BASELINE: plan cites rfc_normative_digest 8f0d522d9db0322c…, the approved lineage ends at 7abda8ecf8352dd9…"
+    "BASELINE: plan cites rfc_normative_digest 8f0d522d9db0322c…, the approved lineage ends at eea2e10fa0b40cf9…"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true
@@ -572,6 +572,21 @@
    "expected": "docs/implementation/v2/v1-proofmode-migration.md drifted from its generator",
    "observed": [
     "docs/implementation/v2/v1-proofmode-migration.md drifted from its generator: hand-edited or stale"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "p6_evidence",
+   "package": "WP-6.2",
+   "fixture": "tests/v2/fixtures/known_bad/p6_evidence.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "property FMT3_6_format_3_provider_request_requires_budget_owner is false",
+   "observed": [
+    "WP-6.2: property FMT3_6_format_3_provider_request_requires_budget_owner is false"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

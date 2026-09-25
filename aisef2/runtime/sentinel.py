@@ -86,7 +86,7 @@ def mark_clean(path: str | os.PathLike, run_id: str) -> None:
 def residuals(journal_text: str) -> tuple[str, ...]:
     """What a run's journal records as not released or not closed: FAILED or RESIDUAL releases, acquisitions never
     released, tool calls and provider requests without a result."""
-    from aisef2.journal.format2 import reconstruct
+    from aisef2.journal.format3 import reconstruct  # every format, each read as written
     try:
         j = reconstruct(journal_text)
     except JournalError as e:
@@ -103,9 +103,9 @@ def residuals(journal_text: str) -> tuple[str, ...]:
     answered = {e.source_seqs[0] for e in j.events if e.type == T.PROVIDER_RESULT.value}
     out += [f"{e.data['story_id']}: tool call {e.data['call_id']} ({e.data['tool']}) has no result"
             for e in j.events if e.type == T.TOOL_INVOKED.value and e.data["call_id"] not in results]
-    fmt2 = bool(j.events) and j.events[0].data["journal_format"] == 2
+    answerable = bool(j.events) and j.events[0].data["journal_format"] >= 2  # format 1 has no provider/result
     out += [f"{e.data['story_id']}: provider/request at seq {e.seq} has no result" for e in j.events
-            if fmt2 and e.type == T.PROVIDER_REQUEST.value and e.seq not in answered]
+            if answerable and e.type == T.PROVIDER_REQUEST.value and e.seq not in answered]
     return tuple(out)
 
 

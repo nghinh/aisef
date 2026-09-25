@@ -21,7 +21,7 @@ from aisef2.arch.enums import ControlProjection as P, EventType as T, Owner  # n
 from aisef2.control import budget  # noqa: E402
 from aisef2.control.owner import TAXONOMY, FailureCode  # noqa: E402
 from aisef2.journal.fold import ProjectionError, fold  # noqa: E402
-from aisef2.journal.format2 import reconstruct  # noqa: E402
+from aisef2.journal.format3 import reconstruct  # noqa: E402 — every format, each read as written
 from aisef2.journal.projections import PROJECTIONS  # noqa: E402
 from aisef2.runtime.run_scope import RetryRefused, RunScope  # noqa: E402
 from tests.v2.p4.test_run_scope import spec  # noqa: E402
@@ -85,7 +85,7 @@ class Budgets(unittest.TestCase):
 
     def test_D_006_a_credential_or_environment_rejection_never_consumes_the_developer_budget(self):
         self.attempt()
-        self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"]})
+        self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"], "budget_owner": "DEVELOPER"})
         developer_before = dict(budget.developer_spend(self.run.events, "S1"))
         self.fail(FailureCode.INVALID_CREDENTIAL)
         c = budget.charge(self.run.events, "S1", LIMITS)
@@ -105,13 +105,13 @@ class Budgets(unittest.TestCase):
 
     def test_PRE_SATISFIED_and_PLAN_CONTRADICTION_consume_no_developer_budget(self):
         self.attempt(dispositions={"C1": "PRE_SATISFIED", "C2": "READY"})
-        self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C2"]})
+        self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C2"], "budget_owner": "DEVELOPER"})
         with self.assertRaisesRegex(ProjectionError, r"charges \['C1'\], not admitted READY"):
-            self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"]})
+            self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1"], "budget_owner": "DEVELOPER"})
         self.assertEqual(dict(budget.developer_spend(self.run.events, "S1")), {"C2": 1})
         self.attempt("S2", {"C1": "PLAN_CONTRADICTION"})
         with self.assertRaisesRegex(ProjectionError, "provider/request for story S2 in state BEGIN"):
-            self.run.append(T.PROVIDER_REQUEST, {"story_id": "S2", "criteria": ["C1"]})  # a blocked story stays BEGIN
+            self.run.append(T.PROVIDER_REQUEST, {"story_id": "S2", "criteria": ["C1"], "budget_owner": "DEVELOPER"})  # a blocked story stays BEGIN
         self.fail(FailureCode.PLAN_CONTRADICTION, "S2")
         c = budget.charge(self.run.events, "S2", LIMITS)
         self.assertEqual((c.retry, c.budget, c.spent), (False, None, 0))
@@ -148,7 +148,7 @@ class Budgets(unittest.TestCase):
 
     def test_the_journal_rebuilt_from_scratch_gives_the_same_budgets_and_the_same_decisions(self):
         self.attempt()
-        self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1", "C2"]})
+        self.run.append(T.PROVIDER_REQUEST, {"story_id": "S1", "criteria": ["C1", "C2"], "budget_owner": "DEVELOPER"})
         self.fail(FailureCode.PROVIDER_UNAVAILABLE)
         self.retry_and_restart()
         self.fail(FailureCode.CONTRACT_UNSATISFIED)
