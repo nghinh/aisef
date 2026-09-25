@@ -221,6 +221,13 @@ class Orchestration(unittest.TestCase):
     def failures(self, story):
         return [(e.data["code"], e.data["owner"], e.data["retryable"]) for e in self.events("failure/observed", story)]
 
+    def assertAttempts(self, result, outcomes):
+        """The attempt outcomes — and, when they differ, every failure the journal holds for the story (its code and
+        detail), so a run on another machine says why."""
+        story = result.story_id
+        self.assertEqual([a.outcome for a in result.attempts], outcomes,
+                         f"failures of {story}: {self.failures(story)} {self.details(story)}")
+
     def details(self, story):
         return [e.data["detail"] for e in self.events("failure/observed", story)]
 
@@ -250,7 +257,7 @@ class Orchestration(unittest.TestCase):
         self.assertTrue(r.committed)
         self.assertEqual(r.revision, self.merger.base())         # the merge landed on main
         self.assertNotEqual(r.revision, self.base)
-        self.assertEqual([a.outcome for a in r.attempts], ["COMMIT"])
+        self.assertAttempts(r, ["COMMIT"])
         self.assertIsInstance(r.attempts, tuple)                # immutable, like every result of the path
         self.assertIsInstance(r.attempts[0].proofs, tuple)
         self.assertIsInstance(r.attempts[0].checks, tuple)
@@ -397,7 +404,7 @@ class Orchestration(unittest.TestCase):
         self.assertFalse(r.committed)
         self.assertEqual(self.failures("S1"), [("MERGE_CONFLICT", "INTEGRATION", False)])
         self.assertEqual(self.details("S1"), ["merge: MERGE_CONFLICT"])
-        self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
+        self.assertAttempts(r, ["ROLLBACK"])
         self.assertEqual(self.run.state(P.BUDGETS)["retries"], {})
         merge_check = next(e for e in self.events("gate/check") if e.data["check"] == "S1:merge")
         self.assertEqual((merge_check.data["passed"], "app/calc.py" in merge_check.data["detail"]), (False, True))
@@ -423,7 +430,7 @@ class Orchestration(unittest.TestCase):
         self.assertEqual(self.merger.base(), tip)           # the merge was rolled back
         checks = [(e.data["check"], e.data["passed"]) for e in self.events("gate/check") if e.data["check"].startswith("S2:post")]
         self.assertEqual(checks, [("S2:post-merge:C2", True), ("S2:post-merge:C0", False)])   # the prior story's PRESERVE, re-proved
-        self.assertEqual([a.outcome for a in r2.attempts], ["ROLLBACK"])
+        self.assertAttempts(r2, ["ROLLBACK"])
         adequacy = self.events("tests/adequacy", "S2")[0].data
         self.assertEqual((adequacy["outcome"], adequacy["regressions"]["outcome"]), ("INADEQUATE", "FAILED"))  # the policy let it through; the proof did not
         self.assert_disposed("S2")
@@ -453,7 +460,7 @@ class Orchestration(unittest.TestCase):
             def read(s, report, exit_code):
                 return real.read(report, exit_code)
         r = self.story(self.s1_plan(), "S1", self.s1_dev(), scanner=Flaky(), limits={**LIMITS, Owner.ENVIRONMENT: 1})
-        self.assertEqual([a.outcome for a in r.attempts], ["RETRY", "COMMIT"])
+        self.assertAttempts(r, ["RETRY", "COMMIT"])
         self.assertEqual(self.failures("S1"), [("CAPABILITY_UNRUNNABLE", "ENVIRONMENT", True)])
         b = self.run.state(P.BUDGETS)
         self.assertEqual(b["retries"], {"S1": {"ENVIRONMENT": 1}})
@@ -466,7 +473,7 @@ class Orchestration(unittest.TestCase):
     def test_ORCH_2_a_developer_outage_mid_story_is_a_typed_PROVIDER_failure_with_no_cross_charge(self):
         r = self.story(self.s1_plan(), "S1", Dev(outage=True))
         self.assertEqual(self.failures("S1"), [("PROVIDER_UNAVAILABLE", "PROVIDER", True)] * 2)
-        self.assertEqual([a.outcome for a in r.attempts], ["RETRY", "ROLLBACK"])   # PROVIDER limit 1: one retry, then no
+        self.assertAttempts(r, ["RETRY", "ROLLBACK"])   # PROVIDER limit 1: one retry, then no
         self.assertEqual(self.merger.base(), self.base)
         self.assert_disposed("S1")
         self.assertEqual(self.rows("S1"), [("S1:admission", True, "admitted"),
@@ -488,7 +495,7 @@ class Orchestration(unittest.TestCase):
         r = self.story(plan, "S1", self.s1_dev())
         c = classify(FailureCode.PRECONDITION_BROKEN)
         self.assertEqual(self.failures("S1"), [("PRECONDITION_BROKEN", c.owner.value, c.budget is not None)])
-        self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
+        self.assertAttempts(r, ["ROLLBACK"])
         self.assertEqual(self.events("provider/request", "S1"), [])
         self.assertEqual(self.events("story/admitted", "S1")[0].data["admitted"], False)
         self.assertEqual(self.rows("S1"), [("S1:admission", False, "C1: PRECONDITION_BROKEN")])
@@ -530,7 +537,7 @@ class Orchestration(unittest.TestCase):
             def read(s, report, exit_code):
                 return real.read(report, exit_code)
         r = self.story(self.s1_plan(), "S1", self.s1_dev(), scanner=Flaky())
-        self.assertEqual([a.outcome for a in r.attempts], ["RETRY", "COMMIT"])
+        self.assertAttempts(r, ["RETRY", "COMMIT"])
         retry = self.events("story/retry", "S1")[0]
         failure = self.events("failure/observed", "S1")[0]
         self.assertEqual(tuple(retry.source_seqs), (failure.seq,))             # the retry cites its failure by seq
@@ -586,7 +593,7 @@ class Orchestration(unittest.TestCase):
         self.assertEqual(self.failures("S1"), [("VERIFIER_DISAGREEMENT", "INTEGRATION", False)])
         self.assertEqual(self.details("S1"), ["proof of C1: VERIFIER_DISAGREEMENT"])
         self.assertEqual(self.rows("S1")[-1], ("S1:proof:C1", False, "VERIFIER_DISAGREEMENT"))
-        self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
+        self.assertAttempts(r, ["ROLLBACK"])
         proof = self.events("proof/verified", "S1")[0].data
         self.assertEqual((proof["agreement"], "verdict" in proof), (False, False))
         self.assertEqual(len(self.events("probe/evaluated", "S1")), 3)  # one at the parent, two at the candidate: never a third
@@ -609,7 +616,7 @@ class Orchestration(unittest.TestCase):
         self.assertEqual(self.details("S1"), ["proof of C1: PROBE_MISMATCH"])
         self.assertEqual(self.rows("S1")[-1], ("S1:proof:C1", False, "PROBE_MISMATCH"))
         self.assertEqual(self.events("proof/verified", "S1"), [])
-        self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
+        self.assertAttempts(r, ["ROLLBACK"])
 
     def test_ORCH_SCHEMA_4_tests_that_cannot_run_are_TESTS_UNRUNNABLE_with_no_developer_charge(self):
         absent = te.Runner("absent", ("-m", "aisef2_no_such_runner", "{out}"), te._read_unittest)
@@ -617,7 +624,7 @@ class Orchestration(unittest.TestCase):
         self.assertEqual(self.failures("S1"), [("TESTS_UNRUNNABLE", "ENVIRONMENT", True)] * 2)
         self.assertEqual(self.details("S1"), ["engineering quality: TESTS_UNRUNNABLE"] * 2)
         self.assertEqual([x for x in self.rows("S1") if x[0] == "S1:quality"], [("S1:quality", False, "no AdequacyOutcome")] * 2)
-        self.assertEqual([a.outcome for a in r.attempts], ["RETRY", "ROLLBACK"])
+        self.assertAttempts(r, ["RETRY", "ROLLBACK"])
         b = self.run.state(P.BUDGETS)
         self.assertEqual(b["retries"], {"S1": {"ENVIRONMENT": 1}})
         adequacy = self.events("tests/adequacy", "S1")[0].data
@@ -630,7 +637,7 @@ class Orchestration(unittest.TestCase):
         self.assertEqual(self.failures("S1"), [("TESTS_INADEQUATE", "DEVELOPER", True)])
         self.assertEqual(self.details("S1"), ["engineering quality: TESTS_INADEQUATE"])
         self.assertEqual(self.rows("S1")[-1], ("S1:quality", False, "INADEQUATE"))
-        self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
+        self.assertAttempts(r, ["ROLLBACK"])
         self.assertEqual(self.events("tests/adequacy", "S1")[0].data["outcome"], "INADEQUATE")
 
     def test_ORCH_SCHEMA_6_an_integration_owned_INCOMPLETE_collection_is_recorded_only(self):
@@ -663,7 +670,7 @@ class Orchestration(unittest.TestCase):
         r = self.story(self.s1_plan(), "S1", self.s1_dev(), reviewer=corroborated, limits={**LIMITS, Owner.REVIEW: 0})
         self.assertEqual(self.failures("S1"), [("REVIEW_FINDING", "REVIEW", True)])
         self.assertEqual(self.details("S1"), ["review: REVIEW_FINDING"])
-        self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
+        self.assertAttempts(r, ["ROLLBACK"])
         self.assertEqual(self.run.state(P.BUDGETS)["review"]["S1"]["requests"], 1)
         self.assertEqual(self.events("tool/invoked", "S1"), [])                # security never ran: review stopped the story
 
@@ -672,7 +679,7 @@ class Orchestration(unittest.TestCase):
         r = self.story(self.s1_plan(), "S1", self.s1_dev(), scanner=finding, limits={**LIMITS, Owner.SECURITY: 1})
         self.assertEqual(self.failures("S1"), [("SECURITY_FINDING", "SECURITY", True)] * 2)
         self.assertEqual(self.details("S1"), ["security: SECURITY_FINDING"] * 2)
-        self.assertEqual([a.outcome for a in r.attempts], ["RETRY", "ROLLBACK"])
+        self.assertAttempts(r, ["RETRY", "ROLLBACK"])
         self.assertEqual(self.run.state(P.BUDGETS)["retries"], {"S1": {"SECURITY": 1}})
         results = self.events("tool/result", "S1")
         self.assertEqual([e.data["outcome"] for e in results], ["COMPLETED", "COMPLETED"])   # ran and found: EXECUTED
@@ -683,12 +690,12 @@ class Orchestration(unittest.TestCase):
         r = self.story(self.s1_plan(), "S1", self.s1_dev(), reviewer=Rev(unrunnable=True), limits={**LIMITS, Owner.ENVIRONMENT: 0})
         self.assertEqual(self.failures("S1"), [("CAPABILITY_UNRUNNABLE", "ENVIRONMENT", True)])
         self.assertEqual(self.events("provider/result", "S1")[-1].data["outcome"], "FAILED")
-        self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
+        self.assertAttempts(r, ["ROLLBACK"])
 
     def test_ORCH_2b_a_reviewer_outage_stays_PROVIDER(self):
         r = self.story(self.s1_plan(), "S1", self.s1_dev(), reviewer=Rev(outage=True), limits={**LIMITS, Owner.PROVIDER: 0})
         self.assertEqual(self.failures("S1"), [("PROVIDER_UNAVAILABLE", "PROVIDER", True)])
-        self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
+        self.assertAttempts(r, ["ROLLBACK"])
 
     def test_ORCH_SCHEMA_10_a_resource_that_cannot_be_acquired_is_RESOURCE_ACQUISITION_FAILED(self):
         class NoRoom(GitWorkspace):
@@ -699,7 +706,7 @@ class Orchestration(unittest.TestCase):
         self.assertEqual(self.failures("S1"), [("RESOURCE_ACQUISITION_FAILED", "ENVIRONMENT", True)])
         self.assertEqual(self.details("S1"), ["resources: checkout wt-S1: no disk"])
         self.assertEqual(self.rows("S1"), [("S1:resources", False, "resources: checkout wt-S1: no disk")])
-        self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
+        self.assertAttempts(r, ["ROLLBACK"])
         self.assertEqual(self.events("provider/request", "S1"), [])
         self.assert_disposed("S1")
 

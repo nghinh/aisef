@@ -298,7 +298,7 @@ class Workspace(unittest.TestCase):
         self.assertTrue(s.path.is_dir() and s.path.parent == self.tmp / "ws" and s.path.name.startswith("scratch-S1-"))
         s.release()
         self.assertFalse(s.path.exists())
-        with self.assertRaisesRegex(adapters.ResourceUnavailable, r"^scratch x: \[Errno \d+\] "):
+        with self.assertRaisesRegex(adapters.ResourceUnavailable, r"^scratch x: \[(Errno|WinError) \d+\] "):
             ws.GitWorkspace(self.repo, self.tmp / "absent").scratch("x")
 
         class Stuck(tempfile.TemporaryDirectory):
