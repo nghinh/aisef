@@ -38,10 +38,16 @@ def _module(name: str, rel: str):
 
 
 def passed(case: unittest.TestCase) -> bool:
-    """The named test ran and passed (a skip is not a pass)."""
+    """The named test ran and passed (a skip is not a pass). A failure is printed to stderr in full: the record only
+    carries the boolean, and a run on another machine must still say why."""
     result = unittest.TestResult()
     case.run(result)
-    return result.wasSuccessful() and result.testsRun == 1 and not result.skipped
+    ok = result.wasSuccessful() and result.testsRun == 1 and not result.skipped
+    if not ok:
+        for kind, entries in (("FAIL", result.failures), ("ERROR", result.errors), ("SKIP", result.skipped)):
+            for entry, text in entries:
+                print(f"p6_evidence: {kind} {entry.id()}\n{text}", file=sys.stderr)
+    return ok
 
 
 def cases(module, cls: str, *names: str) -> dict[str, bool]:

@@ -810,7 +810,8 @@ class EvidenceTreeDigest(unittest.TestCase):
 
     def test_the_digest_is_ordinal_and_lf_normalised(self):
         ev = _load("aisef_v2_p6_evidence", "validation/v2/p6_evidence.py")
-        root = tree({"t/README.md": "# r\n", "t/a.py": "x = 1\n", "t/Z.py": "y = 2\r\n", "t/sub/b.json": "{}\n", "t/skip.bin": "\x00", "t/__pycache__/a.pyc": ""})
+        root = tree({"t/README.md": "# r\n", "t/a.py": "x = 1\n", "t/sub/b.json": "{}\n", "t/skip.bin": "\x00", "t/__pycache__/a.pyc": ""})
+        (root / "t/Z.py").write_bytes(b"y = 2\r\n")   # bytes: on Windows write_text would turn the LF into CRLF as well
         lines = [f"{rel}\t{hashlib.sha256(text.replace(chr(13) + chr(10), chr(10)).encode()).hexdigest()}"
                  for rel, text in (("t/README.md", "# r\n"), ("t/Z.py", "y = 2\n"), ("t/a.py", "x = 1\n"), ("t/sub/b.json", "{}\n"))]
         self.assertEqual(lines, sorted(lines))   # 'R' < 'Z' < 'a' < 's': ordinal, never case-folded
