@@ -223,6 +223,8 @@ def run(ident: dict) -> dict:
     if p5_identity:
         problems.append(f"P5 records: {p5_identity}")
     cases = authority["cases"] + fixed_probes + quality_modules + [c for q in quality.values() for c in q["cases"]]
+    optional_absent = [{"id": c["id"], "capability": c["optional_capability_absent"], "reason": c.get("detail")}
+                       for c in cases if c.get("optional_capability_absent")]
     return {
         "record": "AISEF V2 — Q2 ADEQUACY", "rung": "Q2", "status": C.status_of(cases, problems, harness), "at": C.now(),
         "subject": ident, "platform": C.platform_id(),
@@ -232,6 +234,7 @@ def run(ident: dict) -> dict:
         "engineering_quality": {"properties": quality, "modules": {"counts": C.counts(quality_modules), "cases": quality_modules},
                                 "sensitivity": {"status": "DEFERRED_BY_RFC", "rfc_row": SENSITIVITY_RFC_ROW,
                                                 "scope": "not measured in Q2 cycle 1; not expanded (owner §15)"},
+                                "optional_capabilities_absent_here": optional_absent,
                                 "p5_records_identity_problems": p5_identity},
         "provider_calls": 0, "problems": problems, "harness_problems": harness, "cases": cases, "counts": C.counts(cases),
     }

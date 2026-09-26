@@ -2,12 +2,12 @@
  "record": "AISEF V2 — Q3 FAULT INJECTION",
  "rung": "Q3",
  "status": "GREEN",
- "at": "2026-09-26T21:58:28Z",
+ "at": "2026-09-26T23:12:03Z",
  "subject": {
   "seal_commit": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
   "semantic_candidate": "097daefefd9229eafeacaca321b7a008a581899b",
   "kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
-  "head": "c1d1a1607a1f8780718550478ccc7d3a032b3eb3",
+  "head": "9a8076226f9d4cd12e7bc3947aaf57eaf1b50b41",
   "head_is_after_the_seal": true,
   "head_kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
   "kernel_tree_is_the_candidates": true,
@@ -38,15 +38,15 @@
   "harness": {
    "files": {
     "validation/qualification/__init__.py": "40f613b3d5ffa39b5807ae0aec2878be51870891f5bd7dd76aae025e73e48f91",
-    "validation/qualification/common.py": "6343e679213c865c0c37ac9afc2a330564a250898aa7b3bc5fb57c22066223a2",
+    "validation/qualification/common.py": "8479b8b4ceeedc83f992561e1750ba4181eb5ce7c7dc0352da486a5f38c808a1",
     "validation/qualification/q0.py": "e31b897a576e622feed0f8407109d0d01d0bd71ead4874f36c7003cdac3e6cca",
     "validation/qualification/q1.py": "66dfc17f07603057fb70210442b31359c3e7c80520a0bdcc9b5cb7af91a6d2ef",
-    "validation/qualification/q2.py": "fb75ef300f24e59b8b7a8f7239f22a4a77f0bb5edc19c43308fbbd686fe8b057",
+    "validation/qualification/q2.py": "0b17822096a4f4cb5a7e3c6be4c19ee1022a5892c689462c0a56d607d1d9cfdc",
     "validation/qualification/q3.py": "5cbdccd0d99ab516a5d71001deb9785cd57b5933721902cb677c1fbecd2b3627",
     "validation/qualification/run.py": "baa82a3c3f7e0716855806d1ce8a78972f62792b8ad220f93c40a5860df28f90",
     "validation/qualification/summary.py": "d38d0e202f229645f79a6f21603a88c3d3552cecb7b19f7fa3a5fd7e1c73e58b"
    },
-   "sha256": "6bd5a7209a471212dacda180733ea9257b9e9e80638386169624de4f8818659c",
+   "sha256": "5a8fd15776c860941f8c706038ee8cce0fc1c6d88850a74fcd3ce6945f167131",
    "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines, sorted"
   }
  },
@@ -2095,47 +2095,47 @@
    {
     "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_auth_rejection_is_fatal_and_free",
     "outcome": "PASS",
-    "seconds": 0.215
+    "seconds": 0.201
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_provider_crash_is_infra_and_the_story_still_completes",
     "outcome": "PASS",
-    "seconds": 0.438
+    "seconds": 0.426
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_quality_block_retries_the_developer_once",
     "outcome": "PASS",
-    "seconds": 0.636
+    "seconds": 0.631
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_timeout_with_untouched_tree_is_infra",
     "outcome": "PASS",
-    "seconds": 0.434
+    "seconds": 0.428
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_trunk_commit_is_an_isolation_breach",
     "outcome": "PASS",
-    "seconds": 0.419
+    "seconds": 0.412
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_two_noops_with_nothing_frozen_end_the_story_without_quality_cost",
     "outcome": "PASS",
-    "seconds": 0.383
+    "seconds": 0.38
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision",
     "outcome": "PASS",
-    "seconds": 0.469
+    "seconds": 0.464
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_zero_output_session_is_fatal_not_quality",
     "outcome": "PASS",
-    "seconds": 0.227
+    "seconds": 0.22
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestEvidenceFaults.test_a_corrupt_evidence_line_is_skipped_not_trusted",
     "outcome": "PASS",
-    "seconds": 0.002
+    "seconds": 0.001
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestEvidenceValidityFaults.test_latest_exists_and_sha_match_each_score_nothing",
@@ -2145,7 +2145,7 @@
    {
     "id": "tests.hardening.test_fault_matrix:TestMergeFaults.test_conflict_hands_to_the_human_and_never_marks_done",
     "outcome": "PASS",
-    "seconds": 0.301
+    "seconds": 0.298
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestProcessFaults.test_a_dead_claim_is_orphaned_and_a_live_one_is_not",
@@ -2155,27 +2155,27 @@
    {
     "id": "tests.hardening.test_fault_matrix:TestReplayFaults.test_client_drift_is_detected_before_execution",
     "outcome": "PASS",
-    "seconds": 0.058
+    "seconds": 0.059
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestReviewFaults.test_a_malformed_verdict_never_passes_the_review",
     "outcome": "PASS",
-    "seconds": 0.635
+    "seconds": 0.633
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestReviewFaults.test_reviewer_mutation_is_reverted_and_the_review_retried",
     "outcome": "PASS",
-    "seconds": 0.455
+    "seconds": 0.453
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestReviewFaults.test_structured_block_is_developer_feedback",
     "outcome": "PASS",
-    "seconds": 0.664
+    "seconds": 0.638
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestReviewFaults.test_structured_stuck_is_a_plan_conflict_not_developer_work",
     "outcome": "PASS",
-    "seconds": 0.388
+    "seconds": 0.404
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestSandboxIdentityFaults.test_a_docker_that_cannot_be_invoked_still_records_image_and_digest",
@@ -2190,32 +2190,32 @@
    {
     "id": "tests.hardening.test_fault_matrix:TestSecurityFaults.test_malformed_security_report_is_unrunnable_not_a_verdict",
     "outcome": "PASS",
-    "seconds": 0.634
+    "seconds": 0.629
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestSecurityFaults.test_security_block_is_developer_feedback",
     "outcome": "PASS",
-    "seconds": 0.638
+    "seconds": 0.665
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestStaleFaults.test_a_stale_verdict_is_not_reused_after_hygiene_changed_the_tree",
     "outcome": "PASS",
-    "seconds": 1.219
+    "seconds": 1.273
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestToolFaults.test_missing_linter_is_unrunnable",
     "outcome": "PASS",
-    "seconds": 0.452
+    "seconds": 0.459
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestToolFaults.test_missing_runner_is_unrunnable_not_red",
     "outcome": "PASS",
-    "seconds": 0.457
+    "seconds": 0.452
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestToolFaults.test_red_lint_is_a_quality_failure",
     "outcome": "PASS",
-    "seconds": 0.633
+    "seconds": 0.628
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestToolFaults.test_red_suite_is_a_quality_failure",
@@ -2225,52 +2225,52 @@
    {
     "id": "tests.hardening.test_fault_matrix:TestWorkspaceFaults.test_a_scope_violation_is_restored_before_the_retry_and_the_story_completes",
     "outcome": "PASS",
-    "seconds": 1.19
+    "seconds": 1.181
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestWorkspaceFaults.test_generated_harness_dirt_is_preserved_and_never_a_violation",
     "outcome": "PASS",
-    "seconds": 0.659
+    "seconds": 0.653
    },
    {
     "id": "tests.hardening.test_fault_matrix:TestWorkspaceFaults.test_pre_existing_dirt_blocks_before_any_session_and_is_never_deleted",
     "outcome": "PASS",
-    "seconds": 0.241
+    "seconds": 0.237
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF01ReviewerTimeoutAfterRecovery.test_recovery_then_reviewer_absence_keeps_the_candidate_and_never_reopens_the_developer",
     "outcome": "PASS",
-    "seconds": 1.428
+    "seconds": 1.414
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF02SecurityTimeoutAfterBlockRemediation.test_security_absence_after_a_fixed_block_retries_security_not_the_developer",
     "outcome": "PASS",
-    "seconds": 1.322
+    "seconds": 1.317
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF03DirtyTreeThenCrashThenResume.test_attributable_dirt_is_restored_on_resume_and_the_story_completes",
     "outcome": "PASS",
-    "seconds": 1.261
+    "seconds": 1.252
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF03DirtyTreeThenCrashThenResume.test_unattributed_dirt_is_never_deleted_and_no_session_opens",
     "outcome": "PASS",
-    "seconds": 0.824
+    "seconds": 0.821
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF04FreezeThenCrashBeforeEvidence.test_a_committed_but_unrecorded_candidate_is_graded_on_resume_not_treated_as_a_noop",
     "outcome": "PASS",
-    "seconds": 0.926
+    "seconds": 0.921
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF05EvidenceWrittenThenCrashBeforeStateUpdate.test_the_rerun_converges_to_done_with_exactly_one_integration",
     "outcome": "PASS",
-    "seconds": 1.905
+    "seconds": 1.888
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF05EvidenceWrittenThenCrashBeforeStateUpdate.test_the_rerun_reconciles_the_orphaned_claim",
     "outcome": "PASS",
-    "seconds": 1.921
+    "seconds": 1.874
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF06DuplicateEventAfterResume.test_a_replayed_old_record_never_outranks_the_candidates_own_result",
@@ -2280,7 +2280,7 @@
    {
     "id": "tests.hardening.test_compound_faults:TestCF08BaselineDuringResume.test_the_baseline_stays_the_epochs_root_after_main_advanced",
     "outcome": "PASS",
-    "seconds": 1.282
+    "seconds": 1.264
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF09ClientDriftDuringReplay.test_a_replay_declared_for_opencode_but_run_with_claude_stops_before_the_first_agent_call",
@@ -2295,7 +2295,7 @@
    {
     "id": "tests.hardening.test_compound_faults:TestCF11OrphanProcessDuringCleanup.test_a_process_left_by_the_session_is_dead_before_the_workspace_is_removed",
     "outcome": "PASS",
-    "seconds": 14.317
+    "seconds": 14.291
    },
    {
     "id": "tests.hardening.test_compound_faults:TestCF12ApprovalInvalidationDuringResume.test_the_cli_precheck_blocks_a_resume_after_an_upstream_edit",
@@ -2320,7 +2320,7 @@
    {
     "id": "tests.hardening.test_compound_faults:_RunCase.runTest",
     "outcome": "PASS",
-    "seconds": 0.114
+    "seconds": 0.103
    }
   ],
   "note": "the frozen V1 kernel's matrix, still run on the same tree; V1 authority is UNREACHABLE from V2 (P6-OLD-PATH-REMOVAL)"
@@ -2330,67 +2330,67 @@
    "RACE-1": {
     "id": "tests.v2.test_v2_006:Race.test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump",
     "outcome": "PASS",
-    "seconds": 0.828
+    "seconds": 0.85
    },
    "RACE-2": {
     "id": "tests.v2.test_v2_006:Race.test_RACE_2_READY_DISPATCHED_RESULT_then_immediate_exit_is_the_complete_result",
     "outcome": "PASS",
-    "seconds": 1.026
+    "seconds": 1.04
    },
    "RACE-3": {
     "id": "tests.v2.test_v2_006:Race.test_RACE_3_the_exit_notice_before_the_pump_is_scheduled_gives_the_normal_result",
     "outcome": "PASS",
-    "seconds": 0.278
+    "seconds": 0.276
    },
    "RACE-4": {
     "id": "tests.v2.test_v2_006:Race.test_RACE_4_one_party_late_the_other_normal_gives_identical_records",
     "outcome": "PASS",
-    "seconds": 0.626
+    "seconds": 0.62
    },
    "RACE-4-story": {
     "id": "tests.v2.test_v2_006:StoryRace.test_RACE_4_a_story_with_one_party_late_on_every_proof_commits_with_agreement",
     "outcome": "PASS",
-    "seconds": 2.373
+    "seconds": 2.381
    },
    "RACE-5": {
     "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_5_a_harness_that_emits_nothing_and_exits_0_did_not_start_after_the_stream_closed",
     "outcome": "PASS",
-    "seconds": 0.724
+    "seconds": 0.72
    },
    "RACE-6": {
     "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_6_a_target_that_dies_before_READY_keeps_its_typed_outcome",
     "outcome": "PASS",
-    "seconds": 0.489
+    "seconds": 0.482
    },
    "RACE-7": {
     "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_7_a_partial_READY_then_exit_is_no_READY_never_a_guess",
     "outcome": "PASS",
-    "seconds": 0.731
+    "seconds": 0.732
    },
    "RACE-8": {
     "id": "tests.v2.test_v2_006:AnchorHoldsNoWriter.test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives",
     "outcome": "PASS",
-    "seconds": 0.132
+    "seconds": 0.13
    },
    "RACE-8-descendant": {
     "id": "tests.v2.test_v2_006:AnchorHoldsNoWriter.test_a_descendant_holding_the_writer_keeps_the_stream_open_until_it_ends",
     "outcome": "PASS",
-    "seconds": 1.197
+    "seconds": 1.186
    },
    "RACE-9": {
     "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_9_every_line_before_the_end_is_read_before_STREAM_CLOSED",
     "outcome": "PASS",
-    "seconds": 0.386
+    "seconds": 0.387
    },
    "RACE-10": {
     "id": "tests.v2.test_v2_006_repeat:Repeated.test_RACE_10_every_ordering_repeated_gives_the_normal_record",
     "outcome": "PASS",
-    "seconds": 16.68
+    "seconds": 16.659
    },
    "WAIT-CONTRACT": {
     "id": "tests.v2.test_v2_006:WaitContract.test_a_timed_out_wait_returns_only_once_the_monotonic_clock_has_passed_its_deadline",
     "outcome": "PASS",
-    "seconds": 0.825
+    "seconds": 0.822
    }
   },
   "all_pass": true,
@@ -2521,8 +2521,8 @@
     "ok": true
    },
    "F": {
-    "target": 3391,
-    "anchor": 3390,
+    "target": 64788,
+    "anchor": 64787,
     "before": {
      "target_alive": true,
      "anchor_alive": true
@@ -2537,7 +2537,7 @@
      {
       "stage": "cooperative",
       "signal": "SIGINT",
-      "at": 572951.621823208
+      "at": 577366.336429083
      }
     ],
     "target_gone_os": true,
@@ -2565,8 +2565,8 @@
    "ok": true
   },
   "fault_F_anchor_terminated": {
-   "target": 3391,
-   "anchor": 3390,
+   "target": 64788,
+   "anchor": 64787,
    "before": {
     "target_alive": true,
     "anchor_alive": true
@@ -2581,7 +2581,7 @@
     {
      "stage": "cooperative",
      "signal": "SIGINT",
-     "at": 572951.621823208
+     "at": 577366.336429083
     }
    ],
    "target_gone_os": true,
@@ -2605,13 +2605,13 @@
    "samples": 20,
    "violations": [],
    "min_slack_ms": 0.01,
-   "max_slack_ms": 10.159,
+   "max_slack_ms": 10.117,
    "ok": true
   },
   "pinned_case": {
    "id": "tests.v2.test_v2_006:WaitContract.test_a_timed_out_wait_returns_only_once_the_monotonic_clock_has_passed_its_deadline",
    "outcome": "PASS",
-   "seconds": 0.825
+   "seconds": 0.822
   },
   "closed_report_path_distinguishable": true,
   "rule": "a timeout None arrives only after the monotonic deadline; a closed-report None arrives at once; the reader tells them apart by the clock"
@@ -2624,7 +2624,7 @@
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_INTERRUPT_SIG_1_a_controller_stop_is_attributed_to_the_controller",
    "outcome": "PASS",
-   "seconds": 0.545
+   "seconds": 0.547
   },
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_INTERRUPT_SIG_2_a_subject_signal_exit_never_becomes_an_owner",
@@ -2634,12 +2634,12 @@
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_INTERRUPT_SIG_3_closers_distinguish_not_started_from_outcome_unknown_and_leave_no_gap",
    "outcome": "PASS",
-   "seconds": 0.335
+   "seconds": 0.336
   },
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_a_call_is_dispatched_and_finished_once_and_returns_what_it_wrote",
    "outcome": "PASS",
-   "seconds": 0.135
+   "seconds": 0.134
   },
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_a_job_stop_is_the_controllers_only_with_its_stop_in_the_ledger",
@@ -2649,17 +2649,17 @@
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_a_second_interrupt_during_disposal_abandons_and_says_so",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_a_tool_that_finishes_is_measured_and_its_range_released",
    "outcome": "PASS",
-   "seconds": 0.271
+   "seconds": 0.263
   },
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_an_interrupt_during_disposal_only_asks_for_abandonment",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_an_interrupted_run_disposes_its_scopes_before_it_finishes_and_stays_torn",
@@ -2674,7 +2674,7 @@
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_the_closers_of_a_call_say_what_is_known",
    "outcome": "PASS",
-   "seconds": 0.204
+   "seconds": 0.199
   },
   {
    "id": "tests.v2.p4.test_interruption:Interruption.test_the_outcome_table",
@@ -2684,12 +2684,12 @@
   {
    "id": "tests.v2.p4.test_interruption:RealSignals.test_SIGINT_mid_story_is_an_interruption_with_no_gap_and_nothing_left_running",
    "outcome": "PASS",
-   "seconds": 0.407
+   "seconds": 0.395
   },
   {
    "id": "tests.v2.p4.test_interruption:RealSignals.test_SIGKILL_mid_story_leaves_a_journal_that_repair_closes_and_a_tool_that_does_not_survive",
    "outcome": "PASS",
-   "seconds": 0.199
+   "seconds": 0.201
   },
   {
    "id": "tests.v2.p4.test_interruption:Repair.test_a_run_already_interrupted_is_abandoned_by_repair",
@@ -2724,17 +2724,17 @@
   {
    "id": "tests.v2.p4.test_run_scope:Lifetime.test_P3_RESIDUAL_DISPOSAL_ORDER_a_successful_shutdown_is_refused_while_a_story_is_open",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p4.test_run_scope:Lifetime.test_RUN_1_a_process_killed_after_a_durable_run_end_and_before_CLEAN_is_torn",
    "outcome": "PASS",
-   "seconds": 0.141
+   "seconds": 0.139
   },
   {
    "id": "tests.v2.p4.test_run_scope:Lifetime.test_RUN_2_a_held_lease_blocks_a_second_run_even_with_run_end_written",
    "outcome": "PASS",
-   "seconds": 0.066
+   "seconds": 0.069
   },
   {
    "id": "tests.v2.p4.test_run_scope:Lifetime.test_RUN_3_a_writer_that_fails_to_close_leaves_the_sentinel_open_and_the_lease_still_released_last",
@@ -2749,7 +2749,7 @@
   {
    "id": "tests.v2.p4.test_run_scope:Lifetime.test_a_clean_run_follows_the_normative_order_and_releases_the_lease_last",
    "outcome": "PASS",
-   "seconds": 0.004
+   "seconds": 0.005
   },
   {
    "id": "tests.v2.p4.test_run_scope:Lifetime.test_a_run_root_is_made_with_its_parents_and_a_story_keeps_its_scope_until_disposed",
@@ -2779,7 +2779,7 @@
   {
    "id": "tests.v2.p4.test_run_scope:Lifetime.test_the_lease_is_held_before_any_state_read_and_a_failed_begin_still_releases_it_last",
    "outcome": "PASS",
-   "seconds": 0.002
+   "seconds": 0.003
   },
   {
    "id": "tests.v2.p4.test_run_scope:Lifetime.test_the_preflight_names_the_previous_runs_residuals",
@@ -2804,7 +2804,7 @@
   {
    "id": "tests.v2.p4.test_story_scope:Scope.test_SCOPE_3_the_same_resource_graph_gives_the_same_disposal_order_whatever_each_release_takes",
    "outcome": "PASS",
-   "seconds": 0.202
+   "seconds": 0.215
   },
   {
    "id": "tests.v2.p4.test_story_scope:Scope.test_a_broken_journal_during_disposal_still_releases_everything",
@@ -2814,12 +2814,12 @@
   {
    "id": "tests.v2.p4.test_story_scope:Scope.test_a_hanging_release_is_residual_at_its_bound_and_disposal_goes_on",
    "outcome": "PASS",
-   "seconds": 0.185
+   "seconds": 0.197
   },
   {
    "id": "tests.v2.p4.test_story_scope:Scope.test_a_range_not_proved_empty_makes_what_it_could_write_to_residual_and_nothing_else",
    "outcome": "PASS",
-   "seconds": 0.005
+   "seconds": 0.007
   },
   {
    "id": "tests.v2.p4.test_story_scope:Scope.test_a_refused_journal_write_on_acquisition_releases_the_resource",
@@ -2854,17 +2854,17 @@
   {
    "id": "tests.v2.p4.test_process_range:Anchor.test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group",
    "outcome": "PASS",
-   "seconds": 0.079
+   "seconds": 0.048
   },
   {
    "id": "tests.v2.p4.test_process_range:Anchor.test_no_GO_no_target",
    "outcome": "PASS",
-   "seconds": 0.032
+   "seconds": 0.029
   },
   {
    "id": "tests.v2.p4.test_process_range:Anchor.test_the_reaper_reaps_every_child_but_the_target_and_keeps_doing_it",
    "outcome": "PASS",
-   "seconds": 1.125
+   "seconds": 1.168
   },
   {
    "id": "tests.v2.p4.test_process_range:Anchor.test_the_subreaper_is_asked_for_on_linux_only_and_its_absence_is_tolerated",
@@ -2879,57 +2879,57 @@
   {
    "id": "tests.v2.p4.test_process_range:Range.test_D_024_green_after_the_range_is_proved_empty_before_the_worktree_is_removed",
    "outcome": "PASS",
-   "seconds": 0.676
+   "seconds": 0.67
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_D_024_red_before_a_writing_grandchild_outlives_a_cleanup_that_trusts_the_direct_child",
    "outcome": "PASS",
-   "seconds": 0.731
+   "seconds": 0.722
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_PROC_OWN_1_a_controller_that_dies_leaves_no_owned_process_alive",
    "outcome": "PASS",
-   "seconds": 0.255
+   "seconds": 0.265
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_PROC_OWN_1_the_mutation_runner_timeout_takes_the_whole_tree_down",
    "outcome": "PASS",
-   "seconds": 3.296
+   "seconds": 3.311
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_PROC_OWN_2_after_disposal_the_range_never_signals_again",
    "outcome": "PASS",
-   "seconds": 0.195
+   "seconds": 0.199
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_a_controller_that_returns_without_disposing_exits_and_its_range_goes_with_it",
    "outcome": "PASS",
-   "seconds": 0.15
+   "seconds": 0.152
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_a_group_the_kernel_says_has_nobody_left_to_signal_is_measured_not_assumed",
    "outcome": "PASS",
-   "seconds": 1.041
+   "seconds": 1.068
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_a_normal_tree_is_reaped_and_measured_empty",
    "outcome": "PASS",
-   "seconds": 0.325
+   "seconds": 0.318
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_a_range_that_will_not_empty_is_residual_never_a_silent_success_and_blocks_by_default",
    "outcome": "PASS",
-   "seconds": 3.785
+   "seconds": 3.782
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_a_running_target_is_stopped_graceful_first",
    "outcome": "PASS",
-   "seconds": 0.542
+   "seconds": 0.526
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_a_tree_that_exits_by_itself_is_released_without_a_signal",
    "outcome": "PASS",
-   "seconds": 0.244
+   "seconds": 0.257
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_an_escaped_child_is_detected_reported_and_never_signalled",
@@ -2939,22 +2939,22 @@
   {
    "id": "tests.v2.p4.test_process_range:Range.test_an_interrupt_ignoring_target_climbs_the_ladder",
    "outcome": "PASS",
-   "seconds": 1.128
+   "seconds": 1.142
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_an_orphan_the_range_adopts_is_reaped_when_it_dies",
    "outcome": "PASS",
-   "seconds": 0.301
+   "seconds": 0.302
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_escapees_are_reported_in_pid_order",
    "outcome": "PASS",
-   "seconds": 0.132
+   "seconds": 0.131
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_start_failures_are_refused_and_leave_nothing_running",
    "outcome": "PASS",
-   "seconds": 0.221
+   "seconds": 0.227
   },
   {
    "id": "tests.v2.p4.test_process_range:Range.test_the_anchor_runs_isolated_and_the_target_gets_exactly_the_given_environment",
@@ -2964,7 +2964,7 @@
   {
    "id": "tests.v2.p4.test_process_range:Range.test_wait_says_none_at_once_when_the_anchor_is_gone_and_keeps_saying_it",
    "outcome": "PASS",
-   "seconds": 0.228
+   "seconds": 0.23
   },
   {
    "id": "tests.v2.p4.test_process_table:NoPidAncestry.test_WIN_PID_1_a_stale_parent_cycle_terminates_bounded_and_targets_nothing_unowned",
@@ -2979,7 +2979,7 @@
   {
    "id": "tests.v2.p4.test_process_table:NoPidAncestry.test_the_process_table_reads_this_process",
    "outcome": "PASS",
-   "seconds": 0.027
+   "seconds": 0.028
   },
   {
    "id": "tests.v2.p4.test_process_table:NoPidAncestry.test_the_ps_reader_skips_zombies_and_short_lines_and_a_failed_ps_is_not_an_empty_table",
@@ -3014,7 +3014,7 @@
   {
    "id": "tests.v2.p2.test_signal_provenance:AfterDispatch.test_SIG_PROBE_2_a_controller_stop_is_an_interruption_with_no_result",
    "outcome": "PASS",
-   "seconds": 0.717
+   "seconds": 0.714
   },
   {
    "id": "tests.v2.p2.test_signal_provenance:AfterDispatch.test_SIG_PROBE_4_a_subject_that_signals_itself_is_executed_and_indeterminate",
@@ -3024,12 +3024,12 @@
   {
    "id": "tests.v2.p2.test_signal_provenance:BeforeDispatch.test_SIG_PROBE_1_a_signal_before_dispatch_is_still_unrunnable_environment",
    "outcome": "PASS",
-   "seconds": 0.136
+   "seconds": 0.134
   },
   {
    "id": "tests.v2.p2.test_signal_provenance:Budgets.test_a_non_controller_signal_failure_is_not_retryable_from_the_journal",
    "outcome": "PASS",
-   "seconds": 0.004
+   "seconds": 0.003
   },
   {
    "id": "tests.v2.p2.test_signal_provenance:Conformance.test_SIG_PROBE_8_restoring_signal_after_dispatch_to_unrunnable_fails_F5",
@@ -3065,147 +3065,147 @@
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_JOURNAL_AUTHORITY_the_decision_cites_every_check_row_of_the_story_gate",
    "outcome": "PASS",
-   "seconds": 1.716
+   "seconds": 1.71
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_11_scenario_L_INTRODUCE_PRESERVE_and_VERIFY_give_the_identical_product_verdict",
    "outcome": "PASS",
-   "seconds": 5.173
+   "seconds": 5.188
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_12_a_reviewer_confinement_parameter_is_impossible_by_API_shape",
    "outcome": "PASS",
-   "seconds": 1.136
+   "seconds": 1.101
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_13_the_seam_refuses_a_HUMAN_DECLARATION_REQUIRED_row_before_any_provider_execution",
    "outcome": "PASS",
-   "seconds": 1.709
+   "seconds": 1.695
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_14_a_change_of_engineering_adequacy_leaves_the_product_proof_unchanged",
    "outcome": "PASS",
-   "seconds": 1.552
+   "seconds": 1.536
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_15_only_an_explicit_immutable_reference_selects_evidence",
    "outcome": "PASS",
-   "seconds": 2.803
+   "seconds": 2.812
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_16_retry_state_derives_solely_from_the_journal_projection",
    "outcome": "PASS",
-   "seconds": 2.828
+   "seconds": 2.804
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_1_an_end_to_end_story_completes_through_the_real_path",
    "outcome": "PASS",
-   "seconds": 1.723
+   "seconds": 1.697
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_2_a_developer_outage_mid_story_is_a_typed_PROVIDER_failure_with_no_cross_charge",
    "outcome": "PASS",
-   "seconds": 0.528
+   "seconds": 0.522
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_2b_a_reviewer_outage_stays_PROVIDER",
    "outcome": "PASS",
-   "seconds": 1.144
+   "seconds": 1.126
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_3_an_admission_refusal_makes_no_provider_request",
    "outcome": "PASS",
-   "seconds": 0.294
+   "seconds": 0.296
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_4_pre_satisfied_obligations_skip_the_developer_and_the_candidate_is_still_verified",
    "outcome": "PASS",
-   "seconds": 1.758
+   "seconds": 1.753
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_5_and_SCHEMA_1_a_verifier_disagreement_is_VERIFIER_DISAGREEMENT_INTEGRATION_and_stops",
    "outcome": "PASS",
-   "seconds": 0.531
+   "seconds": 0.518
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_6_and_SCHEMA_9_a_reviewer_environment_failure_is_CAPABILITY_UNRUNNABLE_ENVIRONMENT_never_DEVELOPER",
    "outcome": "PASS",
-   "seconds": 1.154
+   "seconds": 1.123
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_7_and_SCHEMA_8_a_scanner_that_ran_and_found_is_EXECUTED_and_SECURITY_FINDING",
    "outcome": "PASS",
-   "seconds": 2.511
+   "seconds": 2.457
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_8_and_SCHEMA_3_a_merge_conflict_is_MERGE_CONFLICT_INTEGRATION_with_zero_developer_charge",
    "outcome": "PASS",
-   "seconds": 1.495
+   "seconds": 1.46
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back",
    "outcome": "PASS",
-   "seconds": 4.292
+   "seconds": 4.208
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_SCHEMA_10_a_resource_that_cannot_be_acquired_is_RESOURCE_ACQUISITION_FAILED",
    "outcome": "PASS",
-   "seconds": 0.072
+   "seconds": 0.069
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_SCHEMA_10b_a_checkout_that_cannot_reach_the_candidate_is_RESOURCE_ACQUISITION_FAILED",
    "outcome": "PASS",
-   "seconds": 0.344
+   "seconds": 0.332
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_SCHEMA_10c_a_checkout_that_cannot_reach_the_merged_revision_reverts_the_merge",
    "outcome": "PASS",
-   "seconds": 1.465
+   "seconds": 1.42
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_SCHEMA_2_a_probe_mismatch_is_PROBE_MISMATCH_and_never_a_proof",
    "outcome": "PASS",
-   "seconds": 0.524
+   "seconds": 0.506
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_SCHEMA_4_tests_that_cannot_run_are_TESTS_UNRUNNABLE_with_no_developer_charge",
    "outcome": "PASS",
-   "seconds": 1.892
+   "seconds": 1.793
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_SCHEMA_5_INADEQUATE_under_a_blocking_policy_is_TESTS_INADEQUATE_owned_by_DEVELOPER",
    "outcome": "PASS",
-   "seconds": 0.994
+   "seconds": 0.968
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_SCHEMA_6_an_integration_owned_INCOMPLETE_collection_is_recorded_only",
    "outcome": "PASS",
-   "seconds": 1.773
+   "seconds": 1.695
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_SCHEMA_7_a_review_request_charges_the_REVIEW_budget_and_blocks_only_with_corroboration",
    "outcome": "PASS",
-   "seconds": 1.747
+   "seconds": 1.692
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_SCHEMA_7b_a_corroborated_review_finding_is_REVIEW_FINDING_owned_by_REVIEW",
    "outcome": "PASS",
-   "seconds": 1.155
+   "seconds": 1.132
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ROOT_tier_arms_I_to_IX_and_the_static_rules_hold_over_the_package",
    "outcome": "PASS",
-   "seconds": 0.551
+   "seconds": 0.596
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_SINGLE_PATH_one_entry_and_no_V1_authority",
    "outcome": "PASS",
-   "seconds": 0.06
+   "seconds": 0.059
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_VERIFIER_INDEPENDENCE_its_own_checkout_and_the_identical_instrument",
    "outcome": "PASS",
-   "seconds": 1.705
+   "seconds": 1.712
   },
   {
    "id": "tests.v2.test_p6_stages:Adapters.test_a_developer_answer_is_COMPLETED_with_a_candidate_or_FAILED_without",
@@ -3225,7 +3225,7 @@
   {
    "id": "tests.v2.test_p6_stages:Adapters.test_confinement_is_derived_from_an_existing_checkout_and_reverses",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.test_p6_stages:Gate.test_a_check_row_and_a_decision_citing_rows",
@@ -3245,7 +3245,7 @@
   {
    "id": "tests.v2.test_p6_stages:MergeStage.test_the_merge_outcome_is_typed_from_the_merger_or_flattened",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.test_p6_stages:ProofStage.test_Ranged_names_a_range_within_the_attempt_and_releases_through_it",
@@ -3275,27 +3275,27 @@
   {
    "id": "tests.v2.test_p6_stages:Quality.test_ADEQUATE_is_no_failure_whatever_the_policy",
    "outcome": "PASS",
-   "seconds": 0.474
+   "seconds": 0.473
   },
   {
    "id": "tests.v2.test_p6_stages:Quality.test_INADEQUATE_blocks_only_under_the_policy_and_is_the_developers",
    "outcome": "PASS",
-   "seconds": 0.632
+   "seconds": 0.626
   },
   {
    "id": "tests.v2.test_p6_stages:Quality.test_INCOMPLETE_is_recorded_and_never_a_failure",
    "outcome": "PASS",
-   "seconds": 0.471
+   "seconds": 0.472
   },
   {
    "id": "tests.v2.test_p6_stages:Quality.test_UNRUNNABLE_is_TESTS_UNRUNNABLE_with_environment_provenance_and_no_outcome",
    "outcome": "PASS",
-   "seconds": 0.274
+   "seconds": 0.272
   },
   {
    "id": "tests.v2.test_p6_stages:Quality.test_payload_is_the_typed_assembly_field_for_field",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.test_p6_stages:Review.test_a_completed_review_is_a_REVIEW_request_its_result_and_a_row_per_finding",
@@ -3315,7 +3315,7 @@
   {
    "id": "tests.v2.test_p6_stages:RunnerHelpers.test_a_probe_factory_is_exactly_one",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.test_p6_stages:RunnerHelpers.test_a_story_result_reads_its_last_attempt",
@@ -3330,7 +3330,7 @@
   {
    "id": "tests.v2.test_p6_stages:RunnerHelpers.test_fail_carries_the_flattened_original_only_for_UNKNOWN",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.test_p6_stages:RunnerHelpers.test_held_acquires_under_stage_names_and_releases_in_reverse",
@@ -3360,12 +3360,12 @@
   {
    "id": "tests.v2.test_p6_stages:Security.test_a_scanner_that_cannot_start_or_report_is_CAPABILITY_UNRUNNABLE",
    "outcome": "PASS",
-   "seconds": 0.913
+   "seconds": 0.905
   },
   {
    "id": "tests.v2.test_p6_stages:Security.test_a_scanner_that_ran_and_found_is_EXECUTED_with_a_row_per_finding",
    "outcome": "PASS",
-   "seconds": 0.271
+   "seconds": 0.27
   },
   {
    "id": "tests.v2.test_p6_stages:VerifiedPayload.test_agreement_is_result_equality_and_the_verdict_only_then",
@@ -3375,22 +3375,22 @@
   {
    "id": "tests.v2.test_p6_stages:Workspace.test_checkouts_are_detached_worktrees_at_a_full_sha_moved_and_released_through_git",
    "outcome": "PASS",
-   "seconds": 0.299
+   "seconds": 0.306
   },
   {
    "id": "tests.v2.test_p6_stages:Workspace.test_commit_all_stages_everything_and_names_the_commit",
    "outcome": "PASS",
-   "seconds": 0.172
+   "seconds": 0.169
   },
   {
    "id": "tests.v2.test_p6_stages:Workspace.test_git_runs_without_background_maintenance_and_sha_resolves_commits_only",
    "outcome": "PASS",
-   "seconds": 0.213
+   "seconds": 0.21
   },
   {
    "id": "tests.v2.test_p6_stages:Workspace.test_revert_undoes_exactly_the_merge_at_the_tip",
    "outcome": "PASS",
-   "seconds": 0.536
+   "seconds": 0.529
   },
   {
    "id": "tests.v2.test_p6_stages:Workspace.test_scratch_is_a_handle_owned_directory_released_by_its_own_cleanup",
@@ -3400,17 +3400,17 @@
   {
    "id": "tests.v2.test_p6_stages:Workspace.test_the_merger_types_merged_conflict_and_up_to_date_from_git",
    "outcome": "PASS",
-   "seconds": 1.269
+   "seconds": 1.247
   },
   {
    "id": "tests.v2.p4.test_budgets:Budgets.test_D_006_a_credential_or_environment_rejection_never_consumes_the_developer_budget",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.004
   },
   {
    "id": "tests.v2.p4.test_budgets:Budgets.test_PRE_SATISFIED_and_PLAN_CONTRADICTION_consume_no_developer_budget",
    "outcome": "PASS",
-   "seconds": 0.004
+   "seconds": 0.003
   },
   {
    "id": "tests.v2.p4.test_budgets:Budgets.test_SS_64_a_cap_reached_in_one_budget_stops_there_and_never_falls_through",
@@ -3425,7 +3425,7 @@
   {
    "id": "tests.v2.p4.test_budgets:Budgets.test_only_a_typed_chargeable_outcome_charges_its_declared_budget",
    "outcome": "PASS",
-   "seconds": 0.114
+   "seconds": 0.113
   },
   {
    "id": "tests.v2.p4.test_budgets:Budgets.test_the_budget_module_keeps_no_counter",
@@ -3495,7 +3495,7 @@
   {
    "id": "tests.v2.p1.test_routing:RetryabilityIsTyped.test_only_the_taxonomy_decides_retryability",
    "outcome": "PASS",
-   "seconds": 0.14
+   "seconds": 0.141
   },
   {
    "id": "tests.v2.p1.test_routing:RoutingTable.test_REFUTED_never_routes_to_ENVIRONMENT",
@@ -3715,12 +3715,12 @@
   {
    "id": "tests.v2.p2.test_probe_protocol:SecondKindPrototype.test_file_X_must_exist_and_a_forbidden_module_must_not",
    "outcome": "PASS",
-   "seconds": 0.002
+   "seconds": 0.001
   },
   {
    "id": "tests.v2.p2.test_probe_protocol:SecondKindPrototype.test_its_harness_failure_and_refusal_are_typed_the_same_way",
    "outcome": "PASS",
-   "seconds": 0.001
+   "seconds": 0.0
   },
   {
    "id": "tests.v2.p2.test_probe_protocol:SubjectDeadline.test_TIME_1_a_harness_timeout_is_UNRUNNABLE",
@@ -3745,7 +3745,7 @@
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_a_missing_dependency_of_a_present_subject_is_not_subject_absence",
    "outcome": "PASS",
-   "seconds": 0.138
+   "seconds": 0.137
   },
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_a_module_that_resolves_only_outside_the_revision_is_absent_there",
@@ -3755,27 +3755,27 @@
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_a_range_that_refuses_to_start_is_a_launch_failure",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_a_result_written_just_before_exit_is_drained_not_lost",
    "outcome": "PASS",
-   "seconds": 0.313
+   "seconds": 0.303
   },
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_a_signal_after_dispatch_is_split_by_provenance",
    "outcome": "PASS",
-   "seconds": 0.012
+   "seconds": 0.011
   },
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_a_subject_that_ends_the_process_is_observed_not_unrunnable",
    "outcome": "PASS",
-   "seconds": 0.165
+   "seconds": 0.166
   },
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_an_exit_status_never_reported_is_a_harness_failure_not_a_verdict",
    "outcome": "PASS",
-   "seconds": 0.004
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_an_unsupported_observation_class_is_refused_before_anything_runs",
@@ -3785,12 +3785,12 @@
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_enforcement_is_declared_bound_and_never_degraded",
    "outcome": "PASS",
-   "seconds": 0.137
+   "seconds": 0.136
   },
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_subject_output_cannot_forge_the_protocol",
    "outcome": "PASS",
-   "seconds": 0.138
+   "seconds": 0.136
   },
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_the_observation_class_is_read_from_the_spec",
@@ -3800,7 +3800,7 @@
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_the_protocol_readers_never_hold_the_interpreter_open",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p2.test_python_callable:Boundaries.test_the_range_and_its_request_are_named_for_the_probe",
@@ -3820,27 +3820,27 @@
   {
    "id": "tests.v2.p2.test_python_callable:Identity.test_the_digest_is_stable_across_processes",
    "outcome": "PASS",
-   "seconds": 0.079
+   "seconds": 0.077
   },
   {
    "id": "tests.v2.p2.test_python_callable:LayoutInvariance.test_product_verdicts_are_identical_across_test_layouts",
    "outcome": "PASS",
-   "seconds": 2.715
+   "seconds": 2.704
   },
   {
    "id": "tests.v2.p2.test_python_callable:Observations.test_a_product_module_cannot_shadow_the_harness",
    "outcome": "PASS",
-   "seconds": 0.139
+   "seconds": 0.137
   },
   {
    "id": "tests.v2.p2.test_python_callable:Observations.test_a_tool_absent_harness_is_named",
    "outcome": "PASS",
-   "seconds": 0.136
+   "seconds": 0.135
   },
   {
    "id": "tests.v2.p2.test_python_callable:Observations.test_an_orphan_holding_the_pipe_does_not_hold_the_interpreter",
    "outcome": "PASS",
-   "seconds": 0.847
+   "seconds": 0.871
   },
   {
    "id": "tests.v2.p2.test_python_callable:Observations.test_keyword_arguments_reach_the_subject",
@@ -3850,12 +3850,12 @@
   {
    "id": "tests.v2.p2.test_python_callable:Observations.test_refusals_name_what_is_refused",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p2.test_python_callable:Observations.test_the_harness_reports_each_kind",
    "outcome": "PASS",
-   "seconds": 3.198
+   "seconds": 3.2
   },
   {
    "id": "tests.v2.p2.test_python_callable:ProbeAbs.test_PROBE_ABS_1_harness_unavailable_is_UNRUNNABLE_ENVIRONMENT_with_no_verdict",
@@ -3865,17 +3865,17 @@
   {
    "id": "tests.v2.p2.test_python_callable:ProbeAbs.test_PROBE_ABS_2_requires_subject_absent_is_EXECUTED_INDETERMINATE_PRECONDITION_ABSENT",
    "outcome": "PASS",
-   "seconds": 0.41
+   "seconds": 0.412
   },
   {
    "id": "tests.v2.p2.test_python_callable:ProbeAbs.test_PROBE_ABS_3_decidable_positive_existence_subject_absent_is_UNSATISFIED",
    "outcome": "PASS",
-   "seconds": 0.139
+   "seconds": 0.138
   },
   {
    "id": "tests.v2.p2.test_python_callable:ProbeAbs.test_PROBE_ABS_4_decidable_negative_existence_forbidden_subject_absent_is_SATISFIED",
    "outcome": "PASS",
-   "seconds": 0.138
+   "seconds": 0.137
   },
   {
    "id": "tests.v2.p2.test_python_callable:ProbeAbs.test_PROBE_ABS_5_one_absence_under_different_contracts_is_not_forced_to_one_satisfaction",
@@ -3885,42 +3885,42 @@
   {
    "id": "tests.v2.p2.test_python_callable:ProbeAbs.test_a_present_subject_is_observed_whatever_the_declaration",
    "outcome": "PASS",
-   "seconds": 1.361
+   "seconds": 1.351
   },
   {
    "id": "tests.v2.p2.test_python_callable:Time.test_TIME_1_the_harness_cannot_launch_the_subject",
    "outcome": "PASS",
-   "seconds": 1.239
+   "seconds": 1.254
   },
   {
    "id": "tests.v2.p2.test_python_callable:Time.test_TIME_2_a_positive_response_contract_past_its_deadline_is_UNSATISFIED",
    "outcome": "PASS",
-   "seconds": 0.805
+   "seconds": 0.811
   },
   {
    "id": "tests.v2.p2.test_python_callable:Time.test_TIME_3_a_forbidden_event_contract_reaching_its_deadline_with_no_event_is_SATISFIED",
    "outcome": "PASS",
-   "seconds": 0.807
+   "seconds": 0.793
   },
   {
    "id": "tests.v2.p2.test_python_callable:Time.test_TIME_4_the_same_physical_timeout_under_different_specs",
    "outcome": "PASS",
-   "seconds": 3.187
+   "seconds": 3.222
   },
   {
    "id": "tests.v2.p2.test_python_callable:Time.test_TIME_5_a_subject_timeout_is_never_ENVIRONMENT",
    "outcome": "PASS",
-   "seconds": 5.628
+   "seconds": 5.624
   },
   {
    "id": "tests.v2.p2.test_python_callable:Time.test_a_spec_without_a_bounded_window_is_INVALID_SPEC_before_anything_runs",
    "outcome": "PASS",
-   "seconds": 0.003
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p2.test_python_callable:Time.test_the_window_is_the_specs",
    "outcome": "PASS",
-   "seconds": 0.509
+   "seconds": 0.505
   },
   {
    "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_1_a_missing_runner_is_UNRUNNABLE_ENVIRONMENT_with_no_outcome_and_no_selection",
@@ -3990,7 +3990,7 @@
   {
    "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_pytest_for_real",
    "outcome": "PASS",
-   "seconds": 0.287
+   "seconds": 0.274
   },
   {
    "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_the_junit_result_set_is_read_typed",
@@ -4005,22 +4005,22 @@
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_2_for_real",
    "outcome": "PASS",
-   "seconds": 0.156
+   "seconds": 0.155
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_directory_target_is_discovered_and_a_node_id_selects_one_test",
    "outcome": "PASS",
-   "seconds": 0.314
+   "seconds": 0.311
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_passing_suite_yields_EXECUTED_PASSED_STORY_TESTS_RAN",
    "outcome": "PASS",
-   "seconds": 0.157
+   "seconds": 0.155
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_ended_by_a_signal_is_UNRUNNABLE",
    "outcome": "PASS",
-   "seconds": 0.134
+   "seconds": 0.132
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_that_crashes_before_reporting_is_UNRUNNABLE",
@@ -4030,17 +4030,17 @@
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_an_empty_selection_is_NO_STORY_TESTS_MATCHED_DEVELOPER",
    "outcome": "PASS",
-   "seconds": 0.312
+   "seconds": 0.309
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
    "outcome": "PASS",
-   "seconds": 0.157
+   "seconds": 0.154
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_the_projects_own_tree_is_DEVELOPER",
    "outcome": "PASS",
-   "seconds": 0.311
+   "seconds": 0.309
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_candidate_is_the_only_tree_execute_knows",
@@ -4050,17 +4050,17 @@
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_harness_deadline_is_UNRUNNABLE_and_the_range_is_released",
    "outcome": "PASS",
-   "seconds": 1.244
+   "seconds": 1.241
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_result_set_is_typed_and_carries_the_collection_detail",
    "outcome": "PASS",
-   "seconds": 0.161
+   "seconds": 0.214
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_undeterminable_collection_cause_is_INTEGRATION",
    "outcome": "PASS",
-   "seconds": 0.156
+   "seconds": 0.157
   },
   {
    "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
@@ -4130,7 +4130,7 @@
   {
    "id": "tests.v2.p2.test_story_admission:Story.test_any_blocker_blocks_the_story",
    "outcome": "PASS",
-   "seconds": 0.001
+   "seconds": 0.0
   },
   {
    "id": "tests.v2.p2.test_story_admission:Story.test_only_this_storys_obligations_run",
@@ -4220,12 +4220,12 @@
   {
    "id": "tests.v2.test_v2_005:BudgetsV2.test_the_reference_model_agrees_on_format_3_traces_and_its_V2_005_calibration",
    "outcome": "PASS",
-   "seconds": 0.523
+   "seconds": 0.52
   },
   {
    "id": "tests.v2.test_v2_005:BudgetsV2.test_under_formats_1_and_2_every_request_is_the_developers_as_frozen",
    "outcome": "PASS",
-   "seconds": 0.002
+   "seconds": 0.001
   },
   {
    "id": "tests.v2.test_v2_005:BudgetsV2.test_version_2_reads_the_declared_format_and_charges_a_format_3_request_to_its_budget_owner",
@@ -4240,12 +4240,12 @@
   {
    "id": "tests.v2.test_v2_005:Catalog.test_FMT3_2_a_missing_schema_fails_the_catalog_check_and_the_reader",
    "outcome": "PASS",
-   "seconds": 0.005
+   "seconds": 0.004
   },
   {
    "id": "tests.v2.test_v2_005:Compatibility.test_FMT3_3_every_format_1_and_format_2_journal_reads_identically_through_the_format_3_reader",
    "outcome": "PASS",
-   "seconds": 0.148
+   "seconds": 0.146
   },
   {
    "id": "tests.v2.test_v2_005:Compatibility.test_FMT3_5_a_reader_reads_a_journal_under_its_declared_format_and_guesses_nothing",
@@ -4255,7 +4255,7 @@
   {
    "id": "tests.v2.test_v2_005:Compatibility.test_FMT3_7_no_format_1_or_format_2_journal_is_rewritten_extended_or_upgraded",
    "outcome": "PASS",
-   "seconds": 0.004
+   "seconds": 0.005
   },
   {
    "id": "tests.v2.test_v2_005:Lineage.test_V2_005_is_the_fourth_link_after_V2_003_changing_exactly_F1",
@@ -4270,7 +4270,7 @@
   {
    "id": "tests.v2.test_v2_005:Messages.test_a_writer_refuses_a_run_begin_that_declares_another_format",
    "outcome": "PASS",
-   "seconds": 0.001
+   "seconds": 0.0
   },
   {
    "id": "tests.v2.test_v2_005:Messages.test_citations_are_checked_by_count_type_and_key_with_exact_reasons",
@@ -4290,7 +4290,7 @@
   {
    "id": "tests.v2.test_v2_005:Messages.test_validate_names_the_seq_rule_the_ignorable_rule_and_the_first_event_rule",
    "outcome": "PASS",
-   "seconds": 0.0
+   "seconds": 0.001
   },
   {
    "id": "tests.v2.test_v2_005:Messages.test_verified_proof_reconstructs_a_proof_only",
@@ -4310,7 +4310,7 @@
   {
    "id": "tests.v2.test_v2_005:Runtime.test_the_run_scope_writes_format_3_and_its_journal_is_read_and_repaired_as_format_3",
    "outcome": "PASS",
-   "seconds": 0.005
+   "seconds": 0.006
   },
   {
    "id": "tests.v2.test_v2_005:Schemas.test_FMT3_4_a_missing_required_field_refuses_the_append_before_the_log_grows",
@@ -4365,7 +4365,7 @@
   {
    "id": "tests.v2.test_v2_005:Taxonomy.test_no_call_site_supplies_owner_or_retryability_and_no_prose_becomes_a_code",
    "outcome": "PASS",
-   "seconds": 0.15
+   "seconds": 0.147
   },
   {
    "id": "tests.v2.test_v2_005:Taxonomy.test_the_conformance_subcheck_pins_the_table_and_rejects_a_swapped_owner_or_retryability",
@@ -4385,12 +4385,12 @@
   {
    "id": "tests.v2.test_v2_006:AnchorHoldsNoWriter.test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives",
    "outcome": "PASS",
-   "seconds": 0.132
+   "seconds": 0.13
   },
   {
    "id": "tests.v2.test_v2_006:AnchorHoldsNoWriter.test_a_descendant_holding_the_writer_keeps_the_stream_open_until_it_ends",
    "outcome": "PASS",
-   "seconds": 1.197
+   "seconds": 1.186
   },
   {
    "id": "tests.v2.test_v2_006:NextAndPump.test_a_protocol_tag_out_of_order_is_the_harness_breaking_its_protocol",
@@ -4400,12 +4400,12 @@
   {
    "id": "tests.v2.test_v2_006:NextAndPump.test_a_stream_closed_while_the_process_runs_is_a_harness_timeout_at_the_watchdog",
    "outcome": "PASS",
-   "seconds": 0.201
+   "seconds": 0.203
   },
   {
    "id": "tests.v2.test_v2_006:NextAndPump.test_after_DISPATCHED_a_closed_stream_with_the_process_running_is_the_window_expiring",
    "outcome": "PASS",
-   "seconds": 0.315
+   "seconds": 0.32
   },
   {
    "id": "tests.v2.test_v2_006:NextAndPump.test_next_returns_only_complete_marked_lines_of_this_nonce",
@@ -4415,112 +4415,112 @@
   {
    "id": "tests.v2.test_v2_006:NextAndPump.test_next_times_out_at_its_deadline_and_never_waits_past_it",
    "outcome": "PASS",
-   "seconds": 0.201
+   "seconds": 0.21
   },
   {
    "id": "tests.v2.test_v2_006:NextAndPump.test_the_pump_publishes_every_line_in_order_then_STREAM_CLOSED_once",
    "outcome": "PASS",
-   "seconds": 0.005
+   "seconds": 0.004
   },
   {
    "id": "tests.v2.test_v2_006:Race.test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump",
    "outcome": "PASS",
-   "seconds": 0.828
+   "seconds": 0.85
   },
   {
    "id": "tests.v2.test_v2_006:Race.test_RACE_2_READY_DISPATCHED_RESULT_then_immediate_exit_is_the_complete_result",
    "outcome": "PASS",
-   "seconds": 1.026
+   "seconds": 1.04
   },
   {
    "id": "tests.v2.test_v2_006:Race.test_RACE_3_the_exit_notice_before_the_pump_is_scheduled_gives_the_normal_result",
    "outcome": "PASS",
-   "seconds": 0.278
+   "seconds": 0.276
   },
   {
    "id": "tests.v2.test_v2_006:Race.test_RACE_4_one_party_late_the_other_normal_gives_identical_records",
    "outcome": "PASS",
-   "seconds": 0.626
+   "seconds": 0.62
   },
   {
    "id": "tests.v2.test_v2_006:StoryRace.test_RACE_4_a_story_with_one_party_late_on_every_proof_commits_with_agreement",
    "outcome": "PASS",
-   "seconds": 2.373
+   "seconds": 2.381
   },
   {
    "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_5_a_harness_that_emits_nothing_and_exits_0_did_not_start_after_the_stream_closed",
    "outcome": "PASS",
-   "seconds": 0.724
+   "seconds": 0.72
   },
   {
    "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_6_a_target_that_dies_before_READY_keeps_its_typed_outcome",
    "outcome": "PASS",
-   "seconds": 0.489
+   "seconds": 0.482
   },
   {
    "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_7_a_partial_READY_then_exit_is_no_READY_never_a_guess",
    "outcome": "PASS",
-   "seconds": 0.731
+   "seconds": 0.732
   },
   {
    "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_9_every_line_before_the_end_is_read_before_STREAM_CLOSED",
    "outcome": "PASS",
-   "seconds": 0.386
+   "seconds": 0.387
   },
   {
    "id": "tests.v2.test_v2_006:WaitContract.test_a_timed_out_wait_returns_only_once_the_monotonic_clock_has_passed_its_deadline",
    "outcome": "PASS",
-   "seconds": 0.825
+   "seconds": 0.822
   },
   {
    "id": "tests.v2.test_v2_006_repeat:Repeated.test_RACE_10_every_ordering_repeated_gives_the_normal_record",
    "outcome": "PASS",
-   "seconds": 16.68
+   "seconds": 16.659
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_auth_rejection_is_fatal_and_free",
    "outcome": "PASS",
-   "seconds": 0.215
+   "seconds": 0.201
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_provider_crash_is_infra_and_the_story_still_completes",
    "outcome": "PASS",
-   "seconds": 0.438
+   "seconds": 0.426
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_quality_block_retries_the_developer_once",
    "outcome": "PASS",
-   "seconds": 0.636
+   "seconds": 0.631
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_timeout_with_untouched_tree_is_infra",
    "outcome": "PASS",
-   "seconds": 0.434
+   "seconds": 0.428
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_trunk_commit_is_an_isolation_breach",
    "outcome": "PASS",
-   "seconds": 0.419
+   "seconds": 0.412
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_two_noops_with_nothing_frozen_end_the_story_without_quality_cost",
    "outcome": "PASS",
-   "seconds": 0.383
+   "seconds": 0.38
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision",
    "outcome": "PASS",
-   "seconds": 0.469
+   "seconds": 0.464
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestDeveloperFaults.test_zero_output_session_is_fatal_not_quality",
    "outcome": "PASS",
-   "seconds": 0.227
+   "seconds": 0.22
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestEvidenceFaults.test_a_corrupt_evidence_line_is_skipped_not_trusted",
    "outcome": "PASS",
-   "seconds": 0.002
+   "seconds": 0.001
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestEvidenceValidityFaults.test_latest_exists_and_sha_match_each_score_nothing",
@@ -4530,7 +4530,7 @@
   {
    "id": "tests.hardening.test_fault_matrix:TestMergeFaults.test_conflict_hands_to_the_human_and_never_marks_done",
    "outcome": "PASS",
-   "seconds": 0.301
+   "seconds": 0.298
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestProcessFaults.test_a_dead_claim_is_orphaned_and_a_live_one_is_not",
@@ -4540,27 +4540,27 @@
   {
    "id": "tests.hardening.test_fault_matrix:TestReplayFaults.test_client_drift_is_detected_before_execution",
    "outcome": "PASS",
-   "seconds": 0.058
+   "seconds": 0.059
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestReviewFaults.test_a_malformed_verdict_never_passes_the_review",
    "outcome": "PASS",
-   "seconds": 0.635
+   "seconds": 0.633
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestReviewFaults.test_reviewer_mutation_is_reverted_and_the_review_retried",
    "outcome": "PASS",
-   "seconds": 0.455
+   "seconds": 0.453
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestReviewFaults.test_structured_block_is_developer_feedback",
    "outcome": "PASS",
-   "seconds": 0.664
+   "seconds": 0.638
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestReviewFaults.test_structured_stuck_is_a_plan_conflict_not_developer_work",
    "outcome": "PASS",
-   "seconds": 0.388
+   "seconds": 0.404
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestSandboxIdentityFaults.test_a_docker_that_cannot_be_invoked_still_records_image_and_digest",
@@ -4575,32 +4575,32 @@
   {
    "id": "tests.hardening.test_fault_matrix:TestSecurityFaults.test_malformed_security_report_is_unrunnable_not_a_verdict",
    "outcome": "PASS",
-   "seconds": 0.634
+   "seconds": 0.629
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestSecurityFaults.test_security_block_is_developer_feedback",
    "outcome": "PASS",
-   "seconds": 0.638
+   "seconds": 0.665
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestStaleFaults.test_a_stale_verdict_is_not_reused_after_hygiene_changed_the_tree",
    "outcome": "PASS",
-   "seconds": 1.219
+   "seconds": 1.273
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestToolFaults.test_missing_linter_is_unrunnable",
    "outcome": "PASS",
-   "seconds": 0.452
+   "seconds": 0.459
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestToolFaults.test_missing_runner_is_unrunnable_not_red",
    "outcome": "PASS",
-   "seconds": 0.457
+   "seconds": 0.452
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestToolFaults.test_red_lint_is_a_quality_failure",
    "outcome": "PASS",
-   "seconds": 0.633
+   "seconds": 0.628
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestToolFaults.test_red_suite_is_a_quality_failure",
@@ -4610,52 +4610,52 @@
   {
    "id": "tests.hardening.test_fault_matrix:TestWorkspaceFaults.test_a_scope_violation_is_restored_before_the_retry_and_the_story_completes",
    "outcome": "PASS",
-   "seconds": 1.19
+   "seconds": 1.181
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestWorkspaceFaults.test_generated_harness_dirt_is_preserved_and_never_a_violation",
    "outcome": "PASS",
-   "seconds": 0.659
+   "seconds": 0.653
   },
   {
    "id": "tests.hardening.test_fault_matrix:TestWorkspaceFaults.test_pre_existing_dirt_blocks_before_any_session_and_is_never_deleted",
    "outcome": "PASS",
-   "seconds": 0.241
+   "seconds": 0.237
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF01ReviewerTimeoutAfterRecovery.test_recovery_then_reviewer_absence_keeps_the_candidate_and_never_reopens_the_developer",
    "outcome": "PASS",
-   "seconds": 1.428
+   "seconds": 1.414
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF02SecurityTimeoutAfterBlockRemediation.test_security_absence_after_a_fixed_block_retries_security_not_the_developer",
    "outcome": "PASS",
-   "seconds": 1.322
+   "seconds": 1.317
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF03DirtyTreeThenCrashThenResume.test_attributable_dirt_is_restored_on_resume_and_the_story_completes",
    "outcome": "PASS",
-   "seconds": 1.261
+   "seconds": 1.252
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF03DirtyTreeThenCrashThenResume.test_unattributed_dirt_is_never_deleted_and_no_session_opens",
    "outcome": "PASS",
-   "seconds": 0.824
+   "seconds": 0.821
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF04FreezeThenCrashBeforeEvidence.test_a_committed_but_unrecorded_candidate_is_graded_on_resume_not_treated_as_a_noop",
    "outcome": "PASS",
-   "seconds": 0.926
+   "seconds": 0.921
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF05EvidenceWrittenThenCrashBeforeStateUpdate.test_the_rerun_converges_to_done_with_exactly_one_integration",
    "outcome": "PASS",
-   "seconds": 1.905
+   "seconds": 1.888
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF05EvidenceWrittenThenCrashBeforeStateUpdate.test_the_rerun_reconciles_the_orphaned_claim",
    "outcome": "PASS",
-   "seconds": 1.921
+   "seconds": 1.874
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF06DuplicateEventAfterResume.test_a_replayed_old_record_never_outranks_the_candidates_own_result",
@@ -4665,7 +4665,7 @@
   {
    "id": "tests.hardening.test_compound_faults:TestCF08BaselineDuringResume.test_the_baseline_stays_the_epochs_root_after_main_advanced",
    "outcome": "PASS",
-   "seconds": 1.282
+   "seconds": 1.264
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF09ClientDriftDuringReplay.test_a_replay_declared_for_opencode_but_run_with_claude_stops_before_the_first_agent_call",
@@ -4680,7 +4680,7 @@
   {
    "id": "tests.hardening.test_compound_faults:TestCF11OrphanProcessDuringCleanup.test_a_process_left_by_the_session_is_dead_before_the_workspace_is_removed",
    "outcome": "PASS",
-   "seconds": 14.317
+   "seconds": 14.291
   },
   {
    "id": "tests.hardening.test_compound_faults:TestCF12ApprovalInvalidationDuringResume.test_the_cli_precheck_blocks_a_resume_after_an_upstream_edit",
@@ -4705,7 +4705,7 @@
   {
    "id": "tests.hardening.test_compound_faults:_RunCase.runTest",
    "outcome": "PASS",
-   "seconds": 0.114
+   "seconds": 0.103
   }
  ],
  "counts": {
@@ -4715,6 +4715,6 @@
   "SKIP": 0,
   "NOT_APPLICABLE": 1
  },
- "seconds": 171.8,
- "harness_digest_at_run": "6bd5a7209a471212dacda180733ea9257b9e9e80638386169624de4f8818659c"
+ "seconds": 171.1,
+ "harness_digest_at_run": "5a8fd15776c860941f8c706038ee8cce0fc1c6d88850a74fcd3ce6945f167131"
 }

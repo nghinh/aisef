@@ -38,6 +38,10 @@ PASS, FAIL, ERROR, SKIP, NOT_APPLICABLE = "PASS", "FAIL", "ERROR", "SKIP", "NOT_
 #: a skip for one of these reasons is a platform inapplicability, recorded and not counted; any other skip is a case
 #: that could not execute here, which makes the rung UNRUNNABLE (never FAILED)
 _PLATFORM_SKIP_MARKS = ("POSIX", "posix", "Windows", "windows", "Linux", "linux", "darwin", "macOS", "signal exit")
+#: a skip for one of these reasons is a declared optional capability absent on the platform (the qualification
+#: platforms run the stdlib test runner and install no third-party runner): recorded as NOT_APPLICABLE with the
+#: capability named, so the record says exactly what was not exercised there; never a rung that cannot run
+OPTIONAL_CAPABILITY_SKIP_MARKS = {"pytest is not installed": "pytest adapter (optional third-party runner)"}
 
 
 def git(*args: str) -> str:
@@ -119,8 +123,11 @@ def _outcome(case_id: str, result: unittest.TestResult, seconds: float) -> dict:
     out = {"id": case_id, "outcome": PASS, "seconds": round(seconds, 3)}
     if result.skipped:
         reason = result.skipped[0][1]
-        out["outcome"] = NOT_APPLICABLE if any(m in reason for m in _PLATFORM_SKIP_MARKS) else SKIP
+        capability = next((cap for mark, cap in OPTIONAL_CAPABILITY_SKIP_MARKS.items() if mark in reason), None)
+        out["outcome"] = NOT_APPLICABLE if capability or any(m in reason for m in _PLATFORM_SKIP_MARKS) else SKIP
         out["detail"] = reason
+        if capability:
+            out["optional_capability_absent"] = capability
     elif result.errors:
         out["outcome"], out["detail"] = ERROR, result.errors[0][1][-2000:]
     elif result.failures:
