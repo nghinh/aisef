@@ -3959,22 +3959,23 @@
    "kill_tests": [
     "tests/v2/p4/test_process_range.py"
    ],
-   "source_sha256": "3351f2752c727af3088280baeca33d2a232d2905562b81b33905b34760ecaea1",
+   "source_sha256": "78e76c395943f3080844c5fab04580cc0433f2a44df5bb6af4a6a2b36bcd8469",
    "mutants": 3,
    "killed": 3,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L33 condition negated",
+     "mutant": "L38 condition negated",
      "killed": true
     },
     {
-     "mutant": "L33 Eq->NotEq",
+     "mutant": "L38 Eq->NotEq",
      "killed": true
     },
     {
-     "mutant": "L33 string 'posix' emptied",
+     "mutant": "L38 string 'posix' emptied",
      "killed": true
     }
    ]
@@ -3984,42 +3985,43 @@
    "kill_tests": [
     "tests/v2/p4/test_process_range.py"
    ],
-   "source_sha256": "3351f2752c727af3088280baeca33d2a232d2905562b81b33905b34760ecaea1",
+   "source_sha256": "78e76c395943f3080844c5fab04580cc0433f2a44df5bb6af4a6a2b36bcd8469",
    "mutants": 8,
    "killed": 8,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L42 condition negated",
+     "mutant": "L47 condition negated",
      "killed": true
     },
     {
-     "mutant": "L42 not removed",
+     "mutant": "L47 not removed",
      "killed": true
     },
     {
-     "mutant": "L44 True->False",
+     "mutant": "L49 True->False",
      "killed": true
     },
     {
-     "mutant": "L49 condition negated",
+     "mutant": "L54 condition negated",
      "killed": true
     },
     {
-     "mutant": "L49 Or swapped",
+     "mutant": "L54 Or swapped",
      "killed": true
     },
     {
-     "mutant": "L42 string 'waitid' emptied",
+     "mutant": "L47 string 'waitid' emptied",
      "killed": true
     },
     {
-     "mutant": "L49 Is->IsNot",
+     "mutant": "L54 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L49 Eq->NotEq",
+     "mutant": "L54 Eq->NotEq",
      "killed": true
     }
    ]
@@ -4029,30 +4031,31 @@
    "kill_tests": [
     "tests/v2/p4/test_process_range.py"
    ],
-   "source_sha256": "3351f2752c727af3088280baeca33d2a232d2905562b81b33905b34760ecaea1",
+   "source_sha256": "78e76c395943f3080844c5fab04580cc0433f2a44df5bb6af4a6a2b36bcd8469",
    "mutants": 5,
    "killed": 5,
    "survivors": [],
    "strays_reaped": 0,
+   "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L60 condition negated",
+     "mutant": "L65 condition negated",
      "killed": true
     },
     {
-     "mutant": "L60 not removed",
+     "mutant": "L65 not removed",
      "killed": true
     },
     {
-     "mutant": "L65 element 0 dropped",
+     "mutant": "L70 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L65 element 1 dropped",
+     "mutant": "L70 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L60 string 'linux' emptied",
+     "mutant": "L65 string 'linux' emptied",
      "killed": true
     }
    ]
@@ -4060,103 +4063,99 @@
   {
    "target": "aisef2/runtime/range_anchor.py::main",
    "kill_tests": [
-    "tests/v2/p4/test_process_range.py"
+    "tests/v2/p4/test_process_range.py",
+    "tests/v2/test_v2_006.py"
    ],
-   "source_sha256": "3351f2752c727af3088280baeca33d2a232d2905562b81b33905b34760ecaea1",
-   "mutants": 21,
-   "killed": 21,
+   "source_sha256": "78e76c395943f3080844c5fab04580cc0433f2a44df5bb6af4a6a2b36bcd8469",
+   "mutants": 18,
+   "killed": 18,
    "survivors": [],
-   "strays_reaped": 7,
+   "strays_reaped": 0,
+   "killed_by_timeout": 4,
    "results": [
     {
-     "mutant": "L70 condition negated",
-     "killed": true,
-     "strays_reaped": 1
-    },
-    {
-     "mutant": "L76 condition negated",
+     "mutant": "L86 condition negated",
      "killed": true
-    },
-    {
-     "mutant": "L70 Eq->NotEq",
-     "killed": true,
-     "strays_reaped": 1
-    },
-    {
-     "mutant": "L76 Or swapped",
-     "killed": true
-    },
-    {
-     "mutant": "L88 True->False",
-     "killed": true,
-     "strays_reaped": 1
-    },
-    {
-     "mutant": "L90 condition negated",
-     "killed": true,
-     "strays_reaped": 2
     },
     {
      "mutant": "L92 condition negated",
      "killed": true
     },
     {
-     "mutant": "L70 string 'posix' emptied",
+     "mutant": "L86 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L92 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L106 condition negated",
      "killed": true,
-     "strays_reaped": 1
+     "timed_out": [
+      "tests/v2/p4/test_process_range.py"
+     ]
     },
     {
-     "mutant": "L76 not removed",
+     "mutant": "L86 string 'posix' emptied",
      "killed": true
     },
     {
-     "mutant": "L76 NotEq->Eq",
+     "mutant": "L92 not removed",
      "killed": true
     },
     {
-     "mutant": "L90 not removed",
+     "mutant": "L92 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L106 Eq->NotEq",
      "killed": true,
-     "strays_reaped": 1
+     "timed_out": [
+      "tests/v2/p4/test_process_range.py"
+     ]
     },
     {
-     "mutant": "L92 Eq->NotEq",
+     "mutant": "L92 string 'GO' emptied",
      "killed": true
     },
     {
-     "mutant": "L76 string 'GO' emptied",
+     "mutant": "L106 string 'EXIT' emptied",
+     "killed": true,
+     "timed_out": [
+      "tests/v2/p4/test_process_range.py"
+     ]
+    },
+    {
+     "mutant": "L96 string 'argv' emptied",
      "killed": true
     },
     {
-     "mutant": "L92 string 'EXIT' emptied",
+     "mutant": "L102 string 'STARTED ' emptied",
      "killed": true
     },
     {
-     "mutant": "L80 string 'argv' emptied",
+     "mutant": "L96 string 'cwd' emptied",
      "killed": true
     },
     {
-     "mutant": "L85 string 'STARTED ' emptied",
+     "mutant": "L96 string 'env' emptied",
      "killed": true
     },
     {
-     "mutant": "L80 string 'cwd' emptied",
+     "mutant": "L99 string 'SPAWN_FAILED ' emptied",
      "killed": true
     },
     {
-     "mutant": "L80 string 'env' emptied",
+     "mutant": "L99 string ': ' emptied",
      "killed": true
     },
     {
-     "mutant": "L83 string 'SPAWN_FAILED ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L83 string ': ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L86 string 'EXITED ' emptied",
-     "killed": true
+     "mutant": "L103 string 'EXITED ' emptied",
+     "killed": true,
+     "timed_out": [
+      "tests/v2/p4/test_process_range.py"
+     ]
     }
    ]
   },

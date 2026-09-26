@@ -1,0 +1,337 @@
+{
+ "record": "AISEF V2 — P6 V2-006 PROBE HARNESS (protocol stream vs process lifecycle)",
+ "work_package": "V2-006",
+ "authority": "AISEF V2 — OWNER RESOLUTION OF P6-FINDING-001 / ARCHITECTURE EXCEPTION V2-006 / PROBE HARNESS READY/EOF ORDERING",
+ "rfc": "§9.4 (new); F5 (the only changed row); F4 consequential (semantic_hash binds the probe digest)",
+ "finding": {
+  "finding": "P6-FINDING-001 — probe harness READY/EOF race",
+  "diagnostics": "~/Downloads/projects/ai-sdlc-diagnostics/2026-09-26-p6-finding-001/ (the finding note, the reproduction scripts, the CI log)",
+  "ci_signature": {
+   "run": 36225825035,
+   "job": "unit (ubuntu-latest, 3.11)",
+   "candidate": "b41a01e1b545bfad0c56f26616138506fb11bc9e",
+   "records": [
+    "implementer: EXECUTED SATISFIED",
+    "verifier: UNRUNNABLE 'the harness did not start (exit 0, no READY): tool absent or broken'"
+   ]
+  }
+ },
+ "exception": {
+  "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
+  "sha256": "47793a3503d13b0a7ba6c679b085558433fd4add4af6b7c78abe2b8712c66388",
+  "status": "APPROVED — APPLIED",
+  "frozen_items_changed_mechanically": [
+   "F5"
+  ],
+  "conformance_subchecks_mechanically": {
+   "added": [
+    "F5.protocol_stream_vs_process_lifecycle"
+   ],
+   "removed": [],
+   "changed": [],
+   "rule": "every F1-F11 subcheck of F-CONFORMANCE.json at the base compared with this candidate's, state and detail"
+  }
+ },
+ "amendment": {
+  "path": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json",
+  "sha256": "a06c6a67929e3fdf84d380cd436ccce85b1cef6e372d060b01d709fe5bdf7931",
+  "amends": {
+   "path": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",
+   "sha256": "9b8636a22875c14211ef6fb974ef9c03f39600721aa8cf9020c7d41a37b6dad1"
+  },
+  "frozen_items_changed": [
+   "F5"
+  ]
+ },
+ "lineage": {
+  "links": [
+   "AISEF-V2-RFC-APPROVAL.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-001.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-002.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-003.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-005.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-006.json"
+  ],
+  "end": "AISEF-V2-RFC-AMENDMENT-V2-006.json",
+  "v2_004_absent": true
+ },
+ "probe_identity": {
+  "digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+  "before": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+  "p2_probe_protocol_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+  "calibration_digests": [
+   "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0"
+  ],
+  "calibration_properties": {
+   "contrast_for_both_polarities": true,
+   "reference_probe_qualified_for_every_class": true,
+   "CAL_1_always_refuted_prohibition_probe_rejected": true,
+   "always_satisfied_probe_rejected_for_must_hold": true,
+   "PROBE_META_1_protocol_only_probe_calibrated": true,
+   "blocks_class_calibrated": true,
+   "spec_falsifiability_not_a_plan_freeze_input": true,
+   "f5_calibration_contracts_equal_rfc": true
+  }
+ },
+ "reader": {
+  "exit_driven_reader_removed": true,
+  "drain_window_removed": true,
+  "stream_closed_marker": true
+ },
+ "anchor_watchdog": {
+  "finding": "P6-FINDING-002 — the range anchor's watchdog lived inside main, the function it guards: main ending any way but os._exit (an exception, a loop that stops reading) left the anchor alive with nobody reading stdin",
+  "test": "tests/v2/p4/test_process_range.py::Anchor::test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group — base anchor: FAIL (120 != -9); this candidate: PASS",
+  "entry_ends_by_die_however_main_ends": true
+ },
+ "races": {
+  "RACE_1_late_pump_READY_observed": true,
+  "RACE_2_complete_protocol_then_immediate_exit": true,
+  "RACE_3_exit_notice_before_the_pump": true,
+  "RACE_4_one_party_late_identical_records": true,
+  "RACE_4_story_one_party_late_commits_with_agreement": true,
+  "RACE_5_nothing_written_exit_0_did_not_start_after_close": true,
+  "RACE_6_dies_before_READY_typed_outcome_kept": true,
+  "RACE_7_partial_READY_is_no_READY": true,
+  "RACE_8_anchor_holds_no_writer_true_EOF": true,
+  "RACE_8_a_descendant_keeps_the_stream_open": true,
+  "RACE_9_every_line_before_STREAM_CLOSED": true,
+  "RACE_10_every_ordering_repeated": true,
+  "pump_publishes_every_line_then_STREAM_CLOSED": true,
+  "next_reads_only_complete_marked_lines": true,
+  "one_reader_no_exit_driven_reader": true,
+  "late_RESULT_read_without_a_drain": true,
+  "anchor_watchdog_holds_however_main_ends": true
+ },
+ "red_before": {
+  "test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives": "FAIL",
+  "test_a_descendant_holding_the_writer_keeps_the_stream_open_until_it_ends": "FAIL",
+  "test_a_protocol_tag_out_of_order_is_the_harness_breaking_its_protocol": "ERROR",
+  "test_a_stream_closed_while_the_process_runs_is_a_harness_timeout_at_the_watchdog": "ERROR",
+  "test_after_DISPATCHED_a_closed_stream_with_the_process_running_is_the_window_expiring": "ERROR",
+  "test_next_returns_only_complete_marked_lines_of_this_nonce": "ERROR",
+  "test_next_times_out_at_its_deadline_and_never_waits_past_it": "PASS",
+  "test_the_pump_publishes_every_line_in_order_then_STREAM_CLOSED_once": "FAIL",
+  "test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump": "FAIL",
+  "test_RACE_2_READY_DISPATCHED_RESULT_then_immediate_exit_is_the_complete_result": "PASS",
+  "test_RACE_3_the_exit_notice_before_the_pump_is_scheduled_gives_the_normal_result": "PASS",
+  "test_RACE_4_one_party_late_the_other_normal_gives_identical_records": "PASS",
+  "test_RACE_4_a_story_with_one_party_late_on_every_proof_commits_with_agreement": "FAIL",
+  "test_RACE_5_a_harness_that_emits_nothing_and_exits_0_did_not_start_after_the_stream_closed": "FAIL",
+  "test_RACE_6_a_target_that_dies_before_READY_keeps_its_typed_outcome": "FAIL",
+  "test_RACE_7_a_partial_READY_then_exit_is_no_READY_never_a_guess": "FAIL",
+  "test_RACE_9_every_line_before_the_end_is_read_before_STREAM_CLOSED": "PASS",
+  "test_RACE_10_every_ordering_repeated_gives_the_normal_record": "FAIL"
+ },
+ "f5_conformance": {
+  "F5.enum.Enforcement": "PASS",
+  "F5.probe_protocol": "PASS",
+  "F5.harness_timeout_vs_subject_deadline": "PASS",
+  "F5.signal_provenance_after_dispatch": "PASS",
+  "F5.protocol_stream_vs_process_lifecycle": "PASS",
+  "F5.calibration_contracts": "PASS"
+ },
+ "f1_f11": {
+  "summary": {
+   "PASS": 11,
+   "PENDING": 0,
+   "FAIL": 0
+  },
+  "ratchet_violations": []
+ },
+ "mutation_by_target": {
+  "aisef2/probe/python_callable.py::ON_DEADLINE": {
+   "phase": "P2",
+   "mutants": 12,
+   "killed": 12,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::PROBE_SOURCES": {
+   "phase": "P2",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::_after_dispatch": {
+   "phase": "P2",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::_ended_without_result": {
+   "phase": "P2",
+   "mutants": 29,
+   "killed": 29,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::_harness_failure": {
+   "phase": "P2",
+   "mutants": 35,
+   "killed": 35,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::_next": {
+   "phase": "P2",
+   "mutants": 36,
+   "killed": 36,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::_probe_digest": {
+   "phase": "P2",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::_pump": {
+   "phase": "P2",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::_signal_of": {
+   "phase": "P2",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::_watch": {
+   "phase": "P2",
+   "mutants": 56,
+   "killed": 56,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::observation_class": {
+   "phase": "P2",
+   "mutants": 42,
+   "killed": 42,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::observe": {
+   "phase": "P2",
+   "mutants": 98,
+   "killed": 98,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/probe/python_callable.py::window_of": {
+   "phase": "P2",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/range_anchor.py::_die": {
+   "phase": "P4",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/range_anchor.py::_reap_adopted": {
+   "phase": "P4",
+   "mutants": 8,
+   "killed": 8,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/range_anchor.py::_subreaper": {
+   "phase": "P4",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  },
+  "aisef2/runtime/range_anchor.py::main": {
+   "phase": "P4",
+   "mutants": 18,
+   "killed": 18,
+   "survivors": 0,
+   "audited_equivalent": 0,
+   "unaudited": [],
+   "error": null,
+   "current": true
+  }
+ },
+ "historical_files_byte_identical": {
+  "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json": true,
+  "closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json": true,
+  "closure-evidence/v2/P4-FINAL-SEAL.json": true,
+  "closure-evidence/v2/P5-FINAL-SEAL.json": true,
+  "closure-evidence/v2/P2-FINAL-SEAL.json": true,
+  "closure-evidence/v2/P3-FINAL-SEAL.json": true,
+  "closure-evidence/v2/P1-FINAL-SEAL.json": true
+ },
+ "properties": {
+  "probe_digest_is_the_amended_one": true,
+  "calibration_re_established_under_the_new_digest": true,
+  "p2_probe_protocol_names_the_new_digest": true,
+  "the_exit_never_ends_the_protocol": true,
+  "every_race_case_passes": true,
+  "the_anchor_watchdog_is_the_script_entry_not_main": true,
+  "the_race_cases_discriminate_on_the_base_code": true,
+  "f5_protocol_stream_vs_process_lifecycle_passes": true,
+  "f1_f11_all_pass_no_ratchet_violation": true,
+  "v2_006_ends_the_lineage_changing_exactly_F5": true,
+  "v2_004_still_never_applied": true,
+  "historical_seals_and_records_byte_identical": true,
+  "mutation_every_changed_target_measured_current_no_unaudited_survivor": true
+ }
+}

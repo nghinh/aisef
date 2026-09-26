@@ -917,10 +917,12 @@ class Lineage(unittest.TestCase):
         self.assertEqual(fm.check(ROOT), [])
         eff, links, problems = fm.lineage(ROOT)
         self.assertEqual(problems, [])
-        self.assertEqual([pathlib.Path(x["record"]).name for x in links],
-                         ["AISEF-V2-RFC-APPROVAL.json", "AISEF-V2-RFC-AMENDMENT-V2-001.json", "AISEF-V2-RFC-AMENDMENT-V2-002.json",
-                          "AISEF-V2-RFC-AMENDMENT-V2-003.json", "AISEF-V2-RFC-AMENDMENT-V2-005.json"])
-        self.assertEqual(links[-1]["frozen_items_changed"], ["F1"])
+        names = [pathlib.Path(x["record"]).name for x in links]
+        self.assertEqual(names[:5], ["AISEF-V2-RFC-APPROVAL.json", "AISEF-V2-RFC-AMENDMENT-V2-001.json",
+                                     "AISEF-V2-RFC-AMENDMENT-V2-002.json", "AISEF-V2-RFC-AMENDMENT-V2-003.json",
+                                     "AISEF-V2-RFC-AMENDMENT-V2-005.json"])
+        self.assertEqual(names[5:], ["AISEF-V2-RFC-AMENDMENT-V2-006.json"])   # V2-006 (§9.4, F5) follows it
+        self.assertEqual(links[4]["frozen_items_changed"], ["F1"])
         self.assertFalse((EVIDENCE / "AISEF-V2-RFC-AMENDMENT-V2-004.json").exists())
         self.assertFalse((EVIDENCE / "ARCHITECTURE-EXCEPTION-V2-004.json").exists())
         amd = json.loads((EVIDENCE / "AISEF-V2-RFC-AMENDMENT-V2-005.json").read_text(encoding="utf-8"))

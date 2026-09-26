@@ -31,6 +31,15 @@ it touches the subject (import, resolution, call), then RESULT. The parent reads
 * after DISPATCHED the spec's window runs: no RESULT within `within_s` -> the process is stopped and the observation is
   SUBJECT_DEADLINE with the class's `ON_DEADLINE` verdict -> EXECUTED (TIME-2..5). Never UNRUNNABLE.
 
+**Protocol stream vs process lifecycle** (RFC §9.4, ARCHITECTURE-EXCEPTION-V2-006). Two independent facts, never
+collapsed: the protocol stream reached its own end of file, and the process's exit was reported. The protocol is read
+from the output stream alone — one pump reads every line in order and publishes STREAM_CLOSED only after the stream's
+end of file, so no line that preceded it can be overtaken; the range's anchor holds no copy of the stream's writer, so
+that end of file is the target's own. The exit is lifecycle evidence, asked of the range only once the stream has
+closed; it never ends the protocol by itself. "Exit before READY" is concluded only when the stream has closed, the
+exit is reported and no READY was read. No timing window decides the order; the watchdog and the subject's window stay
+what they were — deadlines for a harness that does not answer and a subject that does not report.
+
 **Enforcement: PARTIAL.** Weakest path: the subject runs inside the probe's subprocess with the harness user's
 filesystem and network access; isolation is `-I` interpreter isolation and a scrubbed environment, not a sandbox.
 """
@@ -60,7 +69,6 @@ from aisef2.product.spec import ProductProofSpec
 _GRACE_S = (1.0, 1.0)   # the range's graceful-first ladder when the observation is over
 _WAIT_S = 30.0          # bounded: a range that will not empty is a residual, never an endless wait
 _COLLECT_S = 5.0        # how long the anchor is given to report the target's exit status
-_DRAIN_S = 2.0          # after the process ends, how long a line it already wrote is still waited for
 
 PROBE_ID = "probe.python_callable"
 PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py")
@@ -249,25 +257,25 @@ class PythonCallableProbe(HarnessProbe):
                 run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
 
     def _watch(self, run, nonce: str, cls: str, pi, env) -> Observation:
-        """Read the harness protocol: READY and DISPATCHED under the harness watchdog, then the subject's own window."""
+        """Read the harness protocol: READY and DISPATCHED under the harness watchdog, then the subject's own window.
+        The protocol comes from the output stream alone, through one pump (§9.4); the process's exit is asked of the
+        range only after that stream has closed."""
         lines: queue.Queue = queue.Queue()
         threading.Thread(target=_pump, args=(run.output, lines), daemon=True).start()
-        threading.Thread(target=_exited, args=(run, lines), daemon=True).start()
         watchdog = time.monotonic() + env.timeout_s
         for expected in ("READY", "DISPATCHED"):
             tag, _ = _next(lines, nonce, watchdog)
             if tag != expected:
-                return _harness_failure(run, tag, expected, env.timeout_s)
+                return _harness_failure(run, tag, expected, env.timeout_s, watchdog)
         window = window_of(pi["observable"])
-        tag, body = _next(lines, nonce, time.monotonic() + window)
-        ended = tag == "EOF"
-        if ended:  # the process ended: a line it wrote just before may still be in the pipe
-            tag, body = _next(lines, nonce, time.monotonic() + _DRAIN_S)
-        if tag == "RESULT":
-            pass
-        elif ended:
+        until = time.monotonic() + window
+        tag, body = _next(lines, nonce, until)
+        # the stream closed with no RESULT in it: now, and only now, how did the process end? (still running at W: the
+        # window expired, below)
+        if tag == "STREAM_CLOSED" and (run.wait(max(0.0, until - time.monotonic())) is not None
+                                       or time.monotonic() < until):
             return _after_dispatch(run, _ended_without_result(run))
-        else:  # the window closed with the process still running
+        if tag != "RESULT":  # the window closed with the process still running
             return _after_dispatch(run, Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
                                                     detail=f"the subject's {window:g}s observation window expired "
                                                            f"({cls})"))
@@ -283,36 +291,36 @@ class PythonCallableProbe(HarnessProbe):
 METADATA = ProbeMetadata(PROBE_ID, DIGEST, spec_class)
 
 
-def _exited(run, lines: queue.Queue) -> None:
-    """End the protocol when the target's process ends. The range's output pipe stays open while the anchor lives, so
-    the end of the harness's output is its exit, as the anchor reports it — never the closing of the pipe."""
-    run.wait(None)
-    lines.put(None)
-
-
 def _pump(stream, lines: queue.Queue) -> None:
+    """The protocol stream's one reader (§9.4): every line, in order, then STREAM_CLOSED — published by this same
+    thread only after the stream's own end of file, so no line that preceded it can be overtaken by it."""
     try:
         for line in stream:
-            lines.put(line)
+            lines.put(("LINE", line))
     finally:
-        lines.put(None)
+        lines.put(("STREAM_CLOSED", ""))
         if hasattr(stream, "close"):
             stream.close()
 
 
 def _next(lines: queue.Queue, nonce: str, until: float) -> tuple[str, str]:
-    """The next protocol line (tag, body) before `until`; ("EOF", "") when output closed; ("TIMEOUT", "") when late."""
+    """The next protocol line (tag, body) before `until`; ("STREAM_CLOSED", "") once the pump has read the stream to
+    its end, every line before it already returned; ("TIMEOUT", "") when late. A protocol line is complete — it ends in
+    a newline — and carries the mark and this run's nonce; an unterminated fragment is never one."""
     while True:
         left = until - time.monotonic()
         if left <= 0:
             return "TIMEOUT", ""
         try:
-            line = lines.get(timeout=left)
+            kind, line = lines.get(timeout=left)
         except queue.Empty:
             return "TIMEOUT", ""
-        if line is None:
-            return "EOF", ""
-        parts = line.rstrip("\r\n").split(" ", 3)
+        if kind == "STREAM_CLOSED":
+            lines.put((kind, line))  # a closed stream stays closed for any later read
+            return kind, ""
+        if not line.endswith("\n"):
+            continue
+        parts = line[:-1].rstrip("\r").split(" ", 3)
         if len(parts) >= 3 and parts[0] == _MARK and parts[2] == nonce:
             return parts[1], parts[3] if len(parts) == 4 else ""
 
@@ -354,11 +362,20 @@ def _signal_of(code: int | None) -> int | None:
     return -code if code is not None and code < 0 else None
 
 
-def _harness_failure(run, tag: str, expected: str, timeout_s: float) -> Observation:
-    """Before DISPATCHED the observation mechanism itself failed: UNRUNNABLE, unchanged by V2-003 (V2-002, CASE C)."""
-    code = run.wait(_COLLECT_S)
+def _harness_failure(run, tag: str, expected: str, timeout_s: float, until: float) -> Observation:
+    """Before DISPATCHED the observation mechanism itself failed: UNRUNNABLE, unchanged by V2-003 (V2-002, CASE C).
+    It ended before `expected` only when both facts are in (§9.4): the stream closed with no `expected` in it, and the
+    exit was reported — asked of the range now, under the same watchdog. A stream closed while its process still runs
+    at the watchdog is a harness timeout; a protocol tag out of order is the harness breaking its protocol."""
+    code = None
+    if tag == "STREAM_CLOSED":
+        code = run.wait(max(0.0, until - time.monotonic()))
+        if code is None and time.monotonic() >= until:
+            tag = "TIMEOUT"
     if tag == "TIMEOUT":
         detail = f"harness timeout: no {expected} within {timeout_s:g}s — the observation mechanism did not operate"
+    elif tag != "STREAM_CLOSED":
+        detail = f"the harness broke its protocol: {tag} before {expected}"
     elif code is not None and code < 0:
         detail = f"the harness process was killed by signal {-code} before {expected}"
     else:

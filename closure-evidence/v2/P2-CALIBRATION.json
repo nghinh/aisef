@@ -13,35 +13,35 @@
  "calibrations": [
   {
    "probe_id": "probe.python_callable",
-   "probe_digest": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
    "observation_class": "exists",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/exists/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/exists/negative",
-   "demonstrated_at": 1790169246.095673
+   "demonstrated_at": 1790422264.95011
   },
   {
    "probe_id": "probe.python_callable",
-   "probe_digest": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
    "observation_class": "returns",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/returns/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/returns/negative",
-   "demonstrated_at": 1790169246.359912
+   "demonstrated_at": 1790422265.252175
   },
   {
    "probe_id": "probe.python_callable",
-   "probe_digest": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
    "observation_class": "raises",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/raises/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/raises/negative",
-   "demonstrated_at": 1790169246.623584
+   "demonstrated_at": 1790422265.555021
   },
   {
    "probe_id": "probe.python_callable",
-   "probe_digest": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
    "observation_class": "blocks",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/negative",
-   "demonstrated_at": 1790169247.466437
+   "demonstrated_at": 1790422266.431432
   }
  ],
  "contrast_table": {

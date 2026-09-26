@@ -25,11 +25,13 @@ MANIFEST_REL = "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json"
 AMENDMENTS = ("closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
               "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
               "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
-              "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json")  # V2-004 was superseded, never applied
+              "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",  # V2-004 was superseded, never applied
+              "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json")
 EXCEPTIONS = ("closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
               "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
               "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
-              "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json")
+              "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json",
+              "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json")
 #: Every file the baseline is identified from.
 BASELINE_FILES = (RFC_REL, APPROVAL_REL, MANIFEST_REL, *AMENDMENTS, *EXCEPTIONS)
 

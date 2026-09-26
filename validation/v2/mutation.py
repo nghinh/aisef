@@ -75,6 +75,8 @@ _PROTOCOL_TESTS = ["tests/v2/p2/test_probe_protocol.py"]
 _HARNESS_TESTS = ["tests/v2/p2/test_python_callable.py"]
 #: the provenance split is measured by both: the harness's own cases and SIG-PROBE-1..10 (V2-003)
 _SIGNAL_TESTS = ["tests/v2/p2/test_python_callable.py", "tests/v2/p2/test_signal_provenance.py"]
+#: ARCHITECTURE-EXCEPTION-V2-006: the protocol reader and the exit's place in it are killed by the race tests too
+_STREAM_TESTS = [*_SIGNAL_TESTS, "tests/v2/test_v2_006.py"]
 _ADMISSION_TESTS = ["tests/v2/p2/test_static_admission.py"]
 P2_TARGETS: dict[str, list[str]] = {
     # WP-2.1: the only mapping from an observation to a ProbeResult, and the entry point that binds enforcement
@@ -92,15 +94,17 @@ P2_TARGETS: dict[str, list[str]] = {
     "aisef2/probe/python_callable.py::window_of": _HARNESS_TESTS,
     "aisef2/probe/python_callable.py::observation_class": _HARNESS_TESTS,
     "aisef2/probe/python_callable.py::ON_DEADLINE": _HARNESS_TESTS,
-    "aisef2/probe/python_callable.py::_harness_failure": _HARNESS_TESTS,
+    "aisef2/probe/python_callable.py::_harness_failure": [*_HARNESS_TESTS, "tests/v2/test_v2_006.py"],
     # V2-003 (§9.3): the provenance split — the controller's own ledger decides, never the signal number
     "aisef2/probe/python_callable.py::_after_dispatch": _SIGNAL_TESTS,
-    "aisef2/probe/python_callable.py::_ended_without_result": _SIGNAL_TESTS,
+    "aisef2/probe/python_callable.py::_ended_without_result": _STREAM_TESTS,
     "aisef2/probe/python_callable.py::_signal_of": _SIGNAL_TESTS,
     # §35: the probe's identity — a source dropped here would reuse an old digest, and with it an old semantic_hash
     "aisef2/probe/python_callable.py::PROBE_SOURCES": _HARNESS_TESTS,
     "aisef2/probe/python_callable.py::_probe_digest": _HARNESS_TESTS,
-    "aisef2/probe/python_callable.py::_watch": _SIGNAL_TESTS,
+    "aisef2/probe/python_callable.py::_watch": _STREAM_TESTS,
+    "aisef2/probe/python_callable.py::_pump": _STREAM_TESTS,
+    "aisef2/probe/python_callable.py::_next": _STREAM_TESTS,
     # WP-2.2: contrast to the candidate expectation, and the only way a calibration record is issued
     "aisef2/probe/calibration.py::demonstrates_contrast": ["tests/v2/p2/test_calibration.py"],
     "aisef2/probe/calibration.py::calibrate": ["tests/v2/p2/test_calibration.py"],
@@ -218,7 +222,8 @@ P4_TARGETS: dict[str, list[str]] = {
         "_Posix.members", "_Posix.escaped", "_Posix.abort", "ProcessRange.start",
         "ProcessRange.wait", "ProcessRange.members", "ProcessRange.escaped", "ProcessRange.wait_empty",
         "ProcessRange._signal", "ProcessRange.release", "ProcessRange._abort", "ProcessRange._close_pipes")},
-    **{f"aisef2/runtime/range_anchor.py::{f}": _RANGE_TESTS for f in ("main", "_die", "_subreaper", "_reap_adopted")},
+    **{f"aisef2/runtime/range_anchor.py::{f}": _RANGE_TESTS for f in ("_die", "_subreaper", "_reap_adopted")},
+    **{f"aisef2/runtime/range_anchor.py::{f}": [*_RANGE_TESTS, "tests/v2/test_v2_006.py"] for f in ("main",)},
     "aisef2/runtime/process_range.py::_Job.controller_stopped": _RANGE_TESTS,
     "aisef2/runtime/process_range.py::ProcessRange.anchor_returncode": _RANGE_TESTS,
     "aisef2/runtime/story_scope.py::StoryScope.release": _SCOPE_TESTS,

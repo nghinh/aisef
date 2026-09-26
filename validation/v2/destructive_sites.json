@@ -260,6 +260,17 @@
    "enforcement": "static: c bound to subprocess.Popen( in the function"
   },
   {
+   "path": "tests/v2/p4/test_process_range.py",
+   "scope": "Anchor.test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group",
+   "callable": "a.kill",
+   "target": "a",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the anchor subprocess the test started (cleanup, only if it failed to end itself)",
+   "enforcement": "static: a bound to subprocess.Popen( in the function",
+   "occurrences": 1
+  },
+  {
    "path": "tests/v2/p4/test_run_scope.py",
    "scope": "Lifetime.test_RUN_2_a_held_lease_blocks_a_second_run_even_with_run_end_written",
    "callable": "holder.kill",

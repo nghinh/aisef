@@ -6,13 +6,18 @@ reused while the controller can still signal it.
 
 Protocol. stdin (control): one JSON request line {argv, cwd, env}, then `GO` (the controller has made it a member of
 its job), later `EXIT`. stdout (report): `STARTED <pid>`, then `EXITED <returncode>` — or `SPAWN_FAILED <error>`.
-The target inherits this process's stderr as its stdout and stderr, and gets no stdin.
+The target inherits this process's stderr as its stdout and stderr, and gets no stdin. Once the target is spawned the
+anchor gives up its own copy of that output writer (ARCHITECTURE-EXCEPTION-V2-006): the output stream's end of file is
+then the target's (and its descendants') alone — a truthful protocol EOF, independent of the lifecycle report above.
 
 Reaping (POSIX): the anchor reaps every child but the target, as init would — on Linux it is a subreaper, so the
 range's orphans become its children, and an unreaped one is a zombie that still answers kill(pid, 0).
 
 Watchdog: end of file on stdin means the controller is gone. On POSIX the anchor kills its own group (itself
 included); on Windows the controller's job handle closed with it and the job killed every member.
+The watchdog is the script's entry, not `main`: however `main` ends — end of file, an exception (a report pipe
+nobody reads, an interrupt) — the anchor ends by `_die`, or by `EXIT`; never in interpreter shutdown behind its
+reporter and reaper threads with nobody reading stdin.
 """
 
 import json
@@ -66,6 +71,17 @@ def _subreaper() -> None:
         pass  # escaped orphans then re-parent to init, out of the controller's sight
 
 
+def _release_output() -> None:
+    """Close this process's copy of the target's output writer (fd 2) by pointing fd 2 at the null device; the target
+    holds its own, inherited at spawn. Without this the anchor keeps the stream open until it is reaped, and the
+    reader could never see the target's own end of file (V2-006)."""
+    null = os.open(os.devnull, os.O_WRONLY)
+    try:
+        os.dup2(null, 2)
+    finally:
+        os.close(null)
+
+
 def main() -> None:
     if os.name == "posix":
         # handlers, not SIG_IGN: a caught signal reverts to its default in the target, an ignored one would not
@@ -82,16 +98,17 @@ def main() -> None:
     except OSError as e:
         _say(f"SPAWN_FAILED {type(e).__name__}: {e}")
     else:
+        _release_output()
         _say(f"STARTED {proc.pid}")
         threading.Thread(target=lambda: _say(f"EXITED {proc.wait()}")).start()  # the anchor ends by os._exit only
         threading.Thread(target=_reap_adopted, args=(proc.pid,)).start()
-    while True:
-        line = sys.stdin.readline()
-        if not line:
-            _die()
+    for line in iter(sys.stdin.readline, ""):  # until end of file: the controller is gone
         if line.strip() == "EXIT":
             os._exit(0)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:  # the watchdog: however main ends — end of file, an exception — the anchor ends by _die, never
+        _die()  # in interpreter shutdown behind its reporter and reaper threads with nobody watching stdin

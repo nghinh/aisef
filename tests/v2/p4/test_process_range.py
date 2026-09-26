@@ -407,6 +407,23 @@ class Anchor(unittest.TestCase):
         self.assertEqual(out, "")
         self.assertNotEqual(a.returncode, 0)
 
+    @unittest.skipUnless(POSIX, "the anchor's group (POSIX)")
+    def test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group(self):
+        """An exception out of the anchor's main — here STARTED written to a controller already gone — ends the anchor
+        the watchdog's way: its group, the target and itself. Before, the anchor exited 120 and left the target
+        running; once its reporter and reaper threads run, it hung in interpreter shutdown with no watchdog."""
+        a = subprocess.Popen([PY, "-P", str(pr.ANCHOR)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             encoding="utf-8", start_new_session=True)
+        try:
+            a.stdout.close()  # nobody reads the report
+            a.stdin.write(json.dumps({"argv": [PY, "-c", "import time; time.sleep(5)"], "cwd": None, "env": None})
+                          + "\nGO\n")
+            a.stdin.flush()
+            self.assertEqual(a.wait(30), -signal.SIGKILL)  # _die: killpg of its own group
+        finally:
+            if a.poll() is None:
+                a.kill()
+
     @unittest.skipUnless(POSIX, "waitid (POSIX)")
     def test_the_reaper_reaps_every_child_but_the_target_and_keeps_doing_it(self):
         code = (f"import json, os, subprocess, sys, threading, time\nsys.path.insert(0, {str(ROOT)!r})\n"

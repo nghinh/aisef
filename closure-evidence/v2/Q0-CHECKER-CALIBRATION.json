@@ -556,7 +556,7 @@
    "rejects_for_the_expected_reason": true,
    "expected": "BASELINE: plan cites rfc_normative_digest",
    "observed": [
-    "BASELINE: plan cites rfc_normative_digest 8f0d522d9db0322c…, the approved lineage ends at eea2e10fa0b40cf9…"
+    "BASELINE: plan cites rfc_normative_digest 8f0d522d9db0322c…, the approved lineage ends at 84f3a85aa39e94e2…"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

@@ -64,6 +64,7 @@
     "F5.probe_protocol",
     "F5.harness_timeout_vs_subject_deadline",
     "F5.signal_provenance_after_dispatch",
+    "F5.protocol_stream_vs_process_lifecycle",
     "F5.calibration_contracts"
    ],
    "pending_on": []
@@ -842,6 +843,14 @@
    "implemented_by": "WP-2.1",
    "state": "PASS",
    "detail": "the same signal exit is an interruption when this controller's ledger holds it and EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL) when it does not",
+   "required_now": true
+  },
+  {
+   "item": "F5",
+   "id": "F5.protocol_stream_vs_process_lifecycle",
+   "implemented_by": "WP-2.1",
+   "state": "PASS",
+   "detail": "the anchor holds no copy of the output writer; one pump reads the protocol; with the exit reported first a complete protocol is observed as written, and 'did not start' is concluded only after the stream closed",
    "required_now": true
   },
   {

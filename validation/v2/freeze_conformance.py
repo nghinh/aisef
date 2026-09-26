@@ -626,6 +626,104 @@ def _signal_provenance_matches_rfc(rfc: RFC) -> dict:
                                      "and EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL) when it does not"}
 
 
+class _ExitFirstRange:
+    """A process range for the F5 §9.4 check whose exit is known before its output is read: `wait` answers at once,
+    and the protocol lines become readable only after `wait` has been asked — the lifecycle channel first, always.
+    Records whether the stream was exhausted when the exit was first asked for."""
+
+    ledger: list = []
+
+    def __init__(self, lines, returncode):
+        import threading
+        self._asked, self._lines, self.returncode = threading.Event(), list(lines), returncode
+        self.exhausted_when_asked: list[bool] = []
+        self._exhausted = False
+        self.output = self._stream()
+
+    def _stream(self):
+        self._asked.wait(5)          # nothing is readable before the exit has been reported
+        yield from self._lines
+        self._exhausted = True
+
+    def start(self):
+        return self
+
+    def wait(self, timeout=None):
+        self.exhausted_when_asked.append(self._exhausted)
+        self._asked.set()
+        return self.returncode
+
+    def release(self):
+        pass
+
+
+def _stream_lifecycle_matches_rfc(rfc: RFC) -> dict:
+    """F5 as amended by ARCHITECTURE-EXCEPTION-V2-006 (§9.4): the protocol stream and the process lifecycle are
+    independent facts. Structurally: the anchor gives up its copy of the target's output writer after the spawn, and
+    the probe reads its protocol through one pump — no exit-driven reader. Behaviourally, on a range whose exit is
+    reported before any line can be read: a complete protocol is observed as written, and a harness that wrote nothing
+    is concluded not to have started only once its stream has closed."""
+    section = rfc.section("### 9.4 Protocol stream vs process lifecycle", "## 10. Two-axis")
+    needed = ("**MUST NOT** itself manufacture a protocol end of file", "pump-completion barrier",
+              "**only** when the stream has closed, the exit has been reported", "No timing window **MAY** decide")
+    if not section or not all(n in section for n in needed):
+        return {"state": FAIL, "detail": "RFC reference (§9.4 protocol stream vs process lifecycle) could not be extracted"}
+    if not symbol_present("aisef2.probe.python_callable", "_pump"):
+        return {"state": None, "detail": "the reference probe's protocol reader is not implemented"}
+    import os
+    import sys as _sys
+    import tempfile
+    from unittest import mock
+    from aisef2.arch.enums import BehaviorVerdict as V, ProbeExecutionStatus as PES
+    from aisef2.probe import python_callable as pc
+    from aisef2.probe.protocol import ExecutionEnv, RevisionRef, bound_result, run_probe
+    from aisef2.product.spec import ProductProofSpec
+    problems = []
+    anchor = ast.parse((ROOT / "aisef2/runtime/range_anchor.py").read_text(encoding="utf-8"))
+    fns = {n.name: n for n in anchor.body if isinstance(n, ast.FunctionDef)}
+    release = fns.get("_release_output")
+    dup2_to_stderr = release is not None and any(
+        isinstance(n, ast.Call) and ast.unparse(n.func) == "os.dup2" and len(n.args) == 2 and ast.unparse(n.args[1]) == "2"
+        for n in ast.walk(release))
+    called = "main" in fns and any(isinstance(n, ast.Call) and ast.unparse(n.func) == "_release_output"
+                                   for n in ast.walk(fns["main"]))
+    if not (dup2_to_stderr and called):
+        problems.append("the anchor keeps its copy of the target's output writer: the stream's end of file is not the target's")
+    watch = next((n for n in ast.walk(ast.parse(inspect.getsource(pc))) if isinstance(n, ast.FunctionDef) and n.name == "_watch"), None)
+    threads = [n for n in ast.walk(watch) if isinstance(n, ast.Call) and ast.unparse(n.func) == "threading.Thread"] if watch else []
+    targets = [ast.unparse(k.value) for t in threads for k in t.keywords if k.arg == "target"]
+    if targets != ["_pump"]:
+        problems.append(f"the protocol is read by {targets or 'no reader'}, not by the one pump: an exit can end it")
+    with tempfile.TemporaryDirectory(prefix="f5-9-4-") as root:
+        spec = ProductProofSpec.create(
+            contract_id="F5-9.4", probe_id=pc.PROBE_ID, probe_digest=pc.DIGEST,
+            probe_input={"subject": {"kind": "python_callable", "locator": "app.calc:add"}, "stimulus": {},
+                         "observable": {"condition": "exists", "within_s": 10}, "subject_absence": "ABSENCE_IS_DECIDABLE"},
+            candidate_expectation=V.SATISFIED, compiler_id="conformance", compiler_digest="c" * 64)
+        at, env = RevisionRef("0" * 40, root), ExecutionEnv(_sys.executable, 10, pc.Enforcement.PARTIAL)
+        tags = [f"{pc._MARK} {t} n0nce {b}\n" for t, b in (("READY", ""), ("DISPATCHED", ""),
+                                                           ("RESULT", '{"subject": "present", "resolved": true}'))]
+        for name, lines, want in (("a complete protocol, exit reported first", tags, (PES.EXECUTED, "SATISFIED")),
+                                  ("nothing written, exit 0 reported first", [], (PES.UNRUNNABLE, None))):
+            fake = _ExitFirstRange(lines, 0)
+            with mock.patch.multiple(pc, ProcessRange=mock.Mock(return_value=fake),
+                                     secrets=mock.Mock(token_hex=mock.Mock(return_value="n0nce"))):
+                record = run_probe(pc.PythonCallableProbe(), spec, at, env)
+            result = bound_result(record, spec=spec, revision=at.sha, enforcement=env.required_enforcement)
+            got = (result.status, getattr(getattr(result, "behavior_verdict", None), "value", None))
+            if got != want:
+                problems.append(f"{name}: {got[0].value}/{got[1]} instead of {want[0].value}/{want[1]}")
+            if fake.exhausted_when_asked[:1] not in ([], [True]):
+                problems.append(f"{name}: the exit was asked for before the stream had closed")
+        if not os.path.isdir(root):
+            problems.append("the conformance checkout vanished")
+    if problems:
+        return {"state": FAIL, "detail": "protocol stream vs process lifecycle differs from RFC §9.4", "problems": problems}
+    return {"state": PASS, "detail": "the anchor holds no copy of the output writer; one pump reads the protocol; with the "
+                                     "exit reported first a complete protocol is observed as written, and 'did not "
+                                     "start' is concluded only after the stream closed"}
+
+
 def _routing_matches_rfc(rfc: RFC) -> dict:
     """F2 freezes the owner routing table, keyed by measurement point since ARCHITECTURE-EXCEPTION-V2-001.
 
@@ -753,6 +851,7 @@ def subchecks(rfc: RFC, code) -> list[dict]:
     add("F5", "F5.probe_protocol", "WP-2.1", _protocol_matches_rfc(rfc, "aisef2.probe.protocol", "Probe"))
     add("F5", "F5.harness_timeout_vs_subject_deadline", "WP-2.1", _timeout_semantics_match_rfc(rfc))
     add("F5", "F5.signal_provenance_after_dispatch", "WP-2.1", _signal_provenance_matches_rfc(rfc))
+    add("F5", "F5.protocol_stream_vs_process_lifecycle", "WP-2.1", _stream_lifecycle_matches_rfc(rfc))
     add("F5", "F5.calibration_contracts", "WP-2.2", _calibration_contracts_match_rfc(rfc))
     for n in ("ObligationRole", "ParentExpectation"):
         add("F6", f"F6.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))

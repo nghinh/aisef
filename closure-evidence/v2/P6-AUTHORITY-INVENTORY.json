@@ -3035,6 +3035,20 @@
    "evidence": "AST: {\"calls\": [\"aisef2.product.compiler.compile_spec\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
   },
   {
+   "id": "validation/v2/freeze_conformance.py::_stream_lifecycle_matches_rfc",
+   "path": "validation/v2/freeze_conformance.py",
+   "symbol": "_stream_lifecycle_matches_rfc",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/freeze_conformance.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.probe.protocol.bound_result\", \"aisef2.probe.protocol.run_probe\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
    "id": "validation/v2/gen_migration_table.py::Definition",
    "path": "validation/v2/gen_migration_table.py",
    "symbol": "Definition",
@@ -3677,7 +3691,7 @@
   "COMPATIBILITY_NONAUTHORITATIVE": 37,
   "HISTORICAL_ONLY": 2,
   "REMOVED": 0,
-  "UNREACHABLE": 139,
+  "UNREACHABLE": 140,
   "UNCLASSIFIABLE": 0
  }
 }

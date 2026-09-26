@@ -20,6 +20,11 @@ ARCHITECTURE EXCEPTION V2-005*, 2026-09-25): F1 — journal format 3 with a sche
 failure codes (§22.1) and `provider/request.budget_owner`; formats 1 and 2 unchanged. Approval lineage:
 [`closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json`](../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json).
 
+**Amended by `ARCHITECTURE-EXCEPTION-V2-006`** (owner decision *AISEF V2 — OWNER RESOLUTION OF P6-FINDING-001 /
+ARCHITECTURE EXCEPTION V2-006 / PROBE HARNESS READY/EOF ORDERING*, 2026-09-26): F5 — the harness protocol's stream and
+the process's lifecycle are independent facts (§9.4); an exit notice never ends the protocol. Approval lineage:
+[`closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json`](../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json).
+
 **Supersedes** the proposal documents under [`docs/research/v2/`](../research/v2/) for all implementation
 decisions; those are retained as design history and are linked throughout.
 
@@ -411,6 +416,28 @@ authority; the signal number is not.
     it: the operating system, a resource limit or another actor are not excluded.
 - One authority: a probe **MUST NOT** keep a second signal ledger, PID tree or interruption state machine.
 - No new `Owner`, no new `ProbeExecutionStatus`, no new `BehaviorVerdict`, no new architecture plane.
+
+### 9.4 Protocol stream vs process lifecycle *(amended — ARCHITECTURE-EXCEPTION-V2-006)*
+
+An observation harness reports through two channels: the **protocol stream** (the lines the harness writes, in
+order) and the **process lifecycle** (the exit its supervisor reports). They are independent facts and **MUST NOT**
+be collapsed: *the process exited* is lifecycle evidence; *the protocol stream reached its end of file* is
+protocol-consumption evidence.
+
+- A process exit notice **MUST NOT** itself manufacture a protocol end of file. The protocol ends only at the stream's
+  own end of file, after every complete line that preceded it has been delivered to the reader.
+- The stream's end of file **MUST** be truthful: no supervisor or anchor retains a copy of the target's output writer,
+  so the end of file is the target's (and its descendants') own.
+- The reader **MUST** publish the stream's closing only after it has delivered every byte and every complete protocol
+  line that preceded it (a pump-completion barrier). A protocol line is complete — terminated; an unterminated
+  fragment is never a protocol line.
+- The harness **MAY** be concluded to have ended before an expected protocol line (for example *exit before
+  `READY`*) **only** when the stream has closed, the exit has been reported, and that line was not read. The same
+  exit **MUST** give the same result under every scheduling of the two channels.
+- No timing window **MAY** decide this order: no sleep, no drain interval, no retry until a line appears, no re-run to
+  agreement. The harness watchdog and the subject's observation window (§9.2) keep their meaning — a harness that does
+  not answer, a subject that does not report — and are not ordering rules.
+- No new `Owner`, `ProbeExecutionStatus`, `BehaviorVerdict`, `FailureCode`, event type or architecture plane.
 
 ---
 
@@ -1500,7 +1527,7 @@ items marked *(amended — V2-002)* changed through `ARCHITECTURE-EXCEPTION-V2-0
 | **F2** | `ProbeExecutionStatus` × `BehaviorVerdict`, its six legal states, the owner routing table **keyed by `MeasurementPoint` (§10.3)** *(amended — V2-001, V2-003)*, **and the `ContractSatisfaction` derivation** *(adjusted)* | Everything routes on it; `UNRESOLVABLE` is deleted. Re-deriving old evidence under a changed satisfaction mapping would silently re-interpret it |
 | **F3** | The `Owner` set — capped; a new member requires a cited measured defect | Budgets and retries derive from it |
 | **F4** | `BehaviorContract` → `ProductProofSpec` compiler contract and the inputs to `semantic_hash`, **including `SubjectAbsence`** *(adjusted)* | It is what `--check` compares against and what makes product evidence survive re-planning. Absence semantics change what a spec means when the subject is missing |
-| **F5** | `Probe` protocol: observation-harness / subject split, **including harness timeout vs subject observation deadline (§9.2) and signal provenance after dispatch (§9.3)** *(amended — V2-002, V2-003)*, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)* | The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified |
+| **F5** | `Probe` protocol: observation-harness / subject split, **including harness timeout vs subject observation deadline (§9.2), signal provenance after dispatch (§9.3) and protocol stream vs process lifecycle (§9.4)** *(amended — V2-002, V2-003, V2-006)*, `enforcement()`, `ProbeResult` fields, **and the two calibration contracts — `ProbeCapabilityCalibration` and `SpecFalsifiabilityEvidence`, each demonstrating contrast to `candidate_expectation`** *(adjusted)* | The split keeps product absence out of the environment budget; a changed calibration contract re-interprets whether existing probes were ever qualified |
 | **F6** | `PlanObligation` shape, `ObligationRole`, and `ParentExpectation` **expressed as a contract-satisfaction expectation, never a raw verdict** *(adjusted)* | The planning plane's vocabulary. Raw-verdict expectations are polarity-inverted for every negative contract |
 | **F7** | `StoryAdmissionDisposition` set | Gate ordering and budget routing depend on it |
 | **F8** | `RunScope` / `StoryScope` ownership split, the disposal ordering contract, and the **run lease / sentinel / journal lifetime order — lease acquired first and released last** *(adjusted)* | Re-parenting resources later invalidates every disposal record; the lifetime order defines both what TORN means and when a second run may acquire ownership |

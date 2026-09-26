@@ -14,8 +14,10 @@ false. Records hold outcomes only — never a pid, a path, a duration or a wall-
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import importlib.util
+import inspect
 import json
 import pathlib
 import sys
@@ -158,7 +160,7 @@ def v2_005_schema() -> dict:
                              "v2_005_format_3_only": nine},
         "projections": {k.value: p.version for k, p in PROJECTIONS.items()},
         "lineage": {"links": [pathlib.Path(x["record"]).name for x in links],
-                    "frozen_items_changed_by_v2_005": links[-1]["frozen_items_changed"],
+                    "frozen_items_changed_by_v2_005": links[4]["frozen_items_changed"],
                     "exception_status": exc["status"], "v2_004": exc["supersedes"]["status"],
                     "schema_fit_audit_sha256": exc["promoted_from"]["sha256"],
                     "f_conformance": {k: sub.get(k) for k in ("F1.failure_taxonomy", "F1.journal_format_3")},
@@ -202,9 +204,9 @@ def v2_005_schema() -> dict:
             "story_state_v2_active_only": all(story.values()),
             "runtime_writes_format_3_reads_and_repairs_every_format": all(runtime.values()),
             "lineage_V2_003_to_V2_005_F1_only": lineage["test_V2_005_is_the_fourth_link_after_V2_003_changing_exactly_F1"]
-                and [pathlib.Path(x["record"]).name for x in links][-2:] == ["AISEF-V2-RFC-AMENDMENT-V2-003.json",
+                and [pathlib.Path(x["record"]).name for x in links][3:5] == ["AISEF-V2-RFC-AMENDMENT-V2-003.json",
                                                                               "AISEF-V2-RFC-AMENDMENT-V2-005.json"]
-                and links[-1]["frozen_items_changed"] == ["F1"],
+                and links[4]["frozen_items_changed"] == ["F1"],
             "V2_004_superseded_never_applied": exc["supersedes"]["status"] == "SUPERSEDED — NEVER APPLIED"
                 and not (ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-004.json").exists(),
             "P5_sealed_records_identity_verified_not_rewritten": lineage["test_the_sealed_P5_records_are_verified_by_identity_never_rewritten"]
@@ -527,7 +529,8 @@ def old_path_removal() -> dict:
                                      "p5_seal_v1_product_tree": seal5["p5_candidate"]["v1_product_tree"],
                                      "changed_since_p5_seal": aisef_git_tree != seal5["p5_candidate"]["v1_product_tree"]}},
         "v2_005": {"lineage": [pathlib.Path(x["record"]).name for x in links], "end": pathlib.Path(links[-1]["record"]).name,
-                   "frozen_items_changed": links[-1]["frozen_items_changed"],
+                   "frozen_items_changed": links[4]["frozen_items_changed"],
+                   "then": {pathlib.Path(x["record"]).name: x["frozen_items_changed"] for x in links[5:]},
                    "exception_record_sha256": _lf_sha(ROOT / "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json"),
                    "amendment_record_sha256": _lf_sha(ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json"),
                    "v2_004_amendment_file_exists": (ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-004.json").exists()},
@@ -586,8 +589,10 @@ def old_path_removal() -> dict:
             "p4_seal_identity": digests.get("closure-evidence/v2/P4-FINAL-SEAL.json") == seal5["p4_seal"]["sha256"],
             "p5_seal_records_identity": p5.check(ROOT) == [],
             "f1_f11_all_pass_no_ratchet_violation": conformance["summary"] == {"PASS": 11, "PENDING": 0, "FAIL": 0} and conformance["ratchet_violations"] == [],
-            "v2_005_is_the_lineage_end": pathlib.Path(links[-1]["record"]).name == "AISEF-V2-RFC-AMENDMENT-V2-005.json"
-                and links[-1]["frozen_items_changed"] == ["F1"] and not (ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-004.json").exists(),
+            "v2_005_then_v2_006_end_the_lineage": [pathlib.Path(x["record"]).name for x in links[4:]]
+                == ["AISEF-V2-RFC-AMENDMENT-V2-005.json", "AISEF-V2-RFC-AMENDMENT-V2-006.json"]
+                and [x["frozen_items_changed"] for x in links[4:]] == [["F1"], ["F5"]]
+                and not (ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-004.json").exists(),
             "format_3_29_of_29_nine_codes_exact": len(f3.SCHEMAS) == len(T) == 29 and len(FailureCode) == 22 and len(V2_005_CODES) == 9 and len(PROJECTIONS) == 6,
             "run_history_current_zero_residual_no_v1_pf_001": rh.check(ROOT) == [] and bool(latest) and all(
                 e.get("owned_processes_after", 0) == 0 and e.get("owned_escaped", 0) == 0 for e in latest) and all(not e.get("v1_pf_001_signature_found") for e in history),
@@ -598,10 +603,124 @@ def old_path_removal() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- V2-006 / probe harness
+
+V2_006_EXCEPTION = "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json"
+V2_006_AMENDMENT = "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json"
+#: the modules V2-006 changed: their mutation targets are re-measured on this candidate (P2 and P4 records)
+V2_006_TARGET_MODULES = ("aisef2/probe/python_callable.py", "aisef2/runtime/range_anchor.py")
+#: RACE-1..10 (the owner's list), the reader's units and the anchor's watchdog (P6-FINDING-002), each run here as a single case
+RACE_CASES = {
+    "RACE_1_late_pump_READY_observed": ("test_v2_006", "Race", "test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump"),
+    "RACE_2_complete_protocol_then_immediate_exit": ("test_v2_006", "Race", "test_RACE_2_READY_DISPATCHED_RESULT_then_immediate_exit_is_the_complete_result"),
+    "RACE_3_exit_notice_before_the_pump": ("test_v2_006", "Race", "test_RACE_3_the_exit_notice_before_the_pump_is_scheduled_gives_the_normal_result"),
+    "RACE_4_one_party_late_identical_records": ("test_v2_006", "Race", "test_RACE_4_one_party_late_the_other_normal_gives_identical_records"),
+    "RACE_4_story_one_party_late_commits_with_agreement": ("test_v2_006", "StoryRace", "test_RACE_4_a_story_with_one_party_late_on_every_proof_commits_with_agreement"),
+    "RACE_5_nothing_written_exit_0_did_not_start_after_close": ("test_v2_006", "TrueEnd", "test_RACE_5_a_harness_that_emits_nothing_and_exits_0_did_not_start_after_the_stream_closed"),
+    "RACE_6_dies_before_READY_typed_outcome_kept": ("test_v2_006", "TrueEnd", "test_RACE_6_a_target_that_dies_before_READY_keeps_its_typed_outcome"),
+    "RACE_7_partial_READY_is_no_READY": ("test_v2_006", "TrueEnd", "test_RACE_7_a_partial_READY_then_exit_is_no_READY_never_a_guess"),
+    "RACE_8_anchor_holds_no_writer_true_EOF": ("test_v2_006", "AnchorHoldsNoWriter", "test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives"),
+    "RACE_8_a_descendant_keeps_the_stream_open": ("test_v2_006", "AnchorHoldsNoWriter", "test_a_descendant_holding_the_writer_keeps_the_stream_open_until_it_ends"),
+    "RACE_9_every_line_before_STREAM_CLOSED": ("test_v2_006", "TrueEnd", "test_RACE_9_every_line_before_the_end_is_read_before_STREAM_CLOSED"),
+    "RACE_10_every_ordering_repeated": ("test_v2_006_repeat", "Repeated", "test_RACE_10_every_ordering_repeated_gives_the_normal_record"),
+    "pump_publishes_every_line_then_STREAM_CLOSED": ("test_v2_006", "NextAndPump", "test_the_pump_publishes_every_line_in_order_then_STREAM_CLOSED_once"),
+    "next_reads_only_complete_marked_lines": ("test_v2_006", "NextAndPump", "test_next_returns_only_complete_marked_lines_of_this_nonce"),
+    "one_reader_no_exit_driven_reader": ("p2/test_python_callable", "Boundaries", "test_the_protocol_readers_never_hold_the_interpreter_open"),
+    "late_RESULT_read_without_a_drain": ("p2/test_python_callable", "Boundaries", "test_a_result_written_just_before_exit_is_drained_not_lost"),
+    "anchor_watchdog_holds_however_main_ends": ("p4/test_process_range", "Anchor", "test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group"),
+}
+
+
+def v2_006() -> dict:
+    """ARCHITECTURE-EXCEPTION-V2-006 applied: the probe harness's protocol stream and process lifecycle kept apart
+    (RFC §9.4), measured on this candidate — the probe identity and its calibration under the new digest, the race
+    cases, the F5 conformance row, the lineage, the changed components' mutation, and the historical files kept."""
+    from aisef2.probe import python_callable as pc
+    fm = _module("aisef_v2_freeze_manifest", "validation/v2/freeze_manifest.py")
+    exc = json.loads((ROOT / V2_006_EXCEPTION).read_bytes().replace(b"\r\n", b"\n"))
+    amd = json.loads((ROOT / V2_006_AMENDMENT).read_bytes().replace(b"\r\n", b"\n"))
+    links = fm.lineage(ROOT)[1]
+    conformance = json.loads((ROOT / "closure-evidence/v2/F-CONFORMANCE.json").read_text(encoding="utf-8"))
+    subs = conformance["subchecks"] if isinstance(conformance["subchecks"], dict) else {x["id"]: x for x in conformance["subchecks"]}
+    f5 = {k: (v["state"] if isinstance(v, dict) else v) for k, v in subs.items() if k.startswith("F5.")}
+    protocol = json.loads((ROOT / "closure-evidence/v2/P2-PROBE-PROTOCOL.json").read_text(encoding="utf-8"))
+    calibration = json.loads((ROOT / "closure-evidence/v2/P2-CALIBRATION.json").read_text(encoding="utf-8"))
+    cal_digests = sorted({c["probe_digest"] for c in calibration["calibrations"]})
+    modules = {}
+    races = {}
+    for key, (mod, cls, name) in RACE_CASES.items():
+        if mod not in modules:
+            modules[mod] = _module(f"aisef_v2_{mod.replace('/', '_')}", f"tests/v2/{mod}.py")
+        klass = getattr(modules[mod], cls)
+        suite = unittest.TestSuite([klass(name)])   # class setup honoured: a suite runs setUpClass
+        result = unittest.TestResult()
+        suite.run(result)
+        races[key] = result.wasSuccessful() and result.testsRun == 1 and not result.skipped
+    mutation = _mutation_by_target(V2_006_TARGET_MODULES)
+    historical = {rel: _lf_sha(ROOT / rel) == sha for rel, sha in exc["historical_files_kept_byte_identical"].items()}
+    source = inspect.getsource(pc)
+    entry = [n for n in ast.parse((ROOT / "aisef2/runtime/range_anchor.py").read_text(encoding="utf-8")).body
+             if isinstance(n, ast.If) and ast.unparse(n.test) == "__name__ == '__main__'"]
+    anchor_entry = len(entry) == 1 and ast.unparse(entry[0]).splitlines()[1:] == ["    try:", "        main()", "    finally:", "        _die()"]
+    names = [pathlib.Path(x["record"]).name for x in links]
+    return {
+        "record": "AISEF V2 — P6 V2-006 PROBE HARNESS (protocol stream vs process lifecycle)",
+        "work_package": "V2-006",
+        "authority": exc["owner_decision"]["decision"],
+        "rfc": "§9.4 (new); F5 (the only changed row); F4 consequential (semantic_hash binds the probe digest)",
+        "finding": exc["promoted_from"],
+        "exception": {"path": V2_006_EXCEPTION, "sha256": _lf_sha(ROOT / V2_006_EXCEPTION), "status": exc["status"],
+                      "frozen_items_changed_mechanically": exc["frozen_items_changed_mechanically"],
+                      "conformance_subchecks_mechanically": exc["conformance_subchecks_mechanically"]},
+        "amendment": {"path": V2_006_AMENDMENT, "sha256": _lf_sha(ROOT / V2_006_AMENDMENT), "amends": amd["amends"],
+                      "frozen_items_changed": amd["frozen_items_changed"]},
+        "lineage": {"links": names, "end": names[-1], "v2_004_absent": not (ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-004.json").exists()},
+        "probe_identity": {"digest": pc.DIGEST, "before": exc["digests"]["probe_digest"]["before"],
+                           "p2_probe_protocol_digest": protocol["probe"]["digest"] if "digest" in protocol.get("probe", {}) else protocol.get("digest"),
+                           "calibration_digests": cal_digests, "calibration_properties": calibration["properties"]},
+        "reader": {"exit_driven_reader_removed": "def _exited" not in source, "drain_window_removed": "_DRAIN_S" not in source,
+                   "stream_closed_marker": '"STREAM_CLOSED"' in source},
+        "anchor_watchdog": {"finding": exc["anchor_watchdog"]["finding"], "test": exc["anchor_watchdog"]["test"],
+                            "entry_ends_by_die_however_main_ends": anchor_entry},
+        "races": races,
+        "red_before": exc["measured"]["race_tests_on_the_base_code"],
+        "f5_conformance": f5,
+        "f1_f11": {"summary": conformance["summary"], "ratchet_violations": conformance["ratchet_violations"]},
+        "mutation_by_target": mutation,
+        "historical_files_byte_identical": historical,
+        "properties": {
+            "probe_digest_is_the_amended_one": pc.DIGEST == exc["digests"]["probe_digest"]["after"] != exc["digests"]["probe_digest"]["before"],
+            "calibration_re_established_under_the_new_digest": cal_digests == [pc.DIGEST] and all(calibration["properties"].values()),
+            "p2_probe_protocol_names_the_new_digest": pc.DIGEST in json.dumps(protocol),
+            "the_exit_never_ends_the_protocol": "def _exited" not in source and "_DRAIN_S" not in source,
+            "every_race_case_passes": bool(races) and all(races.values()),
+            "the_anchor_watchdog_is_the_script_entry_not_main": anchor_entry,
+            "the_race_cases_discriminate_on_the_base_code": all(
+                exc["measured"]["race_tests_on_the_base_code"].get(n) in ("FAIL", "ERROR") for n in (
+                    "test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump",
+                    "test_RACE_4_a_story_with_one_party_late_on_every_proof_commits_with_agreement",
+                    "test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives",
+                    "test_RACE_10_every_ordering_repeated_gives_the_normal_record")),
+            "f5_protocol_stream_vs_process_lifecycle_passes": f5.get("F5.protocol_stream_vs_process_lifecycle") == "PASS",
+            "f1_f11_all_pass_no_ratchet_violation": conformance["summary"] == {"PASS": 11, "PENDING": 0, "FAIL": 0}
+                and conformance["ratchet_violations"] == [],
+            "v2_006_ends_the_lineage_changing_exactly_F5": names[-2:] == ["AISEF-V2-RFC-AMENDMENT-V2-005.json", "AISEF-V2-RFC-AMENDMENT-V2-006.json"]
+                and links[-1]["frozen_items_changed"] == ["F5"] and amd["amends"]["path"].endswith("AMENDMENT-V2-005.json"),
+            "v2_004_still_never_applied": not (ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-004.json").exists(),
+            "historical_seals_and_records_byte_identical": bool(historical) and all(historical.values()),
+            "mutation_every_changed_target_measured_current_no_unaudited_survivor": bool(mutation) and all(
+                m["current"] and not m["error"] and isinstance(m["mutants"], int) and m["unaudited"] == [] for m in mutation.values())
+                and set(mutation) == {t for t in _module("aisef_v2_mutation", "validation/v2/mutation.py").TARGETS
+                                      if t.split("::")[0] in V2_006_TARGET_MODULES},
+        },
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-6.2/V2-005": ("closure-evidence/v2/P6-V2-005-SCHEMA.json", v2_005_schema, "aisef2/journal/format3.py"),
     "WP-6.2/ORCH": ("closure-evidence/v2/P6-ORCHESTRATION.json", orchestration, "aisef2/orchestrate/story_runner.py"),
     "WP-6.3": ("closure-evidence/v2/P6-OLD-PATH-REMOVAL.json", old_path_removal, "validation/v2/old_path_audit.py"),
+    "V2-006": ("closure-evidence/v2/P6-V2-006-PROBE-HARNESS.json", v2_006, V2_006_EXCEPTION),
 }
 SEAL_REL = "closure-evidence/v2/P6-FINAL-SEAL.json"
 

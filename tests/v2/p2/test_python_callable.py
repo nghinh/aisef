@@ -384,9 +384,9 @@ class Boundaries(_Revisions):
         self.assertTrue(pathlib.Path(argv[-1]).parent.name.startswith("aisef2-probe-"), argv[-1])
 
     def test_a_result_written_just_before_exit_is_drained_not_lost(self):
-        """The anchor reports the exit while the harness's last line is still in the pipe: the exit is the end of the
-        protocol (V2-003), so the reader drains for a bounded time before concluding the subject ended without a
-        RESULT — the same exit must not read as 'ended before the observable'."""
+        """The anchor reports the exit while the harness's last line is still in the pipe: the protocol ends at the
+        stream's own end of file, never at the exit (§9.4, V2-006), so the RESULT still on its way is read — the same
+        exit must not read as 'ended before the observable'. No drain window decides it."""
         dispatched = threading.Event()
 
         class LateResult(FakeRange):
@@ -410,8 +410,9 @@ class Boundaries(_Revisions):
         self.assertEqual(result, Executed(S))  # without the drain: REFUTED, 'ended the process before the observable'
 
     def test_the_protocol_readers_never_hold_the_interpreter_open(self):
-        """Both reader threads are daemon threads: a controller that dies with a pipe still open is not kept alive by
-        its own probe's readers (§17.1: a leak is never silent, and never the reader's)."""
+        """The protocol's one reader is a daemon thread: a controller that dies with a pipe still open is not kept alive
+        by its own probe's reader (§17.1: a leak is never silent, and never the reader's). There is no second,
+        exit-driven reader: the exit never ends the protocol (§9.4, ARCHITECTURE-EXCEPTION-V2-006)."""
         started = []
         real = threading.Thread
 
@@ -421,7 +422,7 @@ class Boundaries(_Revisions):
                 super().__init__(*a, **kw)
         with faked("READY", "DISPATCHED", returncode=0), mock.patch.object(pc.threading, "Thread", Spy):
             self.run_(spec("app.calc:add"))
-        self.assertEqual(started, [True, True])
+        self.assertEqual(started, [True])
 
     def test_subject_output_cannot_forge_the_protocol(self):
         self.assertEqual(self.run_(spec("app.noisy:f", {"returns": 1})), Executed(S))
