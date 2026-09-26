@@ -231,6 +231,19 @@ class Orchestration(unittest.TestCase):
     def details(self, story):
         return [e.data["detail"] for e in self.events("failure/observed", story)]
 
+    def proofs(self, story):
+        """Every proof of the story with the two cited probe records' results: what a disagreement looked like, on
+        any machine."""
+        return [(e.data["criterion_id"], e.data["agreement"],
+                 [(self.run.events[s].data["record"]["revision"][:7], self.run.events[s].data["record"]["result"]) for s in e.source_seqs])
+                for e in self.events("proof/verified", story)]
+
+    def assertCommitted(self, result):
+        """The story committed — and if not, every failure and every proof record the journal holds for it."""
+        story = result.story_id
+        self.assertTrue(result.committed, f"{story} not committed: failures {self.failures(story)} {self.details(story)}; "
+                                          f"proofs {self.proofs(story)}")
+
     def rows(self, story):
         return [(e.data["check"], e.data["passed"], e.data["detail"]) for e in self.events("gate/check")
                 if e.data["check"].startswith(story + ":")]
@@ -254,7 +267,7 @@ class Orchestration(unittest.TestCase):
     def test_ORCH_1_an_end_to_end_story_completes_through_the_real_path(self):
         dev = self.s1_dev()
         r = self.story(self.s1_plan(), "S1", dev)
-        self.assertTrue(r.committed)
+        self.assertCommitted(r)
         self.assertEqual(r.revision, self.merger.base())         # the merge landed on main
         self.assertNotEqual(r.revision, self.base)
         self.assertAttempts(r, ["COMMIT"])
@@ -328,7 +341,7 @@ class Orchestration(unittest.TestCase):
         r = self.story(self.s1_plan(), "S1", self.s1_dev(),
                        inputs=self.inputs("S1", legacy={"C1": "CHANGE_REQUIRED"}, migration_table=table,
                                           declarations={"C1": SubjectAbsence.REQUIRES_SUBJECT}))
-        self.assertTrue(r.committed)
+        self.assertCommitted(r)
         legacy = seam.resolve("C1", "CHANGE_REQUIRED", table, SubjectAbsence.REQUIRES_SUBJECT)
         self.assertEqual((legacy.role, legacy.polarity, legacy.subject_absence),
                          (ObligationRole.INTRODUCE, Polarity.MUST_HOLD, SubjectAbsence.REQUIRES_SUBJECT))
@@ -337,7 +350,7 @@ class Orchestration(unittest.TestCase):
         # the product proof passes while the developer's own test is wrong: INADEQUATE, DEVELOPER — only the policy blocks
         dev = Dev({"app/calc.py": CALC + ADD, "tests/test_s1.py": TEST_ADD_WRONG})
         r = self.story(self.s1_plan(), "S1", dev, tests_block=False)
-        self.assertTrue(r.committed)
+        self.assertCommitted(r)
         adequacy = self.events("tests/adequacy", "S1")[0].data
         self.assertEqual((adequacy["outcome"], adequacy["owner"], adequacy["may_block"], adequacy["developer_chargeable"]),
                          ("INADEQUATE", "DEVELOPER", True, True))
@@ -396,7 +409,7 @@ class Orchestration(unittest.TestCase):
             self.assertEqual(a["revision"], b["revision"])
         names = [e.data["resource"] for e in self.events("story/resource-acquired", "S1")]
         self.assertEqual(names[:3], ["scratch-S1", "wt-S1", "verifier-wt-S1"])
-        self.assertTrue(r.committed)
+        self.assertCommitted(r)
 
     def test_ORCH_8_and_SCHEMA_3_a_merge_conflict_is_MERGE_CONFLICT_INTEGRATION_with_zero_developer_charge(self):
         dev = self.s1_dev(on_trunk={"app/calc.py": CALC + "\n\ndef add(a, b):\n    return b + a\n"}, repo=self.repo)
@@ -443,7 +456,7 @@ class Orchestration(unittest.TestCase):
         self.assertTrue(all(e.type == "gate/check" and e.data["gate"] == "story" for e in cited))
         self.assertEqual(len(cited), len([e for e in self.events("gate/check")]))
         self.assertEqual(list(decisions[0].data["projections"]), ["story_state", "budgets", "failure_owner", "retry_target"])
-        self.assertTrue(r.committed)
+        self.assertCommitted(r)
 
     def test_ORCH_16_retry_state_derives_solely_from_the_journal_projection(self):
         scanner = Scan(self.script, interpreter="/nonexistent/aisef2-python")
@@ -510,7 +523,7 @@ class Orchestration(unittest.TestCase):
         base = self.merger.base()
         r = self.story(plan_of(base, obligation("C1", self.s1.id, "S1", ObligationRole.INTRODUCE)), "S1",
                        Dev(outage=True), tests_block=False)                     # a developer call would raise: none is made
-        self.assertTrue(r.committed)
+        self.assertCommitted(r)
         self.assertEqual(self.events("story/admitted", "S1")[0].data["dispositions"]["C1"], "PRE_SATISFIED")
         self.assertEqual([e.data["budget_owner"] for e in self.events("provider/request", "S1")], ["REVIEW"])
         self.assertEqual(self.run.state(P.BUDGETS)["developer"], {})
@@ -650,13 +663,13 @@ class Orchestration(unittest.TestCase):
         self.assertEqual(adequacy["regressions"]["selection"], "STORY_TESTS_NOT_COLLECTABLE")
         self.assertEqual(adequacy["regressions"]["owner_on_failure"], "INTEGRATION")
         self.assertEqual(self.failures("S1"), [])
-        self.assertTrue(r.committed)
+        self.assertCommitted(r)
         self.assertEqual(self.run.state(P.BUDGETS)["retries"], {})
 
     def test_ORCH_SCHEMA_7_a_review_request_charges_the_REVIEW_budget_and_blocks_only_with_corroboration(self):
         advisory = Rev([Finding("style", True, ())])                       # a model review alone: never the sole authority
         r = self.story(self.s1_plan(), "S1", self.s1_dev(), reviewer=advisory)
-        self.assertTrue(r.committed)
+        self.assertCommitted(r)
         b = self.run.state(P.BUDGETS)
         self.assertEqual(b["review"], {"S1": {"requests": 1, "criteria": {"C1": 1}}})
         self.assertEqual(b["developer"]["S1"]["requests"], 1)

@@ -321,7 +321,7 @@ class NothingExecutesAtTheParent(unittest.TestCase):
             dev = e2e.Dev({"app/calc.py": e2e.CALC + e2e.ADD, "tests/test_s1.py": e2e.TEST_ADD, "tests/test_other.py": e2e.TEST_OTHER,
                            "tests/conftest.py": ""})
             r = case.story(e2e.plan_of(base, e2e.obligation("C1", case.s1.id, "S1", ObligationRole.INTRODUCE)), "S1", dev)
-            self.assertTrue(r.committed, case.failures("S1"))
+            case.assertCommitted(r)
             self.assertFalse(mark.exists(), "a parent-side developer test ran")
             parent_probes = [e for e in case.run.events if e.type == "probe/evaluated" and e.data["record"]["revision"] == base]
             self.assertEqual(len(parent_probes), 1)                                   # admission probed the subject at the parent

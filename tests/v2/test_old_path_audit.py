@@ -804,6 +804,21 @@ class Helpers(unittest.TestCase):
                          {"events": {"GATE_DECISION", "STORY_COMMIT"}, "calls": {"aisef2.orchestrate.gate.check"}, "types": {"aisef2.control.budget.Charge"}})
 
 
+class EvidenceTreeDigest(unittest.TestCase):
+    """The removal record's tree digests are the same on every platform: ordinal order of the posix path string,
+    LF-normalised content (a Windows checkout orders Paths case-insensitively and may carry CRLF)."""
+
+    def test_the_digest_is_ordinal_and_lf_normalised(self):
+        ev = _load("aisef_v2_p6_evidence", "validation/v2/p6_evidence.py")
+        root = tree({"t/README.md": "# r\n", "t/a.py": "x = 1\n", "t/Z.py": "y = 2\r\n", "t/sub/b.json": "{}\n", "t/skip.bin": "\x00", "t/__pycache__/a.pyc": ""})
+        lines = [f"{rel}\t{hashlib.sha256(text.replace(chr(13) + chr(10), chr(10)).encode()).hexdigest()}"
+                 for rel, text in (("t/README.md", "# r\n"), ("t/Z.py", "y = 2\n"), ("t/a.py", "x = 1\n"), ("t/sub/b.json", "{}\n"))]
+        self.assertEqual(lines, sorted(lines))   # 'R' < 'Z' < 'a' < 's': ordinal, never case-folded
+        d = ev.tree_digest("t", root)
+        self.assertEqual(d, {"files": 4, "sha256": hashlib.sha256("\n".join(lines).encode()).hexdigest(),
+                             "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"})
+
+
 class DecisionTable(unittest.TestCase):
     def test_a_synthetic_journal_gives_the_exact_table(self):
         E = collections.namedtuple("E", "seq type data source_seqs")

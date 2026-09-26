@@ -439,15 +439,19 @@ EVIDENCE_FILES = ("closure-evidence/v2/P6-MUTATION.json", "closure-evidence/v2/P
                   "closure-evidence/v2/F-CONFORMANCE.json", "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json")
 
 
-def tree_digest(rel: str) -> dict:
-    """sha256 over the sorted (path, LF-normalised content sha256) of every source or record file under `rel`, from
-    the working tree — a Windows checkout with CRLF gives the same digest."""
-    base = ROOT / rel
+def tree_digest(rel: str, root: pathlib.Path = ROOT) -> dict:
+    """sha256 over the (path, LF-normalised content sha256) lines of every source or record file under `rel`, from the
+    working tree, in ordinal order of the posix path string — a Windows checkout with CRLF gives the same digest, and
+    so does Windows' case-insensitive Path ordering (which put README.md after lowercase names and made the first
+    WP-6.3 candidate's record stale there)."""
+    base = root / rel
     lines = []
-    for p in sorted(base.rglob("*")):
+    for p in base.rglob("*"):
         if p.is_file() and "__pycache__" not in p.parts and p.suffix in (".py", ".json", ".md", ".toml", ".txt", ".yaml", ".yml"):
-            lines.append(f"{p.relative_to(ROOT).as_posix()}\t{_lf_sha(p)}")
-    return {"files": len(lines), "sha256": hashlib.sha256("\n".join(lines).encode()).hexdigest(), "rule": "sha256 over sorted '<path>\\t<lf-sha256>' lines"}
+            lines.append(f"{p.relative_to(root).as_posix()}\t{_lf_sha(p)}")
+    lines.sort()
+    return {"files": len(lines), "sha256": hashlib.sha256("\n".join(lines).encode()).hexdigest(),
+            "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"}
 
 
 def _git_tree(rel: str) -> str | None:

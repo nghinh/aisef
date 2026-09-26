@@ -8,24 +8,24 @@
   "aisef2_tree": {
    "files": 66,
    "sha256": "10055b150073282b23871c6695a4fb2368d985066b1ef6fa76382b3aa303deba",
-   "rule": "sha256 over sorted '<path>\\t<lf-sha256>' lines"
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
   },
   "validation_v2_tree": {
    "files": 27,
-   "sha256": "d812c592e6be3dd14ccacd1bfd2d8cf669a65958963412e74bc77af00fadef91",
-   "rule": "sha256 over sorted '<path>\\t<lf-sha256>' lines"
+   "sha256": "d3b047e523139737bbacc83adc7a35befdc788e5b742b67d06a26907bd065ba1",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
   },
   "tests_v2_tree": {
    "files": 137,
-   "sha256": "67b7c84cd352fe923f839f033551b03c82748c6c7be2ed40b52a12080c01246e",
-   "rule": "sha256 over sorted '<path>\\t<lf-sha256>' lines"
+   "sha256": "7c8497d487cd43b84d7b58ff9e0435ba04ff1a6129d0ed81724c6b49f5dbee4b",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
   },
   "aisef_tree": {
    "git_tree_at_HEAD": "4359f347378e84fcac2d213128c7c26f282c13c0",
    "working_tree": {
     "files": 119,
-    "sha256": "cf5fe0828fc09f236d087645a0113ebff8c7d196f4ac4324e3d3b5fc5847ba50",
-    "rule": "sha256 over sorted '<path>\\t<lf-sha256>' lines"
+    "sha256": "e1dbc469441608e15d5c3c6580063d7fb85d1874f33840c03e0c17ef2468f90b",
+    "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
    },
    "p5_seal_v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
    "changed_since_p5_seal": false
@@ -433,8 +433,8 @@
   "R6_decision_table_of_real_stories": true
  },
  "audit_unit_tests": {
-  "count": 40,
-  "passed": 40,
+  "count": 41,
+  "passed": 41,
   "failed": []
  },
  "mutation": {
@@ -775,10 +775,10 @@
  },
  "run_history": {
   "record": "closure-evidence/v2/P6-RUN-HISTORY.json",
-  "sha256": "ad6d7a49641d893d15f22edc68b139bb8cb2d9510104cebb7e04528fbf6cccc6",
-  "entries": 48,
+  "sha256": "7b74f2f7756b009339b57e62aa5751ca1121f3d8eea6918d252840ef7a9f69b8",
+  "entries": 56,
   "problems": [],
-  "latest_commit": "c07acbaac8c74d6a548568ac1a0056a24b18834a",
+  "latest_commit": "6099a81637a3c1ae68ff3d656fd802876cb38b6a",
   "residual_process_state": {
    "jobs": 8,
    "zero_residual": true,
@@ -787,7 +787,7 @@
  },
  "records": {
   "closure-evidence/v2/P6-MUTATION.json": "fec915d0db3d4279886715f2f6640cb28aaeeeac66081a3d0720c5befb24e3de",
-  "closure-evidence/v2/P6-RUN-HISTORY.json": "ad6d7a49641d893d15f22edc68b139bb8cb2d9510104cebb7e04528fbf6cccc6",
+  "closure-evidence/v2/P6-RUN-HISTORY.json": "7b74f2f7756b009339b57e62aa5751ca1121f3d8eea6918d252840ef7a9f69b8",
   "closure-evidence/v2/P6-MIGRATION-TABLE.json": "157b46f6786d849591f9c08b02a39f48a08c18d69d9e34cf7c3c98ccd5a6752f",
   "closure-evidence/v2/P6-ORCHESTRATION.json": "8eb9430b14c2f194901e895e849f852bbce0269ccb97289a1d5d57a4064449d0",
   "closure-evidence/v2/P6-AUTHORITY-INVENTORY.json": "af2fb8fc25c49c7608ee75c7875f395e29917c320c03283f4c092e481ef4d4d8",
