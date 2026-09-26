@@ -2,12 +2,12 @@
  "record": "AISEF V2 — Q2 ADEQUACY",
  "rung": "Q2",
  "status": "GREEN",
- "at": "2026-09-26T21:17:12Z",
+ "at": "2026-09-26T21:55:36Z",
  "subject": {
   "seal_commit": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
   "semantic_candidate": "097daefefd9229eafeacaca321b7a008a581899b",
   "kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
-  "head": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
+  "head": "c1d1a1607a1f8780718550478ccc7d3a032b3eb3",
   "head_is_after_the_seal": true,
   "head_kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
   "kernel_tree_is_the_candidates": true,
@@ -39,14 +39,14 @@
    "files": {
     "validation/qualification/__init__.py": "40f613b3d5ffa39b5807ae0aec2878be51870891f5bd7dd76aae025e73e48f91",
     "validation/qualification/common.py": "6343e679213c865c0c37ac9afc2a330564a250898aa7b3bc5fb57c22066223a2",
-    "validation/qualification/q0.py": "33b2cb524814f2cb74f0e31ef823dfb3535cf2b1611315aff814efeee6374981",
+    "validation/qualification/q0.py": "e31b897a576e622feed0f8407109d0d01d0bd71ead4874f36c7003cdac3e6cca",
     "validation/qualification/q1.py": "66dfc17f07603057fb70210442b31359c3e7c80520a0bdcc9b5cb7af91a6d2ef",
     "validation/qualification/q2.py": "fb75ef300f24e59b8b7a8f7239f22a4a77f0bb5edc19c43308fbbd686fe8b057",
     "validation/qualification/q3.py": "5cbdccd0d99ab516a5d71001deb9785cd57b5933721902cb677c1fbecd2b3627",
     "validation/qualification/run.py": "baa82a3c3f7e0716855806d1ce8a78972f62792b8ad220f93c40a5860df28f90",
     "validation/qualification/summary.py": "d38d0e202f229645f79a6f21603a88c3d3552cecb7b19f7fa3a5fd7e1c73e58b"
    },
-   "sha256": "1986a51c38e3483d9b1cd996549ed6034e8de1527654c89cd713c7f5bc2ee032",
+   "sha256": "6bd5a7209a471212dacda180733ea9257b9e9e80638386169624de4f8818659c",
    "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines, sorted"
   }
  },
@@ -54,7 +54,7 @@
   "os": "darwin",
   "os_release": "25.5.0",
   "python": "3.14.7",
-  "free_disk_gb": 63.5,
+  "free_disk_gb": 63.4,
   "implementation": "CPython",
   "machine": "arm64",
   "runner_os": null,
@@ -480,52 +480,52 @@
    {
     "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission",
     "outcome": "PASS",
-    "seconds": 2.172
+    "seconds": 2.155
    },
    {
     "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number",
     "outcome": "PASS",
-    "seconds": 1.45
+    "seconds": 1.439
    },
    {
     "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own",
     "outcome": "PASS",
-    "seconds": 1.455
+    "seconds": 1.452
    },
    {
     "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled",
     "outcome": "PASS",
-    "seconds": 1.458
+    "seconds": 1.447
    },
    {
     "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused",
     "outcome": "PASS",
-    "seconds": 1.46
+    "seconds": 1.427
    },
    {
     "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed",
     "outcome": "PASS",
-    "seconds": 1.451
+    "seconds": 1.445
    },
    {
     "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives",
     "outcome": "PASS",
-    "seconds": 1.463
+    "seconds": 1.441
    },
    {
     "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set",
     "outcome": "PASS",
-    "seconds": 1.571
+    "seconds": 1.563
    },
    {
     "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set",
     "outcome": "PASS",
-    "seconds": 1.463
+    "seconds": 1.442
    },
    {
     "id": "tests.v2.p4.test_mutation_safety:DependencyBoundary.test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it",
     "outcome": "PASS",
-    "seconds": 0.014
+    "seconds": 0.013
    },
    {
     "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_class_qualified_name_picks_that_class_method",
@@ -545,12 +545,12 @@
    {
     "id": "tests.v2.p2.test_mutation_targets:Locator.test_every_target_resolves",
     "outcome": "PASS",
-    "seconds": 0.826
+    "seconds": 0.853
    },
    {
     "id": "tests.v2.p5.test_invariants:MutationAuthority.test_INV_MUTATION_AUTHORITY_destructive_sites_of_the_invariant_code_are_ledgered",
     "outcome": "PASS",
-    "seconds": 1.199
+    "seconds": 1.22
    }
   ]
  },
@@ -648,7 +648,7 @@
    {
     "id": "tests.v2.p2.test_calibration:Calibrate.test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected",
     "outcome": "PASS",
-    "seconds": 0.002
+    "seconds": 0.003
    },
    {
     "id": "tests.v2.p2.test_calibration:Calibrate.test_a_probe_that_cannot_look_is_not_qualified",
@@ -668,7 +668,7 @@
    {
     "id": "tests.v2.p2.test_calibration:Calibrate.test_refusing_to_run_is_not_a_demonstration",
     "outcome": "PASS",
-    "seconds": 0.001
+    "seconds": 0.002
    },
    {
     "id": "tests.v2.p2.test_calibration:Calibrate.test_swapped_fixtures_qualify_nothing",
@@ -683,7 +683,7 @@
    {
     "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_spec_is_bound_to_the_probe_and_answers_no_contract",
     "outcome": "PASS",
-    "seconds": 0.001
+    "seconds": 0.002
    },
    {
     "id": "tests.v2.p2.test_calibration:Contrast.test_CAL_1_a_fixed_REFUTED_rule_would_have_passed_the_always_refuted_probe",
@@ -713,7 +713,7 @@
    {
     "id": "tests.v2.p2.test_calibration:Metadata.test_a_protocol_only_probe_is_calibrated",
     "outcome": "PASS",
-    "seconds": 0.001
+    "seconds": 0.002
    },
    {
     "id": "tests.v2.p2.test_calibration:Metadata.test_an_unregistered_probe_or_digest_is_not_qualified",
@@ -927,7 +927,7 @@
      {
       "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
       "outcome": "PASS",
-      "seconds": 0.154
+      "seconds": 0.156
      }
     ]
    },
@@ -937,12 +937,12 @@
      {
       "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
       "outcome": "PASS",
-      "seconds": 1.075
+      "seconds": 1.096
      },
      {
       "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
       "outcome": "PASS",
-      "seconds": 0.304
+      "seconds": 0.313
      }
     ]
    },
@@ -967,7 +967,7 @@
      {
       "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
       "outcome": "PASS",
-      "seconds": 0.615
+      "seconds": 0.625
      },
      {
       "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
@@ -977,7 +977,7 @@
      {
       "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_parent_developer_test_execution_is_refused_statically",
       "outcome": "PASS",
-      "seconds": 0.082
+      "seconds": 0.084
      },
      {
       "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_the_apis_are_structurally_candidate_only",
@@ -1007,12 +1007,12 @@
      {
       "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
       "outcome": "PASS",
-      "seconds": 0.015
+      "seconds": 0.014
      },
      {
       "id": "tests.v2.test_p6_stages:Quality.test_INCOMPLETE_is_recorded_and_never_a_failure",
       "outcome": "PASS",
-      "seconds": 0.46
+      "seconds": 0.471
      }
     ]
    },
@@ -1032,7 +1032,7 @@
      {
       "id": "tests.v2.test_p6_stages:Quality.test_UNRUNNABLE_is_TESTS_UNRUNNABLE_with_environment_provenance_and_no_outcome",
       "outcome": "PASS",
-      "seconds": 0.267
+      "seconds": 0.271
      }
     ]
    },
@@ -1042,12 +1042,12 @@
      {
       "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
       "outcome": "PASS",
-      "seconds": 0.073
+      "seconds": 0.079
      },
      {
       "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_14_a_change_of_engineering_adequacy_leaves_the_product_proof_unchanged",
       "outcome": "PASS",
-      "seconds": 1.528
+      "seconds": 1.583
      }
     ]
    }
@@ -1129,57 +1129,57 @@
     {
      "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_pytest_for_real",
      "outcome": "PASS",
-     "seconds": 0.275
+     "seconds": 0.288
     },
     {
      "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_the_junit_result_set_is_read_typed",
      "outcome": "PASS",
-     "seconds": 0.001
+     "seconds": 0.002
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
      "outcome": "PASS",
-     "seconds": 0.161
+     "seconds": 0.166
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_2_for_real",
      "outcome": "PASS",
-     "seconds": 0.151
+     "seconds": 0.157
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_directory_target_is_discovered_and_a_node_id_selects_one_test",
      "outcome": "PASS",
-     "seconds": 0.303
+     "seconds": 0.312
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_passing_suite_yields_EXECUTED_PASSED_STORY_TESTS_RAN",
      "outcome": "PASS",
-     "seconds": 0.152
+     "seconds": 0.156
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_ended_by_a_signal_is_UNRUNNABLE",
      "outcome": "PASS",
-     "seconds": 0.13
+     "seconds": 0.134
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_that_crashes_before_reporting_is_UNRUNNABLE",
      "outcome": "PASS",
-     "seconds": 0.132
+     "seconds": 0.135
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_an_empty_selection_is_NO_STORY_TESTS_MATCHED_DEVELOPER",
      "outcome": "PASS",
-     "seconds": 0.302
+     "seconds": 0.312
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
      "outcome": "PASS",
-     "seconds": 0.151
+     "seconds": 0.156
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_the_projects_own_tree_is_DEVELOPER",
      "outcome": "PASS",
-     "seconds": 0.302
+     "seconds": 0.313
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_candidate_is_the_only_tree_execute_knows",
@@ -1194,12 +1194,12 @@
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_result_set_is_typed_and_carries_the_collection_detail",
      "outcome": "PASS",
-     "seconds": 0.153
+     "seconds": 0.158
     },
     {
      "id": "tests.v2.p5.test_test_execution:RealRunner.test_undeterminable_collection_cause_is_INTEGRATION",
      "outcome": "PASS",
-     "seconds": 0.152
+     "seconds": 0.156
     },
     {
      "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
@@ -1239,57 +1239,57 @@
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
      "outcome": "PASS",
-     "seconds": 0.153
+     "seconds": 0.16
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_2_for_real",
      "outcome": "PASS",
-     "seconds": 0.154
+     "seconds": 0.157
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_3_for_real_the_runner_without_the_capability_declares_it",
      "outcome": "PASS",
-     "seconds": 0.153
+     "seconds": 0.156
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_4_for_real_a_test_that_replaces_the_tracer_makes_the_measurement_PARTIAL",
      "outcome": "PASS",
-     "seconds": 0.153
+     "seconds": 0.16
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_5_for_real_branch_evidence_is_recorded_and_the_value_is_the_lines",
      "outcome": "PASS",
-     "seconds": 0.307
+     "seconds": 0.316
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_6_for_real_an_accessed_data_file",
      "outcome": "PASS",
-     "seconds": 0.309
+     "seconds": 0.322
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_7_for_real_no_capability_for_the_data_file",
      "outcome": "PASS",
-     "seconds": 0.154
+     "seconds": 0.159
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_8_for_real_the_same_tests_in_another_layout",
      "outcome": "PASS",
-     "seconds": 0.309
+     "seconds": 0.318
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_DEL_1_for_real_the_story_deletes_executable_code_and_its_test_verifies_the_deletion",
      "outcome": "PASS",
-     "seconds": 0.154
+     "seconds": 0.158
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_product_code_run_in_a_thread_is_measured",
      "outcome": "PASS",
-     "seconds": 0.154
+     "seconds": 0.159
     },
     {
      "id": "tests.v2.p5.test_relevance:ForReal.test_the_pytest_adapter_declares_no_measurement",
      "outcome": "PASS",
-     "seconds": 0.262
+     "seconds": 0.269
     },
     {
      "id": "tests.v2.p5.test_relevance:Parsing.test_a_unified_diff_becomes_candidate_line_numbers",
@@ -1299,7 +1299,7 @@
     {
      "id": "tests.v2.p5.test_relevance:Parsing.test_executable_lines_are_the_code_objects_own",
      "outcome": "PASS",
-     "seconds": 0.002
+     "seconds": 0.003
     },
     {
      "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
@@ -1389,67 +1389,67 @@
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_10_a_deletion_the_patch_does_not_carry_is_INDETERMINATE",
      "outcome": "PASS",
-     "seconds": 0.615
+     "seconds": 0.631
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_11_moving_the_developer_tests_does_not_change_the_result",
      "outcome": "PASS",
-     "seconds": 1.225
+     "seconds": 1.256
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
      "outcome": "PASS",
-     "seconds": 0.609
+     "seconds": 0.63
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
      "outcome": "PASS",
-     "seconds": 1.072
+     "seconds": 1.099
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
      "outcome": "PASS",
-     "seconds": 0.304
+     "seconds": 0.314
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_3_a_tree_that_cannot_be_reconstructed_is_INDETERMINATE",
      "outcome": "PASS",
-     "seconds": 0.157
+     "seconds": 0.158
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_4_a_runner_unavailable_in_the_neutralised_run_is_INDETERMINATE",
      "outcome": "PASS",
-     "seconds": 0.284
+     "seconds": 0.295
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_5_a_story_test_that_no_longer_imports_is_INDETERMINATE",
      "outcome": "PASS",
-     "seconds": 0.305
+     "seconds": 0.319
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_6_intended_story_tests_that_do_not_actually_run_are_INDETERMINATE",
      "outcome": "PASS",
-     "seconds": 0.917
+     "seconds": 0.953
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_7_a_failure_not_attributable_to_the_neutralisation_is_INDETERMINATE",
      "outcome": "PASS",
-     "seconds": 0.798
+     "seconds": 0.784
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS",
      "outcome": "PASS",
-     "seconds": 0.311
+     "seconds": 0.316
     },
     {
      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_9_a_pure_deletion_the_patch_carries_is_reconstructed_and_classified_from_execution",
      "outcome": "PASS",
-     "seconds": 0.613
+     "seconds": 0.628
     },
     {
      "id": "tests.v2.p5.test_vacuity:Typed.test_a_baseline_that_does_not_pass_has_no_counterfactual",
      "outcome": "PASS",
-     "seconds": 0.154
+     "seconds": 0.159
     },
     {
      "id": "tests.v2.p5.test_vacuity:Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
@@ -1569,52 +1569,52 @@
     {
      "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
      "outcome": "PASS",
-     "seconds": 0.002
+     "seconds": 0.001
     },
     {
      "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE",
      "outcome": "PASS",
-     "seconds": 0.457
+     "seconds": 0.468
     },
     {
      "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_17_for_real_a_tests_only_diff_is_INADEQUATE_by_the_frozen_rules",
      "outcome": "PASS",
-     "seconds": 0.458
+     "seconds": 0.469
     },
     {
      "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_1_for_real",
      "outcome": "PASS",
-     "seconds": 0.457
+     "seconds": 0.473
     },
     {
      "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_2_for_real_the_story_runner_cannot_execute",
      "outcome": "PASS",
-     "seconds": 0.336
+     "seconds": 0.291
     },
     {
      "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_3_for_real_the_regression_runner_cannot_execute",
      "outcome": "PASS",
-     "seconds": 0.438
+     "seconds": 0.45
     },
     {
      "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_4_and_10_for_real",
      "outcome": "PASS",
-     "seconds": 0.76
+     "seconds": 0.783
     },
     {
      "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner",
      "outcome": "PASS",
-     "seconds": 0.611
+     "seconds": 0.624
     },
     {
      "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_R_for_real_regression_selection_and_collection_by_their_typed_owner",
      "outcome": "PASS",
-     "seconds": 1.376
+     "seconds": 1.408
     },
     {
      "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
      "outcome": "PASS",
-     "seconds": 0.072
+     "seconds": 0.074
     },
     {
      "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
@@ -1672,52 +1672,52 @@
   {
    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission",
    "outcome": "PASS",
-   "seconds": 2.172
+   "seconds": 2.155
   },
   {
    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number",
    "outcome": "PASS",
-   "seconds": 1.45
+   "seconds": 1.439
   },
   {
    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own",
    "outcome": "PASS",
-   "seconds": 1.455
+   "seconds": 1.452
   },
   {
    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled",
    "outcome": "PASS",
-   "seconds": 1.458
+   "seconds": 1.447
   },
   {
    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused",
    "outcome": "PASS",
-   "seconds": 1.46
+   "seconds": 1.427
   },
   {
    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed",
    "outcome": "PASS",
-   "seconds": 1.451
+   "seconds": 1.445
   },
   {
    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives",
    "outcome": "PASS",
-   "seconds": 1.463
+   "seconds": 1.441
   },
   {
    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set",
    "outcome": "PASS",
-   "seconds": 1.571
+   "seconds": 1.563
   },
   {
    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set",
    "outcome": "PASS",
-   "seconds": 1.463
+   "seconds": 1.442
   },
   {
    "id": "tests.v2.p4.test_mutation_safety:DependencyBoundary.test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it",
    "outcome": "PASS",
-   "seconds": 0.014
+   "seconds": 0.013
   },
   {
    "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_class_qualified_name_picks_that_class_method",
@@ -1737,17 +1737,17 @@
   {
    "id": "tests.v2.p2.test_mutation_targets:Locator.test_every_target_resolves",
    "outcome": "PASS",
-   "seconds": 0.826
+   "seconds": 0.853
   },
   {
    "id": "tests.v2.p5.test_invariants:MutationAuthority.test_INV_MUTATION_AUTHORITY_destructive_sites_of_the_invariant_code_are_ledgered",
    "outcome": "PASS",
-   "seconds": 1.199
+   "seconds": 1.22
   },
   {
    "id": "tests.v2.p2.test_calibration:Calibrate.test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected",
    "outcome": "PASS",
-   "seconds": 0.002
+   "seconds": 0.003
   },
   {
    "id": "tests.v2.p2.test_calibration:Calibrate.test_a_probe_that_cannot_look_is_not_qualified",
@@ -1767,7 +1767,7 @@
   {
    "id": "tests.v2.p2.test_calibration:Calibrate.test_refusing_to_run_is_not_a_demonstration",
    "outcome": "PASS",
-   "seconds": 0.001
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p2.test_calibration:Calibrate.test_swapped_fixtures_qualify_nothing",
@@ -1782,7 +1782,7 @@
   {
    "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_spec_is_bound_to_the_probe_and_answers_no_contract",
    "outcome": "PASS",
-   "seconds": 0.001
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p2.test_calibration:Contrast.test_CAL_1_a_fixed_REFUTED_rule_would_have_passed_the_always_refuted_probe",
@@ -1812,7 +1812,7 @@
   {
    "id": "tests.v2.p2.test_calibration:Metadata.test_a_protocol_only_probe_is_calibrated",
    "outcome": "PASS",
-   "seconds": 0.001
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p2.test_calibration:Metadata.test_an_unregistered_probe_or_digest_is_not_qualified",
@@ -1897,57 +1897,57 @@
   {
    "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_pytest_for_real",
    "outcome": "PASS",
-   "seconds": 0.275
+   "seconds": 0.288
   },
   {
    "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_the_junit_result_set_is_read_typed",
    "outcome": "PASS",
-   "seconds": 0.001
+   "seconds": 0.002
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
    "outcome": "PASS",
-   "seconds": 0.161
+   "seconds": 0.166
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_2_for_real",
    "outcome": "PASS",
-   "seconds": 0.151
+   "seconds": 0.157
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_directory_target_is_discovered_and_a_node_id_selects_one_test",
    "outcome": "PASS",
-   "seconds": 0.303
+   "seconds": 0.312
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_passing_suite_yields_EXECUTED_PASSED_STORY_TESTS_RAN",
    "outcome": "PASS",
-   "seconds": 0.152
+   "seconds": 0.156
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_ended_by_a_signal_is_UNRUNNABLE",
    "outcome": "PASS",
-   "seconds": 0.13
+   "seconds": 0.134
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_that_crashes_before_reporting_is_UNRUNNABLE",
    "outcome": "PASS",
-   "seconds": 0.132
+   "seconds": 0.135
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_an_empty_selection_is_NO_STORY_TESTS_MATCHED_DEVELOPER",
    "outcome": "PASS",
-   "seconds": 0.302
+   "seconds": 0.312
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
    "outcome": "PASS",
-   "seconds": 0.151
+   "seconds": 0.156
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_the_projects_own_tree_is_DEVELOPER",
    "outcome": "PASS",
-   "seconds": 0.302
+   "seconds": 0.313
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_candidate_is_the_only_tree_execute_knows",
@@ -1962,12 +1962,12 @@
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_result_set_is_typed_and_carries_the_collection_detail",
    "outcome": "PASS",
-   "seconds": 0.153
+   "seconds": 0.158
   },
   {
    "id": "tests.v2.p5.test_test_execution:RealRunner.test_undeterminable_collection_cause_is_INTEGRATION",
    "outcome": "PASS",
-   "seconds": 0.152
+   "seconds": 0.156
   },
   {
    "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
@@ -2007,57 +2007,57 @@
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
    "outcome": "PASS",
-   "seconds": 0.153
+   "seconds": 0.16
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_2_for_real",
    "outcome": "PASS",
-   "seconds": 0.154
+   "seconds": 0.157
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_3_for_real_the_runner_without_the_capability_declares_it",
    "outcome": "PASS",
-   "seconds": 0.153
+   "seconds": 0.156
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_4_for_real_a_test_that_replaces_the_tracer_makes_the_measurement_PARTIAL",
    "outcome": "PASS",
-   "seconds": 0.153
+   "seconds": 0.16
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_5_for_real_branch_evidence_is_recorded_and_the_value_is_the_lines",
    "outcome": "PASS",
-   "seconds": 0.307
+   "seconds": 0.316
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_6_for_real_an_accessed_data_file",
    "outcome": "PASS",
-   "seconds": 0.309
+   "seconds": 0.322
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_7_for_real_no_capability_for_the_data_file",
    "outcome": "PASS",
-   "seconds": 0.154
+   "seconds": 0.159
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_8_for_real_the_same_tests_in_another_layout",
    "outcome": "PASS",
-   "seconds": 0.309
+   "seconds": 0.318
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_DEL_1_for_real_the_story_deletes_executable_code_and_its_test_verifies_the_deletion",
    "outcome": "PASS",
-   "seconds": 0.154
+   "seconds": 0.158
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_product_code_run_in_a_thread_is_measured",
    "outcome": "PASS",
-   "seconds": 0.154
+   "seconds": 0.159
   },
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_the_pytest_adapter_declares_no_measurement",
    "outcome": "PASS",
-   "seconds": 0.262
+   "seconds": 0.269
   },
   {
    "id": "tests.v2.p5.test_relevance:Parsing.test_a_unified_diff_becomes_candidate_line_numbers",
@@ -2067,7 +2067,7 @@
   {
    "id": "tests.v2.p5.test_relevance:Parsing.test_executable_lines_are_the_code_objects_own",
    "outcome": "PASS",
-   "seconds": 0.002
+   "seconds": 0.003
   },
   {
    "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
@@ -2157,67 +2157,67 @@
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_10_a_deletion_the_patch_does_not_carry_is_INDETERMINATE",
    "outcome": "PASS",
-   "seconds": 0.615
+   "seconds": 0.631
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_11_moving_the_developer_tests_does_not_change_the_result",
    "outcome": "PASS",
-   "seconds": 1.225
+   "seconds": 1.256
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
    "outcome": "PASS",
-   "seconds": 0.609
+   "seconds": 0.63
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
    "outcome": "PASS",
-   "seconds": 1.072
+   "seconds": 1.099
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
    "outcome": "PASS",
-   "seconds": 0.304
+   "seconds": 0.314
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_3_a_tree_that_cannot_be_reconstructed_is_INDETERMINATE",
    "outcome": "PASS",
-   "seconds": 0.157
+   "seconds": 0.158
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_4_a_runner_unavailable_in_the_neutralised_run_is_INDETERMINATE",
    "outcome": "PASS",
-   "seconds": 0.284
+   "seconds": 0.295
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_5_a_story_test_that_no_longer_imports_is_INDETERMINATE",
    "outcome": "PASS",
-   "seconds": 0.305
+   "seconds": 0.319
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_6_intended_story_tests_that_do_not_actually_run_are_INDETERMINATE",
    "outcome": "PASS",
-   "seconds": 0.917
+   "seconds": 0.953
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_7_a_failure_not_attributable_to_the_neutralisation_is_INDETERMINATE",
    "outcome": "PASS",
-   "seconds": 0.798
+   "seconds": 0.784
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS",
    "outcome": "PASS",
-   "seconds": 0.311
+   "seconds": 0.316
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_9_a_pure_deletion_the_patch_carries_is_reconstructed_and_classified_from_execution",
    "outcome": "PASS",
-   "seconds": 0.613
+   "seconds": 0.628
   },
   {
    "id": "tests.v2.p5.test_vacuity:Typed.test_a_baseline_that_does_not_pass_has_no_counterfactual",
    "outcome": "PASS",
-   "seconds": 0.154
+   "seconds": 0.159
   },
   {
    "id": "tests.v2.p5.test_vacuity:Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
@@ -2337,52 +2337,52 @@
   {
    "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
    "outcome": "PASS",
-   "seconds": 0.002
+   "seconds": 0.001
   },
   {
    "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE",
    "outcome": "PASS",
-   "seconds": 0.457
+   "seconds": 0.468
   },
   {
    "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_17_for_real_a_tests_only_diff_is_INADEQUATE_by_the_frozen_rules",
    "outcome": "PASS",
-   "seconds": 0.458
+   "seconds": 0.469
   },
   {
    "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_1_for_real",
    "outcome": "PASS",
-   "seconds": 0.457
+   "seconds": 0.473
   },
   {
    "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_2_for_real_the_story_runner_cannot_execute",
    "outcome": "PASS",
-   "seconds": 0.336
+   "seconds": 0.291
   },
   {
    "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_3_for_real_the_regression_runner_cannot_execute",
    "outcome": "PASS",
-   "seconds": 0.438
+   "seconds": 0.45
   },
   {
    "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_4_and_10_for_real",
    "outcome": "PASS",
-   "seconds": 0.76
+   "seconds": 0.783
   },
   {
    "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner",
    "outcome": "PASS",
-   "seconds": 0.611
+   "seconds": 0.624
   },
   {
    "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_R_for_real_regression_selection_and_collection_by_their_typed_owner",
    "outcome": "PASS",
-   "seconds": 1.376
+   "seconds": 1.408
   },
   {
    "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
    "outcome": "PASS",
-   "seconds": 0.072
+   "seconds": 0.074
   },
   {
    "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
@@ -2452,17 +2452,17 @@
   {
    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
    "outcome": "PASS",
-   "seconds": 0.154
+   "seconds": 0.156
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
    "outcome": "PASS",
-   "seconds": 1.075
+   "seconds": 1.096
   },
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
    "outcome": "PASS",
-   "seconds": 0.304
+   "seconds": 0.313
   },
   {
    "id": "tests.v2.p5.test_adequacy:Exhaustive.test_assembly_is_total_and_follows_the_precedence",
@@ -2477,7 +2477,7 @@
   {
    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
    "outcome": "PASS",
-   "seconds": 0.615
+   "seconds": 0.625
   },
   {
    "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
@@ -2487,7 +2487,7 @@
   {
    "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_parent_developer_test_execution_is_refused_statically",
    "outcome": "PASS",
-   "seconds": 0.082
+   "seconds": 0.084
   },
   {
    "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_the_apis_are_structurally_candidate_only",
@@ -2512,12 +2512,12 @@
   {
    "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
    "outcome": "PASS",
-   "seconds": 0.015
+   "seconds": 0.014
   },
   {
    "id": "tests.v2.test_p6_stages:Quality.test_INCOMPLETE_is_recorded_and_never_a_failure",
    "outcome": "PASS",
-   "seconds": 0.46
+   "seconds": 0.471
   },
   {
    "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
@@ -2532,17 +2532,17 @@
   {
    "id": "tests.v2.test_p6_stages:Quality.test_UNRUNNABLE_is_TESTS_UNRUNNABLE_with_environment_provenance_and_no_outcome",
    "outcome": "PASS",
-   "seconds": 0.267
+   "seconds": 0.271
   },
   {
    "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
    "outcome": "PASS",
-   "seconds": 0.073
+   "seconds": 0.079
   },
   {
    "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_14_a_change_of_engineering_adequacy_leaves_the_product_proof_unchanged",
    "outcome": "PASS",
-   "seconds": 1.528
+   "seconds": 1.583
   }
  ],
  "counts": {
@@ -2552,6 +2552,6 @@
   "SKIP": 0,
   "NOT_APPLICABLE": 0
  },
- "seconds": 43.5,
- "harness_digest_at_run": "1986a51c38e3483d9b1cd996549ed6034e8de1527654c89cd713c7f5bc2ee032"
+ "seconds": 44.0,
+ "harness_digest_at_run": "6bd5a7209a471212dacda180733ea9257b9e9e80638386169624de4f8818659c"
 }

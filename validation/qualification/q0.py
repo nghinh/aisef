@@ -10,7 +10,6 @@ behaviour are asserted; and removing the new F5 subcheck is shown to fail Q0.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from unittest import mock
 
@@ -70,9 +69,10 @@ def _specs_binding(digest: str) -> list[str]:
 
 def _files_mentioning(digest: str) -> list[str]:
     out = []
-    for base in ("aisef2", "tests/v2", "validation/v2", "closure-evidence/v2", "docs"):   # not the scanner itself
+    for base in ("aisef2", "tests/v2", "validation/v2", "closure-evidence/v2", "docs"):   # not the scanner, not its records
         for p in sorted((C.ROOT / base).rglob("*")):
-            if p.is_file() and p.suffix in (".py", ".json", ".md") and "__pycache__" not in p.parts:
+            if p.is_file() and p.suffix in (".py", ".json", ".md") and "__pycache__" not in p.parts \
+                    and not p.relative_to(C.ROOT).as_posix().startswith(C.OUT_REL):
                 try:
                     if digest in p.read_text(encoding="utf-8"):
                         out.append(p.relative_to(C.ROOT).as_posix())
@@ -222,14 +222,17 @@ def run(ident: dict) -> dict:
     if not ok_seals:
         problems.append("a seal identity does not hold")
     w0 = C.ROOT / "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json"
-    v1 = {"guard_problems": guard.check(), "w0_sha256": hashlib.sha256(w0.read_bytes()).hexdigest(),   # raw bytes: byte-identical
+    v1 = {"guard_problems": guard.check(), "w0_sha256": C.lf_sha(w0),   # LF-normalised: the file is LF, so this is its raw sha on a
+          # POSIX checkout and the same value on a CRLF checkout; the git blob below is the byte identity on every platform
+          "w0_blob_at_HEAD": C.git("rev-parse", "HEAD:closure-evidence/hardening/AISEF-W0-QUALIFICATION.json"),
+          "w0_blob_at_the_candidate": C.git("rev-parse", f"{C.SEMANTIC_CANDIDATE}:closure-evidence/hardening/AISEF-W0-QUALIFICATION.json"),
           "w0_expected": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
           "v1_product_tree": ident["v1_product_tree"], "v1_product_tree_at_p5_seal": seal5["p5_candidate"]["v1_product_tree"],
           "external_validation_tree": C.git("rev-parse", "HEAD:closure-evidence/external-validation"),
           "external_validation_tree_at_p5_seal": C.git("rev-parse", f"{seal5['seal_commit']}:closure-evidence/external-validation")
           if "seal_commit" in seal5 else C.git("rev-parse", f"{C.SEMANTIC_CANDIDATE}:closure-evidence/external-validation")}
-    if v1["guard_problems"] or v1["w0_sha256"] != v1["w0_expected"] or v1["v1_product_tree"] != v1["v1_product_tree_at_p5_seal"] \
-            or v1["external_validation_tree"] != v1["external_validation_tree_at_p5_seal"]:
+    if v1["guard_problems"] or v1["w0_sha256"] != v1["w0_expected"] or v1["w0_blob_at_HEAD"] != v1["w0_blob_at_the_candidate"] \
+            or v1["v1_product_tree"] != v1["v1_product_tree_at_p5_seal"] or v1["external_validation_tree"] != v1["external_validation_tree_at_p5_seal"]:
         problems.append("the V1 identity does not hold")
 
     catalog = {"check_problems": gc.check(C.ROOT), "both_directions": C.counts(catalog_tests)}
