@@ -7,7 +7,7 @@
  },
  "exception": {
   "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
-  "sha256": "47793a3503d13b0a7ba6c679b085558433fd4add4af6b7c78abe2b8712c66388"
+  "sha256": "8036c7c73fd6e397af726309c89f7002025b34747ab65aac0e1d43e4ba4fa35a"
  },
  "frozen_items_changed": [
   "F5"

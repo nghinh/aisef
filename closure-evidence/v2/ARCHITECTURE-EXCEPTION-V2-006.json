@@ -95,6 +95,7 @@
    "test_RACE_6_a_target_that_dies_before_READY_keeps_its_typed_outcome": "PASS",
    "test_RACE_7_a_partial_READY_then_exit_is_no_READY_never_a_guess": "PASS",
    "test_RACE_9_every_line_before_the_end_is_read_before_STREAM_CLOSED": "PASS",
+   "test_a_timed_out_wait_returns_only_once_the_monotonic_clock_has_passed_its_deadline": "PASS",
    "test_RACE_10_every_ordering_repeated_gives_the_normal_record": "PASS"
   },
   "race_tests_note": "RACE-2, RACE-3, RACE-9 and the probe-level RACE-4 pass on the base only because their exit-first injection consumes the anchor's exit report the base's exit-driven reader was waiting for; the delayed-pump cases (RACE-1, the story-level RACE-4, RACE-10) and the structural ones (RACE-8, the reader units) discriminate",

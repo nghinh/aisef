@@ -609,7 +609,9 @@ V2_006_EXCEPTION = "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json"
 V2_006_AMENDMENT = "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json"
 #: the modules V2-006 changed: their mutation targets are re-measured on this candidate (P2 and P4 records)
 V2_006_TARGET_MODULES = ("aisef2/probe/python_callable.py", "aisef2/runtime/range_anchor.py")
-#: RACE-1..10 (the owner's list), the reader's units and the anchor's watchdog (P6-FINDING-002), each run here as a single case
+#: RACE-1..10 (the owner's list) and the reader's units, each run here as a single case — platform-independent only: a
+#: case skipped on one platform would make the record differ there (the POSIX-only anchor watchdog test is bound
+#: structurally instead, `anchor_entry`)
 RACE_CASES = {
     "RACE_1_late_pump_READY_observed": ("test_v2_006", "Race", "test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump"),
     "RACE_2_complete_protocol_then_immediate_exit": ("test_v2_006", "Race", "test_RACE_2_READY_DISPATCHED_RESULT_then_immediate_exit_is_the_complete_result"),
@@ -627,7 +629,6 @@ RACE_CASES = {
     "next_reads_only_complete_marked_lines": ("test_v2_006", "NextAndPump", "test_next_returns_only_complete_marked_lines_of_this_nonce"),
     "one_reader_no_exit_driven_reader": ("p2/test_python_callable", "Boundaries", "test_the_protocol_readers_never_hold_the_interpreter_open"),
     "late_RESULT_read_without_a_drain": ("p2/test_python_callable", "Boundaries", "test_a_result_written_just_before_exit_is_drained_not_lost"),
-    "anchor_watchdog_holds_however_main_ends": ("p4/test_process_range", "Anchor", "test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group"),
 }
 
 

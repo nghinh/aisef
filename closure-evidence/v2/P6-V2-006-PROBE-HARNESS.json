@@ -18,7 +18,7 @@
  },
  "exception": {
   "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
-  "sha256": "47793a3503d13b0a7ba6c679b085558433fd4add4af6b7c78abe2b8712c66388",
+  "sha256": "8036c7c73fd6e397af726309c89f7002025b34747ab65aac0e1d43e4ba4fa35a",
   "status": "APPROVED — APPLIED",
   "frozen_items_changed_mechanically": [
    "F5"
@@ -34,7 +34,7 @@
  },
  "amendment": {
   "path": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json",
-  "sha256": "a06c6a67929e3fdf84d380cd436ccce85b1cef6e372d060b01d709fe5bdf7931",
+  "sha256": "09bb03a34f9b95083414625a4da46684d6d2319a5f6d52e54e1033d2bc33fb17",
   "amends": {
    "path": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",
    "sha256": "9b8636a22875c14211ef6fb974ef9c03f39600721aa8cf9020c7d41a37b6dad1"
@@ -99,8 +99,7 @@
   "pump_publishes_every_line_then_STREAM_CLOSED": true,
   "next_reads_only_complete_marked_lines": true,
   "one_reader_no_exit_driven_reader": true,
-  "late_RESULT_read_without_a_drain": true,
-  "anchor_watchdog_holds_however_main_ends": true
+  "late_RESULT_read_without_a_drain": true
  },
  "red_before": {
   "test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives": "FAIL",

@@ -197,6 +197,30 @@ class TrueEnd(_Probe):
         self.assertEqual(o.failures_after_close, [])
 
 
+def running_until(timeout: float) -> None:
+    """A fake range's `wait` for a process still running: None, returned only once the monotonic clock has passed the
+    deadline — the contract of `ProcessRange.wait` (pinned in `WaitContract`). A plain sleep can end before a coarse
+    monotonic clock (Windows) reaches it, and the reader would then take the None for the anchor's report closing."""
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        time.sleep(0.01)
+    return None
+
+
+class WaitContract(unittest.TestCase):
+    def test_a_timed_out_wait_returns_only_once_the_monotonic_clock_has_passed_its_deadline(self):
+        """After DISPATCHED the reader tells 'the window closed with the process running' from 'the anchor's report
+        closed' by this: a timed-out wait never returns before its deadline, by the clock the window is kept in."""
+        r = ProcessRange("wait-contract", [sys.executable, "-c", "import time; time.sleep(30)"]).start()
+        try:
+            for timeout in (0.0, 0.05, 0.2, 0.31):
+                deadline = time.monotonic() + timeout
+                self.assertIsNone(r.wait(timeout))
+                self.assertGreaterEqual(time.monotonic(), deadline)
+        finally:
+            r.release()
+
+
 class AnchorHoldsNoWriter(unittest.TestCase):
     def test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives(self):
         r = ProcessRange("race-8", [sys.executable, "-c", "print('last line')"], output=subprocess.PIPE).start()
@@ -305,8 +329,7 @@ class NextAndPump(unittest.TestCase):
     def test_a_stream_closed_while_the_process_runs_is_a_harness_timeout_at_the_watchdog(self):
         class Running:
             def wait(self, timeout=None):
-                time.sleep(min(timeout or 0, 0.3))
-                return None
+                return running_until(min(timeout or 0, 0.3))
         until = time.monotonic() + 0.2
         got = pc._harness_failure(Running(), "STREAM_CLOSED", "READY", 7, until)
         self.assertEqual(got.detail, "harness timeout: no READY within 7s — the observation mechanism did not operate")
@@ -330,9 +353,7 @@ class NextAndPump(unittest.TestCase):
                 return self
 
             def wait(self, timeout=None):
-                if self.code is None:
-                    time.sleep(min(timeout or 0, 1.0))
-                return self.code
+                return running_until(min(timeout or 0, 1.0)) if self.code is None else self.code
 
             def release(self):
                 pass
