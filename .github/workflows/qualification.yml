@@ -1,0 +1,40 @@
+name: qualification
+# P7 / QP-7 — the Q0→Q3 qualification harness on the platforms the kernel declares (Linux, Windows). Runs only for a
+# push whose commit message carries "[qualify]": each run is a recorded attempt, never a rerun-to-green. The harness
+# prints every rung record into the log (validation/qualification/common.py::emit); nothing is downloaded from it.
+on:
+  push:
+    branches: [hardening/systematic-v1]
+jobs:
+  qualify:
+    if: contains(github.event.head_commit.message, '[qualify]')
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: windows-latest
+            python-version: "3.11"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: harness digest before execution (owner §25)
+        run: python -P -c "import sys; sys.path.insert(0, '.'); from validation.qualification import common as C; print(C.harness_digest()['sha256'])"
+      # the whole run inside an OS-owned process range: an owned residual fails the job even when every rung is GREEN
+      - name: Q0 -> Q1 -> Q2 -> Q3 in the owned range
+        run: python -P validation/v2/owned_run.py --out owned-run.json -- python -P validation/qualification/run.py --rungs q0 q1 q2 q3 --print
+      - name: owned-range measurement of the whole run
+        if: always()
+        run: python -c "import json,sys; print('===AISEF-OWNED-RUN===' + json.dumps(json.load(open('owned-run.json'))) + '===END===')"
+      - name: V1 evidence untouched by the run
+        if: always()
+        run: python -P validation/v2/v1_evidence_guard.py --check
+      - name: the tree after the run
+        if: always()
+        run: git status --porcelain

@@ -1,0 +1,26 @@
+{
+ "command": [
+  "python3",
+  "-P",
+  "validation/qualification/run.py",
+  "--rungs",
+  "q0",
+  "q1",
+  "q2",
+  "q3"
+ ],
+ "exit": 0,
+ "mechanism": "posix-session-and-group",
+ "owned_before": 0,
+ "owned_at_exit": 0,
+ "owned_after": 0,
+ "residual": [],
+ "escaped": [],
+ "ladder": [],
+ "released_empty": true,
+ "harness_orphans_before": 0,
+ "harness_orphans_after": 0,
+ "os": "darwin",
+ "job": "local (non-gate platform)",
+ "ci_run": null
+}
