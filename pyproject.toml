@@ -20,6 +20,10 @@ aisef = "aisef.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["aisef*"]
+# `aisef*` also matches `aisef2` — the V2 Cycle-1 scaffolding, which is not part of the aisef product and must not
+# ship inside its wheel. The V1 package set is unchanged by this line (proved in
+# closure-evidence/v2/P0-PACKAGING-EXCLUDE.json).
+exclude = ["aisef2*"]
 
 [tool.setuptools.package-data]
 # Prompt, luật, skill và script trình duyệt là *dữ liệu chạy*, không phải tài

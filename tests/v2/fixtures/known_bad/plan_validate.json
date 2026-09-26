@@ -1,0 +1,2 @@
+{"checker": "plan_validate", "package": "plan correction", "kind": "plan_fixture",
+"fixture": "PLANDEP-3", "expect": "D: WP-6.2 does not explicitly require WP-2.5"}

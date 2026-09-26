@@ -148,6 +148,8 @@ class SandboxResult:
     timed_out: bool = False
     #: ``"<provider>/<level>"`` — e.g. ``docker/WORKSPACE_WRITE``, ``local/READ_ONLY``.
     isolation: str = ""
+    #: pids of processes the tool left in its group, terminated and verified dead after the run (F5)
+    reaped: list = field(default_factory=list)
     #: Guarantee names required by this level that the provider lacks. Empty when all met.
     missing: list[str] = field(default_factory=list)
     #: **Infrastructure** error — daemon unresponsive, cannot pull image —
@@ -439,8 +441,11 @@ def _run_docker(spec: SandboxSpec) -> SandboxResult:
             exit_code=_DOCKER_INFRA_EXIT, stderr=khong_dung,
             duration_ms=int((time.monotonic() - started) * 1000),
             provider_error=f"verification image unavailable: {khong_dung}",
-            image=spec.image,
+            image=spec.image,                 # the digest is unknown: the image is not there, and the record says so
         )
+    # INV-N.2 (Phase 11): the environment identity is on EVERY result of this run — the timed-out and the
+    # un-invokable ones included — so a failed tool run can still say which image it was meant to run in.
+    identity = {"image": spec.image, "image_id": verify_image.image_id(spec.image)}
     try:
         proc = subprocess.run(
             args, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=spec.timeout_seconds
@@ -454,14 +459,14 @@ def _run_docker(spec: SandboxSpec) -> SandboxResult:
             exit_code=124,
             stderr=f"exceeded {spec.timeout_seconds}s",
             duration_ms=int((time.monotonic() - started) * 1000),
-            timed_out=True,
+            timed_out=True, **identity,
         )
     except OSError as e:
         return SandboxResult(
             exit_code=_DOCKER_INFRA_EXIT,
             stderr=str(e),
             duration_ms=int((time.monotonic() - started) * 1000),
-            provider_error=f"cannot invoke docker: {e}",
+            provider_error=f"cannot invoke docker: {e}", **identity,
         )
     provider_error = ""
     if proc.returncode == _DOCKER_INFRA_EXIT:
@@ -472,9 +477,7 @@ def _run_docker(spec: SandboxSpec) -> SandboxResult:
         stdout=proc.stdout,
         stderr=proc.stderr,
         duration_ms=int((time.monotonic() - started) * 1000),
-        provider_error=provider_error,
-        image=spec.image,
-        image_id=verify_image.image_id(spec.image),
+        provider_error=provider_error, **identity,
     )
 
 
@@ -521,9 +524,12 @@ def _run_degraded(spec: SandboxSpec) -> SandboxResult:
     except OSError as e:
         return SandboxResult(exit_code=127, stderr=str(e), duration_ms=elapsed())
 
+    reaped: list[int] = []
     with proc:
         try:
             out, err = proc.communicate(timeout=spec.timeout_seconds)
+            from .process_owner import reap_group
+            reaped = reap_group(proc)      # F5: what the tool left behind dies here, verified
         except subprocess.TimeoutExpired:
             _kill_group(proc)
             proc.communicate()            # drain pipes and reap
@@ -546,4 +552,5 @@ def _run_degraded(spec: SandboxSpec) -> SandboxResult:
         stdout=out,
         stderr=err,
         duration_ms=elapsed(),
+        reaped=reaped,
     )

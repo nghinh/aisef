@@ -1,0 +1,41 @@
+UP035 [*] Import from `collections.abc` instead: `Iterable`
+ --> ledgerlock/store.py:7:1
+  |
+5 | import tempfile
+6 | from pathlib import Path
+7 | from typing import Iterable
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Import from `collections.abc`
+  |
+6 | from pathlib import Path
+  - from typing import Iterable
+7 + from collections.abc import Iterable
+8 |
+  |
+
+SIM115 Use a context manager for opening files
+  --> ledgerlock/store.py:37:12
+   |
+35 |     """
+36 |     target = Path(path)
+37 |     temp = tempfile.NamedTemporaryFile(
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+38 |         mode="wb",
+39 |         dir=target.parent,
+   |
+
+SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+  --> tests/test_store.py:47:13
+   |
+45 |               original = b'{"a":1}\n{"b":2}\n'
+46 |               path.write_bytes(original)
+47 | /             with mock.patch("os.replace", side_effect=OSError("crash")):
+48 | |                 with self.assertRaises(OSError):
+   | |________________________________________________^
+49 |                       write_atomic(path, [b'{"c":3}\n'])
+50 |               self.assertEqual(path.read_bytes(), original)
+   |
+help: Combine `with` statements
+
+Found 3 errors.
+[*] 1 fixable with the `--fix` option.

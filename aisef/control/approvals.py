@@ -170,6 +170,36 @@ def _artifact_hash(path: Path) -> str:
     return hashlib.sha256(json.dumps(loc, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
+def _repair_slice_hash(path: Path) -> str:
+    """Digest of exactly what `_artifact_hash` removes from the stories index — repair stories, repair epics and
+    repair waves — so that every repair story is inside SOME approval's digest (the `improve` gate's; SS-54)."""
+    if not path.is_file():
+        return ""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return ""
+    if not isinstance(data, dict):
+        return ""
+    lat = {key: [x for x in data.get(key) or [] if isinstance(x, dict) and str(x.get("id", "")).startswith(REPAIR_PREFIX)]
+           for key in ("stories", "epics")}
+    waves = data.get("waves") if isinstance(data.get("waves"), dict) else {}
+    lat["waves"] = {k: v for k, v in waves.items() if str(k).startswith(REPAIR_PREFIX)}
+    return hashlib.sha256(json.dumps(lat, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+
+
+def _verifier_config_digest(root: Path) -> str:
+    """The digest F1 stamps on every verdict (tools.*, verify.*, coverage.*, security.*, review.*), read from the
+    project's declared configuration — the artifact root's parent, file-based only: an environment override is the
+    operator's session and is already part of each verdict's identity (SS-55)."""
+    from ..config import Config
+    from .identity import verifier_config_digest
+    try:
+        return verifier_config_digest(Config.load(root.parent, env={}))
+    except Exception:  # noqa: BLE001 — an unreadable config is "no declared config", hashed as such, never a crash here
+        return ""
+
+
 def sha256_of(path: Path) -> str:
     """Hash artifact content. Returns empty string if the file does not exist."""
     if not path.is_file():
@@ -233,8 +263,14 @@ class ApprovalStore:
         return all(is_present(p) for p in self.artifact_paths(gate))
 
     def content_hash(self, gate: Gate) -> str:
-        """Combined hash of all gate files, in declaration order."""
+        """Combined hash of all gate files, in declaration order — plus what the gate covers beyond its files:
+        readiness covers the verifier configuration (SS-55), improve covers the repair slice of the stories index
+        that `stories`/`readiness` deliberately leave out (SS-54). INV-P.1: the digest is what a person approved."""
         parts = [f"{p.relative_to(self.root)}:{_artifact_hash(p)}" for p in self.artifact_paths(gate)]
+        if gate is Gate.READINESS:
+            parts.append(f"verifier-config:{_verifier_config_digest(self.root)}")
+        if gate is Gate.IMPROVE:
+            parts.append(f"repair-stories:{_repair_slice_hash(self.root / STORIES_INDEX)}")
         return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
     def load(self, gate: Gate) -> Approval | None:
@@ -274,7 +310,16 @@ class ApprovalStore:
             return Status.STALE  # content changed since approval
         if self._upstream_decided_after(gate, rec.seq):
             return Status.STALE  # an upstream gate was re-decided after this one
+        if self._upstream_stale(gate):
+            return Status.STALE  # an upstream artifact was edited after its approval (SS-56): content cascades too
         return Status.APPROVED
+
+    def _upstream_stale(self, gate: Gate) -> bool:
+        """True if any upstream gate's own status is STALE — a content edit, not only a later decision."""
+        if gate not in GATE_ORDER:
+            return False
+        idx = GATE_ORDER.index(gate)   # ponytail: recomputes upstream hashes per call; memoise if `status` shows up in a profile
+        return any(self.status(up) is Status.STALE for up in GATE_ORDER[:idx])
 
     def _upstream_decided_after(self, gate: Gate, seq: int) -> bool:
         """True if any upstream gate was decided after this gate."""

@@ -396,36 +396,16 @@ def _kill_tree_win32(root_pid: int) -> bool:
         return False
     import ctypes
     from ctypes import wintypes
-    k32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
 
-    class PROCESSENTRY32W(ctypes.Structure):
-        _fields_ = [("dwSize", wintypes.DWORD), ("cntUsage", wintypes.DWORD),
-                    ("th32ProcessID", wintypes.DWORD), ("th32DefaultHeapID", ctypes.c_size_t),
-                    ("th32ModuleID", wintypes.DWORD), ("cntThreads", wintypes.DWORD),
-                    ("th32ParentProcessID", wintypes.DWORD), ("pcPriClassBase", ctypes.c_long),
-                    ("dwFlags", wintypes.DWORD), ("szExeFile", ctypes.c_wchar * 260)]
-
-    k32.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
-    k32.Process32FirstW.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESSENTRY32W)]
-    k32.Process32NextW.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESSENTRY32W)]
+    from ..harness.process_owner import _snapshot_win32     # the ONE toolhelp walker (F5 CI on 612efce)
+    children = _snapshot_win32()
+    if not children:
+        return False
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)      # private: prototypes below are ours alone
     k32.OpenProcess.restype = wintypes.HANDLE
     k32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
     k32.TerminateProcess.argtypes = [wintypes.HANDLE, wintypes.UINT]
     k32.CloseHandle.argtypes = [wintypes.HANDLE]
-    invalid = ctypes.c_void_p(-1).value
-    snap = k32.CreateToolhelp32Snapshot(0x2, 0)          # TH32CS_SNAPPROCESS
-    if not snap or snap == invalid:
-        return False
-    children: dict[int, list[int]] = {}
-    try:
-        e = PROCESSENTRY32W()
-        e.dwSize = ctypes.sizeof(e)
-        ok = k32.Process32FirstW(snap, ctypes.byref(e))
-        while ok:
-            children.setdefault(int(e.th32ParentProcessID), []).append(int(e.th32ProcessID))
-            ok = k32.Process32NextW(snap, ctypes.byref(e))
-    finally:
-        k32.CloseHandle(snap)
     order, stack = [], [root_pid]
     while stack:
         pid = stack.pop()
@@ -517,6 +497,8 @@ def _stream_with_timeout(proc, *, timeout_seconds: int, stop_when=None
     # The reader thread reads from the live pipe.  Even if `proc.wait`
     # times out and the child is killed, the thread keeps draining until
     # EOF, so the partial stream survives whatever event forced the kill.
+    from ..harness.process_owner import reap_group, win_job
+    job = win_job(proc)                        # Windows: descendants die when the job closes (F5 / D-024)
     reader = threading.Thread(
         target=_drain,
         args=(proc.stdout, lines, partial, lock),
@@ -568,6 +550,10 @@ def _stream_with_timeout(proc, *, timeout_seconds: int, stop_when=None
         raise
 
     reader.join(timeout=2.0)
+    # F5 / INV-L.2: members of the session's process group that outlived the leader (a dev server, a `git gc`)
+    # are terminated and verified dead here, on EVERY exit — before anything removes the workspace (D-024)
+    proc.aisef_reaped = reap_group(proc)
+    job.close()
     if proc.stderr:
         try:
             stderr = proc.stderr.read()

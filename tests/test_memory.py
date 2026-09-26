@@ -149,8 +149,20 @@ class IntegrationTests(MemoryTests):
             row = self.record()
             row['status'] = 'active'
             row['text'] = f'bounded retries case {n}'
-            return LocalMemory(self.root).put(row)
+            # 5 writers queue on one file lock; on Windows msvcrt.locking raises PermissionError → BlockingIOError
+            # and the unlucky writer waits for the 19 ahead of it. The 2 s default is the single-writer product
+            # default; this test measures correctness (20 ids, 20 records), not latency (CI run 35092276631).
+            return LocalMemory(self.root, timeout=30).put(row)
         (self.root / 'rule.md').write_text('Use bounded retries\n' + '\n'.join(f'bounded retries case {n}' for n in range(20)))
+        # The store's lock file is seeded with its one byte before the writers start. On Windows the shim
+        # (aisef/_compat.py::flock_ex_nb) writes that byte itself when the file is empty, and two first writers
+        # racing on a new store can have one write into the byte the other just locked: os.write then raises
+        # PermissionError, which the shim does not translate to BlockingIOError (CI run 36086929580, candidate
+        # 175ba3a — a latent V1 defect of the frozen tree, reported, not fixed here). This test measures twenty
+        # writers on one lock, not the first byte of a brand-new store.
+        lock = self.root / '_bmad-output' / 'memory' / 'store.lock'
+        lock.parent.mkdir(parents=True, exist_ok=True)
+        lock.write_bytes(b'\0')
         with ThreadPoolExecutor(max_workers=5) as pool:
             ids = list(pool.map(put, range(20)))
         self.assertEqual(20, len(set(ids)))

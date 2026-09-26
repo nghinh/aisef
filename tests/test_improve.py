@@ -42,6 +42,9 @@ INDEX = {
     "stories": [{
         "id": "STORY-01-01", "epic_id": "EPIC-01", "title": "nền",
         "acceptance_criteria": ["đọc được a", "đọc được b"], "covers": [],
+        # every plan declares what each criterion must show (TDD proof policy V2)
+        "ac_proof": [{"ac_id": "AC-STORY-01-01-1", "proof_mode": "CHANGE_REQUIRED", "requirement": "FR-1"},
+                     {"ac_id": "AC-STORY-01-01-2", "proof_mode": "CHANGE_REQUIRED", "requirement": "FR-1"}],
         "write_scope": ["src/core"], "depends_on": [], "screens": [],
         "verification_contract": ["unit"], "file": "stories/EPIC-01/STORY-01-01.md",
     }],
@@ -59,7 +62,7 @@ class Fixer(ClientAdapter):
 
     id = "fixer"
 
-    def __init__(self, artifacts: Path, *, fix: bool = True, review: str = "không có mục chặn",
+    def __init__(self, artifacts: Path, *, fix: bool = True, review: str = "không có mục chặn\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n",
                  fail_first: int = 0):
         self.artifacts = artifacts
         self.fix = fix
@@ -77,7 +80,7 @@ class Fixer(ClientAdapter):
     def run(self, spec: RunSpec) -> RunResult:
         dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
         if dau.startswith("# Security review"):
-            return RunResult(ok=True, text="không có phát hiện bảo mật", cost_usd=0.1)
+            return RunResult(ok=True, text="không có phát hiện bảo mật\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n", cost_usd=0.1)
         if dau.startswith("# Review"):
             return RunResult(ok=True, text=self.review, cost_usd=0.1)
 

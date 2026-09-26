@@ -31,14 +31,27 @@ _GATE_MARK = {
 
 def _artifact_root(args) -> Path:
     """Artifact root — one root per project (invariant 2).
-
     Agents run inside story worktrees, so `--project .` there points at
     the worktree. Writing evidence there means the gate reading from the
     main repo root sees nothing.
+    D-011 (FAM-OWNERSHIP): a bench session's `aisef …` call whose --project fell back to `.` wrote `_bmad-output/`
+    into the framework repository root. An IMPLICIT project must BE a project — otherwise nothing is written.
     """
     from ..control.worktree import main_repo
+    root = main_repo(args.project)
+    if getattr(args, "project_defaulted", False) and not is_aisef_project(root):
+        from ..config import ConfigError
+        raise ConfigError(f"{root} is not an AISEF project (no .ai/config.json, docs/requirements.md, .aisef/ or "
+                          f"_bmad-output/) and no --project was given — nothing is written here; pass --project")
+    return root / ARTIFACT_ROOT
 
-    return main_repo(args.project) / ARTIFACT_ROOT
+
+PROJECT_MARKERS = (".ai/config.json", "docs/requirements.md", ".aisef", ARTIFACT_ROOT)
+
+
+def is_aisef_project(root: Path) -> bool:
+    """Does this directory carry any mark of an AISEF project?"""
+    return any((Path(root) / m).exists() for m in PROJECT_MARKERS)
 
 
 def _approvals(args) -> ApprovalStore:

@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 12 items
+
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps PASSED [  8%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_byte_identical PASSED [ 16%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal PASSED [ 25%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_insertion_order_independent PASSED [ 33%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads PASSED [ 41%]
+tests/test_format.py::TestGenesisConstant::test_AC_STORY_01_02_5_genesis_is_literal PASSED [ 50%]
+tests/test_nfc_normalization.py::TestNfcNormalization::test_AC_STORY_01_01_1_normalize_key_is_nfc 
+tests/test_nfc_normalization.py::TestNfcNormalization::test_AC_STORY_01_01_1_normalize_key_is_nfc PASSED [ 58%]
+tests/test_nfc_normalization.py::TestNfcNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_are_identical PASSED [ 66%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_3_import_prints_init_file_path PASSED [ 75%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_6_ledger_and_conflict_error_importable PASSED [ 83%]
+tests/test_skeleton.py::TestNoSideChannels::test_AC_STORY_01_01_4_no_forbidden_imports PASSED [ 91%]
+tests/test_skeleton.py::TestNoSideChannels::test_AC_STORY_01_01_5_no_forbidden_calls PASSED [100%]
+
+==================== 12 passed, 8 subtests passed in 0.03s =====================

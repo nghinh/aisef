@@ -1,0 +1,172 @@
+{
+ "generated": "2026-09-19T17:43:32+0700",
+ "run": "deepseek-ro-1",
+ "profile": "PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO",
+ "profile_id": "sha256:9f99ce5b057d229403c89e1958c41ee044dc977cd6fce9854b741f8ba691d147",
+ "valid_run": true,
+ "valid_because": "provider preflight PASS; fresh trunk (no delivered commits at start); prepare verified the exact frozen kernel and the profile digest; oracle mapping errors 0; manual state repair 0; orphan state 0; drift records 0; the model/project reached a terminal state (story exhausted) with no provider interruption",
+ "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+ "delivery_complete": false,
+ "progress": {
+  "done": 11,
+  "total": 16
+ },
+ "stories": {
+  "STORY-01-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-02": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-03": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-04": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-05": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-06": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-02-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-02-02": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-03-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-03-02": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-04-01": {
+   "status": "done",
+   "attempts": 2
+  },
+  "STORY-04-02": {
+   "status": "failed",
+   "attempts": 3
+  }
+ },
+ "stop": {
+  "story": "STORY-04-02",
+  "attempts": 3,
+  "attempt_1": "gate TDD + tests verify story: AC-STORY-04-02-1 (wrong positional args -> exit 2) was already green at the parent (argparse from STORY-04-01); the other five criterion tests had an executed red run (evidence seq 55) — the kernel's designed rule (INV-TDD-NOP-PROOF): every criterion test must be proven red without the story's code",
+  "attempt_2": "developer hit max_turns 80; the tree was graded; review blocked: non-JSON ledger line -> exit 2 instead of 5 (FR-12)",
+  "attempt_3": "review blocked: a line mutated to valid JSON of the wrong type ([1,2,3]) -> verify and repair-tail exit 2 instead of 5 (FR-12, AC-STORY-04-02-4/5)"
+ },
+ "block_legitimacy_measured": {
+  "method": "the final candidate 4c8dd82d extracted into the qualification workspace; a 20-line ledger built with its own Ledger.append; line 17 mutated out of band; `ledgerlock.cli.main` run for verify and repair-tail",
+  "results": {
+   "clean": [
+    0,
+    0
+   ],
+   "value-tamper": [
+    5,
+    5
+   ],
+   "non-json": [
+    5,
+    5
+   ],
+   "json-list [1,2,3]": [
+    2,
+    2
+   ],
+   "json-number 42": [
+    2,
+    2
+   ],
+   "json-string \"x\"": [
+    2,
+    2
+   ]
+  },
+  "verdict": "the reviewer's blocking claim is TRUE — FR-12: corruption exits 5, 'Any other exit code is a bug'; the hidden oracle on the same candidate is also red on CLI exit-code checks (a conflicting batch through the CLI exits 0, not 4) — NOT a false BLOCK"
+ },
+ "oracle_at_trunk": {
+  "false_pass_count": 0,
+  "mapping_error_count": 0,
+  "red_classes": {
+   "INCOMPLETE_DELIVERY_EXPECTED_RED": 8
+  }
+ },
+ "false_block_count": 0,
+ "manual_state_repair": 0,
+ "orphan_state_count": 0,
+ "drift_records": [],
+ "resumes_forced": 2,
+ "run_metrics": {
+  "developer_agent_runs": 15,
+  "developer_retries": 3,
+  "reviewer_executions": 15,
+  "reviewer_retries": 0,
+  "security_executions": 15,
+  "security_retries": 0,
+  "max_turn_events": 1,
+  "human_arbitrations_during_the_run": 0,
+  "stories_done": 11,
+  "stories_failed": [
+   "STORY-04-02"
+  ],
+  "stories_never_started": 4,
+  "false_block": [],
+  "false_block_count": 0,
+  "false_block_measurable_for": [
+   "STORY-01-01",
+   "STORY-01-02",
+   "STORY-01-03",
+   "STORY-01-05",
+   "STORY-01-06",
+   "STORY-02-01",
+   "STORY-02-02",
+   "STORY-03-01",
+   "STORY-03-02",
+   "STORY-04-01",
+   "STORY-04-02"
+  ]
+ },
+ "turns": {
+  "developer_sessions": 15,
+  "max": 80,
+  "max_turn_events": 1,
+  "distribution": [
+   11,
+   15,
+   17,
+   19,
+   20,
+   21,
+   21,
+   21,
+   22,
+   22,
+   22,
+   23,
+   32,
+   32,
+   80
+  ]
+ },
+ "runtime_seconds": 10026.1,
+ "output_tokens_logged_by_the_kernel": 75110,
+ "cost_usd_reported": 0.0,
+ "backlog_observed": {
+  "SS-92": "developer-session `bandit -q -r .` classified TOOL_UNRUNNABLE 'not found' although bandit ran (STORY-04-02 evidence seq 94/100/367/373) — OPEN P2, not gating (profile tools.sast is empty)",
+  "SS-93": "the same bandit runs scanned 52 298 lines (.claude/.aisef included) — OPEN P2"
+ }
+}

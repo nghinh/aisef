@@ -1,0 +1,95 @@
+[
+ {
+  "run": 1,
+  "class": "LEGITIMATE_MODEL_PROJECT_STOP",
+  "done": "11/16",
+  "runtime": "2h08m",
+  "sessions": 74,
+  "turns": 1733,
+  "in_tok": 128476781,
+  "out_tok": 513000,
+  "cost": "UNVERIFIABLE",
+  "dev_retries": 9,
+  "rev_exec": 22,
+  "sec_exec": 19,
+  "max_turns": 22,
+  "human": 0,
+  "false_pass": 0,
+  "false_block": 0,
+  "manual_repair": 0,
+  "orphan": 0,
+  "drift": 0,
+  "mapping_err": 0,
+  "oracle": "1P/8F/0S",
+  "failed_stories": [
+   "STORY-04-02"
+  ],
+  "never_started": 4,
+  "resumes": 2,
+  "stops": [
+   "[2026-09-18 09:11:44] epic=EPIC-04 STOPPED at=EPIC-04 \u00b7 wave 2"
+  ]
+ },
+ {
+  "run": 2,
+  "class": "LEGITIMATE_MODEL_PROJECT_STOP",
+  "done": "0/16",
+  "runtime": "0h11m",
+  "sessions": 19,
+  "turns": 309,
+  "in_tok": 23936975,
+  "out_tok": 136000,
+  "cost": "UNVERIFIABLE",
+  "dev_retries": 2,
+  "rev_exec": 2,
+  "sec_exec": 2,
+  "max_turns": 3,
+  "human": 0,
+  "false_pass": 0,
+  "false_block": 0,
+  "manual_repair": 0,
+  "orphan": 0,
+  "drift": 0,
+  "mapping_err": 0,
+  "oracle": "0P/0F/9S",
+  "failed_stories": [
+   "STORY-01-01"
+  ],
+  "never_started": 15,
+  "resumes": 0,
+  "stops": [
+   "[2026-09-18 10:14:52] epic=EPIC-01 STOPPED at=EPIC-01 \u00b7 wave 1"
+  ]
+ },
+ {
+  "run": 3,
+  "class": "LEGITIMATE_MODEL_PROJECT_STOP",
+  "done": "2/16",
+  "runtime": "0h20m",
+  "sessions": 25,
+  "turns": 435,
+  "in_tok": 31868689,
+  "out_tok": 149000,
+  "cost": "UNVERIFIABLE",
+  "dev_retries": 2,
+  "rev_exec": 4,
+  "sec_exec": 4,
+  "max_turns": 3,
+  "human": 0,
+  "false_pass": 0,
+  "false_block": 0,
+  "manual_repair": 0,
+  "orphan": 0,
+  "drift": 0,
+  "mapping_err": 0,
+  "oracle": "0P/9F/0S",
+  "failed_stories": [
+   "STORY-01-03"
+  ],
+  "never_started": 13,
+  "resumes": 0,
+  "stops": [
+   "[2026-09-18 10:46:13] epic=EPIC-01 STOPPED at=EPIC-01 \u00b7 wave 3"
+  ]
+ }
+]

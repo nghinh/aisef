@@ -1,0 +1,17 @@
+{
+ "subject": {
+  "kind": "python_callable",
+  "locator": "calib_subject:target"
+ },
+ "stimulus": {
+  "args": [
+   2,
+   3
+  ]
+ },
+ "observable": {
+  "returns": 5,
+  "within_s": 5
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}

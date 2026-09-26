@@ -1,0 +1,105 @@
+{
+ "record": "AISEF V2 — P1 CONTRACT SHAPES",
+ "work_package": "WP-1.1",
+ "rfc_sections": [
+  "6",
+  "7"
+ ],
+ "shapes": {
+  "Requirement": {
+   "rfc": [
+    "id",
+    "text",
+    "source",
+    "requirement_hash"
+   ],
+   "code": [
+    "id",
+    "text",
+    "source",
+    "requirement_hash"
+   ]
+  },
+  "ContractApproval": {
+   "rfc": [
+    "requirement_id",
+    "requirement_hash",
+    "contract_id",
+    "contract_hash",
+    "approver",
+    "approved_at",
+    "model_reviews"
+   ],
+   "code": [
+    "requirement_id",
+    "requirement_hash",
+    "contract_id",
+    "contract_hash",
+    "approver",
+    "approved_at",
+    "model_reviews"
+   ]
+  },
+  "Subject": {
+   "rfc": [
+    "kind",
+    "locator"
+   ],
+   "code": [
+    "kind",
+    "locator"
+   ]
+  },
+  "BehaviorContract": {
+   "rfc": [
+    "id",
+    "requirement_ids",
+    "subject",
+    "stimulus",
+    "observable",
+    "polarity",
+    "subject_absence",
+    "rationale",
+    "contract_hash"
+   ],
+   "code": [
+    "id",
+    "requirement_ids",
+    "subject",
+    "stimulus",
+    "observable",
+    "polarity",
+    "subject_absence",
+    "rationale",
+    "contract_hash"
+   ]
+  }
+ },
+ "reference_contract_hash": "5ec7896f23f3f8046ae6225c571fe26df82175bd0fefac88d66401db11fcf432",
+ "contract_hash_bound_fields": {
+  "id": true,
+  "requirement_ids": true,
+  "subject": true,
+  "stimulus": true,
+  "observable": true,
+  "polarity": true,
+  "subject_absence": true,
+  "rationale": true
+ },
+ "properties": {
+  "shapes_equal_rfc": true,
+  "contract_hash_binds_every_field": true,
+  "contract_hash_binds_subject_absence": true,
+  "rationale_edit_detected": true,
+  "supplied_hash_verified": true,
+  "json_round_trip_is_identity": true,
+  "approval_binds_both_hashes": true,
+  "requirement_edit_invalidates_approval": true,
+  "contract_edit_invalidates_approval": true,
+  "unapproved_contract_refused": true,
+  "model_cannot_approve": true,
+  "test_artefacts_rejected": true,
+  "subject_absence_never_inferred": true,
+  "no_prose_control": true
+ }
+}

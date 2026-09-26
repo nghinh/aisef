@@ -1,0 +1,6 @@
+{"seq": 1, "step": "attempt.started", "at": 1789795529.009, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789795529.494, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-gpt55-ro-1/.aisef/worktrees/STORY-02-02"}, "undo": {"worktree.remove": "STORY-02-02"}}
+{"seq": 3, "step": "status.running", "at": 1789795529.495, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "verification.completed", "at": 1789800933.578, "attempt": 1, "data": {"ok": false, "attempts": 0, "cost_usd": 0.0, "candidate": ""}, "undo": {}}
+{"seq": 5, "step": "review.completed", "at": 1789800933.579, "attempt": 1, "data": {"blocked": [], "outcome": "NONE", "review_executions": 0, "developer_attempts": 0}, "undo": {}}
+{"seq": 6, "step": "attempt.committed", "at": 1789800933.595, "attempt": 1, "data": {}, "undo": {}}

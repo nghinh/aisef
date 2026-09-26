@@ -1,0 +1,12 @@
+{"seq": 1, "step": "attempt.started", "at": 1789948334.947, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789948335.352, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-v21-run2/.aisef/worktrees/STORY-04-01"}, "undo": {"worktree.remove": "STORY-04-01"}}
+{"seq": 3, "step": "status.running", "at": 1789948335.353, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789948769.574, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/__main__.py", "ledgerlock/cli.py", "tests/test_cli_exit_codes.py"], "preexisting_excluded": [], "count": 3}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789948769.574, "attempt": 1, "data": {"luot": 1, "sha": "f19345d9c9e035dbc56503b054f69d90843059c7", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "changes.detected", "at": 1789949219.35, "attempt": 1, "data": {"luot": 2, "files": ["ledgerlock/__main__.py", "ledgerlock/cli.py", "tests/test_cli_exit_codes.py"], "preexisting_excluded": [], "count": 3}, "undo": {}}
+{"seq": 7, "step": "candidate.frozen", "at": 1789949219.35, "attempt": 1, "data": {"luot": 2, "sha": "463ec0a0c4bf82282135a6add221cb4b6767466a", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 8, "step": "changes.detected", "at": 1789949690.593, "attempt": 1, "data": {"luot": 3, "files": ["ledgerlock/__main__.py", "ledgerlock/cli.py", "tests/test_cli_exit_codes.py"], "preexisting_excluded": [], "count": 3}, "undo": {}}
+{"seq": 9, "step": "candidate.frozen", "at": 1789949690.593, "attempt": 1, "data": {"luot": 3, "sha": "c17f996a7a7389860b6c4ee2d37c5e194d346773", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 10, "step": "verification.completed", "at": 1789950037.458, "attempt": 1, "data": {"ok": false, "attempts": 3, "cost_usd": 0.0, "candidate": "c17f996a7a7389860b6c4ee2d37c5e194d346773"}, "undo": {}}
+{"seq": 11, "step": "review.completed", "at": 1789950037.459, "attempt": 1, "data": {"blocked": [], "outcome": "NONE", "review_executions": 3, "developer_attempts": 3}, "undo": {}}
+{"seq": 12, "step": "attempt.committed", "at": 1789950037.465, "attempt": 1, "data": {}, "undo": {}}

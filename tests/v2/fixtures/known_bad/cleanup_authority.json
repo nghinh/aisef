@@ -1,0 +1,69 @@
+{
+ "checker": "cleanup_authority",
+ "package": "P4 correction (P4-FINDING-011)",
+ "kind": "reported_processes",
+ "boundary": {
+  "runner": 100,
+  "since": 1000.0,
+  "root": "/work"
+ },
+ "table": [
+  [
+   1,
+   0,
+   1,
+   0.0,
+   "/sbin/launchd"
+  ],
+  [
+   50,
+   1,
+   50,
+   10.0,
+   "shell"
+  ],
+  [
+   100,
+   50,
+   100,
+   20.0,
+   "python mutation.py"
+  ],
+  [
+   200,
+   100,
+   200,
+   1001.0,
+   "python -m unittest (the runner's worker)"
+  ],
+  [
+   300,
+   100,
+   300,
+   900.0,
+   "python (a child born before the boundary: a reused pid)"
+  ],
+  [
+   400,
+   1,
+   400,
+   1005.0,
+   "Dock (launchd-owned, born after the boundary, not a descendant)"
+  ]
+ ],
+ "reported": {
+  "pids": [
+   1,
+   50,
+   300,
+   400
+  ],
+  "groups": [
+   1,
+   50,
+   300,
+   400
+  ]
+ },
+ "expect": "born before the boundary or not a descendant of the runner"
+}

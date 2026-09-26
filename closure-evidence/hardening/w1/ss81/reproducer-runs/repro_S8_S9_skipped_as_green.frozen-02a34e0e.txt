@@ -1,0 +1,27 @@
+F................F................
+======================================================================
+FAIL: test_a_baseline_green_test_skipped_at_the_candidate_is_a_regression_signal (__main__.S8_BaselineSkippedAtCandidate.test_a_baseline_green_test_skipped_at_the_candidate_is_a_regression_signal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py", line 15, in test_a_baseline_green_test_skipped_at_the_candidate_is_a_regression_signal
+    self.assertIsNot(m.outcome, Outcome.PASSED)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly identical: <Outcome.PASSED: 'passed'>
+
+======================================================================
+FAIL: test_a_verified_behaviour_whose_test_is_skipped_is_not_preserved (__main__.S9_PreservationSkipped.test_a_verified_behaviour_whose_test_is_skipped_is_not_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_S8_S9_skipped_as_green.py", line 25, in test_a_verified_behaviour_whose_test_is_skipped_is_not_preserved
+    self.assertIsNot(m.outcome, Outcome.PASSED)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly identical: <Outcome.PASSED: 'passed'>
+
+----------------------------------------------------------------------
+Ran 34 tests in 0.067s
+
+FAILED (failures=2)
+
+S8 R9: Outcome.PASSED | 
+S9 preservation: Outcome.PASSED | 1 behaviours of other stories still green
+exit=1

@@ -1,0 +1,88 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> conftest.py:3:1
+  |
+1 |   """Test configuration — keeps ``pytest`` and ``python -m unittest discover`` aligned."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | import sys
+6 | | from pathlib import Path
+  | |________________________^
+help: Organize imports
+  |
+7 |
+  -
+8 | REPO_ROOT = Path(__file__).resolve().parent
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> ledgerlock/__main__.py:3:1
+  |
+1 |   """Allow ``python -m ledgerlock`` to invoke the CLI."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | import sys
+6 | |
+7 | | from ledgerlock.cli import main
+  | |_______________________________^
+help: Organize imports
+  |
+8 |
+  -
+9 | if __name__ == "__main__":
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests/test_nfc_normalization.py:3:1
+  |
+1 |   """AC-STORY-01-01-1..2 — NFC normalization edge cases."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | import unittest
+6 | | import unicodedata
+  | |__________________^
+help: Organize imports
+  |
+4 |
+5 + import unicodedata
+6 | import unittest
+  - import unicodedata
+7 |
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_skeleton.py:3:1
+   |
+ 1 |   """AC-STORY-01-01-1..7 — package skeleton, CLI surface, NFC normalization."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import os
+ 6 | | import subprocess
+ 7 | | import sys
+ 8 | | import unicodedata
+ 9 | | import unittest
+10 | | from pathlib import Path
+   | |________________________^
+help: Organize imports
+   |
+11 |
+   -
+12 | REPO_ROOT = Path(__file__).resolve().parent.parent
+   |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:69:21
+   |
+68 |     def test_AC_STORY_01_01_4_help_lists_subcommands(self) -> None:
+69 |         completed = subprocess.run(
+   |                     ^^^^^^^^^^^^^^
+70 |             [sys.executable, "-m", "ledgerlock", "--help"],
+71 |             cwd=REPO_ROOT,
+   |
+help: Add explicit `check=False`
+
+Found 5 errors.
+[*] 4 fixable with the `--fix` option.

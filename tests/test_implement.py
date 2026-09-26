@@ -11,6 +11,8 @@ from __future__ import annotations
 import subprocess
 import sys
 import tempfile
+import json
+import re
 import unittest
 from pathlib import Path
 
@@ -18,6 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 import tests  # noqa: E402,F401 — HostProvider vào chỗ docker, không mở container (tests/__init__.py)
+from tests import obligations  # noqa: E402
 
 from aisef.clients.base import Capability, ClientAdapter, RunSpec, Support  # noqa: E402
 from aisef.clients.stream import RunResult, ToolUse  # noqa: E402
@@ -41,13 +44,25 @@ from aisef.phases.implement import (  # noqa: F401
 FIX = ROOT / "tests" / "fixtures" / "bmad"
 
 
+def chan(*lines: str) -> str:
+    """A blocking review as a production reviewer answers since F2: the prose lines AND the
+    structured envelope. Absence of the JSON verdict is UNRUNNABLE (retried as a review), never a block."""
+    findings = []
+    for ln in lines:
+        m = re.match(r"\[(chặn|bế tắc)\]\s*(\S+?)(?::(\d+))?\s+—\s*(.*)", ln)
+        tag, file, line, why = m.groups() if m else ("chặn", "", "", ln)
+        findings.append({"tag": tag, "file": file, "line": line or "", "why": why})
+    env = json.dumps({"verdict": "block", "findings": findings}, ensure_ascii=False)
+    return "\n".join(lines) + "\n\n```json\n" + env + "\n```\n"
+
+
 class ScriptedClient(ClientAdapter):
     """Agent giả: mỗi lượt viết code theo kịch bản, rồi rà soát theo kịch bản."""
 
     id = "scripted"
 
-    def __init__(self, *, writes=("src/a.py",), review="không có mục chặn",
-                 security="không có phát hiện bảo mật",
+    def __init__(self, *, writes=("src/a.py",), review="không có mục chặn\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n",
+                 security="không có phát hiện bảo mật\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n",
                  fail_first=0, fail_error="api_error"):
         self.writes = list(writes)
         self.review = review
@@ -114,6 +129,13 @@ class ImplementTestCase(unittest.TestCase):
         self._tmp = tempfile.TemporaryDirectory()
         self.project = Path(self._tmp.name)
         subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
+        # A project has a HEAD: without one every candidate freeze fails ("cannot read HEAD") and the loop
+        # is exercised on its unfrozen path only (found while resolving SS-01/SS-60, 2026-09-16).
+        subprocess.run(["git", "config", "user.email", "t@t"], cwd=self.project, check=True)
+        subprocess.run(["git", "config", "user.name", "t"], cwd=self.project, check=True)
+        (self.project / "README.md").write_text("project\n", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.project, check=True)
+        subprocess.run(["git", "commit", "-qm", "entry"], cwd=self.project, check=True)
         self.artifacts = self.project / "_bmad-output"
         self.artifacts.mkdir()
         self.story = Story(
@@ -123,6 +145,8 @@ class ImplementTestCase(unittest.TestCase):
             acceptance_criteria=["ghi chú mới xuất hiện trong danh sách"],
             covers=["FR-1"],
             write_scope=["src"],
+            # every plan declares what each criterion must show (TDD proof policy V2); this one adds behaviour
+            ac_proof=obligations("STORY-01-01", 1),
         )
 
     def tearDown(self):
@@ -151,16 +175,12 @@ class TestHappyPath(ImplementTestCase):
         self.assertEqual(len(out.attempts), 1)
 
     def test_developer_then_reviewer(self):
-        """Client giả trả văn bản **không** kèm khối JSON, nên mỗi vai rà
-        soát tốn thêm đúng một lượt hỏi lại schema (R8). Đó chính là hành vi
-        cần: thiếu bản máy đọc thì hỏi lại một lần rồi mới lùi về văn bản.
-        Agent thật đọc prompt mới sẽ trả JSON ngay lượt đầu và không có lượt
-        thêm nào."""
+        """Client giả trả khối JSON như reviewer thật phải trả (F2): mỗi vai rà
+        soát đúng một lượt. Lượt hỏi lại schema (R8) khi thiếu JSON được đo ở
+        `test_be_tac_chi_trong_van_xuoi_thi_khong_phai_verdict`."""
         c = ScriptedClient()
         self.implement(c)
-        self.assertEqual(
-            c.calls, ["develop", "review", "review", "security", "security"]
-        )
+        self.assertEqual(c.calls, ["develop", "review", "security"])
 
     def test_cong_nhin_thay_cong_viec_agent_da_commit(self):
         """Agent commit trong worktree thì ba cổng vẫn phải thấy diff.
@@ -219,62 +239,43 @@ class TestHappyPath(ImplementTestCase):
         """Lỗi 46b. Với phép đối chứng nop, đỏ ở parent là kết quả **cần**.
         Nhưng lệnh test không khởi chạy được (exit 127 trên Windows) cũng cho
         `ok=False`, và gọi đó là "expected" là báo một phép đối chứng chưa hề
-        xảy ra."""
-        import inspect
-        from aisef.phases import implement
-        src = inspect.getsource(implement.run_nop)
-        self.assertIn("control NOT performed", src)
-        i_unrun = src.index("res.unrunnable")
-        i_expected = src.index("tests red at parent (expected)")
-        self.assertLess(i_unrun, i_expected, "phải hỏi 'chạy được không' trước khi nói 'đỏ đúng như mong đợi'")
+        xảy ra. (Ported from a source-text check to behaviour, SS-81 family.)"""
+        from aisef.harness.tools import ToolResult
+        from aisef.phases.implement import _nop_summary
+
+        res = ToolResult("test", ok=False, exit_code=127, unrunnable="tool not installed or cannot load (exit 127)",
+                         stdout="sh: pytest: command not found")
+        line = _nop_summary(res, ["src/a.py"], ["src/a.py"])
+        self.assertIn("did not execute", line)
+        self.assertNotIn("expected", line)
 
     def test_thieu_chinh_ma_cua_story_o_parent_la_do_hop_le(self):
         """Lỗi 120 (todo-cli STORY-01-01, 2026-09-13): cây nop **cố tình**
         không có mã của story, nên "cannot find module ../lib/store" là phép
-        đối chứng đang chạy đúng. Luật chung ("chưa test nào xanh thì coi là
-        không chạy được") không phân biệt được, vì story đầu của một dự án
-        greenfield không có test nào khác để in tên — và phép đối chứng mạnh
-        nhất bị ghi là "chưa thực hiện" đúng chỗ cần nó nhất."""
-        from aisef.harness.tools import NO_SETUP, ToolResult
-        from aisef.phases.implement import _vang_ma_cua_story
+        đối chứng đang chạy đúng — một thư viện chưa cài thì vẫn là môi trường.
+        SS-82: the matcher now lives in `control.proof.story_file_for` (package roots, import-root anchoring)."""
+        from aisef.control.proof import story_file_for
 
-        thieu_phu_thuoc = NO_SETUP + " — the project's dependencies are not installed here"
-        story = ["lib/store.js", "tests/store.test.js"]
-
-        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
-                         stdout="Error: Cannot find module '../lib/store'")
-        self.assertEqual(_vang_ma_cua_story(res, story), "lib/store.js")
-
-        # Thư viện dự án chưa cài: đúng là môi trường hỏng, phải giữ nguyên.
-        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
-                         stdout="Error: Cannot find module 'express'")
-        self.assertEqual(_vang_ma_cua_story(res, story), "")
-
-        # Không phải loại "thiếu phụ thuộc" thì không đụng tới.
-        res = ToolResult("test", ok=False, unrunnable="tool not installed or cannot load (exit 127)",
-                         stdout="npm: command not found")
-        self.assertEqual(_vang_ma_cua_story(res, story), "")
-
-        # Python: tên module là dấu chấm, không phải dấu gạch chéo.
-        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
-                         stdout="ModuleNotFoundError: No module named 'app.store'")
-        self.assertEqual(_vang_ma_cua_story(res, ["app/store.py"]), "app/store.py")
-
-        # Tệp test của story không tính: nó **có** trong cây nop.
-        res = ToolResult("test", ok=False, unrunnable=thieu_phu_thuoc,
-                         stdout="Cannot find module './tests/store.test'")
-        self.assertEqual(_vang_ma_cua_story(res, ["tests/store.test.js"]), "")
+        story = ["lib/store.js"]                                  # callers pass the story's NON-test files only
+        self.assertEqual(story_file_for("../lib/store", story, importer="tests/store.test.js"), "lib/store.js")
+        self.assertEqual(story_file_for("express", story, importer="tests/store.test.js"), "")
+        self.assertEqual(story_file_for("app.store", ["app/store.py"]), "app/store.py")    # Python: dotted
+        self.assertEqual(story_file_for("ledgerlock", ["ledgerlock/__init__.py"]), "ledgerlock/__init__.py")  # SS-82
+        self.assertEqual(story_file_for("yaml", ["config/yaml.py"]), "")                  # regression 8: anchored
 
     def test_run_nop_go_co_khong_chay_duoc_khi_thieu_ma_story(self):
-        """Đường thật, không chỉ hàm phụ: `run_nop` phải xoá `unrunnable`
-        trước khi ghi bằng chứng, nếu không cổng vẫn đọc UNRUNNABLE."""
-        import inspect
-        from aisef.phases import implement
+        """Đường thật: bản ghi nop phải mang **nguyên nhân** theo từng tệp để cổng tự phân loại — trước đây run_nop
+        xoá `unrunnable` rồi mới ghi; nay cổng đọc lỗi thu thập của chính tệp test và ràng nó vào mã của story."""
+        from aisef.control.proof import Proof, classify
+        from aisef.harness.testlog import parse
 
-        src = inspect.getsource(implement.run_nop)
-        i_go = src.index("res.unrunnable = \"\"")
-        i_ghi = src.index("record_tool(res, story.id")
-        self.assertLess(i_go, i_ghi, "phải phân loại lại **trước** khi ghi")
+        text = ("tests/test_b.py::test_other PASSED\n"
+                "_______ ERROR collecting tests/test_a.py _______\n"
+                "E   ModuleNotFoundError: No module named 'app.store'\n"
+                "=========== 1 passed, 1 error in 0.02s ===========\n")
+        rec = parse("============ test session starts ============\n" + text).to_evidence()
+        st = classify(rec, ["tests/test_a.py::test_AC_S_1"], ["app/store.py"], added=["app/store.py"])
+        self.assertIs(st["tests/test_a.py::test_AC_S_1"][0], Proof.RED_COLLECTION_BOUND_TO_STORY)
 
     def test_nguoi_ra_soat_nhan_diff_that_khong_chi_ten_file(self):
         """Danh sách tên file bắt người rà soát dựng lại thứ harness đã
@@ -351,21 +352,20 @@ class TestHappyPath(ImplementTestCase):
     def test_cost_recorded_per_run(self):
         out = self.implement(ScriptedClient())
         runs = EvidenceStore(self.artifacts).read("STORY-01-01").of(AGENT_RUN)
-        # viết + rà soát + hỏi lại schema + bảo mật + hỏi lại schema: client
-        # giả không trả khối JSON nên mỗi vai rà soát tốn thêm đúng 1 lượt
-        # (R8), và lượt hỏi lại phải nằm trong bằng chứng để cộng chi phí.
-        self.assertEqual(len(runs), 5)
+        # viết + rà soát + bảo mật: từ F2 client giả trả khối JSON như reviewer
+        # thật phải trả (vắng verdict có cấu trúc = UNRUNNABLE, không bao giờ PASS),
+        # nên không còn lượt hỏi lại schema; mọi lượt phải nằm trong bằng chứng.
+        self.assertEqual(len(runs), 3)
         self.assertEqual(
             [r.name for r in runs][1:],
-            ["STORY-01-01-review", "STORY-01-01-review-retry",
-             "STORY-01-01-security", "STORY-01-01-security-retry"],
+            ["STORY-01-01-review", "STORY-01-01-security"],
         )
         self.assertAlmostEqual(out.cost_usd, 1.0)  # chỉ lượt viết tính vào attempt
 
 
 class TestRetry(ImplementTestCase):
     def test_blocking_review_triggers_a_retry_with_feedback(self):
-        c = ScriptedClient(review="[chặn] src/a.py:1 — mất dữ liệu khi lưu")
+        c = ScriptedClient(review=chan("[chặn] src/a.py:1 — mất dữ liệu khi lưu"))
         out = self.implement(c)
         self.assertFalse(out.done)
         self.assertEqual(out.quality_attempts, 2)   # lần đầu + 1 lần thử lại
@@ -407,10 +407,10 @@ class TestRetry(ImplementTestCase):
                 if inner.develop_calls == 0:
                     return super().run(spec)
                 inner.develop_calls += 1
-                return RunResult(ok=True, num_turns=7, output_tokens=200,
-                                 text="nothing to do", cost_usd=0.0)
+                return RunResult(ok=True, num_turns=7, output_tokens=200, text="nothing to do", cost_usd=0.0,
+                                 tool_uses=[ToolUse(name="Read", tool_use_id="t1", input={})])   # looked, decided
 
-        out = self.implement(ChiVietLanDau(review="[chặn] src/a.py:1 — mất dữ liệu"),
+        out = self.implement(ChiVietLanDau(review=chan("[chặn] src/a.py:1 — mất dữ liệu")),
                              config=self.config(**{"run.max_retries": 1,
                                                    "run.infra_retries": 6}))
         khong_lam = [a for a in out.attempts if a.noop]
@@ -430,7 +430,7 @@ class TestRetry(ImplementTestCase):
         không được commit — tệp mà story không được phép chạm.
         """
         c = ScriptedClient(
-            review="[chặn] ../khac/thu-vien.py:1 — thiếu khai `mot-goi-nao-do`"
+            review=chan("[chặn] ../khac/thu-vien.py:1 — thiếu khai `mot-goi-nao-do`")
         )
         out = self.implement(c, config=self.config(**{"run.max_retries": 5}))
         self.assertEqual(out.quality_attempts, 2, "phải dừng ở lượt 2, không chạy tới 6")
@@ -457,21 +457,26 @@ class TestRetry(ImplementTestCase):
         self.assertIn("deadlock due to plan", out.blocked_reason)
         self.assertIn("src/store/db.ts", out.blocked_reason)
 
-    def test_be_tac_chi_trong_van_xuoi_thi_chan_nhung_khong_ket_thuc(self):
-        """D-026 (LedgerLock 2026-09-15): `[stuck]` trong văn xuôi — kể cả câu
-        *phủ định* thẻ — không được tự nó kết thúc story. Không có JSON là
-        đầu ra có cấu trúc hỏng: chặn (fail-closed), thử lại, không terminal."""
+    def test_be_tac_chi_trong_van_xuoi_thi_khong_phai_verdict(self):
+        """D-026 (LedgerLock 2026-09-15) → F2: `[stuck]` trong văn xuôi — kể cả câu
+        *phủ định* thẻ — không được tự nó kết thúc story. Không có JSON là **không có
+        verdict**: hỏi lại schema đúng một lần (R8), rồi review là UNRUNNABLE và được
+        thử lại như một review (có giới hạn) — không bao giờ là QUALITY_BLOCK, không
+        bao giờ là bế tắc kế hoạch, không tốn một lượt developer nào."""
         c = ScriptedClient(review=(
             "The file IS there. So [stuck] doesn't apply.\n"
             "[bế tắc] TCCN 1 — cần chỉ mục trong `src/store/db.ts`, ngoài write_scope."
         ))
         out = self.implement(c, config=self.config(**{"run.max_retries": 2}))
         self.assertNotIn("deadlock due to plan", out.blocked_reason)
-        self.assertGreater(out.quality_attempts, 1, "văn xuôi chặn lượt, không kết thúc story")
+        self.assertIn("REVIEW_UNRUNNABLE", out.blocked_reason)
+        self.assertEqual(out.quality_attempts, 1, "văn xuôi không phải verdict: không tốn lượt developer")
+        self.assertEqual(c.develop_calls, 1)
+        self.assertEqual(c.calls[1:3], ["review", "review"], "thiếu JSON thì hỏi lại schema đúng một lần (R8)")
 
     def test_muc_chan_thuong_van_duoc_thu_lai(self):
         """`[chặn]` là lỗi code — sửa được, nên vẫn thử tiếp."""
-        c = ScriptedClient(review="[chặn] src/a.py:1 — quên xử lý null")
+        c = ScriptedClient(review=chan("[chặn] src/a.py:1 — quên xử lý null"))
         out = self.implement(c, config=self.config(**{"run.max_retries": 2}))
         self.assertGreater(out.quality_attempts, 1)
         self.assertNotIn("deadlock due to plan", out.blocked_reason)
@@ -484,7 +489,7 @@ class TestRetry(ImplementTestCase):
         `src/app/list-notes.ts` — tệp nằm ngay trong phạm vi của nó. Dừng
         ở đó là cắt ngang một story còn cứu được.
         """
-        c = ScriptedClient(review="[chặn] src/a.py:1 — mất dữ liệu khi lưu")
+        c = ScriptedClient(review=chan("[chặn] src/a.py:1 — mất dữ liệu khi lưu"))
         out = self.implement(c, config=self.config(**{"run.max_retries": 3}))
         self.assertEqual(out.quality_attempts, 4, "hạn mức lượt thử phải chạy hết")
         self.assertIn("tried", out.blocked_reason)
@@ -567,7 +572,7 @@ class TestRetry(ImplementTestCase):
         """Bản tóm tắt in ra màn hình cắt ngắn mục chặn. Muốn biết hai lượt
         có bị chặn vì cùng một chuyện không thì phải đọc được nguyên văn —
         thiếu chỗ này thì lối duy nhất là mò nhật ký phiên."""
-        self.implement(ScriptedClient(review="[chặn] src/a.py:1 — mất dữ liệu"))
+        self.implement(ScriptedClient(review=chan("[chặn] src/a.py:1 — mất dữ liệu")))
         ghi = [
             e for e in EvidenceStore(self.artifacts).read("STORY-01-01").events
             if e.name == "review"
@@ -584,7 +589,7 @@ class TestRetry(ImplementTestCase):
             def run(self, spec):
                 if "Review" in spec.prompt:
                     DoiMuc.lan += 1
-                    self.review = f"[chặn] src/a.py:1 — khiếm khuyết số {DoiMuc.lan}"
+                    self.review = chan(f"[chặn] src/a.py:1 — khiếm khuyết số {DoiMuc.lan}")
                 return super().run(spec)
 
         DoiMuc.lan = 0
@@ -608,7 +613,7 @@ class TestRetry(ImplementTestCase):
                 return super().run(spec)
 
         Recorder.prompts = []
-        self.implement(Recorder(review="[chặn] src/a.py:1 — sai"))
+        self.implement(Recorder(review=chan("[chặn] src/a.py:1 — sai")))
         self.assertGreaterEqual(len(Recorder.prompts), 2)
         self.assertIn("Previous attempt did not pass", Recorder.prompts[1])
         self.assertIn("sai", Recorder.prompts[1])
@@ -836,7 +841,7 @@ class TestHetLuotNhungCoViecDeCham(ImplementTestCase):
                 return RunResult(ok=False, error="max_turns: stopped at 40 turns (cap 40)",
                                  num_turns=40, output_tokens=500, cost_usd=0.0)
 
-        out = self.implement(VietRoiHetLuotTay(review="[chặn] src/a.py:1 — mất dữ liệu"),
+        out = self.implement(VietRoiHetLuotTay(review=chan("[chặn] src/a.py:1 — mất dữ liệu")),
                              config=self.config(**{"run.max_retries": 1,
                                                    "run.infra_retries": 2}))
         from aisef.harness.observe import NOTE, EvidenceStore
@@ -1346,7 +1351,12 @@ class TestKyVongGuardTheoBaoCaoBienDich(ImplementTestCase):
         def run_va_ghi(spec):
             r = goc(spec)
             if spec.env.get("AISEF_STORY_ID"):
-                EvidenceStore(self.artifacts).file_change(spec.env["AISEF_STORY_ID"], "src/a.py")
+                # the guard hook runs inside the session and stamps it (control/identity.py, SS-02): a trace
+                # that names no session proves nothing about the session that produced the candidate
+                from aisef.control.identity import EvidenceIdentity
+                who = EvidenceIdentity(story_id=spec.env["AISEF_STORY_ID"], session_id=spec.env.get("AISEF_SESSION_ID", ""),
+                                       attempt=int(spec.env.get("AISEF_ATTEMPT") or 0))
+                EvidenceStore(self.artifacts, identity=who).file_change(spec.env["AISEF_STORY_ID"], "src/a.py")
             return r
         client.run = run_va_ghi
         out = self.implement(client)
@@ -1403,7 +1413,7 @@ class TestNguoiRaSoatKhongDuocSuaCay(ImplementTestCase):
         noi_dung = (self.project / "src" / "a.py").read_text(encoding="utf-8")
         self.assertTrue(noi_dung.startswith("x = 1\n"), noi_dung)
         self.assertNotIn("bi sua", noi_dung, "phải hoàn nguyên bản security đã ghi đè")
-        self.assertIn("modified the working tree", out.attempts[-1].security.error)
+        self.assertIn("modified the working tree", out.attempts[-1].security.unrunnable)   # F2: typed absence
 
     def test_reviewer_ngoan_khong_bi_dung(self):
         self._init_git()
@@ -1630,6 +1640,9 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         "                              text=True).stdout.strip())\n"
         'text = "\\n".join(x for x in out if x)\n'
         "print(text)\n"
+        # real pytest always ends with its totals; without them the parser reads the output as incomplete (SS-81)
+        'n_f, n_p = text.count(" FAILED"), text.count(" PASSED")\n'
+        'print(f"===== {n_f} failed, {n_p} passed in 0.01s =====")\n'
         'sys.exit(1 if "FAILED" in text else 0)\n'
     )
 
@@ -1672,12 +1685,28 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
     def evidence(self):
         return EvidenceStore(self.artifacts).read(self.story.id)
 
+    def test_a_criterion_the_plan_owns_ends_the_story_without_a_second_attempt(self):
+        """TDD proof policy V2, owner section 12: the criterion is declared CHANGE_REQUIRED but its test passes at
+        the story's parent — a planning fact. The story stops as a plan conflict on the first attempt; no developer
+        retry is spent on work no session can do."""
+        out = self.chay(self.GIA, **{"run.max_retries": 2})
+        self.assertFalse(out.done, out.summary())
+        self.assertEqual(len(out.attempts), 1, "a plan defect must not open a second developer session")
+        self.assertEqual(out.quality_attempts, 1)
+        self.assertIn("deadlock due to plan", out.blocked_reason)
+        self.assertIn("PLAN_OVERLAP", out.blocked_reason)
+        self.assertIn("AC-STORY-01-01-1", out.blocked_reason)
+
     def test_test_that_do_o_sha_cha_thi_dat_va_don_worktree(self):
         out = self.chay(self.THAT)
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.PASSED, out.summary())
-        self.assertIn("red or absent", m.detail)
+        self.assertIn("each showed what their obligation asks at parent SHA", m.detail)
+        self.assertIn("1 executed red", m.detail)
+        self.assertEqual(m.data["proof"]["AC-STORY-01-01-1"]["tests"][self.AC]["state"], "RED_EXECUTED")
         nop = self.evidence().last(TOOL_RUN, "test:nop")
+        self.assertEqual(nop.detail["proof_schema"], 2)
+        self.assertEqual(nop.detail["absent_at_parent"], ["src/a.py"])
         self.assertEqual(nop.detail["candidate"], out.attempts[-1].candidate)
         self.assertEqual(nop.detail["files"], ["tests/test_ac.py"])
         self.assertEqual(nop.detail["parent"], head_sha(self.project))
@@ -1691,7 +1720,7 @@ class TestTestCoKiemDuocStory(ImplementTestCase):
         out = self.chay(self.GIA)
         m = self.muc(out)
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("still green without story code", m.detail)
+        self.assertIn("PLAN_OVERLAP", m.detail)        # V2: already satisfied at the story's entry
         self.assertIn(self.AC, m.detail)
         self.assertFalse(out.done)
 
@@ -1800,9 +1829,11 @@ class TestLuotBiNgatGiuLaiLoiRaSoat(ImplementTestCase):
                               capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.strip()
 
     def _ghi(self, sha: str, findings: list[str]) -> None:
+        # the reviewer's verdict is recorded as `reviewer:verdict` — `NOTE review` was never written by the
+        # kernel, which is why the reader stayed dead until F1 (SS-04)
         EvidenceStore(self.artifacts, candidate=sha).record("STORY-01-01", Event(
-            kind=NOTE, name="review", ok=not findings,
-            detail={"findings": findings, "attempt": 2}))
+            kind=NOTE, name="reviewer:verdict", ok=not findings,
+            detail={"verdict": "block" if findings else "pass", "findings": findings, "attempt": 2}))
 
     def test_muc_chan_con_lai_duoc_giao_lai_cho_luot_dau(self):
         self._ghi(self._head(), ["[block] tests/a.spec.js:217 — không chạm JSON.stringify"])
@@ -1847,7 +1878,8 @@ class TestLuotKhongVietGiThiKhongPhaiUngVien(ImplementTestCase):
                 if self.develop_turns > 1:
                     self.calls.append("develop")
                     return RunResult(ok=True, text="đã xem, không cần sửa", cost_usd=0.4,
-                                     num_turns=7, output_tokens=1616)
+                                     num_turns=7, output_tokens=1616,
+                                     tool_uses=[ToolUse(name="Read", tool_use_id="t1", input={})])   # đã xem thật
             return super().run(spec)
 
     def setUp(self):
@@ -1871,8 +1903,11 @@ class TestLuotKhongVietGiThiKhongPhaiUngVien(ImplementTestCase):
             artifact_root=self.artifacts, client=client, config=self.config())
 
     def test_khong_ra_soat_lai_cay_y_het_va_khong_tinh_luot(self):
-        client = self.ImLang(writes=("src/a.py", "tests/test_a.py"),
-                             review="[chặn] src/a.py:1 — thiếu kiểm tra")
+        # Both writes inside the write scope: an out-of-scope write would be restored by retry hygiene before
+        # attempt 2, and a tree that hygiene changed is legitimately re-graded (D-035 / INV-E.1) — that is not
+        # the "identical tree" this test is about.
+        client = self.ImLang(writes=("src/a.py", "src/b.py"),
+                             review=chan("[chặn] src/a.py:1 — thiếu kiểm tra"))
         report = self.chay(client)
         self.assertEqual(self.so_lan_ra_soat(), 1,
                          "cây không đổi thì không có gì mới để rà soát")
@@ -1970,7 +2005,7 @@ class TestLuotKhongVietGiThiKhongPhaiUngVien(ImplementTestCase):
                 return super().run(spec)
 
         client = SuaThat(writes=("src/a.py", "tests/test_a.py"),
-                         review="[chặn] src/a.py:1 — thiếu kiểm tra")
+                         review=chan("[chặn] src/a.py:1 — thiếu kiểm tra"))
         self.chay(client)
         self.assertEqual(self.so_lan_ra_soat(), 2, "hai lượt sửa thật, hai lần rà soát")
 

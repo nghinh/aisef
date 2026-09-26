@@ -83,10 +83,14 @@ class TestLocNhieu(unittest.TestCase):
 
     def test_muc_bi_loc_van_dem_duoc(self):
         """Lọc mà không nói đã lọc gì thì không ai kiểm lại được bộ lọc."""
-        r = parse(BAO_CAO + "\n[high] api.ts:1 — thiếu giới hạn tần suất\n")
+        # F3 (SS-27): the noise filter has a severity floor — a MEDIUM rate-limit item is filtered (and counted),
+        # a HIGH one is kept whatever its wording (INV-F.2: wording never removes a blocking-severity finding)
+        r = parse(BAO_CAO + "\n[medium] api.ts:1 — thiếu giới hạn tần suất\n")
         self.assertEqual(len(r.filtered), 1)
         self.assertIn("1 items filtered", r.summary())
         self.assertNotIn("tần suất", " ".join(f.text for f in r.findings))
+        giu = parse(BAO_CAO + "\n[high] api.ts:1 — thiếu giới hạn tần suất\n")
+        self.assertIn("tần suất", " ".join(f.text for f in giu.findings), "a high-severity finding is never filtered by wording")
 
 
 class TestNguong(unittest.TestCase):

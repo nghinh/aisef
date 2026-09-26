@@ -1,0 +1,27 @@
+{
+ "checker": "run_history",
+ "package": "P1 retry policy",
+ "kind": "history_versions",
+ "versions": [
+  [
+   {
+    "seq": 1,
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "where": "local",
+    "job": null,
+    "result": "FAIL",
+    "failing_tests": [
+     "tests.x.T.test_y"
+    ],
+    "classification": "PRODUCT",
+    "classification_evidence": "assertion failure in product code",
+    "retry_permitted": false,
+    "gate_effect": "COUNTS",
+    "v1_evidence_changed": false,
+    "retry_of": null
+   }
+  ],
+  []
+ ],
+ "expect": "does not extend"
+}

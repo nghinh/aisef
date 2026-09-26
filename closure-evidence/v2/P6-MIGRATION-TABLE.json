@@ -1,0 +1,914 @@
+{
+ "aliases": {},
+ "declarations": "none in cycle 1: SubjectAbsence is declared per contract by its author (F4); the table holds no default",
+ "generator": "validation/v2/gen_migration_table.py",
+ "inputs": {
+  "v1": {
+   "mode_members": [
+    "CHANGE_REQUIRED",
+    "PRESERVE_REQUIRED",
+    "NEGATIVE_INVARIANT"
+   ],
+   "path": "aisef/control/obligation.py",
+   "read_as": "source (AST); nothing under aisef/ is imported or written",
+   "sha256_lf": "5da5be3cd76fd4bc90a6b4c03fd984e8489bc0542c4cc8925c1b2172f4408ea6",
+   "transitions": {
+    "CHANGE_REQUIRED": "RED -> GREEN",
+    "NEGATIVE_INVARIANT": "GREEN -> GREEN",
+    "PRESERVE_REQUIRED": "GREEN -> GREEN"
+   }
+  },
+  "v2": {
+   "EXPECTED_AT_PARENT": {
+    "INTRODUCE": "UNSATISFIED_AT_PARENT",
+    "PRESERVE": "SATISFIED_AT_PARENT",
+    "VERIFY": "UNCONSTRAINED"
+   },
+   "ObligationRole": [
+    "INTRODUCE",
+    "PRESERVE",
+    "VERIFY"
+   ],
+   "ParentExpectation": [
+    "UNSATISFIED_AT_PARENT",
+    "SATISFIED_AT_PARENT",
+    "UNCONSTRAINED"
+   ],
+   "Polarity": [
+    "MUST_HOLD",
+    "MUST_NOT_HOLD"
+   ],
+   "SubjectAbsence": [
+    "REQUIRES_SUBJECT",
+    "ABSENCE_IS_DECIDABLE"
+   ]
+  }
+ },
+ "inventory": [
+  {
+   "carries": [
+    "CHANGE_REQUIRED",
+    "PRESERVE_REQUIRED",
+    "NEGATIVE_INVARIANT"
+   ],
+   "classification": "ACTIVE_V1_MODE",
+   "kind": "constant",
+   "reason": "a kernel table keyed by Mode members: the transition input",
+   "where": "aisef/control/obligation.py::EXPECTED"
+  },
+  {
+   "classification": "ACTIVE_V1_MODE",
+   "kind": "enum",
+   "members": [
+    "CHANGE_REQUIRED",
+    "PRESERVE_REQUIRED",
+    "NEGATIVE_INVARIANT"
+   ],
+   "reason": "the V1 kernel's proof-mode enum: the migration input",
+   "where": "aisef/control/obligation.py::Mode"
+  },
+  {
+   "classification": "ACTIVE_V1_MODE",
+   "key": "proof_mode",
+   "kind": "evidence_value",
+   "occurrences": 285,
+   "reason": "a serialized V1 proof mode",
+   "value": "CHANGE_REQUIRED"
+  },
+  {
+   "classification": "ACTIVE_V1_MODE",
+   "key": "proof_mode",
+   "kind": "evidence_value",
+   "occurrences": 27,
+   "reason": "a serialized V1 proof mode",
+   "value": "NEGATIVE_INVARIANT"
+  },
+  {
+   "classification": "ACTIVE_V1_MODE",
+   "key": "proof_mode",
+   "kind": "evidence_value",
+   "occurrences": 40,
+   "reason": "a serialized V1 proof mode",
+   "value": "PRESERVE_REQUIRED"
+  },
+  {
+   "classification": "ACTIVE_V1_MODE",
+   "kind": "policy_record",
+   "reason": "a policy record naming the active modes",
+   "record": "TDD PROOF POLICY V2",
+   "where": "closure-evidence/hardening/TDD-PROOF-POLICY-V2.json"
+  },
+  {
+   "carried_by": [
+    {
+     "kind": "code",
+     "path": "aisef/control/change.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/gate.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/machine_gate.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/normalize.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/obligation.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/preflight.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/tdd.py"
+    },
+    {
+     "kind": "config",
+     "path": "aisef/invariants.yaml"
+    },
+    {
+     "kind": "prompt",
+     "path": "aisef/kit/prompts/story-implement.md"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/phases/implement.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/phases/improve.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/phases/plan.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/phases/story_split.py"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/AISEF-V1-W1-QUALIFICATION-FINAL-VERDICT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/ARCH-LESSON-PROOF-PLACEMENT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/TDD-POLICY-V2-CONFORMANCE.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/TDD-PROOF-POLICY-V2.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-LEDGERLOCK-deepseekv2-ro-1.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2-AUDIT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-AUDIT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-FREEZE.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-OWNERSHIP-AUDIT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/fault-matrix.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/ss96/CONFORMANCE-BEFORE-FIX.json"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/ss96/README.md"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/ss96/reproducer_lifecycle.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/ss96/sweep_every_stage.py"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2-APPLIED.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2-EDITS.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2.1-APPLIED.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2.1-EDITS.json"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/build_plan_v2.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/build_plan_v2_1.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/epics-v2.1.md"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/epics-v2.md"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/ownership_audit.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/plan_v2_audit.py"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/run-deepseekv2-ro-1/artifacts/sprint-status.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/run-deepseekv2-ro-1/driver.json"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/run-deepseekv2-ro-1/status.txt"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/FAULT-MATRIX.md"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/INVARIANTS.md"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/research/v2/AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md"
+    },
+    {
+     "kind": "test",
+     "path": "tests/__init__.py"
+    },
+    {
+     "kind": "fixture",
+     "path": "tests/fixtures/bmad/epics.md"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/policy_v2.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_ac_proof_gate.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_ac_proof_machine_gate.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_ac_proof_policy.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_policy_v2_conformance.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_unrunnable_routing.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/test_gate.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/test_implement.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/test_improve.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/test_plan.py"
+    }
+   ],
+   "classification": "ACTIVE_V1_MODE",
+   "kind": "token",
+   "token": "CHANGE_REQUIRED"
+  },
+  {
+   "carried_by": [
+    {
+     "kind": "code",
+     "path": "aisef/control/gate.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/obligation.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/preflight.py"
+    },
+    {
+     "kind": "config",
+     "path": "aisef/invariants.yaml"
+    },
+    {
+     "kind": "prompt",
+     "path": "aisef/kit/prompts/story-implement.md"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/phases/plan.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/phases/story_split.py"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/AISEF-V1-W1-QUALIFICATION-FINAL-VERDICT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/ARCH-LESSON-PROOF-PLACEMENT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/TDD-POLICY-V2-CONFORMANCE.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/TDD-PROOF-POLICY-V2.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-LEDGERLOCK-v21-run1.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2-AUDIT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-AUDIT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-DEFECT-001.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-FREEZE.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-OWNERSHIP-AUDIT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/fault-matrix.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/ss96/CONFORMANCE-BEFORE-FIX.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2-EDITS.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2.1-EDITS.json"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/build_plan_v2.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/build_plan_v2_1.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/epics-v2.1.md"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/epics-v2.md"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/ownership_audit.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/plan_v2_audit.py"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/run-v21-run1/artifacts/sprint-status.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/run-v21-run1/driver.json"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/run-v21-run1/status.txt"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/FAULT-MATRIX.md"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/INVARIANTS.md"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/research/v2/AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/policy_v2.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_ac_proof_gate.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_ac_proof_machine_gate.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_ac_proof_policy.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_policy_v2_conformance.py"
+    }
+   ],
+   "classification": "ACTIVE_V1_MODE",
+   "kind": "token",
+   "token": "NEGATIVE_INVARIANT"
+  },
+  {
+   "carried_by": [
+    {
+     "kind": "code",
+     "path": "aisef/control/gate.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/machine_gate.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/normalize.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/obligation.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/control/preflight.py"
+    },
+    {
+     "kind": "config",
+     "path": "aisef/invariants.yaml"
+    },
+    {
+     "kind": "prompt",
+     "path": "aisef/kit/prompts/story-implement.md"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/phases/plan.py"
+    },
+    {
+     "kind": "code",
+     "path": "aisef/phases/story_split.py"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/ARCH-LESSON-PROOF-PLACEMENT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/TDD-POLICY-V2-CONFORMANCE.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/TDD-PROOF-POLICY-V2.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2-AUDIT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-AUDIT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-FREEZE.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-OWNERSHIP-AUDIT-SUMMARY-CORRECTION.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/W1-PLAN-V2.1-OWNERSHIP-AUDIT.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/fault-matrix.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/ss96/CONFORMANCE-BEFORE-FIX.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2-APPLIED.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2-EDITS.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2.1-APPLIED.json"
+    },
+    {
+     "kind": "evidence",
+     "path": "closure-evidence/hardening/w1/plan-v2/PLAN-V2.1-EDITS.json"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/build_plan_v2.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/build_plan_v2_1.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/epics-v2.1.md"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/epics-v2.md"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/ownership_audit.py"
+    },
+    {
+     "kind": "evidence-text",
+     "path": "closure-evidence/hardening/w1/plan-v2/plan_v2_audit.py"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/FAULT-MATRIX.md"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/INVARIANTS.md"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md"
+    },
+    {
+     "kind": "doc",
+     "path": "docs/research/v2/AISEF-V2-ARCHITECTURE-BOARD-RESOLUTION.md"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/policy_v2.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_ac_proof_gate.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_ac_proof_machine_gate.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_ac_proof_policy.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/hardening/test_policy_v2_conformance.py"
+    },
+    {
+     "kind": "test",
+     "path": "tests/test_gate.py"
+    }
+   ],
+   "classification": "ACTIVE_V1_MODE",
+   "kind": "token",
+   "token": "PRESERVE_REQUIRED"
+  },
+  {
+   "classification": "HISTORICAL_ONLY",
+   "kind": "policy_record",
+   "reason": "a policy record from before the per-criterion modes (the superseded whole-story policy)",
+   "record": "W1_WORKLOAD_V1 / TDD_POLICY_V1 — historical evidence marker",
+   "where": "closure-evidence/hardening/W1-WORKLOAD-V1-POLICY-V1-MARKER.json"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "kind": "constant",
+   "reason": "a constant of the kernel's obligation module that names no Mode member (story types, owner routing)",
+   "where": "aisef/control/obligation.py::NORMAL"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "kind": "constant",
+   "reason": "a constant of the kernel's obligation module that names no Mode member (story types, owner routing)",
+   "where": "aisef/control/obligation.py::OWNER_OF"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "kind": "constant",
+   "reason": "a constant of the kernel's obligation module that names no Mode member (story types, owner routing)",
+   "where": "aisef/control/obligation.py::STORY_TYPES"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "kind": "constant",
+   "reason": "a constant of the kernel's obligation module that names no Mode member (story types, owner routing)",
+   "where": "aisef/control/obligation.py::VERIFICATION_ONLY"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "kind": "enum",
+   "members": [
+    "auto",
+    "explicit",
+    "disabled"
+   ],
+   "reason": "an enum named like a mode with no proof-mode member (name collision)",
+   "where": "aisef/harness/capabilities.py::Mode"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "key": "expected_transition",
+   "kind": "evidence_value",
+   "occurrences": 14,
+   "reason": "derived from the mode by EXPECTED; not an input",
+   "value": "GREEN -> GREEN"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "key": "expected_transition",
+   "kind": "evidence_value",
+   "occurrences": 40,
+   "reason": "derived from the mode by EXPECTED; not an input",
+   "value": "RED -> GREEN"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "key": "mode",
+   "kind": "evidence_value",
+   "occurrences": 56,
+   "reason": "a different 'mode' vocabulary (not a proof mode)",
+   "value": "auto"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "key": "mode",
+   "kind": "evidence_value",
+   "occurrences": 116,
+   "reason": "a different 'mode' vocabulary (not a proof mode)",
+   "value": "explicit"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "kind": "grammar",
+   "reason": "V1's plan parser folds the mode token to upper case before the kernel; a case-folded spelling is neither a mode value nor an alias of this table",
+   "where": "aisef/control/normalize.py::ac_proof"
+  },
+  {
+   "classification": "NOT_A_PROOF_MODE",
+   "files": 28,
+   "kind": "token",
+   "reason": "a member of a V1 enum that is not the proof-mode enum",
+   "token": "HUMAN_REQUIRED",
+   "where": "aisef/control/outcome.py::StageOutcome"
+  },
+  {
+   "classification": "UNMAPPED",
+   "key": "proof_mode",
+   "kind": "evidence_value",
+   "occurrences": 2,
+   "reason": "a proof_mode value the V1 kernel does not know: V1 refused it (PLAN_METADATA_MISSING); nothing to migrate",
+   "value": "NO_SUCH_MODE"
+  }
+ ],
+ "inventory_problems": [],
+ "loss_report": [
+  {
+   "affects": [
+    "CHANGE_REQUIRED",
+    "NEGATIVE_INVARIANT",
+    "PRESERVE_REQUIRED"
+   ],
+   "code": "V1_NO_SUBJECT_ABSENCE_DECLARATION",
+   "dimension": "subject_absence",
+   "statement": "V1 declared no SubjectAbsence for any criterion: every row needs a human declaration on the V2 contract (RFC §7, §10.2); nothing infers it"
+  },
+  {
+   "affects": [
+    "CHANGE_REQUIRED",
+    "NEGATIVE_INVARIANT",
+    "PRESERVE_REQUIRED"
+   ],
+   "code": "V1_POLARITY_UNVERIFIED",
+   "dimension": "polarity",
+   "statement": "V1 carried polarity only in each mode's definition and never checked a criterion's test against it: the V2 contract author declares polarity (F4)"
+  },
+  {
+   "affects": [
+    "INTRODUCE+MUST_NOT_HOLD"
+   ],
+   "code": "V1_COULD_NOT_INTRODUCE_A_PROHIBITION",
+   "dimension": "obligation_role+polarity",
+   "statement": "no V1 mode expressed INTRODUCE + MUST_NOT_HOLD (RFC case NEG-1): V1 planners were told never to write a prohibition as CHANGE_REQUIRED"
+  },
+  {
+   "affects": [
+    "VERIFY+MUST_HOLD",
+    "VERIFY+MUST_NOT_HOLD"
+   ],
+   "code": "V1_HAS_NO_UNCONSTRAINED_PARENT",
+   "dimension": "obligation_role+polarity",
+   "statement": "no V1 mode leaves the parent unconstrained (VERIFY / UNCONSTRAINED)"
+  }
+ ],
+ "record": "AISEF V2 — P6 MIGRATION TABLE",
+ "rfc": "§31 (mechanical, generated, --checked); §7, §10.2 (SubjectAbsence declared, never inferred); §11 (F6, read only)",
+ "rows": [
+  {
+   "definition": {
+    "kind": "BEHAVIOUR",
+    "quote": "this story contributes the behaviour",
+    "source": "aisef/control/obligation.py module docstring, the CHANGE_REQUIRED line"
+   },
+   "derivation": {
+    "obligation_role": "EXPECTED[CHANGE_REQUIRED] = 'RED -> GREEN': parent RED -> UNSATISFIED_AT_PARENT; the role whose EXPECTED_AT_PARENT is that (§11) -> INTRODUCE",
+    "polarity": "the kernel defines CHANGE_REQUIRED as 'this story contributes the behaviour' -> BEHAVIOUR -> MUST_HOLD; V1 never verified a criterion's test against it",
+    "subject_absence": "V1 declared none; nothing here infers it (not from polarity, name, transition, wording, history or a default)"
+   },
+   "expected_parent": "UNSATISFIED_AT_PARENT",
+   "missing": [
+    "subject_absence"
+   ],
+   "obligation_role": "INTRODUCE",
+   "obligation_role_source": "V1_TRANSITION",
+   "polarity": "MUST_HOLD",
+   "polarity_source": "V1_DEFINITION",
+   "rationale_ref": "RFC §31 (proof modes -> ObligationRole + Polarity on the contract); §7 and §10.2 (SubjectAbsence is declared, never inferred from polarity); §11 (ParentExpectation per role)",
+   "reason": "HUMAN_DECLARATION_REQUIRED",
+   "source": "aisef/control/obligation.py::Mode.CHANGE_REQUIRED",
+   "status": "UNMAPPED",
+   "subject_absence": "HUMAN_DECLARATION_REQUIRED",
+   "subject_absence_source": "NONE",
+   "transition": {
+    "candidate": "GREEN",
+    "parent": "RED",
+    "source": "aisef/control/obligation.py::EXPECTED"
+   },
+   "v1_mode": "CHANGE_REQUIRED"
+  },
+  {
+   "definition": {
+    "kind": "PROHIBITION",
+    "quote": "a prohibition that holds before and after",
+    "source": "aisef/control/obligation.py module docstring, the NEGATIVE_INVARIANT line"
+   },
+   "derivation": {
+    "obligation_role": "EXPECTED[NEGATIVE_INVARIANT] = 'GREEN -> GREEN': parent GREEN -> SATISFIED_AT_PARENT; the role whose EXPECTED_AT_PARENT is that (§11) -> PRESERVE",
+    "polarity": "the kernel defines NEGATIVE_INVARIANT as 'a prohibition that holds before and after' -> PROHIBITION -> MUST_NOT_HOLD; V1 never verified a criterion's test against it",
+    "subject_absence": "V1 declared none; nothing here infers it (not from polarity, name, transition, wording, history or a default)"
+   },
+   "expected_parent": "SATISFIED_AT_PARENT",
+   "missing": [
+    "subject_absence"
+   ],
+   "obligation_role": "PRESERVE",
+   "obligation_role_source": "V1_TRANSITION",
+   "polarity": "MUST_NOT_HOLD",
+   "polarity_source": "V1_DEFINITION",
+   "rationale_ref": "RFC §31 (proof modes -> ObligationRole + Polarity on the contract); §7 and §10.2 (SubjectAbsence is declared, never inferred from polarity); §11 (ParentExpectation per role)",
+   "reason": "HUMAN_DECLARATION_REQUIRED",
+   "source": "aisef/control/obligation.py::Mode.NEGATIVE_INVARIANT",
+   "status": "UNMAPPED",
+   "subject_absence": "HUMAN_DECLARATION_REQUIRED",
+   "subject_absence_source": "NONE",
+   "transition": {
+    "candidate": "GREEN",
+    "parent": "GREEN",
+    "source": "aisef/control/obligation.py::EXPECTED"
+   },
+   "v1_mode": "NEGATIVE_INVARIANT"
+  },
+  {
+   "definition": {
+    "kind": "BEHAVIOUR",
+    "quote": "this story must not break what it inherits",
+    "source": "aisef/control/obligation.py module docstring, the PRESERVE_REQUIRED line"
+   },
+   "derivation": {
+    "obligation_role": "EXPECTED[PRESERVE_REQUIRED] = 'GREEN -> GREEN': parent GREEN -> SATISFIED_AT_PARENT; the role whose EXPECTED_AT_PARENT is that (§11) -> PRESERVE",
+    "polarity": "the kernel defines PRESERVE_REQUIRED as 'this story must not break what it inherits' -> BEHAVIOUR -> MUST_HOLD; V1 never verified a criterion's test against it",
+    "subject_absence": "V1 declared none; nothing here infers it (not from polarity, name, transition, wording, history or a default)"
+   },
+   "expected_parent": "SATISFIED_AT_PARENT",
+   "missing": [
+    "subject_absence"
+   ],
+   "obligation_role": "PRESERVE",
+   "obligation_role_source": "V1_TRANSITION",
+   "polarity": "MUST_HOLD",
+   "polarity_source": "V1_DEFINITION",
+   "rationale_ref": "RFC §31 (proof modes -> ObligationRole + Polarity on the contract); §7 and §10.2 (SubjectAbsence is declared, never inferred from polarity); §11 (ParentExpectation per role)",
+   "reason": "HUMAN_DECLARATION_REQUIRED",
+   "source": "aisef/control/obligation.py::Mode.PRESERVE_REQUIRED",
+   "status": "UNMAPPED",
+   "subject_absence": "HUMAN_DECLARATION_REQUIRED",
+   "subject_absence_source": "NONE",
+   "transition": {
+    "candidate": "GREEN",
+    "parent": "GREEN",
+    "source": "aisef/control/obligation.py::EXPECTED"
+   },
+   "v1_mode": "PRESERVE_REQUIRED"
+  }
+ ],
+ "rule": "generated; never hand-edited; --check regenerates and fails on drift, a hand edit, an unknown V1 mode or a row whose V2 value has no typed source",
+ "v2_without_v1_source": [
+  {
+   "loss": "V1_COULD_NOT_INTRODUCE_A_PROHIBITION",
+   "obligation_role": "INTRODUCE",
+   "polarity": "MUST_NOT_HOLD"
+  },
+  {
+   "loss": "V1_HAS_NO_UNCONSTRAINED_PARENT",
+   "obligation_role": "VERIFY",
+   "polarity": "MUST_HOLD"
+  },
+  {
+   "loss": "V1_HAS_NO_UNCONSTRAINED_PARENT",
+   "obligation_role": "VERIFY",
+   "polarity": "MUST_NOT_HOLD"
+  }
+ ],
+ "work_package": "WP-6.1"
+}

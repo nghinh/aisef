@@ -1,0 +1,65 @@
+SIM117 [*] Use a single `with` statement with multiple contexts instead of nested `with` statements
+  --> ledgerlock/ledger.py:22:9
+   |
+20 |               raise ValueError("ledger key must not be empty")
+21 |
+22 | /         with self._append_lock:
+23 | |             with self.path.open("ab") as file:
+   | |______________________________________________^
+24 |                   fcntl.flock(file.fileno(), fcntl.LOCK_EX)
+25 |                   prev_hash = self._tail_hash_from_disk()
+   |
+help: Combine `with` statements
+   |
+21 |
+   -         with self._append_lock:
+   -             with self.path.open("ab") as file:
+   -                 fcntl.flock(file.fileno(), fcntl.LOCK_EX)
+   -                 prev_hash = self._tail_hash_from_disk()
+   -                 line = {
+   -                     "op": op,
+   -                     "key": normalized_key,
+   -                     "value": value,
+   -                     "id": record_id,
+   -                     "ts": ts,
+   -                     "prev_hash": prev_hash,
+   -                     "hash": "",
+   -                 }
+   -                 line["hash"] = format.line_hash(prev_hash, line)
+   -                 line_bytes = format.canonical_bytes(line) + b"\n"
+22 +         with self._append_lock, self.path.open("ab") as file:
+23 +             fcntl.flock(file.fileno(), fcntl.LOCK_EX)
+24 +             prev_hash = self._tail_hash_from_disk()
+25 +             line = {
+26 +                 "op": op,
+27 +                 "key": normalized_key,
+28 +                 "value": value,
+29 +                 "id": record_id,
+30 +                 "ts": ts,
+31 +                 "prev_hash": prev_hash,
+32 +                 "hash": "",
+33 +             }
+34 +             line["hash"] = format.line_hash(prev_hash, line)
+35 +             line_bytes = format.canonical_bytes(line) + b"\n"
+36 |
+   -                 file.write(line_bytes)
+   -                 file.flush()
+   -                 os.fsync(file.fileno())
+37 +             file.write(line_bytes)
+38 +             file.flush()
+39 +             os.fsync(file.fileno())
+40 |
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> tests/test_ledger.py:151:24
+    |
+149 |                 try:
+150 |                     append_after_thread_tail_read(path, record_id, ready, release)
+151 |                 except Exception as exc:  # pragma: no cover - surfaced below
+    |                        ^^^^^^^^^
+152 |                     errors.append(exc)
+    |
+
+Found 2 errors.
+[*] 1 fixable with the `--fix` option.

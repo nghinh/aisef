@@ -1,0 +1,162 @@
+{
+ "_comment": "WP-1.2 conformance corpus. Contracts are minted by BehaviorContract.create; approvals are fixture approvals by a labelled fixture owner; probes are declared identities (fixture.*), not implementations.",
+ "requirements": [
+  {
+   "id": "REQ-QUIET",
+   "text": "In quiet mode the CLI prints nothing on stdout.",
+   "source": "docs/requirements.md#quiet",
+   "requirement_hash": "d50d27874a6010a47316fa44047ecf4faae4e237d60f8facb9f4fa208a6d419c"
+  },
+  {
+   "id": "REQ-NO-TELEMETRY",
+   "text": "The product ships no telemetry module.",
+   "source": "docs/requirements.md#telemetry",
+   "requirement_hash": "fba671a22d6d5b5ce829268ed4941a642a100d1b68f2d407766e4fb7466397e0"
+  },
+  {
+   "id": "REQ-VERSION",
+   "text": "The CLI reports its version.",
+   "source": "docs/requirements.md#version",
+   "requirement_hash": "7861fb008802c351f369168a02be0ac62b7560d56ca74c61a28dcf4b4f25f0a0"
+  },
+  {
+   "id": "REQ-LICENSE",
+   "text": "The distribution contains a LICENSE file.",
+   "source": "docs/requirements.md#license",
+   "requirement_hash": "18cd0c2b459f06e3117fabe2b1286036818869ca4559e8c8c8806938569d6e65"
+  }
+ ],
+ "contracts": [
+  {
+   "id": "BC-QUIET-STDOUT",
+   "requirement_ids": [
+    "REQ-QUIET"
+   ],
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "app.cli:main"
+   },
+   "stimulus": {
+    "argv": [
+     "--quiet",
+     "status"
+    ]
+   },
+   "observable": {
+    "condition": "non_empty",
+    "stream": "stdout"
+   },
+   "polarity": "MUST_NOT_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "NEG-1 / NEG-3: the CLI MUST NOT write to stdout in quiet mode; undecidable without the CLI",
+   "contract_hash": "f46bca9e45c6de52468de11b776157d83e98f48a3b053671211db34f0c2c1c23"
+  },
+  {
+   "id": "BC-NO-TELEMETRY",
+   "requirement_ids": [
+    "REQ-NO-TELEMETRY"
+   ],
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "src/app/telemetry.py"
+   },
+   "stimulus": {},
+   "observable": {
+    "condition": "exists"
+   },
+   "polarity": "MUST_NOT_HOLD",
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "rationale": "NEG-2: a forbidden module MUST NOT exist; its absence is the whole point",
+   "contract_hash": "470f3ddc0af12ec01cfb45cbd6b80a96783e2f9e1783d12b6a56083fb780b7cd"
+  },
+  {
+   "id": "BC-VERSION",
+   "requirement_ids": [
+    "REQ-VERSION"
+   ],
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "app.cli:main"
+   },
+   "stimulus": {
+    "argv": [
+     "--version"
+    ]
+   },
+   "observable": {
+    "matches": "^app \\d+\\.\\d+\\.\\d+$",
+    "stream": "stdout"
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "positive contract over a subject that must exist",
+   "contract_hash": "b73e950c42ee00b5980709e7e15c605b68db425089cd18680631822bc1fbb35f"
+  },
+  {
+   "id": "BC-LICENSE",
+   "requirement_ids": [
+    "REQ-LICENSE"
+   ],
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "LICENSE"
+   },
+   "stimulus": {},
+   "observable": {
+    "condition": "exists"
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "rationale": "file X MUST exist: MUST_HOLD with ABSENCE_IS_DECIDABLE (RFC §7)",
+   "contract_hash": "a8627c6943056dd58b169c22a0518d7a157829c60aa2a095073e856d1a988872"
+  }
+ ],
+ "approvals": [
+  {
+   "requirement_id": "REQ-QUIET",
+   "requirement_hash": "d50d27874a6010a47316fa44047ecf4faae4e237d60f8facb9f4fa208a6d419c",
+   "contract_id": "BC-QUIET-STDOUT",
+   "contract_hash": "f46bca9e45c6de52468de11b776157d83e98f48a3b053671211db34f0c2c1c23",
+   "approver": "human:p1-fixture-owner",
+   "approved_at": 1790000000.0,
+   "model_reviews": []
+  },
+  {
+   "requirement_id": "REQ-NO-TELEMETRY",
+   "requirement_hash": "fba671a22d6d5b5ce829268ed4941a642a100d1b68f2d407766e4fb7466397e0",
+   "contract_id": "BC-NO-TELEMETRY",
+   "contract_hash": "470f3ddc0af12ec01cfb45cbd6b80a96783e2f9e1783d12b6a56083fb780b7cd",
+   "approver": "human:p1-fixture-owner",
+   "approved_at": 1790000000.0,
+   "model_reviews": []
+  },
+  {
+   "requirement_id": "REQ-VERSION",
+   "requirement_hash": "7861fb008802c351f369168a02be0ac62b7560d56ca74c61a28dcf4b4f25f0a0",
+   "contract_id": "BC-VERSION",
+   "contract_hash": "b73e950c42ee00b5980709e7e15c605b68db425089cd18680631822bc1fbb35f",
+   "approver": "human:p1-fixture-owner",
+   "approved_at": 1790000000.0,
+   "model_reviews": []
+  },
+  {
+   "requirement_id": "REQ-LICENSE",
+   "requirement_hash": "18cd0c2b459f06e3117fabe2b1286036818869ca4559e8c8c8806938569d6e65",
+   "contract_id": "BC-LICENSE",
+   "contract_hash": "a8627c6943056dd58b169c22a0518d7a157829c60aa2a095073e856d1a988872",
+   "approver": "human:p1-fixture-owner",
+   "approved_at": 1790000000.0,
+   "model_reviews": []
+  }
+ ],
+ "probes": {
+  "cli_invocation": {
+   "probe_id": "fixture.cli_invocation",
+   "probe_digest": "ca3f07ab47e8a702770085050798289c801784d5763ebd63e95e8344b88bf85c"
+  },
+  "file_artifact": {
+   "probe_id": "fixture.file_artifact",
+   "probe_digest": "77a1145ebe55e2595fc5c1635c77e568f578e9763075dbca513d725ea006abf4"
+  }
+ }
+}

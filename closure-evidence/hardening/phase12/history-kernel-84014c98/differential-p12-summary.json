@@ -1,0 +1,71 @@
+{
+ "phase": 12,
+ "source": "validation/p12_integrity.py (this summary is derived from phase12/integrity.json — one consolidation)",
+ "chunks": 10,
+ "traces": 100000,
+ "matched": 100000,
+ "unexplained": 0,
+ "unexplained_historical": 0,
+ "unexplained_note": "historical = mismatches as the chunks recorded them (a chunk record is never edited); effective = after the targeted re-run of the minimum affected seed set following a registered fix superseded a seed's verdict with rows",
+ "reruns": {
+  "seeds": 0,
+  "matched": 0,
+  "mismatched": 0
+ },
+ "elapsed_s": 24259.7,
+ "model_transitions": 729414,
+ "real_stage_events": 487000,
+ "known_deviations": [],
+ "kernel_by_chunk": {
+  "00000": "6470e4e8b8fb6e4b7de60e506ebe896ab05b7554",
+  "10000": "b43fa3cd02fe89c8416493d64f75210e63dad2fb",
+  "20000": "b43fa3cd02fe89c8416493d64f75210e63dad2fb",
+  "30000": "b43fa3cd02fe89c8416493d64f75210e63dad2fb",
+  "40000": "b43fa3cd02fe89c8416493d64f75210e63dad2fb",
+  "50000": "2e416e9201a9b7c14dcb56cdb142a7df967c2a67",
+  "60000": "2e416e9201a9b7c14dcb56cdb142a7df967c2a67",
+  "70000": "2e416e9201a9b7c14dcb56cdb142a7df967c2a67",
+  "80000": "2e416e9201a9b7c14dcb56cdb142a7df967c2a67",
+  "90000": "2e416e9201a9b7c14dcb56cdb142a7df967c2a67"
+ },
+ "seed_ranges": [
+  "00000",
+  "10000",
+  "20000",
+  "30000",
+  "40000",
+  "50000",
+  "60000",
+  "70000",
+  "80000",
+  "90000"
+ ],
+ "workers": 8,
+ "candidate_kernel_evidence": {
+  "chunks_on_the_candidate": [],
+  "seeds_direct": 0,
+  "seeds_rerun_on_the_candidate": 0,
+  "seeds_with_candidate_kernel_evidence": 0,
+  "seeds_resting_on_the_measured_diff": 100000,
+  "kernel_classes": {}
+ },
+ "manifest": {
+  "path": "closure-evidence/hardening/phase12/PHASE12-DATASET-MANIFEST.json",
+  "pass": true,
+  "kernel_digests": [
+   "84014c980e75f3924c2d5a834f58d6b91e64bd47"
+  ]
+ },
+ "invariant_violations": 0,
+ "exceptions": 0,
+ "silent_skips": 0,
+ "coverage": {
+  "reachable_transitions": 26,
+  "reachable_total": 26,
+  "typed_outcomes": 10,
+  "fault_kinds": "28/28",
+  "compound_pairs": "378/378"
+ },
+ "pass": true,
+ "traces_per_s": 4.12
+}

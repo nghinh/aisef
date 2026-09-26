@@ -1,0 +1,7 @@
+{
+ "checker": "plan_semantics",
+ "package": "P2 plan correction",
+ "kind": "plan_fixture",
+ "fixture": "PLANSEM-1",
+ "expect": "asserts a global missing-subject => REFUTED"
+}

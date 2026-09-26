@@ -1,0 +1,89 @@
+{
+ "finding": "PLAN-FINDING-001",
+ "classification": "normal implementation defect in V1 test code; accepted by the owner as a prerequisite of WP-0.4, not an architecture exception",
+ "defect": "tests/hardening/test_state_model.py rewrote closure-evidence/hardening/state-model-results.json on every run; TestConformance sorts before TestKernelModel, so setUpClass overwrote the merged file and dropped the 'conformance' section (+1/-129)",
+ "step_A_pristine_verification": [
+  "PASS  A1 working tree has no V1 evidence modification or untracked file",
+  "PASS  A2 protected set at HEAD is identical to V1 final verdict b0d87c6",
+  "PASS  A2b no commit after b0d87c6 touches the protected set",
+  "     source commit b0d87c6 = b0d87c6f5f59a43dd72844a1aef72b678de865f1",
+  "PASS  A3 P19-FREEZE.json  — sha256 6676f4d2b1e5c9b2…",
+  "PASS  A3 AISEF-W0-QUALIFICATION-f52df75.json  — sha256 7bb8380e0bebc166…",
+  "PASS  A3 AISEF-W0-QUALIFICATION.json  — sha256 a14c2f58083bd32d…",
+  "PASS  A4 state-model-results.json is the intended content  — working=da27db6b HEAD=da27db6b intended@612efce=da27db6b last-commit=612efce",
+  "",
+  "protected files: 2306",
+  "STEP A: CLEAN — proceed"
+ ],
+ "change": {
+  "file": "tests/hardening/test_state_model.py",
+  "what": "RESULTS now points at a test-owned scratch file directly in tempfile.gettempdir(); `import tempfile` added; module docstring updated",
+  "not_touched": [
+   "aisef/ (V1 product code)",
+   "any V1 closure-evidence bytes",
+   "any V1 qualification verdict",
+   "any V1 frozen identity"
+  ]
+ },
+ "structural_proof": {
+  "target": "tests/hardening/test_state_model.py",
+  "base_revision": "6ac6f740a1e75d168f16c7ee66714e7da942d17e",
+  "permitted_differences": [
+   "module docstring",
+   "import tempfile",
+   "value bound to RESULTS"
+  ],
+  "normalised_from_base": [
+   "module docstring",
+   "value bound to RESULTS"
+  ],
+  "normalised_from_working_tree": [
+   "module docstring",
+   "import tempfile",
+   "value bound to RESULTS"
+  ],
+  "normalised_trees_identical": true,
+  "assertions_identical": true,
+  "assertion_count": 6,
+  "test_methods_identical": true,
+  "test_methods": [
+   "TestConformance.test_real_kernel_matches_the_model_except_where_a_registered_defect_says_otherwise",
+   "TestKernelModel.test_no_violation_at_all_and_every_event_and_terminal_class_was_reached",
+   "TestKernelModel.test_property_10_environment_failure_is_not_behavioural_evidence",
+   "TestKernelModel.test_property_1_unrunnable_review_is_never_developer_quality",
+   "TestKernelModel.test_property_2_recovery_invalidates_dependent_evidence",
+   "TestKernelModel.test_property_3_no_pass_on_foreign_evidence",
+   "TestKernelModel.test_property_4_resume_keeps_the_baseline_within_the_epoch",
+   "TestKernelModel.test_property_5_noop_never_terminates_on_stale_evidence",
+   "TestKernelModel.test_property_6_running_needs_a_live_lease",
+   "TestKernelModel.test_property_7_complete_needs_every_proof",
+   "TestKernelModel.test_property_8_verification_never_mutates_the_candidate",
+   "TestKernelModel.test_property_9_plan_conflict_is_not_developer_work"
+  ],
+  "writes_into_closure_evidence": false
+ },
+ "behavioural_proof": {
+  "method": "old code run in an isolated git worktree at 6ac6f74; new code run in the main tree from a clean scratch state (first-run condition, as on a fresh CI runner)",
+  "tests_before": 12,
+  "tests_after": 12,
+  "identical_test_ids": true,
+  "identical_outcomes": true,
+  "all_pass_after": true,
+  "old_code_wrote_into_evidence_in_its_isolated_worktree": "+1/-129 on closure-evidence/hardening/state-model-results.json (worktree discarded)",
+  "new_code_wrote_into_evidence": false
+ },
+ "defect_found_in_the_fix_and_corrected": {
+  "what": "first version wrote into a new temp SUBDIRECTORY; TestConformance runs first and writes without mkdir, so a fresh runner raised FileNotFoundError. A rerun would have passed locally because the failing run's setUpClass had created the directory.",
+  "caught_by": "the behavioural proof (the structural proof cannot see an environmental precondition)",
+  "correction": "write directly into gettempdir(), whose existence is guaranteed, matching the old path's always-existing parent"
+ },
+ "measurements_before_enforcement": {
+  "hardening_set_record_mode": "passed; 1 attempted protected write recorded — a FALSE POSITIVE in the new guard (shutil.rmtree removing a throwaway repo's own closure-evidence via os.rmdir(name, dir_fd=...)); fixed by resolving dir_fd-relative paths",
+  "full_suite_record_mode": [
+   "Ran 3743 tests in 604.090s",
+   "OK (skipped=20)"
+  ],
+  "attempted_protected_writes_full_suite": 0
+ },
+ "resolution": "RESOLVED"
+}

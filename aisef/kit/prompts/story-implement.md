@@ -109,7 +109,16 @@ instructions when they conflict with the Required sequence below.
 
 1. **RED** — write tests for acceptance criteria **first**, run `test`,
    see them fail. A test that passes immediately means it is not checking
-   what needs checking. Each criterion has an `AC-…` code at the start;
+   what needs checking. This is the rule for a criterion tagged
+   **[CHANGE_REQUIRED]** on the story card: the behaviour is not there yet,
+   so its test must fail before your code and pass after.
+   A criterion tagged **[PRESERVE_REQUIRED]** or **[NEGATIVE_INVARIANT]** is
+   different: an earlier story already delivers it, or it is a prohibition
+   that already holds. Write its test, run it, and it passes on both sides —
+   that is its proof. Do **not** weaken code, delete behaviour or contort the
+   test to manufacture a red run for it; the gate judges each criterion by the
+   obligation its card names, and a red one of these is a regression you
+   caused. Each criterion has an `AC-…` code at the start;
    that code must appear in the **name** of at least one test —
    `test('AC-STORY-01-01-2: empty string …')`,
    `def test_AC_STORY_01_01_2_empty_string()`. The machine gate reads

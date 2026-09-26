@@ -1,0 +1,135 @@
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> tests/test_atomic_batch.py:234:13
+    |
+232 |               try:
+233 |                   _apply_via_ledger(target, batch)
+234 | /             except Exception:
+235 | |                 pass
+    | |____________________^
+236 |
+237 |               self.assertEqual(target.read_bytes(), pre_bytes)
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> tests/test_atomic_batch.py:234:20
+    |
+232 |             try:
+233 |                 _apply_via_ledger(target, batch)
+234 |             except Exception:
+    |                    ^^^^^^^^^
+235 |                 pass
+    |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> tests/test_atomic_batch.py:250:13
+    |
+248 |               try:
+249 |                   _apply_via_ledger(target, batch)
+250 | /             except Exception:
+251 | |                 pass
+    | |____________________^
+252 |
+253 |               self.assertFalse(
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> tests/test_atomic_batch.py:250:20
+    |
+248 |             try:
+249 |                 _apply_via_ledger(target, batch)
+250 |             except Exception:
+    |                    ^^^^^^^^^
+251 |                 pass
+    |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> tests/test_atomic_batch.py:274:13
+    |
+272 |               try:
+273 |                   ledger.apply_batch(batch)
+274 | /             except Exception:
+275 | |                 pass
+    | |____________________^
+276 |
+277 |               self.assertEqual(target.read_bytes(), pre_bytes)
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> tests/test_atomic_batch.py:274:20
+    |
+272 |             try:
+273 |                 ledger.apply_batch(batch)
+274 |             except Exception:
+    |                    ^^^^^^^^^
+275 |                 pass
+    |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> tests/test_atomic_batch.py:319:13
+    |
+317 |               try:
+318 |                   ledger.apply_batch(batch)
+319 | /             except Exception:
+320 | |                 pass
+    | |____________________^
+321 |
+322 |               self.assertEqual(target.read_bytes(), pre_bytes)
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> tests/test_atomic_batch.py:319:20
+    |
+317 |             try:
+318 |                 ledger.apply_batch(batch)
+319 |             except Exception:
+    |                    ^^^^^^^^^
+320 |                 pass
+    |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> tests/test_atomic_batch.py:335:13
+    |
+333 |               try:
+334 |                   ledger.apply_batch(batch)
+335 | /             except Exception:
+336 | |                 pass
+    | |____________________^
+337 |
+338 |               leftovers = [
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> tests/test_atomic_batch.py:335:20
+    |
+333 |             try:
+334 |                 ledger.apply_batch(batch)
+335 |             except Exception:
+    |                    ^^^^^^^^^
+336 |                 pass
+    |
+
+SIM117 [*] Use a single `with` statement with multiple contexts instead of nested `with` statements
+   --> tests/test_atomic_batch.py:371:13
+    |
+369 |                   raise OSError("simulated crash between temp-write and os.replace")
+370 |
+371 | /             with unittest.mock.patch.object(
+372 | |                 os, "replace", side_effect=raise_on_replace
+373 | |             ):
+374 | |                 with self.assertRaises(OSError):
+    | |________________________________________________^
+375 |                       ledger.apply_batch(batch)
+    |
+help: Combine `with` statements
+    |
+372 |                 os, "replace", side_effect=raise_on_replace
+    -             ):
+    -                 with self.assertRaises(OSError):
+    -                     ledger.apply_batch(batch)
+373 +             ), self.assertRaises(OSError):
+374 +                 ledger.apply_batch(batch)
+375 |
+    |
+
+Found 11 errors.
+[*] 1 fixable with the `--fix` option.

@@ -89,10 +89,80 @@ def check_prd(prd: PRD) -> GateResult:
 #: runtime can tell (preservation blocking the real story, the nop control
 #: refusing its tests), an epic has already stalled.
 _GIU_CHO = re.compile(
-    r"\bnot[ -]implemented\b|\bunimplemented\b|\bstubs?\b|\bstubbed\b"
-    r"|\bplaceholder\b|\bno-?op\b|\bTODO\b",
+    # Two kinds of placeholder criterion (SS-30 / lỗi 148). Implementation-STATE words — a command that is "still a
+    # stub", "not implemented", a "no-op" — describe a placeholder wherever they stand (marks-cli 2026-09-14: the
+    # criterion "the stub command exits 1" was VERIFIED and killed the epic). The MARKERS TODO / TBD / FIXME are also
+    # domain nouns (every to-do application), so they count only as the criterion's own token: at the start, then
+    # nothing or a separator — "a TODO item can be marked done" is a real criterion.
+    r"\bnot[ -]implemented\b|\bunimplemented\b|\bstubs?\b|\bstubbed\b|\bplaceholder\b|\bno-?op\b"
+    r"|^\W*(?:TODO|TBD|FIXME)\b\W*(?:$|[:—–\-(])",
     re.IGNORECASE,
 )
+
+
+def ac_proof_defects(ac_count: dict[str, int], ac_proof: dict[str, dict], story_type: dict[str, str],
+                     fr_map: dict[str, list[str]], prd: PRD | None) -> list[str]:
+    """TDD proof policy V2 (owner decision 2026-09-20, sections 8-9): every criterion declares what it must SHOW.
+
+    The obligation is planning data, so this is where it is refused — not at runtime, where the kernel would have to
+    guess it from the criterion's wording. A criterion with no obligation, an unknown mode, an obligation for a
+    criterion that no longer exists, a requirement the PRD does not carry, or a normal story that contributes no new
+    behaviour at all: each is a plan defect a model cannot fix by writing code."""
+    from .obligation import Mode, STORY_TYPES, story_contribution
+
+    known_req = {r.id for r in (prd.requirements if prd else [])}
+    out: list[str] = []
+    for sid, n in sorted(ac_count.items()):
+        if not n:
+            continue                      # "no acceptance criteria" is its own error, reported above
+        declared = ac_proof.get(sid) or {}
+        codes = [f"AC-{sid}-{i}" for i in range(1, int(n or 0) + 1)]
+        kind = (story_type.get(sid) or "NORMAL").upper()
+        if kind not in STORY_TYPES:
+            out.append(f"{sid}: story_type {kind!r} is not one of {', '.join(STORY_TYPES)}")
+        if n and not declared:
+            out.append(f"{sid}: declares no proof obligation for its {n} acceptance criteria — every criterion needs "
+                       f"`ac_proof: <i>=<{'|'.join(m.value for m in Mode)}>/<requirement>`")
+            continue
+        missing = [c for c in codes if c not in declared]
+        if missing:
+            out.append(f"{sid}: no proof obligation for {', '.join(missing[:5])}"
+                       + (f" (+{len(missing) - 5} more)" if len(missing) > 5 else ""))
+        for code, decl in sorted(declared.items()):
+            if decl.get("proof_mode") not in Mode.__members__:
+                out.append(f"{sid}: {code if decl.get('ac_id') else 'unreadable entry'} declares proof mode "
+                           f"{decl.get('proof_mode') or decl.get('raw')!r}, which is not one of "
+                           f"{', '.join(m.value for m in Mode)}")
+                continue
+            if code not in codes:
+                out.append(f"{sid}: {code} has a proof obligation but no such criterion (the story has {n}) — a stale plan")
+                continue
+            req = str(decl.get("requirement") or "")
+            if not req:
+                out.append(f"{sid}: {code} names no requirement — traceability to the frozen requirements is the point")
+            elif known_req and req not in known_req:
+                out.append(f"{sid}: {code} names requirement {req}, which the PRD does not carry")
+            elif req.upper().startswith("FR-") and (fr_map.get(sid) or []) and req not in (fr_map.get(sid) or []):
+                out.append(f"{sid}: {code} names {req}, which this story does not cover ({', '.join(fr_map[sid])})")
+        ok, why = story_contribution(declared, codes, kind)
+        if not ok and not any(o.startswith(f"{sid}: no proof obligation") for o in out):
+            out.append(f"{sid}: {why}")
+    return out
+
+
+def ac_proof_warnings(ac_proof: dict[str, dict]) -> list[str]:
+    """Two stories both claiming to CHANGE a requirement: legal (a requirement can need two steps), but the plan
+    should say why — it is the shape that produced the W1 V1 overlap (STORY-04-01 vs STORY-04-02 on FR-12)."""
+    from .obligation import Mode
+
+    owners: dict[str, list[str]] = {}
+    for sid, declared in (ac_proof or {}).items():
+        for decl in (declared or {}).values():
+            if decl.get("proof_mode") == Mode.CHANGE_REQUIRED.value and decl.get("requirement"):
+                owners.setdefault(str(decl["requirement"]), []).append(sid)
+    return [f"{req} is CHANGE_REQUIRED in {len(set(sids))} stories ({', '.join(sorted(set(sids)))}) — say why each "
+            f"story changes it, or move the later ones to PRESERVE_REQUIRED"
+            for req, sids in sorted(owners.items()) if len(set(sids)) > 1]
 
 
 def check_stories(
@@ -103,6 +173,8 @@ def check_stories(
     story_fr_map: dict[str, list[str]] | None = None,
     story_ac_count: dict[str, int] | None = None,
     story_ac_text: dict[str, list[str]] | None = None,
+    story_ac_proof: dict[str, dict] | None = None,
+    story_type: dict[str, str] | None = None,
 ) -> GateResult:
     """Check the story set before starting implementation."""
     r = GateResult("machine gate: stories")
@@ -220,6 +292,10 @@ def check_stories(
             f"share one identity: reordering them is undetectable and a test named after "
             f"either proves both. Merge them, or state what actually differs"
         )
+
+    r.errors.extend(ac_proof_defects(story_ac_count or {}, story_ac_proof or {}, story_type or {},
+                                     story_fr_map or {}, prd))
+    r.warnings.extend(ac_proof_warnings(story_ac_proof or {}))
 
     max_ac = cfg["story.max_acceptance_criteria"]
     for sid, n in (story_ac_count or {}).items():

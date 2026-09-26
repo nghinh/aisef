@@ -552,7 +552,12 @@ class TestToolCommand(CliTestCase):
 
 class TestVerifyCommand(CliTestCase):
     def test_clean_tree_passes(self):
+        # F4 (SS-40 / INV-J.1): without a scope the guard has nothing to guard — UNCONFIGURED is never a pass,
+        # a clean tree included; with the scope given, a clean tree passes
         code, out, _ = self.run_cli("verify")
+        self.assertNotEqual(code, EXIT_OK)
+        self.assertIn("UNCONFIGURED", out)
+        code, out, _ = self.run_cli("verify", "--write-scope", "src")
         self.assertEqual(code, EXIT_OK)
         self.assertIn("post-check passed", out)
 
@@ -797,7 +802,7 @@ class TestInit(CliTestCase):
         from aisef.cli.harness import _PY
         self.assertEqual(cfg["tools.test"], f"{_PY} -m pytest -v")
         from aisef.harness import verify_image
-        self.assertEqual(cfg["sandbox.image"], verify_image.RECIPES["python"].name)
+        self.assertEqual(cfg["sandbox.image"], verify_image.RECIPES["python"].image)
         self.assertTrue(cfg["sandbox.image"].startswith("aisef-verify-python:"))
         self.assertIn("pypi.org", cfg["sandbox.allow_hosts"])
 

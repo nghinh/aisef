@@ -1,0 +1,44 @@
+{
+ "record": "AISEF V2 — RFC AMENDMENT (approval lineage)",
+ "id": "AISEF-V2-RFC-AMENDMENT-V2-003",
+ "amends": {
+  "path": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+  "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f"
+ },
+ "exception": {
+  "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+  "sha256": "8dcc296574f9978d28822bff51ecd94dadf005c31ffb98e2b8da308765f0c2f9",
+  "note": "re-bound after the exception record's probe digest 'after' value was revised to c335293e… (the dead operand of _watch removed at the corrected candidate); the RFC text and its digests are unchanged by that revision"
+ },
+ "frozen_items_changed": [
+  "F1",
+  "F2",
+  "F5"
+ ],
+ "rfc_normative_digest": {
+  "before": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+  "after": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771"
+ },
+ "freeze_table_digest": {
+  "before": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114",
+  "after": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7"
+ },
+ "f1_row_sha256": {
+  "before": "b0b1b6d6914cda85c16ebc9538a8408e7360752dbdf880ca54987460329eb24b",
+  "after": "c7ef7e857d4dbafa17d8b0ed39f0d619a5c834f7f09460c74f17338f19cbc9b0"
+ },
+ "f2_row_sha256": {
+  "before": "e33271cd13c7752c6f2fe154cb827f9ee46586ac27d38257f9577470ab4188ca",
+  "after": "d129883bfdf9ce3ab795efdaf144e3d3af231f128c73bc62f1b5de78f0ada803"
+ },
+ "f5_row_sha256": {
+  "before": "5c1bf5f75fcb569908893539c7787a228cc865d18d87ee8408a67cd161742ec5",
+  "after": "92ba9a46280167855e2adb8c552062325432593b3a7e75f0ce3383a4a2483735"
+ },
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "AISEF V2 — OWNER DECISION ON ARCHITECTURE EXCEPTION V2-003",
+  "date": "2026-09-23"
+ },
+ "rule": "The original approval record and AMENDMENTS V2-001 and V2-002 are unchanged. The effective approved digests are the 'after' digests of the last amendment in the lineage; validation/v2/freeze_manifest.py verifies every link (amended record sha256, exception sha256, before == previous after)."
+}

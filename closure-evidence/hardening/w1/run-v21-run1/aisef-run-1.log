@@ -1,0 +1,21 @@
+EPIC-01 · wave 1
+STORY-01-01: NOT DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/__init__.py, tests/test_nfc_normalization.py, tests/test_skeleton.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — at parent SHA ad2aa2b: AC-STORY-01-01-4 [NEGATIVE_INVARIANT, FR-14] RED -> GREEN (parent RED_COLLECTION_BOUND_TO_STORY / candidate GREEN_EXECUTED), expected GREEN -> GREEN → PLAN_PRECONDITION_MISSING (PLAN): the prohibition is already violated at this story's parent (red) — a plan defect, not this story's [tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_no_forbidden_module_imports]; AC-STORY-01-01-5 [NEGATIVE_INVARIANT, FR-14] RED -> GREEN (parent RED_COLLECTION_BOUND_TO_STORY / candidate GREEN_EXECUTED), expected GREEN -> GREEN → PLAN_PRECONDITION_MISSING (PLAN): the prohibition is already violated at this story's parent (red) — a plan defect, not this story's [tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_5_no_side_effect_calls]
+    ✅ security
+    ✅ review
+    – preservation — story does not touch any VERIFIED behaviour of other stories
+  ✗ deadlock due to plan: AC-STORY-01-01-4 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is already violated at this story's parent (red) — a plan defect, not this story's; AC-STORY-01-01-5 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is already violated at this story's parent (red) — a plan defect, not this story's. The criterion cannot be satisfied by writing code — correct the plan (its proof obligation, its owning story, or the criterion itself), then re-run.
+
+⏸ stopped at EPIC-01 · wave 1

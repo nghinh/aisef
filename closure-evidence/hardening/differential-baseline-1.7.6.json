@@ -1,0 +1,1060 @@
+{
+ "traces": 10000,
+ "workers": 6,
+ "elapsed_s": 2438.6,
+ "traces_per_s": 4.1,
+ "model_transitions": 70090,
+ "real_stage_events": 47269,
+ "matched": 6706,
+ "mismatched_attributed": {
+  "SS-57": 278,
+  "SS-13": 850,
+  "SS-12": 387,
+  "SS-59": 51,
+  "SS-15": 775,
+  "SS-14": 403,
+  "SS-21": 482,
+  "D-035": 48
+ },
+ "unexplained_count": 20,
+ "unexplained": [
+  {
+   "seed": 1000485,
+   "scenario": "dev=CHANGED/NOOP/CHANGED rev=BLOCK_OUTSIDE sec=BLOCK retries=1",
+   "diff": [
+    "terminal: real='failed:did not pass gate' model='human:plan conflict'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 3,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 2,
+    "events": [
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:BLOCK",
+     "developer:NOOP",
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:BLOCK",
+     "STORY-04-01: NOT DONE |   [attempt 1] gate failed |     ✅ evidence matches candidate |     – guard ran — hooks not compiled for this client — not expected |     ✅ test |     ○ no baseline regression — cannot read test names from baseline — use a reporter that prints names (`node --test`, `vitest --r"
+    ]
+   },
+   "model": {
+    "terminal": "human:plan conflict",
+    "developer_sessions": 3,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 2,
+    "events": [
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_BLOCK->QUALITY_BLOCK",
+     "GATE_EVALUATE->QUALITY_BLOCK",
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_BLOCK->QUALITY_BLOCK",
+     "GATE_EVALUATE->PLAN_CONFLICT"
+    ]
+   },
+   "model_steps": 11,
+   "real_events": 7
+  },
+  {
+   "seed": 1001455,
+   "scenario": "dev=NOOP/MAX_TURNS_UNTOUCHED rev=PASS/PASS sec=PASS retries=1",
+   "diff": [
+    "terminal: real='blocked:no-op: nothing to grade twice' model='failed:did not pass gate'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK"
+    ]
+   },
+   "model_steps": 3,
+   "real_events": 3
+  },
+  {
+   "seed": 1001517,
+   "scenario": "dev=NOOP/MAX_TURNS_UNTOUCHED rev=PASS/BLOCK/MUTATE/PASS sec=PASS retries=1",
+   "diff": [
+    "terminal: real='blocked:no-op: nothing to grade twice' model='failed:did not pass gate'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK"
+    ]
+   },
+   "model_steps": 3,
+   "real_events": 3
+  },
+  {
+   "seed": 1002501,
+   "scenario": "dev=CHANGED_RED/RATE_LIMIT/CHANGED/SCOPE_VIOLATION/TIMEOUT rev=BLOCK_OUTSIDE sec=PASS/BLOCK retries=1",
+   "diff": [
+    "terminal: real='failed:did not pass gate' model='human:plan conflict'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 3,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 2,
+    "events": [
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "developer:RATE_LIMIT",
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:BLOCK",
+     "STORY-04-01: NOT DONE |   [attempt 1] gate failed |     ✅ evidence matches candidate |     – guard ran — hooks not compiled for this client — not expected |     ✗ test — the most recent test run is still failing, the story cannot be finished. |     ○ no baseline regression — cannot read test names f"
+    ]
+   },
+   "model": {
+    "terminal": "human:plan conflict",
+    "developer_sessions": 3,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 2,
+    "events": [
+     "DEVELOP_CHANGED->PASS",
+     "TEST_FAIL->QUALITY_BLOCK",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->QUALITY_BLOCK",
+     "DEVELOP_RATE_LIMIT->INFRA_FAILURE",
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_BLOCK->QUALITY_BLOCK",
+     "GATE_EVALUATE->PLAN_CONFLICT"
+    ]
+   },
+   "model_steps": 11,
+   "real_events": 7
+  },
+  {
+   "seed": 1003087,
+   "scenario": "dev=NOOP/TIMEOUT/NOOP rev=PASS/PASS sec=PASS retries=2",
+   "diff": [
+    "terminal: real='blocked:no-op: budget exhausted' model='blocked:no-op: nothing to grade twice'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: budget exhausted",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 0,
+    "infra_attempts": 3,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:TIMEOUT",
+     "developer:NOOP",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 0,
+    "infra_attempts": 3,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_TIMEOUT->INFRA_FAILURE",
+     "DEVELOP_NOOP->NOOP"
+    ]
+   },
+   "model_steps": 3,
+   "real_events": 3
+  },
+  {
+   "seed": 1003275,
+   "scenario": "dev=NOOP/MAX_TURNS_UNTOUCHED/NOOP rev=PASS/BLOCK_OUTSIDE/PASS sec=PASS/PASS/PASS retries=2",
+   "diff": [
+    "developer_sessions: real=4 model=3",
+    "infra_attempts: real=3 model=2"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 4,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 1,
+    "infra_attempts": 3,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:MAX_TURNS",
+     "developer:NOOP",
+     "developer:NOOP",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 1,
+    "infra_attempts": 2,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_NOOP->NOOP"
+    ]
+   },
+   "model_steps": 3,
+   "real_events": 4
+  },
+  {
+   "seed": 1004195,
+   "scenario": "dev=NOOP/CRASH/NOOP/CRASH rev=BLOCK_OUTSIDE/PASS/STUCK sec=PASS/PASS retries=2",
+   "diff": [
+    "terminal: real='blocked:no-op: budget exhausted' model='blocked:no-op: nothing to grade twice'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: budget exhausted",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 0,
+    "infra_attempts": 3,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:CRASH",
+     "developer:NOOP",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 0,
+    "infra_attempts": 3,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_CRASH->INFRA_FAILURE",
+     "DEVELOP_NOOP->NOOP"
+    ]
+   },
+   "model_steps": 3,
+   "real_events": 3
+  },
+  {
+   "seed": 1004244,
+   "scenario": "dev=NOOP/MAX_TURNS_UNTOUCHED rev=BLOCK_OUTSIDE sec=PASS/PASS/PASS retries=2",
+   "diff": [
+    "terminal: real='blocked:no-op: nothing to grade twice' model='failed:did not pass gate'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 4,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 3,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 4,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 3,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK"
+    ]
+   },
+   "model_steps": 4,
+   "real_events": 4
+  },
+  {
+   "seed": 1004930,
+   "scenario": "dev=NOOP/MAX_TURNS_UNTOUCHED rev=UNRUNNABLE sec=PASS/PASS retries=2",
+   "diff": [
+    "terminal: real='blocked:no-op: nothing to grade twice' model='failed:did not pass gate'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 4,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 3,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 4,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 3,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK"
+    ]
+   },
+   "model_steps": 4,
+   "real_events": 4
+  },
+  {
+   "seed": 1005530,
+   "scenario": "dev=NOOP/TIMEOUT/NOOP rev=PASS/PASS/PASS/PASS sec=BLOCK/PASS retries=2",
+   "diff": [
+    "terminal: real='blocked:no-op: budget exhausted' model='blocked:no-op: nothing to grade twice'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: budget exhausted",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 0,
+    "infra_attempts": 3,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:TIMEOUT",
+     "developer:NOOP",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 0,
+    "infra_attempts": 3,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_TIMEOUT->INFRA_FAILURE",
+     "DEVELOP_NOOP->NOOP"
+    ]
+   },
+   "model_steps": 3,
+   "real_events": 3
+  },
+  {
+   "seed": 1005804,
+   "scenario": "dev=NOOP/MAX_TURNS_UNTOUCHED/NOOP/MAX_TURNS_WORK rev=BLOCK sec=PASS retries=1",
+   "diff": [
+    "terminal: real='blocked:no-op: budget exhausted' model='blocked:no-op: nothing to grade twice'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: budget exhausted",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 1,
+    "infra_attempts": 2,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:MAX_TURNS",
+     "developer:NOOP",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 1,
+    "infra_attempts": 2,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_NOOP->NOOP"
+    ]
+   },
+   "model_steps": 3,
+   "real_events": 3
+  },
+  {
+   "seed": 1006063,
+   "scenario": "dev=CHANGED/CRASH/CHANGED rev=BLOCK_OUTSIDE sec=PASS/PASS retries=1",
+   "diff": [
+    "terminal: real='failed:did not pass gate' model='human:plan conflict'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 3,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 2,
+    "events": [
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "developer:CRASH",
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "STORY-04-01: NOT DONE |   [attempt 1] gate failed |     ✅ evidence matches candidate |     – guard ran — hooks not compiled for this client — not expected |     ✅ test |     ○ no baseline regression — cannot read test names from baseline — use a reporter that prints names (`node --test`, `vitest --r"
+    ]
+   },
+   "model": {
+    "terminal": "human:plan conflict",
+    "developer_sessions": 3,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 2,
+    "events": [
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->QUALITY_BLOCK",
+     "DEVELOP_CRASH->INFRA_FAILURE",
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->PLAN_CONFLICT"
+    ]
+   },
+   "model_steps": 11,
+   "real_events": 7
+  },
+  {
+   "seed": 1006298,
+   "scenario": "dev=NOOP/MAX_TURNS_UNTOUCHED rev=BLOCK sec=PASS retries=2",
+   "diff": [
+    "terminal: real='blocked:no-op: nothing to grade twice' model='failed:did not pass gate'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 4,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 3,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 4,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 3,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK"
+    ]
+   },
+   "model_steps": 4,
+   "real_events": 4
+  },
+  {
+   "seed": 1006932,
+   "scenario": "dev=NOOP/MAX_TURNS_UNTOUCHED rev=PASS sec=PASS/PASS retries=1",
+   "diff": [
+    "terminal: real='blocked:no-op: nothing to grade twice' model='failed:did not pass gate'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK"
+    ]
+   },
+   "model_steps": 3,
+   "real_events": 3
+  },
+  {
+   "seed": 1007338,
+   "scenario": "dev=CHANGED/TIMEOUT/CRASH/CHANGED rev=BLOCK_OUTSIDE sec=PASS/PASS/PASS retries=2",
+   "diff": [
+    "developer_sessions: real=5 model=4",
+    "review_executions: real=3 model=2",
+    "security_executions: real=3 model=2",
+    "quality_attempts: real=3 model=2",
+    "candidates_frozen: real=3 model=2"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "human:plan conflict",
+    "developer_sessions": 5,
+    "review_executions": 3,
+    "security_executions": 3,
+    "quality_attempts": 3,
+    "infra_attempts": 2,
+    "candidates_frozen": 3,
+    "events": [
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "developer:TIMEOUT",
+     "developer:CRASH",
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "STORY-04-01: NOT DONE |   [attempt 1] gate failed |     ✅ evidence matches candidate |     – guard ran — hooks not compiled for this client — not expected |     ✅ test |     ○ no baseline regression — cannot read test names from baseline — use a reporter that prints names (`node --test`, `vitest --r"
+    ]
+   },
+   "model": {
+    "terminal": "human:plan conflict",
+    "developer_sessions": 4,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 2,
+    "candidates_frozen": 2,
+    "events": [
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->QUALITY_BLOCK",
+     "DEVELOP_TIMEOUT->INFRA_FAILURE",
+     "DEVELOP_CRASH->INFRA_FAILURE",
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->PLAN_CONFLICT"
+    ]
+   },
+   "model_steps": 12,
+   "real_events": 11
+  },
+  {
+   "seed": 1008418,
+   "scenario": "dev=CHANGED/TIMEOUT/SCOPE_VIOLATION/AUTH/CHANGED_RED rev=BLOCK_OUTSIDE sec=PASS retries=1",
+   "diff": [
+    "terminal: real='failed:did not pass gate' model='human:plan conflict'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 3,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 2,
+    "events": [
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "developer:TIMEOUT",
+     "developer:SCOPE_VIOLATION",
+     "review:BLOCK",
+     "security:PASS",
+     "STORY-04-01: NOT DONE |   [attempt 1] gate failed |     ✅ evidence matches candidate |     – guard ran — hooks not compiled for this client — not expected |     ✅ test |     ○ no baseline regression — cannot read test names from baseline — use a reporter that prints names (`node --test`, `vitest --r"
+    ]
+   },
+   "model": {
+    "terminal": "human:plan conflict",
+    "developer_sessions": 3,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 2,
+    "events": [
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->QUALITY_BLOCK",
+     "DEVELOP_TIMEOUT->INFRA_FAILURE",
+     "DEVELOP_SCOPE_VIOLATION->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->PLAN_CONFLICT"
+    ]
+   },
+   "model_steps": 11,
+   "real_events": 7
+  },
+  {
+   "seed": 1008588,
+   "scenario": "dev=CHANGED_RED/MAX_TURNS_WORK/TIMEOUT/CHANGED rev=UNRUNNABLE/BLOCK_OUTSIDE sec=BLOCK retries=2",
+   "diff": [
+    "terminal: real='failed:did not pass gate' model='human:plan conflict'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 4,
+    "review_executions": 3,
+    "security_executions": 3,
+    "quality_attempts": 3,
+    "infra_attempts": 1,
+    "candidates_frozen": 3,
+    "events": [
+     "developer:CHANGED",
+     "review:UNRUNNABLE",
+     "security:BLOCK",
+     "developer:MAX_TURNS",
+     "review:BLOCK",
+     "security:BLOCK",
+     "developer:TIMEOUT",
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:BLOCK",
+     "STORY-04-01: NOT DONE |   [attempt 1] gate failed |     ✅ evidence matches candidate |     – guard ran — hooks not compiled for this client — not expected |     ✗ test — the most recent test run is still failing, the story cannot be finished. |     ○ no baseline regression — cannot read test names f"
+    ]
+   },
+   "model": {
+    "terminal": "human:plan conflict",
+    "developer_sessions": 4,
+    "review_executions": 3,
+    "security_executions": 3,
+    "quality_attempts": 3,
+    "infra_attempts": 1,
+    "candidates_frozen": 3,
+    "events": [
+     "DEVELOP_CHANGED->PASS",
+     "TEST_FAIL->QUALITY_BLOCK",
+     "REVIEW_UNRUNNABLE->UNRUNNABLE",
+     "SECURITY_BLOCK->QUALITY_BLOCK",
+     "GATE_EVALUATE->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_WORK->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_BLOCK->QUALITY_BLOCK",
+     "GATE_EVALUATE->QUALITY_BLOCK",
+     "DEVELOP_TIMEOUT->INFRA_FAILURE",
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_BLOCK->QUALITY_BLOCK",
+     "GATE_EVALUATE->PLAN_CONFLICT"
+    ]
+   },
+   "model_steps": 16,
+   "real_events": 10
+  },
+  {
+   "seed": 1009219,
+   "scenario": "dev=CHANGED/CRASH/CHANGED/CHANGED/NOOP/RATE_LIMIT rev=BLOCK_OUTSIDE sec=PASS/PASS/PASS retries=2",
+   "diff": [
+    "developer_sessions: real=4 model=3",
+    "review_executions: real=3 model=2",
+    "security_executions: real=3 model=2",
+    "quality_attempts: real=3 model=2",
+    "candidates_frozen: real=3 model=2"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "human:plan conflict",
+    "developer_sessions": 4,
+    "review_executions": 3,
+    "security_executions": 3,
+    "quality_attempts": 3,
+    "infra_attempts": 1,
+    "candidates_frozen": 3,
+    "events": [
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "developer:CRASH",
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:PASS",
+     "STORY-04-01: NOT DONE |   [attempt 1] gate failed |     ✅ evidence matches candidate |     – guard ran — hooks not compiled for this client — not expected |     ✅ test |     ○ no baseline regression — cannot read test names from baseline — use a reporter that prints names (`node --test`, `vitest --r"
+    ]
+   },
+   "model": {
+    "terminal": "human:plan conflict",
+    "developer_sessions": 3,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 2,
+    "events": [
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->QUALITY_BLOCK",
+     "DEVELOP_CRASH->INFRA_FAILURE",
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_BLOCK_OUTSIDE->QUALITY_BLOCK",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->PLAN_CONFLICT"
+    ]
+   },
+   "model_steps": 11,
+   "real_events": 10
+  },
+  {
+   "seed": 1009236,
+   "scenario": "dev=CRASH/NOOP/CHANGED/CHANGED/MAX_TURNS_UNTOUCHED/AUTH rev=COMMIT sec=PASS/BLOCK retries=2",
+   "diff": [
+    "terminal: real='blocked:credential rejected' model='blocked:REVIEW_UNRUNNABLE'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:credential rejected",
+    "developer_sessions": 3,
+    "review_executions": 3,
+    "security_executions": 1,
+    "quality_attempts": 1,
+    "infra_attempts": 2,
+    "candidates_frozen": 1,
+    "events": [
+     "developer:CRASH",
+     "developer:NOOP",
+     "developer:CHANGED",
+     "review:COMMIT",
+     "security:PASS",
+     "review:COMMIT",
+     "review:COMMIT",
+     "STORY-04-01: NOT DONE |   [infra] api_error: connection reset by peer |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays emp"
+    ]
+   },
+   "model": {
+    "terminal": "blocked:REVIEW_UNRUNNABLE",
+    "developer_sessions": 3,
+    "review_executions": 3,
+    "security_executions": 1,
+    "quality_attempts": 1,
+    "infra_attempts": 2,
+    "candidates_frozen": 1,
+    "events": [
+     "DEVELOP_CRASH->INFRA_FAILURE",
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_MUTATE->UNRUNNABLE",
+     "SECURITY_PASS->PASS",
+     "GATE_EVALUATE->UNRUNNABLE",
+     "REVIEW_MUTATE->UNRUNNABLE",
+     "GATE_EVALUATE->UNRUNNABLE",
+     "REVIEW_MUTATE->UNRUNNABLE",
+     "GATE_EVALUATE->UNRUNNABLE"
+    ]
+   },
+   "model_steps": 11,
+   "real_events": 7
+  },
+  {
+   "seed": 1009422,
+   "scenario": "dev=NOOP/MAX_TURNS_UNTOUCHED rev=PASS/PASS sec=PASS/PASS/PASS retries=1",
+   "diff": [
+    "terminal: real='blocked:no-op: nothing to grade twice' model='failed:did not pass gate'"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:no-op: nothing to grade twice",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "developer:NOOP",
+     "developer:MAX_TURNS",
+     "developer:MAX_TURNS",
+     "STORY-04-01: NOT DONE |   [infra] the session wrote nothing (3 turns) — the tree is exactly as the session found it, so the gate has nothing to grade. If the story's work is already on the main branch, the worktree forked from it and the diff stays empty however many sessions run — check the main br"
+    ]
+   },
+   "model": {
+    "terminal": "failed:did not pass gate",
+    "developer_sessions": 3,
+    "review_executions": 0,
+    "security_executions": 0,
+    "quality_attempts": 2,
+    "infra_attempts": 1,
+    "candidates_frozen": 0,
+    "events": [
+     "DEVELOP_NOOP->NOOP",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK",
+     "DEVELOP_MAX_TURNS_UNTOUCHED->QUALITY_BLOCK"
+    ]
+   },
+   "model_steps": 3,
+   "real_events": 3
+  }
+ ],
+ "known_deviations": [
+  "D-035",
+  "SS-12",
+  "SS-13",
+  "SS-14",
+  "SS-15",
+  "SS-21",
+  "SS-57",
+  "SS-59"
+ ],
+ "vocabulary": {
+  "developer": [
+   [
+    "CHANGED",
+    30
+   ],
+   [
+    "CHANGED_RED",
+    8
+   ],
+   [
+    "NOOP",
+    8
+   ],
+   [
+    "TIMEOUT",
+    4
+   ],
+   [
+    "CRASH",
+    4
+   ],
+   [
+    "RATE_LIMIT",
+    2
+   ],
+   [
+    "CONTEXT",
+    3
+   ],
+   [
+    "AUTH",
+    2
+   ],
+   [
+    "SCOPE_VIOLATION",
+    6
+   ],
+   [
+    "TRUNK_COMMIT",
+    1
+   ],
+   [
+    "ZERO_OUTPUT",
+    2
+   ],
+   [
+    "MAX_TURNS_WORK",
+    3
+   ],
+   [
+    "MAX_TURNS_UNTOUCHED",
+    3
+   ],
+   [
+    "BUDGET",
+    2
+   ]
+  ],
+  "review": [
+   [
+    "PASS",
+    30
+   ],
+   [
+    "BLOCK",
+    7
+   ],
+   [
+    "BLOCK_OUTSIDE",
+    4
+   ],
+   [
+    "STUCK",
+    2
+   ],
+   [
+    "MALFORMED",
+    4
+   ],
+   [
+    "UNRUNNABLE",
+    5
+   ],
+   [
+    "MUTATE",
+    2
+   ],
+   [
+    "COMMIT",
+    2
+   ],
+   [
+    "BUDGET",
+    1
+   ]
+  ],
+  "security": [
+   [
+    "PASS",
+    30
+   ],
+   [
+    "BLOCK",
+    6
+   ],
+   [
+    "UNRUNNABLE",
+    4
+   ],
+   [
+    "MALFORMED",
+    3
+   ],
+   [
+    "BUDGET",
+    1
+   ]
+  ]
+ }
+}

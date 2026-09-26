@@ -1,0 +1,11 @@
+Progress: 7/16 stories done (8 not started)
+Active epics: EPIC-02
+
+  done        7
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 41 · max_turns 1
+
+✗ 1 stories not passing:
+    STORY-02-02      failed   deadlock due to plan, reviewer verified: [stuck] tests/test_snapshot_determinism.py:37 — AC-2 requires put(k,r1) then delete(k,r2) — different rids. §4.5 (docs/requirements.md:88) mandates ConflictError on different-rid mutation of the same key. So the AC's scenario cannot be reproduced: ConflictError aborts before snapshot() runs, or no abort means §4.5 is violated. Author rewrote the test to delete a never-put key, sidestepping both §4.5 and the AC's scenario. Test is green but does not exercise AC-2.. Fix the acceptance criteria or the story's write_scope, then re-run — retrying will not resolve this.

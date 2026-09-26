@@ -1,0 +1,105 @@
+FURB122 [*] Use of `temp.write` in a for loop
+   --> ledgerlock/ledger.py:193:17
+    |
+191 |                   for raw in existing:
+192 |                       temp.write(raw + b"\n")
+193 | /                 for chunk in pending_bytes:
+194 | |                     temp.write(chunk)
+    | |_____________________________________^
+195 |                   temp.flush()
+196 |                   os.fsync(temp.fileno())
+    |
+help: Replace with `temp.writelines`
+    |
+192 |                     temp.write(raw + b"\n")
+    -                 for chunk in pending_bytes:
+    -                     temp.write(chunk)
+193 +                 temp.writelines(pending_bytes)
+194 |                 temp.flush()
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_atomic_batch.py:1:1
+   |
+ 1 | / from __future__ import annotations
+ 2 | |
+ 3 | | import copy
+ 4 | | import json
+ 5 | | import os
+ 6 | | import tempfile
+ 7 | | import unittest
+ 8 | | from pathlib import Path
+ 9 | | from unittest import mock
+10 | |
+11 | | from ledgerlock import Ledger
+12 | | from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+13 | | from ledgerlock.ledger import ConflictError
+14 | | from ledgerlock import ledger as ledger_module
+   | |______________________________________________^
+15 |
+16 |   REPO_ROOT = Path(__file__).resolve().parent.parent
+   |
+help: Organize imports
+   |
+11 | from ledgerlock import Ledger
+12 + from ledgerlock import ledger as ledger_module
+13 | from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+14 | from ledgerlock.ledger import ConflictError
+   - from ledgerlock import ledger as ledger_module
+15 |
+   |
+
+F401 [*] `ledgerlock.format.canonical_bytes` imported but unused
+  --> tests/test_atomic_batch.py:12:40
+   |
+11 | from ledgerlock import Ledger
+12 | from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+   |                                        ^^^^^^^^^^^^^^^
+13 | from ledgerlock.ledger import ConflictError
+14 | from ledgerlock import ledger as ledger_module
+   |
+help: Remove unused import: `ledgerlock.format.canonical_bytes`
+   |
+11 | from ledgerlock import Ledger
+   - from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+12 + from ledgerlock.format import GENESIS, line_hash
+13 | from ledgerlock.ledger import ConflictError
+   |
+
+F841 Local variable `raw_before` is assigned to but never used
+   --> tests/test_atomic_batch.py:106:13
+    |
+105 |             lines_before = path.read_bytes().count(b"\n")
+106 |             raw_before = path.read_bytes()
+    |             ^^^^^^^^^^
+107 |             self.assertEqual(lines_before, 1)
+    |
+help: Remove assignment to unused variable `raw_before`
+
+F841 Local variable `real_replace` is assigned to but never used
+   --> tests/test_atomic_batch.py:243:13
+    |
+241 |             raw_before = path.read_bytes()
+242 |
+243 |             real_replace = os.replace
+    |             ^^^^^^^^^^^^
+244 |
+245 |             def _crashing_replace(src: str, dst: str) -> None:
+    |
+help: Remove assignment to unused variable `real_replace`
+
+SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+   --> tests/test_atomic_batch.py:248:13
+    |
+246 |                   raise RuntimeError("simulated crash between temp write and rename")
+247 |
+248 | /             with mock.patch.object(ledger_module.os, "replace", side_effect=_crashing_replace):
+249 | |                 with self.assertRaises(RuntimeError):
+    | |_____________________________________________________^
+250 |                       ledger.apply_batch(
+251 |                           [("put", "k3", "v3", "r3", 102)]
+    |
+help: Combine `with` statements
+
+Found 6 errors.
+[*] 3 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).

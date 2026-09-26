@@ -1,0 +1,75 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 5 items / 1 error
+
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_3_import_prints_package_path FAILED [ 20%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_4_no_forbidden_imports PASSED [ 40%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_5_no_forbidden_calls PASSED [ 60%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_6_public_names_importable FAILED [ 80%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_7_verify_usage_error_exit_2 FAILED [100%]
+
+==================================== ERRORS ====================================
+_______________ ERROR collecting tests/test_nfc_normalization.py _______________
+ImportError while importing test module '/workspace/tests/test_nfc_normalization.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_nfc_normalization.py:4: in <module>
+    from ledgerlock.format import normalize_key
+E   ModuleNotFoundError: No module named 'ledgerlock'
+=================================== FAILURES ===================================
+________ TestSkeleton.test_AC_STORY_01_01_3_import_prints_package_path _________
+
+self = <tests.test_skeleton.TestSkeleton testMethod=test_AC_STORY_01_01_3_import_prints_package_path>
+
+    def test_AC_STORY_01_01_3_import_prints_package_path(self):
+        result = subprocess.run(
+            [sys.executable, "-c", "import ledgerlock; print(ledgerlock.__file__)"],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+            check=False,
+        )
+>       self.assertEqual(result.returncode, 0, result.stderr)
+E       AssertionError: 1 != 0 : Traceback (most recent call last):
+E         File "<string>", line 1, in <module>
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_skeleton.py:32: AssertionError
+__________ TestSkeleton.test_AC_STORY_01_01_6_public_names_importable __________
+
+self = <tests.test_skeleton.TestSkeleton testMethod=test_AC_STORY_01_01_6_public_names_importable>
+
+    def test_AC_STORY_01_01_6_public_names_importable(self):
+>       from ledgerlock import ConflictError, Ledger
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_skeleton.py:52: ModuleNotFoundError
+_________ TestSkeleton.test_AC_STORY_01_01_7_verify_usage_error_exit_2 _________
+
+self = <tests.test_skeleton.TestSkeleton testMethod=test_AC_STORY_01_01_7_verify_usage_error_exit_2>
+
+    def test_AC_STORY_01_01_7_verify_usage_error_exit_2(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "ledgerlock", "verify", "ledger.jsonl", "extra"],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+            check=False,
+        )
+>       self.assertEqual(result.returncode, 2)
+E       AssertionError: 1 != 2
+
+tests/test_skeleton.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_3_import_prints_package_path
+FAILED tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_6_public_names_importable
+FAILED tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_7_verify_usage_error_exit_2
+ERROR tests/test_nfc_normalization.py
+===================== 3 failed, 2 passed, 1 error in 0.10s =====================

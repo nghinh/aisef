@@ -1,0 +1,43 @@
+TRY004 Prefer `TypeError` exception for invalid type
+  --> ledgerlock/cli.py:41:9
+   |
+39 | def _coerce_op(raw: Any) -> Op:
+40 |     if not isinstance(raw, list):
+41 |         raise ValueError(f"batch element must be a list; got {type(raw).__name__}")
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+42 |     if len(raw) != 5:
+43 |         raise ValueError(f"batch element must have 5 fields; got {len(raw)}")
+   |
+
+TRY004 Prefer `TypeError` exception for invalid type
+  --> ledgerlock/cli.py:76:9
+   |
+74 |         raw_ops = json.loads(handle.read())
+75 |     if not isinstance(raw_ops, list):
+76 |         raise ValueError("batch file must contain a JSON list of ops")
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+77 |     ops = [_coerce_op(item) for item in raw_ops]
+   |
+
+SIM115 Use a context manager for opening files
+   --> ledgerlock/cli.py:100:18
+    |
+ 98 | def _cmd_repair_tail(ledger_path: str) -> tuple[int, str | None]:
+ 99 |     try:
+100 |         before = open(ledger_path, "rb").read()
+    |                  ^^^^
+101 |     except FileNotFoundError:
+102 |         before = b""
+    |
+
+SIM115 Use a context manager for opening files
+   --> ledgerlock/cli.py:107:17
+    |
+106 |     try:
+107 |         after = open(ledger_path, "rb").read()
+    |                 ^^^^
+108 |     except FileNotFoundError:
+109 |         after = b""
+    |
+
+Found 4 errors.

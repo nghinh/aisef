@@ -299,6 +299,26 @@ def cmd_run(args) -> int:
     if adapter is None:
         return code
 
+    # Phase 17 (INV-S.1): every run records the conditions it starts under; a replay compares them with the
+    # source's BEFORE the first agent invocation and stops on material drift unless the owner accepted it by name.
+    from ..control import replay_manifest as RM
+    manifest = RM.capture(args.project, _artifact_root(args), Config.load(args.project), adapter)
+    replay_of = getattr(args, "replay_of", "") or ""
+    if replay_of:
+        source = RM.load(_artifact_root(args), replay_of)
+        if source is None:
+            print(f"✗ --replay-of {replay_of}: no manifest with that run id or path", file=sys.stderr)
+            return EXIT_USAGE
+        accept = tuple(x.strip() for x in (getattr(args, "accept_drift", "") or "").split(",") if x.strip())
+        drift = RM.preflight(manifest, source, accept=accept)
+        path = RM.record(_artifact_root(args), drift, manifest, source)
+        if drift.stop:
+            print(f"✗ {RM.DRIFT_RECORD}: this run does not reproduce {source.source_run} — {drift.summary()} "
+                  f"(recorded at {path}). Restore the conditions, or accept each field by name: "
+                  f"--accept-drift {','.join(drift.material)}", file=sys.stderr)
+            return EXIT_NOT_READY
+        print(f"replay of {source.source_run}: {drift.summary()}")
+
     git_err = _ensure_git(args.project)
     if git_err is not None:
         return git_err
@@ -376,7 +396,10 @@ def cmd_verify(args) -> int:
         if not v.allowed:
             problems.append("write scope")
     else:
-        print("  ○ no --write-scope given, skipping scope check")
+        # SS-40 / INV-J.1: without a scope the guard has nothing to guard — UNCONFIGURED, never a pass
+        print("  ⚠ no --write-scope given: the scope check is UNCONFIGURED (pass --write-scope, or --story for the "
+              "story's declared scope); a check that cannot run is not a pass")
+        problems.append("write scope unconfigured")
 
     if args.story:
         evidence = EvidenceStore(_artifact_root(args)).read(args.story)

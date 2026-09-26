@@ -1,0 +1,871 @@
+{
+ "seed": 34999,
+ "replays": [
+  {
+   "replay": 1,
+   "seconds": 3.21,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "d30ee132fb45",
+     "review_unrunnable": "candidate changed during review session (d30ee13 → c8a8f9a) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "d30ee132fb45",
+      "baseline_root": "f59561a4490f",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "d30ee132fb45",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "d30ee132fb45",
+      "baseline_root": "f59561a4490f",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "5ee064a8782a",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "5ee064a8782a",
+      "baseline_root": "f59561a4490f",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"d30ee132fb452336e1b3e9c269ef5",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate 5ee064a8: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  },
+  {
+   "replay": 2,
+   "seconds": 2.9,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "793c695436b2",
+     "review_unrunnable": "candidate changed during review session (793c695 → 2e8e743) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "793c695436b2",
+      "baseline_root": "84c715bd1155",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "793c695436b2",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "793c695436b2",
+      "baseline_root": "84c715bd1155",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "99a0564c0b54",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "99a0564c0b54",
+      "baseline_root": "84c715bd1155",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"793c695436b298cd01fa1d244a9c3",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate 99a0564c: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  },
+  {
+   "replay": 3,
+   "seconds": 2.98,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "1cf2e7f0bd6e",
+     "review_unrunnable": "candidate changed during review session (1cf2e7f → ec4c7b1) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "1cf2e7f0bd6e",
+      "baseline_root": "f43623771b0e",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "1cf2e7f0bd6e",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "1cf2e7f0bd6e",
+      "baseline_root": "f43623771b0e",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "5a0f29487bcc",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "5a0f29487bcc",
+      "baseline_root": "f43623771b0e",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"1cf2e7f0bd6e0f42d00f87e72e8c8",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate 5a0f2948: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  },
+  {
+   "replay": 4,
+   "seconds": 2.73,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "3fa88af858fd",
+     "review_unrunnable": "candidate changed during review session (3fa88af → 47a6ea3) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "3fa88af858fd",
+      "baseline_root": "74ea70449481",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "3fa88af858fd",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "3fa88af858fd",
+      "baseline_root": "74ea70449481",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "f4089a46aa1f",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "f4089a46aa1f",
+      "baseline_root": "74ea70449481",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"3fa88af858fd04be4acb9a730c14f",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate f4089a46: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  },
+  {
+   "replay": 5,
+   "seconds": 3.1,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "a027b85a9c64",
+     "review_unrunnable": "candidate changed during review session (a027b85 → c8e76c4) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "a027b85a9c64",
+      "baseline_root": "b4df347286c4",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "a027b85a9c64",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "a027b85a9c64",
+      "baseline_root": "b4df347286c4",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "b3647d6bf23c",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "b3647d6bf23c",
+      "baseline_root": "b4df347286c4",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"a027b85a9c64ea3ce0a8df0973837",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate b3647d6b: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  },
+  {
+   "replay": 6,
+   "seconds": 2.73,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "ff0732b08419",
+     "review_unrunnable": "candidate changed during review session (ff0732b → b2c7cd6) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "ff0732b08419",
+      "baseline_root": "1caf40aa6662",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "ff0732b08419",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "ff0732b08419",
+      "baseline_root": "1caf40aa6662",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "9669a828a74f",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "9669a828a74f",
+      "baseline_root": "1caf40aa6662",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"ff0732b08419e0331aba2b56d58fe",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate 9669a828: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  },
+  {
+   "replay": 7,
+   "seconds": 3.35,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "5443aacea840",
+     "review_unrunnable": "candidate changed during review session (5443aac → 11ff3b6) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "5443aacea840",
+      "baseline_root": "7cf697832133",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "5443aacea840",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "5443aacea840",
+      "baseline_root": "7cf697832133",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "fff1b6b82a80",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "fff1b6b82a80",
+      "baseline_root": "7cf697832133",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"5443aacea840223db4f525fb8fa04",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate fff1b6b8: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  },
+  {
+   "replay": 8,
+   "seconds": 3.09,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "3fc51ef23e1c",
+     "review_unrunnable": "candidate changed during review session (3fc51ef → fb668d2) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "3fc51ef23e1c",
+      "baseline_root": "995420c4364c",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "3fc51ef23e1c",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "3fc51ef23e1c",
+      "baseline_root": "995420c4364c",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "27dbf0ec2134",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "27dbf0ec2134",
+      "baseline_root": "995420c4364c",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"3fc51ef23e1c8deadb8166db385b1",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate 27dbf0ec: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  },
+  {
+   "replay": 9,
+   "seconds": 3.01,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "c03058861673",
+     "review_unrunnable": "candidate changed during review session (c030588 → 09045b9) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "c03058861673",
+      "baseline_root": "a8b251b2da6c",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "c03058861673",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "c03058861673",
+      "baseline_root": "a8b251b2da6c",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "cd7cff5965cf",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "cd7cff5965cf",
+      "baseline_root": "a8b251b2da6c",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"c03058861673829177914630f96ae",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate cd7cff59: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  },
+  {
+   "replay": 10,
+   "seconds": 3.02,
+   "real_terminal": "blocked:budget cap",
+   "model_terminal": "blocked:budget cap",
+   "calls": [
+    "developer:CHANGED",
+    "review:COMMIT",
+    "security:UNRUNNABLE",
+    "review:BLOCK",
+    "security:BUDGET",
+    "developer:CHANGED",
+    "review:BLOCK",
+    "security:BUDGET"
+   ],
+   "model_events": [
+    "DEVELOP_CHANGED->PASS",
+    "TEST_PASS->PASS",
+    "REVIEW_MUTATE->UNRUNNABLE",
+    "SECURITY_UNRUNNABLE->UNRUNNABLE",
+    "GATE_EVALUATE->UNRUNNABLE",
+    "REVIEW_BLOCK->QUALITY_BLOCK",
+    "SECURITY_BUDGET->HUMAN_REQUIRED"
+   ],
+   "attempts": [
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "20f848712b00",
+     "review_unrunnable": "candidate changed during review session (20f8487 → 8f92049) — this review attempt does not",
+     "security_unrunnable": "could not run: exceeded 1800s",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "20f848712b00",
+      "baseline_root": "39cd8681d94c",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 1,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "20f848712b00",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "20f848712b00",
+      "baseline_root": "39cd8681d94c",
+      "tree_state_digest": "269abee73783"
+     }
+    },
+    {
+     "number": 2,
+     "outcome": "",
+     "infra": false,
+     "fatal": false,
+     "candidate": "26074b39311f",
+     "review_unrunnable": "",
+     "security_unrunnable": "could not run: budget exceeded: synthetic cap reached",
+     "identity": {
+      "story_epoch": "bbd23dc8199a",
+      "candidate_sha": "26074b39311f",
+      "baseline_root": "39cd8681d94c",
+      "tree_state_digest": "269abee73783"
+     }
+    }
+   ],
+   "journal_steps": [
+    "changes.detected",
+    "candidate.frozen",
+    "changes.detected",
+    "candidate.frozen"
+   ],
+   "notes": [
+    "evidence:invalidated:{\"reason\": \"review:candidate-moved\", \"candidate\": \"20f848712b0032524f12970fd473a",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 1, \"checks\": [{\"name\": \"evidence",
+    "gate:verdict:{\"failures\": [\"security\", \"review\"], \"attempt\": 2, \"checks\": [{\"name\": \"evidence"
+   ],
+   "quality_attempts": 2,
+   "blocked_reason": "budget cap reached inside a verifier session on candidate 26074b39: could not run: budget exceeded: synthetic cap reached. The candidate is kept; raise the cap "
+  }
+ ],
+ "all_replays_identical_on_compared_and_event_streams": true,
+ "original_chunk_record_matches_replay": {
+  "calls": true,
+  "model_events": true
+ },
+ "classification": "DETERMINISTIC_MISMATCH"
+}

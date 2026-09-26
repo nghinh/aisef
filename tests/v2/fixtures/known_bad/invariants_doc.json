@@ -1,0 +1,9 @@
+{
+ "checker": "invariants_doc",
+ "package": "WP-5.5 (F10 registry/docs sync)",
+ "kind": "document",
+ "path": "docs/implementation/v2/INVARIANTS-V2.md",
+ "find": "| **IX** | No Developer Artefact Is Executed At The Parent Revision |",
+ "replace": "| **IX** | No Developer Artefact At The Parent |",
+ "expect": "docs/implementation/v2/INVARIANTS-V2.md drifted from aisef2/invariants/registry.py"
+}

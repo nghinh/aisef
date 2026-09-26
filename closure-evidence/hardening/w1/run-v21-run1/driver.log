@@ -1,0 +1,16 @@
+[2026-09-21T05:26:08+0700] phase prepare
+[2026-09-21T05:26:20+0700] prepare ok=True aisef=aisef 1.7.6 wheel=True oracle=True guard=True topology=True preflight=True failed=[] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'stale', 'readiness': 'stale', 'pre-deploy': 'pending'} doctor_red=[]
+[2026-09-21T05:26:20+0700] W1 driver complete
+[2026-09-21T05:26:20+0700] phase kernel-first: aisef run with NO re-approval, NO --force
+[2026-09-21T05:26:20+0700] kernel-first ok=True exit=2 kernel refused the STALE gate before any agent call (kernel path first)
+[2026-09-21T05:26:20+0700] W1 driver complete
+[2026-09-21T05:26:20+0700] phase approve: re-approval of every stale gate, each on its own measured basis
+[2026-09-21T05:26:25+0700] approve ok=True changed=['mockups', 'readiness'] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'approved', 'pre-deploy': 'pending'}
+[2026-09-21T05:26:25+0700] W1 driver complete
+[2026-09-21T05:26:25+0700] phase run
+[2026-09-21T05:26:25+0700] aisef run #1 pid=89725 pgid=89725
+[2026-09-21T05:32:50+0700] aisef run #1 exit=2 after 385.4s killed=False
+[2026-09-21T05:32:50+0700] W1 driver complete
+[2026-09-21T05:32:51+0700] phase finish
+[2026-09-21T05:32:54+0700] finish: progress={'done': 0, 'total': 16} class=LEGITIMATE_MODEL_PROJECT_STOP false_pass=0 mapping_errors=0 red_classes={} safety=[] → W1-LEDGERLOCK-v21-run1.json
+[2026-09-21T05:32:54+0700] W1 driver complete

@@ -1,0 +1,207 @@
+{
+ "traces": 10000,
+ "steps": 105159,
+ "violations": [],
+ "violation_count": 0,
+ "terminal_classes": {
+  "blocked:budget cap": 2685,
+  "done:COMPLETE": 1994,
+  "blocked:credential rejected": 1097,
+  "blocked:zero output: model cannot use tools": 1082,
+  "blocked:isolation breach": 1030,
+  "blocked:SECURITY_UNRUNNABLE": 701,
+  "failed:recurring infrastructure error": 348,
+  "blocked:owner declined: plan": 291,
+  "failed:did not pass gate": 271,
+  "blocked:owner declined: merge": 166,
+  "blocked:REVIEW_UNRUNNABLE": 91,
+  "blocked:no-op: budget exhausted": 67,
+  "running:GATE": 54,
+  "blocked:no-op: nothing to grade twice": 44,
+  "orphaned:GATE": 21,
+  "running:SECURITY": 14,
+  "running:DEVELOP": 10,
+  "blocked:no-op: developer declined proven work twice": 8,
+  "blocked:environment: test tool unrunnable": 6,
+  "verified:MERGE": 5,
+  "running:VERIFY": 5,
+  "running:REVIEW": 4,
+  "human_required:merge conflict": 2,
+  "orphaned:SECURITY": 2,
+  "orphaned:DEVELOP": 1,
+  "orphaned:MERGE": 1
+ },
+ "events_exercised": {
+  "RECLAIM": 18823,
+  "PROCESS_DEATH": 17842,
+  "GATE_EVALUATE": 13923,
+  "DEVELOP_CHANGED": 6400,
+  "SECURITY_PASS": 6323,
+  "TEST_PASS": 6148,
+  "REVIEW_PASS": 3791,
+  "MERGE_OK": 1994,
+  "DEVELOP_AUTH": 1097,
+  "DEVELOP_ZERO_OUTPUT": 1082,
+  "SECURITY_BLOCK": 1066,
+  "DEVELOP_CRASH": 1065,
+  "SECURITY_MALFORMED": 1064,
+  "DEVELOP_SCOPE_VIOLATION": 1058,
+  "DEVELOP_BUDGET": 1051,
+  "DEVELOP_MAX_TURNS_WORK": 1045,
+  "STALE_REPLAY": 1035,
+  "DEVELOP_TRUNK_COMMIT": 1030,
+  "CONTRACT_CHANGE": 1026,
+  "DEVELOP_NOOP": 1017,
+  "TEST_FAIL": 1014,
+  "DEVELOP_TIMEOUT": 1012,
+  "DEVELOP_MAX_TURNS_UNTOUCHED": 1011,
+  "WRONG_CANDIDATE_EVIDENCE": 1009,
+  "LEASE_EXPIRED": 1006,
+  "DEVELOP_RATE_LIMIT": 1005,
+  "CORRUPT_EVIDENCE": 1002,
+  "DEVELOP_CONTEXT": 1001,
+  "TEST_UNRUNNABLE": 1000,
+  "SECURITY_UNRUNNABLE": 991,
+  "SECURITY_BUDGET": 990,
+  "REVIEW_MUTATE": 658,
+  "REVIEW_BUDGET": 644,
+  "REVIEW_BLOCK_UNBOUND": 639,
+  "REVIEW_MALFORMED": 637,
+  "REVIEW_BLOCK": 636,
+  "REVIEW_STUCK": 631,
+  "REVIEW_BLOCK_OUTSIDE": 606,
+  "REVIEW_UNRUNNABLE": 554,
+  "HUMAN_ARBITRATION": 458,
+  "HUMAN_DECLINES": 457,
+  "MERGE_CONFLICT": 318
+ },
+ "model": "tests/hardening/model.py (docs/ASSURANCE-KERNEL.md §6)",
+ "conformance": [
+  {
+   "scenario": "C1 happy path",
+   "real": "done",
+   "model": "done",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C2 review unrunnable then pass",
+   "real": "done",
+   "model": "done",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C3 review unrunnable exhausted",
+   "real": "blocked:REVIEW_UNRUNNABLE",
+   "model": "blocked:REVIEW_UNRUNNABLE",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C4 security unrunnable then pass",
+   "real": "done",
+   "model": "done",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C5 review block then pass",
+   "real": "done",
+   "model": "done",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C6 review stuck",
+   "real": "human:plan conflict",
+   "model": "human:plan conflict",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C7 developer no-op twice with nothing frozen",
+   "real": "blocked:no-op: nothing to grade twice",
+   "model": "blocked:no-op: nothing to grade twice",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C8 context exit then pass",
+   "real": "done",
+   "model": "done",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C9 credential rejected",
+   "real": "blocked:credential rejected",
+   "model": "blocked:credential rejected",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C10 test tool unrunnable",
+   "real": "blocked:environment: test tool unrunnable",
+   "model": "blocked:environment: test tool unrunnable",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C11 budget rejected in review",
+   "real": "blocked:budget cap",
+   "model": "blocked:budget cap",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C12 scope violation then no-op",
+   "real": "done",
+   "model": "done",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C13 reviewer mutates then pass",
+   "real": "done",
+   "model": "done",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C14 security block then pass",
+   "real": "done",
+   "model": "done",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C15 trunk commit",
+   "real": "blocked:isolation breach",
+   "model": "blocked:isolation breach",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C16 two out-of-scope blocks are a plan conflict",
+   "real": "human:plan conflict",
+   "model": "human:plan conflict",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C17 red tests then green",
+   "real": "done",
+   "model": "done",
+   "diff": [],
+   "known_deviation": []
+  },
+  {
+   "scenario": "C18 zero output on a retry",
+   "real": "blocked:zero output: model cannot use tools",
+   "model": "blocked:zero output: model cannot use tools",
+   "diff": [],
+   "known_deviation": []
+  }
+ ]
+}

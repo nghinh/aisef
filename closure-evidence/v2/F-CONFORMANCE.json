@@ -1,0 +1,1052 @@
+{
+ "record": "AISEF V2 — F1–F11 CONFORMANCE",
+ "work_package": "WP-0.3",
+ "current_phase": "P6",
+ "reference": "extracted from the RFC normative body; never transcribed",
+ "items": [
+  {
+   "id": "F1",
+   "state": "PASS",
+   "subchecks": [
+    "F1.event_vocabulary",
+    "F1.payload_enum.Vacuity",
+    "F1.payload_enum.Relevance",
+    "F1.payload_enum.AdequacyOutcome",
+    "F1.payload_enum.TestExecutionStatus",
+    "F1.payload_enum.TestOutcome",
+    "F1.payload_enum.TestSelection",
+    "F1.event_envelope",
+    "F1.failure_taxonomy",
+    "F1.journal_format_3"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F2",
+   "state": "PASS",
+   "subchecks": [
+    "F2.enum.ProbeExecutionStatus",
+    "F2.enum.BehaviorVerdict",
+    "F2.enum.ContractSatisfaction",
+    "F2.enum.MeasurementPoint",
+    "F2.contract_satisfaction_derivation",
+    "F2.owner_routing_table"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F3",
+   "state": "PASS",
+   "subchecks": [
+    "F3.owner_set"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F4",
+   "state": "PASS",
+   "subchecks": [
+    "F4.enum.Polarity",
+    "F4.enum.SubjectAbsence",
+    "F4.subject_kinds",
+    "F4.subject_shape",
+    "F4.behavior_contract_shape",
+    "F4.product_proof_spec_shape",
+    "F4.semantic_hash_binds_subject_absence"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F5",
+   "state": "PASS",
+   "subchecks": [
+    "F5.enum.Enforcement",
+    "F5.probe_protocol",
+    "F5.harness_timeout_vs_subject_deadline",
+    "F5.signal_provenance_after_dispatch",
+    "F5.protocol_stream_vs_process_lifecycle",
+    "F5.calibration_contracts"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F6",
+   "state": "PASS",
+   "subchecks": [
+    "F6.enum.ObligationRole",
+    "F6.enum.ParentExpectation",
+    "F6.plan_obligation_shape"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F7",
+   "state": "PASS",
+   "subchecks": [
+    "F7.dispositions"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F8",
+   "state": "PASS",
+   "subchecks": [
+    "F8.scopes_and_lifetime_order"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F9",
+   "state": "PASS",
+   "subchecks": [
+    "F9.enum.IdentityGrade",
+    "F9.cited_identities_and_runspec"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F10",
+   "state": "PASS",
+   "subchecks": [
+    "F10.invariant_ids",
+    "F10.invariant_titles",
+    "F10.invariants_armed_with_mechanisms"
+   ],
+   "pending_on": []
+  },
+  {
+   "id": "F11",
+   "state": "PASS",
+   "subchecks": [
+    "F11.closed_projection_list",
+    "F11.projections_implemented"
+   ],
+   "pending_on": []
+  }
+ ],
+ "subchecks": [
+  {
+   "item": "F1",
+   "id": "F1.event_vocabulary",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "EventType equals the RFC (29 members)",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.payload_enum.Vacuity",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "Vacuity equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.payload_enum.Relevance",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "Relevance equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.payload_enum.AdequacyOutcome",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "AdequacyOutcome equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.payload_enum.TestExecutionStatus",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "TestExecutionStatus equals the RFC (2 members)",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.payload_enum.TestOutcome",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "TestOutcome equals the RFC (2 members)",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.payload_enum.TestSelection",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "TestSelection equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.event_envelope",
+   "implemented_by": "WP-3.1",
+   "state": "PASS",
+   "detail": "Event fields, defaults ['ignorable', 'source_seqs'] and frozenness equal the RFC",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.failure_taxonomy",
+   "implemented_by": "WP-6.2",
+   "state": "PASS",
+   "detail": "FailureCode equals the RFC §22.1 table: 22 codes, each with its owner and retryability; 13 carried by formats 1 and 2, 9 by format 3 only",
+   "required_now": true
+  },
+  {
+   "item": "F1",
+   "id": "F1.journal_format_3",
+   "implemented_by": "WP-6.2",
+   "state": "PASS",
+   "detail": "format 3 carries a schema for all 29 event types; provider/request requires budget_owner under format 3 only; formats 1 (18) and 2 (25) unchanged",
+   "required_now": true
+  },
+  {
+   "item": "F2",
+   "id": "F2.enum.ProbeExecutionStatus",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "ProbeExecutionStatus equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F2",
+   "id": "F2.enum.BehaviorVerdict",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "BehaviorVerdict equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F2",
+   "id": "F2.enum.ContractSatisfaction",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "ContractSatisfaction equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F2",
+   "id": "F2.enum.MeasurementPoint",
+   "implemented_by": "WP-1.4",
+   "state": "PASS",
+   "detail": "MeasurementPoint equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F2",
+   "id": "F2.contract_satisfaction_derivation",
+   "implemented_by": "WP-1.3",
+   "state": "PASS",
+   "detail": "equals the RFC §10.1 function on all 10 (result, expectation) pairs",
+   "table": [
+    [
+     "EXECUTED",
+     "SATISFIED",
+     "SATISFIED",
+     "SATISFIED"
+    ],
+    [
+     "EXECUTED",
+     "SATISFIED",
+     "REFUTED",
+     "UNSATISFIED"
+    ],
+    [
+     "EXECUTED",
+     "REFUTED",
+     "SATISFIED",
+     "UNSATISFIED"
+    ],
+    [
+     "EXECUTED",
+     "REFUTED",
+     "REFUTED",
+     "SATISFIED"
+    ],
+    [
+     "EXECUTED",
+     "INDETERMINATE",
+     "SATISFIED",
+     "INDETERMINATE"
+    ],
+    [
+     "EXECUTED",
+     "INDETERMINATE",
+     "REFUTED",
+     "INDETERMINATE"
+    ],
+    [
+     "UNRUNNABLE",
+     null,
+     "SATISFIED",
+     "InvariantError"
+    ],
+    [
+     "UNRUNNABLE",
+     null,
+     "REFUTED",
+     "InvariantError"
+    ],
+    [
+     "INVALID_SPEC",
+     null,
+     "SATISFIED",
+     "InvariantError"
+    ],
+    [
+     "INVALID_SPEC",
+     null,
+     "REFUTED",
+     "InvariantError"
+    ]
+   ],
+   "required_now": true
+  },
+  {
+   "item": "F2",
+   "id": "F2.owner_routing_table",
+   "implemented_by": "WP-1.4",
+   "state": "PASS",
+   "detail": "equals the RFC §10 and §10.3 tables on 48 (point, outcome, role) rows, polarity-symmetric",
+   "table": [
+    [
+     "§10.3",
+     "PARENT",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "INTRODUCE",
+     null,
+     "STORY_ADMISSION",
+     "READY"
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "PRESERVE",
+     "PLAN",
+     "STORY_ADMISSION",
+     "PRECONDITION_BROKEN"
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "VERIFY",
+     "PLAN",
+     "STORY_ADMISSION",
+     "PRECONDITION_BROKEN"
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "INTRODUCE",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "PRESERVE",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "VERIFY",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "INTRODUCE",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "PRESERVE",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`SATISFIED`, `UNSATISFIED`",
+     "VERIFY",
+     null,
+     "STORY_ADMISSION",
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`UNSATISFIED`",
+     "INTRODUCE",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`UNSATISFIED`",
+     "PRESERVE",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`UNSATISFIED`",
+     "VERIFY",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "INTRODUCE",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "PRESERVE",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "VERIFY",
+     "DEVELOPER",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`UNSATISFIED`",
+     "INTRODUCE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`UNSATISFIED`",
+     "PRESERVE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`UNSATISFIED`",
+     "VERIFY",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "INTRODUCE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "PRESERVE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(PRECONDITION_ABSENT)`",
+     "VERIFY",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "INTRODUCE",
+     "INTEGRATION",
+     "STORY_ADMISSION",
+     "PROBE_INVALID"
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "PRESERVE",
+     "INTEGRATION",
+     "STORY_ADMISSION",
+     "PROBE_INVALID"
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "VERIFY",
+     "INTEGRATION",
+     "STORY_ADMISSION",
+     "PROBE_INVALID"
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "INTRODUCE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "PRESERVE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "VERIFY",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "INTRODUCE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "PRESERVE",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "`INDETERMINATE(NON_CONTROLLER_SIGNAL)`",
+     "VERIFY",
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "probe `UNRUNNABLE`",
+     "INTRODUCE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "probe `UNRUNNABLE`",
+     "PRESERVE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "PARENT",
+     "probe `UNRUNNABLE`",
+     "VERIFY",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "probe `UNRUNNABLE`",
+     "INTRODUCE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "probe `UNRUNNABLE`",
+     "PRESERVE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "CANDIDATE",
+     "probe `UNRUNNABLE`",
+     "VERIFY",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "probe `UNRUNNABLE`",
+     "INTRODUCE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "probe `UNRUNNABLE`",
+     "PRESERVE",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10.3",
+     "POST_MERGE",
+     "probe `UNRUNNABLE`",
+     "VERIFY",
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "PARENT",
+     "UNRUNNABLE",
+     null,
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "CANDIDATE",
+     "UNRUNNABLE",
+     null,
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "POST_MERGE",
+     "UNRUNNABLE",
+     null,
+     "ENVIRONMENT",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "PARENT",
+     "INVALID_SPEC",
+     null,
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "CANDIDATE",
+     "INVALID_SPEC",
+     null,
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "POST_MERGE",
+     "INVALID_SPEC",
+     null,
+     "INTEGRATION",
+     null,
+     null
+    ],
+    [
+     "§10",
+     "PARENT",
+     "*(absent)*",
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "§10",
+     "CANDIDATE",
+     "*(absent)*",
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "§10",
+     "POST_MERGE",
+     "*(absent)*",
+     null,
+     null,
+     null,
+     null
+    ]
+   ],
+   "required_now": true
+  },
+  {
+   "item": "F3",
+   "id": "F3.owner_set",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "Owner equals the RFC (7 members)",
+   "required_now": true
+  },
+  {
+   "item": "F4",
+   "id": "F4.enum.Polarity",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "Polarity equals the RFC (2 members)",
+   "required_now": true
+  },
+  {
+   "item": "F4",
+   "id": "F4.enum.SubjectAbsence",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "SubjectAbsence equals the RFC (2 members)",
+   "required_now": true
+  },
+  {
+   "item": "F4",
+   "id": "F4.subject_kinds",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "SubjectKind equals the RFC (5 members)",
+   "required_now": true
+  },
+  {
+   "item": "F4",
+   "id": "F4.subject_shape",
+   "implemented_by": "WP-1.1",
+   "state": "PASS",
+   "detail": "Subject fields equal the RFC in order (2)",
+   "required_now": true
+  },
+  {
+   "item": "F4",
+   "id": "F4.behavior_contract_shape",
+   "implemented_by": "WP-1.1",
+   "state": "PASS",
+   "detail": "BehaviorContract fields equal the RFC in order (9)",
+   "required_now": true
+  },
+  {
+   "item": "F4",
+   "id": "F4.product_proof_spec_shape",
+   "implemented_by": "WP-1.2",
+   "state": "PASS",
+   "detail": "ProductProofSpec fields equal the RFC in order (9)",
+   "required_now": true
+  },
+  {
+   "item": "F4",
+   "id": "F4.semantic_hash_binds_subject_absence",
+   "implemented_by": "WP-1.2",
+   "state": "PASS",
+   "detail": "semantic_hash differs for REQUIRES_SUBJECT and ABSENCE_IS_DECIDABLE",
+   "required_now": true
+  },
+  {
+   "item": "F5",
+   "id": "F5.enum.Enforcement",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "Enforcement equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F5",
+   "id": "F5.probe_protocol",
+   "implemented_by": "WP-2.1",
+   "state": "PASS",
+   "detail": "Probe equals the RFC: 5 members, signatures included",
+   "required_now": true
+  },
+  {
+   "item": "F5",
+   "id": "F5.harness_timeout_vs_subject_deadline",
+   "implemented_by": "WP-2.1",
+   "state": "PASS",
+   "detail": "harness timeout -> UNRUNNABLE; subject deadline -> EXECUTED with the spec's verdict, no default (§9.2)",
+   "required_now": true
+  },
+  {
+   "item": "F5",
+   "id": "F5.signal_provenance_after_dispatch",
+   "implemented_by": "WP-2.1",
+   "state": "PASS",
+   "detail": "the same signal exit is an interruption when this controller's ledger holds it and EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL) when it does not",
+   "required_now": true
+  },
+  {
+   "item": "F5",
+   "id": "F5.protocol_stream_vs_process_lifecycle",
+   "implemented_by": "WP-2.1",
+   "state": "PASS",
+   "detail": "the anchor holds no copy of the output writer; one pump reads the protocol; with the exit reported first a complete protocol is observed as written, and 'did not start' is concluded only after the stream closed",
+   "required_now": true
+  },
+  {
+   "item": "F5",
+   "id": "F5.calibration_contracts",
+   "implemented_by": "WP-2.2",
+   "state": "PASS",
+   "detail": "both calibration contracts and the mechanism literal equal the RFC",
+   "required_now": true
+  },
+  {
+   "item": "F6",
+   "id": "F6.enum.ObligationRole",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "ObligationRole equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F6",
+   "id": "F6.enum.ParentExpectation",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "ParentExpectation equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F6",
+   "id": "F6.plan_obligation_shape",
+   "implemented_by": "WP-2.3",
+   "state": "PASS",
+   "detail": "PlanObligation fields equal the RFC in order (7)",
+   "required_now": true
+  },
+  {
+   "item": "F7",
+   "id": "F7.dispositions",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "StoryAdmissionDisposition equals the RFC (6 members)",
+   "required_now": true
+  },
+  {
+   "item": "F8",
+   "id": "F8.scopes_and_lifetime_order",
+   "implemented_by": "WP-4.3",
+   "state": "PASS",
+   "detail": "begin (5) and shutdown (6) orders equal the RFC's, declared and executed; the lease is released last; StoryScope owns no journal writer",
+   "required_now": true
+  },
+  {
+   "item": "F9",
+   "id": "F9.enum.IdentityGrade",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "IdentityGrade equals the RFC (3 members)",
+   "required_now": true
+  },
+  {
+   "item": "F9",
+   "id": "F9.cited_identities_and_runspec",
+   "implemented_by": "WP-4.4",
+   "state": "PASS",
+   "detail": "RunSpec and CapabilityIdentity equal the RFC; the four cited identities are bound; the aggregate is the minimum grade; enforcement enters runspec_hash and comparability; OPAQUE bars Q6",
+   "required_now": true
+  },
+  {
+   "item": "F10",
+   "id": "F10.invariant_ids",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "InvariantId equals the RFC (9 members)",
+   "required_now": true
+  },
+  {
+   "item": "F10",
+   "id": "F10.invariant_titles",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "__invariant_titles__ equals the RFC (9 members)",
+   "required_now": true
+  },
+  {
+   "item": "F10",
+   "id": "F10.invariants_armed_with_mechanisms",
+   "implemented_by": "WP-5.5",
+   "state": "PASS",
+   "rfc_reference": [
+    "I",
+    "II",
+    "III",
+    "IV",
+    "V",
+    "VI",
+    "VII",
+    "VIII",
+    "IX"
+   ],
+   "mechanisms": {
+    "I": [
+     "aisef2.product.approval:require_approved",
+     "aisef2.product.approval:binding_problems",
+     "kernel_static_checks:NO_PROSE_CONTROL",
+     "aisef2.probe.protocol:ProbeRecord"
+    ],
+    "II": [
+     "aisef2.probe.protocol:run_probe",
+     "kernel_static_checks:NO_TIME_IN_PROJECTIONS",
+     "aisef2.journal.fold:fold",
+     "kernel_static_checks:ONE_SIGNAL_AUTHORITY",
+     "aisef2.probe.protocol:ExecutionEnv",
+     "aisef2.runtime.runspec:runspec_hash"
+    ],
+    "III": [
+     "aisef2.runtime.story_scope:StoryScope",
+     "aisef2.probe.protocol:bound_result",
+     "kernel_static_checks:RESULT_ONLY_THROUGH_BINDING",
+     "aisef2.probe.protocol:ExecutionEnv",
+     "aisef2.quality.adequacy:assemble"
+    ],
+    "IV": [
+     "aisef2.control.owner:classify",
+     "aisef2.control.budget:charge",
+     "kernel_static_checks:RETRYABLE_ONLY_IN_TAXONOMY",
+     "kernel_static_checks:NO_SIDE_RETRY_COUNTER",
+     "aisef2.quality.adequacy:assemble"
+    ],
+    "V": [
+     "aisef2.runtime.runspec:comparable",
+     "aisef2.runtime.runspec:runspec_hash",
+     "aisef2.runtime.capability:CapabilityIdentity",
+     "aisef2.runtime.runspec:RunSpec.resolved"
+    ],
+    "VI": [
+     "aisef2.probe.protocol:RevisionRef",
+     "aisef2.runtime.runspec:resolve",
+     "aisef2.journal.format2:JournalWriter2",
+     "aisef2.probe.protocol:ProbeRecord",
+     "aisef2.product.spec:ProductProofSpec",
+     "validation/v2/freeze_manifest.py:check"
+    ],
+    "VII": [
+     "aisef2.control.owner:flatten",
+     "aisef2.control.owner:classify",
+     "kernel_static_checks:NO_PROSE_CONTROL",
+     "kernel_static_checks:NO_RAW_VERDICT_ROUTING",
+     "aisef2.quality.test_execution:classify"
+    ],
+    "VIII": [
+     "aisef2.invariants.evidence:admit",
+     "aisef2.invariants.evidence:EvidenceField",
+     "aisef2.journal.event:Event"
+    ],
+    "IX": [
+     "kernel_static_checks:CANDIDATE_ONLY_EXECUTION",
+     "kernel_static_checks:NO_DEVELOPER_ARTEFACT_AT_PARENT",
+     "aisef2.product.contract:names_test_artefact",
+     "aisef2.probe.protocol:run_probe",
+     "aisef2.quality.vacuity:evaluate"
+    ]
+   },
+   "tiers": [
+    "tests/v2",
+    "tests/v2/conformance",
+    "tests/v2/p0",
+    "tests/v2/p1",
+    "tests/v2/p2",
+    "tests/v2/p3",
+    "tests/v2/p4",
+    "tests/v2/p5",
+    "tests/v2/plan"
+   ],
+   "detail": "I..IX registered with 43 resolved mechanisms and armed in 9 of 9 tiers",
+   "required_now": true
+  },
+  {
+   "item": "F11",
+   "id": "F11.closed_projection_list",
+   "implemented_by": "WP-0.2",
+   "state": "PASS",
+   "detail": "ControlProjection equals the RFC (6 members)",
+   "required_now": true
+  },
+  {
+   "item": "F11",
+   "id": "F11.projections_implemented",
+   "implemented_by": "WP-3.4",
+   "state": "PASS",
+   "detail": "six projections equal the RFC's closed list in order; read-only registry; a gate reads them by ControlProjection only",
+   "required_now": true
+  }
+ ],
+ "summary": {
+  "PASS": 11,
+  "PENDING": 0,
+  "FAIL": 0
+ },
+ "ratchet_violations": []
+}

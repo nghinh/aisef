@@ -1,0 +1,12 @@
+[2026-09-17T14:00:26+0700] phase prepare
+[2026-09-17T14:00:30+0700] prepare ok=True aisef=aisef 1.7.6 wheel=True oracle=True guard=True topology=True preflight=True failed=[] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'stale', 'pre-deploy': 'pending'} doctor_red=['✗ tool tools.sast — `tools.sast` = `bandit -q -r .` — MISSING in aisef-verify-python:b2c7afff2aed: exit 127', '✗ missing: tool tools.sast']
+[2026-09-17T14:00:30+0700] phase kernel-first: aisef run with NO re-approval, NO --force
+[2026-09-17T14:00:31+0700] kernel-first ok=True exit=2 kernel refused the STALE gate before any agent call (ARB-1 kernel path first)
+[2026-09-17T14:00:31+0700] phase approve: ARB-1 re-approval of readiness for byte-identical content
+[2026-09-17T14:00:34+0700] approve ok=True changed=['readiness'] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'approved', 'pre-deploy': 'pending'}
+[2026-09-17T14:00:34+0700] phase run
+[2026-09-17T14:00:34+0700] aisef run #1 pid=28545 pgid=28545
+[2026-09-17T14:00:39+0700] aisef run #1 exit=1 after 5.0s killed=False
+[2026-09-17T14:00:39+0700] phase finish
+[2026-09-17T14:00:42+0700] finish: progress=None oracle={'[1]': 'SKIPPED'} false_pass=0 → W1-LEDGERLOCK-1.json
+[2026-09-17T14:00:42+0700] W1 driver complete

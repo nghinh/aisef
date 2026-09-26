@@ -19,6 +19,8 @@ import subprocess
 from pathlib import Path
 
 from ..harness.observe import TOOL_RUN, Evidence
+from . import proof
+from .acceptance import coverage
 from .impact import is_test_path
 
 TEST_FUNC = re.compile(r"^\s*(def test_|it\(|test\(|func Test)", re.MULTILINE)
@@ -54,14 +56,57 @@ def added_tests(workdir: Path | str, *, base_ref: str, changed: list[str], story
     return out
 
 
-def red_before_green(evidence: Evidence) -> bool:
-    """True if a real (non-skipped) `test` failure exists before the last green run."""
+def runs_before_last_green(evidence: Evidence) -> list:
+    """Non-ok, non-skipped `test` runs positioned before the last green one.
+
+    Position in the (time-ordered) evidence, never `seq`: sequence numbers restart when a writer could not read the
+    file's tail (bug 42) and are audit metadata, not order (SS-T1, INV-D.2). This is only the ordering; whether such
+    a run shows anything about the story is `proven_red_before_green`'s question."""
     runs = evidence.of(TOOL_RUN, "test")
     greens = [e for e in runs if e.ok]
     if not greens:
-        return False
-    last_green = greens[-1]
-    return any((not e.ok) and not e.detail.get("skipped") and e.seq < last_green.seq for e in runs)
+        return []
+    last_green_at = runs.index(greens[-1])
+    return [e for e in runs[:last_green_at] if (not e.ok) and not e.detail.get("skipped")]
+
+
+def tdd_subjects(detail: dict, story_id: str, acceptance: int, added_tests: list[str],
+                 codes: list[str] | None = None) -> list[str]:
+    """The tests TDD is about: the story's criterion tests green in the last green run; failing codes, the green
+    tests declared in the files the story added."""
+    green = [t for t in (detail.get("test_ids") or []) if t in proof.executed_green(detail)]
+    if acceptance > 0:
+        # V2: only criteria the plan declares CHANGE_REQUIRED have a red-before-green obligation (`codes`); with no
+        # declaration the subject is every criterion, as it was under policy V1.
+        want = {c for c in (codes or [])}
+        ac = [t for i, ts in coverage(story_id, acceptance, green).items() for t in ts
+              if not want or f"AC-{story_id}-{i}" in want]
+        if ac or want:
+            # With declared obligations the subject list is exactly those criteria's tests — empty means there is
+            # nothing for TDD to have seen fail, not "fall back to every test the story added" (policy V2).
+            return list(dict.fromkeys(ac))
+    added = set(added_tests or [])
+    return [t for t in green if "::" in t and t.split("::", 1)[0] in added]
+
+
+def proven_red_before_green(evidence: Evidence, story_id: str, *, acceptance: int, added_tests: list[str],
+                            changed: list[str], codes: list[str] | None = None):
+    """The earliest run before the last green that PROVES the story's tests red (SS-83), or None.
+
+    The old rule took any non-ok run: a run that never executed (tool or environment failure) and a run red only
+    because an unrelated test failed both passed TDD. Now a run counts only if, read through the proof model, at
+    least one of the story's tests in it is RED_EXECUTED or RED_COLLECTION_BOUND_TO_STORY."""
+    runs = evidence.of(TOOL_RUN, "test")
+    greens = [e for e in runs if e.ok]
+    if not greens:
+        return None
+    subjects = tdd_subjects(greens[-1].detail, story_id, acceptance, added_tests, codes)
+    if not subjects:
+        return None
+    story_files = [f for f in (changed or []) if not is_test_path(f)]
+    files = proof.files_of(subjects, story_id, acceptance, None)
+    return next((e for e in runs_before_last_green(evidence)
+                 if proof.run_proves_red(e.detail, subjects, story_files, files=files)), None)
 
 
 def test_delta(workdir: Path | str, *, base_ref: str, changed: list[str]) -> list[str]:

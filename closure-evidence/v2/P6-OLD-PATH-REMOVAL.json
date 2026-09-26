@@ -1,0 +1,875 @@
+{
+ "record": "AISEF V2 — P6 OLD-PATH REMOVAL (WP-6.3: no dual authority)",
+ "work_package": "WP-6.3",
+ "authority": "AISEF V2 — WP-6.3 EXECUTION AUTHORIZATION / OLD-PATH REMOVAL / NO DUAL AUTHORITY / P6 CLOSURE",
+ "rfc": "§31, §32; F2, F6, F11 unchanged; V2-005 the lineage end",
+ "candidate": {
+  "commit": "bound by closure-evidence/v2/P6-FINAL-SEAL.json (a record cannot hold the sha of the commit that holds it)",
+  "aisef2_tree": {
+   "files": 66,
+   "sha256": "14f46f0581fe0f0370fbd56621df1713e2a540394c186192b228ce68632bc91b",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
+  },
+  "validation_v2_tree": {
+   "files": 27,
+   "sha256": "2ba71aa5eb33ca670bcc8b97b302da12f4ef0d85028f759598408838d09b7e3c",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
+  },
+  "tests_v2_tree": {
+   "files": 139,
+   "sha256": "19e3b18c53c271143c3de9ba41608f696cca1f34eb9cf35f65b93d4622bd6755",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
+  },
+  "aisef_tree": {
+   "git_tree_at_HEAD": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "working_tree": {
+    "files": 119,
+    "sha256": "e1dbc469441608e15d5c3c6580063d7fb85d1874f33840c03e0c17ef2468f90b",
+    "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
+   },
+   "p5_seal_v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "changed_since_p5_seal": false
+  }
+ },
+ "v2_005": {
+  "lineage": [
+   "AISEF-V2-RFC-APPROVAL.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-001.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-002.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-003.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-005.json",
+   "AISEF-V2-RFC-AMENDMENT-V2-006.json"
+  ],
+  "end": "AISEF-V2-RFC-AMENDMENT-V2-006.json",
+  "frozen_items_changed": [
+   "F1"
+  ],
+  "then": {
+   "AISEF-V2-RFC-AMENDMENT-V2-006.json": [
+    "F5"
+   ]
+  },
+  "exception_record_sha256": "58b5d83d1eda61a6fc40237ac62a2b98906d8f2e7e8a11aa9f577dd5bc3dfff9",
+  "amendment_record_sha256": "9b8636a22875c14211ef6fb974ef9c03f39600721aa8cf9020c7d41a37b6dad1",
+  "v2_004_amendment_file_exists": false
+ },
+ "format_3": {
+  "version": 3,
+  "schemas": 29,
+  "event_types": 29,
+  "failure_codes": 22,
+  "v2_005_codes": [
+   "CAPABILITY_UNRUNNABLE",
+   "MERGE_CONFLICT",
+   "PROBE_MISMATCH",
+   "RESOURCE_ACQUISITION_FAILED",
+   "REVIEW_FINDING",
+   "SECURITY_FINDING",
+   "TESTS_INADEQUATE",
+   "TESTS_UNRUNNABLE",
+   "VERIFIER_DISAGREEMENT"
+  ],
+  "projections": 6,
+  "owners": 7
+ },
+ "authority_inventory": {
+  "path": "closure-evidence/v2/P6-AUTHORITY-INVENTORY.json",
+  "sha256": "8c632a145c8b4f76ca0e5c462e2fa545cd07f05f71dd58da9f53ef6d7c20c592",
+  "rows_digest": "2c45bff04ba65a79e22556cd6bb5c09101eb3f476d264cdededb927f63c79b7b",
+  "committed_rows_digest": "2c45bff04ba65a79e22556cd6bb5c09101eb3f476d264cdededb927f63c79b7b",
+  "summary": {
+   "ACTIVE_V2_AUTHORITY": 64,
+   "COMPATIBILITY_NONAUTHORITATIVE": 37,
+   "HISTORICAL_ONLY": 2,
+   "REMOVED": 0,
+   "UNREACHABLE": 140,
+   "UNCLASSIFIABLE": 0
+  },
+  "rows": 243,
+  "v2_entry": "aisef2/orchestrate/story_runner.py::run_story",
+  "v1_entry": "aisef/cli/parser.py::main",
+  "entrypoints": {
+   "console_scripts": {
+    "aisef": "aisef.cli:main"
+   },
+   "v1_console_script": "aisef.cli:main",
+   "v2_console_script": false
+  },
+  "adapters": {
+   "aisef2/orchestrate/seam.py": {
+    "exists": true,
+    "imports_v1": [],
+    "constructs_only_v2_inputs": true,
+    "touches_engineering_quality": false,
+    "refuses_human_declaration_required": true,
+    "before_the_first_event": true
+   },
+   "validation/v2/gen_migration_table.py": {
+    "exists": true,
+    "imports_v1": [],
+    "constructs_only_v2_inputs": true,
+    "touches_engineering_quality": false,
+    "emits_human_declaration_required": true,
+    "reads_v1_as_text_only": true
+   }
+  },
+  "legacy_references": [],
+  "v1_families_poisoned": [
+   "aisef/cli/implement.py::cmd_improve",
+   "aisef/cli/implement.py::cmd_predeploy",
+   "aisef/cli/implement.py::cmd_qa",
+   "aisef/cli/implement.py::cmd_run",
+   "aisef/cli/implement.py::cmd_verify",
+   "aisef/cli/parser.py::main",
+   "aisef/control/budget.py::BudgetExceeded",
+   "aisef/control/budget.py::BudgetGuard",
+   "aisef/control/budget.py::BudgetLedger",
+   "aisef/control/closure.py::probe_judge_only_semantics",
+   "aisef/control/closure.py::probe_stories_done",
+   "aisef/control/closure.py::probe_upstream_gates",
+   "aisef/control/gate.py::StoryGate",
+   "aisef/control/gate.py::authoritative_baseline",
+   "aisef/control/gate.py::evaluate",
+   "aisef/control/gate.py::judge_only",
+   "aisef/control/gate.py::review_waiver",
+   "aisef/control/journal.py::reconcile_all",
+   "aisef/control/journal.py::reconcile_story",
+   "aisef/control/machine_gate.py::GateResult",
+   "aisef/control/machine_gate.py::check_all",
+   "aisef/control/machine_gate.py::check_prd",
+   "aisef/control/machine_gate.py::check_stories",
+   "aisef/control/obligation.py::blocking",
+   "aisef/control/obligation.py::evaluate",
+   "aisef/control/obligation.py::judge",
+   "aisef/control/obligation.py::row",
+   "aisef/control/proof.py::classify",
+   "aisef/control/proof.py::executed_green",
+   "aisef/control/proof.py::run_proves_red",
+   "aisef/control/qualification.py::Decision",
+   "aisef/control/qualification.py::Verdict",
+   "aisef/control/qualification.py::_qualify_pre_deploy",
+   "aisef/control/qualification.py::_qualify_repair",
+   "aisef/control/qualification.py::_qualify_run",
+   "aisef/control/qualification.py::qualify",
+   "aisef/control/reviewer_qual.py::classify",
+   "aisef/control/reviewer_qual.py::judge_only_audit",
+   "aisef/control/reviewer_qual.py::judgements",
+   "aisef/control/state.py::SprintState",
+   "aisef/control/state.py::StateStore",
+   "aisef/control/tdd.py::proven_red_before_green",
+   "aisef/control/tdd.py::runs_before_last_green",
+   "aisef/harness/guardrails.py::Verdict",
+   "aisef/harness/guardrails.py::check_completion",
+   "aisef/phases/implement.py::freeze_candidate",
+   "aisef/phases/implement.py::run_attempt",
+   "aisef/phases/implement.py::run_baseline",
+   "aisef/phases/implement.py::run_nop",
+   "aisef/phases/implement.py::verify_candidate",
+   "aisef/phases/run.py::_qualify_wave",
+   "aisef/phases/run.py::run_epic",
+   "aisef/phases/run.py::run_sprint",
+   "aisef/phases/run.py::run_verify_only"
+  ],
+  "problems": []
+ },
+ "proofs": {
+  "NO_OLD_GATE_AUTHORITY": {
+   "static": true,
+   "runtime": true,
+   "runtime_cases": [
+    "R1_runtime_poisoning",
+    "adapter_touching_v1_rejected",
+    "dual_authority_rejected_even_when_agreeing",
+    "legacy_fallback_rejected"
+   ],
+   "result": true,
+   "static_evidence": {
+    "legacy_references_in_runtime": [],
+    "v1_rows": 125
+   }
+  },
+  "NO_DEVELOPER_TEST_PRODUCT_AUTHORITY": {
+   "static": true,
+   "runtime": true,
+   "runtime_cases": [
+    "R2_five_developer_test_variants_one_proof"
+   ],
+   "result": true,
+   "static_evidence": {
+    "flows": [],
+    "kernel_rules": []
+   }
+  },
+  "NO_PARENT_DEVELOPER_EXECUTION": {
+   "static": true,
+   "runtime": true,
+   "runtime_cases": [
+    "R3_exploding_parent_tests_never_run"
+   ],
+   "result": true,
+   "static_evidence": {
+    "sites": [],
+    "kernel_rules": []
+   }
+  },
+  "NO_RECENCY_EVIDENCE_SELECTION": {
+   "static": true,
+   "runtime": true,
+   "runtime_cases": [
+    "R4_explicit_reference_whatever_the_timestamps"
+   ],
+   "result": true,
+   "static_evidence": {
+    "sites": []
+   }
+  },
+  "NO_SIDE_RETRY_COUNTER": {
+   "static": true,
+   "runtime": true,
+   "runtime_cases": [
+    "R5_journal_budget_decides_counters_do_not"
+   ],
+   "result": true,
+   "static_evidence": {
+    "kernel_rules": []
+   }
+  },
+  "ALL_CONTROL_DECISIONS_JOURNAL_BACKED": {
+   "static": true,
+   "runtime": true,
+   "runtime_cases": [
+    "R6_decision_table_of_real_stories"
+   ],
+   "result": true,
+   "static_evidence": {
+    "sites": []
+   }
+  }
+ },
+ "decision_table": {
+  "of": "ORCH-1 (a committed story through the real path)",
+  "decisions": 17,
+  "problems": [],
+  "stages_decided": [
+   "admission",
+   "developer",
+   "merge",
+   "post-merge",
+   "proof",
+   "quality",
+   "review",
+   "security"
+  ],
+  "rows": [
+   {
+    "seq": 10,
+    "decision": "story/admitted",
+    "story_id": "S1",
+    "check": null,
+    "facts": [
+     9
+    ]
+   },
+   {
+    "seq": 12,
+    "decision": "gate/check",
+    "story_id": "S1",
+    "check": "S1:admission",
+    "facts": [
+     10
+    ]
+   },
+   {
+    "seq": 14,
+    "decision": "provider/result",
+    "story_id": "S1",
+    "check": null,
+    "facts": [
+     13
+    ]
+   },
+   {
+    "seq": 15,
+    "decision": "gate/check",
+    "story_id": "S1",
+    "check": "S1:developer",
+    "facts": [
+     14
+    ]
+   },
+   {
+    "seq": 22,
+    "decision": "proof/verified",
+    "story_id": "S1",
+    "check": null,
+    "facts": [
+     18,
+     21
+    ]
+   },
+   {
+    "seq": 23,
+    "decision": "gate/check",
+    "story_id": "S1",
+    "check": "S1:proof:C1",
+    "facts": [
+     22
+    ]
+   },
+   {
+    "seq": 27,
+    "decision": "tests/adequacy",
+    "story_id": "S1",
+    "check": null,
+    "facts": [
+     10
+    ]
+   },
+   {
+    "seq": 31,
+    "decision": "gate/check",
+    "story_id": "S1",
+    "check": "S1:quality",
+    "facts": [
+     27
+    ]
+   },
+   {
+    "seq": 33,
+    "decision": "provider/result",
+    "story_id": "S1",
+    "check": null,
+    "facts": [
+     32
+    ]
+   },
+   {
+    "seq": 34,
+    "decision": "gate/check",
+    "story_id": "S1",
+    "check": "S1:review",
+    "facts": [
+     33
+    ]
+   },
+   {
+    "seq": 39,
+    "decision": "gate/check",
+    "story_id": "S1",
+    "check": "S1:security",
+    "facts": [
+     37
+    ]
+   },
+   {
+    "seq": 40,
+    "decision": "gate/check",
+    "story_id": "S1",
+    "check": "S1:merge",
+    "facts": [
+     22
+    ]
+   },
+   {
+    "seq": 47,
+    "decision": "proof/verified",
+    "story_id": "S1",
+    "check": null,
+    "facts": [
+     43,
+     46
+    ]
+   },
+   {
+    "seq": 48,
+    "decision": "gate/check",
+    "story_id": "S1",
+    "check": "S1:post-merge:C1",
+    "facts": [
+     47
+    ]
+   },
+   {
+    "seq": 49,
+    "decision": "gate/decision",
+    "story_id": null,
+    "check": null,
+    "facts": [
+     12,
+     15,
+     23,
+     31,
+     34,
+     39,
+     40,
+     48
+    ]
+   },
+   {
+    "seq": 50,
+    "decision": "story/commit",
+    "story_id": "S1",
+    "check": null,
+    "facts": [
+     49
+    ]
+   },
+   {
+    "seq": 55,
+    "decision": "story/end",
+    "story_id": "S1",
+    "check": null,
+    "facts": [
+     50
+    ]
+   }
+  ]
+ },
+ "runtime_cases": {
+  "inventory_matches_both_directions": true,
+  "unenumerated_and_stale_fail_closed": true,
+  "dual_authority_rejected_even_when_agreeing": true,
+  "legacy_fallback_rejected": true,
+  "adapter_touching_v1_rejected": true,
+  "R1_runtime_poisoning": true,
+  "R2_five_developer_test_variants_one_proof": true,
+  "R3_exploding_parent_tests_never_run": true,
+  "R4_explicit_reference_whatever_the_timestamps": true,
+  "R5_journal_budget_decides_counters_do_not": true,
+  "R6_decision_table_of_real_stories": true
+ },
+ "audit_unit_tests": {
+  "count": 41,
+  "passed": 41,
+  "failed": []
+ },
+ "mutation": {
+  "record": "closure-evidence/v2/P6-MUTATION.json",
+  "sha256": "fec915d0db3d4279886715f2f6640cb28aaeeeac66081a3d0720c5befb24e3de",
+  "old_path_audit_targets": {
+   "validation/v2/old_path_audit.py::_capabilities": {
+    "phase": "P6",
+    "mutants": 27,
+    "killed": 27,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_defs": {
+    "phase": "P6",
+    "mutants": 14,
+    "killed": 14,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_dotted": {
+    "phase": "P6",
+    "mutants": 6,
+    "killed": 6,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_function": {
+    "phase": "P6",
+    "mutants": 3,
+    "killed": 3,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_imports": {
+    "phase": "P6",
+    "mutants": 19,
+    "killed": 19,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_kernel_rules": {
+    "phase": "P6",
+    "mutants": 18,
+    "killed": 18,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_lf": {
+    "phase": "P6",
+    "mutants": 2,
+    "killed": 2,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_module_name": {
+    "phase": "P6",
+    "mutants": 4,
+    "killed": 4,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_py_files": {
+    "phase": "P6",
+    "mutants": 6,
+    "killed": 6,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_qualify": {
+    "phase": "P6",
+    "mutants": 14,
+    "killed": 14,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::_seam_before_first_event": {
+    "phase": "P6",
+    "mutants": 23,
+    "killed": 23,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::adapter_conditions": {
+    "phase": "P6",
+    "mutants": 35,
+    "killed": 35,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::audit": {
+    "phase": "P6",
+    "mutants": 31,
+    "killed": 31,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::check": {
+    "phase": "P6",
+    "mutants": 2,
+    "killed": 2,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::compare": {
+    "phase": "P6",
+    "mutants": 79,
+    "killed": 79,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::decision_problems": {
+    "phase": "P6",
+    "mutants": 19,
+    "killed": 19,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::decision_table": {
+    "phase": "P6",
+    "mutants": 84,
+    "killed": 84,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::def_digest": {
+    "phase": "P6",
+    "mutants": 5,
+    "killed": 5,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::developer_test_flows": {
+    "phase": "P6",
+    "mutants": 35,
+    "killed": 35,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::entrypoints": {
+    "phase": "P6",
+    "mutants": 20,
+    "killed": 20,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::inventory": {
+    "phase": "P6",
+    "mutants": 284,
+    "killed": 284,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::inventory_digest": {
+    "phase": "P6",
+    "mutants": 4,
+    "killed": 4,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::journal_backing": {
+    "phase": "P6",
+    "mutants": 83,
+    "killed": 83,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::legacy_imports": {
+    "phase": "P6",
+    "mutants": 16,
+    "killed": 16,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::legacy_references": {
+    "phase": "P6",
+    "mutants": 54,
+    "killed": 54,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::parent_execution_sites": {
+    "phase": "P6",
+    "mutants": 49,
+    "killed": 49,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::proofs": {
+    "phase": "P6",
+    "mutants": 101,
+    "killed": 101,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::reachable_modules": {
+    "phase": "P6",
+    "mutants": 13,
+    "killed": 13,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::recency_sites": {
+    "phase": "P6",
+    "mutants": 65,
+    "killed": 65,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::render": {
+    "phase": "P6",
+    "mutants": 3,
+    "killed": 3,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::test_legacy_imports": {
+    "phase": "P6",
+    "mutants": 10,
+    "killed": 10,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::v1_reality": {
+    "phase": "P6",
+    "mutants": 33,
+    "killed": 33,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   },
+   "validation/v2/old_path_audit.py::v2_reality": {
+    "phase": "P6",
+    "mutants": 49,
+    "killed": 49,
+    "survivors": 0,
+    "audited_equivalent": 0,
+    "unaudited": [],
+    "error": null,
+    "current": true
+   }
+  }
+ },
+ "run_history": {
+  "record": "closure-evidence/v2/P6-RUN-HISTORY.json",
+  "sha256": "7920444c145a59d0731c5a0c4e80b5ff0a0207bd2be64d1fb3b4600be7297c9b",
+  "entries": 81,
+  "problems": [],
+  "latest_commit": "c1d21f6c1a0fa1062ae5350ad898bf831f61fb1c",
+  "residual_process_state": {
+   "jobs": 8,
+   "zero_residual": true,
+   "v1_pf_001_absent": true
+  }
+ },
+ "records": {
+  "closure-evidence/v2/P6-MUTATION.json": "fec915d0db3d4279886715f2f6640cb28aaeeeac66081a3d0720c5befb24e3de",
+  "closure-evidence/v2/P6-RUN-HISTORY.json": "7920444c145a59d0731c5a0c4e80b5ff0a0207bd2be64d1fb3b4600be7297c9b",
+  "closure-evidence/v2/P6-MIGRATION-TABLE.json": "157b46f6786d849591f9c08b02a39f48a08c18d69d9e34cf7c3c98ccd5a6752f",
+  "closure-evidence/v2/P6-ORCHESTRATION.json": "4173d55004448892665c4f2749117177afbe61340b1b9dd2f0b1a014b0371235",
+  "closure-evidence/v2/P6-AUTHORITY-INVENTORY.json": "8c632a145c8b4f76ca0e5c462e2fa545cd07f05f71dd58da9f53ef6d7c20c592",
+  "closure-evidence/v2/P6-V2-005-SCHEMA.json": "8fe3c142d01603a9a19bcb52ac4e8d51e4d3bd780964d82c05952e308f775071",
+  "closure-evidence/v2/P4-FINAL-SEAL.json": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+  "closure-evidence/v2/P5-FINAL-SEAL.json": "d06d4ae57e1797f6658b1cc3148200865aada86a0d3165aeb9f7f98a6e3e250c",
+  "closure-evidence/v2/V1-EVIDENCE-BASELINE.json": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb",
+  "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "closure-evidence/v2/F-CONFORMANCE.json": "3f7246d825edc4bc834796ea2ae62b262083fb46ae8e879906b4609e234b445a",
+  "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json": "10e2e163e2081081a787dd2dadcd4f0a1c5996007a694e2b8d04a185fdabcdba"
+ },
+ "seals": {
+  "p4": {
+   "path": "closure-evidence/v2/P4-FINAL-SEAL.json",
+   "sha256": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+   "bound_by_p5_seal": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e"
+  },
+  "p5": {
+   "path": "closure-evidence/v2/P5-FINAL-SEAL.json",
+   "sha256": "d06d4ae57e1797f6658b1cc3148200865aada86a0d3165aeb9f7f98a6e3e250c",
+   "records_identity_problems": []
+  }
+ },
+ "v1_evidence_identity": {
+  "guard_problems": [],
+  "baseline_sha256": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb",
+  "w0_sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "w0_expected": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3"
+ },
+ "f1_f11": {
+  "current_phase": "P6",
+  "summary": {
+   "PASS": 11,
+   "PENDING": 0,
+   "FAIL": 0
+  },
+  "ratchet_violations": [],
+  "items": {
+   "F1": "PASS",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PASS",
+   "F6": "PASS",
+   "F7": "PASS",
+   "F8": "PASS",
+   "F9": "PASS",
+   "F10": "PASS",
+   "F11": "PASS"
+  }
+ },
+ "properties": {
+  "NO_OLD_GATE_AUTHORITY": true,
+  "NO_DEVELOPER_TEST_PRODUCT_AUTHORITY": true,
+  "NO_PARENT_DEVELOPER_EXECUTION": true,
+  "NO_RECENCY_EVIDENCE_SELECTION": true,
+  "NO_SIDE_RETRY_COUNTER": true,
+  "ALL_CONTROL_DECISIONS_JOURNAL_BACKED": true,
+  "inventory_fully_classified_and_current": true,
+  "audit_fails_closed_both_directions": true,
+  "dual_authority_rejected_even_when_agreeing": true,
+  "legacy_fallback_rejected": true,
+  "runtime_poisoning_leaves_v2_unchanged": true,
+  "seam_compatibility_nonauthoritative": true,
+  "every_v1_authority_unreachable_from_v2": true,
+  "no_v2_console_script_and_v1_script_unreachable": true,
+  "decision_table_every_stage_decided_every_decision_journal_backed": true,
+  "every_audit_unit_test_passes": true,
+  "aisef_tree_unchanged_since_p5_seal": true,
+  "v1_evidence_byte_identical": true,
+  "p4_seal_identity": true,
+  "p5_seal_records_identity": true,
+  "f1_f11_all_pass_no_ratchet_violation": true,
+  "v2_005_then_v2_006_end_the_lineage": true,
+  "format_3_29_of_29_nine_codes_exact": true,
+  "run_history_current_zero_residual_no_v1_pf_001": true,
+  "mutation_every_audit_target_measured_current_no_unaudited_survivor": true
+ }
+}

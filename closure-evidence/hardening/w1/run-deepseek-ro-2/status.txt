@@ -1,0 +1,11 @@
+Progress: 11/16 stories done (4 not started)
+Active epics: EPIC-04
+
+  done        11
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 50
+
+✗ 1 stories not passing:
+    STORY-04-02      failed   2 sessions in a row ran clean and wrote nothing: the session wrote nothing (35 turns) — the tree is exactly as the session found it, so the gate has nothing to grade: its verdict is still current, and re-running the gate would return the block it already returned. Re-opening with the same context returns the same decision — read the last gate verdict and fix what it asks for, or the story.

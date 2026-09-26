@@ -1,0 +1,41 @@
+{
+ "generated": "2026-09-19T13:57:08+0700",
+ "run": "gpt55-ro-1",
+ "profile": "PROFILE-W1-OC-GPT55-T80-RO",
+ "profile_id": "sha256:90e26847497ee7eda49044f89f86c81f000bb9e919f69e6605cfe22c4c31f2e7",
+ "run_classification": "ENVIRONMENT_OR_PROVIDER_STOP",
+ "counts_toward_the_three_valid_runs": false,
+ "provider_interruption": {
+  "route": "9router/cx/gpt-5.5",
+  "interruption_number_for_route": 1,
+  "measured": "OpenCode log: `[codex/gpt-5.5] [429]: The usage limit has been reached (reset after 13m..27m)` from 12:00 (+07); STORY-02-02's three developer sessions (15 turns, then 0, 0) each waited on the reset until the kernel's 1800 s cut; the kernel charged them to the infra budget and blocked the story `recurring infrastructure error: exceeded 1800s` — no quality attempt charged",
+  "quota_shared_with_other_work": "no — the sessions in the 429 window are this run's worktrees",
+  "preflight_episode_10:36-10:51": "a different, unexplained hang of OpenCode tool sessions before any run; no 429 or error logged then; recorded in the profile's preflight attempts, not counted as a run interruption"
+ },
+ "delivery_progress": {
+  "done": 7,
+  "total": 16
+ },
+ "stories_done_with_attempts": {
+  "STORY-01-01": 2,
+  "STORY-01-02": 1,
+  "STORY-01-03": 1,
+  "STORY-01-04": 1,
+  "STORY-01-05": 3,
+  "STORY-01-06": 1,
+  "STORY-02-01": 3
+ },
+ "oracle": {
+  "false_pass_count": 0,
+  "mapping_error_count": 0,
+  "red_classes": {
+   "INCOMPLETE_DELIVERY_EXPECTED_RED": 8
+  }
+ },
+ "false_block_count": 0,
+ "manual_state_repair": 0,
+ "orphan_state": 0,
+ "max_turns_observed": 54,
+ "max_turn_events": 0,
+ "rule_applied": "owner decision 2026-09-19 section 6: preserved, excluded from the denominator; a second provider interruption on this route abandons it for ds/deepseek-v4-pro"
+}

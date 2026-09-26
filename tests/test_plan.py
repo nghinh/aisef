@@ -294,6 +294,7 @@ class TestFailures(PlanTestCase):
                 f"**Acceptance Criteria:**\n\n{ac}\n\n"
                 "**Story metadata:**\n- covers: FR-1\n- write_scope: src/notes/\n"
                 "- depends_on: none\n"
+                + "- ac_proof: " + ", ".join(f"{i}=CHANGE_REQUIRED/FR-1" for i in range(1, n_ac + 1)) + "\n"
             )
 
         qua_to = self.cfg["story.max_acceptance_criteria"] + 1

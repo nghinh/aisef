@@ -1,0 +1,22 @@
+[2026-09-19T05:42:34+0700] phase prepare
+[2026-09-19T05:42:50+0700] prepare ok=True aisef=aisef 1.7.6 wheel=True oracle=True guard=True topology=True preflight=True failed=[] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'stale', 'pre-deploy': 'pending'} doctor_red=[]
+[2026-09-19T05:42:50+0700] W1 driver complete
+[2026-09-19T05:43:15+0700] phase kernel-first: aisef run with NO re-approval, NO --force
+[2026-09-19T05:43:15+0700] kernel-first ok=True exit=2 kernel refused the STALE gate before any agent call (ARB-1 kernel path first)
+[2026-09-19T05:43:15+0700] W1 driver complete
+[2026-09-19T05:43:15+0700] phase approve: ARB-1 re-approval of readiness for byte-identical content
+[2026-09-19T05:43:24+0700] approve ok=True changed=['readiness'] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'approved', 'readiness': 'approved', 'pre-deploy': 'pending'}
+[2026-09-19T05:43:24+0700] W1 driver complete
+[2026-09-19T05:43:24+0700] phase run
+[2026-09-19T05:43:24+0700] aisef run #1 pid=27563 pgid=27563
+[2026-09-19T06:51:01+0700] SIGTERM process group 27563: {'marker': 'wave=EPIC-01/w3 DONE', 'at': '2026-09-19T06:51:01+0700', 'line': '[2026-09-19 06:51:00] wave=EPIC-01/w3 DONE 0/1 passed $0.00', 'kind': 'forced resume (P20 procedure 3)'}
+[2026-09-19T06:51:06+0700] aisef run #1 exit=2 after 4062.2s killed=True
+[2026-09-19T06:51:06+0700] aisef run #2 pid=43415 pgid=43415
+[2026-09-19T06:57:22+0700] aisef run #2 exit=2 after 375.8s killed=False
+[2026-09-19T06:57:22+0700] W1 driver complete
+[2026-09-19T06:57:22+0700] phase finish
+[2026-09-19T06:57:25+0700] finish: progress={'done': 2, 'total': 16} class=LEGITIMATE_MODEL_PROJECT_STOP false_pass=0 mapping_errors=0 red_classes={'INCOMPLETE_DELIVERY_EXPECTED_RED': 9} safety=[] → W1-LEDGERLOCK-gpt56sol-ro-1.json
+[2026-09-19T06:57:25+0700] W1 driver complete
+[2026-09-19T06:59:28+0700] phase finish
+[2026-09-19T06:59:32+0700] finish: progress={'done': 2, 'total': 16} class=ENVIRONMENT_OR_PROVIDER_STOP false_pass=0 mapping_errors=0 red_classes={'INCOMPLETE_DELIVERY_EXPECTED_RED': 9} safety=[] → W1-LEDGERLOCK-gpt56sol-ro-1.json
+[2026-09-19T06:59:32+0700] W1 driver complete

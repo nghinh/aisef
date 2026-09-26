@@ -726,7 +726,8 @@ Bổ sung sau khi chạy thật — mỗi khoá ra đời từ một lần hỏn
 
 | Khoá | Mặc định | Vì sao có |
 |---|---|---|
-| `tools.test` · `tools.lint` · `tools.sast` | `""` (tự dò) | lệnh là quyết định của dự án; rỗng thì dò từ file có thật |
+| `tools.test` · `tools.lint` · `tools.sast` | `""` (AUTO) | lệnh là quyết định của dự án; rỗng = AUTO: hồ sơ stack trong `aisef/harness/capabilities.py` chọn công cụ **và** môi trường chứa nó (SS-65, [TOOL-CAPABILITIES.md](TOOL-CAPABILITIES.md)) |
+| `tools.disabled` | `[]` | danh sách vai trò tắt **có kiểu** (ghi thành bằng chứng "disabled", không bao giờ chạy); `test` và `lint` bắt buộc, không tắt được; vừa khai lệnh vừa tắt → lỗi cấu hình |
 | `verify.*` (12 loại: `unit` · `sit` · `api-contract` · `e2e` · `uat` · `perf` · `security` · `mutation` · `accessibility` · `migration` · `sbom` · `image-scan`) | `""` | rỗng nghĩa là **chưa cấu hình**, không phải "đạt"; thư mục test suy từ lệnh được cấp thêm vào phạm vi ghi của story đòi loại ấy (lỗi 21) |
 | `verify.tool_images` | `""` | ảnh công cụ đã ghim cho từng loại, dạng `"kind=image,kind=image"` — công cụ kiểm thử **không** phải sống trong cây phụ thuộc của sản phẩm mới chạy được (lỗi 168). Cài Stryker vào marks-cli kéo theo `qs`/`typed-rest-client` và hai lỗ hổng moderate vào một dự án mà cả luận điểm an toàn là *không phụ thuộc, không mạng*. Mạng để tải CSDL lỗ hổng của một scanner **không** phải mạng cấp cho ứng dụng đang bị kiểm |
 | `verify.waived` | `""` | miễn phải là quyết định có người ký, không phải hệ quả của việc quên |

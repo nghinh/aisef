@@ -1,0 +1,232 @@
+{
+ "record": "AISEF V2 — ARCHITECTURE EXCEPTION",
+ "id": "ARCHITECTURE-EXCEPTION-V2-006",
+ "status": "APPROVED — APPLIED",
+ "frozen_items_affected": [
+  "F5 — probe protocol: the harness's protocol stream and its process lifecycle are independent facts; an exit notice never ends the protocol (§9.4, new)"
+ ],
+ "consequential": [
+  "F4 — semantic_hash binds the probe digest (measured: one contract compiles to a different semantic_hash under the old and the new python_callable digest); the F4 rule, its row and its subchecks are unchanged, and no stored spec binds the old digest — specs compiled against probe.python_callable get new semantic hashes at compile time"
+ ],
+ "frozen_items_changed_mechanically": [
+  "F5"
+ ],
+ "frozen_items_unchanged_mechanically": [
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F6",
+  "F7",
+  "F8",
+  "F9",
+  "F10",
+  "F11"
+ ],
+ "conformance_subchecks_mechanically": {
+  "added": [
+   "F5.protocol_stream_vs_process_lifecycle"
+  ],
+  "removed": [],
+  "changed": [],
+  "rule": "every F1-F11 subcheck of F-CONFORMANCE.json at the base compared with this candidate's, state and detail"
+ },
+ "promoted_from": {
+  "finding": "P6-FINDING-001 — probe harness READY/EOF race",
+  "diagnostics": "~/Downloads/projects/ai-sdlc-diagnostics/2026-09-26-p6-finding-001/ (the finding note, the reproduction scripts, the CI log)",
+  "ci_signature": {
+   "run": 36225825035,
+   "job": "unit (ubuntu-latest, 3.11)",
+   "candidate": "b41a01e1b545bfad0c56f26616138506fb11bc9e",
+   "records": [
+    "implementer: EXECUTED SATISFIED",
+    "verifier: UNRUNNABLE 'the harness did not start (exit 0, no READY): tool absent or broken'"
+   ]
+  }
+ },
+ "contradiction_discovered": "RFC §9.2/§9.3 give 'before DISPATCHED ⇒ UNRUNNABLE' for a harness that failed to operate, but the reference probe decided 'before DISPATCHED' from two independent channels racing in one queue: the anchor's exit notice (the _exited thread) and the target's protocol lines (the _pump thread, from the output pipe the anchor also held open). When the exit notice won, an already-written READY was never read and a target that had completed its protocol and exited 0 was recorded as 'did not start' — a false UNRUNNABLE on one party and a false VERIFIER_DISAGREEMENT between two. The defect is in harness observation ordering, not in product behaviour.",
+ "measured": {
+  "mechanism": "aisef2/probe/python_callable.py::_watch at the base: _exited put the end-of-protocol marker when run.wait() returned; before DISPATCHED no drain; the anchor (aisef2/runtime/range_anchor.py) kept fd 2 — the target's output pipe — open until it was reaped, so the pipe's own end of file never reached the reader",
+  "reproduction_before": {
+   "pump lag 50 ms, both parties": "6/6 stories not committed",
+   "pump lag 50 ms, one party": "4/4 not committed, the CI shape exactly",
+   "no lag": "0/6"
+  },
+  "reproduction_after": {
+   "pump lag 50 ms, both parties": "0/6",
+   "pump lag 50 ms, one party": "0/4",
+   "pump lag 500 ms, both parties": "0/3"
+  },
+  "race_tests_on_the_base_code": {
+   "test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives": "FAIL",
+   "test_a_descendant_holding_the_writer_keeps_the_stream_open_until_it_ends": "FAIL",
+   "test_a_protocol_tag_out_of_order_is_the_harness_breaking_its_protocol": "ERROR",
+   "test_a_stream_closed_while_the_process_runs_is_a_harness_timeout_at_the_watchdog": "ERROR",
+   "test_after_DISPATCHED_a_closed_stream_with_the_process_running_is_the_window_expiring": "ERROR",
+   "test_next_returns_only_complete_marked_lines_of_this_nonce": "ERROR",
+   "test_next_times_out_at_its_deadline_and_never_waits_past_it": "PASS",
+   "test_the_pump_publishes_every_line_in_order_then_STREAM_CLOSED_once": "FAIL",
+   "test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump": "FAIL",
+   "test_RACE_2_READY_DISPATCHED_RESULT_then_immediate_exit_is_the_complete_result": "PASS",
+   "test_RACE_3_the_exit_notice_before_the_pump_is_scheduled_gives_the_normal_result": "PASS",
+   "test_RACE_4_one_party_late_the_other_normal_gives_identical_records": "PASS",
+   "test_RACE_4_a_story_with_one_party_late_on_every_proof_commits_with_agreement": "FAIL",
+   "test_RACE_5_a_harness_that_emits_nothing_and_exits_0_did_not_start_after_the_stream_closed": "FAIL",
+   "test_RACE_6_a_target_that_dies_before_READY_keeps_its_typed_outcome": "FAIL",
+   "test_RACE_7_a_partial_READY_then_exit_is_no_READY_never_a_guess": "FAIL",
+   "test_RACE_9_every_line_before_the_end_is_read_before_STREAM_CLOSED": "PASS",
+   "test_RACE_10_every_ordering_repeated_gives_the_normal_record": "FAIL"
+  },
+  "race_tests_on_this_candidate": {
+   "test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives": "PASS",
+   "test_a_descendant_holding_the_writer_keeps_the_stream_open_until_it_ends": "PASS",
+   "test_a_protocol_tag_out_of_order_is_the_harness_breaking_its_protocol": "PASS",
+   "test_a_stream_closed_while_the_process_runs_is_a_harness_timeout_at_the_watchdog": "PASS",
+   "test_after_DISPATCHED_a_closed_stream_with_the_process_running_is_the_window_expiring": "PASS",
+   "test_next_returns_only_complete_marked_lines_of_this_nonce": "PASS",
+   "test_next_times_out_at_its_deadline_and_never_waits_past_it": "PASS",
+   "test_the_pump_publishes_every_line_in_order_then_STREAM_CLOSED_once": "PASS",
+   "test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump": "PASS",
+   "test_RACE_2_READY_DISPATCHED_RESULT_then_immediate_exit_is_the_complete_result": "PASS",
+   "test_RACE_3_the_exit_notice_before_the_pump_is_scheduled_gives_the_normal_result": "PASS",
+   "test_RACE_4_one_party_late_the_other_normal_gives_identical_records": "PASS",
+   "test_RACE_4_a_story_with_one_party_late_on_every_proof_commits_with_agreement": "PASS",
+   "test_RACE_5_a_harness_that_emits_nothing_and_exits_0_did_not_start_after_the_stream_closed": "PASS",
+   "test_RACE_6_a_target_that_dies_before_READY_keeps_its_typed_outcome": "PASS",
+   "test_RACE_7_a_partial_READY_then_exit_is_no_READY_never_a_guess": "PASS",
+   "test_RACE_9_every_line_before_the_end_is_read_before_STREAM_CLOSED": "PASS",
+   "test_a_timed_out_wait_returns_only_once_the_monotonic_clock_has_passed_its_deadline": "PASS",
+   "test_RACE_10_every_ordering_repeated_gives_the_normal_record": "PASS"
+  },
+  "race_tests_note": "RACE-2, RACE-3, RACE-9 and the probe-level RACE-4 pass on the base only because their exit-first injection consumes the anchor's exit report the base's exit-driven reader was waiting for; the delayed-pump cases (RACE-1, the story-level RACE-4, RACE-10) and the structural ones (RACE-8, the reader units) discriminate",
+  "f5_conformance_on_the_base_code": [
+   "the anchor keeps its copy of the target's output writer",
+   "the protocol is read by ['_pump', '_exited']",
+   "a complete protocol, exit reported first: UNRUNNABLE instead of EXECUTED/SATISFIED",
+   "the exit was asked for before the stream had closed (both cases)"
+  ],
+  "p6_attempts_explained": [
+   "abfe99d unit (ubuntu-latest, 3.13) — recorded UNKNOWN",
+   "6099a81 unit (ubuntu-latest, 3.12) — recorded UNKNOWN",
+   "a466345 unit (ubuntu-latest, 3.12) — recorded UNKNOWN",
+   "b41a01e unit (ubuntu-latest, 3.11) — the first with both records printed"
+  ],
+  "note": "earlier attempts stay recorded as classified at the time; a later diagnosis never relabels an attempt"
+ },
+ "anchor_watchdog": {
+  "finding": "P6-FINDING-002 — the range anchor's watchdog lived inside main, the function it guards: main ending any way but os._exit (an exception, a loop that stops reading) left the anchor alive with nobody reading stdin",
+  "found_by": "re-measuring aisef2/runtime/range_anchor.py::main, required because V2-006 changed the module: the mutation runner stopped with RESIDUAL_OWNERSHIP_UNKNOWN at 'L83 condition negated' (runs W26, W29; no SIGINT handler, an interrupt ended main and the interpreter waited on the reporter and reaper threads) and at 'L106 condition negated' (run W30; the end-of-file branch inverted, the anchor spun on end of file). Each left orphaned mutant anchors (ppid 1) whose ownership the runner cannot prove on macOS (no subreaper) and correctly refused to signal; they were stopped by verified PID, operator notes in the diagnostics folder.",
+  "measured_on_the_base_anchor": "the same mutant of the base anchor ('L70 condition negated') through the runner's own _run_tests/_reap_strays: 3/3 RESIDUAL_OWNERSHIP_UNKNOWN with one orphan each; the current source before this change: 3/3. Not caused by V2-006: the committed measurement of main (21/21 killed, strays reaped) predates the fail-closed ownership proof (INV-MUTATION-AUTHORITY), and V2-006 is the first change to the module since.",
+  "product_path": "an exception out of main after the spawn — STARTED written to a report pipe nobody reads (a controller gone between GO and STARTED): the base anchor exited 120 and left the target running with no watchdog; once the reporter and reaper threads run, main ending by exception hung the anchor in interpreter shutdown (sampled: wait_for_thread_shutdown).",
+  "fix": "the watchdog is the script's entry: main reads its control stream until end of file and returns (the end-of-file branch and while True removed); `try: main() finally: _die()` — however main ends, the anchor ends by _die (its group, itself included) or by EXIT. The documented behaviour (end of file on stdin: the anchor kills its own group) is unchanged.",
+  "test": "tests/v2/p4/test_process_range.py::Anchor::test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group — base anchor: FAIL (120 != -9); this candidate: PASS",
+  "after": {
+   "mutants_that_left_orphans": "'L86 condition negated' (was L83) and 'L106 condition negated': killed, 0 strays, nothing left",
+   "main": {
+    "source_sha256": "78e76c395943f3080844c5fab04580cc0433f2a44df5bb6af4a6a2b36bcd8469",
+    "mutants": 18,
+    "killed": 18,
+    "survivors": [],
+    "strays_reaped": 0
+   }
+  },
+  "normative_impact": "none: no frozen item or conformance subcheck changes beyond F5 (the same mechanical row comparison); the anchor's protocol and watchdog semantics are as documented"
+ },
+ "discovered_in": {
+  "phase": "P6 (WP-6.3 candidate gating)",
+  "candidate": "b41a01e1b545bfad0c56f26616138506fb11bc9e",
+  "flagged_by_implementation": "AISEF V2 — WP-6.3 COMPLETE / P6 FINAL SEAL STOPPED — P6-FINDING-001 (PROBE HARNESS READY/EOF RACE, MEASURED) / OWNER DECISION REQUIRED"
+ },
+ "owner_decision": {
+  "decision": "AISEF V2 — OWNER RESOLUTION OF P6-FINDING-001 / ARCHITECTURE EXCEPTION V2-006 / PROBE HARNESS READY/EOF ORDERING",
+  "date": "2026-09-26",
+  "approved": "V2-006 APPROVED; WP-6.3 ACCEPTED / COMPLETE; the P6 final seal stays blocked until a candidate carrying V2-006 is gated green; b41a01e is not sealed; P7 not authorized",
+  "remedy": [
+   "the anchor/process supervisor MUST NOT retain the target's protocol output writer",
+   "the protocol pump owns the read side until true OS stream EOF and publishes STREAM_CLOSED only after every byte and complete line before it",
+   "'exit before READY' only when process_exit_seen AND protocol_stream_closed AND no READY",
+   "no timing window is authority"
+  ],
+  "forbidden": [
+   "sleep",
+   "an arbitrary pre-dispatch drain",
+   "retry until READY",
+   "polling a queue N times",
+   "a non-blocking drain right after the exit notice",
+   "a platform-specific delay",
+   "a CI-only workaround",
+   "a verifier re-run until agreement"
+  ],
+  "historical_seals": "P4 and P5 seal bytes preserved; V2-006 changes a component previously exercised in P2/P4; every affected proof is re-run on the new candidate and bound into P6 evidence and the P6 final seal"
+ },
+ "replacement": {
+  "summary": "Two independent facts, never collapsed. The anchor points its fd 2 at the null device right after spawning the target (range_anchor._release_output), so the output stream's end of file is the target's and its descendants' own. The probe reads its protocol through one pump, which publishes every line and then STREAM_CLOSED from the same thread (the pump-completion barrier); the process's exit is asked of the range only after STREAM_CLOSED. Before DISPATCHED: the stream closed without the expected line and the exit reported ⇒ the existing typed harness failure; the stream closed with the process still running at the watchdog ⇒ harness timeout; a protocol tag out of order ⇒ the harness broke its protocol. After DISPATCHED: the stream closed without RESULT ⇒ the exit's provenance (§9.3), or the window expiring if the process still runs at W. A protocol line must be terminated. No drain window remains (_DRAIN_S and _exited removed).",
+  "code": {
+   "aisef2/runtime/range_anchor.py": "78e76c395943f3080844c5fab04580cc0433f2a44df5bb6af4a6a2b36bcd8469",
+   "aisef2/probe/python_callable.py": "bde62e675c10902d577c8d2a6301c8bd0589228f26c8acf746b8831b5e6e94e5"
+  },
+  "probe_digest": {
+   "before": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "after": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0"
+  },
+  "tests": [
+   "tests/v2/test_v2_006.py (RACE-1..9, the reader units)",
+   "tests/v2/test_v2_006_repeat.py (RACE-10: 102 real observations across three injected orderings)",
+   "tests/v2/p2/test_python_callable.py (the one-reader assertion; the late-RESULT case now read without a drain)",
+   "tests/v2/p4/test_process_range.py (the anchor's watchdog holds however main ends — P6-FINDING-002)"
+  ],
+  "conformance": "validation/v2/freeze_conformance.py: F5.protocol_stream_vs_process_lifecycle (structure of the anchor and the reader; behaviour on a range whose exit is reported before any line)"
+ },
+ "f5_impact": "F5 gains §9.4 and its conformance subcheck; the harness timeout vs subject deadline (§9.2) and signal provenance (§9.3) rules are unchanged and still pass on this candidate.",
+ "evidence_compatibility_impact": "The probe digest changes, so P2-PROBE-PROTOCOL and P2-CALIBRATION are re-derived at this candidate and calibration is re-established by execution (the precedent of V2-003); every other P1–P5 evidence record re-derives identically. Files that bind the old digest and stay byte-identical: ARCHITECTURE-EXCEPTION-V2-003.json, P4-COMPLETION-CORRECTION-V2-003.json, P4-FINAL-SEAL.json (historical). P4 and P5 seals are not rewritten; the fresh measurements of P2/P4 components (mutation, calibration, conformance, lifecycle) are bound into P6 evidence and the P6 final seal.",
+ "digests": {
+  "rfc_normative_digest": {
+   "before": "eea2e10fa0b40cf9e04da3282441e485883df146ddff70ee5ad9949f32f7574a",
+   "after": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f"
+  },
+  "freeze_table_digest": {
+   "before": "92605a0ea18da992efeab69357ebbfaa9c898b5f17ad75e172864874df70c688",
+   "after": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831"
+  },
+  "f5_row_sha256": {
+   "before": "92ba9a46280167855e2adb8c552062325432593b3a7e75f0ce3383a4a2483735",
+   "after": "05915110dcdc7f4f2b1effee5e4eb8ffbe1a04533ac1d0faa8ee8cc08bfb0f55"
+  },
+  "probe_digest": {
+   "before": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "after": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0"
+  },
+  "semantic_hash_of_one_contract_by_probe_digest": {
+   "c335293e03a0": "4b85d7eed840d6b2d89870098ff5ce6f5e22e352a1bfd25fb4a833328843d272",
+   "ac434a4260cd": "20fbca952de40f5c9bd660bcef5eb5ba3c387aadf29dd32106fca2e44fdf706f"
+  }
+ },
+ "files_binding_the_old_probe_digest_at_the_base": [
+  "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+  "closure-evidence/v2/P2-CALIBRATION.json",
+  "closure-evidence/v2/P2-PROBE-PROTOCOL.json",
+  "closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json",
+  "closure-evidence/v2/P4-FINAL-SEAL.json"
+ ],
+ "historical_files_kept_byte_identical": {
+  "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json": "8dcc296574f9978d28822bff51ecd94dadf005c31ffb98e2b8da308765f0c2f9",
+  "closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json": "9f850db370399e1adc3098cf35f0fa570e4e8a81840693626d1452d8b11d700a",
+  "closure-evidence/v2/P4-FINAL-SEAL.json": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+  "closure-evidence/v2/P5-FINAL-SEAL.json": "d06d4ae57e1797f6658b1cc3148200865aada86a0d3165aeb9f7f98a6e3e250c",
+  "closure-evidence/v2/P2-FINAL-SEAL.json": "778c417066abb93119b51f9469c7b76120776ad65aa7964d6586d9144d98874b",
+  "closure-evidence/v2/P3-FINAL-SEAL.json": "c63622683a1d528fc82f3c81fa5091ff47abdbd9a141f076e98d4037bcce5d9e",
+  "closure-evidence/v2/P1-FINAL-SEAL.json": "247b595cae4e78de5addbef623f5ad98c051391b2e8834d6d8cebb01cee8d8b2"
+ },
+ "re_derived_at_this_candidate": [
+  "closure-evidence/v2/P2-PROBE-PROTOCOL.json (the probe digest)",
+  "closure-evidence/v2/P2-CALIBRATION.json (calibration re-established by execution under the new digest)",
+  "closure-evidence/v2/P2-MUTATION.json and P4-MUTATION.json (the changed targets re-measured)",
+  "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json",
+  "closure-evidence/v2/F-CONFORMANCE.json"
+ ],
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "AISEF V2 — OWNER RESOLUTION OF P6-FINDING-001 / ARCHITECTURE EXCEPTION V2-006 / PROBE HARNESS READY/EOF ORDERING",
+  "date": "2026-09-26"
+ }
+}

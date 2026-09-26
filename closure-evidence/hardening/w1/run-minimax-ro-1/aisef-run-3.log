@@ -1,0 +1,111 @@
+EPIC-01 · wave 1
+  ○ STORY-01-01: already done, skipped
+EPIC-01 · wave 2
+  ○ STORY-01-02: already done, skipped
+EPIC-01 · wave 3
+  ○ STORY-01-03: already done, skipped
+EPIC-01 · wave 4
+  ○ STORY-01-04: already done, skipped
+EPIC-01 · wave 5
+  ○ STORY-01-05: already done, skipped
+EPIC-01 · wave 6
+  ○ STORY-01-06: already done, skipped
+EPIC-02 · wave 1
+  ○ STORY-02-01: already done, skipped
+EPIC-02 · wave 2
+  ○ STORY-02-02: already done, skipped
+EPIC-03 · wave 1
+  ○ STORY-03-01: already done, skipped
+EPIC-03 · wave 2
+STORY-03-02: DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 11 tests with criteria codes proven red at parent SHA 97344dc: 11 executed red, 0 unable to import code this story introduces
+    ✅ tests verify story — 11 tests with criteria codes proven red at parent SHA 97344dc: 11 executed red, 0 unable to import code this story introduces
+    ✅ security
+    ✗ review — 1 blocking items: [block] ledgerlock/ledger.py:474 — repair_tail sets truncated=True whenever the file does not end in \n, without consulting verify() first. A clean chain whose trailing \n is missing (e.g., rstripped)
+    ✅ preservation — 31 behaviours of other stories still green
+  [attempt 2] ok
+EPIC-04 · wave 1
+STORY-04-01: DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/test_cli_exit_codes.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA 679c90a): tests/test_cli_exit_codes.py::AC_STORY_04_01_1_VerifyExitsZeroWithOkStderr::test_AC_STORY_04_01_1_verify_exit_zero, tests/test_cli_exit_codes.py::AC_STORY_04_01_1_VerifyExitsZeroWithOkStderr::test_AC_STORY_04_01_1_verify_stdout_empty, tests/test_cli_exit_codes.py::AC_STORY_04_01_2_SnapshotWritesCanonicalBytesToOut::test_AC_STORY_04_01_2_snapshot_exit_zero, tests/test_cli_exit_codes.py::AC_STORY_04_01_2_SnapshotWritesCanonicalBytesToOut::test_AC_STORY_04_01_2_snapshot_stdout_empty, tests/test_cli_exit_codes.py::AC_STORY_04_01_3_ApplyCommitsBatchAndStdoutEmpty::test_AC_STORY_04_01_3_apply_exit_zero (+4)
+    ✅ security
+    ✅ review
+    ✅ preservation — 10 behaviours of other stories still green
+  [attempt 2] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/test_cli_exit_codes.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA 679c90a): tests/test_cli_exit_codes.py::AC_STORY_04_01_4_RepairTailIsByteIdenticalOnCleanJsonl::test_AC_STORY_04_01_4_repair_tail_byte_identical, tests/test_cli_exit_codes.py::AC_STORY_04_01_4_RepairTailIsByteIdenticalOnCleanJsonl::test_AC_STORY_04_01_4_repair_tail_exit_zero, tests/test_cli_exit_codes.py::AC_STORY_04_01_4_RepairTailIsByteIdenticalOnCleanJsonl::test_AC_STORY_04_01_4_repair_tail_stdout_empty
+    ✅ security
+    ✅ review
+    ✅ preservation — 10 behaviours of other stories still green
+  [attempt 3] ok
+EPIC-04 · wave 2
+STORY-04-02: NOT DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/test_cli_exit_codes.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA aef05cd): tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_apply_with_extra_positional_exits_two_silent_stdout, tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_apply_with_no_args_exits_two_silent_stdout, tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_repair_tail_with_extra_positional_exits_two_silent_stdout, tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_repair_tail_with_no_args_exits_two_silent_stdout, tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_snapshot_with_no_args_exits_two_silent_stdout (+4)
+    ✅ security
+    ✗ review — 2 blocking items: [block] ledgerlock/cli.py:234 — main() has no exception wrapper, so AD-9 mapping is not the single source of truth it claims to be. Probed: verify on missing ledger → exit 1 (should be 3); snapshot on
+    ✅ preservation — 15 behaviours of other stories still green
+  [attempt 2] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/test_cli_exit_codes.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA aef05cd): tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_apply_with_extra_positional_exits_two_silent_stdout, tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_apply_with_no_args_exits_two_silent_stdout, tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_repair_tail_with_extra_positional_exits_two_silent_stdout, tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_repair_tail_with_no_args_exits_two_silent_stdout, tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_snapshot_with_no_args_exits_two_silent_stdout (+4)
+    ✅ security
+    ⚠ review — reviewer did not run (max_turns: stopped at 80 turns (cap 80)) — no verdict about the candidate
+    ✅ preservation — 15 behaviours of other stories still green
+  [infra] the session wrote nothing (68 turns) — the tree is exactly as the session found it, so the gate has nothing to grade: its verdict is still current, and re-running the gate would return the block it already returned.
+  [attempt 3] max_turns: stopped at 80 turns (cap 80)
+  ✗ tried 3 attempts, still did not pass gate
+
+⏸ stopped at EPIC-04 · wave 2

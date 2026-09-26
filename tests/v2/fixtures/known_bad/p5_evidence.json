@@ -1,0 +1,13 @@
+{
+ "checker": "p5_evidence",
+ "package": "WP-5.1",
+ "kind": "evidence_record",
+ "record": {
+  "work_package": "WP-5.1",
+  "properties": {
+   "TEST_2_failing_assertions_EXECUTED_FAILED_INADEQUATE_owner_DEVELOPER": true,
+   "no_did_not_run_to_developer_edge_exists_anywhere": false
+  }
+ },
+ "expect": "property no_did_not_run_to_developer_edge_exists_anywhere is false"
+}

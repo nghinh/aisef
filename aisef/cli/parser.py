@@ -69,7 +69,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="AISEF — orchestrate the AI-assisted software development lifecycle",
     )
     p.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}")
-    p.add_argument("--project", default=".", help="project directory (default: current directory)")
+    p.add_argument("--project", default=None, help="project directory (default: current directory)")
     sub = p.add_subparsers(dest="command", required=True, parser_class=_Parser)
 
     from .memory import cmd_memory
@@ -196,6 +196,12 @@ def build_parser() -> argparse.ArgumentParser:
                     help="with --verify-only: run each check K times on the same SHA; tests that "
                          "flip results between runs → gate records UNRUNNABLE 'flaky' naming them, "
                          "not a failure (error 22: e2e sensitive to machine load). Default 1")
+    r2.add_argument("--replay-of", default="", metavar="RUN",
+                    help="replay the conditions of a recorded run (run id or manifest path): a material difference "
+                         "— client, model, route, config, requirements, story contracts, environment — stops before "
+                         "the first agent call (REPLAY_CONDITION_DRIFT) unless named in --accept-drift")
+    r2.add_argument("--accept-drift", default="", metavar="FIELDS",
+                    help="comma-separated manifest fields whose drift the owner accepts for this replay")
     r2.set_defaults(func=cmd_run)
 
     im = sub.add_parser("improve", help="evidence-driven improvement loop for an epic: QA → behaviour ledger → "
@@ -389,7 +395,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     _cho_moi_lenh_nhan_project(parser)
     args = parser.parse_args(argv)
-    args.project = str(Path(args.project).resolve())
+    # D-011: an IMPLICIT project (no --project anywhere) is remembered — evidence roots refuse to appear in a
+    # directory that is not an AISEF project when the caller never named one
+    args.project_defaulted = getattr(args, "project", None) in (None, argparse.SUPPRESS)
+    args.project = str(Path(args.project or ".").resolve())
     try:
         return args.func(args)
     except ConfigError as e:

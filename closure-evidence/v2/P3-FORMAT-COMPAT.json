@@ -1,0 +1,131 @@
+{
+ "record": "AISEF V2 — P3 FORMAT COMPATIBILITY",
+ "work_package": "WP-3.2",
+ "rfc_sections": [
+  "20",
+  "35"
+ ],
+ "frozen_items": [
+  "F1"
+ ],
+ "format": 1,
+ "rule": "unknown type without ignorable -> refuse to reconstruct (never partial); unknown ignorable -> skip, seq kept, never folded; a known type is always validated and never ignorable; the format is declared once, in run/begin at seq 0; a torn tail is reported and never decoded; a reader never negotiates",
+ "fixtures": {
+  "known_log": {
+   "expected": "OK",
+   "read": "OK",
+   "known_seqs": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "skipped": [],
+   "torn_tail": false,
+   "equals_build": true
+  },
+  "unknown_required": {
+   "expected": "REFUSE",
+   "read": "REFUSED",
+   "refusal": "UnknownRequiredEvent",
+   "reason": "seq 2: unknown event type 'story/checkpoint' is not marked ignorable — this reader refuses to reconstruct the journal (§20.4)",
+   "equals_build": true
+  },
+  "unknown_ignorable": {
+   "expected": "OK",
+   "read": "OK",
+   "known_seqs": [
+    0,
+    1,
+    3,
+    4
+   ],
+   "skipped": [
+    2
+   ],
+   "torn_tail": false,
+   "equals_build": true
+  },
+  "malformed_known": {
+   "expected": "REFUSE",
+   "read": "REFUSED",
+   "refusal": "JournalError",
+   "reason": "story/begin: fields of the wrong kind or enum ['parent']",
+   "equals_build": true
+  },
+  "version_mismatch": {
+   "expected": "REFUSE",
+   "read": "REFUSED",
+   "refusal": "JournalError",
+   "reason": "run/begin: journal format 2 is not format 1: refused, never read under another format",
+   "equals_build": true
+  },
+  "newer_schema_field": {
+   "expected": "REFUSE",
+   "read": "REFUSED",
+   "refusal": "JournalError",
+   "reason": "story/begin: fields missing [], not in the schema ['attempt']",
+   "equals_build": true
+  },
+  "mixed_stream_second_declaration": {
+   "expected": "REFUSE",
+   "read": "REFUSED",
+   "refusal": "JournalError",
+   "reason": "run/begin at seq 2: a journal begins with run/begin, and only once",
+   "equals_build": true
+  },
+  "mixed_stream_new_required": {
+   "expected": "REFUSE",
+   "read": "REFUSED",
+   "refusal": "UnknownRequiredEvent",
+   "reason": "seq 4: unknown event type 'story/checkpoint' is not marked ignorable — this reader refuses to reconstruct the journal (§20.4)",
+   "equals_build": true
+  },
+  "mixed_stream_new_ignorable": {
+   "expected": "OK",
+   "read": "OK",
+   "known_seqs": [
+    0,
+    2,
+    4,
+    5
+   ],
+   "skipped": [
+    1,
+    3
+   ],
+   "torn_tail": false,
+   "equals_build": true
+  },
+  "known_type_marked_ignorable": {
+   "expected": "REFUSE",
+   "read": "REFUSED",
+   "refusal": "JournalError",
+   "reason": "failure/observed is a required event in format 1; it is never ignorable",
+   "equals_build": true
+  },
+  "torn_tail": {
+   "expected": "OK_TORN",
+   "read": "OK",
+   "known_seqs": [
+    0,
+    1
+   ],
+   "skipped": [],
+   "torn_tail": true,
+   "equals_build": true
+  }
+ },
+ "properties": {
+  "committed_fixtures_equal_the_build": true,
+  "every_fixture_reads_as_expected": true,
+  "FORMAT_1_unknown_required_refuses_reconstruction": true,
+  "FORMAT_2_unknown_ignorable_skipped_and_reconstruction_continues": true,
+  "malformed_known_type_refused": true,
+  "version_or_schema_mismatch_refused": true,
+  "mixed_old_new_stream": true,
+  "a_known_type_marked_ignorable_is_refused_not_skipped": true,
+  "torn_tail_reported_never_decoded": true,
+  "no_newer_log_produces_a_silent_wrong_state": true
+ }
+}

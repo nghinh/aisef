@@ -257,3 +257,15 @@ class TestReadinessChanTheoCaiChanDuocChay(unittest.TestCase):
         from aisef.cli import plan
         self.assertIn("Gaps that only degrade quality are shown",
                       inspect.getsource(plan.cmd_approve))
+
+
+class TestGatesOutsideTheOrderHaveNoUpstream(ApprovalTestCase):
+    """Phase 13 mutant of `_upstream_stale`: the `improve` gate is outside GATE_ORDER — nothing upstream can stale it."""
+
+    def test_an_approved_improve_gate_stays_approved_when_the_prd_changes(self):
+        self.write(Gate.PRD, "# PRD v1")
+        self.store.approve(Gate.PRD, by="owner")
+        self.store.approve(Gate.IMPROVE, by="owner")
+        self.write(Gate.PRD, "# PRD v2")
+        self.assertIs(self.store.status(Gate.PRD), Status.STALE)
+        self.assertIs(self.store.status(Gate.IMPROVE), Status.APPROVED)

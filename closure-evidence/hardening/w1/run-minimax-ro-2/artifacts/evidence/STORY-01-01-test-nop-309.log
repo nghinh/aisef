@@ -1,0 +1,119 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 7 items
+
+tests/test_nfc_normalization.py::AC_STORY_01_01_1_IdentityTest::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte FAILED [ 14%]
+tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCEquivalenceTest::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical FAILED [ 28%]
+tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_5_no_forbidden_top_level_imports FAILED [ 42%]
+tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_6_no_forbidden_calls FAILED [ 57%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportTest::test_AC_STORY_01_01_3_import_ledgerlock_returns_init_path FAILED [ 71%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CLIHelpTest::test_AC_STORY_01_01_4_cli_help_lists_subcommands FAILED [ 85%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PackageExportsTest::test_AC_STORY_01_01_7_ledger_and_conflicterror_exported FAILED [100%]
+
+=================================== FAILURES ===================================
+_ AC_STORY_01_01_1_IdentityTest.test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte _
+
+self = <tests.test_nfc_normalization.AC_STORY_01_01_1_IdentityTest testMethod=test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte>
+
+    def test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte(self) -> None:
+>       from ledgerlock.format import normalize_key
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_nfc_normalization.py:11: ModuleNotFoundError
+_ AC_STORY_01_01_2_NFCEquivalenceTest.test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical _
+
+self = <tests.test_nfc_normalization.AC_STORY_01_01_2_NFCEquivalenceTest testMethod=test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical>
+
+    def test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical(self) -> None:
+>       from ledgerlock.format import normalize_key
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_nfc_normalization.py:20: ModuleNotFoundError
+__ SideChannelsGuardTest.test_AC_STORY_01_01_5_no_forbidden_top_level_imports __
+
+self = <tests.test_nfc_normalization.SideChannelsGuardTest testMethod=test_AC_STORY_01_01_5_no_forbidden_top_level_imports>
+
+    def test_AC_STORY_01_01_5_no_forbidden_top_level_imports(self) -> None:
+        repo_root = Path(__file__).resolve().parent.parent
+        ledger_dir = repo_root / "ledgerlock"
+>       self.assertTrue(ledger_dir.is_dir(), "ledgerlock/ package must exist")
+E       AssertionError: False is not true : ledgerlock/ package must exist
+
+tests/test_nfc_normalization.py:33: AssertionError
+________ SideChannelsGuardTest.test_AC_STORY_01_01_6_no_forbidden_calls ________
+
+self = <tests.test_nfc_normalization.SideChannelsGuardTest testMethod=test_AC_STORY_01_01_6_no_forbidden_calls>
+
+    def test_AC_STORY_01_01_6_no_forbidden_calls(self) -> None:
+        repo_root = Path(__file__).resolve().parent.parent
+        ledger_dir = repo_root / "ledgerlock"
+>       self.assertTrue(ledger_dir.is_dir(), "ledgerlock/ package must exist")
+E       AssertionError: False is not true : ledgerlock/ package must exist
+
+tests/test_nfc_normalization.py:54: AssertionError
+_ AC_STORY_01_01_3_PackageImportTest.test_AC_STORY_01_01_3_import_ledgerlock_returns_init_path _
+
+self = <tests.test_skeleton.AC_STORY_01_01_3_PackageImportTest testMethod=test_AC_STORY_01_01_3_import_ledgerlock_returns_init_path>
+
+    def test_AC_STORY_01_01_3_import_ledgerlock_returns_init_path(self) -> None:
+        repo_root = Path(__file__).resolve().parent.parent
+        result = subprocess.run(
+            [sys.executable, "-c", "import ledgerlock; print(ledgerlock.__file__)"],
+            capture_output=True,
+            text=True,
+            cwd=str(repo_root),
+            check=False,
+        )
+>       self.assertEqual(
+            result.returncode,
+            0,
+            msg=f"stderr: {result.stderr}",
+        )
+E       AssertionError: 1 != 0 : stderr: Traceback (most recent call last):
+E         File "<string>", line 1, in <module>
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_skeleton.py:19: AssertionError
+_ AC_STORY_01_01_4_CLIHelpTest.test_AC_STORY_01_01_4_cli_help_lists_subcommands _
+
+self = <tests.test_skeleton.AC_STORY_01_01_4_CLIHelpTest testMethod=test_AC_STORY_01_01_4_cli_help_lists_subcommands>
+
+    def test_AC_STORY_01_01_4_cli_help_lists_subcommands(self) -> None:
+        repo_root = Path(__file__).resolve().parent.parent
+        result = subprocess.run(
+            [sys.executable, "-m", "ledgerlock", "--help"],
+            capture_output=True,
+            text=True,
+            cwd=str(repo_root),
+            check=False,
+        )
+>       self.assertEqual(
+            result.returncode,
+            0,
+            msg=f"stderr: {result.stderr}",
+        )
+E       AssertionError: 1 != 0 : stderr: /usr/local/bin/python3: No module named ledgerlock
+
+tests/test_skeleton.py:41: AssertionError
+_ AC_STORY_01_01_7_PackageExportsTest.test_AC_STORY_01_01_7_ledger_and_conflicterror_exported _
+
+self = <tests.test_skeleton.AC_STORY_01_01_7_PackageExportsTest testMethod=test_AC_STORY_01_01_7_ledger_and_conflicterror_exported>
+
+    def test_AC_STORY_01_01_7_ledger_and_conflicterror_exported(self) -> None:
+>       from ledgerlock import ConflictError, Ledger
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_skeleton.py:57: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_nfc_normalization.py::AC_STORY_01_01_1_IdentityTest::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte
+FAILED tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCEquivalenceTest::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical
+FAILED tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_5_no_forbidden_top_level_imports
+FAILED tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_6_no_forbidden_calls
+FAILED tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportTest::test_AC_STORY_01_01_3_import_ledgerlock_returns_init_path
+FAILED tests/test_skeleton.py::AC_STORY_01_01_4_CLIHelpTest::test_AC_STORY_01_01_4_cli_help_lists_subcommands
+FAILED tests/test_skeleton.py::AC_STORY_01_01_7_PackageExportsTest::test_AC_STORY_01_01_7_ledger_and_conflicterror_exported
+============================== 7 failed in 0.10s ===============================

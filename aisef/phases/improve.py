@@ -354,6 +354,11 @@ def repair_story(
         covers=list(owner.covers), write_scope=scope, depends_on=[],
         screens=screens, verification_contract=kinds,
     )
+    # A repair story exists because the behaviour is NOT there now: its criterion must go red -> green, which is
+    # exactly CHANGE_REQUIRED (TDD proof policy V2). The obligation is declared here, where the story is planned —
+    # the gate never infers it at runtime.
+    story.ac_proof = {f"AC-{sid}-1": {"ac_id": f"AC-{sid}-1", "proof_mode": "CHANGE_REQUIRED",
+                                      "requirement": (owner.covers or [""])[0] or b.id}}
     preservation = complexity.verified_touched(
         story, led.as_dict(), complexity.read_scopes(project))
     return register_story(
@@ -712,6 +717,12 @@ def _improve_owned(
             cost_cap=cost_cap, auto=auto, approvals=approvals,
             outside=[b for b in gaps if b not in queue],
         )
+        if auto and _epic_rows(led, epic_id) and approvals.status(Gate.IMPROVE) is not Status.APPROVED:
+            # SS-54: the owner's flag waives the gate for the next round — say so where the run is read, with the
+            # gate's status; the repair stories of this round are inside the improve digest, never outside every one
+            from ..harness.runlog import run_log
+            run_log(root, f"epic={epic_id} improve gate {approvals.status(Gate.IMPROVE).value} — waived by --auto "
+                          f"before round {len(_epic_rows(led, epic_id)) + 1}")
         # Whichever source gives the more specific stop wins; tie-breaker is
         # the unified verdict so the new rule has a single owner.  The
         # legacy qualification list still names concrete evidence reasons

@@ -1,0 +1,74 @@
+EPIC-01 · wave 1
+  ○ STORY-01-01: already done, skipped
+EPIC-01 · wave 2
+  ○ STORY-01-02: already done, skipped
+EPIC-01 · wave 3
+  ○ STORY-01-03: already done, skipped
+EPIC-01 · wave 4
+  ○ STORY-01-04: already done, skipped
+EPIC-01 · wave 5
+  ○ STORY-01-05: already done, skipped
+EPIC-01 · wave 6
+  ○ STORY-01-06: already done, skipped
+EPIC-02 · wave 1
+  ○ STORY-02-01: already done, skipped
+EPIC-02 · wave 2
+  ○ STORY-02-02: already done, skipped
+EPIC-03 · wave 1
+  ○ STORY-03-01: already done, skipped
+EPIC-03 · wave 2
+STORY-03-02: DONE
+  [attempt 1] ok
+EPIC-04 · wave 1
+STORY-04-01: NOT DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 7 criteria each showed what their obligation asks at parent SHA 3605e9f (6 change required, 1 preserve required); 6 executed red, 0 unable to import code this story introduces
+    ✅ tests verify story — 7 criteria each showed what their obligation asks at parent SHA 3605e9f (6 change required, 1 preserve required); 6 executed red, 0 unable to import code this story introduces
+    ✗ security — 1 blocking items: [high] ledgerlock/cli.py:62 — exit-code contract (AD-9/FR-12) not enforced for any error path: `main()` never routes library exceptions through `_exit_for`, so missing ledger/batch/`--out` (should be 
+    ✅ review
+    ✅ preservation — 11 behaviours of other stories still green
+  [attempt 2] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 7 criteria each showed what their obligation asks at parent SHA 3605e9f (6 change required, 1 preserve required); 6 executed red, 0 unable to import code this story introduces
+    ✅ tests verify story — 7 criteria each showed what their obligation asks at parent SHA 3605e9f (6 change required, 1 preserve required); 6 executed red, 0 unable to import code this story introduces
+    ✗ security — 1 blocking items: [high] ledgerlock/cli.py:82 — verify on a truncated/unparseable ledger line raises json.JSONDecodeError (ValueError), which main() maps to exit 2 instead of 5, misclassifying corruption as a usage err
+    ✅ review
+    ✅ preservation — 11 behaviours of other stories still green
+  [attempt 3] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 7 criteria each showed what their obligation asks at parent SHA 3605e9f (6 change required, 1 preserve required); 6 executed red, 0 unable to import code this story introduces
+    ✅ tests verify story — 7 criteria each showed what their obligation asks at parent SHA 3605e9f (6 change required, 1 preserve required); 6 executed red, 0 unable to import code this story introduces
+    ✗ security — 1 blocking items: [high] ledgerlock/cli.py:84 — verify still crashes on a corrupted line that is valid JSON but not an object (e.g. `[]`): `json.loads` succeeds, then `obj.get(...)` raises AttributeError, which main() 
+    ✅ review
+    ✅ preservation — 11 behaviours of other stories still green
+  ✗ tried 3 attempts, still did not pass gate
+
+⏸ stopped at EPIC-04 · wave 1

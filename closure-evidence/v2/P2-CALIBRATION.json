@@ -1,0 +1,102 @@
+{
+ "record": "AISEF V2 — P2 CALIBRATION",
+ "work_package": "WP-2.2",
+ "rfc_sections": [
+  "9.1",
+  "9.1.1",
+  "9.1.2"
+ ],
+ "frozen_items": [
+  "F5"
+ ],
+ "rule": "a counterexample produces the verdict opposite to candidate_expectation; a ProbeCapabilityCalibration exists only when the positive fixture is observed SATISFIED and the negative one REFUTED",
+ "calibrations": [
+  {
+   "probe_id": "probe.python_callable",
+   "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+   "observation_class": "exists",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable/exists/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable/exists/negative",
+   "demonstrated_at": 1790422264.95011
+  },
+  {
+   "probe_id": "probe.python_callable",
+   "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+   "observation_class": "returns",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable/returns/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable/returns/negative",
+   "demonstrated_at": 1790422265.252175
+  },
+  {
+   "probe_id": "probe.python_callable",
+   "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+   "observation_class": "raises",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable/raises/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable/raises/negative",
+   "demonstrated_at": 1790422265.555021
+  },
+  {
+   "probe_id": "probe.python_callable",
+   "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+   "observation_class": "blocks",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/negative",
+   "demonstrated_at": 1790422266.431432
+  }
+ ],
+ "contrast_table": {
+  "SATISFIED expected, SATISFIED observed": false,
+  "SATISFIED expected, REFUTED observed": true,
+  "SATISFIED expected, INDETERMINATE observed": false,
+  "REFUTED expected, SATISFIED observed": true,
+  "REFUTED expected, REFUTED observed": false,
+  "REFUTED expected, INDETERMINATE observed": false
+ },
+ "CAL_1_always_refuted_probe": {
+  "exists": "REJECTED: positive fixture observed Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None) — no contrast with a REFUTED expectation",
+  "returns": "REJECTED: positive fixture observed Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None) — no contrast with a REFUTED expectation",
+  "raises": "REJECTED: positive fixture observed Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None) — no contrast with a REFUTED expectation",
+  "blocks": "REJECTED: positive fixture observed Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None) — no contrast with a REFUTED expectation"
+ },
+ "always_satisfied_probe": {
+  "exists": "REJECTED: negative fixture observed Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None) — no contrast with a SATISFIED expectation",
+  "returns": "REJECTED: negative fixture observed Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None) — no contrast with a SATISFIED expectation",
+  "raises": "REJECTED: negative fixture observed Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None) — no contrast with a SATISFIED expectation",
+  "blocks": "REJECTED: negative fixture observed Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None) — no contrast with a SATISFIED expectation"
+ },
+ "PROBE_META_1_protocol_only_probe": {
+  "exists": "QUALIFIED",
+  "returns": "QUALIFIED",
+  "raises": "QUALIFIED",
+  "blocks": "QUALIFIED"
+ },
+ "spec_falsifiability": {
+  "mechanisms": [
+   "controlled_product_mutation",
+   "fixture_construction",
+   "other_qualified"
+  ],
+  "plan_freeze_prerequisite": false,
+  "planning_modules_scanned": [
+   "aisef2/plan/__init__.py",
+   "aisef2/plan/drift.py",
+   "aisef2/plan/obligation.py",
+   "aisef2/plan/static_admission.py",
+   "aisef2/plan/story_admission.py"
+  ]
+ },
+ "f5_conformance": {
+  "state": "PASS",
+  "detail": "both calibration contracts and the mechanism literal equal the RFC"
+ },
+ "properties": {
+  "contrast_for_both_polarities": true,
+  "reference_probe_qualified_for_every_class": true,
+  "CAL_1_always_refuted_prohibition_probe_rejected": true,
+  "always_satisfied_probe_rejected_for_must_hold": true,
+  "PROBE_META_1_protocol_only_probe_calibrated": true,
+  "blocks_class_calibrated": true,
+  "spec_falsifiability_not_a_plan_freeze_input": true,
+  "f5_calibration_contracts_equal_rfc": true
+ }
+}

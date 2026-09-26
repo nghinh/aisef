@@ -1,0 +1,335 @@
+{
+ "record": "AISEF V2 — P2 FINAL SEAL",
+ "id": "P2-FINAL-SEAL",
+ "authority": "AISEF V2 — OWNER ACCEPTS P2 / AUTHORIZE P3 RECORD AUTHORITY (owner decision, 2026-09-22)",
+ "owner_acceptance": "P2 CORRECTED is ACCEPTED and COMPLETE; ARCHITECTURE-EXCEPTION-V2-002 accepted and applied",
+ "supersedes": [
+  {
+   "path": "closure-evidence/v2/P2-COMPLETION-CORRECTION-V2-002.json",
+   "sha256": "bda9e075596c8c395a91c5d22a2d470ef46abb29fe8f87ad4f727ff7fdc85a34",
+   "committed_in": "0932466998e090769049b5fa9c62875c50b3b1eb",
+   "verdict_then": "P2 CORRECTED — READY FOR OWNER ACCEPTANCE",
+   "status_now": "accepted by the owner; sealed here; kept byte-identical"
+  },
+  {
+   "path": "closure-evidence/v2/P2-COMPLETION.json",
+   "sha256": "a463d38ff0fb690d36b78e0fe55e96fd3b22854ff6ca7c8e4e53af852db0f230",
+   "status_now": "superseded by the correction record; kept byte-identical"
+  }
+ ],
+ "p2_baseline": {
+  "original_candidate": {
+   "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+   "tree": "1353400d4cd8384d5a6ea9f07e960b0d88e92f7f",
+   "aisef2_tree": "209f1ef32d86218a8a6c3194fd60e23492b86ade",
+   "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "corrected_candidate": {
+   "commit": "8a3a7cc95395c2a160fdbbde7895434394c12a6c",
+   "tree": "70b9f8ef434e560c820b19e9e2d146df5d98b3be",
+   "aisef2_tree": "07c96faf760649289bbe53ff62b7fa07e876c899",
+   "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "correction_record": {
+   "commit": "0932466998e090769049b5fa9c62875c50b3b1eb",
+   "path": "closure-evidence/v2/P2-COMPLETION-CORRECTION-V2-002.json",
+   "sha256": "bda9e075596c8c395a91c5d22a2d470ef46abb29fe8f87ad4f727ff7fdc85a34"
+  }
+ },
+ "architecture_lineage": {
+  "exception": {
+   "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+   "sha256": "400a753f392d60c158c53b3ffa263d207ee56e8495841bfc03be20e8a0e0350b"
+  },
+  "amendment": {
+   "path": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+   "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f"
+  },
+  "links": [
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+    "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+    "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+    "frozen_items_changed": [
+     "F2"
+    ],
+    "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+    "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+    "frozen_items_changed": [
+     "F5"
+    ],
+    "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+    "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114"
+   }
+  ],
+  "lineage_valid": true,
+  "effective": {
+   "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+   "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114"
+  },
+  "equals_lineage_end": true,
+  "rfc_last_changed_by": "8a3a7cc95395c2a160fdbbde7895434394c12a6c"
+ },
+ "mutation": {
+  "path": "closure-evidence/v2/P2-MUTATION.json",
+  "sha256": "7f398a027ec2624133f9d5aa7bea1c554b5cbc809c5643139cf50e7a2980f819",
+  "targets": 35,
+  "mutants": 1137,
+  "killed": 1137,
+  "audited": 0
+ },
+ "checker_calibration": {
+  "calibrated": 21,
+  "checkers": 21
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/P2-RUN-HISTORY.json",
+  "sha256_at_seal": "9a14f0976784a0e6307d8cd296a25ed52f18f43c195fd41437a1e787136f54e8",
+  "total_attempts": 44,
+  "failed_attempts": 0,
+  "erased_attempts": 0,
+  "retries": 0,
+  "committed_versions_checked": 8,
+  "first_attempt_pass_everywhere": true,
+  "gate_green": {
+   "8a3a7cc95395": true,
+   "0932466998e0": true
+  },
+  "closed": "sealed at total_attempts: run_history.py --check fails if an entry is added or removed",
+  "seal_commit_verification": "the seal cannot contain its own verification; the seal commit's local and CI attempts are the first entries of P3-RUN-HISTORY.json"
+ },
+ "f1_f11": {
+  "current_phase": "P2",
+  "summary": {
+   "PASS": 6,
+   "PENDING": 5,
+   "FAIL": 0
+  },
+  "items": {
+   "F1": "PENDING",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PASS",
+   "F6": "PASS",
+   "F7": "PASS",
+   "F8": "PENDING",
+   "F9": "PENDING",
+   "F10": "PENDING",
+   "F11": "PENDING"
+  }
+ },
+ "v1_evidence_identity": {
+  "detective_guard": true,
+  "guard": {
+   "path": "validation/v2/v1_evidence_guard.py",
+   "sha256": "2a3135e9669101894f8b334f5fa15d7fb73ed3435e5d79c50fdf3cd451148ede"
+  },
+  "baseline": {
+   "path": "closure-evidence/v2/V1-EVIDENCE-BASELINE.json",
+   "sha256": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb"
+  },
+  "w0_qualification_byte_identical": true,
+  "w0_sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_unchanged": true
+ },
+ "v1_pf_001": {
+  "status": "OPEN_IN_V1",
+  "v2_resolution_owner": "WP-4.2",
+  "recurrences_in_p2": 0,
+  "ci_attempts_searched": 35,
+  "search": "_kill_tree_win32|MemoryError in every CI job log"
+ },
+ "carried_residuals": [
+  {
+   "id": "P2-RESIDUAL-ORPHAN-SUBJECT",
+   "to": "WP-4.2",
+   "what": "harness/subject processes orphaned (parent PID 1) and left running: validation/v2/mutation.py stops only its direct child on timeout (subprocess.run(timeout=)), and a harness whose controller dies is not reaped — no process-range containment yet"
+  },
+  {
+   "id": "P2-RESIDUAL-SIGNAL-SOURCE",
+   "to": "WP-4.6",
+   "what": "a harness process killed by a signal after DISPATCHED is UNRUNNABLE: the probe cannot tell whether the subject or the environment sent the signal; this is not the expiry of the observation window"
+  },
+  {
+   "id": "V1-PF-001",
+   "to": "WP-4.2",
+   "what": "latent V1 _kill_tree_win32 PID-cycle defect (P0, OPEN_IN_V1); WIN-PID-1/2 are WP-4.2 acceptance cases"
+  }
+ ],
+ "exit_checks": [
+  {
+   "check": "plan_validate: zero problems, generated docs in sync",
+   "command": "python -P validation/v2/plan_validate.py --validate --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "generated artefacts in sync"
+  },
+  {
+   "check": "PLANDEP-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 32"
+  },
+  {
+   "check": "PLANDEP-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANDEP-3: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-3",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANDEP-4: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-4",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANSEM-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANSEM-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANSEM-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANSEM-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 4"
+  },
+  {
+   "check": "freeze manifest: RFC digests equal the end of the approval lineage",
+   "command": "python -P validation/v2/freeze_manifest.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "freeze manifest: PASS"
+  },
+  {
+   "check": "architecture catalog --check",
+   "command": "python -P validation/v2/gen_arch_catalog.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "architecture catalog: PASS"
+  },
+  {
+   "check": "F1-F11 conformance at CURRENT_PHASE=P2 (ratchet)",
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "summary {'PASS': 6, 'PENDING': 5, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "check": "Q0 checker calibration",
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "calibrated 21/21; always-PASS mutants rejected 21/21"
+  },
+  {
+   "check": "compiler --check",
+   "command": "python -P validation/v2/gen_specs.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "specs: PASS"
+  },
+  {
+   "check": "P1 evidence records current",
+   "command": "python -P validation/v2/p1_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p1 evidence: PASS"
+  },
+  {
+   "check": "P2 evidence records current, every property true",
+   "command": "python -P validation/v2/p2_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p2 evidence: PASS"
+  },
+  {
+   "check": "mutation records current (P1 and P2), every target fully killed",
+   "command": "python -P validation/v2/mutation.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "check": "kernel static checks",
+   "command": "python -P validation/v2/kernel_static_checks.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "check": "run history: P1 and P2 sealed, append-only, policy-consistent",
+   "command": "python -P validation/v2/run_history.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "run history: PASS"
+  },
+  {
+   "check": "V1 evidence guard, detective",
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  }
+ ],
+ "architecture_exceptions": [
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-001",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-002",
+   "status": "APPROVED — APPLIED"
+  }
+ ],
+ "unapproved_architecture_exceptions": [],
+ "stop_rules_triggered": [],
+ "p3": {
+  "authorization": "AISEF V2 — OWNER ACCEPTS P2 / AUTHORIZE P3 RECORD AUTHORITY (owner decision, 2026-09-22): P3 authorized after this seal; P4 not authorized",
+  "started_at_seal": false
+ },
+ "verdict": "P2 FINAL SEALED"
+}

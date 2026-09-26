@@ -1,0 +1,18 @@
+{
+ "run": "gpt56sol-1",
+ "generated": "2026-09-19T20:08:57+0700",
+ "finding": "SS-95",
+ "finish_record_false_block_count": 0,
+ "false_block_count": 0,
+ "false_block": [],
+ "measured_at_candidate_for": [
+  "STORY-01-01"
+ ],
+ "candidates": {
+  "STORY-01-01": {
+   "sha": "72aabd591dc1b66f5b86472e8b6f322e9c61edf7",
+   "parse_complete": true,
+   "note": null
+  }
+ }
+}

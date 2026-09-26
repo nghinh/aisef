@@ -1,0 +1,24 @@
+{
+  "gate": "mockups",
+  "artifact": "design-contract.json",
+  "artifact_sha256": "72c3bf3623cf772c96981b41bb4580e6962209c23d66ca686dd7d0291dfb3932",
+  "status": "approved",
+  "seq": 13,
+  "decided_by": "nghinh",
+  "decided_at": "2026-09-20T17:59:40+00:00",
+  "note": "W1-LEDGERLOCK-PLAN-V2 re-approval of `mockups`: the artifacts this gate signs are byte-identical to the approved plan base 1621a2bce231, so the previous plan's signature is stale for that reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first (closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)",
+  "machine_checks": {
+    "screens": "5",
+    "machine gate": "pass",
+    "warnings": "verify: mockup has no verifiable components; snapshot: mockup has no verifiable components; apply: mockup has no verifiable components; repair-tail: mockup has no verifiable components; help-version: mockup has no verifiable components"
+  },
+  "history": [
+    {
+      "status": "approved",
+      "decided_by": "auto",
+      "decided_at": "2026-09-15T13:31:22+00:00",
+      "note": "auto-approved (--auto-approve); this step always needs human review",
+      "artifact_sha256": "72c3bf3623cf772c96981b41bb4580e6962209c23d66ca686dd7d0291dfb3932"
+    }
+  ]
+}

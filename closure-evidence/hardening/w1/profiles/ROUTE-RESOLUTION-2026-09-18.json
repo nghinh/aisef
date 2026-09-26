@@ -1,0 +1,338 @@
+{
+ "measured": "2026-09-18, operator's 9router account + direct MiniMax provider, OpenCode 1.18.31",
+ "method": "router /v1/models listing (no model call), then minimal chat completions (stream, max_tokens 32000 as OpenCode sends), then an OpenCode tool-use smoke run (write a file, cat it) per candidate",
+ "mycombo": {
+  "owned_by": "combo",
+  "route_kind": "DYNAMIC_COMBO",
+  "answered_by_today": "MiniMax-M3 on 3/3 probes",
+  "consequence": "the model behind any call in W1 runs 1-3 is not identifiable; PROFILE-W1-OC-MYCOMBO-T40 is a non-fixed-model profile"
+ },
+ "fixed_model_routes_that_work_end_to_end": [
+  "9router/cx/gpt-5.6-sol",
+  "9router/cx/gpt-5.5",
+  "9router/ds/deepseek-v4-pro",
+  "minimax/MiniMax-M3 (direct)",
+  "9router/max/MiniMax-M3"
+ ],
+ "unavailable": {
+  "9router/or/openai/gpt-5.4 (and every or/*)": "402 \u2014 the OpenRouter account can afford 2475 tokens against OpenCode's 32000-token request; adding credits is a purchase for the operator",
+  "9router/cx/gpt-5.4, cx/gpt-5.3-codex-spark": "400 \u2014 not supported when using Codex with a ChatGPT account",
+  "9router/gh/* (gpt-5.4, gpt-5.3-codex, claude-sonnet-5, claude-opus-5)": "402 \u2014 GitHub monthly quota exceeded (claude-opus-5 answered one probe, then 402 on both tool-use runs)",
+  "9router/freellm/*": "404 not in catalog / 429 all routes exhausted",
+  "9router/kira-ai/gpt-5.4, claude-sonnet-5": "503 \u2014 under maintenance",
+  "9router/gh/kimi-k2.7-code": "400 \u2014 rejects the reasoning_effort the router sends"
+ },
+ "also_observed": "OpenCode's small_model 9router/fast (session titles) routes to codex gpt-5.4-mini, which the Codex account refuses \u2014 title generation fails and retries; identical in every profile, recorded in each profile's small_model",
+ "probes": {
+  "probe1": [
+   {
+    "requested": "mycombo",
+    "answered_by": "MiniMax-M3",
+    "usage": {
+     "prompt_tokens": 2049,
+     "completion_tokens": 2,
+     "total_tokens": 2051
+    },
+    "seconds": 1.9,
+    "router_headers": {}
+   },
+   {
+    "requested": "mycombo",
+    "answered_by": "MiniMax-M3",
+    "usage": {
+     "prompt_tokens": 2049,
+     "completion_tokens": 2,
+     "total_tokens": 2051
+    },
+    "seconds": 0.8,
+    "router_headers": {}
+   },
+   {
+    "requested": "mycombo",
+    "answered_by": "MiniMax-M3",
+    "usage": {
+     "prompt_tokens": 2049,
+     "completion_tokens": 2,
+     "total_tokens": 2051
+    },
+    "seconds": 2.0,
+    "router_headers": {}
+   },
+   {
+    "requested": "cx/gpt-5.4",
+    "error": "HTTPError: HTTP Error 503: Service Unavailable"
+   },
+   {
+    "requested": "cx/gpt-5.4",
+    "error": "HTTPError: HTTP Error 503: Service Unavailable"
+   }
+  ],
+  "probe2": [
+   {
+    "route": "9router/cx/gpt-5.4",
+    "http": 503,
+    "body": "{\"error\":{\"message\":\"[codex/gpt-5.4] [400]: {\\\"detail\\\":\\\"The 'gpt-5.4' model is not supported when using Codex with a ChatGPT account.\\\"} (reset after 15s)\"}}"
+   },
+   {
+    "route": "9router/gh/gpt-5.4",
+    "http": 503,
+    "body": "{\"error\":{\"message\":\"[github/gpt-5.4] [402]: {\\\"error\\\":{\\\"message\\\":\\\"You have exceeded your monthly quota\\\",\\\"code\\\":\\\"quota_exceeded\\\"}}\\n (reset after 2m)\"}}"
+   },
+   {
+    "route": "9router/freellm/gpt-5.4",
+    "http": 503,
+    "body": "{\"error\":{\"message\":\"[openai-compatible-chat-ed05727e-093c-4b0e-92b8-377850bb03c0/gpt-5.4] [404]: {\\\"error\\\":{\\\"message\\\":\\\"Model 'gpt-5.4' is not in the catalog. Use 'auto' (or omit the 'model' field) to auto-route, or "
+   },
+   {
+    "route": "9router/kira-ai/gpt-5.4",
+    "http": 503,
+    "body": "{\"error\":{\"message\":\"[openai-compatible-chat-0e0a5a21-53a0-4e8d-89f5-860191b34d1f/gpt-5.4] [503]: {\\\"error\\\":{\\\"message\\\":\\\"Model 'GPT 5.4' is currently under maintenance. Please try again later or select another model.\\"
+   },
+   {
+    "route": "9router/or/openai/gpt-5.4",
+    "answered_by": "openai/gpt-5.4",
+    "usage": {
+     "prompt_tokens": 2013,
+     "completion_tokens": 5,
+     "total_tokens": 2018,
+     "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+     },
+     "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "image_tokens": 0,
+      "audio_tokens": 0
+     }
+    },
+    "s": 1.9
+   },
+   {
+    "route": "9router/gh/gpt-5.3-codex",
+    "http": 503,
+    "body": "{\"error\":{\"message\":\"[github/gpt-5.3-codex] [402]: {\\\"error\\\":{\\\"message\\\":\\\"You have exceeded your monthly quota\\\",\\\"code\\\":\\\"quota_exceeded\\\"}}\\n (reset after 1m 51s)\"}}"
+   },
+   {
+    "route": "9router/minimax/MiniMax-M3",
+    "answered_by": "MiniMax-M3",
+    "usage": {
+     "prompt_tokens": 2183,
+     "completion_tokens": 16,
+     "total_tokens": 2199,
+     "prompt_tokens_details": {
+      "cached_tokens": 128
+     },
+     "completion_tokens_details": {
+      "reasoning_tokens": 15
+     }
+    },
+    "s": 1.1
+   },
+   {
+    "route": "minimax/MiniMax-M3",
+    "answered_by": "MiniMax-M3",
+    "usage": {
+     "total_tokens": 199,
+     "total_characters": 0,
+     "prompt_tokens": 183,
+     "completion_tokens": 16,
+     "completion_tokens_details": {
+      "reasoning_tokens": 15
+     },
+     "prompt_tokens_details": {
+      "cached_tokens": 128
+     }
+    },
+    "s": 1.1
+   }
+  ],
+  "probe3": [
+   {
+    "route": "minimax/MiniMax-M3",
+    "ok": true,
+    "answered_by": "MiniMax-M3",
+    "text": "<think>The user want",
+    "s": 1.5
+   },
+   {
+    "route": "9router/max/MiniMax-M3",
+    "ok": true,
+    "answered_by": "MiniMax-M3",
+    "text": "ok",
+    "s": 2.7
+   },
+   {
+    "route": "9router/freellm/gpt-5.3-codex",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[openai-compatible-chat-ed05727e-093c-4b0e-92b8-377850bb03c0/gpt-5.3-codex] [404]: {\\\"error\\\":{\\\"message\\\":\\\"Model 'gpt-5.3-codex' is not in the cata"
+   },
+   {
+    "route": "9router/freellm/kimi-k2.7-code",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[openai-compatible-chat-ed05727e-093c-4b0e-92b8-377850bb03c0/kimi-k2.7-code] [429]: {\\\"error\\\":{\\\"message\\\":\\\"All models exhausted: 1 route checked ("
+   },
+   {
+    "route": "9router/freellm/qwen3-coder-480b",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[openai-compatible-chat-ed05727e-093c-4b0e-92b8-377850bb03c0/qwen3-coder-480b] [429]: {\\\"error\\\":{\\\"message\\\":\\\"All models exhausted: 1 route checked"
+   },
+   {
+    "route": "9router/gh/kimi-k2.7-code",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[github/kimi-k2.7-code] [400]: {\\\"error\\\":{\\\"message\\\":\\\"reasoning_effort \\\\\\\"high\\\\\\\" was provided, but model kimi-k2.7-code does not support reason"
+   },
+   {
+    "route": "9router/or/moonshotai/kimi-k2.7-code",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[openai-compatible-chat-002829f3-033f-43ce-a923-4377e0f4210e/moonshotai/kimi-k2.7-code] [402]: {\\\"error\\\":{\\\"message\\\":\\\"This request requires more c"
+   },
+   {
+    "route": "9router/or/openai/gpt-5.3-codex",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[openai-compatible-chat-002829f3-033f-43ce-a923-4377e0f4210e/openai/gpt-5.3-codex] [402]: {\\\"error\\\":{\\\"message\\\":\\\"This request requires more credit"
+   }
+  ],
+  "probe4": [
+   {
+    "route": "cx/gpt-5.5",
+    "ok": true,
+    "answered_by": "gpt-5.5",
+    "text": "ok",
+    "s": 2.4
+   },
+   {
+    "route": "cx/gpt-5.6-sol",
+    "ok": true,
+    "answered_by": "gpt-5.6-sol",
+    "text": "ok",
+    "s": 2.3
+   },
+   {
+    "route": "cx/gpt-5.6-terra",
+    "ok": true,
+    "answered_by": "gpt-5.6-terra",
+    "text": "ok",
+    "s": 2.0
+   },
+   {
+    "route": "cx/gpt-5.6-luna",
+    "ok": true,
+    "answered_by": "gpt-5.6-luna",
+    "text": "ok",
+    "s": 2.4
+   },
+   {
+    "route": "cx/gpt-5.3-codex-spark",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[codex/gpt-5.3-codex-spark] [400]: {\\\"detail\\\":\\\"The 'gpt-5.3-codex-spark' model is not supported when using Codex with a ChatGPT"
+   },
+   {
+    "route": "gh/claude-opus-5",
+    "ok": true,
+    "answered_by": "claude-opus-5",
+    "text": "ok",
+    "s": 2.6
+   },
+   {
+    "route": "gh/claude-sonnet-5",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[github/claude-sonnet-5] [402]: {\\\"error\\\":{\\\"message\\\":\\\"You have exceeded your monthly quota\\\",\\\"code\\\":\\\"quota_exceeded\\\"}}\\n "
+   },
+   {
+    "route": "kira-ai/claude-sonnet-5",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[openai-compatible-chat-0e0a5a21-53a0-4e8d-89f5-860191b34d1f/claude-sonnet-5] [503]: {\\\"error\\\":{\\\"message\\\":\\\"Model 'Claude Sonn"
+   },
+   {
+    "route": "ds/deepseek-v4-pro",
+    "ok": true,
+    "answered_by": "deepseek-v4-pro",
+    "text": "ok",
+    "s": 1.7
+   },
+   {
+    "route": "gemini/gemini-3.1-pro-preview",
+    "ok": true,
+    "answered_by": "gemini-3.1-pro-preview",
+    "text": "ok",
+    "s": 3.4
+   },
+   {
+    "route": "nvidia-gemma/deepseek-ai/deepseek-v4-pro-0813",
+    "ok": false,
+    "http": 503,
+    "why": "{\"error\":{\"message\":\"[openai-compatible-chat-6c3e8209-0c43-4b9f-b3fe-6c39dc294c2a/deepseek-ai/deepseek-v4-pro-0813] [410]: {\\\"type\\\":\\\"about:blank\\\",\\"
+   },
+   {
+    "route": "kira-ai/deepseek-v4-pro",
+    "ok": true,
+    "answered_by": "deepseek-v4-pro",
+    "text": "ok",
+    "s": 2.7
+   }
+  ]
+ },
+ "opencode_tool_smoke_first_batch": [
+  {
+   "model": "cx/gpt-5.6-sol",
+   "file_written": false,
+   "tool_calls": [],
+   "errors": [
+    "{'type': 'error', 'timestamp': 1789706182401, 'sessionID': 'ses_f4d32e7d9ffehoXU8t1ZVY1QTF', 'error': {'name': 'UnknownError', 'data': {'message': 'Unexpected s"
+   ],
+   "exit": 1,
+   "s": 2.8
+  },
+  {
+   "model": "cx/gpt-5.5",
+   "file_written": false,
+   "tool_calls": [],
+   "errors": [
+    "{'type': 'error', 'timestamp': 1789706184958, 'sessionID': 'ses_f4d32ddc6ffeBpeEztP9AMhxWM', 'error': {'name': 'UnknownError', 'data': {'message': 'Unexpected s"
+   ],
+   "exit": 1,
+   "s": 2.5
+  },
+  {
+   "model": "gh/claude-opus-5",
+   "file_written": false,
+   "tool_calls": [],
+   "errors": [
+    "{'type': 'error', 'timestamp': 1789706187421, 'sessionID': 'ses_f4d32d3dfffe7zh42CV21kZgLC', 'error': {'name': 'UnknownError', 'data': {'message': 'Unexpected s"
+   ],
+   "exit": 1,
+   "s": 2.4
+  },
+  {
+   "model": "ds/deepseek-v4-pro",
+   "file_written": false,
+   "tool_calls": [],
+   "errors": [
+    "{'type': 'error', 'timestamp': 1789706189955, 'sessionID': 'ses_f4d32ca1effeZXW0vyWikyHQoi', 'error': {'name': 'UnknownError', 'data': {'message': 'Unexpected s"
+   ],
+   "exit": 1,
+   "s": 2.5
+  }
+ ],
+ "opencode_tool_smoke_retries": [
+  "cx/gpt-5.5 try1: file=ready tools=['apply_patch', 'bash'] err=[]",
+  "cx/gpt-5.5 try2: file=ready tools=['apply_patch', 'bash'] err=[]",
+  "gh/claude-opus-5 try1: file=NONE tools=[] err=['[github/claude-opus-5] [402]: {\"error\":{\"message\":\"You have ']",
+  "gh/claude-opus-5 try2: file=NONE tools=[] err=['[github/claude-opus-5] [402]: {\"error\":{\"message\":\"You have ']",
+  "cx/gpt-5.6-sol try1: file=ready tools=['apply_patch', 'bash'] err=[]",
+  "cx/gpt-5.6-sol try2: file=ready tools=['serena_initial_instructions', 'apply_patch', 'bash', 'bash', 'bash', 'bash'] err=[]",
+  "",
+  "[exited with code 0]"
+ ]
+}

@@ -1,0 +1,84 @@
+F401 [*] `sys` imported but unused
+ --> tests/test_nfc_normalization.py:4:8
+  |
+3 | import subprocess
+4 | import sys
+  |        ^^^
+5 | import unicodedata
+6 | import unittest
+  |
+help: Remove unused import: `sys`
+  |
+3 | import subprocess
+  - import sys
+4 | import unicodedata
+  |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_nfc_normalization.py:35:18
+   |
+33 |         ledger_dir = repo_root / "ledgerlock"
+34 |         self.assertTrue(ledger_dir.is_dir(), "ledgerlock/ package must exist")
+35 |         result = subprocess.run(
+   |                  ^^^^^^^^^^^^^^
+36 |             [
+37 |                 "grep",
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_nfc_normalization.py:55:18
+   |
+53 |         ledger_dir = repo_root / "ledgerlock"
+54 |         self.assertTrue(ledger_dir.is_dir(), "ledgerlock/ package must exist")
+55 |         result = subprocess.run(
+   |                  ^^^^^^^^^^^^^^
+56 |             [
+57 |                 "grep",
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:12:18
+   |
+10 |     def test_AC_STORY_01_01_3_import_ledgerlock_returns_init_path(self) -> None:
+11 |         repo_root = Path(__file__).resolve().parent.parent
+12 |         result = subprocess.run(
+   |                  ^^^^^^^^^^^^^^
+13 |             [sys.executable, "-c", "import ledgerlock; print(ledgerlock.__file__)"],
+14 |             capture_output=True,
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:33:18
+   |
+31 |     def test_AC_STORY_01_01_4_cli_help_lists_subcommands(self) -> None:
+32 |         repo_root = Path(__file__).resolve().parent.parent
+33 |         result = subprocess.run(
+   |                  ^^^^^^^^^^^^^^
+34 |             [sys.executable, "-m", "ledgerlock", "--help"],
+35 |             capture_output=True,
+   |
+help: Add explicit `check=False`
+
+F401 [*] `ledgerlock.ConflictError` imported but unused
+  --> tests/test_skeleton.py:55:32
+   |
+53 | class AC_STORY_01_01_7_PackageExportsTest(unittest.TestCase):
+54 |     def test_AC_STORY_01_01_7_ledger_and_conflicterror_exported(self) -> None:
+55 |         from ledgerlock import ConflictError, Ledger
+   |                                ^^^^^^^^^^^^^
+56 |
+57 |         self.assertTrue(callable(Ledger))
+   |
+help: Remove unused import: `ledgerlock.ConflictError`
+   |
+54 |     def test_AC_STORY_01_01_7_ledger_and_conflicterror_exported(self) -> None:
+   -         from ledgerlock import ConflictError, Ledger
+55 +         from ledgerlock import Ledger
+56 |
+   |
+
+Found 6 errors.
+[*] 2 fixable with the `--fix` option.

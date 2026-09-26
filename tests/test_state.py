@@ -432,3 +432,65 @@ class TestClaim(StateTestCase):
         }))
         state = self.store.load()
         self.assertEqual(state.stories["S-01"].claimed_by, "")
+
+
+class TestLeaseEdges(unittest.TestCase):
+    """Phase 13 mutants of `claim_is_live` and `StateStore.transition` (INV-M.1, SS-50, SS-52)."""
+
+    def _rec(self, **kw):
+        from aisef.control.state import StoryRecord
+        return StoryRecord(id="S", epic_id="E", status="running", **kw)
+
+    def test_no_claim_is_not_live(self):
+        from aisef.control.state import claim_is_live
+        self.assertFalse(claim_is_live(self._rec()))
+
+    def test_an_orphaned_claim_on_this_host_is_not_live_even_with_a_term(self):
+        import socket
+        import time
+        from aisef.control.state import claim_is_live
+        self.assertFalse(claim_is_live(self._rec(claimed_by=f"{socket.gethostname()}:{2 ** 22 - 7}", lease_until=time.time() + 600)))
+
+    def test_a_term_less_claim_from_another_host_is_not_live(self):
+        from aisef.control.state import claim_is_live
+        self.assertFalse(claim_is_live(self._rec(claimed_by="other-host:1")))
+
+    def test_a_term_less_claim_by_a_live_local_process_is_live(self):
+        import os
+        import socket
+        from aisef.control.state import claim_is_live
+        self.assertTrue(claim_is_live(self._rec(claimed_by=f"{socket.gethostname()}:{os.getpid()}")))
+
+    def _store(self, root, **rec):
+        from aisef.control.state import StoryRecord
+        st = StateStore(root); st.save(SprintState(stories={"S": StoryRecord(id="S", epic_id="E", status="running", **rec)})); return st
+
+    def test_an_unattributed_write_is_refused_against_another_hosts_live_claim_but_not_a_local_one(self):
+        import os
+        import socket
+        import time
+        with tempfile.TemporaryDirectory() as d:
+            st = self._store(Path(d), claimed_by="other-host:1", lease_until=time.time() + 600)
+            with self.assertRaises(TransitionError):
+                st.transition("S", StoryStatus.VERIFYING)                        # no owner named, foreign live claim
+            st = self._store(Path(d), claimed_by=f"{socket.gethostname()}:{os.getpid()}", lease_until=time.time() + 600)
+            st.transition("S", StoryStatus.VERIFYING)                            # a local live claim: the host is trusted
+
+    def test_only_the_owners_write_refreshes_the_term(self):
+        import time
+        with tempfile.TemporaryDirectory() as d:
+            past = time.time() - 10
+            st = self._store(Path(d), claimed_by="other-host:1", lease_until=past)   # expired: anyone may move it
+            st.transition("S", StoryStatus.VERIFYING, owner="this-host:2")
+            self.assertEqual(st.load().stories["S"].lease_until, past, "a non-owner's write leaves the term alone")
+            st = self._store(Path(d), claimed_by="this-host:2", lease_until=past)
+            st.transition("S", StoryStatus.VERIFYING, owner="this-host:2")
+            self.assertGreater(st.load().stories["S"].lease_until, time.time() + 60, "the owner's write refreshes the term")
+
+    def test_evidence_and_worktree_survive_a_transition_that_does_not_name_them(self):
+        with tempfile.TemporaryDirectory() as d:
+            st = self._store(Path(d))
+            st.transition("S", StoryStatus.VERIFYING, evidence="ev/S.jsonl", worktree="wt/S")
+            st.transition("S", StoryStatus.VERIFIED)
+            rec = st.load().stories["S"]
+            self.assertEqual((rec.evidence, rec.worktree), ("ev/S.jsonl", "wt/S"))

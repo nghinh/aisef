@@ -1,0 +1,731 @@
+{
+ "generated": "2026-09-21T00:04:36+0700",
+ "candidate_aisef_tree": [
+  "02a34e0e63ed",
+  "42a29853a3a8",
+  "4359f347378e",
+  "4f0c124113b7",
+  "84014c980e75",
+  "a2f6e76bf0ec",
+  "dbe2dfdffa34"
+ ],
+ "aisef_tree_identical_since_fix": false,
+ "kernel_variants": {
+  "A (chunks 00000, 10000)": "NOT_AVAILABLE — bounded between 023d6ce/bb31522 and the following commit; re-run in full on the candidate",
+  "B (chunks 20000–40000)": "d956249 aisef tree",
+  "C (chunks 50000–90000 + every re-run)": "f0cd772 aisef tree = the candidate"
+ },
+ "aisef_diff_A_upper_bound": {
+  "summary": " 10 files changed, 326 insertions(+), 41 deletions(-)",
+  "files": [
+   "aisef/cli/implement.py",
+   "aisef/cli/parser.py",
+   "aisef/clients/synthetic.py",
+   "aisef/control/gate.py",
+   "aisef/control/replay.py",
+   "aisef/control/replay_manifest.py",
+   "aisef/harness/process_owner.py",
+   "aisef/harness/sandbox.py",
+   "aisef/invariants.yaml",
+   "aisef/phases/implement.py"
+  ]
+ },
+ "aisef_diff_B_to_candidate": {
+  "summary": " 2 files changed, 15 insertions(+), 4 deletions(-)",
+  "files": [
+   "aisef/invariants.yaml",
+   "aisef/phases/implement.py"
+  ],
+  "semantics": "SS-64 only: the verifier budget cap precedes stage absence in _review_stage and the verify-only path; invariants.yaml is data"
+ },
+ "commits": [
+  {
+   "commit": "023d6ce09307",
+   "committed_at": "2026-09-16T23:26:47+0700",
+   "ct": 1789576007,
+   "aisef_tree": "83ee310ef20a",
+   "subject": "hardening(10/F6): BENCH / RELEASE / APPROVAL — closure probes read ident"
+  },
+  {
+   "commit": "bb31522366fa",
+   "committed_at": "2026-09-17T00:43:17+0700",
+   "ct": 1789580597,
+   "aisef_tree": "201812e0e532",
+   "subject": "hardening(11/14/16/17): REGISTRY 50/50 PROVEN, FAULT MATRIX 72/72 GREEN,"
+  },
+  {
+   "commit": "9e8fc7790b3a",
+   "committed_at": "2026-09-17T02:07:41+0700",
+   "ct": 1789585661,
+   "aisef_tree": "e9fb9b927972",
+   "subject": "hardening(13): MUTATION TESTING — 271 mutants over 28 decision-critical "
+  },
+  {
+   "commit": "ed5085a1f4a5",
+   "committed_at": "2026-09-17T03:06:01+0700",
+   "ct": 1789589161,
+   "aisef_tree": "e9fb9b927972",
+   "subject": "hardening(13/final): MUTATION TESTING CLOSED — 271 mutants, 265 killed, "
+  },
+  {
+   "commit": "d956249ef407",
+   "committed_at": "2026-09-17T03:09:10+0700",
+   "ct": 1789589350,
+   "aisef_tree": "e9fb9b927972",
+   "subject": "hardening(15): ADAPTER CONFORMANCE — deterministic suite 45 green (no mo"
+  },
+  {
+   "commit": "f0cd77268ccb",
+   "committed_at": "2026-09-17T04:58:35+0700",
+   "ct": 1789595915,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): UNEXPLAINED TRACE 34999 RESOLVED — SS-64 (P2, INV-G.5): a"
+  },
+  {
+   "commit": "4bd220337046",
+   "committed_at": "2026-09-17T05:26:56+0700",
+   "ct": 1789597616,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): INTEGRITY TOOLING — per-chunk integrity records + consoli"
+  },
+  {
+   "commit": "308dcf46b565",
+   "committed_at": "2026-09-17T05:33:12+0700",
+   "ct": 1789597992,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): ORACLE INDEPENDENCE — the W1 oracle re-derived from "
+  },
+  {
+   "commit": "e5d451b31d17",
+   "committed_at": "2026-09-17T05:35:38+0700",
+   "ct": 1789598138,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): PREDECLARED ARBITRATION in the required form — ARB-1"
+  },
+  {
+   "commit": "6d84446157dc",
+   "committed_at": "2026-09-17T05:45:48+0700",
+   "ct": 1789598748,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): HISTORICAL REPLAYS (step 5) — runner with every clas"
+  },
+  {
+   "commit": "7351e898c234",
+   "committed_at": "2026-09-17T05:54:51+0700",
+   "ct": 1789599291,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): W1 DRIVER — prepare / kernel-first / approve / run ("
+  },
+  {
+   "commit": "4e04fec54708",
+   "committed_at": "2026-09-17T05:56:47+0700",
+   "ct": 1789599407,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20/prep): fresh-trunk topology — the W1 copy's master re-point"
+  },
+  {
+   "commit": "e8bd51ad5ff8",
+   "committed_at": "2026-09-17T06:00:00+0700",
+   "ct": 1789599600,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): integrity tool reads gzipped rows (the repo keeps 350 KB,"
+  },
+  {
+   "commit": "a8caa839223a",
+   "committed_at": "2026-09-17T06:04:25+0700",
+   "ct": 1789599865,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): kernel attribution per chunk (validation/p12_kernel_split"
+  },
+  {
+   "commit": "c7392f133e95",
+   "committed_at": "2026-09-17T06:04:57+0700",
+   "ct": 1789599897,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): integrity tool — explicit --kernel-split path"
+  },
+  {
+   "commit": "6df4272cfc5b",
+   "committed_at": "2026-09-17T06:16:35+0700",
+   "ct": 1789600595,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): OWNER DECISION APPLIED — single-kernel Phase 12: first ch"
+  },
+  {
+   "commit": "cd1b05909658",
+   "committed_at": "2026-09-17T06:16:35+0700",
+   "ct": 1789600595,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): PHASE12-KERNEL-IDENTITY recorded — PHASE12_KERNEL_DIGEST "
+  },
+  {
+   "commit": "ba2d568ae885",
+   "committed_at": "2026-09-17T06:22:50+0700",
+   "ct": 1789600970,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12/20): dataset manifest + coverage-beyond-count in the consol"
+  },
+  {
+   "commit": "a2e658e06fdc",
+   "committed_at": "2026-09-17T06:23:59+0700",
+   "ct": 1789601039,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(19/20): freeze script (wheel + sha256 outside git, run venv fr"
+  },
+  {
+   "commit": "7b68d09f7bcc",
+   "committed_at": "2026-09-17T06:25:02+0700",
+   "ct": 1789601102,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20): run-copy preparation fetches the cost-cap object by branc"
+  },
+  {
+   "commit": "8da173dc9fc7",
+   "committed_at": "2026-09-17T06:25:57+0700",
+   "ct": 1789601157,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20): CORRECTION — commit 7b68d09 claimed the run-copy rehearsa"
+  },
+  {
+   "commit": "faf3ecd95f7f",
+   "committed_at": "2026-09-17T06:35:48+0700",
+   "ct": 1789601748,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): CI red on 8da173d — the comparator's git helper (and the "
+  },
+  {
+   "commit": "6470e4e8b8fb",
+   "committed_at": "2026-09-17T06:35:48+0700",
+   "ct": 1789601748,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): PHASE12-KERNEL-IDENTITY re-recorded at faf3ecd — product "
+  },
+  {
+   "commit": "156a73e07371",
+   "committed_at": "2026-09-17T06:36:30+0700",
+   "ct": 1789601790,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening: explicit utf-8 on every subprocess.run(text=True) in the vali"
+  },
+  {
+   "commit": "dffc167d0f1f",
+   "committed_at": "2026-09-17T06:37:45+0700",
+   "ct": 1789601865,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening: fix a duplicate encoding kwarg introduced by the previous com"
+  },
+  {
+   "commit": "22f1eca98d89",
+   "committed_at": "2026-09-17T06:45:36+0700",
+   "ct": 1789602336,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): watchdog liveness via the product's cross-platform pid_al"
+  },
+  {
+   "commit": "b43fa3cd02fe",
+   "committed_at": "2026-09-17T06:45:55+0700",
+   "ct": 1789602355,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening: lint — unused import left by the watchdog liveness change (22"
+  },
+  {
+   "commit": "2e416e9201a9",
+   "committed_at": "2026-09-17T09:45:25+0700",
+   "ct": 1789613125,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12): watchdog heartbeat every 30 min (its first armed instance"
+  },
+  {
+   "commit": "a3c514c5ba2f",
+   "committed_at": "2026-09-17T13:32:03+0700",
+   "ct": 1789626723,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12/CLOSE): PHASE 12 CLOSED ON ONE KERNEL — 100 000 / 100 000 t"
+  },
+  {
+   "commit": "1e9891b08379",
+   "committed_at": "2026-09-17T13:32:36+0700",
+   "ct": 1789626756,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(12/CLOSED): 100 000-trace differential against ONE product tre"
+  },
+  {
+   "commit": "abad2a6af796",
+   "committed_at": "2026-09-17T13:33:13+0700",
+   "ct": 1789626793,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(18): W0 builder — the CI criterion requires the run's head SHA"
+  },
+  {
+   "commit": "856e5fe318a4",
+   "committed_at": "2026-09-17T14:00:05+0700",
+   "ct": 1789628405,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(18/19): W0 QUALIFIED + CANDIDATE FROZEN — W0 at abad2a6 (10/10"
+  },
+  {
+   "commit": "26a2b542cdde",
+   "committed_at": "2026-09-17T14:06:10+0700",
+   "ct": 1789628770,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20): W1 run 1 first attempt aborted by the kernel's tools pref"
+  },
+  {
+   "commit": "50d8965574fe",
+   "committed_at": "2026-09-17T15:15:52+0700",
+   "ct": 1789632952,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20): NEW P1 — SS-65: the harness declares a sast tool its own "
+  },
+  {
+   "commit": "e02c5a4fd512",
+   "committed_at": "2026-09-17T15:16:57+0700",
+   "ct": 1789633017,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(18): W0 gate false PASS — the builder scanned only the frozen "
+  },
+  {
+   "commit": "367d9c38224c",
+   "committed_at": "2026-09-17T15:17:25+0700",
+   "ct": 1789633045,
+   "aisef_tree": "84014c980e75",
+   "subject": "hardening(20): P20 plan correction — the doctor red line about the harne"
+  },
+  {
+   "commit": "ec876ff4a7a4",
+   "committed_at": "2026-09-17T22:06:16+0700",
+   "ct": 1789657576,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(SS-65): FIX AT CAPABILITY-MODEL LEVEL — one registry drives to"
+  },
+  {
+   "commit": "71ea44c9e1a0",
+   "committed_at": "2026-09-17T22:07:04+0700",
+   "ct": 1789657624,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(SS-65): real-image tool capability matrix for product tree 02a"
+  },
+  {
+   "commit": "82433cda3908",
+   "committed_at": "2026-09-17T22:37:46+0700",
+   "ct": 1789659466,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(SS-65/12): Windows CI — the advisory-module exemption compared"
+  },
+  {
+   "commit": "d7cf513e2d6d",
+   "committed_at": "2026-09-17T23:07:56+0700",
+   "ct": 1789661276,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(12): PHASE12-KERNEL-IDENTITY for the SS-65 kernel — PHASE12_KE"
+  },
+  {
+   "commit": "a5fd96f2b032",
+   "committed_at": "2026-09-17T23:10:32+0700",
+   "ct": 1789661432,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(20): W1 fresh-trunk allowlist names the three exact preparatio"
+  },
+  {
+   "commit": "4cf1e980acb5",
+   "committed_at": "2026-09-18T05:52:02+0700",
+   "ct": 1789685522,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(12/CLOSE): PHASE 12 RE-QUALIFIED ON THE SS-65 KERNEL — 100 000"
+  },
+  {
+   "commit": "0a7cab86086e",
+   "committed_at": "2026-09-18T05:56:03+0700",
+   "ct": 1789685763,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(20): the W0 qualification and the candidate freeze at abad2a6 "
+  },
+  {
+   "commit": "af94372dd186",
+   "committed_at": "2026-09-18T06:29:25+0700",
+   "ct": 1789687765,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(18/20): W0 RE-QUALIFIED at 0a7cab86086e — 11/11 criteria on th"
+  },
+  {
+   "commit": "2fb231c32ef0",
+   "committed_at": "2026-09-18T06:58:50+0700",
+   "ct": 1789689530,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(19): CANDIDATE FROZEN — af94372dd186, aisef/ tree 02a34e0e = P"
+  },
+  {
+   "commit": "1c3ed0277e51",
+   "committed_at": "2026-09-18T07:02:54+0700",
+   "ct": 1789689774,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(20): the ARB-1 re-approval is now measured mechanically, not a"
+  },
+  {
+   "commit": "1439213d5700",
+   "committed_at": "2026-09-18T07:06:05+0700",
+   "ct": 1789689965,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(20): W1 plan records the second run-1 attempt and the re-quali"
+  },
+  {
+   "commit": "c182d40a6e6d",
+   "committed_at": "2026-09-18T09:18:09+0700",
+   "ct": 1789697889,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(20): W1 RUN 1 COMPLETED — 11/16 stories done, STORY-04-02 fail"
+  },
+  {
+   "commit": "1352c58f5a45",
+   "committed_at": "2026-09-18T10:02:55+0700",
+   "ct": 1789700575,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(20): W1 qualification tooling per the owner's runs-2-3 decisio"
+  },
+  {
+   "commit": "2fd8d101235b",
+   "committed_at": "2026-09-18T10:25:00+0700",
+   "ct": 1789701900,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(20): W1 run 2 — LEGITIMATE_MODEL_PROJECT_STOP at EPIC-01 wave "
+  },
+  {
+   "commit": "7fe551451a22",
+   "committed_at": "2026-09-18T10:36:11+0700",
+   "ct": 1789702571,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(20): per-run W1 metrics for the owner's report table, includin"
+  },
+  {
+   "commit": "04cb79c82241",
+   "committed_at": "2026-09-18T11:00:44+0700",
+   "ct": 1789704044,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(20): W1 THREE-RUN RESULT — 3 fresh runs, 0 framework safety vi"
+  },
+  {
+   "commit": "f989bc3e1ae5",
+   "committed_at": "2026-09-18T12:06:44+0700",
+   "ct": 1789708004,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(21): EXECUTION PROFILE identity — PROFILE-W1-OC-MYCOMBO-T40 re"
+  },
+  {
+   "commit": "54596dd7463a",
+   "committed_at": "2026-09-18T12:07:52+0700",
+   "ct": 1789708072,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(21): W1 fresh-topology check allows exactly one execution-prof"
+  },
+  {
+   "commit": "57d1fdf0d2f5",
+   "committed_at": "2026-09-18T12:52:43+0700",
+   "ct": 1789710763,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(21): STOP — new P1 PRODUCT KERNEL defect SS-81 found in PROFIL"
+  },
+  {
+   "commit": "1fba5220b54f",
+   "committed_at": "2026-09-18T12:53:28+0700",
+   "ct": 1789710808,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(21): correction to 57d1fdf's commit message — three code spans"
+  },
+  {
+   "commit": "580be5436945",
+   "committed_at": "2026-09-18T18:38:48+0700",
+   "ct": 1789731528,
+   "aisef_tree": "02a34e0e63ed",
+   "subject": "hardening(22): W0 at 0a7cab86086e VOID (separate invalidation record, or"
+  },
+  {
+   "commit": "e60cba21be4b",
+   "committed_at": "2026-09-18T19:31:16+0700",
+   "ct": 1789734676,
+   "aisef_tree": "dbe2dfdffa34",
+   "subject": "hardening(23): SS-81 FAMILY FIXED (F7-EXECUTION-EVIDENCE-VALIDITY) — one"
+  },
+  {
+   "commit": "d32031dbe208",
+   "committed_at": "2026-09-18T20:16:08+0700",
+   "ct": 1789737368,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(23b): F7 mutation survivors 104 -> 0 unexplained; SS-91 Window"
+  },
+  {
+   "commit": "40393cda89db",
+   "committed_at": "2026-09-18T20:51:56+0700",
+   "ct": 1789739516,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(23c): SS-81 family CLOSED on d32031d (14/14 closure requiremen"
+  },
+  {
+   "commit": "b6e379fdd3e7",
+   "committed_at": "2026-09-19T05:35:31+0700",
+   "ct": 1789770931,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(24): PHASE 12 RE-QUALIFIED ON THE POST-SS-81 KERNEL (100 000 /"
+  },
+  {
+   "commit": "047ec3e6c3de",
+   "committed_at": "2026-09-19T05:42:07+0700",
+   "ct": 1789771327,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(25): execution profile PROFILE-W1-OC-GPT56SOL-T80-RO — the rev"
+  },
+  {
+   "commit": "aae8ed3a3f86",
+   "committed_at": "2026-09-19T07:01:16+0700",
+   "ct": 1789776076,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(26): W1 PROFILE-W1-OC-GPT56SOL-T80-RO run 1 — ENVIRONMENT_OR_P"
+  },
+  {
+   "commit": "d358bf9f14aa",
+   "committed_at": "2026-09-19T07:13:42+0700",
+   "ct": 1789776822,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(26b): test_w1_execution_profile — the wrapper test's subproces"
+  },
+  {
+   "commit": "f091b1567977",
+   "committed_at": "2026-09-19T10:56:22+0700",
+   "ct": 1789790182,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(27): owner decision \"CONTINUE W1 PROFILE QUALIFICATION, KERNEL"
+  },
+  {
+   "commit": "36af053a1f3b",
+   "committed_at": "2026-09-19T13:59:09+0700",
+   "ct": 1789801149,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(28): W1 PROFILE-W1-OC-GPT55-T80-RO attempt gpt55-ro-1 — ENVIRO"
+  },
+  {
+   "commit": "a38e7986d836",
+   "committed_at": "2026-09-19T14:11:29+0700",
+   "ct": 1789801889,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(29): gpt55-ro-2 provider preflight try 1 FAILED (429 usage lim"
+  },
+  {
+   "commit": "aa213a10933d",
+   "committed_at": "2026-09-19T14:51:10+0700",
+   "ct": 1789804270,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(30): route 9router/cx/gpt-5.5 ABANDONED for provider instabili"
+  },
+  {
+   "commit": "bd63fcff14ca",
+   "committed_at": "2026-09-19T17:43:42+0700",
+   "ct": 1789814622,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(31): W1 PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO run deepseek-ro-1 —"
+  },
+  {
+   "commit": "1c8254858a04",
+   "committed_at": "2026-09-19T20:23:31+0700",
+   "ct": 1789824211,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(32): SS-95 FIXED (P1, qualification infrastructure) — W1 false"
+  },
+  {
+   "commit": "93ec4600c197",
+   "committed_at": "2026-09-20T00:13:14+0700",
+   "ct": 1789837994,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(33): W1 PROFILE-W1-OC-MINIMAXM3-T80-RO run minimax-ro-1 — VALI"
+  },
+  {
+   "commit": "0dbd7ae6f3f6",
+   "committed_at": "2026-09-20T01:41:00+0700",
+   "ct": 1789843260,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(34): STOP (owner section 11 C) — W1 DELIVERY FAILURE DECOMPOSI"
+  },
+  {
+   "commit": "e564fa630691",
+   "committed_at": "2026-09-20T02:07:40+0700",
+   "ct": 1789844860,
+   "aisef_tree": "a2f6e76bf0ec",
+   "subject": "hardening(35): OBS-CI-2026-09-20-1 recorded (P3, observed, not reproduce"
+  },
+  {
+   "commit": "35d51781021a",
+   "committed_at": "2026-09-20T07:25:20+0700",
+   "ct": 1789863920,
+   "aisef_tree": "4f0c124113b7",
+   "subject": "kernel(1): TDD PROOF POLICY V2 — every acceptance criterion is judged by"
+  },
+  {
+   "commit": "ff3115b1cb5a",
+   "committed_at": "2026-09-20T07:34:19+0700",
+   "ct": 1789864459,
+   "aisef_tree": "4f0c124113b7",
+   "subject": "kernel(2): qualification scaffolding for the policy change — fault matri"
+  },
+  {
+   "commit": "ad04de8f951f",
+   "committed_at": "2026-09-20T10:07:31+0700",
+   "ct": 1789873651,
+   "aisef_tree": "42a29853a3a8",
+   "subject": "kernel(3): mutation qualification of the policy code, and the developer "
+  },
+  {
+   "commit": "75532839cf94",
+   "committed_at": "2026-09-20T10:49:39+0700",
+   "ct": 1789876179,
+   "aisef_tree": "42a29853a3a8",
+   "subject": "kernel(4): mutation qualification of the new kernel, and the V1 Phase 12"
+  },
+  {
+   "commit": "5bb9f8166104",
+   "committed_at": "2026-09-20T10:51:52+0700",
+   "ct": 1789876312,
+   "aisef_tree": "42a29853a3a8",
+   "subject": "kernel(5): default tool capabilities re-qualified on the new product tre"
+  },
+  {
+   "commit": "4eaadb17efbb",
+   "committed_at": "2026-09-20T11:03:50+0700",
+   "ct": 1789877030,
+   "aisef_tree": "42a29853a3a8",
+   "subject": "kernel(6): OBS-CI-2026-09-20-2 recorded (P3, observed, not reproduced)."
+  },
+  {
+   "commit": "67bd0251c26e",
+   "committed_at": "2026-09-20T11:43:35+0700",
+   "ct": 1789879415,
+   "aisef_tree": "42a29853a3a8",
+   "subject": "kernel(7): the assurance gap closed — TDD proof policy V2 is exercised a"
+  },
+  {
+   "commit": "aef52ba857dc",
+   "committed_at": "2026-09-20T13:23:22+0700",
+   "ct": 1789885402,
+   "aisef_tree": "42a29853a3a8",
+   "subject": "kernel(8): the conformance scenarios need nothing but the interpreter — "
+  },
+  {
+   "commit": "93d948bab3f5",
+   "committed_at": "2026-09-20T15:54:00+0700",
+   "ct": 1789894440,
+   "aisef_tree": "4359f347378e",
+   "subject": "kernel(9): SS-96 is P1 and fixed — evidence that did not execute is neve"
+  },
+  {
+   "commit": "817d8caefd3a",
+   "committed_at": "2026-09-20T15:55:04+0700",
+   "ct": 1789894504,
+   "aisef_tree": "4359f347378e",
+   "subject": "kernel(9b): the new mutation target names the tests that must kill its m"
+  },
+  {
+   "commit": "2f2be734f5a8",
+   "committed_at": "2026-09-20T16:19:54+0700",
+   "ct": 1789895994,
+   "aisef_tree": "4359f347378e",
+   "subject": "kernel(9c): the four surviving mutants of the new check, killed by what "
+  },
+  {
+   "commit": "ac11bc7a1a35",
+   "committed_at": "2026-09-20T17:08:47+0700",
+   "ct": 1789898927,
+   "aisef_tree": "4359f347378e",
+   "subject": "kernel(10): the SS-96 kernel re-qualified — mutation, conformance and th"
+  }
+ ],
+ "chunks": [
+  {
+   "chunk": "10000",
+   "log_birth": "2026-09-20T18:18:25+0700",
+   "head_at_birth": "ac11bc7",
+   "kernel_class": "NOT_AVAILABLE",
+   "kernel_head_recorded": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+   "kernel_dirty_aisef_recorded": [],
+   "candidate_kernel": false,
+   "attribution": "working tree at start = HEAD ac11bc7 plus edits in progress toward the next commit (P16/P17 gate narrowing, process ownership, replay manifest for 00000; P13 positive session ownership for 10000) — which edits were on disk when the workers were spawned is not recoverable; every seed of the chunk is RE-RUN IN FULL on the candidate kernel"
+  },
+  {
+   "chunk": "20000",
+   "log_birth": "2026-09-20T18:55:57+0700",
+   "head_at_birth": "ac11bc7",
+   "kernel_class": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "kernel_head_recorded": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+   "kernel_dirty_aisef_recorded": [],
+   "candidate_kernel": false,
+   "attribution": "d956249's aisef tree exactly: the chain started 5 s after that commit with a clean tree and f0cd772's only aisef change is SS-64; the 4267 seeds whose scenario contains a verifier BUDGET step — the only path SS-64 changes — are re-run on the candidate, plus a 500-seed control sample"
+  },
+  {
+   "chunk": "30000",
+   "log_birth": "2026-09-20T19:34:51+0700",
+   "head_at_birth": "ac11bc7",
+   "kernel_class": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "kernel_head_recorded": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+   "kernel_dirty_aisef_recorded": [],
+   "candidate_kernel": false,
+   "attribution": "d956249's aisef tree exactly: the chain started 5 s after that commit with a clean tree and f0cd772's only aisef change is SS-64; the 4267 seeds whose scenario contains a verifier BUDGET step — the only path SS-64 changes — are re-run on the candidate, plus a 500-seed control sample"
+  },
+  {
+   "chunk": "40000",
+   "log_birth": "2026-09-20T20:13:12+0700",
+   "head_at_birth": "ac11bc7",
+   "kernel_class": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "kernel_head_recorded": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+   "kernel_dirty_aisef_recorded": [],
+   "candidate_kernel": false,
+   "attribution": "d956249's aisef tree exactly: the chain started 5 s after that commit with a clean tree and f0cd772's only aisef change is SS-64; the 4267 seeds whose scenario contains a verifier BUDGET step — the only path SS-64 changes — are re-run on the candidate, plus a 500-seed control sample"
+  },
+  {
+   "chunk": "50000",
+   "log_birth": "2026-09-20T20:52:01+0700",
+   "head_at_birth": "ac11bc7",
+   "kernel_class": "DIRECTLY_RECORDED",
+   "kernel_head_recorded": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+   "kernel_dirty_aisef_recorded": [],
+   "candidate_kernel": true,
+   "attribution": "ac11bc7a1a35 dirty_aisef=[]"
+  },
+  {
+   "chunk": "60000",
+   "log_birth": "2026-09-20T21:30:45+0700",
+   "head_at_birth": "ac11bc7",
+   "kernel_class": "DIRECTLY_RECORDED",
+   "kernel_head_recorded": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+   "kernel_dirty_aisef_recorded": [],
+   "candidate_kernel": true,
+   "attribution": "ac11bc7a1a35 dirty_aisef=[]"
+  },
+  {
+   "chunk": "70000",
+   "log_birth": "2026-09-20T22:09:22+0700",
+   "head_at_birth": "ac11bc7",
+   "kernel_class": "DIRECTLY_RECORDED",
+   "kernel_head_recorded": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+   "kernel_dirty_aisef_recorded": [],
+   "candidate_kernel": true,
+   "attribution": "ac11bc7a1a35 dirty_aisef=[]"
+  },
+  {
+   "chunk": "80000",
+   "log_birth": "2026-09-20T22:47:31+0700",
+   "head_at_birth": "ac11bc7",
+   "kernel_class": "DIRECTLY_RECORDED",
+   "kernel_head_recorded": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+   "kernel_dirty_aisef_recorded": [],
+   "candidate_kernel": true,
+   "attribution": "ac11bc7a1a35 dirty_aisef=[]"
+  },
+  {
+   "chunk": "90000",
+   "log_birth": "2026-09-20T23:25:59+0700",
+   "head_at_birth": "ac11bc7",
+   "kernel_class": "DIRECTLY_RECORDED",
+   "kernel_head_recorded": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+   "kernel_dirty_aisef_recorded": [],
+   "candidate_kernel": true,
+   "attribution": "ac11bc7a1a35 dirty_aisef=[]"
+  }
+ ],
+ "rule": "Old evidence must never silently satisfy new gates: every seed either has candidate-kernel evidence (chunks 50000–90000, the full re-run of 00000–19999, the targeted SS-64 re-run and the control sample) or rests on the measured B→candidate diff whose only changed path it does not exercise."
+}

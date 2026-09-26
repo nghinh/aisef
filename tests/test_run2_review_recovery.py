@@ -188,7 +188,10 @@ class TestReviewEvidenceAndReuse(ImplementTestCase):
         # non-isolated harness freezes HEAD as the candidate and reviews the diff.
         (self.project / "src").mkdir(exist_ok=True)
         (self.project / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
-        store = EvidenceStore(self.artifacts, candidate=self.sha)
+        # the prior run's records carry the identity the kernel now stamps (control/identity.py); a bare
+        # candidate would be schema-1 evidence, which no control decision may read
+        store = EvidenceStore(self.artifacts, identity=I._identity_now(self.story, workdir=self.project, config=self.config(),
+                                                                          candidate=self.sha, artifact_root=self.artifacts))
         store.record(self.story.id, Event(kind=AGENT_RUN, name=f"{self.story.id}-review", ok=False,
                                           detail={"error": CUT, "num_turns": 40}))
         if legacy:   # the exact 1.7.3 shape from LedgerLock Run #2

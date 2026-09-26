@@ -175,10 +175,10 @@ def _names_screens(header: list[str]) -> bool:
 #: "none", any dash), written by the ux step when the product is a CLI, a
 #: library or a service.
 _NO_SURFACE = re.compile(
-    r"^\**Screens?\**\s*[:：]?\s*\**\s*(?:none|không|no)\b[^\n]{0,120}?"
-    r"(?:graphical|giao diện|headless|GUI|CLI|command[- ]line|terminal|"
-    r"library|thư viện|service|dịch vụ|API)",
-    re.MULTILINE | re.IGNORECASE,
+    # `Screens: none` followed by a separator or the end of the line — the STATEMENT that there is no surface. A
+    # sentence that goes on ("none of the legacy screens…", "none yet, coming in v2") is not that statement (SS-31)
+    r"^\**Screens?\**\s*[:：]?\s*\**\s*(?:none|không|no)\b\s*(?:[—–\-(:.;]|$)",
+    re.IGNORECASE | re.MULTILINE,
 )
 
 

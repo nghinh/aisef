@@ -1,0 +1,105 @@
+{
+ "record": "W1_WORKLOAD_V1 / TDD_POLICY_V1 — historical evidence marker",
+ "decision": "OWNER DECISION — STOP PROFILE HUNTING, FIX W1 PLAN + TDD PROOF POLICY (2026-09-20), section 1",
+ "marked": "2026-09-20T06:24:15+0700",
+ "meaning": "every W1 run, profile, qualification record, false-PASS/false-BLOCK re-audit, hidden-oracle result and the delivery-failure decomposition listed here was produced under the ORIGINAL LedgerLock story plan and the ORIGINAL 'every criterion test must be red at the parent' proof policy",
+ "rule": [
+  "preserve exactly — do not rewrite or reinterpret these records after the policy change",
+  "they are valid historical evidence for W1_WORKLOAD_V1 / TDD_POLICY_V1",
+  "they are NOT qualification evidence for the new workload plan (W1-LEDGERLOCK-PLAN-V2) or the new proof policy"
+ ],
+ "workload": {
+  "id": "W1_WORKLOAD_V1",
+  "project": "ledgerlock-aiseftest-run2",
+  "plan_base_commit": "8ff9f13",
+  "requirements": "docs/requirements.md (frozen; unchanged by the policy change)"
+ },
+ "policy": {
+  "id": "TDD_POLICY_V1",
+  "rule": "INV-TDD-NOP-PROOF as of kernel 40393cd: every criterion test of a story must be PROVEN RED at the parent SHA",
+  "kernel": {
+   "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
+   "product_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba"
+  }
+ },
+ "runs": {
+  "1": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-1.json",
+   "run_dir": "closure-evidence/hardening/w1/run-1",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  },
+  "2": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-2.json",
+   "run_dir": "closure-evidence/hardening/w1/run-2",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  },
+  "3": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-3.json",
+   "run_dir": "closure-evidence/hardening/w1/run-3",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  },
+  "gpt56sol-1": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-gpt56sol-1.json",
+   "run_dir": "closure-evidence/hardening/w1/run-gpt56sol-1",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  },
+  "gpt56sol-ro-1": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-gpt56sol-ro-1.json",
+   "run_dir": "closure-evidence/hardening/w1/run-gpt56sol-ro-1",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  },
+  "gpt55-ro-1": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-gpt55-ro-1.json",
+   "run_dir": "closure-evidence/hardening/w1/run-gpt55-ro-1",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  },
+  "deepseek-ro-1": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-deepseek-ro-1.json",
+   "run_dir": "closure-evidence/hardening/w1/run-deepseek-ro-1",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  },
+  "deepseek-ro-2": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-deepseek-ro-2.json",
+   "run_dir": "closure-evidence/hardening/w1/run-deepseek-ro-2",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  },
+  "minimax-ro-1": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-minimax-ro-1.json",
+   "run_dir": "closure-evidence/hardening/w1/run-minimax-ro-1",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  },
+  "minimax-ro-2": {
+   "ledgerlock": "closure-evidence/hardening/W1-LEDGERLOCK-minimax-ro-2.json",
+   "run_dir": "closure-evidence/hardening/w1/run-minimax-ro-2",
+   "marker": "W1_WORKLOAD_V1 / TDD_POLICY_V1"
+  }
+ },
+ "profiles": [
+  "closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json",
+  "closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-GPT56SOL-T80.json",
+  "closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-GPT56SOL-T80-RO.json",
+  "closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-GPT55-T80-RO.json",
+  "closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO.json",
+  "closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MINIMAXM3-T80-RO.json"
+ ],
+ "other_records": [
+  "closure-evidence/hardening/W1-DELIVERY-FAILURE-DECOMPOSITION.json",
+  "closure-evidence/hardening/w1/run-*/SS95-CANDIDATE-AUDIT.json",
+  "closure-evidence/hardening/AISEF-W0-QUALIFICATION-d32031d.json (W0 of the V1-policy kernel)",
+  "closure-evidence/hardening/differential-p12-summary.json (100 000 traces on tree a2f6e76b)",
+  "closure-evidence/hardening/phase12/history-kernel-a2f6e76b/ (the V1 kernel's 100 000-trace dataset, archived when the new kernel's dataset was run)"
+ ],
+ "hashes_at_marking": {
+  "W1-LEDGERLOCK-1.json": "8dc02fe214acf0248dd2181cadfe8995c58a9017d877d239062b43f249b84a4f",
+  "W1-LEDGERLOCK-2.json": "192a1c9b0bfe79a2fb40d1f51f998996487b4e524977c3062e86ac7f8944a882",
+  "W1-LEDGERLOCK-3.json": "49f7acf94b99eb1a51a311879033ab5313ccc447160e2616ba6a18370815e6e1",
+  "W1-LEDGERLOCK-gpt56sol-1.json": "c52bce549413dd32519bf90f679b4f3fb35714a7b453e1470012165d1eeb0fd1",
+  "W1-LEDGERLOCK-gpt56sol-ro-1.json": "bd424f2cf2a37f76c604522cc96f035c42774d186a1a9e92f9f2da657cad7bf4",
+  "W1-LEDGERLOCK-gpt55-ro-1.json": "6398336c3c9fef37172e0a6bbdc969e4fce36a916e3a79d3c45fc666b984ee14",
+  "W1-LEDGERLOCK-deepseek-ro-1.json": "888b8e8b4730fb1ecbe7107615db05a9ebd37d64b290e2811c1f0c9134622a23",
+  "W1-LEDGERLOCK-deepseek-ro-2.json": "397c767548c7ed2416b0fbfba80fc49307452f637da223cb1092f027bdcdcdb7",
+  "W1-LEDGERLOCK-minimax-ro-1.json": "75699cbdcc47905646f40f1122b4444d659ad5f7918bae31199c3046efa5e85c",
+  "W1-LEDGERLOCK-minimax-ro-2.json": "1a1b7fb20d79b1707015022fd6ee6322a78e4678015365ab914ecc6d3e56671b"
+ },
+ "frozen_kernel_record": "closure-evidence/hardening/freeze/P19-FREEZE-40393cd.json (moved unchanged when the policy change produced a new kernel; the live P19-FREEZE.json is always the current candidate)"
+}

@@ -1,0 +1,33 @@
+{
+ "artifact": "W1-PLAN-V2.1-OWNERSHIP-AUDIT-SUMMARY-CORRECTION",
+ "generated": "2026-09-21",
+ "raised_by": "owner, mid-run integrity check: the report summary's action counts summed to 76 while PLAN-V2.1 has 77 acceptance criteria",
+ "verdict": "REPORTING_SUMMARY_OMISSION — the frozen audit artifact is complete and internally consistent; the prose summary was wrong",
+ "audited_artifact": {
+  "path": "closure-evidence/hardening/W1-PLAN-V2.1-OWNERSHIP-AUDIT.json",
+  "sha256_prefix": "d5f21c1b2f35cfc26dd5f4ee9623149a",
+  "unmodified_since_the_freeze_commit": true
+ },
+ "measured": {
+  "criteria_field": 77,
+  "rows": 77,
+  "distinct_ac_ids": 77,
+  "rows_without_an_action": [],
+  "rows_with_more_than_one_action": [],
+  "action_counts": {"KEEP_CHANGE": 76, "MOVE_CHANGE_OWNER": 1, "PRESERVE_DOWNSTREAM": 0, "REMOVE_DUPLICATE": 0},
+  "action_counts_sum": 77,
+  "recomputed_from_rows_equals_recorded_counts": true,
+  "coverage": "100%",
+  "requirements_traceability": "100%",
+  "errors": [],
+  "pass": true
+ },
+ "what_the_prose_got_wrong": "The report quoted 75 KEEP_CHANGE + 1 MOVE_CHANGE_OWNER = 76. Those are the counts of the audit run over PLAN-V2 (76 criteria), taken before AC-STORY-01-01-7 was added. The frozen V2.1 artifact records 76 KEEP_CHANGE + 1 MOVE_CHANGE_OWNER = 77. The criterion the prose dropped is AC-STORY-01-01-7, the new introduction owner, whose action is KEEP_CHANGE.",
+ "is_the_missing_action_a_preserve_downstream_row": {
+  "answer": "no",
+  "why": "AC-STORY-04-01-2 carries exactly one action, MOVE_CHANGE_OWNER, and its downstream disposition is a separate field on the same row (`downstream_disposition`: PRESERVE_DOWNSTREAM), so that one criterion is never counted twice. PRESERVE_DOWNSTREAM therefore reads 0 in the action counter by construction, and the row also records to_mode PRESERVE_REQUIRED, to_requirement FR-12, also_add_change_to STORY-01-01, and already_applied_in_this_plan true."
+ },
+ "corrected_summary": "77 criteria, one ownership action each: 76 KEEP_CHANGE and 1 MOVE_CHANGE_OWNER (AC-STORY-04-01-2, whose downstream disposition is PRESERVE_DOWNSTREAM and whose introduction owner becomes STORY-01-01 through the new AC-STORY-01-01-7). 0 REMOVE_DUPLICATE.",
+ "action_taken": "None on the plan, the proof modes, the kernel, the profile, the prompts or the running qualification. This record is additive; the audit artifact is left byte-identical.",
+ "qualification_metadata_valid": true
+}

@@ -1,0 +1,49 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 39 items
+
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_1_put_same_rid_replays_original_line_byte_for_byte PASSED [  2%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_2_put_different_rid_raises_conflict PASSED [  5%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_3_delete_then_put_different_rid_raises_conflict PASSED [  7%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_4_delete_same_rid_replays_delete_line_byte_for_byte PASSED [ 10%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_5_nfd_same_rid_replays_nfc_key_byte_exact PASSED [ 12%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps PASSED [ 15%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_byte_identical_across_element_equal_dicts PASSED [ 17%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_encoded_as_utf8_literal PASSED [ 20%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_key_order_independent PASSED [ 23%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_literal_seven_char_string PASSED [ 25%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads PASSED [ 28%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex PASSED [ 30%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_distinct_digest PASSED [ 33%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 35%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_deterministic_across_invocations PASSED [ 38%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_accepts_genesis_prev_hash PASSED [ 41%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_1_first_append_writes_single_chained_line PASSED [ 43%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_2_second_append_chains_prev_hash PASSED [ 46%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_3_empty_key_raises_value_error_no_file PASSED [ 48%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_4_fresh_instance_reads_tail_from_disk PASSED [ 51%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_5_other_instance_sees_line_and_trailing_newline PASSED [ 53%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte PASSED [ 56%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_equivalent PASSED [ 58%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_3_import_prints_init_path PASSED [ 61%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_4_cli_help_lists_subcommands PASSED [ 64%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports PASSED [ 66%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_6_no_side_channel_calls PASSED [ 69%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable PASSED [ 71%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_returns_n_bytes_with_trailing_newline_stripped PASSED [ 74%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found PASSED [ 76%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 79%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_writes_concatenation_and_round_trips PASSED [ 82%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_before_replace_leaves_original_intact PASSED [ 84%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory PASSED [ 87%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_1_n_valid_lines_verify_ok PASSED [ 89%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_2_zero_byte_jsonl_verify_ok PASSED [ 92%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_3_missing_file_raises_file_not_found PASSED [ 94%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_4_hash_overwritten_out_of_band_detected PASSED [ 97%]
+tests/test_verify_independent.py::TestVerifyIndependent::test_AC_STORY_02_01_5_value_mutated_out_of_band_detected PASSED [100%]
+
+============================== 39 passed in 0.22s ==============================

@@ -1,0 +1,12 @@
+{"seq": 1, "step": "attempt.started", "at": 1789790404.253, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789790404.966, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-gpt55-ro-1/.aisef/worktrees/STORY-01-01"}, "undo": {"worktree.remove": "STORY-01-01"}}
+{"seq": 3, "step": "status.running", "at": 1789790404.967, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789790886.538, "attempt": 1, "data": {"luot": 1, "files": ["README.md", "ledgerlock/__init__.py", "ledgerlock/__main__.py", "ledgerlock/cli.py", "ledgerlock/format.py", "pyproject.toml", "tests/__init__.py", "tests/test_nfc_normalization.py", "tests/test_skeleton.py"], "preexisting_excluded": [], "count": 9}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789790886.538, "attempt": 1, "data": {"luot": 1, "sha": "eb95937b59b7d40345ab6aecb2be955d90110598", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "changes.detected", "at": 1789791081.954, "attempt": 1, "data": {"luot": 2, "files": ["README.md", "ledgerlock/__init__.py", "ledgerlock/__main__.py", "ledgerlock/cli.py", "ledgerlock/format.py", "pyproject.toml", "tests/__init__.py", "tests/test_nfc_normalization.py", "tests/test_skeleton.py"], "preexisting_excluded": [], "count": 9}, "undo": {}}
+{"seq": 7, "step": "candidate.frozen", "at": 1789791081.954, "attempt": 1, "data": {"luot": 2, "sha": "ab2ac5e41d7b2010af03182ae91efdabad8ff4d4", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 8, "step": "verification.completed", "at": 1789791121.347, "attempt": 1, "data": {"ok": true, "attempts": 2, "cost_usd": 0.0, "candidate": "ab2ac5e41d7b2010af03182ae91efdabad8ff4d4"}, "undo": {}}
+{"seq": 9, "step": "review.completed", "at": 1789791121.347, "attempt": 1, "data": {"blocked": [], "outcome": "PASS", "review_executions": 2, "developer_attempts": 2}, "undo": {}}
+{"seq": 10, "step": "attempt.aborted", "at": 1789791121.352, "attempt": 1, "data": {"reason": "abnormal termination"}, "undo": {}}
+{"seq": 11, "step": "merge.completed", "at": 1789791121.417, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 12, "step": "attempt.committed", "at": 1789791121.793, "attempt": 1, "data": {}, "undo": {}}

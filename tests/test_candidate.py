@@ -97,6 +97,7 @@ class GateCandidateTestCase(unittest.TestCase):
         store.file_change("S-01", "src/a.py")
         store.tool_run("S-01", "test", ok=True)
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def gate(self, candidate: str = ""):
         return evaluate(
@@ -184,7 +185,7 @@ class Client(ClientAdapter):
         dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
         if dau.startswith("# Security review"):
             self.calls.append("security")
-            return RunResult(ok=True, text="không có phát hiện bảo mật", cost_usd=0.1)
+            return RunResult(ok=True, text="không có phát hiện bảo mật\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n", cost_usd=0.1)
         if dau.startswith("# Review"):
             self.calls.append("review")
             if self.review_commits:
@@ -192,7 +193,7 @@ class Client(ClientAdapter):
                 (d / "src" / "reviewer.py").write_text("x = 2\n", encoding="utf-8")
                 subprocess.run(["git", "add", "src"], cwd=d, check=False)
                 subprocess.run(["git", "commit", "-qm", "reviewer"], cwd=d, check=False)
-            return RunResult(ok=True, text="không có mục chặn", cost_usd=0.1)
+            return RunResult(ok=True, text="không có mục chặn\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n", cost_usd=0.1)
         self.calls.append("develop")
         p = Path(spec.workdir) / "src" / "a.py"
         p.parent.mkdir(parents=True, exist_ok=True)

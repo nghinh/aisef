@@ -1,0 +1,3 @@
+{"checker": "arch_catalog", "package": "WP-0.2", "kind": "catalog_edit",
+"find": "`INTEGRATION` |", "replace": "`INTEGRATION`, `AUDITOR` |",
+"expect": "in catalog, absent from code: Owner.AUDITOR"}

@@ -21,7 +21,6 @@ the wrong time.
 
 from __future__ import annotations
 
-import json
 import os
 import re
 import shutil
@@ -31,7 +30,7 @@ from pathlib import Path
 
 from ..clients.base import quote_command, split_command
 from ..config import Config
-from . import sandbox, verify_image
+from . import capabilities, sandbox
 from .guardrails import scrub_secrets
 from .observe import EvidenceStore
 
@@ -40,43 +39,14 @@ from .observe import EvidenceStore
 #: next to the evidence store.
 TAIL_LINES = 20
 
-#: Sandbox images per stack. `alpine` has no node or python, so running
-#: `npm test` in it would fail due to **missing tools**, not wrong code —
-#: and a gate reporting red for the wrong reason gets ignored for two days.
-STACK_IMAGES: list[tuple[str, str]] = [
-    ("package.json", "node:22-alpine"),
-    # A bare python image has no test runner; the harness-built image does
-    # (`verify_image.RECIPES`, D-028).
-    ("pyproject.toml", verify_image.RECIPES["python"].name),
-    ("setup.py", verify_image.RECIPES["python"].name),
-    ("go.mod", "golang:1.23-alpine"),
-    ("Cargo.toml", "rust:1-alpine"),
-    ("composer.json", "php:8-cli-alpine"),
-    ("Gemfile", "ruby:3-alpine"),
-]
-
-
 def image_for(project: Path | str, config: Config | None = None) -> str:
-    """Sandbox image: config wins, then stack-matching image, then default."""
-    if config is not None and str(config.get("sandbox.image", "")).strip():
-        return str(config["sandbox.image"]).strip()
-    project = Path(project)
-    for marker, image in STACK_IMAGES:
-        if (project / marker).is_file():
-            return image
-    return sandbox.DEFAULT_IMAGE
-
-
-#: Default commands by project marker file. Tuple of (test, lint, sast).
-_STACK_COMMANDS: list[tuple[str, dict[str, str]]] = [
-    ("pyproject.toml", {"test": "pytest -q", "lint": "ruff check .", "sast": "bandit -q -r ."}),
-    ("setup.py", {"test": "pytest -q", "lint": "ruff check .", "sast": "bandit -q -r ."}),
-    ("go.mod", {"test": "go test ./...", "lint": "go vet ./...", "sast": "gosec ./..."}),
-    ("Cargo.toml", {"test": "cargo test", "lint": "cargo clippy -- -D warnings", "sast": "cargo audit"}),
-    ("pubspec.yaml", {"test": "flutter test", "lint": "flutter analyze", "sast": ""}),
-    ("composer.json", {"test": "composer test", "lint": "composer lint", "sast": ""}),
-    ("Gemfile", {"test": "bundle exec rspec", "lint": "bundle exec rubocop", "sast": "bundle exec brakeman -q"}),
-]
+    """Sandbox image: the declared `sandbox.image`, else the stack profile's environment (SS-65: one source of truth,
+    `harness.capabilities`), else the provider's fallback image, which carries no stack tool."""
+    declared = str(config.get("sandbox.image", "") if config is not None else "").strip()
+    if declared:
+        return declared
+    profile = capabilities.profile_for(project)
+    return profile.image if profile else sandbox.DEFAULT_IMAGE
 
 
 @dataclass
@@ -167,47 +137,20 @@ class ToolResult:
 
 
 def detect_commands(project: Path | str) -> dict[str, str]:
-    """Detect project test/lint/sast commands from actual files on disk."""
-    project = Path(project)
-    pkg = project / "package.json"
-    if pkg.is_file():
-        return _from_package_json(pkg)
-    for marker, commands in _STACK_COMMANDS:
-        if (project / marker).is_file():
-            return dict(commands)
-    return {"test": "", "lint": "", "sast": ""}
+    """The commands the stack profile auto-selects for this project ("" where it selects none)."""
+    profile = capabilities.profile_for(project)
+    return {r.value: capabilities.auto_command(profile, r, project)[0] for r in capabilities.Role}
 
 
-def _from_package_json(path: Path) -> dict[str, str]:
-    """Only declare scripts that **actually exist**.
-
-    `npm test` when package.json does not define a `test` script exits non-zero
-    for the wrong reason — the gate would report "test failed" when in reality
-    the project has no tests. These two situations must be distinguished.
-    """
-    try:
-        scripts = json.loads(path.read_text(encoding="utf-8")).get("scripts") or {}
-    except (json.JSONDecodeError, OSError):
-        scripts = {}
-    out = {"test": "", "lint": "", "sast": "npm audit --omit=dev"}
-    if "test" in scripts:
-        out["test"] = "npm test --silent"
-    if "lint" in scripts:
-        out["lint"] = "npm run lint --silent"
-    elif "typecheck" in scripts:
-        out["lint"] = "npm run typecheck --silent"
-    return out
+def resolved_tool(name: str, project: Path | str, config: Config | None = None) -> capabilities.Resolved | None:
+    """The authoritative selection for one role (AUTO / EXPLICIT / DISABLED), or None for an unknown role."""
+    return next((r for r in capabilities.resolve(project, config) if r.role.value == name), None)
 
 
 def command_for(name: str, project: Path | str, config: Config | None = None) -> str:
-    """Command for a tool: config wins, auto-detection is the fallback."""
-    if config is not None:
-        key = f"tools.{name}"
-        if key in config:
-            configured = str(config[key]).strip()
-            if configured:
-                return configured
-    return detect_commands(project).get(name, "")
+    """Command for a tool: the explicit `tools.<name>` wins, a disabled role has none, otherwise the stack profile's."""
+    row = resolved_tool(name, project, config)
+    return row.command if row else ""
 
 
 def run_tool(
@@ -229,9 +172,15 @@ def run_tool(
 
     project = Path(project)
     cfg = config or Config.load(project)
-    command = command_for(name, project, cfg)
+    row = resolved_tool(name, project, cfg)
+    command = row.command if row else ""
     if not command:
-        res = ToolResult(name=name, ok=False, skipped="project has not declared a command for this tool")
+        if row is not None and row.mode is capabilities.Mode.DISABLED:
+            why = row.why
+        else:
+            why = "project has not declared a command for this tool" + (f" — {row.why}" if row is not None and row.why else "")
+        res = ToolResult(name=name, ok=False, skipped=why,
+                         detail={"mode": row.mode.value if row else "", "role": name})
         record(res, story_id, artifact_root, candidate)
         return res
 
@@ -307,7 +256,22 @@ MISSING_TOOL = (
     # (`ModuleNotFoundError: No module named 'x'`) are a missing project
     # dependency — `NO_DEPENDENCIES` routes those to `NO_SETUP`.
     "no module named",
+    # `cargo clippy` / `cargo audit` when the subcommand is not installed: cargo exits 101 with
+    # `error: no such command: \`clippy\`` — measured in rust:1-alpine (SS-65 sweep, 2026-09-17); the 1.7.x kernel
+    # scored it as a lint / security FAILURE.
+    "no such command",
 )
+
+#: The tool started and its environment refused it — no network at this sandbox level, or no writable cache for the
+#: sandbox's non-root user (SS-65 sweep, measured on real images 2026-09-17: `npm audit` → `EAI_AGAIN`, `go test` →
+#: `failed to initialize build cache … permission denied`, which the kernel had scored TEST_FAILED). Environment,
+#: never a behavioural result.
+NO_NETWORK = ("eai_again", "getaddrinfo", "enotfound", "temporary failure in name resolution",
+              "network is unreachable", "could not resolve host")
+#: Whole words only: `enotfound` is also the tail of `ModuleNotFoundError`, a missing project dependency (NO_SETUP).
+_NO_NETWORK_RE = re.compile(r"\b(?:" + "|".join(re.escape(m) for m in NO_NETWORK) + r")\b")
+NO_WRITABLE_CACHE = ("failed to initialize build cache", "gocache is not defined")
+SANDBOX_REFUSED = "the sandbox environment refused the tool"
 
 #: What a non-passing tool run **is** (D-029). Three different next actions:
 #: fix the code, install the tool, or fix the environment — and the gate,
@@ -345,6 +309,29 @@ NO_SETUP = "no runnable setup in this tree"
 NO_MANIFEST = f"{NO_SETUP} — there is no project manifest here"
 
 
+#: pytest ends the whole session when one test file fails to collect ("Interrupted: N errors during collection"), so
+#: one legitimate story-owned ImportError hides every other file's tests (SS-81). The flag keeps it going. node,
+#: vitest, jest and unittest already run each file on its own and need nothing. Qualified on the pinned pytest 9.1.1
+#: in the managed Python image (closure-evidence/hardening/w1/ss81/COLLECTION-STRATEGY-QUALIFICATION.json).
+PYTEST_CONTINUE = "--continue-on-collection-errors"
+
+
+def collection_continuation_args(command: str) -> list[str]:
+    """Extra args for the harness's own control runs (baseline, nop): the pytest flag when `command` runs pytest
+    directly as one of its argv words — never inside a shell string, where an appended word would change meaning."""
+    try:
+        argv = split_command(command or "")
+    except ValueError:
+        return []
+    # pytest must be the program run — not any argv word: `tox -e pytest` or `make pytest` would receive the flag
+    names = [Path(a).name.removesuffix(".exe") for a in argv]
+    if names[:1] in (["uv"], ["poetry"], ["pdm"]) and names[1:2] == ["run"]:
+        names = names[2:]
+    runs_pytest = names[:1] in (["pytest"], ["py.test"]) or (names[:1] != [] and names[0].startswith("python")
+                                                             and names[1:3] == ["-m", "pytest"])
+    return [PYTEST_CONTINUE] if runs_pytest and PYTEST_CONTINUE not in argv else []
+
+
 def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error: str = "") -> str:
     """One-line reason if the run is "unrunnable"; "" if it is a real result.
     For `test`, only conclude unrunnable when **no test passed** — a failing
@@ -355,12 +342,18 @@ def unrunnable_reason(name: str, exit_code: int, output: str, *, provider_error:
         return f"sandbox infrastructure error ({provider_error}) — command did not run; check daemon/image and retry"
     low = output.lower()
     hit = next((m for m in MISSING_TOOL if m in low), "")
-    if exit_code != 127 and not hit:
+    net = _NO_NETWORK_RE.search(low)
+    env = net.group(0) if net else next((m for m in NO_WRITABLE_CACHE if m in low), "")
+    if exit_code != 127 and not hit and not env:
         return ""
     if name == "test":
         from .testlog import parse as parse_testlog
-        if parse_testlog(output).passed:
+        if parse_testlog(output).test_ids:      # any named test — passed OR failed — proves the runner ran (SS-23)
             return ""
+    if env in NO_NETWORK:
+        return f"{SANDBOX_REFUSED}: it needs network, which this sandbox level does not grant ({env})"
+    if env:
+        return f"{SANDBOX_REFUSED}: the sandbox user cannot write the tool's cache ({env}) — fix the environment image"
     if hit == "no such file or directory" and any(m in low for m in MANIFESTS):
         return NO_MANIFEST
     if any(m in low for m in NO_DEPENDENCIES):
@@ -380,7 +373,7 @@ def outcome_kind(res: "ToolResult") -> str:
         return ""
     if not res.unrunnable:
         return TEST_FAILED if res.name == "test" else TOOL_FAILED
-    if res.unrunnable.startswith(NO_SETUP) or res.unrunnable.startswith("sandbox infrastructure error"):
+    if res.unrunnable.startswith((NO_SETUP, "sandbox infrastructure error", SANDBOX_REFUSED)):
         return ENVIRONMENT_FAILURE
     return TOOL_UNRUNNABLE
 

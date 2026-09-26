@@ -1,0 +1,30 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> ledgerlock/__main__.py:1:1
+  |
+1 | from ledgerlock.cli import main
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Organize imports
+  |
+2 |
+  -
+3 | raise SystemExit(main())
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests/test_skeleton.py:1:1
+  |
+1 | / import re
+2 | | import subprocess
+3 | | import sys
+4 | | import unittest
+5 | | from pathlib import Path
+  | |________________________^
+help: Organize imports
+  |
+6 |
+  -
+7 | PROJECT_ROOT = Path(__file__).resolve().parents[1]
+  |
+
+Found 2 errors.
+[*] 2 fixable with the `--fix` option.

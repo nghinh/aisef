@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 31 items
+
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_1_canonical_bytes_matches_json_dumps PASSED [  3%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_2_element_equal_dicts_byte_identical PASSED [  6%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_3_non_ascii_encodes_utf8_literal PASSED [  9%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_4_insertion_order_byte_identical PASSED [ 12%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_5_genesis_is_literal_seven_chars PASSED [ 16%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_6_roundtrip_through_json_loads_stable PASSED [ 19%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_1_returns_64_lowercase_hex PASSED [ 22%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_2_distinct_prev_hash_differs PASSED [ 25%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_3_ignores_precomputed_hash_fields PASSED [ 29%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_4_same_input_same_digest PASSED [ 32%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_5_accepts_genesis_non_hex PASSED [ 35%]
+tests/test_format.py::LineHashTests::test_line_hash_matches_manual_sha256_construction PASSED [ 38%]
+tests/test_ledger.py::AppendTests::test_AC_STORY_01_05_1_append_creates_genesis_line PASSED [ 41%]
+tests/test_ledger.py::AppendTests::test_AC_STORY_01_05_2_second_append_chains_hash PASSED [ 45%]
+tests/test_ledger.py::AppendTests::test_AC_STORY_01_05_3_empty_key_raises_valueerror_no_file PASSED [ 48%]
+tests/test_ledger.py::AppendTests::test_AC_STORY_01_05_4_fresh_ledger_reads_tail_from_disk PASSED [ 51%]
+tests/test_ledger.py::AppendTests::test_AC_STORY_01_05_5_separate_process_sees_new_line_and_newline PASSED [ 54%]
+tests/test_ledger.py::AppendTests::test_FR_13_append_fsyncs_before_return PASSED [ 58%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_NFC 
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_NFC PASSED [ 61%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_byte_identical PASSED [ 64%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path PASSED [ 67%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_module_help_lists_subcommands PASSED [ 70%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_imports PASSED [ 74%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_6_no_side_channel_calls PASSED [ 77%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_7_import_Ledger_and_ConflictError PASSED [ 80%]
+tests/test_store.py::ReadLinesTests::test_AC_STORY_01_04_1_read_lines_returns_N_bytes_stripped PASSED [ 83%]
+tests/test_store.py::ReadLinesTests::test_AC_STORY_01_04_2_read_lines_missing_file_raises PASSED [ 87%]
+tests/test_store.py::ReadLinesTests::test_AC_STORY_01_04_3_read_lines_empty_file_empty_list PASSED [ 90%]
+tests/test_store.py::WriteAtomicTests::test_AC_STORY_01_04_4_write_atomic_roundtrip PASSED [ 93%]
+tests/test_store.py::WriteAtomicTests::test_AC_STORY_01_04_5_write_atomic_crash_preserves_original PASSED [ 96%]
+tests/test_store.py::WriteAtomicTests::test_AC_STORY_01_04_6_write_atomic_temp_same_dir PASSED [100%]
+
+==================== 31 passed, 10 subtests passed in 0.23s ====================

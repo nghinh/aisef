@@ -1,0 +1,206 @@
+{
+ "generated": "2026-09-18T20:50:51+0700",
+ "family": "F7-EXECUTION-EVIDENCE-VALIDITY",
+ "defects": [
+  "SS-81",
+  "SS-82",
+  "SS-83",
+  "SS-84",
+  "SS-85",
+  "SS-86",
+  "SS-87",
+  "SS-88",
+  "SS-89",
+  "SS-90"
+ ],
+ "status": "FIXED",
+ "invariants": [
+  "INV-TDD-NOP-PROOF",
+  "INV-T.EXECUTED-EVIDENCE"
+ ],
+ "candidate_sha": "d32031dbe2081d0a34368b63b992ec5a5cd3694e",
+ "candidate_aisef_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+ "requirements": {
+  "every_family_reproducer_RED_on_the_frozen_kernel": {
+   "ok": true,
+   "fail_counts": {
+    "repro_A_unrunnable_nop_with_pytest_format.frozen-02a34e0e.txt": 1,
+    "repro_B_collection_interruption_masks_tests.frozen-02a34e0e.txt": 1,
+    "repro_S10_no_nop_record.frozen-02a34e0e.txt": 1,
+    "repro_S4_S5_S6_S7_siblings.frozen-02a34e0e.txt": 5,
+    "repro_S8_S9_skipped_as_green.frozen-02a34e0e.txt": 2,
+    "repro_SS82_package_root.frozen-02a34e0e.txt": 1
+   }
+  },
+  "every_family_reproducer_GREEN_on_the_fix": {
+   "ok": true
+  },
+  "the_twelve_required_regressions_exist": {
+   "ok": true,
+   "classes": [
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R05",
+    "R06",
+    "R07",
+    "R08",
+    "R09",
+    "R10",
+    "R11",
+    "R12"
+   ]
+  },
+  "family_suite_GREEN": {
+   "ok": true
+  },
+  "collection_strategy_qualified_on_the_real_image": {
+   "ok": true,
+   "image": "aisef-verify-python:84adf1d8eaf9",
+   "pytest": "pytest 9.1.1",
+   "requirements": {
+    "strategy_is_the_flag_the_kernel_appends": true,
+    "file_b_executes_although_file_a_fails_to_collect": true,
+    "tautology_observed_green_and_control_fails": true,
+    "file_a_bound_to_the_story_only": true,
+    "every_ac_has_an_explicit_state": true,
+    "control_without_strategy_aborts_and_proves_nothing": true
+   }
+  },
+  "historical_re_audit_0_false_pass": {
+   "ok": true,
+   "summary": {
+    "STORY-01-02@w1-run-1": {
+     "recorded": "passed",
+     "replay_on_recorded_evidence": "unrunnable",
+     "remeasured": "passed",
+     "tdd_remeasured": "passed",
+     "classification": "HISTORICAL_PASS_NOW_PROVEN"
+    },
+    "STORY-01-03@w1-run-1": {
+     "recorded": "passed",
+     "replay_on_recorded_evidence": "unrunnable",
+     "remeasured": "passed",
+     "tdd_remeasured": "passed",
+     "classification": "HISTORICAL_PASS_NOW_PROVEN"
+    },
+    "STORY-01-04@w1-run-1": {
+     "recorded": "passed",
+     "replay_on_recorded_evidence": "unrunnable",
+     "remeasured": "passed",
+     "tdd_remeasured": "passed",
+     "classification": "HISTORICAL_PASS_NOW_PROVEN"
+    },
+    "STORY-01-06@w1-run-1": {
+     "recorded": "passed",
+     "replay_on_recorded_evidence": "unrunnable",
+     "remeasured": "passed",
+     "tdd_remeasured": "passed",
+     "classification": "HISTORICAL_PASS_NOW_PROVEN"
+    },
+    "STORY-01-01@w1-run-3": {
+     "recorded": "passed",
+     "replay_on_recorded_evidence": "unrunnable",
+     "remeasured": "passed",
+     "tdd_remeasured": "passed",
+     "classification": "HISTORICAL_PASS_NOW_PROVEN"
+    },
+    "STORY-01-02@w1-run-3": {
+     "recorded": "passed",
+     "replay_on_recorded_evidence": "unrunnable",
+     "remeasured": "passed",
+     "tdd_remeasured": "passed",
+     "classification": "HISTORICAL_PASS_NOW_PROVEN"
+    }
+   }
+  },
+  "family_FIXED_in_the_register": {
+   "ok": true,
+   "family": {
+    "SS-81": [
+     "P1",
+     "FIXED"
+    ],
+    "SS-82": [
+     "P3",
+     "FIXED"
+    ],
+    "SS-83": [
+     "P1",
+     "FIXED"
+    ],
+    "SS-84": [
+     "P2",
+     "FIXED"
+    ],
+    "SS-85": [
+     "P2",
+     "FIXED"
+    ],
+    "SS-86": [
+     "P1",
+     "FIXED"
+    ],
+    "SS-87": [
+     "P1",
+     "FIXED"
+    ],
+    "SS-88": [
+     "P2",
+     "FIXED"
+    ],
+    "SS-89": [
+     "P3",
+     "FIXED"
+    ]
+   }
+  },
+  "SS-90_FIXED": {
+   "ok": true
+  },
+  "invariants_PROVEN": {
+   "ok": true,
+   "registered": 54
+  },
+  "fault_matrix_cells_GREEN": {
+   "ok": true,
+   "cells": {
+    "FM-T-08": "GREEN (F7)",
+    "FM-T-09": "GREEN (F7)",
+    "FM-T-10": "GREEN (F7)",
+    "FM-T-11": "GREEN (F7)",
+    "FM-T-12": "GREEN (F7)",
+    "FM-T-13": "GREEN (F7)",
+    "FM-T-14": "GREEN (F7)",
+    "FM-T-15": "GREEN (F7)",
+    "FM-T-16": "GREEN (F7)"
+   },
+   "total": 88
+  },
+  "full_suite_GREEN": {
+   "ok": true,
+   "summary": "3593 passed, 20 skipped, 1506 subtests passed in 513.48s (0:08:33)"
+  },
+  "ruff_GREEN": {
+   "ok": true
+  },
+  "Linux_CI_GREEN": {
+   "ok": true,
+   "run": "35349243386",
+   "jobs": {
+    "wheel": "success",
+    "unit (windows-latest, 3.11)": "success",
+    "lint": "success",
+    "unit (ubuntu-latest, 3.12)": "success",
+    "unit (ubuntu-latest, 3.14)": "success",
+    "unit (ubuntu-latest, 3.11)": "success",
+    "unit (ubuntu-latest, 3.13)": "success"
+   }
+  },
+  "Windows_CI_GREEN": {
+   "ok": true
+  }
+ },
+ "all_met": true
+}

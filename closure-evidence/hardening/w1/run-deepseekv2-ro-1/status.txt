@@ -1,0 +1,11 @@
+Progress: 10/16 stories done (5 not started)
+Active epics: EPIC-04
+
+  done        10
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 51
+
+✗ 1 stories not passing:
+    STORY-04-01      failed   deadlock due to plan: AC-STORY-04-01-2 [CHANGE_REQUIRED] GREEN -> GREEN → PLAN_OVERLAP: declared CHANGE_REQUIRED, but the behaviour is already there at the story's parent (green) — an upstream story or the plan already delivers it; correct the plan, do not rewrite working code. The criterion cannot be satisfied by writing code — correct the plan (its proof obligation, its owning story, or the criterion itself), then re-run.

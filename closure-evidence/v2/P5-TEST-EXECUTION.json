@@ -1,0 +1,34 @@
+{
+ "record": "AISEF V2 — P5 TEST EXECUTION",
+ "work_package": "WP-5.1",
+ "rfc": "§15.0 (F1 payload enums TestExecutionStatus, TestOutcome, TestSelection; F3 owners)",
+ "implementation": "aisef2/quality/test_execution.py",
+ "runners": {
+  "unittest": "harness-owned, stdlib alone, run with -E -s -c inside an owned process range",
+  "pytest": "read through its junit result set (xunit1)"
+ },
+ "taxonomy": "unchanged: FailureCode (carried by failure/observed, F1 by the V2-003 reading) gains no member in WP-5.1; the engineering-quality codes are proposed under ARCHITECTURE EXCEPTION V2-004 for the owner's decision before WP-5.4 wires TestExecution into routing and budgets",
+ "properties": {
+  "TEST_1_missing_runner_UNRUNNABLE_ENVIRONMENT_no_outcome_no_selection": true,
+  "TEST_2_failing_assertions_EXECUTED_FAILED_INADEQUATE_owner_DEVELOPER": true,
+  "passing_suite_EXECUTED_PASSED_STORY_TESTS_RAN": true,
+  "collection_cause_declared_environment_dependency_UNRUNNABLE_ENVIRONMENT_SS81A": true,
+  "collection_cause_project_source_DEVELOPER": true,
+  "collection_cause_undeterminable_INTEGRATION_never_DEVELOPER": true,
+  "collection_cause_syntax_error_in_the_developers_file_DEVELOPER": true,
+  "NO_STORY_TESTS_MATCHED_DEVELOPER_by_the_typed_value_distinct_from_UNRUNNABLE": true,
+  "regression_execution_uses_the_identical_rules": true,
+  "story_collection_failure_never_hidden_by_story_tests_that_ran_rule_4_before_rule_2": true,
+  "outcome_is_the_storys_own_tests_never_another_files": true,
+  "no_did_not_run_to_developer_edge_exists_anywhere": true,
+  "UNRUNNABLE_is_never_INADEQUATE_or_INCOMPLETE_downstream": true,
+  "shape_is_the_rfcs_and_typed": true,
+  "runner_crash_before_reporting_UNRUNNABLE": true,
+  "harness_deadline_UNRUNNABLE_and_range_released": true,
+  "selection_by_directory_and_by_node_id": true,
+  "pytest_result_set_read_typed": true,
+  "no_parent_revision_reaches_execution_IX": true,
+  "unrunnable_owner_is_environment_by_the_typed_value": true,
+  "classifier_reads_typed_causes_never_prose": true
+ }
+}

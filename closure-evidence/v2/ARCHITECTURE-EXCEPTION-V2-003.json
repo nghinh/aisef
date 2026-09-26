@@ -1,0 +1,140 @@
+{
+ "record": "AISEF V2 — ARCHITECTURE EXCEPTION",
+ "id": "ARCHITECTURE-EXCEPTION-V2-003",
+ "status": "APPROVED — APPLIED",
+ "frozen_items_affected": [
+  "F5 — probe protocol: signal provenance after dispatch (§9.3, new)",
+  "F2 — the owner routing table: one row per measurement point for the new typed reason, and the reason vocabulary of §10.2",
+  "F1 — a typed enumeration carried in an event payload (FailureCode) gains one member"
+ ],
+ "consequential": [
+  "F4 — no rule changes; the probe digest changes, so every python_callable ProductProofSpec has a new semantic_hash (§35, §7 of the owner decision)"
+ ],
+ "promoted_from": {
+  "path": "docs/implementation/v2/ARCHITECTURE-EXCEPTION-V2-003-PROPOSAL.md",
+  "sha256": "2d61d3e9f2f9cfe6ec4fa032d57c071fb69df65bc73b15263d01cf428a4a927d"
+ },
+ "contradiction_discovered": "The P2 probe classified a harness process that dies by a signal after DISPATCHED as HARNESS_FAILED -> UNRUNNABLE -> PROBE_UNRUNNABLE, owner ENVIRONMENT, retryable. A subject that ends its own process (os.abort, os.kill(getpid, SIGTERM)) was therefore charged to the environment budget and retried, which is exactly what INTERRUPT-SIG-2 forbids; the probe had no way to tell a signal it sent itself from one it did not send.",
+ "discovered_in": {
+  "phase": "P4 (WP-4.6)",
+  "candidate": "d234be9181254021cc2fea4ba0379422cbd54348",
+  "flagged_by_implementation": "closure-evidence/v2/P4-COMPLETION.json (verdict: P4 STOPPED — ARCHITECTURE EXCEPTION REQUIRED), P4-FINDING-002"
+ },
+ "owner_decision": {
+  "decision": "AISEF V2 — OWNER DECISION ON ARCHITECTURE EXCEPTION V2-003",
+  "date": "2026-09-23",
+  "approved": "OPTION 1 — PROVENANCE-SPLIT, with the owner's refinements",
+  "refinements": [
+   "the typed reason is NON_CONTROLLER_SIGNAL, not SUBJECT_SIGNALLED: the evidence establishes only that the controller did not send the signal, never who did",
+   "owner INTEGRATION, retryable false, no budget, at every measurement point",
+   "at the parent it fails closed through the existing PROBE_INVALID path; no developer or provider request may start",
+   "routing stays measurement-point aware (V2-001 preserved); PRECONDITION_ABSENT semantics unchanged",
+   "before DISPATCHED the V2-002 semantics are unchanged",
+   "no new Owner, ProbeExecutionStatus, BehaviorVerdict or StoryAdmissionDisposition",
+   "one authority for controller signal provenance: the P4 owned process range's ledger"
+  ]
+ },
+ "replacement": {
+  "summary": "After DISPATCHED the controller's own signal ledger decides, never the signal number. The ledger holds the signal: the controller stopped its own observation — an interruption, no ProbeResult, no verdict, no owner, closed through the P4 interruption path (OUTCOME_UNKNOWN once dispatched). The ledger does not hold it: EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL), routed INTEGRATION and never retried. Before DISPATCHED nothing changes: UNRUNNABLE / ENVIRONMENT (V2-002).",
+  "semantics": {
+   "CASE A — after DISPATCHED, the controller's ledger holds the terminating signal": "an interruption: no ProbeResult, no BehaviorVerdict, no owner; the operation closes OUTCOME_UNKNOWN and the provenance is kept. It applies to whatever the harness managed to report: a cooperative SIGINT surfaces inside the subject as KeyboardInterrupt, and reading that as the subject's own behaviour would charge a controller's decision to the product (measured while implementing; the check therefore covers every post-dispatch path, not only a signal exit)",
+   "CASE B — after DISPATCHED, the ledger does not hold it": "EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL); never UNRUNNABLE, never ENVIRONMENT, never a verdict, and never a global 'signal exit -> REFUTED'",
+   "CASE C — before DISPATCHED": "the observation mechanism failed: UNRUNNABLE, owner ENVIRONMENT (V2-002, unchanged and unconditional — the owner decision states it without a provenance test)"
+  },
+  "routing": {
+   "PARENT": "NON_CONTROLLER_SIGNAL, owner INTEGRATION, not retryable, disposition PROBE_INVALID",
+   "CANDIDATE": "NON_CONTROLLER_SIGNAL, owner INTEGRATION, not retryable, no developer budget",
+   "POST_MERGE": "NON_CONTROLLER_SIGNAL, owner INTEGRATION, not retryable, no regression inferred"
+  },
+  "rfc_text": "new §9.3, §10.2 reason paragraph, one §10.3 routing row, freeze-table rows F1/F2/F5 and the marker sentence",
+  "no_new_plane_or_owner": true,
+  "regression_cases": [
+   "SIG-PROBE-1",
+   "SIG-PROBE-2",
+   "SIG-PROBE-3",
+   "SIG-PROBE-4",
+   "SIG-PROBE-5",
+   "SIG-PROBE-6",
+   "SIG-PROBE-7",
+   "SIG-PROBE-8",
+   "SIG-PROBE-9",
+   "SIG-PROBE-10"
+  ]
+ },
+ "f1_impact": {
+  "verdict": "AFFECTED — declared, and no format version bump is required",
+  "question": "§6 of the owner decision: is IndeterminateReason serialized in an event payload, in an event schema, or in an F1 enum catalog used to interpret existing journals?",
+  "determined_mechanically": {
+   "IndeterminateReason": "NO. The payload enums of journal format 1 are ControlProjection, FailureCode, ObligationRole, Owner and StoryAdmissionDisposition (aisef2/journal/event.py SCHEMAS); format 2 adds Enforcement, IdentityGrade, OperationOutcome, ReleaseStatus, ResourceKind and SignalProvenance (aisef2/journal/format2.py). IndeterminateReason, BehaviorVerdict and ProbeResult appear nowhere under aisef2/journal, and F1's conformance catalog (F1.payload_enum.*) lists Vacuity, Relevance, AdequacyOutcome, TestExecutionStatus, TestOutcome and TestSelection. The new reason therefore touches F2's vocabulary, not F1's.",
+   "FailureCode": "YES. failure/observed carries code: _enum(FailureCode), so the taxonomy is a typed enumeration carried in an event payload, and F1 freezes those. Adding NON_CONTROLLER_SIGNAL grows it, so F1 is declared affected."
+  },
+  "compatibility": [
+   "no existing member changes meaning, so no existing event is reinterpreted — the reason F1 freezes payload enums at all",
+   "no journal written before this amendment can contain the new value; old journals remain valid under their original format identity and read byte-identically",
+   "a reader that does not know the member refuses the event (fail closed), never misreads it",
+   "no new event type and no new payload field, so §35 requires no format version bump; the frozen compatibility mechanism (journal format 2) is unchanged and still reads format-1 journals"
+  ]
+ },
+ "evidence_compatibility_impact": {
+  "is_evidence_compatibility_change": true,
+  "what_changes": "The outcome of a post-dispatch signal: UNRUNNABLE/ENVIRONMENT (retryable) -> either an interruption with no result (the controller's own signal) or EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL) -> INTEGRATION, never retried. python_callable.py and probe/protocol.py change, so probe_digest changes and every spec bound to the old digest is refused (INVALID_SPEC, scenario D) until it is recompiled.",
+  "probe_digest": {
+   "before": "27785f8af066298cee1098bedf981d4cc1e9f9000a29105f748c586ae5f3dc73",
+   "after": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "after_first_applied": "07281265f698ed00765119f27a0800e86c3c1807c6bf60428a112ed55fecca12",
+   "note": "the first applied form of §9.3 (digest 07281265…) carried a dead operand in _watch's end-of-protocol branch (`elif ended or tag == \"EOF\"`, the second operand unreachable); the corrected candidate removed it rather than audit a kernel mutant (tests/v2/p2/test_mutation_targets.py: only reference models are audited), so the probe digest changed once more to c335293e…; calibration was re-established by execution for it and every python_callable.py mutation target re-measured"
+  },
+  "calibration": "every ProbeCapabilityCalibration bound to the old digest is historical; calibration is re-established by execution for the new digest (never by copying a record and editing it)",
+  "evidence_written_under_the_old_wording": "P1, P2 and P3 seals stay untouched and remain evidence of what those phases delivered under their then-current architecture identity. The current P2 evidence records that name the probe digest (P2-CALIBRATION.json, P2-PROBE-PROTOCOL.json) are recomputed; their before/after sha256 are recorded in closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json. V1 evidence is untouched.",
+  "unaffected": "the Owner set (F3), ProbeExecutionStatus x BehaviorVerdict and the ContractSatisfaction derivation (F2), the Probe protocol members and signatures, ProbeResult fields, the two calibration contracts, subject-absence semantics (§10.2), PRECONDITION_ABSENT routing (V2-001), harness timeout vs subject deadline (§9.2, V2-002)"
+ },
+ "implementation_decisions_for_owner_review": [
+  "The probe digest covers probe/protocol.py and probe/python_callable.py, as before. The provenance mechanism it now uses (aisef2/runtime/process_range.py) is NOT in the digest: a P4 range fix would otherwise invalidate every product spec. The probe's use of it is visible in python_callable.py, which is in the digest.",
+  "The probe releases its own range in a finally block; a range that will not empty raises (RangeNotEmpty / RangeEscaped) rather than being swallowed, so a leak is never silent. A story may instead take ownership through the harness-owned on_range hook, which is not part of the frozen Probe protocol (PROBE-META-1).",
+  "CASE C is applied unconditionally, as the owner decision states it: a signal before DISPATCHED is UNRUNNABLE / ENVIRONMENT even when the controller's ledger holds it."
+ ],
+ "digests": {
+  "rfc_normative_digest": {
+   "before": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+   "after": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771"
+  },
+  "freeze_table_digest": {
+   "before": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114",
+   "after": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7"
+  },
+  "f1_row_sha256": {
+   "before": "b0b1b6d6914cda85c16ebc9538a8408e7360752dbdf880ca54987460329eb24b",
+   "after": "c7ef7e857d4dbafa17d8b0ed39f0d619a5c834f7f09460c74f17338f19cbc9b0"
+  },
+  "f2_row_sha256": {
+   "before": "e33271cd13c7752c6f2fe154cb827f9ee46586ac27d38257f9577470ab4188ca",
+   "after": "d129883bfdf9ce3ab795efdaf144e3d3af231f128c73bc62f1b5de78f0ada803"
+  },
+  "f5_row_sha256": {
+   "before": "5c1bf5f75fcb569908893539c7787a228cc865d18d87ee8408a67cd161742ec5",
+   "after": "92ba9a46280167855e2adb8c552062325432593b3a7e75f0ce3383a4a2483735"
+  },
+  "unchanged_rows": {
+   "F3": "a0b7f7a27f0a50b53b4efc16170f01116b07d93248771c07d33b1581cd6e5b12",
+   "F4": "fc637720bc589d6fd68939186e0003e3d97829119bff76b0f908055884d8e53e",
+   "F6": "fb5010a330f858f439ea35b8a1f0e733f653cdc2d5aca43e16abd7640b8edab4",
+   "F7": "36dedf49f90886248be8e692974433619eb051ac34f8082194a88db3f93a61fa",
+   "F8": "0bc2a40b492b8d7b674d91d9e6d084295b843a15ce04e1865d72a90cebbeb91f",
+   "F9": "eab873cc50552e1aa1b7497edff78be3e95ea4cf7314645c24703e60dbc2c6ad",
+   "F10": "6046ef16c4c1c43e6bf2769f6bbba600d1c3abfc65a8c19d96b4882854da7f2e",
+   "F11": "51f57a2579541c96d54cb96655cc02a459c2674ece9ba461ab1ec92f5e2f5b37"
+  }
+ },
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "AISEF V2 — OWNER DECISION ON ARCHITECTURE EXCEPTION V2-003",
+  "date": "2026-09-23",
+  "terms": [
+   "P4 remains STOPPED until the correction is accepted; P5 is NOT AUTHORIZED",
+   "Option 2 (all post-dispatch signal exits are the subject's) is not implemented",
+   "Option 3 (accept the residual) is not accepted",
+   "no rerun-to-green: every failed attempt is preserved",
+   "the anti-loop stop rule of §18 applies: this is V2-003 and is not expanded"
+  ]
+ }
+}

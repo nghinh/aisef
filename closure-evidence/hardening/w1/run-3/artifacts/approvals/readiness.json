@@ -1,0 +1,20 @@
+{
+  "gate": "readiness",
+  "artifact": "stories.index.json, design-contract.json",
+  "artifact_sha256": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+  "status": "approved",
+  "seq": 11,
+  "decided_by": "nghinh",
+  "decided_at": "2026-09-18T03:25:21+00:00",
+  "note": "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json",
+  "machine_checks": {},
+  "history": [
+    {
+      "status": "approved",
+      "decided_by": "nghinh",
+      "decided_at": "2026-09-15T13:32:32+00:00",
+      "note": "",
+      "artifact_sha256": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838"
+    }
+  ]
+}

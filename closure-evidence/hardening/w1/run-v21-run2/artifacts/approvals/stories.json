@@ -1,0 +1,31 @@
+{
+  "gate": "stories",
+  "artifact": "stories.index.json",
+  "artifact_sha256": "6f9e71b300a2a7565c53429c8edfd177273aea429a34b54d0357a1fa90167377",
+  "status": "approved",
+  "seq": 14,
+  "decided_by": "nghinh",
+  "decided_at": "2026-09-20T22:10:37+00:00",
+  "note": "W1-LEDGERLOCK-PLAN-V2.1 (owner decision 2026-09-21, sections 3-5): the usage-error exit moves to its semantic introduction owner",
+  "machine_checks": {
+    "bmad_status": "unreadable",
+    "machine gate": "pass",
+    "warnings": "epics are fully serialized, no stories can run in parallel: EPIC-01 (6 story) — review `depends_on`, only declare when a story truly needs the **output** of an earlier one; stories in the same epic write exactly the same files: STORY-01-02, STORY-01-03 → ledgerlock/format.py, tests/test_format.py; STORY-04-02, STORY-04-03 → ledgerlock/cli.py, tests/test_cli_exit_codes.py — check that each one adds behaviour the others do not. A story whose criteria the earlier story already satisfies cannot pass: its tests are green at the branch point, and that is not something the developer can fix from inside the story; STORY-02-01 missing prerequisites to run: verify.e2e — story declares in `verification_contract`. configure `verify.e2e` — these keys live in `.ai/config.json`; STORY-03-01 missing prerequisites to run: verify.e2e — story declares in `verification_contract`. configure `verify.e2e` — these keys live in `.ai/config.json`"
+  },
+  "history": [
+    {
+      "status": "approved",
+      "decided_by": "auto",
+      "decided_at": "2026-09-15T13:27:08+00:00",
+      "note": "auto-approved (--auto-approve)",
+      "artifact_sha256": "34dd3f9c32e88a9a5523a3c770df5a17c194ed2904138ba7129c4763f36a4c95"
+    },
+    {
+      "status": "approved",
+      "decided_by": "nghinh",
+      "decided_at": "2026-09-20T00:32:30+00:00",
+      "note": "W1-LEDGERLOCK-PLAN-V2 (owner decision 2026-09-20, section 3)",
+      "artifact_sha256": "aad2ceb42228450a42e294139997a98f22082ce40811ebd8c071efc8ac7b5503"
+    }
+  ]
+}
