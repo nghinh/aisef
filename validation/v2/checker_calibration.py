@@ -329,6 +329,15 @@ def _p6_evidence() -> Checker:
                    ("validation/v2/p6_evidence.py",))
 
 
+def _old_path_audit() -> Checker:
+    opa = _load("aisef_v2_old_path_audit", V2 / "old_path_audit.py")
+
+    def bad(fx):
+        text = _edit((ROOT / fx["path"]).read_text(encoding="utf-8"), fx)
+        return opa.compare(json.loads(text), opa.inventory(ROOT))
+    return Checker("old_path_audit", "WP-6.3", lambda: opa.check(ROOT), bad, ("validation/v2/old_path_audit.py",))
+
+
 def _owned_run() -> Checker:
     ow = _load("aisef_v2_owned_run", V2 / "owned_run.py")
     return Checker("owned_run", "WP-4.2", lambda: ow.check(ROOT), lambda fx: ow.problems_of(fx["measurement"]),
@@ -400,7 +409,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_developer_artefact_at_parent", "NO_DEVELOPER_ARTEFACT_AT_PARENT", "WP-5.5 (invariant IX)"),
     _except_boundaries, _invariants_doc,
     _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _p5_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
-    _migration_table, _p6_evidence,
+    _migration_table, _p6_evidence, _old_path_audit,
 ]
 
 

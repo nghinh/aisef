@@ -321,6 +321,17 @@ P6_TARGETS.update({f"aisef2/orchestrate/{m}::{f}": _ORCH_STAGES for m, fs in (
 ) for f in fs})
 P6_TARGETS.update({f"aisef2/orchestrate/story_runner.py::{f}": _ORCH_PATH for f in ("run_story", "_attempt")})
 P6_TARGETS["aisef2/journal/format3.py::verified_payload"] = [*_FMT3_TESTS, *_ORCH_STAGES]
+# WP-6.3: the old-path audit — every function killed on synthetic trees; the audit's entry, comparison, inventory and
+# proofs by the real-tree no-dual-authority cases as well (fail-closed in both directions, R1–R6)
+_OPA_TESTS = ["tests/v2/test_old_path_audit.py"]
+_OPA_REAL = [*_OPA_TESTS, "tests/v2/test_no_dual_authority.py"]
+P6_TARGETS.update({f"validation/v2/old_path_audit.py::{f}": _OPA_TESTS for f in (
+    "_lf", "_module_name", "_imports", "_dotted", "_qualify", "_defs", "def_digest", "_py_files", "legacy_imports",
+    "_capabilities", "v2_reality", "reachable_modules", "v1_reality", "entrypoints", "legacy_references",
+    "test_legacy_imports", "adapter_conditions", "_seam_before_first_event", "inventory_digest", "_function",
+    "_kernel_rules", "developer_test_flows", "parent_execution_sites", "recency_sites", "journal_backing",
+    "decision_table", "decision_problems", "render")})
+P6_TARGETS.update({f"validation/v2/old_path_audit.py::{f}": _OPA_REAL for f in ("inventory", "proofs", "compare", "audit", "check")})
 for _t in ("aisef2/journal/projections/budgets.py::Budgets.step", "aisef2/journal/projections/story_state.py::StoryState.step",
            "aisef2/journal/projections/story_state.py::_WITHIN", "aisef2/journal/projections/story_state.py::_OUTCOMES",
            "tests/v2/refmodel/budgets.py::_walk", "tests/v2/refmodel/budgets.py::model",
@@ -360,7 +371,8 @@ AUDITED: dict[tuple[str, str], str] = {
 }
 #: What a run copies into its scratch tree.
 COPY = ("aisef2", "tests/v2", "validation/v2", "docs/architecture", "docs/implementation/v2", "closure-evidence/v2",
-        "aisef")  # the frozen V1 tree, read by the WIN-PID red-before reproducers; never a target
+        "aisef",   # the frozen V1 tree, read by the WIN-PID red-before reproducers; never a target
+        "pyproject.toml")  # the console-script table the old-path audit inventories (tests/v2/test_no_dual_authority.py)
 
 _SWAP = {ast.Eq: ast.NotEq, ast.NotEq: ast.Eq, ast.Is: ast.IsNot, ast.IsNot: ast.Is, ast.In: ast.NotIn,
          ast.NotIn: ast.In, ast.Lt: ast.GtE, ast.GtE: ast.Lt, ast.Gt: ast.LtE, ast.LtE: ast.Gt}

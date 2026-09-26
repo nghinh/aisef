@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 38,
+ "checker_count": 39,
  "uncovered_checker_modules": [],
- "calibrated_count": 38,
- "always_pass_mutants_rejected": 38,
+ "calibrated_count": 39,
+ "always_pass_mutants_rejected": 39,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -587,6 +587,22 @@
    "expected": "property FMT3_6_format_3_provider_request_requires_budget_owner is false",
    "observed": [
     "WP-6.2: property FMT3_6_format_3_provider_request_requires_budget_owner is false"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "old_path_audit",
+   "package": "WP-6.3",
+   "fixture": "tests/v2/fixtures/known_bad/old_path_audit.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "STALE inventory row: aisef/control/gate.py::judge_nobody",
+   "observed": [
+    "UNENUMERATED authority: aisef/control/gate.py::judge_only (UNREACHABLE) is in the tree and not in the inventory",
+    "STALE inventory row: aisef/control/gate.py::judge_nobody no longer resolves to an authority in the tree"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

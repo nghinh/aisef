@@ -410,10 +410,199 @@ def orchestration() -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------- WP-6.3 / old-path removal
+
+NDA_CASES = {
+    "inventory_matches_both_directions": ("Inventory", "test_the_committed_inventory_matches_reality_in_both_directions"),
+    "unenumerated_and_stale_fail_closed": ("Inventory", "test_an_unenumerated_authority_and_a_stale_row_each_fail_the_audit"),
+    "dual_authority_rejected_even_when_agreeing": ("Inventory", "test_dual_authority_fails_even_when_both_paths_agree"),
+    "legacy_fallback_rejected": ("Inventory", "test_a_legacy_fallback_fails"),
+    "adapter_touching_v1_rejected": ("Inventory", "test_an_adapter_that_touches_v1_and_an_old_authority_reachable_again_fail"),
+    "R1_runtime_poisoning": ("Poisoned", "test_every_v1_family_is_poisoned_and_the_real_path_runs_unchanged"),
+    "R2_five_developer_test_variants_one_proof": ("DeveloperTestsNeverDecide", "test_five_developer_test_variants_one_product_proof"),
+    "R3_exploding_parent_tests_never_run": ("NothingExecutesAtTheParent", "test_exploding_parent_tests_are_never_imported_collected_or_executed"),
+    "R4_explicit_reference_whatever_the_timestamps": ("OnlyExplicitReferencesSelectEvidence", "test_the_cited_record_decides_whatever_the_timestamps_say"),
+    "R5_journal_budget_decides_counters_do_not": ("RetryStateIsTheJournal", "test_a_reporting_counter_is_irrelevant_and_the_journal_decides"),
+    "R6_decision_table_of_real_stories": ("EveryDecisionIsJournalBacked", "test_the_table_of_a_committed_and_a_rolled_back_story"),
+}
+RUNTIME_OF = {"NO_OLD_GATE_AUTHORITY": ("R1_runtime_poisoning", "adapter_touching_v1_rejected", "dual_authority_rejected_even_when_agreeing", "legacy_fallback_rejected"),
+              "NO_DEVELOPER_TEST_PRODUCT_AUTHORITY": ("R2_five_developer_test_variants_one_proof",),
+              "NO_PARENT_DEVELOPER_EXECUTION": ("R3_exploding_parent_tests_never_run",),
+              "NO_RECENCY_EVIDENCE_SELECTION": ("R4_explicit_reference_whatever_the_timestamps",),
+              "NO_SIDE_RETRY_COUNTER": ("R5_journal_budget_decides_counters_do_not",),
+              "ALL_CONTROL_DECISIONS_JOURNAL_BACKED": ("R6_decision_table_of_real_stories",)}
+EVIDENCE_FILES = ("closure-evidence/v2/P6-MUTATION.json", "closure-evidence/v2/P6-RUN-HISTORY.json",
+                  "closure-evidence/v2/P6-MIGRATION-TABLE.json", "closure-evidence/v2/P6-ORCHESTRATION.json",
+                  "closure-evidence/v2/P6-AUTHORITY-INVENTORY.json", "closure-evidence/v2/P6-V2-005-SCHEMA.json",
+                  "closure-evidence/v2/P4-FINAL-SEAL.json", "closure-evidence/v2/P5-FINAL-SEAL.json",
+                  "closure-evidence/v2/V1-EVIDENCE-BASELINE.json", "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json",
+                  "closure-evidence/v2/F-CONFORMANCE.json", "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json")
+
+
+def tree_digest(rel: str) -> dict:
+    """sha256 over the sorted (path, LF-normalised content sha256) of every source or record file under `rel`, from
+    the working tree — a Windows checkout with CRLF gives the same digest."""
+    base = ROOT / rel
+    lines = []
+    for p in sorted(base.rglob("*")):
+        if p.is_file() and "__pycache__" not in p.parts and p.suffix in (".py", ".json", ".md", ".toml", ".txt", ".yaml", ".yml"):
+            lines.append(f"{p.relative_to(ROOT).as_posix()}\t{_lf_sha(p)}")
+    return {"files": len(lines), "sha256": hashlib.sha256("\n".join(lines).encode()).hexdigest(), "rule": "sha256 over sorted '<path>\\t<lf-sha256>' lines"}
+
+
+def _git_tree(rel: str) -> str | None:
+    import subprocess
+    try:
+        out = subprocess.run(["git", "-C", str(ROOT), "rev-parse", f"HEAD:{rel}"], capture_output=True, encoding="utf-8", check=True).stdout.strip()
+    except (subprocess.CalledProcessError, OSError):
+        return None
+    return out or None
+
+
+def _orchestrate_events() -> list:
+    e2e = _module("aisef_v2_test_p6_orchestration", "tests/v2/test_p6_orchestration.py")
+    case = e2e.Orchestration("test_ORCH_1_an_end_to_end_story_completes_through_the_real_path")
+    case.setUp()
+    try:
+        case.story(case.s1_plan(), "S1", case.s1_dev())
+        return list(case.run.events)
+    finally:
+        case.doCleanups()
+
+
+def old_path_removal() -> dict:
+    from aisef2.arch.enums import EventType as T
+    from aisef2.control.owner import V2_005_CODES, FailureCode
+    from aisef2.journal import format3 as f3
+    from aisef2.journal.projections import PROJECTIONS
+    opa = _module("aisef_v2_old_path_audit", "validation/v2/old_path_audit.py")
+    nda = _module("aisef_v2_test_no_dual_authority", "tests/v2/test_no_dual_authority.py")
+    unit = _module("aisef_v2_test_old_path_audit", "tests/v2/test_old_path_audit.py")
+    p5 = _module("aisef_v2_p5_evidence", "validation/v2/p5_evidence.py")
+    fm = _module("aisef_v2_freeze_manifest", "validation/v2/freeze_manifest.py")
+    guard = _module("aisef_v2_v1_evidence_guard", "validation/v2/v1_evidence_guard.py")
+    mt = _module("aisef_v2_mutation", "validation/v2/mutation.py")
+    rh = _module("aisef_v2_run_history", "validation/v2/run_history.py")
+    audit = opa.audit(ROOT)
+    inv = audit["inventory"]
+    runtime = {k: passed(getattr(nda, cls)(name)) for k, (cls, name) in NDA_CASES.items()}
+    unit_results = {}
+    for cls_name, cls in sorted(vars(unit).items()):
+        if isinstance(cls, type) and issubclass(cls, unittest.TestCase) and cls.__module__ == unit.__name__ and cls_name != "Base":
+            for t in unittest.TestLoader().getTestCaseNames(cls):
+                unit_results[f"{cls_name}.{t}"] = passed(cls(t))
+    events = _orchestrate_events()
+    table = opa.decision_table(events)
+    six = {name: {"static": audit["proofs"][name]["static"], "runtime": all(runtime[c] for c in RUNTIME_OF[name]),
+                  "runtime_cases": list(RUNTIME_OF[name])} for name in opa.PROOFS}
+    results = {name: bool(v["static"] and v["runtime"]) for name, v in six.items()}
+    links = fm.lineage(ROOT)[1]
+    seal5 = json.loads((ROOT / "closure-evidence/v2/P5-FINAL-SEAL.json").read_bytes().replace(b"\r\n", b"\n"))
+    history = json.loads((ROOT / "closure-evidence/v2/P6-RUN-HISTORY.json").read_text(encoding="utf-8"))["entries"]
+    latest_commit = history[-1]["commit"] if history else None
+    latest = [e for e in history if e["commit"] == latest_commit]
+    conformance = json.loads((ROOT / "closure-evidence/v2/F-CONFORMANCE.json").read_text(encoding="utf-8"))
+    mutation = _mutation_by_target(("validation/v2/old_path_audit.py",))
+    digests = {rel: _lf_sha(ROOT / rel) for rel in EVIDENCE_FILES if (ROOT / rel).exists()}
+    aisef_git_tree = _git_tree("aisef")
+    return {
+        "record": "AISEF V2 — P6 OLD-PATH REMOVAL (WP-6.3: no dual authority)",
+        "work_package": "WP-6.3",
+        "authority": "AISEF V2 — WP-6.3 EXECUTION AUTHORIZATION / OLD-PATH REMOVAL / NO DUAL AUTHORITY / P6 CLOSURE",
+        "rfc": "§31, §32; F2, F6, F11 unchanged; V2-005 the lineage end",
+        "candidate": {"commit": "bound by closure-evidence/v2/P6-FINAL-SEAL.json (a record cannot hold the sha of the commit that holds it)",
+                      "aisef2_tree": tree_digest("aisef2"), "validation_v2_tree": tree_digest("validation/v2"),
+                      "tests_v2_tree": tree_digest("tests/v2"),
+                      "aisef_tree": {"git_tree_at_HEAD": aisef_git_tree, "working_tree": tree_digest("aisef"),
+                                     "p5_seal_v1_product_tree": seal5["p5_candidate"]["v1_product_tree"],
+                                     "changed_since_p5_seal": aisef_git_tree != seal5["p5_candidate"]["v1_product_tree"]}},
+        "v2_005": {"lineage": [pathlib.Path(x["record"]).name for x in links], "end": pathlib.Path(links[-1]["record"]).name,
+                   "frozen_items_changed": links[-1]["frozen_items_changed"],
+                   "exception_record_sha256": _lf_sha(ROOT / "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json"),
+                   "amendment_record_sha256": _lf_sha(ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json"),
+                   "v2_004_amendment_file_exists": (ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-004.json").exists()},
+        "format_3": {"version": f3.FORMAT, "schemas": len(f3.SCHEMAS), "event_types": len(T), "failure_codes": len(FailureCode),
+                     "v2_005_codes": sorted(V2_005_CODES), "projections": len(PROJECTIONS), "owners": len(__import__("aisef2.arch.enums", fromlist=["Owner"]).Owner)},
+        "authority_inventory": {"path": opa.INVENTORY_REL, "sha256": digests.get(opa.INVENTORY_REL), "rows_digest": audit["inventory_digest"],
+                                "committed_rows_digest": audit["committed_digest"], "summary": inv["summary"], "rows": len(inv["rows"]),
+                                "v2_entry": inv["v2_entry"], "v1_entry": inv["v1_entry"], "entrypoints": inv["entrypoints"],
+                                "adapters": inv["adapters"], "legacy_references": inv["legacy_references"],
+                                "v1_families_poisoned": sorted(f"{rel}::{s}" for rel, syms in opa.V1_SYMBOLS.items() for s in syms),
+                                "problems": audit["problems"]},
+        "proofs": {name: {**six[name], "result": results[name], "static_evidence": {k: v for k, v in audit["proofs"][name].items() if k not in ("static", "runtime")}}
+                   for name in opa.PROOFS},
+        "decision_table": {"of": "ORCH-1 (a committed story through the real path)", "decisions": len(table), "problems": opa.decision_problems(table),
+                           "stages_decided": sorted({row["check"].split(":", 2)[1] for row in table if row["decision"] == "gate/check"}),
+                           "rows": table},
+        "runtime_cases": runtime,
+        "audit_unit_tests": {"count": len(unit_results), "passed": sum(unit_results.values()), "failed": sorted(k for k, v in unit_results.items() if not v)},
+        "mutation": {"record": "closure-evidence/v2/P6-MUTATION.json", "sha256": digests.get("closure-evidence/v2/P6-MUTATION.json"),
+                     "old_path_audit_targets": mutation},
+        "run_history": {"record": "closure-evidence/v2/P6-RUN-HISTORY.json", "sha256": digests.get("closure-evidence/v2/P6-RUN-HISTORY.json"),
+                        "entries": len(history), "problems": rh.check(ROOT), "latest_commit": latest_commit,
+                        "residual_process_state": {"jobs": len(latest),
+                                                   "zero_residual": bool(latest) and all(e.get("owned_processes_after", 0) == 0 and e.get("owned_escaped", 0) == 0
+                                                                                        and e.get("owned_released_empty", True) for e in latest),
+                                                   "v1_pf_001_absent": all(not e.get("v1_pf_001_signature_found") for e in history)}},
+        "records": {rel: digests.get(rel) for rel in EVIDENCE_FILES},
+        "seals": {"p4": {"path": "closure-evidence/v2/P4-FINAL-SEAL.json", "sha256": digests.get("closure-evidence/v2/P4-FINAL-SEAL.json"),
+                         "bound_by_p5_seal": seal5["p4_seal"]["sha256"]},
+                  "p5": {"path": "closure-evidence/v2/P5-FINAL-SEAL.json", "sha256": digests.get("closure-evidence/v2/P5-FINAL-SEAL.json"),
+                         "records_identity_problems": p5.check(ROOT)}},
+        "v1_evidence_identity": {"guard_problems": guard.check(ROOT), "baseline_sha256": digests.get("closure-evidence/v2/V1-EVIDENCE-BASELINE.json"),
+                                 "w0_sha256": digests.get("closure-evidence/hardening/AISEF-W0-QUALIFICATION.json"),
+                                 "w0_expected": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3"},
+        "f1_f11": {"current_phase": conformance["current_phase"], "summary": conformance["summary"], "ratchet_violations": conformance["ratchet_violations"],
+                   "items": {i["id"]: i["state"] for i in conformance["items"]}},
+        "properties": {
+            **{name: results[name] for name in opa.PROOFS},
+            "inventory_fully_classified_and_current": audit["problems"] == [] and inv["summary"]["UNCLASSIFIABLE"] == 0
+                and audit["inventory_digest"] == audit["committed_digest"],
+            "audit_fails_closed_both_directions": runtime["inventory_matches_both_directions"] and runtime["unenumerated_and_stale_fail_closed"],
+            "dual_authority_rejected_even_when_agreeing": runtime["dual_authority_rejected_even_when_agreeing"],
+            "legacy_fallback_rejected": runtime["legacy_fallback_rejected"],
+            "runtime_poisoning_leaves_v2_unchanged": runtime["R1_runtime_poisoning"],
+            "seam_compatibility_nonauthoritative": {r["disposition"] for r in inv["rows"] if r["path"] == "aisef2/orchestrate/seam.py"} == {"COMPATIBILITY_NONAUTHORITATIVE"},
+            "every_v1_authority_unreachable_from_v2": all(r["disposition"] == "UNREACHABLE" for r in inv["rows"] if r["path"].startswith("aisef/")),
+            "no_v2_console_script_and_v1_script_unreachable": not inv["entrypoints"]["v2_console_script"],
+            "decision_table_every_stage_decided_every_decision_journal_backed": opa.decision_problems(table) == [] and bool(table)
+                and all(row["facts"] for row in table)
+                and {row["check"].split(":", 2)[1] for row in table if row["decision"] == "gate/check"}
+                >= {"admission", "developer", "proof", "quality", "review", "security", "merge", "post-merge"},
+            "every_audit_unit_test_passes": bool(unit_results) and all(unit_results.values()),
+            "aisef_tree_unchanged_since_p5_seal": aisef_git_tree == seal5["p5_candidate"]["v1_product_tree"],
+            "v1_evidence_byte_identical": guard.check(ROOT) == [] and digests.get("closure-evidence/hardening/AISEF-W0-QUALIFICATION.json")
+                == "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+            "p4_seal_identity": digests.get("closure-evidence/v2/P4-FINAL-SEAL.json") == seal5["p4_seal"]["sha256"],
+            "p5_seal_records_identity": p5.check(ROOT) == [],
+            "f1_f11_all_pass_no_ratchet_violation": conformance["summary"] == {"PASS": 11, "PENDING": 0, "FAIL": 0} and conformance["ratchet_violations"] == [],
+            "v2_005_is_the_lineage_end": pathlib.Path(links[-1]["record"]).name == "AISEF-V2-RFC-AMENDMENT-V2-005.json"
+                and links[-1]["frozen_items_changed"] == ["F1"] and not (ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-004.json").exists(),
+            "format_3_29_of_29_nine_codes_exact": len(f3.SCHEMAS) == len(T) == 29 and len(FailureCode) == 22 and len(V2_005_CODES) == 9 and len(PROJECTIONS) == 6,
+            "run_history_current_zero_residual_no_v1_pf_001": rh.check(ROOT) == [] and bool(latest) and all(
+                e.get("owned_processes_after", 0) == 0 and e.get("owned_escaped", 0) == 0 for e in latest) and all(not e.get("v1_pf_001_signature_found") for e in history),
+            "mutation_every_audit_target_measured_current_no_unaudited_survivor": bool(mutation) and all(
+                m["current"] and not m["error"] and isinstance(m["mutants"], int) and m["mutants"] > 0 and m["unaudited"] == [] for m in mutation.values())
+                and set(mutation) >= {t for t in mt.P6_TARGETS if t.startswith("validation/v2/old_path_audit.py::")},
+        },
+    }
+
+
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-6.2/V2-005": ("closure-evidence/v2/P6-V2-005-SCHEMA.json", v2_005_schema, "aisef2/journal/format3.py"),
     "WP-6.2/ORCH": ("closure-evidence/v2/P6-ORCHESTRATION.json", orchestration, "aisef2/orchestrate/story_runner.py"),
+    "WP-6.3": ("closure-evidence/v2/P6-OLD-PATH-REMOVAL.json", old_path_removal, "validation/v2/old_path_audit.py"),
 }
+SEAL_REL = "closure-evidence/v2/P6-FINAL-SEAL.json"
+
+
+def sealed(root: pathlib.Path = ROOT) -> dict[str, str]:
+    """record path -> the sha256 the P6 seal binds it to; empty before the seal exists."""
+    p = root / SEAL_REL
+    if not p.exists():
+        return {}
+    seal = json.loads(p.read_bytes().replace(b"\r\n", b"\n"))
+    return {v["path"]: v["sha256"] for v in seal["p6_evidence"].values()}
 
 
 def render(record: dict) -> str:
@@ -428,8 +617,18 @@ def problems_of(record: dict) -> list[str]:
 
 def check(root: pathlib.Path = ROOT) -> list[str]:
     out = []
+    bound = sealed(root)
     for rel, build, needs in BUILDERS.values():
         if not (root / needs).exists():
+            continue
+        if rel in bound:  # sealed: identity against the seal, properties as recorded; never re-derived
+            committed = root / rel
+            if not committed.exists():
+                out.append(f"{rel} is missing")
+            elif _lf_sha(committed) != bound[rel]:
+                out.append(f"{rel} differs from the sha256 bound by {SEAL_REL}: a sealed record is never rewritten")
+            else:
+                out += problems_of(json.loads(committed.read_text(encoding="utf-8")))
             continue
         fresh = build()
         out += problems_of(fresh)
@@ -449,7 +648,11 @@ def main(argv: list[str] | None = None) -> int:
             print(f"FAIL  {p}")
         print("p6 evidence: " + ("FAIL" if problems else "PASS"))
         return 1 if problems else 0
+    bound = sealed()
     for rel, build, needs in BUILDERS.values():
+        if rel in bound:
+            print(f"kept {rel}: sealed by {SEAL_REL}")
+            continue
         if (ROOT / needs).exists():
             record = build()
             for p in problems_of(record):

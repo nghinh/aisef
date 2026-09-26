@@ -1,0 +1,3683 @@
+{
+ "record": "AISEF V2 — P6 AUTHORITY INVENTORY (WP-6.3)",
+ "tool": "validation/v2/old_path_audit.py",
+ "v2_entry": "aisef2/orchestrate/story_runner.py::run_story",
+ "v1_entry": "aisef/cli/parser.py::main",
+ "dispositions": [
+  "ACTIVE_V2_AUTHORITY",
+  "COMPATIBILITY_NONAUTHORITATIVE",
+  "HISTORICAL_ONLY",
+  "REMOVED",
+  "UNREACHABLE"
+ ],
+ "kinds": [
+  "PRODUCT_TRUTH",
+  "ADMISSION",
+  "GATE_DECISION",
+  "RETRY",
+  "FAILURE_OWNER",
+  "RETRYABILITY",
+  "BUDGET",
+  "TERMINAL_STATE",
+  "EVIDENCE_SELECTION",
+  "MERGE_ROLLBACK_COMMIT",
+  "QUALIFICATION"
+ ],
+ "rows": [
+  {
+   "id": "aisef/cli/__init__.py::<module>",
+   "path": "aisef/cli/__init__.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: V2 has no console script in cycle 1",
+   "evidence": "def_digest e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 over 0 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "id": "aisef/cli/__main__.py::<module>",
+   "path": "aisef/cli/__main__.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: V2 has no console script in cycle 1",
+   "evidence": "def_digest e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 over 0 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "id": "aisef/cli/_common.py::<module>",
+   "path": "aisef/cli/_common.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/runtime/run_scope.py",
+   "evidence": "def_digest 4560b9785f465ec9dd80cee5c5d98a167010c745f24c8193b13497449c0dcef1 over 7 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "4560b9785f465ec9dd80cee5c5d98a167010c745f24c8193b13497449c0dcef1"
+  },
+  {
+   "id": "aisef/cli/closure.py::<module>",
+   "path": "aisef/cli/closure.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none in cycle 1: closure is QP-7",
+   "evidence": "def_digest 96eb84d9b85d3d6dc575960340140e61f8d69a2822df0c5ef32b3848456c8ce5 over 2 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "96eb84d9b85d3d6dc575960340140e61f8d69a2822df0c5ef32b3848456c8ce5"
+  },
+  {
+   "id": "aisef/cli/dashboard.py::<module>",
+   "path": "aisef/cli/dashboard.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "validation/v2 evidence records",
+   "evidence": "def_digest dcfc477a60ea9bb64fe3c59c4a314ed16ac59cb761fe812e4d1a58affa48e92c over 13 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "dcfc477a60ea9bb64fe3c59c4a314ed16ac59cb761fe812e4d1a58affa48e92c"
+  },
+  {
+   "id": "aisef/cli/doctor.py::<module>",
+   "path": "aisef/cli/doctor.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/runtime/capability.py",
+   "evidence": "def_digest ced6cba02a31b869d1f4897db1994e2688ce2d9357c1e9a7a6218afd93378d46 over 3 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "ced6cba02a31b869d1f4897db1994e2688ce2d9357c1e9a7a6218afd93378d46"
+  },
+  {
+   "id": "aisef/cli/harness.py::<module>",
+   "path": "aisef/cli/harness.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/probe",
+   "evidence": "def_digest b7b1d9a1693f84beb3305af8b3a753e9a8ed6514027fbc273543487b66de46df over 12 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "b7b1d9a1693f84beb3305af8b3a753e9a8ed6514027fbc273543487b66de46df"
+  },
+  {
+   "id": "aisef/cli/implement.py::<module>",
+   "path": "aisef/cli/implement.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "def_digest eae8bc88c1369948217bd9e5b57f337fe6a1c5e8361f2fb7129f186304ec70ac over 18 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "eae8bc88c1369948217bd9e5b57f337fe6a1c5e8361f2fb7129f186304ec70ac"
+  },
+  {
+   "id": "aisef/cli/implement.py::cmd_improve",
+   "path": "aisef/cli/implement.py",
+   "symbol": "cmd_improve",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/cli/implement.py::cmd_predeploy",
+   "path": "aisef/cli/implement.py",
+   "symbol": "cmd_predeploy",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/cli/implement.py::cmd_qa",
+   "path": "aisef/cli/implement.py",
+   "symbol": "cmd_qa",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/cli/implement.py::cmd_run",
+   "path": "aisef/cli/implement.py",
+   "symbol": "cmd_run",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/cli/implement.py::cmd_verify",
+   "path": "aisef/cli/implement.py",
+   "symbol": "cmd_verify",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/cli/memory.py::<module>",
+   "path": "aisef/cli/memory.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: no memory plane in cycle 1",
+   "evidence": "def_digest 0713c037e58adee952a04f6c81a0744e215e76da6ef784123fedb43af9222afd over 1 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "0713c037e58adee952a04f6c81a0744e215e76da6ef784123fedb43af9222afd"
+  },
+  {
+   "id": "aisef/cli/parser.py::<module>",
+   "path": "aisef/cli/parser.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION",
+    "ADMISSION",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: V2 has no console script in cycle 1",
+   "evidence": "def_digest 480bfe44e05d3061341cdfa6fa838e321e33ebd7b38a88210c2cce0837ccda7f over 8 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "480bfe44e05d3061341cdfa6fa838e321e33ebd7b38a88210c2cce0837ccda7f"
+  },
+  {
+   "id": "aisef/cli/parser.py::main",
+   "path": "aisef/cli/parser.py",
+   "symbol": "main",
+   "authority_kind": [
+    "GATE_DECISION",
+    "ADMISSION",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: V2 has no console script in cycle 1",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/cli/plan.py::<module>",
+   "path": "aisef/cli/plan.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan",
+   "evidence": "def_digest c08cd4f8cd9bf4579465d67c984e638f714ac37866cfe0009e814e8d1b33e4b7 over 13 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "c08cd4f8cd9bf4579465d67c984e638f714ac37866cfe0009e814e8d1b33e4b7"
+  },
+  {
+   "id": "aisef/clients/base.py::<module>",
+   "path": "aisef/clients/base.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "RETRY",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/adapters.py (typed capability protocols)",
+   "evidence": "def_digest d5fe83a3ca5b1355913851f90194d687ccafacd4a0308f8b13a78effe4793a33 over 22 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "d5fe83a3ca5b1355913851f90194d687ccafacd4a0308f8b13a78effe4793a33"
+  },
+  {
+   "id": "aisef/clients/compile.py::<module>",
+   "path": "aisef/clients/compile.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/adapters.py (typed developer answer)",
+   "evidence": "def_digest 0cc2dff33caaf16b4b6fb83893f5fa3ff1e264265c6efae2ac227beccd716886 over 10 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "0cc2dff33caaf16b4b6fb83893f5fa3ff1e264265c6efae2ac227beccd716886"
+  },
+  {
+   "id": "aisef/clients/stream.py::<module>",
+   "path": "aisef/clients/stream.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "RETRY"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/adapters.py",
+   "evidence": "def_digest 22be67c76efc53f1e34fe8ddc7e7f0e25b8768e42b57647c25a791c45da6842b over 16 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "22be67c76efc53f1e34fe8ddc7e7f0e25b8768e42b57647c25a791c45da6842b"
+  },
+  {
+   "id": "aisef/clients/synthetic.py::<module>",
+   "path": "aisef/clients/synthetic.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/adapters.py (typed capability protocols)",
+   "evidence": "def_digest a18dfae4d129951aea924e36ea471819b91726267be5cff3f58e22a4196b274e over 35 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "a18dfae4d129951aea924e36ea471819b91726267be5cff3f58e22a4196b274e"
+  },
+  {
+   "id": "aisef/control/__init__.py::<module>",
+   "path": "aisef/control/__init__.py",
+   "symbol": "<module>",
+   "authority_kind": [],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "def_digest e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 over 0 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "id": "aisef/control/acceptance.py::<module>",
+   "path": "aisef/control/acceptance.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/product/compiler.py",
+   "evidence": "def_digest f6e366aeaf3ff06a4cbfa3d23a1447fd420cdf0743094a1ef3cb2f30a1c320ab over 12 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "f6e366aeaf3ff06a4cbfa3d23a1447fd420cdf0743094a1ef3cb2f30a1c320ab"
+  },
+  {
+   "id": "aisef/control/approvals.py::<module>",
+   "path": "aisef/control/approvals.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/product/approval.py",
+   "evidence": "def_digest e52547a3282dea08ac9230fe85f7c219e211a96d562fa1eeac3d1323aff54890 over 31 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "e52547a3282dea08ac9230fe85f7c219e211a96d562fa1eeac3d1323aff54890"
+  },
+  {
+   "id": "aisef/control/attribution.py::<module>",
+   "path": "aisef/control/attribution.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/control/owner.py",
+   "evidence": "def_digest fddb94dee77113702326a3c5d973f6a085b8564b4aea88964c3cc883e10483cd over 20 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "fddb94dee77113702326a3c5d973f6a085b8564b4aea88964c3cc883e10483cd"
+  },
+  {
+   "id": "aisef/control/bmad_status.py::<module>",
+   "path": "aisef/control/bmad_status.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: no BMAD in cycle 1",
+   "evidence": "def_digest a5d0ae9fc675e484453496923f37ed7820d718b260179028a2ef6af7526c367a over 10 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "a5d0ae9fc675e484453496923f37ed7820d718b260179028a2ef6af7526c367a"
+  },
+  {
+   "id": "aisef/control/budget.py::<module>",
+   "path": "aisef/control/budget.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "BUDGET",
+    "RETRY"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/control/budget.py + aisef2/journal/projections/budgets.py",
+   "evidence": "def_digest e3de574c8451c06202a8da1bc69fd3271fcf9ff709a94cc7c49b48a075c1f2e8 over 23 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "e3de574c8451c06202a8da1bc69fd3271fcf9ff709a94cc7c49b48a075c1f2e8"
+  },
+  {
+   "id": "aisef/control/budget.py::BudgetExceeded",
+   "path": "aisef/control/budget.py",
+   "symbol": "BudgetExceeded",
+   "authority_kind": [
+    "BUDGET",
+    "RETRY"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/control/budget.py + aisef2/journal/projections/budgets.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/budget.py::BudgetGuard",
+   "path": "aisef/control/budget.py",
+   "symbol": "BudgetGuard",
+   "authority_kind": [
+    "BUDGET",
+    "RETRY"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/control/budget.py + aisef2/journal/projections/budgets.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/budget.py::BudgetLedger",
+   "path": "aisef/control/budget.py",
+   "symbol": "BudgetLedger",
+   "authority_kind": [
+    "BUDGET",
+    "RETRY"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/control/budget.py + aisef2/journal/projections/budgets.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/change.py::<module>",
+   "path": "aisef/control/change.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/drift.py",
+   "evidence": "def_digest 490b1e794025840fdbb60de5105a793ab0f2970ec6ef27d227fb7b431070122f over 5 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "490b1e794025840fdbb60de5105a793ab0f2970ec6ef27d227fb7b431070122f"
+  },
+  {
+   "id": "aisef/control/closure.py::<module>",
+   "path": "aisef/control/closure.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none in cycle 1: closure is QP-7 (not authorized)",
+   "evidence": "def_digest 88e46363b670e9e60ab5f91da95537d1f9a71acb3373708b8c9fd3d7b57e2ed7 over 91 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "88e46363b670e9e60ab5f91da95537d1f9a71acb3373708b8c9fd3d7b57e2ed7"
+  },
+  {
+   "id": "aisef/control/closure.py::probe_judge_only_semantics",
+   "path": "aisef/control/closure.py",
+   "symbol": "probe_judge_only_semantics",
+   "authority_kind": [
+    "GATE_DECISION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none in cycle 1: closure is QP-7 (not authorized)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/closure.py::probe_stories_done",
+   "path": "aisef/control/closure.py",
+   "symbol": "probe_stories_done",
+   "authority_kind": [
+    "GATE_DECISION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none in cycle 1: closure is QP-7 (not authorized)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/closure.py::probe_upstream_gates",
+   "path": "aisef/control/closure.py",
+   "symbol": "probe_upstream_gates",
+   "authority_kind": [
+    "GATE_DECISION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none in cycle 1: closure is QP-7 (not authorized)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/cohort.py::<module>",
+   "path": "aisef/control/cohort.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/qualification_counters.py",
+   "evidence": "def_digest 38a7201bdeb7bbea6f2e3880d09a2a2f8d59e7821a1647a7d40e2cd2618780fb over 11 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "38a7201bdeb7bbea6f2e3880d09a2a2f8d59e7821a1647a7d40e2cd2618780fb"
+  },
+  {
+   "id": "aisef/control/complexity.py::<module>",
+   "path": "aisef/control/complexity.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/obligation.py",
+   "evidence": "def_digest 472579328397a43a0f11ed6d8280bd9c5899c2d6aa254a46ee186c4601862d40 over 26 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "472579328397a43a0f11ed6d8280bd9c5899c2d6aa254a46ee186c4601862d40"
+  },
+  {
+   "id": "aisef/control/conformance.py::<module>",
+   "path": "aisef/control/conformance.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "validation/v2/freeze_conformance.py",
+   "evidence": "def_digest 422f4bf8ff40b7047c699ec91a890091ec2ccf8d5f81bee64fb167a7688aaf0c over 10 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "422f4bf8ff40b7047c699ec91a890091ec2ccf8d5f81bee64fb167a7688aaf0c"
+  },
+  {
+   "id": "aisef/control/defects.py::<module>",
+   "path": "aisef/control/defects.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/control/owner.py (typed taxonomy)",
+   "evidence": "def_digest ba8bb8da5a7a0b531d44414a352b2f0dcb9b09fac9ce391ac98be9f1a0d4e8f3 over 7 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "ba8bb8da5a7a0b531d44414a352b2f0dcb9b09fac9ce391ac98be9f1a0d4e8f3"
+  },
+  {
+   "id": "aisef/control/design_contract.py::<module>",
+   "path": "aisef/control/design_contract.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: no design plane in cycle 1",
+   "evidence": "def_digest aa67be79281206b97c59fd0d63073192097571b114dc1c1217f6c9c9d0911b47 over 13 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "aa67be79281206b97c59fd0d63073192097571b114dc1c1217f6c9c9d0911b47"
+  },
+  {
+   "id": "aisef/control/experience.py::<module>",
+   "path": "aisef/control/experience.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: no experience plane in cycle 1",
+   "evidence": "def_digest b20d0a6c5262c0f45dd79641930c71ff2ab6eb43cacd9b2f5cd43bc31b4e32a3 over 18 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "b20d0a6c5262c0f45dd79641930c71ff2ab6eb43cacd9b2f5cd43bc31b4e32a3"
+  },
+  {
+   "id": "aisef/control/findings.py::<module>",
+   "path": "aisef/control/findings.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/adapters.py::Finding",
+   "evidence": "def_digest 1633c41545acd35ca2d46d43104f67d475d3db8a32af59d5734eb9ca25bf821b over 23 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "1633c41545acd35ca2d46d43104f67d475d3db8a32af59d5734eb9ca25bf821b"
+  },
+  {
+   "id": "aisef/control/gate.py::<module>",
+   "path": "aisef/control/gate.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/gate.py + story_runner._attempt (gate rows and the cited decision)",
+   "evidence": "def_digest 501d5c0e9de49a3e4d1ed63c8ec0873a46bf633cb1e35620bf7e88d9168f94f3 over 25 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "501d5c0e9de49a3e4d1ed63c8ec0873a46bf633cb1e35620bf7e88d9168f94f3"
+  },
+  {
+   "id": "aisef/control/gate.py::StoryGate",
+   "path": "aisef/control/gate.py",
+   "symbol": "StoryGate",
+   "authority_kind": [
+    "GATE_DECISION",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/gate.py + story_runner._attempt (gate rows and the cited decision)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/gate.py::authoritative_baseline",
+   "path": "aisef/control/gate.py",
+   "symbol": "authoritative_baseline",
+   "authority_kind": [
+    "GATE_DECISION",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/gate.py + story_runner._attempt (gate rows and the cited decision)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/gate.py::evaluate",
+   "path": "aisef/control/gate.py",
+   "symbol": "evaluate",
+   "authority_kind": [
+    "GATE_DECISION",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/gate.py + story_runner._attempt (gate rows and the cited decision)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/gate.py::judge_only",
+   "path": "aisef/control/gate.py",
+   "symbol": "judge_only",
+   "authority_kind": [
+    "GATE_DECISION",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/gate.py + story_runner._attempt (gate rows and the cited decision)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/gate.py::review_waiver",
+   "path": "aisef/control/gate.py",
+   "symbol": "review_waiver",
+   "authority_kind": [
+    "GATE_DECISION",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/gate.py + story_runner._attempt (gate rows and the cited decision)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/identity.py::<module>",
+   "path": "aisef/control/identity.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/runtime/runspec.py",
+   "evidence": "def_digest d01940706655b3a46f4e5730000371221d8914700082be2db40cb87cebaab0f9 over 18 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "d01940706655b3a46f4e5730000371221d8914700082be2db40cb87cebaab0f9"
+  },
+  {
+   "id": "aisef/control/impact.py::<module>",
+   "path": "aisef/control/impact.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/story_admission.py",
+   "evidence": "def_digest 084924ccb5d742620cb5e22e9492e26d85eb0bb02ad1ea34cf7ad9285d82375f over 14 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "084924ccb5d742620cb5e22e9492e26d85eb0bb02ad1ea34cf7ad9285d82375f"
+  },
+  {
+   "id": "aisef/control/invariants.py::<module>",
+   "path": "aisef/control/invariants.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/invariants/registry.py",
+   "evidence": "def_digest 8b72418833b37c47b1963fc12a729f756c9be6ecd41cb03fe97fe15c82c05462 over 9 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "8b72418833b37c47b1963fc12a729f756c9be6ecd41cb03fe97fe15c82c05462"
+  },
+  {
+   "id": "aisef/control/journal.py::<module>",
+   "path": "aisef/control/journal.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal (format 3, seq-cited)",
+   "evidence": "def_digest 7e4951c2aabbfc9001ab00c991090c7d60607159f378cfdee7637597ca0f7691 over 29 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "7e4951c2aabbfc9001ab00c991090c7d60607159f378cfdee7637597ca0f7691"
+  },
+  {
+   "id": "aisef/control/journal.py::reconcile_all",
+   "path": "aisef/control/journal.py",
+   "symbol": "reconcile_all",
+   "authority_kind": [
+    "EVIDENCE_SELECTION",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal (format 3, seq-cited)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/journal.py::reconcile_story",
+   "path": "aisef/control/journal.py",
+   "symbol": "reconcile_story",
+   "authority_kind": [
+    "EVIDENCE_SELECTION",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal (format 3, seq-cited)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/ledger.py::<module>",
+   "path": "aisef/control/ledger.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal (the journal is the ledger)",
+   "evidence": "def_digest 525c9f4dcc2ac491a42b012a81f80847f32c9353e960d49b24b29d707c2ea020 over 30 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "525c9f4dcc2ac491a42b012a81f80847f32c9353e960d49b24b29d707c2ea020"
+  },
+  {
+   "id": "aisef/control/machine_gate.py::<module>",
+   "path": "aisef/control/machine_gate.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION",
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/static_admission.py",
+   "evidence": "def_digest f1cd836aed19876a470f3d3c205738f8f47e7e08bb1581afc1e15a91a9d91435 over 11 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "f1cd836aed19876a470f3d3c205738f8f47e7e08bb1581afc1e15a91a9d91435"
+  },
+  {
+   "id": "aisef/control/machine_gate.py::GateResult",
+   "path": "aisef/control/machine_gate.py",
+   "symbol": "GateResult",
+   "authority_kind": [
+    "GATE_DECISION",
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/static_admission.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/machine_gate.py::check_all",
+   "path": "aisef/control/machine_gate.py",
+   "symbol": "check_all",
+   "authority_kind": [
+    "GATE_DECISION",
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/static_admission.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/machine_gate.py::check_prd",
+   "path": "aisef/control/machine_gate.py",
+   "symbol": "check_prd",
+   "authority_kind": [
+    "GATE_DECISION",
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/static_admission.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/machine_gate.py::check_stories",
+   "path": "aisef/control/machine_gate.py",
+   "symbol": "check_stories",
+   "authority_kind": [
+    "GATE_DECISION",
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/static_admission.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/normalize.py::<module>",
+   "path": "aisef/control/normalize.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/product/contract.py + validation/v2/gen_migration_table.py (reads it as text)",
+   "evidence": "def_digest 629f97ebb72a571960c8e1a138bcd448fdeb3031105f4018bdde61a3f04aac97 over 48 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "629f97ebb72a571960c8e1a138bcd448fdeb3031105f4018bdde61a3f04aac97"
+  },
+  {
+   "id": "aisef/control/obligation.py::<module>",
+   "path": "aisef/control/obligation.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/product/outcome.py + aisef2/control/routing.py (through the seam's migration table only)",
+   "evidence": "def_digest ae676e969d7ad6ab59a8a9b7158162e6ae05a3f003ac12721b5e4bc7a877f6d1 over 12 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "ae676e969d7ad6ab59a8a9b7158162e6ae05a3f003ac12721b5e4bc7a877f6d1"
+  },
+  {
+   "id": "aisef/control/obligation.py::blocking",
+   "path": "aisef/control/obligation.py",
+   "symbol": "blocking",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/product/outcome.py + aisef2/control/routing.py (through the seam's migration table only)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/obligation.py::evaluate",
+   "path": "aisef/control/obligation.py",
+   "symbol": "evaluate",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/product/outcome.py + aisef2/control/routing.py (through the seam's migration table only)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/obligation.py::judge",
+   "path": "aisef/control/obligation.py",
+   "symbol": "judge",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/product/outcome.py + aisef2/control/routing.py (through the seam's migration table only)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/obligation.py::row",
+   "path": "aisef/control/obligation.py",
+   "symbol": "row",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/product/outcome.py + aisef2/control/routing.py (through the seam's migration table only)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/onboarding.py::<module>",
+   "path": "aisef/control/onboarding.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: no onboarding in cycle 1",
+   "evidence": "def_digest e0fd38c8367ef805e58f1f71400c3b0c2a186958316d13a92f98a00a1c83ecc8 over 8 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "e0fd38c8367ef805e58f1f71400c3b0c2a186958316d13a92f98a00a1c83ecc8"
+  },
+  {
+   "id": "aisef/control/outcome.py::<module>",
+   "path": "aisef/control/outcome.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/product/outcome.py",
+   "evidence": "def_digest 5e3ef9309656750bf1ec0202eef4431a4aa5fde607d0c399bead0eb7fc9be391 over 12 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "5e3ef9309656750bf1ec0202eef4431a4aa5fde607d0c399bead0eb7fc9be391"
+  },
+  {
+   "id": "aisef/control/planes.py::<module>",
+   "path": "aisef/control/planes.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/runtime/runspec.py",
+   "evidence": "def_digest 7db56f540d0af012728a50fde99bf5351583a45d27aa61bb10c6af53571563b9 over 19 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "7db56f540d0af012728a50fde99bf5351583a45d27aa61bb10c6af53571563b9"
+  },
+  {
+   "id": "aisef/control/preflight.py::<module>",
+   "path": "aisef/control/preflight.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/static_admission.py + aisef2/plan/story_admission.py",
+   "evidence": "def_digest 4f8e351dfdb0cadfc4ec8256f920b75f57f58db5f137000eadca50f5805ef106 over 33 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "4f8e351dfdb0cadfc4ec8256f920b75f57f58db5f137000eadca50f5805ef106"
+  },
+  {
+   "id": "aisef/control/proof.py::<module>",
+   "path": "aisef/control/proof.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/probe/protocol.py + aisef2/orchestrate/proof.py",
+   "evidence": "def_digest 9f57c3d681cca1d24b06bcb7cd2e60a0d4f2ec5483f1e5ca03951e002390d095 over 12 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "9f57c3d681cca1d24b06bcb7cd2e60a0d4f2ec5483f1e5ca03951e002390d095"
+  },
+  {
+   "id": "aisef/control/proof.py::classify",
+   "path": "aisef/control/proof.py",
+   "symbol": "classify",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/probe/protocol.py + aisef2/orchestrate/proof.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/proof.py::executed_green",
+   "path": "aisef/control/proof.py",
+   "symbol": "executed_green",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/probe/protocol.py + aisef2/orchestrate/proof.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/proof.py::run_proves_red",
+   "path": "aisef/control/proof.py",
+   "symbol": "run_proves_red",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/probe/protocol.py + aisef2/orchestrate/proof.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/qualification.py::<module>",
+   "path": "aisef/control/qualification.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "QUALIFICATION",
+    "RETRY",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/qualification_counters.py + aisef2/plan/drift.py",
+   "evidence": "def_digest cd08f4a152b40382b5ffa1e2db551be3d1aad5efac71333e39db8c754120f107 over 21 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "cd08f4a152b40382b5ffa1e2db551be3d1aad5efac71333e39db8c754120f107"
+  },
+  {
+   "id": "aisef/control/qualification.py::Decision",
+   "path": "aisef/control/qualification.py",
+   "symbol": "Decision",
+   "authority_kind": [
+    "QUALIFICATION",
+    "RETRY",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/qualification_counters.py + aisef2/plan/drift.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/qualification.py::Verdict",
+   "path": "aisef/control/qualification.py",
+   "symbol": "Verdict",
+   "authority_kind": [
+    "QUALIFICATION",
+    "RETRY",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/qualification_counters.py + aisef2/plan/drift.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/qualification.py::_qualify_pre_deploy",
+   "path": "aisef/control/qualification.py",
+   "symbol": "_qualify_pre_deploy",
+   "authority_kind": [
+    "QUALIFICATION",
+    "RETRY",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/qualification_counters.py + aisef2/plan/drift.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/qualification.py::_qualify_repair",
+   "path": "aisef/control/qualification.py",
+   "symbol": "_qualify_repair",
+   "authority_kind": [
+    "QUALIFICATION",
+    "RETRY",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/qualification_counters.py + aisef2/plan/drift.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/qualification.py::_qualify_run",
+   "path": "aisef/control/qualification.py",
+   "symbol": "_qualify_run",
+   "authority_kind": [
+    "QUALIFICATION",
+    "RETRY",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/qualification_counters.py + aisef2/plan/drift.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/qualification.py::qualify",
+   "path": "aisef/control/qualification.py",
+   "symbol": "qualify",
+   "authority_kind": [
+    "QUALIFICATION",
+    "RETRY",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/qualification_counters.py + aisef2/plan/drift.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/replay.py::<module>",
+   "path": "aisef/control/replay.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal (replay is the fold)",
+   "evidence": "def_digest b5391faddef3667d98fb026cb92632ddce9d7f5e9975047fc8bd2226bc5e44bf over 10 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "b5391faddef3667d98fb026cb92632ddce9d7f5e9975047fc8bd2226bc5e44bf"
+  },
+  {
+   "id": "aisef/control/replay_manifest.py::<module>",
+   "path": "aisef/control/replay_manifest.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/runtime/runspec.py",
+   "evidence": "def_digest e480b40dec662cdfe62f1750312796f043c02fca72031d5ff747d02a7a73a3c0 over 18 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "e480b40dec662cdfe62f1750312796f043c02fca72031d5ff747d02a7a73a3c0"
+  },
+  {
+   "id": "aisef/control/reviewer_qual.py::<module>",
+   "path": "aisef/control/reviewer_qual.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/review.py",
+   "evidence": "def_digest 1245a0ba67e4c139e61b8cf75b12c730f30ac6730e9dcdc57e8e58763afea231 over 21 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "1245a0ba67e4c139e61b8cf75b12c730f30ac6730e9dcdc57e8e58763afea231"
+  },
+  {
+   "id": "aisef/control/reviewer_qual.py::classify",
+   "path": "aisef/control/reviewer_qual.py",
+   "symbol": "classify",
+   "authority_kind": [
+    "GATE_DECISION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/review.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/reviewer_qual.py::judge_only_audit",
+   "path": "aisef/control/reviewer_qual.py",
+   "symbol": "judge_only_audit",
+   "authority_kind": [
+    "GATE_DECISION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/review.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/reviewer_qual.py::judgements",
+   "path": "aisef/control/reviewer_qual.py",
+   "symbol": "judgements",
+   "authority_kind": [
+    "GATE_DECISION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/review.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/scheduler.py::<module>",
+   "path": "aisef/control/scheduler.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/obligation.py (story graph)",
+   "evidence": "def_digest fd7b74b4e49ea6e6f362ba892d64786c787cd4d51e476e06ff56ed3bc88523c9 over 14 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "fd7b74b4e49ea6e6f362ba892d64786c787cd4d51e476e06ff56ed3bc88523c9"
+  },
+  {
+   "id": "aisef/control/security.py::<module>",
+   "path": "aisef/control/security.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/security.py",
+   "evidence": "def_digest edcf3a8e16a9260f5ce55f8f5f44a9be4525b1dad568d87b12531594c991c0df over 10 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "edcf3a8e16a9260f5ce55f8f5f44a9be4525b1dad568d87b12531594c991c0df"
+  },
+  {
+   "id": "aisef/control/state.py::<module>",
+   "path": "aisef/control/state.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/story_state.py",
+   "evidence": "def_digest 72eedfa6fd1e36a4f17b7229f24a34cdc3ad0343e6ef8659fb3c353631f0ae36 over 39 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "72eedfa6fd1e36a4f17b7229f24a34cdc3ad0343e6ef8659fb3c353631f0ae36"
+  },
+  {
+   "id": "aisef/control/state.py::SprintState",
+   "path": "aisef/control/state.py",
+   "symbol": "SprintState",
+   "authority_kind": [
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/story_state.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/state.py::StateStore",
+   "path": "aisef/control/state.py",
+   "symbol": "StateStore",
+   "authority_kind": [
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/journal/projections/story_state.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/tdd.py::<module>",
+   "path": "aisef/control/tdd.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: RED-at-parent is not V2 semantics (invariant IX)",
+   "evidence": "def_digest bc7e920df9da6180a6e6f1094bc673f14bf5c9e76c2a87a7d1a1b062b107e164 over 6 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "bc7e920df9da6180a6e6f1094bc673f14bf5c9e76c2a87a7d1a1b062b107e164"
+  },
+  {
+   "id": "aisef/control/tdd.py::proven_red_before_green",
+   "path": "aisef/control/tdd.py",
+   "symbol": "proven_red_before_green",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: RED-at-parent is not V2 semantics (invariant IX)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/tdd.py::runs_before_last_green",
+   "path": "aisef/control/tdd.py",
+   "symbol": "runs_before_last_green",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: RED-at-parent is not V2 semantics (invariant IX)",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/control/worktree.py::<module>",
+   "path": "aisef/control/worktree.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/workspace.py",
+   "evidence": "def_digest ad19a9e4444ee4cd3683f52658c3d81c6a15d6df0cd3724bad2c600bee02efed over 32 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "ad19a9e4444ee4cd3683f52658c3d81c6a15d6df0cd3724bad2c600bee02efed"
+  },
+  {
+   "id": "aisef/harness/aria.py::<module>",
+   "path": "aisef/harness/aria.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: no browser probe in cycle 1",
+   "evidence": "def_digest dbfc388cdde34ebd0c5e02a4f9306a837613e61f9d536fb9031b983cb7cf6560 over 13 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "dbfc388cdde34ebd0c5e02a4f9306a837613e61f9d536fb9031b983cb7cf6560"
+  },
+  {
+   "id": "aisef/harness/guardrails.py::<module>",
+   "path": "aisef/harness/guardrails.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/adapters.py (typed findings) + review/security stages",
+   "evidence": "def_digest 93668d60b66bfe1781fafff744d5486de2f62834e6b74704d22eceafde85742a over 42 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "93668d60b66bfe1781fafff744d5486de2f62834e6b74704d22eceafde85742a"
+  },
+  {
+   "id": "aisef/harness/guardrails.py::Verdict",
+   "path": "aisef/harness/guardrails.py",
+   "symbol": "Verdict",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/adapters.py (typed findings) + review/security stages",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/harness/guardrails.py::check_completion",
+   "path": "aisef/harness/guardrails.py",
+   "symbol": "check_completion",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/adapters.py (typed findings) + review/security stages",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/harness/observe.py::<module>",
+   "path": "aisef/harness/observe.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/probe/protocol.py",
+   "evidence": "def_digest f1859f3c089733113203e40e145b66200b707976ab39d8cf47b7412c3523bdb1 over 30 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "f1859f3c089733113203e40e145b66200b707976ab39d8cf47b7412c3523bdb1"
+  },
+  {
+   "id": "aisef/harness/testlog.py::<module>",
+   "path": "aisef/harness/testlog.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/quality/test_execution.py (typed result set)",
+   "evidence": "def_digest 8a142bb8a62ef14c5b0ecb2bc1f442965dcdce8756bf916598a8c38825c00e93 over 17 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "8a142bb8a62ef14c5b0ecb2bc1f442965dcdce8756bf916598a8c38825c00e93"
+  },
+  {
+   "id": "aisef/harness/tools.py::<module>",
+   "path": "aisef/harness/tools.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/runtime/tool.py",
+   "evidence": "def_digest ddca20eabbe332ba056ca06ff0a6ce320357446b13e5f9300b1d4aad24848ecd over 19 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "ddca20eabbe332ba056ca06ff0a6ce320357446b13e5f9300b1d4aad24848ecd"
+  },
+  {
+   "id": "aisef/kit/security_filter.py::<module>",
+   "path": "aisef/kit/security_filter.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/security.py (typed scanner findings)",
+   "evidence": "def_digest ce6dfd8c08c65f88366bfd2da2b994d69a171ba4ea1f8345f87775c30bca576e over 7 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "ce6dfd8c08c65f88366bfd2da2b994d69a171ba4ea1f8345f87775c30bca576e"
+  },
+  {
+   "id": "aisef/kit/skill_scan.py::<module>",
+   "path": "aisef/kit/skill_scan.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: no skill plane in cycle 1",
+   "evidence": "def_digest b6a251f897e528abb0a2d42edd911ec2ddaf540c6d5ca9e8481e11b2ef2f0aeb over 11 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "b6a251f897e528abb0a2d42edd911ec2ddaf540c6d5ca9e8481e11b2ef2f0aeb"
+  },
+  {
+   "id": "aisef/phases/__init__.py::<module>",
+   "path": "aisef/phases/__init__.py",
+   "symbol": "<module>",
+   "authority_kind": [],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "def_digest e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 over 0 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "id": "aisef/phases/deploy.py::<module>",
+   "path": "aisef/phases/deploy.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none in cycle 1: pre-deploy is QP-7",
+   "evidence": "def_digest 3e85a6154d6287b38201667fea99b74c8bd3163474e11cdc38d134daeb9bdbf9 over 18 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "3e85a6154d6287b38201667fea99b74c8bd3163474e11cdc38d134daeb9bdbf9"
+  },
+  {
+   "id": "aisef/phases/implement.py::<module>",
+   "path": "aisef/phases/implement.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "def_digest 2f4135520940f6d2f8da2d2d0512871726bf379503d0e0e21556005dd5e425c7 over 107 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "2f4135520940f6d2f8da2d2d0512871726bf379503d0e0e21556005dd5e425c7"
+  },
+  {
+   "id": "aisef/phases/implement.py::freeze_candidate",
+   "path": "aisef/phases/implement.py",
+   "symbol": "freeze_candidate",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/phases/implement.py::run_attempt",
+   "path": "aisef/phases/implement.py",
+   "symbol": "run_attempt",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/phases/implement.py::run_baseline",
+   "path": "aisef/phases/implement.py",
+   "symbol": "run_baseline",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/phases/implement.py::run_nop",
+   "path": "aisef/phases/implement.py",
+   "symbol": "run_nop",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/phases/implement.py::verify_candidate",
+   "path": "aisef/phases/implement.py",
+   "symbol": "verify_candidate",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY",
+    "MERGE_ROLLBACK_COMMIT",
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/phases/improve.py::<module>",
+   "path": "aisef/phases/improve.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION",
+    "RETRY"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py",
+   "evidence": "def_digest b536623721c3baa0fb05d80633a68714253e16e4cb25c19af90c5030c45879cb over 26 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "b536623721c3baa0fb05d80633a68714253e16e4cb25c19af90c5030c45879cb"
+  },
+  {
+   "id": "aisef/phases/mockup.py::<module>",
+   "path": "aisef/phases/mockup.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: no mockup plane in cycle 1",
+   "evidence": "def_digest adc44c8a91395f3dcd515179368ce9c49ca241a089639fc77284cdede1bb9a57 over 14 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "adc44c8a91395f3dcd515179368ce9c49ca241a089639fc77284cdede1bb9a57"
+  },
+  {
+   "id": "aisef/phases/plan.py::<module>",
+   "path": "aisef/phases/plan.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/obligation.py + static_admission.py",
+   "evidence": "def_digest 25fff5ca9d833096fc55c09033d221eff27da457c42eaa840ff75444da212871 over 24 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "25fff5ca9d833096fc55c09033d221eff27da457c42eaa840ff75444da212871"
+  },
+  {
+   "id": "aisef/phases/qa.py::<module>",
+   "path": "aisef/phases/qa.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/quality.py",
+   "evidence": "def_digest 2c52f511b6dd25ce06b4ef8adfcf952d566b1e699547bd08920ec96b3257018c over 25 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "2c52f511b6dd25ce06b4ef8adfcf952d566b1e699547bd08920ec96b3257018c"
+  },
+  {
+   "id": "aisef/phases/report.py::<module>",
+   "path": "aisef/phases/report.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "validation/v2 evidence records",
+   "evidence": "def_digest aad4ad4256ea82fdaea9a8c28d72ed97ef66e231ef50b64967f99c9e5487aa5a over 16 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "aad4ad4256ea82fdaea9a8c28d72ed97ef66e231ef50b64967f99c9e5487aa5a"
+  },
+  {
+   "id": "aisef/phases/run.py::<module>",
+   "path": "aisef/phases/run.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "TERMINAL_STATE",
+    "QUALIFICATION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py + aisef2/runtime/run_scope.py",
+   "evidence": "def_digest 33121c2420cb33ef9d6e4cb3f887e5bae62e7e076b627ce608e8b79f01be64ee over 31 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "33121c2420cb33ef9d6e4cb3f887e5bae62e7e076b627ce608e8b79f01be64ee"
+  },
+  {
+   "id": "aisef/phases/run.py::_qualify_wave",
+   "path": "aisef/phases/run.py",
+   "symbol": "_qualify_wave",
+   "authority_kind": [
+    "TERMINAL_STATE",
+    "QUALIFICATION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py + aisef2/runtime/run_scope.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/phases/run.py::run_epic",
+   "path": "aisef/phases/run.py",
+   "symbol": "run_epic",
+   "authority_kind": [
+    "TERMINAL_STATE",
+    "QUALIFICATION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py + aisef2/runtime/run_scope.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/phases/run.py::run_sprint",
+   "path": "aisef/phases/run.py",
+   "symbol": "run_sprint",
+   "authority_kind": [
+    "TERMINAL_STATE",
+    "QUALIFICATION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py + aisef2/runtime/run_scope.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/phases/run.py::run_verify_only",
+   "path": "aisef/phases/run.py",
+   "symbol": "run_verify_only",
+   "authority_kind": [
+    "TERMINAL_STATE",
+    "QUALIFICATION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/orchestrate/story_runner.py + aisef2/runtime/run_scope.py",
+   "evidence": "resolves in the frozen tree (AST); unreachable from V2 (import graph); poisoned at runtime"
+  },
+  {
+   "id": "aisef/phases/story_split.py::<module>",
+   "path": "aisef/phases/story_split.py",
+   "symbol": "<module>",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef/cli/parser.py::main (the frozen V1 console script; not a V2 entrypoint)"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "aisef2/plan/obligation.py",
+   "evidence": "def_digest 8bae475ca34bf4a5702e0d2e9055f6632cbe4245a706d59437f73b1747d6583c over 12 definitions; no runtime module of aisef2 or validation/v2 imports aisef (import graph); poisoned at runtime by tests/v2/test_no_dual_authority.py",
+   "def_digest": "8bae475ca34bf4a5702e0d2e9055f6632cbe4245a706d59437f73b1747d6583c"
+  },
+  {
+   "id": "aisef2/control/budget.py::charge",
+   "path": "aisef2/control/budget.py",
+   "symbol": "charge",
+   "authority_kind": [
+    "RETRY",
+    "BUDGET",
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [], \"types\": [\"aisef2.control.budget.Charge\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/control/budget.py::developer_spend",
+   "path": "aisef2/control/budget.py",
+   "symbol": "developer_spend",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/control/owner.py::classify",
+   "path": "aisef2/control/owner.py",
+   "symbol": "classify",
+   "authority_kind": [
+    "FAILURE_OWNER",
+    "RETRYABILITY"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/control/owner.py::flatten",
+   "path": "aisef2/control/owner.py",
+   "symbol": "flatten",
+   "authority_kind": [
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/control/routing.py::route",
+   "path": "aisef2/control/routing.py",
+   "symbol": "route",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.routing.row_for\", \"aisef2.product.outcome.contract_satisfaction\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/control/routing.py::row_for",
+   "path": "aisef2/control/routing.py",
+   "symbol": "row_for",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "FAILURE_OWNER",
+    "RETRYABILITY"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.owner.classify\", \"aisef2.product.outcome.contract_satisfaction\"], \"events\": [], \"types\": [\"aisef2.control.routing.Route\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/event.py::carried",
+   "path": "aisef2/journal/event.py",
+   "symbol": "carried",
+   "authority_kind": [
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/fold.py::cache_row",
+   "path": "aisef2/journal/fold.py",
+   "symbol": "cache_row",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/fold.py::fold",
+   "path": "aisef2/journal/fold.py",
+   "symbol": "fold",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/fold.py::oracle_problems",
+   "path": "aisef2/journal/fold.py",
+   "symbol": "oracle_problems",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/fold.py::resume",
+   "path": "aisef2/journal/fold.py",
+   "symbol": "resume",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/format3.py::_failure_schema",
+   "path": "aisef2/journal/format3.py",
+   "symbol": "_failure_schema",
+   "authority_kind": [
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/format3.py::_static_admitted",
+   "path": "aisef2/journal/format3.py",
+   "symbol": "_static_admitted",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"PLAN_STATIC_ADMITTED\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/format3.py::verified_payload",
+   "path": "aisef2/journal/format3.py",
+   "symbol": "verified_payload",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/format3.py::verified_proof",
+   "path": "aisef2/journal/format3.py",
+   "symbol": "verified_proof",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"PROOF_VERIFIED\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/__init__.py::project",
+   "path": "aisef2/journal/projections/__init__.py",
+   "symbol": "project",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/budgets.py::Budgets",
+   "path": "aisef2/journal/projections/budgets.py",
+   "symbol": "Budgets",
+   "authority_kind": [
+    "ADMISSION",
+    "RETRY",
+    "FAILURE_OWNER",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\", \"PROVIDER_REQUEST\", \"STORY_ADMITTED\", \"STORY_RETRY\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/budgets.py::Budgets.step",
+   "path": "aisef2/journal/projections/budgets.py",
+   "symbol": "Budgets.step",
+   "authority_kind": [
+    "ADMISSION",
+    "RETRY",
+    "FAILURE_OWNER",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\", \"PROVIDER_REQUEST\", \"STORY_ADMITTED\", \"STORY_RETRY\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/failure_owner.py::FailureOwner",
+   "path": "aisef2/journal/projections/failure_owner.py",
+   "symbol": "FailureOwner",
+   "authority_kind": [
+    "RETRY",
+    "FAILURE_OWNER",
+    "TERMINAL_STATE",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\", \"STORY_RETRY\", \"STORY_ROLLBACK\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/failure_owner.py::FailureOwner.step",
+   "path": "aisef2/journal/projections/failure_owner.py",
+   "symbol": "FailureOwner.step",
+   "authority_kind": [
+    "RETRY",
+    "FAILURE_OWNER",
+    "TERMINAL_STATE",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\", \"STORY_RETRY\", \"STORY_ROLLBACK\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/qualification_counters.py::QualificationCounters",
+   "path": "aisef2/journal/projections/qualification_counters.py",
+   "symbol": "QualificationCounters",
+   "authority_kind": [
+    "ADMISSION",
+    "RETRY",
+    "FAILURE_OWNER",
+    "TERMINAL_STATE",
+    "MERGE_ROLLBACK_COMMIT",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\", \"STORY_ADMITTED\", \"STORY_COMMIT\", \"STORY_PLAN_DRIFT\", \"STORY_RETRY\", \"STORY_ROLLBACK\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/qualification_counters.py::QualificationCounters.step",
+   "path": "aisef2/journal/projections/qualification_counters.py",
+   "symbol": "QualificationCounters.step",
+   "authority_kind": [
+    "ADMISSION",
+    "RETRY",
+    "FAILURE_OWNER",
+    "TERMINAL_STATE",
+    "MERGE_ROLLBACK_COMMIT",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\", \"STORY_ADMITTED\", \"STORY_COMMIT\", \"STORY_PLAN_DRIFT\", \"STORY_RETRY\", \"STORY_ROLLBACK\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/retry_target.py::RetryTarget",
+   "path": "aisef2/journal/projections/retry_target.py",
+   "symbol": "RetryTarget",
+   "authority_kind": [
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/retry_target.py::RetryTarget.step",
+   "path": "aisef2/journal/projections/retry_target.py",
+   "symbol": "RetryTarget.step",
+   "authority_kind": [
+    "RETRY",
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/story_state.py::StoryState",
+   "path": "aisef2/journal/projections/story_state.py",
+   "symbol": "StoryState",
+   "authority_kind": [
+    "ADMISSION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"STORY_ADMITTED\", \"STORY_PLAN_DRIFT\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/story_state.py::StoryState.step",
+   "path": "aisef2/journal/projections/story_state.py",
+   "symbol": "StoryState.step",
+   "authority_kind": [
+    "ADMISSION",
+    "TERMINAL_STATE",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"STORY_ADMITTED\", \"STORY_PLAN_DRIFT\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/journal/projections/terminal_state.py::TerminalState.step",
+   "path": "aisef2/journal/projections/terminal_state.py",
+   "symbol": "TerminalState.step",
+   "authority_kind": [
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/gate.py::check",
+   "path": "aisef2/orchestrate/gate.py",
+   "symbol": "check",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"GATE_CHECK\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/gate.py::decision",
+   "path": "aisef2/orchestrate/gate.py",
+   "symbol": "decision",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"GATE_DECISION\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/merge.py::merge",
+   "path": "aisef2/orchestrate/merge.py",
+   "symbol": "merge",
+   "authority_kind": [
+    "GATE_DECISION",
+    "FAILURE_OWNER",
+    "RETRYABILITY",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.owner.classify\", \"aisef2.control.owner.flatten\", \"aisef2.orchestrate.gate.check\"], \"events\": [], \"types\": [\"aisef2.orchestrate.merge.Merged\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/merge.py::reprove",
+   "path": "aisef2/orchestrate/merge.py",
+   "symbol": "reprove",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.orchestrate.gate.check\", \"aisef2.orchestrate.proof.prove\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/proof.py::Party",
+   "path": "aisef2/orchestrate/proof.py",
+   "symbol": "Party",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.probe.protocol.run_probe\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/proof.py::Party.run",
+   "path": "aisef2/orchestrate/proof.py",
+   "symbol": "Party.run",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.probe.protocol.run_probe\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/proof.py::prove",
+   "path": "aisef2/orchestrate/proof.py",
+   "symbol": "prove",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "FAILURE_OWNER",
+    "RETRYABILITY"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.owner.classify\", \"aisef2.control.routing.route\", \"aisef2.journal.format3.verified_payload\", \"aisef2.probe.protocol.bound_result\", \"aisef2.product.outcome.contract_satisfaction\"], \"events\": [\"PROOF_VERIFIED\"], \"types\": [\"aisef2.orchestrate.proof.Proof\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/quality.py::assess",
+   "path": "aisef2/orchestrate/quality.py",
+   "symbol": "assess",
+   "authority_kind": [
+    "GATE_DECISION",
+    "FAILURE_OWNER",
+    "RETRYABILITY"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.owner.classify\", \"aisef2.quality.adequacy.assemble\"], \"events\": [\"TESTS_ADEQUACY\"], \"types\": [\"aisef2.orchestrate.quality.Quality\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/review.py::review",
+   "path": "aisef2/orchestrate/review.py",
+   "symbol": "review",
+   "authority_kind": [
+    "GATE_DECISION",
+    "FAILURE_OWNER",
+    "RETRYABILITY",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.owner.classify\", \"aisef2.orchestrate.gate.check\"], \"events\": [\"PROVIDER_REQUEST\"], \"types\": [\"aisef2.orchestrate.review.Review\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/seam.py::Legacy",
+   "path": "aisef2/orchestrate/seam.py",
+   "symbol": "Legacy",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"before_the_first_event\": true, \"constructs_only_v2_inputs\": true, \"exists\": true, \"imports_v1\": [], \"refuses_human_declaration_required\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "aisef2/orchestrate/seam.py::SeamRefusal",
+   "path": "aisef2/orchestrate/seam.py",
+   "symbol": "SeamRefusal",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"before_the_first_event\": true, \"constructs_only_v2_inputs\": true, \"exists\": true, \"imports_v1\": [], \"refuses_human_declaration_required\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "aisef2/orchestrate/seam.py::SeamRefusal.__init__",
+   "path": "aisef2/orchestrate/seam.py",
+   "symbol": "SeamRefusal.__init__",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"before_the_first_event\": true, \"constructs_only_v2_inputs\": true, \"exists\": true, \"imports_v1\": [], \"refuses_human_declaration_required\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "aisef2/orchestrate/seam.py::admit_legacy",
+   "path": "aisef2/orchestrate/seam.py",
+   "symbol": "admit_legacy",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"before_the_first_event\": true, \"constructs_only_v2_inputs\": true, \"exists\": true, \"imports_v1\": [], \"refuses_human_declaration_required\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "aisef2/orchestrate/seam.py::resolve",
+   "path": "aisef2/orchestrate/seam.py",
+   "symbol": "resolve",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"before_the_first_event\": true, \"constructs_only_v2_inputs\": true, \"exists\": true, \"imports_v1\": [], \"refuses_human_declaration_required\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "aisef2/orchestrate/security.py::scan",
+   "path": "aisef2/orchestrate/security.py",
+   "symbol": "scan",
+   "authority_kind": [
+    "GATE_DECISION",
+    "FAILURE_OWNER",
+    "RETRYABILITY"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.owner.classify\", \"aisef2.orchestrate.gate.check\"], \"events\": [], \"types\": [\"aisef2.orchestrate.security.Scan\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/story_runner.py::_attempt",
+   "path": "aisef2/orchestrate/story_runner.py",
+   "symbol": "_attempt",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "ADMISSION",
+    "GATE_DECISION",
+    "RETRY",
+    "FAILURE_OWNER",
+    "RETRYABILITY",
+    "BUDGET",
+    "TERMINAL_STATE",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.budget.charge\", \"aisef2.control.owner.classify\", \"aisef2.orchestrate.gate.check\", \"aisef2.orchestrate.gate.decision\", \"aisef2.orchestrate.merge.merge\", \"aisef2.orchestrate.merge.reprove\", \"aisef2.orchestrate.proof.prove\", \"aisef2.orchestrate.quality.assess\", \"aisef2.orchestrate.review.review\", \"aisef2.orchestrate.security.scan\", \"aisef2.plan.drift.continue_story\", \"aisef2.plan.story_admission.admit_story\"], \"events\": [\"PROVIDER_REQUEST\", \"STORY_COMMIT\", \"STORY_ROLLBACK\"], \"types\": [\"aisef2.orchestrate.story_runner.Attempt\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/story_runner.py::_fail",
+   "path": "aisef2/orchestrate/story_runner.py",
+   "symbol": "_fail",
+   "authority_kind": [
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/orchestrate/story_runner.py::run_story",
+   "path": "aisef2/orchestrate/story_runner.py",
+   "symbol": "run_story",
+   "authority_kind": [
+    "ADMISSION",
+    "GATE_DECISION",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.orchestrate.seam.admit_legacy\"], \"events\": [], \"types\": [\"aisef2.orchestrate.story_runner.StoryResult\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/plan/drift.py::budget_problems",
+   "path": "aisef2/plan/drift.py",
+   "symbol": "budget_problems",
+   "authority_kind": [
+    "ADMISSION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"PROVIDER_REQUEST\", \"STORY_ADMITTED\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/plan/drift.py::continue_story",
+   "path": "aisef2/plan/drift.py",
+   "symbol": "continue_story",
+   "authority_kind": [
+    "ADMISSION",
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"STORY_PLAN_DRIFT\"], \"types\": [\"aisef2.plan.drift.PlanDrift\", \"aisef2.plan.drift.StoryContinuation\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/plan/drift.py::plan_quality",
+   "path": "aisef2/plan/drift.py",
+   "symbol": "plan_quality",
+   "authority_kind": [
+    "QUALIFICATION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/plan/static_admission.py::check_contract_spec_integrity",
+   "path": "aisef2/plan/static_admission.py",
+   "symbol": "check_contract_spec_integrity",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.product.compiler.compile_spec\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/plan/story_admission.py::admit_story",
+   "path": "aisef2/plan/story_admission.py",
+   "symbol": "admit_story",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.plan.story_admission.classify\", \"aisef2.probe.protocol.run_probe\"], \"events\": [\"STORY_ADMITTED\"], \"types\": [\"aisef2.plan.story_admission.StoryAdmissionResult\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/plan/story_admission.py::classify",
+   "path": "aisef2/plan/story_admission.py",
+   "symbol": "classify",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "ADMISSION",
+    "FAILURE_OWNER",
+    "RETRYABILITY"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.owner.classify\", \"aisef2.control.routing.row_for\", \"aisef2.probe.protocol.bound_result\", \"aisef2.product.outcome.contract_satisfaction\"], \"events\": [], \"types\": [\"aisef2.plan.story_admission.Decision\"]}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/plan/story_admission.py::ordering_problems",
+   "path": "aisef2/plan/story_admission.py",
+   "symbol": "ordering_problems",
+   "authority_kind": [
+    "ADMISSION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"PROVIDER_REQUEST\", \"STORY_ADMITTED\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/plan/story_admission.py::request_developer",
+   "path": "aisef2/plan/story_admission.py",
+   "symbol": "request_developer",
+   "authority_kind": [
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"PROVIDER_REQUEST\"], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/probe/calibration.py::calibrate",
+   "path": "aisef2/probe/calibration.py",
+   "symbol": "calibrate",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.probe.protocol.bound_result\", \"aisef2.probe.protocol.run_probe\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/probe/protocol.py::bound_result",
+   "path": "aisef2/probe/protocol.py",
+   "symbol": "bound_result",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/probe/protocol.py::run_probe",
+   "path": "aisef2/probe/protocol.py",
+   "symbol": "run_probe",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/product/compiler.py::compile_spec",
+   "path": "aisef2/product/compiler.py",
+   "symbol": "compile_spec",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/product/outcome.py::contract_satisfaction",
+   "path": "aisef2/product/outcome.py",
+   "symbol": "contract_satisfaction",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/quality/adequacy.py::Assembly",
+   "path": "aisef2/quality/adequacy.py",
+   "symbol": "Assembly",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.quality.adequacy.may_block\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/quality/adequacy.py::Assembly.may_block",
+   "path": "aisef2/quality/adequacy.py",
+   "symbol": "Assembly.may_block",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.quality.adequacy.may_block\"], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/quality/adequacy.py::assemble",
+   "path": "aisef2/quality/adequacy.py",
+   "symbol": "assemble",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/quality/adequacy.py::may_block",
+   "path": "aisef2/quality/adequacy.py",
+   "symbol": "may_block",
+   "authority_kind": [
+    "GATE_DECISION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: reachable"
+  },
+  {
+   "id": "aisef2/runtime/repair.py::closers",
+   "path": "aisef2/runtime/repair.py",
+   "symbol": "closers",
+   "authority_kind": [
+    "BUDGET",
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "V2 plan-level or runtime API (not imported by run_story)"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [\"PROVIDER_REQUEST\"], \"types\": []}; import graph from run_story: not reachable"
+  },
+  {
+   "id": "aisef2/runtime/repair.py::repair",
+   "path": "aisef2/runtime/repair.py",
+   "symbol": "repair",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "V2 plan-level or runtime API (not imported by run_story)"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [], \"types\": []}; import graph from run_story: not reachable"
+  },
+  {
+   "id": "aisef2/runtime/run_scope.py::RunScope",
+   "path": "aisef2/runtime/run_scope.py",
+   "symbol": "RunScope",
+   "authority_kind": [
+    "RETRY",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "V2 plan-level or runtime API (not imported by run_story)"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.budget.charge\"], \"events\": [\"PROVIDER_REQUEST\", \"STORY_RETRY\"], \"types\": []}; import graph from run_story: not reachable"
+  },
+  {
+   "id": "aisef2/runtime/run_scope.py::RunScope.interrupt",
+   "path": "aisef2/runtime/run_scope.py",
+   "symbol": "RunScope.interrupt",
+   "authority_kind": [
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "V2 plan-level or runtime API (not imported by run_story)"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"PROVIDER_REQUEST\"], \"types\": []}; import graph from run_story: not reachable"
+  },
+  {
+   "id": "aisef2/runtime/run_scope.py::RunScope.retry",
+   "path": "aisef2/runtime/run_scope.py",
+   "symbol": "RunScope.retry",
+   "authority_kind": [
+    "RETRY",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "V2 plan-level or runtime API (not imported by run_story)"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.budget.charge\"], \"events\": [\"STORY_RETRY\"], \"types\": []}; import graph from run_story: not reachable"
+  },
+  {
+   "id": "aisef2/runtime/run_scope.py::RunScope.state",
+   "path": "aisef2/runtime/run_scope.py",
+   "symbol": "RunScope.state",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "V2 plan-level or runtime API (not imported by run_story)"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [], \"types\": []}; import graph from run_story: not reachable"
+  },
+  {
+   "id": "aisef2/runtime/sentinel.py::residuals",
+   "path": "aisef2/runtime/sentinel.py",
+   "symbol": "residuals",
+   "authority_kind": [
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "V2 plan-level or runtime API (not imported by run_story)"
+   ],
+   "disposition": "ACTIVE_V2_AUTHORITY",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"PROVIDER_REQUEST\"], \"types\": []}; import graph from run_story: not reachable"
+  },
+  {
+   "id": "pyproject.toml::console_script aisef",
+   "path": "pyproject.toml",
+   "symbol": "aisef = aisef.cli:main",
+   "authority_kind": [
+    "GATE_DECISION",
+    "ADMISSION",
+    "TERMINAL_STATE"
+   ],
+   "reachable_from": [
+    "the operating system: the installed V1 console script"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": "none: V2 has no console script in cycle 1; run_story is the supported V2 entrypoint",
+   "evidence": "pyproject scripts {\"aisef\": \"aisef.cli:main\"}; the V2 tree never imports aisef"
+  },
+  {
+   "id": "tests/v2/p4/test_process_table.py::<import aisef.clients.base>",
+   "path": "tests/v2/p4/test_process_table.py",
+   "symbol": "<import aisef.clients.base>",
+   "authority_kind": [],
+   "reachable_from": [
+    "a test module only"
+   ],
+   "disposition": "HISTORICAL_ONLY",
+   "replacement": null,
+   "evidence": "line 35: a historical reproducer of a V1 defect; the test tree is not a runtime authority path"
+  },
+  {
+   "id": "tests/v2/p4/test_process_table.py::<import aisef.harness.process_owner>",
+   "path": "tests/v2/p4/test_process_table.py",
+   "symbol": "<import aisef.harness.process_owner>",
+   "authority_kind": [],
+   "reachable_from": [
+    "a test module only"
+   ],
+   "disposition": "HISTORICAL_ONLY",
+   "replacement": null,
+   "evidence": "line 36: a historical reproducer of a V1 defect; the test tree is not a runtime authority path"
+  },
+  {
+   "id": "validation/v2/freeze_conformance.py::_routing_matches_rfc",
+   "path": "validation/v2/freeze_conformance.py",
+   "symbol": "_routing_matches_rfc",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/freeze_conformance.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.routing.route\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/freeze_conformance.py::_runspec_matches_rfc",
+   "path": "validation/v2/freeze_conformance.py",
+   "symbol": "_runspec_matches_rfc",
+   "authority_kind": [
+    "TERMINAL_STATE",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/freeze_conformance.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"STORY_COMMIT\"], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/freeze_conformance.py::_semantic_hash_binds_subject_absence",
+   "path": "validation/v2/freeze_conformance.py",
+   "symbol": "_semantic_hash_binds_subject_absence",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/freeze_conformance.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.product.compiler.compile_spec\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::Definition",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "Definition",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::Kind",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "Kind",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::MigrationError",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "MigrationError",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::V1Kernel",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "V1Kernel",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_constants",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_constants",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_enums",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_enums",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_files",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_files",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_ident",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_ident",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_kind",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_kind",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_lf",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_lf",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_loss_code",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_loss_code",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_read",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_read",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_unknown",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_unknown",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_upper",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_upper",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_value",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_value",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::_walk_values",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "_walk_values",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::check",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "check",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::cited",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "cited",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::compare",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "compare",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::declared",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "declared",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::derive",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "derive",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::generate",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "generate",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::inventory",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "inventory",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::loss_report",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "loss_report",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::main",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "main",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::problems",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "problems",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::read_v1",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "read_v1",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::render_doc",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "render_doc",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::render_json",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "render_json",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::resolve",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "resolve",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::without_v1_source",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "without_v1_source",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_migration_table.py::write",
+   "path": "validation/v2/gen_migration_table.py",
+   "symbol": "write",
+   "authority_kind": [
+    "ADMISSION"
+   ],
+   "reachable_from": [
+    "aisef2/orchestrate/story_runner.py::run_story (before its first event)"
+   ],
+   "disposition": "COMPATIBILITY_NONAUTHORITATIVE",
+   "replacement": null,
+   "evidence": "adapter conditions: {\"constructs_only_v2_inputs\": true, \"emits_human_declaration_required\": true, \"exists\": true, \"imports_v1\": [], \"reads_v1_as_text_only\": true, \"touches_engineering_quality\": false}"
+  },
+  {
+   "id": "validation/v2/gen_specs.py::derive",
+   "path": "validation/v2/gen_specs.py",
+   "symbol": "derive",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/gen_specs.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.product.compiler.compile_spec\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p1_evidence.py::outcome_polarity",
+   "path": "validation/v2/p1_evidence.py",
+   "symbol": "outcome_polarity",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p1_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.product.outcome.contract_satisfaction\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p1_evidence.py::routing_table",
+   "path": "validation/v2/p1_evidence.py",
+   "symbol": "routing_table",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "FAILURE_OWNER",
+    "RETRYABILITY"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p1_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.owner.classify\", \"aisef2.control.routing.route\", \"aisef2.product.outcome.contract_satisfaction\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p1_evidence.py::spec_compiler",
+   "path": "validation/v2/p1_evidence.py",
+   "symbol": "spec_compiler",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p1_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.product.compiler.compile_spec\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p2_evidence.py::_outcome",
+   "path": "validation/v2/p2_evidence.py",
+   "symbol": "_outcome",
+   "authority_kind": [
+    "PRODUCT_TRUTH",
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p2_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.control.routing.route\", \"aisef2.probe.protocol.bound_result\", \"aisef2.product.outcome.contract_satisfaction\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p2_evidence.py::plan_drift",
+   "path": "validation/v2/p2_evidence.py",
+   "symbol": "plan_drift",
+   "authority_kind": [
+    "ADMISSION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p2_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.plan.drift.continue_story\", \"aisef2.plan.story_admission.admit_story\"], \"events\": [\"PROVIDER_REQUEST\"], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p2_evidence.py::probe_protocol",
+   "path": "validation/v2/p2_evidence.py",
+   "symbol": "probe_protocol",
+   "authority_kind": [
+    "PRODUCT_TRUTH"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p2_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.probe.protocol.bound_result\", \"aisef2.probe.protocol.run_probe\", \"aisef2.product.compiler.compile_spec\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p2_evidence.py::story_admission",
+   "path": "validation/v2/p2_evidence.py",
+   "symbol": "story_admission",
+   "authority_kind": [
+    "ADMISSION",
+    "BUDGET"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p2_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.plan.story_admission.classify\"], \"events\": [\"PROVIDER_REQUEST\", \"STORY_ADMITTED\"], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p3_evidence.py::control_projections",
+   "path": "validation/v2/p3_evidence.py",
+   "symbol": "control_projections",
+   "authority_kind": [
+    "EVIDENCE_SELECTION"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p3_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p3_evidence.py::fold_oracle",
+   "path": "validation/v2/p3_evidence.py",
+   "symbol": "fold_oracle",
+   "authority_kind": [
+    "TERMINAL_STATE",
+    "EVIDENCE_SELECTION",
+    "MERGE_ROLLBACK_COMMIT"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p3_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [\"aisef2.journal.fold.fold\"], \"events\": [\"STORY_COMMIT\"], \"types\": []}; never imported by aisef2 (import graph)"
+  },
+  {
+   "id": "validation/v2/p3_evidence.py::journal_writer",
+   "path": "validation/v2/p3_evidence.py",
+   "symbol": "journal_writer",
+   "authority_kind": [
+    "ADMISSION",
+    "GATE_DECISION",
+    "FAILURE_OWNER"
+   ],
+   "reachable_from": [
+    "validation CLI: python -P validation/v2/p3_evidence.py"
+   ],
+   "disposition": "UNREACHABLE",
+   "replacement": null,
+   "evidence": "AST: {\"calls\": [], \"events\": [\"FAILURE_OBSERVED\", \"GATE_CHECK\", \"GATE_DECISION\", \"STORY_ADMITTED\"], \"types\": []}; never imported by aisef2 (import graph)"
+  }
+ ],
+ "legacy_references": [],
+ "adapters": {
+  "aisef2/orchestrate/seam.py": {
+   "exists": true,
+   "imports_v1": [],
+   "constructs_only_v2_inputs": true,
+   "touches_engineering_quality": false,
+   "refuses_human_declaration_required": true,
+   "before_the_first_event": true
+  },
+  "validation/v2/gen_migration_table.py": {
+   "exists": true,
+   "imports_v1": [],
+   "constructs_only_v2_inputs": true,
+   "touches_engineering_quality": false,
+   "emits_human_declaration_required": true,
+   "reads_v1_as_text_only": true
+  }
+ },
+ "entrypoints": {
+  "console_scripts": {
+   "aisef": "aisef.cli:main"
+  },
+  "v1_console_script": "aisef.cli:main",
+  "v2_console_script": false
+ },
+ "summary": {
+  "ACTIVE_V2_AUTHORITY": 64,
+  "COMPATIBILITY_NONAUTHORITATIVE": 37,
+  "HISTORICAL_ONLY": 2,
+  "REMOVED": 0,
+  "UNREACHABLE": 139,
+  "UNCLASSIFIABLE": 0
+ }
+}
