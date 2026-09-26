@@ -848,10 +848,13 @@ def subchecks(rfc: RFC, code) -> list[dict]:
         _fields("aisef2.product.spec", "ProductProofSpec", rfc.dataclasses.get("ProductProofSpec")))
     add("F4", "F4.semantic_hash_binds_subject_absence", "WP-1.2", _semantic_hash_binds_subject_absence(rfc))
     add("F5", "F5.enum.Enforcement", "WP-0.2", V("Enforcement", e.get("Enforcement", []), code))
-    add("F5", "F5.probe_protocol", "WP-2.1", _protocol_matches_rfc(rfc, "aisef2.probe.protocol", "Probe"))
+    protocol = _protocol_matches_rfc(rfc, "aisef2.probe.protocol", "Probe")
+    add("F5", "F5.probe_protocol", "WP-2.1", protocol)
     add("F5", "F5.harness_timeout_vs_subject_deadline", "WP-2.1", _timeout_semantics_match_rfc(rfc))
     add("F5", "F5.signal_provenance_after_dispatch", "WP-2.1", _signal_provenance_matches_rfc(rfc))
-    add("F5", "F5.protocol_stream_vs_process_lifecycle", "WP-2.1", _stream_lifecycle_matches_rfc(rfc))
+    add("F5", "F5.protocol_stream_vs_process_lifecycle", "WP-2.1",  # it runs a probe through that protocol
+        _stream_lifecycle_matches_rfc(rfc) if protocol["state"] == PASS else
+        {"state": FAIL, "detail": "not run: the probe protocol differs from the RFC (F5.probe_protocol)"})
     add("F5", "F5.calibration_contracts", "WP-2.2", _calibration_contracts_match_rfc(rfc))
     for n in ("ObligationRole", "ParentExpectation"):
         add("F6", f"F6.enum.{n}", "WP-0.2", V(n, e.get(n, []), code))

@@ -1721,6 +1721,33 @@
    "owned_escaped": 0,
    "owned_released_empty": true,
    "owned_range_mechanism": "posix-session"
+  },
+  {
+   "seq": 73,
+   "commit": "65dc6435dc78f390faddc8de5152dd781f0eec5c",
+   "package": "V2-006 (P6-FINDING-001 and P6-FINDING-002; the first candidate — its local gate failed, so it was never pushed and has no CI run; its attempt appended by the next candidate)",
+   "attempt": 1,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "gate (full suite in the owned range)",
+   "result": "FAIL",
+   "tests_run": 4718,
+   "failing_tests": [
+    "v2.conformance.test_freeze_f1_f11.Conformance.test_F5_probe_protocol_is_compared_member_by_member_with_signatures"
+   ],
+   "classification": "HARNESS",
+   "classification_evidence": "local gate, macOS, Python 3.14 (4718 ran, errors=1): the new conformance subcheck F5.protocol_stream_vs_process_lifecycle runs a probe through run_probe; the test that patches aisef2.probe.protocol.Probe with a drifted, non-runtime-checkable Protocol to prove F5.probe_protocol FAILs then re-ran evaluate(), and run_probe's isinstance(probe, Probe) raised TypeError, aborting the whole evaluation. A defect of the validation tooling, not of the kernel: the stream check now runs only when F5.probe_protocol passes and otherwise reports FAIL 'not run', pinned in that test. Not pushed: the gate stops before the push on any local failure.",
+   "known_defect": null,
+   "gate_effect": "COUNTS",
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
   }
  ]
 }

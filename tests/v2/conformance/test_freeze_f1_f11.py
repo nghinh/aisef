@@ -181,8 +181,10 @@ class Conformance(unittest.TestCase):
 
             def evaluate(self, spec, at, env, extra_path): ...
         with mock.patch.object(protocol, "Probe", Drifted):
-            sub = self._sub(fc.evaluate(self.rfc, self.code, self.manifest), "F5.probe_protocol")
-        self.assertEqual(sub["state"], fc.FAIL)
+            drifted = fc.evaluate(self.rfc, self.code, self.manifest)
+        self.assertEqual(self._sub(drifted, "F5.probe_protocol")["state"], fc.FAIL)
+        self.assertEqual(self._sub(drifted, "F5.protocol_stream_vs_process_lifecycle")["detail"],
+                         "not run: the probe protocol differs from the RFC (F5.probe_protocol)")
         with mock.patch.object(protocol, "Probe", type("NotAProtocol", (), {})):
             self.assertIn("is not a typing.Protocol",
                           self._sub(fc.evaluate(self.rfc, self.code, self.manifest), "F5.probe_protocol")["detail"])

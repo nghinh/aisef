@@ -12,12 +12,12 @@
   },
   "validation_v2_tree": {
    "files": 27,
-   "sha256": "5de9d595da2d5e4fe6d729e19c01a343e22e640247e9136838179daedcd8c7fc",
+   "sha256": "b768f7b258055e188f5b1c1224120e0d53bbe62423374dd20148322e0ffea571",
    "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
   },
   "tests_v2_tree": {
    "files": 139,
-   "sha256": "bafa5c35bd351f94c3afec19c2ede440338a0992737da8e380eba1041ecb403b",
+   "sha256": "9f9166ccb7318412359657ccc4d07e629c75cba5655708da3452259120e4c98c",
    "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines in ordinal string order"
   },
   "aisef_tree": {
@@ -781,19 +781,19 @@
  },
  "run_history": {
   "record": "closure-evidence/v2/P6-RUN-HISTORY.json",
-  "sha256": "6ec2e49ed004a5e5ce216acaf561f0a9f539dee39a77c59741858133cd89fc49",
-  "entries": 72,
+  "sha256": "8b142fb02899a6105fd1df13beaa319ac9fe78f7b807f76719994eef7cdc1e28",
+  "entries": 73,
   "problems": [],
-  "latest_commit": "b41a01e1b545bfad0c56f26616138506fb11bc9e",
+  "latest_commit": "65dc6435dc78f390faddc8de5152dd781f0eec5c",
   "residual_process_state": {
-   "jobs": 8,
+   "jobs": 1,
    "zero_residual": true,
    "v1_pf_001_absent": true
   }
  },
  "records": {
   "closure-evidence/v2/P6-MUTATION.json": "fec915d0db3d4279886715f2f6640cb28aaeeeac66081a3d0720c5befb24e3de",
-  "closure-evidence/v2/P6-RUN-HISTORY.json": "6ec2e49ed004a5e5ce216acaf561f0a9f539dee39a77c59741858133cd89fc49",
+  "closure-evidence/v2/P6-RUN-HISTORY.json": "8b142fb02899a6105fd1df13beaa319ac9fe78f7b807f76719994eef7cdc1e28",
   "closure-evidence/v2/P6-MIGRATION-TABLE.json": "157b46f6786d849591f9c08b02a39f48a08c18d69d9e34cf7c3c98ccd5a6752f",
   "closure-evidence/v2/P6-ORCHESTRATION.json": "4173d55004448892665c4f2749117177afbe61340b1b9dd2f0b1a014b0371235",
   "closure-evidence/v2/P6-AUTHORITY-INVENTORY.json": "8c632a145c8b4f76ca0e5c462e2fa545cd07f05f71dd58da9f53ef6d7c20c592",
