@@ -2,13 +2,13 @@
  "record": "AISEF V2 — Q0 STATIC INTEGRITY",
  "rung": "Q0",
  "status": "GREEN",
- "at": "2026-09-26T23:07:09Z",
+ "at": "2026-09-27T00:22:59Z",
  "rule": "zero-provider; no project admission executed; every Q0 checker discovered and calibrated; fail-closed both ways",
  "subject": {
   "seal_commit": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
   "semantic_candidate": "097daefefd9229eafeacaca321b7a008a581899b",
   "kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
-  "head": "9a8076226f9d4cd12e7bc3947aaf57eaf1b50b41",
+  "head": "32dd8d9d92847a4fe9df1ff4b31493dbd553fbfc",
   "head_is_after_the_seal": true,
   "head_kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
   "kernel_tree_is_the_candidates": true,
@@ -39,7 +39,7 @@
   "harness": {
    "files": {
     "validation/qualification/__init__.py": "40f613b3d5ffa39b5807ae0aec2878be51870891f5bd7dd76aae025e73e48f91",
-    "validation/qualification/common.py": "8479b8b4ceeedc83f992561e1750ba4181eb5ce7c7dc0352da486a5f38c808a1",
+    "validation/qualification/common.py": "6816af440da1cf25a6d3d2ec634562e39c623090527108fd54c2d6dcee46d57c",
     "validation/qualification/q0.py": "e31b897a576e622feed0f8407109d0d01d0bd71ead4874f36c7003cdac3e6cca",
     "validation/qualification/q1.py": "66dfc17f07603057fb70210442b31359c3e7c80520a0bdcc9b5cb7af91a6d2ef",
     "validation/qualification/q2.py": "0b17822096a4f4cb5a7e3c6be4c19ee1022a5892c689462c0a56d607d1d9cfdc",
@@ -47,7 +47,7 @@
     "validation/qualification/run.py": "baa82a3c3f7e0716855806d1ce8a78972f62792b8ad220f93c40a5860df28f90",
     "validation/qualification/summary.py": "d38d0e202f229645f79a6f21603a88c3d3552cecb7b19f7fa3a5fd7e1c73e58b"
    },
-   "sha256": "5a8fd15776c860941f8c706038ee8cce0fc1c6d88850a74fcd3ce6945f167131",
+   "sha256": "dafc15db18ed205c45b8aec972e2b5ddd0fade178e03c49053e5858b49c0262f",
    "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines, sorted"
   }
  },
@@ -55,7 +55,7 @@
   "os": "darwin",
   "os_release": "25.5.0",
   "python": "3.14.7",
-  "free_disk_gb": 63.4,
+  "free_disk_gb": 63.3,
   "implementation": "CPython",
   "machine": "arm64",
   "runner_os": null,
@@ -720,7 +720,7 @@
   "pinned_case": {
    "id": "tests.v2.conformance.test_freeze_f1_f11:Conformance.test_F5_probe_protocol_is_compared_member_by_member_with_signatures",
    "outcome": "PASS",
-   "seconds": 10.119
+   "seconds": 10.117
   },
   "committed_summary": {
    "PASS": 11,
@@ -984,7 +984,7 @@
   {
    "id": "tests.v2.conformance.test_freeze_f1_f11:Conformance.test_F5_probe_protocol_is_compared_member_by_member_with_signatures",
    "outcome": "PASS",
-   "seconds": 10.119
+   "seconds": 10.117
   }
  ],
  "counts": {
@@ -994,6 +994,6 @@
   "SKIP": 0,
   "NOT_APPLICABLE": 0
  },
- "seconds": 205.4,
- "harness_digest_at_run": "5a8fd15776c860941f8c706038ee8cce0fc1c6d88850a74fcd3ce6945f167131"
+ "seconds": 205.8,
+ "harness_digest_at_run": "dafc15db18ed205c45b8aec972e2b5ddd0fade178e03c49053e5858b49c0262f"
 }

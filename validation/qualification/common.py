@@ -37,7 +37,8 @@ GREEN, FAILED, UNRUNNABLE = "GREEN", "FAILED", "UNRUNNABLE"
 PASS, FAIL, ERROR, SKIP, NOT_APPLICABLE = "PASS", "FAIL", "ERROR", "SKIP", "NOT_APPLICABLE"
 #: a skip for one of these reasons is a platform inapplicability, recorded and not counted; any other skip is a case
 #: that could not execute here, which makes the rung UNRUNNABLE (never FAILED)
-_PLATFORM_SKIP_MARKS = ("POSIX", "posix", "Windows", "windows", "Linux", "linux", "darwin", "macOS", "signal exit")
+_PLATFORM_SKIP_MARKS = ("POSIX", "posix", "Windows", "windows", "Linux", "linux", "darwin", "macOS", "signal exit",
+                        "BREAKAWAY_OK", "job object")   # the Windows Job Object's own semantics, named without the word Windows
 #: a skip for one of these reasons is a declared optional capability absent on the platform (the qualification
 #: platforms run the stdlib test runner and install no third-party runner): recorded as NOT_APPLICABLE with the
 #: capability named, so the record says exactly what was not exercised there; never a rung that cannot run
