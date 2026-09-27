@@ -55,6 +55,21 @@ def load_chunks(chunk_dir: pathlib.Path) -> dict[int, list[dict]]:
     return out
 
 
+def attempts_observed(out_dir: pathlib.Path) -> dict[int, list[dict]]:
+    """Every chunk attempt the runner started, from the owned-range records (owned/chunk-K.attempt-N.json), whether
+    or not the worker wrote its record: an attempt with no chunk record is a harness failure, kept as one."""
+    out: dict[int, list[dict]] = {}
+    out_dir = out_dir.resolve()
+    for p in sorted((out_dir / "owned").glob("chunk-*.attempt-*.json")):
+        k, n = (int(x) for x in p.stem.replace("chunk-", "").replace("attempt-", "").split("."))
+        o = json.loads(p.read_text(encoding="utf-8"))
+        rec = q4.chunk_path(out_dir / "chunks", k, n)
+        out.setdefault(k, []).append({"attempt": n, "owned_record": p.relative_to(ROOT).as_posix(), "exit": o.get("exit"),
+                                      "owned_after": o.get("owned_after"), "escaped": len(o.get("escaped") or []), "released_empty": o.get("released_empty"),
+                                      "chunk_record": rec.relative_to(ROOT).as_posix() if rec.exists() else None})
+    return out
+
+
 def reconcile(attempts: dict[int, list[dict]], subject: dict) -> tuple[dict, list[str]]:
     """The accepted attempt per chunk (the last one), every count re-derived from the rows, one identity, coverage."""
     problems: list[str] = []
@@ -285,6 +300,13 @@ def aggregate(out_dir: pathlib.Path) -> dict:
     ident = q4.identity()
     attempts = load_chunks(out_dir / "chunks")
     summary, problems = reconcile(attempts, subject)
+    observed = attempts_observed(out_dir)
+    for k, obs in observed.items():
+        if k in summary["per_chunk"]:
+            summary["per_chunk"][k]["attempts_observed"] = obs
+    residual = [o for obs in observed.values() for o in obs if o["owned_after"] or o["escaped"] or not o["released_empty"]]
+    if residual:
+        problems.append(f"{len(residual)} chunk attempt(s) left a residual or escaped process")
     end_rec = conformance()
     for when, rec in (("start", start_rec), ("end", end_rec)):
         if rec is None:
@@ -312,7 +334,7 @@ def aggregate(out_dir: pathlib.Path) -> dict:
         "one_kernel_identity": q4.one_kernel_identity(ident), "subject": {"path": f"{q4.OUT_REL}/SUBJECT.json", "sha256": _sha(f"{q4.OUT_REL}/SUBJECT.json"),
                                                                            "one_kernel_identity": subject["one_kernel_identity"], "frozen_at": subject["frozen_at"]},
         "seed_schedule": subject["identity"]["seed_schedule"], "generator": subject["identity"]["generator"],
-        "chunks": summary["per_chunk"], "totals": summary["totals"], "seeds": summary["seeds"], "one_kernel_digest_assertion": summary["one_kernel_identity"],
+        "chunks": summary["per_chunk"], "chunk_attempts_observed": {str(k): v for k, v in sorted(observed.items())}, "totals": summary["totals"], "seeds": summary["seeds"], "one_kernel_digest_assertion": summary["one_kernel_identity"],
         "coverage_summary": summary["coverage_summary"], "coverage": summary["coverage"], "zero_sample_categories": summary["zero_sample_categories"],
         "calibration": {"path": f"{q4.OUT_REL}/CALIBRATION.json", "sha256": _sha(f"{q4.OUT_REL}/CALIBRATION.json"),
                         "all_detected": bool(calib_rec and calib_rec.get("all_detected"))},

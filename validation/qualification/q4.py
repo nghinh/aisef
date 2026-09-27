@@ -376,6 +376,7 @@ def run_chunk(k: int, *, attempt: int = 1, out_dir: pathlib.Path) -> dict:
     if problems:
         record.update(attempted=0, terminal=0, counters={c: 0 for c in CLASSES}, rows=[], finished=C.now(), status="UNRUNNABLE")
         return record
+    C.render(record)   # the header must be a record before any trace runs: a value that cannot be written is found here, not after 10,000 traces
     t0 = time.perf_counter()
     counters = {c: 0 for c in CLASSES}
     counters.update(matched_with_refusal=0, prefix_traces=0)
@@ -413,11 +414,10 @@ def run_chunk(k: int, *, attempt: int = 1, out_dir: pathlib.Path) -> dict:
 
 
 def _armed(armed) -> dict:
-    from aisef2.product.contract import plain
-    try:
-        return {"tier": "ROOT", "registry": plain(armed) if armed is not None else None}
-    except Exception:  # noqa: BLE001 — the record of what was armed must not fail the chunk
-        return {"tier": "ROOT", "registry": repr(armed)[:500]}
+    """What tests.v2 armed for this process, in JSON form (the registry holds enums in a frozenset)."""
+    tier = getattr(armed, "tier", None)
+    ids = getattr(armed, "invariants", None) or ()
+    return {"tier": getattr(tier, "value", str(tier)), "invariants": sorted(getattr(i, "value", str(i)) for i in ids), "count": len(ids)}
 
 
 def chunk_path(out_dir: pathlib.Path, k: int, attempt: int) -> pathlib.Path:

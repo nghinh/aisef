@@ -5,7 +5,7 @@
 # first trace, F1-F11 and the V1 guard measured before and after, disk / memory / worker liveness sampled throughout.
 #
 #   validation/qualification/q4_run.sh [W]        # default 5 workers
-set -u
+set -u; unsetopt nomatch
 A=/Users/nghinh/Downloads/projects/ai-sdlc; cd $A
 W=${1:-5}
 OUT=$A/closure-evidence/v2/Q4
@@ -42,7 +42,7 @@ def mem_free_mb():
 def workers():
     try:
         txt = subprocess.run(["ps", "-axo", "pid=,rss=,command="], capture_output=True, text=True, encoding="utf-8").stdout
-        rows = [ln.split(None, 2) for ln in txt.splitlines() if "q4.py --chunk" in ln and "grep" not in ln]
+        rows = [ln.split(None, 2) for ln in txt.splitlines() if "q4.py --chunk" in ln and "owned_run.py" not in ln and "grep" not in ln]   # the worker, not its owned-range wrapper
         return [{"pid": int(r[0]), "rss_mb": int(r[1]) // 1024, "chunk": r[2].split("--chunk")[1].split()[0]} for r in rows]
     except Exception:
         return None
