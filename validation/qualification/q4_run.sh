@@ -73,10 +73,10 @@ run_chunk() {
   echo $RC > $LOG/chunk-$K.attempt-$ATTEMPT.rc
   [ "$(git rev-parse HEAD:aisef2)" = "$KT" ] || echo "[$(stamp)] STOP: the kernel tree changed during chunk $K"
 }
-export -f run_chunk 2>/dev/null || true
+running() { local n=0; for P in $PIDS; do kill -0 $P 2>/dev/null && n=$((n + 1)); done; echo $n; }   # chunk workers alive, by pid (a script has no job table)
 PIDS=()
 for K in $(seq 0 9); do
-  while [ $(jobs -r | wc -l) -ge $((W + 1)) ]; do sleep 5; done   # +1: the monitor is a job too
+  while [ $(running) -ge $W ]; do sleep 5; done
   run_chunk $K &
   PIDS+=($!)
 done
