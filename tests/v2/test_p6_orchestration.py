@@ -1003,7 +1003,7 @@ class Orchestration(unittest.TestCase):
         self.assertEqual(_shape(marshal.loads(blob[16:])), _shape(compile(CALC, "app/calc.py", "exec")))
         self.assertNotEqual(_shape(marshal.loads(blob[16:])), _shape(compile(CALC + ADD, "app/calc.py", "exec")))
         p = subprocess.run([sys.executable, "-I", "-c", "import sys; print(sys.dont_write_bytecode)"],
-                           env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}, capture_output=True, text=True)
+                           env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}, capture_output=True, encoding="utf-8")
         self.assertEqual(p.stdout.strip(), "False")   # -I discards the variable the harness environment sets
         # before the first proof at each revision (C1) both checkouts held the committed bytecode — stale, never valid
         # for the 66-byte source; before the second (C0) each held bytecode of the source, fresh and valid: the C1

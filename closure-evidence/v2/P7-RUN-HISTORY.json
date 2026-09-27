@@ -1852,6 +1852,33 @@
    "owned_escaped": 0,
    "owned_released_empty": true,
    "owned_range_mechanism": "posix-session"
+  },
+  {
+   "seq": 77,
+   "commit": "d9a7bb7c7f4f34f5dc243b87d2218a3cad3e8f6a",
+   "package": "P7-FINDING-001 diagnostic candidate (ORCH_9_and_10 observed, DIAG-1..3, diag_orch9.py, diagnostic.yml, old verdict invalidated); not pushed: its local gate failed",
+   "attempt": 1,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "gate (full suite in the owned range)",
+   "result": "FAIL",
+   "tests_run": 4722,
+   "classification": "HARNESS",
+   "classification_evidence": "local gate (4722 ran, failures=1): tests/test_meta.py's rule that every subprocess call declares encoding=utf-8 caught DIAG-1's interpreter call (tests/v2/test_p6_orchestration.py:1005, text=True without encoding) — new test code, not the candidate's kernel; owned processes 0/0/0, V1 guard PASS; fixed by the next candidate, never rerun",
+   "known_defect": null,
+   "failing_tests": [
+    "test_meta.TestKhongDocDauRaBangBangMaCuaMay.test_moi_lan_goi_tien_trinh_con_deu_khai_bang_ma"
+   ],
+   "gate_effect": "COUNTS",
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
   }
  ]
 }
