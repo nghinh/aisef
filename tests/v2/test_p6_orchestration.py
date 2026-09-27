@@ -245,6 +245,11 @@ def checkout_facts(root: str, spec) -> dict:
     return facts
 
 
+def _on_disk(text: str) -> int:
+    """The size a fixture file has on this platform: write_text translates newlines (34 bytes on Windows for CALC)."""
+    return len(text.replace("\n", os.linesep).encode("utf-8"))
+
+
 def _reads_stale(facts: dict) -> bool:
     return bool(facts.get("bytecode_valid_for_source")) and facts.get("bytecode_stale") is True
 
@@ -999,7 +1004,7 @@ class Orchestration(unittest.TestCase):
                          [f"app/__pycache__/__init__.{tag}.pyc", f"app/__pycache__/calc.{tag}.pyc"])
         blob = self.bytecode_blob(merged, "calc")
         self.assertEqual(git(self.repo, "show", f"{merged}:app/calc.py").stdout, CALC + ADD)
-        self.assertEqual(_pyc_header(blob)["source_size"], len(CALC.encode("utf-8")))
+        self.assertEqual(_pyc_header(blob)["source_size"], _on_disk(CALC))
         self.assertEqual(_shape(marshal.loads(blob[16:])), _shape(compile(CALC, "app/calc.py", "exec")))
         self.assertNotEqual(_shape(marshal.loads(blob[16:])), _shape(compile(CALC + ADD, "app/calc.py", "exec")))
         p = subprocess.run([sys.executable, "-I", "-c", "import sys; print(sys.dont_write_bytecode)"],
@@ -1051,7 +1056,8 @@ class Orchestration(unittest.TestCase):
         before = ev["checkouts"]["verifier"]["before"]
         self.assertEqual((before["bytecode_valid_for_source"], before["bytecode_stale"]), (False, True))
         self.assertEqual(ev["affected_preserve"], {"C0": ["S0", self.s0.id]})
-        self.assertEqual([b["header"]["source_size"] for b in ev["bytecode_at_revision"] if b["path"].endswith(f"calc.{sys.implementation.cache_tag}.pyc")], [32])
+        self.assertEqual([b["header"]["source_size"] for b in ev["bytecode_at_revision"] if b["path"].endswith(f"calc.{sys.implementation.cache_tag}.pyc")],
+                         [_on_disk(CALC)])
         self.assertEqual(ev["proof_verified"]["agreement"], False)
         self.assertEqual(len(ev["process_ranges"]), 4)   # acquired and released, each party
         self.assert_disposed("S2")
