@@ -68,8 +68,12 @@ def _specs_binding(digest: str) -> list[str]:
                 walk(v, f"{where}[{i}]")
     for base in ("tests/v2/fixtures", "closure-evidence/v2", "docs/implementation/v2"):
         for p in sorted((C.ROOT / base).rglob("*.json")):
+            rel = p.relative_to(C.ROOT).as_posix()
+            if rel in HISTORICAL_OLD_DIGEST_FILES or rel.startswith(HISTORICAL_OLD_DIGEST_PREFIXES) \
+                    or rel.startswith(C.OUT_REL + "/invalidated-"):
+                continue   # measurements of history (the finding's records, invalidated rungs): never a stored spec
             try:
-                walk(json.loads(p.read_text(encoding="utf-8")), p.relative_to(C.ROOT).as_posix())
+                walk(json.loads(p.read_text(encoding="utf-8")), rel)
             except (ValueError, UnicodeDecodeError):
                 continue
     return hits
@@ -226,13 +230,25 @@ def run(ident: dict) -> dict:
         "p6": {"sha256": C.lf_sha(p6s), "at_the_seal_commit": C.sha_text(at_seal_commit.replace("\r\n", "\n") + ("" if at_seal_commit.endswith("\n") else "\n")),
                "verdict": seal6["verdict"], "candidate": seal6["p6_candidate"]["commit"], "aisef2_tree": seal6["p6_candidate"]["aisef2_tree"]},
         "p5_records_identity_problems": p5.check(C.ROOT), "p6_records_identity_problems": p6.check(C.ROOT),
+        # post-P6 corrective lineage (owner §21-§22): the P6 seal keeps naming the candidate it sealed; the harness's
+        # candidate is the one the correction record says supersedes it
+        "post_p6_corrective_lineage": {"sealed_candidate": seal6["p6_candidate"]["commit"], "sealed_aisef2_tree": seal6["p6_candidate"]["aisef2_tree"],
+                                       "superseded": correction["lineage"]["new_semantic_candidate"]["supersedes"],
+                                       "old_candidate_in_correction": correction["lineage"]["old_semantic_candidate"]["commit"],
+                                       "corrected_candidate": correction["lineage"]["new_semantic_candidate"]["commit"],
+                                       "corrected_aisef2_tree": correction["lineage"]["new_semantic_candidate"]["aisef2_tree"],
+                                       "harness_candidate": C.SEMANTIC_CANDIDATE, "harness_kernel_tree": C.KERNEL_TREE},
     }
     seals["p6"]["byte_identical_to_the_seal_commit"] = C.git("rev-parse", f"{C.SEAL_COMMIT}:closure-evidence/v2/P6-FINAL-SEAL.json") \
         == C.git("rev-parse", "HEAD:closure-evidence/v2/P6-FINAL-SEAL.json")
     ok_seals = (seals["p4"]["sha256"] == seals["p4"]["bound_by_p5_seal"] == seals["p4"]["bound_by_p6_seal"]
                 and seals["p5"]["sha256"] == seals["p5"]["bound_by_p6_seal"] and seals["p5"]["verdict"] == "P5 FINAL SEALED"
                 and seals["p6"]["verdict"] == "P6 FINAL SEALED" and seals["p6"]["byte_identical_to_the_seal_commit"]
-                and seals["p6"]["candidate"] == C.SEMANTIC_CANDIDATE and seals["p6"]["aisef2_tree"] == C.KERNEL_TREE
+                and seals["p6"]["candidate"] == seals["post_p6_corrective_lineage"]["superseded"]
+                == seals["post_p6_corrective_lineage"]["old_candidate_in_correction"]
+                and seals["post_p6_corrective_lineage"]["corrected_candidate"] == C.SEMANTIC_CANDIDATE
+                and seals["post_p6_corrective_lineage"]["corrected_aisef2_tree"] == C.KERNEL_TREE
+                and seals["p6"]["aisef2_tree"] == correction["lineage"]["old_semantic_candidate"]["aisef2_tree"]
                 and not seals["p5_records_identity_problems"] and not seals["p6_records_identity_problems"])
     if not ok_seals:
         problems.append("a seal identity does not hold")

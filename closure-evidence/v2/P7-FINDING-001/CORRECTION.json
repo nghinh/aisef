@@ -28,8 +28,8 @@
    "status": "historical, P7-failed; not amended, not relabeled"
   },
   "new_semantic_candidate": {
-   "commit": "recorded by the evidence commit that follows the candidate",
-   "aisef2_tree": "recorded with the commit",
+   "commit": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
    "supersedes": "097daefefd9229eafeacaca321b7a008a581899b"
   }
  },

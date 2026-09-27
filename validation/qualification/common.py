@@ -27,8 +27,8 @@ for p in (str(ROOT), str(ROOT / "validation" / "v2")):
 #: The qualification subject, frozen by the owner (§1): the P6 seal commit, the semantic candidate it seals and the
 #: kernel tree both carry. Every rung refuses to run unless HEAD's kernel tree is this one.
 SEAL_COMMIT = "b720de7c4f03061cfa07e7b9f74a74e614e52de4"
-SEMANTIC_CANDIDATE = "097daefefd9229eafeacaca321b7a008a581899b"
-KERNEL_TREE = "ac11f906669c75df634d83f4ce42488a0e27686c"
+SEMANTIC_CANDIDATE = "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2"
+KERNEL_TREE = "4d6081940f5b9dae47439f73f0157161e028d804"
 V1_PRODUCT_TREE = "4359f347378e84fcac2d213128c7c26f282c13c0"
 OUT_REL = "closure-evidence/v2/Q0-Q3"
 #: the platforms the qualification claims (§20); any other platform's record is kept as a non-gate observation
