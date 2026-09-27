@@ -1,0 +1,50 @@
+{
+ "record": "AISEF V2 — P7 ACCEPTANCE (Q0-Q3 requalified on the corrected candidate)",
+ "id": "AISEF-V2-P7-ACCEPTANCE",
+ "authority": "owner decision 'AISEF V2 — P8 / QP-8 EXECUTION AUTHORIZATION / Q4 FRESH 100,000-TRACE DIFFERENTIAL' (2026-09-28): P7 / Q0-Q3 ACCEPTED and COMPLETE",
+ "written": "2026-09-27T22:19:55Z",
+ "p7_qualified_semantic_candidate": {
+  "commit": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+  "supersedes": "097daefefd9229eafeacaca321b7a008a581899b"
+ },
+ "p7_evidence": {
+  "summary": {
+   "path": "closure-evidence/v2/Q0-Q3/SUMMARY.json",
+   "sha256": "5f03687299447a24affa43d638b3ba04d24df071273eb63b831bdb98da4097d2"
+  },
+  "correction": {
+   "path": "closure-evidence/v2/P7-FINDING-001/CORRECTION.json",
+   "sha256": "3da6d2a60e381613ea14670454a0a85e536606f750404dd1f2e0c3de85ee20e7"
+  },
+  "diagnosis": {
+   "path": "closure-evidence/v2/P7-FINDING-001/DIAGNOSIS.json",
+   "sha256": "4904d97d7b62b9ec285c0e64cff94ad4d9bfde66ea168a2e5c2d1dd259c25e3a"
+  },
+  "reproducer": {
+   "path": "closure-evidence/v2/P7-FINDING-001/REPRODUCER.json",
+   "sha256": "5c3a1c13e2fd58450a5fd020724778c84aecd4790380556829c3a47b51ecf71a"
+  },
+  "invalidation_of_the_first_verdict": {
+   "path": "closure-evidence/v2/Q0-Q3/INVALIDATION.json",
+   "sha256": "32f314e1c91e2b9e978681ac4a659f9822ad4e11303788bf9bb1d7129cdc988b"
+  },
+  "evidence_commit": "8260df981ff496e7ae5af99bbee751e3cc33080c"
+ },
+ "p6_seal": {
+  "path": "closure-evidence/v2/P6-FINAL-SEAL.json",
+  "sha256": "9362029864f011d7c727d57ab4f99815e0c440071833285a2964053fa651ea60",
+  "rule": "unchanged; the P7 candidate is post-P6 corrective lineage"
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/P7-RUN-HISTORY.json",
+  "total_attempts": 151,
+  "sha256": "88037578dcfa7963a322d0dc0eb89eed84cc611f474aac9b484ab0ee69be11f8",
+  "rule": "closed at this count; 8260df9's completed attempts open P8-RUN-HISTORY (owner §2); nothing rewritten"
+ },
+ "p8": {
+  "status": "AUTHORIZED — Q4 fresh 100,000-trace differential on 7114177",
+  "history": "closure-evidence/v2/P8-RUN-HISTORY.json"
+ },
+ "verdict": "P7 ACCEPTED"
+}
