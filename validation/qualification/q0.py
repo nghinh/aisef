@@ -15,7 +15,12 @@ from unittest import mock
 
 from . import common as C
 
-OLD_PROBE_DIGEST = "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e"
+OLD_PROBE_DIGEST = "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e"   # pre-V2-006
+#: every probe digest that is history on this tree, oldest first: pre-V2-006, then V2-006 up to the P7-FINDING-001
+#: correction (the correction record carries the effective one)
+OLD_PROBE_DIGESTS = {OLD_PROBE_DIGEST: "pre-V2-006",
+                     "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0": "V2-006 to the P7-FINDING-001 correction"}
+CORRECTION_REL = "closure-evidence/v2/P7-FINDING-001/CORRECTION.json"
 NEW_F5_SUBCHECK = "F5.protocol_stream_vs_process_lifecycle"
 #: owner §6: each required family -> the Q0 checkers (by their discovered names) or test cases that discharge it
 FAMILIES = {
@@ -42,7 +47,10 @@ HISTORICAL_OLD_DIGEST_FILES = {  # evidence that legitimately names the pre-V2-0
     "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json", "closure-evidence/v2/P6-V2-006-PROBE-HARNESS.json",
     "closure-evidence/v2/P6-FINAL-SEAL.json", "closure-evidence/v2/P2-RUN-HISTORY.json", "closure-evidence/v2/P6-RUN-HISTORY.json",
     "closure-evidence/v2/P4-RUN-HISTORY.json", "closure-evidence/v2/P5-RUN-HISTORY.json", "closure-evidence/v2/P3-RUN-HISTORY.json",
+    # the P7-FINDING-001 record set names the V2-006 digest as the one it measured and corrected
+    "closure-evidence/v2/P7-RUN-HISTORY.json", "docs/implementation/v2/P6-V2-006-PROBE-HARNESS.md",
 }
+HISTORICAL_OLD_DIGEST_PREFIXES = ("closure-evidence/v2/P7-FINDING-001/",)
 
 
 def _specs_binding(digest: str) -> list[str]:
@@ -164,6 +172,7 @@ def run(ident: dict) -> dict:
     rows = {i["id"]: i["row_sha256"] for i in fm.freeze_items(rfc_text)}
     amendment = json.loads((C.ROOT / "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json").read_text(encoding="utf-8"))
     exception = json.loads((C.ROOT / "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json").read_text(encoding="utf-8"))
+    correction = json.loads((C.ROOT / CORRECTION_REL).read_text(encoding="utf-8"))
     eff, links, broken = fm.lineage(C.ROOT)
     req = Requirement.create(id="R", text="q0", source="Q0")
     contract = BehaviorContract.create(id="C", requirement_ids=("R",), subject=Subject(SubjectKind.PYTHON_CALLABLE, "app.calc:add"),
@@ -173,28 +182,34 @@ def run(ident: dict) -> dict:
     hashes = {d[:12]: compile_spec(contract, requirements={"R": req}, approvals=[approval],
                                    probes={SubjectKind.PYTHON_CALLABLE: ProbeRef(pc.PROBE_ID, d)}).semantic_hash
               for d in (OLD_PROBE_DIGEST, pc.DIGEST)}
-    old_specs = _specs_binding(OLD_PROBE_DIGEST)
-    mentions = _files_mentioning(OLD_PROBE_DIGEST)
+    old_specs = [w for d in OLD_PROBE_DIGESTS for w in _specs_binding(d)]
+    mentions = sorted({f for d in OLD_PROBE_DIGESTS for f in _files_mentioning(d)})
+    historical = lambda f: f in HISTORICAL_OLD_DIGEST_FILES or f.startswith(HISTORICAL_OLD_DIGEST_PREFIXES)  # noqa: E731
     v2_006 = {
         "lineage_ends_at_V2_006": bool(links) and links[-1]["record"].endswith("AMENDMENT-V2-006.json") and not broken,
         "effective_digests_equal_the_amendment": (eff.get("rfc_normative_digest"), eff.get("freeze_table_digest"))
             == (amendment["rfc_normative_digest"]["after"], amendment["freeze_table_digest"]["after"]),
         "f5_row_sha256": {"rfc_now": rows.get("F5"), "amendment_after": amendment["f5_row_sha256"]["after"],
                           "match": rows.get("F5") == amendment["f5_row_sha256"]["after"]},
-        "probe_digest": {"now": pc.DIGEST, "exception_after": exception["digests"]["probe_digest"]["after"], "old": OLD_PROBE_DIGEST,
-                         "match": pc.DIGEST == exception["digests"]["probe_digest"]["after"] != OLD_PROBE_DIGEST},
+        # the effective probe digest: V2-006's "after" was corrected by P7-FINDING-001 (the correction record's
+        # "before" is V2-006's "after"; its "after" is what the tree computes); every earlier digest is history
+        "probe_digest": {"now": pc.DIGEST, "v2_006_exception_after": exception["digests"]["probe_digest"]["after"],
+                         "correction_before": correction["probe_digest"]["before"], "correction_after": correction["probe_digest"]["after"],
+                         "old": OLD_PROBE_DIGESTS,
+                         "match": pc.DIGEST == correction["probe_digest"]["after"] and correction["probe_digest"]["before"]
+                                  == exception["digests"]["probe_digest"]["after"] and pc.DIGEST not in OLD_PROBE_DIGESTS},
         "f4_semantic_hash_incorporates_the_probe_digest": {"by_digest_prefix": hashes, "differs": len(set(hashes.values())) == 2},
         "stored_specs_bound_to_the_old_digest": old_specs,
         "files_naming_the_old_digest": mentions,
-        "files_naming_the_old_digest_outside_the_historical_set": sorted(set(mentions) - HISTORICAL_OLD_DIGEST_FILES),
+        "files_naming_the_old_digest_outside_the_historical_set": sorted(f for f in mentions if not historical(f)),
         "p2_calibration_digests": sorted({c["probe_digest"] for c in json.loads(
             (C.ROOT / "closure-evidence/v2/P2-CALIBRATION.json").read_text(encoding="utf-8"))["calibrations"]}),
     }
     if not (v2_006["lineage_ends_at_V2_006"] and v2_006["effective_digests_equal_the_amendment"] and v2_006["f5_row_sha256"]["match"]
             and v2_006["probe_digest"]["match"] and v2_006["f4_semantic_hash_incorporates_the_probe_digest"]["differs"]):
-        problems.append("the V2-006 amendment is not the effective one on this tree")
+        problems.append("the V2-006 amendment (with the P7-FINDING-001 probe correction) is not the effective one on this tree")
     if old_specs:
-        problems.append(f"stored specs still bind the pre-V2-006 probe digest: {old_specs}")
+        problems.append(f"stored specs still bind an old probe digest: {old_specs}")
     if v2_006["files_naming_the_old_digest_outside_the_historical_set"]:
         problems.append(f"the old probe digest is named outside historical evidence: {v2_006['files_naming_the_old_digest_outside_the_historical_set']}")
     if v2_006["p2_calibration_digests"] != [pc.DIGEST]:

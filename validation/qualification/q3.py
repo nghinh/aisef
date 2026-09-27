@@ -26,7 +26,8 @@ MODULES = ("tests.v2.p4.test_interruption", "tests.v2.p4.test_run_scope", "tests
            "tests.v2.p4.test_process_table", "tests.v2.p2.test_signal_provenance", "tests.v2.p2.test_signal_provenance_abort",
            "tests.v2.test_p6_orchestration", "tests.v2.test_p6_stages", "tests.v2.p4.test_budgets", "tests.v2.p1.test_routing",
            "tests.v2.p2.test_probe_protocol", "tests.v2.p2.test_python_callable", "tests.v2.p5.test_test_execution",
-           "tests.v2.p2.test_story_admission", "tests.v2.test_v2_005", "tests.v2.test_v2_006", "tests.v2.test_v2_006_repeat")
+           "tests.v2.p2.test_story_admission", "tests.v2.test_v2_005", "tests.v2.test_v2_006", "tests.v2.test_v2_006_repeat",
+           "tests.v2.test_p7_finding_001")
 V1_MATRIX_MODULES = ("tests.hardening.test_fault_matrix", "tests.hardening.test_compound_faults")
 
 
@@ -37,9 +38,44 @@ def _row(fid, cls, what, cases, *, execution, code=None, owner=None, retry=None,
         "terminal_state": terminal, "journal_state": journal, "residual_state": residual}, "platforms": list(platforms)}
 
 
+PYC = "tests.v2.test_p7_finding_001:Bytecode."
 ORCH, ST, INT, RS, SS, PR, SP, PC, TE = ("tests.v2.test_p6_orchestration:Orchestration.", "tests.v2.test_p6_stages:", "tests.v2.p4.test_interruption:",
                                         "tests.v2.p4.test_run_scope:Lifetime.", "tests.v2.p4.test_story_scope:Scope.", "tests.v2.p4.test_process_range:",
                                         "tests.v2.p2.test_signal_provenance:", "tests.v2.p2.test_python_callable:", "tests.v2.p5.test_test_execution:")
+BYTECODE_FAMILY = [
+    # bytecode / cache state (P7-FINDING-001 correction, §25): none of these can change the product verdict; an
+    # inability to run the case is UNRUNNABLE by the run's own typing, never FAILED
+    _row("FM2-PYC-1", "bytecode", "in-tree stale bytecode with a matching timestamp and size", [PYC + "test_PYC_1_in_tree_stale_bytecode_with_a_matching_header_is_not_the_subject_the_source_is"],
+         execution="EXECUTED", journal="probe/evaluated: the source's verdict; the in-tree bytecode is not the subject"),
+    _row("FM2-PYC-2", "bytecode", "implementer and verifier checkouts with different file dates", [PYC + "test_PYC_2_two_checkouts_of_the_same_content_with_different_dates_observe_one_verdict",
+                                                                                                    PYC + "test_PYC_11_a_size_and_whole_second_collision_cannot_split_the_two_parties_of_a_proof",
+                                                                                                    "tests.v2.test_p7_finding_001:Revision.test_PYC_11b_two_worktrees_of_one_revision_with_committed_stale_bytecode_agree"],
+         execution="EXECUTED", journal="proof/verified agreement True; one verdict from the source on both sides"),
+    _row("FM2-PYC-3", "bytecode", "committed __pycache__ present at the revision", [PYC + "test_PYC_3_a_checkout_with_committed_bytecode_is_byte_identical_before_and_after_the_proof",
+                                                                                     PYC + "test_PYC_4_the_probe_writes_no_bytecode_into_the_checkout"],
+         execution="EXECUTED", journal="the checkout byte-identical before and after; git status unchanged; no bytecode written into it"),
+    _row("FM2-PYC-4", "bytecode", "cache placement: fresh, empty, outside the checkout, distinct per party, never reused", [PYC + "test_PYC_5_the_bytecode_cache_is_fresh_empty_and_outside_the_checkout",
+                                                                                                                            PYC + "test_PYC_5b_under_a_story_scratch_the_cache_lies_there_and_is_left_to_the_scratch",
+                                                                                                                            PYC + "test_PYC_6_implementer_and_verifier_get_distinct_caches",
+                                                                                                                            PYC + "test_PYC_7_an_evaluation_never_reuses_the_cache_of_the_one_before"],
+         execution="EXECUTED", journal="the prefix under the story scratch (or the probe's own temporary directory), empty at launch, one per evaluation"),
+    _row("FM2-PYC-5", "bytecode", "pre-existing external cache contamination attempt (an earlier evaluation's bytecode) and the environment route", [PYC + "test_PYC_7_an_evaluation_never_reuses_the_cache_of_the_one_before",
+                                                                                                                                                     PYC + "test_PYC_8_isolated_mode_keeps_the_command_line_controls_and_drops_the_environment_route"],
+         execution="EXECUTED", journal="a new prefix per evaluation; -I keeps -B and -X pycache_prefix and drops PYTHON* variables"),
+    _row("FM2-PYC-6", "bytecode", "mechanism independence: -B removed (external cache alone) and external cache removed (-B alone)", [PYC + "test_PYC_9_without_B_the_external_cache_alone_keeps_the_stale_bytecode_out_and_the_checkout_unwritten",
+                                                                                                                                       PYC + "test_PYC_10_without_the_external_cache_the_stale_bytecode_decides_the_verdict_the_reproducer_detects_the_defect"],
+         execution="EXECUTED", journal="the external cache carries correctness; without it the deterministic reproducer detects the defect"),
+    _row("FM2-PYC-7", "bytecode", "one revision across repeated fresh scopes", [PYC + "test_PYC_12_one_revision_across_repeated_fresh_scopes_observes_one_verdict"],
+         execution="EXECUTED", journal="identical verdict on every evaluation"),
+    _row("FM2-PYC-9", "bytecode", "an evaluation directory inside the checkout (the cache would be product state), or one that cannot be created", [PYC + "test_PYC_13_an_evaluation_directory_inside_the_checkout_is_refused_not_used",
+                                                                                                                                                       PYC + "test_PYC_14_an_evaluation_directory_that_cannot_be_created_is_a_harness_failure"],
+         execution="UNRUNNABLE", journal="the observation is a harness failure, so the probe is UNRUNNABLE, refused before any launch; nothing written into the checkout"),
+    _row("FM2-PYC-8", "bytecode", "the finding's full path: a merged revision carrying stale bytecode, the developer's file dated into the collision", [ORCH + "test_DIAG_2_a_developer_file_dated_to_committed_stale_bytecode_no_longer_splits_the_two_parties_at_one_merged_revision",
+                                                                                                                                                       ORCH + "test_DIAG_1_the_observation_writes_no_bytecode_and_the_merged_revision_of_S0_carries_none",
+                                                                                                                                                       ORCH + "test_DIAG_3_on_the_natural_path_every_proof_agrees_whatever_the_checkouts_hold"],
+         execution="EXECUTED", code="POST_MERGE_REGRESSION", owner="INTEGRATION", retry="NOT_RETRYABLE", budget=None, terminal="ENDED/ROLLBACK",
+         journal="both parties REFUTED at the merged revision; proof/verified agreement True; POST_MERGE_REGRESSION; the merge reverted; no bytecode written by the observation"),
+]
 FAULT_MATRIX = [
     # provider
     _row("FM2-PROV-1", "provider", "developer session outage mid-story", [ORCH + "test_ORCH_2_a_developer_outage_mid_story_is_a_typed_PROVIDER_failure_with_no_cross_charge"],
@@ -242,6 +278,18 @@ def _fault_E() -> dict:
             "ok": result.status is ProbeExecutionStatus.UNRUNNABLE and isinstance(result, Unrunnable) and "no DISPATCHED" in (getattr(result, "detail", "") or "")}
 
 
+def _fault_H() -> dict:
+    """P7-FINDING-001's deterministic reproducer, live: the old semantic candidate's probe (read from git) observes the
+    stale bytecode of a constructed checkout, this tree's probe observes the source, the external cache alone
+    carries that and -B alone does not (validation/qualification/p7_finding_001_reproducer.py)."""
+    from validation.qualification import p7_finding_001_reproducer as rp
+    record = rp.measure()
+    return {"verdicts": record["verdicts"], "old_candidate": record["old_candidate"], "corrected_probe_digest": record["corrected_candidate"]["probe_digest"],
+            "checkout_byte_identical_after_the_proof": record["corrected_candidate"]["checkout_byte_identical_after_the_proof"],
+            "runs": {k: {"behavior_verdict": v["behavior_verdict"], "execution_status": v["execution_status"], "flags": v["harness_argv_flags"]} for k, v in record["runs"].items()},
+            "ok": all(record["verdicts"].values()) and record["old_candidate"]["digest_is_the_one_the_candidate_declared"]}
+
+
 def _fault_F() -> dict:
     """The anchor's main is terminated before its normal path completes (SIGKILL / TerminateProcess) while the target
     runs. Expected: the closed report path is told apart from an elapsed window at once, and after release no owned
@@ -326,6 +374,9 @@ def _evidence_status() -> list[str]:
     return [ln for ln in C.git("status", "--porcelain", "--", "closure-evidence").splitlines() if not ln[3:].startswith(C.OUT_REL)]
 
 
+FAULT_MATRIX += BYTECODE_FAMILY
+
+
 def _taxonomy_check(rows: list[dict]) -> list[str]:
     """Owner, retryability and budget of every coded row are read from the taxonomy and must equal the row's."""
     from aisef2.arch.enums import EventType, Owner
@@ -387,8 +438,9 @@ def run(ident: dict) -> dict:
     e, err_e = C.capture(_fault_E)
     f, err_f = C.capture(_fault_F)
     g, err_g = C.capture(_fault_G)
+    h, err_h = C.capture(_fault_H)
     harness_faults = {"E": e if not err_e else {"ok": False, "error": err_e}, "F": f if not err_f else {"ok": False, "error": err_f},
-                      "G": g if not err_g else {"ok": False, "error": err_g}}
+                      "G": g if not err_g else {"ok": False, "error": err_g}, "H": h if not err_h else {"ok": False, "error": err_h}}
     for k, v in harness_faults.items():
         if v.get("outcome") == C.NOT_APPLICABLE:
             continue
@@ -443,6 +495,7 @@ def run(ident: dict) -> dict:
                         "harness_faults": harness_faults,
                         "forbidden_remedies_absent": {"exit_driven_reader": "def _exited" not in (C.ROOT / "aisef2/probe/python_callable.py").read_text(encoding="utf-8"),
                                                       "drain_window": "_DRAIN_S" not in (C.ROOT / "aisef2/probe/python_callable.py").read_text(encoding="utf-8")}},
+        "bytecode_isolation": {"family": [r["id"] for r in BYTECODE_FAMILY], "fault_H_reproducer_old_vs_corrected": harness_faults["H"]},
         "watchdog_anchor_ownership": {"structure": structure, "fault_F_anchor_terminated": harness_faults["F"], "fault_G_controller_gone_before_STARTED": harness_faults["G"],
                                       "cleanup_authority": authority},
         "process_range_wait_contract": {"measured": wait, "pinned_case": race["WAIT-CONTRACT"],

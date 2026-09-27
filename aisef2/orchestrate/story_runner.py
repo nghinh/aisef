@@ -34,11 +34,11 @@ from aisef2.product.spec import ProductProofSpec
 
 @dataclass(frozen=True, slots=True)
 class StoryInputs:
-    """What a story is proved with: its specs and probe factories (a factory takes the harness's `on_range` and gives
-    a Probe), the execution environment, the developer's tests and the regression tests at the candidate, the test
+    """What a story is proved with: its specs and probe factories (a factory takes the harness's `on_range` and the
+    story's scratch directory, and gives a Probe), the execution environment, the developer's tests and the regression tests at the candidate, the test
     runner, and — only through the seam — any V1 proof modes with their typed declarations."""
     specs: Mapping[str, ProductProofSpec]
-    probes: Mapping[str, Callable[[Callable], object]]
+    probes: Mapping[str, Callable[[Callable, str], object]]
     env: ExecutionEnv
     story_tests: DeveloperTests
     regression_tests: DeveloperTests
@@ -177,11 +177,11 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
         checks.append(gate.check(run, story_id, "resources", False, detail))
     if failure is None:
         held = _Held(scope, "admission")
-        implementer = Party(scope, lambda on_range: _probe(inputs, on_range), "implementer")
-        verifier = Party(scope, lambda on_range: _probe(inputs, on_range), "verifier")
+        implementer = Party(scope, lambda on_range: _probe(inputs, on_range, str(scratch.path)), "implementer")
+        verifier = Party(scope, lambda on_range: _probe(inputs, on_range, str(scratch.path)), "verifier")
         specs = inputs.specs
         obligations = obligations_of(plan, story_id)
-        probes = {pid: make(held) for pid, make in inputs.probes.items()}
+        probes = {pid: make(held, str(scratch.path)) for pid, make in inputs.probes.items()}
         try:
             admission = admit_story(plan, story_id, RevisionRef(base, str(impl.path)), specs=specs, probes=probes,
                                     env=inputs.env, committed_stories=_committed(run), sink=_Sink(run))
@@ -313,10 +313,11 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                    tuple(checks), decision_seq)
 
 
-def _probe(inputs: StoryInputs, on_range):
+def _probe(inputs: StoryInputs, on_range, scratch: str | None = None):
     """The party's probe: cycle 1 proves a story with one probe kind (python_callable), so one factory serves both
-    parties; each party gets its own instance, wired to the scope through `on_range`."""
+    parties; each party gets its own instance, wired to the scope through `on_range` and given the story's scratch
+    directory, under which each of its evaluations keeps its own bytecode cache (never the checkout's)."""
     factories = list(inputs.probes.values())
     if len(factories) != 1:
         raise InvariantError("cycle 1 proves a story with exactly one probe factory")
-    return factories[0](on_range)
+    return factories[0](on_range, scratch)

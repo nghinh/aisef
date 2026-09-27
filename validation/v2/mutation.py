@@ -78,6 +78,7 @@ _SIGNAL_TESTS = ["tests/v2/p2/test_python_callable.py", "tests/v2/p2/test_signal
 #: ARCHITECTURE-EXCEPTION-V2-006: the protocol reader and the exit's place in it are killed by the race tests too
 _STREAM_TESTS = [*_SIGNAL_TESTS, "tests/v2/test_v2_006.py"]
 _ADMISSION_TESTS = ["tests/v2/p2/test_static_admission.py"]
+_BYTECODE_TESTS = ["tests/v2/test_p7_finding_001.py"]
 P2_TARGETS: dict[str, list[str]] = {
     # WP-2.1: the only mapping from an observation to a ProbeResult, and the entry point that binds enforcement
     "aisef2/probe/protocol.py::classify_failure": _PROTOCOL_TESTS,
@@ -90,7 +91,13 @@ P2_TARGETS: dict[str, list[str]] = {
     "aisef2/probe/protocol.py::bound_result": _PROTOCOL_TESTS,
     "aisef2/probe/protocol.py::ProbeRegistry.observation_class": _PROTOCOL_TESTS,
     # the reference harness: the watchdog/window split (TIME-1..5) and the per-class meaning of an expired window
-    "aisef2/probe/python_callable.py::observe": _HARNESS_TESTS,
+    "aisef2/probe/python_callable.py::observe": [*_HARNESS_TESTS, *_BYTECODE_TESTS],
+    # P7-FINDING-001 correction: bytecode isolation — the command line (isolated mode, -B, the external cache), the
+    # fresh evaluation directory (creation, uniqueness, ownership), the in-tree refusal, the probe's own hooks
+    "aisef2/probe/python_callable.py::_harness_argv": _BYTECODE_TESTS,
+    "aisef2/probe/python_callable.py::_evaluation_dir": _BYTECODE_TESTS,
+    "aisef2/probe/python_callable.py::_inside": _BYTECODE_TESTS,
+    "aisef2/probe/python_callable.py::PythonCallableProbe.__init__": _BYTECODE_TESTS,
     "aisef2/probe/python_callable.py::window_of": _HARNESS_TESTS,
     "aisef2/probe/python_callable.py::observation_class": _HARNESS_TESTS,
     "aisef2/probe/python_callable.py::ON_DEADLINE": _HARNESS_TESTS,

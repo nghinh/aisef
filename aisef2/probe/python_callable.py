@@ -40,12 +40,23 @@ closed; it never ends the protocol by itself. "Exit before READY" is concluded o
 exit is reported and no READY was read. No timing window decides the order; the watchdog and the subject's window stay
 what they were — deadlines for a harness that does not answer and a subject that does not report.
 
+**Bytecode isolation** (P7-FINDING-001 correction). The observation is a function of the revision's sources: the
+interpreter's bytecode cache is redirected to a fresh, empty, harness-owned directory of this evaluation's own
+(`-X pycache_prefix`, on the command line, which `-I` honours), so bytecode a developer committed beside a source
+(`__pycache__/*.pyc`), or an earlier observation left, is never read as the subject and never written into the
+checkout; `-B` is defence in depth against writing. The directory lies under the controller-owned scratch of the story
+when the probe was given one (disposed with that StoryScope resource), else under a temporary directory of the
+probe's own (disposed when the evaluation returns); it is never reused across evaluations, parties, criteria,
+revisions or attempts, and never lies inside the checkout. The checkout itself is left byte for byte as it was.
+
 **Enforcement: PARTIAL.** Weakest path: the subject runs inside the probe's subprocess with the harness user's
-filesystem and network access; isolation is `-I` interpreter isolation and a scrubbed environment, not a sandbox.
+filesystem and network access; isolation is `-I` interpreter isolation, a scrubbed environment and a harness-owned
+bytecode cache, not a sandbox.
 """
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import math
@@ -78,7 +89,8 @@ CLASSES = ("exists", "returns", "raises", "blocks")
 ON_DEADLINE = {"exists": BehaviorVerdict.REFUTED, "returns": BehaviorVerdict.REFUTED,
                "raises": BehaviorVerdict.REFUTED, "blocks": BehaviorVerdict.SATISFIED}
 WEAKEST_PATH = ("the subject runs inside the probe's subprocess with the harness user's filesystem and network "
-                "access; isolation is -I interpreter isolation and a scrubbed environment, not a sandbox")
+                "access; isolation is -I interpreter isolation, a scrubbed environment and a harness-owned bytecode "
+                "cache (-X pycache_prefix, -B), not a sandbox")
 _MARK = "AISEF2-PROBE"
 
 
@@ -196,15 +208,44 @@ emit("RESULT", json.dumps(facts()))
 '''
 
 
+def _harness_argv(interpreter: str, ask: str, pycache: str) -> list[str]:
+    """The harness command line. Every control is on the command line, because `-I` discards every PYTHON* variable:
+    isolated mode; `-B`, no bytecode written (defence in depth); `-X pycache_prefix=<fresh dir>`, the control that
+    keeps in-tree bytecode out of the observation — the import system reads and writes cached code only under the
+    prefix, so a stale `__pycache__` beside the source is never the subject and the checkout is never written."""
+    return [interpreter, "-I", "-B", "-X", f"pycache_prefix={pycache}", "-c", HARNESS, ask]
+
+
+def _evaluation_dir(scratch: str | None):
+    """A fresh, empty directory of this evaluation's own, for the request and the bytecode cache: under the
+    controller-owned `scratch` when one was given (a new subdirectory each time, disposed with the scratch resource of
+    the StoryScope — never by this probe), else a temporary directory of the probe's own (disposed when the
+    evaluation returns). A context manager either way."""
+    if scratch is None:
+        return tempfile.TemporaryDirectory(prefix="aisef2-probe-")
+    return contextlib.nullcontext(tempfile.mkdtemp(prefix="probe-", dir=scratch))
+
+
+def _inside(path: str, root: str) -> bool:
+    """Whether `path` lies inside the checkout `root` (the bytecode cache must not: it would be product state)."""
+    try:
+        pathlib.Path(os.path.realpath(path)).relative_to(os.path.realpath(root))
+    except ValueError:
+        return False
+    return True
+
+
 class PythonCallableProbe(HarnessProbe):
     id = PROBE_ID
     digest = DIGEST
 
-    def __init__(self, on_range=None) -> None:
+    def __init__(self, on_range=None, scratch: str | None = None) -> None:
         """`on_range` is called with the process range as soon as it starts — harness-owned, not part of the frozen
         `Probe` protocol (PROBE-META-1). A run uses it to acquire the range into the story's StoryScope, so an
-        interruption disposes it through P4's ownership and its ledger records what the controller sent (§9.3)."""
-        self._on_range = on_range
+        interruption disposes it through P4's ownership and its ledger records what the controller sent (§9.3).
+        `scratch`, harness-owned too: a controller-owned directory (the story's scratch) under which each evaluation
+        gets its own fresh directory for its request and bytecode cache; None, a temporary directory per evaluation."""
+        self._on_range, self._scratch = on_range, scratch
 
     def enforcement(self) -> Enforcement:
         return Enforcement.PARTIAL
@@ -237,12 +278,22 @@ class PythonCallableProbe(HarnessProbe):
         stim = dict(pi["stimulus"])
         request = {"mark": _MARK, "nonce": nonce, "root": at.root, "locator": subject["locator"], "cls": cls,
                    "args": list(stim.get("args", [])), "kwargs": dict(stim.get("kwargs", {}))}
-        with tempfile.TemporaryDirectory(prefix="aisef2-probe-") as work:
+        try:
+            holder = _evaluation_dir(self._scratch)
+        except OSError as e:
+            return Observation(ObservationKind.HARNESS_FAILED, detail=f"the evaluation directory cannot be created: "
+                                                                     f"{type(e).__name__}")
+        with holder as work:
+            if _inside(work, at.root):
+                return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory lies inside the "
+                                                                         "revision checkout: refused")
             ask = os.path.join(work, "request.json")
+            pycache = os.path.join(work, "pycache")
+            os.mkdir(pycache)   # fresh and empty: no other evaluation's bytecode, and none from the checkout
             pathlib.Path(ask).write_text(json.dumps(_plain(request)), encoding="utf-8")
             # the harness runs inside a P4 process range: its ledger is the one authority on what this controller
             # signalled, and disposal takes the whole tree down, not only the direct child (§9.3, V2-003)
-            run = ProcessRange(f"probe {spec.id}", [env.interpreter, "-I", "-c", HARNESS, ask], cwd=at.root,
+            run = ProcessRange(f"probe {spec.id}", _harness_argv(env.interpreter, ask, pycache), cwd=at.root,
                                env=_scrubbed_env(), output=subprocess.PIPE, grace_s=_GRACE_S, wait_s=_WAIT_S)
             try:
                 run.start()

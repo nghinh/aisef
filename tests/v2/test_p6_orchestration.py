@@ -13,6 +13,7 @@ import inspect
 import json
 import marshal
 import os
+import py_compile
 import pathlib
 import struct
 import subprocess
@@ -53,7 +54,7 @@ from tests.v2.p4.test_run_scope import spec as RUN_SPEC  # noqa: E402
 from tests.v2.p4.world import closed_after  # noqa: E402
 
 ENV = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)
-PROBE = {PythonCallableProbe.id: lambda on_range: PythonCallableProbe(on_range=on_range)}
+PROBE = {PythonCallableProbe.id: lambda on_range, scratch: PythonCallableProbe(on_range=on_range, scratch=scratch)}
 CALC = "def sub(a, b):\n    return a - b\n"
 ADD = "\n\ndef add(a, b):\n    return a + b\n"
 MUL = "def mul(a, b):\n    return a * b\n"
@@ -255,8 +256,11 @@ def _reads_stale(facts: dict) -> bool:
 
 
 def predicted_divergence(before: dict) -> dict:
-    """What the two checkouts' facts imply for the proof: a party whose checkout holds bytecode the interpreter takes
-    for the source, compiled from another source, observes that other source's behaviour."""
+    """The stale-bytecode condition of P7-FINDING-001 in the two checkouts: a party whose checkout holds bytecode an
+    interpreter reading in-tree __pycache__ would take for the source, compiled from another source. Before the
+    correction such a party observed that other source's behaviour and `divergence` named the split; since the
+    correction (a harness-owned bytecode cache) the condition changes nothing, and the field records that the case
+    was exercised under it."""
     a, b = _reads_stale(before["implementer"]), _reads_stale(before["verifier"])
     return {"implementer_reads_stale_bytecode": a, "verifier_reads_stale_bytecode": b, "divergence": a != b}
 
@@ -791,7 +795,7 @@ class Orchestration(unittest.TestCase):
                 return Executed(verdict_for_verifier)
         made = []
 
-        def factory(on_range):
+        def factory(on_range, scratch=None):
             made.append(1)
             return real(on_range=on_range) if len(made) % 2 == 1 else Verifier(on_range)
         return {real.id: factory}
@@ -816,7 +820,7 @@ class Orchestration(unittest.TestCase):
             digest = "1" * 64
         made = []
 
-        def factory(on_range):
+        def factory(on_range, scratch=None):
             made.append(1)
             return real(on_range=on_range) if len(made) % 2 == 1 else Other(on_range=on_range)
         inputs = sr.StoryInputs(self.specs, {real.id: factory}, ENV, te.DeveloperTests("S1", ("tests/test_s1.py",)),
@@ -988,49 +992,51 @@ class Orchestration(unittest.TestCase):
         path = f"app/__pycache__/{module}.{sys.implementation.cache_tag}.pyc"
         return subprocess.run(["git", "-C", self.repo, "cat-file", "blob", f"{revision}:{path}"], capture_output=True).stdout
 
-    def test_DIAG_1_the_merged_revision_of_S0_carries_bytecode_the_observation_wrote_and_the_developer_committed(self):
-        """Measured, not assumed: S0's admission probes ran the harness in wt-S0 under `-I`, which discards the
-        PYTHONDONTWRITEBYTECODE=1 the kernel sets, so importing app.calc wrote app/__pycache__/calc.*.pyc into the
-        checkout; the developer's `git add -A` committed it; the merge kept it. The revision then holds bytecode of
-        CALC (32 bytes) beside a source of CALC + ADD (66 bytes): stale, and not valid for that source."""
+    def test_DIAG_1_the_observation_writes_no_bytecode_and_the_merged_revision_of_S0_carries_none(self):
+        """Before the correction S0's admission probes wrote app/__pycache__/calc.*.pyc into wt-S0 (the harness ran
+        under `-I`, which discards the PYTHONDONTWRITEBYTECODE=1 of its environment — measured here still), the
+        developer's `git add -A` committed it and the merge kept it. Now the harness keeps its bytecode cache outside
+        the checkout (`-X pycache_prefix`, `-B`), so no bytecode exists beside any source at any proof of S0, and the
+        merged revision carries none: the developer double, which commits whatever the checkout holds, had nothing
+        of the observation's to commit."""
         plan = self.orch_9_plan()
         with ProofObserver(self.run, plan) as seen:
             r0 = self.story(plan, "S0", self.s1_dev(), inputs=self.inputs("S0"))
         self.assertTrue(r0.committed, seen.report())
         merged = self.merger.base()
-        tag = sys.implementation.cache_tag
         tree = git(self.repo, "ls-tree", "-r", "--name-only", merged).stdout.split()
-        self.assertEqual(sorted(p for p in tree if "__pycache__" in p),
-                         [f"app/__pycache__/__init__.{tag}.pyc", f"app/__pycache__/calc.{tag}.pyc"])
-        blob = self.bytecode_blob(merged, "calc")
+        self.assertEqual([p for p in tree if "__pycache__" in p or p.endswith(".pyc")], [])
         self.assertEqual(git(self.repo, "show", f"{merged}:app/calc.py").stdout, CALC + ADD)
-        self.assertEqual(_pyc_header(blob)["source_size"], _on_disk(CALC))
-        self.assertEqual(_shape(marshal.loads(blob[16:])), _shape(compile(CALC, "app/calc.py", "exec")))
-        self.assertNotEqual(_shape(marshal.loads(blob[16:])), _shape(compile(CALC + ADD, "app/calc.py", "exec")))
         p = subprocess.run([sys.executable, "-I", "-c", "import sys; print(sys.dont_write_bytecode)"],
                            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}, capture_output=True, encoding="utf-8")
-        self.assertEqual(p.stdout.strip(), "False")   # -I discards the variable the harness environment sets
-        # before the first proof at each revision (C1) both checkouts held the committed bytecode — stale, never valid
-        # for the 66-byte source; before the second (C0) each held bytecode of the source, fresh and valid: the C1
-        # proof's harness compiled it and wrote it into the checkout it observed
-        for e in seen.proofs:
+        self.assertEqual(p.stdout.strip(), "False")   # the environment route is dead under -I: the controls are command-line
+        for e in seen.proofs:   # at every proof, both checkouts: the source, and no bytecode beside it
             for party in ("implementer", "verifier"):
                 f = e["before"][party]
-                self.assertEqual((f["bytecode_stale"], f["bytecode_valid_for_source"]),
-                                 (True, False) if e["criterion_id"] == "C1" else (False, True), (e["criterion_id"], e["point"], party, f))
+                self.assertEqual((f["source"], f["bytecode"]), ("app/calc.py", None), (e["criterion_id"], e["point"], party, f))
 
-    def test_DIAG_2_a_developer_file_dated_to_the_committed_bytecode_splits_the_two_parties_at_one_merged_revision(self):
-        """The mechanism, constructed — a product-state construction, no timing change: S2's developer writes
-        app/calc.py (32 bytes, the size the committed bytecode's source had) dated to that bytecode's header second,
-        and commits (the index records that date, so the kernel's forced checkouts leave the file alone, as they leave
-        any file whose stat matches). The implementer's checkout is the developer's, so the interpreter takes the
-        bytecode: sub(3, 1) == 2, SATISFIED; the verifier's own checkout dates the file at its checkout, so it compiles
-        the source: 4, REFUTED. Same spec, same semantic hash, same probe digest, same enforcement, same merged revision
-        in both checkouts — VERIFIER_DISAGREEMENT at post-merge C0, rolled back: P7-FINDING-001's symptom, from a
-        revision that carries bytecode of another source."""
+    def test_DIAG_2_a_developer_file_dated_to_committed_stale_bytecode_no_longer_splits_the_two_parties_at_one_merged_revision(self):
+        """P7-FINDING-001's mechanism, constructed — a product-state construction, no timing change — as the permanent
+        regression of the correction (owner §12). S0's developer commits, beside app/calc.py, bytecode compiled from
+        the 32-byte parent source (what the pre-correction observation used to leave there); S2's developer rewrites
+        app/calc.py at 32 bytes dated to that bytecode's header second and commits (the index records that date, so
+        the kernel's forced checkouts leave the file alone). The implementer's checkout is the developer's: an
+        interpreter reading in-tree __pycache__ took the stale code there (sub(3, 1) == 2, SATISFIED) while the
+        verifier's own checkout, dated at its checkout, compiled the source (4, REFUTED) — VERIFIER_DISAGREEMENT.
+        Since the correction both parties observe the source: REFUTED, agreement, POST_MERGE_REGRESSION, rolled
+        back — with the condition measured present in the implementer's checkout and absent in the verifier's."""
         plan = self.orch_9_plan()
+        tag = sys.implementation.cache_tag
+
+        def commit_stale_bytecode(checkout):   # what a careless developer commits: bytecode of the parent's source
+            src = pathlib.Path(checkout, "app", "calc.py")
+            current = src.read_text(encoding="utf-8")
+            src.write_text(CALC, encoding="utf-8")
+            py_compile.compile(str(src), cfile=str(pathlib.Path(checkout, "app", "__pycache__", f"calc.{tag}.pyc")), doraise=True,
+                               invalidation_mode=py_compile.PycInvalidationMode.TIMESTAMP)
+            src.write_text(current, encoding="utf-8")
         with ProofObserver(self.run, plan) as seen:
-            r0 = self.story(plan, "S0", self.s1_dev(), inputs=self.inputs("S0"))
+            r0 = self.story(plan, "S0", self.s1_dev(before_commit=commit_stale_bytecode), inputs=self.inputs("S0"))
             self.assertTrue(r0.committed, seen.report())
             tip = self.merger.base()
             second = _pyc_header(self.bytecode_blob(tip, "calc"))["source_mtime"]
@@ -1038,51 +1044,38 @@ class Orchestration(unittest.TestCase):
             r2 = self.story(plan, "S2", dated,
                             inputs=self.inputs("S2", tests=("tests/test_s2.py",), regressions=("tests/test_other.py",)), tests_block=False)
         self.assertFalse(r2.committed, seen.report())
-        self.assertEqual(self.failures("S2"), [("VERIFIER_DISAGREEMENT", "INTEGRATION", False)], seen.report())
-        self.assertEqual(self.details("S2"), ["post-merge C0: VERIFIER_DISAGREEMENT"], seen.report())
+        self.assertEqual(self.failures("S2"), [("POST_MERGE_REGRESSION", "INTEGRATION", False)], seen.report())
+        self.assertEqual(self.details("S2"), ["post-merge C0: POST_MERGE_REGRESSION"], seen.report())
         self.assertEqual(self.merger.base(), tip)
         self.assertAttempts(r2, ["ROLLBACK"])
-        [ev] = seen.disagreements
-        self.assertEqual((ev["criterion_id"], ev["measurement_point"], ev["proof_failure"]), ("C0", "POST_MERGE", "VERIFIER_DISAGREEMENT"))
-        self.assertEqual((ev["implementer"]["behavior_verdict"], ev["verifier"]["behavior_verdict"]), ("SATISFIED", "REFUTED"))
-        self.assertEqual((ev["implementer"]["execution_status"], ev["verifier"]["execution_status"]), ("EXECUTED", "EXECUTED"))
-        self.assertTrue(ev["instrument_identical"])
-        self.assertEqual({ev["revision"], ev["implementer"]["revision"], ev["verifier"]["revision"],
-                          ev["checkouts"]["implementer"]["head"], ev["checkouts"]["verifier"]["head"]}, {ev["revision"]})
-        self.assertEqual(ev["predicted_divergence"], {"implementer_reads_stale_bytecode": True, "verifier_reads_stale_bytecode": False, "divergence": True})
-        before = ev["checkouts"]["implementer"]["before"]
-        self.assertEqual((before["source_mtime_s"], before["bytecode_header"]["source_mtime"], before["bytecode_valid_for_source"], before["bytecode_stale"]),
-                         (second, second, True, True))
-        before = ev["checkouts"]["verifier"]["before"]
-        self.assertEqual((before["bytecode_valid_for_source"], before["bytecode_stale"]), (False, True))
-        self.assertEqual(ev["affected_preserve"], {"C0": ["S0", self.s0.id]})
-        self.assertEqual([b["header"]["source_size"] for b in ev["bytecode_at_revision"] if b["path"].endswith(f"calc.{sys.implementation.cache_tag}.pyc")],
-                         [_on_disk(CALC)])
-        self.assertEqual(ev["proof_verified"]["agreement"], False)
-        self.assertEqual(len(ev["process_ranges"]), 4)   # acquired and released, each party
+        self.assertEqual(seen.disagreements, [])
+        c0 = next(e for e in seen.proofs if (e["story_id"], e["criterion_id"], e["point"]) == ("S2", "C0", "POST_MERGE"))
+        self.assertTrue(c0["agreement"])
+        self.assertEqual(c0["failure"], "POST_MERGE_REGRESSION")
+        self.assertEqual(c0["predicted_divergence"], {"implementer_reads_stale_bytecode": True, "verifier_reads_stale_bytecode": False, "divergence": True})
+        before = c0["before"]["implementer"]   # the condition, present: the collision an in-tree reader would take
+        self.assertEqual((before["source_mtime_s"], before["bytecode_header"]["source_mtime"], before["bytecode_header"]["source_size"],
+                          before["bytecode_valid_for_source"], before["bytecode_stale"]), (second, second, _on_disk(CALC), True, True))
+        self.assertEqual((c0["before"]["verifier"]["bytecode_valid_for_source"], c0["before"]["verifier"]["bytecode_stale"]), (False, True))
+        records = [self.run.events[q].data["record"]["result"] for q in (c0["implementer_seq"], c0["verifier_seq"])]
+        self.assertEqual(records, [{"behavior_verdict": "REFUTED", "reason": None}] * 2)   # the source's verdict on both sides
         self.assert_disposed("S2")
 
-    def test_DIAG_3_on_the_natural_path_a_proof_diverges_exactly_when_one_checkout_reads_stale_bytecode(self):
-        """Owner §7 as a check: ORCH_9_and_10's flow, untouched, observed — for every proof, the divergence the two
-        checkouts' pre-proof facts predict is the one the proof shows, and the story's outcome is the one the
-        predictions imply. On a machine where S0's checkout and S2's developer write fall in the same second the
-        prediction is a divergence (VERIFIER_DISAGREEMENT); where both checkouts read the stale bytecode S2 commits;
-        elsewhere POST_MERGE_REGRESSION. Never a divergence without the difference in what the checkouts hold."""
+    def test_DIAG_3_on_the_natural_path_every_proof_agrees_whatever_the_checkouts_hold(self):
+        """ORCH_9_and_10's flow, untouched, observed: every proof agrees and no checkout ever holds bytecode beside a
+        source (the observation writes none), on any machine and at any speed — before the correction a proof
+        diverged exactly when one checkout read stale bytecode and the other did not."""
         plan = self.orch_9_plan()
         with ProofObserver(self.run, plan) as seen:
             r0 = self.story(plan, "S0", self.s1_dev(), inputs=self.inputs("S0"))
             self.assertTrue(r0.committed, seen.report())
             r2 = self.story(plan, "S2", self.orch_9_breaking(),
                             inputs=self.inputs("S2", tests=("tests/test_s2.py",), regressions=("tests/test_other.py",)), tests_block=False)
+        self.assertFalse(r2.committed, seen.report())
         for e in seen.proofs:
-            self.assertEqual(not e["agreement"], e["predicted_divergence"]["divergence"], seen.report())
-        c0 = [e["predicted_divergence"] for e in seen.proofs if (e["story_id"], e["criterion_id"], e["point"]) == ("S2", "C0", "POST_MERGE")]
-        if any(p["divergence"] for p in c0):
-            self.assertEqual(self.failures("S2"), [("VERIFIER_DISAGREEMENT", "INTEGRATION", False)], seen.report())
-        elif any(p["implementer_reads_stale_bytecode"] and p["verifier_reads_stale_bytecode"] for p in c0):
-            self.assertTrue(r2.committed, seen.report())
-        else:
-            self.assertEqual(self.failures("S2"), [("POST_MERGE_REGRESSION", "INTEGRATION", False)], seen.report())
+            self.assertTrue(e["agreement"], seen.report())
+            self.assertEqual([e["before"][party]["bytecode"] for party in ("implementer", "verifier")], [None, None], seen.report())
+        self.assertEqual(self.failures("S2"), [("POST_MERGE_REGRESSION", "INTEGRATION", False)], seen.report())
 
 
 if __name__ == "__main__":

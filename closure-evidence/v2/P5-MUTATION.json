@@ -2579,7 +2579,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
@@ -2609,7 +2609,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 10,
    "killed": 10,
    "survivors": [],
@@ -2663,7 +2663,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 13,
    "killed": 13,
    "survivors": [],
@@ -2729,7 +2729,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
@@ -2759,7 +2759,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 57,
    "killed": 57,
    "survivors": [],
@@ -3001,7 +3001,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 74,
    "killed": 74,
    "survivors": [],
@@ -3311,7 +3311,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 5,
    "killed": 5,
    "survivors": [],
@@ -3345,7 +3345,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 25,
    "killed": 25,
    "survivors": [],
@@ -3459,7 +3459,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 42,
    "killed": 42,
    "survivors": [],
@@ -3642,7 +3642,7 @@
     "tests/v2/p5/test_test_execution.py",
     "tests/v2/p5/test_relevance.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 29,
    "killed": 29,
    "survivors": [],
@@ -3772,7 +3772,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 69,
    "killed": 69,
    "survivors": [],
@@ -4062,7 +4062,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 11,
    "killed": 11,
    "survivors": [],
@@ -4070,31 +4070,23 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L504 returns None",
+     "mutant": "L506 returns None",
      "killed": true
     },
     {
-     "mutant": "L496 element 0 dropped",
+     "mutant": "L498 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L496 element 1 dropped",
+     "mutant": "L498 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L497 condition negated",
+     "mutant": "L499 condition negated",
      "killed": true
     },
     {
-     "mutant": "L497 not removed",
-     "killed": true
-    },
-    {
-     "mutant": "L500 condition negated",
-     "killed": true
-    },
-    {
-     "mutant": "L496 string 'src' emptied",
+     "mutant": "L499 not removed",
      "killed": true
     },
     {
@@ -4102,15 +4094,23 @@
      "killed": true
     },
     {
-     "mutant": "L502 Eq->NotEq",
+     "mutant": "L498 string 'src' emptied",
      "killed": true
     },
     {
-     "mutant": "L502 string '.py' emptied",
+     "mutant": "L504 condition negated",
      "killed": true
     },
     {
-     "mutant": "L500 string '__init__.py' emptied",
+     "mutant": "L504 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L504 string '.py' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L502 string '__init__.py' emptied",
      "killed": true
     }
    ]
@@ -4120,7 +4120,7 @@
    "kill_tests": [
     "tests/v2/p5/test_test_execution.py"
    ],
-   "source_sha256": "9c78b6d2ea42b69ce44ba03baa92aa588191ccf48fea894918ed0795314fbc4d",
+   "source_sha256": "4321c9dc8edf9913e5c067030cc8ef2a85233140327e69252ad34c8314ecb1a3",
    "mutants": 8,
    "killed": 8,
    "survivors": [],

@@ -427,8 +427,10 @@ def _read_junit(path: pathlib.Path) -> ResultSet:
     return ResultSet(tuple(cases), tuple(errors))
 
 
-UNITTEST = Runner("unittest", ("-E", "-s", "-c", _UNITTEST_RUNNER, "{out}"), _read_unittest)
-PYTEST = Runner("pytest", ("-m", "pytest", "-q", "-p", "no:cacheprovider", "-o", "junit_family=xunit1",
+# -B on the command line (the environment's PYTHONDONTWRITEBYTECODE never reaches an -E interpreter): a runner writes
+# no bytecode into the checkout it runs in (P7-FINDING-001 correction, defence in depth)
+UNITTEST = Runner("unittest", ("-E", "-s", "-B", "-c", _UNITTEST_RUNNER, "{out}"), _read_unittest)
+PYTEST = Runner("pytest", ("-B", "-m", "pytest", "-q", "-p", "no:cacheprovider", "-o", "junit_family=xunit1",
                            "--junitxml", "{out}"), _read_junit)
 
 

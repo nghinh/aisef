@@ -5533,7 +5533,7 @@
    "kill_tests": [
     "tests/v2/test_p6_stages.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 3,
    "killed": 3,
    "survivors": [],
@@ -5559,7 +5559,7 @@
    "kill_tests": [
     "tests/v2/test_p6_stages.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 1,
    "killed": 1,
    "survivors": [],
@@ -5577,7 +5577,7 @@
    "kill_tests": [
     "tests/v2/test_p6_stages.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 3,
    "killed": 3,
    "survivors": [],
@@ -5603,7 +5603,7 @@
    "kill_tests": [
     "tests/v2/test_p6_stages.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 6,
    "killed": 6,
    "survivors": [],
@@ -5641,7 +5641,7 @@
    "kill_tests": [
     "tests/v2/test_p6_stages.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 3,
    "killed": 3,
    "survivors": [],
@@ -5668,7 +5668,7 @@
     "tests/v2/test_p6_stages.py",
     "tests/v2/test_p6_orchestration.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 272,
    "killed": 272,
    "survivors": [],
@@ -6770,7 +6770,7 @@
    "kill_tests": [
     "tests/v2/test_p6_stages.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 6,
    "killed": 6,
    "survivors": [],
@@ -6808,7 +6808,7 @@
    "kill_tests": [
     "tests/v2/test_p6_stages.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 34,
    "killed": 34,
    "survivors": [],
@@ -6958,7 +6958,7 @@
    "kill_tests": [
     "tests/v2/test_p6_stages.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 9,
    "killed": 9,
    "survivors": [],
@@ -7008,7 +7008,7 @@
    "kill_tests": [
     "tests/v2/test_p6_stages.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
@@ -7016,19 +7016,19 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L320 condition negated",
+     "mutant": "L321 condition negated",
      "killed": true
     },
     {
-     "mutant": "L322 returns None",
+     "mutant": "L323 returns None",
      "killed": true
     },
     {
-     "mutant": "L320 NotEq->Eq",
+     "mutant": "L321 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L321 string 'cycle 1 proves a story with exactly one probe factory' emptied",
+     "mutant": "L322 string 'cycle 1 proves a story with exactly one probe factory' emptied",
      "killed": true
     }
    ]
@@ -7039,7 +7039,7 @@
     "tests/v2/test_p6_stages.py",
     "tests/v2/test_p6_orchestration.py"
    ],
-   "source_sha256": "a14df7f7f87bd06843760fb45a9d0d7d132871fa4dde9061f3151a042f8e01eb",
+   "source_sha256": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
    "mutants": 11,
    "killed": 11,
    "survivors": [],

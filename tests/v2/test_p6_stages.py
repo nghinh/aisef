@@ -85,7 +85,7 @@ class Other(FakeProbe):
 
 
 def factory(answers, **kw):
-    return lambda on_range: FakeProbe(answers, on_range, **kw)
+    return lambda on_range, scratch=None: FakeProbe(answers, on_range, **kw)
 
 
 class Journal(unittest.TestCase):
