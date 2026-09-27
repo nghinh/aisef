@@ -223,7 +223,7 @@ def checkout_facts(root: str, spec) -> dict:
     module = spec.probe_input["subject"]["locator"].partition(":")[0]
     src = pathlib.Path(root, *module.split("."))
     src = src / "__init__.py" if src.is_dir() else src.with_suffix(".py")
-    facts = {"root": root, "head": _worktree_head(root), "source": str(src.relative_to(root)) if src.exists() else None}
+    facts = {"root": root, "head": _worktree_head(root), "source": src.relative_to(root).as_posix() if src.exists() else None}
     if not src.exists():
         return facts
     st = src.stat()
@@ -231,7 +231,7 @@ def checkout_facts(root: str, spec) -> dict:
     facts.update(source_mtime_ns=st.st_mtime_ns, source_mtime_s=int(st.st_mtime) & 0xFFFFFFFF, source_size=st.st_size,
                  source_sha256=hashlib.sha256(text.encode("utf-8")).hexdigest())
     pyc = pathlib.Path(importlib.util.cache_from_source(str(src)))
-    facts["bytecode"] = str(pyc.relative_to(root)) if pyc.exists() else None
+    facts["bytecode"] = pyc.relative_to(root).as_posix() if pyc.exists() else None   # POSIX form on every platform
     if pyc.exists():
         data = pyc.read_bytes()
         header = _pyc_header(data)
