@@ -7,13 +7,20 @@ typed test doubles only where the path meets a capability (the developer, the re
 asserted from prose; every claim is read from the journal and its six projections.
 """
 
+import hashlib
+import importlib.util
 import inspect
 import json
+import marshal
 import os
 import pathlib
+import struct
+import subprocess
 import sys
 import tempfile
+import types
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -27,7 +34,7 @@ from aisef2.control.owner import FailureCode, classify  # noqa: E402
 from aisef2.errors import InvariantError  # noqa: E402
 from aisef2.journal import format3 as f3  # noqa: E402
 from aisef2.journal.format2 import OperationOutcome as O  # noqa: E402
-from aisef2.orchestrate import adapters, seam, story_runner as sr  # noqa: E402
+from aisef2.orchestrate import adapters, merge as mg, seam, story_runner as sr  # noqa: E402
 from aisef2.orchestrate.adapters import (  # noqa: E402
     CapabilityUnrunnable, Finding, Implemented, ProviderOutage, ResourceUnavailable, Reviewed, Scanned,
 )
@@ -99,9 +106,10 @@ class Dev:
     branch first (a concurrent merge), fails, or is out."""
 
     def __init__(self, files: dict | None = None, *, on_trunk: dict | None = None, repo: str | None = None,
-                 fail: bool = False, outage: bool = False, unchanged: bool = False) -> None:
+                 fail: bool = False, outage: bool = False, unchanged: bool = False, before_commit=None) -> None:
         self.files, self.on_trunk, self.repo, self.fail, self.outage = files or {}, on_trunk, repo, fail, outage
         self.unchanged = unchanged   # answers with the checkout's own revision: a candidate without a change
+        self.before_commit = before_commit   # called with the checkout after the files are written, before the commit
         self.calls: list[tuple[str, tuple[str, ...], str]] = []
         self.candidates: list[str] = []
 
@@ -117,6 +125,8 @@ class Dev:
             p = pathlib.Path(checkout, rel)
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(text, encoding="utf-8")
+        if self.before_commit is not None:
+            self.before_commit(checkout)
         sha = commit_all(checkout, f"{story_id}: {', '.join(criteria)}")
         self.candidates.append(sha)
         if self.on_trunk:
@@ -175,6 +185,186 @@ class Scan:
             return Scanned(False, ())
         rows = json.loads(p.read_text(encoding="utf-8"))
         return Scanned(True, tuple(Finding(i, b, tuple(c)) for i, b, c in rows))
+
+
+# ------------------------------------------ P7-FINDING-001: diagnostic instrumentation (observational, owner §1-§3)
+
+REAL_PROVE = sr.prove
+
+
+def _pyc_header(data: bytes) -> dict:
+    """The 16-byte header of a timestamp-based .pyc: the interpreter takes the bytecode for a source whose mtime (whole
+    seconds) and size equal the header's (importlib._bootstrap_external._validate_timestamp_pyc)."""
+    magic, flags, mtime, size = struct.unpack("<4sIII", data[:16])
+    return {"magic_current": magic == importlib.util.MAGIC_NUMBER, "flags": flags, "source_mtime": mtime, "source_size": size}
+
+
+def _shape(co):
+    """A code object by what it does — its bytecode and, recursively, its constants — never by filename or line."""
+    return (co.co_code, tuple(_shape(c) if isinstance(c, types.CodeType) else c for c in co.co_consts))
+
+
+def _worktree_head(root: str) -> str:
+    """A detached worktree's HEAD, read from its own HEAD file (no process is started before a proof)."""
+    dotgit = pathlib.Path(root, ".git")
+    try:
+        gitdir = dotgit.read_text(encoding="utf-8").strip().removeprefix("gitdir: ") if dotgit.is_file() else str(dotgit)
+        return pathlib.Path(gitdir, "HEAD").read_text(encoding="utf-8").strip()
+    except OSError as e:
+        return f"unreadable: {e}"
+
+
+def checkout_facts(root: str, spec) -> dict:
+    """What one checkout holds for the module a spec's locator names, read without running anything: HEAD, the
+    source's mtime and size, and the bytecode beside it — its header, whether the interpreter would take it for this
+    source (`bytecode_valid_for_source`: header mtime and size equal the source's, at one-second resolution), and
+    whether it was compiled from this source at all (`bytecode_stale`: the code it holds is not the source's)."""
+    module = spec.probe_input["subject"]["locator"].partition(":")[0]
+    src = pathlib.Path(root, *module.split("."))
+    src = src / "__init__.py" if src.is_dir() else src.with_suffix(".py")
+    facts = {"root": root, "head": _worktree_head(root), "source": str(src.relative_to(root)) if src.exists() else None}
+    if not src.exists():
+        return facts
+    st = src.stat()
+    text = src.read_text(encoding="utf-8")
+    facts.update(source_mtime_ns=st.st_mtime_ns, source_mtime_s=int(st.st_mtime) & 0xFFFFFFFF, source_size=st.st_size,
+                 source_sha256=hashlib.sha256(text.encode("utf-8")).hexdigest())
+    pyc = pathlib.Path(importlib.util.cache_from_source(str(src)))
+    facts["bytecode"] = str(pyc.relative_to(root)) if pyc.exists() else None
+    if pyc.exists():
+        data = pyc.read_bytes()
+        header = _pyc_header(data)
+        valid = (header["magic_current"] and header["flags"] == 0 and header["source_mtime"] == facts["source_mtime_s"]
+                 and header["source_size"] == (st.st_size & 0xFFFFFFFF))
+        try:
+            stale = _shape(marshal.loads(data[16:])) != _shape(compile(text, str(src), "exec"))
+        except Exception as e:  # noqa: BLE001 — bytecode this interpreter cannot read is reported as such, not decoded
+            stale = f"undecodable: {type(e).__name__}"
+        facts.update(bytecode_header=header, bytecode_sha256=hashlib.sha256(data).hexdigest(),
+                     bytecode_valid_for_source=valid, bytecode_stale=stale)
+    return facts
+
+
+def _reads_stale(facts: dict) -> bool:
+    return bool(facts.get("bytecode_valid_for_source")) and facts.get("bytecode_stale") is True
+
+
+def predicted_divergence(before: dict) -> dict:
+    """What the two checkouts' facts imply for the proof: a party whose checkout holds bytecode the interpreter takes
+    for the source, compiled from another source, observes that other source's behaviour."""
+    a, b = _reads_stale(before["implementer"]), _reads_stale(before["verifier"])
+    return {"implementer_reads_stale_bytecode": a, "verifier_reads_stale_bytecode": b, "divergence": a != b}
+
+
+def _party_view(record: dict) -> dict:
+    result = record["result"]
+    executed = "behavior_verdict" in result
+    return {"execution_status": "EXECUTED" if executed else "NOT_EXECUTED (Unrunnable or InvalidSpec: the sealed record carries its detail)",
+            "behavior_verdict": result.get("behavior_verdict"), "reason": result.get("reason"), "detail": result.get("detail"),
+            "revision": record["revision"], "record_digest": record["record_digest"], "enforcement": record["enforcement"],
+            "probe_id": record["probe_id"], "probe_digest": record["probe_digest"], "semantic_hash": record["semantic_hash"],
+            "spec_id": record["spec_id"]}
+
+
+def _bytes_of(root: str, *args: str) -> bytes:
+    return subprocess.run(["git", "-C", root, *args], capture_output=True).stdout
+
+
+def disagreement_evidence(run, plan, entry: dict, scope_held: tuple) -> dict:
+    """Owner §2: everything already recorded that reconstructs a divergence, typed, from the journal and the two
+    checkouts — no prose diagnosis."""
+    events = run.events
+    story, cid = entry["story_id"], entry["criterion_id"]
+    a, b = (events[s].data["record"] for s in (entry["implementer_seq"], entry["verifier_seq"]))
+    instrument = ("probe_id", "probe_digest", "enforcement", "semantic_hash")
+    begin = max(e.seq for e in events if e.type == "story/begin" and e.data["story_id"] == story)
+    last = events[-1].seq
+    checks = [(e.seq, e.data["check"], e.data["passed"], e.data["detail"]) for e in events
+              if e.type == "gate/check" and e.data["check"].startswith(story + ":")]
+    committed = frozenset(e.data["story_id"] for e in events if e.type == "story/commit")
+    tag = f"{cid}/{entry['point']}"
+    ranges = [(e.seq, e.type, e.data["resource"]) for e in events
+              if e.type in ("story/resource-acquired", "story/resource-released") and e.data.get("story_id") == story
+              and e.data.get("kind") == "PROCESS_RANGE" and tag in e.data["resource"]]
+    journal = pathlib.Path(run.journal_path)
+    lines = journal.read_bytes().splitlines(keepends=True) if journal.exists() else []
+    checkouts = {}
+    for party in ("implementer", "verifier"):
+        root = entry["before"][party]["root"]
+        checkouts[party] = {"name": pathlib.Path(root).name, "root": root, "head": _worktree_head(root),
+                            "status_porcelain": _bytes_of(root, "status", "--porcelain").decode("utf-8", "replace"),
+                            "before": entry["before"][party], "after": entry["after"][party]}
+    bytecode_at_revision = []
+    for ln in _bytes_of(entry["before"]["implementer"]["root"], "ls-tree", "-r", entry["candidate"]).decode().splitlines():
+        mode, kind, blob, path = ln.split(maxsplit=3)
+        if path.endswith(".pyc"):
+            data = _bytes_of(entry["before"]["implementer"]["root"], "cat-file", "blob", blob)
+            bytecode_at_revision.append({"path": path, "blob": blob, "header": _pyc_header(data), "sha256": hashlib.sha256(data).hexdigest()})
+    return {
+        "finding": "P7-FINDING-001", "story_id": story, "criterion_id": cid, "spec_id": entry["spec_id"],
+        "semantic_hash": a["semantic_hash"], "probe_id": a["probe_id"], "probe_digest": a["probe_digest"],
+        "measurement_point": entry["point"], "revision": entry["candidate"],
+        "implementer": _party_view(a), "verifier": _party_view(b),
+        "instrument_identical": all(a[k] == b[k] for k in instrument), "results_equal": a["result"] == b["result"],
+        "proof_failure": entry["failure"],
+        "probe_evaluated_seqs": [entry["implementer_seq"], entry["verifier_seq"]], "proof_verified_seq": entry["verified_seq"],
+        "proof_verified": dict(events[entry["verified_seq"]].data) if entry["verified_seq"] is not None else None,
+        "gate_checks": checks, "affected_preserve": {k: list(v) for k, v in mg.affected_preserve(plan, story, committed).items()},
+        "committed_stories": sorted(committed), "attempt": run.state(P.STORY_STATE)[story]["attempt"],
+        "scope_held_at_capture": list(scope_held), "event_seq_interval": [begin, last],
+        "journal_path": str(journal), "journal_prefix_lines": last + 1,
+        "journal_prefix_sha256": hashlib.sha256(b"".join(lines[:last + 1])).hexdigest(),
+        "process_ranges": ranges, "checkouts": checkouts, "bytecode_at_revision": bytecode_at_revision,
+        "predicted_divergence": entry["predicted_divergence"],
+    }
+
+
+class ProofObserver:
+    """The instrumentation the owner's P7-FINDING-001 diagnostic authorized (§1-§3): observational only. Wraps the
+    real `prove` where the story runner and the merge module call it; before each proof it reads what the two
+    checkouts hold for the spec's module (`checkout_facts`), and after `prove` has returned — its decision made — it
+    records the proof and, on a disagreement or a mismatch, assembles the typed evidence (`disagreement_evidence`).
+    No argument, timeout, ordering, process lifetime or result is touched; nothing here reaches the decision."""
+
+    def __init__(self, run, plan) -> None:
+        self.run, self.plan, self.proofs, self.disagreements = run, plan, [], []
+        self.story_failures: dict = {}
+
+    def __enter__(self):
+        self._patches = [mock.patch.object(sr, "prove", self._prove), mock.patch.object(mg, "prove", self._prove)]
+        for p in self._patches:
+            p.start()
+        return self
+
+    def __exit__(self, *exc):
+        for p in reversed(self._patches):
+            p.stop()
+        for e in self.run.events:
+            if e.type == "failure/observed":
+                self.story_failures.setdefault(e.data["story_id"], []).append((e.data["code"], e.data["owner"], e.data["retryable"], e.data["detail"]))
+        return False
+
+    def _prove(self, run, story_id, criterion_id, spec, role, *, implementer, verifier, candidate, implementer_root,
+               verifier_root, env, point):
+        before = {"implementer": checkout_facts(implementer_root, spec), "verifier": checkout_facts(verifier_root, spec)}
+        p = REAL_PROVE(run, story_id, criterion_id, spec, role, implementer=implementer, verifier=verifier, candidate=candidate,
+                       implementer_root=implementer_root, verifier_root=verifier_root, env=env, point=point)
+        entry = {"story_id": story_id, "criterion_id": criterion_id, "spec_id": spec.id, "point": point.value,
+                 "candidate": candidate, "agreement": p.agreement, "failure": p.failure.code.value if p.failure else None,
+                 "implementer_seq": p.implementer_seq, "verifier_seq": p.verifier_seq, "verified_seq": p.verified_seq,
+                 "before": before, "predicted_divergence": predicted_divergence(before)}
+        self.proofs.append(entry)
+        if not p.agreement:
+            entry["after"] = {"implementer": checkout_facts(implementer_root, spec), "verifier": checkout_facts(verifier_root, spec)}
+            self.disagreements.append(disagreement_evidence(run, self.plan, entry, tuple(implementer.scope.held)))
+        return p
+
+    def report(self) -> str:
+        """For an assertion message: every disagreement's evidence and every proof's facts, between markers a CI log
+        hands back (validation/qualification/diag_orch9.py reads the same)."""
+        body = json.dumps({"disagreements": self.disagreements, "proofs": self.proofs, "story_failures": self.story_failures},
+                          sort_keys=True, default=str)
+        return f"\n===AISEF-DIAG-EVIDENCE===\n{body}\n===AISEF-DIAG-END===\n"
 
 
 class Orchestration(unittest.TestCase):
@@ -427,19 +617,21 @@ class Orchestration(unittest.TestCase):
         plan = plan_of(self.base, obligation("C1", self.s1.id, "S0", ObligationRole.INTRODUCE),
                        obligation("C0", self.s0.id, "S0", ObligationRole.PRESERVE),
                        obligation("C2", self.s2.id, "S2", ObligationRole.INTRODUCE))
-        r0 = self.story(plan, "S0", self.s1_dev(), inputs=self.inputs("S0"))
-        self.assertTrue(r0.committed)
-        self.assertEqual([e.data["check"] for e in self.events("gate/check") if e.data["check"].startswith("S0:post")],
-                         ["S0:post-merge:C1", "S0:post-merge:C0"])
-        tip = self.merger.base()
-        breaking = Dev({"app/mul.py": MUL, "tests/test_s2.py": TEST_MUL,
-                        "app/calc.py": "def sub(a, b):\n    return a + b\n"})       # breaks S0's preserved behaviour
-        r2 = self.story(plan, "S2", breaking, inputs=self.inputs("S2", tests=("tests/test_s2.py",), regressions=("tests/test_other.py",)),
-                        tests_block=False)
-        self.assertFalse(r2.committed)
+        with ProofObserver(self.run, plan) as seen:   # P7-FINDING-001: observed; the messages below carry its evidence
+            r0 = self.story(plan, "S0", self.s1_dev(), inputs=self.inputs("S0"))
+            self.assertTrue(r0.committed, seen.report())
+            self.assertEqual([e.data["check"] for e in self.events("gate/check") if e.data["check"].startswith("S0:post")],
+                             ["S0:post-merge:C1", "S0:post-merge:C0"])
+            tip = self.merger.base()
+            breaking = Dev({"app/mul.py": MUL, "tests/test_s2.py": TEST_MUL,
+                            "app/calc.py": "def sub(a, b):\n    return a + b\n"})       # breaks S0's preserved behaviour
+            r2 = self.story(plan, "S2", breaking, inputs=self.inputs("S2", tests=("tests/test_s2.py",), regressions=("tests/test_other.py",)),
+                            tests_block=False)
+        self.observed = seen   # read back by validation/qualification/diag_orch9.py after the case ran
+        self.assertFalse(r2.committed, seen.report())
         codes = self.failures("S2")
-        self.assertEqual(codes, [("POST_MERGE_REGRESSION", "INTEGRATION", False)])
-        self.assertEqual(self.details("S2"), ["post-merge C0: POST_MERGE_REGRESSION"])
+        self.assertEqual(codes, [("POST_MERGE_REGRESSION", "INTEGRATION", False)], seen.report())
+        self.assertEqual(self.details("S2"), ["post-merge C0: POST_MERGE_REGRESSION"], seen.report())
         self.assertEqual(self.merger.base(), tip)           # the merge was rolled back
         checks = [(e.data["check"], e.data["passed"]) for e in self.events("gate/check") if e.data["check"].startswith("S2:post")]
         self.assertEqual(checks, [("S2:post-merge:C2", True), ("S2:post-merge:C0", False)])   # the prior story's PRESERVE, re-proved
@@ -776,6 +968,115 @@ class Orchestration(unittest.TestCase):
         with self.assertRaises(InvariantError):
             sr.run_story(self.run, self.s1_plan(), "S9", self.inputs("S9"), self.adapters(Dev()),
                          sr.Policy(LIMITS, TestsPolicy(True)))
+
+    # ---- P7-FINDING-001: the mechanism, measured (owner's diagnostic authorization §5-§7, §10)
+
+    def orch_9_plan(self):
+        return plan_of(self.base, obligation("C1", self.s1.id, "S0", ObligationRole.INTRODUCE),
+                       obligation("C0", self.s0.id, "S0", ObligationRole.PRESERVE),
+                       obligation("C2", self.s2.id, "S2", ObligationRole.INTRODUCE))
+
+    def orch_9_breaking(self, **kw):
+        return Dev({"app/mul.py": MUL, "tests/test_s2.py": TEST_MUL, "app/calc.py": "def sub(a, b):\n    return a + b\n"}, **kw)
+
+    def bytecode_blob(self, revision: str, module: str) -> bytes:
+        path = f"app/__pycache__/{module}.{sys.implementation.cache_tag}.pyc"
+        return subprocess.run(["git", "-C", self.repo, "cat-file", "blob", f"{revision}:{path}"], capture_output=True).stdout
+
+    def test_DIAG_1_the_merged_revision_of_S0_carries_bytecode_the_observation_wrote_and_the_developer_committed(self):
+        """Measured, not assumed: S0's admission probes ran the harness in wt-S0 under `-I`, which discards the
+        PYTHONDONTWRITEBYTECODE=1 the kernel sets, so importing app.calc wrote app/__pycache__/calc.*.pyc into the
+        checkout; the developer's `git add -A` committed it; the merge kept it. The revision then holds bytecode of
+        CALC (32 bytes) beside a source of CALC + ADD (66 bytes): stale, and not valid for that source."""
+        plan = self.orch_9_plan()
+        with ProofObserver(self.run, plan) as seen:
+            r0 = self.story(plan, "S0", self.s1_dev(), inputs=self.inputs("S0"))
+        self.assertTrue(r0.committed, seen.report())
+        merged = self.merger.base()
+        tag = sys.implementation.cache_tag
+        tree = git(self.repo, "ls-tree", "-r", "--name-only", merged).stdout.split()
+        self.assertEqual(sorted(p for p in tree if "__pycache__" in p),
+                         [f"app/__pycache__/__init__.{tag}.pyc", f"app/__pycache__/calc.{tag}.pyc"])
+        blob = self.bytecode_blob(merged, "calc")
+        self.assertEqual(git(self.repo, "show", f"{merged}:app/calc.py").stdout, CALC + ADD)
+        self.assertEqual(_pyc_header(blob)["source_size"], len(CALC.encode("utf-8")))
+        self.assertEqual(_shape(marshal.loads(blob[16:])), _shape(compile(CALC, "app/calc.py", "exec")))
+        self.assertNotEqual(_shape(marshal.loads(blob[16:])), _shape(compile(CALC + ADD, "app/calc.py", "exec")))
+        p = subprocess.run([sys.executable, "-I", "-c", "import sys; print(sys.dont_write_bytecode)"],
+                           env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}, capture_output=True, text=True)
+        self.assertEqual(p.stdout.strip(), "False")   # -I discards the variable the harness environment sets
+        # before the first proof at each revision (C1) both checkouts held the committed bytecode — stale, never valid
+        # for the 66-byte source; before the second (C0) each held bytecode of the source, fresh and valid: the C1
+        # proof's harness compiled it and wrote it into the checkout it observed
+        for e in seen.proofs:
+            for party in ("implementer", "verifier"):
+                f = e["before"][party]
+                self.assertEqual((f["bytecode_stale"], f["bytecode_valid_for_source"]),
+                                 (True, False) if e["criterion_id"] == "C1" else (False, True), (e["criterion_id"], e["point"], party, f))
+
+    def test_DIAG_2_a_developer_file_dated_to_the_committed_bytecode_splits_the_two_parties_at_one_merged_revision(self):
+        """The mechanism, constructed — a product-state construction, no timing change: S2's developer writes
+        app/calc.py (32 bytes, the size the committed bytecode's source had) dated to that bytecode's header second,
+        and commits (the index records that date, so the kernel's forced checkouts leave the file alone, as they leave
+        any file whose stat matches). The implementer's checkout is the developer's, so the interpreter takes the
+        bytecode: sub(3, 1) == 2, SATISFIED; the verifier's own checkout dates the file at its checkout, so it compiles
+        the source: 4, REFUTED. Same spec, same semantic hash, same probe digest, same enforcement, same merged revision
+        in both checkouts — VERIFIER_DISAGREEMENT at post-merge C0, rolled back: P7-FINDING-001's symptom, from a
+        revision that carries bytecode of another source."""
+        plan = self.orch_9_plan()
+        with ProofObserver(self.run, plan) as seen:
+            r0 = self.story(plan, "S0", self.s1_dev(), inputs=self.inputs("S0"))
+            self.assertTrue(r0.committed, seen.report())
+            tip = self.merger.base()
+            second = _pyc_header(self.bytecode_blob(tip, "calc"))["source_mtime"]
+            dated = self.orch_9_breaking(before_commit=lambda checkout: os.utime(pathlib.Path(checkout, "app", "calc.py"), (second, second)))
+            r2 = self.story(plan, "S2", dated,
+                            inputs=self.inputs("S2", tests=("tests/test_s2.py",), regressions=("tests/test_other.py",)), tests_block=False)
+        self.assertFalse(r2.committed, seen.report())
+        self.assertEqual(self.failures("S2"), [("VERIFIER_DISAGREEMENT", "INTEGRATION", False)], seen.report())
+        self.assertEqual(self.details("S2"), ["post-merge C0: VERIFIER_DISAGREEMENT"], seen.report())
+        self.assertEqual(self.merger.base(), tip)
+        self.assertAttempts(r2, ["ROLLBACK"])
+        [ev] = seen.disagreements
+        self.assertEqual((ev["criterion_id"], ev["measurement_point"], ev["proof_failure"]), ("C0", "POST_MERGE", "VERIFIER_DISAGREEMENT"))
+        self.assertEqual((ev["implementer"]["behavior_verdict"], ev["verifier"]["behavior_verdict"]), ("SATISFIED", "REFUTED"))
+        self.assertEqual((ev["implementer"]["execution_status"], ev["verifier"]["execution_status"]), ("EXECUTED", "EXECUTED"))
+        self.assertTrue(ev["instrument_identical"])
+        self.assertEqual({ev["revision"], ev["implementer"]["revision"], ev["verifier"]["revision"],
+                          ev["checkouts"]["implementer"]["head"], ev["checkouts"]["verifier"]["head"]}, {ev["revision"]})
+        self.assertEqual(ev["predicted_divergence"], {"implementer_reads_stale_bytecode": True, "verifier_reads_stale_bytecode": False, "divergence": True})
+        before = ev["checkouts"]["implementer"]["before"]
+        self.assertEqual((before["source_mtime_s"], before["bytecode_header"]["source_mtime"], before["bytecode_valid_for_source"], before["bytecode_stale"]),
+                         (second, second, True, True))
+        before = ev["checkouts"]["verifier"]["before"]
+        self.assertEqual((before["bytecode_valid_for_source"], before["bytecode_stale"]), (False, True))
+        self.assertEqual(ev["affected_preserve"], {"C0": ["S0", self.s0.id]})
+        self.assertEqual([b["header"]["source_size"] for b in ev["bytecode_at_revision"] if b["path"].endswith(f"calc.{sys.implementation.cache_tag}.pyc")], [32])
+        self.assertEqual(ev["proof_verified"]["agreement"], False)
+        self.assertEqual(len(ev["process_ranges"]), 4)   # acquired and released, each party
+        self.assert_disposed("S2")
+
+    def test_DIAG_3_on_the_natural_path_a_proof_diverges_exactly_when_one_checkout_reads_stale_bytecode(self):
+        """Owner §7 as a check: ORCH_9_and_10's flow, untouched, observed — for every proof, the divergence the two
+        checkouts' pre-proof facts predict is the one the proof shows, and the story's outcome is the one the
+        predictions imply. On a machine where S0's checkout and S2's developer write fall in the same second the
+        prediction is a divergence (VERIFIER_DISAGREEMENT); where both checkouts read the stale bytecode S2 commits;
+        elsewhere POST_MERGE_REGRESSION. Never a divergence without the difference in what the checkouts hold."""
+        plan = self.orch_9_plan()
+        with ProofObserver(self.run, plan) as seen:
+            r0 = self.story(plan, "S0", self.s1_dev(), inputs=self.inputs("S0"))
+            self.assertTrue(r0.committed, seen.report())
+            r2 = self.story(plan, "S2", self.orch_9_breaking(),
+                            inputs=self.inputs("S2", tests=("tests/test_s2.py",), regressions=("tests/test_other.py",)), tests_block=False)
+        for e in seen.proofs:
+            self.assertEqual(not e["agreement"], e["predicted_divergence"]["divergence"], seen.report())
+        c0 = [e["predicted_divergence"] for e in seen.proofs if (e["story_id"], e["criterion_id"], e["point"]) == ("S2", "C0", "POST_MERGE")]
+        if any(p["divergence"] for p in c0):
+            self.assertEqual(self.failures("S2"), [("VERIFIER_DISAGREEMENT", "INTEGRATION", False)], seen.report())
+        elif any(p["implementer_reads_stale_bytecode"] and p["verifier_reads_stale_bytecode"] for p in c0):
+            self.assertTrue(r2.committed, seen.report())
+        else:
+            self.assertEqual(self.failures("S2"), [("POST_MERGE_REGRESSION", "INTEGRATION", False)], seen.report())
 
 
 if __name__ == "__main__":
