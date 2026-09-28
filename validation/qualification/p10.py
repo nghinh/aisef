@@ -226,8 +226,9 @@ class Recorder:
 
 # =============================================================================================== 2. the workload
 
-#: RFC §31 / the generated migration table: V1 proof mode -> (ObligationRole, Polarity); SubjectAbsence is declared per contract
-V1_MODE = {"CHANGE_REQUIRED": ("INTRODUCE", "MUST_HOLD"), "PRESERVE_REQUIRED": ("PRESERVE", "MUST_HOLD"), "NEGATIVE_INVARIANT": ("PRESERVE", "MUST_NOT_HOLD")}
+#: RFC §31: a V1 proof mode enters V2 only through the seam and the generated migration table (P6-MIGRATION-TABLE.json):
+#: role and polarity come from the table's row, SubjectAbsence only from the declaration each contract carries here.
+MIGRATION_TABLE_REL = "closure-evidence/v2/P6-MIGRATION-TABLE.json"
 FR_TITLES = {"FR-1": "NFC key normalization", "FR-2": "SHA-256 hash chain over canonical bytes", "FR-3": "Idempotent replay by rid",
              "FR-4": "Conflict detection by rid", "FR-5": "Tombstone semantics for delete", "FR-6": "End-to-end verify from disk",
              "FR-7": "Verifier does not trust in-memory cache", "FR-8": "Atomic apply_batch", "FR-9": "Deterministic snapshot",
@@ -391,15 +392,18 @@ def build_workload(baseline: str) -> dict:
     from aisef2.product.approval import ContractApproval, Requirement
     from aisef2.product.compiler import CompileError, ProbeRef, compile_spec
     from aisef2.product.contract import BehaviorContract, ContractError, Subject
+    from aisef2.orchestrate import seam
     rows = v1_rows()
     assert len(rows) == 77 and set(V2) == {r["ac_id"] for r in rows}, "the V2 table covers exactly the 77 frozen criteria"
+    table = json.loads((ROOT / MIGRATION_TABLE_REL).read_text(encoding="utf-8"))
     reqs = {fr: Requirement.create(id=fr, text=title, source=f"docs/requirements.md@{REQUIREMENTS_SHA256[:12]} (PRD {fr})") for fr, title in FR_TITLES.items()}
     contracts, approvals, specs, criteria = {}, [], {}, []
     probes = {SubjectKind.PYTHON_CALLABLE: ProbeRef(PythonCallableProbe.id, PythonCallableProbe.digest)}
     approver = "human:owner (P10 / QP-10 authorization 2026-09-28; the V2 form authored under it, the criteria as V1 froze them)"
     for r in rows:
         t = V2[r["ac_id"]]
-        role, polarity = V1_MODE[r["proof_mode"]]
+        legacy = seam.resolve(r["ac_id"], r["proof_mode"], table, SubjectAbsence[t["absence"]])   # the seam: role and polarity from the table
+        role, polarity = legacy.role.value, legacy.polarity.value
         entry = {"ac_id": r["ac_id"], "story": r["story"], "requirement": r["requirement"], "v1_mode": r["proof_mode"], "role": role, "polarity": polarity,
                  "subject_kind": t["kind"], "locator": t["locator"], "stimulus": t["stimulus"], "observable": t["observable"], "subject_absence": t["absence"],
                  "depends_on_stories": list(r["depends_on"]), "criterion": r["criterion"], "note": t.get("note", ""), "v2_status": None, "typed_refusal": None}
@@ -447,7 +451,8 @@ def build_workload(baseline: str) -> dict:
         kinds[e["subject_kind"]] = kinds.get(e["subject_kind"], 0) + 1
     return {"plan": {"id": plan.id, "plan_hash": plan.plan_hash, "baseline": baseline, "stories": len(by_story), "criteria": len(criteria),
                      "obligations_by_role": {r: sum(1 for e in criteria if e["role"] == r) for r in ("INTRODUCE", "PRESERVE", "VERIFY")},
-                     "v1_plan_commit": LEDGERLOCK_PLAN_COMMIT, "v1_modes": {m: sum(1 for e in criteria if e["v1_mode"] == m) for m in V1_MODE}},
+                     "v1_plan_commit": LEDGERLOCK_PLAN_COMMIT, "v1_modes": {m: sum(1 for e in criteria if e["v1_mode"] == m) for m in sorted({e["v1_mode"] for e in criteria})},
+                     "migration_table": {"path": MIGRATION_TABLE_REL, "sha256": _sha((ROOT / MIGRATION_TABLE_REL).read_bytes())}},
             "requirements": {fr: {"hash": reqs[fr].requirement_hash, "title": FR_TITLES[fr]} for fr in FR_TITLES},
             "criteria": criteria, "counts_by_v2_status": counts, "counts_by_subject_kind": kinds,
             "expressible_by_cycle1_probe": [e["ac_id"] for e in criteria if e["v2_status"] == "COMPILED"],

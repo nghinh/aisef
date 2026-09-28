@@ -1,0 +1,14 @@
+{
+ "record": "AISEF V2 — P10 attempt 1 (execution commit ac77be3, evidence commit 1317cc6): the run was clean; the evidence commit failed the local suite",
+ "written": "2026-09-28T05:19:49Z",
+ "what": "the run itself completed in an owned range (11 s, released empty): delivery NOT_REACHED, plan_quality NOT_CLAIMED, generalization NONE, the plan not admitted (checks 2, 8, 9); but the local suite at the evidence commit 1317cc6 failed 3 tests: the harness spelled the three V1 proof-mode tokens in validation/qualification/p10.py, a directory the WP-6.1 migration-table generator inventories, so the generated inventory of V1 proof-mode representations no longer matched its committed, P6-sealed output",
+ "classification": "HARNESS (P10-RUN-HISTORY entry 18); no evidence rewritten: the generator's write into the tree during diagnosis was reverted with git checkout (P6-MIGRATION-TABLE.json sha256 157b46f6… as the P6 seal binds it)",
+ "correction": "the harness resolves each V1 mode through the seam (aisef2.orchestrate.seam.resolve) against the generated table, spelling no token; a new harness commit; the run repeated as attempt 2 (a rerun never erases attempt 1)",
+ "evidence": [
+  "CONFORMANCE-end.json",
+  "CONFORMANCE-start.json",
+  "LEDGERLOCK-REGRESSION.json",
+  "WORKLOAD.json",
+  "../owned/run.attempt-1.json"
+ ]
+}

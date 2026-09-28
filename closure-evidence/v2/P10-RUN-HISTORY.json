@@ -400,6 +400,34 @@
    "owned_escaped": 0,
    "owned_released_empty": true,
    "owned_range_mechanism": "posix-session-and-group"
+  },
+  {
+   "seq": 18,
+   "commit": "1317cc696ed7a60179c5a54e0e7adbb940756fa3",
+   "package": "P10 evidence commit attempt (1317cc6): LEDGERLOCK-REGRESSION on the harness of ac77be3",
+   "attempt": 1,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "gate (full suite in the owned range)",
+   "result": "FAIL",
+   "tests_run": 4762,
+   "classification": "HARNESS",
+   "classification_evidence": "the local suite failed 3 tests at 1317cc6 (4762 run): tests/v2/test_migration_table_repo and the migration_table checker calibration — validation/qualification/p10.py spelled the three V1 proof-mode tokens in a scanned directory, so the generated inventory of V1 proof-mode representations (WP-6.1, P6-MIGRATION-TABLE.json, sealed by P6-FINAL-SEAL) no longer matched its committed output; no evidence was rewritten (the generator's write into the tree was reverted with git checkout); the fix routes the modes through the seam and the table (no literal token) in a new harness commit; not pushed",
+   "known_defect": null,
+   "failing_tests": [
+    "v2.p0.test_checker_calibration.CheckerCalibration.test_every_checker_is_calibrated_and_the_committed_record_is_current",
+    "v2.test_migration_table_repo.Committed.test_the_committed_outputs_are_exactly_what_the_generator_writes"
+   ],
+   "gate_effect": "COUNTS",
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
   }
  ]
 }
