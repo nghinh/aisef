@@ -1,0 +1,592 @@
+{
+ "record": "AISEF V2 — WP-2.0.3 REFERENCE FIXTURE FREEZE (bound before the fixture is written)",
+ "work_package": "WP-2.0.3",
+ "authority": "owner decision 'AISEF V2 — CYCLE-2 WP-2.0.3 EXECUTION AUTHORIZATION / REFERENCE LEDGERLOCK WORKLOAD FIXTURE' (2026-09-28)",
+ "parent": {
+  "head": "646f600fb7c05daa6075ed37ca933b2e63dd3564",
+  "aisef2_tree": "2c67d47a7c8fc9ce80f0db86dbdc48ffe60ece70",
+  "cycle2_manifest": {
+   "path": "docs/implementation/v2/cycle2/cycle2-manifest.json",
+   "sha256": "f4293366e53853259c58306b55c4992c7bd45e26fe2dea0bf92e4c8cf050bbc7"
+  },
+  "cycle2_freeze_manifest": {
+   "path": "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json",
+   "sha256": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad"
+  },
+  "owner_decisions": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "wp_2_0_1_acceptance": {
+   "path": "closure-evidence/v2/cycle2/WP-2.0.1-ACCEPTANCE.json",
+   "sha256": "665e1ff327d7c3b5eef040c585b122a91565b0bb8b94a0b0ab5fb2337122462f"
+  },
+  "cycle1": {
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "probe": {
+    "id": "probe.python_callable",
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+   }
+  },
+  "rfc": {
+   "rfc_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831"
+  },
+  "hash_rule": "every sha256 here is over bytes with CRLF normalised to LF; git_blob = sha1 of the blob header and the same bytes"
+ },
+ "requirements": {
+  "origin": {
+   "repository": "ledgerlock-aiseftest-run2",
+   "path": "docs/requirements.md",
+   "plan_commit": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "v1_freeze": "closure-evidence/hardening/W1-PLAN-V2.1-FREEZE.json"
+  },
+  "sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+  "fixture_copy": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md",
+  "sections": [
+   {
+    "id": "R-1",
+    "heading": "Purpose",
+    "lines": [
+     3,
+     9
+    ],
+    "sha256": "f1af46969390765979ca43091a131dc8ae8fa45104d0743454b912d1394f8748"
+   },
+   {
+    "id": "R-2",
+    "heading": "Non-Goals",
+    "lines": [
+     10,
+     16
+    ],
+    "sha256": "6e07aef17d190064b49f633d491b55f277e124914c8102236a8890fa7f3b9a11"
+   },
+   {
+    "id": "R-3",
+    "heading": "Storage",
+    "lines": [
+     17,
+     18
+    ],
+    "sha256": "c5cbd35556380c6875652afad65edb642312d02160eedea05543e0b36e18a83a"
+   },
+   {
+    "id": "R-3.1",
+    "heading": "Key normalization (Unicode NFC)",
+    "lines": [
+     19,
+     25
+    ],
+    "sha256": "082f7bc80a517c0ed2030d4f573b165be1807b4260c270c05638e02d9b6ef51d"
+   },
+   {
+    "id": "R-3.2",
+    "heading": "JSONL hash chain",
+    "lines": [
+     26,
+     43
+    ],
+    "sha256": "1b9bb8062a3b74bb3a91d7a0689ec7ca25248587dc1d008217d253b26080e603"
+   },
+   {
+    "id": "R-3.3",
+    "heading": "Tamper evidence",
+    "lines": [
+     44,
+     53
+    ],
+    "sha256": "0fbf4ad694ddbd7d4de02645807f637c4b7dee479bbc3eba552d187bd5305e49"
+   },
+   {
+    "id": "R-3.4",
+    "heading": "Independent verify",
+    "lines": [
+     54,
+     59
+    ],
+    "sha256": "aee4d9bede00d0626ba9c445f24177d00a8c08703e90ae32de652cd0cf742e5e"
+   },
+   {
+    "id": "R-4",
+    "heading": "Idempotency and Conflict Semantics",
+    "lines": [
+     60,
+     61
+    ],
+    "sha256": "088752d1132c01a898293b1c6002c2cfb9ca96b9468b842f76d4d5e928714f64"
+   },
+   {
+    "id": "R-4.1",
+    "heading": "Request IDs",
+    "lines": [
+     62,
+     67
+    ],
+    "sha256": "2bc80e4df25272460a161d6d4d287d5eca5432237f6873ee7c9f0302c01d81ac"
+   },
+   {
+    "id": "R-4.2",
+    "heading": "Idempotency",
+    "lines": [
+     68,
+     72
+    ],
+    "sha256": "c80e3017ae106a49b7829b058344ea79f7c8e01c13d4048d05736770d7670607"
+   },
+   {
+    "id": "R-4.3",
+    "heading": "Conflict",
+    "lines": [
+     73,
+     78
+    ],
+    "sha256": "34968dc3a08936ca9892b2990a41a769d645e91e9fffe1af6bf24b1b16443ae2"
+   },
+   {
+    "id": "R-4.4",
+    "heading": "Tombstones",
+    "lines": [
+     79,
+     85
+    ],
+    "sha256": "f21f6a2745f56e333aaee15f385201ed51c74621e32fc385f8ed9308f6ba5951"
+   },
+   {
+    "id": "R-4.5",
+    "heading": "Key-with-different-rid-different-op semantics",
+    "lines": [
+     86,
+     90
+    ],
+    "sha256": "81650a0029ca93a13bf92336ab95571619242cf47f58cc8c9e340cce8dc5fdcc"
+   },
+   {
+    "id": "R-5",
+    "heading": "Atomic Batch Mutation",
+    "lines": [
+     91,
+     101
+    ],
+    "sha256": "f65328ddec084132544dd4832af82fdb0da86f624baf96e9071a4c6dc3037f58"
+   },
+   {
+    "id": "R-6",
+    "heading": "Deterministic Snapshot",
+    "lines": [
+     102,
+     111
+    ],
+    "sha256": "e5a61514bb95110d7841b5cbc4761e26883af2275ad03775d37ffc771589353e"
+   },
+   {
+    "id": "R-7",
+    "heading": "Repair-tail",
+    "lines": [
+     112,
+     119
+    ],
+    "sha256": "9988bcd3f69219ab71c3a660968953733a95e5ba6727d58c2720d9b94b9fb525"
+   },
+   {
+    "id": "R-8",
+    "heading": "Durability",
+    "lines": [
+     120,
+     126
+    ],
+    "sha256": "6b3c72e04a9684c6d7bbf64c387ba751c45f170729ba10c21078c6e4f078c918"
+   },
+   {
+    "id": "R-9",
+    "heading": "CLI Exit Codes (exact contract)",
+    "lines": [
+     127,
+     139
+    ],
+    "sha256": "95dcf2833569669f287aeeefc76c6665ef5f041f49af38c8b41ecf2c26daadb6"
+   },
+   {
+    "id": "R-10",
+    "heading": "Language / Runtime",
+    "lines": [
+     140,
+     146
+    ],
+    "sha256": "d2e76a9c009fe8482706ec196dd438e2c730dbefb363b7e02e00a43754c74e56"
+   },
+   {
+    "id": "R-11",
+    "heading": "Tests and Coverage",
+    "lines": [
+     147,
+     154
+    ],
+    "sha256": "d916b45c9c635f474fa8c8d7dfa5082ea1604d18e0f0583b885ecf7b7522062b"
+   },
+   {
+    "id": "R-12",
+    "heading": "No Side Channels",
+    "lines": [
+     155,
+     160
+    ],
+    "sha256": "4a9dee25fdd7d7cc5e2ac46a95a411513f6ddbeeec8ebdd1acc5283a95141b9c"
+   },
+   {
+    "id": "R-13",
+    "heading": "Repository layout",
+    "lines": [
+     161,
+     175
+    ],
+    "sha256": "671900e55a604ec6f3c7096de6b7590cf1de1caa40121a95897b23659487bda8"
+   },
+   {
+    "id": "R-14",
+    "heading": "Acceptance",
+    "lines": [
+     176,
+     185
+    ],
+    "sha256": "bb432ea3d1c0fe928da971cb42303772a3a324377293537967aaa610509a254d"
+   }
+  ],
+  "interpretation": {
+   "R-1": "DESCRIPTIVE",
+   "R-2": "DESCRIPTIVE",
+   "R-3": "CONTAINER",
+   "R-4": "CONTAINER",
+   "R-3.1": "BEHAVIOUR",
+   "R-3.2": "BEHAVIOUR",
+   "R-3.3": "BEHAVIOUR",
+   "R-3.4": "BEHAVIOUR",
+   "R-4.1": "BEHAVIOUR",
+   "R-4.2": "BEHAVIOUR",
+   "R-4.3": "BEHAVIOUR",
+   "R-4.4": "BEHAVIOUR",
+   "R-4.5": "BEHAVIOUR",
+   "R-5": "BEHAVIOUR",
+   "R-6": "BEHAVIOUR",
+   "R-7": "BEHAVIOUR",
+   "R-9": "BEHAVIOUR",
+   "R-8": "STATIC (durability is asserted on the reference's source: fsync in every write path; not observable from outside the process)",
+   "R-10": "STATIC (allowed imports and the __future__ import, asserted on the source)",
+   "R-12": "STATIC (no socket / subprocess / os.system, asserted on the source)",
+   "R-13": "STATIC (package layout and the names ledger.py must define)",
+   "R-11": "DEVELOPER_TEST_REQUIREMENT (unit tests, coverage, runner agreement: a requirement on the product's own tests; outside ProductProof by invariant IX and outside this fixture, which measures product behaviour only — the DECISION-3 domain)",
+   "R-14": "MAPPED (items 1-4 and 6 are the assertions named in REQUIREMENTS-MAP.json; item 5 is R-11's coverage requirement)"
+  },
+  "authored_from": "REQUIREMENTS.md alone; nothing copied from AISEF output, the AISEF-generated LedgerLock, a Cycle-1 candidate, a developer agent, a probe implementation or a PLAN-V2.2 proposal"
+ },
+ "planned": {
+  "reference_modules": [
+   "ledgerlock/__init__.py",
+   "ledgerlock/__main__.py",
+   "ledgerlock/ledger.py",
+   "ledgerlock/cli.py"
+  ],
+  "acceptance_harness": "tests/v2/fixtures/workloads/ledgerlock-reference/acceptance.py (digest bound at --run; every observation through a fresh `python -I` subprocess with only the tree root on sys.path)",
+  "assertions": {
+   "R-3.1": [
+    "A-3.1-a"
+   ],
+   "R-3.2": [
+    "A-3.2-a",
+    "A-3.2-b"
+   ],
+   "R-3.3": [
+    "A-3.3-a",
+    "A-3.3-b",
+    "A-3.3-c",
+    "A-3.3-d",
+    "A-3.3-e"
+   ],
+   "R-3.4": [
+    "A-3.4-a"
+   ],
+   "R-4.1": [
+    "A-4.1-a"
+   ],
+   "R-4.2": [
+    "A-4.2-a"
+   ],
+   "R-4.3": [
+    "A-4.3-a"
+   ],
+   "R-4.4": [
+    "A-4.4-a"
+   ],
+   "R-4.5": [
+    "A-4.5-a"
+   ],
+   "R-5": [
+    "A-5-a",
+    "A-5-b",
+    "A-5-c",
+    "A-5-d"
+   ],
+   "R-6": [
+    "A-6-a",
+    "A-6-b"
+   ],
+   "R-7": [
+    "A-7-a",
+    "A-7-b",
+    "A-7-c"
+   ],
+   "R-8": [
+    "A-8-a"
+   ],
+   "R-9": [
+    "A-9-a",
+    "A-9-b",
+    "A-9-c",
+    "A-9-d",
+    "A-9-e",
+    "A-9-f",
+    "A-9-g",
+    "A-9-h"
+   ],
+   "R-10": [
+    "A-10-a"
+   ],
+   "R-12": [
+    "A-12-a"
+   ],
+   "R-13": [
+    "A-13-a"
+   ]
+  },
+  "mutants": [
+   {
+    "id": "M-3.1-1",
+    "target": "R-3.1",
+    "module": "ledger.py",
+    "change": "key normalisation returns the raw key (NFC dropped)",
+    "expect_fail": [
+     "A-3.1-a"
+    ]
+   },
+   {
+    "id": "M-3.2-1",
+    "target": "R-3.2",
+    "module": "ledger.py",
+    "change": "the line hash omits the '|' separator",
+    "expect_fail": [
+     "A-3.2-a"
+    ]
+   },
+   {
+    "id": "M-3.2-2",
+    "target": "R-3.2",
+    "module": "ledger.py",
+    "change": "every line's prev_hash is GENESIS (no chaining)",
+    "expect_fail": [
+     "A-3.2-a"
+    ]
+   },
+   {
+    "id": "M-3.3-1",
+    "target": "R-3.3",
+    "module": "ledger.py",
+    "change": "verify never compares the recomputed hash with the stored one",
+    "expect_fail": [
+     "A-3.3-a",
+     "A-3.3-b",
+     "A-3.3-c"
+    ]
+   },
+   {
+    "id": "M-3.3-2",
+    "target": "R-3.3",
+    "module": "ledger.py",
+    "change": "verify never checks prev_hash linkage",
+    "expect_fail": [
+     "A-3.3-e"
+    ]
+   },
+   {
+    "id": "M-3.3-3",
+    "target": "R-3.3",
+    "module": "ledger.py",
+    "change": "first_bad_index is off by one",
+    "expect_fail": [
+     "A-3.3-a",
+     "A-3.3-c",
+     "A-3.3-e"
+    ]
+   },
+   {
+    "id": "M-3.4-1",
+    "target": "R-3.4",
+    "module": "ledger.py",
+    "change": "verify trusts the instance's cached line count and skips the chain",
+    "expect_fail": [
+     "A-3.4-a"
+    ]
+   },
+   {
+    "id": "M-4.1-1",
+    "target": "R-4.1",
+    "module": "ledger.py",
+    "change": "an empty rid is accepted",
+    "expect_fail": [
+     "A-4.1-a"
+    ]
+   },
+   {
+    "id": "M-4.2-1",
+    "target": "R-4.2",
+    "module": "ledger.py",
+    "change": "a replayed rid appends a new line",
+    "expect_fail": [
+     "A-4.2-a"
+    ]
+   },
+   {
+    "id": "M-4.3-1",
+    "target": "R-4.3",
+    "module": "ledger.py",
+    "change": "the conflict check is removed",
+    "expect_fail": [
+     "A-4.3-a"
+    ]
+   },
+   {
+    "id": "M-4.3-2",
+    "target": "R-4.3",
+    "module": "ledger.py",
+    "change": "the line is written before the conflict is raised",
+    "expect_fail": [
+     "A-4.3-a"
+    ]
+   },
+   {
+    "id": "M-4.4-1",
+    "target": "R-4.4",
+    "module": "ledger.py",
+    "change": "a tombstone does not block a different rid",
+    "expect_fail": [
+     "A-4.4-a"
+    ]
+   },
+   {
+    "id": "M-4.5-1",
+    "target": "R-4.5",
+    "module": "ledger.py",
+    "change": "a different op with a different rid does not conflict",
+    "expect_fail": [
+     "A-4.5-a"
+    ]
+   },
+   {
+    "id": "M-5-1",
+    "target": "R-5",
+    "module": "ledger.py",
+    "change": "a batch commits line by line: a later conflict leaves earlier lines",
+    "expect_fail": [
+     "A-5-b"
+    ]
+   },
+   {
+    "id": "M-5-2",
+    "target": "R-5",
+    "module": "ledger.py",
+    "change": "a replay inside a batch appends a second line",
+    "expect_fail": [
+     "A-5-c"
+    ]
+   },
+   {
+    "id": "M-6-1",
+    "target": "R-6",
+    "module": "ledger.py",
+    "change": "the snapshot is in insertion order, not byte order",
+    "expect_fail": [
+     "A-6-a"
+    ]
+   },
+   {
+    "id": "M-6-2",
+    "target": "R-6",
+    "module": "ledger.py",
+    "change": "the snapshot includes tombstoned keys",
+    "expect_fail": [
+     "A-6-a"
+    ]
+   },
+   {
+    "id": "M-7-1",
+    "target": "R-7",
+    "module": "ledger.py",
+    "change": "repair-tail drops the last line even when the chain is clean",
+    "expect_fail": [
+     "A-7-b"
+    ]
+   },
+   {
+    "id": "M-7-2",
+    "target": "R-7",
+    "module": "ledger.py",
+    "change": "repair-tail repairs instead of refusing mid-chain corruption",
+    "expect_fail": [
+     "A-7-c"
+    ]
+   },
+   {
+    "id": "M-7-3",
+    "target": "R-7",
+    "module": "ledger.py",
+    "change": "repair-tail drops two lines",
+    "expect_fail": [
+     "A-7-a"
+    ]
+   },
+   {
+    "id": "M-8-1",
+    "target": "R-8",
+    "module": "ledger.py",
+    "change": "fsync removed from the append path",
+    "expect_fail": [
+     "A-8-a"
+    ]
+   },
+   {
+    "id": "M-9-1",
+    "target": "R-9",
+    "module": "cli.py",
+    "change": "a conflict exits 5 instead of 4",
+    "expect_fail": [
+     "A-9-e"
+    ]
+   },
+   {
+    "id": "M-9-2",
+    "target": "R-9",
+    "module": "cli.py",
+    "change": "an I/O error exits 1 instead of 3",
+    "expect_fail": [
+     "A-9-d"
+    ]
+   },
+   {
+    "id": "M-9-3",
+    "target": "R-9",
+    "module": "cli.py",
+    "change": "verify exits 0 whatever the verdict",
+    "expect_fail": [
+     "A-9-b"
+    ]
+   }
+  ],
+  "mutant_count": 24
+ },
+ "rules": [
+  "one mutant, one exact source change, one target requirement; a mutant whose defect necessarily reaches other observables records them as consequential, never as a second target",
+  "a mutant is valid only if its target assertion fails and every failing assertion belongs to its declared set; an equivalent mutant is removed, not kept",
+  "the acceptance suite observes behaviour through the CLI and the library in fresh subprocesses; it never reads a mutant id, a path or a fixture name",
+  "deviations from this plan are recorded in P0-REFERENCE-FIXTURE.json, never silently absorbed"
+ ]
+}
