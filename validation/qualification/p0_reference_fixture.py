@@ -406,9 +406,14 @@ def _tree_with(mutant: dict | None, work: pathlib.Path) -> pathlib.Path:
     return tree
 
 
-def run_matrix(acc, *, workers: int = 4) -> dict:
-    """Reference twice (determinism), every mutant once; per assertion ok/detail."""
+def run_matrix(acc, *, workers: int | None = None) -> dict:
+    """Reference twice (determinism), every mutant once; per assertion ok/detail. Workers default to half the cores
+    (at most 4): every assertion spawns interpreters, and a hosted CI runner needs cycles of its own to stay in
+    contact with its server (attempt 1 of b07dbbd lost the Windows runner while this matrix ran with four)."""
+    import os
     from concurrent.futures import ThreadPoolExecutor
+    if workers is None:
+        workers = max(1, min(4, (os.cpu_count() or 2) // 2))
     catalog = _catalog()
     with tempfile.TemporaryDirectory(prefix="ledgerlock-ref-") as t:
         work = pathlib.Path(t)
@@ -517,8 +522,63 @@ def run() -> dict:
     return record
 
 
+def _gh(*args: str) -> str:
+    return subprocess.run(["gh", *args], cwd=ROOT, capture_output=True, encoding="utf-8", check=True).stdout
+
+
+def bind_ci(run_id: int) -> dict:
+    """Bind the CI measurements of the implementation commit into the record: every attempt of the run, every job's
+    conclusion, the unittest count read from its log when a log exists, and the check-run annotations when it does
+    not (a lost runner leaves no log). The run must be of the commit the record names, so the fixture bytes the CI
+    measured are the ones the record binds by digest."""
+    rec = _load(OUT_REL)
+    head = rec["identities"]["head"]
+    attempts = int(json.loads(_gh("run", "view", str(run_id), "--json", "attempt"))["attempt"])
+    out = {"run": run_id, "commit": head, "attempts": []}
+    for n in range(1, attempts + 1):
+        jobs = json.loads(_gh("api", f"repos/nghinh/aisef/actions/runs/{run_id}/attempts/{n}/jobs"))["jobs"]
+        rows = []
+        for j in sorted(jobs, key=lambda x: x["name"]):
+            if j["head_sha"] != head:
+                raise SystemExit(f"run {run_id} attempt {n} is of {j['head_sha'][:7]}, not {head[:7]}")
+            # the job's own log by id through the API: `gh run view --job --log` resolves a re-run job's name to the
+            # latest attempt's log, which would credit a lost runner with the retry's test count
+            log = subprocess.run(["gh", "api", "--allow-escape-sequences", f"repos/nghinh/aisef/actions/jobs/{j['id']}/logs"],
+                                 cwd=ROOT, capture_output=True, encoding="utf-8", errors="replace")
+            import re
+            text = log.stdout or ""
+            available = log.returncode == 0 and bool(text.strip()) and "<Error>" not in text[:300]
+            m = re.search(r"Ran (\d+) tests", text) if available else None
+            ann = subprocess.run(["gh", "api", f"repos/nghinh/aisef/check-runs/{j['id']}/annotations"], cwd=ROOT,
+                                 capture_output=True, encoding="utf-8", errors="replace")
+            annotations = [a.get("message", "") for a in json.loads(ann.stdout or "[]")] if ann.returncode == 0 else []
+            failing = sorted(set(re.findall(r"(?:ERROR|FAIL): \S+ \((\S+)\)", text))) if available else []
+            rows.append({"job": j["name"], "job_id": j["id"], "conclusion": j["conclusion"], "started_at": j["started_at"],
+                         "completed_at": j["completed_at"], "tests_run": int(m.group(1)) if m else None,
+                         "log_available": available, "failing_tests": failing, "annotations": annotations})
+        out["attempts"].append({"attempt": n, "jobs": rows})
+    rec["cross_platform"] = {
+        "rule": "the implementation commit's CI runs tests/v2/test_p0_reference_fixture.py, which executes the whole "
+                "reference-and-mutant matrix on every platform of the matrix; the fixture bytes it measured are the "
+                "ones this record binds by digest (the evidence commit changes evidence files only)",
+        "ci": out,
+        "platforms": sorted({("windows" if "windows" in r["job"] else "linux") for a in out["attempts"] for r in a["jobs"]
+                             if r["job"].startswith("unit")}),
+    }
+    (ROOT / OUT_REL).write_text(render(rec), encoding="utf-8")
+    return rec["cross_platform"]
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    if "--bind-ci" in argv:
+        cp = bind_ci(int(argv[argv.index("--bind-ci") + 1]))
+        for a in cp["ci"]["attempts"]:
+            for r in a["jobs"]:
+                print(f"attempt {a['attempt']}: {r['job']:32s} {r['conclusion']:8s} tests {r['tests_run']} "
+                      f"{'(no log; ' + '; '.join(r['annotations'])[:90] + ')' if not r['log_available'] else ''}")
+        print(f"bound CI run {cp['ci']['run']} into {OUT_REL}")
+        return 0
     if "--freeze" in argv:
         rec = freeze()
         (ROOT / FREEZE_REL).parent.mkdir(parents=True, exist_ok=True)

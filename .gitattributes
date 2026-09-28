@@ -3,3 +3,7 @@
 
 # Journal lines are canonical LF bytes; a CRLF checkout would make every fixture non-canonical.
 tests/v2/fixtures/journal/* text eol=lf
+
+# The LedgerLock reference fixture is bound by byte-exact digests (REQUIREMENTS.md must equal the frozen document);
+# a CRLF checkout would change every digest and the acceptance would measure different bytes.
+tests/v2/fixtures/workloads/ledgerlock-reference/** text eol=lf
