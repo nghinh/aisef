@@ -8,13 +8,19 @@
   "deviations": [
    "assertion A-3.3-f not in the plan",
    "planned mutant M-4.3-2 not committed",
+   "mutant M-10-1 not in the plan",
+   "mutant M-12-1 not in the plan",
+   "mutant M-13-1 not in the plan",
    "M-3.1-1: planned as 'normalisation returns the raw key'; committed as 'normalises to NFD instead of NFC' — the raw-key form left the unicodedata import unused (a lint-visible, not a behavioural, difference); the NFD form is a defect of the same requirement with the same target assertion",
    "M-4.3-2: planned as 'the line is written before the conflict is raised'; not committed — moving the write is not a one-line change, and the 'no line appended' half of R-4.3 is measured by A-4.3-a's line count under M-4.3-1",
-   "A-3.3-f: assertion added beyond the plan: a removed middle line (A-3.3-e) is caught by the hash recomputation alone, so the prev_hash-equals-previous-hash rule of R-3.3 needed its own observation (a changed prev_hash field); without it M-3.3-2 was equivalent under the suite and would have been rejected"
+   "A-3.3-f: assertion added beyond the plan: a removed middle line (A-3.3-e) is caught by the hash recomputation alone, so the prev_hash-equals-previous-hash rule of R-3.3 needed its own observation (a changed prev_hash field); without it M-3.3-2 was equivalent under the suite and would have been rejected",
+   "M-10-1: added by the owner's C2-P0 correction (2026-09-29): R-10 had no negative witness; a used disallowed import cannot honestly be one changed line (the import statement and its use), so it is two",
+   "M-12-1: added by the owner's C2-P0 correction (2026-09-29): R-12 had no negative witness",
+   "M-13-1: added by the owner's C2-P0 correction (2026-09-29): R-13 had no negative witness; renaming the required definition alone would break the package import and hide the layout defect behind an import failure in every observation, so the package re-export is changed with it (two lines)"
   ]
  },
  "identities": {
-  "head": "b07dbbd5d2c1a35228873444c2d002024e329646",
+  "head": "4c28172617021a4f584d5eaa66100d86095ea371",
   "aisef2_tree": "2c67d47a7c8fc9ce80f0db86dbdc48ffe60ece70",
   "cycle2_manifest": {
    "path": "docs/implementation/v2/cycle2/cycle2-manifest.json",
@@ -89,12 +95,12 @@
    "git_blob": "0de8b6882ac56d789610816bf0d47cda63411ddb"
   },
   "MUTANTS.json": {
-   "sha256": "6d8b2cb8329dd2d0d399adc2606c039610d1e26b120a884b179ac026ebe26089",
-   "git_blob": "a3f4fb687ae1a8f41acb876b8a9a5c5b310ee10c"
+   "sha256": "fa1f3dbd32242ccce5195e6a12647425148b0121ee0ae69b52a0f62c1d0b335f",
+   "git_blob": "8421c45f0e939629640b6ee660a20b87b9eafd7d"
   },
   "REQUIREMENTS-MAP.json": {
-   "sha256": "b96b558716d2ac405ccae657ab8d976aec75ea0fc6850d93fb5166b7acd52ab9",
-   "git_blob": "871662494dfc6607a59a4f7151dfec62ab53d743"
+   "sha256": "a1a56ca50d946f4ee03c8ffdd7f7e9afcc903cd4a91f7f26988e5cf4a9dfcd23",
+   "git_blob": "f1c4d9fca2c13a452898205f8fc896e1ed3e7dc2"
   },
   "reference/ledgerlock/__init__.py": {
    "sha256": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
@@ -203,6 +209,22 @@
   "mutants/M-9-3/cli.py": {
    "sha256": "fe5f9f624166e86971429af7dffdcde61045e067eda0076cedb4c047b878b42a",
    "git_blob": "8e6d417b01352b300b25e071b3de9de4b1593268"
+  },
+  "mutants/M-10-1/ledger.py": {
+   "sha256": "0c2094df2d1027dc38c56f2056645427953928d173c7ad6c135ed5f57514ca77",
+   "git_blob": "dce4fbd49775f9663f244d74cac6675577744c9d"
+  },
+  "mutants/M-12-1/ledger.py": {
+   "sha256": "0f22b9b388be18b10d772d8836a6388da1dfe2cefe0d6b664801f0af4c6b13be",
+   "git_blob": "43a1867838f8c841a219f753a63498989ba179d8"
+  },
+  "mutants/M-13-1/__init__.py": {
+   "sha256": "40f1caf69ee27f65b98b913e97f549f6735b1c41b8b51c3b03e611e46b5cf645",
+   "git_blob": "396408133ba965a17e81404a7ed01ec60569f9e2"
+  },
+  "mutants/M-13-1/ledger.py": {
+   "sha256": "fe9c2e136802a064478985d6460b838bd6933686ea30baee667df06b5c0e5a65",
+   "git_blob": "1829a10fabfe79cba1f832bdd8c5e73e2d647c6b"
   }
  },
  "requirement_map": [
@@ -599,8 +621,10 @@
    "assertions": [
     "A-10-a"
    ],
-   "mutants": [],
-   "interpretation": "no mutant: an import outside the set is caught by the assertion itself and would be artificial"
+   "mutants": [
+    "M-10-1"
+   ],
+   "interpretation": "the negative witness is a used import of a module outside the allowed set (M-10-1, two inserted lines: the import and its use)"
   },
   {
    "id": "R-11",
@@ -630,8 +654,10 @@
    "assertions": [
     "A-12-a"
    ],
-   "mutants": [],
-   "interpretation": "the file-access half is a property of the reference's design (its opens name only those paths); no mutant, as one would be artificial"
+   "mutants": [
+    "M-12-1"
+   ],
+   "interpretation": "the negative witness is an os.system call in the write path (M-12-1); the file-access half is a property of the reference's design (its opens name only those paths) and has no separate mutant"
   },
   {
    "id": "R-13",
@@ -651,8 +677,10 @@
    "assertions": [
     "A-13-a"
    ],
-   "mutants": [],
-   "interpretation": "__main__.py is added so that `python -m ledgerlock` (R-9) runs; tests/, docs/, README and pyproject are the product repository's concern, not the reference's"
+   "mutants": [
+    "M-13-1"
+   ],
+   "interpretation": "the negative witness for the layout half is M-13-1 (ledger.py no longer defines apply_batch; the package re-exports a renamed function under that name); the in-tree resolution half cannot be violated by a product tree under python -I isolation and is witnessed by a harness calibration (the harness importing another tree is rejected by A-13-a). __main__.py is added so that `python -m ledgerlock` (R-9) runs; tests/, docs/, README and pyproject are the product repository's concern, not the reference's"
   },
   {
    "id": "R-14",
@@ -1021,6 +1049,81 @@
     "A-9-b"
    ],
    "consequential": []
+  },
+  {
+   "id": "M-10-1",
+   "target": "R-10",
+   "module": [
+    "ledger.py"
+   ],
+   "category": "disallowed import",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "import tempfile",
+     "after": [
+      "import tempfile",
+      "import time"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "        self._known_length = None   # what this instance last wrote; informative only, never a verdict's input",
+     "after": [
+      "        self._known_length = None   # what this instance last wrote; informative only, never a verdict's input",
+      "        self._opened_at = time.time()   # a convenience field: when this instance was opened"
+     ]
+    }
+   ],
+   "multi_line_rationale": "a disallowed module that is actually used needs its import statement and its use; joining them on one line with a semicolon would be an artificial one-line form, so the mutation is two inserted lines",
+   "consequence": "ledger.py imports `time`, a module outside the allowed standard-library set of R-10, to stamp when a Ledger instance was opened; behaviour is otherwise unchanged",
+   "expect_fail": [
+    "A-10-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-12-1",
+   "target": "R-12",
+   "module": "ledger.py",
+   "category": "side channel",
+   "before": "    os.replace(tmp, path)",
+   "after": [
+    "    os.system(\"sync\")",
+    "    os.replace(tmp, path)"
+   ],
+   "consequence": "the atomic write shells out through os.system to flush the disks before the rename: a forbidden side channel (R-12: no os.system); the ledger's bytes are unchanged",
+   "expect_fail": [
+    "A-12-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-13-1",
+   "target": "R-13",
+   "module": [
+    "ledger.py",
+    "__init__.py"
+   ],
+   "category": "layout",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "def apply_batch(path: str, ops) -> typing.List[Result]:",
+     "after": "def batch_apply(path: str, ops) -> typing.List[Result]:"
+    },
+    {
+     "module": "__init__.py",
+     "before": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,",
+     "after": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, batch_apply as apply_batch, snapshot, verify,"
+    }
+   ],
+   "multi_line_rationale": "renaming the required definition alone would break the package import and turn every observation red for an import error, hiding the layout defect; re-exporting the renamed function under the required name keeps the tree runnable so the acceptance sees exactly the violation: ledger.py no longer defines apply_batch",
+   "consequence": "ledger.py no longer defines the required name apply_batch (it defines batch_apply); the package hides it by re-exporting the new name as apply_batch, so nothing else observes the change",
+   "expect_fail": [
+    "A-13-a"
+   ],
+   "consequential": []
   }
  ],
  "static": {
@@ -1081,6 +1184,15 @@
    "consequential_declared": [
     "A-6-a"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.1-a",
     "A-6-a"
@@ -1099,6 +1211,15 @@
     "A-3.2-a"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.2-a"
    ],
@@ -1121,6 +1242,15 @@
     "A-7-b",
     "A-9-a"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.2-a",
     "A-3.3-d",
@@ -1152,6 +1282,15 @@
     "A-9-b",
     "A-9-g"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.3-a",
     "A-3.3-b",
@@ -1180,6 +1319,15 @@
     "A-3.3-f"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.3-f"
    ],
@@ -1203,6 +1351,15 @@
     "A-3.4-a",
     "A-7-a"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.3-a",
     "A-3.3-b",
@@ -1229,6 +1386,15 @@
     "A-3.4-a"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.4-a"
    ],
@@ -1245,6 +1411,15 @@
     "A-4.1-a"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-4.1-a"
    ],
@@ -1266,6 +1441,15 @@
     "A-4.5-a",
     "A-5-c"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.1-a",
     "A-4.2-a",
@@ -1297,6 +1481,15 @@
     "A-9-e",
     "A-9-f"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.1-a",
     "A-4.3-a",
@@ -1325,6 +1518,15 @@
     "A-4.4-a"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-4.4-a"
    ],
@@ -1343,6 +1545,15 @@
    "consequential_declared": [
     "A-4.4-a"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-4.4-a",
     "A-4.5-a"
@@ -1363,6 +1574,15 @@
    "consequential_declared": [
     "A-9-f"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-5-b",
     "A-9-f"
@@ -1381,6 +1601,15 @@
     "A-5-c"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 0
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-5-c"
    ],
@@ -1397,6 +1626,15 @@
     "A-6-a"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-6-a"
    ],
@@ -1416,6 +1654,15 @@
     "A-4.4-a",
     "A-5-a"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-4.4-a",
     "A-5-a",
@@ -1436,6 +1683,15 @@
     "A-7-b"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-7-b"
    ],
@@ -1452,6 +1708,15 @@
     "A-7-c"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-7-c"
    ],
@@ -1468,6 +1733,15 @@
     "A-7-a"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-7-a"
    ],
@@ -1484,6 +1758,15 @@
     "A-8-a"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 0
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-8-a"
    ],
@@ -1507,6 +1790,15 @@
     "A-4.5-a",
     "A-5-b"
    ],
+   "changes": 1,
+   "lines_changed": {
+    "cli.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-3.1-a",
     "A-4.3-a",
@@ -1535,6 +1827,15 @@
     "A-9-d"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "cli.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-9-d"
    ],
@@ -1551,6 +1852,15 @@
     "A-9-b"
    ],
    "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "cli.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
    "observed_failing": [
     "A-9-b"
    ],
@@ -1560,31 +1870,116 @@
    "observed_detail": {
     "A-9-b": "exit 0"
    }
+  },
+  "M-10-1": {
+   "target": "R-10",
+   "expected_failing": [
+    "A-10-a"
+   ],
+   "consequential_declared": [],
+   "changes": 2,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 0,
+     "added": 2
+    }
+   },
+   "one_line": false,
+   "multi_line_rationale": "a disallowed module that is actually used needs its import statement and its use; joining them on one line with a semicolon would be an artificial one-line form, so the mutation is two inserted lines",
+   "observed_failing": [
+    "A-10-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-10-a": "imports outside the allowed set {'ledger.py': ['time']}; __future__ {'cli.py': True, 'ledger.py': True}"
+   }
+  },
+  "M-12-1": {
+   "target": "R-12",
+   "expected_failing": [
+    "A-12-a"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 0,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-12-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-12-a": "['ledger.py:133: os.system']"
+   }
+  },
+  "M-13-1": {
+   "target": "R-13",
+   "expected_failing": [
+    "A-13-a"
+   ],
+   "consequential_declared": [],
+   "changes": 2,
+   "lines_changed": {
+    "__init__.py": {
+     "removed": 1,
+     "added": 1
+    },
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": false,
+   "multi_line_rationale": "renaming the required definition alone would break the package import and turn every observation red for an import error, hiding the layout defect; re-exporting the renamed function under the required name keeps the tree runnable so the acceptance sees exactly the violation: ledger.py no longer defines apply_batch",
+   "observed_failing": [
+    "A-13-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-13-a": "files {'__init__.py': True, 'ledger.py': True, 'cli.py': True}; missing names ['apply_batch']; module inside the tree True"
+   }
   }
  },
- "mutant_count": 23,
+ "mutant_count": 26,
  "all_mutants_red_on_target": true,
  "harness_calibration": {
   "vacuous_runner_rejected": true,
-  "rule": "a runner whose every assertion passes reports no RED for a mutant; the run refuses to qualify under it"
+  "in_tree_resolution_rejected": true,
+  "rule": "a runner whose every assertion passes reports no RED for a mutant; the run refuses to qualify under it. The in-tree half of A-13-a cannot be violated by a product tree under python -I isolation, so its negative witness is the harness importing another tree, which A-13-a must reject"
+ },
+ "supersedes": {
+  "path": "closure-evidence/v2/cycle2/P0-REFERENCE-FIXTURE.json",
+  "commit": "002fdb773c57a5c247b9ae900cb5ad7aa72bac08",
+  "reason": "owner ruling 'CYCLE-2 C2-P0 CORRECTION / WP-2.0.3 COMPLETION DEFECT ONLY': R-10, R-12 and R-13 had no negative witness; this run adds M-10-1, M-12-1, M-13-1 and the in-tree harness calibration"
  },
  "problems": [],
  "verdict": "REFERENCE GREEN, EVERY MUTANT RED ON TARGET",
  "cross_platform": {
   "rule": "the implementation commit's CI runs tests/v2/test_p0_reference_fixture.py, which executes the whole reference-and-mutant matrix on every platform of the matrix; the fixture bytes it measured are the ones this record binds by digest (the evidence commit changes evidence files only)",
   "ci": {
-   "run": 36444593457,
-   "commit": "b07dbbd5d2c1a35228873444c2d002024e329646",
+   "run": 36489940683,
+   "commit": "4c28172617021a4f584d5eaa66100d86095ea371",
    "attempts": [
     {
      "attempt": 1,
      "jobs": [
       {
        "job": "lint",
-       "job_id": 109003483398,
+       "job_id": 109155855971,
        "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:34:36Z",
+       "started_at": "2026-09-28T22:02:18Z",
+       "completed_at": "2026-09-28T22:02:25Z",
        "tests_run": null,
        "log_available": true,
        "failing_tests": [],
@@ -1595,10 +1990,10 @@
       },
       {
        "job": "unit (ubuntu-latest, 3.11)",
-       "job_id": 109003484264,
+       "job_id": 109155856087,
        "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:50:48Z",
+       "started_at": "2026-09-28T22:02:19Z",
+       "completed_at": "2026-09-28T22:20:53Z",
        "tests_run": 4779,
        "log_available": true,
        "failing_tests": [],
@@ -1609,10 +2004,10 @@
       },
       {
        "job": "unit (ubuntu-latest, 3.12)",
-       "job_id": 109003484050,
+       "job_id": 109155855837,
        "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:53:26Z",
+       "started_at": "2026-09-28T22:02:17Z",
+       "completed_at": "2026-09-28T22:21:20Z",
        "tests_run": 4779,
        "log_available": true,
        "failing_tests": [],
@@ -1623,10 +2018,10 @@
       },
       {
        "job": "unit (ubuntu-latest, 3.13)",
-       "job_id": 109003484171,
+       "job_id": 109155855921,
        "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:49:40Z",
+       "started_at": "2026-09-28T22:02:17Z",
+       "completed_at": "2026-09-28T22:21:31Z",
        "tests_run": 4779,
        "log_available": true,
        "failing_tests": [],
@@ -1637,10 +2032,10 @@
       },
       {
        "job": "unit (ubuntu-latest, 3.14)",
-       "job_id": 109003483742,
+       "job_id": 109155855933,
        "conclusion": "success",
-       "started_at": "2026-09-28T15:34:31Z",
-       "completed_at": "2026-09-28T15:53:52Z",
+       "started_at": "2026-09-28T22:02:17Z",
+       "completed_at": "2026-09-28T22:21:52Z",
        "tests_run": 4779,
        "log_available": true,
        "failing_tests": [],
@@ -1651,117 +2046,30 @@
       },
       {
        "job": "unit (windows-latest, 3.11)",
-       "job_id": 109003484225,
-       "conclusion": "failure",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T16:21:25Z",
-       "tests_run": null,
-       "log_available": false,
-       "failing_tests": [],
-       "annotations": [
-        "The hosted runner lost communication with the server. Anything in your workflow that terminates the runner process, starves it for CPU/Memory, or blocks its network access can cause this error."
-       ]
-      },
-      {
-       "job": "wheel",
-       "job_id": 109003483569,
+       "job_id": 109155855880,
        "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:34:55Z",
-       "tests_run": null,
-       "log_available": true,
-       "failing_tests": [],
-       "annotations": [
-        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
-        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
-       ]
-      }
-     ]
-    },
-    {
-     "attempt": 2,
-     "jobs": [
-      {
-       "job": "lint",
-       "job_id": 109024686500,
-       "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:34:36Z",
-       "tests_run": null,
-       "log_available": true,
-       "failing_tests": [],
-       "annotations": []
-      },
-      {
-       "job": "unit (ubuntu-latest, 3.11)",
-       "job_id": 109024693045,
-       "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:50:48Z",
-       "tests_run": 4779,
-       "log_available": true,
-       "failing_tests": [],
-       "annotations": []
-      },
-      {
-       "job": "unit (ubuntu-latest, 3.12)",
-       "job_id": 109024624564,
-       "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:53:26Z",
-       "tests_run": 4779,
-       "log_available": true,
-       "failing_tests": [],
-       "annotations": []
-      },
-      {
-       "job": "unit (ubuntu-latest, 3.13)",
-       "job_id": 109024686767,
-       "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:49:40Z",
-       "tests_run": 4779,
-       "log_available": true,
-       "failing_tests": [],
-       "annotations": []
-      },
-      {
-       "job": "unit (ubuntu-latest, 3.14)",
-       "job_id": 109024625550,
-       "conclusion": "success",
-       "started_at": "2026-09-28T15:34:31Z",
-       "completed_at": "2026-09-28T15:53:52Z",
-       "tests_run": 4779,
-       "log_available": true,
-       "failing_tests": [],
-       "annotations": []
-      },
-      {
-       "job": "unit (windows-latest, 3.11)",
-       "job_id": 109024623222,
-       "conclusion": "failure",
-       "started_at": "2026-09-28T16:24:17Z",
-       "completed_at": "2026-09-28T17:14:19Z",
+       "started_at": "2026-09-28T22:02:18Z",
+       "completed_at": "2026-09-28T22:51:57Z",
        "tests_run": 4776,
        "log_available": true,
-       "failing_tests": [
-        "v2.test_p0_reference_fixture.StaticClosure.test_the_requirements_copy_is_the_frozen_document"
-       ],
+       "failing_tests": [],
        "annotations": [
-        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
-        "Process completed with exit code 1."
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
        ]
       },
       {
        "job": "wheel",
-       "job_id": 109024682868,
+       "job_id": 109155855570,
        "conclusion": "success",
-       "started_at": "2026-09-28T15:34:24Z",
-       "completed_at": "2026-09-28T15:34:55Z",
+       "started_at": "2026-09-28T22:02:18Z",
+       "completed_at": "2026-09-28T22:02:41Z",
        "tests_run": null,
        "log_available": true,
        "failing_tests": [],
-       "annotations": []
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
       }
      ]
     }
