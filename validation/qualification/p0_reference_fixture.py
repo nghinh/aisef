@@ -158,7 +158,18 @@ DEVIATION_NOTES = {
     "A-3.3-f": "assertion added beyond the plan: a removed middle line (A-3.3-e) is caught by the hash recomputation "
                "alone, so the prev_hash-equals-previous-hash rule of R-3.3 needed its own observation (a changed "
                "prev_hash field); without it M-3.3-2 was equivalent under the suite and would have been rejected",
+    "M-10-1": "added by the owner's C2-P0 correction (2026-09-29): R-10 had no negative witness; a used disallowed "
+              "import cannot honestly be one changed line (the import statement and its use), so it is two",
+    "M-12-1": "added by the owner's C2-P0 correction (2026-09-29): R-12 had no negative witness",
+    "M-13-1": "added by the owner's C2-P0 correction (2026-09-29): R-13 had no negative witness; renaming the "
+              "required definition alone would break the package import and hide the layout defect behind an "
+              "import failure in every observation, so the package re-export is changed with it (two lines)",
 }
+
+#: The record this run supersedes: the pre-correction run at 002fdb7 (kept in history, never rewritten).
+SUPERSEDES = {"path": "closure-evidence/v2/cycle2/P0-REFERENCE-FIXTURE.json", "commit": "002fdb773c57a5c247b9ae900cb5ad7aa72bac08",
+              "reason": "owner ruling 'CYCLE-2 C2-P0 CORRECTION / WP-2.0.3 COMPLETION DEFECT ONLY': R-10, R-12 and R-13 had "
+                        "no negative witness; this run adds M-10-1, M-12-1, M-13-1 and the in-tree harness calibration"}
 
 
 def identities() -> dict:
@@ -238,9 +249,24 @@ def _catalog() -> list[dict]:
     return json.loads((FIX / "MUTANTS.json").read_text(encoding="utf-8"))["mutants"]
 
 
+MODULES = ("__init__.py", "__main__.py", "ledger.py", "cli.py")
+
+
+def changes_of(m: dict) -> list[dict]:
+    """A mutant's controlled changes: one (module, before, after) in the one-line form, or several under `changes`
+    when the defect cannot honestly be one changed line — then `multi_line_rationale` says why."""
+    if "changes" in m:
+        return [dict(c, id=m["id"]) for c in m["changes"]]
+    return [{"id": m["id"], "module": m["module"], "before": m["before"], "after": m["after"]}]
+
+
+def modules_of(m: dict) -> list[str]:
+    return sorted({c["module"] for c in changes_of(m)})
+
+
 def apply_change(source: str, change: dict) -> str:
-    """The one exact change of a mutant: `before` (a line, without its newline) occurs exactly once in the reference
-    module and becomes `after` (None deletes the line; a list inserts several lines)."""
+    """One exact change of a mutant: `before` (a line, without its newline) occurs exactly once in the module and
+    becomes `after` (None deletes the line; a list inserts several lines)."""
     lines = source.split("\n")
     hits = [i for i, line in enumerate(lines) if line == change["before"]]
     if len(hits) != 1:
@@ -255,45 +281,80 @@ def apply_change(source: str, change: dict) -> str:
     return "\n".join(lines)
 
 
+def _expected_module(m: dict, module: str) -> str:
+    src = (REF / "ledgerlock" / module).read_text(encoding="utf-8")
+    for c in changes_of(m):
+        if c["module"] == module:
+            src = apply_change(src, c)
+    return src
+
+
 def materialise() -> list[str]:
     written = []
     for m in _catalog():
-        src = (REF / "ledgerlock" / m["module"]).read_text(encoding="utf-8")
-        out = MUT / m["id"] / m["module"]
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(apply_change(src, m), encoding="utf-8")
-        written.append(str(out.relative_to(ROOT)))
+        for module in modules_of(m):
+            out = MUT / m["id"] / module
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(_expected_module(m, module), encoding="utf-8")
+            written.append(str(out.relative_to(ROOT)))
     return written
 
 
+def lines_changed(m: dict) -> dict:
+    """Per touched module, the lines removed and added between the reference and the committed mutant (difflib)."""
+    out = {}
+    for module in modules_of(m):
+        ref = (REF / "ledgerlock" / module).read_text(encoding="utf-8").split("\n")
+        actual = (MUT / m["id"] / module).read_text(encoding="utf-8").split("\n")
+        changed = [d for d in difflib.ndiff(ref, actual) if d[:1] in "+-"]
+        out[module] = {"removed": sum(1 for d in changed if d.startswith("-")),
+                       "added": sum(1 for d in changed if d.startswith("+"))}
+    return out
+
+
 def mutant_problems() -> list[str]:
-    """Every committed mutant file equals the reference module plus exactly its catalogued change (measured by
-    difflib, not trusted); ids unique; targets and modules known."""
+    """Every committed mutant file equals the reference module plus exactly its catalogued changes (measured by
+    difflib, not trusted): one anchor line removed per change, no more lines added than the change declares; a
+    mutant with more than one change carries its rationale; ids unique; modules known."""
     out = []
     seen = set()
     for m in _catalog():
         if m["id"] in seen:
             out.append(f"{m['id']}: duplicated id")
         seen.add(m["id"])
-        ref = (REF / "ledgerlock" / m["module"])
-        path = MUT / m["id"] / m["module"]
-        if not ref.is_file() or not path.is_file():
-            out.append(f"{m['id']}: reference module or mutant file missing")
-            continue
-        try:
-            expected = apply_change(ref.read_text(encoding="utf-8"), m)
-        except ValueError as e:
-            out.append(str(e))
-            continue
-        actual = path.read_text(encoding="utf-8")
-        if actual != expected:
-            out.append(f"{m['id']}: the committed file is not the reference plus the catalogued change")
-        changed = [d for d in difflib.ndiff(ref.read_text(encoding="utf-8").split("\n"), actual.split("\n"))
-                   if d[:1] in "+-"]
-        removed = sum(1 for d in changed if d.startswith("-"))
-        added = sum(1 for d in changed if d.startswith("+"))
-        if removed != 1 or added > (len(m["after"]) if isinstance(m["after"], list) else 1):
-            out.append(f"{m['id']}: not a one-line change (removed {removed}, added {added})")
+        changes = changes_of(m)
+        if len(changes) > 1 and not m.get("multi_line_rationale"):
+            out.append(f"{m['id']}: {len(changes)} changes without multi_line_rationale")
+        for module in modules_of(m):
+            if module not in MODULES:
+                out.append(f"{m['id']}: unknown module {module}")
+                continue
+            ref = REF / "ledgerlock" / module
+            path = MUT / m["id"] / module
+            if not ref.is_file() or not path.is_file():
+                out.append(f"{m['id']}: reference module or mutant file missing ({module})")
+                continue
+            try:
+                expected = _expected_module(m, module)
+            except ValueError as e:
+                out.append(str(e))
+                continue
+            if path.read_text(encoding="utf-8") != expected:
+                out.append(f"{m['id']}: {module} is not the reference plus the catalogued change(s)")
+                continue
+            mine = [c for c in changes if c["module"] == module]
+            allowed_added = sum(len(c["after"]) if isinstance(c["after"], list) else (0 if c["after"] is None else 1)
+                                for c in mine)
+            counts = lines_changed(m)[module]
+            # an insertion keeps its anchor line, so difflib removes nothing for it; a replacement or deletion
+            # removes exactly its anchor — never more lines than the declared changes, never more added than declared
+            if counts["removed"] > len(mine) or counts["added"] > allowed_added or counts["removed"] + counts["added"] == 0:
+                out.append(f"{m['id']}: {module} differs by more than the declared change(s) "
+                           f"(removed {counts['removed']}, added {counts['added']})")
+        extra = {f for f in (MUT / m["id"]).glob("*.py")} - {MUT / m["id"] / module for module in modules_of(m)} \
+            if (MUT / m["id"]).is_dir() else set()
+        if extra:
+            out.append(f"{m['id']}: uncatalogued files {sorted(p.name for p in extra)}")
     return out
 
 
@@ -402,7 +463,8 @@ def _tree_with(mutant: dict | None, work: pathlib.Path) -> pathlib.Path:
     tree = work / (mutant["id"] if mutant else "reference")
     shutil.copytree(REF, tree)
     if mutant:
-        shutil.copy(MUT / mutant["id"] / mutant["module"], tree / "ledgerlock" / mutant["module"])
+        for module in modules_of(mutant):
+            shutil.copy(MUT / mutant["id"] / module, tree / "ledgerlock" / module)
     return tree
 
 
@@ -441,6 +503,8 @@ def evaluate(results: dict) -> dict:
         out["mutants"][m["id"]] = {
             "target": m["target"], "expected_failing": sorted(m["expect_fail"]),
             "consequential_declared": sorted(m.get("consequential", [])),
+            "changes": len(changes_of(m)), "lines_changed": lines_changed(m),
+            "one_line": len(changes_of(m)) == 1, "multi_line_rationale": m.get("multi_line_rationale"),
             "observed_failing": failing,
             "red_on_target": all(a in failing for a in m["expect_fail"]),
             "undeclared_failures": sorted(set(failing) - declared),
@@ -462,6 +526,21 @@ def vacuous_runner_rejected(acc, tree: pathlib.Path) -> bool:
     return all(r["ok"] for r in res.values())   # True: the vacuous runner saw no failure on a mutant -> rejected
 
 
+def in_tree_resolution_rejected(acc, tree: pathlib.Path, other: pathlib.Path) -> bool:
+    """Harness calibration for the in-tree half of A-13-a. Under `python -I` with only the tree on sys.path a product
+    tree cannot make `ledgerlock` resolve outside itself, so no product mutant can witness that half; its negative
+    witness is the harness importing another tree: `lib` is pointed at `other` while A-13-a evaluates `tree`, and
+    the assertion must go RED for that reason (the module file is not inside the tree)."""
+    original = acc.lib
+    acc.lib = lambda t, code: original(other, code)
+    try:
+        with tempfile.TemporaryDirectory(prefix="ledgerlock-cal-") as w:
+            res = acc.check(tree, "A-13-a", pathlib.Path(w) / "cal")
+    finally:
+        acc.lib = original
+    return res["ok"] is False and "module inside the tree False" in res["detail"]
+
+
 def run() -> dict:
     acc = _module("ledgerlock_reference_acceptance", FIX / "acceptance.py")
     problems = mutant_problems() + stdlib_problems() + independence_problems() + mapping_problems()
@@ -478,8 +557,14 @@ def run() -> dict:
     with tempfile.TemporaryDirectory(prefix="ledgerlock-cal-") as t:
         first = _catalog()[0]
         vacuous = vacuous_runner_rejected(acc, _tree_with(first, pathlib.Path(t)))
+        pristine = _tree_with(None, pathlib.Path(t))
+        other = pathlib.Path(t) / "other"
+        shutil.copytree(REF, other)
+        in_tree = in_tree_resolution_rejected(acc, pristine, other)
     if not vacuous:
         problems.append("the vacuous-runner calibration did not behave as expected")
+    if not in_tree:
+        problems.append("the in-tree resolution calibration did not behave as expected")
     freeze = _load(FREEZE_REL)
     planned = {m["id"]: m for m in freeze["planned"]["mutants"]}
     actual = {m["id"]: m for m in _catalog()}
@@ -502,7 +587,8 @@ def run() -> dict:
                          "interpretation": INTERPRETATION},
         "fixture": {rel: _identity(FIX / rel) for rel in ("REQUIREMENTS.md", "acceptance.py", "MUTANTS.json", "REQUIREMENTS-MAP.json")}
                    | {f"reference/{rel}": _identity(REF / rel) for rel in REFERENCE_MODULES}
-                   | {f"mutants/{m['id']}/{m['module']}": _identity(MUT / m["id"] / m["module"]) for m in _catalog()},
+                   | {f"mutants/{m['id']}/{module}": _identity(MUT / m["id"] / module)
+                      for m in _catalog() for module in modules_of(m)},
         "requirement_map": json.loads((FIX / "REQUIREMENTS-MAP.json").read_text(encoding="utf-8"))["requirements"],
         "mutant_catalog": _catalog(),
         "static": {"stdlib_only": stdlib_problems() == [], "independence": independence_problems() == [],
@@ -514,8 +600,12 @@ def run() -> dict:
         "mutant_count": len(_catalog()),
         "all_mutants_red_on_target": all(r["valid"] for r in ev["mutants"].values()),
         "harness_calibration": {"vacuous_runner_rejected": vacuous,
+                                "in_tree_resolution_rejected": in_tree,
                                 "rule": "a runner whose every assertion passes reports no RED for a mutant; the run "
-                                        "refuses to qualify under it"},
+                                        "refuses to qualify under it. The in-tree half of A-13-a cannot be violated "
+                                        "by a product tree under python -I isolation, so its negative witness is the "
+                                        "harness importing another tree, which A-13-a must reject"},
+        "supersedes": SUPERSEDES,
         "problems": problems,
         "verdict": "REFERENCE GREEN, EVERY MUTANT RED ON TARGET" if not problems else "NOT QUALIFIED",
     }

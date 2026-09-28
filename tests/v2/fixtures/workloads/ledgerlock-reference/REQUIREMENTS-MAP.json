@@ -395,8 +395,10 @@
    "assertions": [
     "A-10-a"
    ],
-   "mutants": [],
-   "interpretation": "no mutant: an import outside the set is caught by the assertion itself and would be artificial"
+   "mutants": [
+    "M-10-1"
+   ],
+   "interpretation": "the negative witness is a used import of a module outside the allowed set (M-10-1, two inserted lines: the import and its use)"
   },
   {
    "id": "R-11",
@@ -426,8 +428,10 @@
    "assertions": [
     "A-12-a"
    ],
-   "mutants": [],
-   "interpretation": "the file-access half is a property of the reference's design (its opens name only those paths); no mutant, as one would be artificial"
+   "mutants": [
+    "M-12-1"
+   ],
+   "interpretation": "the negative witness is an os.system call in the write path (M-12-1); the file-access half is a property of the reference's design (its opens name only those paths) and has no separate mutant"
   },
   {
    "id": "R-13",
@@ -447,8 +451,10 @@
    "assertions": [
     "A-13-a"
    ],
-   "mutants": [],
-   "interpretation": "__main__.py is added so that `python -m ledgerlock` (R-9) runs; tests/, docs/, README and pyproject are the product repository's concern, not the reference's"
+   "mutants": [
+    "M-13-1"
+   ],
+   "interpretation": "the negative witness for the layout half is M-13-1 (ledger.py no longer defines apply_batch; the package re-exports a renamed function under that name); the in-tree resolution half cannot be violated by a product tree under python -I isolation and is witnessed by a harness calibration (the harness importing another tree is rejected by A-13-a). __main__.py is added so that `python -m ledgerlock` (R-9) runs; tests/, docs/, README and pyproject are the product repository's concern, not the reference's"
   },
   {
    "id": "R-14",

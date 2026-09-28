@@ -97,6 +97,29 @@
   {"id": "M-9-3", "target": "R-9", "module": "cli.py", "category": "malformed output behaviour",
    "before": "        return EXIT_OK if verdict.ok else EXIT_CORRUPT", "after": "        return EXIT_OK",
    "consequence": "verify exits 0 whatever the verdict (the verdict on stdout is still correct)",
-   "expect_fail": ["A-9-b"], "consequential": []}
+   "expect_fail": ["A-9-b"], "consequential": []},
+  {"id": "M-10-1", "target": "R-10", "module": ["ledger.py"], "category": "disallowed import",
+   "changes": [
+    {"module": "ledger.py", "before": "import tempfile", "after": ["import tempfile", "import time"]},
+    {"module": "ledger.py", "before": "        self._known_length = None   # what this instance last wrote; informative only, never a verdict's input",
+     "after": ["        self._known_length = None   # what this instance last wrote; informative only, never a verdict's input",
+               "        self._opened_at = time.time()   # a convenience field: when this instance was opened"]}
+   ],
+   "multi_line_rationale": "a disallowed module that is actually used needs its import statement and its use; joining them on one line with a semicolon would be an artificial one-line form, so the mutation is two inserted lines",
+   "consequence": "ledger.py imports `time`, a module outside the allowed standard-library set of R-10, to stamp when a Ledger instance was opened; behaviour is otherwise unchanged",
+   "expect_fail": ["A-10-a"], "consequential": []},
+  {"id": "M-12-1", "target": "R-12", "module": "ledger.py", "category": "side channel",
+   "before": "    os.replace(tmp, path)", "after": ["    os.system(\"sync\")", "    os.replace(tmp, path)"],
+   "consequence": "the atomic write shells out through os.system to flush the disks before the rename: a forbidden side channel (R-12: no os.system); the ledger's bytes are unchanged",
+   "expect_fail": ["A-12-a"], "consequential": []},
+  {"id": "M-13-1", "target": "R-13", "module": ["ledger.py", "__init__.py"], "category": "layout",
+   "changes": [
+    {"module": "ledger.py", "before": "def apply_batch(path: str, ops) -> typing.List[Result]:", "after": "def batch_apply(path: str, ops) -> typing.List[Result]:"},
+    {"module": "__init__.py", "before": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,",
+     "after": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, batch_apply as apply_batch, snapshot, verify,"}
+   ],
+   "multi_line_rationale": "renaming the required definition alone would break the package import and turn every observation red for an import error, hiding the layout defect; re-exporting the renamed function under the required name keeps the tree runnable so the acceptance sees exactly the violation: ledger.py no longer defines apply_batch",
+   "consequence": "ledger.py no longer defines the required name apply_batch (it defines batch_apply); the package hides it by re-exporting the new name as apply_batch, so nothing else observes the change",
+   "expect_fail": ["A-13-a"], "consequential": []}
  ]
 }
