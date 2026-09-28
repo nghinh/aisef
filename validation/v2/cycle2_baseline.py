@@ -105,7 +105,9 @@ def _load(path: pathlib.Path) -> dict:
 
 
 def _sha(path: pathlib.Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    """CRLF-normalised like every digest of the record: a Windows autocrlf checkout compares equal (attempt 1 of
+    WP-2.0.1 failed on Windows because the decision record's digest was taken over raw bytes)."""
+    return hashlib.sha256(_norm(path.read_bytes())).hexdigest()
 
 
 # --------------------------------------------------------------------------------------- build
@@ -159,8 +161,8 @@ def build(root: pathlib.Path = ROOT, *, files=IMMUTABLE_FILES, globs=IMMUTABLE_G
                             "validation/v2/run_history.py (histories, seals)", "validation/v2/v1_evidence_guard.py (V1)"],
         },
         "immutable": {
-            "hash": "sha256 over the file bytes with CRLF normalised to LF; git_blob = sha1 of the git blob header "
-                    "and the same bytes",
+            "hash": "every sha256 of this record is over the file bytes with CRLF normalised to LF (a Windows autocrlf "
+                    "checkout compares equal); git_blob = sha1 of the git blob header and the same bytes",
             "files": immutable,
             "trees": tree_sets,
         },

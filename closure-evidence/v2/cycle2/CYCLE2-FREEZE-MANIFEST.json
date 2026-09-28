@@ -59,7 +59,7 @@
   ]
  },
  "immutable": {
-  "hash": "sha256 over the file bytes with CRLF normalised to LF; git_blob = sha1 of the git blob header and the same bytes",
+  "hash": "every sha256 of this record is over the file bytes with CRLF normalised to LF (a Windows autocrlf checkout compares equal); git_blob = sha1 of the git blob header and the same bytes",
   "files": {
    "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json": {
     "sha256": "10e2e163e2081081a787dd2dadcd4f0a1c5996007a694e2b8d04a185fdabcdba",
