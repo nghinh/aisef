@@ -1,0 +1,3 @@
+{"checker": "cycle2_baseline", "package": "WP-2.0.1", "kind": "throwaway_root_mutation",
+"note": "a temporary root holding the probe sources, one Cycle-1 seal, the decision record and the manifest; the freeze manifest is written for that root, then one byte of the seal changes",
+"expect": "immutable file changed"}

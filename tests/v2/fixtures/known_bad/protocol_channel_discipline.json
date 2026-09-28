@@ -1,0 +1,10 @@
+{
+ "checker": "protocol_channel_discipline",
+ "package": "WP-2.0.1",
+ "kind": "probe_source",
+ "rule": "PROTOCOL_CHANNEL_DISCIPLINE",
+ "path": "aisef2/probe/bad.py",
+ "facts": {"subject_process": "child_of_harness", "stimulus_shape": "invocation"},
+ "source": "HARNESS = '''\nimport sys\nout = sys.stdout\nout.write(\"AISEF2-PROBE READY\")\n'''\n",
+ "expect": "PROTOCOL_CHANNEL_DISCIPLINE aisef2/probe/bad.py:1"
+}

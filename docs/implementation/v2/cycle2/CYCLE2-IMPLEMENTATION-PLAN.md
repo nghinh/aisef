@@ -38,18 +38,20 @@ with four probe designs, and leaves the 6 test-named criteria and the 28 ambigui
 
 ## 3. Phases (P0–P10) and what each produces
 
-- **C2-P0 Freeze / registry / reference fixture.** WP-2.0.1 binds the baseline above and generalises the Cycle-1 plan
-  validator. WP-2.0.2 adds the probe registry catalogue and six Q0 checkers, each with a known-bad fixture. WP-2.0.3
-  writes a stdlib reference implementation of LedgerLock from the frozen requirements with named mutants — the
-  falsifiability fixture; never AISEF output, never the developer's candidate.
+- **C2-P0 Freeze / registry / guards / reference fixture.** WP-2.0.1 (authorized 2026-09-28) binds the baseline above
+  with a guard (`validation/v2/cycle2_baseline.py`), adds the harness-owned probe catalog (`aisef2/probe/catalog.py`),
+  the probe Q0 rules (`validation/v2/probe_static_checks.py`), seven calibrated checkers each with a known-bad fixture,
+  and the owner-decision record. WP-2.0.3 writes a stdlib reference implementation of LedgerLock from the frozen
+  requirements with named mutants — the falsifiability fixture; never AISEF output, never the developer's candidate.
 - **C2-P1 `file_artifact`.** Reads the git object store at the revision; `exists`, `content`, `grep_count`; `FULL`
   enforcement with the weakest path named. Closes the 4 prohibitions.
 - **C2-P2 `cli_invocation`.** A harness that runs a module of the revision as `__main__` with argv, a workspace and
   pre-steps; the protocol on a dedicated channel (DESIGN-CHECK-1); four classes. Closes the 17 CLI criteria.
 - **C2-P3 `process_effect`.** A closed scenario vocabulary over a fresh workspace; three classes; the `fault` step only
   after DECISION-2. Closes the 32 effect criteria (30 without the fault step).
-- **C2-P4 `python_callable` extensions.** `returns_bytes`, `equals`, `workspace`, `raises` attrs, at a new digest
-  (or a second probe id, DECISION-6). Closes the 8 observable gaps.
+- **C2-P4 `python_callable` second identity.** `returns_bytes`, `equals`, `workspace`, `raises` attrs under a second
+  probe id in a new module (DECISION-6); the Cycle-1 module and digest stay byte-identical (guard rule R2). Closes the
+  8 observable gaps.
 - **C2-P5 Contract authoring aid.** Turns PLAN-V2.1's criteria into V2 contracts with recorded decisions, compiles and
   statically admits them, and produces a LedgerLock PLAN-V2.2 proposal for owner approval — a new development
   experiment under RFC §30, never a change to the P10 record.

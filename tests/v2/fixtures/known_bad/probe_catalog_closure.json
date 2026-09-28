@@ -1,0 +1,23 @@
+{
+ "checker": "probe_catalog_closure",
+ "package": "WP-2.0.1",
+ "kind": "catalog_facts",
+ "entries": [
+  {"probe_id": "probe.python_callable", "probe_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "subject_kind": "python_callable", "classes": ["exists", "returns", "raises", "blocks"],
+   "module": "aisef2/probe/python_callable.py", "fixture_root": "python_callable", "active": true, "cycle": 1,
+   "subject_process": "in_harness_process", "stimulus_shape": "call",
+   "metadata_id": "probe.python_callable", "metadata_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
+ ],
+ "modules": {
+  "aisef2/probe/python_callable.py": {"probe_id": "probe.python_callable",
+   "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "classes": ["exists", "returns", "raises", "blocks"], "metadata_id": "probe.python_callable",
+   "metadata_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+ },
+ "fixtures_present": ["python_callable/exists/positive", "python_callable/exists/negative", "python_callable/returns/positive",
+  "python_callable/returns/negative", "python_callable/raises/positive", "python_callable/raises/negative",
+  "python_callable/blocks/positive", "python_callable/blocks/negative"],
+ "frozen": {"id": "probe.python_callable", "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+ "expect": "catalog digest"
+}

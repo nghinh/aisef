@@ -31,14 +31,16 @@ HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evi
              "P3": "closure-evidence/v2/P3-RUN-HISTORY.json", "P4": "closure-evidence/v2/P4-RUN-HISTORY.json",
              "P5": "closure-evidence/v2/P5-RUN-HISTORY.json", "P6": "closure-evidence/v2/P6-RUN-HISTORY.json",
              "P7": "closure-evidence/v2/P7-RUN-HISTORY.json", "P8": "closure-evidence/v2/P8-RUN-HISTORY.json",
-             "P9": "closure-evidence/v2/P9-RUN-HISTORY.json", "P10": "closure-evidence/v2/P10-RUN-HISTORY.json"}
+             "P9": "closure-evidence/v2/P9-RUN-HISTORY.json", "P10": "closure-evidence/v2/P10-RUN-HISTORY.json",
+             # Cycle 2 (WP-2.0.1): a history per Cycle-2 phase, under the same policy; Cycle-1 histories are sealed
+             "C2-P0": "closure-evidence/v2/cycle2/C2-P0-RUN-HISTORY.json"}
 #: the record that closes a phase's history: a FINAL SEAL for P1-P6; for P7, the owner's acceptance of the corrected
 #: candidate's Q0-Q3 (there is no P7 seal builder — P7 qualifies, it does not seal)
 SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence/v2/P2-FINAL-SEAL.json",
          "P3": "closure-evidence/v2/P3-FINAL-SEAL.json", "P4": "closure-evidence/v2/P4-FINAL-SEAL.json",
          "P5": "closure-evidence/v2/P5-FINAL-SEAL.json", "P6": "closure-evidence/v2/P6-FINAL-SEAL.json",
          "P7": "closure-evidence/v2/P7-ACCEPTANCE.json", "P8": "closure-evidence/v2/P8-ACCEPTANCE.json",
-         "P9": "closure-evidence/v2/P9-ACCEPTANCE.json"}
+         "P9": "closure-evidence/v2/P9-ACCEPTANCE.json", "P10": "closure-evidence/v2/P10-ACCEPTANCE.json"}
 HISTORY_REL = HISTORIES["P1"]
 RESULTS = ("PASS", "FAIL")
 GATE_EFFECTS = ("COUNTS", "DIAGNOSTIC_ONLY", "STOP")

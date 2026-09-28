@@ -1,0 +1,43 @@
+{
+ "record": "AISEF V2 — P10 ACCEPTANCE (LedgerLock DEVELOPMENT / REGRESSION benchmark recorded; Cycle 1 accepted COMPLETE by the owner)",
+ "id": "AISEF-V2-P10-ACCEPTANCE",
+ "authority": "owner decision 'AISEF V2 — CLOSE CYCLE-1 / PREPARE CYCLE-2 ARCHITECTURE ONLY' (2026-09-28): Cycle-1 accepted COMPLETE; confirmed by 'AISEF V2 — CYCLE-2 OWNER DECISIONS / WP-2.0.1 AUTHORIZATION' (2026-09-28): the Cycle-1 semantic baseline remains immutable",
+ "written": "2026-09-28T09:15:44Z",
+ "qualified_semantic_candidate": {
+  "commit": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804"
+ },
+ "p10_evidence": {
+  "regression": {
+   "path": "closure-evidence/v2/P10/LEDGERLOCK-REGRESSION.json",
+   "sha256": "5a0d2bddf52824beca0d6afef7a5e7acb10810cb1e2481bdf36c61ca98a2ccd9"
+  },
+  "workload": {
+   "path": "closure-evidence/v2/P10/WORKLOAD.json",
+   "sha256": "d43211043dd141d388250eb756e2e6d40720093d8f091042944da4babd861463"
+  },
+  "execution_commit": "ebc1a6fae22af94955109f7a89591a24423d658f",
+  "result_commit": "503b3a22f872c212d237e70f03aaba7d83f54d67",
+  "verdicts": {
+   "delivery_verdict": "NOT_REACHED",
+   "plan_quality_verdict": "NOT_CLAIMED",
+   "generalization_claim": "NONE",
+   "benchmark_class": "DEVELOPMENT_REGRESSION"
+  }
+ },
+ "p9_acceptance": {
+  "path": "closure-evidence/v2/P9-ACCEPTANCE.json",
+  "sha256": "7c508afcf63b5d84cb3ac6b907f68ac29295a31eabf47cf47f7719e921fd2eea"
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/P10-RUN-HISTORY.json",
+  "total_attempts": 19,
+  "sha256": "b7107acd44171dcdf00c395a7deb6833e63f05d3c8d9c95d6f5d62161f3ca8d5",
+  "rule": "closed at this count; the completed attempts of 503b3a2 (CI), fb641aa (local, not pushed) and 35f0d0d not yet carried forward open C2-P0-RUN-HISTORY (Cycle 2, WP-2.0.1); nothing rewritten"
+ },
+ "cycle1": {
+  "status": "COMPLETE — accepted by the owner: implementation P1-P6 sealed, ladder Q0-Q5 GREEN on the semantic candidate, LedgerLock regression recorded as typed by the kernel (NOT_REACHED / NOT_CLAIMED / NONE)",
+  "successor": "Cycle 2 — WP-2.0.1 authorized 2026-09-28; history closure-evidence/v2/cycle2/C2-P0-RUN-HISTORY.json"
+ },
+ "verdict": "P10 ACCEPTED / CYCLE-1 COMPLETE"
+}

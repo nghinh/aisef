@@ -393,6 +393,42 @@ def _plan_baseline() -> Checker:
                    ("validation/v2/plan_validate.py",))
 
 
+def _cycle2_baseline() -> Checker:
+    cb = _load("aisef_v2_cycle2_baseline", V2 / "cycle2_baseline.py")
+
+    def bad(fx):
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t)
+            seal = "closure-evidence/v2/P4-FINAL-SEAL.json"
+            for rel in (*cb.PROBE_SOURCES, seal, cb.DECISIONS_REL, cb.MANIFEST_REL, cb.RFC_FREEZE_REL,
+                        cb.F_CONFORMANCE_REL):
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(ROOT / rel, root / rel)
+            record = cb.build(root, files=(seal,), globs=(), trees=())
+            (root / cb.OUT_REL).parent.mkdir(parents=True, exist_ok=True)
+            (root / cb.OUT_REL).write_text(cb.render(record), encoding="utf-8")
+            text = (root / seal).read_text(encoding="utf-8")
+            (root / seal).write_text(text.replace("{", "{ ", 1), encoding="utf-8")
+            return cb.check(root, files=(seal,), globs=(), trees=(), live_probe_digest=cb.CYCLE1_PROBE["digest"])
+    return Checker("cycle2_baseline", "WP-2.0.1", lambda: cb.check(), bad, ("validation/v2/cycle2_baseline.py",))
+
+
+def _probe_catalog_closure() -> Checker:
+    ps = _load("aisef_v2_probe_static_checks", V2 / "probe_static_checks.py")
+    return Checker("probe_catalog_closure", "WP-2.0.1", lambda: ps.check(ROOT, ("PROBE_CATALOG_CLOSURE",)),
+                   lambda fx: ps.closure_problems(fx["entries"], fx["modules"], set(fx["fixtures_present"]), fx["frozen"]),
+                   ("validation/v2/probe_static_checks.py",))
+
+
+def _probe_rule(name: str, rule: str) -> Callable[[], Checker]:
+    def make() -> Checker:
+        ps = _load("aisef_v2_probe_static_checks", V2 / "probe_static_checks.py")
+        return Checker(name, "WP-2.0.1", lambda: ps.check(ROOT, (rule,)),
+                       lambda fx: ps.violations(fx["path"], fx["source"], (fx["rule"],), fx.get("facts")),
+                       ("validation/v2/probe_static_checks.py",))
+    return make
+
+
 REGISTRY: list[Callable[[], Checker]] = [
     _freeze_manifest, _v1_evidence_guard, _arch_catalog, _f_conformance, _plan_validate, _plan_docs_check,
     _state_model_prover, _v2_encoding_scanner, _packaging_check, _run_history,
@@ -410,6 +446,13 @@ REGISTRY: list[Callable[[], Checker]] = [
     _except_boundaries, _invariants_doc,
     _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _p5_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
     _migration_table, _p6_evidence, _old_path_audit,
+    # Cycle 2 (WP-2.0.1): the baseline guard, the probe catalog closure and the probe source rules
+    _cycle2_baseline, _probe_catalog_closure,
+    _probe_rule("no_clock_in_probe_facts", "NO_CLOCK_IN_PROBE_FACTS"),
+    _probe_rule("no_test_artefact_in_probes", "NO_TEST_ARTEFACT_IN_PROBES"),
+    _probe_rule("closed_dispatch_in_scenario_probes", "CLOSED_DISPATCH_IN_SCENARIO_PROBES"),
+    _probe_rule("single_placeholder_token", "SINGLE_PLACEHOLDER_TOKEN"),
+    _probe_rule("protocol_channel_discipline", "PROTOCOL_CHANNEL_DISCIPLINE"),
 ]
 
 

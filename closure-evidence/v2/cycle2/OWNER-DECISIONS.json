@@ -1,0 +1,94 @@
+{
+ "record": "AISEF V2 — CYCLE-2 OWNER DECISIONS (DECISION-1..6), as issued",
+ "id": "AISEF-V2-CYCLE2-OWNER-DECISIONS",
+ "authority": "owner decision 'AISEF V2 — CYCLE-2 OWNER DECISIONS / WP-2.0.1 AUTHORIZATION' (2026-09-28)",
+ "study_accepted": "The Cycle-2 architecture study is ACCEPTED for implementation planning. Commit 35f0d0d is accepted as harness hygiene only. Cycle-1 semantic baseline remains immutable.",
+ "authorized": "WP-2.0.1 ONLY. Do NOT start downstream Cycle-2 packages yet. Do NOT start the first production probe implementation until owner acceptance.",
+ "decisions": [
+  {
+   "id": "DECISION-1",
+   "subject": "universal criteria witness sets",
+   "verdict": "APPROVED_WITH_CONSTRAINTS",
+   "owner_text": "Finite witness sets are a measurement strategy only. They MUST NOT silently convert a universal requirement into a sampled requirement. For every affected criterion record the quantifier semantics explicitly: exhaustive over a finite declared domain; bounded witness measurement; or unsupported for FULL enforcement. If FULL universal enforcement cannot be provided, the probe must declare the appropriate weaker enforcement or refuse admission. No \"N examples passed => universal property proven\".",
+   "mechanical_consequences": [
+    "every contract derived from a universally quantified criterion carries a declared quantifier_semantics of exactly one of: exhaustive_finite_domain, bounded_witness_measurement, unsupported_for_full_enforcement",
+    "a probe answering a bounded witness measurement declares an enforcement level below FULL for that class, or the spec is refused at admission (UNSUPPORTED -> INVALID_SPEC)",
+    "no verdict derived from witnesses is recorded as a proof of the universal property; the ProbeResult detail names the witness set"
+   ],
+   "applies_to": ["WP-2.5.1 (contract authoring aid)", "WP-2.2.2, WP-2.3.1 (class tables and enforcement declarations)"],
+   "criteria": ["01-01-1", "04-03-1", "04-03-2", "04-03-3", "04-03-4", "04-03-5"]
+  },
+  {
+   "id": "DECISION-2",
+   "subject": "controlled process-effect fault step",
+   "verdict": "APPROVED",
+   "owner_text": "It MUST be: harness-owned; a closed typed vocabulary; content-addressed; part of probe/capability identity; deterministic; bounded by StoryScope/ProcessRange authority. Forbidden: arbitrary callback; arbitrary shell; developer-authored executable fault step; subject output expanding destructive authority.",
+   "mechanical_consequences": [
+    "the fault step is a member of the closed scenario step vocabulary (an Enum; Q0 CLOSED_DISPATCH_IN_SCENARIO_PROBES); its parameters are a fixed typed shape, never a callable, a shell string or a developer file",
+    "the fault vocabulary is part of the process_effect probe's source and therefore of its digest and capability identity",
+    "the step runs inside the harness's own process range under the StoryScope; nothing the subject prints or returns can select, widen or trigger a fault or any disposal (INV-MUTATION-AUTHORITY)"
+   ],
+   "applies_to": ["WP-2.3.1 (process_effect probe)"],
+   "criteria": ["01-04-5", "03-01-5"]
+  },
+  {
+   "id": "DECISION-3",
+   "subject": "six test-named LedgerLock criteria",
+   "verdict": "APPROVED_FOR_PROPOSAL_ONLY",
+   "owner_text": "Draft PLAN-V2.2 mappings from test-named criteria to actual product subjects/observables. Do NOT approve the contracts automatically. Do NOT run LedgerLock with PLAN-V2.2. Return the six exact before/after mappings for owner review.",
+   "mechanical_consequences": [
+    "WP-2.5.1 produces LEDGERLOCK-PLAN-V2.2-PROPOSAL with six before/after mappings; the contracts carry no approval record",
+    "no LedgerLock run under PLAN-V2.2 until the owner approves the mappings; QP-2.9 runs only an approved plan",
+    "the P10 record (PLAN-V2.1, NOT_REACHED) is never retuned or re-interpreted"
+   ],
+   "applies_to": ["WP-2.5.1", "QP-2.9"],
+   "criteria": ["05-01-1", "05-01-2", "05-01-3", "05-02-1", "05-02-2", "05-02-3"]
+  },
+  {
+   "id": "DECISION-4",
+   "subject": "two-invocation equality",
+   "verdict": "APPROVED",
+   "owner_text": "Implement as two independent observations under one harness-owned probe contract. Bind: both stimuli; revision; probe identity; normalization policy; equality comparator. Equality MUST NOT depend on wall-clock timing, shared mutable cache, checkout metadata, or previous invocation residue.",
+   "mechanical_consequences": [
+    "an equality observable names both stimuli, the normalization policy and the comparator inside the ProductProofSpec, so all of them enter semantic_hash together with revision and probe identity",
+    "the two observations run in two fresh evaluation directories of the same revision under the same probe; the comparator reads the two normalized results only",
+    "Q0 NO_CLOCK_IN_PROBE_FACTS and the hidden-authority matrix rows (bytecode cache, cwd, residue) apply to both observations"
+   ],
+   "applies_to": ["WP-2.2.2 (cli_invocation classes)", "WP-2.3.1 (process_effect)"],
+   "criteria": ["01-02-2", "01-02-4", "01-02-6", "01-03-2", "01-03-4", "02-02-1", "02-02-5"]
+  },
+  {
+   "id": "DECISION-5",
+   "subject": "LedgerLock PlanQualityPolicy",
+   "verdict": "DO_NOT_PREREGISTER",
+   "owner_text": "DO NOT preregister plan-quality thresholds for the Cycle-2 LedgerLock regression. LedgerLock remains DEVELOPMENT_REGRESSION. For its Cycle-2 rerun: plan_quality_verdict = NOT_CLAIMED. Raw plan-quality metrics are still recorded. Thresholds belong to future preregistered sealed workloads only.",
+   "mechanical_consequences": [
+    "no PLAN-QUALITY-POLICY.json is written for LedgerLock; validation/qualification/p10.py's plan_quality_verdict_of yields NOT_CLAIMED",
+    "raw plan-quality metrics are recorded descriptively, as in Cycle 1",
+    "the Workload state machine keeps LedgerLock at DEVELOPMENT; SEALED/HOLDOUT/EVALUATING refused mechanically"
+   ],
+   "applies_to": ["QP-2.9"],
+   "criteria": []
+  },
+  {
+   "id": "DECISION-6",
+   "subject": "python_callable extensions",
+   "verdict": "KEEP_CYCLE1_PROBE_SECOND_IDENTITY",
+   "owner_text": "KEEP the Cycle-1 python_callable implementation and digest unchanged: 1961e84d... New observation classes MUST ship under a SECOND probe identity. Do not mutate the Cycle-1 probe implementation merely to add: returns_bytes; constant equality; workspace stimulus; richer raises attributes. Existing Cycle-1 ProductProofSpec / semantic_hash evidence remains tied to the original probe. The new probe must have independent: probe_id; probe_digest; capability calibration; falsifiability evidence; mutation evidence; Q1/Q2/Q3 coverage.",
+   "mechanical_consequences": [
+    "aisef2/probe/protocol.py and aisef2/probe/python_callable.py stay byte-identical to the parent's blobs (cycle2_baseline R2); the live digest is checked against the frozen 1961e84d… on every run",
+    "the second identity is a new module with its own PROBE_ID, DIGEST, METADATA, CLASSES, calibration fixture root, mutation targets and Q1/Q2/Q3 coverage; it supersedes the Cycle-1 entry as the one active probe for subject kind python_callable (F4 binds one probe per kind at compile time) while the Cycle-1 entry stays registered so its evidence keeps its observation class (aisef2/probe/catalog.py)",
+    "no Cycle-1 ProductProofSpec is recompiled; new specs compile against the second identity only"
+   ],
+   "applies_to": ["WP-2.4.1"],
+   "criteria": []
+  }
+ ],
+ "f5_hard_guard": "During WP-2.0.1 and every later probe package: if any proposed probe kind requires changing the Probe protocol shape, the ProbeResult shape, the observation-harness / subject split, enforcement semantics, execution-status semantics, owner routing, the ProductProofSpec compiler contract or frozen F1–F11 semantics: STOP, produce an ARCHITECTURE_EXCEPTION proposal, do not implement around it.",
+ "cycle1_immutability": [
+  "Cycle-1 semantic candidate 7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "aisef2 Cycle-1 baseline tree 4d6081940f5b9dae47439f73f0157161e028d804",
+  "P4/P5/P6 seals", "P7/P8/P9 acceptances", "P10 LedgerLock evidence", "V1 evidence",
+  "original python_callable probe implementation/digest 1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+ ]
+}

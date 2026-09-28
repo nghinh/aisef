@@ -1,0 +1,10 @@
+{
+ "checker": "no_test_artefact_in_probes",
+ "package": "WP-2.0.1",
+ "kind": "probe_source",
+ "rule": "NO_TEST_ARTEFACT_IN_PROBES",
+ "path": "aisef2/probe/bad.py",
+ "facts": null,
+ "source": "SUBJECT = \"tests/conftest.py\"\n",
+ "expect": "NO_TEST_ARTEFACT_IN_PROBES aisef2/probe/bad.py:1"
+}

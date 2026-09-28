@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 39,
+ "checker_count": 46,
  "uncovered_checker_modules": [],
- "calibrated_count": 39,
- "always_pass_mutants_rejected": 39,
+ "calibrated_count": 46,
+ "always_pass_mutants_rejected": 46,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -603,6 +603,114 @@
    "observed": [
     "UNENUMERATED authority: aisef/control/gate.py::judge_only (UNREACHABLE) is in the tree and not in the inventory",
     "STALE inventory row: aisef/control/gate.py::judge_nobody no longer resolves to an authority in the tree"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "cycle2_baseline",
+   "package": "WP-2.0.1",
+   "fixture": "tests/v2/fixtures/known_bad/cycle2_baseline.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "immutable file changed",
+   "observed": [
+    "immutable file changed: closure-evidence/v2/P4-FINAL-SEAL.json",
+    "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json differs from a fresh build (an identity, a rule, a decision record or a member set changed)"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "probe_catalog_closure",
+   "package": "WP-2.0.1",
+   "fixture": "tests/v2/fixtures/known_bad/probe_catalog_closure.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "catalog digest",
+   "observed": [
+    "PROBE_CATALOG_CLOSURE probe.python_callable: catalog digest 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' != module 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'",
+    "PROBE_CATALOG_CLOSURE probe.python_callable: catalog metadata digest 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' != module 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'",
+    "PROBE_CATALOG_CLOSURE probe.python_callable: a Cycle-1 entry carries ffffffffffff, the freeze manifest inherits aaaaaaaaaaaa"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "no_clock_in_probe_facts",
+   "package": "WP-2.0.1",
+   "fixture": "tests/v2/fixtures/known_bad/no_clock_in_probe_facts.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "NO_CLOCK_IN_PROBE_FACTS aisef2/probe/bad.py:6",
+   "observed": [
+    "NO_CLOCK_IN_PROBE_FACTS aisef2/probe/bad.py:6: a clock read inside Observation(...)"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "no_test_artefact_in_probes",
+   "package": "WP-2.0.1",
+   "fixture": "tests/v2/fixtures/known_bad/no_test_artefact_in_probes.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "NO_TEST_ARTEFACT_IN_PROBES aisef2/probe/bad.py:1",
+   "observed": [
+    "NO_TEST_ARTEFACT_IN_PROBES aisef2/probe/bad.py:1: names a test artefact 'tests/'"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "closed_dispatch_in_scenario_probes",
+   "package": "WP-2.0.1",
+   "fixture": "tests/v2/fixtures/known_bad/closed_dispatch_in_scenario_probes.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "CLOSED_DISPATCH_IN_SCENARIO_PROBES aisef2/probe/bad.py:2",
+   "observed": [
+    "CLOSED_DISPATCH_IN_SCENARIO_PROBES aisef2/probe/bad.py:2: dispatch on step ends in a default branch"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "single_placeholder_token",
+   "package": "WP-2.0.1",
+   "fixture": "tests/v2/fixtures/known_bad/single_placeholder_token.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "SINGLE_PLACEHOLDER_TOKEN aisef2/probe/bad.py:1",
+   "observed": [
+    "SINGLE_PLACEHOLDER_TOKEN aisef2/probe/bad.py:1: token '<tmp>'; only <ws> is substituted"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "protocol_channel_discipline",
+   "package": "WP-2.0.1",
+   "fixture": "tests/v2/fixtures/known_bad/protocol_channel_discipline.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "PROTOCOL_CHANNEL_DISCIPLINE aisef2/probe/bad.py:1",
+   "observed": [
+    "PROTOCOL_CHANNEL_DISCIPLINE aisef2/probe/bad.py:1: child script HARNESS uses sys.stdout (its line 3); the subject owns it"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

@@ -1,0 +1,10 @@
+{
+ "checker": "no_clock_in_probe_facts",
+ "package": "WP-2.0.1",
+ "kind": "probe_source",
+ "rule": "NO_CLOCK_IN_PROBE_FACTS",
+ "path": "aisef2/probe/bad.py",
+ "facts": null,
+ "source": "import time\nfrom aisef2.probe.protocol import Observation, ObservationKind\n\n\ndef observe(spec, at, env, verdict):\n    return Observation(ObservationKind.OBSERVED, verdict, detail=str(time.monotonic()))\n",
+ "expect": "NO_CLOCK_IN_PROBE_FACTS aisef2/probe/bad.py:6"
+}
