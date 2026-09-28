@@ -237,6 +237,32 @@
    "owned_escaped": 0,
    "owned_released_empty": true,
    "owned_range_mechanism": "posix-session-and-group"
+  },
+  {
+   "seq": 11,
+   "commit": "609371d74f2444c4cdb971203343c30f2e4c220e",
+   "package": "QP-9 Q5 reproduction attempt 1 (seven corpus items, model stream replayed, everything else executed again; owned range)",
+   "attempt": 1,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "Q5 reproduction (closure-evidence/v2/Q5/REPRODUCTION.json)",
+   "tests_run": 7,
+   "gate_effect": "COUNTS",
+   "result": "PASS",
+   "failing_tests": [],
+   "classification": null,
+   "one_identity": "6433296388866350e266721fb739acd6ee6d3af84551e8f4c1a51e0582a39c75",
+   "items_green": 7,
+   "model_calls_consumed": 20,
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
   }
  ]
 }
