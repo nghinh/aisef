@@ -1,0 +1,99 @@
+{
+ "record": "AISEF V2 — CYCLE-2 WP-2.0.1 ACCEPTANCE (owner)",
+ "id": "AISEF-V2-CYCLE2-WP-2.0.1-ACCEPTANCE",
+ "authority": "owner decision 'AISEF V2 — CYCLE-2 WP-2.0.1 OWNER ACCEPTANCE' (2026-09-28): WP-2.0.1 ACCEPTED / COMPLETE",
+ "written": "2026-09-28T12:32:40Z",
+ "accepted_head": "635bbefc40c7efbd27b1d16fde4ae43a68fc7f2d",
+ "implementation_lineage": [
+  "05e7b9bbdf152db663cb8f647d48e417108f009f",
+  "fe9260b996b08595f6ea9d644c071c6d17e1e5b3",
+  "635bbefc40c7efbd27b1d16fde4ae43a68fc7f2d"
+ ],
+ "cycle2_aisef2_tree": "2c67d47a7c8fc9ce80f0db86dbdc48ffe60ece70",
+ "inherited": {
+  "cycle1_semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "cycle1_aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+  "probe_python_callable_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+ },
+ "owner_findings": [
+  "Cycle-1 frozen identities remain bound.",
+  "Original python_callable and protocol implementations remain unchanged.",
+  "New catalog code does not introduce production probe execution.",
+  "Probe catalog is closed and mechanically checked.",
+  "Seven new Q0 checks are calibrated against known-bad fixtures.",
+  "46/46 Q0 checkers calibrated.",
+  "46/46 always-PASS checker mutants rejected.",
+  "F1-F11 = 11 PASS / 0 pending / 0 fail.",
+  "V1 guard remains PASS.",
+  "Local and multi-platform CI are green on accepted HEAD.",
+  "Failed harness attempts remain preserved and correctly classified.",
+  "No residual process ownership remains.",
+  "No architecture exception is required.",
+  "PR #6 remains unmerged.",
+  "No downstream package has consumed WP-2.0.1 output."
+ ],
+ "record_correction": {
+  "owner_instruction": "Do not state 'No Cycle-1 evidence was altered.' State instead: 'No frozen/immutable Cycle-1 evidence was altered. Q0-CHECKER-CALIBRATION.json, explicitly treated as a living checker-calibration record, was regenerated for the expanded checker set.'",
+  "statement": "No frozen/immutable Cycle-1 evidence was altered. Q0-CHECKER-CALIBRATION.json, explicitly treated as a living checker-calibration record, was regenerated for the expanded checker set.",
+  "applied_to": [
+   "docs/implementation/v2/cycle2/cycle2-manifest.json (architecture_baseline.rule)",
+   "this record"
+  ],
+  "non_blocking": true
+ },
+ "owner_verdict": "WP-2.0.1 ACCEPTED. The catalog may now serve as the authoritative Cycle-2 probe-registration boundary, subject to the frozen OWNER-DECISIONS and Cycle-2 manifest. No retroactive change to Cycle-1 qualification is implied.",
+ "bound_records": {
+  "freeze_manifest": {
+   "path": "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json",
+   "sha256": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad"
+  },
+  "owner_decisions": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "cycle2_manifest": {
+   "path": "docs/implementation/v2/cycle2/cycle2-manifest.json",
+   "sha256": "f4293366e53853259c58306b55c4992c7bd45e26fe2dea0bf92e4c8cf050bbc7",
+   "note": "wording of architecture_baseline.rule corrected at acceptance; the freeze manifest's sha256_at_freeze names the accepted-HEAD version"
+  },
+  "checker_calibration": {
+   "path": "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json",
+   "sha256": "e51c6bfb723bdca5598535448b9574cb2e76c6870d73731c08092f2b3c4b8f6a",
+   "kind": "living checker-calibration record, regenerated for 46 checkers"
+  },
+  "p10_acceptance": {
+   "path": "closure-evidence/v2/P10-ACCEPTANCE.json",
+   "sha256": "5a534173c838c7474c9e4d90fec83864284f160e6da5d3265267d35b9303cb90"
+  }
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/cycle2/C2-P0-RUN-HISTORY.json",
+  "entries_at_acceptance": 34,
+  "failed": [
+   {
+    "seq": 9,
+    "commit": "fb641aa",
+    "where": "local",
+    "job": "gate (full suite in the owned range)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 18,
+    "commit": "05e7b9b",
+    "where": "local",
+    "job": "gate (full suite in the owned range)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 21,
+    "commit": "fe9260b",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS"
+   }
+  ],
+  "rule": "the phase C2-P0 stays open (WP-2.0.3 not started); the attempts of 635bbef are carried (seq 27-34); the attempts of this record's commit pend until the next permitted evidence commit"
+ },
+ "authorization_state": "no downstream package authorized; no production probe implementation until owner authorization; PR #6 unmerged",
+ "verdict": "WP-2.0.1 ACCEPTED / COMPLETE"
+}

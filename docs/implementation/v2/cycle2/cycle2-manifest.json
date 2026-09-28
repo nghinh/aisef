@@ -19,7 +19,7 @@
   "v1_evidence": {"V1-EVIDENCE-BASELINE.json": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb", "AISEF-W0-QUALIFICATION.json": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3", "product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"},
   "migration_table": "157b46f6786d849591f9c08b02a39f48a08c18d69d9e34cf7c3c98ccd5a6752f",
   "guard": "validation/v2/cycle2_baseline.py --check (closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json)",
-  "rule": "immutable; Cycle 2 builds on top of it; no Cycle-1 evidence, seal, qualification record, attempt history or V1 evidence is regenerated"
+  "rule": "immutable; Cycle 2 builds on top of it; no frozen/immutable Cycle-1 evidence (seal, acceptance, sealed attempt history, qualification evidence tree, V1 evidence, probe implementation) is altered or regenerated; living checker-calibration records (Q0-CHECKER-CALIBRATION.json) are regenerated for an expanded checker set and are not Cycle-1 evidence (owner record correction, WP-2.0.1 acceptance)"
  },
  "objective": "expand ProductProof coverage (cli_invocation, file_artifact, process_effect, a second python_callable identity) while preserving every Cycle-1 assurance property; no frozen item changes; no architecture exception is required (see CYCLE2-F5-COMPATIBILITY-REPORT.md)",
  "owner_decisions": {
