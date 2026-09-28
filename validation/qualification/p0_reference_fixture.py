@@ -49,7 +49,7 @@ REQUIREMENTS_SRC = pathlib.Path("/Users/nghinh/Downloads/projects/ledgerlock-ais
 REFERENCE_MODULES = ("ledgerlock/__init__.py", "ledgerlock/__main__.py", "ledgerlock/ledger.py", "ledgerlock/cli.py")
 #: R-10: the modules the frozen requirements allow the reference to import (plus __future__).
 ALLOWED_IMPORTS = {"hashlib", "json", "os", "sys", "pathlib", "tempfile", "argparse", "unittest", "typing",
-                   "unicodedata", "uuid", "__future__"}
+                   "unicodedata", "uuid", "__future__", "ledgerlock"}   # the package's own modules
 FORBIDDEN_NAMES = ("aisef", "aisef2", "ledgerlock_aiseftest", "ai-sdlc", "ai_sdlc", "closure-evidence", "_bmad-output")
 
 
@@ -145,6 +145,20 @@ PLANNED_MUTANTS = [
     ("M-9-2", "R-9", "cli.py", "an I/O error exits 1 instead of 3", ["A-9-d"]),
     ("M-9-3", "R-9", "cli.py", "verify exits 0 whatever the verdict", ["A-9-b"]),
 ]
+
+
+#: Where the committed catalog departs from the freeze's plan, and why (owner section 3: never silently absorbed).
+DEVIATION_NOTES = {
+    "M-3.1-1": "planned as 'normalisation returns the raw key'; committed as 'normalises to NFD instead of NFC' — "
+               "the raw-key form left the unicodedata import unused (a lint-visible, not a behavioural, difference); "
+               "the NFD form is a defect of the same requirement with the same target assertion",
+    "M-4.3-2": "planned as 'the line is written before the conflict is raised'; not committed — moving the write is "
+               "not a one-line change, and the 'no line appended' half of R-4.3 is measured by A-4.3-a's line count "
+               "under M-4.3-1",
+    "A-3.3-f": "assertion added beyond the plan: a removed middle line (A-3.3-e) is caught by the hash recomputation "
+               "alone, so the prev_hash-equals-previous-hash rule of R-3.3 needed its own observation (a changed "
+               "prev_hash field); without it M-3.3-2 was equivalent under the suite and would have been rejected",
+}
 
 
 def identities() -> dict:
@@ -464,10 +478,14 @@ def run() -> dict:
     freeze = _load(FREEZE_REL)
     planned = {m["id"]: m for m in freeze["planned"]["mutants"]}
     actual = {m["id"]: m for m in _catalog()}
-    deviations = [f"planned mutant {i} not committed" for i in planned if i not in actual] + \
+    planned_a = {a for ids in freeze["planned"]["assertions"].values() for a in ids}
+    deviations = [f"assertion {a} not in the plan" for a in acc.ASSERTIONS if a not in planned_a] + \
+                 [f"planned assertion {a} not committed" for a in sorted(planned_a) if a not in acc.ASSERTIONS] + \
+                 [f"planned mutant {i} not committed" for i in planned if i not in actual] + \
                  [f"mutant {i} not in the plan" for i in actual if i not in planned] + \
                  [f"{i}: target {actual[i]['target']} != planned {planned[i]['target']}" for i in actual
-                  if i in planned and actual[i]["target"] != planned[i]["target"]]
+                  if i in planned and actual[i]["target"] != planned[i]["target"]] + \
+                 [f"{i}: {note}" for i, note in DEVIATION_NOTES.items()]
     record = {
         "record": "AISEF V2 — WP-2.0.3 REFERENCE FIXTURE (LedgerLock reference workload, acceptance and mutants)",
         "work_package": "WP-2.0.3",
