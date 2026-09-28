@@ -1,0 +1,37 @@
+{
+ "record": "AISEF V2 — P9 ACCEPTANCE (Q5 real-execution reproduction accepted by the owner)",
+ "id": "AISEF-V2-P9-ACCEPTANCE",
+ "authority": "owner decision 'AISEF V2 — P10 / QP-10 EXECUTION AUTHORIZATION / LEDGERLOCK DEVELOPMENT / REGRESSION BENCHMARK ONLY' (2026-09-28): P9 / Q5 ACCEPTED and COMPLETE",
+ "written": "2026-09-28T04:38:06Z",
+ "qualified_semantic_candidate": {
+  "commit": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804"
+ },
+ "p9_evidence": {
+  "reproduction": {
+   "path": "closure-evidence/v2/Q5/REPRODUCTION.json",
+   "sha256": "5f0ba2f7e615b8a703ce6c824fb47c0c268bbabea9929b392c9fc88ce57087ce"
+  },
+  "subject": {
+   "path": "closure-evidence/v2/Q5/SUBJECT.json",
+   "sha256": "10c887a1af4e450592847ac9eadf5b69124b88c4aee948ed93393effc59fd5aa"
+  },
+  "execution_commit": "609371d74f2444c4cdb971203343c30f2e4c220e",
+  "result_commit": "357358c32cf2799cf0d28431d43fc36635f31e30"
+ },
+ "p8_acceptance": {
+  "path": "closure-evidence/v2/P8-ACCEPTANCE.json",
+  "sha256": "4f6e0b259bb3d07809e73e98e15fe4db6fa4526480334cfa958141bb02ee679d"
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/P9-RUN-HISTORY.json",
+  "total_attempts": 11,
+  "sha256": "8567c19ed77f55cdc4a166c5ac9d501eb9f553ee5475025115922cf7813e30c5",
+  "rule": "closed at this count; the completed attempts of 609371d and 357358c not yet carried forward open P10-RUN-HISTORY (owner §2); nothing rewritten"
+ },
+ "p10": {
+  "status": "AUTHORIZED — LedgerLock DEVELOPMENT / REGRESSION benchmark on 7114177 (final cycle-1 package)",
+  "history": "closure-evidence/v2/P10-RUN-HISTORY.json"
+ },
+ "verdict": "P9 ACCEPTED"
+}
