@@ -428,6 +428,32 @@
    "owned_escaped": 0,
    "owned_released_empty": true,
    "owned_range_mechanism": "posix-session-and-group"
+  },
+  {
+   "seq": 19,
+   "commit": "ebc1a6fae22af94955109f7a89591a24423d658f",
+   "package": "QP-10 LedgerLock regression attempt 2 (workload compiled and put to static admission; owned range)",
+   "attempt": 2,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "P10 LedgerLock regression run (closure-evidence/v2/P10/LEDGERLOCK-REGRESSION.json)",
+   "tests_run": 77,
+   "gate_effect": "COUNTS",
+   "result": "PASS",
+   "failing_tests": [],
+   "classification": null,
+   "delivery_verdict": "NOT_REACHED",
+   "plan_quality_verdict": "NOT_CLAIMED",
+   "plan_admitted": false,
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
   }
  ]
 }
