@@ -402,6 +402,33 @@
    "owned_escaped": 0,
    "owned_released_empty": true,
    "owned_range_mechanism": "posix-session"
+  },
+  {
+   "seq": 18,
+   "commit": "05e7b9bbdf152db663cb8f647d48e417108f009f",
+   "package": "WP-2.0.1 attempt 1 (baseline guard, catalog, probe rules, histories); local gate",
+   "attempt": 1,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "gate (full suite in the owned range)",
+   "result": "FAIL",
+   "tests_run": 4774,
+   "classification": "HARNESS",
+   "classification_evidence": "validation/v2/run_history.record wrote the open history without creating its parent directory; C2-P0-RUN-HISTORY is the first history under a sub-directory (closure-evidence/v2/cycle2/), so the throwaway root of tests/v2/p1/test_run_history.py raised FileNotFoundError (errors=1 of 4774); a recorder defect in the validation harness, not in the kernel or the evidence; corrected in the next commit (record creates the parent directory); 05e7b9b was never pushed",
+   "known_defect": null,
+   "failing_tests": [
+    "v2.p1.test_run_history.RunHistory.test_sealed_histories_are_closed_and_new_attempts_go_to_the_open_phase"
+   ],
+   "gate_effect": "COUNTS",
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
   }
  ]
 }

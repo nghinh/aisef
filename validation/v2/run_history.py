@@ -194,6 +194,7 @@ def record(fields: dict, root: pathlib.Path = ROOT, phase: str | None = None) ->
     if problems:
         raise SystemExit("refusing to record: " + "; ".join(problems))
     doc["entries"].append(entry)
+    path.parent.mkdir(parents=True, exist_ok=True)   # a Cycle-2 history lives under closure-evidence/v2/cycle2/
     path.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     return entry
 
