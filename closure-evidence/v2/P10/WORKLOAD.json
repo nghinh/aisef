@@ -1,0 +1,2552 @@
+{
+ "record": "AISEF V2 — P10 LedgerLock workload in V2 form (PLAN-V2.1's 77 criteria, their kinds, the kernel's typed answers)",
+ "plan": {
+  "id": "W1-LEDGERLOCK-PLAN-V2.1",
+  "plan_hash": "bc71a701dd84f7227e8a474b9c9e0aec05ca3e10c0eb53168bcdba0bb8242a32",
+  "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "stories": 16,
+  "criteria": 77,
+  "obligations_by_role": {
+   "INTRODUCE": 66,
+   "PRESERVE": 11,
+   "VERIFY": 0
+  },
+  "v1_plan_commit": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "v1_modes": {
+   "CHANGE_REQUIRED": 66,
+   "PRESERVE_REQUIRED": 7,
+   "NEGATIVE_INVARIANT": 4
+  }
+ },
+ "requirements": {
+  "FR-1": {
+   "hash": "28d8803544f6892905ebb779025e42a643e6957e2030aa0af72fbd737680ccb0",
+   "title": "NFC key normalization"
+  },
+  "FR-2": {
+   "hash": "9b3457b253341edf3912718635ccae1ab7243cc75b304b6e514638b93437de0b",
+   "title": "SHA-256 hash chain over canonical bytes"
+  },
+  "FR-3": {
+   "hash": "e54fae7fefddfa6fd6e776a376b8dc5b427d294e9694c8a9eced0dd784aed818",
+   "title": "Idempotent replay by rid"
+  },
+  "FR-4": {
+   "hash": "f240f18413d7a080585460a69120e1db46afefce11c463624debe2bdf51e0b6e",
+   "title": "Conflict detection by rid"
+  },
+  "FR-5": {
+   "hash": "432947f7359e1230e743d3a2ec2bea7982966c7260b09098f19f3ce8798b1e2c",
+   "title": "Tombstone semantics for delete"
+  },
+  "FR-6": {
+   "hash": "5baafda55be0ac2f03be7587489350188428988228ac2d79e23a423d2092c3b1",
+   "title": "End-to-end verify from disk"
+  },
+  "FR-7": {
+   "hash": "d5970d9d9bba0588f7298aacf2bff407d884eaec33f64571b76cf7a364b8e28b",
+   "title": "Verifier does not trust in-memory cache"
+  },
+  "FR-8": {
+   "hash": "e5ca7165070bdfc48f78f2988f7bda3256444700ca819c0952bdb68b0fdaa339",
+   "title": "Atomic apply_batch"
+  },
+  "FR-9": {
+   "hash": "d0f252f5c78ad042937c391e05d2041535e553236aa444bb8d58c7a9180526a1",
+   "title": "Deterministic snapshot"
+  },
+  "FR-10": {
+   "hash": "f04428a244cc609469fd59797be67d1b80875d454df1303df8b2af47360ffca8",
+   "title": "Repair truncated tail only"
+  },
+  "FR-11": {
+   "hash": "b711c10ff490717283cc20b54071b1f00ab07d9146a6c70dac3065134a20bf39",
+   "title": "CLI subcommands"
+  },
+  "FR-12": {
+   "hash": "868e5a3976976a11c0cc1f48a0f6ada627e22ff04bd89dcbd7415bce654e38e9",
+   "title": "Exact exit-code contract"
+  },
+  "FR-13": {
+   "hash": "e557e4b67795e6cab7c9922408e6a10e15b1167c0f3f352f0e4d1be42c594cca",
+   "title": "fsync before return"
+  },
+  "FR-14": {
+   "hash": "a403e9e36717a50bd72accc61bfec0e50b6c323abf69f711cecda508863978ad",
+   "title": "No network, no subprocess, no extra files"
+  }
+ },
+ "criteria": [
+  {
+   "ac_id": "AC-STORY-01-01-1",
+   "story": "STORY-01-01",
+   "requirement": "FR-1",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:normalize_key",
+   "stimulus": {
+    "args": [
+     "é"
+    ]
+   },
+   "observable": {
+    "returns": "é",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [],
+   "criterion": "Given any string `s`, `from ledgerlock.format import normalize_key; normalize_key(s)` returns `unicodedata.normalize(\"NFC\", s)` byte-for-byte.",
+   "note": "one instance of 'any string s': the NFD form",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-22f042096438a6ab3afa3f1530f90f319ce55bda97ceaabbaffbdf6c1dc1c5c3",
+   "semantic_hash": "824c4c963f4d1b6d035b2c940d15ef299cb42c8bf5f94c7fa60159ae68572a16",
+   "contract_hash": "f39e56e81cb2fdc825d0dd7455cdcb80749c969bcad61935cf3ca60fb6b1064e"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-2",
+   "story": "STORY-01-01",
+   "requirement": "FR-1",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:normalize_key",
+   "stimulus": {
+    "args": [
+     "é"
+    ]
+   },
+   "observable": {
+    "returns": "é",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [],
+   "criterion": "Given the NFC string `\"\\u00e9\"` (U+00E9) and its NFD decomposition `\"e\\u0301\"`, calling `normalize_key` on each returns byte-identical results equal to `\"\\u00e9\"`.",
+   "note": "",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-f296cd544b52a8c99bd4576114b5224b56a66d105ac9cf73eba2864f5fecec0c",
+   "semantic_hash": "fc9c85cd76d0b939376a51506248f413ffc249048906470525b68b7b1deadc7f",
+   "contract_hash": "2d983a7dfe96c1efc8e3c7544c7bb9051c90d61d2f391908861be6b9b12ab1fc"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-3",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock:__file__",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [],
+   "criterion": "Given a fresh `pyproject.toml` declaring `name = \"ledgerlock\"` and `requires-python = \">=3.11\"`, an empty `ledgerlock/` package, and an empty `tests/` directory, `python -c \"import ledgerlock; print(ledgerlock.__file__)\"` prints a path ending in `ledgerlock/__init__.py` with no exception.",
+   "note": "the package imports from the checkout",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-5111adf5d286d8e0e8a4ea0a698578e263d185e365e80dfae1d5cb0a8f9f3960",
+   "semantic_hash": "dd1224cf6b1d892df171f82acd62790687fa9db942646f178f4a8fc2e34bb93c",
+   "contract_hash": "24f3a1383218b5058bd5d3fb0fe1172ca66d71acb2510a792eb291bfc0cf0e42"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-4",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "role": "PRESERVE",
+   "polarity": "MUST_NOT_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "ledgerlock:__path__",
+   "stimulus": {
+    "grep": "^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)"
+   },
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "depends_on_stories": [],
+   "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` exits `1` (zero matches).",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind file_artifact",
+   "contract_hash": "aa38b988061a50e378bf8b319e50856fdf69d00b9402dd3eb826e86b577def28"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-5",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "role": "PRESERVE",
+   "polarity": "MUST_NOT_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "ledgerlock:__path__",
+   "stimulus": {
+    "grep": "os\\.system|subprocess\\.|socket\\."
+   },
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "depends_on_stories": [],
+   "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` exits `1` (zero matches).",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind file_artifact",
+   "contract_hash": "ee66d73c5643ffda1a08de0e5325db2133613f7a7e698eef1624247b6b773872"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-6",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock:Ledger",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [],
+   "criterion": "Given an `__init__.py`, `from ledgerlock import Ledger, ConflictError` returns both names without exception and `Ledger` is a callable class.",
+   "note": "the criterion names two symbols; the contract names the class",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-349dfa52e7114c6b375f793a2ee342459e395664312f754c0895c8d6d295c626",
+   "semantic_hash": "5ce47a69f98ee10ea6761a8006bd64a686e1bbcbbef29926e8de14c7a84c3807",
+   "contract_hash": "a391e9e57b3abc7f05bec075d1c9aed329276bfd32828a26393d1baed0c331aa"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-7",
+   "story": "STORY-01-01",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ledger>",
+     "<extra-positional>"
+    ]
+   },
+   "observable": {
+    "exit_code": 2,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [],
+   "criterion": "Given the registered CLI, `python -m ledgerlock verify <ledger> <extra-positional>` in a subprocess exits `2` and writes nothing to stdout (argparse reports a usage error on stderr).",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "66a99b48353fcd6adaf987cd03bf4a052991ca3ca43a7a195a17fd41e4bf193e"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-1",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "stimulus": {
+    "args": [
+     {
+      "op": "put",
+      "key": "k",
+      "value": 1,
+      "ts": 1,
+      "id": "r"
+     }
+    ]
+   },
+   "observable": {
+    "returns_bytes_hex": "7b226964223a2272222c226b6579223a226b222c226f70223a22707574222c227473223a312c2276616c7565223a317d",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given a dict `line` whose `hash` and `prev_hash` are unset, `canonical_bytes(line)` returns exactly `json.dumps(line, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\")`.",
+   "note": "returns bytes: not a JSON value the probe can compare",
+   "v2_status": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-2600578f3026bcbb48ba034fecb4136553443e9c56d74a4da749592d1512067f: probe.python_callable does not support the observation it asks for",
+   "spec_id": "PPS-2600578f3026bcbb48ba034fecb4136553443e9c56d74a4da749592d1512067f",
+   "semantic_hash": "3328b353bef8c9ae30db0c57001d3b240aa80b72177436f9070bd58ed3fab1c8",
+   "contract_hash": "373924bd083a75de5f4e1bbd9f14774b4bad7e32aaf8e336bf47912cc0f5223b"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-2",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "stimulus": {
+    "args": [
+     {
+      "op": "put",
+      "key": "k",
+      "value": 1,
+      "ts": 1,
+      "id": "r"
+     }
+    ]
+   },
+   "observable": {
+    "returns_bytes_hex": "identical to AC-STORY-01-02-1",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given a second dict element-equal to the first, `canonical_bytes` on it returns bytes byte-identical to the first call's bytes.",
+   "note": "",
+   "v2_status": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-3c5b41e2504d466bbe0aa0710f4a54d8af39b26e586a649f4b95ec8fec677cf5: probe.python_callable does not support the observation it asks for",
+   "spec_id": "PPS-3c5b41e2504d466bbe0aa0710f4a54d8af39b26e586a649f4b95ec8fec677cf5",
+   "semantic_hash": "384e0f528ac8c1d3858792998830af41283181dacc830db3502653554d7fbdde",
+   "contract_hash": "705b1c6100e175473f022063e9ab44fb8a8fb27a8dd763fb19e94ce2ab51ffb9"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-3",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "stimulus": {
+    "args": [
+     {
+      "k": "é"
+     }
+    ]
+   },
+   "observable": {
+    "returns_bytes_hex": "7b226b223a22c3a9227d",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given a dict whose value includes a non-ASCII string (e.g. `\"é\"` U+00E9), `canonical_bytes` encodes it as UTF-8 literal (`\\xc3\\xa9`, not `\\u00e9`) and is byte-stable across two invocations.",
+   "note": "",
+   "v2_status": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-1df14f7043a731f9e524e27c2e3a9113c3e27ba71b41e58d91ee628641ca1123: probe.python_callable does not support the observation it asks for",
+   "spec_id": "PPS-1df14f7043a731f9e524e27c2e3a9113c3e27ba71b41e58d91ee628641ca1123",
+   "semantic_hash": "eedca2d3a4ca2d2e4ead2a6c97a0413425f8987379bcd6ee371baf3b5cb5dcb4",
+   "contract_hash": "ff444df871f91f3290d9d6ea010b2a0263b71abc08f8d97f88ee231b5c2669eb"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-4",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "stimulus": {
+    "args": [
+     {
+      "b": 2,
+      "a": 1
+     }
+    ]
+   },
+   "observable": {
+    "returns_bytes_hex": "7b2261223a312c2262223a327d",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given two dicts whose keys differ only in insertion order, `canonical_bytes` returns byte-identical bytes.",
+   "note": "",
+   "v2_status": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-1d54791d23342301fb95f570099408194d635339201f22e7d7c0b4bc0da96b61: probe.python_callable does not support the observation it asks for",
+   "spec_id": "PPS-1d54791d23342301fb95f570099408194d635339201f22e7d7c0b4bc0da96b61",
+   "semantic_hash": "4873b6953a39903204c1a484f20750189450f8b59bb623399bf3a4cd54aad099",
+   "contract_hash": "edfaceece132f07c9dc8e6494b8abd70535e437fcd75fcec5003dea425649b56"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-5",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:GENESIS",
+   "stimulus": {
+    "args": []
+   },
+   "observable": {
+    "equals": "GENESIS",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given `from ledgerlock.format import GENESIS`, `GENESIS == \"GENESIS\"` (literal seven-character string, distinct from any 64-char hex string).",
+   "note": "a constant's value: the probe observes callables",
+   "v2_status": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-1664c77dd60487cb7bc80f5cb8632ad942df84f874d6afb17e10070369e47000: probe.python_callable does not support the observation it asks for",
+   "spec_id": "PPS-1664c77dd60487cb7bc80f5cb8632ad942df84f874d6afb17e10070369e47000",
+   "semantic_hash": "4812d5202572fb87cf01675b00e48fc345ffbf03304b108d3cd840affec9ea5f",
+   "contract_hash": "99218ac798bec679957b060201e1e2e27e627cb6a84ef8f847c2ee7971dda859"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-6",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "stimulus": {
+    "args": [
+     {
+      "op": "put"
+     }
+    ]
+   },
+   "observable": {
+    "returns_bytes_hex": "stable across a json round trip",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-01"
+   ],
+   "criterion": "Given `canonical_bytes` called twice on the same dict after round-tripping through `json.loads`, the returned bytes equal the original bytes.",
+   "note": "",
+   "v2_status": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-d742dd6338d9ff3940b59174283320a834716030b0d80397695cb712d17724fd: probe.python_callable does not support the observation it asks for",
+   "spec_id": "PPS-d742dd6338d9ff3940b59174283320a834716030b0d80397695cb712d17724fd",
+   "semantic_hash": "6039595f3d2c40e52db2329c20fc8b904b103d1c42a8b59bf5ba614cba4b403a",
+   "contract_hash": "978136a0d4ed38ffbdc86d8521aed4b0d0126abe939924b69db500ff6a6a67c4"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-1",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "stimulus": {
+    "args": [
+     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     {
+      "op": "put",
+      "key": "k",
+      "value": {
+       "v": 1
+      },
+      "ts": 100,
+      "id": "r1",
+      "hash": "",
+      "prev_hash": ""
+     }
+    ]
+   },
+   "observable": {
+    "returns": "ca749cddb14ae13c04983ce88358158949839ad76d9049b6bb1e53935e6f05c3",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given a `prev_hash` string and a line dict with hash fields emptied, `line_hash(prev_hash, line)` returns exactly 64 lowercase hex characters.",
+   "note": "",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-a7ecd04e10b530294d590b70cfbb8836a1fd37f20fcee8f7a8024ae057662162",
+   "semantic_hash": "89248e7680fbab2bb3c5b83d34f661bb37d6720aa86b68fe3a1906f33ea27640",
+   "contract_hash": "698756006e3c6d4ac5f07e20ceef1e41d9ab5ae2d5c15839c8fbf6e72b363544"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-2",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "stimulus": {
+    "args": [
+     "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+     {
+      "op": "put",
+      "key": "k",
+      "value": {
+       "v": 1
+      },
+      "ts": 100,
+      "id": "r1",
+      "hash": "",
+      "prev_hash": ""
+     }
+    ]
+   },
+   "observable": {
+    "returns": "3e700b9c269de3ed0a2408843a350f17c98f88c71018686759af5d59d2b97e12",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given two distinct `prev_hash` values against the same line, `line_hash` on each returns different results.",
+   "note": "a distinct prev_hash gives the distinct digest",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-52d439981f7dc5c39e93d498298d5c77e772810fc15c228db96d50ed7f2fdac5",
+   "semantic_hash": "d40abc9a5c93c11125d4acb175af6d0103bb23137bbd01c45c226680e4a239d0",
+   "contract_hash": "37465697cd29f9fd9f8fe0040219939050438461bc251417a90a1f14ab17d489"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-3",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "stimulus": {
+    "args": [
+     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     {
+      "op": "put",
+      "key": "k",
+      "value": {
+       "v": 1
+      },
+      "ts": 100,
+      "id": "r1",
+      "hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "prev_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+     }
+    ]
+   },
+   "observable": {
+    "returns": "ca749cddb14ae13c04983ce88358158949839ad76d9049b6bb1e53935e6f05c3",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given a line dict whose `hash` and `prev_hash` are already set, `line_hash` ignores them (it operates on a copy with those fields emptied).",
+   "note": "hash fields already set are emptied",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-0769cdc0dce783482ab5f41287e4dd862e790edebc79356d0fc56074f6d7725d",
+   "semantic_hash": "8d511858980fc5a24f40e1b81214a01bfbfac090e374e124c7c5aefb7a93ced4",
+   "contract_hash": "c3abbbe35dc7b1cc0b6f1c472934b2546bc5d22a3491b503b8143cd9f154b50b"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-4",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "stimulus": {
+    "args": [
+     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     {
+      "op": "put",
+      "key": "k",
+      "value": {
+       "v": 1
+      },
+      "ts": 100,
+      "id": "r1",
+      "hash": "",
+      "prev_hash": ""
+     }
+    ]
+   },
+   "observable": {
+    "returns": "ca749cddb14ae13c04983ce88358158949839ad76d9049b6bb1e53935e6f05c3",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given the same `(prev_hash, line)` pair, `line_hash` returns the same digest across two invocations.",
+   "note": "the same pair, the same digest",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-22438ce4bcd28e5128d9f5bdda6556b0c6d37358affea6aa51f9e7f3f6f7cb3e",
+   "semantic_hash": "89248e7680fbab2bb3c5b83d34f661bb37d6720aa86b68fe3a1906f33ea27640",
+   "contract_hash": "806e0eff02ebdd7780e9b7cc32632889dd7219813d19823453742bc68879b95c"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-5",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "stimulus": {
+    "args": [
+     "GENESIS",
+     {
+      "op": "put",
+      "key": "k",
+      "value": {
+       "v": 1
+      },
+      "ts": 100,
+      "id": "r1",
+      "hash": "",
+      "prev_hash": ""
+     }
+    ]
+   },
+   "observable": {
+    "returns": "f5bcf5686b5c7371eed56f32607bfae00329d8ea5db25af37b310edd2bfda84b",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-02"
+   ],
+   "criterion": "Given a `prev_hash` of literal `\"GENESIS\"`, `line_hash` accepts the non-hex seven-character string without raising.",
+   "note": "",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-e81585ff113a6f06ffc77f30f8e8c035dff082b0794a4ba9246fade01fd8bdec",
+   "semantic_hash": "8d960fc6a900fd7139d427a10cb1fbe88cbc316eff0728acc934baef2ebb70b9",
+   "contract_hash": "8b0dfe50a0fac26a2b53f656a548441ecdff736b8475a271ef6db63b9eb81383"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-1",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.store:read_lines",
+   "stimulus": {
+    "args": [
+     "<jsonl with N lines>"
+    ]
+   },
+   "observable": {
+    "returns_bytes_list": "N lines",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given a JSONL with N lines, `store.read_lines(path)` returns a list of N `bytes` objects, each line's trailing `\\n` stripped.",
+   "note": "returns list[bytes] over a fixture file",
+   "v2_status": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-0b31ba2649b14c11e9cf601d11492df9cd1438cc17d7687373570b507b28a5b6: probe.python_callable does not support the observation it asks for",
+   "spec_id": "PPS-0b31ba2649b14c11e9cf601d11492df9cd1438cc17d7687373570b507b28a5b6",
+   "semantic_hash": "a40b55568f7a9f0c244cd3db9ead76c8f61c7a4822d9c3a3698c09720c6fcfee",
+   "contract_hash": "e741bd98f6193ae9fb0b1b5dca8604f20e4f2e3acf9b65f868045b590ad5e5c0"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-2",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.store:read_lines",
+   "stimulus": {
+    "args": [
+     "/nonexistent/ledgerlock/missing.jsonl"
+    ]
+   },
+   "observable": {
+    "raises": "FileNotFoundError",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given a missing file path, `store.read_lines(path)` raises `FileNotFoundError`.",
+   "note": "",
+   "v2_status": "COMPILED",
+   "typed_refusal": null,
+   "spec_id": "PPS-04f6a985c4a29d3503f59ad1e614b282ab9aa3b390a69acf35715929a14b2dca",
+   "semantic_hash": "6dcf9879cdc598bbb4a5f76c098370c6d6d40f8a50db9875176b7303491a0032",
+   "contract_hash": "5eb0611340d384b42dc2fb48f9ea3edddef23fcc8301339ef46429376dcee35a"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-3",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.store:read_lines",
+   "stimulus": {
+    "args": [
+     "<empty file>"
+    ]
+   },
+   "observable": {
+    "returns": [],
+    "requires_fixture_file": "a zero-byte file at the argument path",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given an empty file (zero bytes), `store.read_lines(path)` returns an empty list.",
+   "note": "the stimulus is a file the probe cannot create: no fixture facility in the cycle-1 probe",
+   "v2_status": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-44fe05e546b1a64f83592d1b6e99fbe8fd377e7d10e35781df2f58d273e94f25: probe.python_callable does not support the observation it asks for",
+   "spec_id": "PPS-44fe05e546b1a64f83592d1b6e99fbe8fd377e7d10e35781df2f58d273e94f25",
+   "semantic_hash": "c17a6b9a2b12569aa8d1ea410d1b9f839b3d6391289c13c155a904de105d6ad6",
+   "contract_hash": "27982b2151239aa334de1590107b8a8c48e45dd221ab5a810ff694c7b79bb6a5"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-4",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.store:write_atomic",
+   "stimulus": {
+    "scenario": "write two lines then read_lines"
+   },
+   "observable": {
+    "file_bytes": "concatenation",
+    "lines": 2,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given `store.write_atomic(path, [b\"{...}\\n\", b\"{...}\\n\"])`, the path's bytes equal the concatenation and a separate `read_lines` call returns the two lines.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "b6927aba752979e137b8633358b9f42f9ba6e98aef2afd38708321e138943a31"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-5",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.store:write_atomic",
+   "stimulus": {
+    "scenario": "os.replace patched to raise between temp write and replace"
+   },
+   "observable": {
+    "file_bytes": "unchanged",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given `store.write_atomic` called with a non-empty existing path, a simulated crash between temp-write and `os.replace` (e.g. patching `os.replace` to raise) leaves the original path byte-identical.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "da44930bb28972ac67331be3ccb793ab20d75768e20b5feb3f12cd31cad9aacd"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-6",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.store:write_atomic",
+   "stimulus": {
+    "scenario": "observe the temp file's directory"
+   },
+   "observable": {
+    "temp_dir": "same as target",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-03"
+   ],
+   "criterion": "Given a call to `store.write_atomic`, the temp file used is created in the same directory as the target path (so `os.replace` is atomic on POSIX).",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "3030994fab16d107e859cd857609736a92ef7155f27ba957fedab3a799c780e0"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-1",
+   "story": "STORY-01-05",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "fresh path; append put k {v:1} r1 100"
+   },
+   "observable": {
+    "lines": 1,
+    "prev_hash": "GENESIS",
+    "hash": "line_hash(GENESIS, line)",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given a fresh `Ledger(path)` whose JSONL does not yet exist, `append((\"put\", \"k\", {\"v\": 1}, \"r1\", 100))` creates the file with exactly one line terminated by `\\n` whose `op == \"put\"`, `key == \"k\"`, `id == \"r1\"`, `ts == 100`, `value == {\"v\": 1}`, `prev_hash == \"GENESIS\"`, and `hash == format.line_hash(\"GENESIS\", line_with_hash_fields_emptied)`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "394fecc34f067c8b880ed464109e6d7d5a2b8b2eabd0ae6bd24d0670c512866c"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-2",
+   "story": "STORY-01-05",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "second append"
+   },
+   "observable": {
+    "prev_hash": "first line's hash",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given a second `append` after the first, the new line's `prev_hash` equals the first line's stored `hash` and its own `hash` equals `line_hash(first_hash, new_line_emptied)`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "85efee5c50df1a04c584bd3f82d45ed9f8b98e8ebbdd3ef3905be2de3db8b38e"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-3",
+   "story": "STORY-01-05",
+   "requirement": "FR-1",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "append with empty key on an empty ledger"
+   },
+   "observable": {
+    "raises": "ValueError",
+    "file_created": false,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given `append((\"put\", \"\", \"v\", \"r\", 1))` against an empty ledger, `ValueError` is raised and no file is created.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "ecb7c0385b748ecd5a0ad8339c2dc73d2f8a5178eba27cae09f39af08db0a6a6"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-4",
+   "story": "STORY-01-05",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "fresh instance over an existing JSONL"
+   },
+   "observable": {
+    "prev_hash": "tail of the file",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given an existing JSONL written by a previous `Ledger` instance, a fresh `Ledger` opened on the same path computes its first `append`'s `prev_hash` from the tail of the file (the new instance reads the tail from disk, not from any in-memory state).",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "0ec282e190379ccbaf5eb8cd969b252b72999a3568a6eaaf9118bb1d2792c8da"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-5",
+   "story": "STORY-01-05",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "a separate process opens the path after append"
+   },
+   "observable": {
+    "line_present": true,
+    "final_byte": "\\n",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-04"
+   ],
+   "criterion": "Given `append` returns successfully on an empty path, a separate process opening the same path finds the new line present and the file terminated by `\\n`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "698f4cd7bc89f8b42420eb3a55e8c9543c0ca70ee877bdbe511691548cc447f7"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-1",
+   "story": "STORY-01-06",
+   "requirement": "FR-3",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "same rid replay"
+   },
+   "observable": {
+    "replayed": true,
+    "committed": false,
+    "chain_length": "unchanged",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given a committed `put(\"k\", \"v1\", \"r1\", 100)`, `append((\"put\", \"k\", \"anything\", \"r1\", 999))` (same `rid`, different value and ts) returns the original line dict byte-for-byte with `replayed is True`, `committed is False`, and the chain length is unchanged.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "8ac689ae2fb3545ac38f951b493c9e38b81d6cb891e5b9b4619c0add5d6b3d33"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-2",
+   "story": "STORY-01-06",
+   "requirement": "FR-4",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "different rid on a committed key"
+   },
+   "observable": {
+    "raises": "ConflictError",
+    "file_bytes": "unchanged",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given the same committed line, `append((\"put\", \"k\", \"v2\", \"r2\", 200))` (different `rid`) raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index is None`, and the JSONL is byte-identical to its pre-call state.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "349e46974f3aadc0c42173a9c2be32de99bb401992718156e1a82ee707ab66ca"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-3",
+   "story": "STORY-01-06",
+   "requirement": "FR-5",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "put after a tombstone with a different rid"
+   },
+   "observable": {
+    "raises": "ConflictError",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given a committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r2\", 200))` (different `rid`) raises `ConflictError`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "2f628dbcf04414126851e63e48e9d77b8b07ff840880c8f51001d0134e1595fc"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-4",
+   "story": "STORY-01-06",
+   "requirement": "FR-5",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "put after a tombstone with the same rid"
+   },
+   "observable": {
+    "replayed": true,
+    "committed": false,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given the same committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r1\", 200))` (same `rid`) returns the delete line dict byte-for-byte with `replayed is True`, `committed is False`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "855c08daa2879fe3bb08c9646a74a4e54cc69ff57f4aa0f6bbb599c43ccbfb9d"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-5",
+   "story": "STORY-01-06",
+   "requirement": "FR-3",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "stimulus": {
+    "scenario": "NFD key replay of an NFC-committed rid"
+   },
+   "observable": {
+    "replayed": true,
+    "key": "é",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-05"
+   ],
+   "criterion": "Given a key committed with NFC form `\"\\u00e9\"` (U+00E9) and `rid == \"r1\"`, `append((\"put\", \"e\\u0301\", \"v2\", \"r1\", 200))` (NFD form, same `rid`) is a replay: the returned line dict's `key` equals `\"\\u00e9\"` byte-exact, `replayed is True`, and the chain length is unchanged.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "03040310c503f7eaa3db1450b6d49280eea534fc71320f0250c5910d882f93b4"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-1",
+   "story": "STORY-02-01",
+   "requirement": "FR-6",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "stimulus": {
+    "scenario": "N valid lines"
+   },
+   "observable": {
+    "returns": {
+     "ok": true,
+     "first_bad_index": null
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a JSONL with N valid lines written through `Ledger.append`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "c90c658b446546836229cc09ba9b644c848871b428c6c693f3724c13150581df"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-2",
+   "story": "STORY-02-01",
+   "requirement": "FR-6",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "stimulus": {
+    "scenario": "zero-byte JSONL"
+   },
+   "observable": {
+    "returns": {
+     "ok": true,
+     "first_bad_index": null
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a zero-byte JSONL, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "272a33ad19f43fb6dac2071a664e31274241aa0c7355ef25f1a0837cfefe94fa"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-3",
+   "story": "STORY-02-01",
+   "requirement": "FR-6",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "stimulus": {
+    "scenario": "missing JSONL path"
+   },
+   "observable": {
+    "raises": "FileNotFoundError",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a missing JSONL file path, `verify()` raises `FileNotFoundError`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "576a4fc75e0a9cb2324227fe33b0e95c3870de846b2381cc64eaea6246f9d06c"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-4",
+   "story": "STORY-02-01",
+   "requirement": "FR-7",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "stimulus": {
+    "scenario": "hash of line i overwritten out of band"
+   },
+   "observable": {
+    "returns": {
+     "ok": false,
+     "first_bad_index": "i"
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a JSONL whose line at index `i` has had its `hash` field overwritten with `\"0\" * 64` out-of-band after `append` returned, `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}` (or the earlier index whose chain is now broken).",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "bdbe2617973f94b86064c09e32a449f47a02e41574b931b05f714edead851b48"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-5",
+   "story": "STORY-02-01",
+   "requirement": "FR-7",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "stimulus": {
+    "scenario": "value of line i mutated out of band"
+   },
+   "observable": {
+    "returns": {
+     "ok": false,
+     "first_bad_index": "i"
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-01-06"
+   ],
+   "criterion": "Given a JSONL whose `value` field on line `i` is mutated out-of-band after `append` (e.g. `\"v1\"` → `\"v2\"`), `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "bc23070aeb5f48dcf42aac0a08e4e39c544dc61af49308a4fe2eaae89cd6fe7d"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-1",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "stimulus": {
+    "scenario": "put a, c, b"
+   },
+   "observable": {
+    "keys_order": [
+     "a",
+     "b",
+     "c"
+    ],
+    "stable": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given `put(\"a\", 1, r, t)`, `put(\"c\", 3, r, t)`, `put(\"b\", 2, r, t)` written in that order, two calls to `snapshot()` with no intervening mutations return equal dicts and `json.dumps(result, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False)` lists keys in `a, b, c` order.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "c65df607db99314aae542d09a5e2a0da9fb016c2da7c16d22aea429fd735124e"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-2",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "stimulus": {
+    "scenario": "delete with a different rid conflicts; snapshot unchanged"
+   },
+   "observable": {
+    "returns": {
+     "k": "v"
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given a committed `put(\"k\", \"v\", \"r1\", t1)`, `delete(\"k\", \"r2\", t2)` raises `ConflictError` (requirements §4.5: a different `rid` mutating the same key MUST conflict) and a following `snapshot()` still returns `{\"k\": \"v\"}` — the refused delete changed nothing.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "dd4cf6a7aabb1928edc8258ced5e04f95f4bd7ab7504a19323780971b9bbb812"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-3",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "stimulus": {
+    "scenario": "tombstone on an uncommitted key"
+   },
+   "observable": {
+    "absent_key": "k2",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given `delete(\"k2\", \"r3\", t3)` on a key with no committed mutation (a tombstone, requirements §4.4), `snapshot()` returns a dict with no key `\"k2\"`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "bcf8a64eeb7078b50fda3e4e48e1bd6234f0397cd484a6fa3a84f519e29da43e"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-4",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "stimulus": {
+    "scenario": "NFD put then NFC replay"
+   },
+   "observable": {
+    "returns": {
+     "é": "v"
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given `put(\"e\\u0301\", \"v\", r, t)` (NFD form) and a follow-up `put(\"\\u00e9\", \"v2\", r, t)` with the same `rid` (idempotent replay), `snapshot()` returns a dict with the NFC key `\"\\u00e9\"` and value `\"v\"`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "67d36290dbdafddfd8f897698b803770614dd6dcee9fe6bf7bf06ab8eaf01092"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-5",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "stimulus": {
+    "scenario": "two instances over one chain"
+   },
+   "observable": {
+    "equal": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given two `Ledger` instances opened in succession over the same on-disk chain, each `snapshot()` returns equal dicts.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "3cc69c2aa7b9d6db2b154cc8e4dbd3071aaa35dd8fc462179903bfc8d6f75c3e"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-1",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "stimulus": {
+    "scenario": "3 conflict-free puts on an empty ledger"
+   },
+   "observable": {
+    "lines": 3,
+    "first_prev_hash": "GENESIS",
+    "verify_ok": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given an empty ledger and a batch of 3 conflict-free `put` elements, `apply_batch(ops)` produces a JSONL with exactly 3 new lines whose chain verifies end-to-end and whose first batch line's `prev_hash` equals `\"GENESIS\"`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "ea80d535ca652699578b8b42b1a9200b9da1dab2ce2eab5e45b21125337bc956"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-2",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "stimulus": {
+    "scenario": "replay element then a new key"
+   },
+   "observable": {
+    "lines_added": 1,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given a ledger with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch `[(\"put\", \"k\", \"v2\", \"r1\", 200), (\"put\", \"k2\", 2, \"r2\", 201)]`, the first element is an idempotent replay against the pre-batch state and the batch appends exactly one new line (for `k2`); the JSONL gains exactly one line.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "35e4baebfc7d60c07eee0e8d830c416a65fe135a6dcb5f0f84c5c33cd7d9d1ee"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-3",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "stimulus": {
+    "scenario": "conflict inside the batch at index 1"
+   },
+   "observable": {
+    "raises": "ConflictError",
+    "batch_index": 1,
+    "file_bytes": "unchanged",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given an empty ledger and a batch `[(\"put\", \"k\", \"v1\", \"r1\", 100), (\"put\", \"k\", \"v2\", \"r2\", 200)]`, `apply_batch` raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index == 1`, and the JSONL on disk is byte-identical to its pre-batch state.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "58dd15f0a14f8b6de5a19676f2b98a5bdd154a9242ad38993f4c3c5b8ace6bd6"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-4",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "stimulus": {
+    "scenario": "conflict at element 0"
+   },
+   "observable": {
+    "raises": "ConflictError",
+    "batch_index": 0,
+    "file_bytes": "unchanged",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given a ledger whose most recent committed mutation on `k` has `rid == \"r1\"` and a batch whose element 0 targets `k` with `rid == \"r2\"`, `apply_batch` raises `ConflictError` with `batch_index == 0` and the JSONL is unchanged.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "3f4f408027fe2b6013ced168fa637b2dca1a51e786b11b695c83aeba925e60ac"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-5",
+   "story": "STORY-03-01",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "stimulus": {
+    "scenario": "os.replace patched to raise"
+   },
+   "observable": {
+    "file_bytes": "unchanged",
+    "verify_ok": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-02-01"
+   ],
+   "criterion": "Given a simulated crash between temp-file write and `os.replace` (e.g. by patching `os.replace` to raise), `apply_batch` against a non-empty ledger leaves the JSONL byte-identical to its pre-batch state and `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "c0f9c350e11c0bfea93214fe1cdd79c9ae3454e2a381332b46d02f7617cee0c9"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-1",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.repair_tail",
+   "stimulus": {
+    "scenario": "truncated final line over a valid chain"
+   },
+   "observable": {
+    "final_line_removed": true,
+    "verify_ok": true,
+    "final_byte": "\\n",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given a JSONL whose last line is truncated (last byte is not `\\n` OR the last line does not parse) and whose preceding lines form a valid chain, `repair_tail()` rewrites the JSONL with the truncated final line removed: every preserved line's bytes are unchanged and a subsequent `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`; the new final byte is `\\n`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "dda296057d86316ef54747b0afb9d163e361050ace4f3074e5fee3beca5bee1f"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-2",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.repair_tail",
+   "stimulus": {
+    "scenario": "clean JSONL"
+   },
+   "observable": {
+    "file_bytes": "unchanged",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given a clean JSONL whose every line parses and verifies, `repair_tail()` returns without raising and the file is byte-identical before and after.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "356fc16d7a74404c1a117c5e02034009761645594673e8e48e9261b0656b3fda"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-3",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.repair_tail",
+   "stimulus": {
+    "scenario": "truncated tail and mid-chain corruption"
+   },
+   "observable": {
+    "file_bytes": "unchanged",
+    "verdict": "earlier corruption",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given a JSONL with a truncated final line AND a mid-chain corruption at an earlier index `i < len(lines) - 1`, `repair_tail()` does NOT modify the file (byte-identical before and after) and the verify verdict reports the earlier corruption.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "0628248cb19270aec4580ed03f9701dc377ce49a568ede9285185b3739db2537"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-4",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.repair_tail",
+   "stimulus": {
+    "scenario": "tail line parses, hash broken"
+   },
+   "observable": {
+    "file_bytes": "unchanged",
+    "verdict": "corruption",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given a JSONL whose last line parses but whose own `hash` is broken (a tail tampering, not a truncation), `repair_tail()` does not modify the file and reports the corruption via the verdict.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "contract_hash": "eb37a164288c6cfc3c4e57d050c325b227571d32fe9ac88209fc38ef86b85020"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-1",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "snapshot",
+     "<ledger>"
+    ]
+   },
+   "observable": {
+    "exit_code": 2,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given `snapshot` invoked without `--out`, the CLI exits `2`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "17a536ecd7190fb6c35f5d85d2ed7247e8541fd37e1f836891c4835da21a9232"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-2",
+   "story": "STORY-04-01",
+   "requirement": "FR-12",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify"
+    ]
+   },
+   "observable": {
+    "exit_code": 2,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given any subcommand invoked with the wrong number of positional arguments, the CLI exits with code `2` and writes nothing to stdout.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "47df7f1393280ac526c7c5570c6e9db3e77fed1334e687c9d33ab87ad26b5ab9"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-3",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "--help"
+    ]
+   },
+   "observable": {
+    "exit_code": 0,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given the same checkout, `python -m ledgerlock --help` in a subprocess exits `0` and the stdout argparse usage line contains each of the literal strings `verify`, `snapshot`, `apply`, and `repair-tail`.",
+   "note": "stdout usage names verify, snapshot, apply, repair-tail",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "50b614d8e58b944f50fd99b3f8974c326053764c01ed33572881db467da9d9ce"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-4",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ledger>"
+    ],
+    "setup": "a fresh JSONL via Ledger.append"
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr_line_prefix": "verify",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given a fresh JSONL written via `Ledger.append`, `python -m ledgerlock verify <ledger>` in a subprocess exits `0`, stdout is empty, and stderr contains exactly one line whose first word is `verify` and which contains the substring `ok`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "ac63629e0ca95eb51f58e9d4aac486c6a3a8b0d666b1f47d865ef05f55313387"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-5",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "snapshot",
+     "<ledger>",
+     "--out",
+     "<snap>"
+    ],
+    "setup": "a fresh JSONL"
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given the same fresh JSONL, `python -m ledgerlock snapshot <ledger> --out <snap>` exits `0`, stdout is empty, and the contents of `<snap>` equal `json.dumps(Ledger.snapshot(), sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\") + b\"\\n\"` byte-for-byte.",
+   "note": "<snap> equals the canonical snapshot bytes",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "8d040e12d0fad058116612de8138113a0b43082a3176326fcae75a18905bd52c"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-6",
+   "story": "STORY-04-01",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "apply",
+     "--batch",
+     "<batch.json>",
+     "<ledger>"
+    ],
+    "setup": "three conflict-free puts"
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given a `batch.json` containing three conflict-free `put` elements and a fresh ledger, `python -m ledgerlock apply --batch <batch.json> <ledger>` exits `0`, stdout is empty, and the JSONL contains exactly the lines from the batch (verified by `verify()`).",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "bfd653b01dbd28f9596f9990ad6486b45f48b1533c2108d8da4223f0c89b0ea7"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-7",
+   "story": "STORY-04-01",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "repair-tail",
+     "<ledger>"
+    ],
+    "setup": "a clean JSONL"
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-02"
+   ],
+   "criterion": "Given a clean JSONL, `python -m ledgerlock repair-tail <ledger>` exits `0`, stdout is empty, and the JSONL is byte-identical before and after.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "6d4b65c832793e2eca10829d8a559bdd5c8173a9472ff7e5a2d9bbaed959e6fa"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-1",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "apply",
+     "--batch",
+     "<missing>",
+     "<ledger>"
+    ]
+   },
+   "observable": {
+    "exit_code": 3,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-04-01"
+   ],
+   "criterion": "Given `apply --batch` invoked with a missing batch file, the CLI exits `3` and writes nothing to stdout.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "635d5b6ec3828d77e4d375f8328f7af51a5e2b1b24c645a6f84133c3a32f5508"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-2",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "apply",
+     "--batch",
+     "<b.json>",
+     "<ledger>"
+    ],
+    "setup": "conflict at element 0"
+   },
+   "observable": {
+    "exit_code": 4,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-04-01"
+   ],
+   "criterion": "Given a JSONL with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch file whose element 0 is `(\"put\", \"k\", \"v2\", \"r2\", 200)`, `apply --batch <b.json> <ledger>` exits `4`, writes nothing to stdout, and leaves the JSONL byte-identical to its pre-call state.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "457346a81eafabab3c7af1e0a97856c24193fc53bf8d4c339c16093992ca842a"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-3",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ledger>"
+    ],
+    "setup": "line 17 mutated out of band"
+   },
+   "observable": {
+    "exit_code": 5,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-04-01"
+   ],
+   "criterion": "Given a JSONL whose line 17 has been mutated out-of-band on disk, `verify` exits `5` and writes nothing to stdout.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "f2abbe2a9b5b852b8ae327b4eaaa9140c50ee10a0fcf224e8b0207135fa0ca05"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-4",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "repair-tail",
+     "<ledger>"
+    ],
+    "setup": "mid-chain corruption at line 17"
+   },
+   "observable": {
+    "exit_code": 5,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-04-01"
+   ],
+   "criterion": "Given a JSONL with mid-chain corruption at line 17, `repair-tail` exits `5` and writes nothing to stdout.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "3279ff2956097cce00b8a24edca18b702bdbfada9cd41f240f4ee10e49783e6f"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-1",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ledger>"
+    ]
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr_line_prefix": "verify",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given every success path for `verify ok`, the CLI writes nothing to stdout and a single line beginning with `verify` to stderr.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "d8bc80ca3e6ec5763e63199d9fc36d1bd14b010d29e69f010297c4d3c3e2f889"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-2",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "apply",
+     "--batch",
+     "<b.json>",
+     "<ledger>"
+    ]
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr_line_prefix": "apply",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given every success path for `apply` (atomic batch committed), the CLI writes nothing to stdout and a single line beginning with `apply` to stderr that mentions the count of appended lines.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "4eef24cf9e73b512066236e1f007857ad4c0b20cfc0a7f7d7be1f36d9a813ff3"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-3",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "snapshot",
+     "<ledger>",
+     "--out",
+     "<snap>"
+    ]
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr_line_prefix": "snapshot",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given every success path for `snapshot`, the CLI writes nothing to stdout and a single line beginning with `snapshot` to stderr that mentions the destination path.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "128eb2bd53069e7a38af598c09e10e9bf43f21889d66997b115876ca066e91bf"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-4",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "repair-tail",
+     "<ledger>"
+    ]
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr_line_prefix": "repair-tail",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given every success path for `repair-tail` (clean chain or successful repair), the CLI writes nothing to stdout and a single line beginning with `repair-tail` to stderr.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "59a591959fa248acb0dc03d6783623c6502597fc653ac80d4c8ecb30ff760602"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-5",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "<any success path>"
+    ]
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": "",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-04-02"
+   ],
+   "criterion": "Given any success path, the captured stdout via `subprocess.PIPE` equals `b\"\"`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "contract_hash": "60b93f3d3dfa40bff495eccda3d6f53a0f4866640bde625e7f95ef66f9d49931"
+  },
+  {
+   "ac_id": "AC-STORY-05-01-1",
+   "story": "STORY-05-01",
+   "requirement": "FR-2",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "tests.test_property_roundtrip:run",
+   "stimulus": {
+    "scenario": "50 seeded random mutation sequences"
+   },
+   "observable": {
+    "verify_ok": true,
+    "snapshot_stable": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given the library at this point in the epic chain, when the property test runs 50 random mutation sequences against a temp JSONL (each sequence a list of `(op, key, value, rid, ts)` tuples; seeded with a fixed seed for reproducibility), then for every sequence that did not raise `ConflictError`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` AND two calls to `snapshot()` return equal dicts.",
+   "note": "",
+   "v2_status": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: 'tests.test_property_roundtrip:run'"
+  },
+  {
+   "ac_id": "AC-STORY-05-01-2",
+   "story": "STORY-05-01",
+   "requirement": "FR-8",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "tests.test_property_roundtrip:run",
+   "stimulus": {
+    "scenario": "a sequence that raises ConflictError"
+   },
+   "observable": {
+    "file_bytes": "unchanged past the prefix",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given the same property test, when a sequence raises `ConflictError`, the JSONL on disk after the sequence is byte-identical to its pre-sequence state for any prefix up to (and including) the offending element, and the chain length did not grow past that prefix.",
+   "note": "",
+   "v2_status": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: 'tests.test_property_roundtrip:run'"
+  },
+  {
+   "ac_id": "AC-STORY-05-01-3",
+   "story": "STORY-05-01",
+   "requirement": "FR-14",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "tests.test_property_roundtrip:run",
+   "stimulus": {
+    "scenario": "unittest discover and pytest"
+   },
+   "observable": {
+    "same_counts": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-03-01"
+   ],
+   "criterion": "Given the same property test, when it is executed under `python -m unittest discover` and again under `pytest`, both runs report the same total passed/failed counts for the property-test module.",
+   "note": "",
+   "v2_status": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: 'tests.test_property_roundtrip:run'"
+  },
+  {
+   "ac_id": "AC-STORY-05-02-1",
+   "story": "STORY-05-02",
+   "requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "coverage:report",
+   "stimulus": {
+    "scenario": "coverage run -m unittest discover; coverage report --include=ledgerlock/*"
+   },
+   "observable": {
+    "line_coverage_min": 85,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the full test suite at this point in the epic chain, `coverage run -m unittest discover && coverage report --include=ledgerlock/*` shows a `ledgerlock/` total line coverage ≥85%.",
+   "note": "",
+   "v2_status": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: stimulus names ['coverage run -m unittest discover; coverage report --include=ledgerlock/*']"
+  },
+  {
+   "ac_id": "AC-STORY-05-02-2",
+   "story": "STORY-05-02",
+   "requirement": "FR-14",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "pytest:main",
+   "stimulus": {
+    "scenario": "pytest vs unittest discover"
+   },
+   "observable": {
+    "same_counts": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the same full test suite, `pytest` discovers and runs the same suite and reports the same total passed/failed counts as `python -m unittest discover`.",
+   "note": "",
+   "v2_status": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: 'pytest:main'"
+  },
+  {
+   "ac_id": "AC-STORY-05-02-3",
+   "story": "STORY-05-02",
+   "requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "coverage:report",
+   "stimulus": {
+    "scenario": "tests/ excluded from measurement"
+   },
+   "observable": {
+    "excluded": "tests/",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "depends_on_stories": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the full test suite at this point, the `tests/` source itself is excluded from the coverage measurement.",
+   "note": "",
+   "v2_status": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: stimulus names ['tests/ excluded from measurement']"
+  },
+  {
+   "ac_id": "AC-STORY-05-03-1",
+   "story": "STORY-05-03",
+   "requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "role": "PRESERVE",
+   "polarity": "MUST_NOT_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "ledgerlock:__path__",
+   "stimulus": {
+    "grep": "^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)"
+   },
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "depends_on_stories": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` returns no matches and the test passes.",
+   "note": "the same prohibition as AC-STORY-01-01-4, preserved",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind file_artifact",
+   "contract_hash": "05f31ccf89ef9545d5214b91fdc6679adf42de0289ea885e0259e5c2954465ca"
+  },
+  {
+   "ac_id": "AC-STORY-05-03-2",
+   "story": "STORY-05-03",
+   "requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "role": "PRESERVE",
+   "polarity": "MUST_NOT_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "ledgerlock:__path__",
+   "stimulus": {
+    "grep": "os\\.system|subprocess\\.|socket\\."
+   },
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "depends_on_stories": [
+    "STORY-05-01"
+   ],
+   "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` returns no matches and the test passes.",
+   "note": "the same prohibition as AC-STORY-01-01-5, preserved",
+   "v2_status": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind file_artifact",
+   "contract_hash": "715f770a2fd94423e185795ef3a6a70e36e4f4d50c3069df92c9b19cad409f0b"
+  }
+ ],
+ "counts_by_v2_status": {
+  "COMPILED": 10,
+  "REFUSED_BY_COMPILER": 53,
+  "UNSUPPORTED_OBSERVATION": 8,
+  "REFUSED_BY_CONTRACT_RULE": 6
+ },
+ "counts_by_subject_kind": {
+  "python_callable": 18,
+  "file_artifact": 4,
+  "cli_invocation": 17,
+  "process_effect": 38
+ },
+ "expressible_by_cycle1_probe": [
+  "AC-STORY-01-01-1",
+  "AC-STORY-01-01-2",
+  "AC-STORY-01-01-3",
+  "AC-STORY-01-01-6",
+  "AC-STORY-01-03-1",
+  "AC-STORY-01-03-2",
+  "AC-STORY-01-03-3",
+  "AC-STORY-01-03-4",
+  "AC-STORY-01-03-5",
+  "AC-STORY-01-04-2"
+ ],
+ "probe": {
+  "id": "probe.python_callable",
+  "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "kinds_with_a_probe": [
+   "python_callable"
+  ],
+  "kinds_without_a_probe": [
+   "cli_invocation",
+   "file_artifact",
+   "http_route",
+   "process_effect"
+  ]
+ },
+ "static_admission": {
+  "engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+  "admitted": false,
+  "result_digest": "eac4a152eb6c9d240d43ea6457f76ad876b5a1fda08bb65dcf7a047251b75788",
+  "checks": [
+   {
+    "number": 1,
+    "name": "requirement_coverage",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 2,
+    "name": "contract_spec_integrity",
+    "passed": false,
+    "problems": [
+     "contract BC-AC-STORY-01-01-4 does not compile: no probe declared for subject kind file_artifact",
+     "contract BC-AC-STORY-01-01-5 does not compile: no probe declared for subject kind file_artifact",
+     "contract BC-AC-STORY-01-01-7 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-01-04-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-04-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-04-6 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-02-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-02-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-02-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-02-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-04-01-1 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-2 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-3 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-4 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-5 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-6 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-7 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-02-1 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-02-2 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-02-3 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-02-4 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-1 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-2 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-3 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-4 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-5 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-05-03-1 does not compile: no probe declared for subject kind file_artifact",
+     "contract BC-AC-STORY-05-03-2 does not compile: no probe declared for subject kind file_artifact"
+    ]
+   },
+   {
+    "number": 3,
+    "name": "ownership",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 4,
+    "name": "dependency_dag",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 5,
+    "name": "contradictions",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 6,
+    "name": "proof_capability",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 7,
+    "name": "traceability",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 8,
+    "name": "plan_structure",
+    "passed": false,
+    "problems": [
+     "criterion AC-STORY-01-01-4 is an orphan: spec NO-SPEC-AC-STORY-01-01-4 is not in the committed derivation",
+     "criterion AC-STORY-01-01-5 is an orphan: spec NO-SPEC-AC-STORY-01-01-5 is not in the committed derivation",
+     "criterion AC-STORY-01-01-7 is an orphan: spec NO-SPEC-AC-STORY-01-01-7 is not in the committed derivation",
+     "criterion AC-STORY-01-04-4 is an orphan: spec NO-SPEC-AC-STORY-01-04-4 is not in the committed derivation",
+     "criterion AC-STORY-01-04-5 is an orphan: spec NO-SPEC-AC-STORY-01-04-5 is not in the committed derivation",
+     "criterion AC-STORY-01-04-6 is an orphan: spec NO-SPEC-AC-STORY-01-04-6 is not in the committed derivation",
+     "criterion AC-STORY-01-05-1 is an orphan: spec NO-SPEC-AC-STORY-01-05-1 is not in the committed derivation",
+     "criterion AC-STORY-01-05-2 is an orphan: spec NO-SPEC-AC-STORY-01-05-2 is not in the committed derivation",
+     "criterion AC-STORY-01-05-3 is an orphan: spec NO-SPEC-AC-STORY-01-05-3 is not in the committed derivation",
+     "criterion AC-STORY-01-05-4 is an orphan: spec NO-SPEC-AC-STORY-01-05-4 is not in the committed derivation",
+     "criterion AC-STORY-01-05-5 is an orphan: spec NO-SPEC-AC-STORY-01-05-5 is not in the committed derivation",
+     "criterion AC-STORY-01-06-1 is an orphan: spec NO-SPEC-AC-STORY-01-06-1 is not in the committed derivation",
+     "criterion AC-STORY-01-06-2 is an orphan: spec NO-SPEC-AC-STORY-01-06-2 is not in the committed derivation",
+     "criterion AC-STORY-01-06-3 is an orphan: spec NO-SPEC-AC-STORY-01-06-3 is not in the committed derivation",
+     "criterion AC-STORY-01-06-4 is an orphan: spec NO-SPEC-AC-STORY-01-06-4 is not in the committed derivation",
+     "criterion AC-STORY-01-06-5 is an orphan: spec NO-SPEC-AC-STORY-01-06-5 is not in the committed derivation",
+     "criterion AC-STORY-02-01-1 is an orphan: spec NO-SPEC-AC-STORY-02-01-1 is not in the committed derivation",
+     "criterion AC-STORY-02-01-2 is an orphan: spec NO-SPEC-AC-STORY-02-01-2 is not in the committed derivation",
+     "criterion AC-STORY-02-01-3 is an orphan: spec NO-SPEC-AC-STORY-02-01-3 is not in the committed derivation",
+     "criterion AC-STORY-02-01-4 is an orphan: spec NO-SPEC-AC-STORY-02-01-4 is not in the committed derivation",
+     "criterion AC-STORY-02-01-5 is an orphan: spec NO-SPEC-AC-STORY-02-01-5 is not in the committed derivation",
+     "criterion AC-STORY-02-02-1 is an orphan: spec NO-SPEC-AC-STORY-02-02-1 is not in the committed derivation",
+     "criterion AC-STORY-02-02-2 is an orphan: spec NO-SPEC-AC-STORY-02-02-2 is not in the committed derivation",
+     "criterion AC-STORY-02-02-3 is an orphan: spec NO-SPEC-AC-STORY-02-02-3 is not in the committed derivation",
+     "criterion AC-STORY-02-02-4 is an orphan: spec NO-SPEC-AC-STORY-02-02-4 is not in the committed derivation",
+     "criterion AC-STORY-02-02-5 is an orphan: spec NO-SPEC-AC-STORY-02-02-5 is not in the committed derivation",
+     "criterion AC-STORY-03-01-1 is an orphan: spec NO-SPEC-AC-STORY-03-01-1 is not in the committed derivation",
+     "criterion AC-STORY-03-01-2 is an orphan: spec NO-SPEC-AC-STORY-03-01-2 is not in the committed derivation",
+     "criterion AC-STORY-03-01-3 is an orphan: spec NO-SPEC-AC-STORY-03-01-3 is not in the committed derivation",
+     "criterion AC-STORY-03-01-4 is an orphan: spec NO-SPEC-AC-STORY-03-01-4 is not in the committed derivation",
+     "criterion AC-STORY-03-01-5 is an orphan: spec NO-SPEC-AC-STORY-03-01-5 is not in the committed derivation",
+     "criterion AC-STORY-03-02-1 is an orphan: spec NO-SPEC-AC-STORY-03-02-1 is not in the committed derivation",
+     "criterion AC-STORY-03-02-2 is an orphan: spec NO-SPEC-AC-STORY-03-02-2 is not in the committed derivation",
+     "criterion AC-STORY-03-02-3 is an orphan: spec NO-SPEC-AC-STORY-03-02-3 is not in the committed derivation",
+     "criterion AC-STORY-03-02-4 is an orphan: spec NO-SPEC-AC-STORY-03-02-4 is not in the committed derivation",
+     "criterion AC-STORY-04-01-1 is an orphan: spec NO-SPEC-AC-STORY-04-01-1 is not in the committed derivation",
+     "criterion AC-STORY-04-01-2 is an orphan: spec NO-SPEC-AC-STORY-04-01-2 is not in the committed derivation",
+     "criterion AC-STORY-04-01-3 is an orphan: spec NO-SPEC-AC-STORY-04-01-3 is not in the committed derivation",
+     "criterion AC-STORY-04-01-4 is an orphan: spec NO-SPEC-AC-STORY-04-01-4 is not in the committed derivation",
+     "criterion AC-STORY-04-01-5 is an orphan: spec NO-SPEC-AC-STORY-04-01-5 is not in the committed derivation",
+     "criterion AC-STORY-04-01-6 is an orphan: spec NO-SPEC-AC-STORY-04-01-6 is not in the committed derivation",
+     "criterion AC-STORY-04-01-7 is an orphan: spec NO-SPEC-AC-STORY-04-01-7 is not in the committed derivation",
+     "criterion AC-STORY-04-02-1 is an orphan: spec NO-SPEC-AC-STORY-04-02-1 is not in the committed derivation",
+     "criterion AC-STORY-04-02-2 is an orphan: spec NO-SPEC-AC-STORY-04-02-2 is not in the committed derivation",
+     "criterion AC-STORY-04-02-3 is an orphan: spec NO-SPEC-AC-STORY-04-02-3 is not in the committed derivation",
+     "criterion AC-STORY-04-02-4 is an orphan: spec NO-SPEC-AC-STORY-04-02-4 is not in the committed derivation",
+     "criterion AC-STORY-04-03-1 is an orphan: spec NO-SPEC-AC-STORY-04-03-1 is not in the committed derivation",
+     "criterion AC-STORY-04-03-2 is an orphan: spec NO-SPEC-AC-STORY-04-03-2 is not in the committed derivation",
+     "criterion AC-STORY-04-03-3 is an orphan: spec NO-SPEC-AC-STORY-04-03-3 is not in the committed derivation",
+     "criterion AC-STORY-04-03-4 is an orphan: spec NO-SPEC-AC-STORY-04-03-4 is not in the committed derivation",
+     "criterion AC-STORY-04-03-5 is an orphan: spec NO-SPEC-AC-STORY-04-03-5 is not in the committed derivation",
+     "criterion AC-STORY-05-01-1 is an orphan: spec NO-SPEC-AC-STORY-05-01-1 is not in the committed derivation",
+     "criterion AC-STORY-05-01-2 is an orphan: spec NO-SPEC-AC-STORY-05-01-2 is not in the committed derivation",
+     "criterion AC-STORY-05-01-3 is an orphan: spec NO-SPEC-AC-STORY-05-01-3 is not in the committed derivation",
+     "criterion AC-STORY-05-02-1 is an orphan: spec NO-SPEC-AC-STORY-05-02-1 is not in the committed derivation",
+     "criterion AC-STORY-05-02-2 is an orphan: spec NO-SPEC-AC-STORY-05-02-2 is not in the committed derivation",
+     "criterion AC-STORY-05-02-3 is an orphan: spec NO-SPEC-AC-STORY-05-02-3 is not in the committed derivation",
+     "criterion AC-STORY-05-03-1 is an orphan: spec NO-SPEC-AC-STORY-05-03-1 is not in the committed derivation",
+     "criterion AC-STORY-05-03-2 is an orphan: spec NO-SPEC-AC-STORY-05-03-2 is not in the committed derivation"
+    ]
+   },
+   {
+    "number": 9,
+    "name": "probe_calibration",
+    "passed": false,
+    "problems": [
+     "spec PPS-0b31ba2649b14c11e9cf601d11492df9cd1438cc17d7687373570b507b28a5b6: probe.python_callable does not support the observation it asks for",
+     "spec PPS-1664c77dd60487cb7bc80f5cb8632ad942df84f874d6afb17e10070369e47000: probe.python_callable does not support the observation it asks for",
+     "spec PPS-1d54791d23342301fb95f570099408194d635339201f22e7d7c0b4bc0da96b61: probe.python_callable does not support the observation it asks for",
+     "spec PPS-1df14f7043a731f9e524e27c2e3a9113c3e27ba71b41e58d91ee628641ca1123: probe.python_callable does not support the observation it asks for",
+     "spec PPS-2600578f3026bcbb48ba034fecb4136553443e9c56d74a4da749592d1512067f: probe.python_callable does not support the observation it asks for",
+     "spec PPS-3c5b41e2504d466bbe0aa0710f4a54d8af39b26e586a649f4b95ec8fec677cf5: probe.python_callable does not support the observation it asks for",
+     "spec PPS-44fe05e546b1a64f83592d1b6e99fbe8fd377e7d10e35781df2f58d273e94f25: probe.python_callable does not support the observation it asks for",
+     "spec PPS-d742dd6338d9ff3940b59174283320a834716030b0d80397695cb712d17724fd: probe.python_callable does not support the observation it asks for"
+    ]
+   }
+  ]
+ }
+}
