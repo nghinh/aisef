@@ -85,7 +85,8 @@ class PlanDep(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             docs = pathlib.Path(tmp)
             for f in pv.DOCS.iterdir():
-                shutil.copy(f, docs / f.name)
+                if f.is_file():  # docs/implementation/v2 now holds sub-directories (cycle2/)
+                    shutil.copy(f, docs / f.name)
             graph = docs / "AISEF-V2-CYCLE1-DEPENDENCY-GRAPH.md"
             text = graph.read_text(encoding="utf-8")
             edited = text.replace("| `WP-6.2` | P6 | 27 | `WP-6.1`, `WP-4.6`, `WP-5.5`, `WP-2.5` |",
@@ -104,7 +105,8 @@ class PlanDep(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             docs = pathlib.Path(tmp)
             for f in pv.DOCS.iterdir():
-                shutil.copy(f, docs / f.name)
+                if f.is_file():  # docs/implementation/v2 now holds sub-directories (cycle2/)
+                    shutil.copy(f, docs / f.name)
             plan = docs / "AISEF-V2-CYCLE1-IMPLEMENTATION-PLAN.md"
             text = plan.read_text(encoding="utf-8")
             edited = text.replace("**Length 32 packages.**", "**Length 19 packages.**", 1)
