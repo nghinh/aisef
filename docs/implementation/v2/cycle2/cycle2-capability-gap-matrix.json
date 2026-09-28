@@ -1,0 +1,1653 @@
+{
+ "record": "AISEF V2 — CYCLE-2 CAPABILITY GAP MATRIX (planning; derived from closure-evidence/v2/P10/WORKLOAD.json, never from inference)",
+ "source": {
+  "workload_json_sha256": "d43211043dd141d388250eb756e2e6d40720093d8f091042944da4babd861463",
+  "regression_json_sha256": "5a0d2bddf52824beca0d6afef7a5e7acb10810cb1e2481bdf36c61ca98a2ccd9",
+  "plan": {
+   "id": "W1-LEDGERLOCK-PLAN-V2.1",
+   "plan_hash": "bc71a701dd84f7227e8a474b9c9e0aec05ca3e10c0eb53168bcdba0bb8242a32",
+   "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "stories": 16,
+   "criteria": 77,
+   "obligations_by_role": {
+    "INTRODUCE": 66,
+    "PRESERVE": 11,
+    "VERIFY": 0
+   },
+   "v1_plan_commit": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "v1_modes": {
+    "CHANGE_REQUIRED": 66,
+    "NEGATIVE_INVARIANT": 4,
+    "PRESERVE_REQUIRED": 7
+   },
+   "migration_table": {
+    "path": "closure-evidence/v2/P6-MIGRATION-TABLE.json",
+    "sha256": "157b46f6786d849591f9c08b02a39f48a08c18d69d9e34cf7c3c98ccd5a6752f"
+   }
+  }
+ },
+ "cycle1_baseline": {
+  "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+  "probe": {
+   "id": "probe.python_callable",
+   "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+  }
+ },
+ "gap_classes": [
+  "SUPPORTED_BY_CYCLE1",
+  "UNSUPPORTED_SUBJECT_KIND",
+  "UNSUPPORTED_OBSERVABLE",
+  "INVALID_NAMES_TEST_ARTEFACT"
+ ],
+ "ambiguity_overlay": "AMBIGUOUS_NEEDS_HUMAN_CLARIFICATION is an overlay flag (a criterion keeps its gap class); nothing ambiguous is resolved here",
+ "counts_by_gap_class": {
+  "SUPPORTED_BY_CYCLE1": 10,
+  "UNSUPPORTED_SUBJECT_KIND": 53,
+  "UNSUPPORTED_OBSERVABLE": 8,
+  "INVALID_NAMES_TEST_ARTEFACT": 6
+ },
+ "ambiguous_count": 28,
+ "counts_by_cycle2_need": {
+  "none": 10,
+  "probe.file_artifact": 4,
+  "probe.cli_invocation": 17,
+  "python_callable observable 'returns_bytes'": 6,
+  "python_callable observable 'equals' over a non-callable subject": 1,
+  "python_callable stimulus 'workspace'": 1,
+  "probe.process_effect": 32,
+  "plan migration to a product subject or out of ProductProof": 6
+ },
+ "decisions_required": {
+  "DECISION-1": "witness sets for universally quantified criteria (01-01-1, 04-03-1..5) — plan author, owner sign-off",
+  "DECISION-2": "controlled in-process fault steps inside the subject's process (01-04-5, 03-01-5): sanction as a stimulus kind, or restate the criteria",
+  "DECISION-3": "migration of the six test-named criteria (05-01-1..3, 05-02-1..3) to product subjects or out of ProductProof — a LedgerLock PLAN-V2.2, a new development experiment, never a retune of the P10 record",
+  "DECISION-4": "two-invocation equality/inequality criteria (01-02-2/4/6, 01-03-2/4, 02-02-1/5): restated as fixed expected values (P10's reading) or a probe-defined 'stable' observable"
+ },
+ "criteria": [
+  {
+   "ac_id": "AC-STORY-01-01-1",
+   "story": "STORY-01-01",
+   "requirement": "FR-1",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:normalize_key",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": true,
+   "clarification_needed": "universally quantified ('any string s'); a contract holds one stimulus — the plan author must name the witness set (NFD, mixed, empty, ASCII) or restate as a property over a fixed corpus",
+   "criterion": "Given any string `s`, `from ledgerlock.format import normalize_key; normalize_key(s)` returns `unicodedata.normalize(\"NFC\", s)` byte-for-byte."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-2",
+   "story": "STORY-01-01",
+   "requirement": "FR-1",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:normalize_key",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the NFC string `\"\\u00e9\"` (U+00E9) and its NFD decomposition `\"e\\u0301\"`, calling `normalize_key` on each returns byte-identical results equal to `\"\\u00e9\"`."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-3",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock:__file__",
+   "observable_keys": [
+    "condition"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a fresh `pyproject.toml` declaring `name = \"ledgerlock\"` and `requires-python = \">=3.11\"`, an empty `ledgerlock/` package, and an empty `tests/` directory, `python -c \"import ledgerlock; print(ledgerlock.__file__)\"` prints a path ending in `ledgerlock/__init__.py` with no exception."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-4",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "role": "PRESERVE",
+   "polarity": "MUST_NOT_HOLD",
+   "subject_kind_as_written": "file_artifact",
+   "locator": "ledgerlock:__path__",
+   "observable_keys": [
+    "matches"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind file_artifact",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.file_artifact (WP-2.1.x): grep_count over the revision's source tree, ABSENCE_IS_DECIDABLE",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` exits `1` (zero matches)."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-5",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "role": "PRESERVE",
+   "polarity": "MUST_NOT_HOLD",
+   "subject_kind_as_written": "file_artifact",
+   "locator": "ledgerlock:__path__",
+   "observable_keys": [
+    "matches"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind file_artifact",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.file_artifact (WP-2.1.x): grep_count over the revision's source tree, ABSENCE_IS_DECIDABLE",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` exits `1` (zero matches)."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-6",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock:Ledger",
+   "observable_keys": [
+    "condition"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": true,
+   "clarification_needed": "one criterion names two symbols (Ledger, ConflictError); one contract names one subject — split into two contracts or accept the class as the witness (P10 chose the class)",
+   "criterion": "Given an `__init__.py`, `from ledgerlock import Ledger, ConflictError` returns both names without exception and `Ledger` is a callable class."
+  },
+  {
+   "ac_id": "AC-STORY-01-01-7",
+   "story": "STORY-01-01",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the registered CLI, `python -m ledgerlock verify <ledger> <extra-positional>` in a subprocess exits `2` and writes nothing to stdout (argparse reports a usage error on stderr)."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-1",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "observable_keys": [
+    "returns_bytes_hex"
+   ],
+   "cycle1_typed_answer": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-2600578f3026bcbb48ba034fecb4136553443e9c56d74a4da749592d1512067f: probe.python_callable does not support the observation it asks for",
+   "gap_class": "UNSUPPORTED_OBSERVABLE",
+   "cycle2_needs": "python_callable observable 'returns_bytes' (WP-2.4.1)",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a dict `line` whose `hash` and `prev_hash` are unset, `canonical_bytes(line)` returns exactly `json.dumps(line, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\")`."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-2",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "observable_keys": [
+    "returns_bytes_hex"
+   ],
+   "cycle1_typed_answer": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-3c5b41e2504d466bbe0aa0710f4a54d8af39b26e586a649f4b95ec8fec677cf5: probe.python_callable does not support the observation it asks for",
+   "gap_class": "UNSUPPORTED_OBSERVABLE",
+   "cycle2_needs": "python_callable observable 'returns_bytes' (WP-2.4.1)",
+   "ambiguous": true,
+   "clarification_needed": "an equality between two invocations; restate as one invocation with a fixed expected value, or a two-invocation observable ('stable') that the probe defines",
+   "criterion": "Given a second dict element-equal to the first, `canonical_bytes` on it returns bytes byte-identical to the first call's bytes."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-3",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "observable_keys": [
+    "returns_bytes_hex"
+   ],
+   "cycle1_typed_answer": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-1df14f7043a731f9e524e27c2e3a9113c3e27ba71b41e58d91ee628641ca1123: probe.python_callable does not support the observation it asks for",
+   "gap_class": "UNSUPPORTED_OBSERVABLE",
+   "cycle2_needs": "python_callable observable 'returns_bytes' (WP-2.4.1)",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a dict whose value includes a non-ASCII string (e.g. `\"é\"` U+00E9), `canonical_bytes` encodes it as UTF-8 literal (`\\xc3\\xa9`, not `\\u00e9`) and is byte-stable across two invocations."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-4",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "observable_keys": [
+    "returns_bytes_hex"
+   ],
+   "cycle1_typed_answer": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-1d54791d23342301fb95f570099408194d635339201f22e7d7c0b4bc0da96b61: probe.python_callable does not support the observation it asks for",
+   "gap_class": "UNSUPPORTED_OBSERVABLE",
+   "cycle2_needs": "python_callable observable 'returns_bytes' (WP-2.4.1)",
+   "ambiguous": true,
+   "clarification_needed": "as 01-02-2: two dicts differing in insertion order must give identical bytes — restate as one call with a fixed expected value",
+   "criterion": "Given two dicts whose keys differ only in insertion order, `canonical_bytes` returns byte-identical bytes."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-5",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:GENESIS",
+   "observable_keys": [
+    "equals"
+   ],
+   "cycle1_typed_answer": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-1664c77dd60487cb7bc80f5cb8632ad942df84f874d6afb17e10070369e47000: probe.python_callable does not support the observation it asks for",
+   "gap_class": "UNSUPPORTED_OBSERVABLE",
+   "cycle2_needs": "python_callable observable 'equals' over a non-callable subject (WP-2.4.1)",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given `from ledgerlock.format import GENESIS`, `GENESIS == \"GENESIS\"` (literal seven-character string, distinct from any 64-char hex string)."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-6",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:canonical_bytes",
+   "observable_keys": [
+    "returns_bytes_hex"
+   ],
+   "cycle1_typed_answer": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-d742dd6338d9ff3940b59174283320a834716030b0d80397695cb712d17724fd: probe.python_callable does not support the observation it asks for",
+   "gap_class": "UNSUPPORTED_OBSERVABLE",
+   "cycle2_needs": "python_callable observable 'returns_bytes' (WP-2.4.1)",
+   "ambiguous": true,
+   "clarification_needed": "as 01-02-2: round-trip stability — two invocations",
+   "criterion": "Given `canonical_bytes` called twice on the same dict after round-tripping through `json.loads`, the returned bytes equal the original bytes."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-1",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a `prev_hash` string and a line dict with hash fields emptied, `line_hash(prev_hash, line)` returns exactly 64 lowercase hex characters."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-2",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": true,
+   "clarification_needed": "an inequality between two invocations ('different results'); P10 restated it as a second fixed expected value — confirm",
+   "criterion": "Given two distinct `prev_hash` values against the same line, `line_hash` on each returns different results."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-3",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a line dict whose `hash` and `prev_hash` are already set, `line_hash` ignores them (it operates on a copy with those fields emptied)."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-4",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": true,
+   "clarification_needed": "determinism across two invocations; a fixed expected value already implies it — confirm the restatement",
+   "criterion": "Given the same `(prev_hash, line)` pair, `line_hash` returns the same digest across two invocations."
+  },
+  {
+   "ac_id": "AC-STORY-01-03-5",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.format:line_hash",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a `prev_hash` of literal `\"GENESIS\"`, `line_hash` accepts the non-hex seven-character string without raising."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-1",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.store:read_lines",
+   "observable_keys": [
+    "returns_bytes_list"
+   ],
+   "cycle1_typed_answer": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-0b31ba2649b14c11e9cf601d11492df9cd1438cc17d7687373570b507b28a5b6: probe.python_callable does not support the observation it asks for",
+   "gap_class": "UNSUPPORTED_OBSERVABLE",
+   "cycle2_needs": "python_callable observable 'returns_bytes' (WP-2.4.1)",
+   "ambiguous": true,
+   "clarification_needed": "'a JSONL with N lines': N is unbound; the plan author fixes N and the fixture bytes",
+   "criterion": "Given a JSONL with N lines, `store.read_lines(path)` returns a list of N `bytes` objects, each line's trailing `\\n` stripped."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-2",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.store:read_lines",
+   "observable_keys": [
+    "raises"
+   ],
+   "cycle1_typed_answer": "COMPILED",
+   "typed_refusal": null,
+   "gap_class": "SUPPORTED_BY_CYCLE1",
+   "cycle2_needs": "none (python_callable exists/returns/raises at digest 1961e84d…)",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a missing file path, `store.read_lines(path)` raises `FileNotFoundError`."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-3",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "python_callable",
+   "locator": "ledgerlock.store:read_lines",
+   "observable_keys": [
+    "returns",
+    "requires_fixture_file"
+   ],
+   "cycle1_typed_answer": "UNSUPPORTED_OBSERVATION",
+   "typed_refusal": "spec PPS-44fe05e546b1a64f83592d1b6e99fbe8fd377e7d10e35781df2f58d273e94f25: probe.python_callable does not support the observation it asks for",
+   "gap_class": "UNSUPPORTED_OBSERVABLE",
+   "cycle2_needs": "python_callable stimulus 'workspace' (fixture files the harness writes; WP-2.4.1) — or process_effect",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given an empty file (zero bytes), `store.read_lines(path)` returns an empty list."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-4",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.store:write_atomic",
+   "observable_keys": [
+    "file_bytes",
+    "lines"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given `store.write_atomic(path, [b\"{...}\\n\", b\"{...}\\n\"])`, the path's bytes equal the concatenation and a separate `read_lines` call returns the two lines."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-5",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.store:write_atomic",
+   "observable_keys": [
+    "file_bytes"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": true,
+   "clarification_needed": "'a simulated crash (e.g. patching os.replace to raise)': a controlled in-process fault step inside the subject's process — a stimulus kind the owner must sanction (DECISION-2)",
+   "criterion": "Given `store.write_atomic` called with a non-empty existing path, a simulated crash between temp-write and `os.replace` (e.g. patching `os.replace` to raise) leaves the original path byte-identical."
+  },
+  {
+   "ac_id": "AC-STORY-01-04-6",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.store:write_atomic",
+   "observable_keys": [
+    "temp_dir"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": true,
+   "clarification_needed": "'the temp file is created in the same directory': observable requires intercepting the temp-file creation (os-level) — define as a fault-free trace observable or restate as 'after a simulated crash, no temp file remains outside the target directory'",
+   "criterion": "Given a call to `store.write_atomic`, the temp file used is created in the same directory as the target path (so `os.replace` is atomic on POSIX)."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-1",
+   "story": "STORY-01-05",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "lines",
+    "prev_hash",
+    "hash"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a fresh `Ledger(path)` whose JSONL does not yet exist, `append((\"put\", \"k\", {\"v\": 1}, \"r1\", 100))` creates the file with exactly one line terminated by `\\n` whose `op == \"put\"`, `key == \"k\"`, `id == \"r1\"`, `ts == 100`, `value == {\"v\": 1}`, `prev_hash == \"GENESIS\"`, and `hash == format.line_hash(\"GENESIS\", line_with_hash_fields_emptied)`."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-2",
+   "story": "STORY-01-05",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "prev_hash"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a second `append` after the first, the new line's `prev_hash` equals the first line's stored `hash` and its own `hash` equals `line_hash(first_hash, new_line_emptied)`."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-3",
+   "story": "STORY-01-05",
+   "requirement": "FR-1",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "raises",
+    "file_created"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given `append((\"put\", \"\", \"v\", \"r\", 1))` against an empty ledger, `ValueError` is raised and no file is created."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-4",
+   "story": "STORY-01-05",
+   "requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "prev_hash"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given an existing JSONL written by a previous `Ledger` instance, a fresh `Ledger` opened on the same path computes its first `append`'s `prev_hash` from the tail of the file (the new instance reads the tail from disk, not from any in-memory state)."
+  },
+  {
+   "ac_id": "AC-STORY-01-05-5",
+   "story": "STORY-01-05",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "line_present",
+    "final_byte"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": true,
+   "clarification_needed": "'a separate process opening the same path': a second process is part of the stimulus — a subprocess step in the scenario language",
+   "criterion": "Given `append` returns successfully on an empty path, a separate process opening the same path finds the new line present and the file terminated by `\\n`."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-1",
+   "story": "STORY-01-06",
+   "requirement": "FR-3",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "replayed",
+    "committed",
+    "chain_length"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a committed `put(\"k\", \"v1\", \"r1\", 100)`, `append((\"put\", \"k\", \"anything\", \"r1\", 999))` (same `rid`, different value and ts) returns the original line dict byte-for-byte with `replayed is True`, `committed is False`, and the chain length is unchanged."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-2",
+   "story": "STORY-01-06",
+   "requirement": "FR-4",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "raises",
+    "file_bytes"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the same committed line, `append((\"put\", \"k\", \"v2\", \"r2\", 200))` (different `rid`) raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index is None`, and the JSONL is byte-identical to its pre-call state."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-3",
+   "story": "STORY-01-06",
+   "requirement": "FR-5",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "raises"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r2\", 200))` (different `rid`) raises `ConflictError`."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-4",
+   "story": "STORY-01-06",
+   "requirement": "FR-5",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "replayed",
+    "committed"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the same committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r1\", 200))` (same `rid`) returns the delete line dict byte-for-byte with `replayed is True`, `committed is False`."
+  },
+  {
+   "ac_id": "AC-STORY-01-06-5",
+   "story": "STORY-01-06",
+   "requirement": "FR-3",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.append",
+   "observable_keys": [
+    "replayed",
+    "key"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a key committed with NFC form `\"\\u00e9\"` (U+00E9) and `rid == \"r1\"`, `append((\"put\", \"e\\u0301\", \"v2\", \"r1\", 200))` (NFD form, same `rid`) is a replay: the returned line dict's `key` equals `\"\\u00e9\"` byte-exact, `replayed is True`, and the chain length is unchanged."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-1",
+   "story": "STORY-02-01",
+   "requirement": "FR-6",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a JSONL with N valid lines written through `Ledger.append`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-2",
+   "story": "STORY-02-01",
+   "requirement": "FR-6",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a zero-byte JSONL, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-3",
+   "story": "STORY-02-01",
+   "requirement": "FR-6",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "observable_keys": [
+    "raises"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a missing JSONL file path, `verify()` raises `FileNotFoundError`."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-4",
+   "story": "STORY-02-01",
+   "requirement": "FR-7",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": true,
+   "clarification_needed": "'first_bad_index == i (or the earlier index whose chain is now broken)': two acceptable answers — the plan author must fix one (the requirements §3.3 say the first violation)",
+   "criterion": "Given a JSONL whose line at index `i` has had its `hash` field overwritten with `\"0\" * 64` out-of-band after `append` returned, `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}` (or the earlier index whose chain is now broken)."
+  },
+  {
+   "ac_id": "AC-STORY-02-01-5",
+   "story": "STORY-02-01",
+   "requirement": "FR-7",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.verify",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a JSONL whose `value` field on line `i` is mutated out-of-band after `append` (e.g. `\"v1\"` → `\"v2\"`), `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}`."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-1",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "observable_keys": [
+    "keys_order",
+    "stable"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": true,
+   "clarification_needed": "'two calls return equal dicts' and a key order of the JSON dump: restate as one snapshot with a fixed expected canonical JSON",
+   "criterion": "Given `put(\"a\", 1, r, t)`, `put(\"c\", 3, r, t)`, `put(\"b\", 2, r, t)` written in that order, two calls to `snapshot()` with no intervening mutations return equal dicts and `json.dumps(result, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False)` lists keys in `a, b, c` order."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-2",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a committed `put(\"k\", \"v\", \"r1\", t1)`, `delete(\"k\", \"r2\", t2)` raises `ConflictError` (requirements §4.5: a different `rid` mutating the same key MUST conflict) and a following `snapshot()` still returns `{\"k\": \"v\"}` — the refused delete changed nothing."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-3",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "observable_keys": [
+    "absent_key"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given `delete(\"k2\", \"r3\", t3)` on a key with no committed mutation (a tombstone, requirements §4.4), `snapshot()` returns a dict with no key `\"k2\"`."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-4",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "observable_keys": [
+    "returns"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given `put(\"e\\u0301\", \"v\", r, t)` (NFD form) and a follow-up `put(\"\\u00e9\", \"v2\", r, t)` with the same `rid` (idempotent replay), `snapshot()` returns a dict with the NFC key `\"\\u00e9\"` and value `\"v\"`."
+  },
+  {
+   "ac_id": "AC-STORY-02-02-5",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.snapshot",
+   "observable_keys": [
+    "equal"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": true,
+   "clarification_needed": "'two Ledger instances opened in succession return equal dicts': a two-construction scenario; the expected value is the fixed snapshot",
+   "criterion": "Given two `Ledger` instances opened in succession over the same on-disk chain, each `snapshot()` returns equal dicts."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-1",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "observable_keys": [
+    "lines",
+    "first_prev_hash",
+    "verify_ok"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given an empty ledger and a batch of 3 conflict-free `put` elements, `apply_batch(ops)` produces a JSONL with exactly 3 new lines whose chain verifies end-to-end and whose first batch line's `prev_hash` equals `\"GENESIS\"`."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-2",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "observable_keys": [
+    "lines_added"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a ledger with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch `[(\"put\", \"k\", \"v2\", \"r1\", 200), (\"put\", \"k2\", 2, \"r2\", 201)]`, the first element is an idempotent replay against the pre-batch state and the batch appends exactly one new line (for `k2`); the JSONL gains exactly one line."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-3",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "observable_keys": [
+    "raises",
+    "batch_index",
+    "file_bytes"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given an empty ledger and a batch `[(\"put\", \"k\", \"v1\", \"r1\", 100), (\"put\", \"k\", \"v2\", \"r2\", 200)]`, `apply_batch` raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index == 1`, and the JSONL on disk is byte-identical to its pre-batch state."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-4",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "observable_keys": [
+    "raises",
+    "batch_index",
+    "file_bytes"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a ledger whose most recent committed mutation on `k` has `rid == \"r1\"` and a batch whose element 0 targets `k` with `rid == \"r2\"`, `apply_batch` raises `ConflictError` with `batch_index == 0` and the JSONL is unchanged."
+  },
+  {
+   "ac_id": "AC-STORY-03-01-5",
+   "story": "STORY-03-01",
+   "requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.apply_batch",
+   "observable_keys": [
+    "file_bytes",
+    "verify_ok"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": true,
+   "clarification_needed": "as 01-04-5: a controlled in-process fault step (DECISION-2)",
+   "criterion": "Given a simulated crash between temp-file write and `os.replace` (e.g. by patching `os.replace` to raise), `apply_batch` against a non-empty ledger leaves the JSONL byte-identical to its pre-batch state and `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`."
+  },
+  {
+   "ac_id": "AC-STORY-03-02-1",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.repair_tail",
+   "observable_keys": [
+    "final_line_removed",
+    "verify_ok",
+    "final_byte"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a JSONL whose last line is truncated (last byte is not `\\n` OR the last line does not parse) and whose preceding lines form a valid chain, `repair_tail()` rewrites the JSONL with the truncated final line removed: every preserved line's bytes are unchanged and a subsequent `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`; the new final byte is `\\n`."
+  },
+  {
+   "ac_id": "AC-STORY-03-02-2",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.repair_tail",
+   "observable_keys": [
+    "file_bytes"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a clean JSONL whose every line parses and verifies, `repair_tail()` returns without raising and the file is byte-identical before and after."
+  },
+  {
+   "ac_id": "AC-STORY-03-02-3",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.repair_tail",
+   "observable_keys": [
+    "file_bytes",
+    "verdict"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a JSONL with a truncated final line AND a mid-chain corruption at an earlier index `i < len(lines) - 1`, `repair_tail()` does NOT modify the file (byte-identical before and after) and the verify verdict reports the earlier corruption."
+  },
+  {
+   "ac_id": "AC-STORY-03-02-4",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger.repair_tail",
+   "observable_keys": [
+    "file_bytes",
+    "verdict"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind process_effect",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.process_effect (WP-2.3.x): typed scenario over a fresh workspace (construct, call, write, tamper, subprocess), file and return observables",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a JSONL whose last line parses but whose own `hash` is broken (a tail tampering, not a truncation), `repair_tail()` does not modify the file and reports the corruption via the verdict."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-1",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given `snapshot` invoked without `--out`, the CLI exits `2`."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-2",
+   "story": "STORY-04-01",
+   "requirement": "FR-12",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given any subcommand invoked with the wrong number of positional arguments, the CLI exits with code `2` and writes nothing to stdout."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-3",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the same checkout, `python -m ledgerlock --help` in a subprocess exits `0` and the stdout argparse usage line contains each of the literal strings `verify`, `snapshot`, `apply`, and `repair-tail`."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-4",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout",
+    "stderr_line_prefix"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a fresh JSONL written via `Ledger.append`, `python -m ledgerlock verify <ledger>` in a subprocess exits `0`, stdout is empty, and stderr contains exactly one line whose first word is `verify` and which contains the substring `ok`."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-5",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the same fresh JSONL, `python -m ledgerlock snapshot <ledger> --out <snap>` exits `0`, stdout is empty, and the contents of `<snap>` equal `json.dumps(Ledger.snapshot(), sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\") + b\"\\n\"` byte-for-byte."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-6",
+   "story": "STORY-04-01",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a `batch.json` containing three conflict-free `put` elements and a fresh ledger, `python -m ledgerlock apply --batch <batch.json> <ledger>` exits `0`, stdout is empty, and the JSONL contains exactly the lines from the batch (verified by `verify()`)."
+  },
+  {
+   "ac_id": "AC-STORY-04-01-7",
+   "story": "STORY-04-01",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a clean JSONL, `python -m ledgerlock repair-tail <ledger>` exits `0`, stdout is empty, and the JSONL is byte-identical before and after."
+  },
+  {
+   "ac_id": "AC-STORY-04-02-1",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given `apply --batch` invoked with a missing batch file, the CLI exits `3` and writes nothing to stdout."
+  },
+  {
+   "ac_id": "AC-STORY-04-02-2",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given a JSONL with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch file whose element 0 is `(\"put\", \"k\", \"v2\", \"r2\", 200)`, `apply --batch <b.json> <ledger>` exits `4`, writes nothing to stdout, and leaves the JSONL byte-identical to its pre-call state."
+  },
+  {
+   "ac_id": "AC-STORY-04-02-3",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": true,
+   "clarification_needed": "'line 17 mutated out-of-band': the fixture must hold >= 18 lines; the tamper is a scenario step over a workspace file",
+   "criterion": "Given a JSONL whose line 17 has been mutated out-of-band on disk, `verify` exits `5` and writes nothing to stdout."
+  },
+  {
+   "ac_id": "AC-STORY-04-02-4",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": true,
+   "clarification_needed": "as 04-02-3",
+   "criterion": "Given a JSONL with mid-chain corruption at line 17, `repair-tail` exits `5` and writes nothing to stdout."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-1",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout",
+    "stderr_line_prefix"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": true,
+   "clarification_needed": "'every success path' — universally quantified over invocations; the plan author names the witness invocations (one per subcommand)",
+   "criterion": "Given every success path for `verify ok`, the CLI writes nothing to stdout and a single line beginning with `verify` to stderr."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-2",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout",
+    "stderr_line_prefix"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": true,
+   "clarification_needed": "as 04-03-1; 'mentions the count of appended lines' — the exact stderr shape must be fixed (a regex or a literal), never prose-matched",
+   "criterion": "Given every success path for `apply` (atomic batch committed), the CLI writes nothing to stdout and a single line beginning with `apply` to stderr that mentions the count of appended lines."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-3",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout",
+    "stderr_line_prefix"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": true,
+   "clarification_needed": "as 04-03-1; 'mentions the destination path' — fix the shape",
+   "criterion": "Given every success path for `snapshot`, the CLI writes nothing to stdout and a single line beginning with `snapshot` to stderr that mentions the destination path."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-4",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout",
+    "stderr_line_prefix"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": true,
+   "clarification_needed": "as 04-03-1",
+   "criterion": "Given every success path for `repair-tail` (clean chain or successful repair), the CLI writes nothing to stdout and a single line beginning with `repair-tail` to stderr."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-5",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "observable_keys": [
+    "exit_code",
+    "stdout"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind cli_invocation",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.cli_invocation (WP-2.2.x): exit code, stdout/stderr shapes, workspace files before/after",
+   "ambiguous": true,
+   "clarification_needed": "'any success path': a universally quantified duplicate of 04-03-1..4's stdout clause — fold into them or name the witnesses",
+   "criterion": "Given any success path, the captured stdout via `subprocess.PIPE` equals `b\"\"`."
+  },
+  {
+   "ac_id": "AC-STORY-05-01-1",
+   "story": "STORY-05-01",
+   "requirement": "FR-2",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "tests.test_property_roundtrip:run",
+   "observable_keys": [
+    "verify_ok",
+    "snapshot_stable"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: 'tests.test_property_roundtrip:run'",
+   "gap_class": "INVALID_NAMES_TEST_ARTEFACT",
+   "cycle2_needs": "plan migration to a product subject or out of ProductProof (DECISION-3); no probe can take it as written",
+   "ambiguous": true,
+   "clarification_needed": "the subject is a developer test (property test): RFC §7 forbids; the product property it protects (verify ok and snapshot stable after conflict-free sequences) can be a process_effect PRESERVE contract over fixed seeded sequences — a plan migration the owner must authorize (DECISION-3)",
+   "criterion": "Given the library at this point in the epic chain, when the property test runs 50 random mutation sequences against a temp JSONL (each sequence a list of `(op, key, value, rid, ts)` tuples; seeded with a fixed seed for reproducibility), then for every sequence that did not raise `ConflictError`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` AND two calls to `snapshot()` return equal dicts."
+  },
+  {
+   "ac_id": "AC-STORY-05-01-2",
+   "story": "STORY-05-01",
+   "requirement": "FR-8",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "tests.test_property_roundtrip:run",
+   "observable_keys": [
+    "file_bytes"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: 'tests.test_property_roundtrip:run'",
+   "gap_class": "INVALID_NAMES_TEST_ARTEFACT",
+   "cycle2_needs": "plan migration to a product subject or out of ProductProof (DECISION-3); no probe can take it as written",
+   "ambiguous": true,
+   "clarification_needed": "as 05-01-1 (conflict leaves the file unchanged past the prefix)",
+   "criterion": "Given the same property test, when a sequence raises `ConflictError`, the JSONL on disk after the sequence is byte-identical to its pre-sequence state for any prefix up to (and including) the offending element, and the chain length did not grow past that prefix."
+  },
+  {
+   "ac_id": "AC-STORY-05-01-3",
+   "story": "STORY-05-01",
+   "requirement": "FR-14",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "tests.test_property_roundtrip:run",
+   "observable_keys": [
+    "same_counts"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: 'tests.test_property_roundtrip:run'",
+   "gap_class": "INVALID_NAMES_TEST_ARTEFACT",
+   "cycle2_needs": "plan migration to a product subject or out of ProductProof (DECISION-3); no probe can take it as written",
+   "ambiguous": true,
+   "clarification_needed": "unittest/pytest parity of a test module is an engineering-test property (RFC §15, Q1 test-layout invariance), not a product contract — migrate out of ProductProof (DECISION-3)",
+   "criterion": "Given the same property test, when it is executed under `python -m unittest discover` and again under `pytest`, both runs report the same total passed/failed counts for the property-test module."
+  },
+  {
+   "ac_id": "AC-STORY-05-02-1",
+   "story": "STORY-05-02",
+   "requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "coverage:report",
+   "observable_keys": [
+    "line_coverage_min"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: stimulus names ['coverage run -m unittest discover; coverage report --include=ledgerlock/*']",
+   "gap_class": "INVALID_NAMES_TEST_ARTEFACT",
+   "cycle2_needs": "plan migration to a product subject or out of ProductProof (DECISION-3); no probe can take it as written",
+   "ambiguous": true,
+   "clarification_needed": "line-coverage >= 85% is a project quality gate (RFC §15 EngineeringTestAdequacy / project policy), not a product behaviour — migrate out of ProductProof (DECISION-3)",
+   "criterion": "Given the full test suite at this point in the epic chain, `coverage run -m unittest discover && coverage report --include=ledgerlock/*` shows a `ledgerlock/` total line coverage ≥85%."
+  },
+  {
+   "ac_id": "AC-STORY-05-02-2",
+   "story": "STORY-05-02",
+   "requirement": "FR-14",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "role": "PRESERVE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "pytest:main",
+   "observable_keys": [
+    "same_counts"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: 'pytest:main'",
+   "gap_class": "INVALID_NAMES_TEST_ARTEFACT",
+   "cycle2_needs": "plan migration to a product subject or out of ProductProof (DECISION-3); no probe can take it as written",
+   "ambiguous": true,
+   "clarification_needed": "as 05-01-3",
+   "criterion": "Given the same full test suite, `pytest` discovers and runs the same suite and reports the same total passed/failed counts as `python -m unittest discover`."
+  },
+  {
+   "ac_id": "AC-STORY-05-02-3",
+   "story": "STORY-05-02",
+   "requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "role": "INTRODUCE",
+   "polarity": "MUST_HOLD",
+   "subject_kind_as_written": "process_effect",
+   "locator": "coverage:report",
+   "observable_keys": [
+    "excluded"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_CONTRACT_RULE",
+   "typed_refusal": "ContractError: a contract names the product, never a test: stimulus names ['tests/ excluded from measurement']",
+   "gap_class": "INVALID_NAMES_TEST_ARTEFACT",
+   "cycle2_needs": "plan migration to a product subject or out of ProductProof (DECISION-3); no probe can take it as written",
+   "ambiguous": true,
+   "clarification_needed": "as 05-02-1",
+   "criterion": "Given the full test suite at this point, the `tests/` source itself is excluded from the coverage measurement."
+  },
+  {
+   "ac_id": "AC-STORY-05-03-1",
+   "story": "STORY-05-03",
+   "requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "role": "PRESERVE",
+   "polarity": "MUST_NOT_HOLD",
+   "subject_kind_as_written": "file_artifact",
+   "locator": "ledgerlock:__path__",
+   "observable_keys": [
+    "matches"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind file_artifact",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.file_artifact (WP-2.1.x): grep_count over the revision's source tree, ABSENCE_IS_DECIDABLE",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` returns no matches and the test passes."
+  },
+  {
+   "ac_id": "AC-STORY-05-03-2",
+   "story": "STORY-05-03",
+   "requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "role": "PRESERVE",
+   "polarity": "MUST_NOT_HOLD",
+   "subject_kind_as_written": "file_artifact",
+   "locator": "ledgerlock:__path__",
+   "observable_keys": [
+    "matches"
+   ],
+   "cycle1_typed_answer": "REFUSED_BY_COMPILER",
+   "typed_refusal": "CompileError: no probe declared for subject kind file_artifact",
+   "gap_class": "UNSUPPORTED_SUBJECT_KIND",
+   "cycle2_needs": "probe.file_artifact (WP-2.1.x): grep_count over the revision's source tree, ABSENCE_IS_DECIDABLE",
+   "ambiguous": false,
+   "clarification_needed": null,
+   "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` returns no matches and the test passes."
+  }
+ ]
+}
