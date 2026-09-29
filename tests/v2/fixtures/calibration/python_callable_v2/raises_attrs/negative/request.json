@@ -1,0 +1,20 @@
+{
+ "subject": {
+  "kind": "python_callable",
+  "locator": "calib_subject:target"
+ },
+ "stimulus": {
+  "args": [
+   "k"
+  ]
+ },
+ "observable": {
+  "raises": "ConflictError",
+  "attrs": {
+   "key": "k",
+   "batch_index": 1
+  },
+  "within_s": 5
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}

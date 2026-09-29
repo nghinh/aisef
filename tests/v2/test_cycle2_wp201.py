@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:
 
 from aisef2.arch.enums import SubjectKind  # noqa: E402
 from aisef2.errors import InvariantError  # noqa: E402
-from aisef2.probe import catalog, python_callable as pc  # noqa: E402
+from aisef2.probe import catalog, python_callable as pc, python_callable_v2 as pc2  # noqa: E402
 
 
 def _load(name: str, rel: str):
@@ -35,18 +35,23 @@ def _fixture(name: str) -> dict:
 
 
 class Catalog(unittest.TestCase):
-    def test_the_cycle1_probe_is_the_one_active_entry_at_its_frozen_digest(self):
+    def test_the_cycle1_probe_stays_registered_at_its_frozen_digest_superseded_by_the_second_identity(self):
+        # WP-2.4.1 (DECISION-6): the Cycle-1 entry is registered, inactive, at the frozen digest; the one active
+        # entry for python_callable is the second identity
         entries = catalog.active()
         self.assertIn(SubjectKind.PYTHON_CALLABLE, entries)   # WP-2.1.1 registers a second kind beside it
         e = entries[SubjectKind.PYTHON_CALLABLE]
-        self.assertEqual((e.probe_id, e.probe_digest, e.cycle), (pc.PROBE_ID, cb.CYCLE1_PROBE["digest"], 1))
+        self.assertEqual((e.probe_id, e.probe_digest, e.cycle), (pc2.PROBE_ID, pc2.DIGEST, 2))
+        c1 = next(x for x in catalog.CATALOG if x.probe_id == pc.PROBE_ID)
+        self.assertEqual((c1.probe_digest, c1.cycle, c1.active), (cb.CYCLE1_PROBE["digest"], 1, False))
         self.assertEqual(pc.DIGEST, cb.CYCLE1_PROBE["digest"])
 
     def test_registry_and_catalogue_are_built_from_the_catalog(self):
         self.assertIsNotNone(catalog.registry())
         probes = catalog.catalogue()
-        self.assertIsInstance(probes[SubjectKind.PYTHON_CALLABLE], pc.PythonCallableProbe)
+        self.assertIsInstance(probes[SubjectKind.PYTHON_CALLABLE], pc2.PythonCallableV2Probe)
         self.assertEqual(list(catalog.probes_by_id())[0], pc.PROBE_ID)   # the Cycle-1 identity stays first
+        self.assertIn(pc2.PROBE_ID, catalog.probes_by_id())
 
     def test_two_active_probes_for_one_kind_are_refused_F4(self):
         second = catalog.CatalogEntry("probe.python_callable_v2", "b" * 64, SubjectKind.PYTHON_CALLABLE, ("returns_bytes",),

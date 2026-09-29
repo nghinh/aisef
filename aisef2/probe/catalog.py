@@ -28,7 +28,9 @@ from typing import Callable
 
 from aisef2.arch.enums import SubjectKind
 from aisef2.errors import InvariantError
-from aisef2.probe import file_artifact as fa, python_callable as pc
+from aisef2.probe import file_artifact as fa
+from aisef2.probe import python_callable as pc
+from aisef2.probe import python_callable_v2 as pc2
 from aisef2.probe.protocol import Probe, ProbeMetadata, ProbeRegistry
 
 #: Where the subject runs relative to the harness script the probe launches.
@@ -86,11 +88,15 @@ class CatalogEntry:
 CATALOG: tuple[CatalogEntry, ...] = (
     CatalogEntry(pc.PROBE_ID, pc.DIGEST, SubjectKind.PYTHON_CALLABLE, pc.CLASSES, pc.METADATA, pc.PythonCallableProbe,
                  "aisef2/probe/python_callable.py", "python_callable", "in_harness_process", "captured_stdout",
-                 "call", 1),
+                 "call", 1, active=False),
     # WP-2.1.1 (Cycle 2): no child script exists — the probe reads the object store in the harness process — so
     # in_harness_process / captured_stdout are the only truthful declarations for a probe that runs no subject
     CatalogEntry(fa.PROBE_ID, fa.DIGEST, SubjectKind.FILE_ARTIFACT, fa.CLASSES, fa.METADATA, fa.FileArtifactProbe,
                  "aisef2/probe/file_artifact.py", "file_artifact", "in_harness_process", "captured_stdout", "none", 2),
+    # WP-2.4.1 (DECISION-6): the second identity supersedes as the active python_callable probe
+    CatalogEntry(pc2.PROBE_ID, pc2.DIGEST, SubjectKind.PYTHON_CALLABLE, pc2.CLASSES, pc2.METADATA,
+                 pc2.PythonCallableV2Probe, "aisef2/probe/python_callable_v2.py", "python_callable_v2",
+                 "in_harness_process", "captured_stdout", "call", 2),
 )
 
 

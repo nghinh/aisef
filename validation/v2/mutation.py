@@ -39,7 +39,8 @@ import cleanup_authority as ca  # noqa: E402  — the runner's only way to signa
 RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
            "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json",
            "P5": "closure-evidence/v2/P5-MUTATION.json", "P6": "closure-evidence/v2/P6-MUTATION.json",
-           "C2-P1": "closure-evidence/v2/cycle2/P1-MUTATION.json"}
+           "C2-P1": "closure-evidence/v2/cycle2/P1-MUTATION.json",
+           "C2-P4": "closure-evidence/v2/cycle2/P4-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -369,8 +370,20 @@ C2_P1_TARGETS: dict[str, list[str]] = {f"aisef2/probe/file_artifact.py::{f}": _F
     "PlainTree.blob", "entry", "read",
     "facts_of", "FileArtifactProbe.__init__", "FileArtifactProbe.enforcement",
     "FileArtifactProbe.harness_preconditions", "FileArtifactProbe.observe", "FileArtifactProbe._reader")}
+# C2-P4 (WP-2.4.1, owner DECISION-6): the second python_callable identity. The P2 targets of python_callable.py that
+# this module defines for itself (the frozen helpers it imports keep their P2 evidence), plus its own extensions:
+# the class table, the hex/workspace validators, the placeholder substitution, the workspace writer.
+_C2_P4_TESTS = ["tests/v2/test_python_callable_v2.py"]
+_C2_P4_BYTECODE = ["tests/v2/test_python_callable_v2_bytecode.py"]   # PYC-1..9 rerun against the second identity
+C2_P4_TARGETS: dict[str, list[str]] = {f"aisef2/probe/python_callable_v2.py::{f}": _C2_P4_TESTS for f in (
+    "PROBE_SOURCES", "CLASSES", "ON_DEADLINE", "_probe_digest", "_is_hex", "_file_ok", "_workspace_ok", "observation_class",
+    "spec_class", "verdict_of", "_substituted", "_unsubstituted", "_write_workspace", "PythonCallableV2Probe.enforcement",
+    "_watch")}
+C2_P4_TARGETS["aisef2/probe/python_callable_v2.py::observe"] = [*_C2_P4_TESTS, *_C2_P4_BYTECODE]
+C2_P4_TARGETS.update({f"aisef2/probe/python_callable_v2.py::{f}": _C2_P4_BYTECODE
+                      for f in ("_harness_argv", "PythonCallableV2Probe.__init__")})
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
-                 "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS}
+                 "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P4": C2_P4_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
