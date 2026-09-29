@@ -1,0 +1,1122 @@
+{
+ "record": "AISEF V2 — CYCLE-2 INTEGRATION OF C2-P1, C2-P2, C2-P3, C2-P4 INTO ONE CANDIDATE",
+ "id": "AISEF-V2-CYCLE2-INTEGRATION",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P0 ACCEPTED / AUTHORIZE MAXIMUM SAFE PARALLEL EXECUTION' (2026-09-29): integrate P1+P2+P3+P4 into ONE candidate, preserve lane histories and evidence identities, resolve only mechanical conflicts, re-run the Cycle-2 baseline, the checker calibration, F1-F11, the V1 guard, Linux + Windows CI and the residual process checks; STOP on any semantic difference",
+ "identities": {
+  "base": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
+  "head": "069e2118c2eb1c54bf0ba259e9ecba94371f44cd",
+  "aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+  "base_aisef2_tree": "2c67d47a7c8fc9ce80f0db86dbdc48ffe60ece70",
+  "merges": [
+   "e1b7890783a57a0820e75a565eae444d97e84637",
+   "3b23c8023d24b544bff2db11be0454d2e0443521",
+   "99233727e6e0e2658bd49b50b9de926daf9c3adc"
+  ],
+  "lanes": {
+   "C2-P1": {
+    "lane": "LANE A",
+    "head": "ef0ebe9a5bd43ead45620bf8d12fe28ab3dcc441",
+    "is_ancestor": true,
+    "commits": "3"
+   },
+   "C2-P2": {
+    "lane": "LANE B",
+    "head": "e063b76fd1cc625211dca1f8b64db9742e566e6a",
+    "is_ancestor": true,
+    "commits": "8"
+   },
+   "C2-P3": {
+    "lane": "LANE D",
+    "head": "099e019fb579cf2b400f72d15038c56b0f9f8f2a",
+    "is_ancestor": true,
+    "commits": "13"
+   },
+   "C2-P4": {
+    "lane": "LANE C",
+    "head": "e4e02ff40564ce9cc12ac8088ec8780fa87a4b8e",
+    "is_ancestor": true,
+    "commits": "6"
+   }
+  }
+ },
+ "mechanical_conflicts": {
+  "files": [
+   "aisef2/probe/catalog.py",
+   "validation/v2/mutation.py",
+   "tests/v2/test_cycle2_wp201.py"
+  ],
+  "rule": "union of the lanes' own registrations (catalog imports and entries; C2 mutation records, target tables and PHASE_TARGETS); the WP-2.0.1 catalog test states the union's truth (the Cycle-1 identity first and inactive at its frozen digest, the second identity active, more kinds active beside it); any other conflict stops"
+ },
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin"
+ },
+ "preservation": {
+  "C2-P1": {
+   "objects": [
+    {
+     "path": "aisef2/probe/protocol.py",
+     "lane": "fe69b77392672aac3238b9219c2e4efb81c94bf7",
+     "integrated": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    {
+     "path": "aisef2/probe/file_artifact.py",
+     "lane": "807fe59e3a84fb3285a71968d43bf326a50fdc40",
+     "integrated": "807fe59e3a84fb3285a71968d43bf326a50fdc40"
+    },
+    {
+     "path": "aisef2/probe/file_artifact.py DIGEST",
+     "lane": null,
+     "integrated": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+    },
+    {
+     "path": "tests/v2/fixtures/calibration/file_artifact",
+     "lane": "0ef21635e72beeae46475bd7b0aeefb08868ead6",
+     "integrated": "0ef21635e72beeae46475bd7b0aeefb08868ead6"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/P1-FILE-ARTIFACT-CALIBRATION.json",
+     "lane": "bfb3769703dc7be60c26dfa563eafe366575db72",
+     "integrated": "bfb3769703dc7be60c26dfa563eafe366575db72"
+    }
+   ],
+   "record_digests": {
+    "closure-evidence/v2/cycle2/P1-FILE-ARTIFACT-CALIBRATION.json": {
+     "bound": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "live": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+    }
+   },
+   "preserved": true
+  },
+  "C2-P2": {
+   "objects": [
+    {
+     "path": "aisef2/probe/protocol.py",
+     "lane": "fe69b77392672aac3238b9219c2e4efb81c94bf7",
+     "integrated": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    {
+     "path": "aisef2/probe/cli_invocation.py",
+     "lane": "03aa8ab991b0e03c5583b3979a042cee1955e470",
+     "integrated": "03aa8ab991b0e03c5583b3979a042cee1955e470"
+    },
+    {
+     "path": "aisef2/probe/python_callable.py",
+     "lane": "c1d1390adda5ba67b748e075cceba2f3129a1598",
+     "integrated": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+    },
+    {
+     "path": "aisef2/probe/cli_invocation.py DIGEST",
+     "lane": null,
+     "integrated": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+    },
+    {
+     "path": "tests/v2/fixtures/calibration/cli_invocation",
+     "lane": "136a617e52b5296ec4cb76fbb7e7cc3880e5d6fb",
+     "integrated": "136a617e52b5296ec4cb76fbb7e7cc3880e5d6fb"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/P2-CLI-HARNESS.json",
+     "lane": "50a7a7e96b760b143f7df039153ebab82a94c713",
+     "integrated": "50a7a7e96b760b143f7df039153ebab82a94c713"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/P2-CLI-CALIBRATION.json",
+     "lane": "a0d8dd846b09f0640c108ff8034ee8f45f896a5b",
+     "integrated": "a0d8dd846b09f0640c108ff8034ee8f45f896a5b"
+    }
+   ],
+   "record_digests": {
+    "closure-evidence/v2/cycle2/P2-CLI-HARNESS.json": {
+     "bound": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "live": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+    },
+    "closure-evidence/v2/cycle2/P2-CLI-CALIBRATION.json": {
+     "bound": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "live": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+    }
+   },
+   "preserved": true
+  },
+  "C2-P3": {
+   "objects": [
+    {
+     "path": "aisef2/probe/protocol.py",
+     "lane": "fe69b77392672aac3238b9219c2e4efb81c94bf7",
+     "integrated": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    {
+     "path": "aisef2/probe/process_effect.py",
+     "lane": "e340912f0573350476ad97e62c0b00117bc6e1c8",
+     "integrated": "e340912f0573350476ad97e62c0b00117bc6e1c8"
+    },
+    {
+     "path": "aisef2/probe/python_callable.py",
+     "lane": "c1d1390adda5ba67b748e075cceba2f3129a1598",
+     "integrated": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+    },
+    {
+     "path": "aisef2/probe/cli_invocation.py",
+     "lane": "03aa8ab991b0e03c5583b3979a042cee1955e470",
+     "integrated": "03aa8ab991b0e03c5583b3979a042cee1955e470"
+    },
+    {
+     "path": "aisef2/probe/process_effect.py DIGEST",
+     "lane": null,
+     "integrated": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+    },
+    {
+     "path": "tests/v2/fixtures/calibration/process_effect",
+     "lane": "4df09ebf2ce2dbe1e38770d20cf31e35cd464349",
+     "integrated": "4df09ebf2ce2dbe1e38770d20cf31e35cd464349"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/P3-EFFECT-HARNESS.json",
+     "lane": "5676f688c9321c97f86649c73f783fa1d1a1f2ca",
+     "integrated": "5676f688c9321c97f86649c73f783fa1d1a1f2ca"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/P3-EFFECT-CALIBRATION.json",
+     "lane": "07727668f57774f92300c90e98cdf587f12846b3",
+     "integrated": "07727668f57774f92300c90e98cdf587f12846b3"
+    }
+   ],
+   "record_digests": {
+    "closure-evidence/v2/cycle2/P3-EFFECT-HARNESS.json": {
+     "bound": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "live": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+    },
+    "closure-evidence/v2/cycle2/P3-EFFECT-CALIBRATION.json": {
+     "bound": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "live": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+    }
+   },
+   "preserved": true
+  },
+  "C2-P4": {
+   "objects": [
+    {
+     "path": "aisef2/probe/python_callable_v2.py",
+     "lane": "292d1c896961764e112927c888cc10be07fffe16",
+     "integrated": "292d1c896961764e112927c888cc10be07fffe16"
+    },
+    {
+     "path": "aisef2/probe/protocol.py",
+     "lane": "fe69b77392672aac3238b9219c2e4efb81c94bf7",
+     "integrated": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    {
+     "path": "aisef2/probe/python_callable.py",
+     "lane": "c1d1390adda5ba67b748e075cceba2f3129a1598",
+     "integrated": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+    },
+    {
+     "path": "aisef2/probe/python_callable_v2.py DIGEST",
+     "lane": null,
+     "integrated": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+    },
+    {
+     "path": "tests/v2/fixtures/calibration/python_callable_v2",
+     "lane": "43c62a6173bf2a2a825e75a152f3d6b8b146ecfb",
+     "integrated": "43c62a6173bf2a2a825e75a152f3d6b8b146ecfb"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/P4-PYTHON-CALLABLE-V2-CALIBRATION.json",
+     "lane": "ef0e4b9e2853f0a036db69c9f30197fe8957818d",
+     "integrated": "ef0e4b9e2853f0a036db69c9f30197fe8957818d"
+    }
+   ],
+   "record_digests": {
+    "closure-evidence/v2/cycle2/P4-PYTHON-CALLABLE-V2-CALIBRATION.json": {
+     "bound": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "live": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+    }
+   },
+   "preserved": true
+  }
+ },
+ "cycle1_identity": {
+  "probe_id": "probe.python_callable",
+  "live_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "frozen_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "digest_unchanged": true,
+  "sources": {
+   "aisef2/probe/protocol.py": {
+    "parent": "fe69b77392672aac3238b9219c2e4efb81c94bf7",
+    "integrated": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+   },
+   "aisef2/probe/python_callable.py": {
+    "parent": "c1d1390adda5ba67b748e075cceba2f3129a1598",
+    "integrated": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+   }
+  },
+  "sources_unchanged": true
+ },
+ "catalog": {
+  "entries": [
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "subject_kind": "python_callable",
+    "active": false,
+    "cycle": 1,
+    "classes": [
+     "exists",
+     "returns",
+     "raises",
+     "blocks"
+    ],
+    "module": "aisef2/probe/python_callable.py",
+    "fixture_root": "python_callable",
+    "subject_process": "in_harness_process",
+    "protocol_channel": "captured_stdout",
+    "stimulus_shape": "call"
+   },
+   {
+    "probe_id": "probe.file_artifact",
+    "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "subject_kind": "file_artifact",
+    "active": true,
+    "cycle": 2,
+    "classes": [
+     "exists",
+     "content",
+     "grep_count"
+    ],
+    "module": "aisef2/probe/file_artifact.py",
+    "fixture_root": "file_artifact",
+    "subject_process": "in_harness_process",
+    "protocol_channel": "captured_stdout",
+    "stimulus_shape": "none"
+   },
+   {
+    "probe_id": "probe.python_callable_v2",
+    "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+    "subject_kind": "python_callable",
+    "active": true,
+    "cycle": 2,
+    "classes": [
+     "exists",
+     "returns",
+     "raises",
+     "blocks",
+     "returns_bytes",
+     "equals",
+     "raises_attrs"
+    ],
+    "module": "aisef2/probe/python_callable_v2.py",
+    "fixture_root": "python_callable_v2",
+    "subject_process": "in_harness_process",
+    "protocol_channel": "captured_stdout",
+    "stimulus_shape": "call"
+   },
+   {
+    "probe_id": "probe.cli_invocation",
+    "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+    "subject_kind": "cli_invocation",
+    "active": true,
+    "cycle": 2,
+    "classes": [
+     "exits",
+     "exits_streams",
+     "exits_files",
+     "blocks",
+     "equality"
+    ],
+    "module": "aisef2/probe/cli_invocation.py",
+    "fixture_root": "cli_invocation",
+    "subject_process": "child_of_harness",
+    "protocol_channel": "marker_file",
+    "stimulus_shape": "invocation"
+   },
+   {
+    "probe_id": "probe.process_effect",
+    "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "subject_kind": "process_effect",
+    "active": true,
+    "cycle": 2,
+    "classes": [
+     "scenario_returns",
+     "scenario_raises",
+     "scenario_files"
+    ],
+    "module": "aisef2/probe/process_effect.py",
+    "fixture_root": "process_effect",
+    "subject_process": "child_of_harness",
+    "protocol_channel": "marker_file",
+    "stimulus_shape": "scenario"
+   }
+  ],
+  "problems": [],
+  "active": {
+   "file_artifact": "probe.file_artifact",
+   "python_callable": "probe.python_callable_v2",
+   "cli_invocation": "probe.cli_invocation",
+   "process_effect": "probe.process_effect"
+  }
+ },
+ "calibrations": [
+  {
+   "probe_id": "probe.python_callable",
+   "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "observation_class": "exists",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable/exists/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable/exists/negative",
+   "demonstrated_at": 1790710903.2303371,
+   "active": false,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable",
+   "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "observation_class": "returns",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable/returns/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable/returns/negative",
+   "demonstrated_at": 1790710903.5862248,
+   "active": false,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable",
+   "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "observation_class": "raises",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable/raises/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable/raises/negative",
+   "demonstrated_at": 1790710903.9396071,
+   "active": false,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable",
+   "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "observation_class": "blocks",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/negative",
+   "demonstrated_at": 1790710904.8732002,
+   "active": false,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "exists",
+   "positive_fixture": "tests/v2/fixtures/calibration/file_artifact/exists/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/file_artifact/exists/negative",
+   "demonstrated_at": 1790710904.89017,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "content",
+   "positive_fixture": "tests/v2/fixtures/calibration/file_artifact/content/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/file_artifact/content/negative",
+   "demonstrated_at": 1790710904.906152,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "grep_count",
+   "positive_fixture": "tests/v2/fixtures/calibration/file_artifact/grep_count/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/file_artifact/grep_count/negative",
+   "demonstrated_at": 1790710904.9222898,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "exists",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/exists/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/exists/negative",
+   "demonstrated_at": 1790710905.2840981,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "returns",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns/negative",
+   "demonstrated_at": 1790710905.643213,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "raises",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises/negative",
+   "demonstrated_at": 1790710906.004066,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "blocks",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/blocks/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/blocks/negative",
+   "demonstrated_at": 1790710906.937227,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "returns_bytes",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/negative",
+   "demonstrated_at": 1790710907.32361,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "equals",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/equals/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/equals/negative",
+   "demonstrated_at": 1790710907.702911,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "raises_attrs",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/negative",
+   "demonstrated_at": 1790710908.091914,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits/negative",
+   "demonstrated_at": 1790710908.61628,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits_streams",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_streams/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_streams/negative",
+   "demonstrated_at": 1790710909.135371,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits_files",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_files/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_files/negative",
+   "demonstrated_at": 1790710909.665257,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "blocks",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/blocks/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/blocks/negative",
+   "demonstrated_at": 1790710910.844349,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "equality",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/equality/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/equality/negative",
+   "demonstrated_at": 1790710911.876234,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_returns",
+   "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_returns/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_returns/negative",
+   "demonstrated_at": 1790710912.331923,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_raises",
+   "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_raises/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_raises/negative",
+   "demonstrated_at": 1790710912.7934458,
+   "active": true,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_files/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_files/negative",
+   "demonstrated_at": 1790710913.259704,
+   "active": true,
+   "qualified": true
+  }
+ ],
+ "tests": [
+  {
+   "phase": "C2-P1",
+   "module": "tests.v2.test_c2_file_artifact",
+   "exit": 0,
+   "ran": 40,
+   "seconds": 4.16,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P2",
+   "module": "tests.v2.test_c2_cli_protocol",
+   "exit": 0,
+   "ran": 16,
+   "seconds": 1.453,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P2",
+   "module": "tests.v2.test_c2_cli_verdicts",
+   "exit": 0,
+   "ran": 19,
+   "seconds": 0.029,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P2",
+   "module": "tests.v2.test_c2_cli_invocation",
+   "exit": 0,
+   "ran": 29,
+   "seconds": 33.89,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P2",
+   "module": "tests.v2.test_c2_cli_calibration",
+   "exit": 0,
+   "ran": 3,
+   "seconds": 27.856,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P3",
+   "module": "tests.v2.test_probe_process_effect_units",
+   "exit": 0,
+   "ran": 22,
+   "seconds": 1.392,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P3",
+   "module": "tests.v2.test_probe_process_effect",
+   "exit": 0,
+   "ran": 24,
+   "seconds": 27.656,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P3",
+   "module": "tests.v2.test_probe_process_effect_bytecode",
+   "exit": 0,
+   "ran": 5,
+   "seconds": 3.592,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P3",
+   "module": "tests.v2.test_c2_effect_calibration",
+   "exit": 0,
+   "ran": 5,
+   "seconds": 18.748,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P4",
+   "module": "tests.v2.test_python_callable_v2",
+   "exit": 0,
+   "ran": 27,
+   "seconds": 34.3,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  },
+  {
+   "phase": "C2-P4",
+   "module": "tests.v2.test_python_callable_v2_bytecode",
+   "exit": 0,
+   "ran": 10,
+   "seconds": 2.958,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true
+   }
+  }
+ ],
+ "checks": [
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/cycle2_baseline.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "cycle-2 baseline guard: PASS"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/probe_static_checks.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "probe static checks: PASS (6 rules)"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/mutation.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/checker_calibration.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "calibrated 46/46; always-PASS mutants rejected 46/46"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/freeze_conformance.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "summary {'PASS': 11, 'PENDING': 0, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/v1_evidence_guard.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/destructive_authority.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "destructive authority: PASS"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/kernel_static_checks.py"
+   ],
+   "exit": 0,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/run_history.py"
+   ],
+   "exit": 0,
+   "last_line": "run history: PASS"
+  },
+  {
+   "command": [
+    "ruff",
+    "check",
+    "."
+   ],
+   "exit": 0,
+   "last_line": "All checks passed!"
+  }
+ ],
+ "histories": {
+  "C2-P0": {
+   "path": "closure-evidence/v2/cycle2/C2-P0-RUN-HISTORY.json",
+   "present": true,
+   "entries": 82,
+   "sha256": "737df06b4f4d216adda42f3a054bf4d5b0f224768a5fe81ec12d2b7255db5d6d",
+   "failed": [
+    {
+     "seq": 9,
+     "commit": "fb641aa",
+     "job": "gate (full suite in the owned range)",
+     "classification": "HARNESS"
+    },
+    {
+     "seq": 18,
+     "commit": "05e7b9b",
+     "job": "gate (full suite in the owned range)",
+     "classification": "HARNESS"
+    },
+    {
+     "seq": 21,
+     "commit": "fe9260b",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "HARNESS"
+    },
+    {
+     "seq": 49,
+     "commit": "b07dbbd",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "ENVIRONMENT"
+    },
+    {
+     "seq": 50,
+     "commit": "b07dbbd",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "HARNESS"
+    },
+    {
+     "seq": 57,
+     "commit": "002fdb7",
+     "job": "unit (ubuntu-latest, 3.11)",
+     "classification": "HARNESS"
+    }
+   ],
+   "closed_by": {
+    "path": "closure-evidence/v2/cycle2/C2-P0-ACCEPTANCE.json",
+    "sha256": "61096e95e227ff59e3998d0ac370bf7f7d460954373aba905bf4edf37201b45f"
+   }
+  },
+  "C2-P1": {
+   "path": "closure-evidence/v2/cycle2/C2-P1-RUN-HISTORY.json",
+   "present": true,
+   "entries": 15,
+   "sha256": "c46cec67677233218d4d474dac056af50eae5743060ab02432667372151915a2",
+   "failed": [],
+   "closed_by": {
+    "path": "closure-evidence/v2/cycle2/C2-P1-LANE-CLOSURE.json",
+    "sha256": "5de6a1cf40dfaae4d28b637fe24723fc00d5a4289f2d88c81e8e8c2599d9f215"
+   }
+  },
+  "C2-P2": {
+   "path": "closure-evidence/v2/cycle2/C2-P2-RUN-HISTORY.json",
+   "present": true,
+   "entries": 36,
+   "sha256": "feb09f04e094a49e16b637fb71f087099336c8c190313a0b4fe33e05ba84de73",
+   "failed": [
+    {
+     "seq": 8,
+     "commit": "d986ffc",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT"
+    },
+    {
+     "seq": 11,
+     "commit": "ac3ae16",
+     "job": "unit (ubuntu-latest, 3.14)",
+     "classification": "DEVELOPER"
+    },
+    {
+     "seq": 12,
+     "commit": "ac3ae16",
+     "job": "unit (ubuntu-latest, 3.12)",
+     "classification": "DEVELOPER"
+    },
+    {
+     "seq": 13,
+     "commit": "ac3ae16",
+     "job": "unit (ubuntu-latest, 3.13)",
+     "classification": "DEVELOPER"
+    },
+    {
+     "seq": 14,
+     "commit": "ac3ae16",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT"
+    },
+    {
+     "seq": 15,
+     "commit": "ac3ae16",
+     "job": "unit (ubuntu-latest, 3.11)",
+     "classification": "DEVELOPER"
+    },
+    {
+     "seq": 19,
+     "commit": "98b5a04",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT"
+    },
+    {
+     "seq": 26,
+     "commit": "4353c61",
+     "job": "unit (windows-latest, 3.11)",
+     "classification": "PRODUCT"
+    }
+   ],
+   "closed_by": {
+    "path": "closure-evidence/v2/cycle2/C2-P2-LANE-CLOSURE.json",
+    "sha256": "9532c13630fd07ba82f22330878097ae51a08148e0484785dd299756d62424ae"
+   }
+  },
+  "C2-P3": {
+   "path": "closure-evidence/v2/cycle2/C2-P3-RUN-HISTORY.json",
+   "present": true,
+   "entries": 15,
+   "sha256": "225d51fa062661e6f55c9010144857a50c7f33c3001dbda8622ec706e370557c",
+   "failed": [],
+   "closed_by": {
+    "path": "closure-evidence/v2/cycle2/C2-P3-LANE-CLOSURE.json",
+    "sha256": "268fcb383251eadf3c7f34c854b374c601ff4ac2d02803f6093a09b1c80a57ff"
+   }
+  },
+  "C2-P4": {
+   "path": "closure-evidence/v2/cycle2/C2-P4-RUN-HISTORY.json",
+   "present": true,
+   "entries": 15,
+   "sha256": "ac2b0b41286dea38aa9ca0d3c670cae596d417d94be5b6dfc92241751aec777f",
+   "failed": [],
+   "closed_by": {
+    "path": "closure-evidence/v2/cycle2/C2-P4-LANE-CLOSURE.json",
+    "sha256": "3400e039c88e737dc9ecc2c3ea0fc107da4ebe4ed95b643a42202506ab6023b8"
+   }
+  },
+  "C2-INTEGRATION": {
+   "path": "closure-evidence/v2/cycle2/C2-INTEGRATION-RUN-HISTORY.json",
+   "present": true,
+   "entries": 1,
+   "sha256": "a347348fff43da2da662985f277f6e5df6507a3f7eed07d1f8ec94441049e722",
+   "failed": [
+    {
+     "seq": 1,
+     "commit": "9735341",
+     "job": "gate (full suite in the owned range)",
+     "classification": "INTEGRATION"
+    }
+   ],
+   "closed_by": null
+  }
+ },
+ "problems": [],
+ "verdict": "INTEGRATED — NO SEMANTIC DIFFERENCE",
+ "cross_platform": {
+  "rule": "the integrated candidate's CI runs the whole suite — every lane's tests included — on Linux 3.11-3.14 and Windows 3.11",
+  "ci": {
+   "run": 36612821163,
+   "commit": "069e2118c2eb1c54bf0ba259e9ecba94371f44cd",
+   "attempts": [
+    {
+     "attempt": 1,
+     "jobs": [
+      {
+       "job": "lint",
+       "job_id": 109558291034,
+       "conclusion": "success",
+       "started_at": "2026-09-29T18:32:57Z",
+       "completed_at": "2026-09-29T18:33:08Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "owned_processes": null,
+       "v1_guard": false,
+       "v1_pf_001_lines": 0
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.11)",
+       "job_id": 109558291500,
+       "conclusion": "success",
+       "started_at": "2026-09-29T18:32:57Z",
+       "completed_at": "2026-09-29T18:53:41Z",
+       "tests_run": 4979,
+       "log_available": true,
+       "failing_tests": [],
+       "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True",
+       "v1_guard": true,
+       "v1_pf_001_lines": 0
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.12)",
+       "job_id": 109558291383,
+       "conclusion": "success",
+       "started_at": "2026-09-29T18:32:57Z",
+       "completed_at": "2026-09-29T18:53:12Z",
+       "tests_run": 4979,
+       "log_available": true,
+       "failing_tests": [],
+       "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True",
+       "v1_guard": true,
+       "v1_pf_001_lines": 0
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.13)",
+       "job_id": 109558291509,
+       "conclusion": "success",
+       "started_at": "2026-09-29T18:32:57Z",
+       "completed_at": "2026-09-29T18:52:38Z",
+       "tests_run": 4979,
+       "log_available": true,
+       "failing_tests": [],
+       "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True",
+       "v1_guard": true,
+       "v1_pf_001_lines": 0
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.14)",
+       "job_id": 109558291173,
+       "conclusion": "success",
+       "started_at": "2026-09-29T18:32:57Z",
+       "completed_at": "2026-09-29T18:55:34Z",
+       "tests_run": 4979,
+       "log_available": true,
+       "failing_tests": [],
+       "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True",
+       "v1_guard": true,
+       "v1_pf_001_lines": 0
+      },
+      {
+       "job": "unit (windows-latest, 3.11)",
+       "job_id": 109558291360,
+       "conclusion": "success",
+       "started_at": "2026-09-29T18:32:58Z",
+       "completed_at": "2026-09-29T19:40:49Z",
+       "tests_run": 4976,
+       "log_available": true,
+       "failing_tests": [],
+       "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True",
+       "v1_guard": true,
+       "v1_pf_001_lines": 0
+      },
+      {
+       "job": "wheel",
+       "job_id": 109558291400,
+       "conclusion": "success",
+       "started_at": "2026-09-29T18:32:57Z",
+       "completed_at": "2026-09-29T18:33:22Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "owned_processes": null,
+       "v1_guard": false,
+       "v1_pf_001_lines": 0
+      }
+     ]
+    }
+   ]
+  }
+ }
+}
