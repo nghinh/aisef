@@ -54,6 +54,13 @@ the evaluation directory, one pair per invocation), so nothing the subject write
 forged protocol line on stdout is captured bytes like any other. Each capture keeps at most `STREAM_CAP` bytes (the
 subject may write more; the fact says `truncated`, and an exact shape is then REFUTED), and a stream's facts are the
 bytes captured when the invocation returned — bytes a lingering thread writes later are not the invocation's.
+The captured bytes are the same on every platform (C2-P2-FINDING-001): the capture files are opened in binary mode
+(`O_BINARY` where the platform has it, so no C runtime translates a descriptor's newlines), and the harness pins
+the newline handling of the interpreter's standard text streams to `"\n"` before the first invocation — the
+platform default on POSIX, and on Windows what keeps a `"\n"` written through `sys.stdout` from becoming `"\r\n"` and
+a `"\r\n"` read through `sys.stdin` from becoming `"\n"` — the way UTF-8 mode is pinned: a verdict is a function of
+the revision, the spec and the probe identity, never of the platform the harness runs on. Files the subject opens
+itself keep whatever newline convention its own code asks of the platform: that is the product's behaviour.
 
 **Protocol channel (DESIGN-CHECK-1).** The taxonomy proposal suggested a dedicated descriptor (fd 3) on POSIX and a
 marker file on Windows. The owned process range (`aisef2/runtime/process_range.py`) launches the target through an
@@ -477,6 +484,10 @@ nonce, root, work, ws, cap = req["nonce"], os.path.realpath(req["root"]), req["w
 name, _, attr = req["locator"].partition(":")
 sys.path[:0] = [p for p in (root, os.path.join(root, "src")) if os.path.isdir(p)]
 proto = open(req["protocol"], "wb")
+BINARY = getattr(os, "O_BINARY", 0)
+for s in (sys.__stdin__, sys.__stdout__, sys.__stderr__):
+    if s is not None:
+        s.reconfigure(newline="\n")
 def emit(tag, body=""):
     line = req["mark"] + " " + tag + " " + nonce + (" " + body if body else "") + "\n"
     proto.write(line.encode("utf-8")); proto.flush(); os.fsync(proto.fileno())
@@ -524,7 +535,7 @@ def invoke(argv, stdin_path, out_path, err_path):
     flush()
     for fd, path, flags in ((0, stdin_path, os.O_RDONLY), (1, out_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC),
                             (2, err_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC)):
-        h = os.open(path, flags)
+        h = os.open(path, flags | BINARY)
         os.dup2(h, fd)
         os.close(h)
     sys.argv = [name, *argv]

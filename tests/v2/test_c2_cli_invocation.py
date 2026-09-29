@@ -18,6 +18,7 @@ import py_compile
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from unittest import mock
 
@@ -48,7 +49,7 @@ POSIX = os.name == "posix"
 SHA = "89abcdef0123456789abcdef0123456789abcdef"
 W = 10          # a window generous enough for any runner; the hanging cases use HANG_W
 HANG_W = 0.4
-NL = os.linesep  # what the subject's text-mode stdout writes for "\n" on this platform
+NL = "\n"  # what the subject's text-mode stdout writes for "\n" on every platform (C2-P2-FINDING-001)
 EXIT0 = {"exit_code": 0}
 
 #: A product-like checkout: one package with a __main__, an entry function and a command table (names never start
@@ -126,6 +127,15 @@ def dispatch(argv):
         return 0
     if cmd == "cat":
         sys.stdout.buffer.write(sys.stdin.buffer.read())
+        return 0
+    if cmd == "cattext":
+        sys.stdout.write(sys.stdin.read())
+        return 0
+    if cmd == "mixed":
+        print("a")
+        sys.stdout.flush()
+        sys.stdout.buffer.write(b"b\\r\\n")
+        sys.stderr.write("c\\n")
         return 0
     if cmd == "put":
         open(rest[0], "wb").write(rest[1].encode("utf-8"))
@@ -411,6 +421,23 @@ class Harness(_Product):
                 o = self.see(spec("app:__main__", {"exit_code": 0, "stdout": expected}, {"argv": ["cat"], "stdin": stdin}))
                 self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S), o.detail)
 
+    def test_C2_P2_FINDING_001_the_captured_bytes_are_the_same_on_every_platform(self):
+        """The capture files are binary descriptors and the standard text streams write and read "\n" untranslated:
+        the bytes (and every exact stream verdict over them) are a function of the subject alone, never of the
+        platform's newline convention (on Windows the text layer and the C runtime each translated "\n" before)."""
+        o = self.see(spec("app:__main__", EXIT0, {"argv": ["mixed"]}))
+        f = facts_of(o)
+        self.assertEqual((f["stdout"]["sha256"], f["stdout"]["size"]), (sha(b"a\nb\r\n"), 5), o.detail)
+        self.assertEqual((f["stderr"]["sha256"], f["stderr"]["size"]), (sha(b"c\n"), 2), o.detail)
+        raw = b"x\r\ny\x1az\n"   # a CRLF, a Ctrl-Z (a text-mode C runtime reads it as end of file) and an LF
+        for cmd in ("cat", "cattext"):
+            with self.subTest(cmd=cmd):
+                o = self.see(spec("app:__main__", EXIT0, {"argv": [cmd], "stdin": {"bytes_hex": raw.hex()}}))
+                self.assertEqual(facts_of(o)["stdout"]["sha256"], sha(raw), o.detail)
+        o = self.see(spec("app:__main__", {"exit_code": 0, "stdout": {"text": "a\nb\r\n", "newline": "\n"}},
+                          {"argv": ["mixed"]}))
+        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S), o.detail)
+
     def test_CLI_9_the_exit_status_is_recorded_verbatim_beside_the_code(self):
         cases = {
             "SystemExit(None)": (("app:__main__", ["exitnone"]), (None, 0, None), None),
@@ -490,11 +517,22 @@ class FaultSubject(_Product):
 
     def test_FM2_CLI_SUBJECT_3_a_controller_stop_is_an_interruption_with_no_result(self):
         stops = []
+        scratch = tempfile.TemporaryDirectory()
+        self.addCleanup(scratch.cleanup)
+
+        def after_dispatch(run):
+            # the stop lands after DISPATCHED, read from the protocol file of this evaluation — never at a fixed
+            # delay, which on a slow runner can precede DISPATCHED, where a stop is a harness failure instead
+            deadline = time.monotonic() + 60
+            while time.monotonic() < deadline and not any(
+                    b" DISPATCHED " in p.read_bytes() for p in pathlib.Path(scratch.name).glob("*/protocol.log")):
+                time.sleep(0.02)
+            run.release()   # the controller's own ladder: it goes into the ledger
 
         def stop_it(run):
             stops.append(run)
-            threading.Timer(0.5, run.release).start()   # the controller's own ladder: it goes into the ledger
-        probe = CliInvocationProbe(on_range=stop_it)
+            threading.Thread(target=after_dispatch, args=(run,), daemon=True).start()
+        probe = CliInvocationProbe(on_range=stop_it, scratch=scratch.name)
         with self.assertRaises(ProbeInterrupted) as interrupted:
             run_probe(probe, spec("app:__main__", EXIT0, {"argv": ["sleep", "60"]}, window=60), self.at, env())
         self.assertTrue(stops and stops[0].ledger)
