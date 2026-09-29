@@ -1,0 +1,22 @@
+{
+ "subject": {
+  "kind": "python_callable",
+  "locator": "calib_subject:target"
+ },
+ "stimulus": {
+  "workspace": {
+   "ledger.jsonl": {
+    "text": "{\"seq\": 1}\n",
+    "newline": "\n"
+   }
+  },
+  "args": [
+   "<ws>/ledger.jsonl"
+  ]
+ },
+ "observable": {
+  "returns_bytes_hex": "7b22736571223a20317d0a",
+  "within_s": 5
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}
