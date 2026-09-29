@@ -38,7 +38,8 @@ if str(pathlib.Path(__file__).resolve().parent) not in sys.path:
 import cleanup_authority as ca  # noqa: E402  — the runner's only way to signal a process (P4-FINDING-011)
 RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
            "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json",
-           "P5": "closure-evidence/v2/P5-MUTATION.json", "P6": "closure-evidence/v2/P6-MUTATION.json"}
+           "P5": "closure-evidence/v2/P5-MUTATION.json", "P6": "closure-evidence/v2/P6-MUTATION.json",
+           "C2-P2": "closure-evidence/v2/cycle2/P2-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -354,8 +355,27 @@ for _t in ("aisef2/runtime/repair.py::closers", "aisef2/runtime/repair.py::repai
     P4_TARGETS[_t] = [*P4_TARGETS[_t], _V2_005]
 for _t in ("aisef2/control/owner.py::TAXONOMY", "aisef2/control/owner.py::classify", "aisef2/control/owner.py::flatten"):
     P1_TARGETS[_t] = [*P1_TARGETS[_t], _V2_005]
+# Cycle 2, C2-P2 (WP-2.2.1): the cli_invocation probe. The pure functions (classes, shapes, verdicts over fixture
+# facts, the marker-file parser, the layout) are killed in-process; the harness (observe, the watch loop, the
+# hard-exit and harness-failure rules, the command line) by the subprocess-backed cases, DESIGN-CHECK-1 and the
+# FM2-CLI / FM2-PYC-CLI fault families. Scalar constants (PROBE_ID, STREAM_CAP, PLACEHOLDER, POLL_S, HARNESS) have no
+# mutation site and are not targets; HARNESS, the child script, is killed through observe's cases.
+_CLI_PURE = ["tests/v2/test_c2_cli_verdicts.py"]
+_CLI_HARNESS = ["tests/v2/test_c2_cli_invocation.py"]
+C2P2_TARGETS: dict[str, list[str]] = {
+    **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_PURE for f in (
+        "_is_int", "_content_ok", "_bytes_of", "_name_ok", "_ws_key_ok", "_argv_ok", "_stimulus_ok", "_stream_shape_ok",
+        "_file_shape_ok", "observation_class", "spec_class", "_sha_file", "_stream_fact", "_file_fact", "_stream_bytes",
+        "_stream_matches", "_file_matches", "verdict_of", "_ws_name", "_substitute", "_public", "_child_env",
+        "_protocol", "_prepare", "CLASSES", "ON_DEADLINE", "STREAM_SHAPES", "FILE_SHAPES",
+        "CliInvocationProbe.enforcement", "CliInvocationProbe.harness_preconditions")},
+    **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_HARNESS for f in (
+        "PROBE_SOURCES", "_probe_digest", "_await", "CliInvocationProbe.__init__", "CliInvocationProbe.observe",
+        "CliInvocationProbe._observe", "_watch", "_hard_exit", "_harness_failure")},
+    "aisef2/probe/cli_invocation.py::_harness_argv": [*_CLI_PURE, *_CLI_HARNESS],
+}
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
-                 "P6": P6_TARGETS}
+                 "P6": P6_TARGETS, "C2-P2": C2P2_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}

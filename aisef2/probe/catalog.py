@@ -28,6 +28,7 @@ from typing import Callable
 
 from aisef2.arch.enums import SubjectKind
 from aisef2.errors import InvariantError
+from aisef2.probe import cli_invocation as ci
 from aisef2.probe import python_callable as pc
 from aisef2.probe.protocol import Probe, ProbeMetadata, ProbeRegistry
 
@@ -87,6 +88,8 @@ CATALOG: tuple[CatalogEntry, ...] = (
     CatalogEntry(pc.PROBE_ID, pc.DIGEST, SubjectKind.PYTHON_CALLABLE, pc.CLASSES, pc.METADATA, pc.PythonCallableProbe,
                  "aisef2/probe/python_callable.py", "python_callable", "in_harness_process", "captured_stdout",
                  "call", 1),
+    CatalogEntry(ci.PROBE_ID, ci.DIGEST, SubjectKind.CLI_INVOCATION, ci.CLASSES, ci.METADATA, ci.CliInvocationProbe,
+                 "aisef2/probe/cli_invocation.py", "cli_invocation", "child_of_harness", "marker_file", "invocation", 2),
 )
 
 
