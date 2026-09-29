@@ -1,0 +1,770 @@
+{
+ "record": "AISEF V2 — WP-2.4.1 PROBE.PYTHON_CALLABLE_V2 CALIBRATION (C2-P4: the second python_callable identity)",
+ "work_package": "WP-2.4.1",
+ "phase": "C2-P4",
+ "authority": "owner DECISION-6 'KEEP_CYCLE1_PROBE_SECOND_IDENTITY' (AISEF V2 — CYCLE-2 OWNER DECISIONS / WP-2.0.1 AUTHORIZATION, 2026-09-28); CYCLE2-PROBE-TAXONOMY-PROPOSAL §5; CYCLE2-F5-COMPATIBILITY-REPORT §2.4",
+ "identities": {
+  "head": "c1de0cbb5237894c9bb48d353c90d2d90eb2f47f",
+  "aisef2_tree": "07d492342815f14d3576493276dadad503226fc3",
+  "cycle2_manifest": {
+   "path": "docs/implementation/v2/cycle2/cycle2-manifest.json",
+   "sha256": "f4293366e53853259c58306b55c4992c7bd45e26fe2dea0bf92e4c8cf050bbc7"
+  },
+  "cycle2_freeze_manifest": {
+   "path": "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json",
+   "sha256": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad"
+  },
+  "owner_decisions": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "wp_2_0_1_acceptance": {
+   "path": "closure-evidence/v2/cycle2/WP-2.0.1-ACCEPTANCE.json",
+   "sha256": "665e1ff327d7c3b5eef040c585b122a91565b0bb8b94a0b0ab5fb2337122462f"
+  },
+  "cycle1": {
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "probe": {
+    "id": "probe.python_callable",
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+   }
+  },
+  "rfc": {
+   "rfc_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831"
+  },
+  "hash_rule": "every sha256 here is over bytes with CRLF normalised to LF; git_blob = sha1 of the blob header and the same bytes",
+  "package": "WP-2.4.1",
+  "phase": "C2-P4",
+  "parent": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
+  "lane_commits": [
+   "fcbb9dd112f893a94c3fc9b9a9aa014e6265cf9e",
+   "95ccfa97a8a49ed6045304de66c105f8d17bb47a",
+   "323fa4fcc97aa50104d87e8a1015e358e7f421ba",
+   "c1de0cbb5237894c9bb48d353c90d2d90eb2f47f"
+  ],
+  "parent_is_an_ancestor": true
+ },
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin"
+ },
+ "cycle1_identity": {
+  "probe_id": "probe.python_callable",
+  "live_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "frozen_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "digest_unchanged": true,
+  "sources": {
+   "aisef2/probe/protocol.py": {
+    "live": {
+     "sha256": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+     "git_blob": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    "parent_blob": "fe69b77392672aac3238b9219c2e4efb81c94bf7",
+    "frozen": {
+     "sha256": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+     "git_blob": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    "unchanged": true
+   },
+   "aisef2/probe/python_callable.py": {
+    "live": {
+     "sha256": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+     "git_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+    },
+    "parent_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598",
+    "frozen": {
+     "sha256": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+     "git_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+    },
+    "unchanged": true
+   }
+  },
+  "baseline_guard": true
+ },
+ "probe": {
+  "probe_id": "probe.python_callable_v2",
+  "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+  "module": "aisef2/probe/python_callable_v2.py",
+  "sources": {
+   "probe/protocol.py": {
+    "sha256": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+    "git_blob": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+   },
+   "probe/python_callable.py": {
+    "sha256": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+    "git_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+   },
+   "probe/python_callable_v2.py": {
+    "sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7",
+    "git_blob": "292d1c896961764e112927c888cc10be07fffe16"
+   }
+  },
+  "digest_rule": "sha256 over each source's repository-relative name, NUL, its bytes with CRLF normalised to LF, NUL — in PROBE_SOURCES order; the Cycle-1 module is a source because the frozen helpers are imported from it",
+  "classes": [
+   "exists",
+   "returns",
+   "raises",
+   "blocks",
+   "returns_bytes",
+   "equals",
+   "raises_attrs"
+  ],
+  "on_deadline": {
+   "exists": "REFUTED",
+   "returns": "REFUTED",
+   "raises": "REFUTED",
+   "blocks": "SATISFIED",
+   "returns_bytes": "REFUTED",
+   "equals": "REFUTED",
+   "raises_attrs": "REFUTED"
+  },
+  "enforcement": "PARTIAL",
+  "weakest_path": "the subject runs inside the probe's subprocess with the harness user's filesystem and network access; isolation is -I interpreter isolation, a scrubbed environment and a harness-owned bytecode cache (-X pycache_prefix, -B), not a sandbox",
+  "harness_preconditions": [
+   "interpreter: the ExecutionEnv's Python interpreter exists and launches",
+   "checkout: the revision's checkout is a readable directory",
+   "workspace: the evaluation directory and the stimulus's workspace files can be written",
+   "protocol: the harness prints READY, then DISPATCHED before touching the subject, within the harness watchdog (ExecutionEnv.timeout_s)"
+  ],
+  "placeholder": "<ws>"
+ },
+ "catalog": {
+  "entries": [
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "subject_kind": "python_callable",
+    "active": false,
+    "cycle": 1,
+    "classes": [
+     "exists",
+     "returns",
+     "raises",
+     "blocks"
+    ],
+    "module": "aisef2/probe/python_callable.py",
+    "fixture_root": "python_callable"
+   },
+   {
+    "probe_id": "probe.python_callable_v2",
+    "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+    "subject_kind": "python_callable",
+    "active": true,
+    "cycle": 2,
+    "classes": [
+     "exists",
+     "returns",
+     "raises",
+     "blocks",
+     "returns_bytes",
+     "equals",
+     "raises_attrs"
+    ],
+    "module": "aisef2/probe/python_callable_v2.py",
+    "fixture_root": "python_callable_v2"
+   }
+  ],
+  "problems": [],
+  "active": {
+   "python_callable": "probe.python_callable_v2"
+  }
+ },
+ "calibrations": [
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "exists",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/exists/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/exists/negative",
+   "demonstrated_at": 1790659308.2329211,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "returns",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns/negative",
+   "demonstrated_at": 1790659308.625844,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "raises",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises/negative",
+   "demonstrated_at": 1790659309.0153081,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "blocks",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/blocks/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/blocks/negative",
+   "demonstrated_at": 1790659309.948437,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "returns_bytes",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/negative",
+   "demonstrated_at": 1790659310.368782,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "equals",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/equals/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/equals/negative",
+   "demonstrated_at": 1790659310.7523682,
+   "qualified": true
+  },
+  {
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "raises_attrs",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/negative",
+   "demonstrated_at": 1790659311.1427,
+   "qualified": true
+  }
+ ],
+ "fixtures": {
+  "tests/v2/fixtures/calibration/python_callable_v2/blocks/negative/checkout/calib_subject.py": {
+   "sha256": "65c2858b88ac5ce8b39f93d4e0b11777466dcfec024fd8cadd867c7c37124c3c",
+   "git_blob": "e3c9da84cec31ddf49a892ea38c60b6d92507800"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/blocks/negative/request.json": {
+   "sha256": "1d3049b4374c014055f02b8238184e7b70a4eddf3893ab41081237904baa4c1f",
+   "git_blob": "293fb6ad866a947f017cda1c956997cea2289733"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/blocks/positive/checkout/calib_subject.py": {
+   "sha256": "a9917f25dcbbe73bd9965e720576d308dcb362a75db82557f6b5f24b727b5aac",
+   "git_blob": "abb1b9f116b6ae62671c11818b9601963c9b67e1"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/blocks/positive/request.json": {
+   "sha256": "1d3049b4374c014055f02b8238184e7b70a4eddf3893ab41081237904baa4c1f",
+   "git_blob": "293fb6ad866a947f017cda1c956997cea2289733"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/equals/negative/checkout/calib_subject.py": {
+   "sha256": "e03293dd897ef59b9f92953c06970e00b3f2b83ca5280ffed6813ca69bf9af3a",
+   "git_blob": "cbf47438169dda89a74d07522f2e2ab91bd26a0e"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/equals/negative/request.json": {
+   "sha256": "0aa82c1de157c68e881f88145872f92bc36b986597620eb1184fd34feb6d76d6",
+   "git_blob": "df6940299669bed5091d6fa5e4556b91ae66b19c"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/equals/positive/checkout/calib_subject.py": {
+   "sha256": "daec454080dce3a2d487ff3fc733ac765c0f4729f269758e07838bf3badac4f8",
+   "git_blob": "406bfa5cabb78832609edb83a17965480fd7dfe0"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/equals/positive/request.json": {
+   "sha256": "0aa82c1de157c68e881f88145872f92bc36b986597620eb1184fd34feb6d76d6",
+   "git_blob": "df6940299669bed5091d6fa5e4556b91ae66b19c"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/exists/negative/checkout/calib_subject.py": {
+   "sha256": "299716220c96c5f089fcba20b1133b0f85479cf5e74ff7f5d05961cd1fd373f2",
+   "git_blob": "80cb507314146da0f3879014802a7d3d4f6f26f4"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/exists/negative/request.json": {
+   "sha256": "fa96b8d8599c5b070cbe1b3f233d9d4cda2a9d8cf9afc429ffd3a70d6f481c4b",
+   "git_blob": "e869de890fce7bc773f6cc6beaffa5dccb720cfb"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/exists/positive/checkout/calib_subject.py": {
+   "sha256": "e90074bde6f68906b18cd2dd68cec01eb01d6b35cfa5264896405a14cf650435",
+   "git_blob": "0e204f335967fbe8c4ed2d641a1dd99893e305f4"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/exists/positive/request.json": {
+   "sha256": "fa96b8d8599c5b070cbe1b3f233d9d4cda2a9d8cf9afc429ffd3a70d6f481c4b",
+   "git_blob": "e869de890fce7bc773f6cc6beaffa5dccb720cfb"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises/negative/checkout/calib_subject.py": {
+   "sha256": "65c2858b88ac5ce8b39f93d4e0b11777466dcfec024fd8cadd867c7c37124c3c",
+   "git_blob": "e3c9da84cec31ddf49a892ea38c60b6d92507800"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises/negative/request.json": {
+   "sha256": "725e36f2994da3df83df95ef701c8f8576ced150f551e720a4bb497151764237",
+   "git_blob": "91d9e5383daf4a2910ffcf7a92eb33b715599ce2"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises/positive/checkout/calib_subject.py": {
+   "sha256": "e1b191da3fb526674bd67471c7b58c418903b3ff7ff9744c0b01655583b23d25",
+   "git_blob": "8ce789ea6ab380524b1398ff553f800c147ab765"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises/positive/request.json": {
+   "sha256": "725e36f2994da3df83df95ef701c8f8576ced150f551e720a4bb497151764237",
+   "git_blob": "91d9e5383daf4a2910ffcf7a92eb33b715599ce2"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/negative/checkout/calib_subject.py": {
+   "sha256": "a760506330e2f00933ee2992785d2a95c92a07fe052c3b2245b158efab75c527",
+   "git_blob": "fb10901046f5e3da7cac9307461acfb00803d695"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/negative/request.json": {
+   "sha256": "3ecdfd3520231e57fd343220a9ce7e3c8bca426770895c689d6c2ed13a294cad",
+   "git_blob": "58a23be3405333772d6e504076a6873402ac4496"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/positive/checkout/calib_subject.py": {
+   "sha256": "b52adb676c7ee8c8baecfa94c68ee87d1392bf830b1b7ce1df66946b1791173b",
+   "git_blob": "c58aa2cc4d4738f0172b83e596fc74ff6fd13277"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/positive/request.json": {
+   "sha256": "3ecdfd3520231e57fd343220a9ce7e3c8bca426770895c689d6c2ed13a294cad",
+   "git_blob": "58a23be3405333772d6e504076a6873402ac4496"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns/negative/checkout/calib_subject.py": {
+   "sha256": "fb7b22540d1efc4de53f05162df6cb45e3a1323e300c31879ea04974515fc872",
+   "git_blob": "7a57c571ade471b7c480b62c6fb1cedb098794eb"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns/negative/request.json": {
+   "sha256": "5b2fc44a0e63e4b9c04fec2cc1317b35e24f544a6335819116a7071fe0d41734",
+   "git_blob": "996bfd5638375e55583cd37efcdab06cd7d0ec61"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns/positive/checkout/calib_subject.py": {
+   "sha256": "af0125069a1f48faf71a557e7a0e74a375681b0bfb7986b6f611562e8ea7bcc6",
+   "git_blob": "393ad70372b3bb50c15c30f5f960c77bd65f7d30"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns/positive/request.json": {
+   "sha256": "5b2fc44a0e63e4b9c04fec2cc1317b35e24f544a6335819116a7071fe0d41734",
+   "git_blob": "996bfd5638375e55583cd37efcdab06cd7d0ec61"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/negative/checkout/calib_subject.py": {
+   "sha256": "c05facdf8dd4fcd6a3922c0b49983c97f46acabd33d4cdf20eed7ea679def2b6",
+   "git_blob": "fced963db8d455084db57f887f5c7bf12e2b8b89"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/negative/request.json": {
+   "sha256": "f3a653b9a31b5e7a0c929e5c43ae203b2d81461ef3dd2f967a67979e84c546f7",
+   "git_blob": "e5d97fc0c694b6d54096ee16513dd26f527e189f"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/positive/checkout/calib_subject.py": {
+   "sha256": "e3123153de32129c9cf2037ae38f926e6b87790b002968377d721fc796ca112f",
+   "git_blob": "7293a7d9d1d7cd7e231ae802b50cfb50208ff2f3"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/positive/request.json": {
+   "sha256": "f3a653b9a31b5e7a0c929e5c43ae203b2d81461ef3dd2f967a67979e84c546f7",
+   "git_blob": "e5d97fc0c694b6d54096ee16513dd26f527e189f"
+  }
+ },
+ "tests": [
+  {
+   "module": "tests.v2.test_python_callable_v2",
+   "command": [
+    "-P",
+    "validation/v2/owned_run.py",
+    "--out",
+    "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/c2-owned-sx3as0gb/owned.json",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "-v",
+    "tests.v2.test_python_callable_v2"
+   ],
+   "exit": 0,
+   "ran": 27,
+   "seconds": 35.585,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   },
+   "pyc_rows": []
+  },
+  {
+   "module": "tests.v2.test_python_callable_v2_bytecode",
+   "command": [
+    "-P",
+    "validation/v2/owned_run.py",
+    "--out",
+    "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/c2-owned-1kf7cjff/owned.json",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "-v",
+    "tests.v2.test_python_callable_v2_bytecode"
+   ],
+   "exit": 0,
+   "ran": 10,
+   "seconds": 3.232,
+   "ok": true,
+   "failing": [],
+   "owned": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   },
+   "pyc_rows": [
+    {
+     "test": "test_FM2_PYC_V2_1_in_tree_stale_bytecode_with_a_matching_header_is_not_the_subject_the_source_is",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_PYC_V2_2_two_checkouts_of_the_same_content_with_different_dates_observe_one_verdict",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_PYC_V2_3_a_checkout_with_committed_bytecode_is_byte_identical_before_and_after_the_proof",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_PYC_V2_4_the_probe_writes_no_bytecode_into_the_checkout",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_PYC_V2_5_the_bytecode_cache_is_fresh_empty_and_outside_the_checkout",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_PYC_V2_5b_under_a_story_scratch_the_cache_lies_there_and_is_left_to_the_scratch",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_PYC_V2_6_implementer_and_verifier_get_distinct_caches",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_PYC_V2_7_an_evaluation_never_reuses_the_cache_of_the_one_before",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_PYC_V2_8_isolated_mode_keeps_the_command_line_controls_and_drops_the_environment_route",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_PYC_V2_9_without_B_the_external_cache_alone_keeps_the_stale_bytecode_out_and_the_checkout_unwritten",
+     "outcome": "ok"
+    }
+   ]
+  }
+ ],
+ "test_placement": "tests/v2/test_python_callable_v2*.py live in the ROOT tier: aisef2/invariants/registry.py's Tier enum is closed and is not this package's to edit, so tests/v2/c2/ could not be armed",
+ "pyc_family": [
+  {
+   "test": "test_FM2_PYC_V2_1_in_tree_stale_bytecode_with_a_matching_header_is_not_the_subject_the_source_is",
+   "outcome": "ok"
+  },
+  {
+   "test": "test_FM2_PYC_V2_2_two_checkouts_of_the_same_content_with_different_dates_observe_one_verdict",
+   "outcome": "ok"
+  },
+  {
+   "test": "test_FM2_PYC_V2_3_a_checkout_with_committed_bytecode_is_byte_identical_before_and_after_the_proof",
+   "outcome": "ok"
+  },
+  {
+   "test": "test_FM2_PYC_V2_4_the_probe_writes_no_bytecode_into_the_checkout",
+   "outcome": "ok"
+  },
+  {
+   "test": "test_FM2_PYC_V2_5_the_bytecode_cache_is_fresh_empty_and_outside_the_checkout",
+   "outcome": "ok"
+  },
+  {
+   "test": "test_FM2_PYC_V2_5b_under_a_story_scratch_the_cache_lies_there_and_is_left_to_the_scratch",
+   "outcome": "ok"
+  },
+  {
+   "test": "test_FM2_PYC_V2_6_implementer_and_verifier_get_distinct_caches",
+   "outcome": "ok"
+  },
+  {
+   "test": "test_FM2_PYC_V2_7_an_evaluation_never_reuses_the_cache_of_the_one_before",
+   "outcome": "ok"
+  },
+  {
+   "test": "test_FM2_PYC_V2_8_isolated_mode_keeps_the_command_line_controls_and_drops_the_environment_route",
+   "outcome": "ok"
+  },
+  {
+   "test": "test_FM2_PYC_V2_9_without_B_the_external_cache_alone_keeps_the_stale_bytecode_out_and_the_checkout_unwritten",
+   "outcome": "ok"
+  }
+ ],
+ "mutation": {
+  "record": "closure-evidence/v2/cycle2/P4-MUTATION.json",
+  "present": true,
+  "problems": [],
+  "targets": 18,
+  "expected_targets": 18,
+  "mutants": 423,
+  "killed": 423,
+  "killed_by_timeout": 2,
+  "survivors": {},
+  "errors": {},
+  "per_target": [
+   {
+    "target": "aisef2/probe/python_callable_v2.py::CLASSES",
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::ON_DEADLINE",
+    "mutants": 21,
+    "killed": 21,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::PROBE_SOURCES",
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__",
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2_bytecode.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement",
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::_file_ok",
+    "mutants": 15,
+    "killed": 15,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::_harness_argv",
+    "mutants": 14,
+    "killed": 14,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2_bytecode.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::_is_hex",
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::_probe_digest",
+    "mutants": 1,
+    "killed": 1,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::_substituted",
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::_unsubstituted",
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::_watch",
+    "mutants": 66,
+    "killed": 66,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::_workspace_ok",
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::_write_workspace",
+    "mutants": 10,
+    "killed": 10,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::observation_class",
+    "mutants": 75,
+    "killed": 75,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::observe",
+    "mutants": 119,
+    "killed": 119,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_python_callable_v2_bytecode.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::spec_class",
+    "mutants": 13,
+    "killed": 13,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   },
+   {
+    "target": "aisef2/probe/python_callable_v2.py::verdict_of",
+    "mutants": 47,
+    "killed": 47,
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "source_sha256": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   }
+  ]
+ },
+ "static": [
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/probe_static_checks.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "probe static checks: PASS (6 rules)"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/cycle2_baseline.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "cycle-2 baseline guard: PASS"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/kernel_static_checks.py"
+   ],
+   "exit": 0,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/destructive_authority.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "destructive authority: PASS"
+  },
+  {
+   "command": [
+    "python",
+    "-P",
+    "validation/v2/mutation.py",
+    "--check"
+   ],
+   "exit": 0,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "command": [
+    "ruff",
+    "check",
+    "."
+   ],
+   "exit": 0,
+   "last_line": "All checks passed!"
+  }
+ ],
+ "decision_6": {
+  "id": "DECISION-6",
+  "subject": "python_callable extensions",
+  "verdict": "KEEP_CYCLE1_PROBE_SECOND_IDENTITY",
+  "owner_text": "KEEP the Cycle-1 python_callable implementation and digest unchanged: 1961e84d... New observation classes MUST ship under a SECOND probe identity. Do not mutate the Cycle-1 probe implementation merely to add: returns_bytes; constant equality; workspace stimulus; richer raises attributes. Existing Cycle-1 ProductProofSpec / semantic_hash evidence remains tied to the original probe. The new probe must have independent: probe_id; probe_digest; capability calibration; falsifiability evidence; mutation evidence; Q1/Q2/Q3 coverage.",
+  "mechanical_consequences": [
+   "aisef2/probe/protocol.py and aisef2/probe/python_callable.py stay byte-identical to the parent's blobs (cycle2_baseline R2); the live digest is checked against the frozen 1961e84d… on every run",
+   "the second identity is a new module with its own PROBE_ID, DIGEST, METADATA, CLASSES, calibration fixture root, mutation targets and Q1/Q2/Q3 coverage; it supersedes the Cycle-1 entry as the one active probe for subject kind python_callable (F4 binds one probe per kind at compile time) while the Cycle-1 entry stays registered so its evidence keeps its observation class (aisef2/probe/catalog.py)",
+   "no Cycle-1 ProductProofSpec is recompiled; new specs compile against the second identity only"
+  ],
+  "applies_to": [
+   "WP-2.4.1"
+  ],
+  "criteria": []
+ },
+ "semantics": {
+  "unchanged_from_cycle1": [
+   "protocol lines READY/DISPATCHED/RESULT with a per-evaluation nonce on captured stdout",
+   "harness watchdog vs subject window (§9.2)",
+   "signal provenance (§9.3)",
+   "pump-completion barrier (§9.4)",
+   "bytecode isolation (-I -B -X pycache_prefix)",
+   "the meaning of exists/returns/raises/blocks"
+  ],
+  "added": [
+   "returns_bytes",
+   "equals (non-callable subject; a callable subject is UNSUPPORTED -> INVALID_SPEC)",
+   "raises_attrs",
+   "the workspace stimulus with the one placeholder <ws>"
+  ],
+  "expectations": "compared through aisef2.product.contract.plain (the JSON form of the spec's frozen data); the Cycle-1 probe's json round-trip raises TypeError on a nested returns expectation — measured on the frozen module, not changed"
+ },
+ "problems": [],
+ "verdict": "QUALIFIED"
+}
