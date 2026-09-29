@@ -1,0 +1,43 @@
+{
+ "record": "AISEF V2 — CYCLE-2 C2-INTEGRATION CLOSURE (the one integrated candidate of C2-P1..P4)",
+ "id": "AISEF-V2-CYCLE2-C2-INTEGRATION-CLOSURE",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P0 ACCEPTED / AUTHORIZE MAXIMUM SAFE PARALLEL EXECUTION' (2026-09-29): integrate P1+P2+P3+P4 into ONE candidate, then start C2-P5 automatically",
+ "written": "2026-09-29T21:12:44Z",
+ "candidate": {
+  "commit": "069e2118c2eb1c54bf0ba259e9ecba94371f44cd",
+  "aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+  "merges": [
+   "e1b7890783a57a0820e75a565eae444d97e84637",
+   "3b23c8023d24b544bff2db11be0454d2e0443521",
+   "99233727e6e0e2658bd49b50b9de926daf9c3adc"
+  ]
+ },
+ "evidence_commit": {
+  "commit": "71f0ef9a509c6589121b35f93062889e823bc834",
+  "aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
+ },
+ "integration_record": {
+  "path": "closure-evidence/v2/cycle2/C2-INTEGRATION.json",
+  "sha256": "880fd9dcdd8f95cf4cdd6b35f81cc5642e58b6244e20e327afefc8a6c6da0c20",
+  "git_blob": "6390322b7dfe9d7423e7837bfb741ab3514abeb3",
+  "verdict": "INTEGRATED — NO SEMANTIC DIFFERENCE",
+  "problems": []
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/cycle2/C2-INTEGRATION-RUN-HISTORY.json",
+  "total_attempts": 17,
+  "sha256": "47d03568de2a36d9f65bde07fddcf6dc7ab0f42dd72f873a49af9c56f659a2ed",
+  "failed": [
+   {
+    "seq": 1,
+    "commit": "9735341",
+    "where": "local",
+    "job": "gate (full suite in the owned range)",
+    "classification": "INTEGRATION",
+    "gate_effect": "COUNTS"
+   }
+  ],
+  "rule": "closed at this count when C2-P5 began on the integrated candidate; C2-P5's attempts go to C2-P5-RUN-HISTORY.json; nothing rewritten"
+ },
+ "status": "INTEGRATION CLOSED — C2-P1..P4 and the integration await the owner's acceptance"
+}

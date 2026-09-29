@@ -41,7 +41,9 @@ HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evi
              "C2-P2": "closure-evidence/v2/cycle2/C2-P2-RUN-HISTORY.json",
              "C2-P3": "closure-evidence/v2/cycle2/C2-P3-RUN-HISTORY.json",
              "C2-P4": "closure-evidence/v2/cycle2/C2-P4-RUN-HISTORY.json",
-             "C2-INTEGRATION": "closure-evidence/v2/cycle2/C2-INTEGRATION-RUN-HISTORY.json"}
+             "C2-INTEGRATION": "closure-evidence/v2/cycle2/C2-INTEGRATION-RUN-HISTORY.json",
+             # C2-P5 (WP-2.5.1, WP-2.5.2): opened when the integration history was closed
+             "C2-P5": "closure-evidence/v2/cycle2/C2-P5-RUN-HISTORY.json"}
 #: the record that closes a phase's history: a FINAL SEAL for P1-P6; for P7, the owner's acceptance of the corrected
 #: candidate's Q0-Q3 (there is no P7 seal builder — P7 qualifies, it does not seal)
 SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence/v2/P2-FINAL-SEAL.json",
@@ -55,7 +57,9 @@ SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence
          "C2-P1": "closure-evidence/v2/cycle2/C2-P1-LANE-CLOSURE.json",
          "C2-P2": "closure-evidence/v2/cycle2/C2-P2-LANE-CLOSURE.json",
          "C2-P3": "closure-evidence/v2/cycle2/C2-P3-LANE-CLOSURE.json",
-         "C2-P4": "closure-evidence/v2/cycle2/C2-P4-LANE-CLOSURE.json"}
+         "C2-P4": "closure-evidence/v2/cycle2/C2-P4-LANE-CLOSURE.json",
+         # the integration history, by its closure when C2-P5 began (not an owner acceptance)
+         "C2-INTEGRATION": "closure-evidence/v2/cycle2/C2-INTEGRATION-CLOSURE.json"}
 HISTORY_REL = HISTORIES["P1"]
 RESULTS = ("PASS", "FAIL")
 GATE_EFFECTS = ("COUNTS", "DIAGNOSTIC_ONLY", "STOP")
