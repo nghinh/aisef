@@ -1,0 +1,22 @@
+{
+ "subject": {
+  "kind": "cli_invocation",
+  "locator": "calib_cli:__main__"
+ },
+ "stimulus": {
+  "argv": [
+   "<ws>/out.txt"
+  ]
+ },
+ "observable": {
+  "exit_code": 0,
+  "files": {
+   "<ws>/out.txt": {
+    "text": "data\n",
+    "newline": "\n"
+   }
+  },
+  "within_s": 5
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}

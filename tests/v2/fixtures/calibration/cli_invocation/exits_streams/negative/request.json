@@ -1,0 +1,17 @@
+{
+ "subject": {
+  "kind": "cli_invocation",
+  "locator": "calib_cli:__main__"
+ },
+ "stimulus": {
+  "argv": [
+   "verify"
+  ]
+ },
+ "observable": {
+  "exit_code": 0,
+  "stdout": "verify ok\n",
+  "within_s": 5
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}

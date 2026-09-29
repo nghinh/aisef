@@ -14,6 +14,10 @@ The record binds each target's module source (LF-normalised sha256): editing a t
 One record per phase (`RECORDS`): a run writes each target into its phase's record, so a sealed phase's record is
 never rewritten by a later phase's targets.
 
+A probe's child script (a module-level string constant that the probe runs in the subject's process) is code too:
+`path::SCRIPT/function` names a function (or a module-level table) of the script bound to `SCRIPT`; its mutants are
+made in the parsed script and written back into the constant, so the kill tests run the mutated script (C2-P3).
+
     python -P validation/v2/mutation.py run [target ...]   # run; writes closure-evidence/v2/P<n>-MUTATION.json
     python -P validation/v2/mutation.py --check            # every phase record current, every target killed or audited
 """
@@ -40,6 +44,8 @@ RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence
            "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json",
            "P5": "closure-evidence/v2/P5-MUTATION.json", "P6": "closure-evidence/v2/P6-MUTATION.json",
            "C2-P1": "closure-evidence/v2/cycle2/P1-MUTATION.json",
+           "C2-P2": "closure-evidence/v2/cycle2/P2-MUTATION.json",
+           "C2-P3": "closure-evidence/v2/cycle2/P3-MUTATION.json",
            "C2-P4": "closure-evidence/v2/cycle2/P4-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
@@ -382,8 +388,64 @@ C2_P4_TARGETS: dict[str, list[str]] = {f"aisef2/probe/python_callable_v2.py::{f}
 C2_P4_TARGETS["aisef2/probe/python_callable_v2.py::observe"] = [*_C2_P4_TESTS, *_C2_P4_BYTECODE]
 C2_P4_TARGETS.update({f"aisef2/probe/python_callable_v2.py::{f}": _C2_P4_BYTECODE
                       for f in ("_harness_argv", "PythonCallableV2Probe.__init__")})
+# Cycle 2, C2-P2 (WP-2.2.1): the cli_invocation probe. The pure functions (classes, shapes, verdicts over fixture
+# facts, the marker-file parser, the layout) are killed in-process; the harness (observe, the watch loop, the
+# hard-exit and harness-failure rules, the command line) by the subprocess-backed cases, DESIGN-CHECK-1 and the
+# FM2-CLI / FM2-PYC-CLI fault families. Scalar constants (PROBE_ID, STREAM_CAP, PLACEHOLDER, POLL_S, HARNESS) have no
+# mutation site and are not targets; HARNESS, the child script, is killed through observe's cases.
+#: the pure functions, the class table (WP-2.2.2) and the equality shape, comparator and verdict: in-process
+_CLI_PURE = ["tests/v2/test_c2_cli_verdicts.py"]
+#: the decision table over test doubles first (a mutant of the watch loop dies there in a second; the runner stops at
+#: the first failing file), the real subjects only for what the doubles cannot say
+_CLI_HARNESS = ["tests/v2/test_c2_cli_protocol.py", "tests/v2/test_c2_cli_invocation.py"]
+#: WP-2.2.2: the two-invocation path on real subjects
+_CLI_CALIBRATION = ["tests/v2/test_c2_cli_calibration.py"]
+C2P2_TARGETS: dict[str, list[str]] = {
+    **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_PURE for f in (
+        "_is_int", "_content_ok", "_bytes_of", "_name_ok", "_ws_key_ok", "_argv_ok", "_stimulus_ok", "_stream_shape_ok",
+        "_file_shape_ok", "observation_class", "spec_class", "_sha_file", "_stream_fact", "_file_fact", "_stream_bytes",
+        "_stream_matches", "_file_matches", "verdict_of", "_ws_name", "_substitute", "_public", "_child_env",
+        "_protocol", "_prepare", "CLASSES", "ON_DEADLINE", "STREAM_SHAPES", "FILE_SHAPES",
+        "CliInvocationProbe.enforcement", "CliInvocationProbe.harness_preconditions",
+        "_normalization_ok", "_equality_ok", "_streams_ok", "_normalize", "_equal", "_half_ok", "_equality_verdict",
+        "CLASS_TABLE", "QUANTIFIERS", "COMPARATORS")},
+    **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_HARNESS for f in (
+        "PROBE_SOURCES", "_probe_digest", "_await", "CliInvocationProbe.__init__", "CliInvocationProbe.observe",
+        "CliInvocationProbe._observe", "CliInvocationProbe._observe_in", "_preflight", "_watch", "_hard_exit",
+        "_harness_failure", "_disposed")},
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality": [*_CLI_HARNESS[:1], *_CLI_CALIBRATION],
+    "aisef2/probe/cli_invocation.py::_harness_argv": [*_CLI_PURE, *_CLI_HARNESS],
+}
+# Cycle 2, C2-P3 (WP-2.3.1): the process_effect scenario probe. The parent's pure functions and tables (the step
+# vocabulary and its shapes, the scenario rules, the classes, the file observables, the placeholder substitution, the
+# request layout, the RESULT conclusion) are killed in-process; the parent's harness (observe, the watch, the
+# hard-exit rule) by the decision table over test doubles first, then the real subjects; every function of the child
+# script HARNESS (the step dispatcher, the fault scope, the expect_raises attribute comparison, edit_jsonl, the file
+# facts, the placeholder replaced back) by the real subjects, the only place the script runs, then the bytecode
+# family (the subprocess step's isolation). SUBPROCESS (the subprocess step's boot) has no function: it is killed
+# through PE-4 and FM2-PYC-EFFECT-2, never a target.
+_PE_UNITS = ["tests/v2/test_probe_process_effect_units.py"]
+_PE_REAL = ["tests/v2/test_probe_process_effect.py"]
+_PE_PYC = ["tests/v2/test_probe_process_effect_bytecode.py"]
+C2P3_TARGETS: dict[str, list[str]] = {
+    **{f"aisef2/probe/process_effect.py::{f}": _PE_UNITS for f in (
+        "CLASSES", "ON_DEADLINE", "STEPS", "FAULTS", "FAULTED", "FILE_SHAPES", "CLASS_TABLE", "_CONTENT",
+        "_flat_ok", "_ws_path_ok", "_ident_ok", "_content_of", "_invocation_ok", "_workspace_ok", "_expect_ok",
+        "_write_ok", "_edit_ok", "_subprocess_ok", "_fault_ok", "_SHAPES", "_step_ok", "_scenario_ok",
+        "_FILE_SHAPE_OK", "_file_shape_ok", "observation_class", "spec_class", "_same", "_returns_hold",
+        "_raises_hold", "_identity", "_jsonl_holds", "_FILE_HOLDS", "_files_hold", "_HOLDS", "verdict_of",
+        "_substitute", "_resolved", "_observed_files", "_concluded", "PROBE_SOURCES", "_probe_digest",
+        "ProcessEffectProbe.enforcement", "ProcessEffectProbe.harness_preconditions")},
+    **{f"aisef2/probe/process_effect.py::{f}": [*_PE_UNITS, *_PE_REAL, *_PE_PYC] for f in (
+        "_harness_argv", "_prepare", "ProcessEffectProbe.__init__", "ProcessEffectProbe.observe",
+        "ProcessEffectProbe._observe_in", "_watch", "_hard_exit")},
+    **{f"aisef2/probe/process_effect.py::HARNESS/{f}": [*_PE_REAL, *_PE_PYC] for f in (
+        "emit", "inside", "resolve", "unws", "tagged", "same", "row_of", "count_lines", "file_fact", "files_now",
+        "identity", "guarded", "target_of", "do_workspace", "do_construct", "do_call", "raised_as", "do_expect",
+        "do_write", "do_edit", "do_subprocess", "do_fault", "HANDLERS", "run", "main")},
+}
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
-                 "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P4": C2_P4_TARGETS}
+                 "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
@@ -454,10 +516,24 @@ def _inert(func: ast.AST, doc: ast.AST | None) -> set[int]:
     return {id(n) for root in inert for n in ast.walk(root)}
 
 
+def _script(tree: ast.Module, name: str) -> ast.Constant | None:
+    """The child script bound to the module-level name `name`: a string constant holding Python source."""
+    for n in tree.body:
+        if isinstance(n, ast.Assign) and [getattr(t, "id", None) for t in n.targets] == [name] \
+                and isinstance(n.value, ast.Constant) and isinstance(n.value.value, str):
+            return n.value
+    return None
+
+
 def _root(tree: ast.Module, name: str) -> tuple[ast.AST, set[int]] | None:
     """A function named `name` (minus its docstring and annotations), or the value of a module-level assignment
     to `name` — so a routing table or a taxonomy held as data is a mutation target like a function is. `Class.method`
-    names the method of that class when one module has several methods of the same name."""
+    names the method of that class when one module has several methods of the same name; `SCRIPT/name` names one in
+    the child script bound to `SCRIPT` (a node of the parsed script)."""
+    script, _, inner = name.partition("/")
+    if inner:
+        const = _script(tree, script)
+        return None if const is None else _root(ast.parse(const.value), inner)
     owner, _, name = name.rpartition(".")
     if owner:
         tree = next((n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == owner), None)
@@ -481,7 +557,19 @@ def _root(tree: ast.Module, name: str) -> tuple[ast.AST, set[int]] | None:
 
 
 def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tuple[str, str]]:
-    """(description, mutated module source) for every mutation site inside the function or table `func`."""
+    """(description, mutated module source) for every mutation site inside the function or table `func`; for
+    `SCRIPT/name`, the mutants of the child script's function written back into the script's constant."""
+    script, _, inner = func.partition("/")
+    if inner:
+        tree = ast.parse(module_src)
+        const = _script(tree, script)
+        if const is None:
+            raise SystemExit(f"child script {script} not found")
+        out = []
+        for desc, src in mutants(const.value, inner, enums):
+            const.value = src
+            out.append((f"{script} {desc}", ast.unparse(tree)))
+        return out
     tree = ast.parse(module_src)
     found = _root(tree, func)
     if found is None:

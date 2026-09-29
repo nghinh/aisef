@@ -28,7 +28,9 @@ from typing import Callable
 
 from aisef2.arch.enums import SubjectKind
 from aisef2.errors import InvariantError
+from aisef2.probe import cli_invocation as ci
 from aisef2.probe import file_artifact as fa
+from aisef2.probe import process_effect as pe
 from aisef2.probe import python_callable as pc
 from aisef2.probe import python_callable_v2 as pc2
 from aisef2.probe.protocol import Probe, ProbeMetadata, ProbeRegistry
@@ -97,6 +99,10 @@ CATALOG: tuple[CatalogEntry, ...] = (
     CatalogEntry(pc2.PROBE_ID, pc2.DIGEST, SubjectKind.PYTHON_CALLABLE, pc2.CLASSES, pc2.METADATA,
                  pc2.PythonCallableV2Probe, "aisef2/probe/python_callable_v2.py", "python_callable_v2",
                  "in_harness_process", "captured_stdout", "call", 2),
+    CatalogEntry(ci.PROBE_ID, ci.DIGEST, SubjectKind.CLI_INVOCATION, ci.CLASSES, ci.METADATA, ci.CliInvocationProbe,
+                 "aisef2/probe/cli_invocation.py", "cli_invocation", "child_of_harness", "marker_file", "invocation", 2),
+    CatalogEntry(pe.PROBE_ID, pe.DIGEST, SubjectKind.PROCESS_EFFECT, pe.CLASSES, pe.METADATA, pe.ProcessEffectProbe,
+                 "aisef2/probe/process_effect.py", "process_effect", "child_of_harness", "marker_file", "scenario", 2),
 )
 
 

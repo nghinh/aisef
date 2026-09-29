@@ -1,0 +1,14 @@
+{
+ "subject": {
+  "kind": "cli_invocation",
+  "locator": "calib_cli:__main__"
+ },
+ "stimulus": {
+  "argv": []
+ },
+ "observable": {
+  "blocks": true,
+  "within_s": 0.5
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}
