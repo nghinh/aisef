@@ -216,6 +216,10 @@ D4_NOTE = ("DECISION-4: no class of the integrated catalog runs two independent 
            "two fresh evaluation directories; restated as one observation against a constant derived from the "
            "requirements — equivalent under the conjunction with {sib} in the same story, stronger than this criterion "
            "alone (open decision OD-D4)")
+GREP_POLARITY = ("the seam gives this prohibition polarity MUST_NOT_HOLD (the P6 migration table's row for its V1 mode), so its observable must state the FORBIDDEN behaviour — at least one line of the package matches the pattern; file_artifact's grep_count observes an exact count only, and MUST_NOT_HOLD of 'exactly 0 lines match' would demand matches from a correct product (C2-P5-FINDING-001: measured on the reference, which has none — observed SATISFIED under the expectation REFUTED)")
+#: C2-P5-FINDING-001: the form ec473d1 compiled for the four prohibitions (inverted under MUST_NOT_HOLD), kept only so that the falsifiability run can reproduce the finding on the reference
+INVERTED_FORMS = {"AC-STORY-01-01-4": tree(NET, q=EX, measured="(inverted)"), "AC-STORY-01-01-5": tree(SIDE, q=EX, measured="(inverted)"),
+                  "AC-STORY-05-03-1": tree(NET, q=EX, measured="(inverted)"), "AC-STORY-05-03-2": tree(SIDE, q=EX, measured="(inverted)")}
 RETURN_SHAPE = "the returned value's shape ('the line dict … with replayed/committed') is not fixed by the plan (OD-RETURN)"
 
 # --------------------------------------------------------------------------------------- the 77 criteria
@@ -234,8 +238,10 @@ V22: dict[str, dict] = {
     "AC-STORY-01-01-3": pc2("ledgerlock:__file__", {"condition": "exists"}, no_stimulus=True, q=EX,
                             measured="the package imports from the revision and has __file__",
                             unmeasured=["the printed path ends in ledgerlock/__init__.py"]),
-    "AC-STORY-01-01-4": tree(NET, q=EX, measured="zero lines of the package tree match the pattern", witness=TREE),
-    "AC-STORY-01-01-5": tree(SIDE, q=EX, measured="zero lines of the package tree match the pattern", witness=TREE),
+    "AC-STORY-01-01-4": refused("UNSUPPORTED_UNDER_POLARITY", GREP_POLARITY, q=EX, measured="nothing", witness=TREE,
+                    note="C2-P5-FINDING-001; open decision OD-GREP"),
+    "AC-STORY-01-01-5": refused("UNSUPPORTED_UNDER_POLARITY", GREP_POLARITY, q=EX, measured="nothing", witness=TREE,
+                    note="C2-P5-FINDING-001; open decision OD-GREP"),
     "AC-STORY-01-01-6": pc2("ledgerlock:Ledger", {"condition": "exists"}, no_stimulus=True, q=EX,
                             measured="ledgerlock.Ledger resolves",
                             unmeasured=["ledgerlock.ConflictError resolves", "Ledger is a callable class"],
@@ -517,10 +523,12 @@ V22: dict[str, dict] = {
                                 "what the coverage measurement includes is configuration of a developer-test gate: a "
                                 "DEVELOPER_TEST_REQUIREMENT", q=EX, measured="nothing", decisions=["DECISION-3"]),
     # ---- STORY-05-03
-    "AC-STORY-05-03-1": tree(NET, q=EX, measured="zero lines of the package tree match the pattern", witness=TREE,
-                             unmeasured=["'and the test passes' (a developer-test clause)"]),
-    "AC-STORY-05-03-2": tree(SIDE, q=EX, measured="zero lines of the package tree match the pattern", witness=TREE,
-                             unmeasured=["'and the test passes' (a developer-test clause)"]),
+    "AC-STORY-05-03-1": refused("UNSUPPORTED_UNDER_POLARITY", GREP_POLARITY, q=EX, measured="nothing", witness=TREE,
+                    unmeasured=["'and the test passes' (a developer-test clause)"],
+                    note="C2-P5-FINDING-001; open decision OD-GREP"),
+    "AC-STORY-05-03-2": refused("UNSUPPORTED_UNDER_POLARITY", GREP_POLARITY, q=EX, measured="nothing", witness=TREE,
+                    unmeasured=["'and the test passes' (a developer-test clause)"],
+                    note="C2-P5-FINDING-001; open decision OD-GREP"),
 }
 
 #: DECISION-3 (APPROVED_FOR_PROPOSAL_ONLY): the six criteria whose PLAN-V2.1 subject is a developer test
@@ -545,8 +553,20 @@ OPEN_DECISIONS = {
                 "accept them as unmeasured",
     "OD-FACETS": "criteria with more than one clause are measured on one clause (`measured`); every other clause is "
                  "listed as `unmeasured` — accept, or split such criteria into one contract per clause",
+    "OD-GREP": "the four source-tree prohibitions (01-01-4, 01-01-5, 05-03-1, 05-03-2) cannot be expressed under their MUST_NOT_HOLD polarity: commission a file_artifact class 'at least one line matches' (a new probe identity: a probe package), or accept them as unmeasured",
     "OD-STRONGER": "01-03-1 and 01-03-5 fix the digest's value (requirements §3.2), not only its form; accept",
 }
+
+
+FINDINGS = [{
+    "id": "C2-P5-FINDING-001", "class": "DEVELOPER (the authoring aid of WP-2.5.1, candidate ec473d1)",
+    "found_by": "a diagnostic trial run of the WP-2.5.2 falsifiability runner over the reference fixture, before any WP-2.5.2 evidence existed (not a gate attempt, recorded here)",
+    "defect": "ec473d1 compiled the four source-tree prohibitions as file_artifact grep_count {matches: 0} under the seam's polarity MUST_NOT_HOLD: the contracts demanded at least one matching line; static admission admitted them (it checks capability and calibration, not the direction of a contract)",
+    "measured": "the reference (no disallowed import, no os.system/subprocess./socket.) observed SATISFIED for each, under the candidate expectation REFUTED: every correct product would fail them; reproduced in P5-FALSIFIABILITY.json (finding_001)",
+    "correction": "the aid refuses a MUST_NOT_HOLD contract whose observable is not declared to state the forbidden behaviour (REFUSED_POLARITY_INVERTED); the four prohibitions are typed UNSUPPORTED_UNDER_POLARITY (open decision OD-GREP)",
+    "criteria": ["AC-STORY-01-01-4", "AC-STORY-01-01-5", "AC-STORY-05-03-1", "AC-STORY-05-03-2"]}]
+SUPERSEDES = {"commit": "ec473d1742bb41206d34a72542d7ef0d8a19aa4a", "path": "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json",
+              "sha256": "6caf0deb8a556f10f3bb4a62c1d2591d73e15d48c86c4d0788eab08bbc60a851", "reason": "C2-P5-FINDING-001"}
 
 
 # --------------------------------------------------------------------------------------- authoring
@@ -574,9 +594,11 @@ def requirements() -> dict:
             for fr, title in P10.FR_TITLES.items()}
 
 
-def author(ac_id: str, entry: dict, requirement_id: str, polarity: str, rationale: str, reqs: dict) -> dict:
-    """One criterion's contract and spec, or a typed Refusal. The checks are the aid's (DECISION-1) and the kernel's
-    (the contract rule, the compiler, the harness registry's observation class)."""
+def author(ac_id: str, entry: dict, requirement_id: str, polarity: str, rationale: str, reqs: dict,
+           polarity_rule: bool = True) -> dict:
+    """One criterion's contract and spec, or a typed Refusal. The checks are the aid's (DECISION-1; the polarity rule
+    of C2-P5-FINDING-001) and the kernel's (the contract rule, the compiler, the harness registry's observation
+    class). `polarity_rule=False` only reproduces the finding (p5_falsifiability.reproduce_finding_001)."""
     from aisef2.arch.enums import Enforcement, Polarity, SubjectAbsence, SubjectKind
     from aisef2.probe import catalog
     from aisef2.product.approval import ContractApproval
@@ -591,6 +613,8 @@ def author(ac_id: str, entry: dict, requirement_id: str, polarity: str, rational
                                                                 "names no finite domain")
     if "refusal" in entry:
         raise Refusal(entry["refusal"], entry["reason"])
+    if polarity_rule and polarity == "MUST_NOT_HOLD" and entry.get("states") != "forbidden":
+        raise Refusal("REFUSED_POLARITY_INVERTED", f"{ac_id} has polarity MUST_NOT_HOLD and its observable is not declared to state the forbidden behaviour (states: forbidden): a prohibition written as its permitted condition would be inverted (C2-P5-FINDING-001)")
     try:
         contract = BehaviorContract.create(id=f"BC-V22-{ac_id}", requirement_ids=(requirement_id,),
                                            subject=Subject(SubjectKind(entry["kind"]), entry["locator"]),
@@ -770,6 +794,8 @@ def record() -> dict:
                             "class_available": False, "note": next(e["note"] for e in crit if e["ac_id"] == ac)}
                        for ac in decision_criteria(4)},
         "open_decisions": OPEN_DECISIONS,
+        "findings": FINDINGS,
+        "supersedes": SUPERSEDES,
         "static_admission": {"with_check_approvals": _admission(b["checked"]), "without_approvals": _admission(b["bare"])},
         "criteria": crit,
     }
@@ -831,6 +857,10 @@ def document(rec: dict) -> str:
         lines += [f"### {m['ac_id']} ({m['requirement']}, {m['role']})", "",
                   f"- before: `{m['before']['subject_kind']}` `{m['before']['locator']}` — P10: {m['before']['p10_status']}",
                   f"- after: {after}", "- approved: no", ""]
+    lines += ["## Findings", ""] + [f"- **{f['id']}** ({f['class']}) — {f['defect']}. Measured: {f['measured']}. "
+                                    f"Correction: {f['correction']}." for f in rec["findings"]]
+    lines += ["", f"This record supersedes `{rec['supersedes']['path']}` at {rec['supersedes']['commit'][:7]} "
+              f"(sha256 `{rec['supersedes']['sha256'][:12]}…`, {rec['supersedes']['reason']}).", ""]
     lines += ["## Open decisions", ""] + [f"- **{k}** — {v}" for k, v in rec["open_decisions"].items()] + ["", "## Criteria", "",
               "| criterion | kind | class | quantifier | status | measured |", "|---|---|---|---|---|---|"]
     for e in crit:

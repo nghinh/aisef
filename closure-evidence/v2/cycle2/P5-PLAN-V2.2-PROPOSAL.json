@@ -62,7 +62,7 @@
   "plan_v2_1_commit": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
   "authoring_aid": {
    "path": "validation/qualification/p10_contracts.py",
-   "sha256": "c84eb7d5c75588a89f461d41a9ec781fafadb037a1feab598771c24475f11ecc"
+   "sha256": "d3c655d4c80072825cc001989b246e2c2952ebc77dad2c87df9a2eeac34b6a65"
   },
   "calibration_records": [
    {
@@ -148,26 +148,26 @@
  },
  "plan": {
   "id": "LEDGERLOCK-PLAN-V2.2-PROPOSAL",
-  "plan_hash": "7de5af5f7b03e6aa1b6a1ab30fa26ae0fe853efdfe2aa5f63509f54c61fc6a27",
+  "plan_hash": "05a19215baac3af2f7b60fdebe1b1b4a1ab1b63b67d0089df241a9769bdcedd4",
   "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
-  "obligations": 68,
-  "stories": 15,
+  "obligations": 64,
+  "stories": 14,
   "obligations_by_role": {
    "INTRODUCE": 59,
-   "PRESERVE": 9,
+   "PRESERVE": 5,
    "VERIFY": 0
   },
   "plan_quality_policy": "NOT_PREREGISTERED (DECISION-5)"
  },
  "counts_by_v22_status": {
-  "COMPILED": 68,
+  "COMPILED": 64,
   "REMOVED_FROM_PRODUCTPROOF": 4,
   "UNSUPPORTED_OBSERVABLE": 2,
-  "UNSUPPORTED_STIMULUS": 3
+  "UNSUPPORTED_STIMULUS": 3,
+  "UNSUPPORTED_UNDER_POLARITY": 4
  },
  "counts_by_subject_kind": {
   "cli_invocation": 17,
-  "file_artifact": 4,
   "process_effect": 31,
   "python_callable": 16
  },
@@ -605,7 +605,30 @@
   "OD-03-01-5": "the simulated crash in apply_batch: proposed that the fault's OSError propagates to the caller",
   "OD-STORE": "the store criteria 01-04-1, 01-04-4, 01-04-5, 01-04-6 are refused (bytes arguments, a list of bytes, an unobservable temp-file location): restate them at the Ledger level (process_effect over files), or accept them as unmeasured",
   "OD-FACETS": "criteria with more than one clause are measured on one clause (`measured`); every other clause is listed as `unmeasured` — accept, or split such criteria into one contract per clause",
+  "OD-GREP": "the four source-tree prohibitions (01-01-4, 01-01-5, 05-03-1, 05-03-2) cannot be expressed under their MUST_NOT_HOLD polarity: commission a file_artifact class 'at least one line matches' (a new probe identity: a probe package), or accept them as unmeasured",
   "OD-STRONGER": "01-03-1 and 01-03-5 fix the digest's value (requirements §3.2), not only its form; accept"
+ },
+ "findings": [
+  {
+   "id": "C2-P5-FINDING-001",
+   "class": "DEVELOPER (the authoring aid of WP-2.5.1, candidate ec473d1)",
+   "found_by": "a diagnostic trial run of the WP-2.5.2 falsifiability runner over the reference fixture, before any WP-2.5.2 evidence existed (not a gate attempt, recorded here)",
+   "defect": "ec473d1 compiled the four source-tree prohibitions as file_artifact grep_count {matches: 0} under the seam's polarity MUST_NOT_HOLD: the contracts demanded at least one matching line; static admission admitted them (it checks capability and calibration, not the direction of a contract)",
+   "measured": "the reference (no disallowed import, no os.system/subprocess./socket.) observed SATISFIED for each, under the candidate expectation REFUTED: every correct product would fail them; reproduced in P5-FALSIFIABILITY.json (finding_001)",
+   "correction": "the aid refuses a MUST_NOT_HOLD contract whose observable is not declared to state the forbidden behaviour (REFUSED_POLARITY_INVERTED); the four prohibitions are typed UNSUPPORTED_UNDER_POLARITY (open decision OD-GREP)",
+   "criteria": [
+    "AC-STORY-01-01-4",
+    "AC-STORY-01-01-5",
+    "AC-STORY-05-03-1",
+    "AC-STORY-05-03-2"
+   ]
+  }
+ ],
+ "supersedes": {
+  "commit": "ec473d1742bb41206d34a72542d7ef0d8a19aa4a",
+  "path": "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json",
+  "sha256": "6caf0deb8a556f10f3bb4a62c1d2591d73e15d48c86c4d0788eab08bbc60a851",
+  "reason": "C2-P5-FINDING-001"
  },
  "static_admission": {
   "with_check_approvals": {
@@ -681,7 +704,7 @@
   "without_approvals": {
    "engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
    "admitted": false,
-   "result_digest": "199f989ca200f9a27f24417fc2237146137863e34bcd04a9464e7d531d5e71d4",
+   "result_digest": "edcee4a5cee3a4cd12e604c45cc8d33c28e8b269951d12d0c1990604a4c749d5",
    "checks": [
     {
      "number": 1,
@@ -694,13 +717,13 @@
      "number": 2,
      "name": "contract_spec_integrity",
      "passed": false,
-     "problems_count": 68,
+     "problems_count": 64,
      "problems": [
       "contract BC-V22-AC-STORY-01-01-1 does not compile: contract BC-V22-AC-STORY-01-01-1 is not approved: FR-1: no approval binds requirement_hash and contract_hash",
       "contract BC-V22-AC-STORY-01-01-2 does not compile: contract BC-V22-AC-STORY-01-01-2 is not approved: FR-1: no approval binds requirement_hash and contract_hash",
       "contract BC-V22-AC-STORY-01-01-3 does not compile: contract BC-V22-AC-STORY-01-01-3 is not approved: FR-14: no approval binds requirement_hash and contract_hash",
-      "contract BC-V22-AC-STORY-01-01-4 does not compile: contract BC-V22-AC-STORY-01-01-4 is not approved: FR-14: no approval binds requirement_hash and contract_hash",
-      "contract BC-V22-AC-STORY-01-01-5 does not compile: contract BC-V22-AC-STORY-01-01-5 is not approved: FR-14: no approval binds requirement_hash and contract_hash"
+      "contract BC-V22-AC-STORY-01-01-6 does not compile: contract BC-V22-AC-STORY-01-01-6 is not approved: FR-14: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-AC-STORY-01-01-7 does not compile: contract BC-V22-AC-STORY-01-01-7 is not approved: FR-12: no approval binds requirement_hash and contract_hash"
      ]
     },
     {
@@ -735,13 +758,13 @@
      "number": 7,
      "name": "traceability",
      "passed": false,
-     "problems_count": 68,
+     "problems_count": 64,
      "problems": [
       "criterion AC-STORY-01-01-1: contract BC-V22-AC-STORY-01-01-1 is not approved: contract BC-V22-AC-STORY-01-01-1 is not approved: FR-1: no approval binds requirement_hash and contract_hash",
       "criterion AC-STORY-01-01-2: contract BC-V22-AC-STORY-01-01-2 is not approved: contract BC-V22-AC-STORY-01-01-2 is not approved: FR-1: no approval binds requirement_hash and contract_hash",
       "criterion AC-STORY-01-01-3: contract BC-V22-AC-STORY-01-01-3 is not approved: contract BC-V22-AC-STORY-01-01-3 is not approved: FR-14: no approval binds requirement_hash and contract_hash",
-      "criterion AC-STORY-01-01-4: contract BC-V22-AC-STORY-01-01-4 is not approved: contract BC-V22-AC-STORY-01-01-4 is not approved: FR-14: no approval binds requirement_hash and contract_hash",
-      "criterion AC-STORY-01-01-5: contract BC-V22-AC-STORY-01-01-5 is not approved: contract BC-V22-AC-STORY-01-01-5 is not approved: FR-14: no approval binds requirement_hash and contract_hash"
+      "criterion AC-STORY-01-01-6: contract BC-V22-AC-STORY-01-01-6 is not approved: contract BC-V22-AC-STORY-01-01-6 is not approved: FR-14: no approval binds requirement_hash and contract_hash",
+      "criterion AC-STORY-01-01-7: contract BC-V22-AC-STORY-01-01-7 is not approved: contract BC-V22-AC-STORY-01-01-7 is not approved: FR-12: no approval binds requirement_hash and contract_hash"
      ]
     },
     {
@@ -888,31 +911,13 @@
    "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` exits `1` (zero matches).",
    "quantifier": "exhaustive_finite_domain",
    "witness": "every file of the package tree at the revision is scanned: the domain is finite and read entirely",
-   "measured": "zero lines of the package tree match the pattern",
+   "measured": "nothing",
    "unmeasured": [],
    "decisions": [],
-   "note": "",
+   "note": "C2-P5-FINDING-001; open decision OD-GREP",
    "depends_on_stories": [],
-   "subject_kind": "file_artifact",
-   "locator": "path:ledgerlock",
-   "stimulus": {
-    "grep": "^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)"
-   },
-   "observable": {
-    "matches": 0,
-    "within_s": 30
-   },
-   "subject_absence": "ABSENCE_IS_DECIDABLE",
-   "v22_status": "COMPILED",
-   "contract_id": "BC-V22-AC-STORY-01-01-4",
-   "contract_hash": "a5d143155eae70cf9e01a7d711d5b0796e750051c625e27ee4f75212cdb8b60d",
-   "spec_id": "PPS-6af9a67d5bb1603e53ef9b7f01fc68c3746130bf0b1c70b2e482331f6a979c89",
-   "semantic_hash": "ac501b3eddb4982fd4f31179a8bf7f275a632b820d32d469e897f7944fe3633e",
-   "probe_id": "probe.file_artifact",
-   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
-   "observation_class": "grep_count",
-   "enforcement": "FULL",
-   "class_quantifier": null
+   "v22_status": "UNSUPPORTED_UNDER_POLARITY",
+   "typed_refusal": "the seam gives this prohibition polarity MUST_NOT_HOLD (the P6 migration table's row for its V1 mode), so its observable must state the FORBIDDEN behaviour — at least one line of the package matches the pattern; file_artifact's grep_count observes an exact count only, and MUST_NOT_HOLD of 'exactly 0 lines match' would demand matches from a correct product (C2-P5-FINDING-001: measured on the reference, which has none — observed SATISFIED under the expectation REFUTED)"
   },
   {
    "ac_id": "AC-STORY-01-01-5",
@@ -924,31 +929,13 @@
    "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` exits `1` (zero matches).",
    "quantifier": "exhaustive_finite_domain",
    "witness": "every file of the package tree at the revision is scanned: the domain is finite and read entirely",
-   "measured": "zero lines of the package tree match the pattern",
+   "measured": "nothing",
    "unmeasured": [],
    "decisions": [],
-   "note": "",
+   "note": "C2-P5-FINDING-001; open decision OD-GREP",
    "depends_on_stories": [],
-   "subject_kind": "file_artifact",
-   "locator": "path:ledgerlock",
-   "stimulus": {
-    "grep": "os\\.system|subprocess\\.|socket\\."
-   },
-   "observable": {
-    "matches": 0,
-    "within_s": 30
-   },
-   "subject_absence": "ABSENCE_IS_DECIDABLE",
-   "v22_status": "COMPILED",
-   "contract_id": "BC-V22-AC-STORY-01-01-5",
-   "contract_hash": "42d5704f0062bd6d717d3722053974d123728714f924f1a8c37b8bd8f2c68067",
-   "spec_id": "PPS-fec483d2b47b20c1c344e330b7816fd1bbccfe693591d26db3ff21008e3f7975",
-   "semantic_hash": "2bef0e35aae92179d326f4eb5f4e98cba6c1b045cf90e0703212de95807e84e6",
-   "probe_id": "probe.file_artifact",
-   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
-   "observation_class": "grep_count",
-   "enforcement": "FULL",
-   "class_quantifier": null
+   "v22_status": "UNSUPPORTED_UNDER_POLARITY",
+   "typed_refusal": "the seam gives this prohibition polarity MUST_NOT_HOLD (the P6 migration table's row for its V1 mode), so its observable must state the FORBIDDEN behaviour — at least one line of the package matches the pattern; file_artifact's grep_count observes an exact count only, and MUST_NOT_HOLD of 'exactly 0 lines match' would demand matches from a correct product (C2-P5-FINDING-001: measured on the reference, which has none — observed SATISFIED under the expectation REFUTED)"
   },
   {
    "ac_id": "AC-STORY-01-01-6",
@@ -5050,35 +5037,17 @@
    "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` returns no matches and the test passes.",
    "quantifier": "exhaustive_finite_domain",
    "witness": "every file of the package tree at the revision is scanned: the domain is finite and read entirely",
-   "measured": "zero lines of the package tree match the pattern",
+   "measured": "nothing",
    "unmeasured": [
     "'and the test passes' (a developer-test clause)"
    ],
    "decisions": [],
-   "note": "",
+   "note": "C2-P5-FINDING-001; open decision OD-GREP",
    "depends_on_stories": [
     "STORY-05-01"
    ],
-   "subject_kind": "file_artifact",
-   "locator": "path:ledgerlock",
-   "stimulus": {
-    "grep": "^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)"
-   },
-   "observable": {
-    "matches": 0,
-    "within_s": 30
-   },
-   "subject_absence": "ABSENCE_IS_DECIDABLE",
-   "v22_status": "COMPILED",
-   "contract_id": "BC-V22-AC-STORY-05-03-1",
-   "contract_hash": "a710599b2ed042755ec15f096f71a4d83e74a9b052aa78ba890d1341b52df1c6",
-   "spec_id": "PPS-d0e2ce8ad16bdb77e88c43ebabff6f737103511aa62defa9597053f372fb1693",
-   "semantic_hash": "ac501b3eddb4982fd4f31179a8bf7f275a632b820d32d469e897f7944fe3633e",
-   "probe_id": "probe.file_artifact",
-   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
-   "observation_class": "grep_count",
-   "enforcement": "FULL",
-   "class_quantifier": null
+   "v22_status": "UNSUPPORTED_UNDER_POLARITY",
+   "typed_refusal": "the seam gives this prohibition polarity MUST_NOT_HOLD (the P6 migration table's row for its V1 mode), so its observable must state the FORBIDDEN behaviour — at least one line of the package matches the pattern; file_artifact's grep_count observes an exact count only, and MUST_NOT_HOLD of 'exactly 0 lines match' would demand matches from a correct product (C2-P5-FINDING-001: measured on the reference, which has none — observed SATISFIED under the expectation REFUTED)"
   },
   {
    "ac_id": "AC-STORY-05-03-2",
@@ -5090,38 +5059,20 @@
    "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` returns no matches and the test passes.",
    "quantifier": "exhaustive_finite_domain",
    "witness": "every file of the package tree at the revision is scanned: the domain is finite and read entirely",
-   "measured": "zero lines of the package tree match the pattern",
+   "measured": "nothing",
    "unmeasured": [
     "'and the test passes' (a developer-test clause)"
    ],
    "decisions": [],
-   "note": "",
+   "note": "C2-P5-FINDING-001; open decision OD-GREP",
    "depends_on_stories": [
     "STORY-05-01"
    ],
-   "subject_kind": "file_artifact",
-   "locator": "path:ledgerlock",
-   "stimulus": {
-    "grep": "os\\.system|subprocess\\.|socket\\."
-   },
-   "observable": {
-    "matches": 0,
-    "within_s": 30
-   },
-   "subject_absence": "ABSENCE_IS_DECIDABLE",
-   "v22_status": "COMPILED",
-   "contract_id": "BC-V22-AC-STORY-05-03-2",
-   "contract_hash": "e6e4f1cbf4aeb373e0b2e7fc2ed0fe1176e70de60c26a6ad49f722ea9fff7dc7",
-   "spec_id": "PPS-b07b91060e576fcff028e56b046f3c84b141409585a596b23ce1742507e7a96f",
-   "semantic_hash": "2bef0e35aae92179d326f4eb5f4e98cba6c1b045cf90e0703212de95807e84e6",
-   "probe_id": "probe.file_artifact",
-   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
-   "observation_class": "grep_count",
-   "enforcement": "FULL",
-   "class_quantifier": null
+   "v22_status": "UNSUPPORTED_UNDER_POLARITY",
+   "typed_refusal": "the seam gives this prohibition polarity MUST_NOT_HOLD (the P6 migration table's row for its V1 mode), so its observable must state the FORBIDDEN behaviour — at least one line of the package matches the pattern; file_artifact's grep_count observes an exact count only, and MUST_NOT_HOLD of 'exactly 0 lines match' would demand matches from a correct product (C2-P5-FINDING-001: measured on the reference, which has none — observed SATISFIED under the expectation REFUTED)"
   }
  ],
- "proposal_digest": "eddb6573e71e5e8f0202a901152858bd4362fcb4ef39b3fa27f0b458481e4c5f",
+ "proposal_digest": "25e14f3e727afec37cffcd9e2b8e78f834ddf823fddcb3fe12453cf6bfad5c6e",
  "problems": [],
  "verdict": "PROPOSAL ADMITTED STATICALLY (with the check approvals); OWNER REVIEW PENDING"
 }

@@ -102,12 +102,22 @@ class Refusals(unittest.TestCase):
         with self.assertRaises(A.Refusal) as cm:
             self._author("AC-STORY-04-03-1", t)
         self.assertEqual(cm.exception.code, "REFUSED_UNIVERSAL_DECLARED_EXHAUSTIVE")
-        t = {**A.V22["AC-STORY-01-01-4"], "quantifier": A.BW}
+        t = {**A.INVERTED_FORMS["AC-STORY-01-01-4"], "quantifier": A.BW}   # a file_artifact form, under MUST_HOLD
         with self.assertRaises(A.Refusal) as cm:
             self._author("AC-STORY-01-01-4", t)
         self.assertEqual(cm.exception.code, "REFUSED_WITNESS_UNDER_FULL")
         for ac in A.decision_criteria(1):
             self.assertIn(entry(ac)["quantifier"], (A.BW, A.UF), ac)
+
+    def test_P5_4b_a_prohibition_written_as_its_permitted_condition_is_refused(self):
+        r = next(x for x in A.P10.v1_rows() if x["ac_id"] == "AC-STORY-01-01-4")
+        with self.assertRaises(A.Refusal) as cm:
+            A.author(r["ac_id"], A.INVERTED_FORMS[r["ac_id"]], r["requirement"], "MUST_NOT_HOLD", r["criterion"], A.requirements())
+        self.assertEqual(cm.exception.code, "REFUSED_POLARITY_INVERTED")
+        for ac in A.FINDINGS[0]["criteria"]:
+            self.assertEqual(entry(ac)["v22_status"], "UNSUPPORTED_UNDER_POLARITY", ac)
+            self.assertEqual(entry(ac)["polarity"], "MUST_NOT_HOLD", ac)
+        self.assertFalse([e for e in built()["criteria"] if e["polarity"] == "MUST_NOT_HOLD" and e["v22_status"] == "COMPILED"])
 
 
 class Decisions(unittest.TestCase):
