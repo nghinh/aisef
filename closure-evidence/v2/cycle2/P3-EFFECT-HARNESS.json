@@ -1,0 +1,1040 @@
+{
+ "record": "AISEF V2 — WP-2.3.1 PROCESS EFFECT HARNESS (probe.process_effect: scenario interpreter, closed step vocabulary, DECISION-2 fault step, fault rows)",
+ "work_package": "WP-2.3.1",
+ "identities": {
+  "package": "WP-2.3.1",
+  "parent": "e063b76fd1cc625211dca1f8b64db9742e566e6a",
+  "parent_aisef2_tree": "509653f3ea630564976dca4b3e8de5041517718a",
+  "head": "7de6d798e06f57f9731f387031d621434ae897c7",
+  "aisef2_tree": "f4f729de10f1d3adae5b8fa1f31768fcf398f415",
+  "probe": {
+   "id": "probe.process_effect",
+   "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "classes": [
+    "scenario_returns",
+    "scenario_raises",
+    "scenario_files"
+   ],
+   "sources": {
+    "probe/protocol.py": {
+     "sha256": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+     "git_blob": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    "probe/python_callable.py": {
+     "sha256": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+     "git_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+    },
+    "probe/cli_invocation.py": {
+     "sha256": "577f0c97ecbe371241bc7c2b4257e73a67181a881a171d8fffcd61b3c156b4e2",
+     "git_blob": "03aa8ab991b0e03c5583b3979a042cee1955e470"
+    },
+    "probe/process_effect.py": {
+     "sha256": "66298a826617b3e0b88df2a9dedde413aebc1ccdd9145f24ef654898c8ca740f",
+     "git_blob": "e340912f0573350476ad97e62c0b00117bc6e1c8"
+    }
+   },
+   "catalog": {
+    "subject_kind": "process_effect",
+    "subject_process": "child_of_harness",
+    "protocol_channel": "marker_file",
+    "stimulus_shape": "scenario",
+    "fixture_root": "process_effect",
+    "cycle": 2,
+    "active": true
+   },
+   "enforcement": "PARTIAL",
+   "weakest_path": "the subject, and every subprocess step, runs as the harness user with that user's filesystem and network access, and can read the request and the protocol file; -I interpreter isolation, a scrubbed environment, a fresh working directory and a harness-owned bytecode cache (-X pycache_prefix, -B) are isolation, not a sandbox",
+   "fault_witness": "a fault step measures one declared fault at one declared call: a bounded witness of a property quantified over every crash point, never a proof of it (DECISION-1)"
+  },
+  "tests": {
+   "tests.v2.test_probe_process_effect_units": {
+    "sha256": "0af4d058b84383fab62ae46e7c83347c475585fe186b6f2ab839646f43d4e258",
+    "git_blob": "26e7f1b41267eee6f1bb2e25f117a7f491a4348d"
+   },
+   "tests.v2.test_probe_process_effect": {
+    "sha256": "ac93476ebb1016dfe6459fad8e0320126958d3fbf6210948046a9a4b84b74e8f",
+    "git_blob": "e6f5730e75c63f062eba7d3409317f42b6649a89"
+   },
+   "tests.v2.test_probe_process_effect_bytecode": {
+    "sha256": "dc206dad29fa914cf61a54323180751e1144688229b944ac378991aa2ce7ef23",
+    "git_blob": "280fba5bead1ac4a68c5f910f637f69d48ad309f"
+   }
+  },
+  "cycle1": {
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "probe": {
+    "id": "probe.python_callable",
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+   }
+  },
+  "cycle2_freeze_manifest": {
+   "path": "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json",
+   "sha256": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad"
+  },
+  "owner_decisions": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "hash_rule": "every sha256 here is over bytes with CRLF normalised to LF; git_blob = sha1 of the blob header and the same bytes"
+ },
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin"
+ },
+ "vocabulary": {
+  "steps": {
+   "workspace": {
+    "required": [
+     "files"
+    ],
+    "optional": []
+   },
+   "construct": {
+    "required": [
+     "args",
+     "kwargs"
+    ],
+    "optional": []
+   },
+   "call": {
+    "required": [
+     "args",
+     "kwargs"
+    ],
+    "optional": [
+     "method",
+     "as"
+    ]
+   },
+   "expect_raises": {
+    "required": [
+     "args",
+     "kwargs",
+     "exception"
+    ],
+    "optional": [
+     "method",
+     "attrs"
+    ]
+   },
+   "write": {
+    "required": [
+     "path"
+    ],
+    "optional": [
+     "text",
+     "newline",
+     "bytes_hex",
+     "append"
+    ]
+   },
+   "edit_jsonl": {
+    "required": [
+     "path",
+     "line",
+     "field",
+     "value"
+    ],
+    "optional": []
+   },
+   "subprocess": {
+    "required": [
+     "argv"
+    ],
+    "optional": [
+     "expect_exit"
+    ]
+   },
+   "fault": {
+    "required": [
+     "fault"
+    ],
+    "optional": []
+   }
+  },
+  "steps_sha256": "fb140e396a4e2c046ea8f60fbea7355e385583272c4203cc848c7a9f76ffab93",
+  "faults": {
+   "os.replace": [
+    "os",
+    "replace",
+    "OSError"
+   ],
+   "os.rename": [
+    "os",
+    "rename",
+    "OSError"
+   ],
+   "os.fsync": [
+    "os",
+    "fsync",
+    "OSError"
+   ],
+   "os.write": [
+    "os",
+    "write",
+    "OSError"
+   ]
+  },
+  "faults_sha256": "26a2cb04d2831065aadbd0749f90cca6cc040dffd9e81a3d3410b0f070edbc54",
+  "faulted": [
+   "call",
+   "expect_raises",
+   "subprocess"
+  ],
+  "file_shapes": [
+   "sha256",
+   "equals_before",
+   "absent",
+   "line_count",
+   "final_byte",
+   "jsonl"
+  ],
+  "classes": [
+   "scenario_returns",
+   "scenario_raises",
+   "scenario_files"
+  ],
+  "on_deadline": {
+   "scenario_returns": "REFUTED",
+   "scenario_raises": "REFUTED",
+   "scenario_files": "REFUTED"
+  },
+  "placeholder": "<ws>",
+  "digest_rule": "sha256 of the canonical JSON (sorted keys, no whitespace) of the table as declared"
+ },
+ "tests": {
+  "tests.v2.test_probe_process_effect_units": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/lane-d-process-effect/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_probe_process_effect_units"
+   ],
+   "exit": 0,
+   "ran": 22,
+   "seconds": 1.388,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 2s)",
+   "residual": 0
+  },
+  "tests.v2.test_probe_process_effect": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/lane-d-process-effect/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_probe_process_effect"
+   ],
+   "exit": 0,
+   "ran": 24,
+   "seconds": 27.527,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 28s)",
+   "residual": 0
+  },
+  "tests.v2.test_probe_process_effect_bytecode": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/lane-d-process-effect/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_probe_process_effect_bytecode"
+   ],
+   "exit": 0,
+   "ran": 5,
+   "seconds": 3.681,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 4s)",
+   "residual": 0
+  }
+ },
+ "cases": {
+  "PE-1": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Scenario.test_PE_1_a_full_scenario_workspace_construct_call_call_returns"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-2": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Scenario.test_PE_2_expect_raises_with_attributes"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-3": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Scenario.test_PE_3_write_and_edit_jsonl_out_of_band_then_the_subject_and_the_file_observables"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-4": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Scenario.test_PE_4_a_subprocess_step_is_a_separate_process_opening_the_path"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-5": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Scenario.test_PE_5_a_fault_step_applies_to_the_next_call_only_and_is_restored"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-6": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Scenario.test_PE_6_an_absent_subject_before_any_step_a_missing_method_at_call_time"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-7": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Scenario.test_PE_7_ws_is_the_only_placeholder_and_the_workspace_path_is_replaced_back"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-8": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Scenario.test_PE_8_one_window_for_the_whole_scenario"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-ADV-1": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Adversarial.test_PE_ADV_1_an_unknown_or_malformed_step_is_INVALID_SPEC_through_run_probe_and_refused_at_admission"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-ADV-2": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Adversarial.test_PE_ADV_2_a_leaked_fault_is_a_harness_failure_never_a_verdict"
+   ],
+   "outcome": "PASS"
+  },
+  "PE-Q0": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Identity.test_PE_Q0_the_module_passes_the_six_probe_rules_with_its_catalog_facts"
+   ],
+   "outcome": "PASS"
+  }
+ },
+ "fault_rows": {
+  "FM2-EFFECT-1": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_1_an_unknown_step_kind_is_INVALID_SPEC_at_admission_before_anything_runs"
+   ],
+   "outcome": "PASS",
+   "meaning": "an unknown step kind: INVALID_SPEC at admission, nothing runs"
+  },
+  "FM2-EFFECT-2": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_2_a_fault_restoration_failure_is_HARNESS_FAILED"
+   ],
+   "outcome": "PASS",
+   "meaning": "a fault restoration failure (a controlled double of the request): HARNESS_FAILED, never a verdict"
+  },
+  "FM2-EFFECT-3": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_3_an_exception_in_a_non_final_step_refutes_with_the_step_named"
+   ],
+   "outcome": "PASS",
+   "meaning": "an exception in a non-final step: REFUTED with the step named, for every class"
+  },
+  "FM2-EFFECT-4": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_4_a_subprocess_step_that_leaves_a_process_is_the_range_residual_never_the_probe_s"
+   ],
+   "outcome": "PASS",
+   "meaning": "a subprocess step that leaves a process: the range's residual, stopped and recorded by its release (§17.1), the observation unchanged (POSIX)"
+  },
+  "FM2-EFFECT-5": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_5_a_second_construct_without_declaration_is_refused"
+   ],
+   "outcome": "PASS",
+   "meaning": "a second construct without declaration: refused at admission"
+  },
+  "FM2-EFFECT-6": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_6_a_fault_the_subject_swallows_is_observed_by_the_file_observable"
+   ],
+   "outcome": "PASS",
+   "meaning": "a fault the subject swallows: observed by the file observable (equals_before)"
+  },
+  "FM2-EFFECT-7": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_7_a_harness_that_crashes_before_opening_the_marker_file_is_HARNESS_FAILED"
+   ],
+   "outcome": "PASS",
+   "meaning": "a harness that crashes before opening the marker file: HARNESS_FAILED"
+  },
+  "FM2-EFFECT-8": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_8_a_protocol_line_forged_on_stdout_is_captured_bytes_never_protocol"
+   ],
+   "outcome": "PASS",
+   "meaning": "a protocol line forged on stdout: captured bytes, never protocol"
+  },
+  "FM2-EFFECT-9": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_9_the_process_ending_during_a_step_refutes_with_that_step"
+   ],
+   "outcome": "PASS",
+   "meaning": "the process ending during a step: REFUTED with that step"
+  },
+  "FM2-EFFECT-10": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.FaultEffect.test_FM2_EFFECT_10_a_controller_stop_after_DISPATCHED_is_an_interruption_with_no_result"
+   ],
+   "outcome": "PASS",
+   "meaning": "a controller stop after DISPATCHED: an interruption, no result"
+  },
+  "FM2-PYC-2": {
+   "tests": [
+    "tests.v2.test_probe_process_effect.Bytecode.test_FM2_PYC_2_two_checkouts_of_the_same_content_with_different_dates_observe_one_verdict"
+   ],
+   "outcome": "PASS",
+   "meaning": "P7-FINDING-001 case 2: two checkouts of one content, different dates, one verdict"
+  },
+  "FM2-PYC-EFFECT-1": {
+   "tests": [
+    "tests.v2.test_probe_process_effect_bytecode.Bytecode.test_FM2_PYC_EFFECT_1_in_tree_stale_bytecode_with_a_matching_header_is_never_the_subject"
+   ],
+   "outcome": "PASS",
+   "meaning": "in-tree stale bytecode with a matching header is never the subject"
+  },
+  "FM2-PYC-EFFECT-2": {
+   "tests": [
+    "tests.v2.test_probe_process_effect_bytecode.Bytecode.test_FM2_PYC_EFFECT_2_a_subprocess_step_observes_the_source_too"
+   ],
+   "outcome": "PASS",
+   "meaning": "a subprocess step observes the source too"
+  },
+  "FM2-PYC-EFFECT-3": {
+   "tests": [
+    "tests.v2.test_probe_process_effect_bytecode.Bytecode.test_FM2_PYC_EFFECT_3_the_probe_writes_no_bytecode_into_the_checkout"
+   ],
+   "outcome": "PASS",
+   "meaning": "the probe writes no bytecode into the checkout"
+  },
+  "FM2-PYC-EFFECT-4": {
+   "tests": [
+    "tests.v2.test_probe_process_effect_bytecode.Bytecode.test_FM2_PYC_EFFECT_4_the_cache_is_fresh_empty_outside_the_checkout_and_distinct_per_evaluation"
+   ],
+   "outcome": "PASS",
+   "meaning": "the cache is fresh, empty, outside the checkout and distinct per evaluation"
+  },
+  "FM2-PYC-EFFECT-5": {
+   "tests": [
+    "tests.v2.test_probe_process_effect_bytecode.Bytecode.test_FM2_PYC_EFFECT_5_without_the_external_cache_the_stale_bytecode_decides_the_reproducer_detects_it"
+   ],
+   "outcome": "PASS",
+   "meaning": "without the external cache the stale bytecode decides: the reproducer detects the defect"
+  }
+ },
+ "mutation": {
+  "record": "closure-evidence/v2/cycle2/P3-MUTATION.json",
+  "present": true,
+  "phase": "C2-P3",
+  "source_sha256": [
+   "66298a826617b3e0b88df2a9dedde413aebc1ccdd9145f24ef654898c8ca740f"
+  ],
+  "targets": 75,
+  "mutants": 1465,
+  "killed": 1465,
+  "killed_by_timeout": 0,
+  "child_script_targets": 25,
+  "survivors": {},
+  "errors": {},
+  "problems": [],
+  "per_target": {
+   "CLASSES": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "CLASS_TABLE": {
+    "mutants": 118,
+    "killed": 118,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "FAULTED": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "FAULTS": {
+    "mutants": 28,
+    "killed": 28,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "FILE_SHAPES": {
+    "mutants": 6,
+    "killed": 6,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "HARNESS/HANDLERS": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/count_lines": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_call": {
+    "mutants": 27,
+    "killed": 27,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_construct": {
+    "mutants": 12,
+    "killed": 12,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_edit": {
+    "mutants": 52,
+    "killed": 52,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_expect": {
+    "mutants": 19,
+    "killed": 19,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_fault": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_subprocess": {
+    "mutants": 39,
+    "killed": 39,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_workspace": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_write": {
+    "mutants": 16,
+    "killed": 16,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/emit": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/file_fact": {
+    "mutants": 27,
+    "killed": 27,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/files_now": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/guarded": {
+    "mutants": 27,
+    "killed": 27,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/identity": {
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/inside": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/main": {
+    "mutants": 116,
+    "killed": 116,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/raised_as": {
+    "mutants": 42,
+    "killed": 42,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/resolve": {
+    "mutants": 15,
+    "killed": 15,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/row_of": {
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/run": {
+    "mutants": 58,
+    "killed": 58,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/same": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/tagged": {
+    "mutants": 13,
+    "killed": 13,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/target_of": {
+    "mutants": 10,
+    "killed": 10,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/unws": {
+    "mutants": 10,
+    "killed": 10,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "ON_DEADLINE": {
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "PROBE_SOURCES": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "ProcessEffectProbe.__init__": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "ProcessEffectProbe._observe_in": {
+    "mutants": 34,
+    "killed": 34,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "ProcessEffectProbe.enforcement": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "ProcessEffectProbe.harness_preconditions": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "ProcessEffectProbe.observe": {
+    "mutants": 54,
+    "killed": 54,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "STEPS": {
+    "mutants": 67,
+    "killed": 67,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_CONTENT": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_FILE_HOLDS": {
+    "mutants": 19,
+    "killed": 19,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_FILE_SHAPE_OK": {
+    "mutants": 27,
+    "killed": 27,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_HOLDS": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_SHAPES": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_concluded": {
+    "mutants": 30,
+    "killed": 30,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_content_of": {
+    "mutants": 2,
+    "killed": 2,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_edit_ok": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_expect_ok": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_fault_ok": {
+    "mutants": 5,
+    "killed": 5,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_file_shape_ok": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_files_hold": {
+    "mutants": 15,
+    "killed": 15,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_flat_ok": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_hard_exit": {
+    "mutants": 39,
+    "killed": 39,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "_harness_argv": {
+    "mutants": 18,
+    "killed": 18,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "_ident_ok": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_identity": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_invocation_ok": {
+    "mutants": 10,
+    "killed": 10,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_jsonl_holds": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_observed_files": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_prepare": {
+    "mutants": 37,
+    "killed": 37,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "_probe_digest": {
+    "mutants": 1,
+    "killed": 1,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_raises_hold": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_resolved": {
+    "mutants": 31,
+    "killed": 31,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_returns_hold": {
+    "mutants": 28,
+    "killed": 28,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_same": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_scenario_ok": {
+    "mutants": 28,
+    "killed": 28,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_step_ok": {
+    "mutants": 18,
+    "killed": 18,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_subprocess_ok": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_substitute": {
+    "mutants": 14,
+    "killed": 14,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_watch": {
+    "mutants": 44,
+    "killed": 44,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "_workspace_ok": {
+    "mutants": 6,
+    "killed": 6,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_write_ok": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_ws_path_ok": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "observation_class": {
+    "mutants": 74,
+    "killed": 74,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "spec_class": {
+    "mutants": 13,
+    "killed": 13,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "verdict_of": {
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   }
+  }
+ },
+ "static": {
+  "probe_static_checks": [],
+  "cycle2_baseline": [],
+  "destructive_authority": []
+ },
+ "design_notes": [
+  "the step vocabulary is a closed mapping STEPS (kind -> required, optional fields) with one typed shape per kind (_SHAPES keyed by the same vocabulary); the child script dispatches through HANDLERS keyed by it; an unknown kind gives the spec no class (UNSUPPORTED -> INVALID_SPEC at admission), never a default meaning; a scenario holds at most one workspace step (first) and one construct, distinct binding names, and every fault is followed by the call / expect_raises / subprocess step it applies to",
+  "DECISION-2: FAULTS is a closed table in the module (so in the digest): id -> (module, attribute, exception type name); the parent puts the entry in the request; the child installs a stand-in whose first invocation raises, right before the next step's call, and in a finally restores the original and asserts it IS the original again; a failed restoration is a harness failure (HARNESS_FAILED); no callable, shell string, path or developer file can select or shape a fault, and nothing the subject returns can",
+  "one window per scenario (within_s), from DISPATCHED to RESULT; an expired window is REFUTED for every class",
+  "`<ws>` is the only placeholder, substituted at the head of strings of args, kwargs and argv (as `<ws>/x` -> the workspace path, `/`, `x`, on every platform); every reported string, exception attribute and JSON field has the workspace path (as given and resolved) replaced back by `<ws>` before comparison; JSON equality is exact (canonical text: true is not 1, 1 is not 1.0)",
+  "the protocol channel, the watch and the evaluation directory are cli_invocation's, imported (marker file, _await/_protocol, _harness_failure, _preflight, _disposed, _child_env); every conclusion after DISPATCHED goes through python_callable._after_dispatch (C2-P2-FINDING-002); the child opens its capture descriptors with O_BINARY and pins the standard streams' newline (C2-P2-FINDING-001); every file the harness writes is written in binary",
+  "a subprocess step runs the ExecutionEnv's interpreter (never the harness's sys.executable) with -I -B -X pycache_prefix=<fresh per step> -X utf8=1 and a probe-owned boot (SUBPROCESS) that puts the revision on the path and runs `-m module` as __main__, in the workspace, with the scrubbed environment; the child is a member of the probe's range",
+  "the child script's functions are mutation targets (validation/v2/mutation.py `path::HARNESS/function`: the mutant is made in the parsed script and written back into the constant), killed by the real-subject module",
+  "the tests live at the tests/v2 root (the test tiers are a closed enum of the frozen invariant registry); the calibration fixtures (tests/v2/fixtures/calibration/process_effect) are committed with the harness because Q0 PROBE_CATALOG_CLOSURE requires them for every class of a registered probe; their calibration records are WP-2.3.2's"
+ ],
+ "problems": [],
+ "verdict": "HARNESS GREEN"
+}
