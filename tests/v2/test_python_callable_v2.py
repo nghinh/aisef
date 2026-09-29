@@ -17,6 +17,7 @@ import pathlib
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from unittest import mock
@@ -32,6 +33,7 @@ from aisef2.probe.protocol import ExecutionEnv, Observation, ObservationKind as 
 from aisef2.product.contract import names_test_artefact  # noqa: E402
 from aisef2.product.outcome import Executed, IndeterminateReason  # noqa: E402
 from aisef2.product.spec import ProductProofSpec  # noqa: E402
+from aisef2.runtime.process_range import RangeError  # noqa: E402
 
 
 def _load(name: str, rel: str):
@@ -109,6 +111,11 @@ def env(timeout=20, required=Enforcement.PARTIAL, interpreter=sys.executable):
 def never_runs():
     """Patch the probe so building a range at all is a test failure: nothing may run."""
     return mock.patch.object(pc2, "ProcessRange", side_effect=AssertionError("ran"))
+
+
+def refuses(error):
+    """Patch the probe so starting a range fails: the harness cannot launch."""
+    return mock.patch.object(pc2, "ProcessRange", mock.Mock(return_value=mock.Mock(start=mock.Mock(side_effect=error))))
 
 
 class FakeRange:
@@ -476,6 +483,8 @@ class Cycle1Semantics(_Revisions):
                                  Observation(K.SUBJECT_DEADLINE, R, f"the subject's 0.6s observation window expired ({cls})"))
         self.assertEqual(pc2.ON_DEADLINE, {c: (S if c == "blocks" else R) for c in pc2.CLASSES})
         self.assertEqual(self.run_(spec("app.calc:add", {"blocks": True}, {"args": [1, 2]})), Executed(R))
+        self.assertEqual(self.see(spec("app.calc:hang", {"blocks": True}, window=1)),   # an integral window is written 1s, not 1.0s
+                         Observation(K.SUBJECT_DEADLINE, S, "the subject's 1s observation window expired (blocks)"))
 
     def test_PCV2_8_absence_exit_and_forgery_are_what_they_were(self):
         self.assertEqual(self.see(spec("json:dumps", absence=REQUIRES)),
@@ -527,11 +536,36 @@ class Cycle1Semantics(_Revisions):
             inside = pc2.PythonCallableV2Probe(scratch=os.path.join(scratch, "in-tree"))
             os.mkdir(os.path.join(scratch, "in-tree"))
             at = RevisionRef(SHA, scratch)
-            self.assertEqual(self.run_(spec("app.calc:add"), at=at, probe=inside).detail,
-                             "the evaluation directory lies inside the revision checkout: refused")
+            result = self.run_(spec("app.calc:add"), at=at, probe=inside)
+            self.assertEqual((result.status, result.detail), (ProbeExecutionStatus.UNRUNNABLE,
+                                                              "the evaluation directory lies inside the revision checkout: refused"))
             missing = pc2.PythonCallableV2Probe(scratch=os.path.join(scratch, "no-such"))
-            self.assertEqual(self.run_(spec("app.calc:add"), probe=missing).detail,
-                             "the evaluation directory cannot be created: FileNotFoundError")
+            result = self.run_(spec("app.calc:add"), probe=missing)
+            self.assertEqual((result.status, result.detail), (ProbeExecutionStatus.UNRUNNABLE,
+                                                              "the evaluation directory cannot be created: FileNotFoundError"))
+        for error in (RangeError("no anchor"), OSError("cannot launch")):   # the range refuses to start, or the OS does
+            with refuses(error):
+                result = self.run_(spec("app.calc:add"))
+            self.assertEqual((result.status, result.detail),
+                             (ProbeExecutionStatus.UNRUNNABLE, f"the harness cannot launch: {type(error).__name__}"))
+        with mock.patch.object(pc2, "_write_workspace", side_effect=OSError("disk full")), never_runs():
+            result = self.run_(spec("app.files:listing", {"returns": []}, {"workspace": TEXT_WS, "args": ["<ws>"]}))
+        self.assertEqual((result.status, result.detail),
+                         (ProbeExecutionStatus.UNRUNNABLE, "the workspace cannot be written: OSError"))
+
+    def test_PCV2_8_the_protocol_reader_never_holds_the_interpreter_open(self):
+        """The protocol's one reader is a daemon thread (§17.1, §9.4): a controller that dies with a pipe still open is
+        not kept alive by its own probe's reader."""
+        started = []
+        real = threading.Thread
+
+        class Spy(real):
+            def __init__(self, *a, **kw):
+                started.append(kw.get("daemon"))
+                super().__init__(*a, **kw)
+        with faked("READY", "DISPATCHED", returncode=0), mock.patch.object(pc2.threading, "Thread", Spy):
+            self.run_(spec("app.calc:add"))
+        self.assertEqual(started, [True])
 
     def test_PCV2_8_the_stream_and_the_exit_stay_two_facts(self):
         s = spec("app.calc:add", {"blocks": True}, {"args": [1, 2]}, window=0.4)
