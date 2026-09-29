@@ -1,0 +1,3837 @@
+{
+ "record": "AISEF V2 — WP-2.3.2 PROCESS EFFECT CALIBRATION (probe.process_effect: class calibrations over the small fixtures and the LedgerLock reference, DECISION-1 declarations, SpecFalsifiabilityEvidence)",
+ "work_package": "WP-2.3.2",
+ "rfc_sections": [
+  "9.1",
+  "9.1.1",
+  "9.1.2",
+  "9.2"
+ ],
+ "rule": "a ProbeCapabilityCalibration exists only when the positive fixture is observed SATISFIED and the negative one REFUTED by the real probe (the frozen calibrate(), the observation class read from the catalog registry); a spec is falsifiable only when it is SATISFIED on the reference and REFUTED by at least one controlled mutant of it",
+ "identities": {
+  "package": "WP-2.3.2",
+  "parent": "e063b76fd1cc625211dca1f8b64db9742e566e6a",
+  "parent_aisef2_tree": "509653f3ea630564976dca4b3e8de5041517718a",
+  "head": "d93785ec47db0577fa0b67aa5e09ef41115f4b9f",
+  "aisef2_tree": "f4f729de10f1d3adae5b8fa1f31768fcf398f415",
+  "probe": {
+   "id": "probe.process_effect",
+   "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "classes": [
+    "scenario_returns",
+    "scenario_raises",
+    "scenario_files"
+   ],
+   "sources": {
+    "probe/protocol.py": {
+     "sha256": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+     "git_blob": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    "probe/python_callable.py": {
+     "sha256": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+     "git_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+    },
+    "probe/cli_invocation.py": {
+     "sha256": "577f0c97ecbe371241bc7c2b4257e73a67181a881a171d8fffcd61b3c156b4e2",
+     "git_blob": "03aa8ab991b0e03c5583b3979a042cee1955e470"
+    },
+    "probe/process_effect.py": {
+     "sha256": "66298a826617b3e0b88df2a9dedde413aebc1ccdd9145f24ef654898c8ca740f",
+     "git_blob": "e340912f0573350476ad97e62c0b00117bc6e1c8"
+    }
+   },
+   "catalog": {
+    "subject_kind": "process_effect",
+    "subject_process": "child_of_harness",
+    "protocol_channel": "marker_file",
+    "stimulus_shape": "scenario",
+    "fixture_root": "process_effect",
+    "cycle": 2,
+    "active": true
+   },
+   "enforcement": "PARTIAL",
+   "weakest_path": "the subject, and every subprocess step, runs as the harness user with that user's filesystem and network access, and can read the request and the protocol file; -I interpreter isolation, a scrubbed environment, a fresh working directory and a harness-owned bytecode cache (-X pycache_prefix, -B) are isolation, not a sandbox",
+   "fault_witness": "a fault step measures one declared fault at one declared call: a bounded witness of a property quantified over every crash point, never a proof of it (DECISION-1)"
+  },
+  "tests": {
+   "tests.v2.test_probe_process_effect_units": {
+    "sha256": "0af4d058b84383fab62ae46e7c83347c475585fe186b6f2ab839646f43d4e258",
+    "git_blob": "26e7f1b41267eee6f1bb2e25f117a7f491a4348d"
+   },
+   "tests.v2.test_probe_process_effect": {
+    "sha256": "ac93476ebb1016dfe6459fad8e0320126958d3fbf6210948046a9a4b84b74e8f",
+    "git_blob": "e6f5730e75c63f062eba7d3409317f42b6649a89"
+   },
+   "tests.v2.test_probe_process_effect_bytecode": {
+    "sha256": "dc206dad29fa914cf61a54323180751e1144688229b944ac378991aa2ce7ef23",
+    "git_blob": "280fba5bead1ac4a68c5f910f637f69d48ad309f"
+   }
+  },
+  "cycle1": {
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "probe": {
+    "id": "probe.python_callable",
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+   }
+  },
+  "cycle2_freeze_manifest": {
+   "path": "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json",
+   "sha256": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad"
+  },
+  "owner_decisions": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "hash_rule": "every sha256 here is over bytes with CRLF normalised to LF; git_blob = sha1 of the blob header and the same bytes"
+ },
+ "harness_record": {
+  "path": "closure-evidence/v2/cycle2/P3-EFFECT-HARNESS.json",
+  "commit": "7de6d798e06f57f9731f387031d621434ae897c7",
+  "same_probe_digest": true
+ },
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin"
+ },
+ "calibrations": {
+  "small_fixtures": [
+   {
+    "probe_id": "probe.process_effect",
+    "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "observation_class": "scenario_returns",
+    "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_returns/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_returns/negative",
+    "demonstrated_at": 1790695009.669268
+   },
+   {
+    "probe_id": "probe.process_effect",
+    "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "observation_class": "scenario_raises",
+    "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_raises/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_raises/negative",
+    "demonstrated_at": 1790695011.053833
+   },
+   {
+    "probe_id": "probe.process_effect",
+    "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "observation_class": "scenario_files",
+    "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_files/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_files/negative",
+    "demonstrated_at": 1790695012.469301
+   }
+  ],
+  "ledgerlock": [
+   {
+    "probe_id": "probe.process_effect",
+    "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "observation_class": "scenario_returns",
+    "positive_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/reference",
+    "negative_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.3-1",
+    "demonstrated_at": 1790695013.9764202,
+    "mutant": "M-3.3-1",
+    "mutant_target": "R-3.3",
+    "request": {
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "step": "construct",
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {}
+       },
+       {
+        "step": "call",
+        "method": "put",
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {}
+       },
+       {
+        "step": "call",
+        "method": "put",
+        "args": [
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        "kwargs": {}
+       },
+       {
+        "step": "call",
+        "method": "put",
+        "args": [
+         "c",
+         3,
+         "r3",
+         3
+        ],
+        "kwargs": {}
+       },
+       {
+        "step": "edit_jsonl",
+        "path": "<ws>/l.jsonl",
+        "line": 1,
+        "field": "value",
+        "value": 99
+       },
+       {
+        "step": "call",
+        "method": "verify",
+        "args": [],
+        "kwargs": {}
+       }
+      ]
+     },
+     "observable": {
+      "returns": [
+       false,
+       1,
+       3
+      ],
+      "within_s": 30
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "why": "verify recomputes every hash from disk (R-3.3): the mutant never recomputes one, so the tampered value is not found and verify returns another value",
+    "non_contrasting_pair_rejected": true,
+    "positive_checkout": {
+     "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+     "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+     "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+     "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+    },
+    "negative_checkout": {
+     "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+     "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+     "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+     "ledgerlock/ledger.py": "db1fcb87cc2d2d27b08ea046f88e09109c9dfba245da03a9a00541588c0ef3be"
+    }
+   },
+   {
+    "probe_id": "probe.process_effect",
+    "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "observation_class": "scenario_raises",
+    "positive_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/reference",
+    "negative_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.3-1",
+    "demonstrated_at": 1790695015.12019,
+    "mutant": "M-4.3-1",
+    "mutant_target": "R-4.3",
+    "request": {
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "step": "construct",
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {}
+       },
+       {
+        "step": "call",
+        "method": "put",
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {}
+       },
+       {
+        "step": "expect_raises",
+        "args": [
+         "a",
+         2,
+         "r2",
+         2
+        ],
+        "kwargs": {},
+        "exception": "ConflictError",
+        "method": "put",
+        "attrs": {
+         "args": [
+          "key 'a' was last mutated by another rid"
+         ]
+        }
+       }
+      ]
+     },
+     "observable": {
+      "raises": true,
+      "within_s": 30
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "why": "another request id on a mutated key raises ConflictError (R-4.3): the mutant's inverted condition never conflicts, so nothing is raised",
+    "non_contrasting_pair_rejected": true,
+    "positive_checkout": {
+     "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+     "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+     "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+     "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+    },
+    "negative_checkout": {
+     "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+     "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+     "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+     "ledgerlock/ledger.py": "a73f3086ff537dbbb2ea1b119ad31ce163f85e980eaf47f05259b18a4a29f494"
+    }
+   },
+   {
+    "probe_id": "probe.process_effect",
+    "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "observation_class": "scenario_files",
+    "positive_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/reference",
+    "negative_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.2-1",
+    "demonstrated_at": 1790695016.2693639,
+    "mutant": "M-3.2-1",
+    "mutant_target": "R-3.2",
+    "request": {
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "step": "construct",
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {}
+       },
+       {
+        "step": "call",
+        "method": "put",
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {}
+       },
+       {
+        "step": "call",
+        "method": "put",
+        "args": [
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        "kwargs": {}
+       }
+      ]
+     },
+     "observable": {
+      "files": {
+       "<ws>/l.jsonl": {
+        "jsonl": {
+         "line": 1,
+         "field": "hash",
+         "equals": "2c3dd7cba5ed0183caa6b077b983d6883a33216a6d185189727f637aedd5eafc"
+        }
+       }
+      },
+      "within_s": 30
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "why": "the chained hash is SHA-256(prev_hash | canonical bytes) (R-3.2): the mutant drops the separator, so the second line's stored hash is not the specified one",
+    "non_contrasting_pair_rejected": true,
+    "positive_checkout": {
+     "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+     "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+     "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+     "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+    },
+    "negative_checkout": {
+     "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+     "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+     "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+     "ledgerlock/ledger.py": "9cfecface0647390f507d154c36192bcab7980b5108eceb1c50e6f386517bcd6"
+    }
+   }
+  ]
+ },
+ "fixtures": {
+  "scenario_returns": {
+   "positive": {
+    "request.json": {
+     "sha256": "77d4ef7910c56627c272f0392a8f103151940e6066d36643fa13023692afb248",
+     "git_blob": "d3d8dbf82504181e42aacab7b819e1d405a49a9d"
+    },
+    "checkout/tally.py": {
+     "sha256": "47cf2eec5b0ebf1b92478f3ebf2fef0e74b02e31c7221c97a0824f732c656088",
+     "git_blob": "87ba3e1f7de61b89fa908822bb0db7e39efcace5"
+    }
+   },
+   "negative": {
+    "request.json": {
+     "sha256": "77d4ef7910c56627c272f0392a8f103151940e6066d36643fa13023692afb248",
+     "git_blob": "d3d8dbf82504181e42aacab7b819e1d405a49a9d"
+    },
+    "checkout/tally.py": {
+     "sha256": "5e1aebba8db63de10d6d234ebc823511249527eedfa62047dccb80aa0689a5b5",
+     "git_blob": "5c13d97a87d735f90b41562773adb19fe75bb19d"
+    }
+   }
+  },
+  "scenario_raises": {
+   "positive": {
+    "request.json": {
+     "sha256": "a73709949abde1f297b8c016f639f440a09a7ccf166f986fca3cab9c0d11d1bb",
+     "git_blob": "1c573191b14a7b79f42492cc857db8c28834d95b"
+    },
+    "checkout/tally.py": {
+     "sha256": "47cf2eec5b0ebf1b92478f3ebf2fef0e74b02e31c7221c97a0824f732c656088",
+     "git_blob": "87ba3e1f7de61b89fa908822bb0db7e39efcace5"
+    }
+   },
+   "negative": {
+    "request.json": {
+     "sha256": "a73709949abde1f297b8c016f639f440a09a7ccf166f986fca3cab9c0d11d1bb",
+     "git_blob": "1c573191b14a7b79f42492cc857db8c28834d95b"
+    },
+    "checkout/tally.py": {
+     "sha256": "f2c24bbfc79ad2bcdb37d771931f68c945d59eb3be34a883f11c49c3ae1e471d",
+     "git_blob": "36e792e217c63ef3d1214f79067176504b5196d0"
+    }
+   }
+  },
+  "scenario_files": {
+   "positive": {
+    "request.json": {
+     "sha256": "7d315f4d1d076545071c6fe9fc6e2df3cca08ea9a83230cce06276d3b3989085",
+     "git_blob": "333f2190348e389add2482bd9a9d0b78ef453843"
+    },
+    "checkout/tally.py": {
+     "sha256": "47cf2eec5b0ebf1b92478f3ebf2fef0e74b02e31c7221c97a0824f732c656088",
+     "git_blob": "87ba3e1f7de61b89fa908822bb0db7e39efcace5"
+    }
+   },
+   "negative": {
+    "request.json": {
+     "sha256": "7d315f4d1d076545071c6fe9fc6e2df3cca08ea9a83230cce06276d3b3989085",
+     "git_blob": "333f2190348e389add2482bd9a9d0b78ef453843"
+    },
+    "checkout/tally.py": {
+     "sha256": "fb45939e610cfad2ebb15fa8aad82bd887a1d04c4bc52ddeb90c401742dd4e33",
+     "git_blob": "d5f0f833001ac5b97816277a0fbcf5cb921b61c2"
+    }
+   }
+  }
+ },
+ "reference_fixture": {
+  "path": "tests/v2/fixtures/workloads/ledgerlock-reference",
+  "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+  "mutants_catalog_sha256": "fa1f3dbd32242ccce5195e6a12647425148b0121ee0ae69b52a0f62c1d0b335f",
+  "requirements_map_sha256": "a1a56ca50d946f4ee03c8ffdd7f7e9afcc903cd4a91f7f26988e5cf4a9dfcd23",
+  "frozen": "read only; every tree built in a temporary directory"
+ },
+ "class_table": {
+  "scenario_returns": {
+   "quantifier": "exhaustive_finite_domain",
+   "domain": "the one declared scenario (its steps, in order, in one harness process): the domain is that scenario alone",
+   "enforcement": "PARTIAL",
+   "on_deadline": "REFUTED",
+   "rows": [
+    {
+     "facts": "window expired",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "a step refuted",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "the process ended during a step",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "completed, the last call returned the declared value",
+     "verdict": "SATISFIED"
+    },
+    {
+     "facts": "completed, the last call returned another value, bytes or an unserializable value",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "completed, the last call returned the declared bytes",
+     "verdict": "SATISFIED"
+    },
+    {
+     "facts": "completed, the two bound results are equal",
+     "verdict": "SATISFIED"
+    },
+    {
+     "facts": "completed, the two bound results differ or one is unserializable",
+     "verdict": "REFUTED"
+    }
+   ]
+  },
+  "scenario_raises": {
+   "quantifier": "exhaustive_finite_domain",
+   "domain": "the one declared scenario (its steps, in order, in one harness process): the domain is that scenario alone",
+   "enforcement": "PARTIAL",
+   "on_deadline": "REFUTED",
+   "rows": [
+    {
+     "facts": "window expired",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "a step refuted",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "the process ended during a step",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "completed, the last step raised the declared type with every declared attribute",
+     "verdict": "SATISFIED"
+    }
+   ]
+  },
+  "scenario_files": {
+   "quantifier": "exhaustive_finite_domain",
+   "domain": "the one declared scenario (its steps, in order, in one harness process): the domain is that scenario alone",
+   "enforcement": "PARTIAL",
+   "on_deadline": "REFUTED",
+   "rows": [
+    {
+     "facts": "window expired",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "a step refuted",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "the process ended during a step",
+     "verdict": "REFUTED"
+    },
+    {
+     "facts": "completed, every named file matches its shape",
+     "verdict": "SATISFIED"
+    },
+    {
+     "facts": "completed, a named file does not match its shape",
+     "verdict": "REFUTED"
+    }
+   ]
+  }
+ },
+ "decision_1": {
+  "quantifiers": [
+   "exhaustive_finite_domain",
+   "bounded_witness_measurement",
+   "unsupported_for_full_enforcement"
+  ],
+  "declared_per_class": {
+   "scenario_returns": "exhaustive_finite_domain",
+   "scenario_raises": "exhaustive_finite_domain",
+   "scenario_files": "exhaustive_finite_domain"
+  },
+  "declared_per_spec": {
+   "LL-HASH-1": "exhaustive_finite_domain",
+   "LL-NFC-1": "exhaustive_finite_domain",
+   "LL-VERIFY-1": "exhaustive_finite_domain",
+   "LL-VERIFY-2": "exhaustive_finite_domain",
+   "LL-RID-1": "exhaustive_finite_domain",
+   "LL-IDEM-1": "exhaustive_finite_domain",
+   "LL-CONFLICT-1": "exhaustive_finite_domain",
+   "LL-TOMB-1": "exhaustive_finite_domain",
+   "LL-BATCH-1": "exhaustive_finite_domain",
+   "LL-BATCH-2": "exhaustive_finite_domain",
+   "LL-SNAP-1": "exhaustive_finite_domain",
+   "LL-REPAIR-1": "exhaustive_finite_domain",
+   "LL-REPAIR-2": "exhaustive_finite_domain",
+   "LL-FSYNC-1": "bounded_witness_measurement",
+   "LL-FSYNC-2": "bounded_witness_measurement",
+   "LL-REPLACE-1": "bounded_witness_measurement",
+   "LL-CLI-1": "exhaustive_finite_domain"
+  },
+  "fault_step": "a fault step measures one declared fault at one declared call: a bounded witness of a property quantified over every crash point, never a proof of it (DECISION-1)",
+  "enforcement": "PARTIAL for every class; no class claims FULL",
+  "rule": "a class measures the one declared scenario exhaustively; a spec whose fault step witnesses a property quantified over every crash point declares bounded_witness_measurement, and its verdict is never recorded as a proof of it"
+ },
+ "falsifiability": {
+  "mechanism": "controlled_product_mutation",
+  "window_s": 30,
+  "approver": "human:c2-p3-calibration-fixture",
+  "approval_note": "the approvals are fixture approvals, for compilation only: these contracts are calibration and falsifiability instruments over the reference, not a plan (DECISION-3: no LedgerLock contract is approved by this package)",
+  "trees": {
+   "reference": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+   },
+   "M-3.1-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "bcbfea65139375215c82898e0681f6955f5bed5dc17c4fee34f576efe5f7e965"
+   },
+   "M-3.2-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "9cfecface0647390f507d154c36192bcab7980b5108eceb1c50e6f386517bcd6"
+   },
+   "M-3.2-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0df95b31fc42fefd08e51ec690cabbd6265f176429bba735563ae48bdd876b26"
+   },
+   "M-3.3-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "db1fcb87cc2d2d27b08ea046f88e09109c9dfba245da03a9a00541588c0ef3be"
+   },
+   "M-3.3-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0b949dec541d272f1f7819bb8e4b26445cd910d8099d60c00a66a8fe1914dfd8"
+   },
+   "M-3.3-3": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "00d2ce61c41d86a807047080f91c397ae262d52f90b4f992008d202ac4c58d62"
+   },
+   "M-3.4-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "978ca1c594b2758b18a8baa4b09ff8ee0391cd5d23dd60d9ece7c2182b094aa8"
+   },
+   "M-4.1-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "6e5411b61d67f2dafc0781ce455d7a325a27d6f75adb279e29da9246f2c20499"
+   },
+   "M-4.2-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "7eaf325c85772b8fec74ef5748c91337f755ed0b91feb08bf367d13fc4a7bfce"
+   },
+   "M-4.3-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "a73f3086ff537dbbb2ea1b119ad31ce163f85e980eaf47f05259b18a4a29f494"
+   },
+   "M-4.4-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0320d01741f55ce869e515c2a6d778c6f5c4b22e5d02d8f2736de16831578835"
+   },
+   "M-4.5-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "aee539eb99fb4e30733b957ef8c9e8c017fed284b6804b66045c88591f98d054"
+   },
+   "M-5-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "f66e4597ae1c21a060be146402aa6755575a736d005927cae27ef8ddd2ed870d"
+   },
+   "M-5-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "83c08f81e640fdc9121dd4e85fb81f79e8ba4e226c438f61e1b5aacce4a1abd8"
+   },
+   "M-6-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "b4f396578cb26fea4466abdc32babd982bb792eeeb0380a268db4d1d607d5e6a"
+   },
+   "M-6-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "f01fd92d691c242b078734836664284e7e0504fd9ea805449766f3ab1b43c914"
+   },
+   "M-7-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "7f6c4698467aa673964081d20a2d760415e88651ca809fcbf3c7ba71cf43f03f"
+   },
+   "M-7-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "ee2bc929d9a17c1970e21301486549ce900787d6c2967aefe40bcbc7c983a7d3"
+   },
+   "M-7-3": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "f0eb09eda0fb1f53468e50204859c3fc7bc769d8c2b4656bd77f744224fcf7e3"
+   },
+   "M-8-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "493e68848fa64f93faf5cf737d18bf670362e1674433e87af2fdfed33c57b6ea"
+   },
+   "M-9-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "f8efd13f5f68c84d1f9384c81f760e2edcc8c87f98a75c2a1b835a537f280054",
+    "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+   },
+   "M-9-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "2b82420215212854a8fb9284b49c7ba00d8b47a9bd14405a89c0cd68ccb132e5",
+    "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+   },
+   "M-9-3": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "fe5f9f624166e86971429af7dffdcde61045e067eda0076cedb4c047b878b42a",
+    "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+   },
+   "M-10-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0c2094df2d1027dc38c56f2056645427953928d173c7ad6c135ed5f57514ca77"
+   },
+   "M-12-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0f22b9b388be18b10d772d8836a6388da1dfe2cefe0d6b664801f0af4c6b13be"
+   },
+   "M-13-1": {
+    "ledgerlock/__init__.py": "40f1caf69ee27f65b98b913e97f549f6735b1c41b8b51c3b03e611e46b5cf645",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "fe9c2e136802a064478985d6460b838bd6933686ea30baee667df06b5c0e5a65"
+   }
+  },
+  "specs": [
+   {
+    "id": "LL-HASH-1",
+    "family": "hash chain",
+    "requirements": [
+     "R-3.2"
+    ],
+    "claim": "two appends chain: the second line's hash is SHA-256(first hash | canonical bytes of the second)",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-HASH-1",
+    "contract_hash": "2586ac2ee70cf530de77994bb575db2c4a791a150a56cf44fb20d5392f82a170",
+    "spec_id": "PPS-68f809ac7b64fac2a6523d769076d843dcdae0e8073c3339386ad45054f05f8d",
+    "semantic_hash": "ceef9a11209ddbddb7a8e32d86edfb26b175fb993ed7144cc8eb99bebab3ce81",
+    "probe_input": {
+     "observable": {
+      "files": {
+       "<ws>/l.jsonl": {
+        "jsonl": {
+         "equals": "2c3dd7cba5ed0183caa6b077b983d6883a33216a6d185189727f637aedd5eafc",
+         "field": "hash",
+         "line": 1
+        }
+       }
+      },
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "REFUTED",
+     "M-3.2-2": "REFUTED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-3.2-1",
+     "M-3.2-2"
+    ],
+    "refuted": [
+     "M-3.2-1",
+     "M-3.2-2"
+    ],
+    "unrefuted_designed": [],
+    "refuted_beyond_design": [],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-68f809ac7b64fac2a6523d769076d843dcdae0e8073c3339386ad45054f05f8d",
+      "semantic_hash": "ceef9a11209ddbddb7a8e32d86edfb26b175fb993ed7144cc8eb99bebab3ce81",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.2-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-68f809ac7b64fac2a6523d769076d843dcdae0e8073c3339386ad45054f05f8d",
+      "semantic_hash": "ceef9a11209ddbddb7a8e32d86edfb26b175fb993ed7144cc8eb99bebab3ce81",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.2-2",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-NFC-1",
+    "family": "hash chain",
+    "requirements": [
+     "R-3.1"
+    ],
+    "claim": "a key given in NFD is stored in NFC",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-NFC-1",
+    "contract_hash": "e4287b7722e911ecc106816986640fdab0ef2f9c856d61a8eeffa02bd0659433",
+    "spec_id": "PPS-2b63a6a7569246bf5a02dd5411327416887ad75d4c8341885b236a4c9cc1f668",
+    "semantic_hash": "b4fd379df987c72e08231831db2e2b9430758a668d7f40d8894787ac48111524",
+    "probe_input": {
+     "observable": {
+      "files": {
+       "<ws>/l.jsonl": {
+        "jsonl": {
+         "equals": "é",
+         "field": "key",
+         "line": 0
+        }
+       }
+      },
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "é",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "REFUTED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-3.1-1"
+    ],
+    "refuted": [
+     "M-3.1-1"
+    ],
+    "unrefuted_designed": [],
+    "refuted_beyond_design": [],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-2b63a6a7569246bf5a02dd5411327416887ad75d4c8341885b236a4c9cc1f668",
+      "semantic_hash": "b4fd379df987c72e08231831db2e2b9430758a668d7f40d8894787ac48111524",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.1-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-VERIFY-1",
+    "family": "verify",
+    "requirements": [
+     "R-3.3",
+     "R-3.4"
+    ],
+    "claim": "a value changed on disk after three appends is found at its index by the same instance's verify",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-VERIFY-1",
+    "contract_hash": "c19d9d18921e188fe4072b64d0606831fcac1db990e10233131e5a4feb08e0b1",
+    "spec_id": "PPS-6fc022af0737a044c367042b6b0a3a116b8cfaa7c87fa126bf51101639090962",
+    "semantic_hash": "d29a424c802ff76c2c9da907f570ce2f8a388248e9ffe372e4a73c629e951605",
+    "probe_input": {
+     "observable": {
+      "returns": [
+       false,
+       1,
+       3
+      ],
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "c",
+         3,
+         "r3",
+         3
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "field": "value",
+        "line": 1,
+        "path": "<ws>/l.jsonl",
+        "step": "edit_jsonl",
+        "value": 99
+       },
+       {
+        "args": [],
+        "kwargs": {},
+        "method": "verify",
+        "step": "call"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "REFUTED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "REFUTED",
+     "M-3.4-1": "REFUTED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-3.3-1",
+     "M-3.3-2",
+     "M-3.3-3",
+     "M-3.4-1"
+    ],
+    "refuted": [
+     "M-3.3-1",
+     "M-3.3-3",
+     "M-3.4-1"
+    ],
+    "unrefuted_designed": [
+     "M-3.3-2"
+    ],
+    "refuted_beyond_design": [],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-6fc022af0737a044c367042b6b0a3a116b8cfaa7c87fa126bf51101639090962",
+      "semantic_hash": "d29a424c802ff76c2c9da907f570ce2f8a388248e9ffe372e4a73c629e951605",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.3-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-6fc022af0737a044c367042b6b0a3a116b8cfaa7c87fa126bf51101639090962",
+      "semantic_hash": "d29a424c802ff76c2c9da907f570ce2f8a388248e9ffe372e4a73c629e951605",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.3-3",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-6fc022af0737a044c367042b6b0a3a116b8cfaa7c87fa126bf51101639090962",
+      "semantic_hash": "d29a424c802ff76c2c9da907f570ce2f8a388248e9ffe372e4a73c629e951605",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.4-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-VERIFY-2",
+    "family": "verify",
+    "requirements": [
+     "R-3.3"
+    ],
+    "claim": "a prev_hash changed on disk is found at its index",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-VERIFY-2",
+    "contract_hash": "ac5f0b321c474af30eae987d3bfca588d65b1deec339543edbfdb38989c2bee2",
+    "spec_id": "PPS-084d9b478f4d36d0c3e07f89662dede2f0bd20886125d876c5a964c203c7dff7",
+    "semantic_hash": "1efe112f055bcf1fde7ed065eeb0f9d4f69b4f9a1f586a8f107ab4bf55afcbf7",
+    "probe_input": {
+     "observable": {
+      "returns": [
+       false,
+       1,
+       2
+      ],
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "field": "prev_hash",
+        "line": 1,
+        "path": "<ws>/l.jsonl",
+        "step": "edit_jsonl",
+        "value": "2c3dd7cba5ed0183caa6b077b983d6883a33216a6d185189727f637aedd5eafc"
+       },
+       {
+        "args": [],
+        "kwargs": {},
+        "method": "verify",
+        "step": "call"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "REFUTED",
+     "M-3.3-3": "REFUTED",
+     "M-3.4-1": "REFUTED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-3.3-1",
+     "M-3.3-2",
+     "M-3.3-3"
+    ],
+    "refuted": [
+     "M-3.3-2",
+     "M-3.3-3",
+     "M-3.4-1"
+    ],
+    "unrefuted_designed": [
+     "M-3.3-1"
+    ],
+    "refuted_beyond_design": [
+     "M-3.4-1"
+    ],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-084d9b478f4d36d0c3e07f89662dede2f0bd20886125d876c5a964c203c7dff7",
+      "semantic_hash": "1efe112f055bcf1fde7ed065eeb0f9d4f69b4f9a1f586a8f107ab4bf55afcbf7",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.3-2",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-084d9b478f4d36d0c3e07f89662dede2f0bd20886125d876c5a964c203c7dff7",
+      "semantic_hash": "1efe112f055bcf1fde7ed065eeb0f9d4f69b4f9a1f586a8f107ab4bf55afcbf7",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.3-3",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-084d9b478f4d36d0c3e07f89662dede2f0bd20886125d876c5a964c203c7dff7",
+      "semantic_hash": "1efe112f055bcf1fde7ed065eeb0f9d4f69b4f9a1f586a8f107ab4bf55afcbf7",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.4-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-RID-1",
+    "family": "batches/idempotency/conflicts",
+    "requirements": [
+     "R-4.1"
+    ],
+    "claim": "an empty request id is refused",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-RID-1",
+    "contract_hash": "66e873f76322b97c6a8b2878644679f62cfa20ceb093903ff08410a02ae56797",
+    "spec_id": "PPS-28c66bc2e02362330c61bcb08bb03adaff60f3fe88abd94099b55f62214231bd",
+    "semantic_hash": "c0d4a5941b1e48c17376f08804f317e3b24219cec0cf9eaa6613b3a4f8107b03",
+    "probe_input": {
+     "observable": {
+      "raises": true,
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "",
+         1
+        ],
+        "exception": "ValueError",
+        "kwargs": {},
+        "method": "put",
+        "step": "expect_raises"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "REFUTED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-4.1-1"
+    ],
+    "refuted": [
+     "M-4.1-1"
+    ],
+    "unrefuted_designed": [],
+    "refuted_beyond_design": [],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-28c66bc2e02362330c61bcb08bb03adaff60f3fe88abd94099b55f62214231bd",
+      "semantic_hash": "c0d4a5941b1e48c17376f08804f317e3b24219cec0cf9eaa6613b3a4f8107b03",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.1-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-IDEM-1",
+    "family": "batches/idempotency/conflicts",
+    "requirements": [
+     "R-4.2"
+    ],
+    "claim": "a replayed request id returns the first result and appends nothing",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-IDEM-1",
+    "contract_hash": "bf7be5999614bd0ef0bf1eb6bbdd9f310ef7ac022291fc0887a8472d3f8b809d",
+    "spec_id": "PPS-6236ecb0a4e5b34fe69c36e8f266f61cec72260203b0248cc8e6bf0eabbf0e79",
+    "semantic_hash": "92518dbe5aa880a78a5c527d87034e764c29196b9f1645423eafbe67894c71cf",
+    "probe_input": {
+     "observable": {
+      "equals_name": "again",
+      "returns_name": "first",
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "as": "first",
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "as": "again",
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "REFUTED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-4.2-1"
+    ],
+    "refuted": [
+     "M-4.2-1"
+    ],
+    "unrefuted_designed": [],
+    "refuted_beyond_design": [],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-6236ecb0a4e5b34fe69c36e8f266f61cec72260203b0248cc8e6bf0eabbf0e79",
+      "semantic_hash": "92518dbe5aa880a78a5c527d87034e764c29196b9f1645423eafbe67894c71cf",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.2-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-CONFLICT-1",
+    "family": "batches/idempotency/conflicts",
+    "requirements": [
+     "R-4.3"
+    ],
+    "claim": "another request id mutating a key raises ConflictError",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-CONFLICT-1",
+    "contract_hash": "5c1a5902061b7d2eda19f77e6486448eac2e8d0366d3e9bef8f7f878def2d34e",
+    "spec_id": "PPS-ef1bbf05bb7592c1e800973ebf3f437dfd7307c6b6dd3e7d69587d8ab4789e0a",
+    "semantic_hash": "5ec41a94d36baa7a9ffca1fce24db24be1382016bf69c9a48ecb92677bf50cd7",
+    "probe_input": {
+     "observable": {
+      "raises": true,
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "a",
+         2,
+         "r2",
+         2
+        ],
+        "exception": "ConflictError",
+        "kwargs": {},
+        "method": "put",
+        "step": "expect_raises"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "REFUTED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-4.3-1"
+    ],
+    "refuted": [
+     "M-4.3-1"
+    ],
+    "unrefuted_designed": [],
+    "refuted_beyond_design": [],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-ef1bbf05bb7592c1e800973ebf3f437dfd7307c6b6dd3e7d69587d8ab4789e0a",
+      "semantic_hash": "5ec41a94d36baa7a9ffca1fce24db24be1382016bf69c9a48ecb92677bf50cd7",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.3-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-TOMB-1",
+    "family": "batches/idempotency/conflicts",
+    "requirements": [
+     "R-4.4",
+     "R-4.5"
+    ],
+    "claim": "a put with another request id conflicts against a tombstone",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-TOMB-1",
+    "contract_hash": "52e1c501eacf4c343038751f0ecb58fd1ba8e2d1d04afa1259e6762850035fca",
+    "spec_id": "PPS-5e63274a074c297cea60e998113a92029f852f3c2555fa417a63d941569a3272",
+    "semantic_hash": "fd76c1ac564c3f1c8bef2b46837322018cafce654589de4bdd411bc132177292",
+    "probe_input": {
+     "observable": {
+      "raises": true,
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "delete",
+        "step": "call"
+       },
+       {
+        "args": [
+         "a",
+         2,
+         "r2",
+         2
+        ],
+        "exception": "ConflictError",
+        "kwargs": {},
+        "method": "put",
+        "step": "expect_raises"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "REFUTED",
+     "M-4.4-1": "REFUTED",
+     "M-4.5-1": "REFUTED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-4.4-1",
+     "M-4.5-1"
+    ],
+    "refuted": [
+     "M-4.3-1",
+     "M-4.4-1",
+     "M-4.5-1"
+    ],
+    "unrefuted_designed": [],
+    "refuted_beyond_design": [
+     "M-4.3-1"
+    ],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-5e63274a074c297cea60e998113a92029f852f3c2555fa417a63d941569a3272",
+      "semantic_hash": "fd76c1ac564c3f1c8bef2b46837322018cafce654589de4bdd411bc132177292",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.3-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-5e63274a074c297cea60e998113a92029f852f3c2555fa417a63d941569a3272",
+      "semantic_hash": "fd76c1ac564c3f1c8bef2b46837322018cafce654589de4bdd411bc132177292",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.4-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-5e63274a074c297cea60e998113a92029f852f3c2555fa417a63d941569a3272",
+      "semantic_hash": "fd76c1ac564c3f1c8bef2b46837322018cafce654589de4bdd411bc132177292",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.5-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-BATCH-1",
+    "family": "batches/idempotency/conflicts",
+    "requirements": [
+     "R-5",
+     "R-13"
+    ],
+    "claim": "ledger.apply_batch with a conflict in its third op commits nothing (the ledger file is never created)",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:apply_batch",
+    "subject_absence": "ABSENCE_IS_DECIDABLE",
+    "contract_id": "BC-LL-BATCH-1",
+    "contract_hash": "5d68adf11cfec79d3760b545545a6e4d11c7ecbc2b2c515231cd0f7ce84edece",
+    "spec_id": "PPS-03b30d68017f6ad27f573f31b36f6c043b3b2a67bb15f5ce354d37a42cdafbe6",
+    "semantic_hash": "1f3ebb6c82ddf4f09efac7f59fdfdfc2add5cf56327aaa29917bba0af64b79c1",
+    "probe_input": {
+     "observable": {
+      "raises": true,
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl",
+         [
+          [
+           "put",
+           "a",
+           1,
+           "r1",
+           1
+          ],
+          [
+           "put",
+           "b",
+           2,
+           "r2",
+           2
+          ],
+          [
+           "put",
+           "a",
+           3,
+           "r3",
+           3
+          ]
+         ]
+        ],
+        "exception": "ConflictError",
+        "kwargs": {},
+        "step": "expect_raises"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:apply_batch"
+     },
+     "subject_absence": "ABSENCE_IS_DECIDABLE"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "REFUTED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "REFUTED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "REFUTED"
+    },
+    "designed_for": [
+     "M-5-1",
+     "M-5-2",
+     "M-13-1"
+    ],
+    "refuted": [
+     "M-4.3-1",
+     "M-5-1",
+     "M-13-1"
+    ],
+    "unrefuted_designed": [
+     "M-5-2"
+    ],
+    "refuted_beyond_design": [
+     "M-4.3-1"
+    ],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-03b30d68017f6ad27f573f31b36f6c043b3b2a67bb15f5ce354d37a42cdafbe6",
+      "semantic_hash": "1f3ebb6c82ddf4f09efac7f59fdfdfc2add5cf56327aaa29917bba0af64b79c1",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.3-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-03b30d68017f6ad27f573f31b36f6c043b3b2a67bb15f5ce354d37a42cdafbe6",
+      "semantic_hash": "1f3ebb6c82ddf4f09efac7f59fdfdfc2add5cf56327aaa29917bba0af64b79c1",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-5-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-03b30d68017f6ad27f573f31b36f6c043b3b2a67bb15f5ce354d37a42cdafbe6",
+      "semantic_hash": "1f3ebb6c82ddf4f09efac7f59fdfdfc2add5cf56327aaa29917bba0af64b79c1",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-13-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-BATCH-2",
+    "family": "batches/idempotency/conflicts",
+    "requirements": [
+     "R-5"
+    ],
+    "claim": "a request id replayed inside one batch commits one line",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-BATCH-2",
+    "contract_hash": "d9021e397f8d36a418427660f9a3346508bdcf72a3f947a92f2d7c91bcf4e3e4",
+    "spec_id": "PPS-0efaa3e34653674fe4f90cebe51cc58f29503beb4171e97e6dd69b919a82d37d",
+    "semantic_hash": "f650d1397e23df041522e6a6825273322df860387d808e09615d6a22b10ff791",
+    "probe_input": {
+     "observable": {
+      "files": {
+       "<ws>/l.jsonl": {
+        "line_count": 1
+       }
+      },
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         [
+          [
+           "put",
+           "a",
+           1,
+           "r1",
+           1
+          ],
+          [
+           "put",
+           "a",
+           1,
+           "r1",
+           1
+          ]
+         ]
+        ],
+        "kwargs": {},
+        "method": "apply_batch",
+        "step": "call"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "REFUTED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "REFUTED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-5-1",
+     "M-5-2"
+    ],
+    "refuted": [
+     "M-4.2-1",
+     "M-5-2"
+    ],
+    "unrefuted_designed": [
+     "M-5-1"
+    ],
+    "refuted_beyond_design": [
+     "M-4.2-1"
+    ],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-0efaa3e34653674fe4f90cebe51cc58f29503beb4171e97e6dd69b919a82d37d",
+      "semantic_hash": "f650d1397e23df041522e6a6825273322df860387d808e09615d6a22b10ff791",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.2-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-0efaa3e34653674fe4f90cebe51cc58f29503beb4171e97e6dd69b919a82d37d",
+      "semantic_hash": "f650d1397e23df041522e6a6825273322df860387d808e09615d6a22b10ff791",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-5-2",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-SNAP-1",
+    "family": "snapshot",
+    "requirements": [
+     "R-6"
+    ],
+    "claim": "the snapshot holds the live keys in byte order, a tombstoned key absent",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-SNAP-1",
+    "contract_hash": "0cb9a3d9fa2e02004c34e3408604d665ff02bfe20dbf26eb3d35dd2c947a5157",
+    "spec_id": "PPS-ea8864a4a9a1e62ae6b0b788eea2efb71abf5e97ff35563a9883c4e14b87cbfb",
+    "semantic_hash": "edae0acccddea675986a21af7ac85ee9ebe2a841748bb51f0d7d1ddbfdc7250a",
+    "probe_input": {
+     "observable": {
+      "returns_bytes_hex": "7b2261223a312c2262223a327d0a",
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "b",
+         2,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r2",
+         2
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "d",
+         "r3",
+         3
+        ],
+        "kwargs": {},
+        "method": "delete",
+        "step": "call"
+       },
+       {
+        "args": [],
+        "kwargs": {},
+        "method": "snapshot",
+        "step": "call"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "REFUTED",
+     "M-6-2": "REFUTED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-6-1",
+     "M-6-2"
+    ],
+    "refuted": [
+     "M-6-1",
+     "M-6-2"
+    ],
+    "unrefuted_designed": [],
+    "refuted_beyond_design": [],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-ea8864a4a9a1e62ae6b0b788eea2efb71abf5e97ff35563a9883c4e14b87cbfb",
+      "semantic_hash": "edae0acccddea675986a21af7ac85ee9ebe2a841748bb51f0d7d1ddbfdc7250a",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-6-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-ea8864a4a9a1e62ae6b0b788eea2efb71abf5e97ff35563a9883c4e14b87cbfb",
+      "semantic_hash": "edae0acccddea675986a21af7ac85ee9ebe2a841748bb51f0d7d1ddbfdc7250a",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-6-2",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-REPAIR-1",
+    "family": "repair-tail",
+    "requirements": [
+     "R-7"
+    ],
+    "claim": "repair-tail is a no-op on a clean chain, removes exactly a truncated final line, and the chain verifies",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-REPAIR-1",
+    "contract_hash": "3b1fc23340a44f0f001e2fe883b79e1b04c575642decbae6912e922bf4bc5f0e",
+    "spec_id": "PPS-e72ac88b3839b744d720518e103e9b1c2c30712eb1fac2fbc33885e4bbeb99af",
+    "semantic_hash": "35d733fffedcd11c701d6bb869403d2eaab01a45600bf04046278c78c4c9d2e4",
+    "probe_input": {
+     "observable": {
+      "returns": [
+       true,
+       null,
+       2
+      ],
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [],
+        "kwargs": {},
+        "method": "repair_tail",
+        "step": "call"
+       },
+       {
+        "append": true,
+        "path": "<ws>/l.jsonl",
+        "step": "write",
+        "text": "{\"op\":\"put\",\"key\":\"c\""
+       },
+       {
+        "args": [],
+        "kwargs": {},
+        "method": "repair_tail",
+        "step": "call"
+       },
+       {
+        "args": [],
+        "kwargs": {},
+        "method": "verify",
+        "step": "call"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "REFUTED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "REFUTED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "REFUTED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-7-1",
+     "M-7-2",
+     "M-7-3"
+    ],
+    "refuted": [
+     "M-3.2-2",
+     "M-7-1",
+     "M-7-3"
+    ],
+    "unrefuted_designed": [
+     "M-7-2"
+    ],
+    "refuted_beyond_design": [
+     "M-3.2-2"
+    ],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-e72ac88b3839b744d720518e103e9b1c2c30712eb1fac2fbc33885e4bbeb99af",
+      "semantic_hash": "35d733fffedcd11c701d6bb869403d2eaab01a45600bf04046278c78c4c9d2e4",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.2-2",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-e72ac88b3839b744d720518e103e9b1c2c30712eb1fac2fbc33885e4bbeb99af",
+      "semantic_hash": "35d733fffedcd11c701d6bb869403d2eaab01a45600bf04046278c78c4c9d2e4",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-7-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-e72ac88b3839b744d720518e103e9b1c2c30712eb1fac2fbc33885e4bbeb99af",
+      "semantic_hash": "35d733fffedcd11c701d6bb869403d2eaab01a45600bf04046278c78c4c9d2e4",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-7-3",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-REPAIR-2",
+    "family": "repair-tail",
+    "requirements": [
+     "R-7"
+    ],
+    "claim": "repair-tail refuses corruption that is not confined to the tail and leaves the file as it was",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-REPAIR-2",
+    "contract_hash": "51e8fee27cac233625f9381f07c07ea28e047d22ebd1604a4d9b5a6a5b51dc8d",
+    "spec_id": "PPS-39e5f6f2b0e1eaa950b268e77a34330b2b60e5dc77f26897bd9de217fc8ea0c1",
+    "semantic_hash": "bc1f7aa256fa6d357058d27c6715d952af327b69a5bd1a49903921740cab452a",
+    "probe_input": {
+     "observable": {
+      "files": {
+       "<ws>/l.jsonl": {
+        "line_count": 3
+       }
+      },
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "args": [
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "field": "value",
+        "line": 0,
+        "path": "<ws>/l.jsonl",
+        "step": "edit_jsonl",
+        "value": 7
+       },
+       {
+        "append": true,
+        "path": "<ws>/l.jsonl",
+        "step": "write",
+        "text": "{\"op\":\"put\",\"key\":\"c\""
+       },
+       {
+        "args": [],
+        "exception": "CorruptionError",
+        "kwargs": {},
+        "method": "repair_tail",
+        "step": "expect_raises"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "REFUTED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "REFUTED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-7-1",
+     "M-7-2",
+     "M-7-3"
+    ],
+    "refuted": [
+     "M-3.3-1",
+     "M-7-2"
+    ],
+    "unrefuted_designed": [
+     "M-7-1",
+     "M-7-3"
+    ],
+    "refuted_beyond_design": [
+     "M-3.3-1"
+    ],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-39e5f6f2b0e1eaa950b268e77a34330b2b60e5dc77f26897bd9de217fc8ea0c1",
+      "semantic_hash": "bc1f7aa256fa6d357058d27c6715d952af327b69a5bd1a49903921740cab452a",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.3-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-39e5f6f2b0e1eaa950b268e77a34330b2b60e5dc77f26897bd9de217fc8ea0c1",
+      "semantic_hash": "bc1f7aa256fa6d357058d27c6715d952af327b69a5bd1a49903921740cab452a",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-7-2",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-FSYNC-1",
+    "family": "fsync-before-rename and durability (DECISION-2 fault step)",
+    "requirements": [
+     "R-5"
+    ],
+    "claim": "a batch whose temp-file fsync fails is not renamed over the ledger: the ledger keeps its one line",
+    "quantifier_semantics": "bounded_witness_measurement",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-FSYNC-1",
+    "contract_hash": "7467392627e7a8bfe018c1e97fe3bfab1e1eb26789ca6742f9ef2ff0ff33112b",
+    "spec_id": "PPS-454e5aba716b29472a0500f2f1434e194e7fdaaef4fb7e491be6ef7c9b1d0cb5",
+    "semantic_hash": "6871e5ee9c711a07ae7ea495100d7ecec3ba42732de3aa9eed20b1c85fbc6ac6",
+    "probe_input": {
+     "observable": {
+      "returns": [
+       true,
+       null,
+       1
+      ],
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "fault": "os.fsync",
+        "step": "fault"
+       },
+       {
+        "args": [
+         [
+          [
+           "put",
+           "b",
+           2,
+           "r2",
+           2
+          ]
+         ]
+        ],
+        "exception": "OSError",
+        "kwargs": {},
+        "method": "apply_batch",
+        "step": "expect_raises"
+       },
+       {
+        "args": [],
+        "kwargs": {},
+        "method": "verify",
+        "step": "call"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-5-1",
+     "M-5-2"
+    ],
+    "refuted": [],
+    "unrefuted_designed": [
+     "M-5-1",
+     "M-5-2"
+    ],
+    "refuted_beyond_design": [],
+    "qualified": false,
+    "status": "NOT QUALIFIED",
+    "evidence": [],
+    "problems": []
+   },
+   {
+    "id": "LL-FSYNC-2",
+    "family": "fsync-before-rename and durability (DECISION-2 fault step)",
+    "requirements": [
+     "R-8"
+    ],
+    "claim": "an append whose fsync fails does not return successfully",
+    "quantifier_semantics": "bounded_witness_measurement",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-FSYNC-2",
+    "contract_hash": "37bdcda6fad603cd47434d2987e0b33fb62388b46391fad8a817016c668d346c",
+    "spec_id": "PPS-43a712a68d895bbc52fc9e2f8135939a02a3e8442d542989274a946a3498a3a7",
+    "semantic_hash": "ac84481aaec814d9d1f60123505195ba6ec5127b004771ed00fb59420f98fd64",
+    "probe_input": {
+     "observable": {
+      "raises": true,
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "fault": "os.fsync",
+        "step": "fault"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "exception": "OSError",
+        "kwargs": {},
+        "method": "put",
+        "step": "expect_raises"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "REFUTED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-8-1"
+    ],
+    "refuted": [
+     "M-8-1"
+    ],
+    "unrefuted_designed": [],
+    "refuted_beyond_design": [],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-43a712a68d895bbc52fc9e2f8135939a02a3e8442d542989274a946a3498a3a7",
+      "semantic_hash": "ac84481aaec814d9d1f60123505195ba6ec5127b004771ed00fb59420f98fd64",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-8-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   },
+   {
+    "id": "LL-REPLACE-1",
+    "family": "fsync-before-rename and durability (DECISION-2 fault step)",
+    "requirements": [
+     "R-5"
+    ],
+    "claim": "a batch whose rename fails leaves the ledger byte-identical to its pre-batch state",
+    "quantifier_semantics": "bounded_witness_measurement",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-REPLACE-1",
+    "contract_hash": "2a2bf30229d690fc72b040b938a2e9bbc3a35fc599571fcf8ba510258a0e69af",
+    "spec_id": "PPS-7834c6790c30ec916916a4ad324f87ad5665e14ed9db0aca8bb4922ba9c142f8",
+    "semantic_hash": "ff4a5703a0c2eb48ddda54b331d1a67e853226570670b2ff6a00abe30c33620a",
+    "probe_input": {
+     "observable": {
+      "files": {
+       "<ws>/l.jsonl": {
+        "equals_before": true
+       }
+      },
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "files": {
+         "l.jsonl": {
+          "text": ""
+         }
+        },
+        "step": "workspace"
+       },
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "fault": "os.replace",
+        "step": "fault"
+       },
+       {
+        "args": [
+         [
+          [
+           "put",
+           "a",
+           1,
+           "r1",
+           1
+          ]
+         ]
+        ],
+        "exception": "OSError",
+        "kwargs": {},
+        "method": "apply_batch",
+        "step": "expect_raises"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "SATISFIED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "SATISFIED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "SATISFIED",
+     "M-9-2": "SATISFIED",
+     "M-9-3": "SATISFIED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-5-1",
+     "M-5-2"
+    ],
+    "refuted": [],
+    "unrefuted_designed": [
+     "M-5-1",
+     "M-5-2"
+    ],
+    "refuted_beyond_design": [],
+    "qualified": false,
+    "status": "NOT QUALIFIED",
+    "evidence": [],
+    "problems": []
+   },
+   {
+    "id": "LL-CLI-1",
+    "family": "CLI exit codes (subprocess step)",
+    "requirements": [
+     "R-9"
+    ],
+    "claim": "the CLI exits 3 on a missing ledger, 4 on a conflict and 5 on a corrupt chain",
+    "quantifier_semantics": "exhaustive_finite_domain",
+    "subject": "ledgerlock.ledger:Ledger",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "contract_id": "BC-LL-CLI-1",
+    "contract_hash": "4d5548b57270661b5d0c6bba762f59101914d4ba57a6e81eaa21063687ef5b04",
+    "spec_id": "PPS-2c0a68c10af8e3ee5cc1319d0a757f829f3614f1019bcba407926f144bfda69d",
+    "semantic_hash": "181bc47dc5f410d1555a3467dd44401b4c8b66be0d02ce6d501f88ce4a5db181",
+    "probe_input": {
+     "observable": {
+      "files": {
+       "<ws>/l.jsonl": {
+        "line_count": 1
+       }
+      },
+      "within_s": 30
+     },
+     "stimulus": {
+      "scenario": [
+       {
+        "args": [
+         "<ws>/l.jsonl"
+        ],
+        "kwargs": {},
+        "step": "construct"
+       },
+       {
+        "argv": [
+         "-m",
+         "ledgerlock",
+         "verify",
+         "<ws>/missing.jsonl"
+        ],
+        "expect_exit": 3,
+        "step": "subprocess"
+       },
+       {
+        "args": [
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        "kwargs": {},
+        "method": "put",
+        "step": "call"
+       },
+       {
+        "argv": [
+         "-m",
+         "ledgerlock",
+         "put",
+         "<ws>/l.jsonl",
+         "a",
+         "2",
+         "--rid",
+         "r2",
+         "--ts",
+         "2"
+        ],
+        "expect_exit": 4,
+        "step": "subprocess"
+       },
+       {
+        "field": "value",
+        "line": 0,
+        "path": "<ws>/l.jsonl",
+        "step": "edit_jsonl",
+        "value": 5
+       },
+       {
+        "argv": [
+         "-m",
+         "ledgerlock",
+         "verify",
+         "<ws>/l.jsonl"
+        ],
+        "expect_exit": 5,
+        "step": "subprocess"
+       }
+      ]
+     },
+     "subject": {
+      "kind": "process_effect",
+      "locator": "ledgerlock.ledger:Ledger"
+     },
+     "subject_absence": "REQUIRES_SUBJECT"
+    },
+    "reference": "SATISFIED",
+    "verdicts": {
+     "M-3.1-1": "SATISFIED",
+     "M-3.2-1": "SATISFIED",
+     "M-3.2-2": "SATISFIED",
+     "M-3.3-1": "REFUTED",
+     "M-3.3-2": "SATISFIED",
+     "M-3.3-3": "SATISFIED",
+     "M-3.4-1": "SATISFIED",
+     "M-4.1-1": "SATISFIED",
+     "M-4.2-1": "SATISFIED",
+     "M-4.3-1": "REFUTED",
+     "M-4.4-1": "SATISFIED",
+     "M-4.5-1": "SATISFIED",
+     "M-5-1": "SATISFIED",
+     "M-5-2": "SATISFIED",
+     "M-6-1": "SATISFIED",
+     "M-6-2": "SATISFIED",
+     "M-7-1": "SATISFIED",
+     "M-7-2": "SATISFIED",
+     "M-7-3": "SATISFIED",
+     "M-8-1": "SATISFIED",
+     "M-9-1": "REFUTED",
+     "M-9-2": "REFUTED",
+     "M-9-3": "REFUTED",
+     "M-10-1": "SATISFIED",
+     "M-12-1": "SATISFIED",
+     "M-13-1": "SATISFIED"
+    },
+    "designed_for": [
+     "M-9-1",
+     "M-9-2",
+     "M-9-3"
+    ],
+    "refuted": [
+     "M-3.3-1",
+     "M-4.3-1",
+     "M-9-1",
+     "M-9-2",
+     "M-9-3"
+    ],
+    "unrefuted_designed": [],
+    "refuted_beyond_design": [
+     "M-3.3-1",
+     "M-4.3-1"
+    ],
+    "qualified": true,
+    "status": "QUALIFIED",
+    "evidence": [
+     {
+      "spec_id": "PPS-2c0a68c10af8e3ee5cc1319d0a757f829f3614f1019bcba407926f144bfda69d",
+      "semantic_hash": "181bc47dc5f410d1555a3467dd44401b4c8b66be0d02ce6d501f88ce4a5db181",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.3-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-2c0a68c10af8e3ee5cc1319d0a757f829f3614f1019bcba407926f144bfda69d",
+      "semantic_hash": "181bc47dc5f410d1555a3467dd44401b4c8b66be0d02ce6d501f88ce4a5db181",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.3-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-2c0a68c10af8e3ee5cc1319d0a757f829f3614f1019bcba407926f144bfda69d",
+      "semantic_hash": "181bc47dc5f410d1555a3467dd44401b4c8b66be0d02ce6d501f88ce4a5db181",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-9-1",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-2c0a68c10af8e3ee5cc1319d0a757f829f3614f1019bcba407926f144bfda69d",
+      "semantic_hash": "181bc47dc5f410d1555a3467dd44401b4c8b66be0d02ce6d501f88ce4a5db181",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-9-2",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     },
+     {
+      "spec_id": "PPS-2c0a68c10af8e3ee5cc1319d0a757f829f3614f1019bcba407926f144bfda69d",
+      "semantic_hash": "181bc47dc5f410d1555a3467dd44401b4c8b66be0d02ce6d501f88ce4a5db181",
+      "mechanism": "controlled_product_mutation",
+      "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-9-3",
+      "observed": "REFUTED",
+      "falsifiability_problems": []
+     }
+    ],
+    "problems": []
+   }
+  ],
+  "qualified": [
+   "LL-HASH-1",
+   "LL-NFC-1",
+   "LL-VERIFY-1",
+   "LL-VERIFY-2",
+   "LL-RID-1",
+   "LL-IDEM-1",
+   "LL-CONFLICT-1",
+   "LL-TOMB-1",
+   "LL-BATCH-1",
+   "LL-BATCH-2",
+   "LL-SNAP-1",
+   "LL-REPAIR-1",
+   "LL-REPAIR-2",
+   "LL-FSYNC-2",
+   "LL-CLI-1"
+  ],
+  "not_qualified": [
+   "LL-FSYNC-1",
+   "LL-REPLACE-1"
+  ],
+  "families": [
+   "CLI exit codes (subprocess step)",
+   "batches/idempotency/conflicts",
+   "fsync-before-rename and durability (DECISION-2 fault step)",
+   "hash chain",
+   "repair-tail",
+   "snapshot",
+   "verify"
+  ],
+  "requirement_sections_covered": [
+   "R-3.1",
+   "R-3.2",
+   "R-3.3",
+   "R-3.4",
+   "R-4.1",
+   "R-4.2",
+   "R-4.3",
+   "R-4.4",
+   "R-4.5",
+   "R-5",
+   "R-6",
+   "R-7",
+   "R-8",
+   "R-9",
+   "R-13"
+  ],
+  "requirement_sections_not_covered": [
+   "R-10",
+   "R-12"
+  ],
+  "mutants_refuted_by": {
+   "M-3.1-1": [
+    "LL-NFC-1"
+   ],
+   "M-3.2-1": [
+    "LL-HASH-1"
+   ],
+   "M-3.2-2": [
+    "LL-HASH-1",
+    "LL-REPAIR-1"
+   ],
+   "M-3.3-1": [
+    "LL-CLI-1",
+    "LL-REPAIR-2",
+    "LL-VERIFY-1"
+   ],
+   "M-3.3-2": [
+    "LL-VERIFY-2"
+   ],
+   "M-3.3-3": [
+    "LL-VERIFY-1",
+    "LL-VERIFY-2"
+   ],
+   "M-3.4-1": [
+    "LL-VERIFY-1",
+    "LL-VERIFY-2"
+   ],
+   "M-4.1-1": [
+    "LL-RID-1"
+   ],
+   "M-4.2-1": [
+    "LL-BATCH-2",
+    "LL-IDEM-1"
+   ],
+   "M-4.3-1": [
+    "LL-BATCH-1",
+    "LL-CLI-1",
+    "LL-CONFLICT-1",
+    "LL-TOMB-1"
+   ],
+   "M-4.4-1": [
+    "LL-TOMB-1"
+   ],
+   "M-4.5-1": [
+    "LL-TOMB-1"
+   ],
+   "M-5-1": [
+    "LL-BATCH-1"
+   ],
+   "M-5-2": [
+    "LL-BATCH-2"
+   ],
+   "M-6-1": [
+    "LL-SNAP-1"
+   ],
+   "M-6-2": [
+    "LL-SNAP-1"
+   ],
+   "M-7-1": [
+    "LL-REPAIR-1"
+   ],
+   "M-7-2": [
+    "LL-REPAIR-2"
+   ],
+   "M-7-3": [
+    "LL-REPAIR-1"
+   ],
+   "M-8-1": [
+    "LL-FSYNC-2"
+   ],
+   "M-9-1": [
+    "LL-CLI-1"
+   ],
+   "M-9-2": [
+    "LL-CLI-1"
+   ],
+   "M-9-3": [
+    "LL-CLI-1"
+   ],
+   "M-10-1": [],
+   "M-12-1": [],
+   "M-13-1": [
+    "LL-BATCH-1"
+   ]
+  },
+  "gap_mutants_refuted_by_no_spec": [
+   "M-10-1",
+   "M-12-1"
+  ],
+  "gap_rule": "a mutant no spec refutes is a gap of the specs (or of the probe kind), listed, never a failure; a spec that refutes no mutant is NOT QUALIFIED, listed, never removed"
+ },
+ "tests": {
+  "tests.v2.test_c2_effect_calibration": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/lane-d-process-effect/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_c2_effect_calibration"
+   ],
+   "exit": 0,
+   "ran": 5,
+   "seconds": 18.962,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 19s)",
+   "residual": 0
+  },
+  "tests.v2.test_probe_process_effect_units": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/lane-d-process-effect/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_probe_process_effect_units"
+   ],
+   "exit": 0,
+   "ran": 22,
+   "seconds": 1.392,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 2s)",
+   "residual": 0
+  }
+ },
+ "cases": {
+  "PECAL-1": {
+   "tests": [
+    "tests.v2.test_c2_effect_calibration.Calibration.test_PECAL_1_the_three_classes_calibrated_with_contrast_over_the_small_fixtures"
+   ],
+   "outcome": "PASS"
+  },
+  "PECAL-2": {
+   "tests": [
+    "tests.v2.test_c2_effect_calibration.Calibration.test_PECAL_2_the_ledgerlock_trees_are_the_frozen_blobs_and_a_mutant_is_the_reference_plus_its_change"
+   ],
+   "outcome": "PASS"
+  },
+  "PECAL-3": {
+   "tests": [
+    "tests.v2.test_c2_effect_calibration.Calibration.test_PECAL_3_an_authored_spec_is_satisfied_on_the_reference_and_refutes_its_mutant"
+   ],
+   "outcome": "PASS"
+  },
+  "PECAL-4": {
+   "tests": [
+    "tests.v2.test_c2_effect_calibration.Calibration.test_PECAL_4_a_spec_that_no_mutant_refutes_is_reported_NOT_QUALIFIED"
+   ],
+   "outcome": "PASS"
+  }
+ },
+ "mutation": {
+  "record": "closure-evidence/v2/cycle2/P3-MUTATION.json",
+  "present": true,
+  "phase": "C2-P3",
+  "source_sha256": [
+   "66298a826617b3e0b88df2a9dedde413aebc1ccdd9145f24ef654898c8ca740f"
+  ],
+  "targets": 75,
+  "mutants": 1465,
+  "killed": 1465,
+  "killed_by_timeout": 0,
+  "child_script_targets": 25,
+  "survivors": {},
+  "errors": {},
+  "problems": [],
+  "per_target": {
+   "CLASSES": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "CLASS_TABLE": {
+    "mutants": 118,
+    "killed": 118,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "FAULTED": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "FAULTS": {
+    "mutants": 28,
+    "killed": 28,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "FILE_SHAPES": {
+    "mutants": 6,
+    "killed": 6,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "HARNESS/HANDLERS": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/count_lines": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_call": {
+    "mutants": 27,
+    "killed": 27,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_construct": {
+    "mutants": 12,
+    "killed": 12,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_edit": {
+    "mutants": 52,
+    "killed": 52,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_expect": {
+    "mutants": 19,
+    "killed": 19,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_fault": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_subprocess": {
+    "mutants": 39,
+    "killed": 39,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_workspace": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/do_write": {
+    "mutants": 16,
+    "killed": 16,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/emit": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/file_fact": {
+    "mutants": 27,
+    "killed": 27,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/files_now": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/guarded": {
+    "mutants": 27,
+    "killed": 27,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/identity": {
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/inside": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/main": {
+    "mutants": 116,
+    "killed": 116,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/raised_as": {
+    "mutants": 42,
+    "killed": 42,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/resolve": {
+    "mutants": 15,
+    "killed": 15,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/row_of": {
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/run": {
+    "mutants": 58,
+    "killed": 58,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/same": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/tagged": {
+    "mutants": 13,
+    "killed": 13,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/target_of": {
+    "mutants": 10,
+    "killed": 10,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "HARNESS/unws": {
+    "mutants": 10,
+    "killed": 10,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "ON_DEADLINE": {
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "PROBE_SOURCES": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "ProcessEffectProbe.__init__": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "ProcessEffectProbe._observe_in": {
+    "mutants": 34,
+    "killed": 34,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "ProcessEffectProbe.enforcement": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "ProcessEffectProbe.harness_preconditions": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "ProcessEffectProbe.observe": {
+    "mutants": 54,
+    "killed": 54,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "STEPS": {
+    "mutants": 67,
+    "killed": 67,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_CONTENT": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_FILE_HOLDS": {
+    "mutants": 19,
+    "killed": 19,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_FILE_SHAPE_OK": {
+    "mutants": 27,
+    "killed": 27,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_HOLDS": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_SHAPES": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_concluded": {
+    "mutants": 30,
+    "killed": 30,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_content_of": {
+    "mutants": 2,
+    "killed": 2,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_edit_ok": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_expect_ok": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_fault_ok": {
+    "mutants": 5,
+    "killed": 5,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_file_shape_ok": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_files_hold": {
+    "mutants": 15,
+    "killed": 15,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_flat_ok": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_hard_exit": {
+    "mutants": 39,
+    "killed": 39,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "_harness_argv": {
+    "mutants": 18,
+    "killed": 18,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "_ident_ok": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_identity": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_invocation_ok": {
+    "mutants": 10,
+    "killed": 10,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_jsonl_holds": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_observed_files": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_prepare": {
+    "mutants": 37,
+    "killed": 37,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "_probe_digest": {
+    "mutants": 1,
+    "killed": 1,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_raises_hold": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_resolved": {
+    "mutants": 31,
+    "killed": 31,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_returns_hold": {
+    "mutants": 28,
+    "killed": 28,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_same": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_scenario_ok": {
+    "mutants": 28,
+    "killed": 28,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_step_ok": {
+    "mutants": 18,
+    "killed": 18,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_subprocess_ok": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_substitute": {
+    "mutants": 14,
+    "killed": 14,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_watch": {
+    "mutants": 44,
+    "killed": 44,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ]
+   },
+   "_workspace_ok": {
+    "mutants": 6,
+    "killed": 6,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_write_ok": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "_ws_path_ok": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "observation_class": {
+    "mutants": 74,
+    "killed": 74,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "spec_class": {
+    "mutants": 13,
+    "killed": 13,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   },
+   "verdict_of": {
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py"
+    ]
+   }
+  },
+  "verdict_targets": {
+   "targets": {
+    "verdict_of": {
+     "mutants": 9,
+     "killed": 9,
+     "kill_tests": [
+      "tests/v2/test_probe_process_effect_units.py"
+     ]
+    },
+    "_HOLDS": {
+     "mutants": 3,
+     "killed": 3,
+     "kill_tests": [
+      "tests/v2/test_probe_process_effect_units.py"
+     ]
+    },
+    "_returns_hold": {
+     "mutants": 28,
+     "killed": 28,
+     "kill_tests": [
+      "tests/v2/test_probe_process_effect_units.py"
+     ]
+    },
+    "_raises_hold": {
+     "mutants": 8,
+     "killed": 8,
+     "kill_tests": [
+      "tests/v2/test_probe_process_effect_units.py"
+     ]
+    },
+    "_same": {
+     "mutants": 7,
+     "killed": 7,
+     "kill_tests": [
+      "tests/v2/test_probe_process_effect_units.py"
+     ]
+    },
+    "_identity": {
+     "mutants": 11,
+     "killed": 11,
+     "kill_tests": [
+      "tests/v2/test_probe_process_effect_units.py"
+     ]
+    },
+    "_jsonl_holds": {
+     "mutants": 8,
+     "killed": 8,
+     "kill_tests": [
+      "tests/v2/test_probe_process_effect_units.py"
+     ]
+    },
+    "_FILE_HOLDS": {
+     "mutants": 19,
+     "killed": 19,
+     "kill_tests": [
+      "tests/v2/test_probe_process_effect_units.py"
+     ]
+    },
+    "_files_hold": {
+     "mutants": 15,
+     "killed": 15,
+     "kill_tests": [
+      "tests/v2/test_probe_process_effect_units.py"
+     ]
+    }
+   },
+   "note": "killed by the class table on fixture facts (tests/v2/test_probe_process_effect_units.py); tests/v2/test_c2_effect_calibration.py is not in their kill sets because it loads this builder from validation/qualification, which the mutation runner's scratch tree (COPY, shared by every phase) does not contain — COPY is not widened by this package"
+  }
+ },
+ "static": {
+  "probe_static_checks": [],
+  "cycle2_baseline": [],
+  "destructive_authority": []
+ },
+ "problems": [],
+ "verdict": "CALIBRATED"
+}
