@@ -1,0 +1,738 @@
+{
+ "record": "AISEF V2 — WP-2.2.1 CLI INVOCATION HARNESS (probe.cli_invocation: harness, DESIGN-CHECK-1, fault rows)",
+ "work_package": "WP-2.2.1",
+ "identities": {
+  "package": "WP-2.2.1",
+  "parent": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
+  "head": "c40ad471222896524ea961a517c81972c7723097",
+  "aisef2_tree": "b7fad676f05817f2732d9e38d9a95ad585cc0571",
+  "probe": {
+   "id": "probe.cli_invocation",
+   "digest": "ae1e6e6205f0694df4191fd902dd4cddd824e6ea8b1a9249b283d14ff54fa3d9",
+   "classes": [
+    "exits",
+    "exits_streams",
+    "exits_files",
+    "blocks"
+   ],
+   "sources": {
+    "probe/protocol.py": {
+     "sha256": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+     "git_blob": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    "probe/python_callable.py": {
+     "sha256": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+     "git_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+    },
+    "probe/cli_invocation.py": {
+     "sha256": "b9d9e78674e09ccf1a33b99a4c94426d4eb134997c0009a0c61c2f3b3f6443b8",
+     "git_blob": "a608ef23315cb6380032e3af35ac35bc61d61cd6"
+    }
+   },
+   "catalog": {
+    "subject_kind": "cli_invocation",
+    "subject_process": "child_of_harness",
+    "protocol_channel": "marker_file",
+    "stimulus_shape": "invocation",
+    "cycle": 2,
+    "active": true
+   },
+   "on_deadline": {
+    "exits": "REFUTED",
+    "exits_streams": "REFUTED",
+    "exits_files": "REFUTED",
+    "blocks": "SATISFIED"
+   },
+   "enforcement": "PARTIAL",
+   "weakest_path": "the subject runs inside the harness's child process as the harness user, with that user's filesystem and network access, and can read the request and the protocol file; -I interpreter isolation, a scrubbed environment, a fresh working directory and a harness-owned bytecode cache (-X pycache_prefix, -B) are isolation, not a sandbox",
+   "stream_cap": 8388608
+  },
+  "tests": {
+   "tests.v2.test_c2_cli_invocation": {
+    "sha256": "64edbc0b855d7e47cfea38f6f10965a95fdd93c6fa5c91c9a3cc0ea188718166",
+    "git_blob": "7536be350bf89bd3016549cb492ba584f659cf69"
+   },
+   "tests.v2.test_c2_cli_verdicts": {
+    "sha256": "0de298fa9c74cf1bb221e8382c579b4d6372e68405ebc679c8e0975172ef21ab",
+    "git_blob": "0e7789a158659b5929c2863db4e1b3d9d53e3a3b"
+   }
+  },
+  "cycle1": {
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "probe": {
+    "id": "probe.python_callable",
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+   }
+  },
+  "cycle2_freeze_manifest": {
+   "path": "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json",
+   "sha256": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad"
+  },
+  "owner_decisions": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "hash_rule": "every sha256 here is over bytes with CRLF normalised to LF; git_blob = sha1 of the blob header and the same bytes"
+ },
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin"
+ },
+ "tests": {
+  "tests.v2.test_c2_cli_invocation": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/agent-aed7d878b24886e17/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_c2_cli_invocation"
+   ],
+   "exit": 0,
+   "ran": 37,
+   "seconds": 37.569,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 38s)",
+   "residual": 0
+  },
+  "tests.v2.test_c2_cli_verdicts": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/agent-aed7d878b24886e17/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_c2_cli_verdicts"
+   ],
+   "exit": 0,
+   "ran": 16,
+   "seconds": 0.024,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 1s)",
+   "residual": 0
+  }
+ },
+ "cases": {
+  "CLI-1": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_1_runpy_dispatch_with_argv_and_a_workspace_file_exit_0_and_captured_streams"
+   ],
+   "outcome": "PASS"
+  },
+  "CLI-2": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_2_a_forged_protocol_line_on_stdout_is_captured_bytes_never_protocol"
+   ],
+   "outcome": "PASS"
+  },
+  "CLI-3": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_3_a_stdout_flood_is_capped_and_exits_still_observes_the_code"
+   ],
+   "outcome": "PASS"
+  },
+  "CLI-4": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_4_DESIGN_CHECK_1_the_same_result_under_every_scheduling_of_exit_and_file_close"
+   ],
+   "outcome": "PASS"
+  },
+  "CLI-5": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_5_a_failing_pre_step_names_its_index_and_refutes"
+   ],
+   "outcome": "PASS"
+  },
+  "CLI-6": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_6_an_absent_subject_is_SUBJECT_ABSENT_and_the_contract_decides"
+   ],
+   "outcome": "PASS"
+  },
+  "CLI-7": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_7_ws_substitution_and_workspace_bytes_are_exact"
+   ],
+   "outcome": "PASS"
+  },
+  "CLI-8": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_8_stdin_comes_from_the_stimulus_or_the_null_device"
+   ],
+   "outcome": "PASS"
+  },
+  "CLI-9": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_9_the_exit_status_is_recorded_verbatim_beside_the_code"
+   ],
+   "outcome": "PASS"
+  },
+  "CLI-Q0": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_Q0_the_module_passes_the_probe_rules_with_its_catalog_facts"
+   ],
+   "outcome": "PASS"
+  }
+ },
+ "design_check_1": {
+  "repetitions": 3,
+  "variants": {
+   "a_exit_normally": {
+    "observed": [
+     [
+      "OBSERVED",
+      "SATISFIED",
+      false
+     ],
+     [
+      "OBSERVED",
+      "SATISFIED",
+      false
+     ],
+     [
+      "OBSERVED",
+      "SATISFIED",
+      false
+     ]
+    ],
+    "expected": [
+     "OBSERVED",
+     "SATISFIED",
+     false
+    ],
+    "all_equal": true
+   },
+   "b_hard_exit_after_stdout": {
+    "observed": [
+     [
+      "OBSERVED",
+      "SATISFIED",
+      true
+     ],
+     [
+      "OBSERVED",
+      "SATISFIED",
+      true
+     ],
+     [
+      "OBSERVED",
+      "SATISFIED",
+      true
+     ]
+    ],
+    "expected": [
+     "OBSERVED",
+     "SATISFIED",
+     true
+    ],
+    "all_equal": true
+   },
+   "c_lingers_past_the_window": {
+    "observed": [
+     [
+      "SUBJECT_DEADLINE",
+      "REFUTED",
+      null
+     ],
+     [
+      "SUBJECT_DEADLINE",
+      "REFUTED",
+      null
+     ],
+     [
+      "SUBJECT_DEADLINE",
+      "REFUTED",
+      null
+     ]
+    ],
+    "expected": [
+     "SUBJECT_DEADLINE",
+     "REFUTED",
+     null
+    ],
+    "all_equal": true
+   },
+   "d_closes_fd_1_before_exit": {
+    "observed": [
+     [
+      "OBSERVED",
+      "SATISFIED",
+      false
+     ],
+     [
+      "OBSERVED",
+      "SATISFIED",
+      false
+     ],
+     [
+      "OBSERVED",
+      "SATISFIED",
+      false
+     ]
+    ],
+    "expected": [
+     "OBSERVED",
+     "SATISFIED",
+     false
+    ],
+    "all_equal": true
+   },
+   "e_last_protocol_line_unterminated": {
+    "observed": [
+     [
+      "OBSERVED",
+      "SATISFIED",
+      true
+     ],
+     [
+      "OBSERVED",
+      "SATISFIED",
+      true
+     ],
+     [
+      "OBSERVED",
+      "SATISFIED",
+      true
+     ]
+    ],
+    "expected": [
+     "OBSERVED",
+     "SATISFIED",
+     true
+    ],
+    "all_equal": true
+   }
+  },
+  "all_equal": true,
+  "rule": "per variant, every repetition reports the same (kind, verdict, hard_exit); the variants differ only in how the subject's exit is scheduled against the marker file's last write"
+ },
+ "fault_rows": {
+  "FM2-CLI-HARNESS-1": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultHarness.test_FM2_CLI_HARNESS_1_interpreter_absent"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-HARNESS-2": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultHarness.test_FM2_CLI_HARNESS_2_evaluation_directory_uncreatable"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-HARNESS-3": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultHarness.test_FM2_CLI_HARNESS_3_evaluation_directory_inside_the_checkout_refused"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-HARNESS-4": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultHarness.test_FM2_CLI_HARNESS_4_protocol_file_unwritable"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-SUBJECT-1": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultSubject.test_FM2_CLI_SUBJECT_1_a_subject_that_never_exits_gets_the_deadline_verdict_of_its_class"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-SUBJECT-2": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultSubject.test_FM2_CLI_SUBJECT_2_a_non_controller_signal_is_executed_and_indeterminate"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-SUBJECT-3": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultSubject.test_FM2_CLI_SUBJECT_3_a_controller_stop_is_an_interruption_with_no_result"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-SUBJECT-4": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultSubject.test_FM2_CLI_SUBJECT_4_a_stdout_flood_is_bounded"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-SUBJECT-5": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultSubject.test_FM2_CLI_SUBJECT_5_a_forged_protocol_line_then_a_hard_exit_is_the_hard_exit"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-SUBJECT-6": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultSubject.test_FM2_CLI_SUBJECT_6_nonzero_exit_shapes"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-STREAM-1": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultStream.test_FM2_CLI_STREAM_1_exit_before_READY"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-STREAM-2": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultStream.test_FM2_CLI_STREAM_2_exit_after_DISPATCHED_without_RESULT"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-STREAM-3": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultStream.test_FM2_CLI_STREAM_3_RESULT_then_late_bytes_on_stdout"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-STREAM-4": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultStream.test_FM2_CLI_STREAM_4_the_subject_closing_or_redirecting_its_descriptors"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-CLI-STREAM-5": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.FaultStream.test_FM2_CLI_STREAM_5_marker_file_absent_at_exit"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-PYC-CLI-1": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Bytecode.test_FM2_PYC_CLI_1_in_tree_stale_bytecode_with_a_matching_header_is_never_the_subject"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-PYC-CLI-2": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Bytecode.test_FM2_PYC_CLI_2_the_probe_writes_no_bytecode_into_the_checkout"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-PYC-CLI-3": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Bytecode.test_FM2_PYC_CLI_3_the_cache_is_fresh_empty_outside_the_checkout_and_distinct_per_evaluation"
+   ],
+   "outcome": "PASS"
+  },
+  "FM2-PYC-CLI-4": {
+   "tests": [
+    "tests.v2.test_c2_cli_invocation.Bytecode.test_FM2_PYC_CLI_4_without_the_external_cache_the_stale_bytecode_decides_the_reproducer_detects_the_defect"
+   ],
+   "outcome": "PASS"
+  }
+ },
+ "mutation": {
+  "record": "closure-evidence/v2/cycle2/P2-MUTATION.json",
+  "present": true,
+  "phase": "C2-P2",
+  "targets": 40,
+  "mutants": 843,
+  "killed": 843,
+  "killed_by_timeout": 4,
+  "survivors": {},
+  "errors": {},
+  "problems": [],
+  "per_target": {
+   "CLASSES": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "CliInvocationProbe.__init__": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "CliInvocationProbe._observe": {
+    "mutants": 72,
+    "killed": 72,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "CliInvocationProbe.enforcement": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "CliInvocationProbe.harness_preconditions": {
+    "mutants": 9,
+    "killed": 9,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "CliInvocationProbe.observe": {
+    "mutants": 43,
+    "killed": 43,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "FILE_SHAPES": {
+    "mutants": 4,
+    "killed": 4,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "ON_DEADLINE": {
+    "mutants": 12,
+    "killed": 12,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "PROBE_SOURCES": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "STREAM_SHAPES": {
+    "mutants": 5,
+    "killed": 5,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_argv_ok": {
+    "mutants": 2,
+    "killed": 2,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_await": {
+    "mutants": 22,
+    "killed": 22,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "_bytes_of": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_child_env": {
+    "mutants": 18,
+    "killed": 18,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_content_ok": {
+    "mutants": 28,
+    "killed": 28,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_file_fact": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_file_matches": {
+    "mutants": 31,
+    "killed": 31,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_file_shape_ok": {
+    "mutants": 35,
+    "killed": 35,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_hard_exit": {
+    "mutants": 74,
+    "killed": 74,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "_harness_argv": {
+    "mutants": 18,
+    "killed": 18,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "_harness_failure": {
+    "mutants": 27,
+    "killed": 27,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "_is_int": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_name_ok": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_prepare": {
+    "mutants": 53,
+    "killed": 53,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_probe_digest": {
+    "mutants": 1,
+    "killed": 1,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "_protocol": {
+    "mutants": 13,
+    "killed": 13,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_public": {
+    "mutants": 16,
+    "killed": 16,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_sha_file": {
+    "mutants": 12,
+    "killed": 12,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_stimulus_ok": {
+    "mutants": 37,
+    "killed": 37,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_stream_bytes": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_stream_fact": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_stream_matches": {
+    "mutants": 38,
+    "killed": 38,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_stream_shape_ok": {
+    "mutants": 41,
+    "killed": 41,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_substitute": {
+    "mutants": 8,
+    "killed": 8,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_watch": {
+    "mutants": 67,
+    "killed": 67,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "_ws_key_ok": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_ws_name": {
+    "mutants": 1,
+    "killed": 1,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "observation_class": {
+    "mutants": 44,
+    "killed": 44,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "spec_class": {
+    "mutants": 13,
+    "killed": 13,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "verdict_of": {
+    "mutants": 40,
+    "killed": 40,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   }
+  }
+ },
+ "static": {
+  "probe_static_checks": [],
+  "cycle2_baseline": []
+ },
+ "design_notes": [
+  "protocol channel: a harness-owned marker file inside the evaluation directory on every platform (the taxonomy proposal suggested fd 3 on POSIX; the owned process range launches the target through an anchor that forwards no extra descriptor, and the runtime is out of scope) — a design choice inside F5, not an exception",
+  "the subject's stdout and stderr are redirected at the descriptor level onto capture files, one pair per invocation; a protocol line the subject writes to stdout is captured bytes, never protocol",
+  "the parent polls the marker file (complete lines, mark and nonce only; an unterminated last line is never a line), asks the range for the exit with a non-blocking wait at each poll, and re-reads the file to its end after the exit before concluding (RFC §9.4 applied to the file)",
+  "the watchdog runs until DISPATCHED; the spec's window until RESULT; at the window's end the process's presence is measured on the range (members) before SUBJECT_DEADLINE is concluded; a hard exit (no RESULT, an exit status) is OBSERVED with the process's exit code and the capture files as the streams; a signal exit is NON_CONTROLLER_SIGNAL unless the controller's ledger holds the signal (ProbeInterrupted)",
+  "UTF-8 mode is pinned on the command line (-X utf8=1) beside the bytecode prefix, because -I discards every PYTHON* variable (the P7-FINDING-001 lesson applied to the locale row of the hidden-authority matrix)",
+  "the tests live at the tests/v2 root (test_c2_cli_invocation.py, test_c2_cli_verdicts.py): the test tiers are a closed enum of the frozen invariant registry, and a new package under tests/v2 fails registration",
+  "the calibration fixtures (tests/v2/fixtures/calibration/cli_invocation/<class>/{positive,negative}) are committed with the harness because Q0 PROBE_CATALOG_CLOSURE requires them for every class of a registered probe; their calibration records are WP-2.2.2's"
+ ],
+ "problems": [],
+ "verdict": "HARNESS GREEN"
+}
