@@ -5,7 +5,7 @@
   "package": "WP-2.3.1",
   "parent": "e063b76fd1cc625211dca1f8b64db9742e566e6a",
   "parent_aisef2_tree": "509653f3ea630564976dca4b3e8de5041517718a",
-  "head": "7de6d798e06f57f9731f387031d621434ae897c7",
+  "head": "01fff2cc7ca62575e84ea09f499857ca78ca605a",
   "aisef2_tree": "f4f729de10f1d3adae5b8fa1f31768fcf398f415",
   "probe": {
    "id": "probe.process_effect",
@@ -215,7 +215,7 @@
    ],
    "exit": 0,
    "ran": 22,
-   "seconds": 1.388,
+   "seconds": 1.402,
    "status": "OK",
    "status_detail": "",
    "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 2s)",
@@ -232,7 +232,7 @@
    ],
    "exit": 0,
    "ran": 24,
-   "seconds": 27.527,
+   "seconds": 27.506,
    "status": "OK",
    "status_detail": "",
    "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 28s)",
@@ -249,7 +249,7 @@
    ],
    "exit": 0,
    "ran": 5,
-   "seconds": 3.681,
+   "seconds": 3.652,
    "status": "OK",
    "status_detail": "",
    "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 4s)",
@@ -1036,5 +1036,120 @@
   "the tests live at the tests/v2 root (the test tiers are a closed enum of the frozen invariant registry); the calibration fixtures (tests/v2/fixtures/calibration/process_effect) are committed with the harness because Q0 PROBE_CATALOG_CLOSURE requires them for every class of a registered probe; their calibration records are WP-2.3.2's"
  ],
  "problems": [],
- "verdict": "HARNESS GREEN"
+ "verdict": "HARNESS GREEN",
+ "cross_platform": {
+  "rule": "the record's commit's CI runs the whole unittest discovery, which includes the process_effect test modules on every platform of the matrix",
+  "ci": {
+   "run": 36590249123,
+   "commit": "01fff2cc7ca62575e84ea09f499857ca78ca605a",
+   "attempts": [
+    {
+     "attempt": 1,
+     "jobs": [
+      {
+       "job": "lint",
+       "job_id": 109481162371,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:55Z",
+       "completed_at": "2026-09-29T15:27:05Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.11)",
+       "job_id": 109481162715,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:54Z",
+       "completed_at": "2026-09-29T15:47:03Z",
+       "tests_run": 4902,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.12)",
+       "job_id": 109481162713,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:54Z",
+       "completed_at": "2026-09-29T15:47:49Z",
+       "tests_run": 4902,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.13)",
+       "job_id": 109481162795,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:53Z",
+       "completed_at": "2026-09-29T15:47:36Z",
+       "tests_run": 4902,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.14)",
+       "job_id": 109481162783,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:53Z",
+       "completed_at": "2026-09-29T15:48:39Z",
+       "tests_run": 4902,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (windows-latest, 3.11)",
+       "job_id": 109481162638,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:54Z",
+       "completed_at": "2026-09-29T16:28:36Z",
+       "tests_run": 4899,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+       ]
+      },
+      {
+       "job": "wheel",
+       "job_id": 109481162866,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:54Z",
+       "completed_at": "2026-09-29T15:27:16Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "platforms": [
+   "linux",
+   "windows"
+  ]
+ }
 }

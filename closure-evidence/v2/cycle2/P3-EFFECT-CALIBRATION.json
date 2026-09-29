@@ -12,7 +12,7 @@
   "package": "WP-2.3.2",
   "parent": "e063b76fd1cc625211dca1f8b64db9742e566e6a",
   "parent_aisef2_tree": "509653f3ea630564976dca4b3e8de5041517718a",
-  "head": "d93785ec47db0577fa0b67aa5e09ef41115f4b9f",
+  "head": "01fff2cc7ca62575e84ea09f499857ca78ca605a",
   "aisef2_tree": "f4f729de10f1d3adae5b8fa1f31768fcf398f415",
   "probe": {
    "id": "probe.process_effect",
@@ -87,7 +87,7 @@
  },
  "harness_record": {
   "path": "closure-evidence/v2/cycle2/P3-EFFECT-HARNESS.json",
-  "commit": "7de6d798e06f57f9731f387031d621434ae897c7",
+  "commit": "01fff2cc7ca62575e84ea09f499857ca78ca605a",
   "same_probe_digest": true
  },
  "platform": {
@@ -102,7 +102,7 @@
     "observation_class": "scenario_returns",
     "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_returns/positive",
     "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_returns/negative",
-    "demonstrated_at": 1790695009.669268
+    "demonstrated_at": 1790699467.0972722
    },
    {
     "probe_id": "probe.process_effect",
@@ -110,7 +110,7 @@
     "observation_class": "scenario_raises",
     "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_raises/positive",
     "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_raises/negative",
-    "demonstrated_at": 1790695011.053833
+    "demonstrated_at": 1790699468.4107258
    },
    {
     "probe_id": "probe.process_effect",
@@ -118,7 +118,7 @@
     "observation_class": "scenario_files",
     "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_files/positive",
     "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_files/negative",
-    "demonstrated_at": 1790695012.469301
+    "demonstrated_at": 1790699469.8038242
    }
   ],
   "ledgerlock": [
@@ -128,7 +128,7 @@
     "observation_class": "scenario_returns",
     "positive_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/reference",
     "negative_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.3-1",
-    "demonstrated_at": 1790695013.9764202,
+    "demonstrated_at": 1790699471.292696,
     "mutant": "M-3.3-1",
     "mutant_target": "R-3.3",
     "request": {
@@ -224,7 +224,7 @@
     "observation_class": "scenario_raises",
     "positive_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/reference",
     "negative_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.3-1",
-    "demonstrated_at": 1790695015.12019,
+    "demonstrated_at": 1790699472.4303548,
     "mutant": "M-4.3-1",
     "mutant_target": "R-4.3",
     "request": {
@@ -298,7 +298,7 @@
     "observation_class": "scenario_files",
     "positive_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/reference",
     "negative_fixture": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.2-1",
-    "demonstrated_at": 1790695016.2693639,
+    "demonstrated_at": 1790699473.5311549,
     "mutant": "M-3.2-1",
     "mutant_target": "R-3.2",
     "request": {
@@ -3127,7 +3127,7 @@
    ],
    "exit": 0,
    "ran": 5,
-   "seconds": 18.962,
+   "seconds": 18.482,
    "status": "OK",
    "status_detail": "",
    "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 19s)",
@@ -3144,7 +3144,7 @@
    ],
    "exit": 0,
    "ran": 22,
-   "seconds": 1.392,
+   "seconds": 1.372,
    "status": "OK",
    "status_detail": "",
    "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 2s)",
@@ -3833,5 +3833,120 @@
   "destructive_authority": []
  },
  "problems": [],
- "verdict": "CALIBRATED"
+ "verdict": "CALIBRATED",
+ "cross_platform": {
+  "rule": "the record's commit's CI runs the whole unittest discovery, which includes the process_effect test modules on every platform of the matrix",
+  "ci": {
+   "run": 36590249123,
+   "commit": "01fff2cc7ca62575e84ea09f499857ca78ca605a",
+   "attempts": [
+    {
+     "attempt": 1,
+     "jobs": [
+      {
+       "job": "lint",
+       "job_id": 109481162371,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:55Z",
+       "completed_at": "2026-09-29T15:27:05Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.11)",
+       "job_id": 109481162715,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:54Z",
+       "completed_at": "2026-09-29T15:47:03Z",
+       "tests_run": 4902,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.12)",
+       "job_id": 109481162713,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:54Z",
+       "completed_at": "2026-09-29T15:47:49Z",
+       "tests_run": 4902,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.13)",
+       "job_id": 109481162795,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:53Z",
+       "completed_at": "2026-09-29T15:47:36Z",
+       "tests_run": 4902,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.14)",
+       "job_id": 109481162783,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:53Z",
+       "completed_at": "2026-09-29T15:48:39Z",
+       "tests_run": 4902,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (windows-latest, 3.11)",
+       "job_id": 109481162638,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:54Z",
+       "completed_at": "2026-09-29T16:28:36Z",
+       "tests_run": 4899,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+       ]
+      },
+      {
+       "job": "wheel",
+       "job_id": 109481162866,
+       "conclusion": "success",
+       "started_at": "2026-09-29T15:26:54Z",
+       "completed_at": "2026-09-29T15:27:16Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "platforms": [
+   "linux",
+   "windows"
+  ]
+ }
 }
