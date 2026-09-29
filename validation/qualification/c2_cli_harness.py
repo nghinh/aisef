@@ -33,7 +33,9 @@ MUTATION_REL = "closure-evidence/v2/cycle2/P2-MUTATION.json"
 PACKAGE = "WP-2.2.1"
 PARENT = "77a437609fd59cd3c8d61d28472460ab9aa157f0"
 PROBE_REL = "aisef2/probe/cli_invocation.py"
-TEST_MODULES = ("tests.v2.test_c2_cli_invocation", "tests.v2.test_c2_cli_verdicts")
+TEST_MODULES = ("tests.v2.test_c2_cli_invocation", "tests.v2.test_c2_cli_protocol", "tests.v2.test_c2_cli_verdicts")
+#: the rows are read from the modules that hold them (a split row keeps its prefix in both)
+ROW_MODULES = ("tests.v2.test_c2_cli_invocation", "tests.v2.test_c2_cli_protocol")
 FAULT_ROWS = {
     **{f"FM2-CLI-HARNESS-{n}": f"test_FM2_CLI_HARNESS_{n}_" for n in range(1, 5)},
     **{f"FM2-CLI-SUBJECT-{n}": f"test_FM2_CLI_SUBJECT_{n}_" for n in range(1, 7)},
@@ -210,7 +212,7 @@ def run() -> dict:
     for m, r in runs.items():
         if r["status"] != "OK" or r["exit"] != 0 or r["residual"]:
             problems.append(f"{m}: status {r['status']} exit {r['exit']} residual {r['residual']}")
-    outcomes = in_process(TEST_MODULES[0])
+    outcomes = {k: v for m in ROW_MODULES for k, v in in_process(m).items()}
     fault_rows = rows_of(outcomes, FAULT_ROWS)
     cli_rows = rows_of(outcomes, CLI_CASES)
     for name, rows in (("fault", fault_rows), ("case", cli_rows)):

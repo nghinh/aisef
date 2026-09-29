@@ -15,7 +15,6 @@ import json
 import os
 import pathlib
 import py_compile
-import subprocess
 import sys
 import tempfile
 import threading
@@ -28,11 +27,11 @@ if str(ROOT) not in sys.path:
 
 from aisef2.arch.enums import (  # noqa: E402
     BehaviorVerdict, ContractSatisfaction, Enforcement, MeasurementPoint, ObligationRole, Owner, ProbeExecutionStatus,
-    SubjectAbsence, SubjectKind,
+    SubjectAbsence,
 )
 from aisef2.control.owner import FailureCode  # noqa: E402
 from aisef2.control.routing import route  # noqa: E402
-from aisef2.probe import catalog, cli_invocation as ci  # noqa: E402
+from aisef2.probe import cli_invocation as ci  # noqa: E402
 from aisef2.probe.cli_invocation import CliInvocationProbe  # noqa: E402
 from aisef2.probe.protocol import (  # noqa: E402
     ExecutionEnv, Observation, ObservationKind as K, ProbeInterrupted, RevisionRef, classify_failure, run_probe,
@@ -432,20 +431,6 @@ class Harness(_Product):
                 self.assertEqual((f["exit_status_raw"], f["exit_code"], f["raised"]), (raw, code, raised))
         self.assertEqual(self.see(spec("app:__main__", {"exit_code": 0}, {"argv": ["exit", "7"]})).verdict, R)
 
-    def test_CLI_Q0_the_module_passes_the_probe_rules_with_its_catalog_facts(self):
-        sys.path.insert(0, str(ROOT / "validation" / "v2"))
-        import probe_static_checks as ps
-        src = (ROOT / "aisef2/probe/cli_invocation.py").read_text(encoding="utf-8")
-        facts = {"subject_process": "child_of_harness", "stimulus_shape": "invocation"}
-        self.assertEqual(ps.violations("aisef2/probe/cli_invocation.py", src, ps.SOURCE_RULES, facts), [])
-        self.assertEqual(ps.check(ROOT), [])   # catalog closure: registered, digest live, fixtures for every class
-        scripts = ps.child_scripts(__import__("ast").parse(src))
-        self.assertEqual([name for name, _, _ in scripts], ["HARNESS"])
-        # the channel rule is what rejects a harness that puts its protocol on the subject's stdout
-        forged = src.replace('proto.write(line.encode("utf-8"))', 'sys.stdout.write(line)')
-        self.assertTrue(any("PROTOCOL_CHANNEL_DISCIPLINE" in v
-                            for v in ps.violations("aisef2/probe/cli_invocation.py", forged, ps.SOURCE_RULES, facts)))
-
 
 # --------------------------------------------------------------------------------------- FM2-CLI-HARNESS
 
@@ -459,33 +444,6 @@ class FaultHarness(_Product):
             r = route(result, s, point, ObligationRole.INTRODUCE)
             self.assertEqual((r.failure.code, r.failure.owner), (FailureCode.PROBE_UNRUNNABLE, Owner.ENVIRONMENT))
 
-    def test_FM2_CLI_HARNESS_1_interpreter_absent(self):
-        gone = os.path.join(self.empty.root, "no-python")
-        s = spec("app:__main__")
-        with never_runs():
-            self.assertEqual(self.see(s, e=env(interpreter=gone)),
-                             Observation(K.HARNESS_FAILED, detail=f"interpreter absent: {gone}"))
-            self.assert_unrunnable(s, self.run_(s, e=env(interpreter=gone)))
-            self.assert_unrunnable(s, self.run_(s, at=RevisionRef(SHA, os.path.join(self.empty.root, "gone"))),
-                                   "cannot inspect: the revision checkout is missing")
-        with refuses(OSError("cannot launch")):
-            self.assert_unrunnable(s, self.run_(s), "the harness cannot launch: OSError")
-
-    def test_FM2_CLI_HARNESS_2_evaluation_directory_uncreatable(self):
-        s = spec("app:__main__")
-        with never_runs():
-            result = self.run_(s, probe=CliInvocationProbe(scratch=os.path.join(self.empty.root, "no-such-scratch")))
-        self.assert_unrunnable(s, result, "the evaluation directory cannot be created: FileNotFoundError")
-        self.assertFalse(os.path.exists(os.path.join(self.empty.root, "no-such-scratch")))
-
-    def test_FM2_CLI_HARNESS_3_evaluation_directory_inside_the_checkout_refused(self):
-        inside = os.path.join(self.at.root, "scratch-in-tree")
-        os.makedirs(inside, exist_ok=True)
-        s = spec("app:__main__")
-        with never_runs():
-            result = self.run_(s, probe=CliInvocationProbe(scratch=inside))
-        self.assert_unrunnable(s, result, "the evaluation directory lies inside the revision checkout: refused")
-
     def test_FM2_CLI_HARNESS_4_protocol_file_unwritable(self):
         prepared = tempfile.mkdtemp(prefix="aisef2-cli-ro-")
         os.mkdir(os.path.join(prepared, "protocol.log"))   # the harness cannot open its channel for writing
@@ -493,9 +451,6 @@ class FaultHarness(_Product):
         with mock.patch.object(ci, "_evaluation_dir", lambda scratch: contextlib.nullcontext(prepared)):
             result = self.run_(s)
         self.assert_unrunnable(s, result, "the harness did not start (exit 1, no READY): tool absent or broken")
-        # and a workspace that cannot be laid out is a harness failure before any launch
-        with never_runs(), mock.patch.object(ci, "_prepare", side_effect=PermissionError("denied")):
-            self.assert_unrunnable(s, self.run_(s), "the evaluation directory cannot be prepared: PermissionError")
 
 
 # --------------------------------------------------------------------------------------- FM2-CLI-SUBJECT
@@ -577,78 +532,6 @@ class FaultSubject(_Product):
 # --------------------------------------------------------------------------------------- FM2-CLI-STREAM
 
 class FaultStream(_Product):
-    def test_FM2_CLI_STREAM_1_exit_before_READY(self):
-        s = spec("app:__main__")
-        with mock.patch.object(ci, "HARNESS", "import sys\nsys.exit(127)\n"):
-            self.assertEqual(self.see(s), Observation(K.HARNESS_FAILED, detail="the harness did not start (exit 127, "
-                                                                                "no READY): tool absent or broken"))
-        with faked(returncode=-9):
-            self.assertEqual(self.see(s).detail, "the harness process was killed by signal 9 before READY")
-        with faked("READY", returncode=0):
-            self.assertEqual(self.see(s).detail, "the harness did not start (exit 0, no DISPATCHED): tool absent or broken")
-        with faked("READY", returncode=-9):
-            self.assertEqual(self.see(s).detail, "the harness process was killed by signal 9 before DISPATCHED")
-        with mock.patch.object(ci, "HARNESS", "import time\ntime.sleep(3600)\n"):
-            o = self.see(s, e=env(timeout=1.0))   # written 1s, not 1.0s
-        self.assertEqual(o, Observation(K.HARNESS_FAILED, detail="harness timeout: no READY within 1s — the "
-                                                                 "observation mechanism did not operate"))
-        with faked("READY", returncode=0):   # READY read, then the exit: no DISPATCHED is concluded after the file
-            self.assertIs(self.run_(s).status, ProbeExecutionStatus.UNRUNNABLE)
-
-    def test_FM2_CLI_STREAM_2_exit_after_DISPATCHED_without_RESULT(self):
-        s = spec("app:__main__", EXIT0, {"argv": ["echo"]})
-        empty = {"size": 0, "truncated": False, "sha256": sha(b"")}
-        fake = FakeRange(("READY", "DISPATCHED", 'MAIN {"before": {}}'), 0)
-        with mock.patch.object(ci, "ProcessRange", fake):
-            o = self.see(s)
-        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S))
-        self.assertEqual(facts_of(o), {"subject": "present", "exit_code": 0, "hard_exit": True, "stdout": empty,
-                                       "stderr": empty, "before": {}, "files": {}})
-        self.assertEqual((fake.name, fake.released), (f"probe {s.id}", True))   # the range is named for the spec
-        with faked("READY", "DISPATCHED", 'MAIN {"before": {}}', returncode=4):
-            self.assertEqual(self.see(s).verdict, R)
-            self.assertEqual(self.see(spec("app:__main__", {"exit_code": 4}, {"argv": ["echo"]})).verdict, S)
-            self.assertEqual(self.see(spec("app:__main__", {"blocks": True}, {"argv": ["echo"]})).verdict, R)
-        # the files named by the observable are digested by the parent, against what MAIN recorded before
-        files = {"<ws>/a": {"equals_before": True}, "<ws>/b": {"absent": True}}
-        with faked("READY", "DISPATCHED", 'MAIN {"before": {"a": {"absent": true}, "b": {"absent": true}}}', returncode=0):
-            o = self.see(spec("app:__main__", {"exit_code": 0, "files": files}, {"argv": ["echo"]}))
-        self.assertEqual((o.verdict, facts_of(o)["before"], facts_of(o)["files"]),
-                         (S, {"a": {"absent": True}, "b": {"absent": True}}, {"a": {"absent": True}, "b": {"absent": True}}))
-        with faked("READY", "DISPATCHED", 'MAIN {"before": {"a": {"sha256": "00"}, "b": {"absent": true}}}', returncode=0):
-            self.assertEqual(self.see(spec("app:__main__", {"exit_code": 0, "files": files}, {"argv": ["echo"]})).verdict, R)
-        with faked("READY", "DISPATCHED", "PRE 0", returncode=3):   # it died in a pre-step: the state was never built
-            o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"], "pre": [{"argv": ["echo"]}]}))
-        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, R))
-        self.assertEqual(facts_of(o), {"subject": "present", "pre_failed": 0, "exit_code": 3, "hard_exit": True})
-        with faked("READY", "DISPATCHED", "PRE 0", "PRE 1", returncode=3):
-            o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"], "pre": [{"argv": ["a"]}, {"argv": ["b"]}]}))
-        self.assertEqual((o.verdict, facts_of(o)["pre_failed"]), (R, 1))
-        with faked("READY", "DISPATCHED", "PRE 0", returncode=3):   # the file names a pre-step: that is what was running
-            o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"]}))
-        self.assertEqual((o.verdict, facts_of(o)["pre_failed"]), (R, 0))
-        with faked("READY", "DISPATCHED", returncode=3):   # before its first pre-step
-            o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"], "pre": [{"argv": ["echo"]}]}))
-        self.assertEqual((o.verdict, facts_of(o)["pre_failed"]), (R, 0))
-        with faked("READY", "DISPATCHED", "PRE 0", 'MAIN {"before": {}}', returncode=3):   # after a passing pre-step
-            o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"], "pre": [{"argv": ["echo"]}]}))
-        self.assertEqual((o.verdict, facts_of(o).get("pre_failed"), facts_of(o)["hard_exit"]), (S, None, True))
-        with faked("READY", "DISPATCHED", returncode=-9):   # a signal the controller did not send (§9.3)
-            o = self.see(s)
-            self.assertEqual(self.run_(s), Executed(I, NCS))
-        self.assertEqual(o, Observation(K.NON_CONTROLLER_SIGNAL, detail="the process ended by signal 9 after DISPATCHED, "
-                                                                        "and this controller's signal ledger is empty: it "
-                                                                        "did not send it"))
-        with refuses(ci.RangeError("no anchor")):   # a range that refuses to start is a launch failure, like OSError
-            self.assertEqual(self.see(s), Observation(K.HARNESS_FAILED, detail="the harness cannot launch: RangeError"))
-        ladder = [{"stage": "terminate", "signal": "SIGTERM"}, {"stage": "kill", "signal": "SIGKILL"}]
-        with faked("READY", "DISPATCHED", returncode=-9, ledger=ladder):
-            with self.assertRaises(ProbeInterrupted) as stopped:   # the same exit, the controller's own signal
-                self.see(s)
-        self.assertEqual((stopped.exception.signal, stopped.exception.stage), (9, "kill"))
-        # a real hard exit: the captured streams are what the process left, the exit code is the process's
-        o = self.see(spec("app:__main__", {"exit_code": 3, "stdout": ""}, {"argv": ["hard", "3"]}))
-        self.assertEqual((o.kind, o.verdict, facts_of(o)["hard_exit"]), (K.OBSERVED, S, True))
 
     def test_FM2_CLI_STREAM_3_RESULT_then_late_bytes_on_stdout(self):
         o = self.see(spec("app:__main__", {"exit_code": 0, "stdout": "early"}, {"argv": ["late"]}))
@@ -667,72 +550,29 @@ class FaultStream(_Product):
         o = self.see(spec("app:__main__", {"exit_code": 0, "stdout": "a"}, {"argv": ["closefd1"]}))
         self.assertEqual(o.verdict, S)
 
-    def test_FM2_CLI_STREAM_5_marker_file_absent_at_exit(self):
+    def test_FM2_CLI_STREAM_1_exit_before_READY(self):
         s = spec("app:__main__")
-        with mock.patch.object(ci, "HARNESS", "import sys\nsys.exit(0)\n"):   # never opened its channel
-            self.assertEqual(self.see(s), Observation(K.HARNESS_FAILED, detail="the harness did not start (exit 0, "
+        with mock.patch.object(ci, "HARNESS", "import sys\nsys.exit(127)\n"):
+            self.assertEqual(self.see(s), Observation(K.HARNESS_FAILED, detail="the harness did not start (exit 127, "
                                                                                 "no READY): tool absent or broken"))
-        with faked("READY", "DISPATCHED", returncode=0, write=False):
-            self.assertEqual(self.see(s).detail, "the harness did not start (exit 0, no READY): tool absent or broken")
+        with mock.patch.object(ci, "HARNESS", "import time\ntime.sleep(3600)\n"):
+            o = self.see(s, e=env(timeout=1.0))   # written 1s, not 1.0s
+        self.assertEqual(o, Observation(K.HARNESS_FAILED, detail="harness timeout: no READY within 1s — the "
+                                                                 "observation mechanism did not operate"))
+        self.assertIs(self.run_(s, e=env(interpreter=os.path.join(self.empty.root, "none"))).status,
+                      ProbeExecutionStatus.UNRUNNABLE)
 
-    def test_the_marker_file_poll_reports_a_line_an_exit_or_a_timeout_and_re_reads_after_the_exit(self):
-        """`_await`: ("LINE", seen) when the tag is in the file — before the exit, or only in the re-read the exit
-        triggers (§9.4: the exit never ends the protocol); ("EXITED", seen) when the process exited without it;
-        ("TIMEOUT", seen) when the deadline passes with the process still running."""
-        import time
-        work = tempfile.mkdtemp(prefix="aisef2-cli-poll-")
-        proto = os.path.join(work, "protocol.log")
-        lines = "AISEF2-PROBE READY n0nce\nAISEF2-PROBE DISPATCHED n0nce\n"
+    def test_FM2_CLI_STREAM_2b_a_real_hard_exit_after_DISPATCHED(self):
+        # the captured streams are what the process left, the exit code is the process's (the decision table over
+        # every ordering of the marker file and the exit is in test_c2_cli_protocol.py)
+        o = self.see(spec("app:__main__", {"exit_code": 3, "stdout": ""}, {"argv": ["hard", "3"]}))
+        self.assertEqual((o.kind, o.verdict, facts_of(o)["hard_exit"]), (K.OBSERVED, S, True))
 
-        class Exited:
-            returncode = 0
-
-            def wait(self, timeout=None):
-                return 0
-
-        class Running:
-            def wait(self, timeout=None):
-                return None
-
-        class LateWriter(Exited):   # the exit is reported first; the file holds the lines when read once more
-            def wait(self, timeout=None):
-                pathlib.Path(proto).write_text(lines + "AISEF2-PROBE RESULT n0nce {}\n", encoding="utf-8")
-                return 0
-        pathlib.Path(proto).write_text(lines, encoding="utf-8")
-        self.assertEqual(ci._await(Running(), proto, "n0nce", "DISPATCHED", time.monotonic() + 5),
-                         ("LINE", {"READY": [""], "DISPATCHED": [""]}))
-        self.assertEqual(ci._await(Exited(), proto, "n0nce", "RESULT", time.monotonic() + 5),
-                         ("EXITED", {"READY": [""], "DISPATCHED": [""]}))
-        self.assertEqual(ci._await(Running(), proto, "n0nce", "RESULT", time.monotonic() + 0.1)[0], "TIMEOUT")
-        pathlib.Path(proto).write_text("", encoding="utf-8")
-        self.assertEqual(ci._await(LateWriter(), proto, "n0nce", "RESULT", time.monotonic() + 5),
-                         ("LINE", {"READY": [""], "DISPATCHED": [""], "RESULT": ["{}"]}))
-        # and through the harness: the exit reported before any line was read still yields the complete result
-        s = spec("app:__main__", EXIT0, {"argv": ["echo"]})
-
-        class LateRange(FakeRange):
-            def start(self):
-                self.req = json.loads(pathlib.Path(self.argv[-1]).read_text(encoding="utf-8"))
-                return self
-
-            def wait(self, timeout=None):
-                pathlib.Path(self.req["protocol"]).write_text(
-                    f"AISEF2-PROBE READY {self.req['nonce']}\nAISEF2-PROBE DISPATCHED {self.req['nonce']}\n"
-                    f"AISEF2-PROBE RESULT {self.req['nonce']} {{\"subject\": \"present\", \"exit_code\": 0}}\n", encoding="utf-8")
-                return 0
-        with mock.patch.object(ci, "ProcessRange", LateRange((), 0)):
-            o = self.see(s)
-        self.assertEqual((o.kind, o.verdict, facts_of(o)), (K.OBSERVED, S, {"subject": "present", "exit_code": 0}))
-
-    def test_a_status_never_reported_with_nothing_left_of_the_process_is_a_harness_failure(self):
-        class Vanished(FakeRange):
-            def wait(self, timeout=None):
-                return None
-        with mock.patch.object(ci, "ProcessRange", Vanished(("READY", "DISPATCHED"), None)), \
-                mock.patch.object(ci, "_COLLECT_S", 0.05):
-            o = self.see(spec("app:__main__", EXIT0, {"argv": ["echo"]}, window=0.3))
-        self.assertEqual(o, Observation(K.HARNESS_FAILED, detail="the harness process ended and its exit status was "
-                                                                 "never reported"))
+    def test_FM2_CLI_STREAM_5_marker_file_absent_at_exit(self):
+        with mock.patch.object(ci, "HARNESS", "import sys\nsys.exit(0)\n"):   # never opened its channel
+            self.assertEqual(self.see(spec("app:__main__")),
+                             Observation(K.HARNESS_FAILED, detail="the harness did not start (exit 0, no READY): tool "
+                                                                  "absent or broken"))
 
 
 # --------------------------------------------------------------------------------------- FM2-PYC-CLI
@@ -845,36 +685,6 @@ class Bytecode(unittest.TestCase):
 # --------------------------------------------------------------------------------------- identity and refusals
 
 class Identity(_Product):
-    def test_the_digest_covers_exactly_the_sources_it_names_and_is_stable_across_processes(self):
-        self.assertEqual(tuple(ci.PROBE_SOURCES), ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py"))
-
-        def digest_of(files):
-            h = hashlib.sha256()
-            for rel, data in files:
-                h.update(rel.encode() + b"\0" + data + b"\0")
-            return h.hexdigest()
-        files = [(rel, (ROOT / "aisef2" / rel).read_bytes().replace(b"\r\n", b"\n")) for rel in ci.PROBE_SOURCES]
-        self.assertEqual(digest_of(files), P.digest)
-        for i, (rel, data) in enumerate(files):
-            with self.subTest(source=rel):
-                changed = list(files)
-                changed[i] = (rel, data + b"# changed\n")
-                self.assertNotEqual(digest_of(changed), P.digest)
-                self.assertNotEqual(digest_of(files[:i] + files[i + 1:]), P.digest)
-        code = ("import sys; sys.path.insert(0, sys.argv[1]); import aisef2.probe.cli_invocation as m; "
-                "print(m.CliInvocationProbe.digest)")
-        out = subprocess.run([sys.executable, "-P", "-c", code, str(ROOT)], capture_output=True, encoding="utf-8", check=True)
-        self.assertEqual(out.stdout.strip(), P.digest)
-        self.assertNotEqual(P.digest, __import__("aisef2.probe.python_callable", fromlist=["DIGEST"]).DIGEST)
-
-    def test_the_catalog_entry_binds_this_probe_as_the_active_cli_invocation_probe(self):
-        e = catalog.active()[SubjectKind.CLI_INVOCATION]
-        self.assertEqual((e.probe_id, e.probe_digest, e.classes, e.cycle), (ci.PROBE_ID, ci.DIGEST, ci.CLASSES, 2))
-        self.assertEqual((e.subject_process, e.protocol_channel, e.stimulus_shape), ("child_of_harness", "marker_file", "invocation"))
-        self.assertIs(e.metadata, ci.METADATA)
-        self.assertIs(ci.METADATA.observation_class, ci.spec_class)
-        self.assertIsInstance(catalog.catalogue()[SubjectKind.CLI_INVOCATION], CliInvocationProbe)
-        self.assertEqual(catalog.registry().observation_class(ci.PROBE_ID, ci.DIGEST, spec("app:__main__")), "exits")
 
     def test_enforcement_is_declared_bound_and_never_degraded(self):
         self.assertIs(P.enforcement(), Enforcement.PARTIAL)
@@ -884,104 +694,8 @@ class Identity(_Product):
         with never_runs():
             refused = run_probe(P, spec("app:__main__"), self.at, env(required=Enforcement.FULL))
         self.assertIs(refused.result.status, ProbeExecutionStatus.UNRUNNABLE)
-        self.assertEqual(ci.ON_DEADLINE, {"exits": R, "exits_streams": R, "exits_files": R, "blocks": S})
+        self.assertEqual(ci.ON_DEADLINE, {"exits": R, "exits_streams": R, "exits_files": R, "blocks": S, "equality": R})
         self.assertEqual(len(P.harness_preconditions()), 4)
-
-    def test_unsupported_specs_are_refused_before_anything_runs(self):
-        with never_runs():
-            for locator in ("app/__main__.py:__main__", "app-cli", "app.cli", "app.cli:main()", "app.cli:a.b"):
-                with self.subTest(locator=locator):
-                    result = self.run_(spec(locator))
-                    self.assertIs(result.status, ProbeExecutionStatus.INVALID_SPEC)
-                    self.assertRegex(result.detail, "never accepted$")
-            # the refusals name what is refused
-            self.assertEqual(self.see(spec("app-cli")).detail, "locator 'app-cli' is not module.path:__main__ or "
-                                                                "module.path:callable — a path or a console script is "
-                                                                "never accepted")
-            self.assertEqual(self.see(spec("app:__main__", {"returns": 1})).detail,
-                             f"observable/stimulus is not a supported class {ci.CLASSES} with a bounded window "
-                             "(within_s); refused, not degraded")
-            for obs, stim in (({"returns": 1}, {"argv": []}), ({"exit_code": "0"}, {"argv": []}), ({"exit_code": True}, {"argv": []}),
-                              ({"exit_code": 0, "stdout": {"prose": "ok"}}, {"argv": []}), ({"exit_code": 0, "files": {"out": {"absent": True}}}, {"argv": []}),
-                              ({"exit_code": 0, "files": {"<ws>/../x": {"absent": True}}}, {"argv": []}), ({"exit_code": 0}, {"argv": [1]}),
-                              ({"exit_code": 0}, {"args": []}), ({"exit_code": 0}, {"argv": [], "stdin": "text"}),
-                              ({"exit_code": 0}, {"argv": [], "workspace": {"../x": {"text": ""}}}), ({"blocks": 1}, {"argv": []}),
-                              ({"exit_code": 0}, {"argv": [], "pre": [["a"]]})):
-                with self.subTest(observable=obs, stimulus=stim):
-                    result = self.run_(spec("app:__main__", obs, stim))
-                    self.assertIs(result.status, ProbeExecutionStatus.INVALID_SPEC)
-                    self.assertRegex(result.detail, "refused, not degraded$")
-            other = spec("app:__main__")
-            other = ProductProofSpec.create(**{**{f: getattr(other, f) for f in (
-                "contract_id", "probe_id", "probe_digest", "candidate_expectation", "compiler_id", "compiler_digest")},
-                "probe_input": {**other.probe_input, "subject": {"kind": "python_callable", "locator": "app:__main__"}}})
-            self.assertEqual(self.see(other), Observation(K.UNSUPPORTED, detail="subject kind 'python_callable' is not cli_invocation"))
-            self.assertIsNone(ci.spec_class(other))
-            for locator in ("tests.cli:main", "app.test_cli:main"):
-                self.assertRegex(self.run_(spec(locator)).detail, "developer test artefact")
-            result = self.run_(spec("app:__main__", {"exit_code": 0}, window=None))
-            self.assertIs(result.status, ProbeExecutionStatus.INVALID_SPEC)
-            self.assertIn("bounded window (within_s)", result.detail)
-
-    def test_the_internal_observation_carries_its_facts_on_every_path(self):
-        """`_observe` answers (Observation, facts): the facts the harness reported (or the hard-exit facts) with an
-        OBSERVED observation, None with every other kind — the channel a two-invocation class reads."""
-        s = spec("app:__main__", EXIT0, {"argv": ["echo"]})
-        args = (s.id, "exits", "app:__main__", {"argv": ["echo"]}, {"exit_code": 0, "within_s": W})
-        gone = os.path.join(self.empty.root, "no-python")
-        inside = os.path.join(self.at.root, "scratch-in-tree")
-        os.makedirs(inside, exist_ok=True)
-        with never_runs():
-            self.assertEqual(P._observe(*args, self.at, env(interpreter=gone)),
-                             (Observation(K.HARNESS_FAILED, detail=f"interpreter absent: {gone}"), None))
-            self.assertEqual(P._observe(*args, RevisionRef(SHA, gone), env()),
-                             (Observation(K.HARNESS_FAILED, detail="cannot inspect: the revision checkout is missing"), None))
-            self.assertEqual(CliInvocationProbe(scratch=gone)._observe(*args, self.at, env()),
-                             (Observation(K.HARNESS_FAILED, detail="the evaluation directory cannot be created: "
-                                                                   "FileNotFoundError"), None))
-            self.assertEqual(CliInvocationProbe(scratch=inside)._observe(*args, self.at, env()),
-                             (Observation(K.HARNESS_FAILED, detail="the evaluation directory lies inside the revision "
-                                                                   "checkout: refused"), None))
-            with mock.patch.object(ci, "_prepare", side_effect=PermissionError("denied")):
-                self.assertEqual(P._observe(*args, self.at, env()),
-                                 (Observation(K.HARNESS_FAILED, detail="the evaluation directory cannot be prepared: "
-                                                                       "PermissionError"), None))
-        with refuses(OSError("cannot launch")):
-            self.assertEqual(P._observe(*args, self.at, env()),
-                             (Observation(K.HARNESS_FAILED, detail="the harness cannot launch: OSError"), None))
-        with faked("READY", returncode=0):
-            self.assertEqual(P._observe(*args, self.at, env()),
-                             (Observation(K.HARNESS_FAILED, detail="the harness did not start (exit 0, no DISPATCHED): "
-                                                                   "tool absent or broken"), None))
-        with faked("READY", "DISPATCHED", 'RESULT {"subject": "absent", "note": "n"}', returncode=0):
-            self.assertEqual(P._observe(*args, self.at, env()), (Observation(K.SUBJECT_ABSENT, R, "n"), None))
-        with faked("READY", "DISPATCHED", returncode=-9):
-            o, facts = P._observe(*args, self.at, env())
-            self.assertEqual((o.kind, facts), (K.NON_CONTROLLER_SIGNAL, None))
-        with faked("READY", "DISPATCHED", 'RESULT {"subject": "present", "exit_code": 0, "pre": []}', returncode=0):
-            self.assertEqual(P._observe(*args, self.at, env()),
-                             (Observation(K.OBSERVED, S, '{"subject": "present", "exit_code": 0, "pre": []}'),
-                              {"subject": "present", "exit_code": 0, "pre": []}))
-        with faked("READY", "DISPATCHED", 'MAIN {"before": {}}', returncode=2):
-            o, facts = P._observe(*args, self.at, env())
-            self.assertEqual((o.kind, o.verdict, facts["exit_code"], facts["hard_exit"], "path" in facts["stdout"]),
-                             (K.OBSERVED, R, 2, True, True))
-        with faked("READY", "DISPATCHED", "PRE 0", returncode=2):
-            o, facts = P._observe(s.id, "exits", "app:__main__", {"argv": ["echo"], "pre": [{"argv": ["a"]}]},
-                                  {"exit_code": 2, "within_s": W}, self.at, env())
-            self.assertEqual((o.verdict, facts), (R, {"subject": "present", "pre_failed": 0, "exit_code": 2, "hard_exit": True}))
-        o, facts = P._observe(s.id, "exits", "app:__main__", {"argv": ["sleep", "30"]}, {"exit_code": 0, "within_s": HANG_W},
-                              self.at, env())
-        self.assertEqual((o.kind, o.verdict, facts), (K.SUBJECT_DEADLINE, R, None))
-
-        class Vanished(FakeRange):
-            def wait(self, timeout=None):
-                return None
-        with mock.patch.object(ci, "ProcessRange", Vanished(("READY", "DISPATCHED"), None)), \
-                mock.patch.object(ci, "_COLLECT_S", 0.05):
-            o, facts = P._observe(s.id, "exits", "app:__main__", {"argv": ["echo"]}, {"exit_code": 0, "within_s": 0.3},
-                                  self.at, env())
-        self.assertEqual((o.kind, facts), (K.HARNESS_FAILED, None))
 
     def test_product_verdicts_are_identical_across_developer_test_layouts(self):
         layouts = {"no tests": {}, "tests/ at the root": {"tests/__init__.py": "", "tests/test_cli.py": "import app\n"},
@@ -995,6 +709,11 @@ class Identity(_Product):
         for name, results in seen.items():
             with self.subTest(layout=name):
                 self.assertEqual(results, first)
+
+    def test_the_internal_observation_of_an_expired_window_carries_no_facts(self):
+        o, facts = P._observe("PPS-x", "exits", "app:__main__", {"argv": ["sleep", "30"]}, {"exit_code": 0, "within_s": HANG_W},
+                              self.at, env())
+        self.assertEqual((o.kind, o.verdict, facts), (K.SUBJECT_DEADLINE, R, None))
 
 
 if __name__ == "__main__":

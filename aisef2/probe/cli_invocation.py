@@ -21,6 +21,24 @@ own; one that does not exit 0 makes the observation REFUTED with its index in `d
 | `exits_streams` | adds `"stdout"` / `"stderr"`, each a shape | `exits`, and each named stream matches its shape | REFUTED |
 | `exits_files` | adds `"files": {"<ws>/name": shape}` | `exits`, and each named file matches its shape | REFUTED |
 | `blocks` | `{"blocks": true, "within_s": W}` | the invocation has not returned when W closes | SATISFIED |
+| `equality` | `{"equality": {...}, "streams": [...], "within_s": W}` | two invocations agree (below) | REFUTED |
+
+**Equality (WP-2.2.2, DECISION-4).** `{"equality": {"stimulus_a": {...}, "stimulus_b": {...}, "normalization":
+{"newline": "\n", "strip_trailing_newline": false}, "comparator": "bytes_equal" | "json_equal"}, "streams":
+["stdout", ...], "within_s": W}` with an empty spec stimulus: two independent invocations of the same subject, each in
+a fresh evaluation directory of its own (workspace, bytecode cache, protocol file, captures), each under W. SATISFIED
+iff both returned, their exit codes are equal and, for every named stream, the captured bytes — the declared newline
+turned into `\n`, one trailing newline stripped when the policy says so — are equal under the comparator. Both
+stimuli, the policy and the comparator are probe input, so they enter `semantic_hash`; all four are required (an
+empty policy `{}` compares the bytes as captured) — one left out is refused at admission (UNSUPPORTED -> INVALID_SPEC),
+never defaulted. The comparator reads the two normalised results and nothing else; under `json_equal`, bytes that are
+not UTF-8 JSON are unequal (REFUTED), never an error. A half that is not a returned invocation is the observation (an
+absent subject, an expired window — REFUTED —, a signal, a harness failure, a failed pre-step).
+
+**Class table (WP-2.2.2, DECISION-1).** `CLASS_TABLE` declares, per class, its quantifier semantics — the `exits`
+classes measure the one declared invocation exhaustively; `blocks` and `equality` are bounded witness measurements
+(the window, the two invocations), never a proof of the universal property — and the rows (observation facts ->
+verdict) `verdict_of` and `ON_DEADLINE` answer, tested exhaustively.
 
 Stream shapes (a closed set, compared over the captured bytes; prose matching is not offered): an exact string or
 `{"text": s, "newline": nl}` (the text's newlines written as `nl`, default `"\\n"`, compared as bytes), `{"contains":
@@ -102,10 +120,47 @@ PROBE_ID = "probe.cli_invocation"
 #: python_callable's frozen helpers are imported, so this probe's behaviour depends on that source too (§35).
 PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py")
 LOCATOR = re.compile(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*:[A-Za-z_]\w*")
-CLASSES = ("exits", "exits_streams", "exits_files", "blocks")
+CLASSES = ("exits", "exits_streams", "exits_files", "blocks", "equality")
 #: Each class's meaning of an expired observation window (§9.2): what "not returned by W" says about the observable.
 ON_DEADLINE = {"exits": BehaviorVerdict.REFUTED, "exits_streams": BehaviorVerdict.REFUTED,
-               "exits_files": BehaviorVerdict.REFUTED, "blocks": BehaviorVerdict.SATISFIED}
+               "exits_files": BehaviorVerdict.REFUTED, "blocks": BehaviorVerdict.SATISFIED,
+               "equality": BehaviorVerdict.REFUTED}
+#: DECISION-1: the quantifier semantics a class may declare (never "N examples passed => universal property proven").
+QUANTIFIERS = ("exhaustive_finite_domain", "bounded_witness_measurement", "unsupported_for_full_enforcement")
+COMPARATORS = ("bytes_equal", "json_equal")
+_ONE = "the one declared invocation (argv, stdin, workspace, pre-steps): the domain is that invocation alone"
+#: The class table: what each class measures, under which quantifier, and every (observation facts -> verdict) row
+#: `verdict_of` / `ON_DEADLINE` answer (tests/v2/test_c2_cli_calibration.py exercises every row on fixture facts).
+CLASS_TABLE = {
+    "exits": {"quantifier": "exhaustive_finite_domain", "domain": _ONE, "enforcement": "PARTIAL", "rows": (
+        ("window expired", "REFUTED"), ("pre-step failed", "REFUTED"),
+        ("returned, exit code equal", "SATISFIED"), ("returned, exit code differs", "REFUTED"),
+        ("hard exit, exit code equal", "SATISFIED"), ("hard exit, exit code differs", "REFUTED"))},
+    "exits_streams": {"quantifier": "exhaustive_finite_domain", "domain": _ONE, "enforcement": "PARTIAL", "rows": (
+        ("window expired", "REFUTED"), ("pre-step failed", "REFUTED"), ("returned, exit code differs", "REFUTED"),
+        ("returned, exit code equal, every stream matches", "SATISFIED"),
+        ("returned, exit code equal, a stream differs", "REFUTED"),
+        ("returned, exit code equal, a truncated stream under an exact shape", "REFUTED"),
+        ("hard exit, exit code equal, the captured streams match", "SATISFIED"))},
+    "exits_files": {"quantifier": "exhaustive_finite_domain", "domain": _ONE, "enforcement": "PARTIAL", "rows": (
+        ("window expired", "REFUTED"), ("pre-step failed", "REFUTED"), ("returned, exit code differs", "REFUTED"),
+        ("returned, exit code equal, every file matches", "SATISFIED"),
+        ("returned, exit code equal, a file differs", "REFUTED"),
+        ("hard exit before the files were recorded, equals_before", "REFUTED"))},
+    "blocks": {"quantifier": "bounded_witness_measurement", "enforcement": "PARTIAL", "rows": (
+        ("window expired", "SATISFIED"), ("pre-step failed", "REFUTED"), ("returned", "REFUTED"),
+        ("hard exit", "REFUTED")),
+        "domain": "the declared window W witnesses that the invocation had not returned by W; it never proves that "
+                  "it blocks forever"},
+    "equality": {"quantifier": "bounded_witness_measurement", "enforcement": "PARTIAL", "rows": (
+        ("window expired", "REFUTED"), ("pre-step failed in a half", "REFUTED"),
+        ("both returned, exit codes equal, every stream equal", "SATISFIED"),
+        ("both returned, exit codes differ", "REFUTED"), ("both returned, a stream differs", "REFUTED"),
+        ("both returned, json_equal over equal documents in another order", "SATISFIED"),
+        ("both returned, the declared newline and a trailing newline normalised away", "SATISFIED"),
+        ("both returned, evaluation directories not distinct", "REFUTED")),
+        "domain": "the two declared invocations witness equality; they never prove it for every run"},
+}
 WEAKEST_PATH = ("the subject runs inside the harness's child process as the harness user, with that user's filesystem "
                 "and network access, and can read the request and the protocol file; -I interpreter isolation, a "
                 "scrubbed environment, a fresh working directory and a harness-owned bytecode cache "
@@ -216,13 +271,37 @@ def _file_shape_ok(shape) -> bool:
     return kind in ("absent", "equals_before") and v is True
 
 
+def _normalization_ok(n) -> bool:
+    """The policy: an optional non-empty newline (what the subject writes, turned into LF) and an optional flag."""
+    return isinstance(n, dict) and set(n) <= {"newline", "strip_trailing_newline"} \
+        and ("newline" not in n or isinstance(n["newline"], str) and bool(n["newline"])) \
+        and ("strip_trailing_newline" not in n or isinstance(n["strip_trailing_newline"], bool))
+
+
+def _equality_ok(eq) -> bool:
+    """DECISION-4 binds both stimuli, the normalization policy and the comparator: all four are declared."""
+    if not isinstance(eq, dict) or set(eq) != {"stimulus_a", "stimulus_b", "normalization", "comparator"}:
+        return False
+    if not all(isinstance(eq[k], dict) and _stimulus_ok(eq[k]) for k in ("stimulus_a", "stimulus_b")):
+        return False
+    return _normalization_ok(eq["normalization"]) and eq["comparator"] in COMPARATORS
+
+
+def _streams_ok(streams) -> bool:
+    return isinstance(streams, list) and bool(streams) and len(set(streams)) == len(streams) \
+        and set(streams) <= {"stdout", "stderr"}
+
+
 def observation_class(observable, stimulus) -> str | None:
     """The class a spec's observable asks for, or None when this probe cannot give it a meaning."""
     if window_of(observable) is None:
         return None
     obs = {k: v for k, v in plain(dict(observable)).items() if k != "within_s"}
-    if not _stimulus_ok(plain(dict(stimulus))):
+    stim = plain(dict(stimulus))
+    if not _stimulus_ok(stim):
         return None
+    if set(obs) == {"equality", "streams"}:
+        return "equality" if stim == {} and _streams_ok(obs["streams"]) and _equality_ok(obs["equality"]) else None
     if set(obs) == {"blocks"}:
         return "blocks" if obs["blocks"] is True else None
     if not _is_int(obs.get("exit_code")):
@@ -310,9 +389,43 @@ def _file_matches(shape: dict, after: dict | None, before: dict | None) -> bool:
     return after is not None and before is not None and after == before
 
 
+def _normalize(data: bytes, policy: dict) -> bytes:
+    """The declared normalization: the policy's newline becomes LF; one trailing LF is dropped when asked."""
+    data = data.replace(policy.get("newline", "\n").encode("utf-8"), b"\n")
+    if policy.get("strip_trailing_newline") and data.endswith(b"\n"):
+        data = data[:-1]
+    return data
+
+
+def _equal(a: bytes, b: bytes, comparator: str) -> bool:
+    if comparator == "json_equal":
+        try:
+            return json.loads(a.decode("utf-8")) == json.loads(b.decode("utf-8"))
+        except ValueError:   # a JSON error or a decoding error (UnicodeDecodeError is one)
+            return False
+    return a == b
+
+
+def _half_ok(half: dict) -> bool:
+    return half.get("pre_failed") is None and "exit_code" in half
+
+
+def _equality_verdict(obs: dict, facts: dict) -> BehaviorVerdict:
+    eq = obs["equality"]
+    a, b = facts.get("a", {}), facts.get("b", {})
+    ok = facts.get("distinct_evaluation_directories") is True and _half_ok(a) and _half_ok(b) \
+        and a["exit_code"] == b["exit_code"]
+    policy, comparator = eq["normalization"], eq["comparator"]
+    ok = ok and all(_equal(_normalize(_stream_bytes(a.get(s, {})), policy),
+                           _normalize(_stream_bytes(b.get(s, {})), policy), comparator) for s in obs["streams"])
+    return BehaviorVerdict.SATISFIED if ok else BehaviorVerdict.REFUTED
+
+
 def verdict_of(cls: str, observable, facts: dict) -> BehaviorVerdict:
     """What a present subject's facts say about the observable, when the invocation returned (or ended the process)
     before the window closed. Pure over the facts and the capture files they name; no clock."""
+    if cls == "equality":
+        return _equality_verdict(dict(observable), facts)
     if facts.get("pre_failed") is not None or cls == "blocks":
         return BehaviorVerdict.REFUTED   # the state was never built; or blocks: the invocation returned
     obs = dict(observable)
@@ -550,51 +663,94 @@ class CliInvocationProbe(HarnessProbe):
             return Observation(ObservationKind.UNSUPPORTED, detail="observable/stimulus is not a supported class "
                                                                    f"{CLASSES} with a bounded window (within_s); "
                                                                    "refused, not degraded")
-        return self._observe(spec.id, cls, subject["locator"], plain(dict(pi["stimulus"])), plain(dict(pi["observable"])),
-                             at, env)[0]
+        observable = plain(dict(pi["observable"]))
+        if cls == "equality":
+            return self._observe_equality(spec.id, subject["locator"], observable, at, env)
+        return self._observe(spec.id, cls, subject["locator"], plain(dict(pi["stimulus"])), observable, at, env)[0]
 
     def _observe(self, spec_id: str, cls: str, locator: str, stim: dict, observable, at: RevisionRef,
                  env: ExecutionEnv) -> tuple[Observation, dict | None]:
         """One invocation of the subject in a fresh evaluation directory: the observation and, when the harness
         reported, the facts it reported (capture paths included; they are gone when this returns)."""
-        if not os.path.isfile(env.interpreter):
-            return Observation(ObservationKind.HARNESS_FAILED, detail=f"interpreter absent: {env.interpreter}"), None
-        if not os.path.isdir(at.root):
-            return Observation(ObservationKind.HARNESS_FAILED,
-                               detail="cannot inspect: the revision checkout is missing"), None
+        failed = _preflight(at, env)
+        if failed is not None:
+            return failed, None
         try:
             holder = _evaluation_dir(self._scratch)
         except OSError as e:
             return Observation(ObservationKind.HARNESS_FAILED, detail=f"the evaluation directory cannot be created: "
                                                                      f"{type(e).__name__}"), None
         with holder as work:
-            if _inside(work, at.root):
-                return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory lies inside the "
-                                                                         "revision checkout: refused"), None
-            nonce = secrets.token_hex(16)
-            files = [_ws_name(k) for k in dict(observable).get("files", {})]   # a frozen observable's keys are sorted
+            return self._observe_in(work, spec_id, cls, locator, stim, observable, at, env,
+                                    lambda facts: verdict_of(cls, observable, facts))
+
+    def _observe_equality(self, spec_id: str, locator: str, observable: dict, at: RevisionRef,
+                          env: ExecutionEnv) -> Observation:
+        """DECISION-4: two independent invocations, two fresh evaluation directories, one comparison of the
+        normalised captures. A half that is not a returned invocation is the observation."""
+        failed = _preflight(at, env)
+        if failed is not None:
+            return failed
+        eq, window = observable["equality"], {"within_s": observable["within_s"]}
+        try:
+            holder_a, holder_b = _evaluation_dir(self._scratch), _evaluation_dir(self._scratch)
+        except OSError as e:
+            return Observation(ObservationKind.HARNESS_FAILED, detail=f"the evaluation directory cannot be created: "
+                                                                     f"{type(e).__name__}")
+        with holder_a as work_a, holder_b as work_b:
+            halves = {}
+            for side, work in (("a", work_a), ("b", work_b)):
+                o, facts = self._observe_in(work, f"{spec_id}/{side}", "equality", locator, eq[f"stimulus_{side}"],
+                                            window, at, env,
+                                            lambda f: BehaviorVerdict.SATISFIED if _half_ok(f) else BehaviorVerdict.REFUTED)
+                if o.kind is not ObservationKind.OBSERVED or o.verdict is BehaviorVerdict.REFUTED:
+                    return o   # absent, expired (REFUTED), a signal, a harness failure, a failed pre-step: the observation
+                halves[side] = facts
+            facts = {"subject": "present", "a": halves["a"], "b": halves["b"],
+                     "distinct_evaluation_directories": os.path.realpath(work_a) != os.path.realpath(work_b)}
+            return Observation(ObservationKind.OBSERVED, verdict_of("equality", observable, facts),
+                               detail=json.dumps(_public(facts)))
+
+    def _observe_in(self, work: str, spec_id: str, cls: str, locator: str, stim: dict, observable, at: RevisionRef,
+                    env: ExecutionEnv, decide) -> tuple[Observation, dict | None]:
+        """One invocation inside the evaluation directory `work`; `decide` maps the reported facts to the verdict."""
+        if _inside(work, at.root):
+            return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory lies inside the "
+                                                                     "revision checkout: refused"), None
+        nonce = secrets.token_hex(16)
+        files = [_ws_name(k) for k in dict(observable).get("files", {})]   # a frozen observable's keys are sorted
+        try:
+            ask, ws, pycache = _prepare(work, at.root, locator, stim, files, nonce)
+        except OSError as e:
+            return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory cannot be "
+                                                                     f"prepared: {type(e).__name__}"), None
+        log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
+        try:
+            run = ProcessRange(f"probe {spec_id}", _harness_argv(env.interpreter, ask, pycache), cwd=ws,
+                               env=_child_env(ws), output=log, grace_s=_GRACE_S, wait_s=_WAIT_S)
             try:
-                ask, ws, pycache = _prepare(work, at.root, locator, stim, files, nonce)
-            except OSError as e:
-                return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory cannot be "
-                                                                         f"prepared: {type(e).__name__}"), None
-            log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
-            try:
-                run = ProcessRange(f"probe {spec_id}", _harness_argv(env.interpreter, ask, pycache), cwd=ws,
-                                   env=_child_env(ws), output=log, grace_s=_GRACE_S, wait_s=_WAIT_S)
-                try:
-                    run.start()
-                    if self._on_range is not None:
-                        self._on_range(run)
-                except (RangeError, OSError) as e:
-                    return Observation(ObservationKind.HARNESS_FAILED, detail=f"the harness cannot launch: "
-                                                                             f"{type(e).__name__}"), None
-            finally:
-                log.close()
-            try:
-                return _watch(run, os.path.join(work, "protocol.log"), nonce, cls, stim, observable, env, work, ws)
-            finally:
-                run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+                run.start()
+                if self._on_range is not None:
+                    self._on_range(run)
+            except (RangeError, OSError) as e:
+                return Observation(ObservationKind.HARNESS_FAILED, detail=f"the harness cannot launch: "
+                                                                         f"{type(e).__name__}"), None
+        finally:
+            log.close()
+        try:
+            return _watch(run, os.path.join(work, "protocol.log"), nonce, cls, window_of(observable), files,
+                          bool(stim.get("pre")), env, work, ws, decide)
+        finally:
+            run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+
+
+def _preflight(at: RevisionRef, env: ExecutionEnv) -> Observation | None:
+    """What must function for the probe to look at all (harness preconditions 1 and 2)."""
+    if not os.path.isfile(env.interpreter):
+        return Observation(ObservationKind.HARNESS_FAILED, detail=f"interpreter absent: {env.interpreter}")
+    if not os.path.isdir(at.root):
+        return Observation(ObservationKind.HARNESS_FAILED, detail="cannot inspect: the revision checkout is missing")
+    return None
 
 
 def _prepare(work: str, root: str, locator: str, stim: dict, files: list[str], nonce: str) -> tuple[str, str, str]:
@@ -620,14 +776,13 @@ def _prepare(work: str, root: str, locator: str, stim: dict, files: list[str], n
     return ask, ws, pycache
 
 
-def _watch(run, proto: str, nonce: str, cls: str, stim: dict, observable, env: ExecutionEnv, work: str,
-           ws: str) -> tuple[Observation, dict | None]:
+def _watch(run, proto: str, nonce: str, cls: str, window: float, files: list, pre: bool, env: ExecutionEnv,
+           work: str, ws: str, decide) -> tuple[Observation, dict | None]:
     """READY and DISPATCHED under the harness watchdog, then RESULT under the subject's window; the process's exit is
     lifecycle evidence read from the range, and the marker file is read to its end after it (§9.4)."""
     state, seen = _await(run, proto, nonce, "DISPATCHED", time.monotonic() + env.timeout_s)
     if state != "LINE":
         return _harness_failure(run, state, seen, env.timeout_s), None
-    window = window_of(observable)
     state, seen = _await(run, proto, nonce, "RESULT", time.monotonic() + window)
     if state == "TIMEOUT":
         if run.members():   # measured on the range: the subject's process is still there at W
@@ -643,12 +798,12 @@ def _watch(run, proto: str, nonce: str, cls: str, stim: dict, observable, env: E
         if facts.get("subject") == "absent":   # every observable here is positive: not observed over an absent subject
             return _after_dispatch(run, Observation(ObservationKind.SUBJECT_ABSENT, BehaviorVerdict.REFUTED,
                                                     detail=facts.get("note", ""))), None
-        return _after_dispatch(run, Observation(ObservationKind.OBSERVED, verdict_of(cls, observable, facts),
+        return _after_dispatch(run, Observation(ObservationKind.OBSERVED, decide(facts),
                                                 detail=json.dumps(_public(facts)))), facts
-    return _hard_exit(run, seen, cls, stim, observable, work, ws)
+    return _hard_exit(run, seen, files, pre, work, ws, decide)
 
 
-def _hard_exit(run, seen: dict, cls: str, stim: dict, observable, work: str, ws: str) -> tuple[Observation, dict | None]:
+def _hard_exit(run, seen: dict, files: list, pre: bool, work: str, ws: str, decide) -> tuple[Observation, dict | None]:
     """After DISPATCHED the process ended with no RESULT in the marker file (§9.3 CASES B and C): by a signal the
     controller did not send — NON_CONTROLLER_SIGNAL; by an exit status — the subject ended the process itself, an
     observation of the invocation that was running (its exit code, the capture files as its streams)."""
@@ -658,18 +813,17 @@ def _hard_exit(run, seen: dict, cls: str, stim: dict, observable, work: str, ws:
                                                 detail=f"the process ended by signal {-code} after DISPATCHED, and "
                                                        "this controller's signal ledger is empty: it did not "
                                                        "send it")), None
-    if "MAIN" not in seen and (seen.get("PRE") or stim.get("pre")):
+    if "MAIN" not in seen and (seen.get("PRE") or pre):
         step = int(seen["PRE"][-1]) if seen.get("PRE") else 0
         facts = {"subject": "present", "pre_failed": step, "exit_code": code, "hard_exit": True}
         return _after_dispatch(run, Observation(ObservationKind.OBSERVED, BehaviorVerdict.REFUTED,
                                                 detail=json.dumps(facts))), facts
     before = json.loads(seen["MAIN"][0])["before"] if seen.get("MAIN") else {}
-    names = [_ws_name(k) for k in dict(observable).get("files", {})]
     facts = {"subject": "present", "exit_code": code, "hard_exit": True,
              "stdout": _stream_fact(os.path.join(work, "stdout.bin")),
              "stderr": _stream_fact(os.path.join(work, "stderr.bin")), "before": before,
-             "files": {n: _file_fact(os.path.join(ws, *n.split("/"))) for n in names}}
-    return _after_dispatch(run, Observation(ObservationKind.OBSERVED, verdict_of(cls, observable, facts),
+             "files": {n: _file_fact(os.path.join(ws, *n.split("/"))) for n in files}}
+    return _after_dispatch(run, Observation(ObservationKind.OBSERVED, decide(facts),
                                             detail=json.dumps(_public(facts)))), facts
 
 

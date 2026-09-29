@@ -360,18 +360,27 @@ for _t in ("aisef2/control/owner.py::TAXONOMY", "aisef2/control/owner.py::classi
 # hard-exit and harness-failure rules, the command line) by the subprocess-backed cases, DESIGN-CHECK-1 and the
 # FM2-CLI / FM2-PYC-CLI fault families. Scalar constants (PROBE_ID, STREAM_CAP, PLACEHOLDER, POLL_S, HARNESS) have no
 # mutation site and are not targets; HARNESS, the child script, is killed through observe's cases.
+#: the pure functions, the class table (WP-2.2.2) and the equality shape, comparator and verdict: in-process
 _CLI_PURE = ["tests/v2/test_c2_cli_verdicts.py"]
-_CLI_HARNESS = ["tests/v2/test_c2_cli_invocation.py"]
+#: the decision table over test doubles first (a mutant of the watch loop dies there in a second; the runner stops at
+#: the first failing file), the real subjects only for what the doubles cannot say
+_CLI_HARNESS = ["tests/v2/test_c2_cli_protocol.py", "tests/v2/test_c2_cli_invocation.py"]
+#: WP-2.2.2: the two-invocation path on real subjects
+_CLI_CALIBRATION = ["tests/v2/test_c2_cli_calibration.py"]
 C2P2_TARGETS: dict[str, list[str]] = {
     **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_PURE for f in (
         "_is_int", "_content_ok", "_bytes_of", "_name_ok", "_ws_key_ok", "_argv_ok", "_stimulus_ok", "_stream_shape_ok",
         "_file_shape_ok", "observation_class", "spec_class", "_sha_file", "_stream_fact", "_file_fact", "_stream_bytes",
         "_stream_matches", "_file_matches", "verdict_of", "_ws_name", "_substitute", "_public", "_child_env",
         "_protocol", "_prepare", "CLASSES", "ON_DEADLINE", "STREAM_SHAPES", "FILE_SHAPES",
-        "CliInvocationProbe.enforcement", "CliInvocationProbe.harness_preconditions")},
+        "CliInvocationProbe.enforcement", "CliInvocationProbe.harness_preconditions",
+        "_normalization_ok", "_equality_ok", "_streams_ok", "_normalize", "_equal", "_half_ok", "_equality_verdict",
+        "CLASS_TABLE", "QUANTIFIERS", "COMPARATORS")},
     **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_HARNESS for f in (
         "PROBE_SOURCES", "_probe_digest", "_await", "CliInvocationProbe.__init__", "CliInvocationProbe.observe",
-        "CliInvocationProbe._observe", "_watch", "_hard_exit", "_harness_failure")},
+        "CliInvocationProbe._observe", "CliInvocationProbe._observe_in", "_preflight", "_watch", "_hard_exit",
+        "_harness_failure")},
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality": [*_CLI_HARNESS[:1], *_CLI_CALIBRATION],
     "aisef2/probe/cli_invocation.py::_harness_argv": [*_CLI_PURE, *_CLI_HARNESS],
 }
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,

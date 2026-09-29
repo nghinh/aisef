@@ -1,0 +1,31 @@
+{
+ "subject": {
+  "kind": "cli_invocation",
+  "locator": "calib_cli:__main__"
+ },
+ "stimulus": {},
+ "observable": {
+  "equality": {
+   "stimulus_a": {
+    "argv": [
+     "verify"
+    ]
+   },
+   "stimulus_b": {
+    "argv": [
+     "verify"
+    ]
+   },
+   "normalization": {
+    "newline": "\n",
+    "strip_trailing_newline": true
+   },
+   "comparator": "bytes_equal"
+  },
+  "streams": [
+   "stdout"
+  ],
+  "within_s": 5
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}

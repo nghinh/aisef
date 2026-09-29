@@ -30,7 +30,7 @@ def sha(data: bytes) -> str:
 def spec(locator="app:__main__", observable=None, stimulus=None, kind="cli_invocation"):
     return ProductProofSpec.create(
         contract_id="BC", probe_id=ci.PROBE_ID, probe_digest=ci.DIGEST,
-        probe_input={"subject": {"kind": kind, "locator": locator}, "stimulus": stimulus or ARGV,
+        probe_input={"subject": {"kind": kind, "locator": locator}, "stimulus": ARGV if stimulus is None else stimulus,
                      "observable": observable or {"exit_code": 0, **W}, "subject_absence": "REQUIRES_SUBJECT"},
         candidate_expectation=S, compiler_id="t", compiler_digest="c" * 64)
 
@@ -103,8 +103,8 @@ class Classes(unittest.TestCase):
         self.assertEqual(ci.spec_class(spec("mod:main_entry")), "exits")
 
     def test_the_class_vocabulary_and_the_expired_window_verdicts(self):
-        self.assertEqual(ci.CLASSES, ("exits", "exits_streams", "exits_files", "blocks"))
-        self.assertEqual(ci.ON_DEADLINE, {"exits": R, "exits_streams": R, "exits_files": R, "blocks": S})
+        self.assertEqual(ci.CLASSES, ("exits", "exits_streams", "exits_files", "blocks", "equality"))
+        self.assertEqual(ci.ON_DEADLINE, {"exits": R, "exits_streams": R, "exits_files": R, "blocks": S, "equality": R})
         self.assertEqual(ci.STREAM_SHAPES, ("text", "contains", "regex", "lines", "first_word"))
         self.assertEqual(ci.FILE_SHAPES, ("sha256", "text", "absent", "equals_before"))
         self.assertEqual((ci.PLACEHOLDER, ci.STREAM_CAP), ("<ws>", 8 * 1024 * 1024))
@@ -370,6 +370,164 @@ class Protocol(unittest.TestCase):
         self.assertEqual((req2["argv"], req2["pre"], req2["stdin"], req2["files"], os.listdir(ws2)), ([], [], None, [], []))
         self.assertFalse(os.path.exists(os.path.join(bare, "stdin.bin")))
 
+
+class EqualityShape(unittest.TestCase):
+    def test_the_equality_shape_is_closed(self):
+        ok = {"equality": {"stimulus_a": {"argv": ["a"]}, "stimulus_b": {"argv": ["b"]}, "normalization": {},
+                           "comparator": "bytes_equal"}, "streams": ["stdout"], "within_s": 5}
+        self.assertEqual(ci.observation_class(ok, {}), "equality")
+        self.assertEqual(ci.spec_class(spec("app:__main__", ok, {})), "equality")
+        base = ok
+        bad = [
+            dict(base, streams=[]), dict(base, streams=["stdout", "stdout"]), dict(base, streams=["out"]),
+            dict(base, streams="stdout"), dict(base, equality=dict(base["equality"], comparator="prose")),
+            dict(base, equality=dict(base["equality"], normalization={"newline": 1})),
+            dict(base, equality=dict(base["equality"], normalization={"newline": ""})),
+            dict(base, equality=dict(base["equality"], normalization={"strip_trailing_newline": 1})),
+            dict(base, equality=dict(base["equality"], normalization={"x": 1})),
+            dict(base, equality=dict(base["equality"], normalization="x")),
+            *({k: v for k, v in base["equality"].items() if k != gone} for gone in base["equality"]),
+            dict(base, equality=dict(base["equality"], stimulus_a={"args": []})),
+            dict(base, equality=dict(base["equality"], stimulus_a=["a"])),
+            dict(base, equality=dict(base["equality"], extra=1)), dict(base, equality="x"),
+            dict(base, exit_code=0), {k: v for k, v in base.items() if k != "streams"},
+        ]
+        for observable in bad:
+            with self.subTest(observable=observable):
+                self.assertIsNone(ci.observation_class(observable, {}))
+        self.assertIsNone(ci.observation_class(ok, {"argv": ["x"]}))   # the spec's own stimulus stays empty
+        self.assertEqual(ci.observation_class(dict(base, equality={**base["equality"], "normalization": {"newline": "\r\n"},
+                                                                    "comparator": "json_equal"}), {}), "equality")
+        self.assertEqual(ci.observation_class(dict(base, streams=["stderr", "stdout"]), {}), "equality")
+        for n in ({}, {"newline": "\r\n"}, {"strip_trailing_newline": True}, {"newline": "\n", "strip_trailing_newline": False}):
+            self.assertIs(ci._normalization_ok(n), True, n)
+        for n in ("x", [], {"newline": None}, {"newline": ""}, {"strip_trailing_newline": "yes"}, {"other": 1}):
+            self.assertIs(ci._normalization_ok(n), False, n)
+        for s in (["stdout"], ["stderr"], ["stdout", "stderr"]):
+            self.assertIs(ci._streams_ok(s), True, s)
+        for s in ([], ["stdout", "stdout"], ["x"], "stdout", ("stdout",), None):
+            self.assertIs(ci._streams_ok(s), False, s)
+        self.assertIs(ci._equality_ok(base["equality"]), True)
+        full = {"stimulus_a": {}, "stimulus_b": {}, "normalization": {}, "comparator": "bytes_equal"}
+        self.assertIs(ci._equality_ok(full), True)
+        for eq in ({}, {"stimulus_a": {}}, {"stimulus_a": {}, "stimulus_b": {}}, dict(full, stimulus_b=[]), dict(full, x=1),
+                   dict(full, stimulus_a={"argv": "a"}), dict(full, comparator="eq"), dict(full, normalization=[]),
+                   *({k: v for k, v in full.items() if k != gone} for gone in full), "x", None):
+            self.assertIs(ci._equality_ok(eq), False, eq)
+
+
+class Table(unittest.TestCase):
+    """CLICAL-4: every row of the class table on fixture facts, both ways exhaustive."""
+
+    def setUp(self):
+        self._d = tempfile.TemporaryDirectory(prefix="aisef2-cli-table-")
+        self.addCleanup(self._d.cleanup)
+        self.dir = pathlib.Path(self._d.name)
+        self.n = 0
+
+    def stream(self, data: bytes, **more) -> dict:
+        self.n += 1
+        path = self.dir / f"s{self.n}"
+        path.write_bytes(data)
+        return {"path": str(path), "size": len(data), "sha256": sha(data), "truncated": False, **more}
+
+    def returned(self, code=0, out=b"", err=b"", **more) -> dict:
+        return {"subject": "present", "exit_code": code, "exit_status_raw": code, "raised": None,
+                "stdout": self.stream(out), "stderr": self.stream(err), "pre": [], "before": {}, "files": {}, **more}
+
+    def rows(self, cls) -> dict:
+        """label -> (observable, facts) for every row of `cls` but the expired window."""
+        present, other = {"sha256": sha(b"data")}, {"sha256": sha(b"date")}
+        failed = {"subject": "present", "pre_failed": 0, "pre": [{"exit_code": 2}]}
+        if cls == "exits":
+            o = {"exit_code": 2}
+            return {"pre-step failed": (o, failed), "returned, exit code equal": (o, self.returned(2)),
+                    "returned, exit code differs": (o, self.returned(3)),
+                    "hard exit, exit code equal": (o, {"subject": "present", "exit_code": 2, "hard_exit": True}),
+                    "hard exit, exit code differs": (o, {"subject": "present", "exit_code": 0, "hard_exit": True})}
+        if cls == "exits_streams":
+            o = {"exit_code": 0, "stdout": "ok\n", "stderr": {"lines": 0}}
+            return {"pre-step failed": (o, failed), "returned, exit code differs": (o, self.returned(1, b"ok\n")),
+                    "returned, exit code equal, every stream matches": (o, self.returned(0, b"ok\n")),
+                    "returned, exit code equal, a stream differs": (o, self.returned(0, b"ok\n", b"warn\n")),
+                    "returned, exit code equal, a truncated stream under an exact shape":
+                        (o, dict(self.returned(0), stdout=self.stream(b"ok\n", truncated=True))),
+                    "hard exit, exit code equal, the captured streams match":
+                        (o, {"subject": "present", "exit_code": 0, "hard_exit": True, "stdout": self.stream(b"ok\n"),
+                             "stderr": self.stream(b""), "before": {}, "files": {}})}
+        if cls == "exits_files":
+            o = {"exit_code": 0, "files": {"<ws>/a": {"sha256": sha(b"data")}, "<ws>/b": {"equals_before": True}}}
+            return {"pre-step failed": (o, failed),
+                    "returned, exit code differs": (o, self.returned(1, before={"b": present}, files={"a": present, "b": present})),
+                    "returned, exit code equal, every file matches":
+                        (o, self.returned(0, before={"b": present}, files={"a": present, "b": present})),
+                    "returned, exit code equal, a file differs":
+                        (o, self.returned(0, before={"b": present}, files={"a": other, "b": present})),
+                    "hard exit before the files were recorded, equals_before":
+                        (o, {"subject": "present", "exit_code": 0, "hard_exit": True, "stdout": self.stream(b""),
+                             "stderr": self.stream(b""), "before": {}, "files": {"a": present, "b": present}})}
+        if cls == "blocks":
+            o = {"blocks": True}
+            return {"pre-step failed": (o, failed), "returned": (o, self.returned(0)),
+                    "hard exit": (o, {"subject": "present", "exit_code": 0, "hard_exit": True})}
+        o = {"equality": {"stimulus_a": {"argv": ["a"]}, "stimulus_b": {"argv": ["a"]}, "normalization": {},
+                          "comparator": "bytes_equal"}, "streams": ["stdout"]}
+        half = lambda out, code=0: self.returned(code, out)  # noqa: E731
+        both = lambda a, b, distinct=True: {"subject": "present", "a": a, "b": b, "distinct_evaluation_directories": distinct}  # noqa: E731
+        return {"pre-step failed in a half": (o, both(failed, half(b"x"))),
+                "both returned, exit codes equal, every stream equal": (o, both(half(b"x\n"), half(b"x\n"))),
+                "both returned, exit codes differ": (o, both(half(b"x\n", 1), half(b"x\n", 2))),
+                "both returned, a stream differs": (o, both(half(b"x\n"), half(b"y\n"))),
+                "both returned, json_equal over equal documents in another order":
+                    (dict(o, equality=dict(o["equality"], comparator="json_equal")),
+                     both(half(b'{"a": 1, "b": 2}'), half(b'{"b": 2, "a": 1}'))),
+                "both returned, the declared newline and a trailing newline normalised away":
+                    (dict(o, equality=dict(o["equality"], normalization={"newline": "\r\n", "strip_trailing_newline": True})),
+                     both(half(b"x\r\n"), half(b"x"))),
+                "both returned, evaluation directories not distinct": (o, both(half(b"x\n"), half(b"x\n"), False))}
+
+    def test_CLICAL_4_the_class_table_answers_every_row_and_nothing_else(self):
+        self.assertEqual(tuple(ci.CLASS_TABLE), ci.CLASSES)
+        self.assertEqual(ci.QUANTIFIERS, ("exhaustive_finite_domain", "bounded_witness_measurement",
+                                          "unsupported_for_full_enforcement"))
+        for cls, table in ci.CLASS_TABLE.items():
+            with self.subTest(cls=cls):
+                self.assertIn(table["quantifier"], ci.QUANTIFIERS)
+                self.assertEqual(table["enforcement"], "PARTIAL")
+                self.assertTrue(table["domain"])
+                rows = dict(table["rows"])
+                self.assertEqual(len(rows), len(table["rows"]))   # no duplicate label
+                self.assertEqual(BehaviorVerdict(rows.pop("window expired")), ci.ON_DEADLINE[cls])
+                fixtures = self.rows(cls)
+                self.assertEqual(sorted(fixtures), sorted(rows))   # every row has facts, every facts a row
+                for label, verdict in rows.items():
+                    with self.subTest(row=label):
+                        observable, facts = fixtures[label]
+                        self.assertIs(ci.verdict_of(cls, {**observable, "within_s": 5}, facts), BehaviorVerdict(verdict))
+        self.assertEqual({cls: t["quantifier"] for cls, t in ci.CLASS_TABLE.items()},
+                         {"exits": "exhaustive_finite_domain", "exits_streams": "exhaustive_finite_domain",
+                          "exits_files": "exhaustive_finite_domain", "blocks": "bounded_witness_measurement",
+                          "equality": "bounded_witness_measurement"})
+
+    def test_the_normalisation_and_the_comparators_are_exact(self):
+        self.assertEqual(ci._normalize(b"a\r\nb\r\n", {"newline": "\r\n"}), b"a\nb\n")
+        self.assertEqual(ci._normalize(b"a\r\nb\r\n", {}), b"a\r\nb\r\n")
+        self.assertEqual(ci._normalize(b"a\n\n", {"strip_trailing_newline": True}), b"a\n")
+        self.assertEqual(ci._normalize(b"a", {"strip_trailing_newline": True}), b"a")
+        self.assertEqual(ci._normalize(b"a\r\n", {"newline": "\r\n", "strip_trailing_newline": True}), b"a")
+        self.assertEqual(ci._normalize(b"a\r\n", {"newline": "\n", "strip_trailing_newline": False}), b"a\r\n")
+        self.assertEqual(ci._normalize(b"ab", {}), b"ab")   # no policy: the bytes as captured
+        self.assertIs(ci._equal(b"a", b"a", "bytes_equal"), True)
+        self.assertIs(ci._equal(b"a", b"a ", "bytes_equal"), False)
+        self.assertIs(ci._equal(b'{"a": [1]}', b'{ "a" : [ 1 ] }', "json_equal"), True)
+        self.assertIs(ci._equal(b'{"a": 1}', b'{"a": 2}', "json_equal"), False)
+        self.assertIs(ci._equal(b"x", b"x", "json_equal"), False)
+        self.assertIs(ci._equal(b"\xff", b"\xff", "json_equal"), False)
+        self.assertIs(ci._equal(b"1", b"1", "json_equal"), True)
+        self.assertEqual(ci.COMPARATORS, ("bytes_equal", "json_equal"))
+        self.assertIs(ci._half_ok({"exit_code": 0}), True)
+        self.assertIs(ci._half_ok({}), False)
+        self.assertIs(ci._half_ok({"exit_code": 0, "pre_failed": 0}), False)
 
 if __name__ == "__main__":
     unittest.main()
