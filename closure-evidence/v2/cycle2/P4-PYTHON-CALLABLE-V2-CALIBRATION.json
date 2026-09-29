@@ -4,7 +4,7 @@
  "phase": "C2-P4",
  "authority": "owner DECISION-6 'KEEP_CYCLE1_PROBE_SECOND_IDENTITY' (AISEF V2 — CYCLE-2 OWNER DECISIONS / WP-2.0.1 AUTHORIZATION, 2026-09-28); CYCLE2-PROBE-TAXONOMY-PROPOSAL §5; CYCLE2-F5-COMPATIBILITY-REPORT §2.4",
  "identities": {
-  "head": "c1de0cbb5237894c9bb48d353c90d2d90eb2f47f",
+  "head": "e53e182bde962b9e9de23ad3f7808d8fcba1d23f",
   "aisef2_tree": "07d492342815f14d3576493276dadad503226fc3",
   "cycle2_manifest": {
    "path": "docs/implementation/v2/cycle2/cycle2-manifest.json",
@@ -42,7 +42,8 @@
    "fcbb9dd112f893a94c3fc9b9a9aa014e6265cf9e",
    "95ccfa97a8a49ed6045304de66c105f8d17bb47a",
    "323fa4fcc97aa50104d87e8a1015e358e7f421ba",
-   "c1de0cbb5237894c9bb48d353c90d2d90eb2f47f"
+   "c1de0cbb5237894c9bb48d353c90d2d90eb2f47f",
+   "e53e182bde962b9e9de23ad3f7808d8fcba1d23f"
   ],
   "parent_is_an_ancestor": true
  },
@@ -178,7 +179,7 @@
    "observation_class": "exists",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/exists/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/exists/negative",
-   "demonstrated_at": 1790659308.2329211,
+   "demonstrated_at": 1790662562.6962109,
    "qualified": true
   },
   {
@@ -187,7 +188,7 @@
    "observation_class": "returns",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns/negative",
-   "demonstrated_at": 1790659308.625844,
+   "demonstrated_at": 1790662563.082861,
    "qualified": true
   },
   {
@@ -196,7 +197,7 @@
    "observation_class": "raises",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises/negative",
-   "demonstrated_at": 1790659309.0153081,
+   "demonstrated_at": 1790662563.470154,
    "qualified": true
   },
   {
@@ -205,7 +206,7 @@
    "observation_class": "blocks",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/blocks/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/blocks/negative",
-   "demonstrated_at": 1790659309.948437,
+   "demonstrated_at": 1790662564.3921988,
    "qualified": true
   },
   {
@@ -214,7 +215,7 @@
    "observation_class": "returns_bytes",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/negative",
-   "demonstrated_at": 1790659310.368782,
+   "demonstrated_at": 1790662564.822731,
    "qualified": true
   },
   {
@@ -223,7 +224,7 @@
    "observation_class": "equals",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/equals/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/equals/negative",
-   "demonstrated_at": 1790659310.7523682,
+   "demonstrated_at": 1790662565.208363,
    "qualified": true
   },
   {
@@ -232,7 +233,7 @@
    "observation_class": "raises_attrs",
    "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/negative",
-   "demonstrated_at": 1790659311.1427,
+   "demonstrated_at": 1790662565.603714,
    "qualified": true
   }
  ],
@@ -357,7 +358,7 @@
     "-P",
     "validation/v2/owned_run.py",
     "--out",
-    "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/c2-owned-sx3as0gb/owned.json",
+    "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/c2-owned-ocjrdhgo/owned.json",
     "--",
     "/opt/homebrew/opt/python@3.14/bin/python3.14",
     "-m",
@@ -367,7 +368,7 @@
    ],
    "exit": 0,
    "ran": 27,
-   "seconds": 35.585,
+   "seconds": 36.644,
    "ok": true,
    "failing": [],
    "owned": {
@@ -387,7 +388,7 @@
     "-P",
     "validation/v2/owned_run.py",
     "--out",
-    "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/c2-owned-1kf7cjff/owned.json",
+    "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/c2-owned-p3ujgxsh/owned.json",
     "--",
     "/opt/homebrew/opt/python@3.14/bin/python3.14",
     "-m",
@@ -397,7 +398,7 @@
    ],
    "exit": 0,
    "ran": 10,
-   "seconds": 3.232,
+   "seconds": 4.031,
    "ok": true,
    "failing": [],
    "owned": {
@@ -766,5 +767,120 @@
   "expectations": "compared through aisef2.product.contract.plain (the JSON form of the spec's frozen data); the Cycle-1 probe's json round-trip raises TypeError on a nested returns expectation — measured on the frozen module, not changed"
  },
  "problems": [],
- "verdict": "QUALIFIED"
+ "verdict": "QUALIFIED",
+ "cross_platform": {
+  "rule": "the record's commit's CI runs the whole suite, tests/v2/test_python_callable_v2*.py included, on every platform of the matrix; the probe and fixture bytes it measured are the ones this record binds by digest",
+  "ci": {
+   "run": 36525916573,
+   "commit": "e53e182bde962b9e9de23ad3f7808d8fcba1d23f",
+   "attempts": [
+    {
+     "attempt": 1,
+     "jobs": [
+      {
+       "job": "lint",
+       "job_id": 109268816085,
+       "conclusion": "success",
+       "started_at": "2026-09-29T05:23:16Z",
+       "completed_at": "2026-09-29T05:23:24Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.11)",
+       "job_id": 109268816450,
+       "conclusion": "success",
+       "started_at": "2026-09-29T05:23:17Z",
+       "completed_at": "2026-09-29T05:41:55Z",
+       "tests_run": 4816,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.12)",
+       "job_id": 109268816487,
+       "conclusion": "success",
+       "started_at": "2026-09-29T05:23:17Z",
+       "completed_at": "2026-09-29T05:43:00Z",
+       "tests_run": 4816,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.13)",
+       "job_id": 109268816439,
+       "conclusion": "success",
+       "started_at": "2026-09-29T05:23:17Z",
+       "completed_at": "2026-09-29T05:41:14Z",
+       "tests_run": 4816,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.14)",
+       "job_id": 109268816528,
+       "conclusion": "success",
+       "started_at": "2026-09-29T05:23:18Z",
+       "completed_at": "2026-09-29T05:43:39Z",
+       "tests_run": 4816,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (windows-latest, 3.11)",
+       "job_id": 109268816268,
+       "conclusion": "success",
+       "started_at": "2026-09-29T05:23:50Z",
+       "completed_at": "2026-09-29T06:15:15Z",
+       "tests_run": 4813,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+       ]
+      },
+      {
+       "job": "wheel",
+       "job_id": 109268816253,
+       "conclusion": "success",
+       "started_at": "2026-09-29T05:23:18Z",
+       "completed_at": "2026-09-29T05:23:42Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "platforms": [
+   "linux",
+   "windows"
+  ]
+ }
 }
