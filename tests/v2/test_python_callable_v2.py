@@ -421,15 +421,18 @@ class Identity(_Revisions):
         self.assertRegex(self.run_(c1).detail, "^the spec is bound to probe.python_callable@")
         self.assertRegex(self.run_(c2, probe=pc.PythonCallableProbe()).detail, "^the spec is bound to probe.python_callable_v2@")
         self.assertEqual(catalog.problems_of(catalog.CATALOG), [])
+        # the python_callable kind's entries: other kinds may be registered and active beside it (the integrated
+        # Cycle-2 catalog holds file_artifact, cli_invocation and process_effect too)
         active = catalog.active()
-        self.assertEqual(list(active), [SubjectKind.PYTHON_CALLABLE])
+        self.assertIn(SubjectKind.PYTHON_CALLABLE, active)
         self.assertEqual((active[SubjectKind.PYTHON_CALLABLE].probe_id, active[SubjectKind.PYTHON_CALLABLE].cycle),
                          (pc2.PROBE_ID, 2))
         self.assertIsInstance(catalog.catalogue()[SubjectKind.PYTHON_CALLABLE], pc2.PythonCallableV2Probe)
-        self.assertEqual([(e.probe_id, e.probe_digest, e.active, e.cycle) for e in catalog.CATALOG],
+        mine = [e for e in catalog.CATALOG if e.subject_kind is SubjectKind.PYTHON_CALLABLE]
+        self.assertEqual([(e.probe_id, e.probe_digest, e.active, e.cycle) for e in mine],
                          [(pc.PROBE_ID, cb.CYCLE1_PROBE["digest"], False, 1), (pc2.PROBE_ID, pc2.DIGEST, True, 2)])
-        self.assertEqual(list(catalog.probes_by_id()), [pc.PROBE_ID, pc2.PROBE_ID])
-        self.assertEqual(len([e for e in catalog.CATALOG if e.active]), 1)
+        self.assertEqual([i for i in catalog.probes_by_id() if i in (pc.PROBE_ID, pc2.PROBE_ID)], [pc.PROBE_ID, pc2.PROBE_ID])
+        self.assertEqual(len([e for e in mine if e.active]), 1)
 
 
 class LayoutInvariance(unittest.TestCase):

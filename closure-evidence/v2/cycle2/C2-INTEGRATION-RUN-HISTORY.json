@@ -1,0 +1,34 @@
+{
+ "record": "AISEF V2 — C2-INTEGRATION (the integrated Cycle-2 candidate: C2-P1..P4 merged) RUN HISTORY",
+ "policy": "closure-evidence/v2/V2-RETRY-POLICY.json",
+ "rule": "append-only; every full-suite and CI attempt of this lane, failed or not; validated by validation/v2/run_history.py entry rules; registered in run_history.HISTORIES at integration",
+ "entries": [
+  {
+   "seq": 1,
+   "commit": "97353417a04ee855eb4fd9532e59b743f4bf80f8",
+   "package": "integration candidate 9735341 (merges e1b7890, 3b23c80, 9923372 + registration and closures): local gate (not pushed)",
+   "attempt": 1,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "gate (full suite in the owned range)",
+   "result": "FAIL",
+   "tests_run": 4982,
+   "gate_effect": "COUNTS",
+   "classification": "INTEGRATION",
+   "classification_evidence": "local darwin gate (4982 ran, failures=1, skipped=21; owned processes 0/0/0/0, V1 guard PASS, tree clean; not pushed): tests/v2/test_python_callable_v2.py Identity.test_PCV2_6_a_cycle1_spec_still_resolves_and_runs_while_the_second_identity_is_the_active_one asserted that the catalog's active kinds are exactly [python_callable] (and, after it, that the whole catalog, the probe ids and the active entries are exactly LANE C's two) — true in LANE C's isolated tree, false in the union where file_artifact, cli_invocation and process_effect are active beside it. git merged the file without a textual conflict because no other lane touched it: an integration conflict of the same kind as the WP-2.0.1 catalog test's, resolved mechanically by restricting the four assertions to the python_callable kind (the test's intent — the Cycle-1 identity registered inactive at its frozen digest, the second identity the one active python_callable entry — unchanged). No probe, fixture or record differs. Not retried; corrected by a new candidate.",
+   "known_defect": null,
+   "failing_tests": [
+    "v2.test_python_callable_v2.Identity.test_PCV2_6_a_cycle1_spec_still_resolves_and_runs_while_the_second_identity_is_the_active_one"
+   ],
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
+  }
+ ]
+}
