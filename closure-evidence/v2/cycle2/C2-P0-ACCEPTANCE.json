@@ -1,0 +1,133 @@
+{
+ "record": "AISEF V2 — CYCLE-2 C2-P0 ACCEPTANCE (owner)",
+ "id": "AISEF-V2-CYCLE2-C2-P0-ACCEPTANCE",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P0 ACCEPTED / AUTHORIZE MAXIMUM SAFE PARALLEL EXECUTION' (2026-09-29): C2-P0 ACCEPTED at 77a4376; C2-P0 is a historical boundary and is not reopened",
+ "written": "2026-09-29T16:38:36Z",
+ "accepted_candidate": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
+ "accepted_lineage": [
+  "267012e264278fc7a70eff4a546c58ebed513aa2",
+  "4c28172617021a4f584d5eaa66100d86095ea371",
+  "77a437609fd59cd3c8d61d28472460ab9aa157f0"
+ ],
+ "cycle2_aisef2_tree": "2c67d47a7c8fc9ce80f0db86dbdc48ffe60ece70",
+ "inherited": {
+  "cycle1_semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "cycle1_aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+  "cycle1_closing_commit": "503b3a22f872c212d237e70f03aaba7d83f54d67",
+  "probe_python_callable_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+ },
+ "c2_p0_packages": {
+  "WP-2.0.1": {
+   "accepted_head": "635bbefc40c7efbd27b1d16fde4ae43a68fc7f2d",
+   "acceptance": {
+    "path": "closure-evidence/v2/cycle2/WP-2.0.1-ACCEPTANCE.json",
+    "sha256": "665e1ff327d7c3b5eef040c585b122a91565b0bb8b94a0b0ab5fb2337122462f"
+   }
+  },
+  "WP-2.0.3": {
+   "freeze": {
+    "path": "closure-evidence/v2/cycle2/P0-REFERENCE-FIXTURE-FREEZE.json",
+    "sha256": "8bd6da2c5b9aea67c9abc35bdb24eed80e6f824cf4f45e12100646788a40e0b9"
+   },
+   "record": {
+    "path": "closure-evidence/v2/cycle2/P0-REFERENCE-FIXTURE.json",
+    "sha256": "fb4f75e63a3ed97684983dd37b9636dd8e9a0e1936bedfad7be640ecde8f1aa4",
+    "execution_commit": "4c28172617021a4f584d5eaa66100d86095ea371",
+    "supersedes": "the record of 002fdb7 (kept in history)"
+   },
+   "result": "reference GREEN 36/36 (deterministic); 26/26 mutants RED on their declared targets incl. the negative witnesses M-10-1/M-12-1/M-13-1 for R-10/R-12/R-13; 0 undeclared failures; vacuous runner and other-tree import rejected",
+   "r_11": "DEVELOPER_TEST_REQUIREMENT / NOT_PRODUCTPROOF_AT_C2_P0 — carried forward, not closed, never waived"
+  }
+ },
+ "bound_records": {
+  "CYCLE2-FREEZE-MANIFEST.json": {
+   "path": "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json",
+   "sha256": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad"
+  },
+  "OWNER-DECISIONS.json": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "cycle2-manifest.json": {
+   "path": "docs/implementation/v2/cycle2/cycle2-manifest.json",
+   "sha256": "f4293366e53853259c58306b55c4992c7bd45e26fe2dea0bf92e4c8cf050bbc7"
+  },
+  "Q0-CHECKER-CALIBRATION.json": {
+   "path": "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json",
+   "sha256": "e51c6bfb723bdca5598535448b9574cb2e76c6870d73731c08092f2b3c4b8f6a"
+  }
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/cycle2/C2-P0-RUN-HISTORY.json",
+  "total_attempts": 82,
+  "sha256": "737df06b4f4d216adda42f3a054bf4d5b0f224768a5fe81ec12d2b7255db5d6d",
+  "failed": [
+   {
+    "seq": 9,
+    "commit": "fb641aa",
+    "where": "local",
+    "job": "gate (full suite in the owned range)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS",
+    "retry_of": null
+   },
+   {
+    "seq": 18,
+    "commit": "05e7b9b",
+    "where": "local",
+    "job": "gate (full suite in the owned range)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS",
+    "retry_of": null
+   },
+   {
+    "seq": 21,
+    "commit": "fe9260b",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS",
+    "retry_of": null
+   },
+   {
+    "seq": 49,
+    "commit": "b07dbbd",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "ENVIRONMENT",
+    "gate_effect": "COUNTS",
+    "retry_of": null
+   },
+   {
+    "seq": 50,
+    "commit": "b07dbbd",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS",
+    "gate_effect": "DIAGNOSTIC_ONLY",
+    "retry_of": 49
+   },
+   {
+    "seq": 57,
+    "commit": "002fdb7",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS",
+    "retry_of": null
+   }
+  ],
+  "rule": "closed at this count with the attempts of the accepted candidate itself (local gate and CI run 36497458987) appended last; nothing rewritten; successor histories: one per lane (C2-P1, C2-P2, C2-P3, C2-P4) and the integration history"
+ },
+ "authorized_successors": {
+  "lanes": {
+   "LANE-A": "C2-P1 / WP-2.1.1 probe.file_artifact",
+   "LANE-B": "C2-P2 / WP-2.2.1 then WP-2.2.2 probe.cli_invocation",
+   "LANE-C": "C2-P4 / WP-2.4.1 probe.python_callable_v2",
+   "LANE-D": "C2-P3 / WP-2.3.1 then WP-2.3.2 probe.process_effect, started when the whole C2-P2 phase is evidence-complete"
+  },
+  "then": "integration into one candidate; C2-P5 (WP-2.5.1 PLAN-V2.2 PROPOSAL, not self-approved; WP-2.5.2 falsifiability)",
+  "not_authorized": "QP-2.6 and later; PLAN-V2.2 approval; merging PR #6"
+ },
+ "verdict": "C2-P0 ACCEPTED / HISTORICAL BOUNDARY"
+}

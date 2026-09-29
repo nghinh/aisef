@@ -33,14 +33,29 @@ HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evi
              "P7": "closure-evidence/v2/P7-RUN-HISTORY.json", "P8": "closure-evidence/v2/P8-RUN-HISTORY.json",
              "P9": "closure-evidence/v2/P9-RUN-HISTORY.json", "P10": "closure-evidence/v2/P10-RUN-HISTORY.json",
              # Cycle 2 (WP-2.0.1): a history per Cycle-2 phase, under the same policy; Cycle-1 histories are sealed
-             "C2-P0": "closure-evidence/v2/cycle2/C2-P0-RUN-HISTORY.json"}
+             "C2-P0": "closure-evidence/v2/cycle2/C2-P0-RUN-HISTORY.json",
+             # Cycle-2 lanes (owner ruling 2026-09-29, maximum safe parallel execution): one history per lane, each
+             # closed by its lane closure when the lane was merged; the integration candidate's attempts go to the
+             # integration history, the first one not closed
+             "C2-P1": "closure-evidence/v2/cycle2/C2-P1-RUN-HISTORY.json",
+             "C2-P2": "closure-evidence/v2/cycle2/C2-P2-RUN-HISTORY.json",
+             "C2-P3": "closure-evidence/v2/cycle2/C2-P3-RUN-HISTORY.json",
+             "C2-P4": "closure-evidence/v2/cycle2/C2-P4-RUN-HISTORY.json",
+             "C2-INTEGRATION": "closure-evidence/v2/cycle2/C2-INTEGRATION-RUN-HISTORY.json"}
 #: the record that closes a phase's history: a FINAL SEAL for P1-P6; for P7, the owner's acceptance of the corrected
 #: candidate's Q0-Q3 (there is no P7 seal builder — P7 qualifies, it does not seal)
 SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence/v2/P2-FINAL-SEAL.json",
          "P3": "closure-evidence/v2/P3-FINAL-SEAL.json", "P4": "closure-evidence/v2/P4-FINAL-SEAL.json",
          "P5": "closure-evidence/v2/P5-FINAL-SEAL.json", "P6": "closure-evidence/v2/P6-FINAL-SEAL.json",
          "P7": "closure-evidence/v2/P7-ACCEPTANCE.json", "P8": "closure-evidence/v2/P8-ACCEPTANCE.json",
-         "P9": "closure-evidence/v2/P9-ACCEPTANCE.json", "P10": "closure-evidence/v2/P10-ACCEPTANCE.json"}
+         "P9": "closure-evidence/v2/P9-ACCEPTANCE.json", "P10": "closure-evidence/v2/P10-ACCEPTANCE.json",
+         # Cycle 2: C2-P0 by the owner's acceptance (2026-09-29); each lane by its lane closure, written when the lane
+         # was merged into the integration candidate — a closure of the lane's attempts, not an owner acceptance
+         "C2-P0": "closure-evidence/v2/cycle2/C2-P0-ACCEPTANCE.json",
+         "C2-P1": "closure-evidence/v2/cycle2/C2-P1-LANE-CLOSURE.json",
+         "C2-P2": "closure-evidence/v2/cycle2/C2-P2-LANE-CLOSURE.json",
+         "C2-P3": "closure-evidence/v2/cycle2/C2-P3-LANE-CLOSURE.json",
+         "C2-P4": "closure-evidence/v2/cycle2/C2-P4-LANE-CLOSURE.json"}
 HISTORY_REL = HISTORIES["P1"]
 RESULTS = ("PASS", "FAIL")
 GATE_EFFECTS = ("COUNTS", "DIAGNOSTIC_ONLY", "STOP")

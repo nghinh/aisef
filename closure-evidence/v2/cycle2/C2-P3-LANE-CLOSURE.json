@@ -1,0 +1,58 @@
+{
+ "record": "AISEF V2 — CYCLE-2 C2-P3 LANE CLOSURE (LANE D, WP-2.3.1, WP-2.3.2)",
+ "id": "AISEF-V2-CYCLE2-C2-P3-LANE-CLOSURE",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P0 ACCEPTED / AUTHORIZE MAXIMUM SAFE PARALLEL EXECUTION' (2026-09-29): independent lanes, each with its own worktree, branch, evidence and attempt history, integrated into ONE candidate preserving lane histories and evidence identities",
+ "written": "2026-09-29T17:29:48Z",
+ "phase": "C2-P3",
+ "packages": [
+  "WP-2.3.1",
+  "WP-2.3.2"
+ ],
+ "lane": {
+  "branch": "cycle2/lane-d-process-effect",
+  "base": "e063b76fd1cc625211dca1f8b64db9742e566e6a",
+  "head": "099e019fb579cf2b400f72d15038c56b0f9f8f2a",
+  "commits": [
+   "7de6d798e06f57f9731f387031d621434ae897c7",
+   "153e07868eada2e7e94d2020bf5f82485a48bb78",
+   "d93785ec47db0577fa0b67aa5e09ef41115f4b9f",
+   "01fff2cc7ca62575e84ea09f499857ca78ca605a",
+   "099e019fb579cf2b400f72d15038c56b0f9f8f2a"
+  ],
+  "aisef2_tree": "f4f729de10f1d3adae5b8fa1f31768fcf398f415",
+  "ci_pull_request": {
+   "number": 10,
+   "repository": "nghinh/aisef",
+   "draft": true,
+   "purpose": "CI only (tests workflow on Linux 3.11-3.14 and Windows 3.11); never merged"
+  }
+ },
+ "evidence_records": {
+  "P3-EFFECT-HARNESS.json": {
+   "path": "closure-evidence/v2/cycle2/P3-EFFECT-HARNESS.json",
+   "sha256": "9e4bbe6818625f997c681be7bd23955e1a054be2cedcd5d8d9a6fac23af9ab68",
+   "git_blob": "5676f688c9321c97f86649c73f783fa1d1a1f2ca",
+   "verdict": "HARNESS GREEN",
+   "problems": [],
+   "execution_commit": "01fff2cc7ca62575e84ea09f499857ca78ca605a",
+   "cross_platform_run": 36590249123
+  },
+  "P3-EFFECT-CALIBRATION.json": {
+   "path": "closure-evidence/v2/cycle2/P3-EFFECT-CALIBRATION.json",
+   "sha256": "769b67f5aabd40d22a9c20be7e840b631e79321162c0342b6cb48f0ac036c62c",
+   "git_blob": "07727668f57774f92300c90e98cdf587f12846b3",
+   "verdict": "CALIBRATED",
+   "problems": [],
+   "execution_commit": "01fff2cc7ca62575e84ea09f499857ca78ca605a",
+   "cross_platform_run": 36590249123
+  }
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/cycle2/C2-P3-RUN-HISTORY.json",
+  "total_attempts": 15,
+  "sha256": "225d51fa062661e6f55c9010144857a50c7f33c3001dbda8622ec706e370557c",
+  "failed": [],
+  "rule": "closed at this count when the lane was merged into the integration candidate; attempts of the integration candidate go to C2-INTEGRATION-RUN-HISTORY.json; nothing rewritten"
+ },
+ "status": "LANE CLOSED AT INTEGRATION — the phase awaits the owner's acceptance"
+}

@@ -1,0 +1,126 @@
+{
+ "record": "AISEF V2 — CYCLE-2 C2-P2 LANE CLOSURE (LANE B, WP-2.2.1, WP-2.2.2)",
+ "id": "AISEF-V2-CYCLE2-C2-P2-LANE-CLOSURE",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P0 ACCEPTED / AUTHORIZE MAXIMUM SAFE PARALLEL EXECUTION' (2026-09-29): independent lanes, each with its own worktree, branch, evidence and attempt history, integrated into ONE candidate preserving lane histories and evidence identities",
+ "written": "2026-09-29T16:40:03Z",
+ "phase": "C2-P2",
+ "packages": [
+  "WP-2.2.1",
+  "WP-2.2.2"
+ ],
+ "lane": {
+  "branch": "cycle2/lane-b-cli-invocation",
+  "base": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
+  "head": "e063b76fd1cc625211dca1f8b64db9742e566e6a",
+  "commits": [
+   "c40ad471222896524ea961a517c81972c7723097",
+   "3149f9ed168a0976fe5fbaab5996eaa45f79409a",
+   "8751d029787efe4aa6c64d8b1e6e218087d281b6",
+   "d986ffc24a579b0f4ea16add86dc58146d80807f",
+   "ac3ae16ad2e7c64d989fbc4d611617e572b0cf18",
+   "98b5a044f25cb3bf9d8a82913ba46f26f9dc7b0d",
+   "4353c61cd65772bc8d2362af4978fa1a33ab68e9",
+   "e063b76fd1cc625211dca1f8b64db9742e566e6a"
+  ],
+  "aisef2_tree": "509653f3ea630564976dca4b3e8de5041517718a",
+  "ci_pull_request": {
+   "number": 9,
+   "repository": "nghinh/aisef",
+   "draft": true,
+   "purpose": "CI only (tests workflow on Linux 3.11-3.14 and Windows 3.11); never merged"
+  }
+ },
+ "evidence_records": {
+  "P2-CLI-HARNESS.json": {
+   "path": "closure-evidence/v2/cycle2/P2-CLI-HARNESS.json",
+   "sha256": "775cb3023ce6c11778e572513d83b0d36f66dc0324cf99ba110e72e3fc3c3643",
+   "git_blob": "50a7a7e96b760b143f7df039153ebab82a94c713",
+   "verdict": "HARNESS GREEN",
+   "problems": [],
+   "execution_commit": "4353c61cd65772bc8d2362af4978fa1a33ab68e9",
+   "cross_platform_run": 36559497869
+  },
+  "P2-CLI-CALIBRATION.json": {
+   "path": "closure-evidence/v2/cycle2/P2-CLI-CALIBRATION.json",
+   "sha256": "3fd60e88b077b4dcaddf5f9d8705b8d667234b195dc958b2d749fb0afc69f7ee",
+   "git_blob": "a0d8dd846b09f0640c108ff8034ee8f45f896a5b",
+   "verdict": "CALIBRATED",
+   "problems": [],
+   "execution_commit": "4353c61cd65772bc8d2362af4978fa1a33ab68e9",
+   "cross_platform_run": 36559497869
+  }
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/cycle2/C2-P2-RUN-HISTORY.json",
+  "total_attempts": 36,
+  "sha256": "feb09f04e094a49e16b637fb71f087099336c8c190313a0b4fe33e05ba84de73",
+  "failed": [
+   {
+    "seq": 8,
+    "commit": "d986ffc",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 11,
+    "commit": "ac3ae16",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "classification": "DEVELOPER",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 12,
+    "commit": "ac3ae16",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "classification": "DEVELOPER",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 13,
+    "commit": "ac3ae16",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "classification": "DEVELOPER",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 14,
+    "commit": "ac3ae16",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 15,
+    "commit": "ac3ae16",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "classification": "DEVELOPER",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 19,
+    "commit": "98b5a04",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 26,
+    "commit": "4353c61",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT",
+    "gate_effect": "COUNTS"
+   }
+  ],
+  "rule": "closed at this count when the lane was merged into the integration candidate; attempts of the integration candidate go to C2-INTEGRATION-RUN-HISTORY.json; nothing rewritten"
+ },
+ "status": "LANE CLOSED AT INTEGRATION — the phase awaits the owner's acceptance"
+}

@@ -1,0 +1,49 @@
+{
+ "record": "AISEF V2 — CYCLE-2 C2-P4 LANE CLOSURE (LANE C, WP-2.4.1)",
+ "id": "AISEF-V2-CYCLE2-C2-P4-LANE-CLOSURE",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P0 ACCEPTED / AUTHORIZE MAXIMUM SAFE PARALLEL EXECUTION' (2026-09-29): independent lanes, each with its own worktree, branch, evidence and attempt history, integrated into ONE candidate preserving lane histories and evidence identities",
+ "written": "2026-09-29T16:40:03Z",
+ "phase": "C2-P4",
+ "packages": [
+  "WP-2.4.1"
+ ],
+ "lane": {
+  "branch": "cycle2/lane-c-python-callable-v2",
+  "base": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
+  "head": "e4e02ff40564ce9cc12ac8088ec8780fa87a4b8e",
+  "commits": [
+   "fcbb9dd112f893a94c3fc9b9a9aa014e6265cf9e",
+   "95ccfa97a8a49ed6045304de66c105f8d17bb47a",
+   "323fa4fcc97aa50104d87e8a1015e358e7f421ba",
+   "c1de0cbb5237894c9bb48d353c90d2d90eb2f47f",
+   "e53e182bde962b9e9de23ad3f7808d8fcba1d23f",
+   "e4e02ff40564ce9cc12ac8088ec8780fa87a4b8e"
+  ],
+  "aisef2_tree": "07d492342815f14d3576493276dadad503226fc3",
+  "ci_pull_request": {
+   "number": 8,
+   "repository": "nghinh/aisef",
+   "draft": true,
+   "purpose": "CI only (tests workflow on Linux 3.11-3.14 and Windows 3.11); never merged"
+  }
+ },
+ "evidence_records": {
+  "P4-PYTHON-CALLABLE-V2-CALIBRATION.json": {
+   "path": "closure-evidence/v2/cycle2/P4-PYTHON-CALLABLE-V2-CALIBRATION.json",
+   "sha256": "ea23497680a582efb662a09552f6ca41dc4a8f4942a3be3a14ae10a6b9709ea5",
+   "git_blob": "ef0e4b9e2853f0a036db69c9f30197fe8957818d",
+   "verdict": "QUALIFIED",
+   "problems": [],
+   "execution_commit": "e53e182bde962b9e9de23ad3f7808d8fcba1d23f",
+   "cross_platform_run": 36525916573
+  }
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/cycle2/C2-P4-RUN-HISTORY.json",
+  "total_attempts": 15,
+  "sha256": "ac2b0b41286dea38aa9ca0d3c670cae596d417d94be5b6dfc92241751aec777f",
+  "failed": [],
+  "rule": "closed at this count when the lane was merged into the integration candidate; attempts of the integration candidate go to C2-INTEGRATION-RUN-HISTORY.json; nothing rewritten"
+ },
+ "status": "LANE CLOSED AT INTEGRATION — the phase awaits the owner's acceptance"
+}
