@@ -93,19 +93,17 @@ def _is_hex(value) -> bool:
     return isinstance(value, str) and _HEX.fullmatch(value) is not None
 
 
+def _file_ok(name, file) -> bool:
+    """One workspace file: a flat name, and either a text with its newline or a hex byte string."""
+    shaped = isinstance(name, str) and _WS_NAME.fullmatch(name) is not None and isinstance(file, Mapping)
+    text = shaped and set(file) == {"text", "newline"} and isinstance(file["text"], str) and file["newline"] in _NEWLINES
+    raw = shaped and set(file) == {"bytes_hex"} and _is_hex(file["bytes_hex"])
+    return text or raw
+
+
 def _workspace_ok(workspace) -> bool:
-    """A well-formed workspace: flat names, each a text file with its newline or a hex byte string."""
-    if not isinstance(workspace, Mapping):
-        return False
-    for name, file in workspace.items():
-        if not isinstance(name, str) or not _WS_NAME.fullmatch(name) or not isinstance(file, Mapping):
-            return False
-        if set(file) == {"text", "newline"}:
-            if not isinstance(file["text"], str) or file["newline"] not in _NEWLINES:
-                return False
-        elif set(file) != {"bytes_hex"} or not _is_hex(file["bytes_hex"]):
-            return False
-    return True
+    """A well-formed workspace: a mapping of well-formed files (an empty one is well-formed)."""
+    return isinstance(workspace, Mapping) and all(_file_ok(name, file) for name, file in workspace.items())
 
 
 def observation_class(observable, stimulus) -> str | None:

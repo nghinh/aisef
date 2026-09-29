@@ -361,7 +361,7 @@ for _t in ("aisef2/control/owner.py::TAXONOMY", "aisef2/control/owner.py::classi
 _C2_P4_TESTS = ["tests/v2/test_python_callable_v2.py"]
 _C2_P4_BYTECODE = ["tests/v2/test_python_callable_v2_bytecode.py"]   # PYC-1..9 rerun against the second identity
 C2_P4_TARGETS: dict[str, list[str]] = {f"aisef2/probe/python_callable_v2.py::{f}": _C2_P4_TESTS for f in (
-    "PROBE_SOURCES", "CLASSES", "ON_DEADLINE", "_probe_digest", "_is_hex", "_workspace_ok", "observation_class",
+    "PROBE_SOURCES", "CLASSES", "ON_DEADLINE", "_probe_digest", "_is_hex", "_file_ok", "_workspace_ok", "observation_class",
     "spec_class", "verdict_of", "_substituted", "_unsubstituted", "_write_workspace", "PythonCallableV2Probe.enforcement",
     "_watch")}
 C2_P4_TARGETS["aisef2/probe/python_callable_v2.py::observe"] = [*_C2_P4_TESTS, *_C2_P4_BYTECODE]
