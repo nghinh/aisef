@@ -1,0 +1,530 @@
+{
+ "record": "AISEF V2 — WP-2.1.1 FILE_ARTIFACT PROBE CALIBRATION (C2-P1)",
+ "work_package": "WP-2.1.1",
+ "phase": "C2-P1",
+ "identities": {
+  "package": "WP-2.1.1",
+  "phase": "C2-P1",
+  "parent": {
+   "commit": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
+   "aisef2_tree": "2c67d47a7c8fc9ce80f0db86dbdc48ffe60ece70"
+  },
+  "candidate": {
+   "commit": "20b0f01cdecae78abfc684e09112913000bda4b5",
+   "aisef2_tree": "4fcb3d74409145b9ec444fe071a5574df7685008"
+  },
+  "probe": {
+   "id": "probe.file_artifact",
+   "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "classes": [
+    "exists",
+    "content",
+    "grep_count"
+   ],
+   "enforcement": "FULL",
+   "weakest_path": "no subject code runs: the weakest path is git's own object store at the revision SHA (the binary resolved once at construction, its identity a RunSpec capability), or the bytes of a directory that is not a repository",
+   "sources": {
+    "aisef2/probe/protocol.py": {
+     "sha256": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+     "git_blob": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+    },
+    "aisef2/probe/file_artifact.py": {
+     "sha256": "02163b8f33074071c9915d41e01f90c8931e3f7ef563559bb3beea9c55b6dae0",
+     "git_blob": "807fe59e3a84fb3285a71968d43bf326a50fdc40"
+    }
+   },
+   "digest_rule": "sha256 over '<source rel>\\0<LF-normalised bytes>\\0' for each of PROBE_SOURCES, in order"
+  },
+  "cycle1": {
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "closing_commit": "503b3a22f872c212d237e70f03aaba7d83f54d67",
+   "probe": {
+    "id": "probe.python_callable",
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+   }
+  },
+  "cycle2_manifest": {
+   "path": "docs/implementation/v2/cycle2/cycle2-manifest.json",
+   "sha256": "f4293366e53853259c58306b55c4992c7bd45e26fe2dea0bf92e4c8cf050bbc7"
+  },
+  "cycle2_freeze_manifest": {
+   "path": "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json",
+   "sha256": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad"
+  },
+  "owner_decisions": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "rfc": {
+   "rfc_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831"
+  },
+  "hash_rule": "every sha256 here is over bytes with CRLF normalised to LF; git_blob = sha1 of the blob header and the same bytes"
+ },
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin",
+  "machine": "arm64",
+  "git": "git version 2.53.0"
+ },
+ "read_path_rule": "content, existence and matches are read from the object store at RevisionRef.sha when the checkout root is itself a repository top level (git's own discovery, ceilinged at the root's parent); a root that is not one (a committed fixture directory) is read as a directory tree with the same refusal rules; the SHA's value never enters the decision",
+ "calibrations": [
+  {
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "exists",
+   "positive_fixture": "tests/v2/fixtures/calibration/file_artifact/exists/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/file_artifact/exists/negative",
+   "demonstrated_at": 1790651018.628099,
+   "observed": {
+    "positive": {
+     "kind": "OBSERVED",
+     "verdict": "SATISFIED",
+     "read_path": "directory",
+     "facts": {
+      "present": true,
+      "path": "app/config.toml",
+      "mode": "100644"
+     }
+    },
+    "negative": {
+     "kind": "SUBJECT_ABSENT",
+     "verdict": "REFUTED",
+     "read_path": "directory",
+     "facts": {
+      "present": false,
+      "path": "app/config.toml"
+     }
+    }
+   },
+   "note": "a committed fixture directory is not a repository top level, so the probe read the directory tree at the fixture's checkout (read_path 'directory'); the object-store read path is exercised by the test module on real repositories (FA-1)"
+  },
+  {
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "content",
+   "positive_fixture": "tests/v2/fixtures/calibration/file_artifact/content/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/file_artifact/content/negative",
+   "demonstrated_at": 1790651018.6711411,
+   "observed": {
+    "positive": {
+     "kind": "OBSERVED",
+     "verdict": "SATISFIED",
+     "read_path": "directory",
+     "facts": {
+      "path": "app/VERSION",
+      "mode": "100644",
+      "present": true,
+      "kind": "blob",
+      "size": 6,
+      "sha256": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03"
+     }
+    },
+    "negative": {
+     "kind": "OBSERVED",
+     "verdict": "REFUTED",
+     "read_path": "directory",
+     "facts": {
+      "path": "app/VERSION",
+      "mode": "100644",
+      "present": true,
+      "kind": "blob",
+      "size": 6,
+      "sha256": "44e161e4495cac2cf7858043e9e6418e9579f0ddcfae826f9a372622968ce066"
+     }
+    }
+   },
+   "note": "a committed fixture directory is not a repository top level, so the probe read the directory tree at the fixture's checkout (read_path 'directory'); the object-store read path is exercised by the test module on real repositories (FA-1)"
+  },
+  {
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "grep_count",
+   "positive_fixture": "tests/v2/fixtures/calibration/file_artifact/grep_count/positive",
+   "negative_fixture": "tests/v2/fixtures/calibration/file_artifact/grep_count/negative",
+   "demonstrated_at": 1790651018.729669,
+   "observed": {
+    "positive": {
+     "kind": "OBSERVED",
+     "verdict": "SATISFIED",
+     "read_path": "directory",
+     "facts": {
+      "path": "app",
+      "mode": "040000",
+      "present": true,
+      "files": 1,
+      "matches": 0,
+      "skipped_binary": [],
+      "locations": []
+     }
+    },
+    "negative": {
+     "kind": "OBSERVED",
+     "verdict": "REFUTED",
+     "read_path": "directory",
+     "facts": {
+      "path": "app",
+      "mode": "040000",
+      "present": true,
+      "files": 1,
+      "matches": 1,
+      "skipped_binary": [],
+      "locations": [
+       [
+        "app/main.py",
+        4
+       ]
+      ]
+     }
+    }
+   },
+   "note": "a committed fixture directory is not a repository top level, so the probe read the directory tree at the fixture's checkout (read_path 'directory'); the object-store read path is exercised by the test module on real repositories (FA-1)"
+  }
+ ],
+ "fixtures": {
+  "tests/v2/fixtures/calibration/file_artifact/content/negative/checkout/app/VERSION": {
+   "sha256": "44e161e4495cac2cf7858043e9e6418e9579f0ddcfae826f9a372622968ce066",
+   "git_blob": "7dea76edb3dc51b6e5e8223e9f941a35c1e364d6"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/content/negative/request.json": {
+   "sha256": "d3196009019e09672863cb2a090d537f532600066334b212d3a63b5326123ac0",
+   "git_blob": "d8b06a44fe1bc59219aa130d2a9c4e1b7ebc551e"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/content/positive/checkout/app/VERSION": {
+   "sha256": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+   "git_blob": "3eefcb9dd5b38e2c1dc061052455dd97bcd51e6c"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/content/positive/request.json": {
+   "sha256": "d3196009019e09672863cb2a090d537f532600066334b212d3a63b5326123ac0",
+   "git_blob": "d8b06a44fe1bc59219aa130d2a9c4e1b7ebc551e"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/exists/negative/checkout/app/other.toml": {
+   "sha256": "6a46a5cf8bd142c0e6fe9d629936a8fa27c7ec5cceffcbbb3180594d4bd07c70",
+   "git_blob": "3518c97c74781678fbfe7320af0c43dda592ae6d"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/exists/negative/request.json": {
+   "sha256": "6960d07877522551ff0b98d8f08b42b98989ba5b64e4559cbc4c63c824c40888",
+   "git_blob": "124b73df64f2c8717ac8ec71a13ba40752d8f0a0"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/exists/positive/checkout/app/config.toml": {
+   "sha256": "6a46a5cf8bd142c0e6fe9d629936a8fa27c7ec5cceffcbbb3180594d4bd07c70",
+   "git_blob": "3518c97c74781678fbfe7320af0c43dda592ae6d"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/exists/positive/request.json": {
+   "sha256": "6960d07877522551ff0b98d8f08b42b98989ba5b64e4559cbc4c63c824c40888",
+   "git_blob": "124b73df64f2c8717ac8ec71a13ba40752d8f0a0"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/grep_count/negative/checkout/app/NOTES.md": {
+   "sha256": "847a0db91ab4582ae90849bb51cbe61d64772eb9cd6ff34e3ff9326f8b55beb0",
+   "git_blob": "1b2359e05208ac1e84c4b28a86ca3f8ba85637a7"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/grep_count/negative/checkout/app/main.py": {
+   "sha256": "5e042b8da558cc37316edba430050a7352a8c72822ef57dd65dd83859d557996",
+   "git_blob": "43c8f16519ad02a414914a44a3180ade2a5eb9b2"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/grep_count/negative/request.json": {
+   "sha256": "af1e0e424034417e00daa44ac29c26ee3322c9e89c624774de92972e13067877",
+   "git_blob": "d2108fc1430c8e5301750bf4fa0ac3ae14d466bb"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/grep_count/positive/checkout/app/NOTES.md": {
+   "sha256": "847a0db91ab4582ae90849bb51cbe61d64772eb9cd6ff34e3ff9326f8b55beb0",
+   "git_blob": "1b2359e05208ac1e84c4b28a86ca3f8ba85637a7"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/grep_count/positive/checkout/app/main.py": {
+   "sha256": "e298345bd5a37e4e428b65f47ebe52852fa14890512a5d662dff257d51ad25aa",
+   "git_blob": "1884d270146d8a08d4ee8ec01f2de249976bd87a"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/grep_count/positive/request.json": {
+   "sha256": "af1e0e424034417e00daa44ac29c26ee3322c9e89c624774de92972e13067877",
+   "git_blob": "d2108fc1430c8e5301750bf4fa0ac3ae14d466bb"
+  }
+ },
+ "tests": {
+  "argv": [
+   "-P",
+   "validation/v2/owned_run.py",
+   "--",
+   "/opt/homebrew/opt/python@3.14/bin/python3.14",
+   "-m",
+   "unittest",
+   "-v",
+   "tests.v2.test_c2_file_artifact"
+  ],
+  "exit": 0,
+  "ran": 40,
+  "seconds": 6.532,
+  "verdict": "OK",
+  "failures": [],
+  "skipped": [],
+  "outcomes": {
+   "test_FA_2_REQUIRES_SUBJECT_drops_the_offered_verdict": "ok",
+   "test_FA_2_a_MUST_NOT_HOLD_prohibition_over_an_absent_path_is_decided": "ok",
+   "test_FA_2_grep_over_an_absent_package_takes_the_verdict_of_zero_matches": "ok",
+   "test_run_probe_binds_FULL_enforcement_and_refuses_a_foreign_spec": "ok",
+   "test_FA_Q0_the_probe_passes_the_probe_source_rules_and_is_registered_closed": "ok",
+   "test_FA_3_file_artifact_is_qualified_for_every_class_over_the_directory_read_path": "ok",
+   "test_FA_3_the_same_fixtures_reject_it_once_they_stop_contrasting": "ok",
+   "test_FA_ADV_3_an_always_REFUTED_probe_of_the_same_shape_is_not_calibrated": "ok",
+   "test_every_supported_class_has_both_fixtures_asking_for_it": "ok",
+   "test_the_directory_read_path_matches_names_exactly_and_never_follows_a_link": "ok",
+   "test_FA_1_a_dirty_checkout_answers_with_the_committed_tree_at_the_sha": "ok",
+   "test_FA_1_exists_and_modes_come_from_the_tree": "ok",
+   "test_FA_1_grep_counts_lines_over_the_tree_by_suffix": "ok",
+   "test_FA_1_implementer_and_verifier_worktrees_of_one_commit_agree_one_dirty": "ok",
+   "test_FA_ADV_1_a_symlink_entry_is_refused_for_content_and_grep_and_never_followed": "ok",
+   "test_FM2_FILE_2_a_revision_the_repository_does_not_hold_is_a_harness_failure_never_absence": "ok",
+   "test_FM2_FILE_3_a_binary_file_under_a_text_grep_is_skipped_and_recorded": "ok",
+   "test_FM2_FILE_3_a_file_that_is_not_utf8_leaves_the_count_unestablished": "ok",
+   "test_FM2_FILE_5_case_collision_paths_are_read_exactly_from_the_tree": "ok",
+   "test_a_gitlink_is_not_a_file_of_this_repository": "ok",
+   "test_content_newline_declares_the_line_convention": "ok",
+   "test_every_class_means_REFUTED_by_an_expired_window": "ok",
+   "test_git_that_does_not_answer_within_the_watchdog_is_a_harness_failure": "ok",
+   "test_the_per_file_cap_is_a_harness_refusal_never_a_verdict": "ok",
+   "test_the_scrubbed_git_environment_and_the_evaluation_home": "ok",
+   "test_FA_ADV_2_a_tree_escape_is_refused": "ok",
+   "test_FM2_FILE_1_a_probe_constructed_without_git_refuses_every_observation": "ok",
+   "test_FM2_FILE_4_a_pattern_over_the_cap_is_a_harness_failure": "ok",
+   "test_a_locator_without_the_path_prefix_or_of_another_kind_is_unsupported": "ok",
+   "test_a_missing_checkout_is_a_harness_failure": "ok",
+   "test_an_unsupported_observable_is_refused_not_degraded": "ok",
+   "test_declared_tables_identity_and_preconditions": "ok",
+   "test_git_env_is_an_allowlist_plus_pins": "ok",
+   "test_grep_facts_counts_lines_skips_binary_and_names_undecodable": "ok",
+   "test_normalisation_and_the_content_facts": "ok",
+   "test_observation_class_table": "ok",
+   "test_refusal_table": "ok",
+   "test_spec_class_reads_the_subject_kind_and_the_path_prefix": "ok",
+   "test_the_object_store_parser_and_the_entry_walk": "ok",
+   "test_verdict_of_and_the_expected_digest": "ok"
+  },
+  "owned_processes": {
+   "before": 0,
+   "at_exit": 0,
+   "after": 0,
+   "escaped": 0,
+   "released_empty": true
+  },
+  "tail": [
+   "test_verdict_of_and_the_expected_digest (tests.v2.test_c2_file_artifact.Tables.test_verdict_of_and_the_expected_digest) ... ok",
+   "",
+   "----------------------------------------------------------------------",
+   "Ran 40 tests in 6.532s",
+   "",
+   "OK"
+  ]
+ },
+ "cases": {
+  "FA-1": {
+   "tests": {
+    "test_FA_1_a_dirty_checkout_answers_with_the_committed_tree_at_the_sha": "ok",
+    "test_FA_1_exists_and_modes_come_from_the_tree": "ok",
+    "test_FA_1_grep_counts_lines_over_the_tree_by_suffix": "ok",
+    "test_FA_1_implementer_and_verifier_worktrees_of_one_commit_agree_one_dirty": "ok"
+   },
+   "held": true
+  },
+  "FA-2": {
+   "tests": {
+    "test_FA_2_REQUIRES_SUBJECT_drops_the_offered_verdict": "ok",
+    "test_FA_2_a_MUST_NOT_HOLD_prohibition_over_an_absent_path_is_decided": "ok",
+    "test_FA_2_grep_over_an_absent_package_takes_the_verdict_of_zero_matches": "ok"
+   },
+   "held": true
+  },
+  "FA-3": {
+   "tests": {
+    "test_FA_3_file_artifact_is_qualified_for_every_class_over_the_directory_read_path": "ok",
+    "test_FA_3_the_same_fixtures_reject_it_once_they_stop_contrasting": "ok"
+   },
+   "held": true
+  },
+  "FA-Q0": {
+   "tests": {
+    "test_FA_Q0_the_probe_passes_the_probe_source_rules_and_is_registered_closed": "ok"
+   },
+   "held": true
+  }
+ },
+ "fault_family": [
+  {
+   "id": "FM2-FILE-1",
+   "fault": "git absent: a probe constructed without a git binary refuses every observation (HARNESS_FAILED -> UNRUNNABLE)",
+   "tests": [
+    {
+     "test": "test_FM2_FILE_1_a_probe_constructed_without_git_refuses_every_observation",
+     "outcome": "ok"
+    }
+   ],
+   "held": true
+  },
+  {
+   "id": "FM2-FILE-2",
+   "fault": "revision not in the repository: HARNESS_FAILED, never SUBJECT_ABSENT",
+   "tests": [
+    {
+     "test": "test_FM2_FILE_2_a_revision_the_repository_does_not_hold_is_a_harness_failure_never_absence",
+     "outcome": "ok"
+    }
+   ],
+   "held": true
+  },
+  {
+   "id": "FM2-FILE-3",
+   "fault": "a binary file under a text grep is skipped and recorded; a file that is not UTF-8 leaves the count unestablished (REFUTED, the file named)",
+   "tests": [
+    {
+     "test": "test_FM2_FILE_3_a_binary_file_under_a_text_grep_is_skipped_and_recorded",
+     "outcome": "ok"
+    },
+    {
+     "test": "test_FM2_FILE_3_a_file_that_is_not_utf8_leaves_the_count_unestablished",
+     "outcome": "ok"
+    }
+   ],
+   "held": true
+  },
+  {
+   "id": "FM2-FILE-4",
+   "fault": "regex pattern over the cap: HARNESS_FAILED, never a verdict",
+   "tests": [
+    {
+     "test": "test_FM2_FILE_4_a_pattern_over_the_cap_is_a_harness_failure",
+     "outcome": "ok"
+    }
+   ],
+   "held": true
+  },
+  {
+   "id": "FM2-FILE-5",
+   "fault": "case-collision paths: read exactly from the tree (both entries readable, a third spelling absent)",
+   "tests": [
+    {
+     "test": "test_FM2_FILE_5_case_collision_paths_are_read_exactly_from_the_tree",
+     "outcome": "ok"
+    }
+   ],
+   "held": true
+  }
+ ],
+ "adversarial": [
+  {
+   "id": "FA-ADV-1",
+   "case": "a symlink entry is refused for content and grep and never followed as a component",
+   "tests": [
+    {
+     "test": "test_FA_ADV_1_a_symlink_entry_is_refused_for_content_and_grep_and_never_followed",
+     "outcome": "ok"
+    }
+   ],
+   "held": true
+  },
+  {
+   "id": "FA-ADV-2",
+   "case": "a tree escape (absolute, '..', backslash, drive letter, empty or '.' component) is refused",
+   "tests": [
+    {
+     "test": "test_FA_ADV_2_a_tree_escape_is_refused",
+     "outcome": "ok"
+    }
+   ],
+   "held": true
+  },
+  {
+   "id": "FA-ADV-3",
+   "case": "an always-REFUTED probe of the same shape and identity is not calibrated",
+   "tests": [
+    {
+     "test": "test_FA_ADV_3_an_always_REFUTED_probe_of_the_same_shape_is_not_calibrated",
+     "outcome": "ok"
+    }
+   ],
+   "held": true
+  }
+ ],
+ "mutation": {
+  "record": "closure-evidence/v2/cycle2/P1-MUTATION.json",
+  "sha256": "d5643478b074273efb530d1b7a1d162e767b7c45c8e5a8d20764303f9648df38",
+  "targets": 42,
+  "declared_targets": 42,
+  "mutants": 654,
+  "killed": 654,
+  "killed_by_timeout": 0,
+  "survivors": [],
+  "per_target": {
+   "aisef2/probe/file_artifact.py::CLASSES": "3/3",
+   "aisef2/probe/file_artifact.py::FileArtifactProbe.__init__": "5/5",
+   "aisef2/probe/file_artifact.py::FileArtifactProbe._reader": "15/15",
+   "aisef2/probe/file_artifact.py::FileArtifactProbe.enforcement": "3/3",
+   "aisef2/probe/file_artifact.py::FileArtifactProbe.harness_preconditions": "7/7",
+   "aisef2/probe/file_artifact.py::FileArtifactProbe.observe": "134/134",
+   "aisef2/probe/file_artifact.py::MODES": "4/4",
+   "aisef2/probe/file_artifact.py::NEWLINES": "2/2",
+   "aisef2/probe/file_artifact.py::ON_DEADLINE": "9/9",
+   "aisef2/probe/file_artifact.py::ObjectStore.__init__": "10/10",
+   "aisef2/probe/file_artifact.py::ObjectStore._parse": "18/18",
+   "aisef2/probe/file_artifact.py::ObjectStore.blob": "3/3",
+   "aisef2/probe/file_artifact.py::ObjectStore.entries": "5/5",
+   "aisef2/probe/file_artifact.py::ObjectStore.holds_revision": "8/8",
+   "aisef2/probe/file_artifact.py::ObjectStore.lookup": "6/6",
+   "aisef2/probe/file_artifact.py::ObjectStore.run": "3/3",
+   "aisef2/probe/file_artifact.py::ObjectStore.walk": "6/6",
+   "aisef2/probe/file_artifact.py::PROBE_SOURCES": "2/2",
+   "aisef2/probe/file_artifact.py::PlainTree._full": "2/2",
+   "aisef2/probe/file_artifact.py::PlainTree._row": "15/15",
+   "aisef2/probe/file_artifact.py::PlainTree.blob": "1/1",
+   "aisef2/probe/file_artifact.py::PlainTree.entries": "3/3",
+   "aisef2/probe/file_artifact.py::PlainTree.lookup": "10/10",
+   "aisef2/probe/file_artifact.py::PlainTree.walk": "7/7",
+   "aisef2/probe/file_artifact.py::_HEX64": "1/1",
+   "aisef2/probe/file_artifact.py::_compiles": "10/10",
+   "aisef2/probe/file_artifact.py::_probe_digest": "1/1",
+   "aisef2/probe/file_artifact.py::content_facts": "12/12",
+   "aisef2/probe/file_artifact.py::entry": "27/27",
+   "aisef2/probe/file_artifact.py::expected_sha256": "10/10",
+   "aisef2/probe/file_artifact.py::facts_of": "73/73",
+   "aisef2/probe/file_artifact.py::git_env": "49/49",
+   "aisef2/probe/file_artifact.py::grep_facts": "38/38",
+   "aisef2/probe/file_artifact.py::normalised": "5/5",
+   "aisef2/probe/file_artifact.py::observation_class": "64/64",
+   "aisef2/probe/file_artifact.py::read": "3/3",
+   "aisef2/probe/file_artifact.py::refusal": "29/29",
+   "aisef2/probe/file_artifact.py::run_git": "8/8",
+   "aisef2/probe/file_artifact.py::selected": "3/3",
+   "aisef2/probe/file_artifact.py::spec_class": "12/12",
+   "aisef2/probe/file_artifact.py::verdict_of": "20/20",
+   "aisef2/probe/file_artifact.py::window_of": "8/8"
+  },
+  "kill_tests": [
+   "tests/v2/test_c2_file_artifact.py"
+  ]
+ },
+ "static": {
+  "probe_rules": [],
+  "probe_module_violations": [],
+  "cycle2_baseline": [],
+  "destructive_authority": [],
+  "kernel_rules": [],
+  "catalog_entry": {
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "subject_kind": "file_artifact",
+   "classes": [
+    "exists",
+    "content",
+    "grep_count"
+   ],
+   "fixture_root": "file_artifact",
+   "subject_process": "in_harness_process",
+   "protocol_channel": "captured_stdout",
+   "stimulus_shape": "none",
+   "cycle": 2,
+   "active": true
+  },
+  "one_active_probe_for_file_artifact": true,
+  "cycle1_probe_sources_unchanged": true
+ },
+ "problems": [],
+ "verdict": "CALIBRATED: 3/3 classes, tests OK, mutation killed or audited, static PASS"
+}
