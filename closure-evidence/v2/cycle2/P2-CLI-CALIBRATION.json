@@ -10,11 +10,11 @@
  "identities": {
   "package": "WP-2.2.2",
   "parent": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
-  "head": "8751d029787efe4aa6c64d8b1e6e218087d281b6",
-  "aisef2_tree": "3f870e780f79fc2ccee6872b2ead32d02e6f30db",
+  "head": "4353c61cd65772bc8d2362af4978fa1a33ab68e9",
+  "aisef2_tree": "509653f3ea630564976dca4b3e8de5041517718a",
   "probe": {
    "id": "probe.cli_invocation",
-   "digest": "436fe3a5219f4424b024699df4046cc00d19d6f000769aaf4c2f3ebef1b92dfa",
+   "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
    "classes": [
     "exits",
     "exits_streams",
@@ -32,8 +32,8 @@
      "git_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598"
     },
     "probe/cli_invocation.py": {
-     "sha256": "63b7271ffdc3792f0dd83d9edaac841a68bb95e1302f3390325700d8f2d1021f",
-     "git_blob": "cfad98f41f0bc46cd4e802a8f4f8b0c3a905c07a"
+     "sha256": "577f0c97ecbe371241bc7c2b4257e73a67181a881a171d8fffcd61b3c156b4e2",
+     "git_blob": "03aa8ab991b0e03c5583b3979a042cee1955e470"
     }
    },
    "catalog": {
@@ -57,12 +57,12 @@
   },
   "tests": {
    "tests.v2.test_c2_cli_invocation": {
-    "sha256": "9be9d030c114665e381dd1934302c4aaae44e99dfecb8be1ee13e778d1f1f656",
-    "git_blob": "6c62e1c54af6e20d8677f0bc5f04f18d03610700"
+    "sha256": "b57ced9df561d0bdaebdc6ba987b95ea46bd97880636f5494a0300d30e76476e",
+    "git_blob": "25f40c9d80bab38afead14ed0eff40166161aca1"
    },
    "tests.v2.test_c2_cli_protocol": {
-    "sha256": "6b7f557e18cb095247660ec1106b4967f57138b41cb3f27a9da52f4f13500f7a",
-    "git_blob": "54731da7d3adc3247007848b5bb9c36b240ecb45"
+    "sha256": "caaebc5c1263add7054e3b51a8c53cc73ae1eeb800c739e004a6dcd215019a0b",
+    "git_blob": "e27412ade0881ee13cad99d41c048f11bab5bdcc"
    },
    "tests.v2.test_c2_cli_verdicts": {
     "sha256": "9399e9b7c08242f95429165d53c93f58339781b0ed9e799a11625af20805d7b4",
@@ -89,10 +89,10 @@
  },
  "probe_digest_change": {
   "wp_2_2_1_record": "closure-evidence/v2/cycle2/P2-CLI-HARNESS.json",
-  "wp_2_2_1_commit": "c40ad471222896524ea961a517c81972c7723097",
-  "wp_2_2_1_probe_digest": "ae1e6e6205f0694df4191fd902dd4cddd824e6ea8b1a9249b283d14ff54fa3d9",
-  "this_probe_digest": "436fe3a5219f4424b024699df4046cc00d19d6f000769aaf4c2f3ebef1b92dfa",
-  "changed": true,
+  "wp_2_2_1_commit": "4353c61cd65772bc8d2362af4978fa1a33ab68e9",
+  "wp_2_2_1_probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+  "this_probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+  "changed": false,
   "rule": "the WP-2.2.1 harness record stays bound to its commit and digest (not regenerated); every C2-P2 mutation target is re-run at this digest (P2-MUTATION.json binds the module source); the integration binds the final digest"
  },
  "platform": {
@@ -102,43 +102,43 @@
  "calibrations": [
   {
    "probe_id": "probe.cli_invocation",
-   "probe_digest": "436fe3a5219f4424b024699df4046cc00d19d6f000769aaf4c2f3ebef1b92dfa",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
    "observation_class": "exits",
    "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits/negative",
-   "demonstrated_at": 1790661072.4721038
+   "demonstrated_at": 1790679963.921463
   },
   {
    "probe_id": "probe.cli_invocation",
-   "probe_digest": "436fe3a5219f4424b024699df4046cc00d19d6f000769aaf4c2f3ebef1b92dfa",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
    "observation_class": "exits_streams",
    "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_streams/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_streams/negative",
-   "demonstrated_at": 1790661073.484718
+   "demonstrated_at": 1790679964.976953
   },
   {
    "probe_id": "probe.cli_invocation",
-   "probe_digest": "436fe3a5219f4424b024699df4046cc00d19d6f000769aaf4c2f3ebef1b92dfa",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
    "observation_class": "exits_files",
    "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_files/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_files/negative",
-   "demonstrated_at": 1790661074.522256
+   "demonstrated_at": 1790679966.040148
   },
   {
    "probe_id": "probe.cli_invocation",
-   "probe_digest": "436fe3a5219f4424b024699df4046cc00d19d6f000769aaf4c2f3ebef1b92dfa",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
    "observation_class": "blocks",
    "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/blocks/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/blocks/negative",
-   "demonstrated_at": 1790661076.224063
+   "demonstrated_at": 1790679967.8294241
   },
   {
    "probe_id": "probe.cli_invocation",
-   "probe_digest": "436fe3a5219f4424b024699df4046cc00d19d6f000769aaf4c2f3ebef1b92dfa",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
    "observation_class": "equality",
    "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/equality/positive",
    "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/equality/negative",
-   "demonstrated_at": 1790661077.799767
+   "demonstrated_at": 1790679969.4439528
   }
  ],
  "fixtures": {
@@ -454,7 +454,7 @@
    ],
    "exit": 0,
    "ran": 3,
-   "seconds": 28.36,
+   "seconds": 28.357,
    "status": "OK",
    "status_detail": "",
    "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 29s)",
@@ -487,11 +487,11 @@
     "tests.v2.test_c2_cli_protocol"
    ],
    "exit": 0,
-   "ran": 14,
-   "seconds": 0.997,
+   "ran": 16,
+   "seconds": 1.374,
    "status": "OK",
    "status_detail": "",
-   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 1s)",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 2s)",
    "residual": 0
   },
   "tests.v2.test_c2_cli_invocation": {
@@ -504,11 +504,11 @@
     "tests.v2.test_c2_cli_invocation"
    ],
    "exit": 0,
-   "ran": 28,
-   "seconds": 33.866,
+   "ran": 29,
+   "seconds": 34.429,
    "status": "OK",
    "status_detail": "",
-   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 34s)",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 35s)",
    "residual": 0
   }
  },
@@ -542,9 +542,9 @@
   "record": "closure-evidence/v2/cycle2/P2-MUTATION.json",
   "present": true,
   "phase": "C2-P2",
-  "targets": 53,
-  "mutants": 1255,
-  "killed": 1255,
+  "targets": 54,
+  "mutants": 1258,
+  "killed": 1258,
   "killed_by_timeout": 2,
   "survivors": {},
   "errors": {},
@@ -695,6 +695,14 @@
     "killed": 28,
     "kill_tests": [
      "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_disposed": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_invocation.py"
     ]
    },
    "_equal": {
@@ -942,5 +950,123 @@
   "cycle2_baseline": []
  },
  "problems": [],
- "verdict": "CALIBRATED"
+ "verdict": "CALIBRATED",
+ "cross_platform": {
+  "rule": "the record's commit's CI runs the whole unittest discovery, which includes tests/v2/test_c2_cli_invocation.py and tests/v2/test_c2_cli_verdicts.py on every platform of the matrix",
+  "ci": {
+   "run": 36559497869,
+   "commit": "4353c61cd65772bc8d2362af4978fa1a33ab68e9",
+   "attempts": [
+    {
+     "attempt": 1,
+     "jobs": [
+      {
+       "job": "lint",
+       "job_id": 109376661249,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:45Z",
+       "completed_at": "2026-09-29T11:04:56Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.11)",
+       "job_id": 109376661412,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:45Z",
+       "completed_at": "2026-09-29T11:24:08Z",
+       "tests_run": 4846,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.12)",
+       "job_id": 109376661427,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:46Z",
+       "completed_at": "2026-09-29T11:24:49Z",
+       "tests_run": 4846,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.13)",
+       "job_id": 109376661456,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:46Z",
+       "completed_at": "2026-09-29T11:23:55Z",
+       "tests_run": 4846,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.14)",
+       "job_id": 109376661477,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:45Z",
+       "completed_at": "2026-09-29T11:22:58Z",
+       "tests_run": 4846,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (windows-latest, 3.11)",
+       "job_id": 109376661431,
+       "conclusion": "failure",
+       "started_at": "2026-09-29T11:04:46Z",
+       "completed_at": "2026-09-29T11:54:01Z",
+       "tests_run": 4843,
+       "log_available": true,
+       "failing_tests": [
+        "test_clients.TestTranLuotDoAdapterThiHanh.test_cham_tran_thi_dung_tien_trinh_va_goi_ten_dung"
+       ],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "Process completed with exit code 1."
+       ]
+      },
+      {
+       "job": "wheel",
+       "job_id": 109376661950,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:46Z",
+       "completed_at": "2026-09-29T11:05:09Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "platforms": [
+   "linux",
+   "windows"
+  ]
+ }
 }

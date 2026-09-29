@@ -4,16 +4,17 @@
  "identities": {
   "package": "WP-2.2.1",
   "parent": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
-  "head": "c40ad471222896524ea961a517c81972c7723097",
-  "aisef2_tree": "b7fad676f05817f2732d9e38d9a95ad585cc0571",
+  "head": "4353c61cd65772bc8d2362af4978fa1a33ab68e9",
+  "aisef2_tree": "509653f3ea630564976dca4b3e8de5041517718a",
   "probe": {
    "id": "probe.cli_invocation",
-   "digest": "ae1e6e6205f0694df4191fd902dd4cddd824e6ea8b1a9249b283d14ff54fa3d9",
+   "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
    "classes": [
     "exits",
     "exits_streams",
     "exits_files",
-    "blocks"
+    "blocks",
+    "equality"
    ],
    "sources": {
     "probe/protocol.py": {
@@ -25,8 +26,8 @@
      "git_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598"
     },
     "probe/cli_invocation.py": {
-     "sha256": "b9d9e78674e09ccf1a33b99a4c94426d4eb134997c0009a0c61c2f3b3f6443b8",
-     "git_blob": "a608ef23315cb6380032e3af35ac35bc61d61cd6"
+     "sha256": "577f0c97ecbe371241bc7c2b4257e73a67181a881a171d8fffcd61b3c156b4e2",
+     "git_blob": "03aa8ab991b0e03c5583b3979a042cee1955e470"
     }
    },
    "catalog": {
@@ -41,7 +42,8 @@
     "exits": "REFUTED",
     "exits_streams": "REFUTED",
     "exits_files": "REFUTED",
-    "blocks": "SATISFIED"
+    "blocks": "SATISFIED",
+    "equality": "REFUTED"
    },
    "enforcement": "PARTIAL",
    "weakest_path": "the subject runs inside the harness's child process as the harness user, with that user's filesystem and network access, and can read the request and the protocol file; -I interpreter isolation, a scrubbed environment, a fresh working directory and a harness-owned bytecode cache (-X pycache_prefix, -B) are isolation, not a sandbox",
@@ -49,12 +51,16 @@
   },
   "tests": {
    "tests.v2.test_c2_cli_invocation": {
-    "sha256": "64edbc0b855d7e47cfea38f6f10965a95fdd93c6fa5c91c9a3cc0ea188718166",
-    "git_blob": "7536be350bf89bd3016549cb492ba584f659cf69"
+    "sha256": "b57ced9df561d0bdaebdc6ba987b95ea46bd97880636f5494a0300d30e76476e",
+    "git_blob": "25f40c9d80bab38afead14ed0eff40166161aca1"
+   },
+   "tests.v2.test_c2_cli_protocol": {
+    "sha256": "caaebc5c1263add7054e3b51a8c53cc73ae1eeb800c739e004a6dcd215019a0b",
+    "git_blob": "e27412ade0881ee13cad99d41c048f11bab5bdcc"
    },
    "tests.v2.test_c2_cli_verdicts": {
-    "sha256": "0de298fa9c74cf1bb221e8382c579b4d6372e68405ebc679c8e0975172ef21ab",
-    "git_blob": "0e7789a158659b5929c2863db4e1b3d9d53e3a3b"
+    "sha256": "9399e9b7c08242f95429165d53c93f58339781b0ed9e799a11625af20805d7b4",
+    "git_blob": "fc78efbedf438afe2c114b879e5f266316487136"
    }
   },
   "cycle1": {
@@ -90,11 +96,28 @@
     "tests.v2.test_c2_cli_invocation"
    ],
    "exit": 0,
-   "ran": 37,
-   "seconds": 37.569,
+   "ran": 29,
+   "seconds": 34.589,
    "status": "OK",
    "status_detail": "",
-   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 38s)",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 35s)",
+   "residual": 0
+  },
+  "tests.v2.test_c2_cli_protocol": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/agent-aed7d878b24886e17/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_c2_cli_protocol"
+   ],
+   "exit": 0,
+   "ran": 16,
+   "seconds": 1.394,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 2s)",
    "residual": 0
   },
   "tests.v2.test_c2_cli_verdicts": {
@@ -107,11 +130,11 @@
     "tests.v2.test_c2_cli_verdicts"
    ],
    "exit": 0,
-   "ran": 16,
-   "seconds": 0.024,
+   "ran": 19,
+   "seconds": 0.029,
    "status": "OK",
    "status_detail": "",
-   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 1s)",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 0s)",
    "residual": 0
   }
  },
@@ -172,7 +195,7 @@
   },
   "CLI-Q0": {
    "tests": [
-    "tests.v2.test_c2_cli_invocation.Harness.test_CLI_Q0_the_module_passes_the_probe_rules_with_its_catalog_facts"
+    "tests.v2.test_c2_cli_protocol.Identity.test_CLI_Q0_the_module_passes_the_probe_rules_with_its_catalog_facts"
    ],
    "outcome": "PASS"
   }
@@ -312,19 +335,19 @@
  "fault_rows": {
   "FM2-CLI-HARNESS-1": {
    "tests": [
-    "tests.v2.test_c2_cli_invocation.FaultHarness.test_FM2_CLI_HARNESS_1_interpreter_absent"
+    "tests.v2.test_c2_cli_protocol.FaultHarness.test_FM2_CLI_HARNESS_1_interpreter_absent"
    ],
    "outcome": "PASS"
   },
   "FM2-CLI-HARNESS-2": {
    "tests": [
-    "tests.v2.test_c2_cli_invocation.FaultHarness.test_FM2_CLI_HARNESS_2_evaluation_directory_uncreatable"
+    "tests.v2.test_c2_cli_protocol.FaultHarness.test_FM2_CLI_HARNESS_2_evaluation_directory_uncreatable"
    ],
    "outcome": "PASS"
   },
   "FM2-CLI-HARNESS-3": {
    "tests": [
-    "tests.v2.test_c2_cli_invocation.FaultHarness.test_FM2_CLI_HARNESS_3_evaluation_directory_inside_the_checkout_refused"
+    "tests.v2.test_c2_cli_protocol.FaultHarness.test_FM2_CLI_HARNESS_3_evaluation_directory_inside_the_checkout_refused"
    ],
    "outcome": "PASS"
   },
@@ -378,7 +401,7 @@
   },
   "FM2-CLI-STREAM-2": {
    "tests": [
-    "tests.v2.test_c2_cli_invocation.FaultStream.test_FM2_CLI_STREAM_2_exit_after_DISPATCHED_without_RESULT"
+    "tests.v2.test_c2_cli_protocol.FaultStream.test_FM2_CLI_STREAM_2_exit_after_DISPATCHED_without_RESULT"
    ],
    "outcome": "PASS"
   },
@@ -429,17 +452,31 @@
   "record": "closure-evidence/v2/cycle2/P2-MUTATION.json",
   "present": true,
   "phase": "C2-P2",
-  "targets": 40,
-  "mutants": 843,
-  "killed": 843,
-  "killed_by_timeout": 4,
+  "targets": 54,
+  "mutants": 1258,
+  "killed": 1258,
+  "killed_by_timeout": 2,
   "survivors": {},
   "errors": {},
   "problems": [],
   "per_target": {
    "CLASSES": {
-    "mutants": 4,
-    "killed": 4,
+    "mutants": 5,
+    "killed": 5,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "CLASS_TABLE": {
+    "mutants": 212,
+    "killed": 212,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "COMPARATORS": {
+    "mutants": 2,
+    "killed": 2,
     "kill_tests": [
      "tests/v2/test_c2_cli_verdicts.py"
     ]
@@ -448,13 +485,31 @@
     "mutants": 4,
     "killed": 4,
     "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
     ]
    },
    "CliInvocationProbe._observe": {
-    "mutants": 72,
-    "killed": 72,
+    "mutants": 15,
+    "killed": 15,
     "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "CliInvocationProbe._observe_equality": {
+    "mutants": 73,
+    "killed": 73,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_calibration.py"
+    ]
+   },
+   "CliInvocationProbe._observe_in": {
+    "mutants": 42,
+    "killed": 42,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
     ]
    },
@@ -473,9 +528,10 @@
     ]
    },
    "CliInvocationProbe.observe": {
-    "mutants": 43,
-    "killed": 43,
+    "mutants": 48,
+    "killed": 48,
     "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
     ]
    },
@@ -487,8 +543,8 @@
     ]
    },
    "ON_DEADLINE": {
-    "mutants": 12,
-    "killed": 12,
+    "mutants": 15,
+    "killed": 15,
     "kill_tests": [
      "tests/v2/test_c2_cli_verdicts.py"
     ]
@@ -497,7 +553,15 @@
     "mutants": 3,
     "killed": 3,
     "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "QUANTIFIERS": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
     ]
    },
    "STREAM_SHAPES": {
@@ -518,6 +582,7 @@
     "mutants": 22,
     "killed": 22,
     "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
     ]
    },
@@ -536,6 +601,35 @@
     ]
    },
    "_content_ok": {
+    "mutants": 28,
+    "killed": 28,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_disposed": {
+    "mutants": 3,
+    "killed": 3,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
+   "_equal": {
+    "mutants": 11,
+    "killed": 11,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_equality_ok": {
+    "mutants": 24,
+    "killed": 24,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_equality_verdict": {
     "mutants": 28,
     "killed": 28,
     "kill_tests": [
@@ -563,10 +657,18 @@
      "tests/v2/test_c2_cli_verdicts.py"
     ]
    },
-   "_hard_exit": {
-    "mutants": 74,
-    "killed": 74,
+   "_half_ok": {
+    "mutants": 6,
+    "killed": 6,
     "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_hard_exit": {
+    "mutants": 72,
+    "killed": 72,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
     ]
    },
@@ -575,6 +677,7 @@
     "killed": 18,
     "kill_tests": [
      "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
     ]
    },
@@ -582,6 +685,7 @@
     "mutants": 27,
     "killed": 27,
     "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
     ]
    },
@@ -599,6 +703,28 @@
      "tests/v2/test_c2_cli_verdicts.py"
     ]
    },
+   "_normalization_ok": {
+    "mutants": 15,
+    "killed": 15,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_normalize": {
+    "mutants": 7,
+    "killed": 7,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
+   "_preflight": {
+    "mutants": 18,
+    "killed": 18,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ]
+   },
    "_prepare": {
     "mutants": 53,
     "killed": 53,
@@ -610,6 +736,7 @@
     "mutants": 1,
     "killed": 1,
     "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
     ]
    },
@@ -669,6 +796,13 @@
      "tests/v2/test_c2_cli_verdicts.py"
     ]
    },
+   "_streams_ok": {
+    "mutants": 6,
+    "killed": 6,
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py"
+    ]
+   },
    "_substitute": {
     "mutants": 8,
     "killed": 8,
@@ -680,6 +814,7 @@
     "mutants": 67,
     "killed": 67,
     "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
      "tests/v2/test_c2_cli_invocation.py"
     ]
    },
@@ -698,8 +833,8 @@
     ]
    },
    "observation_class": {
-    "mutants": 44,
-    "killed": 44,
+    "mutants": 55,
+    "killed": 55,
     "kill_tests": [
      "tests/v2/test_c2_cli_verdicts.py"
     ]
@@ -712,8 +847,8 @@
     ]
    },
    "verdict_of": {
-    "mutants": 40,
-    "killed": 40,
+    "mutants": 44,
+    "killed": 44,
     "kill_tests": [
      "tests/v2/test_c2_cli_verdicts.py"
     ]
@@ -734,5 +869,123 @@
   "the calibration fixtures (tests/v2/fixtures/calibration/cli_invocation/<class>/{positive,negative}) are committed with the harness because Q0 PROBE_CATALOG_CLOSURE requires them for every class of a registered probe; their calibration records are WP-2.2.2's"
  ],
  "problems": [],
- "verdict": "HARNESS GREEN"
+ "verdict": "HARNESS GREEN",
+ "cross_platform": {
+  "rule": "the record's commit's CI runs the whole unittest discovery, which includes tests/v2/test_c2_cli_invocation.py and tests/v2/test_c2_cli_verdicts.py on every platform of the matrix",
+  "ci": {
+   "run": 36559497869,
+   "commit": "4353c61cd65772bc8d2362af4978fa1a33ab68e9",
+   "attempts": [
+    {
+     "attempt": 1,
+     "jobs": [
+      {
+       "job": "lint",
+       "job_id": 109376661249,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:45Z",
+       "completed_at": "2026-09-29T11:04:56Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.11)",
+       "job_id": 109376661412,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:45Z",
+       "completed_at": "2026-09-29T11:24:08Z",
+       "tests_run": 4846,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.12)",
+       "job_id": 109376661427,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:46Z",
+       "completed_at": "2026-09-29T11:24:49Z",
+       "tests_run": 4846,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.13)",
+       "job_id": 109376661456,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:46Z",
+       "completed_at": "2026-09-29T11:23:55Z",
+       "tests_run": 4846,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.14)",
+       "job_id": 109376661477,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:45Z",
+       "completed_at": "2026-09-29T11:22:58Z",
+       "tests_run": 4846,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (windows-latest, 3.11)",
+       "job_id": 109376661431,
+       "conclusion": "failure",
+       "started_at": "2026-09-29T11:04:46Z",
+       "completed_at": "2026-09-29T11:54:01Z",
+       "tests_run": 4843,
+       "log_available": true,
+       "failing_tests": [
+        "test_clients.TestTranLuotDoAdapterThiHanh.test_cham_tran_thi_dung_tien_trinh_va_goi_ten_dung"
+       ],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "Process completed with exit code 1."
+       ]
+      },
+      {
+       "job": "wheel",
+       "job_id": 109376661950,
+       "conclusion": "success",
+       "started_at": "2026-09-29T11:04:46Z",
+       "completed_at": "2026-09-29T11:05:09Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "platforms": [
+   "linux",
+   "windows"
+  ]
+ }
 }
