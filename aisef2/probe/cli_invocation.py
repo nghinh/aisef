@@ -106,6 +106,7 @@ scrubbed environment, the fresh working directory and the harness-owned bytecode
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import os
@@ -180,6 +181,7 @@ STREAM_SHAPES = ("text", "contains", "regex", "lines", "first_word")
 FILE_SHAPES = ("sha256", "text", "absent", "equals_before")
 PLACEHOLDER = "<ws>"
 POLL_S = 0.02   # how often the parent looks at the protocol file; it never decides content
+DISPOSE_S = 10.0   # how long the disposal of a probe-owned evaluation directory waits out a sharing violation
 _NAME = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]*(?:/[A-Za-z0-9_][A-Za-z0-9._-]*)*")
 _HEX = re.compile(r"(?:[0-9a-fA-F]{2})*")
 _SHA = re.compile(r"[0-9a-f]{64}")
@@ -694,7 +696,7 @@ class CliInvocationProbe(HarnessProbe):
         except OSError as e:
             return Observation(ObservationKind.HARNESS_FAILED, detail=f"the evaluation directory cannot be created: "
                                                                      f"{type(e).__name__}"), None
-        with holder as work:
+        with _disposed(holder) as work:
             return self._observe_in(work, spec_id, cls, locator, stim, observable, at, env,
                                     lambda facts: verdict_of(cls, observable, facts))
 
@@ -711,7 +713,7 @@ class CliInvocationProbe(HarnessProbe):
         except OSError as e:
             return Observation(ObservationKind.HARNESS_FAILED, detail=f"the evaluation directory cannot be created: "
                                                                      f"{type(e).__name__}")
-        with holder_a as work_a, holder_b as work_b:
+        with _disposed(holder_a) as work_a, _disposed(holder_b) as work_b:
             halves = {}
             for side, work in (("a", work_a), ("b", work_b)):
                 o, facts = self._observe_in(work, f"{spec_id}/{side}", "equality", locator, eq[f"stimulus_{side}"],
@@ -756,6 +758,28 @@ class CliInvocationProbe(HarnessProbe):
                           bool(stim.get("pre")), env, work, ws, decide)
         finally:
             run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+
+
+@contextlib.contextmanager
+def _disposed(holder):
+    """The evaluation directory, disposed when the evaluation ends (C2-P2-FINDING-003). The range is released
+    before this runs, so no member is alive; on Windows a member the controller's TerminateJobObject just ended
+    can still hold its working directory and inherited handles inside the directory for a moment, and the
+    disposal meets a sharing violation. It is retried until `DISPOSE_S` has passed, then raised: a directory that
+    stays in use is a leak, never silent. A controller-owned scratch is not disposed here (StoryScope does it)."""
+    work = holder.__enter__()
+    try:
+        yield work
+    finally:
+        until = time.monotonic() + DISPOSE_S
+        while True:
+            try:
+                holder.__exit__(None, None, None)
+                break
+            except PermissionError:
+                if time.monotonic() >= until:
+                    raise
+                time.sleep(POLL_S)
 
 
 def _preflight(at: RevisionRef, env: ExecutionEnv) -> Observation | None:

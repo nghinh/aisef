@@ -222,6 +222,42 @@ class FaultStream(_Product):
         self.assertEqual(stopped.exception.stage, "terminate_job")
         self.assertIn("what the subject did is not known", stopped.exception.detail)
 
+    def test_C2_P2_FINDING_003_the_evaluation_directory_is_disposed_through_a_passing_sharing_violation(self):
+        """Windows: a member TerminateJobObject just ended can still hold handles inside the evaluation directory for a
+        moment after the range is measured empty; the probe-owned directory's disposal waits that out, bounded."""
+        class Holder:
+            def __init__(self, fails, error=PermissionError):
+                self.fails, self.error, self.exits = fails, error, 0
+
+            def __enter__(self):
+                return "work"
+
+            def __exit__(self, *exc):
+                self.exits += 1
+                if self.exits <= self.fails:
+                    raise self.error("[WinError 32] in use by another process")
+        with mock.patch.object(ci, "POLL_S", 0.001):
+            passing = Holder(2)
+            with ci._disposed(passing) as work:
+                self.assertEqual(work, "work")
+            self.assertEqual(passing.exits, 3)                     # two sharing violations, then disposed
+            other = Holder(1, OSError)
+            with self.assertRaises(OSError), ci._disposed(other):  # any other failure is raised at once
+                pass
+            self.assertEqual(other.exits, 1)
+            body = Holder(0)
+            with self.assertRaises(ProbeInterrupted), ci._disposed(body):   # the body's own outcome passes through
+                raise ProbeInterrupted("stopped", signal=None, stage="terminate_job")
+            self.assertEqual(body.exits, 1)
+            with mock.patch.object(ci, "DISPOSE_S", 0.05):
+                stuck = Holder(10 ** 6)
+                started = time.monotonic()
+                with self.assertRaises(PermissionError), ci._disposed(stuck):   # still in use: a leak, raised
+                    pass
+                self.assertLess(time.monotonic() - started, 5)
+                self.assertGreater(stuck.exits, 1)
+        self.assertEqual(ci.DISPOSE_S, 10.0)
+
     def test_the_internal_observation_carries_its_facts_on_every_path(self):
         """`_observe` answers (Observation, facts): the facts the harness reported (or the hard-exit facts) with an
         OBSERVED observation, None with every other kind — the channel the equality class reads."""

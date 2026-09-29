@@ -517,7 +517,9 @@ class FaultSubject(_Product):
 
     def test_FM2_CLI_SUBJECT_3_a_controller_stop_is_an_interruption_with_no_result(self):
         stops = []
-        scratch = tempfile.TemporaryDirectory()
+        # a controller-owned scratch the test disposes itself: on Windows a member TerminateJobObject just ended can
+        # hold handles in it for a moment (C2-P2-FINDING-003); process leaks are the owned range's measurement
+        scratch = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         self.addCleanup(scratch.cleanup)
 
         def after_dispatch(run):
@@ -652,7 +654,8 @@ def verdict(record):
 
 class Bytecode(unittest.TestCase):
     def setUp(self):
-        self._d = tempfile.TemporaryDirectory(prefix="aisef2-pyc-cli-")
+        # holds controller-owned scratches (see FM2-CLI-SUBJECT-3): C2-P2-FINDING-003 on Windows
+        self._d = tempfile.TemporaryDirectory(prefix="aisef2-pyc-cli-", ignore_cleanup_errors=True)
         self.addCleanup(self._d.cleanup)
         self.tmp = pathlib.Path(self._d.name)
         self.root = self.tmp / "checkout"

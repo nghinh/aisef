@@ -379,7 +379,7 @@ C2P2_TARGETS: dict[str, list[str]] = {
     **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_HARNESS for f in (
         "PROBE_SOURCES", "_probe_digest", "_await", "CliInvocationProbe.__init__", "CliInvocationProbe.observe",
         "CliInvocationProbe._observe", "CliInvocationProbe._observe_in", "_preflight", "_watch", "_hard_exit",
-        "_harness_failure")},
+        "_harness_failure", "_disposed")},
     "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality": [*_CLI_HARNESS[:1], *_CLI_CALIBRATION],
     "aisef2/probe/cli_invocation.py::_harness_argv": [*_CLI_PURE, *_CLI_HARNESS],
 }
