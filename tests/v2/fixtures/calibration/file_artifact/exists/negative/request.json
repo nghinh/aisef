@@ -1,0 +1,12 @@
+{
+ "subject": {
+  "kind": "file_artifact",
+  "locator": "path:app/config.toml"
+ },
+ "stimulus": {},
+ "observable": {
+  "condition": "exists",
+  "within_s": 5
+ },
+ "subject_absence": "ABSENCE_IS_DECIDABLE"
+}

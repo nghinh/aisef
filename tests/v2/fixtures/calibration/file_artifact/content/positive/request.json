@@ -1,0 +1,12 @@
+{
+ "subject": {
+  "kind": "file_artifact",
+  "locator": "path:app/VERSION"
+ },
+ "stimulus": {},
+ "observable": {
+  "sha256": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03",
+  "within_s": 5
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}

@@ -37,7 +37,7 @@ def _fixture(name: str) -> dict:
 class Catalog(unittest.TestCase):
     def test_the_cycle1_probe_is_the_one_active_entry_at_its_frozen_digest(self):
         entries = catalog.active()
-        self.assertEqual(list(entries), [SubjectKind.PYTHON_CALLABLE])
+        self.assertIn(SubjectKind.PYTHON_CALLABLE, entries)   # WP-2.1.1 registers a second kind beside it
         e = entries[SubjectKind.PYTHON_CALLABLE]
         self.assertEqual((e.probe_id, e.probe_digest, e.cycle), (pc.PROBE_ID, cb.CYCLE1_PROBE["digest"], 1))
         self.assertEqual(pc.DIGEST, cb.CYCLE1_PROBE["digest"])
@@ -46,7 +46,7 @@ class Catalog(unittest.TestCase):
         self.assertIsNotNone(catalog.registry())
         probes = catalog.catalogue()
         self.assertIsInstance(probes[SubjectKind.PYTHON_CALLABLE], pc.PythonCallableProbe)
-        self.assertEqual(list(catalog.probes_by_id()), [pc.PROBE_ID])
+        self.assertEqual(list(catalog.probes_by_id())[0], pc.PROBE_ID)   # the Cycle-1 identity stays first
 
     def test_two_active_probes_for_one_kind_are_refused_F4(self):
         second = catalog.CatalogEntry("probe.python_callable_v2", "b" * 64, SubjectKind.PYTHON_CALLABLE, ("returns_bytes",),
