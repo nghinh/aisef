@@ -84,6 +84,9 @@ timing window orders the exit and the last write). Decision table, after DISPATC
   signal, which is an interruption (`ProbeInterrupted`, as python_callable._after_dispatch);
 * no RESULT at the window's end with the process still there (measured on the range, never assumed): SUBJECT_DEADLINE
   with the class's `ON_DEADLINE` verdict; the caller's `release` stops it — the probe never signals anything.
+* no RESULT at the window's end, nothing left of the process and its exit status never reported: HARNESS_FAILED,
+  unless the controller's ledger holds a stop — an interruption (C2-P2-FINDING-002: on Windows the controller's
+  TerminateJobObject takes the range's anchor down with the job, so its own stop reports no exit status).
 
 Before DISPATCHED the watchdog runs: an exit with no READY/DISPATCHED, or none within the watchdog, is HARNESS_FAILED
 (UNRUNNABLE): the harness did not start or broke its protocol.
@@ -801,8 +804,11 @@ def _watch(run, proto: str, nonce: str, cls: str, window: float, files: list, pr
                                                     detail=f"the subject's {window:g}s observation window expired "
                                                            f"({cls})")), None
         if run.wait(_COLLECT_S) is None:   # nothing of it is left, and the range never said how it ended
-            return Observation(ObservationKind.HARNESS_FAILED,
-                               detail="the harness process ended and its exit status was never reported"), None
+            # after DISPATCHED the controller's ledger is asked first (§9.3): on Windows its TerminateJobObject
+            # takes the range's anchor down with the job, so a controller stop reports no exit status at all
+            return _after_dispatch(run, Observation(ObservationKind.HARNESS_FAILED,
+                                                    detail="the harness process ended and its exit status was "
+                                                           "never reported")), None
         seen = _protocol(proto, nonce)
     if "RESULT" in seen:
         facts = json.loads(seen["RESULT"][0])

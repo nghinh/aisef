@@ -209,6 +209,19 @@ class FaultStream(_Product):
         self.assertEqual(o, Observation(K.HARNESS_FAILED, detail="the harness process ended and its exit status was "
                                                                  "never reported"))
 
+    def test_C2_P2_FINDING_002_a_controller_stop_with_no_status_reported_is_an_interruption(self):
+        """On Windows the controller's TerminateJobObject takes the range's anchor down with the job, so the stop
+        reports no exit status: after DISPATCHED the ledger is asked first (§9.3), as on every other path."""
+        class Vanished(FakeRange):
+            def wait(self, timeout=None):
+                return None
+        ledger = [{"stage": "terminate_job", "signal": "TerminateJobObject", "at": 0.0}]
+        with mock.patch.object(ci, "ProcessRange", Vanished(("READY", "DISPATCHED"), None, ledger)), \
+                mock.patch.object(ci, "_COLLECT_S", 0.05), self.assertRaises(ProbeInterrupted) as stopped:
+            self.see(spec("app:__main__", EXIT0, {"argv": ["echo"]}, window=0.3))
+        self.assertEqual(stopped.exception.stage, "terminate_job")
+        self.assertIn("what the subject did is not known", stopped.exception.detail)
+
     def test_the_internal_observation_carries_its_facts_on_every_path(self):
         """`_observe` answers (Observation, facts): the facts the harness reported (or the hard-exit facts) with an
         OBSERVED observation, None with every other kind — the channel the equality class reads."""
