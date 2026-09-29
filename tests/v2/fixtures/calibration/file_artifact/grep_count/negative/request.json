@@ -1,0 +1,17 @@
+{
+ "subject": {
+  "kind": "file_artifact",
+  "locator": "path:app"
+ },
+ "stimulus": {
+  "grep": "^import telemetry\\b",
+  "suffixes": [
+   ".py"
+  ]
+ },
+ "observable": {
+  "matches": 0,
+  "within_s": 5
+ },
+ "subject_absence": "ABSENCE_IS_DECIDABLE"
+}

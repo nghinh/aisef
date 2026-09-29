@@ -38,7 +38,8 @@ if str(pathlib.Path(__file__).resolve().parent) not in sys.path:
 import cleanup_authority as ca  # noqa: E402  — the runner's only way to signal a process (P4-FINDING-011)
 RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence/v2/P2-MUTATION.json",
            "P3": "closure-evidence/v2/P3-MUTATION.json", "P4": "closure-evidence/v2/P4-MUTATION.json",
-           "P5": "closure-evidence/v2/P5-MUTATION.json", "P6": "closure-evidence/v2/P6-MUTATION.json"}
+           "P5": "closure-evidence/v2/P5-MUTATION.json", "P6": "closure-evidence/v2/P6-MUTATION.json",
+           "C2-P1": "closure-evidence/v2/cycle2/P1-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -354,8 +355,22 @@ for _t in ("aisef2/runtime/repair.py::closers", "aisef2/runtime/repair.py::repai
     P4_TARGETS[_t] = [*P4_TARGETS[_t], _V2_005]
 for _t in ("aisef2/control/owner.py::TAXONOMY", "aisef2/control/owner.py::classify", "aisef2/control/owner.py::flatten"):
     P1_TARGETS[_t] = [*P1_TARGETS[_t], _V2_005]
+# Cycle 2, C2-P1 (WP-2.1.1): every function and table of the file_artifact probe, killed by its own module (the
+# object-store rule on real repositories, the fault family FM2-FILE, the calibration fixtures, the pinned tables).
+# Names that generate no mutant (PROBE_ID, WEAKEST_PATH, the integer caps, _PREFIX, _LOCATIONS, DIGEST, METADATA,
+# PlainTree.__init__) are not targets: a run that cannot say NO proves nothing.
+_FILE_ARTIFACT_TESTS = ["tests/v2/test_c2_file_artifact.py"]
+C2_P1_TARGETS: dict[str, list[str]] = {f"aisef2/probe/file_artifact.py::{f}": _FILE_ARTIFACT_TESTS for f in (
+    "PROBE_SOURCES", "CLASSES", "ON_DEADLINE", "NEWLINES", "MODES", "_HEX64", "_probe_digest", "window_of", "_compiles",
+    "observation_class", "spec_class", "refusal", "expected_sha256", "verdict_of", "normalised", "content_facts",
+    "grep_facts", "selected", "git_env", "run_git", "ObjectStore.__init__", "ObjectStore.run",
+    "ObjectStore.holds_revision", "ObjectStore.lookup", "ObjectStore.entries", "ObjectStore.walk", "ObjectStore._parse",
+    "ObjectStore.blob", "PlainTree._full", "PlainTree._row", "PlainTree.lookup", "PlainTree.entries", "PlainTree.walk",
+    "PlainTree.blob", "entry", "read",
+    "facts_of", "FileArtifactProbe.__init__", "FileArtifactProbe.enforcement",
+    "FileArtifactProbe.harness_preconditions", "FileArtifactProbe.observe", "FileArtifactProbe._reader")}
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
-                 "P6": P6_TARGETS}
+                 "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
