@@ -1,0 +1,3440 @@
+{
+ "record": "AISEF V2 — C2-P5 correction, LANE-P5C independent audit (reviewer report) and its reconciliation",
+ "lane": "LANE-P5C",
+ "authority": "owner ruling 2026-09-30 (P5 CORRECTION AUTHORIZED): LANE-P5C read-only audit of requirement coverage, plan-only overconstraint, multi-facet criteria, polarity, synthetic approval authority and probe expressiveness",
+ "nature": "a read-only subagent's report over the repository at 0f77995 (it wrote only its report); a reviewer's opinion, NOT evidence of product behaviour — every behavioural claim of the P5 correction rests on P5-FALSIFIABILITY.json",
+ "report_sha256": "40b5786ea1bfdcbb121f15f2cce103d410c966787a34d2c71a328581373f4d69",
+ "report": {
+  "record": "P5C-AUDIT",
+  "lane": "LANE-P5C (read-only independent audit)",
+  "repository_head": "0f779956f98f38abf4d4c33c6db4cadd819d8640 (branch hardening/systematic-v1)",
+  "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc (verified)",
+  "sources_read": [
+   "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md",
+   "…/REQUIREMENTS-MAP.json",
+   "…/reference/ledgerlock/{__init__,__main__,ledger,cli}.py",
+   "docs/implementation/v2/cycle2/cycle2-capability-gap-matrix.json (criteria, 77)",
+   "aisef2/probe/{python_callable_v2,file_artifact,cli_invocation,process_effect}.py",
+   "aisef2/probe/protocol.py (classify_failure)",
+   "aisef2/product/{compiler,contract,approval,outcome}.py",
+   "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json (FR titles, approvals block)"
+  ],
+  "method": {
+   "neutral": "A spec is neutral when EVERY implementation conforming to the frozen requirements satisfies it, whatever it chose for the open choices; interface assumptions (IA-*) are listed where a library spec needs one.",
+   "requirement_clause_classes": "NORMATIVE_PRODUCT_REQUIREMENT: a testable product obligation; UNSUPPORTED_FOR_FULL_ENFORCEMENT: normative but outside every probe's vocabulary whatever is assumed (durability, crashes, locks, code structure, file-access tracing, interpreter version, documentation); ENGINEERING_TEST_REQUIREMENT: obligations on the developer test suite; DESCRIPTIVE: purpose/non-goal prose measured elsewhere.",
+   "plan_criterion_rule": "NORMATIVE when every asserted clause traces to a frozen clause and the only non-normative content is the call shape/return representation used to state it; PLAN_ONLY_DETAIL when it asserts any behaviour or artefact the requirements do not require (plan module/helper, stream contents, exception attributes, a fixed open choice, flags) or contradicts them — normative clauses are then listed separately; ENGINEERING_TEST_REQUIREMENT when its subject is the developer test suite/coverage/runners; UNSUPPORTED_FOR_FULL_ENFORCEMENT when its core clause is normative but unobservable."
+  },
+  "summary": {
+   "requirement_clauses": 82,
+   "requirement_clause_counts": {
+    "DESCRIPTIVE": 7,
+    "NORMATIVE_PRODUCT_REQUIREMENT": 60,
+    "UNSUPPORTED_FOR_FULL_ENFORCEMENT": 10,
+    "ENGINEERING_TEST_REQUIREMENT": 5
+   },
+   "normative_expressibility_counts": {
+    "YES": 25,
+    "PARTIAL": 28,
+    "NO": 7
+   },
+   "plan_criteria": 77,
+   "plan_criteria_counts": {
+    "PLAN_ONLY_DETAIL": 53,
+    "NORMATIVE_PRODUCT_REQUIREMENT": 17,
+    "UNSUPPORTED_FOR_FULL_ENFORCEMENT": 2,
+    "ENGINEERING_TEST_REQUIREMENT": 5
+   },
+   "plan_criteria_mixed": 38,
+   "plan_criteria_contradicting": 9,
+   "key_gaps": [
+    "No neutral spec for the hash formula (R-3.2/3), the GENESIS value (R-3.2/5: a disjunction), first_bad_index (R-3.3/4), snapshot content/order/--out identity (R-6/1-2, R-6/4), CLI conflict exit 4 (R-9/5) and CLI apply success (R-5/5, R-14/3): each presumes an open choice (encoding, representation, layout, batch file format).",
+    "Byte identity of a product-written pre-state is not expressible (equals_before anchors after the workspace step); only line_count/jsonl fields are.",
+    "Library verify verdicts are never neutral (representation); the neutral verify is the CLI exit code 0/5, which cannot witness R-3.4's same-instance clause.",
+    "Neutral library specs still need IA-1 (Ledger(path)), IA-2 (apply_batch with JSON lists for tuples), IA-4, IA-5, IA-9, IA-10; 'same result' additionally needs IA-8/IA-14.",
+    "Durability, crash atomicity, the lock, file-access confinement and in-memory independence are UNSUPPORTED_FOR_FULL_ENFORCEMENT."
+   ]
+  },
+  "normative_clauses": [
+   {
+    "id": "R-1/1",
+    "requirement": "R-1",
+    "clause": "append-only, tamper-evident key/value ledger with cryptographic hash chaining, idempotent mutating operations, and crash-safe atomic batch writes",
+    "classification": "DESCRIPTIVE",
+    "open_choices": [],
+    "note": "purpose; restated normatively in R-3..R-5"
+   },
+   {
+    "id": "R-1/2",
+    "requirement": "R-1",
+    "clause": "implemented as a Python 3.11+ library using only the standard library",
+    "classification": "DESCRIPTIVE",
+    "open_choices": [],
+    "note": "restated in R-10"
+   },
+   {
+    "id": "R-1/3",
+    "requirement": "R-1",
+    "clause": "with a deterministic snapshot/verify CLI",
+    "classification": "DESCRIPTIVE",
+    "open_choices": [],
+    "note": "restated in R-6, R-9, R-14"
+   },
+   {
+    "id": "R-1/4",
+    "requirement": "R-1",
+    "clause": "No network, server, UI, or database is involved.",
+    "classification": "DESCRIPTIVE",
+    "open_choices": [],
+    "note": "non-goal; measurable half is R-12/1"
+   },
+   {
+    "id": "R-2/1",
+    "requirement": "R-2",
+    "clause": "No network listener / HTTP server / web UI / desktop UI.",
+    "classification": "DESCRIPTIVE",
+    "open_choices": [],
+    "note": "non-goal; its measurable half is the socket prohibition R-12/1"
+   },
+   {
+    "id": "R-2/2",
+    "requirement": "R-2",
+    "clause": "No external database (SQLite, Postgres, etc.). Storage is a single JSONL file.",
+    "classification": "DESCRIPTIVE",
+    "open_choices": [],
+    "note": "non-goal; measured through R-10/2 (sqlite3 is outside the allowlist) and R-3.2/1"
+   },
+   {
+    "id": "R-2/3",
+    "requirement": "R-2",
+    "clause": "No client/server split. This is a single-process library + CLI.",
+    "classification": "DESCRIPTIVE",
+    "open_choices": []
+   },
+   {
+    "id": "R-2/4",
+    "requirement": "R-2",
+    "clause": "No third-party runtime dependencies (no cryptography, no pynacl, no requests).",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "subsumed by R-10/2 (allowlist)"
+   },
+   {
+    "id": "R-3.1/1",
+    "requirement": "R-3.1",
+    "clause": "All keys are normalized to Unicode NFC before any storage, lookup, hashing, or serialization step.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "where normalisation happens (entry point, helper name)",
+     "whether a non-str key is refused"
+    ]
+   },
+   {
+    "id": "R-3.1/2",
+    "requirement": "R-3.1",
+    "clause": "Two strings that differ only in NFC/NFD representation MUST be treated as the same key.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-3.1/3",
+    "requirement": "R-3.1",
+    "clause": "Equivalence is checked using unicodedata.normalize(\"NFC\", s).",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "spelling of the call (module attribute vs from-import)"
+    ],
+    "note": "mechanism directive; its behavioural consequence is R-3.1/1-2"
+   },
+   {
+    "id": "R-3.1/4",
+    "requirement": "R-3.1",
+    "clause": "Comparison of the normalized form MUST be byte-exact.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "no case folding, no NFKC: 'k' vs 'K' and U+FB01 vs 'fi' are different keys"
+   },
+   {
+    "id": "R-3.2/1",
+    "requirement": "R-3.2",
+    "clause": "The ledger is a single JSONL file.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "whether a mutation on a missing file creates it",
+     "line terminator (\\n assumed by R-7)",
+     "whether an existing empty file is a valid empty ledger"
+    ]
+   },
+   {
+    "id": "R-3.2/2",
+    "requirement": "R-3.2",
+    "clause": "Each line is one of: { op: put, key, value, ts, id } / { op: delete, key, ts, id }",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "field order",
+     "whitespace / escaping (ensure_ascii)",
+     "whether extra fields are allowed",
+     "whether a delete line may carry value",
+     "who supplies ts (caller vs implementation)"
+    ]
+   },
+   {
+    "id": "R-3.2/3",
+    "requirement": "R-3.2",
+    "clause": "Each line carries a \"hash\" field ... computed over the canonical bytes of the line with \"hash\" and \"prev_hash\" set to the empty string: hash = SHA-256( prev_hash || \"|\" || canonical_bytes )",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "canonical-bytes encoding (key order, separators, non-ASCII escaping, number form, UTF-8)",
+     "byte encoding of the prev_hash operand and of '|'",
+     "digest text encoding (lower/upper hex, other)",
+     "whether the prev_hash operand at verify time is the stored field or the previous line's stored hash"
+    ]
+   },
+   {
+    "id": "R-3.2/4",
+    "requirement": "R-3.2",
+    "clause": "prev_hash of the next line = this hash",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-3.2/5",
+    "requirement": "R-3.2",
+    "clause": "The first line's prev_hash is the literal string \"GENESIS\" (64 hex chars of zeros OR the literal string \"GENESIS\" — implementation choice ...)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "GENESIS form: literal \"GENESIS\" or 64 '0' characters (explicitly the implementer's)"
+    ]
+   },
+   {
+    "id": "R-3.2/6",
+    "requirement": "R-3.2",
+    "clause": "but it MUST be documented and constant",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [
+     "where it is documented (README, docs/, docstring)"
+    ],
+    "note": "'documented' has no location and no content rule; 'constant' is a property across ledgers, which no probe compares"
+   },
+   {
+    "id": "R-3.2/7",
+    "requirement": "R-3.2",
+    "clause": "The chain is append-only: existing records MUST NOT be rewritten in place.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "R-5 rewrites the whole file through temp+rename; 'in place' is read as: the old records' bytes survive"
+   },
+   {
+    "id": "R-3.3/1",
+    "requirement": "R-3.3",
+    "clause": "Any modification to a committed line (mutating value, swapping op, or modifying hash) MUST be detected by an independent full verify that does not trust any cached metadata.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "'any modification' includes canonical-form-preserving edits a canonical-bytes hash cannot see (see risks)"
+   },
+   {
+    "id": "R-3.3/2",
+    "requirement": "R-3.3",
+    "clause": "Verify returns a structured verdict",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "verdict representation: dict, NamedTuple, dataclass, custom object; extra fields"
+    ]
+   },
+   {
+    "id": "R-3.3/3",
+    "requirement": "R-3.3",
+    "clause": "ok=True if every line's recomputed hash matches its stored hash AND every line's stored prev_hash matches the previous line's stored hash.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "first_bad_index on success (absent / None / other)"
+    ]
+   },
+   {
+    "id": "R-3.3/4",
+    "requirement": "R-3.3",
+    "clause": "ok=False and first_bad_index=<i> on the first violation.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "index base (0 or 1)",
+     "index of an unparsable line",
+     "how the CLI reports the index (unspecified)"
+    ]
+   },
+   {
+    "id": "R-3.4/1",
+    "requirement": "R-3.4",
+    "clause": "The verify implementation MUST NOT read any field from in-memory state set by append.",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [],
+    "note": "a code-structure property; its only consequence (a tamper after the same instance appended is detected) is observable only through the library verdict's representation"
+   },
+   {
+    "id": "R-3.4/2",
+    "requirement": "R-3.4",
+    "clause": "It MUST recompute the chain from disk end-to-end.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-3.4/3",
+    "requirement": "R-3.4",
+    "clause": "This rule applies whether verify is called from CLI or library.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-4.1/1",
+    "requirement": "R-4.1",
+    "clause": "Every mutating operation (put, delete) takes a request id (rid).",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "put/delete/append signatures (argument order, ts parameter, method vs function)"
+    ]
+   },
+   {
+    "id": "R-4.1/2",
+    "requirement": "R-4.1",
+    "clause": "A rid is a non-empty UTF-8 string supplied by the caller (UUID4, ULID, etc. — format opaque to LedgerLock).",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "behaviour and error type for an empty or non-str rid"
+    ]
+   },
+   {
+    "id": "R-4.2/1",
+    "requirement": "R-4.2",
+    "clause": "If the same rid is replayed, the second call MUST return the same result",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "replay scope: rid alone (R-4.4/3 implies op-agnostic) vs rid+key",
+     "result representation",
+     "whether a differing value/ts under the same rid is still a replay"
+    ]
+   },
+   {
+    "id": "R-4.2/2",
+    "requirement": "R-4.2",
+    "clause": "and MUST NOT append a new line to the chain.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-4.3/1",
+    "requirement": "R-4.3",
+    "clause": "If a different rid tries to mutate a key whose last committed mutation used a different rid, the call MUST raise ConflictError (or return an error result depending on CLI surface)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "exception attributes and message",
+     "conflicts between elements of one batch (earlier element not committed)",
+     "the CLI error result's form beyond exit 4"
+    ]
+   },
+   {
+    "id": "R-4.3/2",
+    "requirement": "R-4.3",
+    "clause": "and MUST NOT append a new line.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-4.4/1",
+    "requirement": "R-4.4",
+    "clause": "A delete produces a tombstone line.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "value slot of a delete op",
+     "delete of a never-put key"
+    ]
+   },
+   {
+    "id": "R-4.4/2",
+    "requirement": "R-4.4",
+    "clause": "A subsequent put on the same key with a different rid MUST conflict against the tombstone just as it would against a live value.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-4.4/3",
+    "requirement": "R-4.4",
+    "clause": "A subsequent put with the same rid as the tombstone is an idempotent replay and MUST be a no-op returning the same result as the delete.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "result representation"
+    ]
+   },
+   {
+    "id": "R-4.5/1",
+    "requirement": "R-4.5",
+    "clause": "A put on key k with rid=r1, then a delete on key k with rid=r2 — the second MUST conflict.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-4.5/2",
+    "requirement": "R-4.5",
+    "clause": "Replays of either MUST NOT conflict.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "holds consistently only for the committed put; a replay of the refused delete r2 conflicts again by R-4.3 (see risks)"
+   },
+   {
+    "id": "R-5/1",
+    "requirement": "R-5",
+    "clause": "apply_batch(ops) accepts an iterable of (op, key, value, rid, ts) tuples",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "method of a path-bound Ledger vs module function",
+     "whether non-tuple sequences are accepted",
+     "return value (per-op results, count, None)",
+     "replays and conflicts inside one batch"
+    ]
+   },
+   {
+    "id": "R-5/2",
+    "requirement": "R-5",
+    "clause": "under the lock",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [],
+    "note": "'the lock' is never defined; threading/fcntl/msvcrt are outside R-10's allowlist; concurrency is outside every probe's vocabulary"
+   },
+   {
+    "id": "R-5/3",
+    "requirement": "R-5",
+    "clause": "writes all lines to a sibling temp file, fsyncs the temp file, then renames it over the JSONL path",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [
+     "temp file name/prefix",
+     "os.replace vs os.rename",
+     "fsync vs fdatasync"
+    ],
+    "note": "mechanism; its observable consequence (old lines survive, file = old + new lines) is carried by R-3.2/7 and R-5/1"
+   },
+   {
+    "id": "R-5/4",
+    "requirement": "R-5",
+    "clause": "If the process crashes at any point, the JSONL on disk MUST either reflect the full batch or be byte-identical to its pre-batch state — never a partial batch.",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [],
+    "note": "universal over crash points; see expressibility of R-5 in plan criterion AC-STORY-03-01-5"
+   },
+   {
+    "id": "R-5/5",
+    "requirement": "R-5",
+    "clause": "The CLI equivalent is ledgerlock apply --batch <file> which reads the batch spec and performs the same atomic operation.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "batch file format and schema",
+     "CLI output"
+    ]
+   },
+   {
+    "id": "R-6/1",
+    "requirement": "R-6",
+    "clause": "snapshot() returns a deterministic, sorted JSON document representing the current materialized state: for each key, the most recent committed put value (if not tombstoned by a later delete)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "document layout (object key->value vs list of pairs)",
+     "return type (bytes, str, dict)",
+     "whitespace, escaping, trailing newline",
+     "snapshot of a missing ledger"
+    ]
+   },
+   {
+    "id": "R-6/2",
+    "requirement": "R-6",
+    "clause": "sorted by NFC-normalized key in byte order (UTF-8 codepoint order)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-6/3",
+    "requirement": "R-6",
+    "clause": "The snapshot MUST be byte-stable for a given chain content (same chain → same snapshot bytes).",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-6/4",
+    "requirement": "R-6",
+    "clause": "The CLI ledgerlock snapshot --out <file> writes this same document.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "'same document' when snapshot() returns a non-bytes value"
+    ]
+   },
+   {
+    "id": "R-7/1",
+    "requirement": "R-7",
+    "clause": "If the JSONL ends in a truncated line (last byte is not \\n and the last line does not parse / hash), ledgerlock repair-tail MUST rewrite the file with the truncated final line removed",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "'parse / hash' = does not parse OR does not hash",
+     "result when the only line is truncated (empty file)",
+     "CLI output"
+    ]
+   },
+   {
+    "id": "R-7/2",
+    "requirement": "R-7",
+    "clause": "and verify cleanly afterwards.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-7/3",
+    "requirement": "R-7",
+    "clause": "No other content may be modified.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-7/4",
+    "requirement": "R-7",
+    "clause": "If the chain is clean, repair-tail is a no-op.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-7/5",
+    "requirement": "R-7",
+    "clause": "If the chain is corrupt in the middle (not at the tail), repair-tail MUST refuse.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "'refuse' = no write (implied by R-7/3)",
+     "a newline-terminated last line that fails parse/hash (neither truncated nor mid-chain: unspecified)"
+    ]
+   },
+   {
+    "id": "R-8/1",
+    "requirement": "R-8",
+    "clause": "After a successful append, the bytes MUST be durably on disk before the function returns successfully.",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [],
+    "note": "durability is not observable from a process: a second reader sees the page cache"
+   },
+   {
+    "id": "R-8/2",
+    "requirement": "R-8",
+    "clause": "Implementation: write to temp file, fsync, then rename; or open the JSONL in append mode and call f.flush(); os.fsync(fd) before close.",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [
+     "which of the two strategies"
+    ],
+    "note": "mechanism; a fault witness presumes the function faulted and the exception propagated"
+   },
+   {
+    "id": "R-9/1",
+    "requirement": "R-9",
+    "clause": "ledgerlock (or python -m ledgerlock) MUST exit with:",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "the python -m form is observable (cli_invocation ledgerlock:__main__); a console script is refused by the probe"
+   },
+   {
+    "id": "R-9/2",
+    "requirement": "R-9",
+    "clause": "0 — success (append / verify ok / snapshot ok / repair-tail no-op or repair ok)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "which CLI surface 'append' is (no CLI append command is specified)"
+    ]
+   },
+   {
+    "id": "R-9/3",
+    "requirement": "R-9",
+    "clause": "2 — usage error (bad arguments)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "the full CLI grammar beyond R-14's four forms"
+    ]
+   },
+   {
+    "id": "R-9/4",
+    "requirement": "R-9",
+    "clause": "3 — I/O error (file not found, permission denied)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "whether a missing ledger is 'not found' or a fresh empty ledger"
+    ]
+   },
+   {
+    "id": "R-9/5",
+    "requirement": "R-9",
+    "clause": "4 — conflict (rid mismatch on a key)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-9/6",
+    "requirement": "R-9",
+    "clause": "5 — corruption (verify reports ok=False or repair-tail finds non-tail corruption)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-9/7",
+    "requirement": "R-9",
+    "clause": "verify exiting 0 means the chain is intact. verify exiting 5 means corruption. Any other exit code is a bug.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "conflicts with R-9/3 and R-9/4 for verify (see risks)"
+   },
+   {
+    "id": "R-10/1a",
+    "requirement": "R-10",
+    "clause": "Python 3.11+ required",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [],
+    "note": "the interpreter is the ExecutionEnv's (a RunSpec capability); no probe selects a version"
+   },
+   {
+    "id": "R-10/1b",
+    "requirement": "R-10",
+    "clause": "(use from __future__ import annotations)",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "in which modules (every module? the reference's __init__.py has none)"
+    ]
+   },
+   {
+    "id": "R-10/2",
+    "requirement": "R-10",
+    "clause": "Stdlib only. Allowed: hashlib, json, os, sys, pathlib, tempfile, argparse, unittest, typing, unicodedata, uuid.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "__future__ (required by R-10/1b) and intra-package imports (required by R-13) are not listed but must be allowed"
+   },
+   {
+    "id": "R-10/3",
+    "requirement": "R-10",
+    "clause": "No pip install of any runtime dependency.",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [],
+    "note": "a process directive; pyproject content is TOML-layout-dependent"
+   },
+   {
+    "id": "R-11/1",
+    "requirement": "R-11",
+    "clause": "Unit tests covering every requirement in §3–§9.",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-11/2",
+    "requirement": "R-11",
+    "clause": "≥85% line coverage measured by coverage.py (a dev-only dependency ... allowed only for the test phase).",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-11/3",
+    "requirement": "R-11",
+    "clause": "Tests must be runnable with python -m unittest discover AND pytest if pytest is available; results MUST agree.",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-12/1",
+    "requirement": "R-12",
+    "clause": "No socket, no subprocess, no os.system.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "read as: the product source uses none of them"
+   },
+   {
+    "id": "R-12/2",
+    "requirement": "R-12",
+    "clause": "No opening of files outside the configured ledger path except the explicit batch input and snapshot output paths supplied by the caller.",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "open_choices": [],
+    "note": "no probe traces file access; also in tension with R-5/3's sibling temp file (see risks)"
+   },
+   {
+    "id": "R-13/1",
+    "requirement": "R-13",
+    "clause": "ledgerlock/ __init__.py, ledger.py, cli.py",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "src/ layout vs root (the tree shows root)"
+    ]
+   },
+   {
+    "id": "R-13/2",
+    "requirement": "R-13",
+    "clause": "ledger.py # core: Ledger, ConflictError, append, verify, snapshot, apply_batch",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "append/verify/snapshot/apply_batch as module functions or Ledger methods"
+    ]
+   },
+   {
+    "id": "R-13/3",
+    "requirement": "R-13",
+    "clause": "cli.py # argparse CLI, exact exit codes",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-13/4",
+    "requirement": "R-13",
+    "clause": "tests/ test_*.py # unittest.TestCase based",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-13/5",
+    "requirement": "R-13",
+    "clause": "docs/ requirements.md # this file",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "verbatim copy vs edited copy"
+    ]
+   },
+   {
+    "id": "R-13/6",
+    "requirement": "R-13",
+    "clause": "README.md",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "content"
+    ]
+   },
+   {
+    "id": "R-13/7",
+    "requirement": "R-13",
+    "clause": "pyproject.toml # stdlib only; coverage as optional dev dep",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "TOML layout, build backend"
+    ]
+   },
+   {
+    "id": "R-14/1",
+    "requirement": "R-14",
+    "clause": "python -m ledgerlock verify path/to/ledger.jsonl exits 0 on a fresh ledger.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "'fresh ledger' = existing empty file vs nonexistent path"
+    ]
+   },
+   {
+    "id": "R-14/2",
+    "requirement": "R-14",
+    "clause": "python -m ledgerlock snapshot path/to/ledger.jsonl produces deterministic bytes.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "destination without --out (stdout is the natural reading)"
+    ]
+   },
+   {
+    "id": "R-14/3",
+    "requirement": "R-14",
+    "clause": "python -m ledgerlock apply --batch batch.json path/to/ledger.jsonl commits atomically.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [
+     "batch file format"
+    ]
+   },
+   {
+    "id": "R-14/4",
+    "requirement": "R-14",
+    "clause": "python -m ledgerlock repair-tail path/to/ledger.jsonl fixes a truncated tail.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-14/5",
+    "requirement": "R-14",
+    "clause": "coverage run -m unittest discover && coverage report reports ≥85%.",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "open_choices": []
+   },
+   {
+    "id": "R-14/6",
+    "requirement": "R-14",
+    "clause": "No third-party imports succeed at runtime.",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "open_choices": [],
+    "note": "static half observable (R-10/2 grep); 'succeed at runtime' is an environment property"
+   }
+  ],
+  "expressibility": [
+   {
+    "clause": "R-2/4",
+    "neutral_spec": "YES",
+    "how": "file_artifact grep_count path:ledgerlock, suffixes ['.py'], a pattern for import statements of non-allowlisted modules, {matches: 0}, MUST_HOLD (see polarity)",
+    "presumes": [
+     "line-grep caveats (polarity)"
+    ]
+   },
+   {
+    "clause": "R-3.1/1",
+    "neutral_spec": "PARTIAL",
+    "how": "storage half: process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); call apply_batch [[['put','e\\u0301','v','r1',1]]]; scenario_files l.jsonl {jsonl: {line 0, field 'key', equals '\\u00e9'}} (the harness parses the line, so the product's escaping is irrelevant). Lookup half: R-3.1/2. Hashing half: not separately observable.",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-3",
+     "IA-5",
+     "IA-9"
+    ],
+    "gap": "serialization half (the snapshot shows the NFC key) presumes the snapshot layout",
+    "quantifier": "bounded witness"
+   },
+   {
+    "clause": "R-3.1/2",
+    "neutral_spec": "YES",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); call apply_batch put NFD 'e\\u0301' rid r1; expect_raises apply_batch put NFC '\\u00e9' rid r2 ConflictError; scenario_raises (or scenario_files line_count 1)",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-10"
+    ],
+    "quantifier": "bounded witness (one pair per contract)"
+   },
+   {
+    "clause": "R-3.1/3",
+    "neutral_spec": "PARTIAL",
+    "how": "behaviour: the R-3.1/1-2 witnesses; mechanism: file_artifact grep_count over path:ledgerlock for an import of unicodedata, 'at least one line' (see od_grep)",
+    "presumes": [
+     "od_grep caveats"
+    ],
+    "gap": "the call spelling itself is not a neutral observable"
+   },
+   {
+    "clause": "R-3.1/4",
+    "neutral_spec": "YES",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); apply_batch put 'k' r1; call apply_batch put 'K' rid r2 (must not raise); scenario_files line_count 2; same with U+FB01 vs 'fi'",
+    "presumes": [
+     "IA-1",
+     "IA-2"
+    ],
+    "quantifier": "bounded witness"
+   },
+   {
+    "clause": "R-3.2/1",
+    "neutral_spec": "PARTIAL",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); product-written lines are JSON objects (every jsonl shape parses its line)",
+    "presumes": [
+     "IA-1",
+     "IA-2"
+    ],
+    "gap": "'single file' (no sidecar/index/lock file) is not observable: unnamed files cannot be enumerated, only guessed names asserted absent"
+   },
+   {
+    "clause": "R-3.2/2",
+    "neutral_spec": "PARTIAL",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); apply_batch one put / one delete; one contract per field: jsonl line 0 field op / key / value / ts / id equals the supplied value (file shapes are one per file)",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-3",
+     "IA-4",
+     "IA-5"
+    ],
+    "gap": "the absence of a field (no value on a delete line, no extra fields) cannot be asserted: jsonl only tests equality of a present field"
+   },
+   {
+    "clause": "R-3.2/3",
+    "neutral_spec": "NO",
+    "how": "indirect only: product-written lines + subprocess '-m ledgerlock verify' expect_exit 0 (self-consistency)",
+    "presumes": [],
+    "gap": "recomputing the hash presumes the canonical-bytes encoding and the digest text encoding; even the presence of a 'hash' field cannot be asserted without its value. An MD5 or '|'-less chain would self-verify."
+   },
+   {
+    "clause": "R-3.2/4",
+    "neutral_spec": "PARTIAL",
+    "how": "indirect: 2+ product-written lines, subprocess verify expect_exit 0",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-11"
+    ],
+    "gap": "no shape compares one field of line i+1 with another field of line i; jsonl equals takes a constant"
+   },
+   {
+    "clause": "R-3.2/5",
+    "neutral_spec": "NO",
+    "how": "-",
+    "presumes": [],
+    "gap": "the clause is a disjunction of two constants ('GENESIS' or 64 zeros); jsonl equals takes one constant and no class offers OR, so any single spec presumes the choice"
+   },
+   {
+    "clause": "R-3.2/7",
+    "neutral_spec": "PARTIAL",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); batch 1 then batch 2; line_count = old + new and jsonl fields of line 0 unchanged",
+    "presumes": [
+     "IA-1",
+     "IA-2"
+    ],
+    "gap": "byte identity of the old records is not expressible: equals_before is anchored right after the workspace step (the product-written line does not exist yet) and a sha256 of product bytes presumes the encoding"
+   },
+   {
+    "clause": "R-3.3/1",
+    "neutral_spec": "YES",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); apply_batch 3 puts; edit_jsonl line i field value -> another value (variants: op 'put' -> 'delete'; hash -> '0'*64); subprocess ['-m','ledgerlock','verify','<ws>/l.jsonl'] expect_exit 5; scenario_files line_count 3 (the expect_exit carries the verdict)",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-11",
+     "edit_jsonl re-serialises the edited line compactly (a semantic edit, so detection is required under every encoding)"
+    ],
+    "gap": "'any modification' is universal: bounded witness; canonical-form-preserving edits are undetectable by design",
+    "quantifier": "bounded witness"
+   },
+   {
+    "clause": "R-3.3/2",
+    "neutral_spec": "NO",
+    "how": "-",
+    "presumes": [],
+    "gap": "comparing a library verdict to a constant presumes its representation (the reference's NamedTuple serialises as a JSON list, a dataclass as unserializable)"
+   },
+   {
+    "clause": "R-3.3/3",
+    "neutral_spec": "YES",
+    "how": "cli_invocation (subject ledgerlock:__main__) workspace l.jsonl = 0 bytes, argv ['verify','<ws>/l.jsonl'], exits 0 (vacuous chain); and process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']) + subprocess verify expect_exit 0 over product-written lines",
+    "presumes": [
+     "IA-9",
+     "IA-11"
+    ],
+    "gap": "the library ok field itself is not neutral (R-3.3/2)"
+   },
+   {
+    "clause": "R-3.3/4",
+    "neutral_spec": "PARTIAL",
+    "how": "ok=False: cli_invocation (subject ledgerlock:__main__) workspace l.jsonl text 'not json\\n', argv verify, exits 5 (a line with no hash cannot match — harness bytes, no encoding presumed); or the R-3.3/1 tamper scenario",
+    "presumes": [
+     "IA-11"
+    ],
+    "gap": "first_bad_index is not neutrally observable at all: library representation, CLI output and index base are all unspecified"
+   },
+   {
+    "clause": "R-3.4/2",
+    "neutral_spec": "YES",
+    "how": "the R-3.3/1 scenario tampering line 0 of a 3-line chain (a tail-only check misses it)",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-11"
+    ],
+    "gap": "library half as R-3.4/3",
+    "quantifier": "bounded witness"
+   },
+   {
+    "clause": "R-3.4/3",
+    "neutral_spec": "PARTIAL",
+    "how": "CLI half: the R-3.3/1 scenario (a fresh process; a sidecar cache would be caught too)",
+    "presumes": [
+     "IA-11"
+    ],
+    "gap": "library half: construct, apply_batch, edit_jsonl, call verify on the same instance can only be judged against a constant verdict (representation); returns_name/equals_name has no inequality"
+   },
+   {
+    "clause": "R-4.1/1",
+    "neutral_spec": "YES",
+    "how": "implicit in every rid-bearing stimulus (apply_batch tuples carry rid)",
+    "presumes": [
+     "IA-2"
+    ]
+   },
+   {
+    "clause": "R-4.1/2",
+    "neutral_spec": "PARTIAL",
+    "how": "acceptance: process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); apply_batch put with rid 'x' and rid 'e\\u0301 1/2'; line_count, jsonl id equals",
+    "presumes": [
+     "IA-1",
+     "IA-2"
+    ],
+    "gap": "refusal of an empty rid: the error type is unspecified, expect_raises needs an exact type name and a raising `call` refutes the scenario, so 'raised something and appended nothing' is not expressible"
+   },
+   {
+    "clause": "R-4.2/1",
+    "neutral_spec": "PARTIAL",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); call <single-op mutation> as a; call the identical mutation as b; {returns_name: a, equals_name: b}",
+    "presumes": [
+     "IA-1",
+     "IA-8 or IA-2 with per-op batch results",
+     "IA-14"
+    ],
+    "gap": "neutral about the result's representation (any JSON-serialisable or bytes value) but not about the call: single-op signatures are unspecified, and a count-returning apply_batch is conforming yet fails"
+   },
+   {
+    "clause": "R-4.2/2",
+    "neutral_spec": "YES",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); apply_batch the identical op twice (same op/key/value/rid/ts: a replay under every reading of replay scope); scenario_files line_count 1",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-3",
+     "IA-5"
+    ]
+   },
+   {
+    "clause": "R-4.3/1",
+    "neutral_spec": "YES",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); apply_batch put k v1 r1; expect_raises apply_batch put k v2 r2 ConflictError; scenario_raises",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-10"
+    ],
+    "gap": "CLI 'error result' (exit 4) is R-9/5: not neutral"
+   },
+   {
+    "clause": "R-4.3/2",
+    "neutral_spec": "YES",
+    "how": "the R-4.3/1 scenario observed by scenario_files line_count 1",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-10"
+    ],
+    "gap": "byte identity of a product-written pre-state is not expressible (equals_before anchor); line count is"
+   },
+   {
+    "clause": "R-4.4/1",
+    "neutral_spec": "YES",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); apply_batch [['delete','k',null,'r1',1]]; line_count 1; jsonl line 0 op equals 'delete'",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-4"
+    ]
+   },
+   {
+    "clause": "R-4.4/2",
+    "neutral_spec": "YES",
+    "how": "delete k r1; expect_raises apply_batch put k v r2 ConflictError; line_count 1",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-4",
+     "IA-10"
+    ]
+   },
+   {
+    "clause": "R-4.4/3",
+    "neutral_spec": "PARTIAL",
+    "how": "no-op half: delete k r1; apply_batch put k v r1 (must not raise); line_count 1. Same-result half as R-4.2/1.",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-4",
+     "IA-8",
+     "IA-14"
+    ]
+   },
+   {
+    "clause": "R-4.5/1",
+    "neutral_spec": "YES",
+    "how": "apply_batch put k v r1; expect_raises apply_batch delete k r2 ConflictError; line_count 1",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-4",
+     "IA-10"
+    ]
+   },
+   {
+    "clause": "R-4.5/2",
+    "neutral_spec": "PARTIAL",
+    "how": "put half: after the refused delete, replay put k v r1 (must not raise); line_count 1",
+    "presumes": [
+     "IA-1",
+     "IA-2"
+    ],
+    "gap": "delete half contradicts R-4.3 (risks): no consistent spec exists"
+   },
+   {
+    "clause": "R-5/1",
+    "neutral_spec": "YES",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); apply_batch of 3 puts; line_count 3",
+    "presumes": [
+     "IA-1",
+     "IA-2"
+    ],
+    "gap": "the probe passes JSON lists, never tuples: an implementation that type-checks tuple would be refuted"
+   },
+   {
+    "clause": "R-5/5",
+    "neutral_spec": "PARTIAL",
+    "how": "only failure paths: cli_invocation (subject ledgerlock:__main__) argv ['apply','--batch','<ws>/missing.json','<ws>/l.jsonl'] exits 3",
+    "presumes": [
+     "IA-11"
+    ],
+    "gap": "every success path presumes the batch file format (IA-12)"
+   },
+   {
+    "clause": "R-6/1",
+    "neutral_spec": "PARTIAL",
+    "how": "relative invariants only: process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); call snapshot as s0 on the empty ledger; tombstone of an unseen key / refused conflict / exact replay; call snapshot as s1; {returns_name: s0, equals_name: s1}",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-6"
+    ],
+    "gap": "positive content (the value of a key) presumes the layout. Least-presuming option: snapshot --out file with jsonl line 0 field '<key>' equals <value> — presumes a single-line JSON object keyed by key"
+   },
+   {
+    "clause": "R-6/2",
+    "neutral_spec": "NO",
+    "how": "-",
+    "presumes": [],
+    "gap": "order is visible only in the serialised bytes (layout); jsonl parsing loses order; an insertion-order-independence witness needs two ledgers in one comparison (one construct per scenario; truncating the file behind the instance presumes no state caching) and would not establish the order anyway"
+   },
+   {
+    "clause": "R-6/3",
+    "neutral_spec": "PARTIAL",
+    "how": "process_effect (subject ledgerlock.ledger:Ledger; workspace l.jsonl = 0 bytes; construct ['<ws>/l.jsonl']); mutations; call snapshot as a; call snapshot as b; returns_name/equals_name",
+    "presumes": [
+     "IA-1",
+     "IA-2",
+     "IA-6"
+    ],
+    "gap": "across processes: cli equality needs ledger content from the harness (encoding) or a pre-step apply (batch format), and the no-`--out` destination (IA-13); only the empty-ledger witness is neutral, presuming stdout"
+   },
+   {
+    "clause": "R-6/4",
+    "neutral_spec": "NO",
+    "how": "-",
+    "presumes": [],
+    "gap": "no comparator between a library return value and a file; the file's expected bytes presume the layout"
+   },
+   {
+    "clause": "R-7/1",
+    "neutral_spec": "YES",
+    "how": "cli_invocation (subject ledgerlock:__main__) workspace l.jsonl bytes '{\"op\":\"pu' (unterminated, not JSON), argv ['repair-tail','<ws>/l.jsonl'], exits_files exit_code 0 + l.jsonl sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (removing the only line leaves 0 bytes)",
+    "presumes": [
+     "IA-11"
+    ],
+    "gap": "with a product-written valid prefix (process_effect: apply_batch; write append fragment; subprocess repair-tail expect_exit 0): only line_count and fields, not prefix bytes",
+    "quantifier": "bounded witness"
+   },
+   {
+    "clause": "R-7/2",
+    "neutral_spec": "YES",
+    "how": "cli_invocation (subject ledgerlock:__main__) same workspace, pre [['repair-tail','<ws>/l.jsonl']] (must exit 0), main ['verify','<ws>/l.jsonl'] exits 0",
+    "presumes": [
+     "IA-11"
+    ]
+   },
+   {
+    "clause": "R-7/3",
+    "neutral_spec": "PARTIAL",
+    "how": "neutral for the harness-only witness (resulting sha256 of b'')",
+    "presumes": [
+     "IA-11"
+    ],
+    "gap": "byte preservation of a product-written prefix is not expressible (no prefix shape; equals_before anchor)"
+   },
+   {
+    "clause": "R-7/4",
+    "neutral_spec": "PARTIAL",
+    "how": "cli_invocation (subject ledgerlock:__main__) workspace l.jsonl = 0 bytes, repair-tail exits 0 + equals_before",
+    "presumes": [
+     "IA-9",
+     "IA-11"
+    ],
+    "gap": "non-trivial clean chain: product-written, so only line_count unchanged, not byte identity"
+   },
+   {
+    "clause": "R-7/5",
+    "neutral_spec": "YES",
+    "how": "cli_invocation (subject ledgerlock:__main__) workspace l.jsonl text 'garbage\\n' + '{\"op' (line 0 corrupt, tail truncated), repair-tail exits 5 + exits_files equals_before",
+    "presumes": [
+     "IA-11",
+     "IA-16"
+    ],
+    "quantifier": "bounded witness"
+   },
+   {
+    "clause": "R-9/1",
+    "neutral_spec": "PARTIAL",
+    "how": "every CLI spec uses ledgerlock:__main__ / '-m ledgerlock'",
+    "presumes": [
+     "IA-11"
+    ],
+    "gap": "the bare 'ledgerlock' console script: cli_invocation refuses console scripts (environment-resolved)"
+   },
+   {
+    "clause": "R-9/2",
+    "neutral_spec": "PARTIAL",
+    "how": "cli_invocation (subject ledgerlock:__main__): verify / snapshot (with and without --out) / repair-tail over a 0-byte ledger exit 0; repair of a fragment exits 0; process_effect subprocess verify exit 0 over product lines",
+    "presumes": [
+     "IA-9",
+     "IA-11"
+    ],
+    "gap": "apply success presumes the batch format; 'append' has no specified CLI surface"
+   },
+   {
+    "clause": "R-9/3",
+    "neutral_spec": "YES",
+    "how": "cli_invocation (subject ledgerlock:__main__) argv ['no-such-command'] exits 2; ['verify'] exits 2; ['apply','<ws>/l.jsonl'] (no --batch) exits 2",
+    "presumes": [
+     "IA-11 (R-14's forms are the grammar)"
+    ],
+    "quantifier": "bounded witness"
+   },
+   {
+    "clause": "R-9/4",
+    "neutral_spec": "PARTIAL",
+    "how": "cli_invocation (subject ledgerlock:__main__) ['apply','--batch','<ws>/missing.json','<ws>/l.jsonl'] exits 3; ['snapshot','<ws>/l.jsonl','--out','<ws>/no-dir/s.json'] exits 3",
+    "presumes": [
+     "IA-11"
+    ],
+    "gap": "'permission denied': no permission control in the vocabulary (and not portable); verify of a missing ledger contradicts R-9/7"
+   },
+   {
+    "clause": "R-9/5",
+    "neutral_spec": "NO",
+    "how": "-",
+    "presumes": [],
+    "gap": "the only specified CLI mutation surface is apply --batch (IA-12), and the ledger must already hold a committed mutation (harness-written presumes encoding)"
+   },
+   {
+    "clause": "R-9/6",
+    "neutral_spec": "YES",
+    "how": "cli_invocation (subject ledgerlock:__main__) verify over 'garbage\\n' exits 5; repair-tail over 'garbage\\n'+fragment exits 5; process_effect tamper + subprocess verify expect_exit 5",
+    "presumes": [
+     "IA-11"
+    ]
+   },
+   {
+    "clause": "R-9/7",
+    "neutral_spec": "PARTIAL",
+    "how": "the 0 and 5 witnesses above",
+    "presumes": [
+     "IA-11"
+    ],
+    "gap": "'any other exit code is a bug' is inconsistent with R-9/3-4 for verify; no consistent universal spec"
+   },
+   {
+    "clause": "R-10/1b",
+    "neutral_spec": "PARTIAL",
+    "how": "file_artifact grep_count path:ledgerlock (.py) '^from __future__ import annotations\\b', 'at least one line' ({matches: 0}, MUST_NOT_HOLD)",
+    "presumes": [
+     "od_grep caveats"
+    ],
+    "gap": "per-module obligation is an open reading (the reference's __init__.py has none)"
+   },
+   {
+    "clause": "R-10/2",
+    "neutral_spec": "YES",
+    "how": "prohibition grep MUST_HOLD {matches: 0} over path:ledgerlock (.py) for import statements naming a module outside the allowlist ∪ {__future__, ledgerlock, relative}",
+    "presumes": [
+     "polarity caveats"
+    ]
+   },
+   {
+    "clause": "R-12/1",
+    "neutral_spec": "YES",
+    "how": "prohibition grep MUST_HOLD {matches: 0} over path:ledgerlock (.py): imports of socket/subprocess and os.system uses",
+    "presumes": [
+     "polarity caveats"
+    ]
+   },
+   {
+    "clause": "R-13/1",
+    "neutral_spec": "YES",
+    "how": "file_artifact exists path:ledgerlock/__init__.py, path:ledgerlock/ledger.py, path:ledgerlock/cli.py (MUST_HOLD)",
+    "presumes": []
+   },
+   {
+    "clause": "R-13/2",
+    "neutral_spec": "PARTIAL",
+    "how": "python_callable_v2 exists ledgerlock.ledger:Ledger and ledgerlock.ledger:ConflictError",
+    "presumes": [],
+    "gap": "append/verify/snapshot/apply_batch: module functions or Ledger methods is open; one locator presumes one"
+   },
+   {
+    "clause": "R-13/3",
+    "neutral_spec": "PARTIAL",
+    "how": "cli.py exists; argparse import presence in path:ledgerlock/cli.py, 'at least one line'",
+    "presumes": [
+     "od_grep caveats"
+    ]
+   },
+   {
+    "clause": "R-13/5",
+    "neutral_spec": "PARTIAL",
+    "how": "exists path:docs/requirements.md",
+    "presumes": [],
+    "gap": "content = the frozen bytes (sha256 3a6a9995…, newline '\\n') only under the verbatim-copy reading"
+   },
+   {
+    "clause": "R-13/6",
+    "neutral_spec": "YES",
+    "how": "exists path:README.md",
+    "presumes": []
+   },
+   {
+    "clause": "R-13/7",
+    "neutral_spec": "PARTIAL",
+    "how": "exists path:pyproject.toml",
+    "presumes": [],
+    "gap": "'stdlib only; coverage optional' content is TOML-layout-dependent"
+   },
+   {
+    "clause": "R-14/1",
+    "neutral_spec": "YES",
+    "how": "cli_invocation (subject ledgerlock:__main__) workspace l.jsonl = 0 bytes, ['verify','<ws>/l.jsonl'] exits 0",
+    "presumes": [
+     "IA-9",
+     "IA-11"
+    ],
+    "gap": "'fresh' as a nonexistent path contradicts R-9/4"
+   },
+   {
+    "clause": "R-14/2",
+    "neutral_spec": "PARTIAL",
+    "how": "cli_invocation (subject ledgerlock:__main__) equality: two invocations ['snapshot','<ws>/l.jsonl'] over a 0-byte ledger, streams ['stdout'], comparator bytes_equal",
+    "presumes": [
+     "IA-9",
+     "IA-11",
+     "IA-13"
+    ],
+    "gap": "non-empty content needs harness bytes (encoding) or a pre-step apply (batch format)"
+   },
+   {
+    "clause": "R-14/3",
+    "neutral_spec": "NO",
+    "how": "-",
+    "presumes": [],
+    "gap": "batch file format (IA-12); crash atomicity (R-5/4)"
+   },
+   {
+    "clause": "R-14/4",
+    "neutral_spec": "YES",
+    "how": "as R-7/1",
+    "presumes": [
+     "IA-11"
+    ]
+   },
+   {
+    "clause": "R-14/6",
+    "neutral_spec": "PARTIAL",
+    "how": "static half: the R-10/2 grep",
+    "presumes": [],
+    "gap": "'succeed at runtime' is an environment property"
+   }
+  ],
+  "interface_assumptions": [
+   {
+    "id": "IA-1",
+    "assumption": "A Ledger is bound to its file by construction: ledgerlock.ledger:Ledger called with the ledger path as its single positional str argument (process_effect construct).",
+    "closest_text": [
+     "R-12: 'outside the configured ledger path'",
+     "R-13: 'ledger.py # core: Ledger, ...'",
+     "R-5: 'renames it over the JSONL path'"
+    ],
+    "reference": "Ledger(path) (os.fspath) — same"
+   },
+   {
+    "id": "IA-2",
+    "assumption": "apply_batch is a method of the path-bound Ledger taking one iterable of 5-element sequences (op, key, value, rid, ts); the probe can only pass JSON lists, never tuples.",
+    "closest_text": [
+     "R-5: 'apply_batch(ops) accepts an iterable of (op, key, value, rid, ts) tuples'"
+    ],
+    "reference": "method (and a module function apply_batch(path, ops)); unpacks any 5-sequence — same"
+   },
+   {
+    "id": "IA-3",
+    "assumption": "op strings are 'put' and 'delete'.",
+    "closest_text": [
+     "R-3.2 line shapes",
+     "R-4.1: '(put, delete)'"
+    ],
+    "reference": "same"
+   },
+   {
+    "id": "IA-4",
+    "assumption": "the value slot of a delete op accepts null.",
+    "closest_text": [
+     "none: R-5's tuple has a value slot for every op; R-3.2's delete line has no value"
+    ],
+    "reference": "value ignored for a delete — same"
+   },
+   {
+    "id": "IA-5",
+    "assumption": "ts is a caller-supplied int stored as the line's 'ts'.",
+    "closest_text": [
+     "R-3.2: '\"ts\": <int>'",
+     "R-5 tuple carries ts",
+     "R-10 allows no clock module"
+    ],
+    "reference": "int required (bool refused), stored verbatim — same"
+   },
+   {
+    "id": "IA-6",
+    "assumption": "snapshot() is a no-argument Ledger method whose result is bytes or JSON-serialisable (used only in relative comparisons).",
+    "closest_text": [
+     "R-6: 'snapshot() returns a deterministic, sorted JSON document'"
+    ],
+    "reference": "returns bytes (compact JSON object + '\\n') — compatible"
+   },
+   {
+    "id": "IA-7",
+    "assumption": "verify() is a no-argument Ledger method; its representation is unknown, so it is never compared to a constant.",
+    "closest_text": [
+     "R-3.3: 'Verify returns a structured verdict: ok=... first_bad_index=<i>'"
+    ],
+    "reference": "Verdict NamedTuple (ok, first_bad_index, length) -> JSON [ok, index, length]; a dict-comparing spec (PLAN-V2.1's) fails it — differs from the plan"
+   },
+   {
+    "id": "IA-8",
+    "assumption": "single-op mutation methods exist with a known signature (needed only for the 'same result' clauses).",
+    "closest_text": [
+     "R-4.1: 'Every mutating operation (put, delete) takes a request id'",
+     "R-13 lists 'append'; R-3.4/R-8 say 'append'"
+    ],
+    "reference": "put(key, value, rid, ts), delete(key, rid, ts), append(op, key, value, rid, ts); PLAN-V2.1's append((op, key, value, rid, ts)) would fail on it — differs from the plan"
+   },
+   {
+    "id": "IA-9",
+    "assumption": "an existing 0-byte file is a valid empty ledger for every operation.",
+    "closest_text": [
+     "R-14/1: 'exits 0 on a fresh ledger'",
+     "R-3.2: 'Each line is one of ...' (zero lines)"
+    ],
+    "reference": "empty file = empty ledger; a mutation creates a missing file; reads of a missing file are I/O errors — compatible"
+   },
+   {
+    "id": "IA-10",
+    "assumption": "a conflict raises an exception whose type name is exactly ConflictError (the probe compares type(e).__name__; a differently named subclass is refuted).",
+    "closest_text": [
+     "R-4.3: 'MUST raise ConflictError'",
+     "R-13"
+    ],
+    "reference": "same"
+   },
+   {
+    "id": "IA-11",
+    "assumption": "CLI grammar: python -m ledgerlock verify <ledger> | snapshot <ledger> [--out <file>] | apply --batch <file> <ledger> | repair-tail <ledger>; the exit status is the process's.",
+    "closest_text": [
+     "R-14 items 1-4",
+     "R-6",
+     "R-5",
+     "R-9"
+    ],
+    "reference": "same (plus put/delete subcommands the requirements do not specify)"
+   },
+   {
+    "id": "IA-12",
+    "assumption": "CLI batch file format — no neutral choice exists; every CLI apply success spec presumes one.",
+    "closest_text": [
+     "R-5: 'reads the batch spec'",
+     "R-14/3: 'batch.json'"
+    ],
+    "reference": "JSON list of {op, key, value, rid, ts} objects"
+   },
+   {
+    "id": "IA-13",
+    "assumption": "snapshot without --out writes the document to stdout.",
+    "closest_text": [
+     "R-14/2: 'produces deterministic bytes'"
+    ],
+    "reference": "stdout — same"
+   },
+   {
+    "id": "IA-14",
+    "assumption": "mutation results are bytes or JSON-serialisable (compared by returns_name/equals_name).",
+    "closest_text": [
+     "R-4.2: 'return the same result'"
+    ],
+    "reference": "Result NamedTuple (op, key, rid, index, hash) -> JSON list — compatible"
+   },
+   {
+    "id": "IA-15",
+    "assumption": "first_bad_index is a 0-based line index (needed by any spec observing it; none is neutral).",
+    "closest_text": [
+     "R-3.3: 'first_bad_index=<i>'"
+    ],
+    "reference": "0-based"
+   },
+   {
+    "id": "IA-16",
+    "assumption": "a refused repair-tail writes nothing.",
+    "closest_text": [
+     "R-7: 'MUST refuse'",
+     "R-7: 'No other content may be modified'"
+    ],
+    "reference": "raises CorruptionError before any write — same"
+   }
+  ],
+  "probe_constraints": [
+   "process_effect: at most one construct per scenario, so two Ledger instances (or two ledgers) never meet in one comparison; cross-instance properties need a subprocess step, i.e. the CLI.",
+   "process_effect equals_before is anchored right after the workspace step: only harness-written bytes (0-byte file, garbage, fragments) can be compared for byte identity; product-written pre-states cannot.",
+   "cli_invocation equals_before is anchored before the main invocation (after pre-steps), but the only mutating CLI pre-step is apply --batch (IA-12).",
+   "No file shape asserts existence, a field's absence, a prefix, or a disjunction; no comparator relates a returned value to a file or one file to another.",
+   "Contract strings are filtered for test-artefact names (aisef2/product/contract.py names_test_artefact): e.g. workspace name '<ws>/test.jsonl' and the grep text 'import unittest' are refused at contract creation; '<ws>/l.jsonl' and an alternation '...|unittest|...' pass."
+  ],
+  "plan_criteria": [
+   {
+    "ac_id": "AC-STORY-01-01-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.1/1",
+     "R-3.1/3"
+    ],
+    "reason": "Asserts a helper ledgerlock.format:normalize_key the requirements never name (R-13 puts the core in ledger.py); NFC must hold at storage/lookup/hashing/serialisation of the Ledger, and 'any string' is universal.",
+    "clauses": [
+     {
+      "clause": "ledgerlock.format:normalize_key exists",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "keys are NFC (unicodedata.normalize)",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.1/1",
+       "R-3.1/3"
+      ]
+     },
+     {
+      "clause": "for any string s",
+      "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+      "traces": [
+       "R-3.1/1"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-01-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.1/2"
+    ],
+    "reason": "The NFC/NFD equivalence is normative but must be observed as one key of the Ledger (conflict), not through the plan helper.",
+    "clauses": [
+     {
+      "clause": "via ledgerlock.format:normalize_key",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "U+00E9 and e+U+0301 are one key",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.1/2"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-01-3",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-13/1",
+     "R-10/1a"
+    ],
+    "reason": "The observable (the package imports from ledgerlock/__init__.py) is R-13's layout; the Given is a story-time scaffold, false at the final revision. 'ends in' over an absolute path is not expressible by python_callable_v2 equals; file_artifact exists path:ledgerlock/__init__.py carries it.",
+    "clauses": [
+     {
+      "clause": "import ledgerlock resolves to ledgerlock/__init__.py",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-13/1"
+      ]
+     },
+     {
+      "clause": "pyproject declares name = ledgerlock and requires-python >= 3.11",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-13/7"
+      ]
+     },
+     {
+      "clause": "empty package and empty tests/ as precondition",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-01-4",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-12/1",
+     "R-10/2",
+     "R-2/4"
+    ],
+    "reason": "Every denylisted module lies outside R-10's allowlist (socket/subprocess also R-12). A prohibition: MUST_HOLD over {matches: 0}; compiling the plan's MUST_NOT_HOLD label over {matches: 0} inverts it (C2-P5-FINDING-001). The column-0 pattern is weaker than the requirement (indented, comma-list and dynamic imports pass)."
+   },
+   {
+    "ac_id": "AC-STORY-01-01-5",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-12/1"
+    ],
+    "reason": "Textual proxy for 'no os.system / subprocess / socket use'; MUST_HOLD over {matches: 0}. Over-approximates (a comment naming os.system fails) and under-approximates (aliases, from-imports; 'import subprocess' has no dot — only 01-01-4 catches it)."
+   },
+   {
+    "ac_id": "AC-STORY-01-01-6",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-13/2",
+     "R-4.3/1"
+    ],
+    "reason": "Requires re-export from the package root; R-13 places Ledger and ConflictError in ledger.py and never requires __init__ to re-export them.",
+    "clauses": [
+     {
+      "clause": "from ledgerlock import Ledger, ConflictError",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "Ledger and ConflictError defined in ledgerlock/ledger.py",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-13/2"
+      ]
+     },
+     {
+      "clause": "Ledger is a callable class",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-13/2"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-01-7",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/3"
+    ],
+    "reason": "Exit 2 on an extra positional is normative; stdout silence is not.",
+    "clauses": [
+     {
+      "clause": "verify <ledger> <extra> exits 2",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-9/3"
+      ]
+     },
+     {
+      "clause": "writes nothing to stdout",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-02-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3"
+    ],
+    "reason": "Fixes the canonical-bytes encoding (sorted keys, compact separators, ensure_ascii=False, UTF-8) that R-3.2 leaves open, at a plan module."
+   },
+   {
+    "ac_id": "AC-STORY-01-02-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3"
+    ],
+    "reason": "Determinism of a plan helper; the requirements name no such function."
+   },
+   {
+    "ac_id": "AC-STORY-01-02-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3"
+    ],
+    "reason": "Fixes the non-ASCII escaping choice (literal UTF-8), open in R-3.2."
+   },
+   {
+    "ac_id": "AC-STORY-01-02-4",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3"
+    ],
+    "reason": "Key-order independence is a fair meaning of 'canonical' but is asserted of a plan helper; the product-level consequence is a verify that recomputes from parsed lines (R-3.3)."
+   },
+   {
+    "ac_id": "AC-STORY-01-02-5",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/5"
+    ],
+    "reason": "Fixes GENESIS to the literal 'GENESIS' where R-3.2 makes 'GENESIS' vs 64 zeros the implementer's choice; also at a plan module."
+   },
+   {
+    "ac_id": "AC-STORY-01-02-6",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3"
+    ],
+    "reason": "Round-trip stability of a plan helper under the plan's encoding."
+   },
+   {
+    "ac_id": "AC-STORY-01-03-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3"
+    ],
+    "reason": "Fixes the digest text encoding (64 lowercase hex) at a plan helper; R-3.2 says SHA-256 only."
+   },
+   {
+    "ac_id": "AC-STORY-01-03-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3",
+     "R-3.2/4"
+    ],
+    "reason": "Chain sensitivity to prev_hash, asserted of a plan helper."
+   },
+   {
+    "ac_id": "AC-STORY-01-03-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3"
+    ],
+    "reason": "'hash and prev_hash blanked' is normative for the hash input but asserted of a plan helper."
+   },
+   {
+    "ac_id": "AC-STORY-01-03-4",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3"
+    ],
+    "reason": "Determinism of a plan helper."
+   },
+   {
+    "ac_id": "AC-STORY-01-03-5",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/5"
+    ],
+    "reason": "A plan helper accepting the plan's GENESIS choice."
+   },
+   {
+    "ac_id": "AC-STORY-01-04-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [],
+    "reason": "ledgerlock.store:read_lines is a plan module/function the requirements never mention."
+   },
+   {
+    "ac_id": "AC-STORY-01-04-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [],
+    "reason": "Plan helper; missing-file behaviour of a library read is unspecified."
+   },
+   {
+    "ac_id": "AC-STORY-01-04-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [],
+    "reason": "Plan helper."
+   },
+   {
+    "ac_id": "AC-STORY-01-04-4",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [],
+    "reason": "ledgerlock.store:write_atomic is a plan helper."
+   },
+   {
+    "ac_id": "AC-STORY-01-04-5",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-5/4"
+    ],
+    "reason": "Plan helper; the crash-atomicity core is unsupported.",
+    "clauses": [
+     {
+      "clause": "store.write_atomic",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "a fault before the rename leaves the original bytes",
+      "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+      "traces": [
+       "R-5/4"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-04-6",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-5/3"
+    ],
+    "reason": "Plan helper; 'sibling temp file' is normative for apply_batch but not observable (implementation-chosen name, gone after the rename).",
+    "clauses": [
+     {
+      "clause": "store.write_atomic",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "temp file in the target's directory",
+      "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+      "traces": [
+       "R-5/3"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-05-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/1",
+     "R-3.2/2",
+     "R-3.2/3",
+     "R-3.2/5"
+    ],
+    "reason": "Mixes a neutral line-format check with the plan's call shape, GENESIS choice and helper.",
+    "clauses": [
+     {
+      "clause": "append takes one (op, key, value, rid, ts) tuple",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "a mutation on a missing path creates the file",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-3.2/1"
+      ]
+     },
+     {
+      "clause": "exactly one \\n-terminated line with op/key/id/ts/value equal to the inputs",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.2/1",
+       "R-3.2/2"
+      ]
+     },
+     {
+      "clause": "prev_hash == 'GENESIS'",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-3.2/5"
+      ]
+     },
+     {
+      "clause": "hash == format.line_hash('GENESIS', ...)",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-3.2/3"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-05-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.2/3",
+     "R-3.2/4"
+    ],
+    "reason": "The link is normative; the hash equality is bound to the plan helper.",
+    "clauses": [
+     {
+      "clause": "new prev_hash equals the first line's stored hash",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.2/4"
+      ]
+     },
+     {
+      "clause": "new hash equals line_hash(first_hash, ...)",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-3.2/3"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-05-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [],
+    "reason": "The tuple's KEY is empty (rid is 'r'): no requirement constrains keys beyond NFC (R-4.1 constrains rids), so refusing an empty key, with ValueError and no file created, is the plan's."
+   },
+   {
+    "ac_id": "AC-STORY-01-05-4",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-3.2/4"
+    ],
+    "reason": "prev_hash of the next line is the previous line's hash whichever instance appends; the mechanism claim is not observable, and a cross-instance witness needs a CLI mutation (batch format), so it is not neutral."
+   },
+   {
+    "ac_id": "AC-STORY-01-05-5",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "traces": [
+     "R-8/1",
+     "R-3.2/1"
+    ],
+    "reason": "Durability is the core and is not observable: another process reads the page cache.",
+    "clauses": [
+     {
+      "clause": "bytes durable before return",
+      "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+      "traces": [
+       "R-8/1"
+      ]
+     },
+     {
+      "clause": "file terminated by \\n",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.2/1"
+      ]
+     },
+     {
+      "clause": "append on an empty path creates the file",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-06-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-4.2/1",
+     "R-4.2/2"
+    ],
+    "reason": "No-append is normative; the flags contradict 'the same result'.",
+    "clauses": [
+     {
+      "clause": "replay appends nothing",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-4.2/2"
+      ]
+     },
+     {
+      "clause": "returns the original line dict byte-for-byte",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "replayed is True, committed is False",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "same rid with different value/ts is a replay",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-4.2/1"
+      ]
+     }
+    ],
+    "contradicts": [
+     "R-4.2/1: the first call's result would carry committed=True/replayed=False, so the replay's result is not 'the same result'"
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-06-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-4.3/1",
+     "R-4.3/2",
+     "R-3.2/7"
+    ],
+    "reason": "ConflictError and no append are normative; the attributes are not.",
+    "clauses": [
+     {
+      "clause": "different rid raises ConflictError",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-4.3/1"
+      ]
+     },
+     {
+      "clause": "JSONL byte-identical to its pre-call state",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-4.3/2",
+       "R-3.2/7"
+      ]
+     },
+     {
+      "clause": "attributes key, incoming_rid, committed_rid, batch_index",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-06-3",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-4.4/2"
+    ],
+    "reason": "Exactly R-4.4/2; neutral via apply_batch + expect_raises ConflictError."
+   },
+   {
+    "ac_id": "AC-STORY-01-06-4",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-4.4/3"
+    ],
+    "reason": "No-op is normative; the flags contradict 'returning the same result as the delete'.",
+    "clauses": [
+     {
+      "clause": "put with the tombstone's rid is a no-op",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-4.4/3"
+      ]
+     },
+     {
+      "clause": "returns the delete line dict with replayed True / committed False",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ],
+    "contradicts": [
+     "R-4.4/3: the replay must return the same result as the delete"
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-01-06-5",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-3.1/2",
+     "R-4.2/1",
+     "R-4.2/2"
+    ],
+    "reason": "NFD replay under the same rid is normative; the flag contradicts 'the same result'.",
+    "clauses": [
+     {
+      "clause": "NFD spelling with the same rid is a replay; chain length unchanged",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.1/2",
+       "R-4.2/2"
+      ]
+     },
+     {
+      "clause": "returned key equals the NFC form",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-4.2/1",
+       "R-3.1/1"
+      ]
+     },
+     {
+      "clause": "replayed is True",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ],
+    "contradicts": [
+     "R-4.2/1 (as AC-STORY-01-06-1)"
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-02-01-1",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-3.3/3"
+    ],
+    "reason": "verify is ok on a product-written chain; the dict {ok: True, first_bad_index: None} is a representation (the reference returns a NamedTuple). Neutral via CLI verify exit 0.",
+    "clauses": [
+     {
+      "clause": "verify ok on an intact chain",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.3/3"
+      ]
+     },
+     {
+      "clause": "returns exactly {ok: True, first_bad_index: None}",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-3.3/2"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-02-01-2",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-3.3/3",
+     "R-14/1"
+    ],
+    "reason": "Vacuous chain: zero lines satisfy 'every line ...'."
+   },
+   {
+    "ac_id": "AC-STORY-02-01-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/4"
+    ],
+    "reason": "The library's behaviour on a missing ledger is unspecified; R-9/4 gives the CLI exit 3 and R-9/7 even conflicts with that for verify."
+   },
+   {
+    "ac_id": "AC-STORY-02-01-4",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-3.3/1",
+     "R-3.3/4",
+     "R-3.4/2"
+    ],
+    "reason": "Hash overwrite detection is normative (neutral via CLI exit 5); the index is normative but not neutrally observable; the '(or the earlier index ...)' escape is vacuous — editing line i cannot break an earlier line.",
+    "clauses": [
+     {
+      "clause": "overwritten hash detected (ok=False)",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.3/1"
+      ]
+     },
+     {
+      "clause": "first_bad_index == i",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.3/4"
+      ]
+     },
+     {
+      "clause": "dict representation",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-3.3/2"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-02-01-5",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-3.3/1",
+     "R-3.3/4"
+    ],
+    "reason": "Value mutation detection; index as in 02-01-4."
+   },
+   {
+    "ac_id": "AC-STORY-02-02-1",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-6/1",
+     "R-6/2",
+     "R-6/3"
+    ],
+    "reason": "Determinism and order are normative. The criterion's order check json.dumps(result, sort_keys=True) sorts in the harness and says nothing about the product's order. With one literal rid r for all three puts, R-4.2's rid-keyed replay commits only 'a'.",
+    "clauses": [
+     {
+      "clause": "two snapshot() calls equal",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-6/3"
+      ]
+     },
+     {
+      "clause": "keys listed a, b, c",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-6/2"
+      ]
+     },
+     {
+      "clause": "snapshot returns dicts",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-6/1"
+      ]
+     }
+    ],
+    "contradicts": [
+     "R-4.2/1-2 if r is literally one rid (three puts, one commit)"
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-02-02-2",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-4.5/1",
+     "R-4.3/2",
+     "R-6/1"
+    ],
+    "reason": "Refused delete changes nothing; neutral as s_before == s_after (returns_name/equals_name); {k: v} is a representation."
+   },
+   {
+    "ac_id": "AC-STORY-02-02-3",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-4.4/1",
+     "R-6/1"
+    ],
+    "reason": "A delete of an unseen key is a tombstone and the key is absent; neutral as snapshot(after) == snapshot(empty)."
+   },
+   {
+    "ac_id": "AC-STORY-02-02-4",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-3.1/1",
+     "R-3.1/2",
+     "R-4.2/1",
+     "R-4.2/2",
+     "R-6/1"
+    ],
+    "reason": "NFD put then NFC same-rid replay; neutral via line_count and the jsonl key field; the snapshot's content presumes a layout."
+   },
+   {
+    "ac_id": "AC-STORY-02-02-5",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-6/3"
+    ],
+    "reason": "Same chain, same snapshot; cross-instance is not neutrally expressible (one construct per scenario)."
+   },
+   {
+    "ac_id": "AC-STORY-03-01-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-5/1",
+     "R-3.3/3",
+     "R-3.2/5"
+    ],
+    "reason": "Adds the GENESIS literal to normative batch clauses.",
+    "clauses": [
+     {
+      "clause": "three new lines",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-5/1"
+      ]
+     },
+     {
+      "clause": "chain verifies end to end",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.3/3"
+      ]
+     },
+     {
+      "clause": "first batch line's prev_hash == 'GENESIS'",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-3.2/5"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-03-01-2",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-5/1",
+     "R-4.2/2"
+    ],
+    "reason": "A replay inside a batch appends nothing; neutral via line_count 2."
+   },
+   {
+    "ac_id": "AC-STORY-03-01-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-4.3/1",
+     "R-4.3/2",
+     "R-5/1"
+    ],
+    "reason": "Intra-batch conflict is an interpretation (R-4.3 judges against the last committed mutation); attributes are the plan's. The pre-state is an empty ledger, so byte identity IS neutral here (equals_before on a 0-byte file).",
+    "clauses": [
+     {
+      "clause": "same key, different rid within one batch conflicts",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-4.3/1"
+      ]
+     },
+     {
+      "clause": "JSONL byte-identical after the refusal",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-4.3/2"
+      ]
+     },
+     {
+      "clause": "attributes key, incoming_rid, committed_rid, batch_index == 1",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-03-01-4",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-4.3/1",
+     "R-4.3/2"
+    ],
+    "reason": "Conflict against the committed rid is normative; batch_index is not.",
+    "clauses": [
+     {
+      "clause": "ConflictError, JSONL unchanged",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-4.3/1",
+       "R-4.3/2"
+      ]
+     },
+     {
+      "clause": "batch_index == 0",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-03-01-5",
+    "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "traces": [
+     "R-5/4",
+     "R-3.3/3"
+    ],
+    "reason": "Crash atomicity is quantified over every crash point; a fault step raises an exception (not a crash) at one call of os.replace (R-5 says 'renames': os.rename is equally conforming); 'unchanged OR full batch' is a disjunction; the product-written pre-state cannot anchor equals_before.",
+    "clauses": [
+     {
+      "clause": "patched os.replace leaves the JSONL byte-identical",
+      "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+      "traces": [
+       "R-5/4"
+      ]
+     },
+     {
+      "clause": "verify ok afterwards",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.3/3"
+      ]
+     },
+     {
+      "clause": "dict representation",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-3.3/2"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-03-02-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-7/1",
+     "R-7/2",
+     "R-7/3"
+    ],
+    "reason": "R-7 specifies only the CLI; the plan's truncation test is OR where R-7's is AND.",
+    "clauses": [
+     {
+      "clause": "library Ledger.repair_tail",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "truncated := last byte not \\n OR last line does not parse",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-7/1"
+      ]
+     },
+     {
+      "clause": "truncated final line removed, other lines unchanged, verify ok afterwards",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-7/1",
+       "R-7/2",
+       "R-7/3"
+      ]
+     },
+     {
+      "clause": "new final byte is \\n",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-7/3"
+      ]
+     }
+    ],
+    "contradicts": [
+     "R-7/1 and R-7/3: an unterminated last line that parses and hashes is a committed record, not a truncated line; the plan's OR removes it"
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-03-02-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-7/4"
+    ],
+    "reason": "Library method not required.",
+    "clauses": [
+     {
+      "clause": "library Ledger.repair_tail",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "clean chain: no-op, byte-identical",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-7/4"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-03-02-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-7/5",
+     "R-3.3/4"
+    ],
+    "reason": "Library method not required.",
+    "clauses": [
+     {
+      "clause": "library Ledger.repair_tail",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "refuses; file byte-identical",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-7/5"
+      ]
+     },
+     {
+      "clause": "the verdict reports the earlier corruption",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-3.3/4"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-03-02-4",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-7/1",
+     "R-7/5"
+    ],
+    "reason": "A newline-terminated last line that parses but fails its hash is outside R-7 (neither truncated nor mid-chain): a plan choice. If that line is unterminated, R-7/1 ('does not parse / hash') calls it truncated and requires its removal.",
+    "clauses": [
+     {
+      "clause": "library Ledger.repair_tail",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     },
+     {
+      "clause": "a parsed-but-bad last line is left alone and reported",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-7/1"
+      ]
+     }
+    ],
+    "contradicts": [
+     "R-7/1 when the tampered last line is unterminated"
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-01-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-14/2",
+     "R-9/2"
+    ],
+    "reason": "R-14/2 runs 'snapshot path/to/ledger.jsonl' without --out and requires deterministic bytes (a success, exit 0).",
+    "contradicts": [
+     "R-14/2",
+     "R-9/2 (snapshot ok -> 0)"
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-01-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/3"
+    ],
+    "reason": "Exit 2 is normative (a bounded witness over subcommands and arities); stdout silence is not.",
+    "clauses": [
+     {
+      "clause": "wrong positional count -> exit 2",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-9/3"
+      ]
+     },
+     {
+      "clause": "nothing on stdout",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-01-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/1"
+    ],
+    "reason": "--help and its usage text are argparse conventions the requirements never state."
+   },
+   {
+    "ac_id": "AC-STORY-04-01-4",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/2",
+     "R-3.3/3"
+    ],
+    "reason": "Exit 0 is normative; stream format is not.",
+    "clauses": [
+     {
+      "clause": "verify on a product-written chain exits 0",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-9/2",
+       "R-3.3/3"
+      ]
+     },
+     {
+      "clause": "stdout empty; one stderr line starting 'verify' containing 'ok'",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-01-5",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-6/4",
+     "R-9/2"
+    ],
+    "reason": "The --out file must be the document snapshot() returns (normative, not neutral); the plan fixes a layout and presumes snapshot() returns a dict.",
+    "clauses": [
+     {
+      "clause": "snapshot --out exits 0",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-9/2"
+      ]
+     },
+     {
+      "clause": "--out file is the same document",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-6/4"
+      ]
+     },
+     {
+      "clause": "== json.dumps(Ledger.snapshot(), sort_keys, compact, ensure_ascii=False) + '\\n'",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": [
+       "R-6/1"
+      ]
+     },
+     {
+      "clause": "stdout empty",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-01-6",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-5/5",
+     "R-9/2"
+    ],
+    "reason": "Exit 0 and commit are normative (batch format not neutral); 'exactly the lines from the batch' is ill-formed (lines carry hash/prev_hash no batch element has).",
+    "clauses": [
+     {
+      "clause": "apply --batch of 3 conflict-free puts exits 0 and commits them",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-5/5",
+       "R-9/2"
+      ]
+     },
+     {
+      "clause": "stdout empty",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-01-7",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-7/4",
+     "R-9/2"
+    ],
+    "reason": "Normative no-op plus stdout silence.",
+    "clauses": [
+     {
+      "clause": "clean JSONL: repair-tail exits 0, byte-identical",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-7/4",
+       "R-9/2"
+      ]
+     },
+     {
+      "clause": "stdout empty",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-02-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/4"
+    ],
+    "reason": "Exit 3 is normative and neutral; stdout silence is not.",
+    "clauses": [
+     {
+      "clause": "missing batch file -> exit 3",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-9/4"
+      ]
+     },
+     {
+      "clause": "nothing on stdout",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-02-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/5",
+     "R-4.3/2",
+     "R-5/5"
+    ],
+    "reason": "Exit 4 is normative but not neutral (batch format, committed pre-state); stdout silence is not normative.",
+    "clauses": [
+     {
+      "clause": "conflicting batch -> exit 4, JSONL byte-identical",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-9/5",
+       "R-4.3/2"
+      ]
+     },
+     {
+      "clause": "nothing on stdout",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-02-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/6",
+     "R-3.3/1"
+    ],
+    "reason": "Exit 5 is normative and neutral via process_effect; stdout is not.",
+    "clauses": [
+     {
+      "clause": "line mutated out of band -> verify exit 5",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-9/6",
+       "R-3.3/1"
+      ]
+     },
+     {
+      "clause": "nothing on stdout",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-02-4",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-7/5",
+     "R-9/6"
+    ],
+    "reason": "Exit 5 is normative and neutral with a harness garbage line; stdout is not.",
+    "clauses": [
+     {
+      "clause": "mid-chain corruption -> repair-tail exit 5",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-7/5",
+       "R-9/6"
+      ]
+     },
+     {
+      "clause": "nothing on stdout",
+      "classification": "PLAN_ONLY_DETAIL",
+      "traces": []
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-03-1",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/2"
+    ],
+    "reason": "Stream contents are not specified."
+   },
+   {
+    "ac_id": "AC-STORY-04-03-2",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/2"
+    ],
+    "reason": "Stream contents are not specified."
+   },
+   {
+    "ac_id": "AC-STORY-04-03-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/2",
+     "R-14/2"
+    ],
+    "reason": "Stream contents are not specified; 'every success path writes nothing to stdout' includes snapshot without --out.",
+    "contradicts": [
+     "R-14/2 under its natural reading (the document goes to stdout)"
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-04-03-4",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/2"
+    ],
+    "reason": "Stream contents are not specified."
+   },
+   {
+    "ac_id": "AC-STORY-04-03-5",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-9/2",
+     "R-14/2"
+    ],
+    "reason": "Stdout b'' on every success path is not required.",
+    "contradicts": [
+     "R-14/2 under its natural reading"
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-05-01-1",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "traces": [
+     "R-11/1",
+     "R-11/3"
+    ],
+    "reason": "The subject is a developer test (tests.test_property_roundtrip:run), refused by the contract rule; its embedded product property is universal (bounded witness at best).",
+    "clauses": [
+     {
+      "clause": "the property test passes",
+      "classification": "ENGINEERING_TEST_REQUIREMENT",
+      "traces": [
+       "R-11/1"
+      ]
+     },
+     {
+      "clause": "verify ok and snapshot stable for any conflict-free sequence",
+      "classification": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+      "traces": [
+       "R-3.3/3",
+       "R-6/3"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-05-01-2",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "traces": [
+     "R-11/1"
+    ],
+    "reason": "Developer test subject; embedded claim R-4.3/2 / R-5.",
+    "clauses": [
+     {
+      "clause": "the property test passes",
+      "classification": "ENGINEERING_TEST_REQUIREMENT",
+      "traces": [
+       "R-11/1"
+      ]
+     },
+     {
+      "clause": "a conflict leaves the prefix unchanged",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-4.3/2"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-05-01-3",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "traces": [
+     "R-11/3"
+    ],
+    "reason": "Runner agreement."
+   },
+   {
+    "ac_id": "AC-STORY-05-02-1",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "traces": [
+     "R-11/2",
+     "R-14/5"
+    ],
+    "reason": "Coverage >= 85%; the --include=ledgerlock/* scope is the plan's."
+   },
+   {
+    "ac_id": "AC-STORY-05-02-2",
+    "classification": "ENGINEERING_TEST_REQUIREMENT",
+    "traces": [
+     "R-11/3"
+    ],
+    "reason": "Runner agreement."
+   },
+   {
+    "ac_id": "AC-STORY-05-02-3",
+    "classification": "PLAN_ONLY_DETAIL",
+    "traces": [
+     "R-11/2"
+    ],
+    "reason": "R-11/R-14 measure coverage with 'coverage run -m unittest discover && coverage report'; excluding tests/ is the plan's engineering choice."
+   },
+   {
+    "ac_id": "AC-STORY-05-03-1",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-12/1",
+     "R-10/2"
+    ],
+    "reason": "As 01-01-4 (MUST_HOLD over {matches: 0}).",
+    "clauses": [
+     {
+      "clause": "no denylisted import in ledgerlock/",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-12/1",
+       "R-10/2"
+      ]
+     },
+     {
+      "clause": "and the test passes",
+      "classification": "ENGINEERING_TEST_REQUIREMENT",
+      "traces": [
+       "R-11/1"
+      ]
+     }
+    ]
+   },
+   {
+    "ac_id": "AC-STORY-05-03-2",
+    "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+    "traces": [
+     "R-12/1"
+    ],
+    "reason": "As 01-01-5 (MUST_HOLD over {matches: 0}).",
+    "clauses": [
+     {
+      "clause": "no os.system / subprocess. / socket. in ledgerlock/",
+      "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+      "traces": [
+       "R-12/1"
+      ]
+     },
+     {
+      "clause": "and the test passes",
+      "classification": "ENGINEERING_TEST_REQUIREMENT",
+      "traces": [
+       "R-11/1"
+      ]
+     }
+    ]
+   }
+  ],
+  "od_grep": {
+   "answer": "YES, only as the complement of 'exactly zero': observable {matches: 0, within_s: W}, stimulus {grep: R, suffixes: [...]}, polarity MUST_NOT_HOLD (compiler.expectation_for -> candidate REFUTED; outcome.contract_satisfaction: SATISFIED iff the executed verdict == REFUTED). 'At least N' for N >= 2 is not expressible (grep_count is an exact count).",
+   "sources": [
+    "aisef2/probe/file_artifact.py observation_class, verdict_of, grep_facts, observe",
+    "aisef2/product/compiler.py expectation_for",
+    "aisef2/product/outcome.py contract_satisfaction, on_subject_absent",
+    "aisef2/probe/protocol.py classify_failure"
+   ],
+   "outcome_table": [
+    {
+     "case": "observed, k >= 1 matching lines",
+     "probe": "OBSERVED REFUTED",
+     "contract": "SATISFIED (correct)"
+    },
+    {
+     "case": "observed, 0 matching lines",
+     "probe": "OBSERVED SATISFIED",
+     "contract": "UNSATISFIED (correct)"
+    },
+    {
+     "case": "a selected file is not UTF-8 (count unestablished: facts carry 'undecodable', no 'matches')",
+     "probe": "OBSERVED REFUTED",
+     "contract": "SATISFIED — SPURIOUS: nothing was counted"
+    },
+    {
+     "case": "window expired (read took longer than within_s)",
+     "probe": "SUBJECT_DEADLINE REFUTED (ON_DEADLINE)",
+     "contract": "SATISFIED — SPURIOUS"
+    },
+    {
+     "case": "a matching line only inside a file holding a NUL byte",
+     "probe": "file skipped as binary",
+     "contract": "may be UNSATISFIED (fail-closed for presence)"
+    },
+    {
+     "case": "path not in the tree",
+     "probe": "SUBJECT_ABSENT with the zero-match verdict SATISFIED",
+     "contract": "ABSENCE_IS_DECIDABLE: UNSATISFIED (correct); REQUIRES_SUBJECT: INDETERMINATE(PRECONDITION_ABSENT)"
+    },
+    {
+     "case": "file > 4 MiB, symlink/gitlink, pattern > 512 chars, git failure, revision missing",
+     "probe": "HARNESS_FAILED",
+     "contract": "UNRUNNABLE, no satisfaction"
+    },
+    {
+     "case": "pattern does not compile, no within_s, bad suffix",
+     "probe": "UNSUPPORTED",
+     "contract": "INVALID_SPEC"
+    }
+   ],
+   "caveats": [
+    "Under MUST_NOT_HOLD the two REFUTED-by-construction paths (non-UTF-8 file, expired window) become fail-OPEN; under MUST_HOLD {matches: 0} (a prohibition) the same paths are fail-closed. The undecodable path is deterministic per revision and can be closed by a companion MUST_HOLD contract over the same selection with a never-matching pattern such as '(?!)' and {matches: 0} (SATISFIED only when every selected file decodes); the expired-window path of the MUST_NOT_HOLD evaluation itself cannot be closed by another contract.",
+    "A 'line' is str.splitlines() of the UTF-8 text (also splits on \\r, \\x0b, \\x0c, \\x1c-\\x1e, \\x85, U+2028, U+2029); each line counts once however many matches it holds; the pattern is Python re with re.search per line, not POSIX ERE.",
+    "The tree is read from the git object store at the revision SHA (committed content, never the working file).",
+    "The grep text and suffixes pass through the contract's test-artefact filter: 'import unittest' is refused at contract creation; '...|unittest|...' passes.",
+    "A textual presence check presumes a spelling (e.g. 'import argparse' vs 'from argparse import ...'); choose patterns that cover every import form."
+   ]
+  },
+  "polarity": {
+   "rule": "A source-tree prohibition is 'the number of product source lines matching the prohibited form is exactly 0': observable {matches: 0, within_s: W}, stimulus {grep: <prohibited form>, suffixes: ['.py']}, subject file_artifact path:ledgerlock, polarity MUST_HOLD (candidate SATISFIED). MUST_NOT_HOLD over {matches: 0} states the opposite ('at least one prohibited line exists') — the inversion recorded as C2-P5-FINDING-001. PLAN-V2.1's MUST_NOT_HOLD label names the prohibited behaviour, whose own observable ('matches >= 1') is not in the vocabulary; its only expressible form is MUST_HOLD over matches == 0.",
+   "subject_absence": "REQUIRES_SUBJECT: under ABSENCE_IS_DECIDABLE a missing ledgerlock/ is SUBJECT_ABSENT with the zero-match verdict SATISFIED, a vacuous pass of every prohibition.",
+   "fail_mode": "Under MUST_HOLD a non-UTF-8 file or an expired window is REFUTED -> UNSATISFIED (fail-closed); a file with a NUL byte is skipped (fail-open for anything hidden in it; CPython refuses to import source holding NUL, so an importable .py cannot hide there).",
+   "clauses": [
+    {
+     "requirement": "R-12/1",
+     "text": "No socket, no subprocess, no os.system.",
+     "observable_state": "zero lines in ledgerlock/**/*.py that import socket or subprocess (any import form) or reference os.system",
+     "caveats": [
+      "aliases (import os as o; o.system), getattr(os, 'system'), __import__('socket') and importlib are invisible to a line grep unless patterned; importlib and __import__ can be added",
+      "a comment or docstring naming the form fails the prohibition (over-approximation)",
+      "other process spawners (os.popen, os.exec*, os.spawn*, os.posix_spawn) are not named by R-12; R-10/2 does not stop them either, since os is allowed"
+     ]
+    },
+    {
+     "requirement": "R-10/2",
+     "text": "Stdlib only. Allowed: hashlib, json, os, sys, pathlib, tempfile, argparse, unittest, typing, unicodedata, uuid.",
+     "observable_state": "zero lines in ledgerlock/**/*.py whose import statement names a top-level module outside the allowlist ∪ {__future__ (R-10/1b), ledgerlock and relative imports (R-13)}",
+     "caveats": [
+      "comma lists ('import os, socket') and parenthesised from-imports need explicit patterns",
+      "a prose line in a docstring starting with 'from '/'import ' can match (false positive)",
+      "the allowlist check covers static imports only (R-14/6's runtime half is not observable)"
+     ]
+    }
+   ]
+  },
+  "risks": {
+   "requirements": [
+    {
+     "id": "RISK-1",
+     "clauses": [
+      "R-4.2/1",
+      "R-4.3/1",
+      "R-4.4/3",
+      "R-4.5/1",
+      "R-6/1"
+     ],
+     "kind": "UNREACHABLE_CLAUSE",
+     "text": "A key that has a committed put can never be deleted or changed. R-4.4/3 makes replay op-agnostic (a put with the tombstone's rid replays the delete), so delete(k, r1) after put(k, r1) is a replay (no tombstone), and delete(k, r2) conflicts (R-4.3, R-4.5/1). Keys are write-once; R-6's 'most recent committed put' has one candidate and 'if not tombstoned by a later delete' is unreachable for a put key; tombstones exist only as a key's first mutation. Any spec expecting put-then-delete to remove a key contradicts R-4."
+    },
+    {
+     "id": "RISK-2",
+     "clauses": [
+      "R-4.5/2",
+      "R-4.3/1"
+     ],
+     "kind": "CONTRADICTION",
+     "text": "'Replays of either MUST NOT conflict': the delete r2 conflicted and was never committed; replaying it is again a different rid on k, which R-4.3 requires to conflict. Consistent only if 'either' means the committed put."
+    },
+    {
+     "id": "RISK-3",
+     "clauses": [
+      "R-4.2/1"
+     ],
+     "kind": "AMBIGUITY",
+     "text": "Replay scope is rid alone (implied by R-4.4/3) or rid+key; under rid alone, put(a, r) then put(b, r) never stores b (affects AC-STORY-02-02-1)."
+    },
+    {
+     "id": "RISK-4",
+     "clauses": [
+      "R-9/7",
+      "R-9/3",
+      "R-9/4",
+      "R-14/1"
+     ],
+     "kind": "CONTRADICTION",
+     "text": "'verify ... Any other exit code is a bug' vs usage error 2 and I/O error 3 (file not found) for verify; with R-14/1 'fresh ledger' read as a nonexistent path, R-9/4 (3) and R-14/1 (0) disagree. Only 'fresh = existing empty file' is consistent."
+    },
+    {
+     "id": "RISK-5",
+     "clauses": [
+      "R-3.3/1",
+      "R-3.2/3"
+     ],
+     "kind": "UNTESTABLE",
+     "text": "'Any modification ... MUST be detected' vs a hash over canonical bytes: edits that preserve the canonical form (whitespace, key order, \\u00e9 vs literal é, possibly 1.0 vs 1) are undetectable unless canonical bytes equal stored bytes. Only semantic edits are testable."
+    },
+    {
+     "id": "RISK-6",
+     "clauses": [
+      "R-3.2/5",
+      "R-3.2/6"
+     ],
+     "kind": "SELF_CONTRADICTION",
+     "text": "'The first line's prev_hash is the literal string \"GENESIS\"' then '(64 hex chars of zeros OR ... implementation choice)'; 'documented' has no location. No neutral spec fixes the value."
+    },
+    {
+     "id": "RISK-7",
+     "clauses": [
+      "R-12/2",
+      "R-5/3",
+      "R-8/2",
+      "R-5/2"
+     ],
+     "kind": "CONTRADICTION",
+     "text": "R-12/2 forbids opening files other than the ledger, batch input and snapshot output, but R-5/3 (and R-8/2's first strategy) require a sibling temp file, and any file lock for R-5's 'the lock' would be another file. The reference opens a mkstemp sibling."
+    },
+    {
+     "id": "RISK-8",
+     "clauses": [
+      "R-5/2",
+      "R-10/2"
+     ],
+     "kind": "UNTESTABLE",
+     "text": "'under the lock' is undefined; threading/fcntl/msvcrt are not allowed, so it can only be an O_EXCL lock file (in tension with R-12/2) or trivial in-process serialisation."
+    },
+    {
+     "id": "RISK-9",
+     "clauses": [
+      "R-7/1",
+      "R-7/5",
+      "R-9/6"
+     ],
+     "kind": "GAP",
+     "text": "A newline-terminated last line that fails parse/hash is neither truncated (R-7/1 needs last byte not \\n) nor 'in the middle'; R-9/6's exit 5 covers only 'non-tail corruption'. repair-tail's behaviour and exit code for it are unspecified. 'does not parse / hash' is itself ambiguous (OR vs AND)."
+    },
+    {
+     "id": "RISK-10",
+     "clauses": [
+      "R-4.3/1",
+      "R-5/1"
+     ],
+     "kind": "AMBIGUITY",
+     "text": "Conflicts and replays between elements of one batch: R-4.3 judges against the last COMMITTED mutation, and an earlier element of the same batch is not committed."
+    },
+    {
+     "id": "RISK-11",
+     "clauses": [
+      "R-10/1b",
+      "R-10/2",
+      "R-13/1"
+     ],
+     "kind": "CONTRADICTION",
+     "text": "R-10 requires 'from __future__ import annotations' but __future__ is not in its allowlist; intra-package imports (cli.py -> ledger.py) are not listed either. A literal allowlist check fails every conforming tree."
+    },
+    {
+     "id": "RISK-12",
+     "clauses": [
+      "R-3.2/2",
+      "R-3.2/3",
+      "R-3.3/3"
+     ],
+     "kind": "INCONSISTENCY",
+     "text": "R-3.2's line shapes omit 'hash' and 'prev_hash', which R-3.2/3 and R-3.3 require on every line."
+    },
+    {
+     "id": "RISK-13",
+     "clauses": [
+      "R-13/2",
+      "R-5/1",
+      "R-6/1",
+      "R-4.1/1"
+     ],
+     "kind": "AMBIGUITY",
+     "text": "append/verify/snapshot/apply_batch as module functions or methods; put/delete/append signatures and ts provenance unspecified; apply_batch(ops) and snapshot() read as methods of a path-bound Ledger."
+    },
+    {
+     "id": "RISK-14",
+     "clauses": [
+      "R-8/1",
+      "R-5/4",
+      "R-3.4/1",
+      "R-12/2",
+      "R-10/1a"
+     ],
+     "kind": "UNTESTABLE",
+     "text": "Durability, crash-at-any-point atomicity, 'does not read in-memory state', file-access confinement and the interpreter version are outside every probe's vocabulary."
+    },
+    {
+     "id": "RISK-15",
+     "clauses": [
+      "R-9/2"
+     ],
+     "kind": "GAP",
+     "text": "'0 — success (append ...)' names a CLI append that no clause specifies (only apply --batch)."
+    },
+    {
+     "id": "RISK-16",
+     "clauses": [
+      "R-14/6"
+     ],
+     "kind": "AMBIGUITY",
+     "text": "'No third-party imports succeed at runtime' reads as an environment property, not a tree property."
+    }
+   ],
+   "plan_criteria_contradicting_requirements": [
+    {
+     "ac_id": "AC-STORY-04-01-1",
+     "against": [
+      "R-14/2",
+      "R-9/2"
+     ],
+     "why": "snapshot without --out must succeed and produce the bytes; the plan requires exit 2."
+    },
+    {
+     "ac_id": "AC-STORY-04-03-3",
+     "against": [
+      "R-14/2"
+     ],
+     "why": "no stdout on every snapshot success path, while R-14/2's no-`--out` form naturally writes to stdout."
+    },
+    {
+     "ac_id": "AC-STORY-04-03-5",
+     "against": [
+      "R-14/2"
+     ],
+     "why": "as AC-STORY-04-03-3, for every success path."
+    },
+    {
+     "ac_id": "AC-STORY-01-06-1",
+     "against": [
+      "R-4.2/1"
+     ],
+     "why": "a replay result flagged replayed=True/committed=False is not 'the same result' as the first call."
+    },
+    {
+     "ac_id": "AC-STORY-01-06-4",
+     "against": [
+      "R-4.4/3"
+     ],
+     "why": "as 01-06-1, against 'returning the same result as the delete'."
+    },
+    {
+     "ac_id": "AC-STORY-01-06-5",
+     "against": [
+      "R-4.2/1"
+     ],
+     "why": "as 01-06-1."
+    },
+    {
+     "ac_id": "AC-STORY-03-02-1",
+     "against": [
+      "R-7/1",
+      "R-7/3"
+     ],
+     "why": "truncation defined with OR: an unterminated but valid committed last record would be removed."
+    },
+    {
+     "ac_id": "AC-STORY-03-02-4",
+     "against": [
+      "R-7/1"
+     ],
+     "why": "conditional: when the tampered last line is unterminated, R-7/1 requires its removal; the plan requires no modification."
+    },
+    {
+     "ac_id": "AC-STORY-02-02-1",
+     "against": [
+      "R-4.2/1",
+      "R-4.2/2"
+     ],
+     "why": "conditional: if 'r' is literally one rid, only the first put commits under rid-keyed replay, so keys a, b, c cannot all appear."
+    }
+   ],
+   "plan_criteria_fixing_open_choices": [
+    "AC-STORY-01-02-1/3 (canonical encoding)",
+    "AC-STORY-01-02-5, 01-05-1, 03-01-1 (GENESIS literal)",
+    "AC-STORY-01-03-1 (lowercase hex)",
+    "AC-STORY-02-01-* / 03-01-5 (verdict as a dict)",
+    "AC-STORY-02-02-* / 04-01-5 (snapshot as a dict, its layout)",
+    "AC-STORY-04-01-6 / 04-02-2 (batch file)",
+    "AC-STORY-01-05-1 (append takes one tuple)"
+   ]
+  },
+  "synthetic_approval": {
+   "approver_shape": "ContractApproval.approver must be a str that starts with 'human:' and has a non-blank remainder (approval.py HUMAN_PREFIX; __post_init__: approver.startswith('human:') and approver[6:].strip()); anything else — a model or agent identity included — raises ContractError. The other fields: requirement_id + requirement_hash + contract_id + contract_hash (all bound by binding_problems), approved_at a finite int/float (not bool), model_reviews a tuple of str (advisory journal references only).",
+   "what_the_check_is": "Purely syntactic. No registry, signature, owner list or provenance is consulted: 'human:owner' and 'human:c2-p5-proposal-check' are indistinguishable to the kernel. require_approved accepts any approval whose four ids/hashes match the current requirement and contract.",
+   "why_never_persist_a_synthetic_identity": [
+    "A persisted ContractApproval with a synthetic 'human:...' approver bound to a real contract_hash and requirement_hash passes require_approved exactly as the owner's would, so compile_spec (and the static admission engine) would produce and admit a ProductProofSpec on authority that RFC §6 reserves to a human.",
+    "Nothing downstream can tell it apart later: the approver string is the only authority evidence and it is free text after the prefix; approved_at is not checked against anything.",
+    "It does not expire: it stays valid for as long as the two bound hashes do, i.e. it silently authorises that exact contract forever.",
+    "It would turn a measurement ('would this compile/admit once approved?') into an approval, against owner DECISION-3 (APPROVED_FOR_PROPOSAL_ONLY) and the rule that generated or tool output never expands authority. The precedent keeps check approvals in memory only (validation/qualification/p10_contracts.py: record approvals.given = [], check_approver declared)."
+   ],
+   "observed_usage": "Synthetic identities in the tree: human:c2-p5-proposal-check (P5-PLAN-V2.2-PROPOSAL.json declares approvals.given = []), human:c2-p3-calibration-fixture (P3-EFFECT-CALIBRATION.json, fixture approvals for calibration only), and human:evidence / human:conformance / human:q0 / human:owner in validation scripts that build approvals in memory."
+  },
+  "observations": [
+   "During this audit the working tree changed without this lane's action: git status shows M validation/qualification/p10_contracts.py and ?? tests/v2/fixtures/workloads/ledgerlock-p5-mutants/ (and a diff in validation/qualification/p5_falsifiability.py) — presumably parallel lanes. This lane wrote only this report and its builder in the scratchpad; its reads of p10_contracts.py (docstring, CHECK_APPROVER) may reflect that in-flight version."
+  ]
+ },
+ "reconciliation": {
+  "adopted": [
+   "prohibition and count greps declare REQUIRES_SUBJECT (a missing package is no vacuous pass)",
+   "the nine PLAN-V2.1 criteria contradicting the requirements are marked (CONTRADICTS)",
+   "RISK-1..16 recorded in the proposal (REQUIREMENT_RISKS); each ambiguous case is avoided by the retained specs",
+   "RISK-10: S-5-a conflicts against a COMMITTED mutation (a conflict between two elements of one batch is not required by R-4.3); AC-STORY-03-01-3's in-batch conflict is a plan-only facet",
+   "interface assumptions IB-ELEMENTS (a delete's value slot, a caller-supplied int ts) and IB-EMPTY (a zero-byte file is a fresh ledger) declared beside IB-LEDGER",
+   "clauses R-5/0 (the undefined lock, UNSUPPORTED) and R-10/4 (Python 3.11+, ENGINEERING) added",
+   "OD-GREP caveat: a NUL-byte file is skipped (as are non-UTF-8 files and an expired window, which the MUST_NOT_HOLD form would count as a match)",
+   "S-10-a admits __future__ and the package's own modules (RISK-11)"
+  ],
+  "disagreements": [
+   {
+    "point": "criterion classification granularity",
+    "audit": "a criterion whose written form rests on a plan-only surface is PLAN_ONLY_DETAIL (53)",
+    "aid": "a criterion is classified by its normative content, re-expressed at the requirement level, with every plan-only facet listed (45 NORMATIVE, 21 PLAN_ONLY)",
+    "reason": "the owner's correction strategy rewrites normative content around product behaviour (OD-STORE, OD-D4) and asks for every rewritten spec with old/new semantics; the plan-only facets the audit names are all listed per criterion, so no plan detail becomes a ProductProof property either way"
+   },
+   {
+    "point": "R-3.4 (verify reads no in-memory state)",
+    "audit": "UNSUPPORTED",
+    "aid": "S-3.4-a: MUST_NOT_HOLD over the equality of one instance's verdicts before and after an on-disk change",
+    "reason": "representation-agnostic among JSON-shaped verdicts and refuted by a cached-verdict witness; its caveat (a scenario failing before the comparison also satisfies a MUST_NOT_HOLD contract) is recorded"
+   },
+   {
+    "point": "AC-STORY-01-05-5",
+    "audit": "UNSUPPORTED (durability)",
+    "aid": "NORMATIVE via S-3.2-h and S-3.2-a (the line is visible to a separate process and newline-terminated); durability (R-8/1) listed as its unsupported facet",
+    "reason": "the criterion's stated clause is visibility"
+   },
+   {
+    "point": "AC-STORY-05-01-1 / 05-01-2",
+    "audit": "ENGINEERING_TEST_REQUIREMENT",
+    "aid": "NORMATIVE (DECISION-3 behavioural mappings to S-D3-05-01-1 / S-D3-05-01-2)",
+    "reason": "the owner's ruling keeps the two mappings as proposals when they trace to normative requirements and are independently falsifiable (both are, P5-FALSIFIABILITY.json); the property test itself stays engineering"
+   }
+  ],
+  "classification_counts": {
+   "audit": {
+    "ENGINEERING_TEST_REQUIREMENT": 5,
+    "NORMATIVE_PRODUCT_REQUIREMENT": 17,
+    "PLAN_ONLY_DETAIL": 53,
+    "UNSUPPORTED_FOR_FULL_ENFORCEMENT": 2
+   },
+   "aid": {
+    "ENGINEERING_TEST_REQUIREMENT": 4,
+    "NORMATIVE_PRODUCT_REQUIREMENT": 45,
+    "PLAN_ONLY_DETAIL": 21,
+    "UNSUPPORTED_FOR_FULL_ENFORCEMENT": 7
+   }
+  },
+  "per_criterion_differences": [
+   {
+    "ac_id": "AC-STORY-01-01-1",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-01-2",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-01-6",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-01-7",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-04-2",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-04-3",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-04-5",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "UNSUPPORTED_FOR_FULL_ENFORCEMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-04-6",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "UNSUPPORTED_FOR_FULL_ENFORCEMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-05-1",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-05-2",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-05-5",
+    "audit": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-06-1",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-06-2",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-06-4",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-01-06-5",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-02-01-3",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-03-01-1",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-03-01-3",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-03-01-4",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-03-02-1",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-03-02-2",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-03-02-3",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-03-02-4",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "UNSUPPORTED_FOR_FULL_ENFORCEMENT"
+   },
+   {
+    "ac_id": "AC-STORY-04-01-2",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-04-01-4",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-04-01-5",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "UNSUPPORTED_FOR_FULL_ENFORCEMENT"
+   },
+   {
+    "ac_id": "AC-STORY-04-01-6",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "UNSUPPORTED_FOR_FULL_ENFORCEMENT"
+   },
+   {
+    "ac_id": "AC-STORY-04-01-7",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-04-02-1",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-04-02-2",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "UNSUPPORTED_FOR_FULL_ENFORCEMENT"
+   },
+   {
+    "ac_id": "AC-STORY-04-02-3",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-04-02-4",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-05-01-1",
+    "audit": "ENGINEERING_TEST_REQUIREMENT",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-05-01-2",
+    "audit": "ENGINEERING_TEST_REQUIREMENT",
+    "aid": "NORMATIVE_PRODUCT_REQUIREMENT"
+   },
+   {
+    "ac_id": "AC-STORY-05-02-3",
+    "audit": "PLAN_ONLY_DETAIL",
+    "aid": "ENGINEERING_TEST_REQUIREMENT"
+   }
+  ]
+ }
+}

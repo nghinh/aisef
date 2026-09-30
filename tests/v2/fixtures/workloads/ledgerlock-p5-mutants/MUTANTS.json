@@ -1,0 +1,1251 @@
+{
+ "catalog": "LedgerLock P5 falsifiability corpus (C2-P5 correction): one controlled mutation per retained PLAN-V2.2 ProductProofSpec, applied to the frozen WP-2.0.3 reference (tests/v2/fixtures/workloads/ledgerlock-reference/reference, never modified). A change names a reference module and a line occurring exactly once in it; `after` replaces it (a list of lines; null deletes it); `remove` deletes the module; `rename_to` moves it. `modules` binds, per materialised tree, the sha256 of every module that differs from the reference (null when absent): the corpus is content-addressed and a materialisation that does not reproduce these digests is refused. Independent of the P0 mutants (P0-REFERENCE-FIXTURE.json), which prove the reference acceptance falsifiable, not these specs.",
+ "reference": "tests/v2/fixtures/workloads/ledgerlock-reference/reference",
+ "mutants": [
+  {
+   "id": "M5-3.1-a",
+   "spec": "S-3.1-a",
+   "requirement": "R-3.1",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    return unicodedata.normalize(\"NFC\", key)",
+     "after": [
+      "    return key"
+     ]
+    }
+   ],
+   "violation": "keys are stored as given, not NFC",
+   "modules": {
+    "ledgerlock/ledger.py": "60c33e2db40073e9af83f8a2638cca157c001a861f067e7d0718a641c8cb649b"
+   }
+  },
+  {
+   "id": "M5-3.1-b",
+   "spec": "S-3.1-b",
+   "requirement": "R-3.1",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    last_rec = last.get(key)",
+     "after": [
+      "    last_rec = last.get(unicodedata.normalize(\"NFD\", key))"
+     ]
+    }
+   ],
+   "violation": "the conflict lookup uses the NFD spelling, so an NFD and an NFC spelling of one key are two keys for conflicts",
+   "modules": {
+    "ledgerlock/ledger.py": "3f04695338ed3eaadb68de664d73c8525990f65a9413858eb1c2f125995ca7c7"
+   }
+  },
+  {
+   "id": "M5-3.1-c",
+   "spec": "S-3.1-c",
+   "requirement": "R-3.1",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    if rid in seen:",
+     "after": [
+      "    if rid in seen and seen[rid][1][\"key\"] == unicodedata.normalize(\"NFD\", key):"
+     ]
+    }
+   ],
+   "violation": "a replay is recognised only when the stored key equals the NFD spelling: an NFD replay of an NFC-committed rid is not a replay",
+   "modules": {
+    "ledgerlock/ledger.py": "0c1e6b40213d227f78ec772c1d2d4a772fa824da1a91a07cf12b93c4f86e55a1"
+   }
+  },
+  {
+   "id": "M5-3.2-a",
+   "spec": "S-3.2-a",
+   "requirement": "R-3.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        prev = GENESIS if not records else records[-1][\"hash\"]",
+     "after": [
+      "        prev = GENESIS"
+     ]
+    }
+   ],
+   "violation": "every batch starts its chain at GENESIS: a second batch's first line does not link to the stored tail",
+   "modules": {
+    "ledgerlock/ledger.py": "ef828f477a6b8068ef9a33290d67cccfc7d276f5a62a6b961601a4bd0bf41837"
+   }
+  },
+  {
+   "id": "M5-3.2-b",
+   "spec": "S-3.2-b",
+   "requirement": "R-3.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "            _fsync_write(self.path, raw + joiner + b\"\".join(new_lines))",
+     "after": [
+      "            _fsync_write(self.path, b\"\".join(new_lines))"
+     ]
+    }
+   ],
+   "violation": "a batch replaces the ledger with its own lines: committed lines are lost",
+   "modules": {
+    "ledgerlock/ledger.py": "858c35b3a5233b47f3d4e4aac11931539415753ceccd4e9ab7f9679b2455a179"
+   }
+  },
+  {
+   "id": "M5-3.2-c",
+   "spec": "S-3.2-c",
+   "requirement": "R-3.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "            _fsync_write(self.path, raw + joiner + b\"\".join(new_lines))",
+     "after": [
+      "            _fsync_write(self.path, b\"\".join(new_lines) + joiner + raw)"
+     ]
+    }
+   ],
+   "violation": "a batch writes its lines before the committed ones: an existing record is rewritten out of place",
+   "modules": {
+    "ledgerlock/ledger.py": "e5a1c64cb71e61d537594bc4063ce273dece47d8e4f140e4afd5be9b03b02127"
+   }
+  },
+  {
+   "id": "M5-3.2-d",
+   "spec": "S-3.2-d",
+   "requirement": "R-3.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    record = {\"op\": op, \"key\": key, \"ts\": ts, \"id\": rid}",
+     "after": [
+      "    record = {\"op\": op.upper(), \"key\": key, \"ts\": ts, \"id\": rid}"
+     ]
+    }
+   ],
+   "violation": "the op field is stored as PUT / DELETE",
+   "modules": {
+    "ledgerlock/ledger.py": "a11d10119241c242a70fafd9d5f5ef43183147187102491820ba69e7bf881099"
+   }
+  },
+  {
+   "id": "M5-3.2-e",
+   "spec": "S-3.2-e",
+   "requirement": "R-3.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        record[\"value\"] = value",
+     "after": [
+      "        record[\"value\"] = json.dumps(value)"
+     ]
+    }
+   ],
+   "violation": "the value field is stored as a JSON string, not as the JSON value",
+   "modules": {
+    "ledgerlock/ledger.py": "21ef6904fdb5715cf250df01ba543205f60c628dbbcf743cdc7f2bdf058ff103"
+   }
+  },
+  {
+   "id": "M5-3.2-f",
+   "spec": "S-3.2-f",
+   "requirement": "R-3.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    record = {\"op\": op, \"key\": key, \"ts\": ts, \"id\": rid}",
+     "after": [
+      "    record = {\"op\": op, \"key\": key, \"ts\": str(ts), \"id\": rid}"
+     ]
+    }
+   ],
+   "violation": "the ts field is stored as a string, not an integer",
+   "modules": {
+    "ledgerlock/ledger.py": "fa2ff8bf98470b7b58984f0639298bf5cbf17d450464cbd073e6a7d0602b624a"
+   }
+  },
+  {
+   "id": "M5-3.2-g",
+   "spec": "S-3.2-g",
+   "requirement": "R-3.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    record = {\"op\": op, \"key\": key, \"ts\": ts, \"id\": rid}",
+     "after": [
+      "    record = {\"op\": op, \"key\": key, \"ts\": ts, \"rid\": rid}"
+     ]
+    }
+   ],
+   "violation": "the request id is stored under 'rid', not 'id'",
+   "modules": {
+    "ledgerlock/ledger.py": "e914f2c8a9d34464b8221856bccbe24801ffd9609d03a89deb824c4c787a425f"
+   }
+  },
+  {
+   "id": "M5-3.2-h",
+   "spec": "S-3.2-h",
+   "requirement": "R-3.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "            _fsync_write(self.path, raw + joiner + b\"\".join(new_lines))",
+     "after": [
+      "            _fsync_write(self.path, (raw + joiner + b\"\".join(new_lines))[:-1])"
+     ]
+    }
+   ],
+   "violation": "the ledger's last line is left without its terminating newline",
+   "modules": {
+    "ledgerlock/ledger.py": "5b996589ad1ede56c2067b067474ca620cd5e5153fcbc1097707f0b36b0a199a"
+   }
+  },
+  {
+   "id": "M5-3.3-a",
+   "spec": "S-3.3-a",
+   "requirement": "R-3.3",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    blank = dict(record, hash=\"\", prev_hash=\"\")",
+     "after": [
+      "    blank = dict(record, hash=\"\", prev_hash=\"\", value=None)"
+     ]
+    }
+   ],
+   "violation": "the value is not part of the hashed bytes: a mutated value is not detected",
+   "modules": {
+    "ledgerlock/ledger.py": "6689dd54ea2b7f2e3fcb7cdb24b22cf1ad4e255897b74187b0a7dd6cd88d0e6b"
+   }
+  },
+  {
+   "id": "M5-3.3-b",
+   "spec": "S-3.3-b",
+   "requirement": "R-3.3",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    blank = dict(record, hash=\"\", prev_hash=\"\")",
+     "after": [
+      "    blank = dict(record, hash=\"\", prev_hash=\"\", op=\"\")"
+     ]
+    }
+   ],
+   "violation": "the op is not part of the hashed bytes: a swapped op is not detected",
+   "modules": {
+    "ledgerlock/ledger.py": "e7832d0bf089c3408fff218967687ee08608aa11fa13dd97fe100b1a5d6ffb01"
+   }
+  },
+  {
+   "id": "M5-3.3-c",
+   "spec": "S-3.3-c",
+   "requirement": "R-3.3",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        intact = rec.get(\"hash\") == line_hash(prev, rec)",
+     "after": [
+      "        intact = True"
+     ]
+    }
+   ],
+   "violation": "verify does not recompute hashes: a modified hash on the last line is not detected",
+   "modules": {
+    "ledgerlock/ledger.py": "d20c4a3ef87605833c5645c2a64f76e22d547a64cc64b94451781a3d920c03bc"
+   }
+  },
+  {
+   "id": "M5-3.3-d",
+   "spec": "S-3.3-d",
+   "requirement": "R-3.3",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        linked = rec.get(\"prev_hash\") == prev",
+     "after": [
+      "        linked = True"
+     ]
+    }
+   ],
+   "violation": "verify does not check that prev_hash is the previous line's hash",
+   "modules": {
+    "ledgerlock/ledger.py": "0b0e8e6b3bd279d26bedaa69870bc95cb7831f5ad65faae6d7a2e0ec0b770c32"
+   }
+  },
+  {
+   "id": "M5-3.4-a",
+   "spec": "S-3.4-a",
+   "requirement": "R-3.4",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        return verify_raw(raw)",
+     "after": [
+      "        return verify_raw(raw) if self._known_length is None else Verdict(True, None, self._known_length)"
+     ]
+    }
+   ],
+   "violation": "an instance that wrote the ledger answers verify from what it remembers, not from disk",
+   "modules": {
+    "ledgerlock/ledger.py": "978ca1c594b2758b18a8baa4b09ff8ee0391cd5d23dd60d9ece7c2182b094aa8"
+   }
+  },
+  {
+   "id": "M5-4.2-a",
+   "spec": "S-4.2-a",
+   "requirement": "R-4.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    if rid in seen:",
+     "after": [
+      "    if rid in seen and seen[rid][1][\"ts\"] == ts:"
+     ]
+    }
+   ],
+   "violation": "a replayed rid with another ts is not recognised as a replay and appends a line",
+   "modules": {
+    "ledgerlock/ledger.py": "e854d7702a22f71201773fc0b0e5acd87dfcbac5b4335c5cd996b32173ff149e"
+   }
+  },
+  {
+   "id": "M5-4.2-b",
+   "spec": "S-4.2-b",
+   "requirement": "R-4.2",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        seen, last = _by_rid(records), _last_mutation(records)",
+     "after": [
+      "        seen, last = {}, _last_mutation(records)"
+     ]
+    }
+   ],
+   "violation": "a batch ignores the rids committed before it: a replayed element appends a line",
+   "modules": {
+    "ledgerlock/ledger.py": "5b31a45af3400fe894dd455392b78e566865a8057aea35f4cc2010b80ddeb5e9"
+   }
+  },
+  {
+   "id": "M5-4.3-a",
+   "spec": "S-4.3-a",
+   "requirement": "R-4.3",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        return \"conflict\", None",
+     "after": [
+      "        return \"replay\", _result_of(0, last_rec)"
+     ]
+    }
+   ],
+   "violation": "a different rid on a committed key is silently treated as a no-op instead of raising ConflictError",
+   "modules": {
+    "ledgerlock/ledger.py": "3f30098bb20af76682baa8395bf7b2dd9150147c2b8f0c5fcfd3bc5dad0c4959"
+   }
+  },
+  {
+   "id": "M5-4.3-b",
+   "spec": "S-4.3-b",
+   "requirement": "R-4.3",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")",
+     "after": [
+      "                _fsync_write(self.path, raw + b\"\".join(new_lines) + encode_line({\"op\": op, \"key\": normalize_key(key), \"ts\": ts, \"id\": rid, \"value\": value, \"prev_hash\": prev, \"hash\": \"\"}))",
+      "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")"
+     ]
+    }
+   ],
+   "violation": "the conflicting mutation is written before ConflictError is raised",
+   "multi_line_rationale": "the violation needs the write and the unchanged raise, so the anchor line is kept after the inserted write",
+   "modules": {
+    "ledgerlock/ledger.py": "5fe1329badbf93d5ae9cbd505cd1e91955dd9d76db7028483766326e7fbb25e3"
+   }
+  },
+  {
+   "id": "M5-4.4-a",
+   "spec": "S-4.4-a",
+   "requirement": "R-4.4",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    if last_rec is not None and last_rec[\"id\"] != rid:",
+     "after": [
+      "    if last_rec is not None and last_rec[\"id\"] != rid and last_rec[\"op\"] == \"put\":"
+     ]
+    }
+   ],
+   "violation": "a tombstone never conflicts",
+   "modules": {
+    "ledgerlock/ledger.py": "0320d01741f55ce869e515c2a6d778c6f5c4b22e5d02d8f2736de16831578835"
+   }
+  },
+  {
+   "id": "M5-4.4-b",
+   "spec": "S-4.4-b",
+   "requirement": "R-4.4",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    if rid in seen:",
+     "after": [
+      "    if rid in seen and seen[rid][1][\"op\"] == op:"
+     ]
+    }
+   ],
+   "violation": "a put with the tombstone's rid is not a replay and appends a line",
+   "modules": {
+    "ledgerlock/ledger.py": "c618a4481527795318059accbcf6500646b6994dc6647e77a77faf210c9e53f5"
+   }
+  },
+  {
+   "id": "M5-4.5-a",
+   "spec": "S-4.5-a",
+   "requirement": "R-4.5",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    if last_rec is not None and last_rec[\"id\"] != rid:",
+     "after": [
+      "    if last_rec is not None and last_rec[\"id\"] != rid and last_rec[\"op\"] == op:"
+     ]
+    }
+   ],
+   "violation": "a delete with another rid after a put does not conflict",
+   "modules": {
+    "ledgerlock/ledger.py": "aee539eb99fb4e30733b957ef8c9e8c017fed284b6804b66045c88591f98d054"
+   }
+  },
+  {
+   "id": "M5-4.5-b",
+   "spec": "S-4.5-b",
+   "requirement": "R-4.5",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")",
+     "after": [
+      "                self._refused = True",
+      "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "        seen, last = _by_rid(records), _last_mutation(records)",
+     "after": [
+      "        if getattr(self, \"_refused\", False):",
+      "            raise ConflictError(\"an earlier refused mutation blocks this ledger\")",
+      "        seen, last = _by_rid(records), _last_mutation(records)"
+     ]
+    }
+   ],
+   "violation": "after a refused mutation, every later call on the instance conflicts, a replay included",
+   "multi_line_rationale": "the violation is a state carried from the refused call to the replay: one line records it, two lines consult it",
+   "modules": {
+    "ledgerlock/ledger.py": "5dffec8bc3dbf242ad72cf5f06e8e4d9bdead923a034ad3b3eed92fc1aa44f4a"
+   }
+  },
+  {
+   "id": "M5-5-a",
+   "spec": "S-5-a",
+   "requirement": "R-5",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")",
+     "after": [
+      "                _fsync_write(self.path, raw + b\"\".join(new_lines))",
+      "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")"
+     ]
+    }
+   ],
+   "violation": "a refused batch commits the elements planned before its conflict (a partial batch)",
+   "multi_line_rationale": "the partial write must precede the unchanged raise",
+   "modules": {
+    "ledgerlock/ledger.py": "0859ef5e1241dd1fd54538cac5423ab5b4d57240321fd2f4dacf98cda4982df7"
+   }
+  },
+  {
+   "id": "M5-5-b",
+   "spec": "S-5-b",
+   "requirement": "R-5",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "            new_lines.append(encode_line(payload))",
+     "after": [
+      "            new_lines[:] = [encode_line(payload)]"
+     ]
+    }
+   ],
+   "violation": "a batch commits only its last element",
+   "modules": {
+    "ledgerlock/ledger.py": "c389ba3d473347aae2e7f3f0b58a0d965af5ac309fb6e2f81599c31a086c412b"
+   }
+  },
+  {
+   "id": "M5-6-a",
+   "spec": "S-6-a",
+   "requirement": "R-6",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    return (json.dumps(dict(items), ensure_ascii=False, separators=(\",\", \":\")) + \"\\n\").encode(\"utf-8\")",
+     "after": [
+      "    return (json.dumps(dict(items, _nonce=os.urandom(4).hex()), ensure_ascii=False, separators=(\",\", \":\")) + \"\\n\").encode(\"utf-8\")"
+     ]
+    }
+   ],
+   "violation": "every snapshot carries a fresh nonce: two snapshots of one chain differ",
+   "modules": {
+    "ledgerlock/ledger.py": "1390a6fa2a8a807056179c863c79823f9d119fe598017cad5eadaea4dafc8243"
+   }
+  },
+  {
+   "id": "M5-6-b",
+   "spec": "S-6-b",
+   "requirement": "R-6",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")",
+     "after": [
+      "                if op == \"delete\":",
+      "                    _fsync_write(self.path, raw + encode_line(dict(last[normalize_key(key)], op=\"delete\", id=rid, ts=ts)))",
+      "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")"
+     ]
+    }
+   ],
+   "violation": "a refused delete is written as a tombstone before ConflictError is raised",
+   "multi_line_rationale": "the tombstone is written only for a delete, before the unchanged raise",
+   "modules": {
+    "ledgerlock/ledger.py": "e5e3333d3d3b12e50bd4d47de593824a91b295c39fe7f36873dbb2fd6c641de3"
+   }
+  },
+  {
+   "id": "M5-6-c",
+   "spec": "S-6-c",
+   "requirement": "R-6",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "            state.pop(rec[\"key\"], None)",
+     "after": [
+      "            state[rec[\"key\"]] = None"
+     ]
+    }
+   ],
+   "violation": "a tombstoned key appears in the snapshot with a null value",
+   "modules": {
+    "ledgerlock/ledger.py": "4ca0a714fa737387ffba608d32c339b4f471e54efd6b00426cb412be091f90cf"
+   }
+  },
+  {
+   "id": "M5-6-d",
+   "spec": "S-6-d",
+   "requirement": "R-6",
+   "changes": [
+    {
+     "module": "cli.py",
+     "before": "import sys",
+     "after": [
+      "import os",
+      "import sys"
+     ]
+    },
+    {
+     "module": "cli.py",
+     "before": "            sys.stdout.buffer.write(data)",
+     "after": [
+      "            sys.stdout.buffer.write(data + os.urandom(4).hex().encode(\"ascii\") + b\"\\n\")"
+     ]
+    }
+   ],
+   "violation": "the CLI snapshot appends a random line to its output",
+   "multi_line_rationale": "the random source must be imported by the CLI module",
+   "modules": {
+    "ledgerlock/cli.py": "fdc96287359d2d86824333808af9306fb17c4379b3d4a4f033a258e09ec14ee9"
+   }
+  },
+  {
+   "id": "M5-7-a",
+   "spec": "S-7-a",
+   "requirement": "R-7",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        head = raw.split(b\"\\n\")[:total - 1]",
+     "after": [
+      "        head = raw.split(b\"\\n\")[:total]"
+     ]
+    }
+   ],
+   "violation": "repair-tail keeps the truncated line",
+   "modules": {
+    "ledgerlock/ledger.py": "6cfdb0dbd86562e67b3d9ddf6c43f352c1aa36fa3e047c053862f9f0b3fbe5c6"
+   }
+  },
+  {
+   "id": "M5-7-b",
+   "spec": "S-7-b",
+   "requirement": "R-7",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        head = raw.split(b\"\\n\")[:total - 1]",
+     "after": [
+      "        head = raw.split(b\"\\n\")[1:total - 1]"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "        if not self.verify().ok:",
+     "after": [
+      "        if False:"
+     ]
+    }
+   ],
+   "violation": "repair-tail also drops the first line and no longer checks its result: the repaired chain does not verify",
+   "multi_line_rationale": "dropping a line alone is caught by the reference's own post-check, which would hide the violation behind a refusal",
+   "modules": {
+    "ledgerlock/ledger.py": "a72f45f6968949ab59b1c5a78c6199fbe805f43fcc840201cb8fdd73e683c25b"
+   }
+  },
+  {
+   "id": "M5-7-c",
+   "spec": "S-7-c",
+   "requirement": "R-7",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "        _fsync_write(self.path, b\"\\n\".join(head) + (b\"\\n\" if head else b\"\"))",
+     "after": [
+      "        _fsync_write(self.path, b\"\\n\".join(head))"
+     ]
+    }
+   ],
+   "violation": "repair-tail leaves the new last line without its newline",
+   "modules": {
+    "ledgerlock/ledger.py": "9515d8ec7552620b3332de6f3c72c643c3cae8d3473b3cd60ab1d1042ee74c0f"
+   }
+  },
+  {
+   "id": "M5-7-d",
+   "spec": "S-7-d",
+   "requirement": "R-7",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "            return False",
+     "after": [
+      "            _fsync_write(self.path, raw + b\"\\n\")",
+      "            return False"
+     ]
+    }
+   ],
+   "violation": "repair-tail rewrites a clean ledger (appends a newline)",
+   "multi_line_rationale": "the write must precede the unchanged return",
+   "modules": {
+    "ledgerlock/ledger.py": "77d5bfee0cf41cf132e327624b2ff435d75e156f3d855d10cfa93d2c05acadd4"
+   }
+  },
+  {
+   "id": "M5-7-e",
+   "spec": "S-7-e",
+   "requirement": "R-7",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "            raise CorruptionError(f\"corruption at line {verdict.first_bad_index} is not confined to the tail\")",
+     "after": [
+      "            return False"
+     ]
+    }
+   ],
+   "violation": "repair-tail succeeds silently on mid-chain corruption instead of refusing",
+   "modules": {
+    "ledgerlock/ledger.py": "63f968a0fb395c56f0fe5522f2933cd5c64b1a5e0cd3d6874cfdede3f34d7314"
+   }
+  },
+  {
+   "id": "M5-7-f",
+   "spec": "S-7-f",
+   "requirement": "R-7",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "            raise CorruptionError(f\"corruption at line {verdict.first_bad_index} is not confined to the tail\")",
+     "after": [
+      "            _fsync_write(self.path, b\"\")",
+      "            raise CorruptionError(f\"corruption at line {verdict.first_bad_index} is not confined to the tail\")"
+     ]
+    }
+   ],
+   "violation": "repair-tail empties the file before it refuses",
+   "multi_line_rationale": "the destructive write must precede the unchanged refusal",
+   "modules": {
+    "ledgerlock/ledger.py": "77fdd4fb7afc0e276c9bd687aecfbaa20d8f382fe818c6456602049c8349062e"
+   }
+  },
+  {
+   "id": "M5-9-a",
+   "spec": "S-9-a",
+   "requirement": "R-9",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    return Verdict(True, None, total)",
+     "after": [
+      "    return Verdict(total > 0, None, total)"
+     ]
+    }
+   ],
+   "violation": "an empty ledger does not verify",
+   "modules": {
+    "ledgerlock/ledger.py": "d1add311bdb51f1629c82e32fb9a5262b43628303782512d2eec1b5b1c03bb4e"
+   }
+  },
+  {
+   "id": "M5-9-b",
+   "spec": "S-9-b",
+   "requirement": "R-9",
+   "changes": [
+    {
+     "module": "cli.py",
+     "before": "        return EXIT_USAGE if e.code else EXIT_OK",
+     "after": [
+      "        return EXIT_OK"
+     ]
+    }
+   ],
+   "violation": "a usage error exits 0",
+   "modules": {
+    "ledgerlock/cli.py": "f03a6ec06efd2eaa9e174f21b11d7cf9c3bd4d7531e251d8cc9bbbd9f3ef8d2a"
+   }
+  },
+  {
+   "id": "M5-9-c",
+   "spec": "S-9-c",
+   "requirement": "R-9",
+   "changes": [
+    {
+     "module": "cli.py",
+     "before": "        args = build_parser().parse_args(argv)",
+     "after": [
+      "        args = build_parser().parse_known_args(argv)[0]"
+     ]
+    }
+   ],
+   "violation": "extra positional arguments are ignored instead of being a usage error",
+   "modules": {
+    "ledgerlock/cli.py": "ec8f60c5c2df6192364be0416efcbb1711cab15842582e2a1e68f65f1b22bf48"
+   }
+  },
+  {
+   "id": "M5-9-d",
+   "spec": "S-9-d",
+   "requirement": "R-9",
+   "changes": [
+    {
+     "module": "cli.py",
+     "before": "        return EXIT_IO",
+     "after": [
+      "        return EXIT_CORRUPT"
+     ]
+    }
+   ],
+   "violation": "an I/O error exits 5",
+   "modules": {
+    "ledgerlock/cli.py": "4b4dce33e14e29df84222d5286f2751906e2107f98823f5c354b4dd31eaa0fe9"
+   }
+  },
+  {
+   "id": "M5-9-e",
+   "spec": "S-9-e",
+   "requirement": "R-9",
+   "changes": [
+    {
+     "module": "cli.py",
+     "before": "    with open(path, encoding=\"utf-8\") as f:",
+     "after": [
+      "    if not __import__(\"os\").path.exists(path):",
+      "        return []",
+      "    with open(path, encoding=\"utf-8\") as f:"
+     ]
+    }
+   ],
+   "violation": "a missing batch file is read as an empty batch",
+   "multi_line_rationale": "the existence test must precede the unchanged open",
+   "modules": {
+    "ledgerlock/cli.py": "7b8c49f61210c69ede43f26959814e295dcbef2a9e9bc66d31e1596887289fab"
+   }
+  },
+  {
+   "id": "M5-9-f",
+   "spec": "S-9-f",
+   "requirement": "R-9",
+   "changes": [
+    {
+     "module": "cli.py",
+     "before": "        return EXIT_OK if verdict.ok else EXIT_CORRUPT",
+     "after": [
+      "        return EXIT_OK"
+     ]
+    }
+   ],
+   "violation": "verify exits 0 on a corrupt chain",
+   "modules": {
+    "ledgerlock/cli.py": "fe5f9f624166e86971429af7dffdcde61045e067eda0076cedb4c047b878b42a"
+   }
+  },
+  {
+   "id": "M5-10-a",
+   "spec": "S-10-a",
+   "requirement": "R-10",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "import tempfile",
+     "after": [
+      "import tempfile",
+      "import time"
+     ]
+    }
+   ],
+   "violation": "the core module imports a module outside the allowed set",
+   "multi_line_rationale": "the anchor import is kept",
+   "modules": {
+    "ledgerlock/ledger.py": "5087d37cb6bb3747b3aa26aeb355a493bf89096a6bac84d5ed61ab4d1086eb66"
+   }
+  },
+  {
+   "id": "M5-10-b",
+   "spec": "S-10-b",
+   "requirement": "R-10",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "from __future__ import annotations",
+     "after": null
+    }
+   ],
+   "violation": "ledger.py drops `from __future__ import annotations`",
+   "modules": {
+    "ledgerlock/ledger.py": "15fee2d2e4847c585cea6034bcb523cae5efaf80724c8f7aef1936d72c3368ad"
+   }
+  },
+  {
+   "id": "M5-10-c",
+   "spec": "S-10-c",
+   "requirement": "R-10",
+   "changes": [
+    {
+     "module": "cli.py",
+     "before": "from __future__ import annotations",
+     "after": null
+    }
+   ],
+   "violation": "cli.py drops `from __future__ import annotations`",
+   "modules": {
+    "ledgerlock/cli.py": "98b5c5274f498b9793f79662edb1c5f5ef8a87a085b0c143f416cdc9f466edc0"
+   }
+  },
+  {
+   "id": "M5-12-a",
+   "spec": "S-12-a",
+   "requirement": "R-12",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "import tempfile",
+     "after": [
+      "import socket",
+      "import tempfile"
+     ]
+    }
+   ],
+   "violation": "the core module imports socket",
+   "multi_line_rationale": "the anchor import is kept",
+   "modules": {
+    "ledgerlock/ledger.py": "4b7d4d22660e883fcb88c334e046a9afd8c8b9c63999b0099a9177f5f3fd7bdf"
+   }
+  },
+  {
+   "id": "M5-12-b",
+   "spec": "S-12-b",
+   "requirement": "R-12",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "import tempfile",
+     "after": [
+      "import subprocess",
+      "import tempfile"
+     ]
+    }
+   ],
+   "violation": "the core module imports subprocess",
+   "multi_line_rationale": "the anchor import is kept",
+   "modules": {
+    "ledgerlock/ledger.py": "06721fcaf9c192cddc76a2689d07d062033c4060b61cdb685367a66c9c36dffe"
+   }
+  },
+  {
+   "id": "M5-12-c",
+   "spec": "S-12-c",
+   "requirement": "R-12",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    os.replace(tmp, path)",
+     "after": [
+      "    os.replace(tmp, path)",
+      "",
+      "",
+      "def _flush_os() -> None:",
+      "    os.system(\"sync\")"
+     ]
+    }
+   ],
+   "violation": "the core module defines a function calling os.system (never called, so no shell runs in any observation)",
+   "multi_line_rationale": "a new never-called function carries the call, so that no observation executes a shell command",
+   "modules": {
+    "ledgerlock/ledger.py": "c6aa10a884136777936898532d06f3de648c96ae908d2ca6f64b3d6b913a17f9"
+   }
+  },
+  {
+   "id": "M5-13-a",
+   "spec": "S-13-a",
+   "requirement": "R-13",
+   "changes": [
+    {
+     "module": "__init__.py",
+     "remove": true
+    }
+   ],
+   "violation": "ledgerlock/__init__.py is absent (the package becomes a namespace package)",
+   "modules": {
+    "ledgerlock/__init__.py": null
+   }
+  },
+  {
+   "id": "M5-13-b",
+   "spec": "S-13-b",
+   "requirement": "R-13",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "rename_to": "core.py"
+    },
+    {
+     "module": "__init__.py",
+     "before": "from ledgerlock.ledger import (",
+     "after": [
+      "from ledgerlock.core import ("
+     ]
+    },
+    {
+     "module": "cli.py",
+     "before": "from ledgerlock.ledger import ConflictError, CorruptionError, Ledger",
+     "after": [
+      "from ledgerlock.core import ConflictError, CorruptionError, Ledger"
+     ]
+    }
+   ],
+   "violation": "the core module is ledgerlock/core.py, not ledgerlock/ledger.py",
+   "multi_line_rationale": "moving the module alone would break the package; the imports follow it so only the layout is violated",
+   "modules": {
+    "ledgerlock/__init__.py": "af4297c6a54605edece6b4d9695855d8b18e19d4da3b0babf366114f0ce50ef5",
+    "ledgerlock/cli.py": "05f8b544aa699099ee7889bb0a7a95b59efcacfd381089c3234712d2c107ecd8",
+    "ledgerlock/core.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16",
+    "ledgerlock/ledger.py": null
+   }
+  },
+  {
+   "id": "M5-13-c",
+   "spec": "S-13-c",
+   "requirement": "R-13",
+   "changes": [
+    {
+     "module": "cli.py",
+     "rename_to": "commands.py"
+    },
+    {
+     "module": "__main__.py",
+     "before": "from ledgerlock.cli import main",
+     "after": [
+      "from ledgerlock.commands import main"
+     ]
+    }
+   ],
+   "violation": "the CLI module is ledgerlock/commands.py, not ledgerlock/cli.py",
+   "multi_line_rationale": "the entry point follows the moved module so only the layout is violated",
+   "modules": {
+    "ledgerlock/__main__.py": "b34813993609226fc299f986cdc68144d9071b97370c081fe0554266eb2035d2",
+    "ledgerlock/cli.py": null,
+    "ledgerlock/commands.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075"
+   }
+  },
+  {
+   "id": "M5-13-d",
+   "spec": "S-13-d",
+   "requirement": "R-13",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "class Ledger:",
+     "after": [
+      "class Journal:"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "    return Ledger(path).append(op, key, value, rid, ts)",
+     "after": [
+      "    return Journal(path).append(op, key, value, rid, ts)"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "    return Ledger(path).verify()",
+     "after": [
+      "    return Journal(path).verify()"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "    return Ledger(path).snapshot()",
+     "after": [
+      "    return Journal(path).snapshot()"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "    return Ledger(path).apply_batch(ops)",
+     "after": [
+      "    return Journal(path).apply_batch(ops)"
+     ]
+    },
+    {
+     "module": "__init__.py",
+     "before": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,",
+     "after": [
+      "    ConflictError, CorruptionError, Journal as Ledger, Result, Verdict, append, apply_batch, snapshot, verify,"
+     ]
+    },
+    {
+     "module": "cli.py",
+     "before": "from ledgerlock.ledger import ConflictError, CorruptionError, Ledger",
+     "after": [
+      "from ledgerlock.ledger import ConflictError, CorruptionError, Journal as Ledger"
+     ]
+    }
+   ],
+   "violation": "ledger.py defines the class as Journal, not Ledger (the package and the CLI alias it)",
+   "multi_line_rationale": "renaming the class alone would break every caller; the callers follow so only ledger.py's names change",
+   "modules": {
+    "ledgerlock/__init__.py": "c162e9753adfe9128a52b4ac8e0caa12955947931e90c0b6aff6fa8e95b6f775",
+    "ledgerlock/cli.py": "a6aa625e0e4f993073e3a4bf50dfce027f3dcec7ae28ab2db3757fccfff74bad",
+    "ledgerlock/ledger.py": "82ea18b189dce075b7c91d7e060a20fbf69cfe3488d35b30453e7f2b8ca487ce"
+   }
+  },
+  {
+   "id": "M5-13-e",
+   "spec": "S-13-e",
+   "requirement": "R-13",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "class ConflictError(Exception):",
+     "after": [
+      "class LedgerConflict(Exception):"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "            raise ConflictError(f\"key {normalize_key(key)!r} was last mutated by another rid\")",
+     "after": [
+      "            raise LedgerConflict(f\"key {normalize_key(key)!r} was last mutated by another rid\")"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")",
+     "after": [
+      "                raise LedgerConflict(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")"
+     ]
+    },
+    {
+     "module": "__init__.py",
+     "before": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,",
+     "after": [
+      "    LedgerConflict as ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,"
+     ]
+    },
+    {
+     "module": "cli.py",
+     "before": "from ledgerlock.ledger import ConflictError, CorruptionError, Ledger",
+     "after": [
+      "from ledgerlock.ledger import CorruptionError, Ledger, LedgerConflict as ConflictError"
+     ]
+    }
+   ],
+   "violation": "ledger.py defines the conflict exception as LedgerConflict, not ConflictError",
+   "multi_line_rationale": "the raises and the importers follow the new name so only ledger.py's names change",
+   "modules": {
+    "ledgerlock/__init__.py": "5338ade9f654a79450f743199083df8b5e650118533c161b8ef6419d85c438ec",
+    "ledgerlock/cli.py": "77774a8457ead1038d4781b1fbdbb104cebf8d44943c56ed08846b6f070e6474",
+    "ledgerlock/ledger.py": "a0553a87a231e06271057ef80aa707c6f9cd8dc64d5bf8cd4a49151510d2fc69"
+   }
+  },
+  {
+   "id": "M5-13-f",
+   "spec": "S-13-f",
+   "requirement": "R-13",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "def append(path: str, op: str, key: str, value, rid: str, ts: int) -> Result:",
+     "after": [
+      "def append_record(path: str, op: str, key: str, value, rid: str, ts: int) -> Result:"
+     ]
+    },
+    {
+     "module": "__init__.py",
+     "before": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,",
+     "after": [
+      "    ConflictError, CorruptionError, Ledger, Result, Verdict, append_record as append, apply_batch, snapshot, verify,"
+     ]
+    }
+   ],
+   "violation": "ledger.py defines append_record, not append (the package re-exports it under the required name)",
+   "multi_line_rationale": "renaming alone would break the package import; the re-export keeps the tree runnable so only ledger.py's names change",
+   "modules": {
+    "ledgerlock/__init__.py": "d3ea180862cd9a170b5a871bfa5df66d64406bbd7105b4e49379a749b5bf293f",
+    "ledgerlock/ledger.py": "9f43903ea8636d65ff6ecc6ee070ceed6db49c15d932837fbd7678e895db2990"
+   }
+  },
+  {
+   "id": "M5-13-g",
+   "spec": "S-13-g",
+   "requirement": "R-13",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "def verify(path: str) -> Verdict:",
+     "after": [
+      "def verify_path(path: str) -> Verdict:"
+     ]
+    },
+    {
+     "module": "__init__.py",
+     "before": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,",
+     "after": [
+      "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify_path as verify,"
+     ]
+    }
+   ],
+   "violation": "ledger.py defines verify_path, not verify (the package re-exports it under the required name)",
+   "multi_line_rationale": "renaming alone would break the package import; the re-export keeps the tree runnable so only ledger.py's names change",
+   "modules": {
+    "ledgerlock/__init__.py": "0c841419872b058e7d9f4ae52700ebd6de44abd09deb8879bacdb0f0c4be3165",
+    "ledgerlock/ledger.py": "6be87820c3c408ae30cbb4f4ca16e11098f2177a4a998164e2efd7c246e0bab3"
+   }
+  },
+  {
+   "id": "M5-13-h",
+   "spec": "S-13-h",
+   "requirement": "R-13",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "def snapshot(path: str) -> bytes:",
+     "after": [
+      "def snapshot_path(path: str) -> bytes:"
+     ]
+    },
+    {
+     "module": "__init__.py",
+     "before": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,",
+     "after": [
+      "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot_path as snapshot, verify,"
+     ]
+    }
+   ],
+   "violation": "ledger.py defines snapshot_path, not snapshot (the package re-exports it under the required name)",
+   "multi_line_rationale": "renaming alone would break the package import; the re-export keeps the tree runnable so only ledger.py's names change",
+   "modules": {
+    "ledgerlock/__init__.py": "6f326e0a44f9361affcacd4304f64e45fecc25391797dce4edc5884fb1a8cb64",
+    "ledgerlock/ledger.py": "d179b1f4e3adc3dcc5714bd7c760b2fe7f9fa4a274f59d15f46118541a28d830"
+   }
+  },
+  {
+   "id": "M5-13-i",
+   "spec": "S-13-i",
+   "requirement": "R-13",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "def apply_batch(path: str, ops) -> typing.List[Result]:",
+     "after": [
+      "def apply_batch_path(path: str, ops) -> typing.List[Result]:"
+     ]
+    },
+    {
+     "module": "__init__.py",
+     "before": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,",
+     "after": [
+      "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch_path as apply_batch, snapshot, verify,"
+     ]
+    }
+   ],
+   "violation": "ledger.py defines apply_batch_path, not apply_batch (the package re-exports it under the required name)",
+   "multi_line_rationale": "renaming alone would break the package import; the re-export keeps the tree runnable so only ledger.py's names change",
+   "modules": {
+    "ledgerlock/__init__.py": "c961b0a10a43ba9dd211387c9db00e7e00a196615e6f79214176fa6a66272385",
+    "ledgerlock/ledger.py": "d181694ffcdea86242467c582caa006bcd20fea4eb2a27bb4b6b0304d452f8bc"
+   }
+  },
+  {
+   "id": "M5-D3-05-01-1",
+   "spec": "S-D3-05-01-1",
+   "requirement": "R-3.3",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "    record[\"prev_hash\"] = prev",
+     "after": [
+      "    record[\"prev_hash\"] = prev if op == \"put\" else GENESIS"
+     ]
+    }
+   ],
+   "violation": "a tombstone line stores GENESIS as its prev_hash: a sequence with a delete after other lines no longer verifies",
+   "modules": {
+    "ledgerlock/ledger.py": "f255eb15de39a63e7ef7aa09b2eb2b02c26fd32230c41117840f7a4d715dcca8"
+   }
+  },
+  {
+   "id": "M5-D3-05-01-2",
+   "spec": "S-D3-05-01-2",
+   "requirement": "R-5",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")",
+     "after": [
+      "                _fsync_write(self.path, raw.split(b\"\\n\")[0] + b\"\\n\")",
+      "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")"
+     ]
+    }
+   ],
+   "violation": "a conflicting element truncates the ledger to its first line before ConflictError is raised",
+   "multi_line_rationale": "the truncation must precede the unchanged raise",
+   "modules": {
+    "ledgerlock/ledger.py": "d5e5e8358acc791c7436f9017298cc4d1bfe14f3e8790a06e1d0cbf2238d2a81"
+   }
+  }
+ ],
+ "corpus_sha256": "b5cc63ec354376d90b39cf7f69a71ae9acb2810cf6fd662739b08e9ce2ad713a"
+}

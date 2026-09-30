@@ -1,13 +1,14 @@
-"""WP-2.5.2 — SpecFalsifiabilityEvidence for the PLAN-V2.2 proposal specs over the LedgerLock reference fixture
+"""WP-2.5.2 (corrected) — SpecFalsifiabilityEvidence per retained PLAN-V2.2 spec with its own P5 witness
 (validation/qualification/p5_falsifiability.py; RFC §9.1.2).
 
-P5F-1 a proposal spec the reference satisfies refutes its designed mutant, and the evidence passes the frozen
-`falsifiability_problems`; P5F-2 a spec the reference does not satisfy is reported REFERENCE_NOT_SATISFIED with the
-reference's observation, and no mutant is run against it; P5F-3 a designed mutant the spec cannot refute is reported in
-`unrefuted_designed`, never hidden; P5F-5 C2-P5-FINDING-001 reproduced; P5F-4 the committed record accounts for every criterion of the proposal, binds the
-proposal it measured, and every QUALIFIED row carries only valid evidence. Real subjects, real probes, the catalog.
+P5F-1 the P5 corpus is content-addressed: every witness reproduces its sealed digests, one witness per spec, and the
+frozen reference is untouched; P5F-2 a retained spec is satisfied by the pristine reference and refuted by its own
+witness, the evidence passing the frozen `falsifiability_problems` (one spec per probe kind); P5F-3 a witness a spec
+cannot refute is classified NOT_QUALIFIED, never hidden; P5F-5 C2-P5-FINDING-001 stays reproducible; P5F-4 the committed
+record: every retained spec QUALIFIED, none NOT_QUALIFIED, none unsatisfied by the reference, none without a witness.
 """
 
+import hashlib
 import importlib.util
 import json
 import pathlib
@@ -31,80 +32,63 @@ def _load(name, rel):
 
 
 F = _load("aisef_v2_p5_falsifiability", "validation/qualification/p5_falsifiability.py")
-_BUILT = {}
+_SPECS = {}
 
 
-def built():
-    if not _BUILT:
-        _BUILT.update(F._aid().build())
-    return _BUILT
+def spec(sid):
+    if not _SPECS:
+        _SPECS.update(F._aid().build()["compiled"])
+    return _SPECS[sid]
 
 
-def row(ac):
-    return next(e for e in built()["criteria"] if e["ac_id"] == ac)
-
-
-def targets():
-    return {m["id"]: m["target"] for m in F._trees()._p0()._catalog()}
+def witness(sid):
+    return next(m for m in F.corpus()["mutants"] if m["spec"] == sid)
 
 
 class Falsifiability(unittest.TestCase):
-    def _run(self, ac, mutants):
-        e = row(ac)
-        spec = built()["specs"][e["spec_id"]]
+    def test_P5F_1_the_corpus_is_content_addressed_and_the_reference_untouched(self):
+        self.assertEqual(F.corpus_problems(), [])
+        fixture = json.loads((ROOT / "closure-evidence/v2/cycle2/P0-REFERENCE-FIXTURE.json").read_text(encoding="utf-8"))["fixture"]
+        for name, text in F.reference_modules().items():
+            self.assertEqual(hashlib.sha256(text.encode("utf-8")).hexdigest(), fixture[f"reference/ledgerlock/{name}"]["sha256"], name)
+
+    def _pair(self, sid, mutant):
         with tempfile.TemporaryDirectory(prefix="aisef-p5f-", ignore_cleanup_errors=True) as tmp:
             work = pathlib.Path(tmp)
-            trees = {"reference": F._trees().build_tree(None, work)}
-            trees.update({m: F._trees().build_tree(m, work) for m in mutants})
-            return F.falsify(e, spec, trees, {m: t for m, t in targets().items() if m in mutants})
+            ref, mut = F.build_tree(None, work), F.build_tree(mutant, work)
+            return F.verdict_of(F.observe(spec(sid), ref)), F.verdict_of(F.observe(spec(sid), mut))
 
-    def test_P5F_1_a_satisfied_spec_refutes_its_designed_mutant(self):
-        out = self._run("AC-STORY-03-01-1", ["M-3.2-1"])
-        self.assertEqual(out["reference"], "SATISFIED")
-        self.assertEqual(out["status"], "QUALIFIED")
-        self.assertEqual(out["refuted"], ["M-3.2-1"])
-        self.assertTrue(all(not ev["falsifiability_problems"] for ev in out["evidence"]))
+    def test_P5F_2_a_retained_spec_is_satisfied_and_refutes_its_own_witness(self):
+        for sid in ("S-3.3-c", "S-9-b", "S-13-d", "S-12-c"):
+            with self.subTest(spec=sid):
+                pristine, refuted = self._pair(sid, witness(sid))
+                self.assertEqual(F.classify(spec(sid).candidate_expectation.value, pristine, refuted), "QUALIFIED")
+                self.assertEqual(F.evidence(spec(sid), witness(sid)["id"], refuted)["falsifiability_problems"], [])
 
-    def test_P5F_2_a_spec_the_reference_does_not_satisfy_is_reported_and_no_mutant_runs(self):
-        out = self._run("AC-STORY-01-01-2", ["M-3.1-1"])
-        self.assertEqual(out["status"], "REFERENCE_NOT_SATISFIED")
-        self.assertEqual(out["verdicts"], {})
-        self.assertEqual(out["reference_observation"]["kind"], "SUBJECT_ABSENT")
-        self.assertEqual(out["unrefuted_designed"], ["M-3.1-1"])
+    def test_P5F_3_a_witness_the_spec_cannot_refute_is_not_qualified(self):
+        pristine, other = self._pair("S-9-b", witness("S-3.1-a"))
+        self.assertEqual(F.classify(spec("S-9-b").candidate_expectation.value, pristine, other), "NOT_QUALIFIED")
 
-    def test_P5F_3_an_unrefuted_designed_mutant_is_reported(self):
-        out = self._run("AC-STORY-02-01-3", ["M-3.3-1"])
-        self.assertEqual(out["reference"], "SATISFIED")
-        self.assertEqual(out["refuted"], [])
-        self.assertEqual(out["unrefuted_designed"], ["M-3.3-1"])
-        self.assertEqual(out["status"], "NOT_QUALIFIED")
-
-    def test_P5F_5_finding_001_the_inverted_prohibitions_fail_a_correct_reference(self):
+    def test_P5F_5_finding_001_is_reproduced(self):
         with tempfile.TemporaryDirectory(prefix="aisef-p5f-", ignore_cleanup_errors=True) as tmp:
-            out = F.reproduce_finding_001(built(), F._trees().build_tree(None, pathlib.Path(tmp)))
+            out = F.reproduce_finding_001(F.build_tree(None, pathlib.Path(tmp)))
         self.assertTrue(out["reproduced"])
-        for ac, r in out["specs"].items():
-            self.assertEqual((r["polarity"], r["expectation"], r["reference"]), ("MUST_NOT_HOLD", "REFUTED", "SATISFIED"), ac)
+        self.assertEqual((out["expectation"], out["reference"]), ("REFUTED", "SATISFIED"))
 
 
 class Record(unittest.TestCase):
-    def test_P5F_4_the_record_accounts_for_the_proposal(self):
+    def test_P5F_4_every_retained_spec_is_qualified(self):
         rec = json.loads((ROOT / F.OUT_REL).read_text(encoding="utf-8"))
         proposal = json.loads((ROOT / F._aid().OUT_REL).read_text(encoding="utf-8"))
         self.assertEqual(rec["identities"]["proposal_digest"], proposal["proposal_digest"])
-        self.assertEqual(rec["identities"]["plan_hash"], proposal["plan"]["plan_hash"])
-        self.assertEqual({r["ac_id"] for r in rec["specs"]}, {e["ac_id"] for e in proposal["criteria"]})
-        compiled = {e["ac_id"]: e["spec_id"] for e in proposal["criteria"] if e["v22_status"] == "COMPILED"}
+        s = rec["summary"]
+        self.assertEqual((s["qualified"], s["not_qualified"], s["reference_not_satisfied"], s["specs_without_witness"]),
+                         (s["retained_specs"], 0, 0, 0))
+        self.assertEqual({r["spec_id"] for r in rec["specs"]}, {x["spec_id"] for x in proposal["specs"]})
         for r in rec["specs"]:
-            if r["ac_id"] in compiled:
-                self.assertEqual(r["spec_id"], compiled[r["ac_id"]])
-                self.assertIn(r["status"], ("QUALIFIED", "NOT_QUALIFIED", "REFERENCE_NOT_SATISFIED"))
-            else:
-                self.assertEqual(r["status"], "NO_SPEC")
-            if r["status"] == "QUALIFIED":
-                self.assertEqual(r["reference"], "SATISFIED")
-                self.assertTrue(r["refuted"])
-                self.assertTrue(all(not ev["falsifiability_problems"] for ev in r["evidence"]))
+            self.assertEqual((r["status"], r["pristine"]), ("QUALIFIED", "SATISFIED" if r["expectation"] == "SATISFIED" else "REFUTED"))
+            self.assertEqual(r["evidence"]["falsifiability_problems"], [], r["spec_id"])
+        self.assertTrue(rec["finding_001"]["reproduced"])
         self.assertEqual(rec["problems"], [])
 
 

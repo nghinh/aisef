@@ -11,3 +11,7 @@ tests/v2/fixtures/workloads/ledgerlock-reference/** text eol=lf
 # The file_artifact calibration fixtures are read as bytes when the fixture directory is not a repository (the
 # content class binds a sha256 of the exact blob); a CRLF checkout would change the bytes the record binds.
 tests/v2/fixtures/calibration/file_artifact/** text eol=lf
+
+# The P5 falsifiability corpus declares exact source lines of the reference and the digests of the modules they
+# produce; a CRLF checkout would change the declared lines.
+tests/v2/fixtures/workloads/ledgerlock-p5-mutants/** text eol=lf
