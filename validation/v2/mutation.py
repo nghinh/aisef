@@ -12,7 +12,9 @@ The record binds each target's module source (LF-normalised sha256): editing a t
 `--check` fails until the mutation run is repeated.
 
 One record per phase (`RECORDS`): a run writes each target into its phase's record, so a sealed phase's record is
-never rewritten by a later phase's targets.
+never rewritten by a later phase's targets. A later phase that must re-measure an earlier phase's targets (their module
+changed) takes them over (`SUPERSEDED`): the earlier record keeps its historical entries for them, reported as
+superseded and never re-checked against the new source, so no target is counted twice.
 
 A probe's child script (a module-level string constant that the probe runs in the subject's process) is code too:
 `path::SCRIPT/function` names a function (or a module-level table) of the script bound to `SCRIPT`; its mutants are
@@ -46,7 +48,8 @@ RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence
            "C2-P1": "closure-evidence/v2/cycle2/P1-MUTATION.json",
            "C2-P2": "closure-evidence/v2/cycle2/P2-MUTATION.json",
            "C2-P3": "closure-evidence/v2/cycle2/P3-MUTATION.json",
-           "C2-P4": "closure-evidence/v2/cycle2/P4-MUTATION.json"}
+           "C2-P4": "closure-evidence/v2/cycle2/P4-MUTATION.json",
+           "C2-ORCH": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -444,8 +447,20 @@ C2P3_TARGETS: dict[str, list[str]] = {
         "identity", "guarded", "target_of", "do_workspace", "do_construct", "do_call", "raised_as", "do_expect",
         "do_write", "do_edit", "do_subprocess", "do_fault", "HANDLERS", "run", "main")},
 }
+# C2-ORCHESTRATION-CONFORMANCE-REPAIR (owner ruling 2026-09-30): the repair changed story_runner.py and proof.py, and a
+# source digest is whole-file, so every P6 target of the two modules is re-measured here, the conformance cases added
+# to its kill set (after the stage tests, before the real-path cases); P6 keeps its historical entries for them.
+_C2_ORCH_MODULES = ("aisef2/orchestrate/story_runner.py", "aisef2/orchestrate/proof.py")
+C2_ORCH_TARGETS: dict[str, list[str]] = {
+    t: [k[0], "tests/v2/test_c2_orchestration_conformance.py", *k[1:]]
+    for t, k in P6_TARGETS.items() if t.split("::")[0] in _C2_ORCH_MODULES}
+#: target -> the phase that took it over; an earlier phase's record entry for it is historical (reported, not checked)
+SUPERSEDED: dict[str, str] = {t: "C2-ORCH" for t in C2_ORCH_TARGETS}
+for _t in C2_ORCH_TARGETS:
+    del P6_TARGETS[_t]
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
-                 "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS}
+                 "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS,
+                 "C2-ORCH": C2_ORCH_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
@@ -756,11 +771,18 @@ def phase_of(target: str) -> str:
     return next(ph for ph, targets in PHASE_TARGETS.items() if target in targets)
 
 
+def superseded(record: dict, phase: str) -> list[str]:
+    """The targets of `record` (phase `phase`) that a later phase took over: historical entries, never re-checked."""
+    return [t["target"] for t in record["targets"] if SUPERSEDED.get(t["target"], phase) != phase]
+
+
 def problems_of(record: dict, root: pathlib.Path = ROOT, phase: str = "P1") -> list[str]:
-    seen = {t["target"] for t in record["targets"]}
+    old = set(superseded(record, phase))
+    targets = [t for t in record["targets"] if t["target"] not in old]
+    seen = {t["target"] for t in targets}
     out = [f"{t} has no mutation result" for t in PHASE_TARGETS[phase] if t not in seen]
     out += [f"{t} belongs to {phase_of(t)}, not {phase}" for t in seen if t in TARGETS and phase_of(t) != phase]
-    return out + [p for t in record["targets"] for p in target_problems(t, root)]
+    return out + [p for t in targets for p in target_problems(t, root)]
 
 
 def check(root: pathlib.Path = ROOT) -> list[str]:
@@ -798,6 +820,10 @@ def main(argv: list[str] | None = None) -> int:
         if unknown:
             raise SystemExit(f"not a mutation target: {unknown}")
     problems = check()
+    for phase, rel in RECORDS.items():
+        if (ROOT / rel).exists():
+            for t in superseded(json.loads((ROOT / rel).read_text(encoding="utf-8")), phase):
+                print(f"SUPERSEDED  {phase} {t}: historical, taken over by {SUPERSEDED[t]}")
     for p in problems:
         print(f"FAIL  {p}")
     print("mutation: " + ("FAIL" if problems else "PASS"))

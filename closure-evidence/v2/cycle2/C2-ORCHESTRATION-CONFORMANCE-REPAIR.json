@@ -1,0 +1,1225 @@
+{
+ "record": "AISEF V2 — C2-ORCHESTRATION-CONFORMANCE-REPAIR: one ProductProof evaluation per PlanObligation, by the probe identity its ProductProofSpec carries",
+ "authority": "owner ruling 2026-09-30, 'ORCHESTRATION CONFORMANCE REPAIR AUTHORIZED' (C2-ORCHESTRATION-CONFORMANCE-REPAIR)",
+ "classification": "CONFORMANCE REPAIR to the frozen architecture (not an architecture expansion, not a new probe feature)",
+ "subject": {
+  "base": "45136086c3e4a98534f975e6db979f94165af5f3",
+  "head_when_written": "ac88f366f98e5d1f4e2859df1001d430bdb8364c",
+  "note": "written on head_when_written, the commit that carries the repair, and committed in the commit after it (a record cannot name the commit that contains it; the C2-P5 proposal's derived provenance in (e) reads HEAD's kernel tree); (d) binds every changed file by content",
+  "old_kernel": {
+   "commit": "63112544f1146097b69c538d98e09e5a52c547c1",
+   "aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+   "files": 71,
+   "kernel_digest": "41233b8172ee0144c2e82e00dcd9c8e7f85e1b876aae93e9c7786e3c6a9a4fd0",
+   "support": {
+    "tests/__init__.py": {
+     "commit": "22df5bf266174358345143e92ca0c508f2bef200",
+     "base": "22df5bf266174358345143e92ca0c508f2bef200"
+    },
+    "tests/v2": {
+     "commit": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330",
+     "base": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330"
+    },
+    "validation/v2": {
+     "commit": "60920999bdc44dc9530e7a6fe14d1341f5615a07",
+     "base": "60920999bdc44dc9530e7a6fe14d1341f5615a07"
+    },
+    "docs/architecture": {
+     "commit": "2e2cb173107c9aa18efdea069aeab3770296ae52",
+     "base": "2e2cb173107c9aa18efdea069aeab3770296ae52"
+    },
+    "docs/implementation/v2": {
+     "commit": "a21fd2f5943eb31bc69a7fd7ace53fd9c8fa0d44",
+     "base": "a21fd2f5943eb31bc69a7fd7ace53fd9c8fa0d44"
+    }
+   }
+  },
+  "new_kernel": {
+   "kernel_digest": "8e8f00ca9327599f850088181aa64fa8751d8405a5485d52faccb18fa8ef4d3d",
+   "rule": "q4's kernel digest over this working tree's aisef2 (its git tree exists once the repair is committed; (d) binds the two changed modules by content)"
+  }
+ },
+ "repair": {
+  "story_runner._probe": "resolves the factory of the spec's own probe identity (inputs.probes.get(spec.probe_id)); None when the harness wires none; without a spec only a single factory is unambiguous (as before)",
+  "proof.Party": "keyword-only by_spec: the maker is given the spec it is asked to prove; a maker without the spec's probe makes the party run nothing and return no record (a party never manufactures one: invariant III, INV-III-1 pins the record producers to protocol.py and story_admission.py); one-argument makers unchanged",
+  "proof.prove": "a party with no probe for the spec's identity is PROBE_INVALID_SPEC, the code an INVALID_SPEC result routes to at every point (§10) — never a crash, never another probe's run; the journal order of a proof is unchanged (implementer record, verifier record, proof)",
+  "StoryInputs.probes": "several factories keyed by probe id (a harness wires every probe the plan's specs name)",
+  "unchanged": "StoryAdmission, ContractSatisfaction, routing, budgets, journal events and payloads, the RunSpec, F1-F11, every contract, spec, plan and probe identity"
+ },
+ "defect_reproducer": {
+  "story": "tests.v2.test_c2_orchestration_conformance.reproduce_multi_kind: C-F (file_artifact) and C-P (python_callable_v2), both INTRODUCE and READY at the parent; the harness wires exactly the story's two probes",
+  "old": {
+   "raised": "InvariantError: cycle 1 proves a story with exactly one probe factory",
+   "attempts": null,
+   "committed": false,
+   "probe_factories": [
+    "probe.file_artifact",
+    "probe.python_callable_v2"
+   ],
+   "event_types": [
+    "run/begin",
+    "capability/resolved",
+    "run/spec-resolved",
+    "plan/frozen",
+    "story/begin",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "probe/evaluated",
+    "story/resource-acquired",
+    "probe/evaluated",
+    "story/admitted",
+    "story/resource-released",
+    "gate/check",
+    "provider/request",
+    "provider/result",
+    "gate/check",
+    "run/interrupted",
+    "story/resource-released",
+    "story/resource-released",
+    "story/resource-released",
+    "run/dispose-begin",
+    "run/end"
+   ],
+   "dispositions": {
+    "C-F": "READY",
+    "C-P": "READY"
+   },
+   "developer_requests": [
+    [
+     "C-F",
+     "C-P"
+    ]
+   ],
+   "records": [
+    {
+     "criterion_id": "C-F",
+     "probe_id": "probe.file_artifact",
+     "at": "parent",
+     "verdict": "REFUTED"
+    },
+    {
+     "criterion_id": "C-P",
+     "probe_id": "probe.python_callable_v2",
+     "at": "parent",
+     "verdict": "INDETERMINATE"
+    }
+   ],
+   "proofs": [],
+   "failures": []
+  },
+  "new": {
+   "raised": null,
+   "attempts": [
+    "COMMIT"
+   ],
+   "committed": true,
+   "probe_factories": [
+    "probe.file_artifact",
+    "probe.python_callable_v2"
+   ],
+   "event_types": [
+    "run/begin",
+    "capability/resolved",
+    "run/spec-resolved",
+    "plan/frozen",
+    "story/begin",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "probe/evaluated",
+    "story/resource-acquired",
+    "probe/evaluated",
+    "story/admitted",
+    "story/resource-released",
+    "gate/check",
+    "provider/request",
+    "provider/result",
+    "gate/check",
+    "probe/evaluated",
+    "probe/evaluated",
+    "proof/verified",
+    "gate/check",
+    "story/resource-acquired",
+    "story/resource-released",
+    "probe/evaluated",
+    "story/resource-acquired",
+    "story/resource-released",
+    "probe/evaluated",
+    "proof/verified",
+    "gate/check",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "story/resource-acquired",
+    "tests/adequacy",
+    "story/resource-released",
+    "story/resource-released",
+    "story/resource-released",
+    "gate/check",
+    "provider/request",
+    "provider/result",
+    "gate/check",
+    "story/resource-acquired",
+    "tool/invoked",
+    "tool/result",
+    "story/resource-released",
+    "gate/check",
+    "gate/check",
+    "probe/evaluated",
+    "probe/evaluated",
+    "proof/verified",
+    "gate/check",
+    "story/resource-acquired",
+    "story/resource-released",
+    "probe/evaluated",
+    "story/resource-acquired",
+    "story/resource-released",
+    "probe/evaluated",
+    "proof/verified",
+    "gate/check",
+    "gate/decision",
+    "story/commit",
+    "story/dispose",
+    "story/resource-released",
+    "story/resource-released",
+    "story/resource-released",
+    "story/end"
+   ],
+   "dispositions": {
+    "C-F": "READY",
+    "C-P": "READY"
+   },
+   "developer_requests": [
+    [
+     "C-F",
+     "C-P"
+    ]
+   ],
+   "records": [
+    {
+     "criterion_id": "C-F",
+     "probe_id": "probe.file_artifact",
+     "at": "parent",
+     "verdict": "REFUTED"
+    },
+    {
+     "criterion_id": "C-P",
+     "probe_id": "probe.python_callable_v2",
+     "at": "parent",
+     "verdict": "INDETERMINATE"
+    },
+    {
+     "criterion_id": "C-F",
+     "probe_id": "probe.file_artifact",
+     "at": "later",
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-F",
+     "probe_id": "probe.file_artifact",
+     "at": "later",
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-P",
+     "probe_id": "probe.python_callable_v2",
+     "at": "later",
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-P",
+     "probe_id": "probe.python_callable_v2",
+     "at": "later",
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-F",
+     "probe_id": "probe.file_artifact",
+     "at": "later",
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-F",
+     "probe_id": "probe.file_artifact",
+     "at": "later",
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-P",
+     "probe_id": "probe.python_callable_v2",
+     "at": "later",
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-P",
+     "probe_id": "probe.python_callable_v2",
+     "at": "later",
+     "verdict": "SATISFIED"
+    }
+   ],
+   "proofs": [
+    {
+     "criterion_id": "C-F",
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-P",
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-F",
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    {
+     "criterion_id": "C-P",
+     "agreement": true,
+     "verdict": "SATISFIED"
+    }
+   ],
+   "failures": []
+  }
+ },
+ "single_probe_equivalence": {
+  "corpus": "validation/qualification/q5.py CORPUS",
+  "mode": "record (the item's scripted model stream; no provider)",
+  "items": 7,
+  "identical": 7,
+  "by_item": {
+   "normal-completion": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "outcomes_identical": true,
+    "events": [
+     63,
+     63
+    ],
+    "errors": {
+     "replay_request_mismatch": 0,
+     "assert_consumed_failure": 0,
+     "tool_diff": 0,
+     "subprocess_diff": 0,
+     "workspace_diff": 0,
+     "probe_product_diff": 0,
+     "control_diff": 0,
+     "capability_mismatch": 0,
+     "harness_error": 0,
+     "invariant_violation": 0,
+     "exception": 0,
+     "residual_process": 0
+    },
+    "journal_raw_differences": [
+     {
+      "index": 3,
+      "event": "capability/resolved kernel",
+      "fields": [
+       "data.binding.digest",
+       "data.identity"
+      ]
+     },
+     {
+      "index": 7,
+      "event": "run/spec-resolved",
+      "fields": [
+       "data.runspec_hash"
+      ]
+     }
+    ],
+    "journal_identical_but_kernel_identity": true,
+    "other_observations_identical": {
+     "outcomes": true,
+     "errors": true,
+     "notes": true,
+     "model_requests": true,
+     "consumption": true,
+     "tool_ledger": true,
+     "subprocesses": true,
+     "initial_workspace": true,
+     "final_workspace": true
+    }
+   },
+   "retry-then-commit": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "COMMIT"
+     ]
+    },
+    "outcomes_identical": true,
+    "events": [
+     91,
+     91
+    ],
+    "errors": {
+     "replay_request_mismatch": 0,
+     "assert_consumed_failure": 0,
+     "tool_diff": 0,
+     "subprocess_diff": 0,
+     "workspace_diff": 0,
+     "probe_product_diff": 0,
+     "control_diff": 0,
+     "capability_mismatch": 0,
+     "harness_error": 0,
+     "invariant_violation": 0,
+     "exception": 0,
+     "residual_process": 0
+    },
+    "journal_raw_differences": [
+     {
+      "index": 3,
+      "event": "capability/resolved kernel",
+      "fields": [
+       "data.binding.digest",
+       "data.identity"
+      ]
+     },
+     {
+      "index": 7,
+      "event": "run/spec-resolved",
+      "fields": [
+       "data.runspec_hash"
+      ]
+     }
+    ],
+    "journal_identical_but_kernel_identity": true,
+    "other_observations_identical": {
+     "outcomes": true,
+     "errors": true,
+     "notes": true,
+     "model_requests": true,
+     "consumption": true,
+     "tool_ledger": true,
+     "subprocesses": true,
+     "initial_workspace": true,
+     "final_workspace": true
+    }
+   },
+   "review-finding-rollback": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "outcomes_identical": true,
+    "events": [
+     89,
+     89
+    ],
+    "errors": {
+     "replay_request_mismatch": 0,
+     "assert_consumed_failure": 0,
+     "tool_diff": 0,
+     "subprocess_diff": 0,
+     "workspace_diff": 0,
+     "probe_product_diff": 0,
+     "control_diff": 0,
+     "capability_mismatch": 0,
+     "harness_error": 0,
+     "invariant_violation": 0,
+     "exception": 0,
+     "residual_process": 0
+    },
+    "journal_raw_differences": [
+     {
+      "index": 3,
+      "event": "capability/resolved kernel",
+      "fields": [
+       "data.binding.digest",
+       "data.identity"
+      ]
+     },
+     {
+      "index": 7,
+      "event": "run/spec-resolved",
+      "fields": [
+       "data.runspec_hash"
+      ]
+     }
+    ],
+    "journal_identical_but_kernel_identity": true,
+    "other_observations_identical": {
+     "outcomes": true,
+     "errors": true,
+     "notes": true,
+     "model_requests": true,
+     "consumption": true,
+     "tool_ledger": true,
+     "subprocesses": true,
+     "initial_workspace": true,
+     "final_workspace": true
+    }
+   },
+   "pre-satisfied": {
+    "outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "outcomes_identical": true,
+    "events": [
+     61,
+     61
+    ],
+    "errors": {
+     "replay_request_mismatch": 0,
+     "assert_consumed_failure": 0,
+     "tool_diff": 0,
+     "subprocess_diff": 0,
+     "workspace_diff": 0,
+     "probe_product_diff": 0,
+     "control_diff": 0,
+     "capability_mismatch": 0,
+     "harness_error": 0,
+     "invariant_violation": 0,
+     "exception": 0,
+     "residual_process": 0
+    },
+    "journal_raw_differences": [
+     {
+      "index": 3,
+      "event": "capability/resolved kernel",
+      "fields": [
+       "data.binding.digest",
+       "data.identity"
+      ]
+     },
+     {
+      "index": 7,
+      "event": "run/spec-resolved",
+      "fields": [
+       "data.runspec_hash"
+      ]
+     }
+    ],
+    "journal_identical_but_kernel_identity": true,
+    "other_observations_identical": {
+     "outcomes": true,
+     "errors": true,
+     "notes": true,
+     "model_requests": true,
+     "consumption": true,
+     "tool_ledger": true,
+     "subprocesses": true,
+     "initial_workspace": true,
+     "final_workspace": true
+    }
+   },
+   "security-finding-rollback": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "outcomes_identical": true,
+    "events": [
+     99,
+     99
+    ],
+    "errors": {
+     "replay_request_mismatch": 0,
+     "assert_consumed_failure": 0,
+     "tool_diff": 0,
+     "subprocess_diff": 0,
+     "workspace_diff": 0,
+     "probe_product_diff": 0,
+     "control_diff": 0,
+     "capability_mismatch": 0,
+     "harness_error": 0,
+     "invariant_violation": 0,
+     "exception": 0,
+     "residual_process": 0
+    },
+    "journal_raw_differences": [
+     {
+      "index": 3,
+      "event": "capability/resolved kernel",
+      "fields": [
+       "data.binding.digest",
+       "data.identity"
+      ]
+     },
+     {
+      "index": 7,
+      "event": "run/spec-resolved",
+      "fields": [
+       "data.runspec_hash"
+      ]
+     }
+    ],
+    "journal_identical_but_kernel_identity": true,
+    "other_observations_identical": {
+     "outcomes": true,
+     "errors": true,
+     "notes": true,
+     "model_requests": true,
+     "consumption": true,
+     "tool_ledger": true,
+     "subprocesses": true,
+     "initial_workspace": true,
+     "final_workspace": true
+    }
+   },
+   "developer-outage-rollback": {
+    "outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "outcomes_identical": true,
+    "events": [
+     51,
+     51
+    ],
+    "errors": {
+     "replay_request_mismatch": 0,
+     "assert_consumed_failure": 0,
+     "tool_diff": 0,
+     "subprocess_diff": 0,
+     "workspace_diff": 0,
+     "probe_product_diff": 0,
+     "control_diff": 0,
+     "capability_mismatch": 0,
+     "harness_error": 0,
+     "invariant_violation": 0,
+     "exception": 0,
+     "residual_process": 0
+    },
+    "journal_raw_differences": [
+     {
+      "index": 3,
+      "event": "capability/resolved kernel",
+      "fields": [
+       "data.binding.digest",
+       "data.identity"
+      ]
+     },
+     {
+      "index": 7,
+      "event": "run/spec-resolved",
+      "fields": [
+       "data.runspec_hash"
+      ]
+     }
+    ],
+    "journal_identical_but_kernel_identity": true,
+    "other_observations_identical": {
+     "outcomes": true,
+     "errors": true,
+     "notes": true,
+     "model_requests": true,
+     "consumption": true,
+     "tool_ledger": true,
+     "subprocesses": true,
+     "initial_workspace": true,
+     "final_workspace": true
+    }
+   },
+   "post-merge-regression": {
+    "outcomes": {
+     "S0": [
+      "COMMIT"
+     ],
+     "S2": [
+      "ROLLBACK"
+     ]
+    },
+    "outcomes_identical": true,
+    "events": [
+     143,
+     143
+    ],
+    "errors": {
+     "replay_request_mismatch": 0,
+     "assert_consumed_failure": 0,
+     "tool_diff": 0,
+     "subprocess_diff": 0,
+     "workspace_diff": 0,
+     "probe_product_diff": 0,
+     "control_diff": 0,
+     "capability_mismatch": 0,
+     "harness_error": 0,
+     "invariant_violation": 0,
+     "exception": 0,
+     "residual_process": 0
+    },
+    "journal_raw_differences": [
+     {
+      "index": 3,
+      "event": "capability/resolved kernel",
+      "fields": [
+       "data.binding.digest",
+       "data.identity"
+      ]
+     },
+     {
+      "index": 7,
+      "event": "run/spec-resolved",
+      "fields": [
+       "data.runspec_hash"
+      ]
+     }
+    ],
+    "journal_identical_but_kernel_identity": true,
+    "other_observations_identical": {
+     "outcomes": true,
+     "errors": true,
+     "notes": true,
+     "model_requests": true,
+     "consumption": true,
+     "tool_ledger": true,
+     "subprocesses": true,
+     "initial_workspace": true,
+     "final_workspace": true
+    }
+   }
+  },
+  "difference_rule": "the raw normalized journals differ only in capability/resolved kernel: binding.digest, capability/resolved kernel: identity, run/spec-resolved: runspec_hash (each process binds the kernel it imported); neutralised, they are identical"
+ },
+ "test_matrix": {
+  "module": "tests.v2.test_c2_orchestration_conformance",
+  "classes": [
+   "OneProofPerObligation",
+   "MixedStory",
+   "ReproofOfAnotherKind",
+   "Parties",
+   "LedgerLockStories"
+  ],
+  "exit": 0,
+  "ran": 22,
+  "passed": 22,
+  "outcomes": {
+   "LedgerLockStories.test_14a_each_spec_s_own_probe_gives_its_pristine_expectation_on_the_reference_tree": "PASS",
+   "LedgerLockStories.test_14b_admission_and_both_parties_accept_each_whole_story_through_the_path": "PASS",
+   "MixedStory.test_11_no_evaluation_is_shared_two_specs_of_one_kind_and_one_spec_under_two_obligations_each_run": "PASS",
+   "MixedStory.test_13_the_developer_request_follows_the_complete_admission_that_permits_it": "PASS",
+   "MixedStory.test_2_one_story_with_specs_of_three_probe_kinds_commits": "PASS",
+   "MixedStory.test_3_mixed_PRE_SATISFIED_and_READY_the_developer_gets_the_READY_ones_and_all_are_proved": "PASS",
+   "MixedStory.test_8_each_obligation_has_its_own_candidate_records_binding_its_spec_probe_and_candidate": "PASS",
+   "MixedStory.test_9_each_obligation_has_its_own_verified_proof_citing_its_two_records": "PASS",
+   "OneProofPerObligation.test_10_one_failing_candidate_spec_is_not_masked_by_the_others_passing": "PASS",
+   "OneProofPerObligation.test_12_a_permuted_obligation_order_gives_the_same_semantic_outcome": "PASS",
+   "OneProofPerObligation.test_1_a_story_with_specs_of_two_probe_kinds_commits_each_proved_by_its_own_probe": "PASS",
+   "OneProofPerObligation.test_4_all_PRE_SATISFIED_no_developer_request_the_candidate_is_the_parent_and_every_obligation_is_proved": "PASS",
+   "OneProofPerObligation.test_5_one_PRECONDITION_BROKEN_among_READY_blocks_the_story_before_any_developer_request": "PASS",
+   "OneProofPerObligation.test_6_one_PROBE_UNRUNNABLE_among_READY_is_the_environment_s_and_charges_its_budget": "PASS",
+   "OneProofPerObligation.test_7_one_INVALID_SPEC_among_READY_is_PROBE_INVALID_from_the_real_probe_or_from_an_unwired_one": "PASS",
+   "Parties.test_a_by_spec_party_gives_the_maker_the_spec_and_makes_a_probe_per_evaluation": "PASS",
+   "Parties.test_a_party_without_the_spec_s_probe_runs_nothing_and_makes_no_record": "PASS",
+   "Parties.test_prove_types_a_party_without_the_spec_s_probe_as_PROBE_INVALID_SPEC_and_seals_nothing": "PASS",
+   "Parties.test_the_runner_resolves_the_factory_of_the_spec_s_own_probe_identity_or_none": "PASS",
+   "ReproofOfAnotherKind.test_a_prior_spec_whose_probe_the_harness_did_not_wire_is_PROBE_INVALID_SPEC_never_a_crash": "PASS",
+   "ReproofOfAnotherKind.test_a_regression_of_the_prior_spec_of_another_kind_is_POST_MERGE_REGRESSION_and_rolled_back": "PASS",
+   "ReproofOfAnotherKind.test_the_prior_PRESERVE_spec_of_another_kind_is_re_proved_by_its_own_probe": "PASS"
+  },
+  "owned_processes": {
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "released_empty": true,
+   "escaped": 0
+  },
+  "seconds": 127.3
+ },
+ "files_changed": {
+  "aisef2/orchestrate/proof.py": {
+   "before": "c870ec47d5c661249e1da432412ba0e874e1b8f12dd4625a7cc3839da67e1138",
+   "after": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f"
+  },
+  "aisef2/orchestrate/story_runner.py": {
+   "before": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
+   "after": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59"
+  },
+  "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json": {
+   "before": null,
+   "after": "56940fea58adc10f80ab3ccb470cfd50cf69292ca7b2dc0b9e4591bfaf568bd6"
+  },
+  "tests/v2/test_c2_orchestration_conformance.py": {
+   "before": null,
+   "after": "fea1c95f6975c479f5282c38f6fd06c329217cee659a54fbb114c073a17da647"
+  },
+  "validation/qualification/c2_orchestration_repair.py": {
+   "before": null,
+   "after": "9462b86c9f40f9c63731ab33fd199a0de553727c7b345759eb6f4963b287cbdf"
+  },
+  "validation/v2/mutation.py": {
+   "before": "dc9c3bd5cfc9779d8449b7bd8fe2901a794d50305129de594b27c55c8d8b51f3",
+   "after": "a07786b45967ae2f82fd9fbe0cc5762023099d5d07e836b12ebcb61a9ac9cdc0"
+  }
+ },
+ "identities": {
+  "contracts": 59,
+  "all_equal_to_accepted": true,
+  "contract_spec_semantic_digest": "83a73da271805c470db4da55f50f542950494aa8b50a31e5b6f07e5364415745",
+  "contract_spec_semantic_rule": "sha256 of the JSON list of [spec, contract id, contract hash, spec id, semantic hash, probe id, probe digest] rows of p5_acceptance.verify, in proposal order",
+  "semantic_change": "NONE",
+  "verify_problems": [
+   "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json is not what the authoring aid derives from this tree"
+  ],
+  "verify_problems_are_provenance_only": true,
+  "c2_p5_proposal_provenance": {
+   "differing_paths": [
+    "identities.aisef2_tree"
+   ],
+   "committed": {
+    "identities.aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
+   },
+   "derived": {
+    "identities.aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904"
+   },
+   "provenance_only": true,
+   "proposal_digest_unchanged": true
+  },
+  "c2_p5_checks_as_observed": {
+   "p10_contracts.check": [
+    "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json is not what the authoring aid derives from this tree"
+   ],
+   "p5_acceptance.check": [
+    "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json is not what the authoring aid derives from this tree",
+    "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json is stale in verification.identities"
+   ]
+  },
+  "c2_p5_acceptance_verification_differences": {
+   "identities": [
+    "proposal_record_current"
+   ],
+   "semantic_change": [],
+   "rulings": [],
+   "admission": [],
+   "cycle1_drift": []
+  },
+  "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+  "plan_ok": true,
+  "catalog": {
+   "probe.python_callable": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "probe.file_artifact": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe.python_callable_v2": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "probe.cli_invocation": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "probe.process_effect": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+  },
+  "catalog_matches_the_brief": true,
+  "cycle1_drift_ok": true,
+  "cycle1_frozen_probe_sources": {
+   "aisef2/probe/protocol.py": {
+    "cycle1_parent": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+    "now": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a"
+   },
+   "aisef2/probe/python_callable.py": {
+    "cycle1_parent": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+    "now": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06"
+   }
+  },
+  "cycle1_frozen_probe_sources_identical": true,
+  "probe_sources_vs_6311254": {
+   "aisef2/probe/__init__.py": {
+    "6311254": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "now": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "aisef2/probe/calibration.py": {
+    "6311254": "562ff1f1ac98884db7fd72b29f12be38678a751d673fcfc232b389e802c1d00c",
+    "now": "562ff1f1ac98884db7fd72b29f12be38678a751d673fcfc232b389e802c1d00c"
+   },
+   "aisef2/probe/catalog.py": {
+    "6311254": "3bb9f60903ec944eff50270bb2c5bf2c07c8783ee40bb37fcc14ce6c4052976d",
+    "now": "3bb9f60903ec944eff50270bb2c5bf2c07c8783ee40bb37fcc14ce6c4052976d"
+   },
+   "aisef2/probe/cli_invocation.py": {
+    "6311254": "577f0c97ecbe371241bc7c2b4257e73a67181a881a171d8fffcd61b3c156b4e2",
+    "now": "577f0c97ecbe371241bc7c2b4257e73a67181a881a171d8fffcd61b3c156b4e2"
+   },
+   "aisef2/probe/file_artifact.py": {
+    "6311254": "02163b8f33074071c9915d41e01f90c8931e3f7ef563559bb3beea9c55b6dae0",
+    "now": "02163b8f33074071c9915d41e01f90c8931e3f7ef563559bb3beea9c55b6dae0"
+   },
+   "aisef2/probe/process_effect.py": {
+    "6311254": "66298a826617b3e0b88df2a9dedde413aebc1ccdd9145f24ef654898c8ca740f",
+    "now": "66298a826617b3e0b88df2a9dedde413aebc1ccdd9145f24ef654898c8ca740f"
+   },
+   "aisef2/probe/protocol.py": {
+    "6311254": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+    "now": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a"
+   },
+   "aisef2/probe/python_callable.py": {
+    "6311254": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+    "now": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06"
+   },
+   "aisef2/probe/python_callable_v2.py": {
+    "6311254": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7",
+    "now": "5480ace5a6c8ada3891b0dea9c43da19eac87fdb649f5d20efbba3d6d1410ff7"
+   }
+  },
+  "probe_sources_identical_to_6311254": true
+ },
+ "mutation": {
+  "record": {
+   "path": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json",
+   "sha256": "56940fea58adc10f80ab3ccb470cfd50cf69292ca7b2dc0b9e4591bfaf568bd6"
+  },
+  "targets": {
+   "aisef2/orchestrate/proof.py::Party.__init__": {
+    "mutants": 9,
+    "killed": 9,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
+    "error": null
+   },
+   "aisef2/orchestrate/proof.py::Party.run": {
+    "mutants": 9,
+    "killed": 9,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
+    "error": null
+   },
+   "aisef2/orchestrate/proof.py::Ranged.__init__": {
+    "mutants": 4,
+    "killed": 4,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
+    "error": null
+   },
+   "aisef2/orchestrate/proof.py::obligations_of": {
+    "mutants": 4,
+    "killed": 4,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
+    "error": null
+   },
+   "aisef2/orchestrate/proof.py::prove": {
+    "mutants": 108,
+    "killed": 108,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
+    "mutants": 3,
+    "killed": 3,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
+    "mutants": 1,
+    "killed": 1,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::_Held.__call__": {
+    "mutants": 3,
+    "killed": 3,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::_Held.__init__": {
+    "mutants": 6,
+    "killed": 6,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::_Held.release": {
+    "mutants": 3,
+    "killed": 3,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::_attempt": {
+    "mutants": 274,
+    "killed": 274,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py",
+     "tests/v2/test_p6_orchestration.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::_committed": {
+    "mutants": 6,
+    "killed": 6,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::_fail": {
+    "mutants": 34,
+    "killed": 34,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::_freeze_plan": {
+    "mutants": 9,
+    "killed": 9,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::_probe": {
+    "mutants": 9,
+    "killed": 9,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   },
+   "aisef2/orchestrate/story_runner.py::run_story": {
+    "mutants": 11,
+    "killed": 11,
+    "survivors": [],
+    "killed_by_timeout": 0,
+    "strays_reaped": 0,
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_c2_orchestration_conformance.py",
+     "tests/v2/test_p6_orchestration.py"
+    ],
+    "source_sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+    "error": null
+   }
+  },
+  "totals": {
+   "targets": 16,
+   "mutants": 493,
+   "killed": 493,
+   "survivors": 0,
+   "killed_by_timeout": 0
+  },
+  "owned_targets": [
+   "aisef2/orchestrate/proof.py::Party.__init__",
+   "aisef2/orchestrate/proof.py::Party.run",
+   "aisef2/orchestrate/proof.py::Ranged.__init__",
+   "aisef2/orchestrate/proof.py::obligations_of",
+   "aisef2/orchestrate/proof.py::prove",
+   "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+   "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+   "aisef2/orchestrate/story_runner.py::_Held.__call__",
+   "aisef2/orchestrate/story_runner.py::_Held.__init__",
+   "aisef2/orchestrate/story_runner.py::_Held.release",
+   "aisef2/orchestrate/story_runner.py::_attempt",
+   "aisef2/orchestrate/story_runner.py::_committed",
+   "aisef2/orchestrate/story_runner.py::_fail",
+   "aisef2/orchestrate/story_runner.py::_freeze_plan",
+   "aisef2/orchestrate/story_runner.py::_probe",
+   "aisef2/orchestrate/story_runner.py::run_story"
+  ],
+  "problems": [],
+  "p6_superseded_entries": [
+   "aisef2/orchestrate/proof.py::Party.__init__",
+   "aisef2/orchestrate/proof.py::Party.run",
+   "aisef2/orchestrate/proof.py::Ranged.__init__",
+   "aisef2/orchestrate/proof.py::obligations_of",
+   "aisef2/orchestrate/proof.py::prove",
+   "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+   "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+   "aisef2/orchestrate/story_runner.py::_Held.__call__",
+   "aisef2/orchestrate/story_runner.py::_Held.__init__",
+   "aisef2/orchestrate/story_runner.py::_Held.release",
+   "aisef2/orchestrate/story_runner.py::_attempt",
+   "aisef2/orchestrate/story_runner.py::_committed",
+   "aisef2/orchestrate/story_runner.py::_fail",
+   "aisef2/orchestrate/story_runner.py::_freeze_plan",
+   "aisef2/orchestrate/story_runner.py::_probe",
+   "aisef2/orchestrate/story_runner.py::run_story"
+  ],
+  "p6_problems": [],
+  "every_record": []
+ },
+ "guards": {
+  "cycle2_baseline": {
+   "command": "python -P validation/v2/cycle2_baseline.py --check",
+   "exit": 0,
+   "tail": [
+    "cycle-2 baseline guard: PASS"
+   ],
+   "seconds": 0.4
+  },
+  "checker_calibration": {
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "exit": 0,
+   "tail": [
+    "OK   protocol_channel_discipline clean=True rejects=True always-pass-mutant-caught=True",
+    "calibrated 46/46; always-PASS mutants rejected 46/46"
+   ],
+   "seconds": 182.8
+  },
+  "freeze_conformance": {
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "exit": 0,
+   "tail": [
+    "PASS     F11 ",
+    "summary {'PASS': 11, 'PENDING': 0, 'FAIL': 0} | ratchet violations 0"
+   ],
+   "seconds": 10.3
+  },
+  "v1_evidence_guard": {
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "exit": 0,
+   "tail": [
+    "V1 evidence guard (DETECTIVE): PASS"
+   ],
+   "seconds": 0.1
+  },
+  "old_path_audit": {
+   "command": "python -P validation/v2/old_path_audit.py --check",
+   "exit": 0,
+   "tail": [
+    "old path audit: PASS"
+   ],
+   "seconds": 2.1
+  },
+  "p6_evidence": {
+   "command": "python -P validation/v2/p6_evidence.py --check",
+   "exit": 0,
+   "tail": [
+    "p6 evidence: PASS"
+   ],
+   "seconds": 0.1
+  },
+  "destructive_authority": {
+   "command": "python -P validation/v2/destructive_authority.py --check",
+   "exit": 0,
+   "tail": [
+    "destructive authority: PASS"
+   ],
+   "seconds": 1.7
+  },
+  "kernel_static_checks": {
+   "command": "python -P validation/v2/kernel_static_checks.py --check",
+   "exit": 0,
+   "tail": [
+    "kernel static checks: PASS"
+   ],
+   "seconds": 0.5
+  },
+  "except_boundaries": {
+   "command": "python -P validation/v2/except_boundaries.py --check",
+   "exit": 0,
+   "tail": [
+    "boundaries 72 {'RERAISES': 7, 'STRUCTURAL': 65}",
+    "except boundaries: PASS"
+   ],
+   "seconds": 0.3
+  },
+  "mutation": {
+   "command": "python -P validation/v2/mutation.py --check",
+   "exit": 0,
+   "tail": [
+    "SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::run_story: historical, taken over by C2-ORCH",
+    "mutation: PASS"
+   ],
+   "seconds": 0.1
+  },
+  "ruff": {
+   "command": "ruff check .",
+   "exit": 0,
+   "tail": [
+    "All checks passed!"
+   ],
+   "seconds": 0.0
+  }
+ },
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin"
+ },
+ "problems": [],
+ "verdict": "COMPLETE",
+ "seconds": 368.3
+}
