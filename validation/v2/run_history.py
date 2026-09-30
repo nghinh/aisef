@@ -8,7 +8,10 @@ Owner decision "OWNER ACCEPTS P0 / AUTHORIZE P1" §3 and §5, as mechanism rathe
   into a class the preregistered policy marks retryable (ENVIRONMENT, PROVIDER) **and** the execution path has an
   approved retry count (resolved execution policy; `null` = none approved, never a default); any other case makes
   the rerun diagnostic only, and a later green attempt does not convert the failure;
-* **V1-PF-001 stops the gate** — an attempt attributed to it must carry gate_effect STOP;
+* **V1-PF-001 stops the gate** — an attempt attributed to it must carry gate_effect STOP, except that after its WP-4.2
+  replacement an exact legacy recurrence in the frozen V1 tree may carry RECORD_ONLY (a recorded, non-blocking FAIL —
+  never a pass): owner ruling 2026-09-30, `V2-RETRY-POLICY-AMENDMENT-1.json`, derived from the attempt's typed
+  `recurrence_facts` by `recurrence_effect`, failing closed to STOP on any missing or untyped fact;
 * **one history per phase, closed by its seal** — once a phase's seal record exists (`P<n>-FINAL-SEAL.json`), its
   history must hold exactly the attempt count the seal names: nothing added, nothing removed. New attempts go to the
   first unsealed phase.
@@ -19,6 +22,7 @@ Owner decision "OWNER ACCEPTS P0 / AUTHORIZE P1" §3 and §5, as mechanism rathe
 
 from __future__ import annotations
 
+import hashlib
 import itertools
 import json
 import pathlib
@@ -27,6 +31,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 POLICY_REL = "closure-evidence/v2/V2-RETRY-POLICY.json"
+#: append-only amendments overlaid on the preregistered policy (which stays byte-identical: the P1 seal binds it)
+POLICY_AMENDMENTS = ("closure-evidence/v2/cycle2/V2-RETRY-POLICY-AMENDMENT-1.json",)
 HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evidence/v2/P2-RUN-HISTORY.json",
              "P3": "closure-evidence/v2/P3-RUN-HISTORY.json", "P4": "closure-evidence/v2/P4-RUN-HISTORY.json",
              "P5": "closure-evidence/v2/P5-RUN-HISTORY.json", "P6": "closure-evidence/v2/P6-RUN-HISTORY.json",
@@ -66,14 +72,81 @@ SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence
          "C2-P5": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json"}
 HISTORY_REL = HISTORIES["P1"]
 RESULTS = ("PASS", "FAIL")
-GATE_EFFECTS = ("COUNTS", "DIAGNOSTIC_ONLY", "STOP")
+GATE_EFFECTS = ("COUNTS", "DIAGNOSTIC_ONLY", "STOP", "RECORD_ONLY")
 
 
 def _load(path: pathlib.Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def entry_problems(entries: list[dict], policy: dict) -> list[str]:
+def load_policy(root: pathlib.Path = ROOT) -> dict:
+    """The preregistered policy with its amendments overlaid (an absent amendment adds nothing: fail closed)."""
+    policy = _load(root / POLICY_REL)
+    for rel in POLICY_AMENDMENTS:
+        if (root / rel).exists():
+            amendment = _load(root / rel)
+            policy.setdefault("known_defect_lifecycle", {}).update(amendment.get("known_defect_lifecycle", {}))
+            policy["amendments"] = [*policy.get("amendments", []), rel]
+    return policy
+
+
+def _v1_tree(root: pathlib.Path) -> str | None:
+    got = subprocess.run(["git", "rev-parse", "HEAD:aisef"], cwd=root, capture_output=True, encoding="utf-8")
+    return got.stdout.strip() if got.returncode == 0 else None
+
+
+def replacement_complete(lifecycle: dict, root: pathlib.Path) -> bool:
+    """Every replacement evidence file holds its stated fact."""
+    for ev in lifecycle.get("replacement", {}).get("evidence", []) or [None]:
+        if not ev or not (root / ev["path"]).exists():
+            return False
+        value = _load(root / ev["path"]).get(ev["key"])
+        if "equals" in ev and value != ev["equals"]:
+            return False
+        if "has" in ev and not (isinstance(value, dict) and ev["has"] in value):
+            return False
+    return True
+
+
+def recurrence_effect(entry: dict, entries: list[dict], policy: dict, root: pathlib.Path = ROOT,
+                      v1_tree: str | None = None) -> tuple[str, list[str]]:
+    """The gate effect a recorded V1-PF-001 recurrence must carry: RECORD_ONLY only when every fact of an exact legacy
+    recurrence after the replacement is typed on the attempt and holds; STOP otherwise, with the reasons."""
+    lc = policy.get("known_defect_lifecycle", {}).get(entry.get("known_defect"))
+    if not lc:
+        return "STOP", ["no lifecycle for this defect in the policy"]
+    why = []
+    if not replacement_complete(lc, root):
+        why.append(f"the {lc.get('replacement', {}).get('work_package')} replacement is not complete")
+    facts = entry.get("recurrence_facts")
+    if not isinstance(facts, dict) or not facts.get("failing"):
+        return "STOP", why + ["no typed recurrence facts"]
+    legacy, v2, v2_tests = lc["legacy_code_prefix"], lc["v2_code_prefix"], lc["v2_test_prefix"]
+    for f in facts["failing"]:
+        frames = f.get("product_frames") or []
+        if f.get("error_type") != lc["error_type"] or not frames or frames[-1] != lc["component"]:
+            why.append(f"{f.get('test')}: not the known signature ({f.get('error_type')} at {frames[-1:] or 'no frame'})")
+        if not frames or not all(x.startswith(legacy) for x in frames) or any(x.startswith(v2) for x in frames):
+            why.append(f"{f.get('test')}: a product frame outside the frozen V1 tree")
+        if any(x.startswith(v2_tests) for x in f.get("test_frames") or []) or str(f.get("test", "")).startswith(v2_tests):
+            why.append(f"{f.get('test')}: a V2 test")
+    tree = v1_tree if v1_tree is not None else _v1_tree(root)
+    if facts.get("v1_product_tree") != lc["frozen_v1_tree"] or tree != lc["frozen_v1_tree"]:
+        why.append(f"the V1 tree is not the frozen one (attempt {facts.get('v1_product_tree')}, here {tree})")
+    if facts.get("cycle1_evidence_changed") is not False or entry.get("v1_evidence_changed") is not False:
+        why.append("Cycle-1 evidence changed, or its state is not recorded")
+    q = facts.get("v2_process_range_qualification") or {}
+    qp = root / q["path"] if q.get("path") else None
+    if not qp or not qp.exists() or hashlib.sha256(qp.read_bytes().replace(b"\r\n", b"\n")).hexdigest() != q.get("sha256") \
+            or _load(qp).get("verdict") != "GREEN":
+        why.append("no GREEN V2 process-range qualification bound by path and sha256")
+    if any(x.startswith(v2) for e in entries for f in ((e.get("recurrence_facts") or {}).get("failing") or [])
+           for x in f.get("product_frames") or []):
+        why.append("the history holds the error in the V2 path")
+    return ("STOP", why) if why else ("RECORD_ONLY", [])
+
+
+def entry_problems(entries: list[dict], policy: dict, root: pathlib.Path = ROOT, v1_tree: str | None = None) -> list[str]:
     classes = set(policy["retryable_classes"]) | set(policy["diagnostic_only_classes"])
     out = []
     for i, e in enumerate(entries, 1):
@@ -104,7 +177,12 @@ def entry_problems(entries: list[dict], policy: dict) -> list[str]:
             if e.get("retry_permitted") is not permitted:
                 out.append(f"{tag}: retry_permitted must be {permitted} for class {e.get('classification')}")
             if e.get("known_defect") in policy["stop_on_recurrence"] and e.get("gate_effect") != "STOP":
-                out.append(f"{tag}: {e['known_defect']} recurred — gate_effect must be STOP")
+                effect, why = recurrence_effect(e, entries, policy, root, v1_tree)
+                if not (effect == "RECORD_ONLY" and e.get("gate_effect") == "RECORD_ONLY"):
+                    out.append(f"{tag}: {e['known_defect']} recurred — gate_effect must be STOP ({'; '.join(why) or 'not RECORD_ONLY'})")
+        if e.get("gate_effect") == "RECORD_ONLY" and (e.get("result") != "FAIL"
+                                                      or e.get("known_defect") not in policy.get("known_defect_lifecycle", {})):
+            out.append(f"{tag}: RECORD_ONLY is only a failed attempt's effect, for a known defect with a lifecycle")
         r = e.get("retry_of")
         if r is not None:
             prior = entries[r - 1] if isinstance(r, int) and 1 <= r < i else None
@@ -189,7 +267,7 @@ def open_phase(root: pathlib.Path = ROOT) -> str:
 
 
 def check(root: pathlib.Path = ROOT) -> list[str]:
-    policy = _load(root / POLICY_REL)
+    policy = load_policy(root)
     if not (root / HISTORY_REL).exists():
         return [f"{HISTORY_REL} is missing"]
     out = []
@@ -213,7 +291,7 @@ def record(fields: dict, root: pathlib.Path = ROOT, phase: str | None = None) ->
         "rule": "append-only; every full-suite and CI attempt, failed or not; see validation/v2/run_history.py",
         "entries": []}
     entry = {"seq": len(doc["entries"]) + 1, **fields}
-    problems = entry_problems(doc["entries"] + [entry], _load(root / POLICY_REL))
+    problems = entry_problems(doc["entries"] + [entry], load_policy(root), root)
     if problems:
         raise SystemExit("refusing to record: " + "; ".join(problems))
     doc["entries"].append(entry)

@@ -188,7 +188,7 @@ def _packaging_check() -> Checker:
 
 def _run_history() -> Checker:
     rh = _load("aisef_v2_run_history", V2 / "run_history.py")
-    policy = json.loads((ROOT / rh.POLICY_REL).read_text(encoding="utf-8"))
+    policy = rh.load_policy(ROOT)   # the preregistered policy with its append-only amendments (V1-PF-001 lifecycle)
     return Checker("run_history", "P1 retry policy", lambda: rh.check(ROOT),
                    lambda fx: rh.append_only_problems(fx["versions"]) + rh.entry_problems(fx["versions"][-1], policy),
                    ("validation/v2/run_history.py",))

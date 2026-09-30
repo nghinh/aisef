@@ -1,0 +1,67 @@
+{
+ "record": "AISEF V2 — C2-P5 ACCEPTANCE CORRIGENDUM 1 (S-5-a and the zero-byte-file ruling)",
+ "id": "AISEF-V2-CYCLE2-C2-P5-ACCEPTANCE-CORRIGENDUM-1",
+ "authority": "owner ruling 2026-09-30 'P5 WORDING CORRIGENDUM': append-only; the recorded acceptance is not edited",
+ "corrects": {
+  "record": {
+   "path": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+   "sha256": "69c23b49f393276117c957f598f811a91a81e36595d60c7bf9fc0af5f414453d",
+   "edited": false
+  },
+  "statement": "verification.rulings.OR-IFACE-3.as_named_by_the_proposal lists S-5-a, copied from the proposal's IB-EMPTY prose (P5-PLAN-V2.2-PROPOSAL.json interface_bindings.IB-EMPTY.gap)",
+  "as_recorded": [
+   "S-5-a",
+   "S-6-d",
+   "S-7-d",
+   "S-9-a",
+   "S-9-c",
+   "S-9-e"
+  ]
+ },
+ "corrected_statement": [
+  "S-5-a does NOT rely on the zero-byte-existing-file interpretation (OR-IFACE-3): its stimulus holds no ledger file at all; its scenario constructs Ledger(<ws>/l.jsonl) over a path with no file, as its exact approved contract hash encodes",
+  "the OR-IFACE-3 ruling applies only where the stimulus actually contains an existing zero-byte ledger: S-6-d, S-7-d, S-9-a, S-9-c, S-9-e",
+  "no BehaviorContract changes; no ProductProofSpec changes; no semantic_hash changes; no plan_hash change; no falsifiability evidence invalidated"
+ ],
+ "measured": {
+  "S-5-a": {
+   "contract_id": "BC-V22-S-5-a",
+   "contract_hash": "dd2ec91c8fe3c30c0d5c34ca58b56262bde538d9b3e7906952626331b00f4809",
+   "zero_byte_ledger_file_in_the_stimulus": false,
+   "any_workspace_file_in_the_stimulus": false,
+   "first_step": {
+    "args": [
+     "<ws>/l.jsonl"
+    ],
+    "kwargs": {},
+    "step": "construct"
+   },
+   "bound_by_OR_IFACE_3": false
+  },
+  "or_iface_3_contracts": [
+   "S-6-d",
+   "S-7-d",
+   "S-9-a",
+   "S-9-c",
+   "S-9-e"
+  ],
+  "semantic_change": "NONE",
+  "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+  "proposal_digest": "856ed25dcf10df2b7c1c3e45c125ca0642a6f8aef6b913ae84bba13cdfd1e3f9",
+  "specs_equal_to_accepted": 59,
+  "falsifiability": {
+   "record": {
+    "path": "closure-evidence/v2/cycle2/P5-FALSIFIABILITY.json",
+    "sha256": "4b1c1a06ca31c4e4eb4dd83950ef77ff058e1f6bed4d02bba7d529defed2f668"
+   },
+   "S-5-a": {
+    "status": "QUALIFIED",
+    "pristine": "SATISFIED",
+    "mutant_verdict": "REFUTED",
+    "semantic_hash": "3b5de7d325f1a8770ff29408aa0182ef350bfbf1fad5ed88f44fbb95b58e4956"
+   }
+  }
+ },
+ "problems": [],
+ "verdict": "CORRIGENDUM RECORDED — NO SEMANTIC CHANGE"
+}

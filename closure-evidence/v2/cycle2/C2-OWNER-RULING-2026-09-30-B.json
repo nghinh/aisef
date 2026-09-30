@@ -1,0 +1,105 @@
+{
+ "record": "AISEF V2 — CYCLE-2 OWNER RULING (2026-09-30): V1-PF-001 POST-WP-4.2 POLICY RESOLVED / ORCHESTRATION CONFORMANCE REPAIR AUTHORIZED / QP-2.6 MUST BE REQUALIFIED ON THE NEW EXACT CANDIDATE",
+ "id": "AISEF-V2-CYCLE2-OWNER-RULING-2026-09-30-B",
+ "approver": "owner",
+ "ruling_1_v1_pf_001": {
+  "recurrence": {
+   "ci_run": 36674401627,
+   "commit": "a76177ec20e2bee799763fc8d55a2eb285cef8a1",
+   "platform": "windows-latest / Python 3.11",
+   "accepted_as": "a genuine recurrence of the already-known V1-PF-001 defect",
+   "record": {
+    "path": "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1.json",
+    "sha256": "b3f921bfb3b56be6f6dd30aaa5f66c59182f2cf0fb79dbc769aa13d68d457d76",
+    "rule": "preserved unchanged"
+   }
+  },
+  "not": [
+   "erase it",
+   "relabel the historical attempt",
+   "claim the failing CI run passed",
+   "modify frozen V1 code"
+  ],
+  "non_blocking_after_WP_4_2_when_all": [
+   "the failure matches the known V1-PF-001 signature",
+   "the executing code belongs exclusively to the frozen V1 tree",
+   "frozen V1 tree identity is unchanged",
+   "no Cycle-1 frozen evidence changed",
+   "the V2 WP-4.2 process-range implementation is not on the failing path",
+   "V2 process ownership / range-emptiness qualification remains GREEN",
+   "no analogous recurrence is observed in the V2 path"
+  ],
+  "classification": [
+   "KNOWN_LEGACY_RECURRENCE",
+   "NON_BLOCKING_AFTER_REPLACEMENT",
+   "RECORD_ONLY_FOR_CYCLE2_GATE"
+  ],
+  "is_not": [
+   "PASS",
+   "FIXED_IN_V1",
+   "NOT_REPRODUCED",
+   "ERASED",
+   "WAIVED_AS_NONEXISTENT"
+  ],
+  "policy_correction": {
+   "amendment": "closure-evidence/v2/cycle2/V2-RETRY-POLICY-AMENDMENT-1.json",
+   "checker": "validation/v2/run_history.py::recurrence_effect",
+   "decision": "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1-DECISION.json",
+   "calibration": "closure-evidence/v2/cycle2/V1-PF-001-POLICY-CALIBRATION.json"
+  }
+ },
+ "p5_wording_corrigendum": {
+  "record": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE-CORRIGENDUM-1.json",
+  "rule": "append-only; the recorded acceptance is not edited; STOP if any semantic change"
+ },
+ "ruling_2_qp_2_6_evidence": {
+  "candidate": "63112544f1146097b69c538d98e09e5a52c547c1",
+  "accepted_as": "VALID HISTORICAL QUALIFICATION EVIDENCE (Q0-Q3 GREEN on Linux 3.11-3.14 and Windows)",
+  "summary": {
+   "path": "closure-evidence/v2/cycle2/Q0-Q3/SUMMARY.json",
+   "sha256": "4836216af4ae94c11af36bd42e7f4812fce62801b48c6996b817039609b33c51"
+  },
+  "not_the_final_gate_candidate": true,
+  "not_rerun": "6311254 is not rerun to turn the V1 legacy failure into a pass",
+  "rule": "the orchestration repair changes a qualification-consumed kernel path: the full QP-2.6 is rerun on the new exact candidate; the 6311254 evidence is kept, never overwritten"
+ },
+ "ruling_3_orchestration": {
+  "classification": "C2-ORCHESTRATION-CONFORMANCE-REPAIR",
+  "not": [
+   "architecture expansion",
+   "new probe feature"
+  ],
+  "model": "one ProductProof evaluation per PlanObligation / ProductProofSpec using the probe identity each spec carries",
+  "unchanged": [
+   "Requirement semantics",
+   "BehaviorContract semantics",
+   "the 59 approved ProductProofSpecs",
+   "PLAN-V2.2 obligations",
+   "probe protocol shape",
+   "ProbeResult shape",
+   "ContractSatisfaction semantics",
+   "StoryAdmission dispositions",
+   "failure ownership taxonomy",
+   "retry-budget taxonomy",
+   "journal event semantics",
+   "projection semantics",
+   "F1-F11",
+   "Cycle-1 frozen evidence",
+   "frozen V1 implementation"
+  ],
+  "no_dedup": true
+ },
+ "execution": {
+  "parallel": {
+   "LANE-O": "orchestration repair (worktree .claude/worktrees/lane-o-orchestration, branch c2/lane-o-orchestration)",
+   "LANE-R": "policy correction, owner ruling record, S-5-a corrigendum (main worktree)"
+  },
+  "then": [
+   "dedicated integration candidate",
+   "identity checks",
+   "guards + orchestration adversarial suite",
+   "full QP-2.6 on the new exact candidate incl. a Windows V1-PF-001-family containment check",
+   "if GREEN: [QP-2.7 -> QP-2.8 -> QP-2.9] || [WP-2.10.1 -> WP-2.10.2]"
+  ]
+ }
+}

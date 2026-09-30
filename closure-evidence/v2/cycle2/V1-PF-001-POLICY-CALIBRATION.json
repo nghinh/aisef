@@ -1,0 +1,158 @@
+{
+ "record": "AISEF V2 — V1-PF-001 POLICY CALIBRATION (the corrected rule on known-bad cases)",
+ "authority": "owner ruling 2026-09-30: 'Add adversarial calibration covering at least ...'",
+ "checker": {
+  "path": "validation/v2/run_history.py",
+  "sha256": "23203dffbcb19c7be3c7f107fc2d79a2fe0022647154ee0ac87d34305a55333a"
+ },
+ "amendment": {
+  "path": "closure-evidence/v2/cycle2/V2-RETRY-POLICY-AMENDMENT-1.json",
+  "sha256": "3f3fd17ae5839583f07bda0683a18149b44953e1efee516f3ffc9b1e3ce5a5d5"
+ },
+ "cases": [
+  {
+   "id": "known_recurrence_before_WP_4_2",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "the WP-4.2 replacement is not complete"
+   ],
+   "held": true
+  },
+  {
+   "id": "exact_known_recurrence_after_WP_4_2_in_frozen_V1",
+   "expected": "RECORD_ONLY",
+   "observed": "RECORD_ONLY",
+   "reasons": [],
+   "held": true
+  },
+  {
+   "id": "same_signature_in_the_aisef2_process_path",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "test_dogfood_ledgerlock.TestTurnCapKillsTheWholeProcessTree.test_the_cap_stops_a_session_whose_client_is_a_grandchild: not the known signature (MemoryError at ['aisef2/runtime/process_table.py::_walk'])",
+    "test_dogfood_ledgerlock.TestTurnCapKillsTheWholeProcessTree.test_the_cap_stops_a_session_whose_client_is_a_grandchild: a product frame outside the frozen V1 tree",
+    "the history holds the error in the V2 path"
+   ],
+   "held": true
+  },
+  {
+   "id": "known_frame_reached_through_the_aisef2_path",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "test_dogfood_ledgerlock.TestTurnCapKillsTheWholeProcessTree.test_the_cap_stops_a_session_whose_client_is_a_grandchild: a product frame outside the frozen V1 tree",
+    "the history holds the error in the V2 path"
+   ],
+   "held": true
+  },
+  {
+   "id": "unknown_windows_process_cleanup_failure",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "test_dogfood_ledgerlock.TestTurnCapKillsTheWholeProcessTree.test_the_cap_stops_a_session_whose_client_is_a_grandchild: not the known signature (PermissionError at ['aisef/clients/base.py::kill_tree'])"
+   ],
+   "held": true
+  },
+  {
+   "id": "changed_v1_tree_at_the_attempt",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "the V1 tree is not the frozen one (attempt 0000000000000000000000000000000000000000, here 4359f347378e84fcac2d213128c7c26f282c13c0)"
+   ],
+   "held": true
+  },
+  {
+   "id": "changed_v1_tree_being_checked",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "the V1 tree is not the frozen one (attempt 4359f347378e84fcac2d213128c7c26f282c13c0, here 0000000000000000000000000000000000000000)"
+   ],
+   "held": true
+  },
+  {
+   "id": "missing_replacement_evidence",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "the WP-4.2 replacement is not complete"
+   ],
+   "held": true
+  },
+  {
+   "id": "missing_v2_range_qualification_binding",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "no GREEN V2 process-range qualification bound by path and sha256"
+   ],
+   "held": true
+  },
+  {
+   "id": "v2_range_qualification_not_green",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "no GREEN V2 process-range qualification bound by path and sha256"
+   ],
+   "held": true
+  },
+  {
+   "id": "cycle1_evidence_changed",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "Cycle-1 evidence changed, or its state is not recorded"
+   ],
+   "held": true
+  },
+  {
+   "id": "a_second_failing_test_without_the_signature",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "test_other (test_x.T): not the known signature (AssertionError at ['aisef/clients/base.py::run'])"
+   ],
+   "held": true
+  },
+  {
+   "id": "a_v2_test",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "test_dogfood_ledgerlock.TestTurnCapKillsTheWholeProcessTree.test_the_cap_stops_a_session_whose_client_is_a_grandchild: a V2 test"
+   ],
+   "held": true
+  },
+  {
+   "id": "untyped_facts",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "no typed recurrence facts"
+   ],
+   "held": true
+  },
+  {
+   "id": "policy_without_the_amendment",
+   "expected": "STOP",
+   "observed": "STOP",
+   "reasons": [
+    "no lifecycle for this defect in the policy"
+   ],
+   "held": true
+  },
+  {
+   "id": "another_run_and_commit_same_facts",
+   "expected": "RECORD_ONLY",
+   "observed": "RECORD_ONLY",
+   "reasons": [],
+   "held": true
+  }
+ ],
+ "all_held": true
+}

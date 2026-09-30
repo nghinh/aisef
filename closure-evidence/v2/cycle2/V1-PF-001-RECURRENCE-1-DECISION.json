@@ -1,0 +1,73 @@
+{
+ "record": "AISEF V2 — V1-PF-001 RECURRENCE 1: the Cycle-2 gate effect under the corrected policy",
+ "authority": "owner ruling 2026-09-30, Ruling 1 (V1-PF-001 POST-WP-4.2 POLICY RESOLVED)",
+ "recurrence_record": {
+  "path": "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1.json",
+  "sha256": "b3f921bfb3b56be6f6dd30aaa5f66c59182f2cf0fb79dbc769aa13d68d457d76",
+  "unchanged": true
+ },
+ "history_entry_as_recorded": {
+  "path": "closure-evidence/v2/cycle2/C2-P6-RUN-HISTORY.json",
+  "seq": 6,
+  "commit": "a76177ec20e2bee799763fc8d55a2eb285cef8a1",
+  "job": "unit (windows-latest, 3.11)",
+  "result": "FAIL",
+  "gate_effect": "STOP",
+  "known_defect": "V1-PF-001",
+  "rule": "kept exactly as recorded (FAIL, STOP); never relabeled, never erased"
+ },
+ "policy": {
+  "base": {
+   "path": "closure-evidence/v2/V2-RETRY-POLICY.json",
+   "sha256": "605f6d044d0746812e3b70b909d48cacf0abc0a1e507b8f81cccf67598e255db"
+  },
+  "amendment": {
+   "path": "closure-evidence/v2/cycle2/V2-RETRY-POLICY-AMENDMENT-1.json",
+   "sha256": "3f3fd17ae5839583f07bda0683a18149b44953e1efee516f3ffc9b1e3ce5a5d5"
+  },
+  "checker": {
+   "path": "validation/v2/run_history.py",
+   "sha256": "23203dffbcb19c7be3c7f107fc2d79a2fe0022647154ee0ac87d34305a55333a",
+   "function": "recurrence_effect"
+  }
+ },
+ "typed_facts": {
+  "failing": [
+   {
+    "test": "test_dogfood_ledgerlock.TestTurnCapKillsTheWholeProcessTree.test_the_cap_stops_a_session_whose_client_is_a_grandchild",
+    "error_type": "MemoryError",
+    "product_frames": [
+     "aisef/clients/opencode.py::run",
+     "aisef/clients/base.py::_stream_with_timeout",
+     "aisef/clients/base.py::kill_tree",
+     "aisef/clients/base.py::_kill_tree_win32"
+    ],
+    "test_frames": [
+     "tests/test_dogfood_ledgerlock.py::test_the_cap_stops_a_session_whose_client_is_a_grandchild",
+     "tests/test_dogfood_ledgerlock.py::_run"
+    ]
+   }
+  ],
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "cycle1_evidence_changed": false,
+  "v2_process_range_qualification": {
+   "path": "closure-evidence/v2/cycle2/Q0-Q3/SUMMARY.json",
+   "sha256": "4836216af4ae94c11af36bd42e7f4812fce62801b48c6996b817039609b33c51"
+  }
+ },
+ "derived_effect": "RECORD_ONLY",
+ "reasons_if_stop": [],
+ "classification": [
+  "KNOWN_LEGACY_RECURRENCE",
+  "NON_BLOCKING_AFTER_REPLACEMENT",
+  "RECORD_ONLY_FOR_CYCLE2_GATE"
+ ],
+ "is_not": [
+  "PASS",
+  "FIXED_IN_V1",
+  "NOT_REPRODUCED",
+  "ERASED",
+  "WAIVED_AS_NONEXISTENT"
+ ],
+ "meaning": "the recorded failure stays a FAIL of commit a76177e's Windows job; it does not block the Cycle-2 gate; the frozen V1 code is not fixed and not changed; the V2 process-range path is not on the failing path"
+}
