@@ -35,13 +35,17 @@ CYCLE1_OUT_REL = "closure-evidence/v2/Q0-Q3"
 #: Cycle 2 has no seal of its own, so the candidate is its own seal commit. The subject is the candidate's kernel
 #: tree AND its validation/v2 and tests/v2 trees: every rung refuses to run unless HEAD carries all three (any change
 #: to one of them is a new candidate, restarted from Q0).
-SEMANTIC_CANDIDATE = "63112544f1146097b69c538d98e09e5a52c547c1"
+SEMANTIC_CANDIDATE = "ac4a6c75b461e409f024965391ce77e7689c0e08"
 SEAL_COMMIT = SEMANTIC_CANDIDATE
-KERNEL_TREE = "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
-SUBJECT_TREES = {"validation/v2": "60920999bdc44dc9530e7a6fe14d1341f5615a07", "tests/v2": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330"}
+KERNEL_TREE = "37bf6457f350dd720a2214f04f3896c554ad0904"
+SUBJECT_TREES = {"validation/v2": "2fd461971dd6c92637d45df3948668ec7de59ccd", "tests/v2": "f6b04e08d6da55ad5e626087ebd4d1639960eb62"}
 C2_P5_ACCEPTANCE_REL = "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json"
 V1_PRODUCT_TREE = "4359f347378e84fcac2d213128c7c26f282c13c0"
-OUT_REL = "closure-evidence/v2/cycle2/Q0-Q3"
+#: QP-2.6 attempt 1 (candidate 6311254, historical evidence kept where it was written — owner ruling 2026-09-30 B)
+C2_ATTEMPT1_OUT_REL = "closure-evidence/v2/cycle2/Q0-Q3"
+#: QP-2.6 requalification (owner ruling 2026-09-30 B: the orchestration conformance repair changed a qualification-consumed
+#: kernel path; the full QP-2.6 reruns on the new exact candidate, recorded beside attempt 1, never over it)
+OUT_REL = "closure-evidence/v2/cycle2/Q0-Q3-R2"
 #: the platforms the qualification claims (§20); any other platform's record is kept as a non-gate observation
 QUALIFICATION_PLATFORMS = ("linux", "windows")
 GREEN, FAILED, UNRUNNABLE = "GREEN", "FAILED", "UNRUNNABLE"

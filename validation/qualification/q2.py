@@ -68,7 +68,8 @@ def _mutation() -> dict:
     phases = {}
     for phase, rel in mt.RECORDS.items():
         rec = json.loads((C.ROOT / rel).read_text(encoding="utf-8"))
-        targets = rec["targets"]
+        old = set(mt.superseded(rec, phase))
+        targets = [t for t in rec["targets"] if t["target"] not in old]
         survivors = [{"target": t["target"], "mutant": s, "audit": mt.AUDITED.get((t["target"], s)),
                       "source_sha256": t["source_sha256"], "source_current": mt.source_digest(
                           (C.ROOT / t["target"].split("::")[0]).read_text(encoding="utf-8")) == t["source_sha256"]}
@@ -79,7 +80,8 @@ def _mutation() -> dict:
                          "mutants": sum(t["mutants"] for t in targets), "killed": sum(t["killed"] for t in targets),
                          "survivors": survivors, "unaudited": [s for s in survivors if not s["audit"]],
                          "killed_by_timeout_named": len(timeouts), "timeouts": timeouts,
-                         "errors": [t["target"] for t in targets if t.get("error")]}
+                         "errors": [t["target"] for t in targets if t.get("error")],
+                         "superseded": [{"target": t, "by": mt.SUPERSEDED[t]} for t in sorted(old)]}
     audited_outside_refmodel = sorted(k[0] for k in mt.AUDITED if not k[0].startswith("tests/v2/refmodel/"))
     return {"check_problems": problems, "phases": phases,
             "totals": {"targets": sum(p["targets"] for p in phases.values()), "mutants": sum(p["mutants"] for p in phases.values()),

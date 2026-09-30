@@ -55,6 +55,13 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 OUT_REL = "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json"
+#: The lane's last commit. After integration (C2-INTEGRATION-R2.json) the record accounts for the repair's own changes
+#: up to it; a later change to a recorded file, or any later change under the orchestration or the probes, still fails.
+LANE_HEAD = "cacaa6bd65a0c627bdb18e1a9fc8c29b98695676"
+#: The identities that must still hold on any later tree; the record's C2-P5 check observations are as written.
+SEMANTIC_IDENTITIES = ("contracts", "all_equal_to_accepted", "contract_spec_semantic_digest", "semantic_change", "plan_hash",
+                       "plan_ok", "catalog", "catalog_matches_the_brief", "cycle1_drift_ok", "cycle1_frozen_probe_sources",
+                       "cycle1_frozen_probe_sources_identical", "probe_sources_vs_6311254", "probe_sources_identical_to_6311254")
 MUTATION_REL = "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json"
 P6_MUTATION_REL = "closure-evidence/v2/P6-MUTATION.json"
 AUTHORITY = "owner ruling 2026-09-30, 'ORCHESTRATION CONFORMANCE REPAIR AUTHORIZED' (C2-ORCHESTRATION-CONFORMANCE-REPAIR)"
@@ -98,6 +105,10 @@ def _lf(data: bytes) -> str:
 def _git(*args: str, binary: bool = False):
     r = subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, check=True)
     return r.stdout if binary else r.stdout.decode("utf-8").strip()
+
+
+def _is_ancestor(a: str, b: str) -> bool:
+    return subprocess.run(["git", "-C", str(ROOT), "merge-base", "--is-ancestor", a, b], capture_output=True).returncode == 0
 
 
 def _at(rev: str, rel: str) -> str | None:
@@ -287,9 +298,21 @@ def matrix() -> dict:
 
 # --------------------------------------------------------------------------------------- (d) (e) (f) (g)
 
+def repair_paths() -> set[str]:
+    """The repair's files: every file that differs from the base — committed since, modified or new. On an integrated
+    tree (LANE_HEAD an ancestor of HEAD) the lane's own changes up to LANE_HEAD, and any later change under the
+    orchestration or the probes (another lane's files are the integration record's, not this one's)."""
+    head = _git("rev-parse", "HEAD")
+    if head != LANE_HEAD and _is_ancestor(LANE_HEAD, head):
+        later = set(_git("diff", "--name-only", LANE_HEAD).splitlines()) | set(_git("ls-files", "--others", "--exclude-standard").splitlines())
+        return set(_git("diff", "--name-only", BASE, LANE_HEAD).splitlines()) | {
+            x for x in later if x.startswith(("aisef2/orchestrate/", "aisef2/probe/"))}
+    return set(_git("diff", "--name-only", BASE).splitlines()) | set(_git("ls-files", "--others", "--exclude-standard").splitlines())
+
+
 def changed_files() -> dict:
-    """Every file that differs from the base — committed since, modified or new — except this record."""
-    paths = set(_git("diff", "--name-only", BASE).splitlines()) | set(_git("ls-files", "--others", "--exclude-standard").splitlines())
+    """Every file of the repair (`repair_paths`) except this record, before and after."""
+    paths = repair_paths()
     rows = {}
     for rel in sorted(p for p in paths if p and p != OUT_REL):
         f = ROOT / rel
@@ -479,9 +502,10 @@ def check() -> list[str]:
         now = _lf(f.read_bytes()) if f.exists() else None
         if now != row["after"]:
             out.append(f"(d) {rel} changed since the record")
-    committed = {x for x in _git("diff", "--name-only", BASE, "HEAD").splitlines() if x and x != OUT_REL}
+    committed = {x for x in repair_paths() if x and x != OUT_REL}
     out += [f"(d) {x} changed since the base and is not in the record" for x in sorted(committed - set(rec["files_changed"]))]
-    if identities() != rec["identities"]:
+    now = identities()
+    if {k: now.get(k) for k in SEMANTIC_IDENTITIES} != {k: rec["identities"].get(k) for k in SEMANTIC_IDENTITIES}:
         out.append("(e) the identities differ from the record")
     if mutation() != rec["mutation"]:
         out.append("(f) the mutation summary differs from the record")

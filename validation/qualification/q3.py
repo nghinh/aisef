@@ -268,7 +268,9 @@ STRESS = {"A protocol lines before the exit notice": ["RACE-2", "RACE-3", "RACE-
           "F anchor main exits early": ["harness:F", "tests.v2.p4.test_process_range:Anchor.test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group",
                                         "tests.v2.p4.test_process_range:Range.test_wait_says_none_at_once_when_the_anchor_is_gone_and_keeps_saying_it"],
           "G controller disappears before STARTED / ownership boundary": ["harness:G", "tests.v2.p4.test_process_range:Range.test_PROC_OWN_1_a_controller_that_dies_leaves_no_owned_process_alive",
-                                                                          "tests.v2.p4.test_process_range:Range.test_a_controller_that_returns_without_disposing_exits_and_its_range_goes_with_it"]}
+                                                                          "tests.v2.p4.test_process_range:Range.test_a_controller_that_returns_without_disposing_exits_and_its_range_goes_with_it"],
+          # owner ruling 2026-09-30 B: the V1-PF-001 family (Windows tree cleanup) exercised on the V2 process range only
+          "I V1-PF-001 family contained by the V2 process range, V1 tree walkers never reached": ["harness:I"]}
 
 
 def _fault_E() -> dict:
@@ -297,6 +299,71 @@ def _fault_H() -> dict:
             "checkout_byte_identical_after_the_proof": record["corrected_candidate"]["checkout_byte_identical_after_the_proof"],
             "runs": {k: {"behavior_verdict": v["behavior_verdict"], "execution_status": v["execution_status"], "flags": v["harness_argv_flags"]} for k, v in record["runs"].items()},
             "ok": all(record["verdicts"].values()) and record["old_candidate"]["digest_is_the_one_the_candidate_declared"]}
+
+
+V1PF_REPS = 30
+_TREE_SCRIPT = ("import subprocess, sys, time\n"
+                "inner = 'import subprocess, sys, time; subprocess.Popen([sys.executable, \"-c\", \"import time; time.sleep(60)\"]); time.sleep(60)'\n"
+                "subprocess.Popen([sys.executable, '-c', inner])\n"
+                "time.sleep(60)\n")
+
+
+def _fault_I() -> dict:
+    """The V1-PF-001 family, contained (owner ruling 2026-09-30): the V2 process range started and released V1PF_REPS
+    times around a target that spawns a child and a grandchild; the range's own mechanism (Windows: the Job Object;
+    POSIX: session and group) ends them, every pid asserted gone by the OS, nothing left in the range. For the duration
+    the frozen V1 tree-walkers (aisef/clients/base.py kill_tree, _kill_tree_win32) are replaced by sentinels that must
+    never be called, and no aisef2 module imports the V1 package. Nothing here fixes or changes V1."""
+    import ast
+    import importlib
+    from aisef2.runtime.process_range import ProcessRange
+    from tests.v2.p4.test_process_range import gone
+    base = importlib.import_module("aisef.clients.base")
+    names = [n for n in ("kill_tree", "_kill_tree_win32") if hasattr(base, n)]
+    real = {n: getattr(base, n) for n in names}
+    calls: list[str] = []
+
+    def sentinel(name):
+        def refuse(*_a, **_k):
+            calls.append(name)
+            raise AssertionError(f"the V1 {name} reached from the V2 path")
+        return refuse
+    imports = []
+    for p in sorted((C.ROOT / "aisef2").rglob("*.py")):
+        for n in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
+            mods = [a.name for a in n.names] if isinstance(n, ast.Import) else [n.module or ""] if isinstance(n, ast.ImportFrom) and not n.level else []
+            imports += [f"{p.relative_to(C.ROOT).as_posix()}: {m}" for m in mods if m == "aisef" or m.startswith("aisef.")]
+    reps, residual, not_gone, errors = [], 0, [], []
+    for n in names:
+        setattr(base, n, sentinel(n))
+    try:
+        for i in range(V1PF_REPS):
+            r = ProcessRange(f"q3-v1pf-containment-{i}", [sys.executable, "-c", _TREE_SCRIPT]).start()
+            deadline = time.monotonic() + 15
+            pids = []
+            while time.monotonic() < deadline:
+                pids = sorted({m.pid for m in r.members()})
+                if len(pids) >= 3:
+                    break
+                time.sleep(0.05)
+            try:
+                r.release()
+            except Exception as e:  # noqa: BLE001 — a residual is a typed refusal: recorded, then asserted against the OS
+                errors.append(f"{i}: {type(e).__name__}: {e}")
+            left = [m.pid for m in r.members()]
+            residual += len(left)
+            stay = [p for p in pids if not gone(p)]
+            not_gone += stay
+            reps.append({"rep": i, "members_seen": len(pids), "members_after": len(left), "not_gone": stay})
+    finally:
+        for n, f in real.items():
+            setattr(base, n, f)
+    full_trees = sum(1 for x in reps if x["members_seen"] >= 3)
+    return {"reps": V1PF_REPS, "full_trees_observed": full_trees, "residual_members": residual, "pids_not_gone": not_gone,
+            "release_errors": errors, "v1_walker_calls": calls, "v1_walkers_sentinelled": names, "aisef2_imports_of_v1": imports,
+            "mechanism": "windows-job" if os.name == "nt" else "posix-session-and-group",
+            "ok": full_trees == V1PF_REPS and residual == 0 and not not_gone and not errors and not calls and not imports and bool(names),
+            "claim": "containment of the V2 path only; the frozen V1 defect is not fixed", "per_rep": reps}
 
 
 def _fault_F() -> dict:
@@ -567,8 +634,10 @@ def run(ident: dict) -> dict:
     f, err_f = C.capture(_fault_F)
     g, err_g = C.capture(_fault_G)
     h, err_h = C.capture(_fault_H)
+    i_, err_i = C.capture(_fault_I)
     harness_faults = {"E": e if not err_e else {"ok": False, "error": err_e}, "F": f if not err_f else {"ok": False, "error": err_f},
-                      "G": g if not err_g else {"ok": False, "error": err_g}, "H": h if not err_h else {"ok": False, "error": err_h}}
+                      "G": g if not err_g else {"ok": False, "error": err_g}, "H": h if not err_h else {"ok": False, "error": err_h},
+                      "I": i_ if not err_i else {"ok": False, "error": err_i}}
     for k, v in harness_faults.items():
         if v.get("outcome") == C.NOT_APPLICABLE:
             continue
@@ -623,6 +692,8 @@ def run(ident: dict) -> dict:
                         "harness_faults": harness_faults,
                         "forbidden_remedies_absent": {"exit_driven_reader": "def _exited" not in (C.ROOT / "aisef2/probe/python_callable.py").read_text(encoding="utf-8"),
                                                       "drain_window": "_DRAIN_S" not in (C.ROOT / "aisef2/probe/python_callable.py").read_text(encoding="utf-8")}},
+        "v1_pf_001_family_containment": {"fault_I": harness_faults["I"],
+                                         "claim": "the V2 process range contains the V1-PF-001 family on this platform; V1 is not fixed or changed"},
         "bytecode_isolation": {"family": [r["id"] for r in BYTECODE_FAMILY], "fault_H_reproducer_old_vs_corrected": harness_faults["H"]},
         "watchdog_anchor_ownership": {"structure": structure, "fault_F_anchor_terminated": harness_faults["F"], "fault_G_controller_gone_before_STARTED": harness_faults["G"],
                                       "cleanup_authority": authority},

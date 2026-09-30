@@ -54,6 +54,8 @@ FAMILIES = {
     "placeholder_single_token": ["single_placeholder_token"],
     "protocol_channel_discipline": ["protocol_channel_discipline"],
     "c2_p5_owner_acceptance_and_real_approvals": ["tests:c2_p5_acceptance"],
+    # owner ruling 2026-09-30 B: the V1-PF-001 lifecycle after its replacement, calibrated on its known-bad cases
+    "v1_pf_001_recurrence_policy": ["run_history", "tests:c2_v1_pf_001_policy"],
 }
 CYCLE2_ACTIVE = {"file_artifact": "probe.file_artifact", "python_callable": "probe.python_callable_v2",
                  "cli_invocation": "probe.cli_invocation", "process_effect": "probe.process_effect"}
@@ -87,7 +89,7 @@ def _specs_binding(digest: str) -> list[str]:
         for p in sorted((C.ROOT / base).rglob("*.json")):
             rel = p.relative_to(C.ROOT).as_posix()
             if rel in HISTORICAL_OLD_DIGEST_FILES or rel.startswith(HISTORICAL_OLD_DIGEST_PREFIXES) \
-                    or rel.startswith(C.CYCLE1_OUT_REL + "/invalidated-") or rel.startswith(C.OUT_REL + "/"):
+                    or rel.startswith(C.CYCLE1_OUT_REL + "/invalidated-") or rel.startswith((C.OUT_REL + "/", C.C2_ATTEMPT1_OUT_REL + "/")):
                 continue   # measurements of history (the finding's records, invalidated rungs): never a stored spec
             try:
                 walk(json.loads(p.read_text(encoding="utf-8")), rel)
@@ -101,7 +103,7 @@ def _files_mentioning(digest: str) -> list[str]:
     for base in ("aisef2", "tests/v2", "validation/v2", "closure-evidence/v2", "docs"):   # not the scanner, not its records
         for p in sorted((C.ROOT / base).rglob("*")):
             if p.is_file() and p.suffix in (".py", ".json", ".md") and "__pycache__" not in p.parts \
-                    and not p.relative_to(C.ROOT).as_posix().startswith((C.OUT_REL, C.CYCLE1_OUT_REL)):
+                    and not p.relative_to(C.ROOT).as_posix().startswith((C.OUT_REL, C.CYCLE1_OUT_REL, C.C2_ATTEMPT1_OUT_REL)):
                 try:
                     if digest in p.read_text(encoding="utf-8"):
                         out.append(p.relative_to(C.ROOT).as_posix())
@@ -145,6 +147,7 @@ def run(ident: dict) -> dict:
     # 2. the required families, each discharged by a discovered checker or a named test set
     admission = C.run_module("tests.v2.p2.test_static_admission")   # the engine's rules on fixture plans; no project's admission
     acceptance_cases = C.run_module("tests.v2.test_c2_p5_acceptance")   # re-derives the owner-accepted plan's admission
+    policy_cases = C.run_module("tests.v2.test_c2_v1_pf_001_policy")    # the corrected V1-PF-001 rule on its known-bad cases
     catalog_tests = C.run_module("tests.v2.p0.test_arch_catalog")     # fail-closed in both directions
     families = {}
     for fam, refs in FAMILIES.items():
@@ -154,6 +157,8 @@ def run(ident: dict) -> dict:
                 rows[ref] = C.status_of(admission)
             elif ref == "tests:c2_p5_acceptance":
                 rows[ref] = C.status_of(acceptance_cases)
+            elif ref == "tests:c2_v1_pf_001_policy":
+                rows[ref] = C.status_of(policy_cases)
             elif ref == "explicit:seals":
                 rows[ref] = "asserted below"
             else:
@@ -324,7 +329,7 @@ def run(ident: dict) -> dict:
     if cycle2["c2_p5_acceptance"]["re_derivation_problems"] or not acceptance["verdict"].startswith("C2-P5 ACCEPTED"):
         problems.append(f"the C2-P5 acceptance does not re-derive: {cycle2['c2_p5_acceptance']['re_derivation_problems']}")
 
-    cases = admission + catalog_tests + [drifted_pin] + acceptance_cases
+    cases = admission + catalog_tests + [drifted_pin] + acceptance_cases + policy_cases
     status = C.status_of(cases, problems, harness)
     return {
         "record": "AISEF V2 — Q0 STATIC INTEGRITY", "rung": "Q0", "status": status, "at": C.now(),

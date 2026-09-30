@@ -79,6 +79,8 @@ CYCLE2_PROPERTIES = {
     "design_check_1": [f"{CLI}:Harness.test_CLI_4_DESIGN_CHECK_1_the_same_result_under_every_scheduling_of_exit_and_file_close"],
 }
 WITNESS_MODULE = "tests.v2.test_c2_witness_independence"
+#: C2-ORCHESTRATION-CONFORMANCE-REPAIR: one ProductProof evaluation per PlanObligation with the probe its spec carries
+ORCHESTRATION_MODULE = "tests.v2.test_c2_orchestration_conformance"
 
 
 def _layout_permutations() -> dict:
@@ -199,6 +201,7 @@ def run(ident: dict) -> dict:
     c2_cases = {kind: [c for module, classes in refs for c in C.run_module(module, classes=classes)]
                 for kind, refs in CYCLE2_SEMANTICS.items()}
     witness = C.run_module(WITNESS_MODULE)
+    orchestration = C.run_module(ORCHESTRATION_MODULE)
     by_id = {c["id"]: c for cs in list(c2_cases.values()) + [witness] for c in cs}
     c2_properties = {}
     for prop, ids in CYCLE2_PROPERTIES.items():
@@ -207,7 +210,9 @@ def run(ident: dict) -> dict:
         if c2_properties[prop]["status"] != C.GREEN:
             problems.append(f"cycle 2 {prop}: {c2_properties[prop]['status']}: " + "; ".join(C.problems_of(rows)))
     cases = [c for v in rfc.values() for c in v] + list(scenarios.values()) + v2_005 + v2_006 + layout_cases + refmodel_cases + admission
-    cases += [c for cs in c2_cases.values() for c in cs] + witness
+    cases += [c for cs in c2_cases.values() for c in cs] + witness + orchestration
+    if not orchestration:
+        harness.append(f"{ORCHESTRATION_MODULE} ran no case")
     return {
         "record": "AISEF V2 — Q1 SEMANTIC CONFORMANCE", "rung": "Q1", "status": C.status_of(cases, problems, harness), "at": C.now(),
         "subject": ident, "platform": C.platform_id(),
@@ -225,6 +230,8 @@ def run(ident: dict) -> dict:
         "cycle2": {"semantics_by_kind": {k: {"status": C.status_of(v), "counts": C.counts(v), "cases": v} for k, v in c2_cases.items()},
                    "properties": c2_properties,
                    "witness_independence": {"status": C.status_of(witness), "cases": witness,
-                                            "variants": ["implementer", "verifier-crlf", "verifier-exec-bit", "verifier-colliding-dates"]}},
+                                            "variants": ["implementer", "verifier-crlf", "verifier-exec-bit", "verifier-colliding-dates"]},
+                   "orchestration_conformance": {"status": C.status_of(orchestration), "counts": C.counts(orchestration),
+                                                 "module": ORCHESTRATION_MODULE, "cases": orchestration}},
         "provider_calls": 0, "problems": problems, "harness_problems": harness, "cases": cases, "counts": C.counts(cases),
     }

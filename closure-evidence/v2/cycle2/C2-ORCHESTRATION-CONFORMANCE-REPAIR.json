@@ -4,7 +4,7 @@
  "classification": "CONFORMANCE REPAIR to the frozen architecture (not an architecture expansion, not a new probe feature)",
  "subject": {
   "base": "45136086c3e4a98534f975e6db979f94165af5f3",
-  "head_when_written": "ac88f366f98e5d1f4e2859df1001d430bdb8364c",
+  "head_when_written": "ac4a6c75b461e409f024965391ce77e7689c0e08",
   "note": "written on head_when_written, the commit that carries the repair, and committed in the commit after it (a record cannot name the commit that contains it; the C2-P5 proposal's derived provenance in (e) reads HEAD's kernel tree); (d) binds every changed file by content",
   "old_kernel": {
    "commit": "63112544f1146097b69c538d98e09e5a52c547c1",
@@ -726,7 +726,7 @@
    "released_empty": true,
    "escaped": 0
   },
-  "seconds": 127.3
+  "seconds": 127.1
  },
  "files_changed": {
   "aisef2/orchestrate/proof.py": {
@@ -747,7 +747,7 @@
   },
   "validation/qualification/c2_orchestration_repair.py": {
    "before": null,
-   "after": "9462b86c9f40f9c63731ab33fd199a0de553727c7b345759eb6f4963b287cbdf"
+   "after": "be526067bd56cdd9c3d66ff10db7f55f7959c3abf93753eef0e81e9bc5bdaafb"
   },
   "validation/v2/mutation.py": {
    "before": "dc9c3bd5cfc9779d8449b7bd8fe2901a794d50305129de594b27c55c8d8b51f3",
@@ -760,9 +760,7 @@
   "contract_spec_semantic_digest": "83a73da271805c470db4da55f50f542950494aa8b50a31e5b6f07e5364415745",
   "contract_spec_semantic_rule": "sha256 of the JSON list of [spec, contract id, contract hash, spec id, semantic hash, probe id, probe digest] rows of p5_acceptance.verify, in proposal order",
   "semantic_change": "NONE",
-  "verify_problems": [
-   "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json is not what the authoring aid derives from this tree"
-  ],
+  "verify_problems": [],
   "verify_problems_are_provenance_only": true,
   "c2_p5_proposal_provenance": {
    "differing_paths": [
@@ -781,15 +779,10 @@
    "p10_contracts.check": [
     "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json is not what the authoring aid derives from this tree"
    ],
-   "p5_acceptance.check": [
-    "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json is not what the authoring aid derives from this tree",
-    "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json is stale in verification.identities"
-   ]
+   "p5_acceptance.check": []
   },
   "c2_p5_acceptance_verification_differences": {
-   "identities": [
-    "proposal_record_current"
-   ],
+   "identities": [],
    "semantic_change": [],
    "rulings": [],
    "admission": [],
@@ -1137,7 +1130,7 @@
     "OK   protocol_channel_discipline clean=True rejects=True always-pass-mutant-caught=True",
     "calibrated 46/46; always-PASS mutants rejected 46/46"
    ],
-   "seconds": 182.8
+   "seconds": 183.2
   },
   "freeze_conformance": {
    "command": "python -P validation/v2/freeze_conformance.py --check",
@@ -1195,7 +1188,7 @@
     "boundaries 72 {'RERAISES': 7, 'STRUCTURAL': 65}",
     "except boundaries: PASS"
    ],
-   "seconds": 0.3
+   "seconds": 0.2
   },
   "mutation": {
    "command": "python -P validation/v2/mutation.py --check",
@@ -1212,7 +1205,7 @@
    "tail": [
     "All checks passed!"
    ],
-   "seconds": 0.0
+   "seconds": 0.1
   }
  },
  "platform": {
@@ -1221,5 +1214,5 @@
  },
  "problems": [],
  "verdict": "COMPLETE",
- "seconds": 368.3
+ "seconds": 368.8
 }
