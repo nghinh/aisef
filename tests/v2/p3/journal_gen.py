@@ -39,10 +39,14 @@ def _text(specs, times):
 
 
 def specs(seed: int, *, stories: int = 4, max_attempts: int = 3,
-          journal_format: int = 1, failures: tuple[str, ...] | None = None) -> list[tuple[str, dict, tuple[int, ...]]]:
+          journal_format: int = 1, failures: tuple[str, ...] | None = None,
+          probe_ids: tuple[str, ...] | None = None) -> list[tuple[str, dict, tuple[int, ...]]]:
     """`failures`: the pool an active story draws its failures from; None keeps the format's own pool (every seed's
-    run is then exactly what it was), and Q4 passes the whole taxonomy."""
+    run is then exactly what it was), and Q4 passes the whole taxonomy. `probe_ids`: the probe identities a
+    probe/evaluated record names (Cycle-2 Q4 coverage key); drawn from a stream of its own, so every other event of the
+    run is exactly what it is without them, and None names none (every default trace byte-identical)."""
     rng = random.Random(seed)
+    probe_rng = random.Random(seed ^ 0x5EED1D5) if probe_ids else None
     out: list[tuple[str, dict, tuple[int, ...]]] = []
     three = journal_format == 3
     active_failures = failures if failures is not None else (ACTIVE_FAILURES_3 if three else ACTIVE_FAILURES)
@@ -103,7 +107,10 @@ def specs(seed: int, *, stories: int = 4, max_attempts: int = 3,
         elif st["phase"] == "begun":
             for c in mine[sid]:
                 if rng.random() < .5:
-                    emit("probe/evaluated", {"story_id": sid, "criterion_id": c, "record": {"result": {"status": "x"}}})
+                    record = {"result": {"status": "x"}}
+                    if probe_rng is not None:
+                        record["probe_id"] = probe_rng.choice(probe_ids)
+                    emit("probe/evaluated", {"story_id": sid, "criterion_id": c, "record": record})
             d = {c: disposition(roles[c]) for c in mine[sid]}
             blocked = [v for v in d.values() if v in BLOCKED]
             ready = [c for c, v in d.items() if v == "READY"]
@@ -189,7 +196,7 @@ def specs(seed: int, *, stories: int = 4, max_attempts: int = 3,
     return out
 
 
-def journal(seed: int, *, stories: int = 4, times=None, **kw) -> str:  # kw: max_attempts, journal_format, failures
+def journal(seed: int, *, stories: int = 4, times=None, **kw) -> str:  # kw: max_attempts, journal_format, failures, probe_ids
     """Stored text of run `seed`; `times` maps n -> the event's wall-clock time (default: n)."""
     s = specs(seed, stories=stories, **kw)
     return _text(s, [float(n) if times is None else float(times(n)) for n in range(len(s))])
