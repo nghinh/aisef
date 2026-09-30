@@ -11,7 +11,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Mapping
 
-from aisef2.arch.enums import ContractSatisfaction, EventType as T, MeasurementPoint, ObligationRole, ProbeExecutionStatus
+from aisef2.arch.enums import (
+    ContractSatisfaction, Enforcement, EventType as T, MeasurementPoint, ObligationRole, ProbeExecutionStatus,
+)
 from aisef2.control.owner import Classification, FailureCode, classify
 from aisef2.control.routing import route
 from aisef2.errors import InvariantError
@@ -20,7 +22,7 @@ from aisef2.journal.format2 import ResourceKind
 from aisef2.journal.format3 import verified_payload
 from aisef2.probe.protocol import ExecutionEnv, Probe, ProbeRecord, RevisionRef, bound_result, run_probe
 from aisef2.product.contract import plain
-from aisef2.product.outcome import contract_satisfaction
+from aisef2.product.outcome import InvalidSpec, contract_satisfaction
 from aisef2.product.spec import ProductProofSpec
 from aisef2.runtime.story_scope import StoryScope
 
@@ -53,10 +55,14 @@ class Ranged:
 
 class Party:
     """One party's probe run: the probe evaluates in the party's own checkout; its process range is acquired into the
-    story's scope when it starts and released when the probe returns (§17.1)."""
+    story's scope when it starts and released when the probe returns (§17.1). With `by_spec` the maker is also given
+    the spec it is asked to prove and answers with that spec's own probe (C2-ORCHESTRATION-CONFORMANCE-REPAIR), or
+    None when the harness has none for the spec's identity: the record is then a typed InvalidSpec, as StoryAdmission
+    records one (§13) — never a crash, never another probe's run."""
 
-    def __init__(self, scope: StoryScope, make_probe: Callable[[Callable], Probe], label: str) -> None:
-        self.scope, self._make, self.label = scope, make_probe, label
+    def __init__(self, scope: StoryScope, make_probe: Callable[..., Probe | None], label: str, *,
+                 by_spec: bool = False) -> None:
+        self.scope, self._make, self.label, self._by_spec = scope, make_probe, label, by_spec
 
     def run(self, spec: ProductProofSpec, at: RevisionRef, env: ExecutionEnv, *, under: str) -> ProbeRecord:
         held: list = []
@@ -65,7 +71,13 @@ class Party:
             held.append(self.scope.acquire(Ranged(process_range, f"{process_range.name} [{under} {self.label}]")))
 
         try:
-            return run_probe(self._make(on_range), spec, at, env)
+            probe = self._make(on_range, spec) if self._by_spec else self._make(on_range)
+            if probe is None:
+                return ProbeRecord.create(spec_id=spec.id, semantic_hash=spec.semantic_hash, probe_id=spec.probe_id,
+                                          probe_digest=spec.probe_digest, revision=at.sha,
+                                          enforcement=Enforcement.UNAVAILABLE,
+                                          result=InvalidSpec(f"probe {spec.probe_id} is not in the harness catalogue"))
+            return run_probe(probe, spec, at, env)
         finally:
             for r in reversed(held):
                 if self.scope.held[-1:] == (r.name,):   # only the top of the stack is released early (§17.1)

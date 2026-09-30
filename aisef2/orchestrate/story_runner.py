@@ -34,9 +34,11 @@ from aisef2.product.spec import ProductProofSpec
 
 @dataclass(frozen=True, slots=True)
 class StoryInputs:
-    """What a story is proved with: its specs and probe factories (a factory takes the harness's `on_range` and the
-    story's scratch directory, and gives a Probe), the execution environment, the developer's tests and the regression tests at the candidate, the test
-    runner, and — only through the seam — any V1 proof modes with their typed declarations."""
+    """What a story is proved with: its specs and probe factories keyed by probe id (a factory takes the harness's
+    `on_range` and the story's scratch directory, and gives a Probe; a harness wires every probe the plan's specs name,
+    so a re-proof of another story's spec finds its own), the execution environment, the developer's tests and the
+    regression tests at the candidate, the test runner, and — only through the seam — any V1 proof modes with their
+    typed declarations."""
     specs: Mapping[str, ProductProofSpec]
     probes: Mapping[str, Callable[[Callable, str], object]]
     env: ExecutionEnv
@@ -177,8 +179,10 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
         checks.append(gate.check(run, story_id, "resources", False, detail))
     if failure is None:
         held = _Held(scope, "admission")
-        implementer = Party(scope, lambda on_range: _probe(inputs, on_range, str(scratch.path)), "implementer")
-        verifier = Party(scope, lambda on_range: _probe(inputs, on_range, str(scratch.path)), "verifier")
+        implementer = Party(scope, lambda on_range, spec: _probe(inputs, on_range, str(scratch.path), spec),
+                            "implementer", by_spec=True)
+        verifier = Party(scope, lambda on_range, spec: _probe(inputs, on_range, str(scratch.path), spec), "verifier",
+                         by_spec=True)
         specs = inputs.specs
         obligations = obligations_of(plan, story_id)
         probes = {pid: make(held, str(scratch.path)) for pid, make in inputs.probes.items()}
@@ -313,10 +317,16 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                    tuple(checks), decision_seq)
 
 
-def _probe(inputs: StoryInputs, on_range, scratch: str | None = None):
-    """The party's probe: cycle 1 proves a story with one probe kind (python_callable), so one factory serves both
-    parties; each party gets its own instance, wired to the scope through `on_range` and given the story's scratch
-    directory, under which each of its evaluations keeps its own bytecode cache (never the checkout's)."""
+def _probe(inputs: StoryInputs, on_range, scratch: str | None = None, spec: ProductProofSpec | None = None):
+    """The party's probe for `spec`: the factory of the spec's own probe identity, so each obligation is proved by the
+    probe its ProductProofSpec names — never by a representative of the story (C2-ORCHESTRATION-CONFORMANCE-REPAIR);
+    None when the harness wires no factory for that identity. Each evaluation gets its own instance, wired to the scope
+    through `on_range` and given the story's scratch directory, under which each of its evaluations keeps its own
+    bytecode cache (never the checkout's). Without a spec there is nothing to resolve by: only one factory is
+    unambiguous."""
+    if spec is not None:
+        make = inputs.probes.get(spec.probe_id)
+        return None if make is None else make(on_range, scratch)
     factories = list(inputs.probes.values())
     if len(factories) != 1:
         raise InvariantError("cycle 1 proves a story with exactly one probe factory")
