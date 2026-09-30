@@ -2,6 +2,8 @@
 known-bad cases, the decision for the recorded recurrence, and the historical attempt left exactly as recorded."""
 
 import json
+import pathlib
+import tempfile
 import unittest
 
 from validation.qualification import v1_pf_001_policy as V
@@ -10,6 +12,17 @@ rh = V.rh
 
 
 class Policy(unittest.TestCase):
+    def test_a_traceback_path_resolves_to_the_repository_path_even_where_its_absolute_form_exists(self):
+        # CI 36788420167 (windows): the recorded D:\\a\\aisef\\aisef\\aisef\\... exists on a runner checked out there
+        with tempfile.TemporaryDirectory() as d:
+            root = pathlib.Path(d).resolve()
+            (root / "aisef" / "clients").mkdir(parents=True)
+            (root / "aisef" / "clients" / "base.py").write_text("", encoding="utf-8")
+            for raw in (str(root / "aisef" / "clients" / "base.py"), str(root).replace("/", "\\") + "\\aisef\\clients\\base.py",
+                        "D:\\a\\aisef\\aisef\\aisef\\clients\\base.py"):
+                self.assertEqual(V.repo_path(raw, root), "aisef/clients/base.py", raw)
+            self.assertIsNone(V.repo_path("/elsewhere/other.py", root))
+
     def test_every_calibration_case_holds(self):
         rec = V.calibrate()
         self.assertTrue(rec["all_held"], [c for c in rec["cases"] if not c["held"]])

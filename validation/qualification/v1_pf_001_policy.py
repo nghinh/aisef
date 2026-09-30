@@ -48,11 +48,12 @@ def _sha(path: pathlib.Path) -> str:
 
 
 def repo_path(raw: str, root: pathlib.Path = ROOT) -> str | None:
-    """The repository path a traceback names: the longest suffix of its parts that exists in the tree."""
+    """The repository path a traceback names: the longest suffix of its parts that exists in the tree — relative, never
+    the traceback's own absolute path (on the runner that recorded it, `root / 'D:/a/...'` is that absolute file)."""
     parts = re.split(r"[\\/]+", raw)
     for i in range(len(parts)):
         rel = "/".join(parts[i:])
-        if rel and (root / rel).is_file():
+        if rel and not rel.startswith("/") and not re.match(r"^[A-Za-z]:", rel) and (root / rel).is_file():
             return rel
     return None
 
