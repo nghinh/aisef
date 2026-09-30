@@ -4,8 +4,8 @@
  "classification": "CONFORMANCE REPAIR to the frozen architecture (not an architecture expansion, not a new probe feature)",
  "subject": {
   "base": "45136086c3e4a98534f975e6db979f94165af5f3",
-  "head_when_written": "e3d0560e277024eeb31ddf54a95dba8fb41ae1b6",
-  "note": "written before the commit that carries the repair and this record (a record cannot name the commit that contains it); (d) binds every changed file by content",
+  "head_when_written": "ac88f366f98e5d1f4e2859df1001d430bdb8364c",
+  "note": "written on head_when_written, the commit that carries the repair, and committed in the commit after it (a record cannot name the commit that contains it; the C2-P5 proposal's derived provenance in (e) reads HEAD's kernel tree); (d) binds every changed file by content",
   "old_kernel": {
    "commit": "63112544f1146097b69c538d98e09e5a52c547c1",
    "aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
@@ -35,13 +35,14 @@
    }
   },
   "new_kernel": {
-   "kernel_digest": "dac2df216c747905cd4025b9f54ef906f4695ea401bd1ffb963b5d364bfcbbf0",
+   "kernel_digest": "8e8f00ca9327599f850088181aa64fa8751d8405a5485d52faccb18fa8ef4d3d",
    "rule": "q4's kernel digest over this working tree's aisef2 (its git tree exists once the repair is committed; (d) binds the two changed modules by content)"
   }
  },
  "repair": {
   "story_runner._probe": "resolves the factory of the spec's own probe identity (inputs.probes.get(spec.probe_id)); None when the harness wires none; without a spec only a single factory is unambiguous (as before)",
-  "proof.Party": "keyword-only by_spec: the maker is given the spec it is asked to prove; a maker without the spec's probe gives a typed InvalidSpec record (enforcement UNAVAILABLE), as StoryAdmission records one — never a crash, never another probe's run; one-argument makers unchanged",
+  "proof.Party": "keyword-only by_spec: the maker is given the spec it is asked to prove; a maker without the spec's probe makes the party run nothing and return no record (a party never manufactures one: invariant III, INV-III-1 pins the record producers to protocol.py and story_admission.py); one-argument makers unchanged",
+  "proof.prove": "a party with no probe for the spec's identity is PROBE_INVALID_SPEC, the code an INVALID_SPEC result routes to at every point (§10) — never a crash, never another probe's run; the journal order of a proof is unchanged (implementer record, verifier record, proof)",
   "StoryInputs.probes": "several factories keyed by probe id (a harness wires every probe the plan's specs name)",
   "unchanged": "StoryAdmission, ContractSatisfaction, routing, budgets, journal events and payloads, the RunSpec, F1-F11, every contract, spec, plan and probe identity"
  },
@@ -692,8 +693,8 @@
    "LedgerLockStories"
   ],
   "exit": 0,
-  "ran": 21,
-  "passed": 21,
+  "ran": 22,
+  "passed": 22,
   "outcomes": {
    "LedgerLockStories.test_14a_each_spec_s_own_probe_gives_its_pristine_expectation_on_the_reference_tree": "PASS",
    "LedgerLockStories.test_14b_admission_and_both_parties_accept_each_whole_story_through_the_path": "PASS",
@@ -711,9 +712,10 @@
    "OneProofPerObligation.test_6_one_PROBE_UNRUNNABLE_among_READY_is_the_environment_s_and_charges_its_budget": "PASS",
    "OneProofPerObligation.test_7_one_INVALID_SPEC_among_READY_is_PROBE_INVALID_from_the_real_probe_or_from_an_unwired_one": "PASS",
    "Parties.test_a_by_spec_party_gives_the_maker_the_spec_and_makes_a_probe_per_evaluation": "PASS",
-   "Parties.test_a_party_without_the_spec_s_probe_records_a_typed_INVALID_SPEC_and_runs_nothing": "PASS",
+   "Parties.test_a_party_without_the_spec_s_probe_runs_nothing_and_makes_no_record": "PASS",
+   "Parties.test_prove_types_a_party_without_the_spec_s_probe_as_PROBE_INVALID_SPEC_and_seals_nothing": "PASS",
    "Parties.test_the_runner_resolves_the_factory_of_the_spec_s_own_probe_identity_or_none": "PASS",
-   "ReproofOfAnotherKind.test_a_prior_spec_whose_probe_the_harness_did_not_wire_is_a_typed_INVALID_SPEC_never_a_crash": "PASS",
+   "ReproofOfAnotherKind.test_a_prior_spec_whose_probe_the_harness_did_not_wire_is_PROBE_INVALID_SPEC_never_a_crash": "PASS",
    "ReproofOfAnotherKind.test_a_regression_of_the_prior_spec_of_another_kind_is_POST_MERGE_REGRESSION_and_rolled_back": "PASS",
    "ReproofOfAnotherKind.test_the_prior_PRESERVE_spec_of_another_kind_is_re_proved_by_its_own_probe": "PASS"
   },
@@ -724,12 +726,12 @@
    "released_empty": true,
    "escaped": 0
   },
-  "seconds": 128.2
+  "seconds": 127.3
  },
  "files_changed": {
   "aisef2/orchestrate/proof.py": {
    "before": "c870ec47d5c661249e1da432412ba0e874e1b8f12dd4625a7cc3839da67e1138",
-   "after": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe"
+   "after": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f"
   },
   "aisef2/orchestrate/story_runner.py": {
    "before": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
@@ -737,15 +739,15 @@
   },
   "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json": {
    "before": null,
-   "after": "eb1ee7f2e59b5cb68d5be9b5aef1383ba1f6cf2927c1c35204734c61c99d8d8a"
+   "after": "56940fea58adc10f80ab3ccb470cfd50cf69292ca7b2dc0b9e4591bfaf568bd6"
   },
   "tests/v2/test_c2_orchestration_conformance.py": {
    "before": null,
-   "after": "24e8d19b70eb99d998ff30ac38024f5d880e61fe914b4e8024ce0c7674745147"
+   "after": "fea1c95f6975c479f5282c38f6fd06c329217cee659a54fbb114c073a17da647"
   },
   "validation/qualification/c2_orchestration_repair.py": {
    "before": null,
-   "after": "66dbda450fa701c8e5df7dbdd29747b6cfa2178d5d31e9e23a487de6232f6ecb"
+   "after": "9462b86c9f40f9c63731ab33fd199a0de553727c7b345759eb6f4963b287cbdf"
   },
   "validation/v2/mutation.py": {
    "before": "dc9c3bd5cfc9779d8449b7bd8fe2901a794d50305129de594b27c55c8d8b51f3",
@@ -770,7 +772,7 @@
     "identities.aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
    },
    "derived": {
-    "identities.aisef2_tree": "8282a7ba8f5f765acc6cd9c7068a7c0ea18fea14"
+    "identities.aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904"
    },
    "provenance_only": true,
    "proposal_digest_unchanged": true
@@ -858,7 +860,7 @@
  "mutation": {
   "record": {
    "path": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json",
-   "sha256": "eb1ee7f2e59b5cb68d5be9b5aef1383ba1f6cf2927c1c35204734c61c99d8d8a"
+   "sha256": "56940fea58adc10f80ab3ccb470cfd50cf69292ca7b2dc0b9e4591bfaf568bd6"
   },
   "targets": {
    "aisef2/orchestrate/proof.py::Party.__init__": {
@@ -871,12 +873,12 @@
      "tests/v2/test_p6_stages.py",
      "tests/v2/test_c2_orchestration_conformance.py"
     ],
-    "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
     "error": null
    },
    "aisef2/orchestrate/proof.py::Party.run": {
-    "mutants": 14,
-    "killed": 14,
+    "mutants": 9,
+    "killed": 9,
     "survivors": [],
     "killed_by_timeout": 0,
     "strays_reaped": 0,
@@ -884,7 +886,7 @@
      "tests/v2/test_p6_stages.py",
      "tests/v2/test_c2_orchestration_conformance.py"
     ],
-    "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
     "error": null
    },
    "aisef2/orchestrate/proof.py::Ranged.__init__": {
@@ -897,7 +899,7 @@
      "tests/v2/test_p6_stages.py",
      "tests/v2/test_c2_orchestration_conformance.py"
     ],
-    "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
     "error": null
    },
    "aisef2/orchestrate/proof.py::obligations_of": {
@@ -910,12 +912,12 @@
      "tests/v2/test_p6_stages.py",
      "tests/v2/test_c2_orchestration_conformance.py"
     ],
-    "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
     "error": null
    },
    "aisef2/orchestrate/proof.py::prove": {
-    "mutants": 77,
-    "killed": 77,
+    "mutants": 108,
+    "killed": 108,
     "survivors": [],
     "killed_by_timeout": 0,
     "strays_reaped": 0,
@@ -923,7 +925,7 @@
      "tests/v2/test_p6_stages.py",
      "tests/v2/test_c2_orchestration_conformance.py"
     ],
-    "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
+    "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
     "error": null
    },
    "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
@@ -1074,8 +1076,8 @@
   },
   "totals": {
    "targets": 16,
-   "mutants": 467,
-   "killed": 467,
+   "mutants": 493,
+   "killed": 493,
    "survivors": 0,
    "killed_by_timeout": 0
   },
@@ -1176,7 +1178,7 @@
    "tail": [
     "destructive authority: PASS"
    ],
-   "seconds": 1.8
+   "seconds": 1.7
   },
   "kernel_static_checks": {
    "command": "python -P validation/v2/kernel_static_checks.py --check",
@@ -1219,5 +1221,5 @@
  },
  "problems": [],
  "verdict": "COMPLETE",
- "seconds": 369.3
+ "seconds": 368.3
 }
