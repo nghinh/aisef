@@ -21,7 +21,11 @@ each ProductProofSpec carries; a conformance repair to the frozen architecture, 
 (d) Every file changed since the base 45136086, with its sha256 before and after (LF-normalised).
 (e) Identities unchanged: the 59 contract hashes, spec ids and semantic hashes and the plan hash
     (p5_acceptance.verify(run_guards=False)), the catalog's probe digests, the Cycle-1 frozen probe sources, the probe
-    sources of 6311254.
+    sources of 6311254. The accepted P5-PLAN-V2.2 proposal record also names the kernel tree it was authored on
+    (`identities.aisef2_tree`, HEAD:aisef2 then); once the repair is committed the authoring aid re-derives it with the
+    new tree, so p10_contracts.check and p5_acceptance.check report that record as not re-derived. The record is measured
+    here field by field: that one provenance field must be the only difference (the proposal digest, every hash and the
+    plan are the accepted ones); the two C2-P5 checks' outputs are recorded as they are, nothing of C2-P5 is edited.
 (f) The C2-ORCH mutation record, summarised, with mutation.py's verdict on it and on P6's superseded entries.
 (g) The guards, each run once.
 
@@ -293,10 +297,35 @@ def changed_files() -> dict:
     return rows
 
 
+PROPOSAL_REL = "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json"
+PROPOSAL_NOT_REDERIVED = f"{PROPOSAL_REL} is not what the authoring aid derives from this tree"
+
+
+def proposal_provenance() -> dict:
+    """Every path at which the accepted proposal record differs from what the authoring aid derives on this tree."""
+    from validation.qualification import p10_contracts as aid
+    committed = json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8"))
+    derived = aid.record()
+    paths = _paths(committed, derived)
+    return {"differing_paths": paths, "committed": {p: _at_path(committed, p) for p in paths},
+            "derived": {p: _at_path(derived, p) for p in paths},
+            "provenance_only": paths in ([], ["identities.aisef2_tree"]),
+            "proposal_digest_unchanged": derived["proposal_digest"] == committed["proposal_digest"]}
+
+
+def _at_path(doc, path: str):
+    for part in path.split("."):
+        doc = doc.get(part) if isinstance(doc, dict) else None
+    return doc
+
+
 def identities() -> dict:
     from aisef2.probe import catalog
     from validation.qualification import p5_acceptance as pa
+    from validation.qualification import p10_contracts as aid
     v = pa.verify(run_guards=False)
+    provenance = proposal_provenance()
+    acceptance = json.loads((ROOT / pa.OUT_REL).read_text(encoding="utf-8"))
     specs = v["identities"]["specs"]
     rows = [[r["spec_id"], r["contract_id"], r["contract_hash"], r["spec_hash_id"], r["semantic_hash"], r["probe_id"],
              r["probe_digest"]] for r in specs]
@@ -310,6 +339,15 @@ def identities() -> dict:
         "contract_spec_semantic_rule": "sha256 of the JSON list of [spec, contract id, contract hash, spec id, semantic hash, "
                                        "probe id, probe digest] rows of p5_acceptance.verify, in proposal order",
         "semantic_change": v["semantic_change"], "verify_problems": v["problems"],
+        "verify_problems_are_provenance_only": all(x == PROPOSAL_NOT_REDERIVED for x in v["problems"])
+            and provenance["provenance_only"] and provenance["proposal_digest_unchanged"]
+            and _paths(acceptance["verification"]["identities"], json.loads(json.dumps(v["identities"])))
+            in ([], ["proposal_record_current"]),
+        "c2_p5_proposal_provenance": provenance,
+        "c2_p5_checks_as_observed": {"p10_contracts.check": aid.check(), "p5_acceptance.check": pa.check()},
+        "c2_p5_acceptance_verification_differences": {
+            k: _paths(acceptance["verification"][k], json.loads(json.dumps(v[k])))
+            for k in ("identities", "semantic_change", "rulings", "admission", "cycle1_drift")},
         "plan_hash": v["identities"]["plan_hash"], "plan_ok": v["identities"]["plan_ok"] and v["identities"]["plan_hash"] == PLAN_HASH,
         "catalog": digests, "catalog_matches_the_brief": sorted(d[:8] for d in digests.values()) == sorted(BRIEFED_DIGEST_PREFIXES),
         "cycle1_drift_ok": v["cycle1_drift"]["ok"],
@@ -367,7 +405,7 @@ def verdict_problems(rec: dict) -> list[str]:
               "cycle1_frozen_probe_sources_identical", "probe_sources_identical_to_6311254"):
         if e[k] is not True:
             out.append(f"(e) {k} is not true")
-    if e["contracts"] != 59 or e["semantic_change"] != "NONE" or e["verify_problems"]:
+    if e["contracts"] != 59 or e["semantic_change"] != "NONE" or not e["verify_problems_are_provenance_only"]:
         out.append(f"(e) {e['contracts']} contracts, semantic change {e['semantic_change']}, {e['verify_problems']}")
     f = rec["mutation"]
     if f["problems"] or f["p6_problems"] or f["every_record"] or f["totals"]["survivors"]:
