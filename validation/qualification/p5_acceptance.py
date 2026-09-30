@@ -248,6 +248,41 @@ def ruling_bindings(cs: dict) -> dict:
 
 # ------------------------------------------------------------------------------------------- verification
 
+#: The one field of the proposal record that names where it was authored rather than what it says: the kernel tree.
+#: The owner authorized a kernel change after the acceptance (ruling 2026-09-30 B, C2-ORCHESTRATION-CONFORMANCE-REPAIR)
+#: and, asked about this field (2026-10-01), chose the narrow provenance rule below.
+PROVENANCE_PATH = "identities.aisef2_tree"
+
+
+def _paths(a, b, at: str = "") -> list[str]:
+    """The dotted paths where two JSON values differ."""
+    if isinstance(a, dict) and isinstance(b, dict):
+        return [p for k in sorted(set(a) | set(b)) for p in _paths(a.get(k), b.get(k), f"{at}.{k}" if at else k)]
+    if isinstance(a, list) and isinstance(b, list) and len(a) == len(b):
+        return [p for i, (x, y) in enumerate(zip(a, b, strict=True)) for p in _paths(x, y, f"{at}[{i}]")]
+    return [] if a == b else [at]
+
+
+def proposal_currency(recomputed: dict, committed: dict, accepted_kernel: str, head_kernel: str) -> dict:
+    """Is the committed proposal what the authoring aid derives from this tree? Fail closed: current when the two are
+    equal, or when they differ ONLY in the authoring-kernel provenance and the committed value is exactly the accepted
+    candidate's kernel while the derived one is this tree's — every semantic field (specs, contracts, semantic hashes,
+    plan, compiler, admission engine, catalog, requirements, digest) still re-derives identically."""
+    diff = _paths(recomputed, committed)
+    tree = lambda d: (d.get("identities") or {}).get("aisef2_tree")   # noqa: E731
+    provenance_only = diff == [PROVENANCE_PATH] and tree(committed) == accepted_kernel and tree(recomputed) == head_kernel
+    return {"differing_paths": diff, "committed_kernel": tree(committed), "derived_kernel": tree(recomputed),
+            "accepted_kernel": accepted_kernel, "provenance_only": provenance_only, "current": not diff or provenance_only,
+            "rule": "the proposal names the kernel it was authored on; a later authorized kernel changes that field only — "
+                    "tolerated when it is the one differing path and the committed value is the accepted candidate's kernel"}
+
+
+def current_proposal_currency() -> dict:
+    """`proposal_currency` of the committed proposal against the authoring aid on this tree."""
+    return proposal_currency(_aid().record(), json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8")),
+                             _git("rev-parse", f"{ACCEPTED['candidate']}:aisef2"), _git("rev-parse", "HEAD:aisef2"))
+
+
 def verify(run_guards: bool) -> dict:
     """Everything the acceptance binds, re-derived on this tree; `run_guards` also runs the five guard commands."""
     from aisef2.plan import static_admission as sa
@@ -294,7 +329,8 @@ def verify(run_guards: bool) -> dict:
     digest_ok = recomputed["proposal_digest"] == ACCEPTED["proposal_digest"] == prop["proposal_digest"]
     if not digest_ok:
         problems.append("the proposal digest differs")
-    record_current = recomputed == prop
+    currency = proposal_currency(recomputed, prop, _git("rev-parse", f"{ACCEPTED['candidate']}:aisef2"), _git("rev-parse", "HEAD:aisef2"))
+    record_current = currency["current"]
     if not record_current:
         problems.append(f"{PROPOSAL_REL} is not what the authoring aid derives from this tree")
     if now_blob is not None and now_blob != accepted_blob:
@@ -380,6 +416,7 @@ def verify(run_guards: bool) -> dict:
                       "plan_structure": "the authoring aid's obligations (p10_contracts.build); its in-memory synthetic compilation "
                                         "never reaches this admission, which receives exactly the persisted approvals"},
         "cycle1_drift": drift,
+        "proposal_kernel_provenance": currency,
         "approvals_file": {**_file(APPROVALS_REL), "committed_versions": committed_versions_identical(APPROVALS_REL)},
         "problems": problems,
     }

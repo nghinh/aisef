@@ -53,5 +53,46 @@ class Acceptance(unittest.TestCase):
         self.assertEqual(doc["verification"]["semantic_change"], "NONE")
 
 
+
+class KernelProvenance(unittest.TestCase):
+    """The proposal names the kernel it was authored on; only that field may differ after an authorized kernel change,
+    and only when the committed value is the accepted candidate's kernel (owner, 2026-10-01)."""
+    ACCEPTED_K, HEAD_K = "a" * 40, "b" * 40
+
+    def _rec(self, tree, **identities):
+        return {"proposal_digest": "d", "plan": {"plan_hash": "p"}, "identities": {"aisef2_tree": tree, "compiler": {"digest": "c"},
+                                                                                     **identities}}
+
+    def test_identical_records_are_current(self):
+        r = A.proposal_currency(self._rec(self.ACCEPTED_K), self._rec(self.ACCEPTED_K), self.ACCEPTED_K, self.ACCEPTED_K)
+        self.assertEqual((r["current"], r["differing_paths"]), (True, []))
+
+    def test_only_the_provenance_differs_from_the_accepted_kernel_is_current(self):
+        r = A.proposal_currency(self._rec(self.HEAD_K), self._rec(self.ACCEPTED_K), self.ACCEPTED_K, self.HEAD_K)
+        self.assertEqual((r["current"], r["provenance_only"], r["differing_paths"]), (True, True, [A.PROVENANCE_PATH]))
+
+    def test_a_committed_kernel_that_is_not_the_accepted_one_is_refused(self):
+        r = A.proposal_currency(self._rec(self.HEAD_K), self._rec("c" * 40), self.ACCEPTED_K, self.HEAD_K)
+        self.assertFalse(r["current"])
+
+    def test_a_derived_kernel_that_is_not_this_tree_is_refused(self):
+        r = A.proposal_currency(self._rec("c" * 40), self._rec(self.ACCEPTED_K), self.ACCEPTED_K, self.HEAD_K)
+        self.assertFalse(r["current"])
+
+    def test_any_semantic_difference_is_refused_with_or_without_the_provenance(self):
+        for derived in (self._rec(self.HEAD_K, compiler={"digest": "x"}), self._rec(self.ACCEPTED_K, compiler={"digest": "x"})):
+            r = A.proposal_currency(derived, self._rec(self.ACCEPTED_K), self.ACCEPTED_K, self.HEAD_K)
+            self.assertFalse(r["current"])
+            self.assertIn("identities.compiler.digest", r["differing_paths"])
+        bad = self._rec(self.HEAD_K)
+        bad["proposal_digest"] = "e"
+        self.assertFalse(A.proposal_currency(bad, self._rec(self.ACCEPTED_K), self.ACCEPTED_K, self.HEAD_K)["current"])
+
+    def test_on_this_tree_the_committed_proposal_is_current(self):
+        r = A.current_proposal_currency()
+        self.assertTrue(r["current"], r)
+        self.assertIn(r["differing_paths"], ([], [A.PROVENANCE_PATH]))
+
+
 if __name__ == "__main__":
     unittest.main()

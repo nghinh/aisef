@@ -135,7 +135,12 @@ class Coverage(unittest.TestCase):
 
 class Record(unittest.TestCase):
     def test_P5_8_committed_record_is_current(self):
-        self.assertEqual(A.check(), [])
+        # current up to the authoring-kernel provenance, the one field an authorized later kernel changes (owner, 2026-10-01)
+        from validation.qualification import p5_acceptance as PA
+        found = A.check()
+        if PA.current_proposal_currency()["provenance_only"]:
+            found = [p for p in found if p != f"{A.OUT_REL} is not what the authoring aid derives from this tree"]
+        self.assertEqual(found, [])
         rec = json.loads((ROOT / A.OUT_REL).read_text(encoding="utf-8"))
         self.assertEqual(rec["approvals"]["given"], [])
         self.assertFalse(any(m["approved"] for m in rec["decision_3_mappings"]))
