@@ -1,0 +1,3180 @@
+{
+ "record": "AISEF V2 — C2-P5 WP-2.5.2 SPEC FALSIFIABILITY (PLAN-V2.2 proposal specs over the LedgerLock reference)",
+ "work_package": "WP-2.5.2",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P0 ACCEPTED / AUTHORIZE MAXIMUM SAFE PARALLEL EXECUTION' (2026-09-29): C2-P5 WP-2.5.2 after WP-2.5.1",
+ "status": "MEASUREMENT of a proposal that is NOT approved and NOT applied",
+ "identities": {
+  "head": "bd787ca6acbbb880e9b2fa9355f5e5d0c8c530e5",
+  "aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+  "proposal": {
+   "path": "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json",
+   "sha256": "13283389e04c220342aba95add2cc8935af407ee406ef6a251f6278117a7d23d"
+  },
+  "proposal_digest": "25e14f3e727afec37cffcd9e2b8e78f834ddf823fddcb3fe12453cf6bfad5c6e",
+  "plan_hash": "05a19215baac3af2f7b60fdebe1b1b4a1ab1b63b67d0089df241a9769bdcedd4",
+  "authoring_aid": {
+   "path": "validation/qualification/p10_contracts.py",
+   "sha256": "d3c655d4c80072825cc001989b246e2c2952ebc77dad2c87df9a2eeac34b6a65"
+  },
+  "runner": {
+   "path": "validation/qualification/p5_falsifiability.py",
+   "sha256": "0ce33d3b9757e8299d4a66a20572f928090595379533aba91799b538866a63ab"
+  },
+  "fixture": {
+   "path": "tests/v2/fixtures/workloads/ledgerlock-reference",
+   "record": {
+    "path": "closure-evidence/v2/cycle2/P0-REFERENCE-FIXTURE.json",
+    "sha256": "fb4f75e63a3ed97684983dd37b9636dd8e9a0e1936bedfad7be640ecde8f1aa4"
+   },
+   "mutants_catalog": {
+    "path": "tests/v2/fixtures/workloads/ledgerlock-reference/MUTANTS.json",
+    "sha256": "fa1f3dbd32242ccce5195e6a12647425148b0121ee0ae69b52a0f62c1d0b335f"
+   },
+   "requirements_map": {
+    "path": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS-MAP.json",
+    "sha256": "a1a56ca50d946f4ee03c8ffdd7f7e9afcc903cd4a91f7f26988e5cf4a9dfcd23"
+   }
+  },
+  "trees": {
+   "reference": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+   },
+   "M-3.1-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "bcbfea65139375215c82898e0681f6955f5bed5dc17c4fee34f576efe5f7e965"
+   },
+   "M-3.2-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "9cfecface0647390f507d154c36192bcab7980b5108eceb1c50e6f386517bcd6"
+   },
+   "M-3.2-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0df95b31fc42fefd08e51ec690cabbd6265f176429bba735563ae48bdd876b26"
+   },
+   "M-3.3-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "db1fcb87cc2d2d27b08ea046f88e09109c9dfba245da03a9a00541588c0ef3be"
+   },
+   "M-3.3-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0b949dec541d272f1f7819bb8e4b26445cd910d8099d60c00a66a8fe1914dfd8"
+   },
+   "M-3.3-3": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "00d2ce61c41d86a807047080f91c397ae262d52f90b4f992008d202ac4c58d62"
+   },
+   "M-3.4-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "978ca1c594b2758b18a8baa4b09ff8ee0391cd5d23dd60d9ece7c2182b094aa8"
+   },
+   "M-4.1-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "6e5411b61d67f2dafc0781ce455d7a325a27d6f75adb279e29da9246f2c20499"
+   },
+   "M-4.2-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "7eaf325c85772b8fec74ef5748c91337f755ed0b91feb08bf367d13fc4a7bfce"
+   },
+   "M-4.3-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "a73f3086ff537dbbb2ea1b119ad31ce163f85e980eaf47f05259b18a4a29f494"
+   },
+   "M-4.4-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0320d01741f55ce869e515c2a6d778c6f5c4b22e5d02d8f2736de16831578835"
+   },
+   "M-4.5-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "aee539eb99fb4e30733b957ef8c9e8c017fed284b6804b66045c88591f98d054"
+   },
+   "M-5-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "f66e4597ae1c21a060be146402aa6755575a736d005927cae27ef8ddd2ed870d"
+   },
+   "M-5-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "83c08f81e640fdc9121dd4e85fb81f79e8ba4e226c438f61e1b5aacce4a1abd8"
+   },
+   "M-6-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "b4f396578cb26fea4466abdc32babd982bb792eeeb0380a268db4d1d607d5e6a"
+   },
+   "M-6-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "f01fd92d691c242b078734836664284e7e0504fd9ea805449766f3ab1b43c914"
+   },
+   "M-7-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "7f6c4698467aa673964081d20a2d760415e88651ca809fcbf3c7ba71cf43f03f"
+   },
+   "M-7-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "ee2bc929d9a17c1970e21301486549ce900787d6c2967aefe40bcbc7c983a7d3"
+   },
+   "M-7-3": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "f0eb09eda0fb1f53468e50204859c3fc7bc769d8c2b4656bd77f744224fcf7e3"
+   },
+   "M-8-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "493e68848fa64f93faf5cf737d18bf670362e1674433e87af2fdfed33c57b6ea"
+   },
+   "M-9-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "f8efd13f5f68c84d1f9384c81f760e2edcc8c87f98a75c2a1b835a537f280054",
+    "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+   },
+   "M-9-2": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "2b82420215212854a8fb9284b49c7ba00d8b47a9bd14405a89c0cd68ccb132e5",
+    "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+   },
+   "M-9-3": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "fe5f9f624166e86971429af7dffdcde61045e067eda0076cedb4c047b878b42a",
+    "ledgerlock/ledger.py": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16"
+   },
+   "M-10-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0c2094df2d1027dc38c56f2056645427953928d173c7ad6c135ed5f57514ca77"
+   },
+   "M-12-1": {
+    "ledgerlock/__init__.py": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "0f22b9b388be18b10d772d8836a6388da1dfe2cefe0d6b664801f0af4c6b13be"
+   },
+   "M-13-1": {
+    "ledgerlock/__init__.py": "40f1caf69ee27f65b98b913e97f549f6735b1c41b8b51c3b03e611e46b5cf645",
+    "ledgerlock/__main__.py": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+    "ledgerlock/cli.py": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+    "ledgerlock/ledger.py": "fe9c2e136802a064478985d6460b838bd6933686ea30baee667df06b5c0e5a65"
+   }
+  }
+ },
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin"
+ },
+ "mechanism": "controlled_product_mutation",
+ "fr_sections": {
+  "FR-1": [
+   "R-3.1"
+  ],
+  "FR-2": [
+   "R-3.2"
+  ],
+  "FR-3": [
+   "R-4.1",
+   "R-4.2"
+  ],
+  "FR-4": [
+   "R-4.3",
+   "R-4.5"
+  ],
+  "FR-5": [
+   "R-4.4"
+  ],
+  "FR-6": [
+   "R-3.3"
+  ],
+  "FR-7": [
+   "R-3.4"
+  ],
+  "FR-8": [
+   "R-5"
+  ],
+  "FR-9": [
+   "R-6"
+  ],
+  "FR-10": [
+   "R-7"
+  ],
+  "FR-11": [
+   "R-9"
+  ],
+  "FR-12": [
+   "R-9"
+  ],
+  "FR-13": [
+   "R-8"
+  ],
+  "FR-14": [
+   "R-10",
+   "R-12",
+   "R-13"
+  ]
+ },
+ "counts_by_status": {
+  "NOT_QUALIFIED": 9,
+  "NO_SPEC": 13,
+  "QUALIFIED": 7,
+  "REFERENCE_NOT_SATISFIED": 48
+ },
+ "summary": {
+  "specs": 64,
+  "reference_satisfied": 16,
+  "qualified": 7,
+  "reference_not_satisfied_by_cause": {
+   "SUBJECT_ABSENT": [
+    "AC-STORY-01-01-1",
+    "AC-STORY-01-01-2",
+    "AC-STORY-01-02-1",
+    "AC-STORY-01-02-2",
+    "AC-STORY-01-02-3",
+    "AC-STORY-01-02-5",
+    "AC-STORY-01-02-6",
+    "AC-STORY-01-03-1",
+    "AC-STORY-01-03-2",
+    "AC-STORY-01-03-3",
+    "AC-STORY-01-03-4",
+    "AC-STORY-01-03-5",
+    "AC-STORY-01-04-2",
+    "AC-STORY-01-04-3"
+   ],
+   "OBSERVED REFUTED": [
+    "AC-STORY-01-05-1",
+    "AC-STORY-01-05-2",
+    "AC-STORY-01-05-3",
+    "AC-STORY-01-05-4",
+    "AC-STORY-01-05-5",
+    "AC-STORY-01-06-1",
+    "AC-STORY-01-06-2",
+    "AC-STORY-01-06-3",
+    "AC-STORY-01-06-4",
+    "AC-STORY-01-06-5",
+    "AC-STORY-02-01-1",
+    "AC-STORY-02-01-2",
+    "AC-STORY-02-01-4",
+    "AC-STORY-02-01-5",
+    "AC-STORY-02-02-1",
+    "AC-STORY-02-02-2",
+    "AC-STORY-02-02-3",
+    "AC-STORY-02-02-4",
+    "AC-STORY-02-02-5",
+    "AC-STORY-03-01-3",
+    "AC-STORY-03-01-4",
+    "AC-STORY-03-02-3",
+    "AC-STORY-03-02-4",
+    "AC-STORY-04-01-1",
+    "AC-STORY-04-01-4",
+    "AC-STORY-04-01-6",
+    "AC-STORY-04-02-2",
+    "AC-STORY-04-02-3",
+    "AC-STORY-04-03-1",
+    "AC-STORY-04-03-2",
+    "AC-STORY-04-03-3",
+    "AC-STORY-04-03-4",
+    "AC-STORY-05-01-1",
+    "AC-STORY-05-01-2"
+   ]
+  },
+  "unrefuted_designed_mutants": {
+   "AC-STORY-01-01-3": [
+    "M-10-1",
+    "M-12-1",
+    "M-13-1"
+   ],
+   "AC-STORY-01-01-6": [
+    "M-10-1",
+    "M-12-1",
+    "M-13-1"
+   ],
+   "AC-STORY-01-01-7": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "AC-STORY-02-01-3": [
+    "M-3.3-1",
+    "M-3.3-2",
+    "M-3.3-3"
+   ],
+   "AC-STORY-03-01-1": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "AC-STORY-03-01-2": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "AC-STORY-03-01-5": [
+    "M-8-1"
+   ],
+   "AC-STORY-03-02-1": [
+    "M-7-1",
+    "M-7-2"
+   ],
+   "AC-STORY-03-02-2": [
+    "M-7-2",
+    "M-7-3"
+   ],
+   "AC-STORY-04-01-2": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "AC-STORY-04-01-3": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "AC-STORY-04-01-5": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "AC-STORY-04-01-7": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "AC-STORY-04-02-1": [
+    "M-9-1",
+    "M-9-3"
+   ],
+   "AC-STORY-04-02-4": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "AC-STORY-04-03-5": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ]
+  },
+  "mutants_refuted_by_no_spec": [
+   "M-10-1",
+   "M-12-1",
+   "M-13-1",
+   "M-3.1-1",
+   "M-3.2-2",
+   "M-3.3-2",
+   "M-3.3-3",
+   "M-3.4-1",
+   "M-4.1-1",
+   "M-4.3-1",
+   "M-4.4-1",
+   "M-4.5-1",
+   "M-5-1",
+   "M-5-2",
+   "M-6-1",
+   "M-6-2",
+   "M-7-2",
+   "M-8-1",
+   "M-9-1",
+   "M-9-3"
+  ]
+ },
+ "specs": [
+  {
+   "ac_id": "AC-STORY-01-01-1",
+   "requirement": "FR-1",
+   "sections": [
+    "R-3.1"
+   ],
+   "spec_id": "PPS-8f50f35c2533660ae3a18f90a96a557525ec5c67335391b24fdf0d355a129f38",
+   "semantic_hash": "403124573240243af82c0a6ef50146e740140a5b2cc5b123318d0dc14a218b32",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.1-1"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.1-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-2",
+   "requirement": "FR-1",
+   "sections": [
+    "R-3.1"
+   ],
+   "spec_id": "PPS-3e772bf6b1446029e1e32e98e4511ac3f5b79e5e96ebe18d9a9b91fcc73c53c9",
+   "semantic_hash": "37dce55066fc07778cc242ba890b914378ec83ffae29f196ed2dffe7a8a22e17",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.1-1"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.1-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-3",
+   "requirement": "FR-14",
+   "sections": [
+    "R-10",
+    "R-12",
+    "R-13"
+   ],
+   "spec_id": "PPS-f8e163225998d2f3e05e43798e850bd5e93f1dad8f59e25a5f33c87be2caf658",
+   "semantic_hash": "3d93b0b021ab7d9dedf73be493f2e8a4dce83d24009a4f1abeb25ce04d4773a4",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "exists",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-10-1",
+    "M-12-1",
+    "M-13-1"
+   ],
+   "reference": "SATISFIED",
+   "status": "NOT_QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-10-1",
+    "M-12-1",
+    "M-13-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-01-01-4",
+   "requirement": "FR-14",
+   "status": "NO_SPEC",
+   "v22_status": "UNSUPPORTED_UNDER_POLARITY",
+   "reason": "the seam gives this prohibition polarity MUST_NOT_HOLD (the P6 migration table's row for its V1 mode), so its observable must state the FORBIDDEN behaviour — at least one line of the package matches the pattern; file_artifact's grep_count observes an exact count only, and MUST_NOT_HOLD of 'exactly 0 lines match' would demand matches from a correct product (C2-P5-FINDING-001: measured on the reference, which has none — observed SATISFIED under the expectation REFUTED)"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-5",
+   "requirement": "FR-14",
+   "status": "NO_SPEC",
+   "v22_status": "UNSUPPORTED_UNDER_POLARITY",
+   "reason": "the seam gives this prohibition polarity MUST_NOT_HOLD (the P6 migration table's row for its V1 mode), so its observable must state the FORBIDDEN behaviour — at least one line of the package matches the pattern; file_artifact's grep_count observes an exact count only, and MUST_NOT_HOLD of 'exactly 0 lines match' would demand matches from a correct product (C2-P5-FINDING-001: measured on the reference, which has none — observed SATISFIED under the expectation REFUTED)"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-6",
+   "requirement": "FR-14",
+   "sections": [
+    "R-10",
+    "R-12",
+    "R-13"
+   ],
+   "spec_id": "PPS-645ab60344d49b0ea1d01702c5dc9ca9f1a0b8b97bcd6afba7f312b807f0eeab",
+   "semantic_hash": "3e8360257e230bf4a7f062c85aea15e81691f8b647115a355e8c6594a75b78a3",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "exists",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-10-1",
+    "M-12-1",
+    "M-13-1"
+   ],
+   "reference": "SATISFIED",
+   "status": "NOT_QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-10-1",
+    "M-12-1",
+    "M-13-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-01-01-7",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-7c92225d874067b2a4cc109c8760534101e519128904172c7b6518a55abb6c5d",
+   "semantic_hash": "5d3fb239f4289016a33585c6ae107a466e80e37280af1081e62dd8b2f58816fc",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "NOT_QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-01-02-1",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-33a3f1ad6a2c671c5a4ca04be239dd8c9024d45664df50c39ce2ed0e084c2a70",
+   "semantic_hash": "6c22757d7082df8dfaf7970db7cfa97070854532f34cae740a240d5540899f82",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns_bytes",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-2",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-a8bd2192ed783b2bfeaddd4fc7aab42972f719a11a497fd362012dc0a682baeb",
+   "semantic_hash": "6c22757d7082df8dfaf7970db7cfa97070854532f34cae740a240d5540899f82",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns_bytes",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-3",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-e663130a5fb18d3c4713183c2362e434983fb9df7ad9c5c26e9922d492bd89e1",
+   "semantic_hash": "15e9b71575ee1f53d843393437182676e58116e09c9c582e717774da74e19cf8",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns_bytes",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-4",
+   "requirement": "FR-2",
+   "status": "NO_SPEC",
+   "v22_status": "UNSUPPORTED_STIMULUS",
+   "reason": "the witness is two dicts differing only in key insertion order; the contract layer canonicalises every mapping of a stimulus (aisef2.product.contract.freeze sorts keys), so no contract can deliver a dict in a non-sorted insertion order to the subject"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-5",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-006b69e67d7e41dd166ca39c3b23f57663198fcee1c86ab15a7c57876c851f67",
+   "semantic_hash": "c2305e8f93ce8622a641c5df7c46bdfa07444c06bf0355b10278c0b9e665c87b",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "equals",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-6",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-2708eaf84efb46f53c12f866425a07ff9e03f587620b0c9f3593384ee07f560f",
+   "semantic_hash": "9cfa32265c4d42b86d768fee806e913ddcc57ff5e9d25c175305f9e3121ba918",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns_bytes",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-1",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-ea170bd772839354e74af1e128922a25e78b83b1f4e9d6ffabef1ec0ba6d712e",
+   "semantic_hash": "4f5f5a766bfd2bcc0880a49594b9518f6e530d88c3c9f4cee8ae4cfaf0a7e0aa",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-2",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-0ef1ba795da2d7f6f180a9ab9ada75dee3a33a42e8a909a8319666bd8d9db1bf",
+   "semantic_hash": "e41229c81a8f5187a93876ea6d74d10040eca8b0e81a55e0e635908fb606cb8b",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-3",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-99e700294e2eaa41c39fb64fc2330f3b0e72a448a53d4e210bf49e56175ea5f1",
+   "semantic_hash": "9acda528a3e5633041e0131fe67f7759c72ccbf2d6447db9235591735311959e",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-4",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-c561cf1b761e943b9be0fa72943d92fe045ca5bed3c20f0c3984b3575f52810d",
+   "semantic_hash": "4f5f5a766bfd2bcc0880a49594b9518f6e530d88c3c9f4cee8ae4cfaf0a7e0aa",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-5",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-9ca46f6d4b63d7ad14719e1177c1db1994e9baee75be9407d81c8d0c121d9f09",
+   "semantic_hash": "08c536a5102e4e6a2c7d8672ec335acda4af37983d0c576a178f855ccceaa18e",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-1",
+   "requirement": "FR-13",
+   "status": "NO_SPEC",
+   "v22_status": "UNSUPPORTED_OBSERVABLE",
+   "reason": "read_lines returns a list of bytes: python_callable_v2 compares one bytes value (returns_bytes) and process_effect one bytes value (returns_bytes_hex); a list of bytes is unserializable to both, so no class can compare it"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-2",
+   "requirement": "FR-13",
+   "sections": [
+    "R-8"
+   ],
+   "spec_id": "PPS-74328fc3b5a73fcf53b0db5309f7d331bc043a860facf0a684f4e3bca6909af6",
+   "semantic_hash": "a9b7937c90b4ee30a2959a9c36c806bb18ea3b58eac77cfa4b066d7d1b7e1aec",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "raises",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-8-1"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-8-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-3",
+   "requirement": "FR-13",
+   "sections": [
+    "R-8"
+   ],
+   "spec_id": "PPS-19ac0a2faf85c76db654d07613299445e095787fea748d440511f1cbcaf5e2d6",
+   "semantic_hash": "5c2eca7ebabafb4076ad5fc6b007e4abc95d140d471c3b330a127dbd0a7749ee",
+   "probe_id": "probe.python_callable_v2",
+   "observation_class": "returns",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-8-1"
+   ],
+   "reference": "INDETERMINATE (PRECONDITION_ABSENT)",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "SUBJECT_ABSENT",
+    "verdict": "REFUTED",
+    "detail": ""
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-8-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-4",
+   "requirement": "FR-13",
+   "status": "NO_SPEC",
+   "v22_status": "UNSUPPORTED_STIMULUS",
+   "reason": "the call takes bytes arguments (a list of lines as bytes); a contract's stimulus is JSON-shaped data and no probe stimulus converts a value to bytes (workspace files are the only byte-exact input)"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-5",
+   "requirement": "FR-13",
+   "status": "NO_SPEC",
+   "v22_status": "UNSUPPORTED_STIMULUS",
+   "reason": "the call takes bytes arguments (a list of lines as bytes); a contract's stimulus is JSON-shaped data and no probe stimulus converts a value to bytes (workspace files are the only byte-exact input)"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-6",
+   "requirement": "FR-13",
+   "status": "NO_SPEC",
+   "v22_status": "UNSUPPORTED_OBSERVABLE",
+   "reason": "where the subject creates a temporary file under a name it chooses is observed by no class (file shapes name files; no step traces the subject's own file creation)"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-1",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-eb25cecc0122bde7d968963f2483105c525608cb35cf990d7dd6864600893775",
+   "semantic_hash": "56554738e2d57d27d943d55421efc88a5dcf9b8a38537deda395ad35203bbf4d",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"absent\": true}}, \"files\": {\"l.jsonl\": {\"absent\": true}}, \"refuted\": {\"step\": 1, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-2",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-b303201fac93de882e164668f9d3146c014b40af9b6e220c27e218fc1858e3a1",
+   "semantic_hash": "a5de290f669388039e9275b375e150327981422db17d7f1316b17576ab142c4c",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"absent\": true}}, \"files\": {\"l.jsonl\": {\"absent\": true}}, \"refuted\": {\"step\": 1, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-3",
+   "requirement": "FR-1",
+   "sections": [
+    "R-3.1"
+   ],
+   "spec_id": "PPS-00c5800e1c9ed9b8d2f3ed4812fa654b0ee79b6aff6293de67bae366378646d2",
+   "semantic_hash": "92313cb9742d5bf00f32d31332a3a14bfd8618ea84179b3f4a74ed4376241b62",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.1-1"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"expect_raises\", \"outcome\": \"refuted:raised TypeError, not ValueError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"absent\": true}}, \"files\": {\"l.jsonl\": {\"absent\": true}}, \"refuted\": {\"step\": 1, \"kind\": \"expect_raises\", \"why\": \"raised TypeError, not ValueError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.1-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-4",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-f04b1a699644403f56cfd6b0fc2aacee1822458514ce0416d10f99e0f8cd5332",
+   "semantic_hash": "6fce6b9299c4e840410d8eb05124abb21b03541f69417d45180b572fd6758105",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"6cb9ac94c1b33988aab2ebfe19a3d988b19c0a9b3c45e8184c3f8fdef8aea542\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"6cb9ac94c1b33988aab2ebfe19a3d988b19c0a9b3c45e8184c3f8fdef8aea542\", \"size\": 146, \"line_count\": 1, \"final_byte_hex\": \"0a\", \"jsonl\": {\"1\": null}}}, \"refuted\": {\"step\": 2, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-5",
+   "requirement": "FR-13",
+   "sections": [
+    "R-8"
+   ],
+   "spec_id": "PPS-4be03b8b6b0de8ff67f77c78b9a708fdc0d3073a37eb816d7121f4688cae4edb",
+   "semantic_hash": "6374d47f252abfaed120546c5ecc1074326fc3f8493709b4dcec2d301721f26e",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-8-1"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"absent\": true}}, \"files\": {\"l.jsonl\": {\"absent\": true}}, \"refuted\": {\"step\": 1, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-8-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-1",
+   "requirement": "FR-3",
+   "sections": [
+    "R-4.1",
+    "R-4.2"
+   ],
+   "spec_id": "PPS-cf270491fa8ace44144097e9fcb6212207aca067edc3d9f2a932f3a1003597ec",
+   "semantic_hash": "e97a70bfcd3dd302e3d87c762263bf80e5f6e794e5152781379565cfd1581eda",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-4.1-1",
+    "M-4.2-1"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"c8611ae0bc51f1797619e9bcebef7fde408396d14fb7ff30d7da067570108260\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"c8611ae0bc51f1797619e9bcebef7fde408396d14fb7ff30d7da067570108260\", \"size\": 151, \"line_count\": 1, \"final_byte_hex\": \"0a\", \"jsonl\": {}}}, \"refuted\": {\"step\": 2, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-4.1-1",
+    "M-4.2-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-2",
+   "requirement": "FR-4",
+   "sections": [
+    "R-4.3",
+    "R-4.5"
+   ],
+   "spec_id": "PPS-529a3dc4f83841c023a273e4884d9abc207bad22aa54c092199c208874b19117",
+   "semantic_hash": "f17f39d93fcc20fdea1073c34e2ed4da18ad53862335f09d291315007c025359",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-4.3-1",
+    "M-4.5-1"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"expect_raises\", \"outcome\": \"refuted:raised TypeError, not ConflictError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"c8611ae0bc51f1797619e9bcebef7fde408396d14fb7ff30d7da067570108260\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"c8611ae0bc51f1797619e9bcebef7fde408396d14fb7ff30d7da067570108260\", \"size\": 151, \"line_count\": 1, \"final_byte_hex\": \"0a\", \"jsonl\": {}}}, \"refuted\": {\"step\": 2, \"kind\": \"expect_raises\", \"why\": \"raised TypeError, not ConflictError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-4.3-1",
+    "M-4.5-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-3",
+   "requirement": "FR-5",
+   "sections": [
+    "R-4.4"
+   ],
+   "spec_id": "PPS-eb19081ec723a8251ffbf833c6d353259329718c9d988db15111f6a2a757bb23",
+   "semantic_hash": "f4eb8255e5b71e1e1170fa376e1e056aebbaf9006f1cd11fc99c9e55a4153496",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_raises",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-4.4-1"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"expect_raises\", \"outcome\": \"refuted:raised TypeError, not ConflictError\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"refuted\": {\"step\": 2, \"kind\": \"expect_raises\", \"why\": \"raised TypeError, not ConflictError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-4.4-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-4",
+   "requirement": "FR-5",
+   "sections": [
+    "R-4.4"
+   ],
+   "spec_id": "PPS-aee2e3127bc0bdfb8f3e814f5c8e0aeb9fa193e129d53d46b779e0e95de5e058",
+   "semantic_hash": "c59d996a13590391ca96778b01332e5b53f3e260def357998a109daf06d89ecd",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-4.4-1"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"6e7d4975c3557351e0028bee100f73ee31b69cc2d2decb61b30118bc7472e0fe\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"6e7d4975c3557351e0028bee100f73ee31b69cc2d2decb61b30118bc7472e0fe\", \"size\": 141, \"line_count\": 1, \"final_byte_hex\": \"0a\", \"jsonl\": {}}}, \"refuted\": {\"step\": 2, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-4.4-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-5",
+   "requirement": "FR-3",
+   "sections": [
+    "R-4.1",
+    "R-4.2"
+   ],
+   "spec_id": "PPS-69eb4771584d3d7f221c70b17b442bd2cd4d8cad44cfc527efa74aed8f586081",
+   "semantic_hash": "64d2c98634950809228cae9a43ee09db423f7b133573c92047c83d9a4998b993",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-4.1-1",
+    "M-4.2-1"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"f39d2e608e864b174fb1fbed37518fb1ada73df637e4ca4323bcc656b92fe6ed\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"f39d2e608e864b174fb1fbed37518fb1ada73df637e4ca4323bcc656b92fe6ed\", \"size\": 152, \"line_count\": 1, \"final_byte_hex\": \"0a\", \"jsonl\": {}}}, \"refuted\": {\"step\": 2, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-4.1-1",
+    "M-4.2-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-1",
+   "requirement": "FR-6",
+   "sections": [
+    "R-3.3"
+   ],
+   "spec_id": "PPS-1a12ef2f6db15ab059ac3f20e1ba59d01a7788fdce693c77fdc3b0cbd9b12f59",
+   "semantic_hash": "f98c8301fefc286552179321d3809aa5afd28e5436f96afa70cf64e355142bd6",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.3-1",
+    "M-3.3-2",
+    "M-3.3-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"refuted\": {\"step\": 1, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.3-1",
+    "M-3.3-2",
+    "M-3.3-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-2",
+   "requirement": "FR-6",
+   "sections": [
+    "R-3.3"
+   ],
+   "spec_id": "PPS-435095b516c5268caaf0e1840ba62bf36b3e19472db9f07dd1b9084c6f027c36",
+   "semantic_hash": "7bf9fd51cb4f75eec9f42a0472fb751de312c641c3122c1b1fda13c79dcf4de0",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.3-1",
+    "M-3.3-2",
+    "M-3.3-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"call\", \"outcome\": \"ok\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"last_returned\": [true, null, 0]}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.3-1",
+    "M-3.3-2",
+    "M-3.3-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-3",
+   "requirement": "FR-6",
+   "sections": [
+    "R-3.3"
+   ],
+   "spec_id": "PPS-568eed1c1d53a05f400a400d5e391dcd60ca5c79fe13a712382b70bf9f865576",
+   "semantic_hash": "64fa842780207b94426865a9d7a7232c63f157e182ca0b01af4d315adeaad639",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_raises",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.3-1",
+    "M-3.3-2",
+    "M-3.3-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "NOT_QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.3-1",
+    "M-3.3-2",
+    "M-3.3-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-02-01-4",
+   "requirement": "FR-7",
+   "sections": [
+    "R-3.4"
+   ],
+   "spec_id": "PPS-51965eaa3e009bf99b5db16f1ec870dbf17c97de192f8e3131dec90928b7e83f",
+   "semantic_hash": "f214f2071cb5f1d76eaa003190190bc85d51bd9550af5e00fd992413744d843b",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.4-1"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"edit_jsonl\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 3, \"kind\": \"call\", \"outcome\": \"ok\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"last_returned\": [false, 1, 3]}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.4-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-5",
+   "requirement": "FR-7",
+   "sections": [
+    "R-3.4"
+   ],
+   "spec_id": "PPS-f20acea9186378476530ff5ec884dfe12433780929f25e056bddfc0422332ab4",
+   "semantic_hash": "686fcb5898b159257d7abb99e78c41d92619d62addf73b5ccbad76d6d6d0bf79",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.4-1"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"edit_jsonl\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 3, \"kind\": \"call\", \"outcome\": \"ok\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"last_returned\": [false, 1, 3]}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.4-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-1",
+   "requirement": "FR-9",
+   "sections": [
+    "R-6"
+   ],
+   "spec_id": "PPS-58bb72394ea94173b66d7d730f89ecd240a34bf770177630b3909276df0eb8f9",
+   "semantic_hash": "41cd29c53283ec44e665989ba3c18c999bcbde4d923d60ecd85a8f426541b0a2",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"refuted\": {\"step\": 1, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-2",
+   "requirement": "FR-9",
+   "sections": [
+    "R-6"
+   ],
+   "spec_id": "PPS-a8e74ba3f6d127f3add96ca8114a11d7fdf8a4d5c37aa4073a75cdd1ad848bf6",
+   "semantic_hash": "a5ad2f5a7df1abc590510843941a28ff267f8d701ce12b3ea130e9ce37d83ecc",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"refuted\": {\"step\": 1, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-3",
+   "requirement": "FR-9",
+   "sections": [
+    "R-6"
+   ],
+   "spec_id": "PPS-e3876874d063afb4d20ae8c2c066e69408b0fd6171a7838ed70ebce292a8cb9d",
+   "semantic_hash": "2397254de4049fb49c4a15a17d031d94992249a1a9be204d0ff9f620d043dd8b",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"refuted\": {\"step\": 1, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-4",
+   "requirement": "FR-9",
+   "sections": [
+    "R-6"
+   ],
+   "spec_id": "PPS-5faba66b0b01d747e1e0fa8c08d710caf8a0fb30c0e4b64aaddbcb71e185efb8",
+   "semantic_hash": "1eaed33a62a6d62db559f62adb05610c65fe8d7bd06c6ec2668e0a725c255303",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"refuted\": {\"step\": 1, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-5",
+   "requirement": "FR-9",
+   "sections": [
+    "R-6"
+   ],
+   "spec_id": "PPS-c1e77abfebcc7aca5a9fef26672ab7cb9526c2ed5049a40cd13b150ea380e874",
+   "semantic_hash": "4cb177de6cebd4e9cb1d255d14b085405cabccc5cc7d866d792968ccd1a6361b",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"call\", \"outcome\": \"ok\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"last_returned_bytes_hex\": \"7b2261223a312c2262223a322c2263223a337d0a\"}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-6-1",
+    "M-6-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-1",
+   "requirement": "FR-8",
+   "sections": [
+    "R-5"
+   ],
+   "spec_id": "PPS-9a8b51d1552e36d967e4d0de78609142765f957f6a3d70ba46263af5991211c3",
+   "semantic_hash": "6d68d7b0aa04def91a0cd6f3d5e224bf59e0284e4b8f0e458dddee474222e16c",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "reference": "SATISFIED",
+   "status": "QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "REFUTED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [
+    "M-3.2-1"
+   ],
+   "unrefuted_designed": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "refuted_beyond_design": [
+    "M-3.2-1"
+   ],
+   "evidence": [
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.2-1",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    }
+   ],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-03-01-2",
+   "requirement": "FR-8",
+   "sections": [
+    "R-5"
+   ],
+   "spec_id": "PPS-e7a44e9e0a4a1b2d21e6e8cc90d6b807cb72e69c638f2491d6b0e39d9b4fa389",
+   "semantic_hash": "9f545eb232cebec180213550bc16fcded6c6ef00b24540f389bacd6b008d89c6",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "reference": "SATISFIED",
+   "status": "QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "REFUTED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [
+    "M-4.2-1"
+   ],
+   "unrefuted_designed": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "refuted_beyond_design": [
+    "M-4.2-1"
+   ],
+   "evidence": [
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-4.2-1",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    }
+   ],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-03-01-3",
+   "requirement": "FR-8",
+   "sections": [
+    "R-5"
+   ],
+   "spec_id": "PPS-f8d5d2922e47da1b027783f4cb452cb5d5f680e590ae6cb281532ee33e65d841",
+   "semantic_hash": "a31336988707d016f0d0580adc5b1e48a9b72bc9172d2d831d6920938972d32f",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"expect_raises\", \"outcome\": \"refuted:ConflictError has no attribute batch_index\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\", \"size\": 0, \"line_count\": 0, \"final_byte_hex\": null, \"jsonl\": {}}}, \"refuted\": {\"step\": 2, \"kind\": \"expect_raises\", \"why\": \"ConflictError has no attribute batch_index\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-4",
+   "requirement": "FR-8",
+   "sections": [
+    "R-5"
+   ],
+   "spec_id": "PPS-d9d29302c68bd2d8d0a170632a7988bf94fd153b94cb5c8e74254acc70862807",
+   "semantic_hash": "5419280dfc4feaff2b993d332ad55372c851bfd3e62c8de1fe525585a9c3e2a9",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"expect_raises\", \"outcome\": \"refuted:ConflictError has no attribute batch_index\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"c8611ae0bc51f1797619e9bcebef7fde408396d14fb7ff30d7da067570108260\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"c8611ae0bc51f1797619e9bcebef7fde408396d14fb7ff30d7da067570108260\", \"size\": 151, \"line_count\": 1, \"final_byte_hex\": \"0a\", \"jsonl\": {}}}, \"refuted\": {\"step\": 2, \"kind\": \"expect_raises\", \"why\": \"ConflictError has no attribute batch_index\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-5",
+   "requirement": "FR-13",
+   "sections": [
+    "R-8"
+   ],
+   "spec_id": "PPS-8aecc94ce50844b2871da2fbbe2c93c83a37e565b8566d594b3b64c07f1d0442",
+   "semantic_hash": "1f6c391e0f51548c6280ebd506deee786009052be6609653a14c9ae091904c06",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-8-1"
+   ],
+   "reference": "SATISFIED",
+   "status": "NOT_QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-8-1"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-03-02-1",
+   "requirement": "FR-10",
+   "sections": [
+    "R-7"
+   ],
+   "spec_id": "PPS-3027fd71cd792199605a05e56d221c6a1865ab71c1acc550c072fcaee37e5be2",
+   "semantic_hash": "5b49c2d8036e2f3770d0871769d7c164e737209a3da9562fbe03a9257ae02f36",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-7-1",
+    "M-7-2",
+    "M-7-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "REFUTED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "REFUTED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [
+    "M-3.2-1",
+    "M-7-3"
+   ],
+   "unrefuted_designed": [
+    "M-7-1",
+    "M-7-2"
+   ],
+   "refuted_beyond_design": [
+    "M-3.2-1"
+   ],
+   "evidence": [
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.2-1",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    },
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-7-3",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    }
+   ],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-03-02-2",
+   "requirement": "FR-10",
+   "sections": [
+    "R-7"
+   ],
+   "spec_id": "PPS-5cef155bd9acdbb232e1fa8ea73d9434bb197e5732e7fb21ea800d7fbaabbebf",
+   "semantic_hash": "383d031a1c1e319687f9f62b9a335832cf5e4999cdbae5cbe5ef10c9f2333ac8",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-7-1",
+    "M-7-2",
+    "M-7-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "REFUTED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "REFUTED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [
+    "M-3.2-1",
+    "M-7-1"
+   ],
+   "unrefuted_designed": [
+    "M-7-2",
+    "M-7-3"
+   ],
+   "refuted_beyond_design": [
+    "M-3.2-1"
+   ],
+   "evidence": [
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.2-1",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    },
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-7-1",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    }
+   ],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-03-02-3",
+   "requirement": "FR-10",
+   "sections": [
+    "R-7"
+   ],
+   "spec_id": "PPS-c5976c81afdb3daf3a4ce0778f614460ecb17d69ac8f9ca55f42781230f324ac",
+   "semantic_hash": "77a493281b8eab57ba78d7d8d69151abaea407cd294ee6d8a040da4378cb46a1",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-7-1",
+    "M-7-2",
+    "M-7-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"call\", \"outcome\": \"refuted:raised CorruptionError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"b814f74cf5fd3b2c99541ea9961f691dd73bf7bba65bc0cca6d45b29991e7cf2\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"b814f74cf5fd3b2c99541ea9961f691dd73bf7bba65bc0cca6d45b29991e7cf2\", \"size\": 574, \"line_count\": 4, \"final_byte_hex\": \"22\", \"jsonl\": {}}}, \"refuted\": {\"step\": 2, \"kind\": \"call\", \"why\": \"raised CorruptionError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-7-1",
+    "M-7-2",
+    "M-7-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-4",
+   "requirement": "FR-10",
+   "sections": [
+    "R-7"
+   ],
+   "spec_id": "PPS-824fa410c1e0e63bd1c39b89cc132bb2d9625345a47556d631e2557d35d4827e",
+   "semantic_hash": "0e753608f80d96f5dda3c3b60871fc745d4869f4eef8d134355a64b9825fd529",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-7-1",
+    "M-7-2",
+    "M-7-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"call\", \"outcome\": \"refuted:raised CorruptionError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"edd29320839794ad01f1c6992211256fb17f4c4d5e5fdc8353c4ff458e553e70\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"edd29320839794ad01f1c6992211256fb17f4c4d5e5fdc8353c4ff458e553e70\", \"size\": 552, \"line_count\": 3, \"final_byte_hex\": \"0a\", \"jsonl\": {}}}, \"refuted\": {\"step\": 2, \"kind\": \"call\", \"why\": \"raised CorruptionError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-7-1",
+    "M-7-2",
+    "M-7-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-1",
+   "requirement": "FR-11",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-655f2c5ccd12d3be09e19be6c75e329ac91e44b19efdf64dacdcdb74a1dc554d",
+   "semantic_hash": "a61e4e08129789f6393378c193475e4dd878b001ae4e38aaa36b539462d38ccd",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"exit_status_raw\": 0, \"exit_code\": 0, \"raised\": null, \"stdout\": {\"size\": 11, \"truncated\": false, \"sha256\": \"5b2a4c1dbff1fe64e4b44c725565e8335d12023b8c10e7e8480f5a3f4911b78d\"}, \"stderr\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"subject\": \"present\", \"pre\": [], \"before\": {}, \"files\": {}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-2",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-12d5035f01f412e229fa4e79d63f871152e8f28437821f2c563546baffd12a60",
+   "semantic_hash": "782abb962b9baa0664906ae570292911a08155d00940d488259f04893059dcb3",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "NOT_QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-04-01-3",
+   "requirement": "FR-11",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-735ea35d3d613702ca1dba189521f499e49bcc5ab3ad04267a7918579b4d3137",
+   "semantic_hash": "d3434a41850bbee2d61eaf9f7683aa73e5dbf394d80c487b65e91386db54ea3a",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "NOT_QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-04-01-4",
+   "requirement": "FR-11",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-59f4d482c1fc1e159f39f86d0ec94de0cc3ef7f1ae25a8c12e06ded89a9aa69a",
+   "semantic_hash": "5ad2d3e615fa23e64bc844335a421bda1a5df3d31eb84a8c16a86f64fcbe3f40",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"exit_status_raw\": 0, \"exit_code\": 0, \"raised\": null, \"stdout\": {\"size\": 51, \"truncated\": false, \"sha256\": \"4f74d832b33487daf693b9f2278649ed72ae03b05cd5a3815054ca8b371f505a\"}, \"stderr\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"subject\": \"present\", \"pre\": [], \"before\": {}, \"files\": {}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-5",
+   "requirement": "FR-11",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-b03f5c32da371065a063bbd0d4a1a91bee0c84441674dae5dd01a7783f20a8b5",
+   "semantic_hash": "004c92218571d67d97cf6a6ccdfa6f6e91a4283f9fbd06c95c50e3834f09e905",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "NOT_QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-04-01-6",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-e93490232b5da6cd20ef68f4c1ead4540fe2a5b29b71cd7eff7361602b1f835c",
+   "semantic_hash": "a345249bc80fa612fad8494ed9d763e85916af01da61ef9f7b90231f6b94cb5a",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"pre_failed\": 0, \"pre\": [{\"exit_status_raw\": 2, \"exit_code\": 2, \"raised\": null, \"stdout\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"stderr\": {\"size\": 44, \"truncated\": false, \"sha256\": \"d31a8d8bcf3a05274d317c0c85fd6ac2fe3e63c8a81c475df86ac19cebff9ffa\"}}]}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-7",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-60ff608517544c54214ee01e15701ce31316ca0e6e502c3a21bb4410b3b4747f",
+   "semantic_hash": "c2eae523adcfe41eac4dedbeb7814b3b45f4d93d8fa51d4a9652190f69ff8426",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_files",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "REFUTED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "REFUTED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [
+    "M-3.2-1",
+    "M-7-1"
+   ],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [
+    "M-3.2-1",
+    "M-7-1"
+   ],
+   "evidence": [
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.2-1",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    },
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-7-1",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    }
+   ],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-04-02-1",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-9ec297d9071193f9000efe3b7c37432b8a1ecc6fafce3388392bca057287766a",
+   "semantic_hash": "80e50ff2628163f50843a22523607fd445689c1c9d3f817fd0632361ad80213c",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "REFUTED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [
+    "M-9-2"
+   ],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-9-2",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    }
+   ],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-04-02-2",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-dfa475e1deee3293d29896c3f1a12e30642c9d62ff386276ced386d4a04210ee",
+   "semantic_hash": "6b0d6adaef4ca5897d7bb18832a04124aaa4c9220f49d1178b422c52d659a024",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_files",
+   "quantifier": "exhaustive_finite_domain",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"exit_status_raw\": 2, \"exit_code\": 2, \"raised\": null, \"stdout\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"stderr\": {\"size\": 44, \"truncated\": false, \"sha256\": \"d31a8d8bcf3a05274d317c0c85fd6ac2fe3e63c8a81c475df86ac19cebff9ffa\"}, \"subject\": \"present\", \"pre\": [], \"before\": {\"l.jsonl\": {\"sha256\": \"c8611ae0bc51f1797619e9bcebef7fde408396d14fb7ff30d7da067570108260\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"c8611ae0bc51f1797619e9bcebef7fde408396d14fb7ff30d7da067570108260\"}}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-3",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-23f4d0fd7447c68cf8a74652cdf56917d999060e0a4c4588a34c60e675b338ac",
+   "semantic_hash": "643e802e1d966fb4b892e31fb3e4fe4b4ff3518892dfcd937d9de2c4dfc98b04",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"exit_status_raw\": 5, \"exit_code\": 5, \"raised\": null, \"stdout\": {\"size\": 51, \"truncated\": false, \"sha256\": \"e9c221582357a73c2f7db9d41bf4b475aa6a8fb9d779d939a0d2e8f02083eaa0\"}, \"stderr\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"subject\": \"present\", \"pre\": [], \"before\": {}, \"files\": {}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-4",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-ee5c46356c64fc220b01d03e5f5902d3307152a156cbf3626b3a3afde2a6939e",
+   "semantic_hash": "d19425655d3f08627d2641713351b735f366571628d14410bb8504f980644c24",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "REFUTED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [
+    "M-3.3-1"
+   ],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [
+    "M-3.3-1"
+   ],
+   "evidence": [
+    {
+     "counterexample_ref": "tests/v2/fixtures/workloads/ledgerlock-reference/mutants/M-3.3-1",
+     "mechanism": "controlled_product_mutation",
+     "observed": "REFUTED",
+     "falsifiability_problems": []
+    }
+   ],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-04-03-1",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-cf07822b253c47129279bdf80b78e98e7ffd738e2dc01800c249c18b804d7346",
+   "semantic_hash": "164892bcc0644de182d2e21196f5958621e1da551044470de21e7f27b0533190",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"exit_status_raw\": 0, \"exit_code\": 0, \"raised\": null, \"stdout\": {\"size\": 51, \"truncated\": false, \"sha256\": \"d4e3bdbd96cceec06330467f89f323d7b8da3e161aa8e4462f3d04b169a58149\"}, \"stderr\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"subject\": \"present\", \"pre\": [], \"before\": {}, \"files\": {}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-2",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-11b7adc8ac90599ef28d46c17c5344f2e0faeb6c6eed7a79d58f8e83f72e8c7f",
+   "semantic_hash": "e418490fed938ff1cb54563c8332203f736711fd1d5a27b1d5b0c74c33a6bbd3",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"exit_status_raw\": 2, \"exit_code\": 2, \"raised\": null, \"stdout\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"stderr\": {\"size\": 44, \"truncated\": false, \"sha256\": \"d31a8d8bcf3a05274d317c0c85fd6ac2fe3e63c8a81c475df86ac19cebff9ffa\"}, \"subject\": \"present\", \"pre\": [], \"before\": {}, \"files\": {}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-3",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-d81b782d0b2b6883f1efa3e63104339b2f1183ee1dfc75a285553387114dc826",
+   "semantic_hash": "14f62e493ae78b1915a86df0fd1db2ac790d89817597ef6dceb50c2c3f330afd",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"exit_status_raw\": 0, \"exit_code\": 0, \"raised\": null, \"stdout\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"stderr\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"subject\": \"present\", \"pre\": [], \"before\": {}, \"files\": {}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-4",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-242c6acacb402e0d256b9f5f006ff7055c2f7e59c2cd5f91f30b2f43cbcd288b",
+   "semantic_hash": "e65edab41a9d55791a9a0d306a1a0c07291ed6c6e1c59255fb95bf7f7f7b9d87",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"exit_status_raw\": 0, \"exit_code\": 0, \"raised\": null, \"stdout\": {\"size\": 19, \"truncated\": false, \"sha256\": \"66e2efc48cc2045bf488a321c9c4bd665ad986208d560049bdd8014d0e0afec9\"}, \"stderr\": {\"size\": 0, \"truncated\": false, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, \"subject\": \"present\", \"pre\": [], \"before\": {}, \"files\": {}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-5",
+   "requirement": "FR-12",
+   "sections": [
+    "R-9"
+   ],
+   "spec_id": "PPS-37baa9ae26aa3a163bba7ec87088985dbf55a223ea9f37315fd60beff15d9da4",
+   "semantic_hash": "20e64cf8473e2caf52cd255720500833013e8758aba2e0d221bca98e679fe3da",
+   "probe_id": "probe.cli_invocation",
+   "observation_class": "exits_streams",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "reference": "SATISFIED",
+   "status": "NOT_QUALIFIED",
+   "verdicts": {
+    "M-3.1-1": "SATISFIED",
+    "M-3.2-1": "SATISFIED",
+    "M-3.2-2": "SATISFIED",
+    "M-3.3-1": "SATISFIED",
+    "M-3.3-2": "SATISFIED",
+    "M-3.3-3": "SATISFIED",
+    "M-3.4-1": "SATISFIED",
+    "M-4.1-1": "SATISFIED",
+    "M-4.2-1": "SATISFIED",
+    "M-4.3-1": "SATISFIED",
+    "M-4.4-1": "SATISFIED",
+    "M-4.5-1": "SATISFIED",
+    "M-5-1": "SATISFIED",
+    "M-5-2": "SATISFIED",
+    "M-6-1": "SATISFIED",
+    "M-6-2": "SATISFIED",
+    "M-7-1": "SATISFIED",
+    "M-7-2": "SATISFIED",
+    "M-7-3": "SATISFIED",
+    "M-8-1": "SATISFIED",
+    "M-9-1": "SATISFIED",
+    "M-9-2": "SATISFIED",
+    "M-9-3": "SATISFIED",
+    "M-10-1": "SATISFIED",
+    "M-12-1": "SATISFIED",
+    "M-13-1": "SATISFIED"
+   },
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "problems": []
+  },
+  {
+   "ac_id": "AC-STORY-05-01-1",
+   "requirement": "FR-2",
+   "sections": [
+    "R-3.2"
+   ],
+   "spec_id": "PPS-7faa8ea54624ca999c4b1ad765986f976021c1457f7e1e652c21d2aed880a0eb",
+   "semantic_hash": "1927cecdd267b980ffd8b28da869c6b76ab4bea1f2c93ab790f1ff2b4895644b",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_returns",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"call\", \"outcome\": \"refuted:raised TypeError\"}], \"bound\": {}, \"raised\": null, \"before\": {}, \"files\": {}, \"refuted\": {\"step\": 1, \"kind\": \"call\", \"why\": \"raised TypeError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-05-01-2",
+   "requirement": "FR-8",
+   "sections": [
+    "R-5"
+   ],
+   "spec_id": "PPS-3e05665dc3e83e8c07aa927940b22e1a24eb817131ff38583895243d6857f0e1",
+   "semantic_hash": "6895e39d7d178fef2b6135866cc09cd7d76dbeabce088d15414f26abe841151d",
+   "probe_id": "probe.process_effect",
+   "observation_class": "scenario_files",
+   "quantifier": "bounded_witness_measurement",
+   "expectation": "SATISFIED",
+   "designed_for": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "reference": "REFUTED",
+   "status": "REFERENCE_NOT_SATISFIED",
+   "reference_observation": {
+    "kind": "OBSERVED",
+    "verdict": "REFUTED",
+    "detail": "{\"subject\": \"present\", \"trace\": [{\"i\": 0, \"kind\": \"workspace\", \"outcome\": \"ok\"}, {\"i\": 1, \"kind\": \"construct\", \"outcome\": \"ok\"}, {\"i\": 2, \"kind\": \"expect_raises\", \"outcome\": \"refuted:raised TypeError, not ConflictError\"}], \"bound\": {}, \"raised\": null, \"before\": {\"l.jsonl\": {\"sha256\": \"d3c27e84ae90a79aaf6d0401fc017dec4ca7c18722e5c2c3faff1bad3d60a77d\"}}, \"files\": {\"l.jsonl\": {\"sha256\": \"d3c27e84ae90a79aaf6d0401fc017dec4ca7c18722e5c2c3faff1bad3d60a77d\", \"size\": 349, \"line_count\": 2, \"final_byte_hex\": \"0a\", \"jsonl\": {}}}, \"refuted\": {\"step\": 2, \"kind\": \"expect_raises\", \"why\": \"raised TypeError, not ConflictError\"}}"
+   },
+   "verdicts": {},
+   "refuted": [],
+   "unrefuted_designed": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "refuted_beyond_design": [],
+   "evidence": [],
+   "note": "no mutant can show contrast against a reference that does not meet the expectation; none run"
+  },
+  {
+   "ac_id": "AC-STORY-05-01-3",
+   "requirement": "FR-14",
+   "status": "NO_SPEC",
+   "v22_status": "REMOVED_FROM_PRODUCTPROOF",
+   "reason": "unittest / pytest agreement of a test module is a property of the developer's tests, not of the product: a DEVELOPER_TEST_REQUIREMENT (as R-11 in the reference fixture), outside ProductProof by invariant IX"
+  },
+  {
+   "ac_id": "AC-STORY-05-02-1",
+   "requirement": "FR-14",
+   "status": "NO_SPEC",
+   "v22_status": "REMOVED_FROM_PRODUCTPROOF",
+   "reason": "line coverage >= 85% is a project quality gate over the developer's tests (RFC §15), not a product behaviour: a DEVELOPER_TEST_REQUIREMENT"
+  },
+  {
+   "ac_id": "AC-STORY-05-02-2",
+   "requirement": "FR-14",
+   "status": "NO_SPEC",
+   "v22_status": "REMOVED_FROM_PRODUCTPROOF",
+   "reason": "as AC-STORY-05-01-3, for the whole suite"
+  },
+  {
+   "ac_id": "AC-STORY-05-02-3",
+   "requirement": "FR-14",
+   "status": "NO_SPEC",
+   "v22_status": "REMOVED_FROM_PRODUCTPROOF",
+   "reason": "what the coverage measurement includes is configuration of a developer-test gate: a DEVELOPER_TEST_REQUIREMENT"
+  },
+  {
+   "ac_id": "AC-STORY-05-03-1",
+   "requirement": "FR-14",
+   "status": "NO_SPEC",
+   "v22_status": "UNSUPPORTED_UNDER_POLARITY",
+   "reason": "the seam gives this prohibition polarity MUST_NOT_HOLD (the P6 migration table's row for its V1 mode), so its observable must state the FORBIDDEN behaviour — at least one line of the package matches the pattern; file_artifact's grep_count observes an exact count only, and MUST_NOT_HOLD of 'exactly 0 lines match' would demand matches from a correct product (C2-P5-FINDING-001: measured on the reference, which has none — observed SATISFIED under the expectation REFUTED)"
+  },
+  {
+   "ac_id": "AC-STORY-05-03-2",
+   "requirement": "FR-14",
+   "status": "NO_SPEC",
+   "v22_status": "UNSUPPORTED_UNDER_POLARITY",
+   "reason": "the seam gives this prohibition polarity MUST_NOT_HOLD (the P6 migration table's row for its V1 mode), so its observable must state the FORBIDDEN behaviour — at least one line of the package matches the pattern; file_artifact's grep_count observes an exact count only, and MUST_NOT_HOLD of 'exactly 0 lines match' would demand matches from a correct product (C2-P5-FINDING-001: measured on the reference, which has none — observed SATISFIED under the expectation REFUTED)"
+  }
+ ],
+ "finding_001": {
+  "finding": "C2-P5-FINDING-001",
+  "specs": {
+   "AC-STORY-01-01-4": {
+    "polarity": "MUST_NOT_HOLD",
+    "semantic_hash": "ac501b3eddb4982fd4f31179a8bf7f275a632b820d32d469e897f7944fe3633e",
+    "expectation": "REFUTED",
+    "reference": "SATISFIED",
+    "inverted": true
+   },
+   "AC-STORY-01-01-5": {
+    "polarity": "MUST_NOT_HOLD",
+    "semantic_hash": "2bef0e35aae92179d326f4eb5f4e98cba6c1b045cf90e0703212de95807e84e6",
+    "expectation": "REFUTED",
+    "reference": "SATISFIED",
+    "inverted": true
+   },
+   "AC-STORY-05-03-1": {
+    "polarity": "MUST_NOT_HOLD",
+    "semantic_hash": "ac501b3eddb4982fd4f31179a8bf7f275a632b820d32d469e897f7944fe3633e",
+    "expectation": "REFUTED",
+    "reference": "SATISFIED",
+    "inverted": true
+   },
+   "AC-STORY-05-03-2": {
+    "polarity": "MUST_NOT_HOLD",
+    "semantic_hash": "2bef0e35aae92179d326f4eb5f4e98cba6c1b045cf90e0703212de95807e84e6",
+    "expectation": "REFUTED",
+    "reference": "SATISFIED",
+    "inverted": true
+   }
+  },
+  "reproduced": true,
+  "rule": "the ec473d1 form of each prohibition, compiled with the aid's polarity rule off, run on the reference"
+ },
+ "elapsed_s": 153.6,
+ "tests": {
+  "tests.v2.test_p5_falsifiability.Falsifiability": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_p5_falsifiability.Falsifiability"
+   ],
+   "exit": 0,
+   "ran": 4,
+   "seconds": 1.667,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 2s)",
+   "residual": 0
+  },
+  "tests.v2.test_p5_plan_v22_proposal": {
+   "command": [
+    "/Users/nghinh/Downloads/projects/ai-sdlc/validation/v2/owned_run.py",
+    "--",
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-m",
+    "unittest",
+    "tests.v2.test_p5_plan_v22_proposal"
+   ],
+   "exit": 0,
+   "ran": 8,
+   "seconds": 0.147,
+   "status": "OK",
+   "status_detail": "",
+   "owned_processes": "before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 1s)",
+   "residual": 0
+  }
+ },
+ "problems": [],
+ "verdict": "COMPLETE"
+}
