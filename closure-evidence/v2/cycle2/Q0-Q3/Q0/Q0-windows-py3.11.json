@@ -1,0 +1,1356 @@
+{
+ "record": "AISEF V2 — Q0 STATIC INTEGRITY",
+ "rung": "Q0",
+ "status": "GREEN",
+ "at": "2026-09-30T06:26:03Z",
+ "rule": "zero-provider; no project admission executed; every Q0 checker discovered and calibrated; fail-closed both ways",
+ "subject": {
+  "seal_commit": "63112544f1146097b69c538d98e09e5a52c547c1",
+  "semantic_candidate": "63112544f1146097b69c538d98e09e5a52c547c1",
+  "kernel_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+  "head": "ee766761b2388762e4010d0e472d0a0e727ee4b8",
+  "head_is_after_the_seal": true,
+  "head_kernel_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+  "kernel_tree_is_the_candidates": true,
+  "candidate_kernel_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_unchanged": true,
+  "validation_v2_tree": "60920999bdc44dc9530e7a6fe14d1341f5615a07",
+  "tests_v2_tree": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330",
+  "subject_trees": {
+   "validation/v2": {
+    "head": "60920999bdc44dc9530e7a6fe14d1341f5615a07",
+    "candidate": "60920999bdc44dc9530e7a6fe14d1341f5615a07",
+    "frozen": "60920999bdc44dc9530e7a6fe14d1341f5615a07"
+   },
+   "tests/v2": {
+    "head": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330",
+    "candidate": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330",
+    "frozen": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330"
+   }
+  },
+  "cycle1": {
+   "seal_commit": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "records": "closure-evidence/v2/Q0-Q3"
+  },
+  "working_tree_clean_outside_qualification_output": true,
+  "rfc": {
+   "effective_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "effective_freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "lineage": [
+    "AISEF-V2-RFC-APPROVAL.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-005.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-006.json"
+   ],
+   "lineage_end": "AISEF-V2-RFC-AMENDMENT-V2-006.json",
+   "broken_links": []
+  },
+  "probe": {
+   "id": "probe.python_callable",
+   "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+  },
+  "probes": {
+   "probe.python_callable": {
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "kind": "python_callable",
+    "active": false,
+    "cycle": 1
+   },
+   "probe.file_artifact": {
+    "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "kind": "file_artifact",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.python_callable_v2": {
+    "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+    "kind": "python_callable",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.cli_invocation": {
+    "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+    "kind": "cli_invocation",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.process_effect": {
+    "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "kind": "process_effect",
+    "active": true,
+    "cycle": 2
+   }
+  },
+  "harness": {
+   "files": {
+    "validation/qualification/__init__.py": "40f613b3d5ffa39b5807ae0aec2878be51870891f5bd7dd76aae025e73e48f91",
+    "validation/qualification/c2_cli_calibration.py": "9c2ab78e85a8ad55d373b00c90285651fd38b413871c5bb5bc1103e78bad4864",
+    "validation/qualification/c2_cli_harness.py": "eb8c19a1831840e15bc6f1b644730a92b4cf340c913e75bb14ba06236c772293",
+    "validation/qualification/c2_effect_calibration.py": "209ea08c1c65ee4c7b0dc841d207c8518988c5ba48b5207b6451bbefc16216ca",
+    "validation/qualification/c2_effect_harness.py": "1078e3236294245aff0ebe1e9226a931a0e30d7031d7ca51d3e59c4d90273495",
+    "validation/qualification/c2_file_artifact.py": "1027f3db09055e905224ca6cfda3ef39948fd0f1ee9bf126b67178bffddcd0b5",
+    "validation/qualification/c2_integration.py": "1fbb214fc191abb2640bdd311a7b66ba47035f78ee87e37c74fbac529508f734",
+    "validation/qualification/c2_python_callable_v2.py": "798134ee826773b17147b39b163e64782177909bd6fce39432baef3a56908de8",
+    "validation/qualification/common.py": "a701c5d09dc5507e49156f1f8e8f279f2eac65690a9725500e3d03d252c1a737",
+    "validation/qualification/diag_orch9.py": "2f6d9524dacbafb90ca47990310a5b1e08116ab2bb1cdf8705b7f6c6f5c3bd23",
+    "validation/qualification/p0_reference_fixture.py": "0546e895bd890703c2e923b7872415df3f924e669f7feff9f521c4c97cb1810f",
+    "validation/qualification/p10.py": "208dc6f18a96523752ee8067740101a2c9ad18f93c1960ea2338cc65c2c2e0a0",
+    "validation/qualification/p10_contracts.py": "969a014dbe87a71b1c39088ed4a94fd555aecd8352abccb99628678746ad6e8f",
+    "validation/qualification/p5_acceptance.py": "34cc7f2ee411f0ad925ef7d232505044fe0bdac213c754fd81d4caf352564033",
+    "validation/qualification/p5_falsifiability.py": "dff3755bc28d4c10f0c5afaca666f4926fd4dbcabcc5acfb8c3d092ed1444bc4",
+    "validation/qualification/p7_finding_001_reproducer.py": "2cb9b13292ce94bfc8c8d78efba97839b73c065805e7bd9aa50a2ef29bc80363",
+    "validation/qualification/q0.py": "6cc27627aaaf262b24421b8b56deaafb96b19d04a6649bf9b78637eb1448598d",
+    "validation/qualification/q1.py": "dfedd5601db18ad8012dd2390ba4dcf08d9f4cf9aba0729d1166e0f79183ecb5",
+    "validation/qualification/q2.py": "30aaa364e74e797c8a30b564e2fc069ada0e6ff77301ffbecfdbf1c3b5b5285f",
+    "validation/qualification/q3.py": "88937252b4b75140f13f7546d88733b360da87e5d38aba68a195ac4665c8a403",
+    "validation/qualification/q4.py": "1fd9425c6a93ba163300af60ea152261712c63c51eabc280599eaeede34e30ff",
+    "validation/qualification/q4_aggregate.py": "b437489c7c7b6e2eb5a76c2a2a6bbcef1726039ba604ddcc9c7429bfe27c128f",
+    "validation/qualification/q5.py": "9de93fd23e60d746d28054fa9d6fda1e9ad351704f4677eebce70e87260ac9a3",
+    "validation/qualification/run.py": "baa82a3c3f7e0716855806d1ce8a78972f62792b8ad220f93c40a5860df28f90",
+    "validation/qualification/summary.py": "7ec9e8a4eb3588a65378702a65e647c532a3fc6b3f4f83464afe3e858e0362d9"
+   },
+   "sha256": "db5a3cc98b4f9c445b7eedc1e01ec7cbce80f15e82d7cf2ef679e26cbfcc8b7d",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines, sorted"
+  }
+ },
+ "platform": {
+  "os": "windows",
+  "os_release": "10",
+  "python": "3.11.9",
+  "free_disk_gb": 235.8,
+  "implementation": "CPython",
+  "machine": "AMD64",
+  "runner_os": "Windows",
+  "ci_run": "36677859393",
+  "ci_job": "qualify",
+  "ci_attempt": "1",
+  "qualification_platform": true,
+  "range_mechanism": "windows-job",
+  "label": "windows-py3.11"
+ },
+ "checker_calibration": {
+  "discovered": 46,
+  "names": [
+   "freeze_manifest",
+   "v1_evidence_guard",
+   "arch_catalog",
+   "f_conformance",
+   "plan_validate",
+   "plan_docs_check",
+   "state_model_prover",
+   "v2_encoding_scanner",
+   "packaging_check",
+   "run_history",
+   "no_prose_control",
+   "no_raw_verdict_routing",
+   "retryable_only_in_taxonomy",
+   "no_verdict_from_absence_declaration",
+   "result_only_through_binding",
+   "no_time_in_projections",
+   "no_side_retry_counter",
+   "sentinel_is_not_evidence",
+   "one_signal_authority",
+   "candidate_only_execution",
+   "no_developer_artefact_at_parent",
+   "except_boundaries",
+   "invariants_doc",
+   "mutation",
+   "cleanup_authority",
+   "destructive_authority",
+   "p1_evidence",
+   "p2_evidence",
+   "p3_evidence",
+   "p4_evidence",
+   "p5_evidence",
+   "owned_run",
+   "refmodel_independence",
+   "gen_specs",
+   "plan_semantics",
+   "plan_baseline",
+   "migration_table",
+   "p6_evidence",
+   "old_path_audit",
+   "cycle2_baseline",
+   "probe_catalog_closure",
+   "no_clock_in_probe_facts",
+   "no_test_artefact_in_probes",
+   "closed_dispatch_in_scenario_probes",
+   "single_placeholder_token",
+   "protocol_channel_discipline"
+  ],
+  "calibrated": 46,
+  "always_pass_mutants_rejected": 46,
+  "uncovered_checker_modules": [],
+  "problems": [],
+  "committed_record_current": true,
+  "checkers": {
+   "freeze_manifest": {
+    "package": "WP-0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "v1_evidence_guard": {
+    "package": "WP-0.4",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "arch_catalog": {
+    "package": "WP-0.2",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "f_conformance": {
+    "package": "WP-0.3",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "plan_validate": {
+    "package": "plan correction",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "plan_docs_check": {
+    "package": "plan correction",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "state_model_prover": {
+    "package": "WP-0.4",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "v2_encoding_scanner": {
+    "package": "WP-0.4",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "packaging_check": {
+    "package": "WP-0.2",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "run_history": {
+    "package": "P1 retry policy",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_prose_control": {
+    "package": "WP-1.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_raw_verdict_routing": {
+    "package": "WP-1.3",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "retryable_only_in_taxonomy": {
+    "package": "WP-1.4",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_verdict_from_absence_declaration": {
+    "package": "P1 hygiene (RFC §10.2)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "result_only_through_binding": {
+    "package": "P2 correction (PROBE-BIND-1)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_time_in_projections": {
+    "package": "WP-3.3",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_side_retry_counter": {
+    "package": "WP-4.5",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "sentinel_is_not_evidence": {
+    "package": "WP-4.3",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "one_signal_authority": {
+    "package": "P4 correction (V2-003, RFC §9.3)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "candidate_only_execution": {
+    "package": "WP-5.3 (invariant IX)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_developer_artefact_at_parent": {
+    "package": "WP-5.5 (invariant IX)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "except_boundaries": {
+    "package": "WP-5.5 (RFC §4 uncontainable)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "invariants_doc": {
+    "package": "WP-5.5 (F10 registry/docs sync)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "mutation": {
+    "package": "WP-1.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "cleanup_authority": {
+    "package": "P4 correction (P4-FINDING-011)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "destructive_authority": {
+    "package": "P4 post-seal hygiene (INV-MUTATION-AUTHORITY)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "p1_evidence": {
+    "package": "WP-1.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "p2_evidence": {
+    "package": "WP-2.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "p3_evidence": {
+    "package": "WP-3.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "p4_evidence": {
+    "package": "WP-4.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "p5_evidence": {
+    "package": "WP-5.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "owned_run": {
+    "package": "WP-4.2",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "refmodel_independence": {
+    "package": "WP-3.5",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "gen_specs": {
+    "package": "WP-1.2",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "plan_semantics": {
+    "package": "P2 plan correction",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "plan_baseline": {
+    "package": "P2 plan correction",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "migration_table": {
+    "package": "WP-6.1 (RFC §31 generated, --checked)",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "p6_evidence": {
+    "package": "WP-6.2",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "old_path_audit": {
+    "package": "WP-6.3",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "cycle2_baseline": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "probe_catalog_closure": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_clock_in_probe_facts": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_test_artefact_in_probes": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "closed_dispatch_in_scenario_probes": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "single_placeholder_token": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "protocol_channel_discipline": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   }
+  }
+ },
+ "families": {
+  "schemas": {
+   "arch_catalog": "calibrated",
+   "p6_evidence": "calibrated",
+   "packaging_check": "calibrated"
+  },
+  "provenance": {
+   "freeze_manifest": "calibrated",
+   "run_history": "calibrated",
+   "p1_evidence": "calibrated",
+   "p2_evidence": "calibrated",
+   "p3_evidence": "calibrated",
+   "p4_evidence": "calibrated",
+   "p5_evidence": "calibrated",
+   "p6_evidence": "calibrated"
+  },
+  "architecture_catalog": {
+   "arch_catalog": "calibrated"
+  },
+  "freeze_amendment_lineage_through_V2_006": {
+   "freeze_manifest": "calibrated",
+   "plan_baseline": "calibrated"
+  },
+  "f1_f11_conformance": {
+   "f_conformance": "calibrated"
+  },
+  "ownership_graph_and_unique_INTRODUCE": {
+   "plan_semantics": "calibrated",
+   "tests:static_admission_rules": "GREEN"
+  },
+  "no_prose_control_walker": {
+   "no_prose_control": "calibrated"
+  },
+  "no_projection_reads_time": {
+   "no_time_in_projections": "calibrated"
+  },
+  "static_admission_rule_conformance": {
+   "tests:static_admission_rules": "GREEN"
+  },
+  "invariant_registry": {
+   "invariants_doc": "calibrated",
+   "no_developer_artefact_at_parent": "calibrated",
+   "candidate_only_execution": "calibrated"
+  },
+  "except_boundary_audit": {
+   "except_boundaries": "calibrated"
+  },
+  "destructive_authority_audit": {
+   "destructive_authority": "calibrated",
+   "cleanup_authority": "calibrated"
+  },
+  "old_path_audit": {
+   "old_path_audit": "calibrated"
+  },
+  "migration_table_check": {
+   "migration_table": "calibrated"
+  },
+  "seal_identities_P4_P5_P6": {
+   "explicit:seals": "asserted below"
+  },
+  "v1_evidence_guard": {
+   "v1_evidence_guard": "calibrated"
+  },
+  "cycle2_baseline_cycle1_immutability": {
+   "cycle2_baseline": "calibrated"
+  },
+  "probe_registry_closure": {
+   "probe_catalog_closure": "calibrated"
+  },
+  "no_clock_in_probe_facts": {
+   "no_clock_in_probe_facts": "calibrated"
+  },
+  "no_test_artefact_resolution_in_probes": {
+   "no_test_artefact_in_probes": "calibrated"
+  },
+  "scenario_vocabulary_closed": {
+   "closed_dispatch_in_scenario_probes": "calibrated"
+  },
+  "placeholder_single_token": {
+   "single_placeholder_token": "calibrated"
+  },
+  "protocol_channel_discipline": {
+   "protocol_channel_discipline": "calibrated"
+  },
+  "c2_p5_owner_acceptance_and_real_approvals": {
+   "tests:c2_p5_acceptance": "GREEN"
+  }
+ },
+ "static_admission_rules": {
+  "counts": {
+   "PASS": 27,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 0,
+   "NOT_APPLICABLE": 0
+  },
+  "cases": [
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_1_requirement_coverage",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_2_contract_spec_integrity",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_3_ownership",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_4_dependency_dag",
+    "outcome": "PASS",
+    "seconds": 0.015
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_5_contradictions",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_6_proof_capability_catches_scenario_D_statically",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_7_traceability",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_8_plan_structure",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_9_probe_calibration",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_PROBE_META_1_a_protocol_only_probe_is_admitted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_a_plan_that_is_not_admitted_cannot_freeze",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_a_well_formed_plan_is_admitted_with_a_stable_digest",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_a_contract_with_several_committed_specs_lists_them_sorted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_a_result_is_immutable",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_requirements_and_contracts_are_reported_sorted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_specs_are_visited_sorted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_stories_and_expectations_are_listed_sorted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_story_order_is_transitive_and_a_bool",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_the_cycle_reported_does_not_depend_on_listing_order",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_hash_binds_everything_and_the_baseline_is_a_full_sha",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_obligation_fields_are_the_rfcs",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_quality_policy_has_no_universal_threshold",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Shapes.test_the_expected_parent_is_a_satisfaction_expectation_never_a_verdict",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:StaticOnly.test_CAL_2_no_plan_freeze_path_requires_spec_falsifiability",
+    "outcome": "PASS",
+    "seconds": 0.016
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:StaticOnly.test_engine_and_result_are_distinct",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:StaticOnly.test_the_engine_executes_no_probe_and_no_process",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:StaticOnly.test_the_engine_never_invents_a_parent_sha",
+    "outcome": "PASS",
+    "seconds": 0.0
+   }
+  ],
+  "executes_no_probe_and_no_process": "PASS"
+ },
+ "architecture_catalog": {
+  "check_problems": [],
+  "both_directions": {
+   "PASS": 9,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 0,
+   "NOT_APPLICABLE": 0
+  },
+  "cases": [
+   {
+    "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_committed_catalog_is_in_sync",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_cosmetic_edit_is_still_drift",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_frozen_item_reassignment_fails",
+    "outcome": "PASS",
+    "seconds": 0.015
+   },
+   {
+    "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_member_in_catalog_absent_from_code_fails",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_member_in_code_absent_from_catalog_fails",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_removing_a_member_from_code_fails",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_round_trip_parse_equals_code",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_vocabulary_in_catalog_absent_from_code_fails",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_vocabulary_in_code_absent_from_catalog_fails",
+    "outcome": "PASS",
+    "seconds": 0.0
+   }
+  ]
+ },
+ "f1_f11": {
+  "summary": {
+   "PASS": 11,
+   "PENDING": 0,
+   "FAIL": 0
+  },
+  "ratchet_violations": [],
+  "committed_record_current": true,
+  "f5_subchecks": {
+   "F5.enum.Enforcement": "PASS",
+   "F5.probe_protocol": "PASS",
+   "F5.harness_timeout_vs_subject_deadline": "PASS",
+   "F5.signal_provenance_after_dispatch": "PASS",
+   "F5.protocol_stream_vs_process_lifecycle": "PASS",
+   "F5.calibration_contracts": "PASS"
+  },
+  "new_subcheck_present": true,
+  "new_subcheck_passes": true,
+  "removing_the_new_subcheck_fails_q0": true,
+  "how": "with the subcheck removed the committed F-CONFORMANCE.json no longer equals the evaluation (freeze_conformance --check: stale) and the pinned conformance case reads the subcheck by id",
+  "pinned_case": {
+   "id": "tests.v2.conformance.test_freeze_f1_f11:Conformance.test_F5_probe_protocol_is_compared_member_by_member_with_signatures",
+   "outcome": "PASS",
+   "seconds": 10.266
+  },
+  "committed_summary": {
+   "PASS": 11,
+   "PENDING": 0,
+   "FAIL": 0
+  }
+ },
+ "v2_006": {
+  "lineage_ends_at_V2_006": true,
+  "effective_digests_equal_the_amendment": true,
+  "f5_row_sha256": {
+   "rfc_now": "05915110dcdc7f4f2b1effee5e4eb8ffbe1a04533ac1d0faa8ee8cc08bfb0f55",
+   "amendment_after": "05915110dcdc7f4f2b1effee5e4eb8ffbe1a04533ac1d0faa8ee8cc08bfb0f55",
+   "match": true
+  },
+  "probe_digest": {
+   "now": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "v2_006_exception_after": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+   "correction_before": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+   "correction_after": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "old": {
+    "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e": "pre-V2-006",
+    "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0": "V2-006 to the P7-FINDING-001 correction"
+   },
+   "match": true
+  },
+  "f4_semantic_hash_incorporates_the_probe_digest": {
+   "by_digest_prefix": {
+    "c335293e03a0": "4b85d7eed840d6b2d89870098ff5ce6f5e22e352a1bfd25fb4a833328843d272",
+    "1961e84d913e": "336c452571722cf8ccc46caacf9383791f8a3c55e2039a247ef2e93b62e7bd07"
+   },
+   "differs": true
+  },
+  "stored_specs_bound_to_the_old_digest": [],
+  "files_naming_the_old_digest": [
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
+   "closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json",
+   "closure-evidence/v2/P4-FINAL-SEAL.json",
+   "closure-evidence/v2/P6-FINAL-SEAL.json",
+   "closure-evidence/v2/P6-V2-006-PROBE-HARNESS.json",
+   "closure-evidence/v2/P7-FINDING-001/CORRECTION.json",
+   "closure-evidence/v2/P7-FINDING-001/REPRODUCER.json",
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard1.json",
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard2.json",
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard3.json",
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard4.json",
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.12-shard1.json",
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.13-shard1.json",
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.14-shard1.json",
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-windows-py3.11-shard1.json"
+  ],
+  "files_naming_the_old_digest_outside_the_historical_set": [],
+  "p2_calibration_digests": [
+   "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+  ]
+ },
+ "seals": {
+  "p4": {
+   "sha256": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+   "bound_by_p5_seal": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+   "bound_by_p6_seal": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e"
+  },
+  "p5": {
+   "sha256": "d06d4ae57e1797f6658b1cc3148200865aada86a0d3165aeb9f7f98a6e3e250c",
+   "bound_by_p6_seal": "d06d4ae57e1797f6658b1cc3148200865aada86a0d3165aeb9f7f98a6e3e250c",
+   "verdict": "P5 FINAL SEALED"
+  },
+  "p6": {
+   "sha256": "9362029864f011d7c727d57ab4f99815e0c440071833285a2964053fa651ea60",
+   "at_the_seal_commit": "9362029864f011d7c727d57ab4f99815e0c440071833285a2964053fa651ea60",
+   "verdict": "P6 FINAL SEALED",
+   "candidate": "097daefefd9229eafeacaca321b7a008a581899b",
+   "aisef2_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+   "byte_identical_to_the_seal_commit": true
+  },
+  "p5_records_identity_problems": [],
+  "p6_records_identity_problems": [],
+  "post_p6_corrective_lineage": {
+   "sealed_candidate": "097daefefd9229eafeacaca321b7a008a581899b",
+   "sealed_aisef2_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+   "superseded": "097daefefd9229eafeacaca321b7a008a581899b",
+   "old_candidate_in_correction": "097daefefd9229eafeacaca321b7a008a581899b",
+   "corrected_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "corrected_aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "harness_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "harness_kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804"
+  }
+ },
+ "v1": {
+  "guard_problems": [],
+  "w0_sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "w0_blob_at_HEAD": "2b808b6694a66b168df8b3561a5db8467839d01e",
+  "w0_blob_at_the_candidate": "2b808b6694a66b168df8b3561a5db8467839d01e",
+  "w0_expected": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_at_p5_seal": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "external_validation_tree": "6e3cc45612780ec0a3ee5e6cbba96977edc1ee35",
+  "external_validation_tree_at_p5_seal": "6e3cc45612780ec0a3ee5e6cbba96977edc1ee35"
+ },
+ "cycle2": {
+  "probes": {
+   "probe.cli_invocation": {
+    "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+    "kind": "cli_invocation",
+    "active": true,
+    "cycle": 2,
+    "module": "aisef2.probe.cli_invocation"
+   },
+   "probe.file_artifact": {
+    "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "kind": "file_artifact",
+    "active": true,
+    "cycle": 2,
+    "module": "aisef2.probe.file_artifact"
+   },
+   "probe.process_effect": {
+    "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "kind": "process_effect",
+    "active": true,
+    "cycle": 2,
+    "module": "aisef2.probe.process_effect"
+   },
+   "probe.python_callable": {
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "kind": "python_callable",
+    "active": false,
+    "cycle": 1,
+    "module": "aisef2.probe.python_callable"
+   },
+   "probe.python_callable_v2": {
+    "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+    "kind": "python_callable",
+    "active": true,
+    "cycle": 2,
+    "module": "aisef2.probe.python_callable_v2"
+   }
+  },
+  "active_by_kind": {
+   "file_artifact": "probe.file_artifact",
+   "python_callable": "probe.python_callable_v2",
+   "cli_invocation": "probe.cli_invocation",
+   "process_effect": "probe.process_effect"
+  },
+  "active_expected": {
+   "file_artifact": "probe.file_artifact",
+   "python_callable": "probe.python_callable_v2",
+   "cli_invocation": "probe.cli_invocation",
+   "process_effect": "probe.process_effect"
+  },
+  "catalog_problems": [],
+  "cycle1_probe": {
+   "id": "probe.python_callable",
+   "frozen_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "catalog_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "module_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "active": false,
+   "resolvable_and_inactive": true
+  },
+  "probe_rule_checkers": {
+   "probe_catalog_closure": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_clock_in_probe_facts": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "no_test_artefact_in_probes": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "closed_dispatch_in_scenario_probes": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "single_placeholder_token": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "protocol_channel_discipline": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   },
+   "cycle2_baseline": {
+    "package": "WP-2.0.1",
+    "clean_passes": true,
+    "rejects_known_bad": true,
+    "rejects_for_the_expected_reason": true,
+    "calibrated": true,
+    "always_pass_mutant_rejected": true
+   }
+  },
+  "c2_p5_acceptance": {
+   "record": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+   "sha256": "69c23b49f393276117c957f598f811a91a81e36595d60c7bf9fc0af5f414453d",
+   "verdict": "C2-P5 ACCEPTED BY THE OWNER — ACCEPTANCE BOUNDARY RECORDED",
+   "re_derivation_problems": [],
+   "approvals": 59,
+   "aggregate_digest": "73e3644949a95810a43d4e91df8a91e91cef0bf434f6ce8bfc9217b862d139d5",
+   "cases": [
+    {
+     "id": "tests.v2.test_c2_p5_acceptance:Acceptance.test_the_acceptance_re_derives_on_this_tree",
+     "outcome": "PASS",
+     "seconds": 0.344
+    },
+    {
+     "id": "tests.v2.test_c2_p5_acceptance:Acceptance.test_the_admission_holds_only_under_every_real_approval",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.test_c2_p5_acceptance:Approvals.test_a_synthetic_approver_is_refused",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.test_c2_p5_acceptance:Approvals.test_a_tampered_approval_is_refused",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.test_c2_p5_acceptance:Approvals.test_one_real_approval_per_retained_contract_by_the_owner",
+     "outcome": "PASS",
+     "seconds": 0.0
+    }
+   ]
+  }
+ },
+ "provider_calls": 0,
+ "project_admissions_executed": 0,
+ "problems": [],
+ "harness_problems": [],
+ "cases": [
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_1_requirement_coverage",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_2_contract_spec_integrity",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_3_ownership",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_4_dependency_dag",
+   "outcome": "PASS",
+   "seconds": 0.015
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_5_contradictions",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_6_proof_capability_catches_scenario_D_statically",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_7_traceability",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_8_plan_structure",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_9_probe_calibration",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_PROBE_META_1_a_protocol_only_probe_is_admitted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_a_plan_that_is_not_admitted_cannot_freeze",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_a_well_formed_plan_is_admitted_with_a_stable_digest",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_a_contract_with_several_committed_specs_lists_them_sorted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_a_result_is_immutable",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_requirements_and_contracts_are_reported_sorted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_specs_are_visited_sorted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_stories_and_expectations_are_listed_sorted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_story_order_is_transitive_and_a_bool",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_the_cycle_reported_does_not_depend_on_listing_order",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_hash_binds_everything_and_the_baseline_is_a_full_sha",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_obligation_fields_are_the_rfcs",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_quality_policy_has_no_universal_threshold",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Shapes.test_the_expected_parent_is_a_satisfaction_expectation_never_a_verdict",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:StaticOnly.test_CAL_2_no_plan_freeze_path_requires_spec_falsifiability",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:StaticOnly.test_engine_and_result_are_distinct",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:StaticOnly.test_the_engine_executes_no_probe_and_no_process",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:StaticOnly.test_the_engine_never_invents_a_parent_sha",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_committed_catalog_is_in_sync",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_cosmetic_edit_is_still_drift",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_frozen_item_reassignment_fails",
+   "outcome": "PASS",
+   "seconds": 0.015
+  },
+  {
+   "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_member_in_catalog_absent_from_code_fails",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_member_in_code_absent_from_catalog_fails",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_removing_a_member_from_code_fails",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_round_trip_parse_equals_code",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_vocabulary_in_catalog_absent_from_code_fails",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p0.test_arch_catalog:ArchCatalog.test_vocabulary_in_code_absent_from_catalog_fails",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.conformance.test_freeze_f1_f11:Conformance.test_F5_probe_protocol_is_compared_member_by_member_with_signatures",
+   "outcome": "PASS",
+   "seconds": 10.266
+  },
+  {
+   "id": "tests.v2.test_c2_p5_acceptance:Acceptance.test_the_acceptance_re_derives_on_this_tree",
+   "outcome": "PASS",
+   "seconds": 0.344
+  },
+  {
+   "id": "tests.v2.test_c2_p5_acceptance:Acceptance.test_the_admission_holds_only_under_every_real_approval",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_c2_p5_acceptance:Approvals.test_a_synthetic_approver_is_refused",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_c2_p5_acceptance:Approvals.test_a_tampered_approval_is_refused",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_c2_p5_acceptance:Approvals.test_one_real_approval_per_retained_contract_by_the_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  }
+ ],
+ "counts": {
+  "PASS": 42,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "NOT_APPLICABLE": 0
+ },
+ "seconds": 218.0,
+ "harness_digest_at_run": "db5a3cc98b4f9c445b7eedc1e01ec7cbce80f15e82d7cf2ef679e26cbfcc8b7d"
+}

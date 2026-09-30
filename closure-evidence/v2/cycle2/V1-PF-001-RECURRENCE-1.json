@@ -1,0 +1,94 @@
+{
+ "record": "AISEF V2 — V1-PF-001 RECURRENCE (Cycle 2, QP-2.6 phase gate STOPPED)",
+ "id": "V1-PF-001-RECURRENCE-1",
+ "defect": {
+  "id": "V1-PF-001",
+  "register": {
+   "path": "closure-evidence/v2/V1-POST-FREEZE-DEFECTS.json",
+   "sha256": "16d30104cef30de8c219fd59e6e8d84d9c9b066ed80bb2d067d718cae7609356"
+  },
+  "status_in_register": "OPEN_IN_V1 (P0, LATENT PRODUCT DEFECT WITH NONDETERMINISTIC TRIGGER, not a CI flake)",
+  "first_occurrence": {
+   "ci_run": 35565857461,
+   "commit": "b96cc06068b18382aeabfa17bb1137c7afa38396",
+   "error": "MemoryError at order.append(pid) in _kill_tree_win32"
+  }
+ },
+ "occurrence": {
+  "ci_run": 36674401627,
+  "run_attempt": 1,
+  "ci_job_id": 109756124005,
+  "job": "unit (windows-latest, 3.11)",
+  "commit": "a76177ec20e2bee799763fc8d55a2eb285cef8a1",
+  "observed_at": "2026-09-30T06:46:32Z",
+  "test": "tests/test_dogfood_ledgerlock.py::TestTurnCapKillsTheWholeProcessTree::test_the_cap_stops_a_session_whose_client_is_a_grandchild (a V1 test)",
+  "suite": "4996 ran, errors 1, skipped 123 (Windows); the same commit: ubuntu 3.11/3.12/3.13/3.14 4999 OK, locally 5002 OK",
+  "stack": "aisef/clients/opencode.py:270 run -> aisef/clients/base.py:536 _stream_with_timeout -> :373 kill_tree -> :412 _kill_tree_win32 order.append(pid) -> MemoryError",
+  "log_excerpt": [
+   "ERROR: test_the_cap_stops_a_session_whose_client_is_a_grandchild (test_dogfood_ledgerlock.TestTurnCapKillsTheWholeProcessTree.test_the_cap_stops_a_session_whose_client_is_a_grandchild)",
+   "----------------------------------------------------------------------",
+   "Traceback (most recent call last):",
+   "  File \"D:\\a\\aisef\\aisef\\tests\\test_dogfood_ledgerlock.py\", line 167, in test_the_cap_stops_a_session_whose_client_is_a_grandchild",
+   "    res, took, alive = self._run(_ViaLauncher)",
+   "                       ^^^^^^^^^^^^^^^^^^^^^^^",
+   "  File \"D:\\a\\aisef\\aisef\\tests\\test_dogfood_ledgerlock.py\", line 151, in _run",
+   "    res = a.run(RunSpec(prompt=\"x\", workdir=\".\", max_turns=5, timeout_seconds=60))",
+   "          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "  File \"D:\\a\\aisef\\aisef\\aisef\\clients\\opencode.py\", line 270, in run",
+   "    lines, stderr, timed_out = _stream_with_timeout(",
+   "                               ^^^^^^^^^^^^^^^^^^^^^",
+   "  File \"D:\\a\\aisef\\aisef\\aisef\\clients\\base.py\", line 536, in _stream_with_timeout",
+   "    kill_tree(proc)",
+   "  File \"D:\\a\\aisef\\aisef\\aisef\\clients\\base.py\", line 373, in kill_tree",
+   "    if not _kill_tree_win32(proc.pid):",
+   "           ^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "  File \"D:\\a\\aisef\\aisef\\aisef\\clients\\base.py\", line 412, in _kill_tree_win32",
+   "    order.append(pid)",
+   "MemoryError",
+   "",
+   "----------------------------------------------------------------------",
+   "Ran 4996 tests in 3997.124s",
+   "",
+   "FAILED (errors=1, skipped=123)",
+   "  git init → C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\tmpc425686b"
+  ],
+  "owned_range_of_the_job": "before=0 at_exit=0 after=0 escaped=0 released_empty=True (windows-job)"
+ },
+ "signature_match": {
+  "policy": {
+   "path": "closure-evidence/v2/V2-RETRY-POLICY.json",
+   "sha256": "605f6d044d0746812e3b70b909d48cacf0abc0a1e507b8f81cccf67598e255db",
+   "signature": "MemoryError raised inside aisef/clients/base.py::_kill_tree_win32"
+  },
+  "matches": true
+ },
+ "scope": {
+  "v1_product_tree": {
+   "at_the_commit": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "frozen": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "files_of_the_commit_under_aisef_or_the_test": [],
+  "v2_path": "not involved: V2 process ownership is the OS mechanism (WP-4.2, WIN-PID-1/2; P4-RANGE-EMPTINESS); V1 authority is unreachable from V2 (P6-OLD-PATH-REMOVAL); the code that failed is the frozen V1 OpenCode adapter"
+ },
+ "rules": {
+  "register": "If V1-PF-001 recurs before WP-4.2 is complete: STOP the current phase gate and report it. Do not retry-until-green.",
+  "retry_policy": "stop_on_recurrence: [V1-PF-001]; 'if it recurs before WP-4.2: STOP the current phase gate and report it; do not retry-until-green'",
+  "history_checker": "validation/v2/run_history.py entry_problems: an attempt whose known_defect is in stop_on_recurrence must carry gate_effect STOP (unconditional)",
+  "reading_applied": "WP-4.2 is complete (P4 sealed), so the register's text alone would not require a stop; the preregistered policy lists V1-PF-001 under stop_on_recurrence and the history checker enforces STOP for every recorded recurrence without that qualification. The stricter, mechanically enforced reading is applied: the QP-2.6 phase gate is STOPPED and the owner decides"
+ },
+ "effect": {
+  "gate": "the C2-P6 (QP-2.6) phase gate is STOPPED at the attempt recorded in C2-P6-RUN-HISTORY.json (gate_effect STOP)",
+  "not_done": [
+   "no rerun of the failed job, no retry of any kind",
+   "C2-P6 not closed (no C2-P6-CLOSURE.json)",
+   "LANE-Q (QP-2.7..2.9) and LANE-X (WP-2.10.1..2) not started",
+   "nothing pushed after the stop was observed"
+  ],
+  "preserved": [
+   "the attempt, typed PRODUCT with known_defect V1-PF-001",
+   "this record",
+   "the QP-2.6 rung records collected from CI run 36677859393 and SUMMARY.json (as observed; they are not a closure)"
+  ]
+ },
+ "owner_decision_requested": "whether a post-WP-4.2 recurrence of V1-PF-001 in frozen V1 code stops Cycle-2 phase gates (policy text vs checker), and how the QP-2.6 gate proceeds"
+}
