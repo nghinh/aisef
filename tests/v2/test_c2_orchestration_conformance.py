@@ -526,16 +526,16 @@ class ReproofOfAnotherKind(unittest.TestCase):
                          {(SPECS["K_SUB"].probe_id, "REFUTED")})
         self.assertEqual(self.after3, self.tip)
 
-    def test_a_prior_spec_whose_probe_the_harness_did_not_wire_is_a_typed_INVALID_SPEC_never_a_crash(self):
+    def test_a_prior_spec_whose_probe_the_harness_did_not_wire_is_PROBE_INVALID_SPEC_never_a_crash(self):
         self.assertEqual([a.outcome for a in self.r2.attempts], ["ROLLBACK"])
         self.assertEqual(self.w.failures("S2"), [("PROBE_INVALID_SPEC", "INTEGRATION", False)])
         self.assertEqual(self.w.details("S2"), ["post-merge C-K0: PROBE_INVALID_SPEC"])
-        k = [e.data["record"] for e in self.w.records("S2", "C-K0")]
-        self.assertEqual([(x["probe_id"], x["probe_digest"], x["enforcement"], result_of(x)) for x in k],
-                         [(SPECS["K_SUB"].probe_id, SPECS["K_SUB"].probe_digest, "UNAVAILABLE",
-                           {"detail": f"probe {SPECS['K_SUB'].probe_id} is not in the harness catalogue"})] * 2)
-        v = [e for e in self.w.events("proof/verified", "S2") if e.data["criterion_id"] == "C-K0"]
-        self.assertEqual([(e.data["agreement"], "verdict" in e.data) for e in v], [(True, False)])
+        self.assertEqual(self.post_merge("S2"), [("S2:post-merge:C-M2", True), ("S2:post-merge:C-K0", False)])
+        self.assertEqual(self.w.records("S2", "C-K0"), [])   # nothing measured, no record made by a party (invariant III)
+        self.assertEqual([e for e in self.w.events("proof/verified", "S2") if e.data["criterion_id"] == "C-K0"], [])
+        last = self.r2.attempts[-1].proofs[-1]
+        self.assertEqual((last.criterion_id, last.implementer_seq, last.verifier_seq, last.verified_seq, last.agreement,
+                          last.satisfaction, last.failure.code), ("C-K0", None, None, None, False, None, F.PROBE_INVALID_SPEC))
         self.assertEqual(self.after2, self.tip)          # the merge was reverted
         self.assertEqual(self.w.run.state(P.STORY_STATE)["S2"]["state"], "ENDED")
 
@@ -591,22 +591,37 @@ class Parties(st.Journal):
         legacy = pf.Party(self.scope, lambda on_range: st.FakeProbe({self.s1.id: Executed(V.REFUTED)}, on_range), "verifier")
         self.assertEqual(legacy.run(self.s1, at, st.ENV, under="C1/CANDIDATE").result, Executed(V.REFUTED))   # one argument, as before
 
-    def test_a_party_without_the_spec_s_probe_records_a_typed_INVALID_SPEC_and_runs_nothing(self):
+    def test_a_party_without_the_spec_s_probe_runs_nothing_and_makes_no_record(self):
         absent = pf.Party(self.scope, lambda on_range, spec: None, "implementer", by_spec=True)
         n = len(self.run.events)
-        rec = absent.run(self.s1, RevisionRef(st.SHA_B, str(self.tmp / "impl")), st.ENV, under="C1/CANDIDATE")
-        self.assertEqual((rec.spec_id, rec.semantic_hash, rec.probe_id, rec.probe_digest, rec.revision, rec.enforcement),
-                         (self.s1.id, self.s1.semantic_hash, self.s1.probe_id, self.s1.probe_digest, st.SHA_B, Enforcement.UNAVAILABLE))
-        self.assertEqual(type(rec.result).__name__, "InvalidSpec")
-        self.assertEqual(plain(rec)["result"], {"detail": f"probe {self.s1.probe_id} is not in the harness catalogue"})
+        self.assertIsNone(absent.run(self.s1, RevisionRef(st.SHA_B, str(self.tmp / "impl")), st.ENV, under="C1/CANDIDATE"))
         self.assertEqual((len(self.run.events), self.scope.held), (n, ()))   # no range acquired, nothing journaled
-        self.assertEqual(bound_result(rec, spec=self.s1, revision=st.SHA_B, enforcement=Enforcement.UNAVAILABLE), rec.result)
-        p = pf.prove(self.run, "S1", "C1", self.s1, R.INTRODUCE, implementer=absent,
-                     verifier=pf.Party(self.scope, lambda on_range, spec: None, "verifier", by_spec=True), candidate=st.SHA_B,
-                     implementer_root=str(self.tmp / "impl"), verifier_root=str(self.tmp / "ver"), env=st.ENV,
-                     point=M.CANDIDATE)
-        self.assertEqual((p.agreement, p.satisfaction, p.failure.code), (True, None, F.PROBE_INVALID_SPEC))
-        self.assertNotIn("verdict", self.run.events[p.verified_seq].data)
+
+    def test_prove_types_a_party_without_the_spec_s_probe_as_PROBE_INVALID_SPEC_and_seals_nothing(self):
+        def absent(label):
+            return pf.Party(self.scope, lambda on_range, spec: None, label, by_spec=True)
+
+        def present(label):
+            return pf.Party(self.scope, lambda on_range, spec: st.FakeProbe({spec.id: Executed(V.SATISFIED)}, on_range),
+                            label, by_spec=True)
+
+        def prove(implementer, verifier, criterion):
+            return pf.prove(self.run, "S1", criterion, self.s1, R.INTRODUCE, implementer=implementer, verifier=verifier,
+                            candidate=st.SHA_B, implementer_root=str(self.tmp / "impl"),
+                            verifier_root=str(self.tmp / "ver"), env=st.ENV, point=M.CANDIDATE)
+        n = len(self.run.events)
+        p = prove(absent("implementer"), present("verifier"), "C1")   # the verifier is never asked
+        self.assertEqual((p.criterion_id, p.spec_id, p.implementer_seq, p.verifier_seq, p.verified_seq, p.agreement,
+                          p.satisfaction, p.failure.code), ("C1", self.s1.id, None, None, None, False, None, F.PROBE_INVALID_SPEC))
+        self.assertEqual(len(self.run.events), n)
+        q = prove(present("implementer"), absent("verifier"), "C1b")
+        added = self.run.events[n:]
+        self.assertEqual([e.type for e in added if e.type in ("probe/evaluated", "proof/verified")], ["probe/evaluated"])
+        a = next(e for e in added if e.type == "probe/evaluated")
+        self.assertEqual((q.implementer_seq, q.verifier_seq, q.verified_seq, q.agreement, q.satisfaction, q.failure.code),
+                         (a.seq, None, None, False, None, F.PROBE_INVALID_SPEC))
+        r = prove(present("implementer"), present("verifier"), "C1c")
+        self.assertEqual((r.agreement, r.satisfaction, r.failure), (True, CS.SATISFIED, None))
 
 
 # ------------------------------------------------------------------------------------------- PLAN-V2.2 (case 14)

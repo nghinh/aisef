@@ -8,7 +8,7 @@
     "tests/v2/test_p6_stages.py",
     "tests/v2/test_c2_orchestration_conformance.py"
    ],
-   "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
+   "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
    "mutants": 9,
    "killed": 9,
    "survivors": [],
@@ -16,39 +16,39 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L64 False->True",
+     "mutant": "L62 False->True",
      "killed": true
     },
     {
-     "mutant": "L65 element 0 dropped",
+     "mutant": "L63 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L65 element 1 dropped",
+     "mutant": "L63 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L65 element 2 dropped",
+     "mutant": "L63 element 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L65 element 3 dropped",
+     "mutant": "L63 element 3 dropped",
      "killed": true
     },
     {
-     "mutant": "L65 element 0 dropped",
+     "mutant": "L63 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L65 element 1 dropped",
+     "mutant": "L63 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L65 element 2 dropped",
+     "mutant": "L63 element 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L65 element 3 dropped",
+     "mutant": "L63 element 3 dropped",
      "killed": true
     }
    ]
@@ -59,67 +59,47 @@
     "tests/v2/test_p6_stages.py",
     "tests/v2/test_c2_orchestration_conformance.py"
    ],
-   "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
-   "mutants": 14,
-   "killed": 14,
+   "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
+   "mutants": 9,
+   "killed": 9,
    "survivors": [],
    "strays_reaped": 0,
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L75 condition negated",
+     "mutant": "L73 returns None",
      "killed": true
     },
     {
-     "mutant": "L80 returns None",
+     "mutant": "L72 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L74 conditional negated",
+     "mutant": "L73 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L75 Is->IsNot",
+     "mutant": "L76 condition negated",
      "killed": true
     },
     {
-     "mutant": "L76 returns None",
+     "mutant": "L73 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L83 condition negated",
+     "mutant": "L76 Eq->NotEq",
      "killed": true
     },
     {
-     "mutant": "L83 Eq->NotEq",
+     "mutant": "L69 string ' [' emptied",
      "killed": true
     },
     {
-     "mutant": "L78 Enforcement.UNAVAILABLE->FULL",
+     "mutant": "L69 string ' ' emptied",
      "killed": true
     },
     {
-     "mutant": "L78 Enforcement.UNAVAILABLE->PARTIAL",
-     "killed": true
-    },
-    {
-     "mutant": "L71 string ' [' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L71 string ' ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L71 string ']' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L79 string 'probe ' emptied",
-     "killed": true
-    },
-    {
-     "mutant": "L79 string ' is not in the harness catalogue' emptied",
+     "mutant": "L69 string ']' emptied",
      "killed": true
     }
    ]
@@ -130,7 +110,7 @@
     "tests/v2/test_p6_stages.py",
     "tests/v2/test_c2_orchestration_conformance.py"
    ],
-   "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
+   "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
@@ -138,19 +118,19 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L50 element 0 dropped",
+     "mutant": "L48 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L50 element 1 dropped",
+     "mutant": "L48 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L50 element 0 dropped",
+     "mutant": "L48 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L50 element 1 dropped",
+     "mutant": "L48 element 1 dropped",
      "killed": true
     }
    ]
@@ -161,7 +141,7 @@
     "tests/v2/test_p6_stages.py",
     "tests/v2/test_c2_orchestration_conformance.py"
    ],
-   "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
+   "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
    "mutants": 4,
    "killed": 4,
    "survivors": [],
@@ -169,19 +149,19 @@
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L117 returns None",
+     "mutant": "L116 returns None",
      "killed": true
     },
     {
-     "mutant": "L117 element 0 dropped",
+     "mutant": "L116 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L117 element 1 dropped",
+     "mutant": "L116 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L117 Eq->NotEq",
+     "mutant": "L116 Eq->NotEq",
      "killed": true
     }
    ]
@@ -192,319 +172,443 @@
     "tests/v2/test_p6_stages.py",
     "tests/v2/test_c2_orchestration_conformance.py"
    ],
-   "source_sha256": "9817d6696bf22108ad4168e4f4f218b52bcfce4b510c495f146e9082ae69acfe",
-   "mutants": 77,
-   "killed": 77,
+   "source_sha256": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f",
+   "mutants": 108,
+   "killed": 108,
    "survivors": [],
    "strays_reaped": 0,
    "killed_by_timeout": 0,
    "results": [
     {
-     "mutant": "L91 condition negated",
+     "mutant": "L86 condition negated",
      "killed": true
     },
     {
-     "mutant": "L98 condition negated",
+     "mutant": "L95 condition negated",
      "killed": true
     },
     {
-     "mutant": "L104 condition negated",
+     "mutant": "L97 condition negated",
      "killed": true
     },
     {
-     "mutant": "L112 returns None",
+     "mutant": "L103 condition negated",
      "killed": true
     },
     {
-     "mutant": "L91 Is->IsNot",
+     "mutant": "L111 returns None",
      "killed": true
     },
     {
-     "mutant": "L98 NotEq->Eq",
+     "mutant": "L86 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L99 returns None",
+     "mutant": "L90 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L104 not removed",
+     "mutant": "L92 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L105 returns None",
+     "mutant": "L93 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L111 conditional negated",
+     "mutant": "L95 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L91 MeasurementPoint.PARENT->CANDIDATE",
+     "mutant": "L96 returns None",
      "killed": true
     },
     {
-     "mutant": "L91 MeasurementPoint.PARENT->POST_MERGE",
+     "mutant": "L97 NotEq->Eq",
      "killed": true
     },
     {
-     "mutant": "L93 string '/' emptied",
+     "mutant": "L98 returns None",
      "killed": true
     },
     {
-     "mutant": "L111 Is->IsNot",
+     "mutant": "L103 not removed",
      "killed": true
     },
     {
-     "mutant": "L112 True->False",
+     "mutant": "L104 returns None",
      "killed": true
     },
     {
-     "mutant": "L92 string 'the parent is measured by StoryAdmission, never by a proof (§13)' emptied",
+     "mutant": "L110 conditional negated",
      "killed": true
     },
     {
-     "mutant": "L95 dict entry 0 dropped",
+     "mutant": "L86 MeasurementPoint.PARENT->CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L95 dict entry 1 dropped",
+     "mutant": "L86 MeasurementPoint.PARENT->POST_MERGE",
      "killed": true
     },
     {
-     "mutant": "L95 dict entry 2 dropped",
+     "mutant": "L88 string '/' emptied",
      "killed": true
     },
     {
-     "mutant": "L97 dict entry 0 dropped",
+     "mutant": "L90 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L97 dict entry 1 dropped",
+     "mutant": "L92 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L97 dict entry 2 dropped",
+     "mutant": "L93 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L99 False->True",
+     "mutant": "L110 Is->IsNot",
      "killed": true
     },
     {
-     "mutant": "L103 element 0 dropped",
+     "mutant": "L111 True->False",
      "killed": true
     },
     {
-     "mutant": "L103 element 1 dropped",
+     "mutant": "L87 string 'the parent is measured by StoryAdmission, never by a proof (§13)' emptied",
      "killed": true
     },
     {
-     "mutant": "L104 string 'agreement' emptied",
+     "mutant": "L96 False->True",
      "killed": true
     },
     {
-     "mutant": "L105 False->True",
+     "mutant": "L98 False->True",
      "killed": true
     },
     {
-     "mutant": "L111 ProbeExecutionStatus.EXECUTED->UNRUNNABLE",
+     "mutant": "L102 element 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L111 ProbeExecutionStatus.EXECUTED->INVALID_SPEC",
+     "mutant": "L102 element 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L95 string 'story_id' emptied",
+     "mutant": "L103 string 'agreement' emptied",
      "killed": true
     },
     {
-     "mutant": "L95 string 'criterion_id' emptied",
+     "mutant": "L104 False->True",
      "killed": true
     },
     {
-     "mutant": "L95 string 'record' emptied",
+     "mutant": "L110 ProbeExecutionStatus.EXECUTED->UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L97 string 'story_id' emptied",
+     "mutant": "L110 ProbeExecutionStatus.EXECUTED->INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L97 string 'criterion_id' emptied",
+     "mutant": "L90 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L97 string 'record' emptied",
+     "mutant": "L90 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->PROBE_UNRUNNABLE",
+     "mutant": "L90 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->PROBE_INVALID_SPEC",
+     "mutant": "L93 dict entry 0 dropped",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->CONTRACT_UNSATISFIED",
+     "mutant": "L93 dict entry 1 dropped",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L93 dict entry 2 dropped",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->PRECONDITION_BROKEN",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->PLAN_CONTRADICTION",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->POST_MERGE_REGRESSION",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->NON_CONTROLLER_SIGNAL",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->MISSING_CREDENTIAL",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->INVALID_CREDENTIAL",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->PROVIDER_UNAVAILABLE",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->UNKNOWN",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->VERIFIER_DISAGREEMENT",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->MERGE_CONFLICT",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->TESTS_UNRUNNABLE",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->TESTS_INADEQUATE",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->REVIEW_FINDING",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->PROBE_MISMATCH",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->SECURITY_FINDING",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->CAPABILITY_UNRUNNABLE",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L99 FailureCode.PROBE_MISMATCH->RESOURCE_ACQUISITION_FAILED",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->TESTS_INADEQUATE",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->PROBE_UNRUNNABLE",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->REVIEW_FINDING",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->PROBE_INVALID_SPEC",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->SECURITY_FINDING",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->CONTRACT_UNSATISFIED",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->CAPABILITY_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->SUBJECT_ABSENT_AT_CANDIDATE",
+     "mutant": "L96 FailureCode.PROBE_INVALID_SPEC->RESOURCE_ACQUISITION_FAILED",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->PRECONDITION_BROKEN",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->PROBE_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->PLAN_CONTRADICTION",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->PROBE_INVALID_SPEC",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->POST_MERGE_REGRESSION",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->CONTRACT_UNSATISFIED",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->POST_MERGE_SUBJECT_LOST",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->SUBJECT_ABSENT_AT_CANDIDATE",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->NON_CONTROLLER_SIGNAL",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->PRECONDITION_BROKEN",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->MISSING_CREDENTIAL",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->PLAN_CONTRADICTION",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->INVALID_CREDENTIAL",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->POST_MERGE_REGRESSION",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->PROVIDER_UNAVAILABLE",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->POST_MERGE_SUBJECT_LOST",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->UNKNOWN",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->NON_CONTROLLER_SIGNAL",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->PROBE_MISMATCH",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->MISSING_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->MERGE_CONFLICT",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->INVALID_CREDENTIAL",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->TESTS_UNRUNNABLE",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->PROVIDER_UNAVAILABLE",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->TESTS_INADEQUATE",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->UNKNOWN",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->REVIEW_FINDING",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->VERIFIER_DISAGREEMENT",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->SECURITY_FINDING",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->MERGE_CONFLICT",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->CAPABILITY_UNRUNNABLE",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->TESTS_UNRUNNABLE",
      "killed": true
     },
     {
-     "mutant": "L106 FailureCode.VERIFIER_DISAGREEMENT->RESOURCE_ACQUISITION_FAILED",
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L98 FailureCode.PROBE_MISMATCH->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->PROBE_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->PROBE_INVALID_SPEC",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->CONTRACT_UNSATISFIED",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->SUBJECT_ABSENT_AT_CANDIDATE",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->PRECONDITION_BROKEN",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->PLAN_CONTRADICTION",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->POST_MERGE_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->POST_MERGE_SUBJECT_LOST",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->NON_CONTROLLER_SIGNAL",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->MISSING_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->INVALID_CREDENTIAL",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->PROVIDER_UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->UNKNOWN",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->PROBE_MISMATCH",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->MERGE_CONFLICT",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->TESTS_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->TESTS_INADEQUATE",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->REVIEW_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->SECURITY_FINDING",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->CAPABILITY_UNRUNNABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L105 FailureCode.VERIFIER_DISAGREEMENT->RESOURCE_ACQUISITION_FAILED",
+     "killed": true
+    },
+    {
+     "mutant": "L90 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L90 string 'criterion_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L91 string 'record' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L93 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L93 string 'criterion_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L94 string 'record' emptied",
      "killed": true
     }
    ]

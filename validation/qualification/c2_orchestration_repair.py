@@ -431,8 +431,9 @@ def write() -> dict:
         "authority": AUTHORITY,
         "classification": "CONFORMANCE REPAIR to the frozen architecture (not an architecture expansion, not a new probe feature)",
         "subject": {"base": BASE, "head_when_written": _git("rev-parse", "HEAD"),
-                    "note": "written before the commit that carries the repair and this record (a record cannot name the "
-                            "commit that contains it); (d) binds every changed file by content",
+                    "note": "written on head_when_written, the commit that carries the repair, and committed in the commit "
+                            "after it (a record cannot name the commit that contains it; the C2-P5 proposal's derived "
+                            "provenance in (e) reads HEAD's kernel tree); (d) binds every changed file by content",
                     "old_kernel": old,
                     "new_kernel": {"kernel_digest": kernel_digest(ROOT / "aisef2"),
                                    "rule": "q4's kernel digest over this working tree's aisef2 (its git tree exists once the "
@@ -441,8 +442,12 @@ def write() -> dict:
             "story_runner._probe": "resolves the factory of the spec's own probe identity (inputs.probes.get(spec.probe_id)); "
                                    "None when the harness wires none; without a spec only a single factory is unambiguous (as before)",
             "proof.Party": "keyword-only by_spec: the maker is given the spec it is asked to prove; a maker without the spec's "
-                           "probe gives a typed InvalidSpec record (enforcement UNAVAILABLE), as StoryAdmission records one — "
-                           "never a crash, never another probe's run; one-argument makers unchanged",
+                           "probe makes the party run nothing and return no record (a party never manufactures one: invariant "
+                           "III, INV-III-1 pins the record producers to protocol.py and story_admission.py); one-argument "
+                           "makers unchanged",
+            "proof.prove": "a party with no probe for the spec's identity is PROBE_INVALID_SPEC, the code an INVALID_SPEC result "
+                           "routes to at every point (§10) — never a crash, never another probe's run; the journal order of "
+                           "a proof is unchanged (implementer record, verifier record, proof)",
             "StoryInputs.probes": "several factories keyed by probe id (a harness wires every probe the plan's specs name)",
             "unchanged": "StoryAdmission, ContractSatisfaction, routing, budgets, journal events and payloads, the RunSpec, "
                          "F1-F11, every contract, spec, plan and probe identity"},

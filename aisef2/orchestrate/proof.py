@@ -11,9 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Mapping
 
-from aisef2.arch.enums import (
-    ContractSatisfaction, Enforcement, EventType as T, MeasurementPoint, ObligationRole, ProbeExecutionStatus,
-)
+from aisef2.arch.enums import ContractSatisfaction, EventType as T, MeasurementPoint, ObligationRole, ProbeExecutionStatus
 from aisef2.control.owner import Classification, FailureCode, classify
 from aisef2.control.routing import route
 from aisef2.errors import InvariantError
@@ -22,7 +20,7 @@ from aisef2.journal.format2 import ResourceKind
 from aisef2.journal.format3 import verified_payload
 from aisef2.probe.protocol import ExecutionEnv, Probe, ProbeRecord, RevisionRef, bound_result, run_probe
 from aisef2.product.contract import plain
-from aisef2.product.outcome import InvalidSpec, contract_satisfaction
+from aisef2.product.outcome import contract_satisfaction
 from aisef2.product.spec import ProductProofSpec
 from aisef2.runtime.story_scope import StoryScope
 
@@ -31,9 +29,9 @@ from aisef2.runtime.story_scope import StoryScope
 class Proof:
     criterion_id: str
     spec_id: str
-    implementer_seq: int
-    verifier_seq: int
-    verified_seq: int | None       # None when the two records could not become a proof (mismatch)
+    implementer_seq: int | None    # None when that party had no probe for the spec (nothing measured)
+    verifier_seq: int | None
+    verified_seq: int | None       # None when the two records could not become a proof (mismatch, no probe)
     agreement: bool
     satisfaction: ContractSatisfaction | None   # the bound implementer result's, when it executed and they agree
     failure: Classification | None
@@ -57,14 +55,14 @@ class Party:
     """One party's probe run: the probe evaluates in the party's own checkout; its process range is acquired into the
     story's scope when it starts and released when the probe returns (§17.1). With `by_spec` the maker is also given
     the spec it is asked to prove and answers with that spec's own probe (C2-ORCHESTRATION-CONFORMANCE-REPAIR), or
-    None when the harness has none for the spec's identity: the record is then a typed InvalidSpec, as StoryAdmission
-    records one (§13) — never a crash, never another probe's run."""
+    None when the harness has none for the spec's identity: the party then runs nothing and returns no record — a
+    party never manufactures one (invariant III: only the harness seals a record) — and `prove` types the outcome."""
 
     def __init__(self, scope: StoryScope, make_probe: Callable[..., Probe | None], label: str, *,
                  by_spec: bool = False) -> None:
         self.scope, self._make, self.label, self._by_spec = scope, make_probe, label, by_spec
 
-    def run(self, spec: ProductProofSpec, at: RevisionRef, env: ExecutionEnv, *, under: str) -> ProbeRecord:
+    def run(self, spec: ProductProofSpec, at: RevisionRef, env: ExecutionEnv, *, under: str) -> ProbeRecord | None:
         held: list = []
 
         def on_range(process_range) -> None:
@@ -72,12 +70,7 @@ class Party:
 
         try:
             probe = self._make(on_range, spec) if self._by_spec else self._make(on_range)
-            if probe is None:
-                return ProbeRecord.create(spec_id=spec.id, semantic_hash=spec.semantic_hash, probe_id=spec.probe_id,
-                                          probe_digest=spec.probe_digest, revision=at.sha,
-                                          enforcement=Enforcement.UNAVAILABLE,
-                                          result=InvalidSpec(f"probe {spec.probe_id} is not in the harness catalogue"))
-            return run_probe(probe, spec, at, env)
+            return None if probe is None else run_probe(probe, spec, at, env)
         finally:
             for r in reversed(held):
                 if self.scope.held[-1:] == (r.name,):   # only the top of the stack is released early (§17.1)
@@ -87,14 +80,20 @@ class Party:
 def prove(run, story_id: str, criterion_id: str, spec: ProductProofSpec, role: ObligationRole | None, *,
           implementer: Party, verifier: Party, candidate: str, implementer_root: str, verifier_root: str,
           env: ExecutionEnv, point: MeasurementPoint) -> Proof:
-    """Two independent records of `spec` at `candidate`, journaled and bound into one proof or one typed failure."""
+    """Two independent records of `spec` at `candidate`, journaled and bound into one proof or one typed failure. A
+    party with no probe for the spec's identity measures nothing: PROBE_INVALID_SPEC, as an INVALID_SPEC result routes
+    at every point (§10) — never a crash, never another probe's run, never a record the party made itself."""
     if point is MeasurementPoint.PARENT:
         raise InvariantError("the parent is measured by StoryAdmission, never by a proof (§13)")
     under = f"{criterion_id}/{point.value}"
     a = implementer.run(spec, RevisionRef(candidate, implementer_root), env, under=under)
-    seq_a = run.append(T.PROBE_EVALUATED, {"story_id": story_id, "criterion_id": criterion_id, "record": plain(a)}).seq
-    b = verifier.run(spec, RevisionRef(candidate, verifier_root), env, under=under)
-    seq_b = run.append(T.PROBE_EVALUATED, {"story_id": story_id, "criterion_id": criterion_id, "record": plain(b)}).seq
+    seq_a = None if a is None else run.append(T.PROBE_EVALUATED, {"story_id": story_id, "criterion_id": criterion_id,
+                                                                   "record": plain(a)}).seq
+    b = None if a is None else verifier.run(spec, RevisionRef(candidate, verifier_root), env, under=under)
+    seq_b = None if b is None else run.append(T.PROBE_EVALUATED, {"story_id": story_id, "criterion_id": criterion_id,
+                                                                   "record": plain(b)}).seq
+    if b is None:
+        return Proof(criterion_id, spec.id, seq_a, seq_b, None, False, None, classify(FailureCode.PROBE_INVALID_SPEC))
     if a.comparability != b.comparability:
         return Proof(criterion_id, spec.id, seq_a, seq_b, None, False, None, classify(FailureCode.PROBE_MISMATCH))
     payload = verified_payload(story_id=story_id, criterion_id=criterion_id, spec_id=spec.id,
