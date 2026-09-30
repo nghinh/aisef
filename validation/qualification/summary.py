@@ -1,4 +1,5 @@
-"""Assemble `closure-evidence/v2/Q0-Q3/SUMMARY.json` from the per-platform rung records, and verify it.
+"""Assemble `<OUT_REL>/SUMMARY.json` (Cycle 2: closure-evidence/v2/cycle2/Q0-Q3/SUMMARY.json) from the per-platform
+rung records, and verify it.
 
     python -P validation/qualification/summary.py            # write
     python -P validation/qualification/summary.py --check    # exit 1 if the summary is stale or a binding does not hold
@@ -36,8 +37,10 @@ def _records(out: pathlib.Path) -> dict[str, list[dict]]:
 
 def _bound(rec: dict) -> bool:
     s = rec.get("subject", {})
+    trees = s.get("subject_trees") or {}
     return (s.get("seal_commit"), s.get("semantic_candidate"), s.get("kernel_tree"), s.get("head_kernel_tree")) == \
-        (C.SEAL_COMMIT, C.SEMANTIC_CANDIDATE, C.KERNEL_TREE, C.KERNEL_TREE) and s.get("kernel_tree_is_the_candidates") is True
+        (C.SEAL_COMMIT, C.SEMANTIC_CANDIDATE, C.KERNEL_TREE, C.KERNEL_TREE) and s.get("kernel_tree_is_the_candidates") is True \
+        and set(trees) == set(C.SUBJECT_TREES) and all(t["head"] == t["candidate"] == C.SUBJECT_TREES[rel] for rel, t in trees.items())
 
 
 def assemble() -> dict:
@@ -101,13 +104,15 @@ def assemble() -> dict:
     overall = C.GREEN if all(r["status"] == C.GREEN for r in rungs.values()) else (
         C.FAILED if any(r["status"] == C.FAILED for r in rungs.values()) else C.UNRUNNABLE)
     return {
-        "record": "AISEF V2 — Q0–Q3 QUALIFICATION SUMMARY (QP-7)", "work_package": "QP-7", "rfc_sections": ["27"],
-        "authority": "AISEF V2 — P7 / QP-7 EXECUTION AUTHORIZATION / Q0 → Q1 → Q2 → Q3 QUALIFICATION (owner, 2026-09-27)",
+        "record": "AISEF V2 — CYCLE-2 Q0–Q3 QUALIFICATION SUMMARY (QP-2.6)", "work_package": "QP-2.6", "rfc_sections": ["27"],
+        "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P5 ACCEPTED WITH EXPLICIT CONTRACT INTERPRETATIONS / "
+                     "AUTHORIZE QP-2.6 AND AUTOMATIC DOWNSTREAM EXECUTION' (2026-09-30)",
         "verdict": overall, "rung_status_model": {"GREEN": "every applicable case passed on every qualification platform",
                                                   "FAILED": "a case executed and failed", "UNRUNNABLE": "could not execute or measure; never presented as FAILED"},
         "subject": {"seal_commit": C.SEAL_COMMIT, "semantic_candidate": C.SEMANTIC_CANDIDATE, "kernel_tree": C.KERNEL_TREE,
                     "v1_product_tree": C.V1_PRODUCT_TREE, "head_at_assembly": ident["head"], "head_kernel_tree": ident["head_kernel_tree"],
-                    "rfc": ident["rfc"], "probe": ident["probe"], "harness": ident["harness"]},
+                    "rfc": ident["rfc"], "probe": ident["probe"], "probes": ident["probes"], "subject_trees": C.SUBJECT_TREES,
+                    "cycle1": ident["cycle1"], "harness": ident["harness"]},
         "rungs": rungs,
         "q0": {"checker_calibration_count": (q0 or {}).get("calibrated"), "checkers_discovered": (q0 or {}).get("discovered"),
                "f1_f11": pick("Q0", "f1_f11", {}).get("summary") if pick("Q0", "f1_f11") else None,
@@ -117,6 +122,13 @@ def assemble() -> dict:
         "q3": {"fault_matrix_rows": (q3 or {}).get("rows"), "fault_matrix_classes": (q3 or {}).get("classes"),
                "fault_matrix_digest": C.sha_text(json.dumps([{k: r[k] for k in ("id", "class", "cases", "expected")} for r in (q3 or {}).get("matrix", [])], sort_keys=True)) if q3 else None,
                "v1_matrix_cells": (pick("Q3", "v1_fault_matrix") or {}).get("cells"), "race_10_observations": (q3r or {}).get("RACE_10_observations")},
+        "cycle2": {"q0": pick("Q0", "cycle2"), "q1_properties": (pick("Q1", "cycle2") or {}).get("properties"),
+                   "q2_calibration": {k: v for k, v in ((pick("Q2", "cycle2") or {}).get("probe_capability_calibration") or {}).items()
+                                      if k in ("probes", "in_use", "all_calibrated_fresh", "problems")},
+                   "q2_falsifiability": {k: v for k, v in ((pick("Q2", "cycle2") or {}).get("spec_falsifiability") or {}).items()
+                                         if k in ("specs", "qualified", "by_probe", "approvals", "problems")},
+                   "q3_rows_by_class": {c: sum(1 for r in (q3 or {}).get("matrix", []) if r["class"] == c)
+                                        for c in sorted({r["class"] for r in (q3 or {}).get("matrix", [])})}},
         "platform_identities": {rung: {k: {"os": v["os"], "python": v["python"], "ci_run": v["ci_run"], "status": v["status"]} for k, v in r["records"].items()}
                                 for rung, r in rungs.items()},
         "residual_processes": residual,
@@ -131,7 +143,7 @@ def check() -> list[str]:
     if not committed.exists():
         return out + [f"{SUMMARY_REL} is missing"]
     old = json.loads(committed.read_text(encoding="utf-8"))
-    for k in ("verdict", "subject", "rungs", "q0", "q2", "q3"):
+    for k in ("verdict", "subject", "rungs", "q0", "q2", "q3", "cycle2"):
         a, b = old.get(k), fresh.get(k)
         if k == "subject":
             a, b = {x: y for x, y in a.items() if x != "head_at_assembly"}, {x: y for x, y in b.items() if x != "head_at_assembly"}

@@ -5,18 +5,34 @@ reconfirmed without turning them into product proof.
 Mutation is not re-run here: the records were measured on the candidate's exact sources and each target carries the
 source digest of the file it mutated; `mutation.check` re-derives every digest against this tree and fails closed on
 any drift, any unaudited survivor, and any target with no mutants. Every timeout kill is named in the record.
+
+Cycle 2 (QP-2.6; CYCLE2-QUALIFICATION-PLAN §3): the Cycle-2 mutation records (C2-P1..P4) are read the same way; a
+ProbeCapabilityCalibration is re-derived fresh for every catalog probe and every class it declares, and the same
+fixtures must reject the probe once they stop contrasting; and every spec of the owner-approved PLAN-V2.2 — compiled
+here under the persisted real approvals — is re-executed against the frozen reference and against its own P5 witness:
+SpecFalsifiabilityEvidence (controlled_product_mutation) with no falsifiability problem, for all of them.
 """
 
 from __future__ import annotations
 
+import concurrent.futures
 import dataclasses
 import json
+import pathlib
 import sys
+import tempfile
 import time
 
 from . import common as C
 
 FIXTURES_REL = "tests/v2/fixtures/calibration"
+#: the Cycle-2 calibration records, one per lane; with P2-CALIBRATION.json (Cycle 1) they are every committed record
+CYCLE2_CALIBRATION_RECORDS = ("closure-evidence/v2/cycle2/P1-FILE-ARTIFACT-CALIBRATION.json", "closure-evidence/v2/cycle2/P2-CLI-CALIBRATION.json",
+                              "closure-evidence/v2/cycle2/P3-EFFECT-CALIBRATION.json",
+                              "closure-evidence/v2/cycle2/P4-PYTHON-CALLABLE-V2-CALIBRATION.json")
+CYCLE2_CALIBRATION_CASES = [("tests.v2.test_c2_file_artifact", ("Fixtures",)), ("tests.v2.test_c2_cli_calibration", ("Fixtures",)),
+                            ("tests.v2.test_python_callable_v2", ("Calibration",)), ("tests.v2.test_c2_effect_calibration", None)]
+WORKERS = 3
 SENSITIVITY_RFC_ROW = ("Engineering-test **sensitivity** (mutation at story scope) | when Q2 mutation infrastructure is stable "
                        "and its cost per story is measured")
 QUALITY_MODULES = ("tests.v2.p5.test_test_execution", "tests.v2.p5.test_relevance", "tests.v2.p5.test_vacuity", "tests.v2.p5.test_adequacy")
@@ -110,6 +126,105 @@ def _calibration() -> dict:
             "contrast_table": contrast, "both_polarities_required": contrast["SATISFIED expected, REFUTED observed"]
             and contrast["REFUTED expected, SATISFIED observed"] and not contrast["SATISFIED expected, SATISFIED observed"]
             and not contrast["REFUTED expected, REFUTED observed"], "problems": problems}
+
+
+def _committed_calibration_keys() -> set:
+    keys = set()
+    for rel in ("closure-evidence/v2/P2-CALIBRATION.json", *CYCLE2_CALIBRATION_RECORDS):
+        c = json.loads((C.ROOT / rel).read_text(encoding="utf-8"))["calibrations"]
+        rows = [r for v in c.values() for r in v] if isinstance(c, dict) else c
+        keys |= {(r["probe_id"], r["probe_digest"], r["observation_class"]) for r in rows if "probe_id" in r and r.get("qualified", True)}
+    return keys
+
+
+def _calibration_cycle2() -> dict:
+    """Every catalog probe (the four active Cycle-2 probes and the frozen Cycle-1 one), every class it declares:
+    calibrated fresh over its committed fixtures, and rejected by the same fixtures once they stop contrasting."""
+    import importlib
+    from aisef2.probe import calibration as cal
+    from aisef2.probe import catalog
+    registry = catalog.registry()
+    env = cal.calibration_env(sys.executable)
+    fresh, problems = [], []
+    for e in catalog.CATALOG:
+        module = importlib.import_module(e.factory.__module__)
+        probe = e.factory()
+        folder = e.factory.__module__.rsplit(".", 1)[-1]
+        base = C.ROOT / FIXTURES_REL / folder
+        for cls in module.CLASSES:
+            pos, neg = base / cls / "positive", base / cls / "negative"
+            names = (f"{FIXTURES_REL}/{folder}/{cls}/positive", f"{FIXTURES_REL}/{folder}/{cls}/negative")
+            row = {"probe_id": e.probe_id, "probe_digest": e.probe_digest, "active": e.active, "observation_class": cls,
+                   "fixtures": list(names)}
+            try:
+                rec = cal.calibrate(probe, cls, pos, neg, env, time.time, registry=registry, names=names)
+                row.update(qualified=True, calibrated_digest=rec.probe_digest)
+            except cal.NotQualified as x:
+                row.update(qualified=False, why=str(x))
+                problems.append(f"{e.probe_id}/{cls}: {x}")
+            try:
+                cal.calibrate(probe, cls, neg, neg, env, time.time, registry=registry)
+                row["non_contrasting_pair_rejected"] = False
+                problems.append(f"{e.probe_id}/{cls}: a non-contrasting pair (negative, negative) was not rejected")
+            except cal.NotQualified:
+                row["non_contrasting_pair_rejected"] = True
+            fresh.append(row)
+    in_use = {(e.probe_id, e.probe_digest, cls) for e in catalog.CATALOG
+              for cls in importlib.import_module(e.factory.__module__).CLASSES}
+    fresh_keys = {(r["probe_id"], r["probe_digest"], r["observation_class"]) for r in fresh if r["qualified"]}
+    committed = _committed_calibration_keys()
+    if in_use != fresh_keys:
+        problems.append(f"declared but not calibrated fresh: {sorted(in_use - fresh_keys)}")
+    if committed != in_use:
+        problems.append(f"the committed calibration records differ from the declared classes: {sorted(committed ^ in_use)}")
+    return {"probes": {e.probe_id: {"digest": e.probe_digest, "active": e.active,
+                                    "classes": list(importlib.import_module(e.factory.__module__).CLASSES)} for e in catalog.CATALOG},
+            "fresh": fresh, "in_use": sorted(in_use), "committed_record_keys": sorted(committed),
+            "records": list(CYCLE2_CALIBRATION_RECORDS), "all_calibrated_fresh": in_use == fresh_keys, "problems": problems}
+
+
+def _falsifiability_cycle2() -> dict:
+    """Every spec of the owner-approved PLAN-V2.2, compiled under the persisted real approvals, re-executed: the frozen
+    reference must give its expectation and its own P5 witness the contrast; the evidence is validated by the frozen
+    `falsifiability_problems`."""
+    from aisef2.probe import catalog
+    from aisef2.product.compiler import ProbeRef, compile_spec
+    from validation.qualification import p5_acceptance as pa
+    from validation.qualification import p5_falsifiability as pf
+    reqs, real, contracts = pa._aid().requirements(), pa.load_approvals(), pa.contracts()
+    refs = {k: ProbeRef(e.probe_id, e.probe_digest) for k, e in catalog.active().items()}
+    specs = {sid: compile_spec(c, requirements=reqs, approvals=real, probes=refs) for sid, c in contracts.items()}
+    witness_of = {m["spec"]: m for m in pf.corpus()["mutants"]}
+    committed = {r["spec_id"]: r for r in json.loads((C.ROOT / pf.OUT_REL).read_text(encoding="utf-8"))["specs"]}
+    corpus_problems = pf.corpus_problems()
+    rows, problems = [], [f"P5 corpus: {x}" for x in corpus_problems]
+    with tempfile.TemporaryDirectory(prefix="aisef-q2-c2f-", ignore_cleanup_errors=True) as tmp:
+        work = pathlib.Path(tmp)
+        reference = pf.build_tree(None, work)
+        trees = {sid: pf.build_tree(witness_of[sid], work) for sid in specs}
+
+        def job(sid):
+            return sid, pf.verdict_of(pf.observe(specs[sid], reference)), pf.verdict_of(pf.observe(specs[sid], trees[sid]))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=WORKERS) as pool:   # each job waits on its own child processes
+            observed = {sid: (a, b) for sid, a, b in pool.map(job, sorted(specs))}
+    for sid in sorted(specs):
+        spec, (pristine, witness) = specs[sid], observed[sid]
+        expectation = spec.candidate_expectation.value
+        status = pf.classify(expectation, pristine, witness)
+        ev = pf.evidence(spec, witness_of[sid]["id"], witness.split(" ")[0]) if status == "QUALIFIED" else None
+        row = {"spec_id": sid, "semantic_hash": spec.semantic_hash, "probe_id": spec.probe_id, "probe_digest": spec.probe_digest,
+               "expectation": expectation, "pristine": pristine, "witness": witness_of[sid]["id"], "witness_verdict": witness,
+               "status": status, "mechanism": pf.MECHANISM, "evidence_problems": ev["falsifiability_problems"] if ev else None,
+               "equal_to_the_accepted_record": committed.get(sid, {}).get("semantic_hash") == spec.semantic_hash}
+        rows.append(row)
+        if status != "QUALIFIED" or (ev and ev["falsifiability_problems"]) or not row["equal_to_the_accepted_record"]:
+            problems.append(f"{sid}: {status} (pristine {pristine}, witness {witness}) {ev and ev['falsifiability_problems']}")
+    return {"rule": "every spec that backs qualified product evidence in Cycle 2 is a spec of the owner-approved PLAN-V2.2; each is "
+                    "compiled under the persisted real approvals and re-executed, never read from the P5 record",
+            "specs": len(rows), "qualified": sum(1 for r in rows if r["status"] == "QUALIFIED"),
+            "by_probe": {pid: sum(1 for r in rows if r["probe_id"] == pid) for pid in sorted({r["probe_id"] for r in rows})},
+            "approvals": {"count": len(real), "approver": sorted({a.approver for a in real})},
+            "rows": rows, "problems": problems}
 
 
 def _falsifiability() -> dict:
@@ -207,6 +322,17 @@ def run(ident: dict) -> dict:
     else:
         problems += [f"calibration: {p}" for p in calibration["problems"]]
     fixed_probes = C.run_module("tests.v2.p2.test_calibration")
+    calibration2, err = C.capture(_calibration_cycle2)
+    if err:
+        harness.append(f"cycle 2 calibration could not run: {err}")
+    else:
+        problems += [f"cycle 2 calibration: {p}" for p in calibration2["problems"]]
+    calibration2_cases = [c for module, classes in CYCLE2_CALIBRATION_CASES for c in C.run_module(module, classes=classes)]
+    falsifiability2, err = C.capture(_falsifiability_cycle2)
+    if err:
+        harness.append(f"cycle 2 falsifiability could not run: {err}")
+    else:
+        problems += [f"cycle 2 falsifiability: {p}" for p in falsifiability2["problems"]]
     falsifiability, err = C.capture(_falsifiability)
     if err:
         harness.append(f"falsifiability could not run: {err}")
@@ -222,7 +348,7 @@ def run(ident: dict) -> dict:
     p5_identity = p5.check(C.ROOT)
     if p5_identity:
         problems.append(f"P5 records: {p5_identity}")
-    cases = authority["cases"] + fixed_probes + quality_modules + [c for q in quality.values() for c in q["cases"]]
+    cases = authority["cases"] + fixed_probes + quality_modules + [c for q in quality.values() for c in q["cases"]] + calibration2_cases
     optional_absent = [{"id": c["id"], "capability": c["optional_capability_absent"], "reason": c.get("detail")}
                        for c in cases if c.get("optional_capability_absent")]
     return {
@@ -231,6 +357,9 @@ def run(ident: dict) -> dict:
         "product_mutation": mutation, "inv_mutation_authority": authority,
         "probe_capability_calibration": calibration, "fixed_verdict_probes_rejected": {"counts": C.counts(fixed_probes), "cases": fixed_probes},
         "spec_falsifiability": falsifiability,
+        "cycle2": {"probe_capability_calibration": calibration2, "calibration_cases": {"counts": C.counts(calibration2_cases),
+                                                                                      "cases": calibration2_cases},
+                   "spec_falsifiability": falsifiability2},
         "engineering_quality": {"properties": quality, "modules": {"counts": C.counts(quality_modules), "cases": quality_modules},
                                 "sensitivity": {"status": "DEFERRED_BY_RFC", "rfc_row": SENSITIVITY_RFC_ROW,
                                                 "scope": "not measured in Q2 cycle 1; not expanded (owner §15)"},

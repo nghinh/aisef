@@ -5,6 +5,12 @@ V2-006 semantic conformance case, test-layout invariance (the committed cases an
 path, nesting, filename, import arrangement and split/merge on the reference probe), and the six control-critical
 projection reference models: independent by the AST no-import audit, calibrated against a wrong-model case each,
 equal to the kernel projection on every generated trace and at every prefix (incremental fold == from-scratch fold).
+
+Cycle 2 (QP-2.6; CYCLE2-QUALIFICATION-PLAN §2): for every active probe kind its observation-class table on fixture
+facts (including the expired-window verdict of each class and SUBJECT_ABSENT under the contract's declaration), its
+scenario / protocol semantics, test-layout invariance, the independence of the two witnesses over committed bytecode,
+CRLF, the executable bit and colliding dates, and DESIGN-CHECK-1 (one result under every scheduling of exit and
+channel close) — on every qualification platform.
 """
 
 from __future__ import annotations
@@ -46,6 +52,33 @@ LAYOUT_CASES = [
     ("tests.v2.p5.test_invariants", "SemanticDeterminism", "test_INV_II_1_developer_test_topology_is_not_an_input_of_the_product_verdict"),
 ]
 V2_006_SEMANTIC_MODULES = ("tests.v2.test_v2_006", "tests.v2.test_v2_006_repeat")
+FA, CLI, PE, PEU, PC2 = ("tests.v2.test_c2_file_artifact", "tests.v2.test_c2_cli_invocation", "tests.v2.test_probe_process_effect",
+                         "tests.v2.test_probe_process_effect_units", "tests.v2.test_python_callable_v2")
+#: kind -> (module, classes) of its class table and semantics, run whole
+CYCLE2_SEMANTICS = {
+    "file_artifact": [(FA, ("Tables", "Absence", "ObjectStoreRule", "Refusals"))],
+    "cli_invocation": [("tests.v2.test_c2_cli_verdicts", None), ("tests.v2.test_c2_cli_calibration", ("Equality",)),
+                       (CLI, ("Harness", "Identity")), ("tests.v2.test_c2_cli_protocol", ("Identity",))],
+    "process_effect": [(PEU, None), (PE, ("Scenario", "Adversarial", "Identity"))],
+    "python_callable_v2": [(PC2, ("ReturnsBytes", "Equals", "RaisesAttrs", "Workspace", "Identity", "Cycle1Semantics", "LayoutInvariance"))],
+}
+#: the table properties the plan names, each read from the run by case id
+CYCLE2_PROPERTIES = {
+    "expired_window_verdict_per_class": [f"{FA}:ObjectStoreRule.test_every_class_means_REFUTED_by_an_expired_window",
+                                         "tests.v2.test_c2_cli_verdicts:Classes.test_the_class_vocabulary_and_the_expired_window_verdicts",
+                                         f"{PEU}:Decision.test_the_window_expired_with_the_process_present_or_gone",
+                                         f"{PC2}:Cycle1Semantics.test_PCV2_8_the_deadline_verdict_of_every_class"],
+    "subject_absent_under_the_declaration": [f"{FA}:Absence.test_FA_2_a_MUST_NOT_HOLD_prohibition_over_an_absent_path_is_decided",
+                                             f"{FA}:Absence.test_FA_2_REQUIRES_SUBJECT_drops_the_offered_verdict",
+                                             f"{CLI}:Harness.test_CLI_6_an_absent_subject_is_SUBJECT_ABSENT_and_the_contract_decides",
+                                             f"{PE}:Scenario.test_PE_6_an_absent_subject_before_any_step_a_missing_method_at_call_time",
+                                             f"{PC2}:Cycle1Semantics.test_PCV2_8_absence_exit_and_forgery_are_what_they_were"],
+    "test_layout_invariance": [f"{CLI}:Identity.test_product_verdicts_are_identical_across_developer_test_layouts",
+                               f"{PE}:Identity.test_product_verdicts_are_identical_across_developer_test_layouts",
+                               f"{PC2}:LayoutInvariance.test_PCV2_7_product_verdicts_are_identical_across_test_layouts"],
+    "design_check_1": [f"{CLI}:Harness.test_CLI_4_DESIGN_CHECK_1_the_same_result_under_every_scheduling_of_exit_and_file_close"],
+}
+WITNESS_MODULE = "tests.v2.test_c2_witness_independence"
 
 
 def _layout_permutations() -> dict:
@@ -163,7 +196,18 @@ def run(ident: dict) -> dict:
                       "stream_closed_marker": '"STREAM_CLOSED"' in source, "probe_digest": pc.DIGEST}
     if not all(v for k, v in race_semantics.items() if k != "probe_digest"):
         problems.append("the reader keeps an exit-driven path or a drain window")
+    c2_cases = {kind: [c for module, classes in refs for c in C.run_module(module, classes=classes)]
+                for kind, refs in CYCLE2_SEMANTICS.items()}
+    witness = C.run_module(WITNESS_MODULE)
+    by_id = {c["id"]: c for cs in list(c2_cases.values()) + [witness] for c in cs}
+    c2_properties = {}
+    for prop, ids in CYCLE2_PROPERTIES.items():
+        rows = [by_id.get(i) or {"id": i, "outcome": C.ERROR, "detail": "case not found in the run", "unrunnable": True} for i in ids]
+        c2_properties[prop] = {"status": C.status_of(rows), "cases": [{"id": r["id"], "outcome": r["outcome"]} for r in rows]}
+        if c2_properties[prop]["status"] != C.GREEN:
+            problems.append(f"cycle 2 {prop}: {c2_properties[prop]['status']}: " + "; ".join(C.problems_of(rows)))
     cases = [c for v in rfc.values() for c in v] + list(scenarios.values()) + v2_005 + v2_006 + layout_cases + refmodel_cases + admission
+    cases += [c for cs in c2_cases.values() for c in cs] + witness
     return {
         "record": "AISEF V2 — Q1 SEMANTIC CONFORMANCE", "rung": "Q1", "status": C.status_of(cases, problems, harness), "at": C.now(),
         "subject": ident, "platform": C.platform_id(),
@@ -178,5 +222,9 @@ def run(ident: dict) -> dict:
         "test_layout_invariance": {"committed_cases": layout_cases, "harness_permutations": permutations},
         "six_reference_models": {"fresh": fresh, "committed_record_properties": p3["properties"], "cases": refmodel_cases},
         "admission_engines_on_fixtures": {"counts": C.counts(admission), "cases": admission, "project_admissions_executed": 0},
+        "cycle2": {"semantics_by_kind": {k: {"status": C.status_of(v), "counts": C.counts(v), "cases": v} for k, v in c2_cases.items()},
+                   "properties": c2_properties,
+                   "witness_independence": {"status": C.status_of(witness), "cases": witness,
+                                            "variants": ["implementer", "verifier-crlf", "verifier-exec-bit", "verifier-colliding-dates"]}},
         "provider_calls": 0, "problems": problems, "harness_problems": harness, "cases": cases, "counts": C.counts(cases),
     }

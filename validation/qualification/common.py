@@ -24,13 +24,24 @@ for p in (str(ROOT), str(ROOT / "validation" / "v2")):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-#: The qualification subject, frozen by the owner (§1): the P6 seal commit, the semantic candidate it seals and the
-#: kernel tree both carry. Every rung refuses to run unless HEAD's kernel tree is this one.
-SEAL_COMMIT = "b720de7c4f03061cfa07e7b9f74a74e614e52de4"
-SEMANTIC_CANDIDATE = "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2"
-KERNEL_TREE = "4d6081940f5b9dae47439f73f0157161e028d804"
+#: Cycle 1 (QP-7, accepted and closed): the P6 seal commit, the semantic candidate the P7-FINDING-001 correction put in
+#: its place and their kernel tree. Kept as the Cycle-1 lineage the Cycle-2 rungs still assert (q0 seals).
+CYCLE1_SEAL_COMMIT = "b720de7c4f03061cfa07e7b9f74a74e614e52de4"
+CYCLE1_SEMANTIC_CANDIDATE = "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2"
+CYCLE1_KERNEL_TREE = "4d6081940f5b9dae47439f73f0157161e028d804"
+CYCLE1_OUT_REL = "closure-evidence/v2/Q0-Q3"
+#: The Cycle-2 qualification subject (QP-2.6; owner ruling 2026-09-30: "Run Q0-Q3 on ONE exact Cycle-2 candidate"):
+#: the candidate commit, which carries the accepted C2-P5 boundary (a76177e) and the witness-independence cases.
+#: Cycle 2 has no seal of its own, so the candidate is its own seal commit. The subject is the candidate's kernel
+#: tree AND its validation/v2 and tests/v2 trees: every rung refuses to run unless HEAD carries all three (any change
+#: to one of them is a new candidate, restarted from Q0).
+SEMANTIC_CANDIDATE = "63112544f1146097b69c538d98e09e5a52c547c1"
+SEAL_COMMIT = SEMANTIC_CANDIDATE
+KERNEL_TREE = "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
+SUBJECT_TREES = {"validation/v2": "60920999bdc44dc9530e7a6fe14d1341f5615a07", "tests/v2": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330"}
+C2_P5_ACCEPTANCE_REL = "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json"
 V1_PRODUCT_TREE = "4359f347378e84fcac2d213128c7c26f282c13c0"
-OUT_REL = "closure-evidence/v2/Q0-Q3"
+OUT_REL = "closure-evidence/v2/cycle2/Q0-Q3"
 #: the platforms the qualification claims (§20); any other platform's record is kept as a non-gate observation
 QUALIFICATION_PLATFORMS = ("linux", "windows")
 GREEN, FAILED, UNRUNNABLE = "GREEN", "FAILED", "UNRUNNABLE"
@@ -42,7 +53,10 @@ _PLATFORM_SKIP_MARKS = ("POSIX", "posix", "Windows", "windows", "Linux", "linux"
 #: a skip for one of these reasons is a declared optional capability absent on the platform (the qualification
 #: platforms run the stdlib test runner and install no third-party runner): recorded as NOT_APPLICABLE with the
 #: capability named, so the record says exactly what was not exercised there; never a rung that cannot run
-OPTIONAL_CAPABILITY_SKIP_MARKS = {"pytest is not installed": "pytest adapter (optional third-party runner)"}
+OPTIONAL_CAPABILITY_SKIP_MARKS = {"pytest is not installed": "pytest adapter (optional third-party runner)",
+                                  # Cycle 2 (file_artifact FA-ADV fixtures): an OS that withholds the privilege to create
+                                  # a symbolic link (Windows without SeCreateSymbolicLinkPrivilege)
+                                  "symlink creation not permitted here": "symbolic-link creation privilege (platform)"}
 
 
 def git(*args: str) -> str:
@@ -69,6 +83,7 @@ def harness_digest() -> dict:
 def identity() -> dict:
     """The subject as HEAD carries it now, checked against the frozen values; the effective RFC lineage; the probe."""
     import freeze_manifest as fm
+    from aisef2.probe import catalog
     from aisef2.probe import python_callable as pc
     head = git("rev-parse", "HEAD")
     kernel = git("rev-parse", "HEAD:aisef2")
@@ -81,12 +96,18 @@ def identity() -> dict:
         "candidate_kernel_tree": git("rev-parse", f"{SEMANTIC_CANDIDATE}:aisef2"),
         "v1_product_tree": git("rev-parse", "HEAD:aisef"), "v1_product_tree_unchanged": git("rev-parse", "HEAD:aisef") == V1_PRODUCT_TREE,
         "validation_v2_tree": git("rev-parse", "HEAD:validation/v2"), "tests_v2_tree": git("rev-parse", "HEAD:tests/v2"),
+        "subject_trees": {rel: {"head": git("rev-parse", f"HEAD:{rel}"), "candidate": git("rev-parse", f"{SEMANTIC_CANDIDATE}:{rel}"),
+                                "frozen": tree} for rel, tree in SUBJECT_TREES.items()},
+        "cycle1": {"seal_commit": CYCLE1_SEAL_COMMIT, "semantic_candidate": CYCLE1_SEMANTIC_CANDIDATE, "kernel_tree": CYCLE1_KERNEL_TREE,
+                   "records": CYCLE1_OUT_REL},
         "working_tree_clean_outside_qualification_output": all(
             ln[3:].startswith(OUT_REL) or ln[3:].startswith("validation/qualification") for ln in dirty.splitlines()),
         "rfc": {"effective_normative_digest": eff.get("rfc_normative_digest"), "effective_freeze_table_digest": eff.get("freeze_table_digest"),
                 "lineage": [pathlib.Path(x["record"]).name for x in links], "lineage_end": pathlib.Path(links[-1]["record"]).name if links else None,
                 "broken_links": broken},
-        "probe": {"id": pc.PROBE_ID, "digest": pc.DIGEST},
+        "probe": {"id": pc.PROBE_ID, "digest": pc.DIGEST},   # the frozen Cycle-1 identity (resolvable, inactive for its kind)
+        "probes": {e.probe_id: {"digest": e.probe_digest, "kind": e.subject_kind.value, "active": e.active, "cycle": e.cycle}
+                   for e in catalog.CATALOG},
         "harness": harness_digest(),
     }
 
@@ -99,6 +120,9 @@ def subject_problems(ident: dict) -> list[str]:
         out.append("the semantic candidate does not carry the frozen kernel tree")
     if not ident["head_is_after_the_seal"]:
         out.append("HEAD does not descend from the seal commit")
+    for rel, t in ident["subject_trees"].items():
+        if not (t["head"] == t["candidate"] == t["frozen"]):
+            out.append(f"HEAD's {rel} tree {t['head']} is not the candidate's {t['frozen']}: a new candidate, restart from Q0")
     if not ident["v1_product_tree_unchanged"]:
         out.append("the V1 product tree changed")
     if ident["rfc"]["broken_links"] or ident["rfc"]["lineage_end"] != "AISEF-V2-RFC-AMENDMENT-V2-006.json":

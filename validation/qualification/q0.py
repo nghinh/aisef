@@ -6,6 +6,11 @@ named reason, and have its always-PASS mutant rejected. On top: the required fam
 to the checkers that discharge them (fail-closed if a family has no checker); the V2-006 / F5 amendment is verified
 explicitly; the P4/P5/P6 seal identities, the V1 evidence identity and the catalog's both-direction fail-closed
 behaviour are asserted; and removing the new F5 subcheck is shown to fail Q0.
+
+Cycle 2 (QP-2.6): the same rung on the Cycle-2 candidate, extended — the six probe source rules and the Cycle-2
+baseline guard as families of their own (each a discovered, calibrated checker whose known-bad probe fixture fails
+it); the catalog's probe identities (every active Cycle-2 probe, the frozen Cycle-1 probe resolvable and inactive);
+the owner's C2-P5 acceptance and its real approvals re-derived; the Cycle-1 seal lineage still asserted.
 """
 
 from __future__ import annotations
@@ -40,7 +45,19 @@ FAMILIES = {
     "migration_table_check": ["migration_table"],
     "seal_identities_P4_P5_P6": ["explicit:seals"],
     "v1_evidence_guard": ["v1_evidence_guard"],
+    # Cycle 2 (CYCLE2-QUALIFICATION-PLAN §1): each with its known-bad fixture in the checker calibration
+    "cycle2_baseline_cycle1_immutability": ["cycle2_baseline"],
+    "probe_registry_closure": ["probe_catalog_closure"],
+    "no_clock_in_probe_facts": ["no_clock_in_probe_facts"],
+    "no_test_artefact_resolution_in_probes": ["no_test_artefact_in_probes"],
+    "scenario_vocabulary_closed": ["closed_dispatch_in_scenario_probes"],
+    "placeholder_single_token": ["single_placeholder_token"],
+    "protocol_channel_discipline": ["protocol_channel_discipline"],
+    "c2_p5_owner_acceptance_and_real_approvals": ["tests:c2_p5_acceptance"],
 }
+CYCLE2_ACTIVE = {"file_artifact": "probe.file_artifact", "python_callable": "probe.python_callable_v2",
+                 "cli_invocation": "probe.cli_invocation", "process_effect": "probe.process_effect"}
+CYCLE1_FROZEN_PROBE = ("probe.python_callable", "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf")
 HISTORICAL_OLD_DIGEST_FILES = {  # evidence that legitimately names the pre-V2-006 digest as history
     "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json", "closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json",
     "closure-evidence/v2/P4-FINAL-SEAL.json", "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
@@ -70,7 +87,7 @@ def _specs_binding(digest: str) -> list[str]:
         for p in sorted((C.ROOT / base).rglob("*.json")):
             rel = p.relative_to(C.ROOT).as_posix()
             if rel in HISTORICAL_OLD_DIGEST_FILES or rel.startswith(HISTORICAL_OLD_DIGEST_PREFIXES) \
-                    or rel.startswith(C.OUT_REL + "/invalidated-"):
+                    or rel.startswith(C.CYCLE1_OUT_REL + "/invalidated-") or rel.startswith(C.OUT_REL + "/"):
                 continue   # measurements of history (the finding's records, invalidated rungs): never a stored spec
             try:
                 walk(json.loads(p.read_text(encoding="utf-8")), rel)
@@ -84,7 +101,7 @@ def _files_mentioning(digest: str) -> list[str]:
     for base in ("aisef2", "tests/v2", "validation/v2", "closure-evidence/v2", "docs"):   # not the scanner, not its records
         for p in sorted((C.ROOT / base).rglob("*")):
             if p.is_file() and p.suffix in (".py", ".json", ".md") and "__pycache__" not in p.parts \
-                    and not p.relative_to(C.ROOT).as_posix().startswith(C.OUT_REL):
+                    and not p.relative_to(C.ROOT).as_posix().startswith((C.OUT_REL, C.CYCLE1_OUT_REL)):
                 try:
                     if digest in p.read_text(encoding="utf-8"):
                         out.append(p.relative_to(C.ROOT).as_posix())
@@ -127,6 +144,7 @@ def run(ident: dict) -> dict:
 
     # 2. the required families, each discharged by a discovered checker or a named test set
     admission = C.run_module("tests.v2.p2.test_static_admission")   # the engine's rules on fixture plans; no project's admission
+    acceptance_cases = C.run_module("tests.v2.test_c2_p5_acceptance")   # re-derives the owner-accepted plan's admission
     catalog_tests = C.run_module("tests.v2.p0.test_arch_catalog")     # fail-closed in both directions
     families = {}
     for fam, refs in FAMILIES.items():
@@ -134,6 +152,8 @@ def run(ident: dict) -> dict:
         for ref in refs:
             if ref == "tests:static_admission_rules":
                 rows[ref] = C.status_of(admission)
+            elif ref == "tests:c2_p5_acceptance":
+                rows[ref] = C.status_of(acceptance_cases)
             elif ref == "explicit:seals":
                 rows[ref] = "asserted below"
             else:
@@ -223,7 +243,7 @@ def run(ident: dict) -> dict:
     p4, p5s, p6s = (C.ROOT / f"closure-evidence/v2/P{n}-FINAL-SEAL.json" for n in (4, 5, 6))
     seal5 = json.loads(p5s.read_text(encoding="utf-8"))
     seal6 = json.loads(p6s.read_text(encoding="utf-8"))
-    at_seal_commit = C.git("show", f"{C.SEAL_COMMIT}:closure-evidence/v2/P6-FINAL-SEAL.json")
+    at_seal_commit = C.git("show", f"{C.CYCLE1_SEAL_COMMIT}:closure-evidence/v2/P6-FINAL-SEAL.json")
     seals = {
         "p4": {"sha256": C.lf_sha(p4), "bound_by_p5_seal": seal5["p4_seal"]["sha256"], "bound_by_p6_seal": seal6["p4_seal"]["sha256"]},
         "p5": {"sha256": C.lf_sha(p5s), "bound_by_p6_seal": seal6["p5_seal"]["sha256"], "verdict": seal5["verdict"]},
@@ -237,17 +257,17 @@ def run(ident: dict) -> dict:
                                        "old_candidate_in_correction": correction["lineage"]["old_semantic_candidate"]["commit"],
                                        "corrected_candidate": correction["lineage"]["new_semantic_candidate"]["commit"],
                                        "corrected_aisef2_tree": correction["lineage"]["new_semantic_candidate"]["aisef2_tree"],
-                                       "harness_candidate": C.SEMANTIC_CANDIDATE, "harness_kernel_tree": C.KERNEL_TREE},
+                                       "harness_candidate": C.CYCLE1_SEMANTIC_CANDIDATE, "harness_kernel_tree": C.CYCLE1_KERNEL_TREE},
     }
-    seals["p6"]["byte_identical_to_the_seal_commit"] = C.git("rev-parse", f"{C.SEAL_COMMIT}:closure-evidence/v2/P6-FINAL-SEAL.json") \
+    seals["p6"]["byte_identical_to_the_seal_commit"] = C.git("rev-parse", f"{C.CYCLE1_SEAL_COMMIT}:closure-evidence/v2/P6-FINAL-SEAL.json") \
         == C.git("rev-parse", "HEAD:closure-evidence/v2/P6-FINAL-SEAL.json")
     ok_seals = (seals["p4"]["sha256"] == seals["p4"]["bound_by_p5_seal"] == seals["p4"]["bound_by_p6_seal"]
                 and seals["p5"]["sha256"] == seals["p5"]["bound_by_p6_seal"] and seals["p5"]["verdict"] == "P5 FINAL SEALED"
                 and seals["p6"]["verdict"] == "P6 FINAL SEALED" and seals["p6"]["byte_identical_to_the_seal_commit"]
                 and seals["p6"]["candidate"] == seals["post_p6_corrective_lineage"]["superseded"]
                 == seals["post_p6_corrective_lineage"]["old_candidate_in_correction"]
-                and seals["post_p6_corrective_lineage"]["corrected_candidate"] == C.SEMANTIC_CANDIDATE
-                and seals["post_p6_corrective_lineage"]["corrected_aisef2_tree"] == C.KERNEL_TREE
+                and seals["post_p6_corrective_lineage"]["corrected_candidate"] == C.CYCLE1_SEMANTIC_CANDIDATE
+                and seals["post_p6_corrective_lineage"]["corrected_aisef2_tree"] == C.CYCLE1_KERNEL_TREE
                 and seals["p6"]["aisef2_tree"] == correction["lineage"]["old_semantic_candidate"]["aisef2_tree"]
                 and not seals["p5_records_identity_problems"] and not seals["p6_records_identity_problems"])
     if not ok_seals:
@@ -270,7 +290,41 @@ def run(ident: dict) -> dict:
     if catalog["check_problems"]:
         problems.append(f"architecture catalog: {catalog['check_problems']}")
 
-    cases = admission + catalog_tests + [drifted_pin]
+    # 6. Cycle 2: the probe identities, the Cycle-1 probe frozen and inactive, the owner's C2-P5 acceptance re-derived
+    from aisef2.probe import catalog as probe_catalog
+    from validation.qualification import p5_acceptance as pa
+    entries = {e.probe_id: e for e in probe_catalog.CATALOG}
+    active = {k.value: e.probe_id for k, e in probe_catalog.active().items()}
+    frozen = entries.get(CYCLE1_FROZEN_PROBE[0])
+    acceptance = json.loads((C.ROOT / C.C2_P5_ACCEPTANCE_REL).read_text(encoding="utf-8"))
+    cycle2 = {
+        "probes": {pid: {"digest": e.probe_digest, "kind": e.subject_kind.value, "active": e.active, "cycle": e.cycle,
+                         "module": e.factory.__module__} for pid, e in sorted(entries.items())},
+        "active_by_kind": active, "active_expected": CYCLE2_ACTIVE,
+        "catalog_problems": probe_catalog.problems_of(probe_catalog.CATALOG),
+        "cycle1_probe": {"id": CYCLE1_FROZEN_PROBE[0], "frozen_digest": CYCLE1_FROZEN_PROBE[1],
+                         "catalog_digest": frozen.probe_digest if frozen else None, "module_digest": pc.DIGEST,
+                         "active": frozen.active if frozen else None,
+                         "resolvable_and_inactive": bool(frozen) and frozen.probe_digest == pc.DIGEST == CYCLE1_FROZEN_PROBE[1]
+                         and not frozen.active},
+        "probe_rule_checkers": {k: checkers.get(k) for k in ("probe_catalog_closure", "no_clock_in_probe_facts", "no_test_artefact_in_probes",
+                                                              "closed_dispatch_in_scenario_probes", "single_placeholder_token",
+                                                              "protocol_channel_discipline", "cycle2_baseline")},
+        "c2_p5_acceptance": {"record": C.C2_P5_ACCEPTANCE_REL, "sha256": C.lf_sha(C.ROOT / C.C2_P5_ACCEPTANCE_REL),
+                             "verdict": acceptance["verdict"], "re_derivation_problems": pa.check(),
+                             "approvals": acceptance["contract_approvals"]["count"],
+                             "aggregate_digest": acceptance["contract_approvals"]["aggregate_digest"], "cases": acceptance_cases},
+    }
+    if active != CYCLE2_ACTIVE or cycle2["catalog_problems"]:
+        problems.append(f"the active probe set is not the Cycle-2 one: {active} {cycle2['catalog_problems']}")
+    if not cycle2["cycle1_probe"]["resolvable_and_inactive"]:
+        problems.append(f"the Cycle-1 probe is not resolvable at its frozen digest and inactive: {cycle2['cycle1_probe']}")
+    if not all(v and v["calibrated"] and v["rejects_known_bad"] for v in cycle2["probe_rule_checkers"].values()):
+        problems.append("a Cycle-2 probe rule checker is missing, uncalibrated or does not reject its known-bad probe fixture")
+    if cycle2["c2_p5_acceptance"]["re_derivation_problems"] or not acceptance["verdict"].startswith("C2-P5 ACCEPTED"):
+        problems.append(f"the C2-P5 acceptance does not re-derive: {cycle2['c2_p5_acceptance']['re_derivation_problems']}")
+
+    cases = admission + catalog_tests + [drifted_pin] + acceptance_cases
     status = C.status_of(cases, problems, harness)
     return {
         "record": "AISEF V2 — Q0 STATIC INTEGRITY", "rung": "Q0", "status": status, "at": C.now(),
@@ -284,7 +338,7 @@ def run(ident: dict) -> dict:
                                                           "executes_no_probe_and_no_process": next((c["outcome"] for c in admission
                                                                                                     if c["id"].endswith("test_the_engine_executes_no_probe_and_no_process")), None)},
         "architecture_catalog": {**catalog, "cases": catalog_tests},
-        "f1_f11": f1_f11, "v2_006": v2_006, "seals": seals, "v1": v1,
+        "f1_f11": f1_f11, "v2_006": v2_006, "seals": seals, "v1": v1, "cycle2": cycle2,
         "provider_calls": 0, "project_admissions_executed": 0,
         "problems": problems, "harness_problems": harness, "cases": cases, "counts": C.counts(cases),
     }

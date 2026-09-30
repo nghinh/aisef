@@ -5,6 +5,11 @@ family with its stress orderings A–G; the watchdog / anchor ownership proof as
 the ProcessRange.wait deadline contract measured; and the frozen V1 102-cell matrix, which still runs on the same tree.
 
 The rung runs on each qualification platform (Linux, Windows) and records the platform's own ownership mechanism.
+
+Cycle 2 (QP-2.6; CYCLE2-QUALIFICATION-PLAN §4): the Cycle-2 families, each row typed the same way and run on the
+Cycle-2 candidate — FM2-CLI-HARNESS, FM2-CLI-SUBJECT, FM2-CLI-STREAM (cli_invocation), FM2-FILE (file_artifact),
+FM2-EFFECT (process_effect) and the bytecode family re-run under every new probe (FM2-PYC-CLI, FM2-PYC-EFFECT,
+FM2-PYC-V2); the Cycle-1 families and the V1 matrix are unchanged and re-run.
 """
 
 from __future__ import annotations
@@ -27,7 +32,11 @@ MODULES = ("tests.v2.p4.test_interruption", "tests.v2.p4.test_run_scope", "tests
            "tests.v2.test_p6_orchestration", "tests.v2.test_p6_stages", "tests.v2.p4.test_budgets", "tests.v2.p1.test_routing",
            "tests.v2.p2.test_probe_protocol", "tests.v2.p2.test_python_callable", "tests.v2.p5.test_test_execution",
            "tests.v2.p2.test_story_admission", "tests.v2.test_v2_005", "tests.v2.test_v2_006", "tests.v2.test_v2_006_repeat",
-           "tests.v2.test_p7_finding_001")
+           "tests.v2.test_p7_finding_001",
+           # Cycle 2
+           "tests.v2.test_c2_cli_invocation", "tests.v2.test_c2_cli_protocol", "tests.v2.test_c2_file_artifact",
+           "tests.v2.test_probe_process_effect", "tests.v2.test_probe_process_effect_bytecode",
+           "tests.v2.test_python_callable_v2_bytecode")
 V1_MATRIX_MODULES = ("tests.hardening.test_fault_matrix", "tests.hardening.test_compound_faults")
 
 
@@ -375,6 +384,125 @@ def _evidence_status() -> list[str]:
 
 
 FAULT_MATRIX += BYTECODE_FAMILY
+
+CLIP, CLII, FAT, PEF, PEB, PCB = ("tests.v2.test_c2_cli_protocol:", "tests.v2.test_c2_cli_invocation:", "tests.v2.test_c2_file_artifact:",
+                                 "tests.v2.test_probe_process_effect:", "tests.v2.test_probe_process_effect_bytecode:Bytecode.",
+                                 "tests.v2.test_python_callable_v2_bytecode:BytecodeV2.")
+_UNRUN = dict(execution="UNRUNNABLE", code="PROBE_UNRUNNABLE", owner="ENVIRONMENT", retry="RETRYABLE", budget="ENVIRONMENT",
+              residual="RELEASED_EMPTY")
+_INVALID = dict(execution="INVALID_SPEC", code="PROBE_INVALID_SPEC", owner="INTEGRATION", retry="NOT_RETRYABLE", budget=None)
+_POSIX = ("linux", "darwin")
+CYCLE2_FAMILY = [
+    # cli_invocation — the harness (the probe's own machinery): every one a harness failure, never a verdict
+    _row("FM2-CLI-HARNESS-1", "cli_harness", "interpreter absent", [CLIP + "FaultHarness.test_FM2_CLI_HARNESS_1_interpreter_absent"],
+         journal="probe/evaluated UNRUNNABLE with no verdict; PROBE_UNRUNNABLE from the taxonomy", **_UNRUN),
+    _row("FM2-CLI-HARNESS-2", "cli_harness", "evaluation directory uncreatable", [CLIP + "FaultHarness.test_FM2_CLI_HARNESS_2_evaluation_directory_uncreatable"],
+         journal="probe/evaluated UNRUNNABLE; nothing created", **_UNRUN),
+    _row("FM2-CLI-HARNESS-3", "cli_harness", "evaluation directory inside the checkout", [CLIP + "FaultHarness.test_FM2_CLI_HARNESS_3_evaluation_directory_inside_the_checkout_refused"],
+         journal="refused before any launch; probe/evaluated UNRUNNABLE", **_UNRUN),
+    _row("FM2-CLI-HARNESS-4", "cli_harness", "protocol file unwritable; workspace that cannot be laid out",
+         [CLII + "FaultHarness.test_FM2_CLI_HARNESS_4_protocol_file_unwritable", CLIP + "FaultHarness.test_FM2_CLI_HARNESS_4b_workspace_that_cannot_be_laid_out"],
+         journal="the harness did not start: probe/evaluated UNRUNNABLE", **_UNRUN),
+    # cli_invocation — the subject
+    _row("FM2-CLI-SUBJECT-1", "cli_subject", "a subject that never exits", [CLII + "FaultSubject.test_FM2_CLI_SUBJECT_1_a_subject_that_never_exits_gets_the_deadline_verdict_of_its_class"],
+         execution="EXECUTED", journal="the subject deadline verdict of its class; never ENVIRONMENT (TIME-5)"),
+    _row("FM2-CLI-SUBJECT-2", "cli_subject", "a non-controller signal ends the subject", [CLII + "FaultSubject.test_FM2_CLI_SUBJECT_2_a_non_controller_signal_is_executed_and_indeterminate"],
+         execution="EXECUTED", code="NON_CONTROLLER_SIGNAL", owner="INTEGRATION", retry="NOT_RETRYABLE", budget=None,
+         journal="EXECUTED indeterminate NON_CONTROLLER_SIGNAL; no ENVIRONMENT owner", platforms=_POSIX),
+    _row("FM2-CLI-SUBJECT-3", "cli_subject", "a controller stop of the invocation", [CLII + "FaultSubject.test_FM2_CLI_SUBJECT_3_a_controller_stop_is_an_interruption_with_no_result",
+                                                                                     CLIP + "FaultStream.test_C2_P2_FINDING_002_a_controller_stop_with_no_status_reported_is_an_interruption"],
+         execution="INTERRUPTED", journal="the controller's signal ledger names the stop; no result; the range emptied", residual="RELEASED_EMPTY"),
+    _row("FM2-CLI-SUBJECT-4", "cli_subject", "a stdout flood", [CLII + "FaultSubject.test_FM2_CLI_SUBJECT_4_a_stdout_flood_is_bounded"],
+         execution="EXECUTED", journal="the captured stream capped and marked truncated; the exit still observed"),
+    _row("FM2-CLI-SUBJECT-5", "cli_subject", "a forged protocol line on stdout, then a hard exit", [CLII + "FaultSubject.test_FM2_CLI_SUBJECT_5_a_forged_protocol_line_then_a_hard_exit_is_the_hard_exit"],
+         execution="EXECUTED", journal="the forged line is captured subject bytes, never protocol; the hard exit is the observation"),
+    _row("FM2-CLI-SUBJECT-6", "cli_subject", "nonzero exit shapes (SystemExit None / str / int, os._exit)", [CLII + "FaultSubject.test_FM2_CLI_SUBJECT_6_nonzero_exit_shapes"],
+         execution="EXECUTED", journal="the exit code recorded verbatim beside the status"),
+    # cli_invocation — the protocol channel
+    _row("FM2-CLI-STREAM-1", "cli_stream", "exit before READY", [CLII + "FaultStream.test_FM2_CLI_STREAM_1_exit_before_READY",
+                                                                 CLIP + "FaultStream.test_FM2_CLI_STREAM_1b_exit_before_READY_or_DISPATCHED_on_the_range"],
+         journal="harness failure: probe/evaluated UNRUNNABLE", **_UNRUN),
+    _row("FM2-CLI-STREAM-2", "cli_stream", "exit after DISPATCHED without RESULT", [CLIP + "FaultStream.test_FM2_CLI_STREAM_2_exit_after_DISPATCHED_without_RESULT",
+                                                                                    CLII + "FaultStream.test_FM2_CLI_STREAM_2b_a_real_hard_exit_after_DISPATCHED"],
+         execution="EXECUTED", journal="the subject's hard exit is the observation, decided by its class"),
+    _row("FM2-CLI-STREAM-3", "cli_stream", "RESULT then late bytes on stdout", [CLII + "FaultStream.test_FM2_CLI_STREAM_3_RESULT_then_late_bytes_on_stdout"],
+         execution="EXECUTED", journal="the bytes captured when the invocation returned; nothing after RESULT counts"),
+    _row("FM2-CLI-STREAM-4", "cli_stream", "the subject closing or redirecting its descriptors", [CLII + "FaultStream.test_FM2_CLI_STREAM_4_the_subject_closing_or_redirecting_its_descriptors"],
+         execution="EXECUTED", journal="the channel is not the subject's stdout: the result is unchanged"),
+    _row("FM2-CLI-STREAM-5", "cli_stream", "marker file absent at exit or never opened (DESIGN-CHECK-1)",
+         [CLII + "FaultStream.test_FM2_CLI_STREAM_5_marker_file_absent_at_exit", CLIP + "FaultStream.test_FM2_CLI_STREAM_5b_marker_file_never_opened"],
+         journal="harness failure: probe/evaluated UNRUNNABLE", **_UNRUN),
+    _row("FM2-CLI-DISPOSE-1", "cli_stream", "the evaluation directory disposed through a passing sharing violation (C2-P2-FINDING-003)",
+         [CLIP + "FaultStream.test_C2_P2_FINDING_003_the_evaluation_directory_is_disposed_through_a_passing_sharing_violation"],
+         execution="EXECUTED", journal="bounded retry on a sharing violation; any other failure raised at once"),
+    # file_artifact
+    _row("FM2-FILE-1", "file_artifact", "git absent", [FAT + "Refusals.test_FM2_FILE_1_a_probe_constructed_without_git_refuses_every_observation"],
+         journal="every observation a harness failure: probe/evaluated UNRUNNABLE", **_UNRUN),
+    _row("FM2-FILE-2", "file_artifact", "a revision the repository does not hold", [FAT + "ObjectStoreRule.test_FM2_FILE_2_a_revision_the_repository_does_not_hold_is_a_harness_failure_never_absence"],
+         journal="harness failure, never subject absence: probe/evaluated UNRUNNABLE", **_UNRUN),
+    _row("FM2-FILE-3", "file_artifact", "binary file under a text grep; a file that is not UTF-8",
+         [FAT + "ObjectStoreRule.test_FM2_FILE_3_a_binary_file_under_a_text_grep_is_skipped_and_recorded",
+          FAT + "ObjectStoreRule.test_FM2_FILE_3_a_file_that_is_not_utf8_leaves_the_count_unestablished"],
+         execution="EXECUTED", journal="binary skipped and recorded; an undecodable file leaves the count unestablished (refuted, the file named)"),
+    _row("FM2-FILE-4", "file_artifact", "regex pattern over the cap", [FAT + "Refusals.test_FM2_FILE_4_a_pattern_over_the_cap_is_a_harness_failure"],
+         journal="harness failure, never a verdict: probe/evaluated UNRUNNABLE", **_UNRUN),
+    _row("FM2-FILE-5", "file_artifact", "case-collision paths", [FAT + "ObjectStoreRule.test_FM2_FILE_5_case_collision_paths_are_read_exactly_from_the_tree"],
+         execution="EXECUTED", journal="both entries read exactly from the tree; a third spelling absent"),
+    _row("FM2-FILE-6", "file_artifact", "symlink entry; tree escape", [FAT + "ObjectStoreRule.test_FA_ADV_1_a_symlink_entry_is_refused_for_content_and_grep_and_never_followed",
+                                                                       FAT + "Refusals.test_FA_ADV_2_a_tree_escape_is_refused"],
+         execution="EXECUTED", journal="a link is never followed; an escaping locator is refused before any read"),
+    # process_effect
+    _row("FM2-EFFECT-1", "process_effect", "unknown step kind", [PEF + "FaultEffect.test_FM2_EFFECT_1_an_unknown_step_kind_is_INVALID_SPEC_at_admission_before_anything_runs"],
+         journal="PROBE_INVALID_SPEC at admission; nothing runs", **_INVALID),
+    _row("FM2-EFFECT-2", "process_effect", "fault restoration failure", [PEF + "FaultEffect.test_FM2_EFFECT_2_a_fault_restoration_failure_is_HARNESS_FAILED"],
+         journal="harness failure, never a verdict: probe/evaluated UNRUNNABLE", **_UNRUN),
+    _row("FM2-EFFECT-3", "process_effect", "exception in a non-final step", [PEF + "FaultEffect.test_FM2_EFFECT_3_an_exception_in_a_non_final_step_refutes_with_the_step_named"],
+         execution="EXECUTED", journal="refuted with the step named, for every class"),
+    _row("FM2-EFFECT-4", "process_effect", "a subprocess step that leaves a process", [PEF + "FaultEffect.test_FM2_EFFECT_4_a_subprocess_step_that_leaves_a_process_is_the_range_residual_never_the_probe_s"],
+         execution="EXECUTED", journal="the range's residual, stopped and recorded by its release; the observation unchanged",
+         residual="RESIDUAL_NAMED", platforms=_POSIX),
+    _row("FM2-EFFECT-5", "process_effect", "a second construct without declaration", [PEF + "FaultEffect.test_FM2_EFFECT_5_a_second_construct_without_declaration_is_refused"],
+         journal="refused at admission; nothing runs", **_INVALID),
+    _row("FM2-EFFECT-6", "process_effect", "a fault the subject swallows", [PEF + "FaultEffect.test_FM2_EFFECT_6_a_fault_the_subject_swallows_is_observed_by_the_file_observable"],
+         execution="EXECUTED", journal="observed by the file observable (equals_before)"),
+    _row("FM2-EFFECT-7", "process_effect", "harness crashes before opening the marker file", [PEF + "FaultEffect.test_FM2_EFFECT_7_a_harness_that_crashes_before_opening_the_marker_file_is_HARNESS_FAILED"],
+         journal="harness failure: probe/evaluated UNRUNNABLE", **_UNRUN),
+    _row("FM2-EFFECT-8", "process_effect", "a protocol line forged on stdout", [PEF + "FaultEffect.test_FM2_EFFECT_8_a_protocol_line_forged_on_stdout_is_captured_bytes_never_protocol"],
+         execution="EXECUTED", journal="captured bytes, never protocol"),
+    _row("FM2-EFFECT-9", "process_effect", "the process ending during a step", [PEF + "FaultEffect.test_FM2_EFFECT_9_the_process_ending_during_a_step_refutes_with_that_step"],
+         execution="EXECUTED", journal="refuted with that step"),
+    _row("FM2-EFFECT-10", "process_effect", "a controller stop after DISPATCHED", [PEF + "FaultEffect.test_FM2_EFFECT_10_a_controller_stop_after_DISPATCHED_is_an_interruption_with_no_result"],
+         execution="INTERRUPTED", journal="an interruption, no result", residual="RELEASED_EMPTY"),
+    # the bytecode family under every new probe (CYCLE2-QUALIFICATION-PLAN §4 FM2-PYC-2): the checkout's bytecode is
+    # never the subject, and the probe writes none into it
+    _row("FM2-PYC-CLI", "bytecode_cycle2", "cli_invocation: stale in-tree bytecode, no bytecode written, fresh cache, mechanism load-bearing",
+         [CLII + "Bytecode.test_FM2_PYC_CLI_1_in_tree_stale_bytecode_with_a_matching_header_is_never_the_subject",
+          CLII + "Bytecode.test_FM2_PYC_CLI_2_the_probe_writes_no_bytecode_into_the_checkout",
+          CLII + "Bytecode.test_FM2_PYC_CLI_3_the_cache_is_fresh_empty_outside_the_checkout_and_distinct_per_evaluation",
+          CLII + "Bytecode.test_FM2_PYC_CLI_4_without_the_external_cache_the_stale_bytecode_decides_the_reproducer_detects_the_defect"],
+         execution="EXECUTED", journal="the source's verdict at every checkout; the checkout unwritten"),
+    _row("FM2-PYC-EFFECT", "bytecode_cycle2", "process_effect: stale in-tree bytecode (in the subject and in a subprocess step), two checkouts, cache",
+         [PEB + "test_FM2_PYC_EFFECT_1_in_tree_stale_bytecode_with_a_matching_header_is_never_the_subject",
+          PEB + "test_FM2_PYC_EFFECT_2_a_subprocess_step_observes_the_source_too",
+          PEB + "test_FM2_PYC_EFFECT_3_the_probe_writes_no_bytecode_into_the_checkout",
+          PEB + "test_FM2_PYC_EFFECT_4_the_cache_is_fresh_empty_outside_the_checkout_and_distinct_per_evaluation",
+          PEB + "test_FM2_PYC_EFFECT_5_without_the_external_cache_the_stale_bytecode_decides_the_reproducer_detects_it",
+          PEF + "Bytecode.test_FM2_PYC_2_two_checkouts_of_the_same_content_with_different_dates_observe_one_verdict"],
+         execution="EXECUTED", journal="the source's verdict at every checkout; the checkout unwritten"),
+    _row("FM2-PYC-V2", "bytecode_cycle2", "python_callable_v2: the frozen PYC-1..9 bodies rebound to the second identity",
+         [PCB + n for n in ("test_FM2_PYC_V2_1_in_tree_stale_bytecode_with_a_matching_header_is_not_the_subject_the_source_is",
+                            "test_FM2_PYC_V2_2_two_checkouts_of_the_same_content_with_different_dates_observe_one_verdict",
+                            "test_FM2_PYC_V2_3_a_checkout_with_committed_bytecode_is_byte_identical_before_and_after_the_proof",
+                            "test_FM2_PYC_V2_4_the_probe_writes_no_bytecode_into_the_checkout",
+                            "test_FM2_PYC_V2_5_the_bytecode_cache_is_fresh_empty_and_outside_the_checkout",
+                            "test_FM2_PYC_V2_5b_under_a_story_scratch_the_cache_lies_there_and_is_left_to_the_scratch",
+                            "test_FM2_PYC_V2_6_implementer_and_verifier_get_distinct_caches",
+                            "test_FM2_PYC_V2_7_an_evaluation_never_reuses_the_cache_of_the_one_before",
+                            "test_FM2_PYC_V2_8_isolated_mode_keeps_the_command_line_controls_and_drops_the_environment_route",
+                            "test_FM2_PYC_V2_9_without_B_the_external_cache_alone_keeps_the_stale_bytecode_out_and_the_checkout_unwritten")],
+         execution="EXECUTED", journal="the source's verdict; the checkout byte-identical; one fresh cache per evaluation"),
+]
+FAULT_MATRIX += CYCLE2_FAMILY
 
 
 def _taxonomy_check(rows: list[dict]) -> list[str]:
