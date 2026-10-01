@@ -43,7 +43,8 @@ if str(ROOT) not in sys.path:
 
 from validation.qualification import common as C  # noqa: E402
 
-OUT_REL = "closure-evidence/v2/cycle2/Q4"
+#: the final integration candidate's fresh run; the QP-2.7 run on the QP-2.6 candidate stays in cycle2/Q4
+OUT_REL = "closure-evidence/v2/cycle2/Q4-FINAL"
 SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE   # the Cycle-2 candidate (QP-2.6)
 KERNEL_TREE = C.KERNEL_TREE
 #: the active probe identities (aisef2/probe/catalog.py), one named on each probe/evaluated record of a trace

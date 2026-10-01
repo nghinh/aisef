@@ -54,7 +54,8 @@ if str(ROOT) not in sys.path:
 
 from validation.qualification import common as C  # noqa: E402
 
-OUT_REL = "closure-evidence/v2/cycle2/Q5"
+#: the final integration candidate's fresh run; the QP-2.8 run on the QP-2.6 candidate stays in cycle2/Q5
+OUT_REL = "closure-evidence/v2/cycle2/Q5-FINAL"
 CYCLE1_OUT_REL = "closure-evidence/v2/Q5"
 SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE   # the Cycle-2 candidate (QP-2.6)
 KERNEL_TREE = C.KERNEL_TREE
@@ -1017,7 +1018,7 @@ def aggregate(out_dir: pathlib.Path, subject: dict, ident: dict, verdicts: dict,
     dirty_outside = [ln for ln in ident["dirty"] if not ln[3:].startswith(OUT_REL)]
     if dirty_outside:
         problems.append(f"the working tree is dirty outside {OUT_REL}: {dirty_outside[:5]}")
-    p8 = "closure-evidence/v2/cycle2/Q4/DIFFERENTIAL.json"   # Cycle 2: the QP-2.7 differential below this rung
+    p8 = "closure-evidence/v2/cycle2/Q4-FINAL/DIFFERENTIAL.json"   # the final candidate's differential below this rung
     return {
         "record": "AISEF V2 — Q5 REPRODUCTION (real execution; the model stream alone replayed)", "rung": "Q5",
         "authority": "owner's P9 / QP-9 EXECUTION AUTHORIZATION (2026-09-28)", "aggregated": C.now(),
@@ -1037,7 +1038,7 @@ def aggregate(out_dir: pathlib.Path, subject: dict, ident: dict, verdicts: dict,
         "network": {"guard": "in-process socket refusal during every item", "socket_attempts": totals["socket_attempts"]},
         "residual_processes": {"from_journal": totals["residual_process"], "owned_range": "see the owned-run record beside this file"},
         "conformance": {"start": start_rec, "end": end_rec}, "calibration": {"path": f"{OUT_REL}/CALIBRATION.json", "all_rejected": bool(calib_rec and calib_rec.get("all_rejected"))},
-        "p8_evidence": {p8: _sha((ROOT / p8).read_bytes()), "closure-evidence/v2/cycle2/Q4/SUBJECT.json": _sha((ROOT / "closure-evidence/v2/cycle2/Q4/SUBJECT.json").read_bytes())},
+        "p8_evidence": {p8: _sha((ROOT / p8).read_bytes()), "closure-evidence/v2/cycle2/Q4-FINAL/SUBJECT.json": _sha((ROOT / "closure-evidence/v2/cycle2/Q4-FINAL/SUBJECT.json").read_bytes())},
         "p7_evidence": {rel: _sha((ROOT / rel).read_bytes()) for rel in A.P7_EVIDENCE}, "seals": {rel: _sha((ROOT / rel).read_bytes()) for rel in A.SEALS},
         "v1_evidence": {"baseline": _sha((ROOT / "closure-evidence/v2/V1-EVIDENCE-BASELINE.json").read_bytes()), "w0": _sha((ROOT / A.W0_REL).read_bytes()),
                         "product_tree": C.git("rev-parse", "HEAD:aisef")},

@@ -6,12 +6,12 @@
 #   validation/qualification/q5_run.sh
 set -u; unsetopt nomatch
 A=/Users/nghinh/Downloads/projects/ai-sdlc; cd $A
-OUT=$A/closure-evidence/v2/cycle2/Q5
+OUT=$A/closure-evidence/v2/cycle2/Q5-FINAL
 SP=${AISEF_SCRATCH:-/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad}
 LOG=$SP/q5-logs; mkdir -p $LOG $OUT/owned
-KT=37bf6457f350dd720a2214f04f3896c554ad0904   # the Cycle-2 candidate ac4a6c7 kernel tree (QP-2.8; QP-2.6 R2)
+KT=254d8f559b879c210c4936321022f1350c4b2f89   # the final integration candidate's kernel tree (aisef2/cohort added; C2-FINAL-INTEGRATION.json)
 stamp() { date '+%F %T'; }
-DIRTY=$(git status --porcelain | grep -v '^?? closure-evidence/v2/cycle2/Q5/\|^ M closure-evidence/v2/cycle2/Q5/\|^?? closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json\|^ M closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json' || true)
+DIRTY=$(git status --porcelain | grep -v '^?? closure-evidence/v2/cycle2/Q5-FINAL/\|^ M closure-evidence/v2/cycle2/Q5-FINAL/\|^?? closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json\|^ M closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json' || true)
 [ -z "$DIRTY" ] || { echo "REFUSED: the working tree is dirty outside Q5's output:"; echo "$DIRTY"; exit 1; }
 [ "$(git rev-parse HEAD:aisef2)" = "$KT" ] || { echo "REFUSED: HEAD's aisef2 tree is not the candidate's $KT"; exit 1; }
 [ -f $OUT/CORPUS.json ] || { echo "REFUSED: no frozen corpus (q5.py --record first, committed)"; exit 1; }
