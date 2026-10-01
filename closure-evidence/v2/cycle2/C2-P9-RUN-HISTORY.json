@@ -1,0 +1,34 @@
+{
+ "record": "AISEF V2 — C2-P9 RUN HISTORY",
+ "policy": "closure-evidence/v2/V2-RETRY-POLICY.json",
+ "rule": "append-only; every full-suite and CI attempt, failed or not; see validation/v2/run_history.py",
+ "entries": [
+  {
+   "seq": 1,
+   "commit": "0b1f473b12c8b002145ba5a94681c661541f63ef",
+   "package": "QP-2.9 LedgerLock regression, attempt 1 (harness of ac608c1)",
+   "attempt": 1,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "QP-2.9 live run (PLAN-V2.2 through story_runner; owned range)",
+   "tests_run": null,
+   "gate_effect": "COUNTS",
+   "result": "FAIL",
+   "failing_tests": [
+    "validation/qualification/c2_p9.py: no LEDGERLOCK-REGRESSION.json written"
+   ],
+   "classification": "HARNESS",
+   "classification_evidence": "closure-evidence/v2/cycle2/P10/NO-RECORD.json: the harness's secret pattern had no left boundary and matched inside ordinary words (8 hits, all word fragments; 0 occurrences of any of 5 exact known secret values); it stopped after the 5547 s run with nothing written, and the journal was in a removed temporary directory",
+   "known_defect": null,
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
+  }
+ ]
+}
