@@ -1,0 +1,5 @@
+{"checker": "no_cohort_record", "package": "WP-2.10.1", "kind": "throwaway_root_census",
+ "note": "a temporary root holding one evidence file with a preregistration nested in it; the census must find it. The file text is a string here, so this fixture is not itself a record",
+ "files": {"closure-evidence/v2/cycle2/COHORT-EXAMPLE.json": "{\"record\": \"an unauthorized cohort\", \"cohort\": {\"preregistration\": {\"schema\": \"aisef2.cohort.preregistration/1\", \"cohort_id\": \"C-X\"}}}\n",
+           "closure-evidence/v2/cycle2/OTHER.json": "{\"schema\": \"something else\"}\n"},
+ "expect": "NO_COHORT_RECORD closure-evidence/v2/cycle2/COHORT-EXAMPLE.json $.cohort.preregistration: holds a preregistration"}

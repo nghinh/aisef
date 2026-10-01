@@ -1,0 +1,5 @@
+{"checker": "cohort_confined", "package": "WP-2.10.1", "kind": "source_rule",
+ "note": "a kernel module the probes and the compiler sit beside importing the cohort machinery",
+ "path": "aisef2/journal/cohort_events.py", "rule": "COHORT_CONFINED",
+ "source": "from aisef2.cohort.lifecycle import CohortState\n\n\ndef state_of(event):\n    return CohortState(event)\n",
+ "expect": "COHORT_CONFINED aisef2/journal/cohort_events.py:1 imports aisef2.cohort"}

@@ -1,0 +1,5 @@
+{"checker": "cohort_boundary", "package": "WP-2.10.1", "kind": "source_rule",
+ "note": "a cohort module reaching into the journal, which would carry a cohort state in an event (F1)",
+ "path": "aisef2/cohort/emit.py", "rule": "COHORT_BOUNDARY",
+ "source": "from aisef2.journal.event import Event\n\n\ndef emit(state):\n    return Event\n",
+ "expect": "COHORT_BOUNDARY aisef2/cohort/emit.py:1 imports aisef2.journal.event"}
