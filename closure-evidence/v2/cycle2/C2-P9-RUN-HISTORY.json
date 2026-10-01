@@ -29,6 +29,34 @@
    "owned_escaped": 0,
    "owned_released_empty": true,
    "owned_range_mechanism": "posix-session-and-group"
+  },
+  {
+   "seq": 2,
+   "commit": "1f992baa55c28caf8be0c059aa081806bc931b1b",
+   "package": "QP-2.9 LedgerLock regression, attempt 2 (corrected harness of 1f992ba; a new attempt, not a retry of attempt 1)",
+   "attempt": 2,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "QP-2.9 live run (closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json)",
+   "tests_run": 67,
+   "gate_effect": "COUNTS",
+   "result": "PASS",
+   "failing_tests": [],
+   "classification": null,
+   "delivery_verdict": "FAIL",
+   "plan_quality_verdict": "NOT_CLAIMED",
+   "plan_admitted": true,
+   "stories_committed": 3,
+   "stories_total": 9,
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
   }
  ]
 }

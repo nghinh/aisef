@@ -1,0 +1,1608 @@
+{
+ "record": "AISEF V2 — CYCLE-2 QP-2.9 LEDGERLOCK REGRESSION (DEVELOPMENT / REGRESSION BENCHMARK ONLY)",
+ "rung": "C2-P9 / QP-2.9",
+ "authority": "owner rulings 2026-09-30 A ('C2-P9 / QP-2.9 — LEDGERLOCK REGRESSION') and B (QP-2.9: execute the approved plan model)",
+ "written": "2026-10-01T07:35:39Z",
+ "purpose": "does the Cycle-2 framework execute more of the known workload correctly? — not: how would AISEF perform on unseen projects",
+ "semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+ "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+ "head_kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+ "repository_execution_commit": "1f992baa55c28caf8be0c059aa081806bc931b1b",
+ "harness": {
+  "path": "validation/qualification/c2_p9.py",
+  "sha256": "c37a13d9890b6b74b1f5a9c0101a4780c790f3cbc1b2c723c188dba9e44c3bca"
+ },
+ "workload": {
+  "id": "LedgerLock",
+  "benchmark_class": "DEVELOPMENT_REGRESSION",
+  "repository": {
+   "repo": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2",
+   "present": true,
+   "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "baseline_is_the_plan_commit": true,
+   "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+   "requirements_match_frozen": true,
+   "epics_sha256": "4f2c920ef4853cf98254f7c2ad582a2bfdc8b90becc8bd45f44e3c262cd81376",
+   "tree": "d4560f79d0b6cc9e9b685c9cb6150ab73afb4971"
+  },
+  "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+  "final_main": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+  "repository_written": false
+ },
+ "plan_identity": {
+  "id": "LEDGERLOCK-PLAN-V2.2-PROPOSAL",
+  "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+  "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "stories": 9,
+  "obligations": 67,
+  "execution_order": [
+   "STORY-01-01",
+   "STORY-01-05",
+   "STORY-02-01",
+   "STORY-02-02",
+   "STORY-03-01",
+   "STORY-04-01",
+   "STORY-04-02",
+   "STORY-05-01",
+   "STORY-05-03"
+  ],
+  "replanned": false,
+  "stories_split": false
+ },
+ "approvals": {
+  "record": "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json",
+  "count": 59,
+  "approver": "human:owner"
+ },
+ "execution_profile": {
+  "source": "p10.runspec_for (Cycle-1 P10 profile): OpenCode developer and reviewer on the declared route, ruff scanner, P10 limits",
+  "runspec_hash": "4278bd29f717ea047cad14c77b5df88d8850932c737c99d6b1e23d7138eb4c39",
+  "aggregate_min_grade": "OPAQUE",
+  "limits": {
+   "DEVELOPER": 1,
+   "PLAN": 0,
+   "ENVIRONMENT": 1,
+   "PROVIDER": 1,
+   "INTEGRATION": 0,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "capabilities": [
+   {
+    "name": "developer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "git",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "kernel",
+    "grade": "VERIFIED",
+    "enforcement": "FULL"
+   },
+   {
+    "name": "probe.cli_invocation",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "probe.file_artifact",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "probe.process_effect",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "probe.python_callable_v2",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "python",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "reviewer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "scanner",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL"
+   }
+  ],
+  "model": {
+   "client": "opencode",
+   "binary": "/Users/nghinh/.opencode/bin/opencode",
+   "binary_sha256": "16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198",
+   "version": "1.18.31",
+   "declared_route": "9router/mycombo",
+   "endpoint": "https://9router.vnteki.com/v1",
+   "provider_config_digest_without_secrets": "e471c8f750f88e544112105b2846b5bb4af59fa48c6d1c7ec436ad2064278cee",
+   "grade": "OPAQUE",
+   "why_opaque": "declared route and client only: no request was made, so no preflight fingerprint was measured (RFC §23)"
+  },
+  "kernel_digest": "8e8f00ca9327599f850088181aa64fa8751d8405a5485d52faccb18fa8ef4d3d",
+  "grade_note": "the route is a routing alias: OPAQUE, which bars sealing and nothing else here; no model identity is inferred from it"
+ },
+ "run_identity": {
+  "run_id": "c2-p9-ledgerlock",
+  "journal_events": 6152,
+  "journal_sha256": "5ac145f26a8c0cb25c03958911043f44be56c1551361063595c453c17a41813f"
+ },
+ "cohort_state": "DEVELOPMENT",
+ "benchmark_class": "DEVELOPMENT_REGRESSION",
+ "generalization_claim": "NONE",
+ "verdict": {
+  "delivery_verdict": "FAIL",
+  "plan_quality_verdict": "NOT_CLAIMED"
+ },
+ "delivery_verdict_derivation": "from the run's journal events only; no plan-quality input",
+ "story_outcomes": {
+  "STORY-01-01": [
+   "RETRY",
+   "ROLLBACK"
+  ],
+  "STORY-01-05": [
+   "RETRY",
+   "COMMIT"
+  ],
+  "STORY-02-01": [
+   "RETRY",
+   "ROLLBACK"
+  ],
+  "STORY-02-02": [
+   "RETRY",
+   "ROLLBACK"
+  ],
+  "STORY-03-01": [
+   "COMMIT"
+  ],
+  "STORY-04-01": [
+   "ROLLBACK"
+  ],
+  "STORY-04-02": [
+   "RETRY",
+   "COMMIT"
+  ],
+  "STORY-05-01": [
+   "RETRY",
+   "ROLLBACK"
+  ],
+  "STORY-05-03": [
+   "ROLLBACK"
+  ]
+ },
+ "story_state": {
+  "STORY-01-01": {
+   "admitted": true,
+   "attempt": 2,
+   "outcome": "ROLLBACK",
+   "state": "ENDED"
+  },
+  "STORY-01-05": {
+   "admitted": true,
+   "attempt": 2,
+   "outcome": "COMMIT",
+   "state": "ENDED"
+  },
+  "STORY-02-01": {
+   "admitted": true,
+   "attempt": 2,
+   "outcome": "ROLLBACK",
+   "state": "ENDED"
+  },
+  "STORY-02-02": {
+   "admitted": true,
+   "attempt": 2,
+   "outcome": "ROLLBACK",
+   "state": "ENDED"
+  },
+  "STORY-03-01": {
+   "admitted": true,
+   "attempt": 1,
+   "outcome": "COMMIT",
+   "state": "ENDED"
+  },
+  "STORY-04-01": {
+   "admitted": false,
+   "attempt": 1,
+   "outcome": "ROLLBACK",
+   "state": "ENDED"
+  },
+  "STORY-04-02": {
+   "admitted": true,
+   "attempt": 2,
+   "outcome": "COMMIT",
+   "state": "ENDED"
+  },
+  "STORY-05-01": {
+   "admitted": true,
+   "attempt": 2,
+   "outcome": "ROLLBACK",
+   "state": "ENDED"
+  },
+  "STORY-05-03": {
+   "admitted": false,
+   "attempt": 1,
+   "outcome": "ROLLBACK",
+   "state": "ENDED"
+  }
+ },
+ "story_errors": [],
+ "productproof": {
+  "obligations": [
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.1-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-65d059abcd7bdb6aa4ae2bc1baacc5266397c4e603f2445fcb0eceeb1b7cd685",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3865,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.1-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-810d70f8680ef0143b3c99f951cf5a36a17ec6fb381464c8b04257c9a7e12072",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3873,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.1-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-e8786e89d9c8d608ecb8b3422f4d962581b71c405a88677cd298ed8d73d4aa04",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3881,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-3.2-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-6fb67922e547bc2418a84f30b9eceda641440b06d427c80b8fa75350ba67341c",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-163fb6867c732cc0910fc7cb0aa41dc00e333ffa863e3e20c290e89044694435",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3889,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-75b12a5444f2f7af7002c3117377649819b64b3d717b9dbd47d31adb9c5d33f1",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3897,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-2262384034b21519c6a2a3e48d3928eee26cb57eb12b9b8c74db7c7e72ffbb5e",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3905,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-e",
+    "role": "INTRODUCE",
+    "spec": "PPS-3fcd647712352b2cf0e8c569f89d039e6d4b6eee5b45801bf1c4a6965494a4cd",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3913,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-f",
+    "role": "INTRODUCE",
+    "spec": "PPS-c03399bb5a08910e909b1170b8dabf7cea87f9f1c74588cfb3d25ca3cc0c82e2",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3921,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-g",
+    "role": "INTRODUCE",
+    "spec": "PPS-48d94aa56e303126c572596f4f18b171bf5b3d570b60882ea3d913ddf0f29aa7",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3929,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-h",
+    "role": "INTRODUCE",
+    "spec": "PPS-79eb2e82003c7aaad2412a035af5931ab81d49d8d050dc4df1b3efff28168bfa",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3937,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-3.3-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-249d9aac810991ad250ad76be4e8ae791c1cd66ed70be4a097c6e842fb17cdce",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "seq": 5963,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-3.3-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-3a187fb9c232f40735c52deab24f1a6a4c343b487a2eed8b3a5b5eca837b797a",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "seq": 5971,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-3.3-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-b35f6d40ba01f56fb575a776cd8347c34cde7c8b2c5d635976e6b9789ec45e7b",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "seq": 5979,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-3.3-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-2ab21163d87a1a2939203dea178c47e710d1ee602696e75f5fa5a01a75295451",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "seq": 5987,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.4-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-9a902e79dbf7c4b212f84dd24ff6c544cb0d9c7d6855c5ff6498de6054752b9b",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "REFUTED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3945,
+     "agreement": true,
+     "verdict": "REFUTED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.2-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-b2363ec360a30b7d13ad6affe219aea7b1eb8394d8a75ea31de74895734d7bf1",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3953,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.2-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-1afb7c134205830634e1475eb8243f898d3f27f2d97c357ed508c99b55c98ef7",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3961,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.3-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-776c49de9eddd417972d7615a7f7dd7ce1e50e38a37dd0aa70d9a71711b05f92",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3969,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.3-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-f5caa8ad200d3849be60bd861f139678bbbd9f53534e859607ae84e34c5c0d6a",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3977,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.4-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-130df03b6e64d882a2b283367f0c58736ed84b017f59da3c296464f37edf0dff",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3985,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.4-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-696a93c595369a88fee8230a492502fd7f7330c4d2e208c8aa0ea0c2f7487662",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 3993,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.5-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-b0c5328235c22b8bcd473329e501fe8d59b6245f50974950e550b2887bf4d540",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 4001,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.5-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-e3a1fd208c077746eb99c3513ba8e730f58b3937336d839e04457dad734ca644",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 4009,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-5-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-3f801acc0c3ad4640f99b2c72a2d28feab81c2b6e3b37996709a3734232d5a89",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 4017,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-5-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-9f0fe5cf930f01cdcf87af1f128aa97d17215688a5408eee6a17541777896939",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 4025,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-6-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-c0136d891545f89f462cfa6ad7df93065d842b73a566c9cf7bbe3d30ce8dc682",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 4033,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-6-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-7eb6897129a4419d85e86d09c314073280f9f2e42f7f9967b3b5b6acefcddafa",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 4041,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-6-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-d87f76a65c1d2d69c1b4a367b8ec19e9cb743645f487f629d67cbc13d44e2375",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 4049,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-6-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-4a7450884db9c3b82dab5604469f98058db02ce2360f7d458756a6c9a2600ba4",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-7-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-420e7ad407224beb963f2d769d04882579aa064a4b5c6e5767a20074c940bfe6",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-7-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-828ef030c2a8432c8f7bbeb19f3bea2fb383064da59f4fd3a06171c65c1380cf",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-7-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-d094dfe207adf4c1b225c4255b4e27246a884332953ce2a18aa00fa3ec865387",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-7-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-a191c7367820fb7cd78fd9a0f523af8f348788941e3bddd2b9465af6002a7850",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-7-e",
+    "role": "INTRODUCE",
+    "spec": "PPS-43483423030653d241413c1c094c32e846de3732498ab497a016565e33fe68a3",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "seq": 5995,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-7-f",
+    "role": "INTRODUCE",
+    "spec": "PPS-7dcfdcbb13ccefa37dd810c72bd0b8a6c121881b6839b4b3448996b0aa7cd550",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "seq": 6003,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-9-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-ebd3b11fd02a74fd3724c195f5ece4eaf6c13485e346a436dfbdbf1bcbd7aa15",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-9-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-81369279af03544a8906bb7e3438dbcad2d2cb30bcdc1d6a01c6336af2d8b31c",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1ff84a73cf0f663f8c4d2759054457d7a3cfcebf",
+     "seq": 111,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-9-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-5a6b99a28ae4d26308a06536b021253b0cb6f3a965c4ce45aaf2c56738414720",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1ff84a73cf0f663f8c4d2759054457d7a3cfcebf",
+     "seq": 119,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-9-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-e825d561178e2874d1ca950b0af95a5a4fd2897c0406dae6850e7da204a76ee8",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "seq": 6011,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-9-e",
+    "role": "INTRODUCE",
+    "spec": "PPS-e9e4783931d2a93ba6a911c9bfbcf769c5c3f65498fc6c9753fbf5c000525525",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "seq": 6019,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-9-f",
+    "role": "INTRODUCE",
+    "spec": "PPS-b4b13254279c00c21ee6625d58a186377463dbacb9035686748c346178e05cc6",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1efcb8cf723c4c4ca08de00de4b396dabf138247",
+     "seq": 6027,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-10-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "1ff84a73cf0f663f8c4d2759054457d7a3cfcebf",
+     "seq": 123,
+     "agreement": true,
+     "verdict": "REFUTED"
+    },
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-10-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-64c46ebaed2d255c26a9e79c34c803fe2609161938311dfb237f066b36a67867",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "a44f6a27f8bd7a45ac052f26f1f8a32995c825fc",
+     "seq": 65,
+     "agreement": true,
+     "verdict": "INDETERMINATE"
+    },
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-10-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-8ab146580469d11dbb6c20443dd9c2070da4ecb2f7c2222f33ba127775898894",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-12-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-12-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-12-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-c70151a34378bac3b90ea06dc632037dd9908f97e0b5b9a9f94fea1f158a0292",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-7e99202d7849d4f22d2a4da4728b0f9000ebdb5d8507e2dec7e03c38e3f7547e",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-9cc8e42134b41d39f3e9b94b976290ffb97c28384525cb18e210ca8ee8e574f6",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-b573709fccf5f6ced92b5aa4d8638c27d434141fe9ba1f1d880f1d698ab577ed",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-e",
+    "role": "INTRODUCE",
+    "spec": "PPS-e2189b7dadd035417eed5d47363cb0a9f1f2d8373eb4b085a516cba572b4780f",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-05",
+    "criterion": "S-13-f",
+    "role": "INTRODUCE",
+    "spec": "PPS-85b98ccc7a5c2646588b6e4075a93541a21be2a2a246c24746359c23ca80aaa9",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "800b085d6417d1b6be343534055b91668d789a98",
+     "seq": 1807,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-02-01",
+    "criterion": "S-13-g",
+    "role": "INTRODUCE",
+    "spec": "PPS-baccecf95521389460b05a2eacb1bf62a90286fbdd336e03ba9576661646b730",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "800b085d6417d1b6be343534055b91668d789a98",
+     "seq": 1864,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-02-02",
+    "criterion": "S-13-h",
+    "role": "INTRODUCE",
+    "spec": "PPS-53ca471b36753ac39ac8744a1f9fc143612c61e387751b8e79539b655a38a5d3",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "800b085d6417d1b6be343534055b91668d789a98",
+     "seq": 1928,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-13-i",
+    "role": "INTRODUCE",
+    "spec": "PPS-0528ad5eb0576a4ec11976977458231c270b770a38142f4c40475b2968a09c12",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "d2f3ed2f4240956748e87983ca964c1af7d0524c",
+     "seq": 4057,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-05-01",
+    "criterion": "S-D3-05-01-1",
+    "role": "PRESERVE",
+    "spec": "PPS-b3407979dd38c3b08a8bbae4199e4aee2bd4a7b747bb87a6f0ac80f276279404",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "de9cefcc1df7ea36f2187996dbfb055c2bf65142",
+     "seq": 6104,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-05-01",
+    "criterion": "S-D3-05-01-2",
+    "role": "PRESERVE",
+    "spec": "PPS-cd03ddb94c8f8a97a4c5fdb700ab6b84634082ef6746e75d309ab57996f29249",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "de9cefcc1df7ea36f2187996dbfb055c2bf65142",
+     "seq": 6112,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "AC-STORY-04-01-2:S-9-b",
+    "role": "PRESERVE",
+    "spec": "PPS-81369279af03544a8906bb7e3438dbcad2d2cb30bcdc1d6a01c6336af2d8b31c",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "AC-STORY-04-01-2:S-9-c",
+    "role": "PRESERVE",
+    "spec": "PPS-5a6b99a28ae4d26308a06536b021253b0cb6f3a965c4ce45aaf2c56738414720",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-05-03",
+    "criterion": "AC-STORY-05-03-1:S-10-a",
+    "role": "PRESERVE",
+    "spec": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-05-03",
+    "criterion": "AC-STORY-05-03-1:S-12-a",
+    "role": "PRESERVE",
+    "spec": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-05-03",
+    "criterion": "AC-STORY-05-03-1:S-12-b",
+    "role": "PRESERVE",
+    "spec": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-05-03",
+    "criterion": "AC-STORY-05-03-2:S-12-a",
+    "role": "PRESERVE",
+    "spec": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-05-03",
+    "criterion": "AC-STORY-05-03-2:S-12-b",
+    "role": "PRESERVE",
+    "spec": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-05-03",
+    "criterion": "AC-STORY-05-03-2:S-12-c",
+    "role": "PRESERVE",
+    "spec": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   }
+  ],
+  "total": 67,
+  "with_a_verified_proof": 43,
+  "satisfied_at_last_proof": 41,
+  "delivered_in_committed_stories": 35,
+  "rule": "satisfied = the two parties agree and the verdict is the spec's candidate expectation; delivered = satisfied in a story whose last outcome is COMMIT"
+ },
+ "requirements": {
+  "covered_by_productproof": [
+   "R-10",
+   "R-12",
+   "R-13",
+   "R-3.1",
+   "R-3.2",
+   "R-3.3",
+   "R-3.4",
+   "R-4.2",
+   "R-4.3",
+   "R-4.4",
+   "R-4.5",
+   "R-5",
+   "R-6",
+   "R-7",
+   "R-9"
+  ],
+  "unsupported": {
+   "clauses": [
+    "R-3.2/2",
+    "R-3.2/4",
+    "R-3.3/3",
+    "R-4.2/2",
+    "R-4.3/3",
+    "R-4.4/3",
+    "R-5/0",
+    "R-5/1",
+    "R-5/2",
+    "R-5/4",
+    "R-6/3",
+    "R-6/4",
+    "R-7/2",
+    "R-8/1",
+    "R-9/4",
+    "R-12/2"
+   ],
+   "rule": "remain UNSUPPORTED_FOR_FULL_ENFORCEMENT; never counted as passes"
+  },
+  "engineering_test_only": [
+   "R-10/3",
+   "R-10/4",
+   "R-11/1",
+   "R-13/3"
+  ],
+  "classes": {
+   "DESCRIPTIVE": 4,
+   "NORMATIVE_PRODUCT_REQUIREMENT": 30,
+   "UNSUPPORTED_FOR_FULL_ENFORCEMENT": 16,
+   "ENGINEERING_TEST_REQUIREMENT": 4
+  },
+  "known_ambiguities": {
+   "RISK-1": "a key with a committed put can never be deleted or changed (a same-rid delete replays, another rid conflicts): R-6's 'unless tombstoned by a later delete' is unreachable for a put key; tombstones exist only as a first mutation",
+   "RISK-2": "R-4.5 'replays of either MUST NOT conflict' holds only for the committed put (S-4.5-b); the refused delete replayed is again another rid (R-4.3)",
+   "RISK-3": "replay scope rid alone or rid+key: no spec reuses a rid across keys",
+   "RISK-4": "'verify: any other exit code is a bug' vs 2 and 3; 'fresh ledger' consistent only as an existing empty file (IB-EMPTY)",
+   "RISK-5": "'any modification detected' vs hashing canonical bytes: only semantic edits are testable (S-3.3-* edit value, op, hash, prev_hash)",
+   "RISK-6": "the GENESIS form is both 'the literal' and an implementation choice (R-3.2/4 UNSUPPORTED)",
+   "RISK-7": "§12 file confinement vs §5's sibling temp file (R-12/2 UNSUPPORTED)",
+   "RISK-8": "'under the lock' is undefined (R-5/0 UNSUPPORTED)",
+   "RISK-9": "a newline-terminated corrupt last line is neither truncated nor 'in the middle' (AC-STORY-03-02-4 UNSUPPORTED)",
+   "RISK-10": "conflicts and replays between elements of one batch: R-4.3 judges against committed mutations (S-5-a conflicts against a committed line)",
+   "RISK-11": "§10's allowed set omits __future__ (which §10 requires) and the package's own modules: S-10-a admits both",
+   "RISK-12": "§3.2's line shapes omit hash and prev_hash, which every line carries",
+   "RISK-13": "module functions vs methods; append/put/delete signatures and ts provenance open (IB-LEDGER, IB-ELEMENTS)",
+   "RISK-14": "durability, crash atomicity, file confinement and the interpreter version are outside every probe",
+   "RISK-15": "'0 — success (append …)' names a CLI append no clause specifies",
+   "RISK-16": "'no third-party imports succeed at runtime' reads as an environment property (R-14 item 6 mapped to S-10-a)"
+  }
+ },
+ "plan_quality_metrics": {
+  "introduce_obligations": 57,
+  "pre_satisfied_introduce": 16,
+  "pre_satisfied_introduce_ratio": 0.2807017543859649,
+  "fully_pre_satisfied_stories": 2,
+  "fully_pre_satisfied_story_ids": [
+   "STORY-02-01",
+   "STORY-02-02"
+  ],
+  "unattributed_plan_drift": 17,
+  "attributed_plan_drift": 0,
+  "delivery_complete_stories": [
+   "STORY-01-05",
+   "STORY-03-01",
+   "STORY-04-02"
+  ],
+  "failed_stories": [
+   "STORY-01-01",
+   "STORY-02-01",
+   "STORY-02-02",
+   "STORY-04-01",
+   "STORY-05-01",
+   "STORY-05-03"
+  ],
+  "retries": {
+   "STORY-01-01": 1,
+   "STORY-01-05": 1,
+   "STORY-02-01": 1,
+   "STORY-02-02": 1,
+   "STORY-04-02": 1,
+   "STORY-05-01": 1
+  },
+  "provider_requests_by_budget": {
+   "DEVELOPER": 9,
+   "REVIEW": 3
+  },
+  "note": "observations of the journal; without preregistered thresholds they produce no plan-quality PASS/FAIL"
+ },
+ "plan_drift": {
+  "attributed": 0,
+  "unattributed": 17
+ },
+ "plan_quality_policy": {
+  "preregistered": false,
+  "decision": "DECISION-5: DO_NOT_PREREGISTER",
+  "path": null
+ },
+ "model_sessions": {
+  "count": 12,
+  "by_role": {
+   "developer": 9,
+   "reviewer": 3
+  },
+  "sessions": [
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 109,
+    "tokens": {
+     "input": 9796215,
+     "output": 19035
+    },
+    "seconds": 560.4,
+    "log": "STORY-01-01.developer.1.jsonl",
+    "log_sha256": "1784b508a56b99cff96d05ac4de05333e2f14f90e6f5736676266a4b4dcfabb2",
+    "story_id": "STORY-01-01",
+    "attempt": 1,
+    "role": "developer",
+    "prompt_sha256": "c014ac941f56205b4e5a6bf9ae4a0b9f69a7e61e617e733dc0fad0d4664ba721",
+    "developer_committed_itself": false,
+    "candidate": "a44f6a27f8bd7a45ac052f26f1f8a32995c825fc"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 81,
+    "tokens": {
+     "input": 6554815,
+     "output": 12261
+    },
+    "seconds": 315.4,
+    "log": "STORY-01-01.developer.2.jsonl",
+    "log_sha256": "7a1a3f6e7b8dad76bbf5cd4885b2a738e5fbb74a7cc0cab38ce4815ef7823f47",
+    "story_id": "STORY-01-01",
+    "attempt": 2,
+    "role": "developer",
+    "prompt_sha256": "6c57ea3cc7d63ec3f7ec3ada933c279ed4cf9c82c4820790880820bcf938771a",
+    "developer_committed_itself": false,
+    "candidate": "1ff84a73cf0f663f8c4d2759054457d7a3cfcebf"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 52,
+    "tokens": {
+     "input": 4037678,
+     "output": 14415
+    },
+    "seconds": 467.2,
+    "log": "STORY-01-05.developer.1.jsonl",
+    "log_sha256": "7b1d848e947e50a4c86555cb1a60249446384ce2d2987109562a6da82553c64a",
+    "story_id": "STORY-01-05",
+    "attempt": 1,
+    "role": "developer",
+    "prompt_sha256": "e45606b693dd14a76995a4dadc8cb6849adfef8290a05bc9d71622137a7f049f",
+    "developer_committed_itself": false,
+    "candidate": "94401624b5c06642ad9355546e1958e2a9f572ab"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 67,
+    "tokens": {
+     "input": 5827123,
+     "output": 21571
+    },
+    "seconds": 317.0,
+    "log": "STORY-01-05.developer.2.jsonl",
+    "log_sha256": "0840a21a046bd89b59934aa37bb4be7bab0be1dfc450b3e746a389701ae7b4cf",
+    "story_id": "STORY-01-05",
+    "attempt": 2,
+    "role": "developer",
+    "prompt_sha256": "748b01bcde6d838a4e932f4ec3f03f15d45156fc568d8392f17a9919a35f8e42",
+    "developer_committed_itself": false,
+    "candidate": "bb53ab9f1d4d3a7636af237bc0bc0b560d6e5d90"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 111,
+    "tokens": {
+     "input": 11141973,
+     "output": 32157
+    },
+    "seconds": 573.0,
+    "log": "STORY-03-01.developer.1.jsonl",
+    "log_sha256": "9c339325725f22e5bfc4f728dada4d099994a83f79f6e9e6c3024c9040ddda65",
+    "story_id": "STORY-03-01",
+    "attempt": 1,
+    "role": "developer",
+    "prompt_sha256": "fff9543de15e39e04bbccf45cb82abb29c0b70a8e3a116b032dfa1220940a594",
+    "developer_committed_itself": false,
+    "candidate": "63d09cca44d07f983f02323756a50f59b581d20a"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 70,
+    "tokens": {
+     "input": 6626359,
+     "output": 12719
+    },
+    "seconds": 603.7,
+    "log": "STORY-04-02.developer.1.jsonl",
+    "log_sha256": "71f32db826872aeb98b2c1fbdf36e89ee5c810e6131564dd2c969e4cb015b264",
+    "story_id": "STORY-04-02",
+    "attempt": 1,
+    "role": "developer",
+    "prompt_sha256": "589f08e772de6ce173d48911a32c749b631ee88da709d79bc574989348deebe7",
+    "developer_committed_itself": false,
+    "candidate": "62fe7a1befd41a65b4a0186d808af4f8cc38ec87"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 161,
+    "tokens": {
+     "input": 18701432,
+     "output": 47293
+    },
+    "seconds": 1538.2,
+    "log": "STORY-04-02.developer.2.jsonl",
+    "log_sha256": "9cf245d9cda1227c3dcd2f011fad495edbcab69533ab95615250d600ec17b80d",
+    "story_id": "STORY-04-02",
+    "attempt": 2,
+    "role": "developer",
+    "prompt_sha256": "4be03ed6dc8cf35a82471f1f92751bebb9455765554262fa9d814a33c1670d09",
+    "developer_committed_itself": false,
+    "candidate": "b859a79be36ea3225285e4a83bb1e31a14c6e610"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 87,
+    "tokens": {
+     "input": 7891339,
+     "output": 27166
+    },
+    "seconds": 1032.3,
+    "log": "STORY-05-01.developer.1.jsonl",
+    "log_sha256": "8f5de7656a1d2b545de1a8cd535e342b57395850a4d09758e8c141427d8c48a9",
+    "story_id": "STORY-05-01",
+    "attempt": 1,
+    "role": "developer",
+    "prompt_sha256": "578fe745377abbf08c04fcb8d4968da862b8500e783bc2f1e50d3722b64eb9d2",
+    "developer_committed_itself": false,
+    "candidate": "f09f7c0d67888cae57183c9e5ea089e95985b5d2"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 193,
+    "tokens": {
+     "input": 22607102,
+     "output": 60719
+    },
+    "seconds": 1937.7,
+    "log": "STORY-05-01.developer.2.jsonl",
+    "log_sha256": "1a4857aec68f005de4683a96fcc99f8eb7a3ee944f16503e920e8a1595283de7",
+    "story_id": "STORY-05-01",
+    "attempt": 2,
+    "role": "developer",
+    "prompt_sha256": "78335a61d762d78ac383f8b4844f9537d1d2f5274b3e8bba34189825240cf294",
+    "developer_committed_itself": false,
+    "candidate": "de9cefcc1df7ea36f2187996dbfb055c2bf65142"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 13,
+    "tokens": {
+     "input": 819710,
+     "output": 821
+    },
+    "seconds": 55.4,
+    "log": "STORY-01-05.reviewer.2.jsonl",
+    "log_sha256": "e53731937f964c05fcef1406e82f46de13526c99cbae8c924f00645e574f61cb",
+    "story_id": "STORY-01-05",
+    "attempt": 2,
+    "role": "reviewer",
+    "prompt_sha256": "a1c62706c01ce2245dbd5027d05e1211915f832c4e129fa034d98f5ad9bdbcda",
+    "findings": [
+     {
+      "id": "R-13/2-satisfied",
+      "blocking": false,
+      "summary": "ledger.py defines and exports Ledger, ConflictError, append, verify, snapshot, apply_batch as required."
+     }
+    ]
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 30,
+    "tokens": {
+     "input": 2203647,
+     "output": 9649
+    },
+    "seconds": 180.5,
+    "log": "STORY-03-01.reviewer.1.jsonl",
+    "log_sha256": "f74716f8ffaf89e7718b22335b303a044aed9197470c97faf179c9b802fa5f1a",
+    "story_id": "STORY-03-01",
+    "attempt": 1,
+    "role": "reviewer",
+    "prompt_sha256": "3cdb2893c85d4b070ac88669cfa67008f1a36cfce863b68d9ad813b21a5def71",
+    "findings": []
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "error": null,
+    "turns": 10,
+    "tokens": {
+     "input": 656028,
+     "output": 1442
+    },
+    "seconds": 43.6,
+    "log": "STORY-04-02.reviewer.2.jsonl",
+    "log_sha256": "e40a2fd0e8cc1a0e2522fcc1127defc2ad40e159688b3e4ac1c8949f38fddf7d",
+    "story_id": "STORY-04-02",
+    "attempt": 2,
+    "role": "reviewer",
+    "prompt_sha256": "5103cf988642b6c8d073d5a02ff26e076679fd6b0e3fc4c603847c5f661cf354",
+    "findings": []
+   }
+  ],
+  "tokens": {
+   "input": 96863421,
+   "output": 259248
+  }
+ },
+ "prohibitions": {
+  "SEALED": "REJECTED: LedgerLock is a DEVELOPMENT_REGRESSION workload in state DEVELOPMENT: it cannot become SEALED (RFC §30: permanently development; no re-labelling is available and none may be sought)",
+  "HOLDOUT": "REJECTED: LedgerLock is a DEVELOPMENT_REGRESSION workload in state DEVELOPMENT: it cannot become HOLDOUT (RFC §30: permanently development; no re-labelling is available and none may be sought)",
+  "EVALUATING": "REJECTED: LedgerLock is a DEVELOPMENT_REGRESSION workload in state DEVELOPMENT: it cannot become EVALUATING (RFC §30: permanently development; no re-labelling is available and none may be sought)",
+  "generalization_claim=POSITIVE": "REJECTED: generalization_claim is NONE: LedgerLock backs no generalization (RFC §28.6, §30)",
+  "qualification_sample_size": "REJECTED: a LedgerLock record cannot carry 'qualification_sample_size': no sample size, seal, holdout or single score exists for a development benchmark",
+  "overall_verdict": "REJECTED: delivery and plan quality are never collapsed into one score (RFC §29: the distinction is mandatory)"
+ },
+ "residual_processes": {
+  "owned_range": "see the owned-run record beside this file"
+ },
+ "platform": {
+  "system": "darwin",
+  "python": "3.14.7"
+ },
+ "stop_rules": {
+  "kernel_tree_is_the_candidates": true,
+  "plan_retuned": false,
+  "kernel_repaired": false,
+  "historical_evidence_rewritten": false,
+  "cohort_sealed": false,
+  "generalization_claimed": false
+ },
+ "finished": "2026-10-01T07:35:39Z",
+ "delivery_verdict": "FAIL",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "attempt": 2,
+ "harness_change_from_prior_attempt": "attempt 1's developer prompt named each obligation's clause by its id only (e.g. 'R-10: R-10/1') and its retry prompt the failure codes only; attempt 2 gives the clause's paraphrase and the requirement's numbered section of docs/requirements.md, and on a retry each observed failure with the clause its proof concerns — never a probe, stimulus, observable or expectation. The journal is written beside the record before the temporary directory is removed, and a secret-like token is redacted and counted instead of aborting the record (attempt 1 left none: NO-RECORD.json). Profile, limits, plan, specs and kernel unchanged.",
+ "prior_attempts": [
+  {
+   "path": "closure-evidence/v2/cycle2/P10/NO-RECORD.json",
+   "sha256": "98677079fd68c2f21d5d259fba7041c65fde62d4f0c1896396c1482d4fbe529e",
+   "delivery_verdict": "NO_RECORD"
+  }
+ ],
+ "journal_file": {
+  "path": "closure-evidence/v2/cycle2/P10/attempt-2/JOURNAL.json",
+  "sha256": "eda76b7b07ef01596066aab62f15a61443a98607a259fb4d0f453bf5f35250ff"
+ },
+ "secret_scan": {
+  "known_secret_values_checked": 5,
+  "redactions_in_files": {},
+  "redactions_in_record": 0,
+  "rule": "exact known secret values and sk- tokens are replaced and counted; nothing is discarded"
+ }
+}
