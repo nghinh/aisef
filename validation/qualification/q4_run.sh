@@ -8,12 +8,12 @@
 set -u; unsetopt nomatch
 A=/Users/nghinh/Downloads/projects/ai-sdlc; cd $A
 W=${1:-5}
-OUT=$A/closure-evidence/v2/Q4
+OUT=$A/closure-evidence/v2/cycle2/Q4
 SP=${AISEF_SCRATCH:-/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad}
 LOG=$SP/q4-logs; mkdir -p $LOG $OUT/chunks $OUT/owned
-KT=4d6081940f5b9dae47439f73f0157161e028d804
+KT=37bf6457f350dd720a2214f04f3896c554ad0904   # the Cycle-2 candidate ac4a6c7 kernel tree (QP-2.7; QP-2.6 R2)
 stamp() { date '+%F %T'; }
-DIRTY=$(git status --porcelain | grep -v '^?? closure-evidence/v2/Q4/\|^ M closure-evidence/v2/Q4/\|^?? closure-evidence/v2/P8-RUN-HISTORY.json\|^ M closure-evidence/v2/P8-RUN-HISTORY.json' || true)
+DIRTY=$(git status --porcelain | grep -v '^?? closure-evidence/v2/cycle2/Q4/\|^ M closure-evidence/v2/cycle2/Q4/\|^?? closure-evidence/v2/cycle2/C2-P7-RUN-HISTORY.json\|^ M closure-evidence/v2/cycle2/C2-P7-RUN-HISTORY.json' || true)
 [ -z "$DIRTY" ] || { echo "REFUSED: the working tree is dirty outside Q4's output:"; echo "$DIRTY"; exit 1; }
 [ "$(git rev-parse HEAD:aisef2)" = "$KT" ] || { echo "REFUSED: HEAD's aisef2 tree is not the candidate's $KT"; exit 1; }
 [ -f $OUT/CALIBRATION.json ] && python3 -P -c "import json,sys; sys.exit(0 if json.load(open(sys.argv[1]))['all_detected'] else 1)" $OUT/CALIBRATION.json \

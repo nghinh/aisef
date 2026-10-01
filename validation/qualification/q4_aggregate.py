@@ -31,7 +31,9 @@ from validation.qualification import common as C  # noqa: E402
 from validation.qualification import q4  # noqa: E402
 
 W0_REL, W0_SHA = "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json", "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3"
-P7_EVIDENCE = ("closure-evidence/v2/Q0-Q3/SUMMARY.json", "closure-evidence/v2/P7-FINDING-001/CORRECTION.json", "closure-evidence/v2/P7-ACCEPTANCE.json")
+#: the rung below Q4, bound by digest: Cycle 2 (QP-2.7) — the QP-2.6 summary and the C2-P5 acceptance it qualified
+P7_EVIDENCE = ("closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json", "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+               "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json")
 SEALS = ("closure-evidence/v2/P4-FINAL-SEAL.json", "closure-evidence/v2/P5-FINAL-SEAL.json", "closure-evidence/v2/P6-FINAL-SEAL.json")
 
 

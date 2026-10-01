@@ -17,6 +17,13 @@ probe (corrected digest), the developer-test runner, the scanner tool in its own
 post-merge re-proof all execute again and are compared with the recorded expectation afterwards. The recording is
 expectation, never evidence: evidence is the current execution plus the comparison.
 
+Cycle 2 (QP-2.8; CYCLE2-QUALIFICATION-PLAN §6): the same mechanism on the Cycle-2 candidate, the corpus extended with
+items proved by each active Cycle-2 probe — a CLI-proved story (and its refuted-then-retried variant), a file-artifact
+prohibition, a scenario-proved story and a bytes-returning python_callable — each story proved by the catalog's active
+probe for its kind, re-executed at reproduction exactly like every other tool. The seven Cycle-1 items stay, proved by
+the frozen Cycle-1 python_callable probe (a Cycle-1 compatibility item on the Cycle-2 kernel). A new adversarial case:
+a file the probe observes changed on the trunk outside the model stream (the request unchanged) is a diff.
+
 Determinism is normalization after observation: the run's clock is the real clock and event times are dropped; temp
 roots become tokens. Nothing semantic is normalized (control outcomes, owners, retryability, revisions, semantic hashes,
 probe digests, request content, tool exit status, report content, file contents, test verdicts, the workspace diff).
@@ -47,10 +54,11 @@ if str(ROOT) not in sys.path:
 
 from validation.qualification import common as C  # noqa: E402
 
-OUT_REL = "closure-evidence/v2/Q5"
-SEMANTIC_CANDIDATE = "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2"
-KERNEL_TREE = "4d6081940f5b9dae47439f73f0157161e028d804"
-PROBE_DIGEST = "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"   # the P7-FINDING-001 correction
+OUT_REL = "closure-evidence/v2/cycle2/Q5"
+CYCLE1_OUT_REL = "closure-evidence/v2/Q5"
+SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE   # the Cycle-2 candidate (QP-2.6)
+KERNEL_TREE = C.KERNEL_TREE
+PROBE_DIGEST = "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"   # the Cycle-1 probe (P7-FINDING-001 correction), frozen
 HISTORICAL_PROBE_DIGEST = "ac434a42"
 #: the fixture's commit metadata, pinned so a real commit of the same tree has the same SHA (author and e-mail are pinned
 #: by aisef2.orchestrate.workspace.commit_all); the harness's own clock is not touched
@@ -136,7 +144,27 @@ class Item:
     scanner_findings: tuple[tuple[str, bool, tuple[str, ...]], ...] = ()
     limits: dict = field(default_factory=dict)   # owner name -> retries (default 1 each)
     expected_outcomes: dict = field(default_factory=dict)
+    kind: str | None = None                       # Cycle 2: the subject kind every story of the item is proved with (KIND_CONTRACTS)
 
+
+#: Cycle 2: cid -> (subject kind, locator, stimulus, observable, subject absence), each proved by the catalog's active probe
+KIND_CONTRACTS = {
+    "C3": ("cli_invocation", "app:__main__", {"argv": ["2", "3"]}, {"exit_code": 5}, "REQUIRES_SUBJECT"),
+    "C4": ("file_artifact", "path:app", {"grep": r"\bsocket\b", "suffixes": [".py"]}, {"matches": 0}, "ABSENCE_IS_DECIDABLE"),
+    "C5": ("process_effect", "app.counter:Counter", {"scenario": [{"step": "construct", "args": [], "kwargs": {}},
+                                                                  {"step": "call", "method": "incr", "args": [], "kwargs": {}},
+                                                                  {"step": "call", "method": "incr", "args": [], "kwargs": {}}]},
+           {"returns": 2}, "REQUIRES_SUBJECT"),
+    "C6": ("python_callable", "app.codec:encode", {"args": ["ab"]}, {"returns_bytes_hex": "6162"}, "REQUIRES_SUBJECT"),
+}
+CLI_MAIN = "import sys\n\nsys.exit(int(sys.argv[1]) + int(sys.argv[2]))\n"
+CLI_MAIN_WRONG = "import sys\n\nsys.exit(int(sys.argv[1]) + int(sys.argv[2]) + 1)\n"
+NET_SOCKET = "import socket\n\n\ndef ping():\n    return socket.gethostname()\n"
+NET_PLAIN = "def ping():\n    return 'offline'\n"
+COUNTER = "class Counter:\n    def __init__(self):\n        self.n = 0\n\n    def incr(self):\n        self.n += 1\n        return self.n\n"
+CODEC = "def encode(text):\n    return text.encode('utf-8')\n"
+TEST_C2 = ("import unittest\n\n\nclass T(unittest.TestCase):\n    def test_package(self):\n        import app\n"
+           "        self.assertTrue(app.__name__)\n")
 
 CORPUS: tuple[Item, ...] = (
     Item("normal-completion", ("normal story completion", "developer tool execution", "candidate proof", "independent verification",
@@ -164,7 +192,62 @@ CORPUS: tuple[Item, ...] = (
           Story("S2", (("C2", "INTRODUCE"),), tests=("tests/test_s2.py",), tests_block=False)),
          (completed(S1_FILES, "S0: C1"), completed({"app/mul.py": MUL, "tests/test_s2.py": TEST_MUL, "app/calc.py": SUB_BROKEN}, "S2: C2")),
          (reviewed(), reviewed()), expected_outcomes={"S0": ["COMMIT"], "S2": ["ROLLBACK"]}),
+    # Cycle 2: one item per active Cycle-2 probe, and a refuted-then-retried one
+    Item("cli-proved-story", ("probe.cli_invocation", "candidate proof", "independent verification", "review path", "security path",
+                              "merge path", "post-merge path"),
+         (Story("S1", (("C3", "INTRODUCE"),), tests_block=False),), (completed({"app/__main__.py": CLI_MAIN, "tests/test_s1.py": TEST_C2}, "S1: C3"),),
+         (reviewed(),), expected_outcomes={"S1": ["COMMIT"]}, kind="cli_invocation"),
+    Item("cli-refuted-then-commit", ("probe.cli_invocation", "candidate proof refuted", "retry path", "developer budget"),
+         (Story("S1", (("C3", "INTRODUCE"),), tests_block=False),),
+         (completed({"app/__main__.py": CLI_MAIN_WRONG, "tests/test_s1.py": TEST_C2}, "S1: C3"),
+          completed({"app/__main__.py": CLI_MAIN, "tests/test_s1.py": TEST_C2}, "S1: C3")),
+         (reviewed(),), expected_outcomes={"S1": ["RETRY", "COMMIT"]}, kind="cli_invocation"),
+    Item("file-artifact-prohibition", ("probe.file_artifact", "prohibition (grep_count 0)", "candidate proof", "merge path", "post-merge path"),
+         (Story("S1", (("C4", "INTRODUCE"),), tests_block=False),), (completed({"app/net.py": NET_PLAIN, "tests/test_s1.py": TEST_C2}, "S1: C4"),),
+         (reviewed(),), pre_landed={"app/net.py": NET_SOCKET}, expected_outcomes={"S1": ["COMMIT"]}, kind="file_artifact"),
+    Item("scenario-proved-story", ("probe.process_effect", "scenario (construct, call, call)", "candidate proof", "post-merge path"),
+         (Story("S1", (("C5", "INTRODUCE"),), tests_block=False),), (completed({"app/counter.py": COUNTER, "tests/test_s1.py": TEST_C2}, "S1: C5"),),
+         (reviewed(),), expected_outcomes={"S1": ["COMMIT"]}, kind="process_effect"),
+    Item("bytes-returning-python-callable", ("probe.python_callable_v2", "returns_bytes_hex", "candidate proof", "post-merge path"),
+         (Story("S1", (("C6", "INTRODUCE"),), tests_block=False),), (completed({"app/codec.py": CODEC, "tests/test_s1.py": TEST_C2}, "S1: C6"),),
+         (reviewed(),), expected_outcomes={"S1": ["COMMIT"]}, kind="python_callable"),
 )
+#: the trunk change of the `changed_probe_fixture` variant: a file the file-artifact probe observes, landed on the trunk
+#: after the developer's (replayed) answer and before the merge — the model stream never saw it, the requests are unchanged
+TRUNK_FIXTURE_CHANGE = {"app/extra.py": "import socket\n"}
+
+
+def kind_contract(cid: str) -> tuple:
+    """A Cycle-2 corpus contract, compiled against the catalog's active probe for its kind (the approval is the fixture's)."""
+    from aisef2.arch.enums import Polarity, SubjectAbsence, SubjectKind
+    from aisef2.probe import catalog
+    from aisef2.product.approval import ContractApproval, Requirement
+    from aisef2.product.compiler import ProbeRef, compile_spec
+    from aisef2.product.contract import BehaviorContract, Subject
+    kind, locator, stimulus, observable, absence = KIND_CONTRACTS[cid]
+    req = Requirement.create(id=f"R-{cid}", text=f"requirement {cid}", source="q5")
+    c = BehaviorContract.create(id=f"BC-{cid}", requirement_ids=(req.id,), subject=Subject(SubjectKind(kind), locator), stimulus=stimulus,
+                                observable={**observable, "within_s": 30}, polarity=Polarity.MUST_HOLD,
+                                subject_absence=SubjectAbsence[absence], rationale=f"rationale {cid}")
+    approval = ContractApproval(req.id, req.requirement_hash, c.id, c.contract_hash, "human:owner", 1.0, ())
+    refs = {k: ProbeRef(e.probe_id, e.probe_digest) for k, e in catalog.active().items()}
+    return c, compile_spec(c, requirements={req.id: req}, approvals=[approval], probes=refs)
+
+
+class _LandsAfter:
+    """The `changed_probe_fixture` variant: the developer answers from the stream as always; after its answer is applied,
+    a file the probe observes is landed on the trunk by somebody else (never in any request)."""
+
+    def __init__(self, dev, repo: str, files: dict) -> None:
+        self.dev, self.repo, self.files, self.landed = dev, repo, files, 0
+
+    def implement(self, story_id: str, criteria: tuple[str, ...], checkout: str):
+        from tests.v2 import test_p6_orchestration as T
+        out = self.dev.implement(story_id, criteria, checkout)
+        if not self.landed:
+            T.land(self.repo, self.files, "a change on the trunk the model stream never saw")
+            self.landed += 1
+        return out
 
 
 # -------------------------------------------------------------------------------------------- typed replay refusals
@@ -580,7 +663,8 @@ def execute(item: Item, mode: str, *, ledger: list[dict] | None = None, variant:
             out["initial_workspace"] = workspace_identity(repo, tmp / "ws")
             contracts = {cid: (loc, ([2, 3] if variant == "changed_request" and cid == "C1" else args), (5 if variant == "changed_request" and cid == "C1" else ret))
                          for cid, (loc, args, ret) in CONTRACTS.items()}
-            built = {cid: T.contract(cid, *contracts[cid]) for cid in CONTRACTS}
+            built = {cid: T.contract(cid, *contracts[cid]) for cid in CONTRACTS} if item.kind is None else \
+                {cid: kind_contract(cid) for cid in KIND_CONTRACTS if KIND_CONTRACTS[cid][0] == item.kind}
             specs = {spec.id: spec for _, spec in built.values()}
             semantic = {cid: spec.semantic_hash for cid, (_, spec) in built.items()}
             caps = capabilities(item, str(script))
@@ -591,11 +675,23 @@ def execute(item: Item, mode: str, *, ledger: list[dict] | None = None, variant:
             run.begin()
             cap_id = {"name": "model-stream", "grade": "VERIFIED", "developer": next(c.tuple_["digest"] for c in caps if c.name == "developer"),
                       "reviewer": next(c.tuple_["digest"] for c in caps if c.name == "reviewer")}
-            profile = {"enforcement": Enforcement.PARTIAL.value, "timeout_s": 60, "runner": te.UNITTEST.name, "probe_digest": PythonCallableProbe.digest}
+            if item.kind is None:
+                probe_ref = (PythonCallableProbe.id, PythonCallableProbe.digest)
+                probes = {PythonCallableProbe.id: lambda on_range, scratch: PythonCallableProbe(on_range=on_range, scratch=scratch)}
+            else:   # Cycle 2: the catalog's active probe for the item's kind, the only probe factory of its stories
+                from aisef2.arch.enums import SubjectKind
+                from aisef2.probe import catalog
+                entry = catalog.active()[SubjectKind(item.kind)]
+                probe_ref = (entry.probe_id, entry.probe_digest)
+                probes = {entry.probe_id: lambda on_range, scratch, f=entry.factory: f(on_range=on_range, scratch=scratch)}
+            profile = {"enforcement": Enforcement.PARTIAL.value, "timeout_s": 60, "runner": te.UNITTEST.name, "probe_digest": probe_ref[1]}
+            if item.kind is not None:
+                profile["probe_id"] = probe_ref[0]
             dev = StreamDeveloper(run, stream, capability=cap_id, semantic_hashes=semantic, profile=profile)
             rev = StreamReviewer(run, stream, capability=cap_id, semantic_hashes=semantic, profile=profile)
-            probes = {PythonCallableProbe.id: lambda on_range, scratch: PythonCallableProbe(on_range=on_range, scratch=scratch)}
             env = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)
+            if variant == "changed_probe_fixture":
+                dev = _LandsAfter(dev, repo, TRUNK_FIXTURE_CHANGE)
             obligations = [T.obligation(cid, built[cid][1].id, st.id, ObligationRole[role]) for st in item.stories for cid, role in st.obligations]
             plan = T.plan_of(base, *obligations, pid=f"PLAN-{item.id}")
             adapters = sr.Adapters(dev, rev, scanner, merger, ws)
@@ -771,11 +867,18 @@ def identity(out_dir: pathlib.Path) -> dict:
         "header_classes": HEADER_CLASSES, "normalization": NORMALIZATION, "route_class": ROUTE_CLASS, "drift_bound": 0,
         "probe": {"id": PythonCallableProbe.id, "digest": PythonCallableProbe.digest, "corrected": PythonCallableProbe.digest == PROBE_DIGEST,
                   "historical_absent": not PythonCallableProbe.digest.startswith(HISTORICAL_PROBE_DIGEST)},
+        "active_catalog": _active_catalog(), "kind_contracts": {cid: list(v) for cid, v in KIND_CONTRACTS.items()},
+        "probe_ids_by_item": {i.id: (_active_catalog()[i.kind]["probe_id"] if i.kind else PythonCallableProbe.id) for i in CORPUS},
         "tool_adapters": {"python": interpreter_identity(), "git": git_identity(), "scanner_script_sha256": _sha(SCAN_SCRIPT), "runner": "unittest (-E -s -B)",
                           "developer": "model stream (VERIFIED by the digest of its answer stream)", "reviewer": "model stream (VERIFIED by the digest of its answer stream)"},
         "git_commit_metadata_pinned": GIT_DATES, "platform": {"system": platform.system().lower(), "release": platform.release(), "machine": platform.machine(),
                                                               "python": platform.python_version()},
     }
+
+
+def _active_catalog() -> dict:
+    from aisef2.probe import catalog
+    return {k.value: {"probe_id": e.probe_id, "digest": e.probe_digest} for k, e in sorted(catalog.active().items(), key=lambda kv: kv[0].value)}
 
 
 def one_identity(ident: dict) -> str:
@@ -914,7 +1017,7 @@ def aggregate(out_dir: pathlib.Path, subject: dict, ident: dict, verdicts: dict,
     dirty_outside = [ln for ln in ident["dirty"] if not ln[3:].startswith(OUT_REL)]
     if dirty_outside:
         problems.append(f"the working tree is dirty outside {OUT_REL}: {dirty_outside[:5]}")
-    p8 = "closure-evidence/v2/Q4/DIFFERENTIAL.json"
+    p8 = "closure-evidence/v2/cycle2/Q4/DIFFERENTIAL.json"   # Cycle 2: the QP-2.7 differential below this rung
     return {
         "record": "AISEF V2 — Q5 REPRODUCTION (real execution; the model stream alone replayed)", "rung": "Q5",
         "authority": "owner's P9 / QP-9 EXECUTION AUTHORIZATION (2026-09-28)", "aggregated": C.now(),
@@ -934,7 +1037,7 @@ def aggregate(out_dir: pathlib.Path, subject: dict, ident: dict, verdicts: dict,
         "network": {"guard": "in-process socket refusal during every item", "socket_attempts": totals["socket_attempts"]},
         "residual_processes": {"from_journal": totals["residual_process"], "owned_range": "see the owned-run record beside this file"},
         "conformance": {"start": start_rec, "end": end_rec}, "calibration": {"path": f"{OUT_REL}/CALIBRATION.json", "all_rejected": bool(calib_rec and calib_rec.get("all_rejected"))},
-        "p8_evidence": {p8: _sha((ROOT / p8).read_bytes()), "closure-evidence/v2/Q4/SUBJECT.json": _sha((ROOT / "closure-evidence/v2/Q4/SUBJECT.json").read_bytes())},
+        "p8_evidence": {p8: _sha((ROOT / p8).read_bytes()), "closure-evidence/v2/cycle2/Q4/SUBJECT.json": _sha((ROOT / "closure-evidence/v2/cycle2/Q4/SUBJECT.json").read_bytes())},
         "p7_evidence": {rel: _sha((ROOT / rel).read_bytes()) for rel in A.P7_EVIDENCE}, "seals": {rel: _sha((ROOT / rel).read_bytes()) for rel in A.SEALS},
         "v1_evidence": {"baseline": _sha((ROOT / "closure-evidence/v2/V1-EVIDENCE-BASELINE.json").read_bytes()), "w0": _sha((ROOT / A.W0_REL).read_bytes()),
                         "product_tree": C.git("rev-parse", "HEAD:aisef")},
@@ -961,6 +1064,8 @@ def calibrate(out_dir: pathlib.Path) -> dict:
     ledger = base["model_ledger"]
     three = next(i for i in CORPUS if i.id == "retry-then-commit")     # three model calls: developer, developer, reviewer
     base3 = execute(three, "record")
+    fa = next(i for i in CORPUS if i.id == "file-artifact-prohibition")   # Cycle 2: proved by probe.file_artifact
+    base_fa = execute(fa, "record")
     cases: dict[str, dict] = {}
 
     def full(name, *, variant=None, ledger_=None, expect: dict, item_=item, base_=None):
@@ -971,6 +1076,7 @@ def calibrate(out_dir: pathlib.Path) -> dict:
                "workspace_diffs": len(v["workspace"]["final"]["diff"]), "consumption_ok": v["model_calls"]["consumption"].get("ok"),
                "extra": len(v["model_calls"]["consumption"].get("extra_requests", [])), "unconsumed": len(v["model_calls"]["consumption"].get("missing_unconsumed", [])),
                "model_calls": v["model_calls"]["observed"], "kind": (v.get("replay_failure") or {}).get("kind"),
+               "probe_product_diff": v["errors"].get("probe_product_diff", 0),
                "tool_exit_expected_observed": [(t["expected_result"]["exit_code"], t["observed_result"]["exit_code"]) for t in v["tool_ledger"]]}
         rejected = v["status"] != "GREEN" and all(got.get(k) == val or (callable(val) and val(got.get(k))) for k, val in expect.items())
         cases[name] = {"expected": {k: (val if not callable(val) else "predicate") for k, val in expect.items()}, "observed": got, "rejected": rejected,
@@ -988,6 +1094,10 @@ def calibrate(out_dir: pathlib.Path) -> dict:
     full("6_changed_tool_exit_status", variant="tool_exit", expect={"tool_diffs": lambda n: n >= 1, "tool_exit_expected_observed": lambda x: any(a != b for a, b in x)})
     synthetic = {**ledger[-1], "seq": len(ledger) + 1, "request_hash": "f" * 64, "request": {**ledger[-1]["request"], "story_id": "S9"}}
     full("7_unconsumed_replay_item", ledger_=ledger + [synthetic], expect={"consumption_ok": False, "unconsumed": 1})
+    # Cycle 2: a file the (re-executed) file_artifact probe observes changed on the trunk outside the model stream — the
+    # requests unchanged and every recorded answer consumed, the difference surfaces as a probe/product diff
+    full("10_changed_probe_fixture", item_=fa, base_=base_fa, variant="changed_probe_fixture",
+         expect={"replay_request_mismatch": 0, "consumption_ok": True, "probe_product_diff": lambda n: n >= 1})
     # §9 at the ledger, without a run: reordered, duplicate consumption
     if len(ledger) >= 2:
         s = ModelStream("replay", ledger=[ledger[1], ledger[0]])
@@ -1027,7 +1137,8 @@ def calibrate(out_dir: pathlib.Path) -> dict:
     cases["16_normalization"] = {"cases": n, "rejected": all(n.values())}
     all_rejected = cases["control_round_trip"]["green"] and all(c.get("rejected") for k, c in cases.items() if k != "control_round_trip")
     return {"record": "AISEF V2 — Q5 CALIBRATION (§6, §9, §11, §16, §29): the harness rejects each named defect", "when": C.now(),
-            "scratch_recordings": {item.id: ledger_digest(ledger), three.id: ledger_digest(l3), "note": "recordings made for calibration; not the corpus"},
+            "scratch_recordings": {item.id: ledger_digest(ledger), three.id: ledger_digest(l3), fa.id: ledger_digest(base_fa["model_ledger"]),
+                                   "note": "recordings made for calibration; not the corpus"},
             "cases": cases, "all_rejected": all_rejected, "harness_digest": identity(out_dir)["harness_digest"],
             "git": git(ROOT, "--version").stdout.strip()}
 

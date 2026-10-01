@@ -14,6 +14,12 @@ A trace ends in exactly one terminal class: MATCHED, DIVERGENCE, INVARIANT_VIOLA
 nine invariants are armed at tier ROOT by importing tests.v2) or EXCEPTION (anything else escaped). A seed with no
 terminal class is a silent skip, which the aggregator finds. Nothing is retried, nothing is dropped, nothing is
 reclassified after the fact: a chunk record is written once, and a rerun is a new attempt file beside the old one.
+
+Cycle 2 (QP-2.7, owner ruling 2026-09-30): the same differential, fresh, on the Cycle-2 candidate (the QP-2.6 subject).
+Changed here: the subject pointer, the output directory, and the one extension the Cycle-2 qualification plan names
+(§5) — every probe/evaluated record names one of the active probe identities (the generator's `probe_ids`, a stream of
+its own) and the coverage model gains the category `probe_id`, so the coverage names every active probe id. The
+differential itself (the six projections compared three ways, the terminal classes, the prefix rule) is unchanged.
 """
 
 from __future__ import annotations
@@ -37,9 +43,11 @@ if str(ROOT) not in sys.path:
 
 from validation.qualification import common as C  # noqa: E402
 
-OUT_REL = "closure-evidence/v2/Q4"
-SEMANTIC_CANDIDATE = "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2"
-KERNEL_TREE = "4d6081940f5b9dae47439f73f0157161e028d804"
+OUT_REL = "closure-evidence/v2/cycle2/Q4"
+SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE   # the Cycle-2 candidate (QP-2.6)
+KERNEL_TREE = C.KERNEL_TREE
+#: the active probe identities (aisef2/probe/catalog.py), one named on each probe/evaluated record of a trace
+PROBE_IDS = ("probe.cli_invocation", "probe.file_artifact", "probe.process_effect", "probe.python_callable_v2")
 CHUNKS, CHUNK_SIZE, SEED_BASE = 10, 10_000, 0
 TOTAL = CHUNKS * CHUNK_SIZE
 PREFIX_EVERY = 10   # seeds with seed % 10 == 0: the triple compared at every journal prefix (10,000 traces)
@@ -88,6 +96,7 @@ PREREGISTERED = {
                    "story/dispose", "story/end", "run/interrupted", "run/dispose-begin", "run/end"],
     "compound_pair": [f"{a}|{b}" for a, b in itertools.combinations(sorted(TAXONOMY_CODES), 2)],   # two distinct codes in one trace, sorted
     "same_story_pair": ["same_story_two_codes", "same_story_repeated_code", "retry_then_other_code", "retry_then_same_code"],
+    "probe_id": list(PROBE_IDS),   # Cycle 2 (CYCLE2-QUALIFICATION-PLAN §5): the coverage names every active probe id
 }
 TERMINAL_CLASSES = CLASSES + ("SILENT_SKIP",)
 
@@ -98,7 +107,7 @@ def stories_of(seed: int) -> int:
 
 def generate(seed: int) -> str:
     from tests.v2.p3 import journal_gen as gen
-    return gen.journal(seed, stories=stories_of(seed), journal_format=3, failures=ACTIVE_POOL)
+    return gen.journal(seed, stories=stories_of(seed), journal_format=3, failures=ACTIVE_POOL, probe_ids=PROBE_IDS)
 
 
 # ------------------------------------------------------------------------------------------------------ identity
@@ -136,9 +145,16 @@ def identity() -> dict:
         "seed_schedule": {"base": SEED_BASE, "chunks": CHUNKS, "chunk_size": CHUNK_SIZE, "total": TOTAL,
                           "ranges": [[SEED_BASE + k * CHUNK_SIZE, SEED_BASE + (k + 1) * CHUNK_SIZE - 1] for k in range(CHUNKS)],
                           "prefix_every": PREFIX_EVERY},
-        "generator": {"journal_format": 3, "stories": "3 + seed % 5", "max_attempts": 3, "failures": list(ACTIVE_POOL)},
+        "generator": {"journal_format": 3, "stories": "3 + seed % 5", "max_attempts": 3, "failures": list(ACTIVE_POOL),
+                      "probe_ids": list(PROBE_IDS)},
+        "active_catalog": _active_catalog(),
         "python": platform.python_version(), "platform": platform.system().lower(),
     }
+
+
+def _active_catalog() -> dict:
+    from aisef2.probe import catalog
+    return {k.value: {"probe_id": e.probe_id, "digest": e.probe_digest} for k, e in sorted(catalog.active().items(), key=lambda kv: kv[0].value)}
 
 
 def one_kernel_identity(ident: dict) -> str:
@@ -157,6 +173,8 @@ def subject_problems(ident: dict) -> list[str]:
         out.append(f"the working tree is dirty under aisef2, tests/v2 or validation: {ident['dirty'][:5]}")
     if ident["rfc"]["broken_links"]:
         out.append(f"broken lineage links: {ident['rfc']['broken_links']}")
+    if sorted(e["probe_id"] for e in ident["active_catalog"].values()) != sorted(PROBE_IDS):
+        out.append(f"the active catalog {ident['active_catalog']} is not the probe set the coverage names {PROBE_IDS}")
     return out
 
 
@@ -280,6 +298,8 @@ def coverage_of(events, answers: dict) -> tuple[dict, list[str]]:
             hit["gate"].add("decision_passed" if d["passed"] else "decision_failed")
         elif t == "invariant/violated":
             hit["invariant"].add(d["invariant"])
+        elif t == "probe/evaluated" and (d.get("record") or {}).get("probe_id"):
+            hit["probe_id"].add(d["record"]["probe_id"])
     # interruption pattern, from the run events in order
     kinds = [(e.type, e.data.get("abandoned")) for e in run_events]
     names = [k for k, _ in kinds]
