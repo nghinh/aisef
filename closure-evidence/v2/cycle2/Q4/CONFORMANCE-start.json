@@ -1,0 +1,44 @@
+{
+ "when": "2026-10-01T02:21:02Z",
+ "head": "ac608c1128c0a7b6061277cf9a12c234d86aa545",
+ "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+ "freeze_conformance": {
+  "problems": [],
+  "statuses": {
+   "F1": "PASS",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PASS",
+   "F6": "PASS",
+   "F7": "PASS",
+   "F8": "PASS",
+   "F9": "PASS",
+   "F10": "PASS",
+   "F11": "PASS"
+  },
+  "summary": {
+   "PASS": 11,
+   "PENDING": 0,
+   "FAIL": 0
+  },
+  "ratchet_violations": [],
+  "pass": true,
+  "f1_f2_f11": {
+   "F1": "PASS",
+   "F2": "PASS",
+   "F11": "PASS"
+  }
+ },
+ "v1_evidence_guard": {
+  "problems": [],
+  "pass": true
+ },
+ "w0": {
+  "path": "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json",
+  "sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "expected": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "unchanged": true
+ },
+ "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+}
