@@ -1,0 +1,1437 @@
+{
+ "record": "AISEF V2 — Q4 resource monitor (§23)",
+ "started": "2026-10-01T07:38:35Z",
+ "finished": "2026-10-01T07:48:23Z",
+ "interval_s": 15,
+ "samples": 39,
+ "disk_free_mb_min": 54470,
+ "mem_free_mb_min": 7264,
+ "workers_max": 5,
+ "worker_rss_mb_max": 38,
+ "kernel_tree_unchanged_throughout": true,
+ "chunk_files_at_end": [
+  "chunk-0.json",
+  "chunk-1.json",
+  "chunk-2.json",
+  "chunk-3.json",
+  "chunk-4.json"
+ ],
+ "series": [
+  {
+   "t": "2026-10-01T07:38:35Z",
+   "disk_free_mb": 54597,
+   "mem_free_mb": 8045,
+   "workers": [],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:38:51Z",
+   "disk_free_mb": 54475,
+   "mem_free_mb": 7456,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 36,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 36,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 36,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 37,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 36,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:39:06Z",
+   "disk_free_mb": 54475,
+   "mem_free_mb": 7514,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 37,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 36,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 37,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 37,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:39:21Z",
+   "disk_free_mb": 54474,
+   "mem_free_mb": 7568,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 37,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 37,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 37,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 37,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:39:36Z",
+   "disk_free_mb": 54474,
+   "mem_free_mb": 7563,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 37,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 37,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 37,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 37,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:39:51Z",
+   "disk_free_mb": 54474,
+   "mem_free_mb": 7558,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 37,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 37,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 37,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 37,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:40:06Z",
+   "disk_free_mb": 54474,
+   "mem_free_mb": 7551,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 37,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 37,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 37,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 37,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:40:21Z",
+   "disk_free_mb": 54474,
+   "mem_free_mb": 7509,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 37,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 37,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 37,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 37,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:40:36Z",
+   "disk_free_mb": 54474,
+   "mem_free_mb": 7492,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 37,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 37,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 37,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 37,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:40:51Z",
+   "disk_free_mb": 54473,
+   "mem_free_mb": 7486,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 37,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 37,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 37,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 37,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:41:06Z",
+   "disk_free_mb": 54473,
+   "mem_free_mb": 7485,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 37,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 37,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 38,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 37,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:41:21Z",
+   "disk_free_mb": 54473,
+   "mem_free_mb": 7494,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 37,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 38,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 37,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 38,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 38,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:41:36Z",
+   "disk_free_mb": 54473,
+   "mem_free_mb": 7495,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 38,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 38,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 38,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 38,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 38,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:41:51Z",
+   "disk_free_mb": 54473,
+   "mem_free_mb": 7429,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 38,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 38,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 38,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 38,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 38,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:42:07Z",
+   "disk_free_mb": 54475,
+   "mem_free_mb": 7432,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 38,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 38,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 38,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 38,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 38,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:42:22Z",
+   "disk_free_mb": 54475,
+   "mem_free_mb": 7315,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 38,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 38,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 38,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 38,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 38,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:42:37Z",
+   "disk_free_mb": 54475,
+   "mem_free_mb": 7353,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 38,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 38,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 38,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 38,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 38,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:42:52Z",
+   "disk_free_mb": 54475,
+   "mem_free_mb": 7367,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 38,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 38,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 38,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 38,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 38,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:43:07Z",
+   "disk_free_mb": 54475,
+   "mem_free_mb": 7339,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 38,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 38,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 38,
+     "chunk": "0"
+    },
+    {
+     "pid": 86309,
+     "rss_mb": 38,
+     "chunk": "4"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 38,
+     "chunk": "1"
+    }
+   ],
+   "chunk_files": [],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:43:22Z",
+   "disk_free_mb": 54473,
+   "mem_free_mb": 7360,
+   "workers": [
+    {
+     "pid": 86306,
+     "rss_mb": 38,
+     "chunk": "3"
+    },
+    {
+     "pid": 86307,
+     "rss_mb": 38,
+     "chunk": "2"
+    },
+    {
+     "pid": 86308,
+     "rss_mb": 38,
+     "chunk": "0"
+    },
+    {
+     "pid": 86311,
+     "rss_mb": 38,
+     "chunk": "1"
+    },
+    {
+     "pid": 86693,
+     "rss_mb": 36,
+     "chunk": "5"
+    }
+   ],
+   "chunk_files": [
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:43:37Z",
+   "disk_free_mb": 54470,
+   "mem_free_mb": 7414,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 36,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 36,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 37,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 36,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:43:52Z",
+   "disk_free_mb": 54470,
+   "mem_free_mb": 7420,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 37,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 37,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 37,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 36,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:44:07Z",
+   "disk_free_mb": 54470,
+   "mem_free_mb": 7414,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 37,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 37,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 37,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 36,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:44:22Z",
+   "disk_free_mb": 54470,
+   "mem_free_mb": 7475,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 37,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 37,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 37,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 36,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:44:37Z",
+   "disk_free_mb": 54485,
+   "mem_free_mb": 7467,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 37,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 37,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 37,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 36,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:44:52Z",
+   "disk_free_mb": 54485,
+   "mem_free_mb": 7462,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 37,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 37,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 37,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 36,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:45:07Z",
+   "disk_free_mb": 54485,
+   "mem_free_mb": 7461,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 37,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 37,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 37,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:45:22Z",
+   "disk_free_mb": 54485,
+   "mem_free_mb": 7439,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 37,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 37,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 37,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:45:38Z",
+   "disk_free_mb": 54485,
+   "mem_free_mb": 7441,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 37,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 37,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 37,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:45:53Z",
+   "disk_free_mb": 54485,
+   "mem_free_mb": 7444,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 37,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:46:08Z",
+   "disk_free_mb": 54483,
+   "mem_free_mb": 7402,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 38,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:46:23Z",
+   "disk_free_mb": 54482,
+   "mem_free_mb": 7411,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 38,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:46:38Z",
+   "disk_free_mb": 54482,
+   "mem_free_mb": 7418,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 38,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:46:53Z",
+   "disk_free_mb": 54481,
+   "mem_free_mb": 7433,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 38,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:47:08Z",
+   "disk_free_mb": 54481,
+   "mem_free_mb": 7371,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 38,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:47:23Z",
+   "disk_free_mb": 54481,
+   "mem_free_mb": 7368,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 37,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 38,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:47:38Z",
+   "disk_free_mb": 54481,
+   "mem_free_mb": 7413,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 38,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 38,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:47:53Z",
+   "disk_free_mb": 54480,
+   "mem_free_mb": 7430,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 38,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 38,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  },
+  {
+   "t": "2026-10-01T07:48:08Z",
+   "disk_free_mb": 54477,
+   "mem_free_mb": 7264,
+   "workers": [
+    {
+     "pid": 86693,
+     "rss_mb": 38,
+     "chunk": "5"
+    },
+    {
+     "pid": 86780,
+     "rss_mb": 38,
+     "chunk": "8"
+    },
+    {
+     "pid": 86781,
+     "rss_mb": 38,
+     "chunk": "7"
+    },
+    {
+     "pid": 86782,
+     "rss_mb": 38,
+     "chunk": "6"
+    },
+    {
+     "pid": 86783,
+     "rss_mb": 38,
+     "chunk": "9"
+    }
+   ],
+   "chunk_files": [
+    "chunk-0.json",
+    "chunk-1.json",
+    "chunk-2.json",
+    "chunk-3.json",
+    "chunk-4.json"
+   ],
+   "kernel_tree_unchanged": true
+  }
+ ]
+}
