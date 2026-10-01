@@ -1,0 +1,173 @@
+{
+ "item": "security-finding-rollback",
+ "status": "GREEN",
+ "errors": {
+  "replay_request_mismatch": 0,
+  "assert_consumed_failure": 0,
+  "tool_diff": 0,
+  "subprocess_diff": 0,
+  "workspace_diff": 0,
+  "probe_product_diff": 0,
+  "control_diff": 0,
+  "capability_mismatch": 0,
+  "harness_error": 0,
+  "invariant_violation": 0,
+  "exception": 0,
+  "residual_process": 0
+ },
+ "journal_diffs": [],
+ "journal_events": {
+  "expected": 99,
+  "observed": 99
+ },
+ "tool_ledger": [
+  {
+   "index": 0,
+   "tool": "scan",
+   "story_id": "S1",
+   "input_digest": {
+    "expected": "761b9d12081152bf7edd54ed5c38ad62477ace72bdd8bc19d0b5ea91a6290b18",
+    "observed": "761b9d12081152bf7edd54ed5c38ad62477ace72bdd8bc19d0b5ea91a6290b18"
+   },
+   "expected_result": {
+    "exit_code": 0,
+    "report_sha256": "13bb712904d5fe38b570015016ef61e69fb7acdcdcdead11883c08cbf4f08ad9",
+    "executed": true
+   },
+   "observed_result": {
+    "exit_code": 0,
+    "report_sha256": "13bb712904d5fe38b570015016ef61e69fb7acdcdcdead11883c08cbf4f08ad9",
+    "executed": true
+   },
+   "differing_fields": [],
+   "verdict": "MATCH"
+  },
+  {
+   "index": 1,
+   "tool": "scan",
+   "story_id": "S1",
+   "input_digest": {
+    "expected": "761b9d12081152bf7edd54ed5c38ad62477ace72bdd8bc19d0b5ea91a6290b18",
+    "observed": "761b9d12081152bf7edd54ed5c38ad62477ace72bdd8bc19d0b5ea91a6290b18"
+   },
+   "expected_result": {
+    "exit_code": 0,
+    "report_sha256": "13bb712904d5fe38b570015016ef61e69fb7acdcdcdead11883c08cbf4f08ad9",
+    "executed": true
+   },
+   "observed_result": {
+    "exit_code": 0,
+    "report_sha256": "13bb712904d5fe38b570015016ef61e69fb7acdcdcdead11883c08cbf4f08ad9",
+    "executed": true
+   },
+   "differing_fields": [],
+   "verdict": "MATCH"
+  }
+ ],
+ "tool_executions": 2,
+ "tool_diffs": 0,
+ "subprocesses": {
+  "expected": {
+   "probe": 6,
+   "tests": 6,
+   "tool": 2,
+   "worktree": 4,
+   "scratch": 2
+  },
+  "observed": {
+   "probe": 6,
+   "tests": 6,
+   "tool": 2,
+   "worktree": 4,
+   "scratch": 2
+  }
+ },
+ "subprocess_diffs": 0,
+ "probe_product_diffs": 0,
+ "workspace": {
+  "initial": {
+   "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "diff": []
+  },
+  "final": {
+   "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "tip_expected": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+   "tip_observed": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+   "diff": []
+  }
+ },
+ "model_calls": {
+  "expected": 4,
+  "observed": 4,
+  "request_hash_mismatches": 0,
+  "consumption": {
+   "expected": 4,
+   "consumed": 4,
+   "missing_unconsumed": [],
+   "extra_requests": [],
+   "duplicate_consumptions": 0,
+   "mismatches": 0,
+   "ok": true
+  },
+  "drift_total": 0,
+  "drift_bound": 0
+ },
+ "outcomes": {
+  "expected": {
+   "S1": [
+    "RETRY",
+    "ROLLBACK"
+   ]
+  },
+  "observed": {
+   "S1": [
+    "RETRY",
+    "ROLLBACK"
+   ]
+  }
+ },
+ "network": {
+  "guarded": true,
+  "socket_attempts": 0
+ },
+ "replay_failure": null,
+ "notes": [],
+ "model_requests": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "1cbe29306e3d7b4fc259fb651098cbb6af08e108a960baf8e375a858369557a9",
+   "matched": 1,
+   "replay_item_digest": "050ea92c1b0fb0776c1390a614d6b6ae9443ca08966adc1c2a163a90b1f14cbc",
+   "drift": 0
+  },
+  {
+   "seq": 2,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "30f7159ede42197ffef559295eb89436ba6d38dc1991b7e64e37ada253b5f63b",
+   "matched": 2,
+   "replay_item_digest": "68cb63f84920e0ba36b319ce944aadcd0bad0c1a1ff6e5d827dec931caca79c8",
+   "drift": 0
+  },
+  {
+   "seq": 3,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "f592004b94c2704b6b6bbeaa17a2021a6ed944b492d5f24188e9dad049f31f74",
+   "matched": 3,
+   "replay_item_digest": "14b4273234f647b52dc61250e640ccbffb1c1bb2c02f24c1329f5e1b0bb607c3",
+   "drift": 0
+  },
+  {
+   "seq": 4,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "12bf947a8a8a7991796b03bcc2b10390e5aaea6c0d3fac7b994f85f94ffd959e",
+   "matched": 4,
+   "replay_item_digest": "7c19bc319f50bb2c5987a5644822ca3e9c18f360aed694097955309c4746a075",
+   "drift": 0
+  }
+ ],
+ "expected_ledger_digest": "8f370de4f5385157b852647aeaa60b7ddd7c383465e6d4ceb68cc05b68f3e8b7",
+ "kernel_tree_after": "37bf6457f350dd720a2214f04f3896c554ad0904"
+}

@@ -1,0 +1,455 @@
+{
+ "record": "AISEF V2 — Q5 SUBJECT (frozen before the first reproduction)",
+ "authority": "owner's P9 / QP-9 EXECUTION AUTHORIZATION §2",
+ "frozen_at": "2026-10-01T03:05:55Z",
+ "identity": {
+  "semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "execution_commit": "7e1e94571784c371e7654111e6fdf79c51372dfe",
+  "head_kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "kernel_tree_is_the_candidates": true,
+  "working_tree_clean": true,
+  "dirty": [],
+  "kernel_digest": "8e8f00ca9327599f850088181aa64fa8751d8405a5485d52faccb18fa8ef4d3d",
+  "rfc": {
+   "effective_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "effective_freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "lineage_end": "AISEF-V2-RFC-AMENDMENT-V2-006.json",
+   "broken_links": []
+  },
+  "f1_identity": "34eb00bbb74ade41bebc98e7c06437c1c6833bb6f95d30b1d64b04ad905e37fc",
+  "f9_identity": "2f00a8b02918bc45eeec4549d0bd04b74fa9211c60060a2d32319beaa0b7baeb",
+  "harness_digest": "283c32d91527c19e0632143c46eb98615e6f1357633932139e323d70d4438ba9",
+  "fixture_digest": "6b7be925719dbf63743a32eae69147f6abcab57974a298ead641141780d31290",
+  "files": {
+   "harness": {
+    "validation/qualification/q5.py": "2670aa4804f674bf293780b2468aae894cd2c1869d2083152c754e29d358fc1e",
+    "validation/qualification/q5_run.sh": "633268357c7e12b96fc570aef0a582214e7c9330cc0479f8d78e7f7214d477c7"
+   },
+   "fixtures": {
+    "tests/v2/test_p6_orchestration.py": "4088ed288add7676a75e11ab99d5b5b5b09ab0cbb8631d0f5ac8af5bc140bb30",
+    "tests/v2/p4/test_run_scope.py": "3835408133a46380704c652476af5a84cf2fee278b3ef9fe29fc243e56e0e27b",
+    "tests/v2/p4/world.py": "2cdc63ebb19928a97f909661010740af3281f5e3a131351b409c3dab77677099"
+   },
+   "f1": {
+    "aisef2/arch/enums.py": "fe6b9af1b96b1ef61210c40e7df0210111d0a6d0df1aa8ff0db5697a89df4c42",
+    "aisef2/journal/event.py": "550c6846b7bdf55fe34486b0599d4b7e3efc8fc9649f174a0fe62bdbb84484e3",
+    "aisef2/journal/format2.py": "9fb177f6697aea097e723e90934f7c2183eea2aad46af8367ccd1f08b3d0d68f",
+    "aisef2/journal/format3.py": "4bf13215cbba1dcf0c704b474449c91c79d617a558c072a2cdb4a80f5541d5b9"
+   },
+   "f9": {
+    "aisef2/runtime/capability.py": "eceba49e146b02a180aa2d92e3dd4c164abc5f6a853a2d34cb6ca990efb4729b",
+    "aisef2/runtime/runspec.py": "b7ee6b3af5830717983a3a4867e699bfcf0c41ecb8fa8ac6ea368f2b028dec38",
+    "aisef2/product/contract.py": "900c9f9ce819d561beef0815790a5d4b202311ccade95f9f695ffdcf30ba3d97",
+    "aisef2/probe/protocol.py": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a"
+   }
+  },
+  "corpus": {
+   "items": {
+    "bytes-returning-python-callable": {
+     "sha256": "44e9a2e5aa3654253401465b4daa809c6891406f6f52d67a3d0a66e920d8ab36",
+     "ledger_digest": "970834bb7e2a158e3d00934d26cdf57849df69cbdfbd8562ab27bcd6bcd195fb",
+     "model_calls": 2,
+     "tool_calls": 1,
+     "final_workspace": "62d4c4bc22336f7b62226145870f2c8c448a92a875b439fb8d2f6d2580490265",
+     "final_tip": "00883720eb60e45d453fee7b7213466d5873f74c",
+     "events": 63,
+     "outcomes": {
+      "S1": [
+       "COMMIT"
+      ]
+     }
+    },
+    "cli-proved-story": {
+     "sha256": "8e590575edf9b8e5eb454d81dc497cd1cb20869f1c801ac7442b8679fd9fc9d8",
+     "ledger_digest": "3d39c333fe0a427aeb5952228baa560cd40e5b1da3824b8da081c4ba3ca92536",
+     "model_calls": 2,
+     "tool_calls": 1,
+     "final_workspace": "dec4bd9b00a8a32db06ea1755980fb2e76da5e1e4048082b28b2d299a7efe822",
+     "final_tip": "67fe973b7daf1b54d53eb69e615b726b233b4bd7",
+     "events": 63,
+     "outcomes": {
+      "S1": [
+       "COMMIT"
+      ]
+     }
+    },
+    "cli-refuted-then-commit": {
+     "sha256": "511bf832e7aa12d346b8c8755e33b039e32edb9456543063f1af452d3a137cfb",
+     "ledger_digest": "3be8b8e69abdbc82947dd236ea6ed99444a68d0abfd597d1a015de6ac5606539",
+     "model_calls": 3,
+     "tool_calls": 1,
+     "final_workspace": "dec4bd9b00a8a32db06ea1755980fb2e76da5e1e4048082b28b2d299a7efe822",
+     "final_tip": "67fe973b7daf1b54d53eb69e615b726b233b4bd7",
+     "events": 91,
+     "outcomes": {
+      "S1": [
+       "RETRY",
+       "COMMIT"
+      ]
+     }
+    },
+    "developer-outage-rollback": {
+     "sha256": "73ce01af6bbddc0b85e33d91365faf0d09ff0a122bcda73013ca0f3b216e36aa",
+     "ledger_digest": "fd961a67b8cffa47b3bede896ab6a9249904fd59079ffca694c8242c27c6a350",
+     "model_calls": 2,
+     "tool_calls": 0,
+     "final_workspace": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "events": 51,
+     "outcomes": {
+      "S1": [
+       "RETRY",
+       "ROLLBACK"
+      ]
+     }
+    },
+    "file-artifact-prohibition": {
+     "sha256": "a42c8f844edc0c13efd89dfeadee3ff2e430c4e28976b86661b1ead170d0b0ce",
+     "ledger_digest": "a88bf4f1bf412b2804cd33769aa37c592e38b212724632eea8806bb204097f0c",
+     "model_calls": 2,
+     "tool_calls": 1,
+     "final_workspace": "3174b942901b0d92838836bdd70b4e3cb3d24d517506881deaef67e44ed03bbf",
+     "final_tip": "02e0336e762506e4a432dcbd530755d5f038ff4a",
+     "events": 53,
+     "outcomes": {
+      "S1": [
+       "COMMIT"
+      ]
+     }
+    },
+    "normal-completion": {
+     "sha256": "2bfe7b2905690299ccb752e01ea7e8c5d2ddb4c33a52687659828f04d3bf009e",
+     "ledger_digest": "1ca2f56cdf1c21fc781865e442c745395ef645f04fffe209021ef2d085f2f087",
+     "model_calls": 2,
+     "tool_calls": 1,
+     "final_workspace": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+     "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+     "events": 63,
+     "outcomes": {
+      "S1": [
+       "COMMIT"
+      ]
+     }
+    },
+    "post-merge-regression": {
+     "sha256": "fadbda15a395f1a9ef29982529664ba21d64f3acd58a6982ab190ed34b2535ca",
+     "ledger_digest": "a21b7af5013b0fabe882c762ef050a070fa1a0bd2c7a57d765ccac7f5eb68f7f",
+     "model_calls": 4,
+     "tool_calls": 2,
+     "final_workspace": "cda0adbf757d843fde2113ff337ead44d875aaadc146aa904aaff63aff0680a9",
+     "final_tip": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+     "events": 143,
+     "outcomes": {
+      "S0": [
+       "COMMIT"
+      ],
+      "S2": [
+       "ROLLBACK"
+      ]
+     }
+    },
+    "pre-satisfied": {
+     "sha256": "c56c9cb4b52bb39c38bdbe7b325cdc27d1fe2c830a45ca5f5b47ddd529b0efad",
+     "ledger_digest": "5e228c5bb27ef0eacffd800ee164722b7d9666158ed1c1a8139b67b3882a76cc",
+     "model_calls": 1,
+     "tool_calls": 1,
+     "final_workspace": "df73c14d40bd36af82d0ea58cd2726e67163a81c48cf337008101f33fbb617e4",
+     "final_tip": "6722fb28d2c35a5a820d9c5575feecf0a6b66072",
+     "events": 61,
+     "outcomes": {
+      "S1": [
+       "COMMIT"
+      ]
+     }
+    },
+    "retry-then-commit": {
+     "sha256": "94afb9906379b7e0322cded78bd676b0c5af77b151ce86f9f9e365a57f83dede",
+     "ledger_digest": "86cf7ff2f6cba003b7d736fcb6020fd9cd00b2f3fe83abaee8407356bcec13bf",
+     "model_calls": 3,
+     "tool_calls": 1,
+     "final_workspace": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+     "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+     "events": 91,
+     "outcomes": {
+      "S1": [
+       "RETRY",
+       "COMMIT"
+      ]
+     }
+    },
+    "review-finding-rollback": {
+     "sha256": "c0915a64a03b08bc73448299848361111d706f9d00df52b299f5ca96ae60e3c4",
+     "ledger_digest": "78a9f31d301acfd9322cf196cb784e7466fd2d95588161d4e36b7a7d1be51c81",
+     "model_calls": 4,
+     "tool_calls": 0,
+     "final_workspace": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "events": 89,
+     "outcomes": {
+      "S1": [
+       "RETRY",
+       "ROLLBACK"
+      ]
+     }
+    },
+    "scenario-proved-story": {
+     "sha256": "b41f705e0b4b3dd89f2d7e5eceeca3590beddbe4f91d149e8bb49fb7bf91ca51",
+     "ledger_digest": "9677445d4f2d7878d397a65177eddd235eae2d8606252671dfa86c5be7a1d4a6",
+     "model_calls": 2,
+     "tool_calls": 1,
+     "final_workspace": "65719a034d3e9ac90a9763f9b8fb48ba024566ca0fab8278dc226fb8692be001",
+     "final_tip": "613fb770fb9d1f65266258be83f80d219534633c",
+     "events": 63,
+     "outcomes": {
+      "S1": [
+       "COMMIT"
+      ]
+     }
+    },
+    "security-finding-rollback": {
+     "sha256": "95f0cbe7873b073490d77b3b33579e75f8736e8baf0839057a3e61c7461ad979",
+     "ledger_digest": "8f370de4f5385157b852647aeaa60b7ddd7c383465e6d4ceb68cc05b68f3e8b7",
+     "model_calls": 4,
+     "tool_calls": 2,
+     "final_workspace": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "events": 99,
+     "outcomes": {
+      "S1": [
+       "RETRY",
+       "ROLLBACK"
+      ]
+     }
+    }
+   },
+   "corpus_digest": "614c81687a213c4fef16644fde4c24fb0c16b0a69ad935337a837e5790754924",
+   "replay_digest": "aa9e5ff8a43c2ef63702a16fcd1ffd515484ede1bea4cd531dc8199939bf964b"
+  },
+  "request_class_catalog_digest": "70052790d0520311e82721c00df26922da823044a0c14d52c64d0cb9d0c00de9",
+  "normalization_digest": "076f05bf0f5e097238b6562b8e539fa93d636754783a96596ecc9c9d86b361cb",
+  "header_classes": {
+   "DEVELOPER_IMPLEMENT": {
+    "capability": "developer",
+    "adapter": "aisef2.orchestrate.adapters.Developer.implement",
+    "stable": [
+     "header_class",
+     "capability",
+     "story_id",
+     "criteria",
+     "attempt",
+     "prior_failures",
+     "parent",
+     "tree",
+     "semantic_hashes",
+     "plan_hash",
+     "tool_schema",
+     "execution_profile",
+     "route_class"
+    ],
+    "normalized": [
+     "checkout path (an execution locator; never hashed)"
+    ],
+    "drift_fields": [],
+    "drift_bound": 0
+   },
+   "REVIEWER_REVIEW": {
+    "capability": "reviewer",
+    "adapter": "aisef2.orchestrate.adapters.Reviewer.review",
+    "stable": [
+     "header_class",
+     "capability",
+     "story_id",
+     "criteria",
+     "attempt",
+     "prior_failures",
+     "parent",
+     "files",
+     "content",
+     "semantic_hashes",
+     "plan_hash",
+     "tool_schema",
+     "execution_profile",
+     "route_class"
+    ],
+    "normalized": [
+     "scope root (an execution locator; never hashed)"
+    ],
+    "drift_fields": [],
+    "drift_bound": 0
+   }
+  },
+  "normalization": {
+   "dropped": [
+    "event.time (the real clock, recorded and dropped after observation)"
+   ],
+   "tokens": {
+    "<TMP>": "the item's temporary root",
+    "<PY>": "the interpreter path",
+    "<SCRIPT>": "the scanner script path",
+    "<REPORT>": "the scanner's report path (under the story's scratch)"
+   },
+   "applied_to": [
+    "event.data.detail (text) and tool argv"
+   ],
+   "never": [
+    "control outcomes",
+    "owner",
+    "retryable",
+    "revisions",
+    "semantic_hash",
+    "probe digest",
+    "request content",
+    "tool exit status",
+    "report content",
+    "file contents",
+    "test verdicts",
+    "workspace diff",
+    "capability identity",
+    "runspec_hash",
+    "plan_hash"
+   ]
+  },
+  "route_class": "MODEL_STREAM",
+  "drift_bound": 0,
+  "probe": {
+   "id": "probe.python_callable",
+   "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "corrected": true,
+   "historical_absent": true
+  },
+  "active_catalog": {
+   "cli_invocation": {
+    "probe_id": "probe.cli_invocation",
+    "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+   },
+   "file_artifact": {
+    "probe_id": "probe.file_artifact",
+    "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+   },
+   "process_effect": {
+    "probe_id": "probe.process_effect",
+    "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+   },
+   "python_callable": {
+    "probe_id": "probe.python_callable_v2",
+    "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+   }
+  },
+  "kind_contracts": {
+   "C3": [
+    "cli_invocation",
+    "app:__main__",
+    {
+     "argv": [
+      "2",
+      "3"
+     ]
+    },
+    {
+     "exit_code": 5
+    },
+    "REQUIRES_SUBJECT"
+   ],
+   "C4": [
+    "file_artifact",
+    "path:app",
+    {
+     "grep": "\\bsocket\\b",
+     "suffixes": [
+      ".py"
+     ]
+    },
+    {
+     "matches": 0
+    },
+    "ABSENCE_IS_DECIDABLE"
+   ],
+   "C5": [
+    "process_effect",
+    "app.counter:Counter",
+    {
+     "scenario": [
+      {
+       "step": "construct",
+       "args": [],
+       "kwargs": {}
+      },
+      {
+       "step": "call",
+       "method": "incr",
+       "args": [],
+       "kwargs": {}
+      },
+      {
+       "step": "call",
+       "method": "incr",
+       "args": [],
+       "kwargs": {}
+      }
+     ]
+    },
+    {
+     "returns": 2
+    },
+    "REQUIRES_SUBJECT"
+   ],
+   "C6": [
+    "python_callable",
+    "app.codec:encode",
+    {
+     "args": [
+      "ab"
+     ]
+    },
+    {
+     "returns_bytes_hex": "6162"
+    },
+    "REQUIRES_SUBJECT"
+   ]
+  },
+  "probe_ids_by_item": {
+   "normal-completion": "probe.python_callable",
+   "retry-then-commit": "probe.python_callable",
+   "review-finding-rollback": "probe.python_callable",
+   "pre-satisfied": "probe.python_callable",
+   "security-finding-rollback": "probe.python_callable",
+   "developer-outage-rollback": "probe.python_callable",
+   "post-merge-regression": "probe.python_callable",
+   "cli-proved-story": "probe.cli_invocation",
+   "cli-refuted-then-commit": "probe.cli_invocation",
+   "file-artifact-prohibition": "probe.file_artifact",
+   "scenario-proved-story": "probe.process_effect",
+   "bytes-returning-python-callable": "probe.python_callable_v2"
+  },
+  "tool_adapters": {
+   "python": {
+    "path_token": "<PY>",
+    "sha256": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634",
+    "version": "3.14.7",
+    "implementation": "CPython"
+   },
+   "git": {
+    "sha256": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537",
+    "version": "git version 2.53.0"
+   },
+   "scanner_script_sha256": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c",
+   "runner": "unittest (-E -s -B)",
+   "developer": "model stream (VERIFIED by the digest of its answer stream)",
+   "reviewer": "model stream (VERIFIED by the digest of its answer stream)"
+  },
+  "git_commit_metadata_pinned": {
+   "GIT_AUTHOR_DATE": "2026-09-28T00:00:00Z",
+   "GIT_COMMITTER_DATE": "2026-09-28T00:00:00Z"
+  },
+  "platform": {
+   "system": "darwin",
+   "release": "25.5.0",
+   "machine": "arm64",
+   "python": "3.14.7"
+  }
+ },
+ "one_identity": "7497b610455cf4ca938499dbd296375d482561e2a69c98b2e86207fe34630608",
+ "subject_problems": [],
+ "rule": "any kernel/control/probe semantic change after this point invalidates Q5; the corpus, the replay ledger, the header classes, the normalization rules and the harness are bound here and compared at reproduction"
+}
