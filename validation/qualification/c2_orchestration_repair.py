@@ -187,13 +187,18 @@ def _job_multi_kind() -> dict:
         return m.reproduce_multi_kind(pathlib.Path(t) / "w")
 
 
+#: (b) is the seven Cycle-1 corpus items by name: q5.CORPUS also carries the Cycle-2 items (QP-2.8) since the lane closed
+CYCLE1_ITEMS = ("normal-completion", "retry-then-commit", "review-finding-rollback", "pre-satisfied", "security-finding-rollback",
+                "developer-outage-rollback", "post-merge-regression")
+
+
 def _job_q5() -> dict:
     import aisef2
     from validation.qualification import q5
     kernel = pathlib.Path(aisef2.__file__).resolve().parent
     q5.kernel_digest = lambda: kernel_digest(kernel)   # the kernel this process imported, not the working tree's
     out = {}
-    for item in q5.CORPUS:
+    for item in (i for i in q5.CORPUS if i.id in CYCLE1_ITEMS):
         o = q5.execute(item, "record")
         out[item.id] = {k: o.get(k) for k in ("outcomes", "errors", "notes", "journal", "model_requests", "consumption",
                                               "tool_ledger", "subprocesses", "initial_workspace", "final_workspace")}
