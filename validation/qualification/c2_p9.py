@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import pathlib
 import platform
 import re
@@ -45,7 +46,63 @@ REVIEW_TIMEOUT_S = 900.0
 #: P10's limits (p10.runspec_for), the accepted Cycle-1 execution profile
 LIMITS = {"DEVELOPER": 1, "PLAN": 0, "ENVIRONMENT": 1, "PROVIDER": 1, "INTEGRATION": 0, "REVIEW": 1, "SECURITY": 1}
 PROJECT = frozenset({"ledgerlock", "tests"})
-SECRET = re.compile(r"(sk-[A-Za-z0-9_-]{12,}|api[_-]?key\"?\s*[:=]\s*\"[^\"]{8,})", re.I)
+#: what the harness changed from the attempt before (a harness defect fixed by a new harness commit, both attempts recorded)
+HARNESS_CHANGES = {2: "attempt 1's developer prompt named each obligation's clause by its id only (e.g. 'R-10: R-10/1') and its "
+                      "retry prompt the failure codes only; attempt 2 gives the clause's paraphrase and the requirement's "
+                      "numbered section of docs/requirements.md, and on a retry each observed failure with the clause its "
+                      "proof concerns — never a probe, stimulus, observable or expectation. The journal is written beside "
+                      "the record before the temporary directory is removed, and a secret-like token is redacted and counted "
+                      "instead of aborting the record (attempt 1 left none: NO-RECORD.json). Profile, limits, plan, specs and "
+                      "kernel unchanged."}
+#: a secret-like token: `sk-` at a token start (attempt 1's pattern had no left boundary and matched inside words such as
+#: "task-…", which aborted the record of a finished run: NO-RECORD.json)
+SECRET = re.compile(r"(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,}")
+
+
+def known_secrets() -> set[str]:
+    """The exact secret values this machine holds, in memory only — the values of key/token/secret/password environment
+    variables and of such fields of the OpenCode configuration. Never printed, never recorded."""
+    vals = {v for k, v in os.environ.items() if re.search(r"KEY|TOKEN|SECRET|PASSWORD", k, re.I) and len(v) >= 8}
+
+    def walk(o, key=""):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                yield from walk(v, k)
+        elif isinstance(o, list):
+            for v in o:
+                yield from walk(v, key)
+        elif isinstance(o, str) and re.search(r"api[_-]?key|token|secret|authorization|password", key, re.I) and len(o) >= 8:
+            yield o
+    cfg = pathlib.Path(os.environ.get("XDG_CONFIG_HOME") or (pathlib.Path.home() / ".config")) / "opencode" / "opencode.json"
+    try:
+        vals |= set(walk(json.loads(cfg.read_text(encoding="utf-8"))))
+    except (OSError, ValueError):
+        pass
+    return vals
+
+
+def redact(text: str, secrets: set[str]) -> tuple[str, int]:
+    """`text` with every exact known secret and every secret-like token replaced, and how many were replaced. A finished
+    run is never discarded over a suspicion: the suspected bytes are removed and counted, the rest is kept."""
+    n = 0
+    for v in sorted(secrets, key=len, reverse=True):
+        c = text.count(v)
+        if c:
+            text, n = text.replace(v, "<REDACTED:known-secret>"), n + c
+    text, m = SECRET.subn("<REDACTED:secret-like>", text)
+    return text, n + m
+
+
+def attempt_dir(n: int) -> str:
+    return OUT_REL if n == 1 else f"{OUT_REL}/attempt-{n}"
+
+
+def attempt_record(n: int) -> str | None:
+    """The record an attempt left: its regression record, or the record that it left none."""
+    for name in ("LEDGERLOCK-REGRESSION.json", "NO-RECORD.json"):
+        if (ROOT / attempt_dir(n) / name).exists():
+            return f"{attempt_dir(n)}/{name}"
+    return None
 
 
 def _sha(b: bytes) -> str:
@@ -64,21 +121,36 @@ def epics_section(epics: str, story: str) -> str:
     return m.group(0).strip() if m else ""
 
 
-def prompts(plan, epics: str) -> tuple[dict[str, str], dict[str, str]]:
+def sections(requirements: str) -> dict[str, str]:
+    """'10' -> '§10 Language / Runtime', '3.1' -> '§3.1 Key normalization (Unicode NFC)': the numbered headings of the
+    requirements, so a requirement id R-<n> names the section the developer reads."""
+    out = {}
+    for m in re.finditer(r"^#{2,3} (\d+(?:\.\d+)?)\.? (.+)$", requirements, re.M):
+        out[m.group(1)] = f"§{m.group(1)} {m.group(2).strip()}"
+    return out
+
+
+def prompts(plan, epics: str, requirements: str = "") -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
     """The developer's task per plan story: the requirements (authoritative, in the repository), the story's epics
     section, and the requirement clause of each obligation it must deliver or preserve. The specs' probes, stimuli and
     expectations are not shown: the proof is independent of the developer."""
     from validation.qualification import p10_contracts as aid
     graph = aid.story_graph()
     specs = {s.id: sid for sid, s in _compiled().items()}
-    out, clauses = {}, {}
+    text = {c["id"]: c["clause"] for c in aid.CLAUSES}
+    secs = sections(requirements)
+    out, clauses, by_criterion = {}, {}, {}
     for story in sorted({o.story_id for o in plan.obligations}):
         lines = []
         for o in (o for o in plan.obligations if o.story_id == story):
             t = aid.SPECS[specs[o.product_proof_spec_id]]
-            lines.append(f"- [{o.role.value}] {t['requirement']}: {t['clause']}")
+            where = secs.get(t["requirement"].removeprefix("R-"), "")
+            line = (f"- [{o.role.value}] {t['requirement']} (docs/requirements.md {where}), clause {t['clause']}: "
+                    f"{text.get(t['clause'], t['clause'])}")
+            lines.append(line)
+            by_criterion[o.criterion_id] = line
         prior = [s for s in sorted(graph.get(story, ())) if not any(o.story_id == s for o in plan.obligations)]
-        clauses[story] = "\n".join(lines)
+        clauses[story] = "\n".join(dict.fromkeys(lines))
         prior_text = "\n\n".join(epics_section(epics, s) for s in prior)
         out[story] = (
             f"You are the developer of LedgerLock story {story}. LedgerLock is a small Python library and CLI; "
@@ -88,11 +160,11 @@ def prompts(plan, epics: str) -> tuple[dict[str, str], dict[str, str]]:
             + (f"Earlier stories it builds on that no other step of this run delivers (implement what is missing):\n\n{prior_text}\n\n" if prior else "")
             + "When you finish, each of the following requirement clauses is verified independently against the "
               "requirements (INTRODUCE: this story makes it true; PRESERVE: it must stay true):\n"
-            + "\n".join(lines)
+            + "\n".join(dict.fromkeys(lines))
             + f"\n\nWrite this story's unit tests in {test_path(story)} (unittest; `python -m unittest {test_path(story)}` "
               "must pass from the repository root) and keep every earlier test passing. Do not edit docs/requirements.md. "
               "Do not run git commit; the harness commits your working tree.")
-    return out, clauses
+    return out, clauses, by_criterion
 
 
 _COMPILED: dict = {}
@@ -152,8 +224,18 @@ def opencode_session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeou
 
 
 class OpenCodeDeveloper:
-    def __init__(self, run, prompts: dict[str, str], logs: pathlib.Path) -> None:
-        self.run, self.prompts, self.logs, self.sessions = run, prompts, logs, []
+    def __init__(self, run, prompts: dict[str, str], logs: pathlib.Path, by_criterion: dict[str, str] | None = None) -> None:
+        self.run, self.prompts, self.logs, self.sessions, self.by_criterion = run, prompts, logs, [], by_criterion or {}
+
+    def feedback(self, story_id: str) -> str:
+        """The failures the kernel observed in this story, each with the requirement clause its proof concerns."""
+        rows = []
+        for e in self.run.events:
+            if e.type == "failure/observed" and e.data.get("story_id") == story_id:
+                m = re.match(r"proof of (\S+):", str(e.data.get("detail", "")))
+                clause = self.by_criterion.get(m.group(1), "") if m else ""
+                rows.append(f"- {e.data['code']}" + (f" — {clause.lstrip('- ')}" if clause else f": {e.data.get('detail', '')}"))
+        return "\n".join(rows)
 
     def implement(self, story_id: str, criteria: tuple[str, ...], checkout: str):
         from aisef2.journal.format2 import OperationOutcome as O
@@ -161,8 +243,8 @@ class OpenCodeDeveloper:
         from aisef2.orchestrate.workspace import commit_all, git
         from validation.qualification.q5 import _story_context
         attempt, prior = _story_context(self.run, story_id)
-        prompt = self.prompts[story_id] + (f"\n\nA previous attempt of this story was rolled back; the kernel observed: {prior}. "
-                                           "Fix the implementation." if prior else "")
+        prompt = self.prompts[story_id] + (f"\n\nA previous attempt of this story was not accepted; the kernel observed:\n"
+                                           f"{self.feedback(story_id)}\nFix the implementation." if prior else "")
         parent = git(checkout, "rev-parse", "HEAD").stdout.strip()
         s = opencode_session(f"developer {story_id}", prompt, checkout, self.logs / f"{story_id}.developer.{attempt}.jsonl", DEV_TIMEOUT_S)
         s.update(story_id=story_id, attempt=attempt, role="developer", prompt_sha256=_sha(prompt.encode()))
@@ -267,7 +349,9 @@ def run(out_dir: pathlib.Path) -> dict:
     oc = P10.opencode_identity()
     epics = subprocess.run(["git", "-C", str(P10.LEDGERLOCK_REPO), "show", f"{P10.LEDGERLOCK_PLAN_COMMIT}:_bmad-output/epics.md"],
                            capture_output=True, encoding="utf-8", check=True).stdout
-    tasks, clauses = prompts(plan, epics)
+    requirements_md = subprocess.run(["git", "-C", str(P10.LEDGERLOCK_REPO), "show", f"{P10.LEDGERLOCK_PLAN_COMMIT}:docs/requirements.md"],
+                                     capture_output=True, encoding="utf-8", check=True).stdout
+    tasks, clauses, by_criterion = prompts(plan, epics, requirements_md)
     kernel = q4._over(q4._file_digests(("aisef2",)))
     caps = [verified("kernel", kernel.encode(), Enforcement.FULL, tree=C.git("rev-parse", "HEAD:aisef2")),
             verified("python", pathlib.Path(sys.executable), Enforcement.PARTIAL, version=platform.python_version()),
@@ -294,7 +378,7 @@ def run(out_dir: pathlib.Path) -> dict:
         ws, merger = GitWorkspace(repo, tmp / "ws"), GitMerger(repo, "main", tmp / "merge")
         run_ = RunScope(tmp / "run", "c2-p9-ledgerlock", spec=lambda: resolve(caps, layers, base["baseline"]))
         run_.begin()
-        dev, rev = OpenCodeDeveloper(run_, tasks, logs), OpenCodeReviewer(run_, clauses, logs)
+        dev, rev = OpenCodeDeveloper(run_, tasks, logs, by_criterion), OpenCodeReviewer(run_, clauses, logs)
         adapters = sr.Adapters(dev, rev, RuffScanner(), merger, ws)
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch)) for e in catalog.CATALOG}
         env = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)
@@ -318,6 +402,7 @@ def run(out_dir: pathlib.Path) -> dict:
         if run_._state == "RUNNING":
             run_.shutdown()
         events = [{"seq": e.seq, "type": e.type, "data": plain(e.data)} for e in run_.events]
+        (out_dir / "JOURNAL.json").write_text(C.render(events), encoding="utf-8")   # kept whatever happens after
         run_id = {"run_id": "c2-p9-ledgerlock", "journal_events": len(events),
                   "journal_sha256": _sha(json.dumps(events, sort_keys=True, default=str).encode())}
         final = git(repo, "rev-parse", "main").stdout.strip()
@@ -430,16 +515,37 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--run", action="store_true", required=True)
-    ap.parse_args(argv)
-    out_dir = ROOT / OUT_REL
-    if (out_dir / "LEDGERLOCK-REGRESSION.json").exists():
-        raise SystemExit("REFUSED: LEDGERLOCK-REGRESSION.json exists — a rerun is a new attempt, never an overwrite")
+    ap.add_argument("--attempt", type=int, default=1)
+    a = ap.parse_args(argv)
+    rel = attempt_dir(a.attempt)
+    out_dir = ROOT / rel
+    if attempt_record(a.attempt):
+        raise SystemExit(f"REFUSED: {attempt_record(a.attempt)} exists — a rerun is a new attempt, never an overwrite")
+    prior = [attempt_record(n) for n in range(1, a.attempt)]
+    if None in prior:
+        raise SystemExit(f"REFUSED: attempt {a.attempt} without a record of every earlier attempt")
     m = run(out_dir)
     rec = record(out_dir, m)
-    for p in (out_dir / SESSIONS).glob("*.jsonl"):
-        if SECRET.search(p.read_text(encoding="utf-8", errors="replace")):
-            raise SystemExit(f"STOP: {p.name} looks like it holds a secret; nothing is written")
-    C.write(f"{OUT_REL}/LEDGERLOCK-REGRESSION.json", rec)
+    rec["attempt"] = a.attempt
+    rec["harness_change_from_prior_attempt"] = HARNESS_CHANGES.get(a.attempt)
+    rec["prior_attempts"] = [{"path": r, "sha256": C.lf_sha(ROOT / r),
+                              "delivery_verdict": json.loads((ROOT / r).read_text(encoding="utf-8")).get("delivery_verdict", "NO_RECORD")}
+                             for r in prior]
+    secrets, redactions = known_secrets(), {}
+    for p in [*sorted((out_dir / SESSIONS).glob("*.jsonl")), out_dir / "JOURNAL.json"]:
+        text, n = redact(p.read_text(encoding="utf-8", errors="replace"), secrets)
+        if n:
+            p.write_text(text, encoding="utf-8")
+            redactions[p.name] = n
+    body, n = redact(json.dumps(rec, default=str), secrets)
+    rec = json.loads(body)
+    for s in rec["model_sessions"]["sessions"]:
+        if s.get("log"):
+            s["log_sha256"] = _sha((out_dir / SESSIONS / s["log"]).read_bytes())   # the bytes kept, after any redaction
+    rec["journal_file"] = {"path": f"{rel}/JOURNAL.json", "sha256": C.lf_sha(out_dir / "JOURNAL.json")}
+    rec["secret_scan"] = {"known_secret_values_checked": len(secrets), "redactions_in_files": redactions, "redactions_in_record": n,
+                          "rule": "exact known secret values and sk- tokens are replaced and counted; nothing is discarded"}
+    C.write(f"{rel}/LEDGERLOCK-REGRESSION.json", rec)
     print(f"delivery {rec['delivery_verdict']}; plan quality {rec['plan_quality_verdict']}; outcomes {rec['story_outcomes']}")
     return 0
 
