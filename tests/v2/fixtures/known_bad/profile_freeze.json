@@ -1,0 +1,62 @@
+{
+ "checker": "profile_freeze",
+ "package": "WP-2.10.2",
+ "kind": "record",
+ "note": "a silent alias (listed like a fixed model, every call served by another id), measured on the fixture provider and recorded as ATTESTED: re-classifying its own measurement must refuse it",
+ "record": {
+  "classifications": [
+   {
+    "id": "BAD-ALIAS-AS-ATTESTED",
+    "source": "fixture provider, measured",
+    "route": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "provider": "fixture",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "model": "fixture-alias"
+    },
+    "measurement": {
+     "listing": {
+      "id": "fixture-alias",
+      "owned_by": "fixture"
+     },
+     "calls": [
+      {
+       "served_model": "fixture-model-2",
+       "deployment": "fp_fixture_2",
+       "finish_reason": "length"
+      },
+      {
+       "served_model": "fixture-model-2",
+       "deployment": "fp_fixture_2",
+       "finish_reason": "length"
+      },
+      {
+       "served_model": "fixture-model-2",
+       "deployment": "fp_fixture_2",
+       "finish_reason": "length"
+      }
+     ]
+    },
+    "grade": "ATTESTED",
+    "reasons": [],
+    "capability": {
+     "name": "model",
+     "grade": "ATTESTED",
+     "enforcement": "PARTIAL",
+     "binding": {
+      "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+      "declared_model": "fixture-alias",
+      "deployment": "fp_fixture_2",
+      "endpoint": "fixture-provider (127.0.0.1 stub)",
+      "fingerprint": "9be26952b56bdecb55797a85281074059295355c8f2128ef9ea9c5525939d230",
+      "provider": "fixture",
+      "route": "fixture/fixture-alias"
+     },
+     "identity": "a416cd2f2b903ec59edfea866a608c4b79efdb785f5d4efc4dd50c7af8797553"
+    }
+   }
+  ],
+  "profiles": []
+ },
+ "expect": "the measurement classifies OPAQUE ['SERVED_OTHER_MODEL']"
+}

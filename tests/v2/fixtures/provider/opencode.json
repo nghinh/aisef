@@ -1,0 +1,12 @@
+{
+ "$schema": "https://opencode.ai/config.json",
+ "model": "fixture-router/fixture-combo",
+ "small_model": "fixture-router/fast",
+ "provider": {
+  "fixture-router": {
+   "npm": "@ai-sdk/openai-compatible",
+   "options": {"apiKey": "FIXTURE-PLACEHOLDER-NOT-A-KEY", "baseURL": "http://127.0.0.1:9/v1"},
+   "models": {"fixture-combo": {"name": "fixture-combo"}, "fast": {"name": "fast"}}
+  }
+ }
+}

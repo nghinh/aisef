@@ -1,0 +1,18 @@
+{
+ "checker": "development_regression_bound",
+ "package": "WP-2.10.1",
+ "kind": "registry_entries",
+ "note": "the LedgerLock entry with its plan hash replaced: a registry that no longer carries the frozen identity would let a re-labelled LedgerLock through",
+ "entries": [
+  {
+   "label": "LedgerLock",
+   "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+   "plan_baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "plan_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "requirements_source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md",
+   "workload_record": "closure-evidence/v2/P10/WORKLOAD.json",
+   "workload_record_sha256": "d43211043dd141d388250eb756e2e6d40720093d8f091042944da4babd861463"
+  }
+ ],
+ "expect": "DEVELOPMENT_REGRESSION_BOUND LedgerLock: plan_hash is 'ffff"
+}

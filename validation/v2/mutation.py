@@ -49,7 +49,8 @@ RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence
            "C2-P2": "closure-evidence/v2/cycle2/P2-MUTATION.json",
            "C2-P3": "closure-evidence/v2/cycle2/P3-MUTATION.json",
            "C2-P4": "closure-evidence/v2/cycle2/P4-MUTATION.json",
-           "C2-ORCH": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json"}
+           "C2-ORCH": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json",
+           "C2-P10": "closure-evidence/v2/cycle2/P10-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -454,13 +455,30 @@ _C2_ORCH_MODULES = ("aisef2/orchestrate/story_runner.py", "aisef2/orchestrate/pr
 C2_ORCH_TARGETS: dict[str, list[str]] = {
     t: [k[0], "tests/v2/test_c2_orchestration_conformance.py", *k[1:]]
     for t, k in P6_TARGETS.items() if t.split("::")[0] in _C2_ORCH_MODULES}
+# Cycle 2, C2-P10 (WP-2.10.1): the evaluation-cohort machinery — every function of aisef2/cohort and every module-level
+# table that generates a mutant (the hex patterns, the shape table, the identity components, the DEVELOPMENT_REGRESSION
+# registry, the one-way successor table, the demoted states). SCHEMA (a bare string), FROZEN_INPUTS (tuple(SHAPES)) and
+# MIN_WORKLOADS (an integer) have no mutation site and are not targets; the kill tests pin their values. Kill tests are in-process and read only the two frozen LedgerLock files.
+_COHORT_TESTS = ["tests/v2/test_c2_p10_cohort.py"]
+C2_P10_TARGETS: dict[str, list[str]] = {
+    **{f"aisef2/cohort/preregistration.py::{f}": _COHORT_TESTS for f in (
+        "_HEX40", "_HEX64", "CohortRefused.__init__", "_hex40", "_hex64", "_name", "_count", "_names",
+        "SHAPES", "IDENTITY", "DEVELOPMENT_REGRESSION", "execution_profile", "runspec_of", "policy_of",
+        "problems", "validate", "preregistration_hash", "frozen_inputs", "workload_identity", "shared",
+        "development_regression")},
+    **{f"aisef2/cohort/lifecycle.py::{f}": _COHORT_TESTS for f in (
+        "NEXT", "DEMOTED", "EvaluationCohort.__post_init__", "EvaluationCohort.id",
+        "EvaluationCohort.preregistration_hash", "EvaluationCohort.frozen_inputs", "EvaluationCohort.planned_runs",
+        "EvaluationCohort.threshold", "EvaluationCohort.plan_quality_policy", "EvaluationCohort.workload", "seal",
+        "advance", "_live", "record_run", "read_results", "observe_inputs", "_complete", "generalization")},
+}
 #: target -> the phase that took it over; an earlier phase's record entry for it is historical (reported, not checked)
 SUPERSEDED: dict[str, str] = {t: "C2-ORCH" for t in C2_ORCH_TARGETS}
 for _t in C2_ORCH_TARGETS:
     del P6_TARGETS[_t]
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
                  "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS,
-                 "C2-ORCH": C2_ORCH_TARGETS}
+                 "C2-ORCH": C2_ORCH_TARGETS, "C2-P10": C2_P10_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}

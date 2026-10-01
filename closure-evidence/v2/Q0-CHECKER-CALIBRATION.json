@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 46,
+ "checker_count": 51,
  "uncovered_checker_modules": [],
- "calibrated_count": 46,
- "always_pass_mutants_rejected": 46,
+ "calibrated_count": 51,
+ "always_pass_mutants_rejected": 51,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -711,6 +711,81 @@
    "expected": "PROTOCOL_CHANNEL_DISCIPLINE aisef2/probe/bad.py:1",
    "observed": [
     "PROTOCOL_CHANNEL_DISCIPLINE aisef2/probe/bad.py:1: child script HARNESS uses sys.stdout (its line 3); the subject owns it"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "cohort_confined",
+   "package": "WP-2.10.1",
+   "fixture": "tests/v2/fixtures/known_bad/cohort_confined.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "COHORT_CONFINED aisef2/journal/cohort_events.py:1 imports aisef2.cohort",
+   "observed": [
+    "COHORT_CONFINED aisef2/journal/cohort_events.py:1 imports aisef2.cohort: nothing outside the machinery, its checks and its tests imports it"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "cohort_boundary",
+   "package": "WP-2.10.1",
+   "fixture": "tests/v2/fixtures/known_bad/cohort_boundary.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "COHORT_BOUNDARY aisef2/cohort/emit.py:1 imports aisef2.journal.event",
+   "observed": [
+    "COHORT_BOUNDARY aisef2/cohort/emit.py:1 imports aisef2.journal.event: the machinery reaches only the standard library and aisef2.arch.enums, aisef2.plan.obligation, aisef2.product.contract, aisef2.runtime.capability, aisef2.runtime.runspec, aisef2.cohort"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "development_regression_bound",
+   "package": "WP-2.10.1",
+   "fixture": "tests/v2/fixtures/known_bad/development_regression_bound.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "DEVELOPMENT_REGRESSION_BOUND LedgerLock: plan_hash is 'ffff",
+   "observed": [
+    "DEVELOPMENT_REGRESSION_BOUND LedgerLock: plan_hash is 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', its file holds 'bc71a701dd84f7227e8a474b9c9e0aec05ca3e10c0eb53168bcdba0bb8242a32'"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "no_cohort_record",
+   "package": "WP-2.10.1",
+   "fixture": "tests/v2/fixtures/known_bad/no_cohort_record.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "NO_COHORT_RECORD closure-evidence/v2/cycle2/COHORT-EXAMPLE.json $.cohort.preregistration: holds a preregistration",
+   "observed": [
+    "NO_COHORT_RECORD closure-evidence/v2/cycle2/COHORT-EXAMPLE.json $.cohort.preregistration: holds a preregistration — no cohort is authorized"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "profile_freeze",
+   "package": "WP-2.10.2",
+   "fixture": "tests/v2/fixtures/known_bad/profile_freeze.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "the measurement classifies OPAQUE ['SERVED_OTHER_MODEL']",
+   "observed": [
+    "BAD-ALIAS-AS-ATTESTED: recorded ATTESTED [], the measurement classifies OPAQUE ['SERVED_OTHER_MODEL']"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

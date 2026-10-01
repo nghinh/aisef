@@ -56,7 +56,9 @@ HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evi
              "C2-P7": "closure-evidence/v2/cycle2/C2-P7-RUN-HISTORY.json",
              "C2-P8": "closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json",
              "C2-P9": "closure-evidence/v2/cycle2/C2-P9-RUN-HISTORY.json",
-             "C2-P10": "closure-evidence/v2/cycle2/C2-P10-RUN-HISTORY.json"}
+             "C2-P10": "closure-evidence/v2/cycle2/C2-P10-RUN-HISTORY.json",
+             # the final integration candidate (LANE-Q + LANE-X): its gate, its requalification (R4) and the fresh Q4/Q5
+             "C2-FINAL": "closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json"}
 #: the record that closes a phase's history: a FINAL SEAL for P1-P6; for P7, the owner's acceptance of the corrected
 #: candidate's Q0-Q3 (there is no P7 seal builder — P7 qualifies, it does not seal)
 SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence/v2/P2-FINAL-SEAL.json",

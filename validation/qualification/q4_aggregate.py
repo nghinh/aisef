@@ -32,7 +32,7 @@ from validation.qualification import q4  # noqa: E402
 
 W0_REL, W0_SHA = "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json", "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3"
 #: the rung below Q4, bound by digest: Cycle 2 (QP-2.7) — the QP-2.6 summary and the C2-P5 acceptance it qualified
-P7_EVIDENCE = ("closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json", "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+P7_EVIDENCE = ("closure-evidence/v2/cycle2/Q0-Q3-R4/SUMMARY.json", "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
                "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json")
 SEALS = ("closure-evidence/v2/P4-FINAL-SEAL.json", "closure-evidence/v2/P5-FINAL-SEAL.json", "closure-evidence/v2/P6-FINAL-SEAL.json")
 
@@ -318,6 +318,12 @@ def aggregate(out_dir: pathlib.Path) -> dict:
     if q4.one_kernel_identity(ident) != subject["one_kernel_identity"]:
         problems.append("the identity at aggregation is not the frozen subject's")
     problems += [f"subject at aggregation: {p}" for p in q4.subject_problems(ident) if not p.startswith("the working tree is dirty")]
+    # the rung below is bound only when it is GREEN for this candidate (C2-P7-P8-BINDING-CORRIGENDUM-1: a FAILED summary was bound)
+    for rel in (r for r in P7_EVIDENCE if r.endswith("SUMMARY.json")):
+        low = json.loads((ROOT / rel).read_text(encoding="utf-8")) if (ROOT / rel).exists() else {}
+        if low.get("verdict") != "GREEN" or (low.get("subject") or {}).get("semantic_candidate") != q4.SEMANTIC_CANDIDATE:
+            problems.append(f"the rung below ({rel}) is not GREEN for {q4.SEMANTIC_CANDIDATE[:7]}: "
+                            f"{low.get('verdict')}, candidate {(low.get('subject') or {}).get('semantic_candidate')}")
     dirty_outside = [ln for ln in ident["dirty"] if not ln[3:].startswith(q4.OUT_REL)]
     if dirty_outside:
         problems.append(f"the working tree is dirty outside {q4.OUT_REL}: {dirty_outside[:5]}")

@@ -1,0 +1,794 @@
+{
+ "record": "AISEF V2 — CYCLE-2 C2-P10 / WP-2.10.2 MODEL / PROFILE FREEZE",
+ "package": "WP-2.10.2",
+ "phase": "C2-P10",
+ "authority": "owner ruling 2026-09-30: explicit authorization of the C2-P10 scope (WP-2.10.1, WP-2.10.2); machinery only — no cohort, no workload selected, no live provider",
+ "base": {
+  "commit": "9bd16fa9c578bb91a0a6c0047d2ceb6e6ab3b414",
+  "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904"
+ },
+ "sources": {
+  "validation/v2/profile_freeze.py": "04e3113a45f04855ee3413b3efd830a816642353d82ff4081c8c0791c0201e9f",
+  "tests/v2/fixtures/provider/fixture_provider.py": "b13b7ddcfa1ac4b68046b4c7d0f285903d2107d4681640a85cc668e3b9a2c8dd",
+  "tests/v2/fixtures/provider/opencode.json": "a3c7966ffee54b3738bbc5163449e9b602c221cb24265e5b5a6230443aaeaaec",
+  "tests/v2/fixtures/known_bad/profile_freeze.json": "c988972085868247eb9a398ac3bda941b7c6fb3d28b486a1be82d2318cde06eb",
+  "tests/v2/test_c2_p10_profile_freeze.py": "2ce196a6ed0924b2ffd422f41e047d008d7b776e0d92f5ed9da985023b6d230e",
+  "validation/qualification/c2_p10_profile.py": "80fab75c33fd86f8f0a095b6443f39a760372e883242bcb114c3ce8ac9d04b87",
+  "closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json": "0662b1a2cff4687792c4f89c92d60983c464c3c2f6dd716bf778d25c7f917bb5",
+  "closure-evidence/hardening/w1/profiles/ROUTE-RESOLUTION-2026-09-18.json": "0614e59a32a3505635a6e6d8c85e103bf51eb5aa55cdacdf6db8db841a550399"
+ },
+ "measured_live": "nothing: no call to any real provider was made and nothing was spent",
+ "live_provider_calls": 0,
+ "measured_on_fixture": "28 requests, every one to the fixture provider on 127.0.0.1 (paths /v1/chat/completions, /v1/models)",
+ "rules": {
+  "preflight_calls": 3,
+  "loopback_only": [
+   "127.0.0.1",
+   "localhost",
+   "::1"
+  ],
+  "alias_owners": [
+   "combo"
+  ],
+  "reasons": [
+   "UNMEASURED",
+   "UNDER_MEASURED",
+   "NOT_LISTED",
+   "LISTED_AS_ALIAS",
+   "SERVED_OTHER_MODEL",
+   "UNSTABLE"
+  ],
+  "enforcement": "PARTIAL",
+  "weakest_path": "a provider that switches the model behind a fixed id between two preflights and reports the declared id and deployment: the fingerprint detects drift at the next preflight, never between them",
+  "opaque_binds": "only what the configuration names; never a model inferred from what an alias served",
+  "fingerprint": "sha256 of the canonical preflight facts (listing entry, one call's served model, deployment and finish reason): a drift detector, not proof of weights"
+ },
+ "what_was_measured": {
+  "real_provider_live": [],
+  "fixture_stub_live": [
+   "FIX-FIXED",
+   "FIX-COMBO",
+   "FIX-ALIAS",
+   "FIX-ROTATING",
+   "FIX-UNLISTED",
+   "per_run.repeat_preflight_same_deployment",
+   "per_run.deployment_changed",
+   "per_run.alias_route"
+  ],
+  "configuration_only_not_measured": [
+   "FIX-UNMEASURED",
+   "DEV-DESIGNER",
+   "DEV-DEVELOPER",
+   "DEV-REVIEWER",
+   "DEV-SECURITY"
+  ],
+  "recorded_2026_09_18_not_re_measured": [
+   "DEV-DESIGNER-RECORDED",
+   "DEV-DEVELOPER-RECORDED",
+   "DEV-REVIEWER-RECORDED",
+   "DEV-SECURITY-RECORDED"
+  ]
+ },
+ "classifications": [
+  {
+   "id": "FIX-FIXED",
+   "source": "fixture provider, measured",
+   "route": {
+    "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+    "provider": "fixture",
+    "endpoint": "fixture-provider (127.0.0.1 stub)",
+    "model": "fixture-model-1"
+   },
+   "measurement": {
+    "listing": {
+     "id": "fixture-model-1",
+     "owned_by": "fixture"
+    },
+    "calls": [
+     {
+      "served_model": "fixture-model-1",
+      "deployment": "fp_fixture_1",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-model-1",
+      "deployment": "fp_fixture_1",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-model-1",
+      "deployment": "fp_fixture_1",
+      "finish_reason": "length"
+     }
+    ]
+   },
+   "grade": "ATTESTED",
+   "reasons": [],
+   "capability": {
+    "name": "model",
+    "grade": "ATTESTED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "declared_model": "fixture-model-1",
+     "deployment": "fp_fixture_1",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "fingerprint": "2914c8611b5bb156f0001cdd1c7491e6c804d0447d197af1da4c61a1455fb8d7",
+     "provider": "fixture",
+     "route": "fixture/fixture-model-1"
+    },
+    "identity": "059ad8603bc30c0307be468928720ba0806a621c93e0128a86be05b4f9960bbc"
+   }
+  },
+  {
+   "id": "FIX-COMBO",
+   "source": "fixture provider, measured",
+   "route": {
+    "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+    "provider": "fixture",
+    "endpoint": "fixture-provider (127.0.0.1 stub)",
+    "model": "fixture-combo"
+   },
+   "measurement": {
+    "listing": {
+     "id": "fixture-combo",
+     "owned_by": "combo"
+    },
+    "calls": [
+     {
+      "served_model": "fixture-model-1",
+      "deployment": "fp_combo",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-model-2",
+      "deployment": "fp_combo",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-model-1",
+      "deployment": "fp_combo",
+      "finish_reason": "length"
+     }
+    ]
+   },
+   "grade": "OPAQUE",
+   "reasons": [
+    "LISTED_AS_ALIAS",
+    "SERVED_OTHER_MODEL",
+    "UNSTABLE"
+   ],
+   "capability": {
+    "name": "model",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "declared_model": "fixture-combo",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "provider": "fixture",
+     "route": "fixture/fixture-combo"
+    },
+    "identity": "2068fb6a435675cc7f9ce13a9447343b14b7c9f04f4114b910fe96a37f474ff5"
+   }
+  },
+  {
+   "id": "FIX-ALIAS",
+   "source": "fixture provider, measured",
+   "route": {
+    "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+    "provider": "fixture",
+    "endpoint": "fixture-provider (127.0.0.1 stub)",
+    "model": "fixture-alias"
+   },
+   "measurement": {
+    "listing": {
+     "id": "fixture-alias",
+     "owned_by": "fixture"
+    },
+    "calls": [
+     {
+      "served_model": "fixture-model-2",
+      "deployment": "fp_fixture_2",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-model-2",
+      "deployment": "fp_fixture_2",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-model-2",
+      "deployment": "fp_fixture_2",
+      "finish_reason": "length"
+     }
+    ]
+   },
+   "grade": "OPAQUE",
+   "reasons": [
+    "SERVED_OTHER_MODEL"
+   ],
+   "capability": {
+    "name": "model",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "declared_model": "fixture-alias",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "provider": "fixture",
+     "route": "fixture/fixture-alias"
+    },
+    "identity": "6793749d891fc20106016c8f232afcf8a21dd408d350a7c6ef50b6c1c40eb6e8"
+   }
+  },
+  {
+   "id": "FIX-ROTATING",
+   "source": "fixture provider, measured",
+   "route": {
+    "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+    "provider": "fixture",
+    "endpoint": "fixture-provider (127.0.0.1 stub)",
+    "model": "fixture-rotating"
+   },
+   "measurement": {
+    "listing": {
+     "id": "fixture-rotating",
+     "owned_by": "fixture"
+    },
+    "calls": [
+     {
+      "served_model": "fixture-rotating",
+      "deployment": "fp_rotating_0",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-rotating",
+      "deployment": "fp_rotating_1",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-rotating",
+      "deployment": "fp_rotating_0",
+      "finish_reason": "length"
+     }
+    ]
+   },
+   "grade": "OPAQUE",
+   "reasons": [
+    "UNSTABLE"
+   ],
+   "capability": {
+    "name": "model",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "declared_model": "fixture-rotating",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "provider": "fixture",
+     "route": "fixture/fixture-rotating"
+    },
+    "identity": "94fe3b1f448d6789a02a080707a1bafc711d8b626c32d7a0f237d63c3bdd7ec8"
+   }
+  },
+  {
+   "id": "FIX-UNLISTED",
+   "source": "fixture provider, measured",
+   "route": {
+    "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+    "provider": "fixture",
+    "endpoint": "fixture-provider (127.0.0.1 stub)",
+    "model": "fixture-unlisted"
+   },
+   "measurement": {
+    "listing": null,
+    "calls": [
+     {
+      "served_model": "fixture-unlisted",
+      "deployment": "fp_fixture-unlisted",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-unlisted",
+      "deployment": "fp_fixture-unlisted",
+      "finish_reason": "length"
+     },
+     {
+      "served_model": "fixture-unlisted",
+      "deployment": "fp_fixture-unlisted",
+      "finish_reason": "length"
+     }
+    ]
+   },
+   "grade": "OPAQUE",
+   "reasons": [
+    "NOT_LISTED"
+   ],
+   "capability": {
+    "name": "model",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "declared_model": "fixture-unlisted",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "provider": "fixture",
+     "route": "fixture/fixture-unlisted"
+    },
+    "identity": "9801aee147eef501e4df289f6d29f5a239fc7e3e10900584992e010729717711"
+   }
+  },
+  {
+   "id": "FIX-UNMEASURED",
+   "source": "fixture route, configuration only (no preflight)",
+   "route": {
+    "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+    "provider": "fixture",
+    "endpoint": "fixture-provider (127.0.0.1 stub)",
+    "model": "fixture-model-1"
+   },
+   "measurement": null,
+   "grade": "OPAQUE",
+   "reasons": [
+    "UNMEASURED"
+   ],
+   "capability": {
+    "name": "model",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "declared_model": "fixture-model-1",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "provider": "fixture",
+     "route": "fixture/fixture-model-1"
+    },
+    "identity": "faedf7f5ee8d0228546081c0f012838c0167495c15e5da0383f52928e5d42ef6"
+   }
+  },
+  {
+   "id": "DEV-DESIGNER",
+   "source": "configured development profile (closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json), configuration only: no live preflight",
+   "route": {
+    "client": "opencode",
+    "provider": "9router",
+    "endpoint": "9router",
+    "model": "mycombo"
+   },
+   "measurement": null,
+   "grade": "OPAQUE",
+   "reasons": [
+    "UNMEASURED"
+   ],
+   "capability": {
+    "name": "model.designer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "declared_model": "mycombo",
+     "endpoint": "9router",
+     "provider": "9router",
+     "route": "9router/mycombo"
+    },
+    "identity": "92243e5e247df221da88d2cacc8e0c24528eb31e4aae6064618638c310f881c9"
+   }
+  },
+  {
+   "id": "DEV-DESIGNER-RECORDED",
+   "source": "the same route against the router facts recorded on 2026-09-18 (closure-evidence/hardening/w1/profiles/ROUTE-RESOLUTION-2026-09-18.json); recorded, not re-measured",
+   "route": {
+    "client": "opencode",
+    "provider": "9router",
+    "endpoint": "9router",
+    "model": "mycombo"
+   },
+   "measurement": {
+    "listing": {
+     "id": "mycombo",
+     "owned_by": "combo"
+    },
+    "calls": [
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     },
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     },
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     }
+    ]
+   },
+   "grade": "OPAQUE",
+   "reasons": [
+    "LISTED_AS_ALIAS",
+    "SERVED_OTHER_MODEL"
+   ],
+   "capability": {
+    "name": "model.designer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "declared_model": "mycombo",
+     "endpoint": "9router",
+     "provider": "9router",
+     "route": "9router/mycombo"
+    },
+    "identity": "92243e5e247df221da88d2cacc8e0c24528eb31e4aae6064618638c310f881c9"
+   }
+  },
+  {
+   "id": "DEV-DEVELOPER",
+   "source": "configured development profile (closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json), configuration only: no live preflight",
+   "route": {
+    "client": "opencode",
+    "provider": "9router",
+    "endpoint": "9router",
+    "model": "mycombo"
+   },
+   "measurement": null,
+   "grade": "OPAQUE",
+   "reasons": [
+    "UNMEASURED"
+   ],
+   "capability": {
+    "name": "model.developer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "declared_model": "mycombo",
+     "endpoint": "9router",
+     "provider": "9router",
+     "route": "9router/mycombo"
+    },
+    "identity": "cfb8d0cd602989ae807f1bc6a0deb2c504d9c5cd2eae4d76fd5f40d520e50b03"
+   }
+  },
+  {
+   "id": "DEV-DEVELOPER-RECORDED",
+   "source": "the same route against the router facts recorded on 2026-09-18 (closure-evidence/hardening/w1/profiles/ROUTE-RESOLUTION-2026-09-18.json); recorded, not re-measured",
+   "route": {
+    "client": "opencode",
+    "provider": "9router",
+    "endpoint": "9router",
+    "model": "mycombo"
+   },
+   "measurement": {
+    "listing": {
+     "id": "mycombo",
+     "owned_by": "combo"
+    },
+    "calls": [
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     },
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     },
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     }
+    ]
+   },
+   "grade": "OPAQUE",
+   "reasons": [
+    "LISTED_AS_ALIAS",
+    "SERVED_OTHER_MODEL"
+   ],
+   "capability": {
+    "name": "model.developer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "declared_model": "mycombo",
+     "endpoint": "9router",
+     "provider": "9router",
+     "route": "9router/mycombo"
+    },
+    "identity": "cfb8d0cd602989ae807f1bc6a0deb2c504d9c5cd2eae4d76fd5f40d520e50b03"
+   }
+  },
+  {
+   "id": "DEV-REVIEWER",
+   "source": "configured development profile (closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json), configuration only: no live preflight",
+   "route": {
+    "client": "opencode",
+    "provider": "9router",
+    "endpoint": "9router",
+    "model": "mycombo"
+   },
+   "measurement": null,
+   "grade": "OPAQUE",
+   "reasons": [
+    "UNMEASURED"
+   ],
+   "capability": {
+    "name": "model.reviewer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "declared_model": "mycombo",
+     "endpoint": "9router",
+     "provider": "9router",
+     "route": "9router/mycombo"
+    },
+    "identity": "e09df290b28e1ce13521917a53290ca5ce81210fdb43bef6a5413ff185f0977d"
+   }
+  },
+  {
+   "id": "DEV-REVIEWER-RECORDED",
+   "source": "the same route against the router facts recorded on 2026-09-18 (closure-evidence/hardening/w1/profiles/ROUTE-RESOLUTION-2026-09-18.json); recorded, not re-measured",
+   "route": {
+    "client": "opencode",
+    "provider": "9router",
+    "endpoint": "9router",
+    "model": "mycombo"
+   },
+   "measurement": {
+    "listing": {
+     "id": "mycombo",
+     "owned_by": "combo"
+    },
+    "calls": [
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     },
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     },
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     }
+    ]
+   },
+   "grade": "OPAQUE",
+   "reasons": [
+    "LISTED_AS_ALIAS",
+    "SERVED_OTHER_MODEL"
+   ],
+   "capability": {
+    "name": "model.reviewer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "declared_model": "mycombo",
+     "endpoint": "9router",
+     "provider": "9router",
+     "route": "9router/mycombo"
+    },
+    "identity": "e09df290b28e1ce13521917a53290ca5ce81210fdb43bef6a5413ff185f0977d"
+   }
+  },
+  {
+   "id": "DEV-SECURITY",
+   "source": "configured development profile (closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json), configuration only: no live preflight",
+   "route": {
+    "client": "opencode",
+    "provider": "9router",
+    "endpoint": "9router",
+    "model": "mycombo"
+   },
+   "measurement": null,
+   "grade": "OPAQUE",
+   "reasons": [
+    "UNMEASURED"
+   ],
+   "capability": {
+    "name": "model.security",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "declared_model": "mycombo",
+     "endpoint": "9router",
+     "provider": "9router",
+     "route": "9router/mycombo"
+    },
+    "identity": "4c262a0178df59ef2213edab9baa31542effd283081174bb6c4963874a480131"
+   }
+  },
+  {
+   "id": "DEV-SECURITY-RECORDED",
+   "source": "the same route against the router facts recorded on 2026-09-18 (closure-evidence/hardening/w1/profiles/ROUTE-RESOLUTION-2026-09-18.json); recorded, not re-measured",
+   "route": {
+    "client": "opencode",
+    "provider": "9router",
+    "endpoint": "9router",
+    "model": "mycombo"
+   },
+   "measurement": {
+    "listing": {
+     "id": "mycombo",
+     "owned_by": "combo"
+    },
+    "calls": [
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     },
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     },
+     {
+      "served_model": "MiniMax-M3",
+      "deployment": null,
+      "finish_reason": null
+     }
+    ]
+   },
+   "grade": "OPAQUE",
+   "reasons": [
+    "LISTED_AS_ALIAS",
+    "SERVED_OTHER_MODEL"
+   ],
+   "capability": {
+    "name": "model.security",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "declared_model": "mycombo",
+     "endpoint": "9router",
+     "provider": "9router",
+     "route": "9router/mycombo"
+    },
+    "identity": "4c262a0178df59ef2213edab9baa31542effd283081174bb6c4963874a480131"
+   }
+  }
+ ],
+ "per_run": {
+  "repeat_preflight_same_deployment": "ATTESTED",
+  "deployment_changed": "REFUSED DRIFT: fixture/fixture-model-1: fingerprint 61f2c0f9af6e is not the frozen 2914c8611b5b",
+  "alias_route": "REFUSED OPAQUE: fixture/fixture-alias: SERVED_OTHER_MODEL"
+ },
+ "profiles": [
+  {
+   "id": "PROFILE-FIXTURE-FIXED",
+   "profile": {
+    "capabilities": [
+     {
+      "name": "model",
+      "grade": "ATTESTED",
+      "tuple": {
+       "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+       "declared_model": "fixture-model-1",
+       "deployment": "fp_fixture_1",
+       "endpoint": "fixture-provider (127.0.0.1 stub)",
+       "fingerprint": "2914c8611b5bb156f0001cdd1c7491e6c804d0447d197af1da4c61a1455fb8d7",
+       "provider": "fixture",
+       "route": "fixture/fixture-model-1"
+      },
+      "enforcement": "PARTIAL"
+     }
+    ],
+    "aggregate_min_grade": "ATTESTED",
+    "settings": {
+     "revision": {
+      "layer": "run",
+      "value": "9bd16fa9c578bb91a0a6c0047d2ceb6e6ab3b414"
+     }
+    },
+    "runspec_hash": "06a6af0e1ecf374c9cd0044fb82486711aa9e0ede49d00cc6f0aad77ea194d99"
+   },
+   "profile_id": "06a6af0e1ecf374c9cd0044fb82486711aa9e0ede49d00cc6f0aad77ea194d99",
+   "aggregate_min_grade": "ATTESTED",
+   "bars_sealing": false,
+   "synthetic_seal": "not barred by the profile"
+  },
+  {
+   "id": "PROFILE-DEV-MYCOMBO",
+   "profile": {
+    "capabilities": [
+     {
+      "name": "model.designer",
+      "grade": "OPAQUE",
+      "tuple": {
+       "client": "opencode",
+       "declared_model": "mycombo",
+       "endpoint": "9router",
+       "provider": "9router",
+       "route": "9router/mycombo"
+      },
+      "enforcement": "PARTIAL"
+     },
+     {
+      "name": "model.developer",
+      "grade": "OPAQUE",
+      "tuple": {
+       "client": "opencode",
+       "declared_model": "mycombo",
+       "endpoint": "9router",
+       "provider": "9router",
+       "route": "9router/mycombo"
+      },
+      "enforcement": "PARTIAL"
+     },
+     {
+      "name": "model.reviewer",
+      "grade": "OPAQUE",
+      "tuple": {
+       "client": "opencode",
+       "declared_model": "mycombo",
+       "endpoint": "9router",
+       "provider": "9router",
+       "route": "9router/mycombo"
+      },
+      "enforcement": "PARTIAL"
+     },
+     {
+      "name": "model.security",
+      "grade": "OPAQUE",
+      "tuple": {
+       "client": "opencode",
+       "declared_model": "mycombo",
+       "endpoint": "9router",
+       "provider": "9router",
+       "route": "9router/mycombo"
+      },
+      "enforcement": "PARTIAL"
+     }
+    ],
+    "aggregate_min_grade": "OPAQUE",
+    "settings": {
+     "client_version": {
+      "layer": "profile",
+      "value": "1.18.31"
+     },
+     "revision": {
+      "layer": "run",
+      "value": "9bd16fa9c578bb91a0a6c0047d2ceb6e6ab3b414"
+     }
+    },
+    "runspec_hash": "0fea5e735f51c4339b2278875f7e38f5de9081b224ba42791539b61c6b5ffe62"
+   },
+   "profile_id": "0fea5e735f51c4339b2278875f7e38f5de9081b224ba42791539b61c6b5ffe62",
+   "aggregate_min_grade": "OPAQUE",
+   "bars_sealing": true,
+   "synthetic_seal": "REFUSED OPAQUE_PROFILE: an OPAQUE aggregate_min_grade never seals (RFC §28 rule 5)"
+  }
+ ],
+ "verdict": "attestation qualified",
+ "observed_at_write": {
+  "source": "~/.config/opencode/opencode.json — the `model` field only, read in memory; no key, endpoint or option was read out, copied or recorded",
+  "present": true,
+  "route": {
+   "client": "opencode",
+   "provider": "9router",
+   "endpoint": "9router",
+   "model": "mycombo"
+  },
+  "grade": "OPAQUE",
+  "reasons": [
+   "UNMEASURED"
+  ],
+  "same_route_as_committed_profile": true
+ }
+}

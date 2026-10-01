@@ -4,7 +4,7 @@
  "classification": "CONFORMANCE REPAIR to the frozen architecture (not an architecture expansion, not a new probe feature)",
  "subject": {
   "base": "45136086c3e4a98534f975e6db979f94165af5f3",
-  "head_when_written": "ac4a6c75b461e409f024965391ce77e7689c0e08",
+  "head_when_written": "89de2b78ee3007b1ee312409d8cfa591b4d430ff",
   "note": "written on head_when_written, the commit that carries the repair, and committed in the commit after it (a record cannot name the commit that contains it; the C2-P5 proposal's derived provenance in (e) reads HEAD's kernel tree); (d) binds every changed file by content",
   "old_kernel": {
    "commit": "63112544f1146097b69c538d98e09e5a52c547c1",
@@ -35,7 +35,7 @@
    }
   },
   "new_kernel": {
-   "kernel_digest": "8e8f00ca9327599f850088181aa64fa8751d8405a5485d52faccb18fa8ef4d3d",
+   "kernel_digest": "f763b238d9e9c007937b959238feac9d54e6af7d9c1bb707cad1686640526908",
    "rule": "q4's kernel digest over this working tree's aisef2 (its git tree exists once the repair is committed; (d) binds the two changed modules by content)"
   }
  },
@@ -726,7 +726,7 @@
    "released_empty": true,
    "escaped": 0
   },
-  "seconds": 127.1
+  "seconds": 131.9
  },
  "files_changed": {
   "aisef2/orchestrate/proof.py": {
@@ -747,11 +747,11 @@
   },
   "validation/qualification/c2_orchestration_repair.py": {
    "before": null,
-   "after": "be526067bd56cdd9c3d66ff10db7f55f7959c3abf93753eef0e81e9bc5bdaafb"
+   "after": "28a7ca9c57c0325c5c28262070d9344502571b2d6a79c8aee055b4b6d56d835d"
   },
   "validation/v2/mutation.py": {
    "before": "dc9c3bd5cfc9779d8449b7bd8fe2901a794d50305129de594b27c55c8d8b51f3",
-   "after": "a07786b45967ae2f82fd9fbe0cc5762023099d5d07e836b12ebcb61a9ac9cdc0"
+   "after": "bb519e51284d8811319860b18682c3634e618fad17132cb9928835836c75180c"
   }
  },
  "identities": {
@@ -770,7 +770,7 @@
     "identities.aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
    },
    "derived": {
-    "identities.aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904"
+    "identities.aisef2_tree": "254d8f559b879c210c4936321022f1350c4b2f89"
    },
    "provenance_only": true,
    "proposal_digest_unchanged": true
@@ -1121,16 +1121,16 @@
    "tail": [
     "cycle-2 baseline guard: PASS"
    ],
-   "seconds": 0.4
+   "seconds": 0.5
   },
   "checker_calibration": {
    "command": "python -P validation/v2/checker_calibration.py --check",
    "exit": 0,
    "tail": [
-    "OK   protocol_channel_discipline clean=True rejects=True always-pass-mutant-caught=True",
-    "calibrated 46/46; always-PASS mutants rejected 46/46"
+    "OK   profile_freeze         clean=True rejects=True always-pass-mutant-caught=True",
+    "calibrated 51/51; always-PASS mutants rejected 51/51"
    ],
-   "seconds": 183.2
+   "seconds": 189.9
   },
   "freeze_conformance": {
    "command": "python -P validation/v2/freeze_conformance.py --check",
@@ -1155,7 +1155,7 @@
    "tail": [
     "old path audit: PASS"
    ],
-   "seconds": 2.1
+   "seconds": 2.2
   },
   "p6_evidence": {
    "command": "python -P validation/v2/p6_evidence.py --check",
@@ -1171,7 +1171,7 @@
    "tail": [
     "destructive authority: PASS"
    ],
-   "seconds": 1.7
+   "seconds": 1.8
   },
   "kernel_static_checks": {
    "command": "python -P validation/v2/kernel_static_checks.py --check",
@@ -1185,10 +1185,10 @@
    "command": "python -P validation/v2/except_boundaries.py --check",
    "exit": 0,
    "tail": [
-    "boundaries 72 {'RERAISES': 7, 'STRUCTURAL': 65}",
+    "boundaries 75 {'RERAISES': 7, 'STRUCTURAL': 68}",
     "except boundaries: PASS"
    ],
-   "seconds": 0.2
+   "seconds": 0.3
   },
   "mutation": {
    "command": "python -P validation/v2/mutation.py --check",
@@ -1214,5 +1214,5 @@
  },
  "problems": [],
  "verdict": "COMPLETE",
- "seconds": 368.8
+ "seconds": 382.7
 }
