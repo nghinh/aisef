@@ -1,0 +1,638 @@
+{
+ "record": "AISEF V2 — QP-2.9 PREFLIGHT: can the current authoritative path prove the owner-approved LedgerLock PLAN-V2.2?",
+ "authority": "owner ruling 2026-09-30 (QP-2.9 authorized after QP-2.8; global stop rules)",
+ "subject": {
+  "head": "fbde1d9121e1e967fee6dceb778af0f180132597",
+  "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904"
+ },
+ "benchmark_class": "DEVELOPMENT_REGRESSION",
+ "generalization": "NONE",
+ "plan_quality_policy": "DO_NOT_PREREGISTER (DECISION-5)",
+ "plan": {
+  "id": "LEDGERLOCK-PLAN-V2.2-PROPOSAL",
+  "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+  "stories": 9,
+  "obligations": 67
+ },
+ "approvals": {
+  "count": 59,
+  "approver": [
+   "human:owner"
+  ]
+ },
+ "stories": {
+  "STORY-01-01": {
+   "specs": [
+    "S-10-a",
+    "S-10-b",
+    "S-10-c",
+    "S-12-a",
+    "S-12-b",
+    "S-12-c",
+    "S-13-a",
+    "S-13-b",
+    "S-13-c",
+    "S-13-d",
+    "S-13-e",
+    "S-9-b",
+    "S-9-c"
+   ],
+   "obligations": 13,
+   "probe_ids": [
+    "probe.cli_invocation",
+    "probe.file_artifact",
+    "probe.python_callable_v2"
+   ],
+   "kinds": 3,
+   "depends_on": [],
+   "orchestration_party_probe": {
+    "accepted": true,
+    "resolved_by_spec": {
+     "S-10-a": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-10-b": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-10-c": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-12-a": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-12-b": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-12-c": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-13-a": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-13-b": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-13-c": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-13-d": [
+      "probe.python_callable_v2",
+      "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+     ],
+     "S-13-e": [
+      "probe.python_callable_v2",
+      "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+     ],
+     "S-9-b": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ],
+     "S-9-c": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ]
+    }
+   },
+   "single_probe_on_a_foreign_spec": {
+    "probe": "probe.cli_invocation",
+    "spec": "S-10-a",
+    "spec_probe": "probe.file_artifact",
+    "result": "InvalidSpec",
+    "invalid_spec": true,
+    "detail": "the spec is bound to probe.file_artifact@31465b73cbe2, not probe.cli_invocation@5ec17bea4a67"
+   },
+   "provable_by_the_current_path": true
+  },
+  "STORY-01-05": {
+   "specs": [
+    "S-13-f"
+   ],
+   "obligations": 1,
+   "probe_ids": [
+    "probe.python_callable_v2"
+   ],
+   "kinds": 1,
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-04"
+   ],
+   "orchestration_party_probe": {
+    "accepted": true,
+    "resolved_by_spec": {
+     "S-13-f": [
+      "probe.python_callable_v2",
+      "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+     ]
+    }
+   },
+   "single_probe_on_a_foreign_spec": null,
+   "provable_by_the_current_path": true
+  },
+  "STORY-02-01": {
+   "specs": [
+    "S-13-g"
+   ],
+   "obligations": 1,
+   "probe_ids": [
+    "probe.python_callable_v2"
+   ],
+   "kinds": 1,
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-04",
+    "STORY-01-05",
+    "STORY-01-06"
+   ],
+   "orchestration_party_probe": {
+    "accepted": true,
+    "resolved_by_spec": {
+     "S-13-g": [
+      "probe.python_callable_v2",
+      "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+     ]
+    }
+   },
+   "single_probe_on_a_foreign_spec": null,
+   "provable_by_the_current_path": true
+  },
+  "STORY-02-02": {
+   "specs": [
+    "S-13-h"
+   ],
+   "obligations": 1,
+   "probe_ids": [
+    "probe.python_callable_v2"
+   ],
+   "kinds": 1,
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-04",
+    "STORY-01-05",
+    "STORY-01-06",
+    "STORY-02-01"
+   ],
+   "orchestration_party_probe": {
+    "accepted": true,
+    "resolved_by_spec": {
+     "S-13-h": [
+      "probe.python_callable_v2",
+      "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+     ]
+    }
+   },
+   "single_probe_on_a_foreign_spec": null,
+   "provable_by_the_current_path": true
+  },
+  "STORY-03-01": {
+   "specs": [
+    "S-13-i",
+    "S-3.1-a",
+    "S-3.1-b",
+    "S-3.1-c",
+    "S-3.2-b",
+    "S-3.2-c",
+    "S-3.2-d",
+    "S-3.2-e",
+    "S-3.2-f",
+    "S-3.2-g",
+    "S-3.2-h",
+    "S-3.4-a",
+    "S-4.2-a",
+    "S-4.2-b",
+    "S-4.3-a",
+    "S-4.3-b",
+    "S-4.4-a",
+    "S-4.4-b",
+    "S-4.5-a",
+    "S-4.5-b",
+    "S-5-a",
+    "S-5-b",
+    "S-6-a",
+    "S-6-b",
+    "S-6-c"
+   ],
+   "obligations": 25,
+   "probe_ids": [
+    "probe.process_effect",
+    "probe.python_callable_v2"
+   ],
+   "kinds": 2,
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-04",
+    "STORY-01-05",
+    "STORY-01-06",
+    "STORY-02-01",
+    "STORY-02-02"
+   ],
+   "orchestration_party_probe": {
+    "accepted": true,
+    "resolved_by_spec": {
+     "S-13-i": [
+      "probe.python_callable_v2",
+      "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc"
+     ],
+     "S-3.1-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.1-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.1-c": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.2-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.2-c": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.2-d": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.2-e": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.2-f": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.2-g": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.2-h": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.4-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-4.2-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-4.2-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-4.3-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-4.3-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-4.4-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-4.4-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-4.5-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-4.5-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-5-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-5-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-6-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-6-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-6-c": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ]
+    }
+   },
+   "single_probe_on_a_foreign_spec": {
+    "probe": "probe.process_effect",
+    "spec": "S-13-i",
+    "spec_probe": "probe.python_callable_v2",
+    "result": "InvalidSpec",
+    "invalid_spec": true,
+    "detail": "the spec is bound to probe.python_callable_v2@b71adecf433e, not probe.process_effect@dbbe4cd51feb"
+   },
+   "provable_by_the_current_path": true
+  },
+  "STORY-04-01": {
+   "specs": [
+    "S-3.2-a",
+    "S-6-d",
+    "S-7-a",
+    "S-7-b",
+    "S-7-c",
+    "S-7-d",
+    "S-9-a",
+    "S-9-b",
+    "S-9-c"
+   ],
+   "obligations": 9,
+   "probe_ids": [
+    "probe.cli_invocation",
+    "probe.process_effect"
+   ],
+   "kinds": 2,
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-04",
+    "STORY-01-05",
+    "STORY-01-06",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-03-01",
+    "STORY-03-02"
+   ],
+   "orchestration_party_probe": {
+    "accepted": true,
+    "resolved_by_spec": {
+     "S-3.2-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-6-d": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ],
+     "S-7-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-7-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-7-c": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-7-d": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ],
+     "S-9-a": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ],
+     "S-9-b": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ],
+     "S-9-c": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ]
+    }
+   },
+   "single_probe_on_a_foreign_spec": {
+    "probe": "probe.cli_invocation",
+    "spec": "S-3.2-a",
+    "spec_probe": "probe.process_effect",
+    "result": "InvalidSpec",
+    "invalid_spec": true,
+    "detail": "the spec is bound to probe.process_effect@dbbe4cd51feb, not probe.cli_invocation@5ec17bea4a67"
+   },
+   "provable_by_the_current_path": true
+  },
+  "STORY-04-02": {
+   "specs": [
+    "S-3.3-a",
+    "S-3.3-b",
+    "S-3.3-c",
+    "S-3.3-d",
+    "S-7-e",
+    "S-7-f",
+    "S-9-d",
+    "S-9-e",
+    "S-9-f"
+   ],
+   "obligations": 9,
+   "probe_ids": [
+    "probe.cli_invocation",
+    "probe.process_effect"
+   ],
+   "kinds": 2,
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-04",
+    "STORY-01-05",
+    "STORY-01-06",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-03-01",
+    "STORY-03-02",
+    "STORY-04-01"
+   ],
+   "orchestration_party_probe": {
+    "accepted": true,
+    "resolved_by_spec": {
+     "S-3.3-a": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.3-b": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.3-c": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-3.3-d": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-7-e": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ],
+     "S-7-f": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ],
+     "S-9-d": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ],
+     "S-9-e": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ],
+     "S-9-f": [
+      "probe.cli_invocation",
+      "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393"
+     ]
+    }
+   },
+   "single_probe_on_a_foreign_spec": {
+    "probe": "probe.cli_invocation",
+    "spec": "S-3.3-a",
+    "spec_probe": "probe.process_effect",
+    "result": "InvalidSpec",
+    "invalid_spec": true,
+    "detail": "the spec is bound to probe.process_effect@dbbe4cd51feb, not probe.cli_invocation@5ec17bea4a67"
+   },
+   "provable_by_the_current_path": true
+  },
+  "STORY-05-01": {
+   "specs": [
+    "S-D3-05-01-1",
+    "S-D3-05-01-2"
+   ],
+   "obligations": 2,
+   "probe_ids": [
+    "probe.process_effect"
+   ],
+   "kinds": 1,
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-04",
+    "STORY-01-05",
+    "STORY-01-06",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-03-01"
+   ],
+   "orchestration_party_probe": {
+    "accepted": true,
+    "resolved_by_spec": {
+     "S-D3-05-01-1": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ],
+     "S-D3-05-01-2": [
+      "probe.process_effect",
+      "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+     ]
+    }
+   },
+   "single_probe_on_a_foreign_spec": null,
+   "provable_by_the_current_path": true
+  },
+  "STORY-05-03": {
+   "specs": [
+    "S-10-a",
+    "S-12-a",
+    "S-12-b",
+    "S-12-c"
+   ],
+   "obligations": 6,
+   "probe_ids": [
+    "probe.file_artifact"
+   ],
+   "kinds": 1,
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-02",
+    "STORY-01-03",
+    "STORY-01-04",
+    "STORY-01-05",
+    "STORY-01-06",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-03-01",
+    "STORY-05-01"
+   ],
+   "orchestration_party_probe": {
+    "accepted": true,
+    "resolved_by_spec": {
+     "S-10-a": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-12-a": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-12-b": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ],
+     "S-12-c": [
+      "probe.file_artifact",
+      "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"
+     ]
+    }
+   },
+   "single_probe_on_a_foreign_spec": null,
+   "provable_by_the_current_path": true
+  }
+ },
+ "blocked_stories": [],
+ "runnable_and_unblocked": [
+  "STORY-01-01",
+  "STORY-01-05",
+  "STORY-02-01",
+  "STORY-02-02",
+  "STORY-03-01",
+  "STORY-04-01",
+  "STORY-04-02",
+  "STORY-05-01",
+  "STORY-05-03"
+ ],
+ "orchestration_source": {
+  "path": "aisef2/orchestrate/story_runner.py",
+  "sha256": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59",
+  "rule_measured": "story_runner._probe(inputs, on_range, scratch, spec): the factory of the spec's own probe identity (C2-ORCHESTRATION-CONFORMANCE-REPAIR); run_probe still refuses a spec bound to another probe identity (InvalidSpec)"
+ },
+ "model_calls": 0,
+ "subjects_executed": 0,
+ "stop": {
+  "triggered": false,
+  "rule": null,
+  "what_it_would_take": null
+ },
+ "verdict": "PREFLIGHT PASSED — every story provable by the current path",
+ "seconds": 0.1,
+ "at": "2026-10-01T03:07:58Z"
+}
