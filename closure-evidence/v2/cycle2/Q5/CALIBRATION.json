@@ -1,0 +1,429 @@
+{
+ "record": "AISEF V2 — Q5 CALIBRATION (§6, §9, §11, §16, §29): the harness rejects each named defect",
+ "when": "2026-10-01T03:05:27Z",
+ "scratch_recordings": {
+  "normal-completion": "1ca2f56cdf1c21fc781865e442c745395ef645f04fffe209021ef2d085f2f087",
+  "retry-then-commit": "86cf7ff2f6cba003b7d736fcb6020fd9cd00b2f3fe83abaee8407356bcec13bf",
+  "file-artifact-prohibition": "a88bf4f1bf412b2804cd33769aa37c592e38b212724632eea8806bb204097f0c",
+  "note": "recordings made for calibration; not the corpus"
+ },
+ "cases": {
+  "control_round_trip": {
+   "observed": {
+    "status": "GREEN",
+    "model_calls": {
+     "expected": 2,
+     "observed": 2,
+     "request_hash_mismatches": 0,
+     "consumption": {
+      "expected": 2,
+      "consumed": 2,
+      "missing_unconsumed": [],
+      "extra_requests": [],
+      "duplicate_consumptions": 0,
+      "mismatches": 0,
+      "ok": true
+     },
+     "drift_total": 0,
+     "drift_bound": 0
+    },
+    "tool_diffs": 0,
+    "workspace_diff": []
+   },
+   "rejected": null,
+   "green": true
+  },
+  "1_same_call_count_changed_request": {
+   "expected": {
+    "replay_request_mismatch": "predicate",
+    "kind": "REQUEST_HASH_MISMATCH"
+   },
+   "observed": {
+    "status": "FAILED",
+    "replay_request_mismatch": 1,
+    "tool_diffs": 1,
+    "workspace_diffs": 1,
+    "consumption_ok": false,
+    "extra": 1,
+    "unconsumed": 2,
+    "model_calls": 1,
+    "kind": "REQUEST_HASH_MISMATCH",
+    "probe_product_diff": 7,
+    "tool_exit_expected_observed": [
+     [
+      0,
+      null
+     ]
+    ]
+   },
+   "rejected": true,
+   "first_journal_diff": {
+    "index": 8,
+    "kind": "control_diff",
+    "expected": {
+     "seq": 8,
+     "type": "plan/frozen",
+     "data": {
+      "plan_hash": "45e84e08e5e69992deb73242fb512a7087dd686bd9a27db9857891040772a596",
+      "plan_id": "PLAN-normal-completion",
+      "roles": {
+       "C1": "INTRODUCE"
+      }
+     },
+     "source_seqs": []
+    },
+    "observed": {
+     "seq": 8,
+     "type": "plan/frozen",
+     "data": {
+      "plan_hash": "bbaf97387f74706405084ab658d6985d8fd0e1c4da9d1360c82082660c3aea18",
+      "plan_id": "PLAN-normal-completion",
+      "roles": {
+       "C1": "INTRODUCE"
+      }
+     },
+     "source_seqs": []
+    }
+   }
+  },
+  "2_changed_tool_behaviour": {
+   "expected": {
+    "tool_diffs": "predicate"
+   },
+   "observed": {
+    "status": "FAILED",
+    "replay_request_mismatch": 1,
+    "tool_diffs": 1,
+    "workspace_diffs": 1,
+    "consumption_ok": false,
+    "extra": 1,
+    "unconsumed": 0,
+    "model_calls": 3,
+    "kind": "EXTRA_MODEL_CALL",
+    "probe_product_diff": 3,
+    "tool_exit_expected_observed": [
+     [
+      0,
+      0
+     ]
+    ]
+   },
+   "rejected": true,
+   "first_journal_diff": {
+    "index": 6,
+    "kind": "capability_mismatch",
+    "expected": {
+     "seq": 6,
+     "type": "capability/resolved",
+     "data": {
+      "binding": {
+       "digest": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c"
+      },
+      "enforcement": "FULL",
+      "grade": "VERIFIED",
+      "identity": "c4869c506e599411c8a570a867d8806f534944fdebfce14f9c685c402e3f5795",
+      "name": "scanner"
+     },
+     "source_seqs": []
+    },
+    "observed": {
+     "seq": 6,
+     "type": "capability/resolved",
+     "data": {
+      "binding": {
+       "digest": "10757ad774f320e83681782c9cfce8fa47d0dce379ee67a614977a7b50ca4adb"
+      },
+      "enforcement": "FULL",
+      "grade": "VERIFIED",
+      "identity": "721162a43b8e4f056f109b8f8f8cfa927766e800b30542909bc55436371c59ab",
+      "name": "scanner"
+     },
+     "source_seqs": []
+    }
+   }
+  },
+  "3_missing_replay_item": {
+   "expected": {
+    "kind": "MISSING_REPLAY_ITEM",
+    "replay_request_mismatch": "predicate"
+   },
+   "observed": {
+    "status": "FAILED",
+    "replay_request_mismatch": 1,
+    "tool_diffs": 1,
+    "workspace_diffs": 1,
+    "consumption_ok": false,
+    "extra": 1,
+    "unconsumed": 1,
+    "model_calls": 2,
+    "kind": "MISSING_REPLAY_ITEM",
+    "probe_product_diff": 6,
+    "tool_exit_expected_observed": [
+     [
+      0,
+      null
+     ]
+    ]
+   },
+   "rejected": true,
+   "first_journal_diff": {
+    "index": 47,
+    "kind": "control_diff",
+    "expected": {
+     "seq": 47,
+     "type": "provider/result",
+     "data": {
+      "detail": "implemented 2 files",
+      "outcome": "COMPLETED",
+      "story_id": "S1",
+      "synthetic": false
+     },
+     "source_seqs": [
+      46
+     ]
+    },
+    "observed": {
+     "seq": 47,
+     "type": "run/interrupted",
+     "data": {
+      "abandoned": false
+     },
+     "source_seqs": []
+    }
+   }
+  },
+  "4_extra_model_call": {
+   "expected": {
+    "kind": "EXTRA_MODEL_CALL",
+    "extra": "predicate"
+   },
+   "observed": {
+    "status": "FAILED",
+    "replay_request_mismatch": 1,
+    "tool_diffs": 1,
+    "workspace_diffs": 1,
+    "consumption_ok": false,
+    "extra": 1,
+    "unconsumed": 0,
+    "model_calls": 2,
+    "kind": "EXTRA_MODEL_CALL",
+    "probe_product_diff": 3,
+    "tool_exit_expected_observed": [
+     [
+      0,
+      null
+     ]
+    ]
+   },
+   "rejected": true,
+   "first_journal_diff": {
+    "index": 38,
+    "kind": "control_diff",
+    "expected": {
+     "seq": 38,
+     "type": "provider/result",
+     "data": {
+      "detail": "reviewed",
+      "outcome": "COMPLETED",
+      "story_id": "S1",
+      "synthetic": false
+     },
+     "source_seqs": [
+      37
+     ]
+    },
+    "observed": {
+     "seq": 38,
+     "type": "run/interrupted",
+     "data": {
+      "abandoned": false
+     },
+     "source_seqs": []
+    }
+   }
+  },
+  "5_changed_final_workspace_file": {
+   "expected": {
+    "workspace_diffs": "predicate"
+   },
+   "observed": {
+    "status": "FAILED",
+    "replay_request_mismatch": 0,
+    "tool_diffs": 0,
+    "workspace_diffs": 4,
+    "consumption_ok": true,
+    "extra": 0,
+    "unconsumed": 0,
+    "model_calls": 2,
+    "kind": null,
+    "probe_product_diff": 0,
+    "tool_exit_expected_observed": [
+     [
+      0,
+      0
+     ]
+    ]
+   },
+   "rejected": true,
+   "first_journal_diff": null
+  },
+  "6_changed_tool_exit_status": {
+   "expected": {
+    "tool_diffs": "predicate",
+    "tool_exit_expected_observed": "predicate"
+   },
+   "observed": {
+    "status": "FAILED",
+    "replay_request_mismatch": 0,
+    "tool_diffs": 1,
+    "workspace_diffs": 0,
+    "consumption_ok": true,
+    "extra": 0,
+    "unconsumed": 0,
+    "model_calls": 2,
+    "kind": null,
+    "probe_product_diff": 0,
+    "tool_exit_expected_observed": [
+     [
+      0,
+      3
+     ]
+    ]
+   },
+   "rejected": true,
+   "first_journal_diff": {
+    "index": 6,
+    "kind": "capability_mismatch",
+    "expected": {
+     "seq": 6,
+     "type": "capability/resolved",
+     "data": {
+      "binding": {
+       "digest": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c"
+      },
+      "enforcement": "FULL",
+      "grade": "VERIFIED",
+      "identity": "c4869c506e599411c8a570a867d8806f534944fdebfce14f9c685c402e3f5795",
+      "name": "scanner"
+     },
+     "source_seqs": []
+    },
+    "observed": {
+     "seq": 6,
+     "type": "capability/resolved",
+     "data": {
+      "binding": {
+       "digest": "55f5897047c60219f3092a40eb50a0b5dea2c4b85b7f64f042d81924aa319e1f"
+      },
+      "enforcement": "FULL",
+      "grade": "VERIFIED",
+      "identity": "d9ae79a5e603d092f516807b1eb055078d6905d3de0b402ede677e519629cf38",
+      "name": "scanner"
+     },
+     "source_seqs": []
+    }
+   }
+  },
+  "7_unconsumed_replay_item": {
+   "expected": {
+    "consumption_ok": false,
+    "unconsumed": 1
+   },
+   "observed": {
+    "status": "FAILED",
+    "replay_request_mismatch": 0,
+    "tool_diffs": 0,
+    "workspace_diffs": 0,
+    "consumption_ok": false,
+    "extra": 0,
+    "unconsumed": 1,
+    "model_calls": 2,
+    "kind": null,
+    "probe_product_diff": 0,
+    "tool_exit_expected_observed": [
+     [
+      0,
+      0
+     ]
+    ]
+   },
+   "rejected": true,
+   "first_journal_diff": null
+  },
+  "10_changed_probe_fixture": {
+   "expected": {
+    "replay_request_mismatch": 0,
+    "consumption_ok": true,
+    "probe_product_diff": "predicate"
+   },
+   "observed": {
+    "status": "FAILED",
+    "replay_request_mismatch": 0,
+    "tool_diffs": 0,
+    "workspace_diffs": 6,
+    "consumption_ok": true,
+    "extra": 0,
+    "unconsumed": 0,
+    "model_calls": 2,
+    "kind": null,
+    "probe_product_diff": 3,
+    "tool_exit_expected_observed": [
+     [
+      0,
+      0
+     ]
+    ]
+   },
+   "rejected": true,
+   "first_journal_diff": {
+    "index": 39,
+    "kind": "control_diff",
+    "expected": {
+     "seq": 39,
+     "type": "gate/check",
+     "data": {
+      "check": "S1:merge",
+      "detail": "merged at 02e0336e762506e4a432dcbd530755d5f038ff4a",
+      "gate": "story",
+      "passed": true
+     },
+     "source_seqs": []
+    },
+    "observed": {
+     "seq": 39,
+     "type": "gate/check",
+     "data": {
+      "check": "S1:merge",
+      "detail": "merged at 044244a1d98021b86f18f9d934b14714f2c9576d",
+      "gate": "story",
+      "passed": true
+     },
+     "source_seqs": []
+    }
+   }
+  },
+  "9_reordered_request": {
+   "rejected": true,
+   "kind": "REORDERED_REQUEST"
+  },
+  "9_duplicate_consumption": {
+   "rejected": true
+  },
+  "16_normalization": {
+   "cases": {
+    "timestamp_only_change_equal": true,
+    "temp_path_only_change_equal": true,
+    "meaningful_stdout_change_diff": true,
+    "exit_code_change_diff": true,
+    "file_content_change_diff": true,
+    "owner_retryability_change_diff": true,
+    "revision_change_diff": true,
+    "real_journal_is_time_free": true
+   },
+   "rejected": true
+  }
+ },
+ "all_rejected": true,
+ "harness_digest": "283c32d91527c19e0632143c46eb98615e6f1357633932139e323d70d4438ba9",
+ "git": "git version 2.53.0"
+}

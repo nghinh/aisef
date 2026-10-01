@@ -1,0 +1,902 @@
+{
+ "record": "AISEF V2 — Q5 corpus item (a real execution, its model stream recorded)",
+ "item": "developer-outage-rollback",
+ "covers": [
+  "provider failure",
+  "retry path",
+  "rollback path"
+ ],
+ "definition": {
+  "stories": [
+   {
+    "id": "S1",
+    "obligations": [
+     [
+      "C1",
+      "INTRODUCE"
+     ]
+    ],
+    "tests": [
+     "tests/test_s1.py"
+    ],
+    "regressions": [
+     "tests/test_other.py"
+    ],
+    "tests_block": true
+   }
+  ],
+  "developer": [
+   {
+    "kind": "OUTAGE",
+    "detail": "503 from the developer capability"
+   },
+   {
+    "kind": "OUTAGE",
+    "detail": "503 from the developer capability"
+   }
+  ],
+  "reviewer": [],
+  "pre_landed": {},
+  "scanner_findings": [],
+  "limits": {},
+  "expected_outcomes": {
+   "S1": [
+    "RETRY",
+    "ROLLBACK"
+   ]
+  }
+ },
+ "platform": "darwin",
+ "python": "3.14.7",
+ "execution_commit": "74dffbc8ea601080a06261e4295c9adc836c207f",
+ "mode": "record",
+ "variant": null,
+ "errors": {
+  "replay_request_mismatch": 0,
+  "assert_consumed_failure": 0,
+  "tool_diff": 0,
+  "subprocess_diff": 0,
+  "workspace_diff": 0,
+  "probe_product_diff": 0,
+  "control_diff": 0,
+  "capability_mismatch": 0,
+  "harness_error": 0,
+  "invariant_violation": 0,
+  "exception": 0,
+  "residual_process": 0
+ },
+ "started": "2026-10-01T03:04:15Z",
+ "initial_workspace": {
+  "branch": "main",
+  "tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+  "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+  "files": {
+   "app/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "app/calc.py": {
+    "mode": "100644",
+    "blob": "312b477d18e86322d223001d940fc5a0b3758fc0"
+   },
+   "tests/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "tests/test_other.py": {
+    "mode": "100644",
+    "blob": "3db64f878468b50e6fa1d7573c0316e6e0e15ba6"
+   }
+  },
+  "status": "",
+  "status_note": "git status of the fixture repository's own checkout against its index (the branch moves by update-ref; the checkout stays at the base)",
+  "worktrees": 1,
+  "ws_entries": [],
+  "digest": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866"
+ },
+ "final_workspace": {
+  "branch": "main",
+  "tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+  "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+  "files": {
+   "app/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "app/calc.py": {
+    "mode": "100644",
+    "blob": "312b477d18e86322d223001d940fc5a0b3758fc0"
+   },
+   "tests/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "tests/test_other.py": {
+    "mode": "100644",
+    "blob": "3db64f878468b50e6fa1d7573c0316e6e0e15ba6"
+   }
+  },
+  "status": "",
+  "status_note": "git status of the fixture repository's own checkout against its index (the branch moves by update-ref; the checkout stays at the base)",
+  "worktrees": 1,
+  "ws_entries": [],
+  "digest": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866"
+ },
+ "network": {
+  "guarded": true,
+  "socket_attempts": 0
+ },
+ "journal": [
+  {
+   "seq": 0,
+   "type": "run/begin",
+   "data": {
+    "journal_format": 3,
+    "run_id": "q5-developer-outage-rollback"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 1,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "72a93a45c9721f48229e3fe83bf623442c1661a6077a3458d8e726e8c9b59c13",
+     "route": "MODEL_STREAM"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "fa3029cbadefa59e947268ad05b600db6157b1c703ec5d2a256332440b7b673f",
+    "name": "developer"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 2,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "5faddbb6c18e9e8367ff426e1d708237d78c6b8f320a497c74aa5b9b67b5659c",
+    "name": "git"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 3,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "732bc8ba289b2a68df7786e23cf40b5645c0abe2d32ef375b2bee1b89138a8ef",
+     "tree": "37bf6457f350dd720a2214f04f3896c554ad0904"
+    },
+    "enforcement": "FULL",
+    "grade": "VERIFIED",
+    "identity": "47de78dc3d69f345b4f59960184ab89259ee2cbc7c822127ac536be884bf57f0",
+    "name": "kernel"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 4,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634",
+     "version": "3.14.7"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "5f34b937df4725ab238ce4b6b1e08ecf7e1cc4263b17445bd80993e0bc06aa38",
+    "name": "python"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 5,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+     "route": "MODEL_STREAM"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "c4b665974882ea8024bf3c3633eb628bf55104fe779be94dcd90b8134e4b7596",
+    "name": "reviewer"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 6,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c"
+    },
+    "enforcement": "FULL",
+    "grade": "VERIFIED",
+    "identity": "c4869c506e599411c8a570a867d8806f534944fdebfce14f9c685c402e3f5795",
+    "name": "scanner"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 7,
+   "type": "run/spec-resolved",
+   "data": {
+    "aggregate_min_grade": "VERIFIED",
+    "capabilities": [
+     "developer",
+     "git",
+     "kernel",
+     "python",
+     "reviewer",
+     "scanner"
+    ],
+    "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "runspec_hash": "93b2a3fdef7c6d59fcd1683fa6a66306e393cd6e66fe917fc6a860e91ba8b340"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 8,
+   "type": "plan/frozen",
+   "data": {
+    "plan_hash": "9e7abd3ac819475c639eca66efeb10e39baea043525c7419b78faaed9e1ff56e",
+    "plan_id": "PLAN-developer-outage-rollback",
+    "roles": {
+     "C1": "INTRODUCE"
+    }
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 9,
+   "type": "story/begin",
+   "data": {
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 10,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "SCRATCH",
+    "resource": "scratch-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 11,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "wt-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 12,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 13,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [admission 1]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 14,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C1",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "2bf082e42ac8bafd70e11101388376998473e9dc3734c257456f0e532aa28f19",
+     "result": {
+      "behavior_verdict": "INDETERMINATE",
+      "reason": "PRECONDITION_ABSENT"
+     },
+     "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "semantic_hash": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+     "spec_id": "PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 15,
+   "type": "story/admitted",
+   "data": {
+    "admitted": true,
+    "developer_call_permitted": true,
+    "dispositions": {
+     "C1": "READY"
+    },
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 16,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [admission 1]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    13
+   ]
+  },
+  {
+   "seq": 17,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:admission",
+    "detail": "admitted",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 18,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "DEVELOPER",
+    "criteria": [
+     "C1"
+    ],
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 19,
+   "type": "provider/result",
+   "data": {
+    "detail": "developer outage: 503 from the developer capability",
+    "outcome": "FAILED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    18
+   ]
+  },
+  {
+   "seq": 20,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:developer",
+    "detail": "developer outage: 503 from the developer capability",
+    "gate": "story",
+    "passed": false
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 21,
+   "type": "gate/decision",
+   "data": {
+    "gate": "story",
+    "passed": false,
+    "projections": [
+     "story_state",
+     "budgets",
+     "failure_owner",
+     "retry_target"
+    ]
+   },
+   "source_seqs": [
+    17,
+    20
+   ]
+  },
+  {
+   "seq": 22,
+   "type": "failure/observed",
+   "data": {
+    "code": "PROVIDER_UNAVAILABLE",
+    "detail": "developer outage: 503 from the developer capability",
+    "owner": "PROVIDER",
+    "retryable": true,
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 23,
+   "type": "story/retry",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": [
+    22
+   ]
+  },
+  {
+   "seq": 24,
+   "type": "story/dispose",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 25,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    12
+   ]
+  },
+  {
+   "seq": 26,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "wt-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    11
+   ]
+  },
+  {
+   "seq": 27,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "SCRATCH",
+    "resource": "scratch-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    10
+   ]
+  },
+  {
+   "seq": 28,
+   "type": "story/end",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 29,
+   "type": "story/begin",
+   "data": {
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 30,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "SCRATCH",
+    "resource": "scratch-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 31,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "wt-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 32,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 33,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [admission 1]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 34,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C1",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "2bf082e42ac8bafd70e11101388376998473e9dc3734c257456f0e532aa28f19",
+     "result": {
+      "behavior_verdict": "INDETERMINATE",
+      "reason": "PRECONDITION_ABSENT"
+     },
+     "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "semantic_hash": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+     "spec_id": "PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 35,
+   "type": "story/admitted",
+   "data": {
+    "admitted": true,
+    "developer_call_permitted": true,
+    "dispositions": {
+     "C1": "READY"
+    },
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 36,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [admission 1]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    33
+   ]
+  },
+  {
+   "seq": 37,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:admission",
+    "detail": "admitted",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 38,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "DEVELOPER",
+    "criteria": [
+     "C1"
+    ],
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 39,
+   "type": "provider/result",
+   "data": {
+    "detail": "developer outage: 503 from the developer capability",
+    "outcome": "FAILED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    38
+   ]
+  },
+  {
+   "seq": 40,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:developer",
+    "detail": "developer outage: 503 from the developer capability",
+    "gate": "story",
+    "passed": false
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 41,
+   "type": "gate/decision",
+   "data": {
+    "gate": "story",
+    "passed": false,
+    "projections": [
+     "story_state",
+     "budgets",
+     "failure_owner",
+     "retry_target"
+    ]
+   },
+   "source_seqs": [
+    37,
+    40
+   ]
+  },
+  {
+   "seq": 42,
+   "type": "failure/observed",
+   "data": {
+    "code": "PROVIDER_UNAVAILABLE",
+    "detail": "developer outage: 503 from the developer capability",
+    "owner": "PROVIDER",
+    "retryable": true,
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 43,
+   "type": "story/rollback",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": [
+    42
+   ]
+  },
+  {
+   "seq": 44,
+   "type": "story/dispose",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 45,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    32
+   ]
+  },
+  {
+   "seq": 46,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "wt-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    31
+   ]
+  },
+  {
+   "seq": 47,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "SCRATCH",
+    "resource": "scratch-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    30
+   ]
+  },
+  {
+   "seq": 48,
+   "type": "story/end",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 49,
+   "type": "run/dispose-begin",
+   "data": {},
+   "source_seqs": []
+  },
+  {
+   "seq": 50,
+   "type": "run/end",
+   "data": {},
+   "source_seqs": []
+  }
+ ],
+ "journal_raw_digest": "ca76472e00967e709bc154b14f445e3bd282b040a0007faf0fdba1d117c5f5e4",
+ "subprocesses": {
+  "probe": 2,
+  "tests": 0,
+  "tool": 0,
+  "worktree": 4,
+  "scratch": 2
+ },
+ "residual_from_journal": 0,
+ "run_trace": [
+  "lease",
+  "sentinel OPEN",
+  "journal writer",
+  "RunSpec",
+  "execution",
+  "story scopes disposed",
+  "run/dispose-begin",
+  "run/end",
+  "journal writer closed",
+  "sentinel CLEAN",
+  "lease released"
+ ],
+ "outcomes": {
+  "S1": [
+   "RETRY",
+   "ROLLBACK"
+  ]
+ },
+ "model_ledger": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "03b93ce1be5f1c82d28cc2f9beba6f941412ef59527a6e5e6de51fdf7b0ae769",
+   "request": {
+    "header_class": "DEVELOPER_IMPLEMENT",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "72a93a45c9721f48229e3fe83bf623442c1661a6077a3458d8e726e8c9b59c13",
+     "reviewer": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "story_id": "S1",
+    "criteria": [
+     "C1"
+    ],
+    "attempt": 1,
+    "prior_failures": [],
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+    "semantic_hashes": {
+     "C1": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83"
+    },
+    "plan_hash": "9e7abd3ac819475c639eca66efeb10e39baea043525c7419b78faaed9e1ff56e",
+    "tool_schema": "b0a95b22b87abbdf6bfc57b55850896031dfbfdd955e3156abc946792424106d",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "OUTAGE",
+    "detail": "503 from the developer capability"
+   }
+  },
+  {
+   "seq": 2,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "504090e0cac564bda18fa0f6c21ac381338580498f3d716dffa52916f0aee736",
+   "request": {
+    "header_class": "DEVELOPER_IMPLEMENT",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "72a93a45c9721f48229e3fe83bf623442c1661a6077a3458d8e726e8c9b59c13",
+     "reviewer": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "story_id": "S1",
+    "criteria": [
+     "C1"
+    ],
+    "attempt": 2,
+    "prior_failures": [
+     "PROVIDER_UNAVAILABLE"
+    ],
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+    "semantic_hashes": {
+     "C1": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83"
+    },
+    "plan_hash": "9e7abd3ac819475c639eca66efeb10e39baea043525c7419b78faaed9e1ff56e",
+    "tool_schema": "b0a95b22b87abbdf6bfc57b55850896031dfbfdd955e3156abc946792424106d",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "OUTAGE",
+    "detail": "503 from the developer capability"
+   }
+  }
+ ],
+ "model_requests": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "03b93ce1be5f1c82d28cc2f9beba6f941412ef59527a6e5e6de51fdf7b0ae769",
+   "matched": 1
+  },
+  {
+   "seq": 2,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "504090e0cac564bda18fa0f6c21ac381338580498f3d716dffa52916f0aee736",
+   "matched": 2
+  }
+ ],
+ "consumption": {
+  "expected": 2,
+  "consumed": 2,
+  "missing_unconsumed": [],
+  "extra_requests": [],
+  "duplicate_consumptions": 0,
+  "mismatches": 0,
+  "ok": true
+ },
+ "model_mismatches": [],
+ "tool_ledger": [],
+ "notes": [],
+ "finished": "2026-10-01T03:04:16Z",
+ "ledger_digest": "fd961a67b8cffa47b3bede896ab6a9249904fd59079ffca694c8242c27c6a350"
+}
