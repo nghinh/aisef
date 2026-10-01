@@ -50,7 +50,8 @@ RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence
            "C2-P3": "closure-evidence/v2/cycle2/P3-MUTATION.json",
            "C2-P4": "closure-evidence/v2/cycle2/P4-MUTATION.json",
            "C2-ORCH": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json",
-           "C2-P10": "closure-evidence/v2/cycle2/P10-MUTATION.json"}
+           "C2-P10": "closure-evidence/v2/cycle2/P10-MUTATION.json",
+           "K-PRESAT-001": "closure-evidence/v2/cycle2/K-PRESAT-001-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -472,13 +473,23 @@ C2_P10_TARGETS: dict[str, list[str]] = {
         "EvaluationCohort.threshold", "EvaluationCohort.plan_quality_policy", "EvaluationCohort.workload", "seal",
         "advance", "_live", "record_run", "read_results", "observe_inputs", "_complete", "generalization")},
 }
+# K-PRESAT-001 (owner rulings 2026-10-01, 'BOUNDED CORRECTIVE PATCH' §3 and 'DETERMINISTIC REPAIR COMPLETION' §4): the
+# correction changed story_runner.py, and a source digest is whole-file, so every C2-ORCH target of that module — and
+# only those — is re-measured here, the K-PRESAT regression cases added to its kill set (after the stage tests); C2-ORCH
+# keeps its historical entries for them, as P6 does.
+K_PRESAT_TARGETS: dict[str, list[str]] = {
+    t: [k[0], "tests/v2/test_c2_k_presat_001.py", *k[1:]]
+    for t, k in C2_ORCH_TARGETS.items() if t.split("::")[0] == "aisef2/orchestrate/story_runner.py"}
 #: target -> the phase that took it over; an earlier phase's record entry for it is historical (reported, not checked)
 SUPERSEDED: dict[str, str] = {t: "C2-ORCH" for t in C2_ORCH_TARGETS}
 for _t in C2_ORCH_TARGETS:
     del P6_TARGETS[_t]
+SUPERSEDED.update({t: "K-PRESAT-001" for t in K_PRESAT_TARGETS})
+for _t in K_PRESAT_TARGETS:
+    del C2_ORCH_TARGETS[_t]
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
                  "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS,
-                 "C2-ORCH": C2_ORCH_TARGETS, "C2-P10": C2_P10_TARGETS}
+                 "C2-ORCH": C2_ORCH_TARGETS, "C2-P10": C2_P10_TARGETS, "K-PRESAT-001": K_PRESAT_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}

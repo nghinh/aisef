@@ -4,7 +4,7 @@
  "classification": "CONFORMANCE REPAIR to the frozen architecture (not an architecture expansion, not a new probe feature)",
  "subject": {
   "base": "45136086c3e4a98534f975e6db979f94165af5f3",
-  "head_when_written": "89de2b78ee3007b1ee312409d8cfa591b4d430ff",
+  "head_when_written": "7630dbe5d0aa7f873e26a573ce2b9962bb0c72c2",
   "note": "written on head_when_written, the commit that carries the repair, and committed in the commit after it (a record cannot name the commit that contains it; the C2-P5 proposal's derived provenance in (e) reads HEAD's kernel tree); (d) binds every changed file by content",
   "old_kernel": {
    "commit": "63112544f1146097b69c538d98e09e5a52c547c1",
@@ -35,7 +35,7 @@
    }
   },
   "new_kernel": {
-   "kernel_digest": "f763b238d9e9c007937b959238feac9d54e6af7d9c1bb707cad1686640526908",
+   "kernel_digest": "dccc6f48f5aa8e3f9727a029eebd6a9d5a4d3508ae9cc5765b794ab8b921f319",
    "rule": "q4's kernel digest over this working tree's aisef2 (its git tree exists once the repair is committed; (d) binds the two changed modules by content)"
   }
  },
@@ -45,6 +45,12 @@
   "proof.prove": "a party with no probe for the spec's identity is PROBE_INVALID_SPEC, the code an INVALID_SPEC result routes to at every point (§10) — never a crash, never another probe's run; the journal order of a proof is unchanged (implementer record, verifier record, proof)",
   "StoryInputs.probes": "several factories keyed by probe id (a harness wires every probe the plan's specs name)",
   "unchanged": "StoryAdmission, ContractSatisfaction, routing, budgets, journal events and payloads, the RunSpec, F1-F11, every contract, spec, plan and probe identity"
+ },
+ "k_presat_001": {
+  "authority": "owner rulings 2026-10-01, 'AISEF V2 — BOUNDED CORRECTIVE PATCH' §3 (K-PRESAT-001) and 'AISEF V2 — DETERMINISTIC REPAIR COMPLETION' §2 (K-PRESAT-001 CONFIRMED)",
+  "story_runner._attempt": "the engineering-adequacy stage runs only when the story has developer work (`not continuation.already_satisfied`): a story whose every obligation is PRE_SATISFIED made no developer call, so the stage is not run and can neither fail nor charge it (RFC §14)",
+  "unchanged": "the developer call was already skipped for such a story; its independent verification at the candidate, plan-drift, review, security, merge and post-merge re-proof are as before",
+  "effect_on_this_record": "(b): the one Cycle-1 item that is a fully PRE_SATISFIED story differs from the old kernel by exactly that stage; (d): story_runner.py; (f): its mutation targets are re-measured in closure-evidence/v2/cycle2/K-PRESAT-001-MUTATION.json, the C2-ORCH entries for them kept as historical"
  },
  "defect_reproducer": {
   "story": "tests.v2.test_c2_orchestration_conformance.reproduce_multi_kind: C-F (file_artifact) and C-P (python_callable_v2), both INTRODUCE and READY at the parent; the harness wires exactly the story's two probes",
@@ -286,7 +292,7 @@
   "corpus": "validation/qualification/q5.py CORPUS",
   "mode": "record (the item's scripted model stream; no provider)",
   "items": 7,
-  "identical": 7,
+  "identical": 6,
   "by_item": {
    "normal-completion": {
     "outcomes": {
@@ -464,7 +470,7 @@
     "outcomes_identical": true,
     "events": [
      61,
-     61
+     53
     ],
     "errors": {
      "replay_request_mismatch": 0,
@@ -495,9 +501,398 @@
       "fields": [
        "data.runspec_hash"
       ]
+     },
+     {
+      "index": 27,
+      "event": "story/resource-acquired",
+      "fields": [
+       "data.budget_owner",
+       "data.criteria",
+       "data.kind",
+       "data.resource",
+       "type"
+      ]
+     },
+     {
+      "index": 28,
+      "event": "story/resource-acquired",
+      "fields": [
+       "data.detail",
+       "data.kind",
+       "data.outcome",
+       "data.resource",
+       "data.synthetic",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 29,
+      "event": "story/resource-acquired",
+      "fields": [
+       "data.check",
+       "data.detail",
+       "data.gate",
+       "data.kind",
+       "data.passed",
+       "data.resource",
+       "data.story_id",
+       "type"
+      ]
+     },
+     {
+      "index": 30,
+      "event": "tests/adequacy",
+      "fields": [
+       "data.developer_chargeable",
+       "data.execution",
+       "data.kind",
+       "data.may_block",
+       "data.outcome",
+       "data.owner",
+       "data.regressions",
+       "data.relevance",
+       "data.resource",
+       "data.vacuity",
+       "type"
+      ]
+     },
+     {
+      "index": 31,
+      "event": "story/resource-released",
+      "fields": [
+       "data.call_id",
+       "data.detail",
+       "data.kind",
+       "data.resource",
+       "data.status",
+       "data.synthetic",
+       "data.tool",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 32,
+      "event": "story/resource-released",
+      "fields": [
+       "data.call_id",
+       "data.kind",
+       "data.outcome",
+       "data.provenance",
+       "data.resource",
+       "data.signal",
+       "data.status",
+       "source_seqs[0]",
+       "type"
+      ]
+     },
+     {
+      "index": 33,
+      "event": "story/resource-released",
+      "fields": [
+       "data.resource",
+       "source_seqs[0]"
+      ]
+     },
+     {
+      "index": 34,
+      "event": "gate/check",
+      "fields": [
+       "data.check",
+       "data.detail"
+      ]
+     },
+     {
+      "index": 35,
+      "event": "provider/request",
+      "fields": [
+       "data.budget_owner",
+       "data.check",
+       "data.criteria",
+       "data.detail",
+       "data.gate",
+       "data.passed",
+       "data.story_id",
+       "type"
+      ]
+     },
+     {
+      "index": 36,
+      "event": "provider/result",
+      "fields": [
+       "data.detail",
+       "data.kind",
+       "data.outcome",
+       "data.resource",
+       "data.synthetic",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 37,
+      "event": "gate/check",
+      "fields": [
+       "data.check",
+       "data.detail",
+       "data.gate",
+       "data.kind",
+       "data.passed",
+       "data.resource",
+       "data.status",
+       "data.story_id",
+       "data.synthetic",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 38,
+      "event": "story/resource-acquired",
+      "fields": [
+       "data.criterion_id",
+       "data.kind",
+       "data.record",
+       "data.resource",
+       "type"
+      ]
+     },
+     {
+      "index": 39,
+      "event": "tool/invoked",
+      "fields": [
+       "data.call_id",
+       "data.kind",
+       "data.resource",
+       "data.tool",
+       "type"
+      ]
+     },
+     {
+      "index": 40,
+      "event": "tool/result",
+      "fields": [
+       "data.call_id",
+       "data.kind",
+       "data.outcome",
+       "data.provenance",
+       "data.resource",
+       "data.signal",
+       "data.status",
+       "type"
+      ]
+     },
+     {
+      "index": 41,
+      "event": "story/resource-released",
+      "fields": [
+       "data.criterion_id",
+       "data.detail",
+       "data.kind",
+       "data.record",
+       "data.resource",
+       "data.status",
+       "data.synthetic",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 42,
+      "event": "gate/check",
+      "fields": [
+       "data.agreement",
+       "data.candidate",
+       "data.check",
+       "data.criterion_id",
+       "data.detail",
+       "data.gate",
+       "data.passed",
+       "data.semantic_hash",
+       "data.spec_id",
+       "data.story_id",
+       "data.verdict",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 43,
+      "event": "gate/check",
+      "fields": [
+       "data.check",
+       "data.detail"
+      ]
+     },
+     {
+      "index": 44,
+      "event": "story/resource-acquired",
+      "fields": [
+       "data.gate",
+       "data.kind",
+       "data.passed",
+       "data.projections",
+       "data.resource",
+       "data.story_id",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 45,
+      "event": "story/resource-released",
+      "fields": [
+       "data.detail",
+       "data.kind",
+       "data.resource",
+       "data.revision",
+       "data.status",
+       "data.synthetic",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 46,
+      "event": "probe/evaluated",
+      "fields": [
+       "data.criterion_id",
+       "data.record",
+       "type"
+      ]
+     },
+     {
+      "index": 47,
+      "event": "story/resource-acquired",
+      "fields": [
+       "data.detail",
+       "data.kind",
+       "data.resource",
+       "data.status",
+       "data.synthetic",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 48,
+      "event": "story/resource-released",
+      "fields": [
+       "data.kind",
+       "data.resource",
+       "source_seqs[0]"
+      ]
+     },
+     {
+      "index": 49,
+      "event": "probe/evaluated",
+      "fields": [
+       "data.criterion_id",
+       "data.detail",
+       "data.kind",
+       "data.record",
+       "data.resource",
+       "data.status",
+       "data.synthetic",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 50,
+      "event": "proof/verified",
+      "fields": [
+       "data.agreement",
+       "data.candidate",
+       "data.criterion_id",
+       "data.semantic_hash",
+       "data.spec_id",
+       "data.verdict",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 51,
+      "event": "gate/check",
+      "fields": [
+       "data.check",
+       "data.detail",
+       "data.gate",
+       "data.passed",
+       "type"
+      ]
+     },
+     {
+      "index": 52,
+      "event": "gate/decision",
+      "fields": [
+       "data.gate",
+       "data.passed",
+       "data.projections",
+       "source_seqs",
+       "type"
+      ]
+     },
+     {
+      "index": 53,
+      "event": "story/commit",
+      "fields": [
+       "<value>"
+      ]
+     },
+     {
+      "index": 54,
+      "event": "story/dispose",
+      "fields": [
+       "<value>"
+      ]
+     },
+     {
+      "index": 55,
+      "event": "story/resource-released",
+      "fields": [
+       "<value>"
+      ]
+     },
+     {
+      "index": 56,
+      "event": "story/resource-released",
+      "fields": [
+       "<value>"
+      ]
+     },
+     {
+      "index": 57,
+      "event": "story/resource-released",
+      "fields": [
+       "<value>"
+      ]
+     },
+     {
+      "index": 58,
+      "event": "story/end",
+      "fields": [
+       "<value>"
+      ]
+     },
+     {
+      "index": 59,
+      "event": "run/dispose-begin",
+      "fields": [
+       "<value>"
+      ]
+     },
+     {
+      "index": 60,
+      "event": "run/end",
+      "fields": [
+       "<value>"
+      ]
      }
     ],
-    "journal_identical_but_kernel_identity": true,
+    "journal_identical_but_kernel_identity": false,
     "other_observations_identical": {
      "outcomes": true,
      "errors": true,
@@ -505,9 +900,37 @@
      "model_requests": true,
      "consumption": true,
      "tool_ledger": true,
-     "subprocesses": true,
+     "subprocesses": false,
      "initial_workspace": true,
      "final_workspace": true
+    },
+    "k_presat_001": {
+     "removed_from_the_old_journal": {
+      "story/resource-acquired": 3,
+      "tests/adequacy": 1,
+      "story/resource-released": 3,
+      "gate/check": 1
+     },
+     "adequacy_stage_events_in_the_new_journal": {},
+     "journal_identical_but_kernel_identity_and_the_adequacy_stage": true,
+     "subprocesses": {
+      "old": {
+       "probe": 5,
+       "tests": 3,
+       "tool": 1,
+       "worktree": 2,
+       "scratch": 1
+      },
+      "new": {
+       "probe": 5,
+       "tests": 0,
+       "tool": 1,
+       "worktree": 2,
+       "scratch": 1
+      }
+     },
+     "subprocesses_identical_but_the_tests_of_the_stage": true,
+     "other_observations_identical_but_subprocesses": true
     }
    },
    "security-finding-rollback": {
@@ -681,6 +1104,16 @@
     }
    }
   },
+  "identical_but_the_adequacy_stage_of_a_fully_pre_satisfied_story": [
+   "pre-satisfied"
+  ],
+  "k_presat_001": {
+   "authority": "owner rulings 2026-10-01, 'AISEF V2 — BOUNDED CORRECTIVE PATCH' §3 (K-PRESAT-001) and 'AISEF V2 — DETERMINISTIC REPAIR COMPLETION' §2 (K-PRESAT-001 CONFIRMED)",
+   "items": [
+    "pre-satisfied"
+   ],
+   "rule": "a story whose every obligation is PRE_SATISFIED makes no developer call and runs no engineering-adequacy stage; such an item's journal is the old kernel's without that stage (its `tests …` process ranges, tests/adequacy, the quality gate check), renumbered, and nothing else differs"
+  },
   "difference_rule": "the raw normalized journals differ only in capability/resolved kernel: binding.digest, capability/resolved kernel: identity, run/spec-resolved: runspec_hash (each process binds the kernel it imported); neutralised, they are identical"
  },
  "test_matrix": {
@@ -726,7 +1159,7 @@
    "released_empty": true,
    "escaped": 0
   },
-  "seconds": 131.9
+  "seconds": 122.4
  },
  "files_changed": {
   "aisef2/orchestrate/proof.py": {
@@ -735,7 +1168,7 @@
   },
   "aisef2/orchestrate/story_runner.py": {
    "before": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
-   "after": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59"
+   "after": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013"
   },
   "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json": {
    "before": null,
@@ -743,15 +1176,15 @@
   },
   "tests/v2/test_c2_orchestration_conformance.py": {
    "before": null,
-   "after": "fea1c95f6975c479f5282c38f6fd06c329217cee659a54fbb114c073a17da647"
+   "after": "8a8b8c362ddd0364f6529143a679220c03512dd49cdc8a8b9b7674c9bda82a03"
   },
   "validation/qualification/c2_orchestration_repair.py": {
    "before": null,
-   "after": "28a7ca9c57c0325c5c28262070d9344502571b2d6a79c8aee055b4b6d56d835d"
+   "after": "506c4e410b32c7dc7a25d0da7c612cf9dcd2bd0b00b1aee2ef62101315a5f8bc"
   },
   "validation/v2/mutation.py": {
    "before": "dc9c3bd5cfc9779d8449b7bd8fe2901a794d50305129de594b27c55c8d8b51f3",
-   "after": "bb519e51284d8811319860b18682c3634e618fad17132cb9928835836c75180c"
+   "after": "f32807ed3b293bc57822f9f100a7b869cd6809c1b82b305141814a7c7acae98a"
   }
  },
  "identities": {
@@ -1079,7 +1512,10 @@
    "aisef2/orchestrate/proof.py::Party.run",
    "aisef2/orchestrate/proof.py::Ranged.__init__",
    "aisef2/orchestrate/proof.py::obligations_of",
-   "aisef2/orchestrate/proof.py::prove",
+   "aisef2/orchestrate/proof.py::prove"
+  ],
+  "problems": [],
+  "superseded_entries": [
    "aisef2/orchestrate/story_runner.py::StoryResult.committed",
    "aisef2/orchestrate/story_runner.py::StoryResult.revision",
    "aisef2/orchestrate/story_runner.py::_Held.__call__",
@@ -1092,7 +1528,6 @@
    "aisef2/orchestrate/story_runner.py::_probe",
    "aisef2/orchestrate/story_runner.py::run_story"
   ],
-  "problems": [],
   "p6_superseded_entries": [
    "aisef2/orchestrate/proof.py::Party.__init__",
    "aisef2/orchestrate/proof.py::Party.run",
@@ -1112,6 +1547,193 @@
    "aisef2/orchestrate/story_runner.py::run_story"
   ],
   "p6_problems": [],
+  "k_presat_001": {
+   "record": {
+    "path": "closure-evidence/v2/cycle2/K-PRESAT-001-MUTATION.json",
+    "sha256": "8f466055079285bd67815ced8028a9a647f9cc13b22e31d85eea6fe7679fec42"
+   },
+   "authority": "owner rulings 2026-10-01, 'AISEF V2 — BOUNDED CORRECTIVE PATCH' §3 (K-PRESAT-001) and 'AISEF V2 — DETERMINISTIC REPAIR COMPLETION' §2 (K-PRESAT-001 CONFIRMED)",
+   "targets": {
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
+     "mutants": 3,
+     "killed": 3,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
+     "mutants": 1,
+     "killed": 1,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_Held.__call__": {
+     "mutants": 3,
+     "killed": 3,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_Held.__init__": {
+     "mutants": 6,
+     "killed": 6,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_Held.release": {
+     "mutants": 3,
+     "killed": 3,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_attempt": {
+     "mutants": 276,
+     "killed": 276,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py",
+      "tests/v2/test_p6_orchestration.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_committed": {
+     "mutants": 6,
+     "killed": 6,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_fail": {
+     "mutants": 34,
+     "killed": 34,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_freeze_plan": {
+     "mutants": 9,
+     "killed": 9,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_probe": {
+     "mutants": 9,
+     "killed": 9,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::run_story": {
+     "mutants": 11,
+     "killed": 11,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py",
+      "tests/v2/test_p6_orchestration.py"
+     ],
+     "source_sha256": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013",
+     "error": null
+    }
+   },
+   "owned_targets": [
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+    "aisef2/orchestrate/story_runner.py::_Held.__call__",
+    "aisef2/orchestrate/story_runner.py::_Held.__init__",
+    "aisef2/orchestrate/story_runner.py::_Held.release",
+    "aisef2/orchestrate/story_runner.py::_attempt",
+    "aisef2/orchestrate/story_runner.py::_committed",
+    "aisef2/orchestrate/story_runner.py::_fail",
+    "aisef2/orchestrate/story_runner.py::_freeze_plan",
+    "aisef2/orchestrate/story_runner.py::_probe",
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "totals": {
+    "targets": 11,
+    "mutants": 361,
+    "killed": 361,
+    "survivors": 0,
+    "audited_survivors": 0,
+    "killed_by_timeout": 0
+   },
+   "problems": []
+  },
   "every_record": []
  },
  "guards": {
@@ -1130,7 +1752,7 @@
     "OK   profile_freeze         clean=True rejects=True always-pass-mutant-caught=True",
     "calibrated 51/51; always-PASS mutants rejected 51/51"
    ],
-   "seconds": 189.9
+   "seconds": 189.2
   },
   "freeze_conformance": {
    "command": "python -P validation/v2/freeze_conformance.py --check",
@@ -1139,7 +1761,7 @@
     "PASS     F11 ",
     "summary {'PASS': 11, 'PENDING': 0, 'FAIL': 0} | ratchet violations 0"
    ],
-   "seconds": 10.3
+   "seconds": 10.6
   },
   "v1_evidence_guard": {
    "command": "python -P validation/v2/v1_evidence_guard.py --check",
@@ -1155,7 +1777,7 @@
    "tail": [
     "old path audit: PASS"
    ],
-   "seconds": 2.2
+   "seconds": 2.1
   },
   "p6_evidence": {
    "command": "python -P validation/v2/p6_evidence.py --check",
@@ -1194,7 +1816,7 @@
    "command": "python -P validation/v2/mutation.py --check",
    "exit": 0,
    "tail": [
-    "SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::run_story: historical, taken over by C2-ORCH",
+    "SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::run_story: historical, taken over by K-PRESAT-001",
     "mutation: PASS"
    ],
    "seconds": 0.1
@@ -1214,5 +1836,5 @@
  },
  "problems": [],
  "verdict": "COMPLETE",
- "seconds": 382.7
+ "seconds": 369.0
 }

@@ -240,7 +240,9 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                     if p.failure is not None:
                         failure, detail = p.failure, f"proof of {cid}: {p.failure.code.value}"
                         break
-            if failure is None:
+            if failure is None and not continuation.already_satisfied:
+                # §14 (K-PRESAT-001): a story whose every obligation is PRE_SATISFIED made no developer call — there is no
+                # developer work for engineering adequacy to judge, so it is not run and can neither fail nor charge it
                 tests_held = _Held(scope, "tests")
                 try:
                     q = assess(run, story_id, str(verifier_wt.path), ws.diff(base, candidate), inputs.story_tests,

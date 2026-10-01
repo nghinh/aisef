@@ -26,7 +26,15 @@ each ProductProofSpec carries; a conformance repair to the frozen architecture, 
     new tree, so p10_contracts.check and p5_acceptance.check report that record as not re-derived. The record is measured
     here field by field: that one provenance field must be the only difference (the proposal digest, every hash and the
     plan are the accepted ones); the two C2-P5 checks' outputs are recorded as they are, nothing of C2-P5 is edited.
-(f) The C2-ORCH mutation record, summarised, with mutation.py's verdict on it and on P6's superseded entries.
+(f) The C2-ORCH mutation record, summarised, with mutation.py's verdict on it and on P6's superseded entries, and the
+    record of the phase that took over story_runner.py's targets since (K-PRESAT-001).
+
+K-PRESAT-001 (owner rulings 2026-10-01, 'BOUNDED CORRECTIVE PATCH' §3 and 'DETERMINISTIC REPAIR COMPLETION' §2): a story
+whose every obligation is PRE_SATISFIED makes no developer call and no longer runs the engineering-adequacy stage. One of
+the seven Cycle-1 items (`pre-satisfied`) is such a story, so under this kernel its journal is the old kernel's WITHOUT
+that stage — the three `tests …` process ranges, `tests/adequacy` and the `<story>:quality` gate check — and nothing else
+differs. (b) measures exactly that (`without_adequacy_stage`): the other six items are identical as before, and this one
+must differ by that stage and by nothing else, or the record states a problem.
 (g) The guards, each run once.
 
 `--check` re-derives (d), (e) and (f) and compares them with the record, and requires the verdict the record states;
@@ -65,6 +73,11 @@ SEMANTIC_IDENTITIES = ("contracts", "all_equal_to_accepted", "contract_spec_sema
 MUTATION_REL = "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json"
 P6_MUTATION_REL = "closure-evidence/v2/P6-MUTATION.json"
 AUTHORITY = "owner ruling 2026-09-30, 'ORCHESTRATION CONFORMANCE REPAIR AUTHORIZED' (C2-ORCHESTRATION-CONFORMANCE-REPAIR)"
+#: the Cycle-1 corpus items whose story is fully PRE_SATISFIED: under K-PRESAT-001 they run no engineering-adequacy stage
+K_PRESAT_ITEMS = ("pre-satisfied",)
+K_PRESAT_AUTHORITY = ("owner rulings 2026-10-01, 'AISEF V2 — BOUNDED CORRECTIVE PATCH' §3 (K-PRESAT-001) and 'AISEF V2 — "
+                      "DETERMINISTIC REPAIR COMPLETION' §2 (K-PRESAT-001 CONFIRMED)")
+K_PRESAT_MUTATION_REL = "closure-evidence/v2/cycle2/K-PRESAT-001-MUTATION.json"
 BASE = "45136086c3e4a98534f975e6db979f94165af5f3"
 OLD = "63112544f1146097b69c538d98e09e5a52c547c1"
 OLD_AISEF2_TREE = "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
@@ -230,7 +243,29 @@ def _neutral(journal: list[dict]) -> list[dict]:
     return out
 
 
-def compare_item(old: dict, new: dict) -> dict:
+def _adequacy_stage(e: dict) -> bool:
+    """An event of the engineering-adequacy stage: its `tests …` process ranges, `tests/adequacy`, the quality check."""
+    d = e["data"]
+    return e["type"] == "tests/adequacy" or (e["type"] == "gate/check" and str(d.get("check", "")).endswith(":quality")) or (
+        e["type"] in ("story/resource-acquired", "story/resource-released") and d.get("kind") == "PROCESS_RANGE"
+        and str(d.get("resource", "")).startswith("tests "))
+
+
+def without_adequacy_stage(journal: list[dict]) -> tuple[list[dict], dict]:
+    """`journal` as it would read had the engineering-adequacy stage not run: its events removed, every later sequence
+    number and every citation renumbered, a citation of a removed event dropped. With the removed events by type."""
+    gone = [e for e in journal if _adequacy_stage(e)]
+    kept = [e for e in journal if not _adequacy_stage(e)]
+    seq = {e["seq"]: i for i, e in enumerate(kept)}
+    out = [{**json.loads(json.dumps(e)), "seq": seq[e["seq"]], "source_seqs": [seq[x] for x in e.get("source_seqs", []) if x in seq]}
+           for e in kept]
+    removed: dict[str, int] = {}
+    for e in gone:
+        removed[e["type"]] = removed.get(e["type"], 0) + 1
+    return out, removed
+
+
+def compare_item(old: dict, new: dict, k_presat: bool = False) -> dict:
     raw = []
     for i in range(max(len(old["journal"]), len(new["journal"]))):
         a = old["journal"][i] if i < len(old["journal"]) else None
@@ -243,20 +278,48 @@ def compare_item(old: dict, new: dict) -> dict:
                                           ("run/spec-resolved", "data.runspec_hash")} for d in raw for f in d["fields"])
     others = {k: old[k] == new[k] for k in ("outcomes", "errors", "notes", "model_requests", "consumption", "tool_ledger",
                                            "subprocesses", "initial_workspace", "final_workspace")}
-    return {"outcomes": new["outcomes"], "outcomes_identical": old["outcomes"] == new["outcomes"],
-            "events": [len(old["journal"]), len(new["journal"])], "errors": new["errors"],
-            "journal_raw_differences": raw, "journal_identical_but_kernel_identity":
-                only_kernel and _neutral(old["journal"]) == _neutral(new["journal"]),
-            "other_observations_identical": others}
+    out = {"outcomes": new["outcomes"], "outcomes_identical": old["outcomes"] == new["outcomes"],
+           "events": [len(old["journal"]), len(new["journal"])], "errors": new["errors"],
+           "journal_raw_differences": raw, "journal_identical_but_kernel_identity":
+               only_kernel and _neutral(old["journal"]) == _neutral(new["journal"]),
+           "other_observations_identical": others}
+    if k_presat:
+        # K-PRESAT-001: the old journal without its adequacy stage must be the new journal, and the new one has none
+        stripped, removed = without_adequacy_stage(old["journal"])
+        _, in_new = without_adequacy_stage(new["journal"])
+        tests = (old["subprocesses"] or {}).get("tests") if isinstance(old["subprocesses"], dict) else None
+        out["k_presat_001"] = {
+            "removed_from_the_old_journal": removed, "adequacy_stage_events_in_the_new_journal": in_new,
+            "journal_identical_but_kernel_identity_and_the_adequacy_stage": _neutral(stripped) == _neutral(new["journal"]),
+            "subprocesses": {"old": old["subprocesses"], "new": new["subprocesses"]},
+            "subprocesses_identical_but_the_tests_of_the_stage": bool(tests) and {**old["subprocesses"], "tests": 0} == new["subprocesses"],
+            "other_observations_identical_but_subprocesses": all(v for k, v in others.items() if k != "subprocesses")}
+    return out
+
+
+def by_k_presat(v: dict) -> bool:
+    """The item differs from the old kernel by the engineering-adequacy stage of a fully PRE_SATISFIED story and by
+    nothing else: same outcomes, the stage present in the old journal and absent from the new, the rest identical."""
+    k = v.get("k_presat_001") or {}
+    return bool(v["outcomes_identical"] and not v["journal_identical_but_kernel_identity"]
+                and k.get("removed_from_the_old_journal", {}).get("tests/adequacy") and not k.get("adequacy_stage_events_in_the_new_journal")
+                and k.get("journal_identical_but_kernel_identity_and_the_adequacy_stage")
+                and k.get("subprocesses_identical_but_the_tests_of_the_stage") and k.get("other_observations_identical_but_subprocesses"))
 
 
 def single_probe_equivalence(old_root: pathlib.Path) -> dict:
     old, new = in_kernel(old_root, "q5"), in_kernel(None, "q5")
-    by_item = {i: compare_item(old[i], new[i]) for i in new}
+    by_item = {i: compare_item(old[i], new[i], i in K_PRESAT_ITEMS) for i in new}
     same = [i for i, v in by_item.items() if v["outcomes_identical"] and v["journal_identical_but_kernel_identity"]
             and all(v["other_observations_identical"].values())]
     return {"corpus": "validation/qualification/q5.py CORPUS", "mode": "record (the item's scripted model stream; no provider)",
             "items": len(by_item), "identical": len(same), "by_item": by_item,
+            "identical_but_the_adequacy_stage_of_a_fully_pre_satisfied_story": sorted(i for i, v in by_item.items() if by_k_presat(v)),
+            "k_presat_001": {"authority": K_PRESAT_AUTHORITY, "items": list(K_PRESAT_ITEMS),
+                             "rule": "a story whose every obligation is PRE_SATISFIED makes no developer call and runs no "
+                                     "engineering-adequacy stage; such an item's journal is the old kernel's without that "
+                                     "stage (its `tests …` process ranges, tests/adequacy, the quality gate check), renumbered, "
+                                     "and nothing else differs"},
             "difference_rule": "the raw normalized journals differ only in " + ", ".join(KERNEL_FIELDS)
                                + " (each process binds the kernel it imported); neutralised, they are identical"}
 
@@ -392,13 +455,26 @@ def mutation() -> dict:
     p6 = json.loads((ROOT / P6_MUTATION_REL).read_text(encoding="utf-8"))
     rows = {t["target"]: {k: t.get(k) for k in ("mutants", "killed", "survivors", "killed_by_timeout", "strays_reaped",
                                                  "kill_tests", "source_sha256", "error")} for t in rec["targets"]}
+    later = ROOT / K_PRESAT_MUTATION_REL
+    krec = json.loads(later.read_text(encoding="utf-8")) if later.exists() else {"targets": []}
+    krows = {t["target"]: {k: t.get(k) for k in ("mutants", "killed", "survivors", "killed_by_timeout", "strays_reaped",
+                                                  "kill_tests", "source_sha256", "error")} for t in krec["targets"]}
     return {"record": {"path": MUTATION_REL, "sha256": _lf((ROOT / MUTATION_REL).read_bytes())}, "targets": rows,
             "totals": {"targets": len(rows), "mutants": sum(r["mutants"] or 0 for r in rows.values()),
                        "killed": sum(r["killed"] or 0 for r in rows.values()),
                        "survivors": sum(len(r["survivors"] or []) for r in rows.values()),
                        "killed_by_timeout": sum(r["killed_by_timeout"] or 0 for r in rows.values())},
             "owned_targets": sorted(mu.C2_ORCH_TARGETS), "problems": mu.problems_of(rec, ROOT, "C2-ORCH"),
+            "superseded_entries": mu.superseded(rec, "C2-ORCH"),
             "p6_superseded_entries": mu.superseded(p6, "P6"), "p6_problems": mu.problems_of(p6, ROOT, "P6"),
+            "k_presat_001": {"record": {"path": K_PRESAT_MUTATION_REL, "sha256": _lf(later.read_bytes()) if later.exists() else None},
+                             "authority": K_PRESAT_AUTHORITY, "targets": krows, "owned_targets": sorted(mu.K_PRESAT_TARGETS),
+                             "totals": {"targets": len(krows), "mutants": sum(r["mutants"] or 0 for r in krows.values()),
+                                        "killed": sum(r["killed"] or 0 for r in krows.values()),
+                                        "survivors": sum(len(r["survivors"] or []) for r in krows.values()),
+                                        "audited_survivors": sum(1 for t, r in krows.items() for m in r["survivors"] or [] if (t, m) in mu.AUDITED),
+                                        "killed_by_timeout": sum(r["killed_by_timeout"] or 0 for r in krows.values())},
+                             "problems": mu.problems_of(krec, ROOT, "K-PRESAT-001") if later.exists() else [f"{K_PRESAT_MUTATION_REL} is missing"]},
             "every_record": mu.check(ROOT)}
 
 
@@ -422,8 +498,11 @@ def verdict_problems(rec: dict) -> list[str]:
     if a["new"]["raised"] is not None or a["new"]["attempts"] != ["COMMIT"]:
         out.append(f"(a) the new kernel did not commit the two-kind story: {a['new']['raised']!r} {a['new']['attempts']}")
     b = rec["single_probe_equivalence"]
-    if (b["items"], b["identical"]) != (7, 7):
-        out.append(f"(b) {b['identical']} of {b['items']} single-probe items identical under both kernels")
+    staged = b.get("identical_but_the_adequacy_stage_of_a_fully_pre_satisfied_story")
+    if (b["items"], b["identical"], staged) != (7, 7 - len(K_PRESAT_ITEMS), sorted(K_PRESAT_ITEMS)):
+        out.append(f"(b) {b['identical']} of {b['items']} single-probe items identical under both kernels and {staged} identical "
+                   f"but the adequacy stage of a fully PRE_SATISFIED story (K-PRESAT-001): expected {7 - len(K_PRESAT_ITEMS)} and "
+                   f"{sorted(K_PRESAT_ITEMS)}")
     c = rec["test_matrix"]
     bad = {k: v for k, v in c["outcomes"].items() if v != "PASS"}
     if bad or c["exit"] != 0 or not c["ran"] or c["owned_processes"]["owned_after"] != 0 or c["owned_processes"]["escaped"]:
@@ -436,8 +515,9 @@ def verdict_problems(rec: dict) -> list[str]:
     if e["contracts"] != 59 or e["semantic_change"] != "NONE" or not e["verify_problems_are_provenance_only"]:
         out.append(f"(e) {e['contracts']} contracts, semantic change {e['semantic_change']}, {e['verify_problems']}")
     f = rec["mutation"]
-    if f["problems"] or f["p6_problems"] or f["every_record"] or f["totals"]["survivors"]:
-        out.append(f"(f) mutation: {f['problems'] + f['p6_problems'] + f['every_record']} survivors {f['totals']['survivors']}")
+    k = f.get("k_presat_001") or {"problems": ["no K-PRESAT-001 mutation summary"], "totals": {}}
+    if f["problems"] or f["p6_problems"] or f["every_record"] or f["totals"]["survivors"] or k["problems"]:
+        out.append(f"(f) mutation: {f['problems'] + f['p6_problems'] + f['every_record'] + k['problems']} survivors {f['totals']['survivors']}")
     out += [f"(g) guard {k}: exit {v['exit']}" for k, v in rec["guards"].items() if v["exit"] != 0]
     return out
 
@@ -479,6 +559,16 @@ def write() -> dict:
             "StoryInputs.probes": "several factories keyed by probe id (a harness wires every probe the plan's specs name)",
             "unchanged": "StoryAdmission, ContractSatisfaction, routing, budgets, journal events and payloads, the RunSpec, "
                          "F1-F11, every contract, spec, plan and probe identity"},
+        "k_presat_001": {
+            "authority": K_PRESAT_AUTHORITY,
+            "story_runner._attempt": "the engineering-adequacy stage runs only when the story has developer work "
+                                     "(`not continuation.already_satisfied`): a story whose every obligation is PRE_SATISFIED "
+                                     "made no developer call, so the stage is not run and can neither fail nor charge it (RFC §14)",
+            "unchanged": "the developer call was already skipped for such a story; its independent verification at the candidate, "
+                         "plan-drift, review, security, merge and post-merge re-proof are as before",
+            "effect_on_this_record": "(b): the one Cycle-1 item that is a fully PRE_SATISFIED story differs from the old kernel "
+                                     "by exactly that stage; (d): story_runner.py; (f): its mutation targets are re-measured in "
+                                     f"{K_PRESAT_MUTATION_REL}, the C2-ORCH entries for them kept as historical"},
         "defect_reproducer": reproducer,
         "single_probe_equivalence": equivalence,
         "test_matrix": matrix(),

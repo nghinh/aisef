@@ -708,12 +708,24 @@ class LedgerLockStories(unittest.TestCase):
                      "validation/qualification is not in this tree (the mutation runner's copy); the suite runs it")
 class Record(unittest.TestCase):
     def test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story(self):
+        """Agreement is identity for six of the seven Cycle-1 items; the seventh is a fully PRE_SATISFIED story, which
+        under K-PRESAT-001 runs no engineering-adequacy stage: it must differ from the old kernel by that stage and by
+        nothing else."""
         from validation.qualification import c2_orchestration_repair as rp
         self.assertEqual(rp.check(), [])
         rec = json.loads((ROOT / rp.OUT_REL).read_text(encoding="utf-8"))
         eq = rec["single_probe_equivalence"]
-        self.assertEqual((eq["items"], eq["identical"]), (7, 7))
-        self.assertTrue(all(v["outcomes_identical"] and v["journal_identical_but_kernel_identity"] for v in eq["by_item"].values()))
+        staged = eq["identical_but_the_adequacy_stage_of_a_fully_pre_satisfied_story"]
+        self.assertEqual((eq["items"], eq["identical"], staged), (7, 6, ["pre-satisfied"]))
+        self.assertTrue(all(v["outcomes_identical"] for v in eq["by_item"].values()))
+        self.assertEqual(sorted(i for i, v in eq["by_item"].items() if not v["journal_identical_but_kernel_identity"]), staged)
+        k = eq["by_item"]["pre-satisfied"]["k_presat_001"]
+        self.assertEqual(k["removed_from_the_old_journal"], {"story/resource-acquired": 3, "tests/adequacy": 1,
+                                                             "story/resource-released": 3, "gate/check": 1})
+        self.assertEqual(k["adequacy_stage_events_in_the_new_journal"], {})
+        self.assertTrue(k["journal_identical_but_kernel_identity_and_the_adequacy_stage"])
+        self.assertTrue(k["subprocesses_identical_but_the_tests_of_the_stage"] and k["other_observations_identical_but_subprocesses"])
+        self.assertEqual((k["subprocesses"]["old"]["tests"], k["subprocesses"]["new"]["tests"]), (3, 0))
         old, new = rec["defect_reproducer"]["old"], rec["defect_reproducer"]["new"]
         self.assertEqual(old["raised"], "InvariantError: cycle 1 proves a story with exactly one probe factory")
         self.assertEqual((new["raised"], new["attempts"]), (None, ["COMMIT"]))
