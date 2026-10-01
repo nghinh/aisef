@@ -1,0 +1,174 @@
+{
+ "generated": "2026-09-20T00:13:14+0700",
+ "run": "minimax-ro-1",
+ "profile": "PROFILE-W1-OC-MINIMAXM3-T80-RO",
+ "profile_id": "sha256:ae9adf64987f08ed498c0672325e81defa596d14e30822b8b8970847a320b1f3",
+ "valid_run": true,
+ "valid_because": "provider preflight PASS; fresh trunk; prepare verified the frozen kernel and the profile digest; mapping errors 0; repair 0; orphan 0; drift 0; terminal model/project state with no provider interruption",
+ "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+ "delivery_complete": false,
+ "progress": {
+  "done": 11,
+  "total": 16
+ },
+ "stories": {
+  "STORY-01-01": {
+   "status": "done",
+   "attempts": 2
+  },
+  "STORY-01-02": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-03": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-04": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-05": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-06": {
+   "status": "done",
+   "attempts": 2
+  },
+  "STORY-02-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-02-02": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-03-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-03-02": {
+   "status": "done",
+   "attempts": 2
+  },
+  "STORY-04-01": {
+   "status": "done",
+   "attempts": 3
+  },
+  "STORY-04-02": {
+   "status": "failed",
+   "attempts": 3
+  }
+ },
+ "stop": {
+  "story": "STORY-04-02",
+  "attempt_1": "79 developer turns; gate TDD + tests verify story (AC-STORY-04-02-1 already green at the parent aef05cd) + review blocked: main() had no exception wrapper — verify/snapshot on a missing ledger exit 1, an empty-key batch element exits 1",
+  "attempt_2": "developer max_turns 80; reviewer max_turns 80 -> review UNRUNNABLE (no verdict); TDD/nop again",
+  "attempt_3": "a 68-turn session wrote nothing (no-op, charged to the infra budget), then an 80-turn session -> EXHAUSTED 3 attempts"
+ },
+ "block_legitimacy_measured": {
+  "method": "the last candidate 12d0de0d extracted into the qualification workspace; 20-line ledger; line 17 mutated out of band; ledgerlock.cli.main",
+  "results": {
+   "clean": [
+    0,
+    0
+   ],
+   "value-tamper": [
+    5,
+    5
+   ],
+   "non-json": [
+    2,
+    5
+   ],
+   "json-list": [
+    5,
+    5
+   ],
+   "json-number": [
+    5,
+    5
+   ],
+   "verify missing ledger": 3,
+   "snapshot missing ledger": 3,
+   "apply empty-key element": 2
+  },
+  "verdict": "the refused candidate still violates FR-12 — `verify` on a line corrupted to non-JSON exits 2, not 5 — NOT a false BLOCK; the SS-95 candidate measurement agrees (false_block 0 at 12d0de0d)"
+ },
+ "oracle_at_trunk": {
+  "false_pass_count": 0,
+  "mapping_error_count": 0,
+  "red_classes": {
+   "INCOMPLETE_DELIVERY_EXPECTED_RED": 8
+  }
+ },
+ "false_block_count": 0,
+ "manual_state_repair": 0,
+ "orphan_state_count": 0,
+ "drift_records": [],
+ "resumes_forced": 2,
+ "run_metrics": {
+  "developer_agent_runs": 20,
+  "developer_retries": 7,
+  "reviewer_executions": 19,
+  "reviewer_retries": 0,
+  "security_executions": 18,
+  "security_retries": 0,
+  "max_turn_events": 8,
+  "human_arbitrations_during_the_run": 0,
+  "stories_done": 11,
+  "stories_failed": [
+   "STORY-04-02"
+  ],
+  "stories_never_started": 4,
+  "false_block": [],
+  "false_block_count": 0,
+  "false_block_measurable_for": [
+   "STORY-01-01",
+   "STORY-01-02",
+   "STORY-01-03",
+   "STORY-01-05",
+   "STORY-01-06",
+   "STORY-02-01",
+   "STORY-02-02",
+   "STORY-03-01",
+   "STORY-03-02",
+   "STORY-04-01",
+   "STORY-04-02"
+  ],
+  "false_block_measured_at_candidate_for": [
+   "STORY-04-02"
+  ]
+ },
+ "turns": {
+  "developer_sessions": 20,
+  "max": 80,
+  "max_turn_events": 8,
+  "distribution": [
+   22,
+   35,
+   37,
+   42,
+   50,
+   57,
+   63,
+   65,
+   68,
+   69,
+   75,
+   77,
+   79,
+   79,
+   80,
+   80,
+   80,
+   80,
+   80,
+   80
+  ]
+ },
+ "runtime_seconds": 13602.7,
+ "output_tokens_logged_by_the_kernel": 270233,
+ "cost_usd_reported": 0.0
+}

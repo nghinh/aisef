@@ -1,0 +1,71 @@
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:15:12
+   |
+13 |     env = os.environ.copy()
+14 |     env["PYTHONPATH"] = str(REPO_ROOT) + os.pathsep + env.get("PYTHONPATH", "")
+15 |     return subprocess.run(
+   |            ^^^^^^^^^^^^^^
+16 |         [sys.executable, *args],
+17 |         cwd=str(REPO_ROOT),
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:53:16
+   |
+52 |     def test_AC_STORY_01_01_5_no_forbidden_imports_in_package(self) -> None:
+53 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+54 |             [
+55 |                 "grep",
+   |
+help: Add explicit `check=False`
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:71:16
+   |
+70 |     def test_AC_STORY_01_01_6_no_forbidden_calls_in_package(self) -> None:
+71 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+72 |             [
+73 |                 "grep",
+   |
+help: Add explicit `check=False`
+
+B009 [*] Do not call `getattr` with a constant attribute value. It is not any safer than normal property access.
+  --> tests/test_skeleton.py:91:18
+   |
+89 |         import ledgerlock
+90 |
+91 |         Ledger = getattr(ledgerlock, "Ledger")
+   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+92 |         ConflictError = getattr(ledgerlock, "ConflictError")
+93 |         self.assertTrue(callable(Ledger), msg="Ledger is not callable")
+   |
+help: Replace `getattr` with attribute access
+   |
+90 |
+   -         Ledger = getattr(ledgerlock, "Ledger")
+91 +         Ledger = ledgerlock.Ledger
+92 |         ConflictError = getattr(ledgerlock, "ConflictError")
+   |
+
+B009 [*] Do not call `getattr` with a constant attribute value. It is not any safer than normal property access.
+  --> tests/test_skeleton.py:92:25
+   |
+91 |         Ledger = getattr(ledgerlock, "Ledger")
+92 |         ConflictError = getattr(ledgerlock, "ConflictError")
+   |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+93 |         self.assertTrue(callable(Ledger), msg="Ledger is not callable")
+94 |         self.assertIsNotNone(ConflictError)
+   |
+help: Replace `getattr` with attribute access
+   |
+91 |         Ledger = getattr(ledgerlock, "Ledger")
+   -         ConflictError = getattr(ledgerlock, "ConflictError")
+92 +         ConflictError = ledgerlock.ConflictError
+93 |         self.assertTrue(callable(Ledger), msg="Ledger is not callable")
+   |
+
+Found 5 errors.
+[*] 2 fixable with the `--fix` option.

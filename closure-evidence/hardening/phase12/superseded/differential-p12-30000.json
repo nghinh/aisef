@@ -1,0 +1,200 @@
+{
+ "traces": 10000,
+ "workers": 8,
+ "elapsed_s": 2274.1,
+ "traces_per_s": 4.4,
+ "model_transitions": 72970,
+ "real_stage_events": 48668,
+ "matched": 9999,
+ "mismatched_attributed": {},
+ "unexplained_count": 1,
+ "unexplained": [
+  {
+   "seed": 34999,
+   "scenario": "dev=CHANGED_ARTIFACT/CHANGED_ARTIFACT/NOOP/CONTEXT/CHANGED_RED/NOOP rev=COMMIT/BLOCK sec=UNRUNNABLE/BUDGET retries=1",
+   "diff": [
+    "developer_sessions: real=2 model=1",
+    "review_executions: real=3 model=2",
+    "security_executions: real=3 model=2",
+    "quality_attempts: real=2 model=1",
+    "candidates_frozen: real=2 model=1"
+   ],
+   "attributed": [],
+   "real": {
+    "terminal": "blocked:budget cap",
+    "developer_sessions": 2,
+    "review_executions": 3,
+    "security_executions": 3,
+    "quality_attempts": 2,
+    "infra_attempts": 0,
+    "candidates_frozen": 2,
+    "events": [
+     "developer:CHANGED",
+     "review:COMMIT",
+     "security:UNRUNNABLE",
+     "review:BLOCK",
+     "security:BUDGET",
+     "developer:CHANGED",
+     "review:BLOCK",
+     "security:BUDGET",
+     "STORY-04-01: NOT DONE |   [attempt 1] gate failed |     ✅ evidence matches candidate |     – guard ran — hooks not compiled for this client — not expected |     ✅ test |     ○ no baseline regression — cannot read test names from baseline — use a reporter that prints names (`node --test`, `vitest --r"
+    ],
+    "orphans_surviving": 0
+   },
+   "model": {
+    "terminal": "blocked:budget cap",
+    "developer_sessions": 1,
+    "review_executions": 2,
+    "security_executions": 2,
+    "quality_attempts": 1,
+    "infra_attempts": 0,
+    "candidates_frozen": 1,
+    "events": [
+     "DEVELOP_CHANGED->PASS",
+     "TEST_PASS->PASS",
+     "REVIEW_MUTATE->UNRUNNABLE",
+     "SECURITY_UNRUNNABLE->UNRUNNABLE",
+     "GATE_EVALUATE->UNRUNNABLE",
+     "REVIEW_BLOCK->QUALITY_BLOCK",
+     "SECURITY_BUDGET->HUMAN_REQUIRED"
+    ],
+    "orphans_surviving": 0
+   },
+   "model_steps": 7,
+   "real_events": 8
+  }
+ ],
+ "known_deviations": [],
+ "vocabulary": {
+  "developer": [
+   [
+    "CHANGED",
+    30
+   ],
+   [
+    "CHANGED_RED",
+    8
+   ],
+   [
+    "CHANGED_ARTIFACT",
+    3
+   ],
+   [
+    "CHANGED_ORPHAN",
+    3
+   ],
+   [
+    "NOOP",
+    8
+   ],
+   [
+    "TIMEOUT",
+    4
+   ],
+   [
+    "CRASH",
+    4
+   ],
+   [
+    "RATE_LIMIT",
+    2
+   ],
+   [
+    "CONTEXT",
+    3
+   ],
+   [
+    "AUTH",
+    2
+   ],
+   [
+    "SCOPE_VIOLATION",
+    6
+   ],
+   [
+    "TRUNK_COMMIT",
+    1
+   ],
+   [
+    "ZERO_OUTPUT",
+    2
+   ],
+   [
+    "MAX_TURNS_WORK",
+    3
+   ],
+   [
+    "MAX_TURNS_UNTOUCHED",
+    3
+   ],
+   [
+    "BUDGET",
+    2
+   ]
+  ],
+  "review": [
+   [
+    "PASS",
+    30
+   ],
+   [
+    "BLOCK",
+    7
+   ],
+   [
+    "BLOCK_OUTSIDE",
+    4
+   ],
+   [
+    "STUCK",
+    2
+   ],
+   [
+    "MALFORMED",
+    4
+   ],
+   [
+    "UNRUNNABLE",
+    5
+   ],
+   [
+    "MUTATE",
+    2
+   ],
+   [
+    "COMMIT",
+    2
+   ],
+   [
+    "BUDGET",
+    1
+   ],
+   [
+    "BLOCK_UNBOUND",
+    2
+   ]
+  ],
+  "security": [
+   [
+    "PASS",
+    30
+   ],
+   [
+    "BLOCK",
+    6
+   ],
+   [
+    "UNRUNNABLE",
+    4
+   ],
+   [
+    "MALFORMED",
+    3
+   ],
+   [
+    "BUDGET",
+    1
+   ]
+  ]
+ }
+}

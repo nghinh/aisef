@@ -299,6 +299,12 @@ def reconcile_story(
     stale = cur in (StoryStatus.RUNNING, StoryStatus.VERIFYING)
     if not in_progress and not stale:
         return None
+    from .state import claim_is_live
+    if stale and claim_is_live(rec):
+        # F5 / SS-49 / INV-M.1: the owner is alive (this host) or its lease has not expired (another host) — the
+        # story is theirs; resetting it would hand one run's work to another
+        return Reconciled(story_id, "live", f"claim held by {rec.claimed_by} is live (lease until "
+                                            f"{time.strftime('%H:%M:%S', time.gmtime(rec.lease_until)) if rec.lease_until else 'no term'}); left alone")
 
     if worktrees is not None and (in_progress or stale):
         # Branch is kept: commits in it are real work.

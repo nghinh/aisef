@@ -1,0 +1,14 @@
+sssssssss                                                                [100%]
+=========================== short test summary info ============================
+SKIPPED [1] oracle/test_oracle.py:72: AISEF_W1_PROJECT must point at a delivered LedgerLock
+SKIPPED [1] oracle/test_oracle.py:79: AISEF_W1_PROJECT must point at a delivered LedgerLock
+SKIPPED [1] oracle/test_oracle.py:96: AISEF_W1_PROJECT must point at a delivered LedgerLock
+SKIPPED [1] oracle/test_oracle.py:108: AISEF_W1_PROJECT must point at a delivered LedgerLock
+SKIPPED [1] oracle/test_oracle.py:127: AISEF_W1_PROJECT must point at a delivered LedgerLock
+SKIPPED [1] oracle/test_oracle.py:138: AISEF_W1_PROJECT must point at a delivered LedgerLock
+SKIPPED [1] oracle/test_oracle.py:207: AISEF_W1_PROJECT must point at a delivered LedgerLock
+SKIPPED [1] oracle/test_oracle.py:196: AISEF_W1_PROJECT must point at a delivered LedgerLock
+SKIPPED [1] oracle/test_oracle.py:181: AISEF_W1_PROJECT must point at a delivered LedgerLock
+9 skipped in 0.01s
+
+--- stderr ---

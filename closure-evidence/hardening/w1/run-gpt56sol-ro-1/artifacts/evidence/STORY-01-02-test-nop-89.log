@@ -1,0 +1,32 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 7 items / 1 error
+
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_matches_unicodedata_nfc_byte_for_byte 
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_matches_unicodedata_nfc_byte_for_byte PASSED [ 14%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_identical PASSED [ 28%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_3_package_import_reports_init_path PASSED [ 42%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_4_module_help_lists_all_subcommands 
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_4_module_help_lists_all_subcommands PASSED [ 57%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_5_runtime_has_no_forbidden_imports PASSED [ 71%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_6_runtime_has_no_forbidden_calls PASSED [ 85%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error PASSED [100%]
+
+==================================== ERRORS ====================================
+____________________ ERROR collecting tests/test_format.py _____________________
+ImportError while importing test module '/workspace/tests/test_format.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_format.py:4: in <module>
+    from ledgerlock.format import GENESIS, canonical_bytes
+E   ImportError: cannot import name 'GENESIS' from 'ledgerlock.format' (/workspace/ledgerlock/format.py)
+=========================== short test summary info ============================
+ERROR tests/test_format.py
+================ 7 passed, 1 error, 11 subtests passed in 0.12s ================

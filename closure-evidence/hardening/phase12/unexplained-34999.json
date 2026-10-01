@@ -1,0 +1,89 @@
+{
+ "artifact": "Phase 12 unexplained trace — frozen verbatim from the chunk record; nothing regenerated",
+ "chunk_id": "differential-p12-30000",
+ "chunk_file_sha256": "c034f0d7a07270ae31b4fe92fd6ce67d238ef2e077c3052aef41bd2b97ce0a14",
+ "seed": 34999,
+ "trace_index_in_chunk": 4999,
+ "seed_range": [
+  30000,
+  39999
+ ],
+ "chunk_summary": {
+  "traces": 10000,
+  "workers": 8,
+  "elapsed_s": 2274.1,
+  "traces_per_s": 4.4,
+  "model_transitions": 72970,
+  "real_stage_events": 48668,
+  "matched": 9999,
+  "unexplained_count": 1
+ },
+ "kernel_identity": {
+  "git_head_at_freeze": "d956249ef407397c88c1fc072283f0a24e2a6088",
+  "aisef_tree_dirty_at_freeze": true,
+  "note": "the chunk ran in a fresh process on the working tree; aisef/ was unchanged between 9e8fc77 and this freeze (ed5085a, d956249 touched tests/validation/docs only)",
+  "python": "3.14.7",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O"
+ },
+ "initial_state": "story STORY-04-01 pending, no candidate, epoch 1, quality budget = retries + 1, infra budget per kernel default (HygieneCase fixture)",
+ "generated_event_sequence": "dev=CHANGED_ARTIFACT/CHANGED_ARTIFACT/NOOP/CONTEXT/CHANGED_RED/NOOP rev=COMMIT/BLOCK sec=UNRUNNABLE/BUDGET retries=1",
+ "model_transitions": [
+  "DEVELOP_CHANGED->PASS",
+  "TEST_PASS->PASS",
+  "REVIEW_MUTATE->UNRUNNABLE",
+  "SECURITY_UNRUNNABLE->UNRUNNABLE",
+  "GATE_EVALUATE->UNRUNNABLE",
+  "REVIEW_BLOCK->QUALITY_BLOCK",
+  "SECURITY_BUDGET->HUMAN_REQUIRED"
+ ],
+ "real_kernel_transitions": [
+  "developer:CHANGED",
+  "review:COMMIT",
+  "security:UNRUNNABLE",
+  "review:BLOCK",
+  "security:BUDGET",
+  "developer:CHANGED",
+  "review:BLOCK",
+  "security:BUDGET"
+ ],
+ "real_kernel_summary_text": "STORY-04-01: NOT DONE |   [attempt 1] gate failed |     ✅ evidence matches candidate |     – guard ran — hooks not compiled for this client — not expected |     ✅ test |     ○ no baseline regression — cannot read test names from baseline — use a reporter that prints names (`node --test`, `vitest --r",
+ "model_terminal": "blocked:budget cap",
+ "real_terminal": "blocked:budget cap",
+ "compared_fields_diff": [
+  "developer_sessions: real=2 model=1",
+  "review_executions: real=3 model=2",
+  "security_executions: real=3 model=2",
+  "quality_attempts: real=2 model=1",
+  "candidates_frozen: real=2 model=1"
+ ],
+ "model_observation": {
+  "terminal": "blocked:budget cap",
+  "developer_sessions": 1,
+  "review_executions": 2,
+  "security_executions": 2,
+  "quality_attempts": 1,
+  "infra_attempts": 0,
+  "candidates_frozen": 1,
+  "orphans_surviving": 0
+ },
+ "real_observation": {
+  "terminal": "blocked:budget cap",
+  "developer_sessions": 2,
+  "review_executions": 3,
+  "security_executions": 3,
+  "quality_attempts": 2,
+  "infra_attempts": 0,
+  "candidates_frozen": 2,
+  "orphans_surviving": 0
+ },
+ "not_recorded_by_the_chunk": [
+  "candidate identity",
+  "baseline identity",
+  "story epoch",
+  "evidence freshness state",
+  "invalidation events",
+  "exception/timeout information"
+ ],
+ "note_on_not_recorded": "the chunk recorded only the compared observation and the event streams; the fields above are captured by the deterministic replays (unexplained-34999-replays.json), which are labelled as replay evidence, never as the original",
+ "frozen_at": "2026-09-16T21:46:41Z"
+}

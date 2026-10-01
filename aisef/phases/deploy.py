@@ -32,7 +32,7 @@ from ..control.approvals import (
 )
 from ..control.outcome import Check, Outcome
 from ..control.state import StateStore, StoryStatus
-from .qa import QaReport, run_suite
+from .qa import TREE_CLEAN, QaReport, run_suite
 
 CI_PATH = ".github/workflows/aisef.yml"
 
@@ -40,6 +40,8 @@ CI_PATH = ".github/workflows/aisef.yml"
 #: or git-based installs.
 INSTALL_SPEC = "aisef"          # PyPI package name; module/command stays `aisef`
 RUNBOOK_PATH = "docs/RUNBOOK.md"
+#: What the devsecops session may write — the guard reads it from the session env (SS-42)
+DEVSECOPS_SCOPE = ("Dockerfile", ".dockerignore", "docker-compose.yml", ".github/workflows", "docs/RUNBOOK.md", "deploy")
 
 #: Four required runbook sections. Missing any one renders it useless exactly
 #: when needed most -- at 3 AM, by the on-call who has never read this system.
@@ -141,10 +143,27 @@ def _isolation_check(report: PreDeployReport, cfg: Config) -> Check:
     )
 
 
-def check_runbook(path: Path) -> Check:
-    if not path.is_file():
+def _tree_file(project: Path, rel: str, *, at_head: bool) -> str | None:
+    """Content of ``rel`` in the tree being graded: HEAD when the suite ran on the clean worktree of HEAD, the
+    working tree otherwise (SS-43 / INV-P.1: one report, one tree). ``None`` when the file is absent there."""
+    if not at_head:
+        f = project / rel
+        return f.read_text(encoding="utf-8", errors="replace") if f.is_file() else None
+    import subprocess
+    r = subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=project, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", timeout=30)
+    return r.stdout if r.returncode == 0 else None
+
+
+def check_runbook(path: Path, *, text: str | None = None, present: bool | None = None) -> Check:
+    """``text`` / ``present`` let the caller grade the runbook of the tree the suite ran on (SS-43)."""
+    if present is None:
+        present = path.is_file()
+    if not present:
         return Check("runbook", False, f"missing {path.name}")
-    text = path.read_text(encoding="utf-8", errors="replace").lower()
+    if text is None:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    text = text.lower()
     # Accept both English and Vietnamese section headings.
     found = {s for s in RUNBOOK_SECTIONS if s in text}
     for vi, en in _RUNBOOK_VI.items():
@@ -313,15 +332,20 @@ def pre_deploy(
             Check("isolation", Outcome.NOT_APPLICABLE, "skipped along with verification suite")
         )
 
-    dockerfile = project / "Dockerfile"
+    # SS-43 / INV-P.1, INV-A.3: the report grades ONE tree — when the suite ran on the clean worktree of HEAD, the
+    # Dockerfile / CI workflow / runbook are read at HEAD too; an uncommitted file never passes bound to a commit
+    at_head = bool(report.qa is not None and report.qa.tree == TREE_CLEAN)
+    where = " at HEAD" if at_head else ""
+    dockerfile = _tree_file(project, "Dockerfile", at_head=at_head)
     report.checks.append(
-        Check("Dockerfile", dockerfile.is_file(), "" if dockerfile.is_file() else "missing")
+        Check("Dockerfile", dockerfile is not None, "" if dockerfile is not None else f"missing{where}")
     )
+    ci = _tree_file(project, CI_PATH, at_head=at_head)
     report.checks.append(
-        Check("CI workflow", (project / CI_PATH).is_file(),
-              "" if (project / CI_PATH).is_file() else f"missing {CI_PATH}")
+        Check("CI workflow", ci is not None, "" if ci is not None else f"missing {CI_PATH}{where}")
     )
-    report.checks.append(check_runbook(project / RUNBOOK_PATH))
+    runbook = _tree_file(project, RUNBOOK_PATH, at_head=at_head)
+    report.checks.append(check_runbook(project / RUNBOOK_PATH, text=runbook, present=runbook is not None))
     return report
 
 
@@ -389,7 +413,10 @@ jobs:
         run: {bin} doctor
 
       - name: Post-hoc guard on diff
-        run: {bin} verify
+        # the scope is a repository variable (the union of the stories' write scopes); an empty scope fails closed
+        env:
+          AISEF_WRITE_SCOPE: ${{{{ vars.AISEF_WRITE_SCOPE }}}}
+        run: {bin} verify --write-scope "$AISEF_WRITE_SCOPE"
 
       - name: Verification
         run: {bin} qa
@@ -484,10 +511,13 @@ def generate(
     req = project / "docs" / "requirements.md"
     stack = detect_file(req).summary() if req.is_file() else ""
 
+    from ..harness.guardrails import ENV_PROJECT, ENV_WORKDIR, ENV_WRITE_SCOPE
     result = client.run(
         RunSpec(
             prompt=build_prompt(project, stack),
             workdir=project,
+            env={ENV_WRITE_SCOPE: ",".join(DEVSECOPS_SCOPE), ENV_PROJECT: str(project),   # SS-42 / INV-J.1
+                 ENV_WORKDIR: str(project)},
             max_turns=cfg["run.max_turns"],
             timeout_seconds=cfg["run.timeout_seconds"],
         )

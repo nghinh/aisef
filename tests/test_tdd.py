@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from aisef.control.tdd import added_tests, red_before_green, test_delta as _test_delta
+from aisef.control.tdd import added_tests, proven_red_before_green, test_delta as _test_delta
 from aisef.harness.observe import EvidenceStore
 
 
@@ -71,6 +71,11 @@ class TestTestBienMat(RepoCase):
 
 
 class TestDoTruocXanh(unittest.TestCase):
+    """Red before green, read through the proof model (SS-83): a red counts only when it shows the story's own
+    tests red for a reason the story's code decides — never a run that could not execute, never an unrelated red."""
+
+    AC = "tests/test_a.py::test_AC_S_1_x"
+
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
         self.store = EvidenceStore(self._tmp.name)
@@ -78,24 +83,33 @@ class TestDoTruocXanh(unittest.TestCase):
     def tearDown(self):
         self._tmp.cleanup()
 
-    def ev(self):
-        return self.store.read("S")
+    def proven(self):
+        return proven_red_before_green(self.store.read("S"), "S", acceptance=1, added_tests=["tests/test_a.py"],
+                                       changed=["src/a.py", "tests/test_a.py"])
+
+    def green(self):
+        self.store.tool_run("S", "test", ok=True, detail={"test_format": "pytest", "test_ids": [self.AC], "failed_ids": []})
 
     def test_green_only_is_unproven(self):
-        self.store.tool_run("S", "test", ok=True)
-        self.assertFalse(red_before_green(self.ev()))
+        self.green()
+        self.assertIsNone(self.proven())
 
-    def test_red_then_green(self):
-        self.store.tool_run("S", "test", ok=False)
-        self.store.tool_run("S", "test", ok=True)
-        self.assertTrue(red_before_green(self.ev()))
+    def test_the_storys_test_red_then_green(self):
+        self.store.tool_run("S", "test", ok=False, detail={"test_format": "pytest", "test_ids": [self.AC], "failed_ids": [self.AC]})
+        self.green()
+        self.assertIsNotNone(self.proven())
+
+    def test_a_bare_red_with_no_names_proves_nothing(self):
+        self.store.tool_run("S", "test", ok=False)          # SS-83: the old rule took this as TDD's red
+        self.green()
+        self.assertIsNone(self.proven())
 
     def test_skipped_is_not_red(self):
         self.store.tool_run("S", "test", ok=False, detail={"skipped": "chưa khai lệnh"})
-        self.store.tool_run("S", "test", ok=True)
-        self.assertFalse(red_before_green(self.ev()))
+        self.green()
+        self.assertIsNone(self.proven())
 
     def test_red_after_last_green_does_not_count(self):
-        self.store.tool_run("S", "test", ok=True)
-        self.store.tool_run("S", "test", ok=False)
-        self.assertFalse(red_before_green(self.ev()))
+        self.green()
+        self.store.tool_run("S", "test", ok=False, detail={"test_format": "pytest", "test_ids": [self.AC], "failed_ids": [self.AC]})
+        self.assertIsNone(self.proven())

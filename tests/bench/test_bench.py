@@ -1064,6 +1064,32 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
             ra = A.cut_sessions(db)
         self.assertEqual(ra, {("opencode", "bug-a2-x", 1): (2, 1)})
 
+    def test_mot_con_so_bench_thuoc_ve_dung_mot_cohort(self):
+        """D-003 (F6, 2026-09-17): `cut_sessions()` at the report's own call site — no `bench_dir` — merged
+        `.bench` and `.bench-c1b` sessions on the (condition, task, attempt) key: a task both cohorts ran counted
+        the other cohort's sessions in this cohort's cut rate. A bench number belongs to exactly one cohort: without
+        `bench_dir` the rows are those of the cohort the report collects from (`R.KEEP_DIR`), and nothing else."""
+        import sqlite3
+        import tempfile
+        from unittest import mock
+        from . import _analyze as A
+        from . import _runner as R
+        with tempfile.TemporaryDirectory() as d:
+            db = Path(d) / "opencode.db"
+            con = sqlite3.connect(db)
+            con.execute("create table part (session_id text, data text)")
+            con.executemany("insert into part values (?,?)", [
+                ("s1", '{"type":"text","text":"đọc .bench/run/opencode/bug-a2-x/a1"}'),
+                ("s1", '{"type":"text","text":"xong"}'),
+                ("s2", '{"type":"text","text":"đọc .bench-c1b/run/opencode/bug-a2-x/a1"}'),   # the OTHER cohort, same task
+                ("s2", '{"type":"text","text":"<minimax:tool_call><invoke name=\"read\">"}'),
+            ])
+            con.commit(); con.close()
+            with mock.patch.object(R, "KEEP_DIR", Path(d) / ".bench"):
+                ra = A.cut_sessions(db)
+        self.assertEqual(ra, {("opencode", "bug-a2-x", 1): (1, 0)},
+                         "the .bench-c1b session must not be counted (or cut) in the .bench cohort's row")
+
     def test_cot_phu_noi_bao_nhieu_luot_xong_gia_that_ra_bi_cat(self):
         """Không trừ vào cột "xong giả" — định nghĩa đã đóng băng trước khi
         chạy. Chỉ nói thêm, để người đọc tự trừ nếu muốn."""
@@ -1084,7 +1110,9 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
         có lỗi nào, đúng kiểu hỏng khó thấy nhất."""
         import sqlite3
         import tempfile
+        from unittest import mock
         from . import _analyze as A
+        from . import _runner as R
         with tempfile.TemporaryDirectory() as d:
             db = Path(d) / "opencode.db"
             con = sqlite3.connect(db)
@@ -1097,9 +1125,13 @@ class TestLenhAnalyzeCoThat(unittest.TestCase):
             ])
             con.commit()
             con.close()
-            ra = A.cut_sessions(db)
-        self.assertEqual(ra, {("opencode", "bug-a2-sec-1", 6): (1, 1),
-                              ("opencode", "bug-a2-sec-1", 1): (1, 0)})
+            with mock.patch.object(R, "KEEP_DIR", Path(d) / ".bench"):
+                mac_dinh = A.cut_sessions(db)
+                khac = A.cut_sessions(db, bench_dir=".bench-c1b")
+        # D-003 (F6, 2026-09-17): the other cohort is measurable when NAMED — never merged into this cohort's rows
+        # when it is not (that merge was the defect: one key, two cohorts' sessions).
+        self.assertEqual(khac, {("opencode", "bug-a2-sec-1", 6): (1, 1)})
+        self.assertEqual(mac_dinh, {("opencode", "bug-a2-sec-1", 1): (1, 0)})
 
     def test_khong_co_kho_phien_thi_chi_so_them_bi_bo_qua(self):
         """Chỉ số này là phần thêm: CI không có kho phiên của OpenCode, và bảng

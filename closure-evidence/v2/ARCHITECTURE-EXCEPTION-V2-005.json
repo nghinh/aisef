@@ -1,0 +1,127 @@
+{
+ "record": "AISEF V2 — ARCHITECTURE EXCEPTION",
+ "id": "ARCHITECTURE-EXCEPTION-V2-005",
+ "status": "APPROVED — APPLIED",
+ "frozen_items_affected": [
+  "F1 — the typed enumerations carried in event payloads: FailureCode gains exactly nine members (RFC §22.1); the journal gains format 3 with a schema for all 29 event types and a required provider/request.budget_owner (§20.1)"
+ ],
+ "consequential": [],
+ "frozen_items_changed_mechanically": [
+  "F1"
+ ],
+ "frozen_items_unchanged_mechanically": [
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "F6",
+  "F7",
+  "F8",
+  "F9",
+  "F10",
+  "F11"
+ ],
+ "promoted_from": {
+  "path": "closure-evidence/v2/WP-6.2-SCHEMA-FIT-AUDIT.json",
+  "sha256": "0dba31654c9142698a06de3c1f1ac7ecdc244f0c06b89e9ee6e9d866857cd763",
+  "note": "the WP-6.2 §2 read-only pre-code schema-fit audit (STOP report, 2026-09-25), copied byte-identically from the diagnostics directory; it is the measured defect this exception is bound to"
+ },
+ "supersedes": {
+  "path": "docs/implementation/v2/ARCHITECTURE-EXCEPTION-V2-004-PROPOSAL.md",
+  "sha256": "6b89fa2866dcb5304e6241f4b83e43afb9463375c920547879b40be0ebac32d2",
+  "status": "SUPERSEDED — NEVER APPLIED",
+  "note": "V2-004 proposed three TESTS_* codes and a tests/adequacy schema for the engineering-quality paths only; V2-005 narrows its tests semantics (an integration-owned INCOMPLETE collection is not a FailureCode; TESTS_NOT_COLLECTABLE_UNDETERMINED is not added) and covers every non-representable path (digest of the proposal document with its SUPERSEDED / NOT APPLIED header)"
+ },
+ "contradiction_discovered": "The frozen orchestration semantics (RFC §16 verifier disagreement and probe mismatch, §26 merge conflict and post-merge re-proof, §15.3 engineering-test adequacy, §25 reviewer and security findings and capability failures, §17.1 resource acquisition, §22 typed budgets) require typed states that journal format 2, the sealed FailureCode set and the provider-request budget semantics (every request charged to the developer) cannot represent. Measured, read-only, before any orchestration code: 11 of the required WP-6.2 paths DOES_NOT_FIT; four EventTypes (plan/static-admitted, proof/verified, tests/adequacy, invariant/violated) have no schema in any format.",
+ "measured": {
+  "paths_that_do_not_fit": [
+   "verifier disagreement => INDETERMINATE / INTEGRATION / stop",
+   "instrument identity mismatch between implementer and verifier records (PROBE_MISMATCH, §16 rule 2)",
+   "engineering-quality checks (EngineeringTestAdequacy) — recorded",
+   "engineering-quality checks — UNRUNNABLE execution => environment failure (§15.3)",
+   "engineering-quality checks — INADEQUATE => DEVELOPER (where policy permits blocking, §15.3)",
+   "reviewer (model) request and result",
+   "reviewer blocking finding => owner REVIEW",
+   "reviewer environment failure => ENVIRONMENT, never DEVELOPER (ORCH-6)",
+   "security scanner executes and finds issues => EXECUTED, never UNRUNNABLE (ORCH-7); findings => owner SECURITY",
+   "merge conflict => INTEGRATION, zero developer charge (ORCH-8)",
+   "environment failure while acquiring a scope resource (worktree, sandbox)"
+  ],
+  "event_types_without_any_schema": [
+   "plan/static-admitted",
+   "proof/verified",
+   "tests/adequacy",
+   "invariant/violated"
+  ],
+  "event_types": 29,
+  "writable_in_format_2": 25
+ },
+ "discovered_in": {
+  "phase": "P6 (WP-6.2 §2 read-only schema-fit audit)",
+  "candidate": "116b92a39ef5bff2846ab8978550276f446d8a5d",
+  "flagged_by_implementation": "AISEF V2 — WP-6.2 STOPPED AT §2 (schema-fit audit): 11 DOES_NOT_FIT paths; no orchestration code written"
+ },
+ "owner_decision": {
+  "decision": "AISEF V2 — OWNER RESOLUTION OF WP-6.2 SCHEMA STOP / ARCHITECTURE EXCEPTION V2-005",
+  "date": "2026-09-25",
+  "approved": "V2-005 APPROVED; the STOP accepted; V2-004 SUPERSEDED / NEVER APPLIED; WP-6.2 resumes only after this amendment is recorded, freeze and conformance are regenerated and the amendment-specific tests pass; WP-6.3 not authorized",
+  "refinements": [
+   "journal FORMAT 3: format 2 remains a supported historical reader/writer exactly; no rewrite or migration of old journals; schemas for all 29 EventTypes, each derived from existing frozen typed objects; no new EventType; no prose field as control",
+   "proof/verified is a lossless VerifiedProof (spec identity, candidate identity, both results' identity and evidence, agreement, verdict only with agreement); immutable source-seq references are permitted when exact reconstruction is mechanically proven",
+   "tests/adequacy serialises the WP-5 typed result with the two-axis semantics; TESTS_UNRUNNABLE (ENVIRONMENT, retryable) and TESTS_INADEQUATE (DEVELOPER, retryable); TESTS_NOT_COLLECTABLE_UNDETERMINED is NOT added; an integration-owned INCOMPLETE collection is recorded in tests/adequacy and gate evidence only — never failure/observed, never rollback or retry by itself",
+   "invariant/violated carries the invariant id, the owning module and diagnostic context (evidence only, never routing); InvariantError stays uncontainable; no correctness depends on appending it",
+   "plan/static-admitted is the StaticPlanAdmissionResult; WP-6.2 need not run static admission at runtime",
+   "exactly nine FailureCodes: VERIFIER_DISAGREEMENT INTEGRATION retryable=false; PROBE_MISMATCH INTEGRATION retryable=false; MERGE_CONFLICT INTEGRATION retryable=false; TESTS_UNRUNNABLE ENVIRONMENT retryable=true; TESTS_INADEQUATE DEVELOPER retryable=true; REVIEW_FINDING REVIEW retryable=true; SECURITY_FINDING SECURITY retryable=true; CAPABILITY_UNRUNNABLE ENVIRONMENT retryable=true; RESOURCE_ACQUISITION_FAILED ENVIRONMENT retryable=true; a tenth is a STOP",
+   "format-3 provider/request requires budget_owner: Owner (cycle 1: DEVELOPER, REVIEW, SECURITY); budgets charge budget_owner and never default it; provider failure keeps owner PROVIDER; format-2 semantics unchanged",
+   "review = provider/request + provider/result + gate/check; a model review alone is never the sole blocking authority; REVIEW_FINDING only with corroborated authority; reviewer outage stays PROVIDER; a capability that cannot run is CAPABILITY_UNRUNNABLE / ENVIRONMENT",
+   "security = tool/invoked + tool/result + gate/check; ran-and-found is EXECUTED; SECURITY_FINDING typed from the adapter result, never parsed text",
+   "MERGE_CONFLICT and RESOURCE_ACQUISITION_FAILED never from stderr text",
+   "the six projections stay the closed list; only their handling of the new typed events and codes is extended; reference models updated independently; no side counters; no seventh projection",
+   "P5 sealed: P5-FINAL-SEAL not regenerated; P5 evidence files not mutated; current HEAD conformance may cite V2-005",
+   "no Owner change, no EventType member added, no change to the six projections' identity"
+  ]
+ },
+ "replacement": {
+  "summary": "Journal format 3 (aisef2/journal/format3.py): the format-1 and format-2 schemas as they were, five re-declared (run/begin accepts 3; failure/observed carries the whole §22.1 taxonomy; provider/request requires budget_owner; plan/static-admitted, proof/verified, tests/adequacy, invariant/violated gain schemas), a format-aware reader that reads formats 1, 2 and 3 each under its own rules and refuses any other, and a writer that never extends a format-1 or format-2 journal. FailureCode = the 13 historical codes (the only ones formats 1 and 2 may carry) + the nine V2-005 codes. budgets projection version 2 charges a format-3 request to its budget_owner; story_state version 2 admits proof/verified and tests/adequacy in ACTIVE; invariant/violated is ignored by every projection.",
+  "not_changed": [
+   "Owner (7, F3)",
+   "EventType (29, F1 vocabulary)",
+   "ControlProjection (6, F11)",
+   "formats 1 and 2 as written: schemas, readers, writers, repair closers, evidence",
+   "P1–P5 seals and approvals",
+   "the routing table F2",
+   "the probe protocol F5"
+  ]
+ },
+ "f1_impact": "FailureCode: 13 -> 22 members; journal format 3 declared; provider/request gains a required field under format 3 only. Existing events are not re-interpreted: a format-1 or format-2 journal is read exactly as before, and the new codes are refused there (FMT3-5).",
+ "evidence_compatibility_impact": "Evidence written under formats 1 and 2 is unchanged and still validates under its own format. No format-2 journal is rewritten or auto-upgraded (FMT3-7). P1–P4 evidence records whose derivation includes the taxonomy, the projection versions or the run scope's journal format are re-derived at this candidate (the precedent of the P2, P4 and P5 candidates); P1–P5 seal records stay byte-identical; P5 evidence files stay byte-identical and are verified by identity against P5-FINAL-SEAL rather than re-derived (validation/v2/p5_evidence.py --check).",
+ "implementation_decisions_for_owner_review": [
+  "formats 1 and 2 enforce their historical code set (FORMAT_2_CODES) in their failure/observed schema: a new code in an old format is refused rather than read (FMT3-5)",
+  "proof/verified cites the two immutable probe/evaluated records (implementer, verifier) by seq; format3.verified_proof(event, prior) reconstructs the VerifiedProof mechanically and the schema rule proves instrument identity and agreement from the cited records",
+  "post-merge re-proof at the merged revision happens before story/commit, so its probe/evaluated records stay within the attempt and a POST_MERGE_REGRESSION still rolls the story back",
+  "P3-PROJECTION-SEMANTICS.md gains version-2 sections for budgets and story_state (the precedent: the document was extended after the P3 seal by P4 and its post-seal hygiene)",
+  "RFC §22.1 pins the 13 historical codes exactly as sealed with P1 (V2-003 included) — no semantic change to them — so 'no other code' is mechanically checkable (F1.failure_taxonomy)",
+  "the P5-INVARIANTS record cannot be re-derived byte-identically at any later HEAD (its mechanism digest hashes mechanism module sources; its except-boundary count grows with the kernel), so the sealed P5 records are identity-checked against the seal"
+ ],
+ "digests": {
+  "rfc_normative_digest": {
+   "before": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
+   "after": "eea2e10fa0b40cf9e04da3282441e485883df146ddff70ee5ad9949f32f7574a"
+  },
+  "freeze_table_digest": {
+   "before": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7",
+   "after": "92605a0ea18da992efeab69357ebbfaa9c898b5f17ad75e172864874df70c688"
+  },
+  "f1_row_sha256": {
+   "before": "c7ef7e857d4dbafa17d8b0ed39f0d619a5c834f7f09460c74f17338f19cbc9b0",
+   "after": "27c00d53fb8655a75666e34d3195570cb48c38d552b78c0264c02cca420617f0"
+  },
+  "schema_fit_audit_sha256": "0dba31654c9142698a06de3c1f1ac7ecdc244f0c06b89e9ee6e9d866857cd763",
+  "v2_004_proposal_sha256": "6b89fa2866dcb5304e6241f4b83e43afb9463375c920547879b40be0ebac32d2"
+ },
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "AISEF V2 — OWNER RESOLUTION OF WP-6.2 SCHEMA STOP / ARCHITECTURE EXCEPTION V2-005",
+  "date": "2026-09-25"
+ }
+}

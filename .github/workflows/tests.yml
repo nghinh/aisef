@@ -32,7 +32,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m unittest discover -s tests -q
+      # WP-4.2 / process-leak discipline: the suite runs inside an OS-owned process range; the job fails when an owned
+      # process outlives it (or escapes it), even if every test passed. Measured, never grepped.
+      - run: python -P validation/v2/owned_run.py -- python -m unittest discover -s tests -q
+      # WP-0.4 — V1 closure evidence is frozen. The suite arms an in-process guard at discovery; this step is
+      # the detective layer and runs AFTER the suite, on every OS, so a test that rewrote V1 evidence by any
+      # route (including a subprocess) fails the build. Compares git objects, so Windows autocrlf is safe.
+      - run: python -P validation/v2/v1_evidence_guard.py --check
 
   # Cổng lint — bật 2026-09-12. Tập rule ở `[tool.ruff.lint]` của pyproject là
   # cổng chứ không phải sở thích: F (pyflakes), B (bugbear), E9. Lượt bật đã bắt
@@ -67,6 +73,13 @@ jobs:
         run: |
           python -m venv /tmp/venv
           /tmp/venv/bin/pip install --no-index dist/*.whl
+      # P0 (V2): `include = ["aisef*"]` also matches `aisef2`, the V2 scaffolding kept out by pyproject's exclude.
+      # `python -m build` builds this wheel FROM the sdist, so this is the rebuilt-from-sdist case.
+      - name: V2 scaffolding (aisef2) is not in the wheel and cannot be imported from it
+        run: |
+          set -eu
+          python -c "import sys,zipfile,glob; n=[m for m in zipfile.ZipFile(glob.glob('dist/*.whl')[0]).namelist() if m.startswith('aisef2')]; sys.exit(f'aisef2 shipped in the wheel: {n}' if n else 0)"
+          cd /tmp && /tmp/venv/bin/python -I -c "import importlib.util,sys; sys.exit('aisef2 importable from the installed wheel' if importlib.util.find_spec('aisef2') else 0)"
       - name: the command runs and reports the packaged version
         run: |
           set -eu

@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 13 items
+
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps PASSED [  7%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_byte_identical_across_element_equal_dicts PASSED [ 15%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_encoded_as_utf8_literal PASSED [ 23%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_key_order_independent PASSED [ 30%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_literal_seven_char_string PASSED [ 38%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads PASSED [ 46%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte PASSED [ 53%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_equivalent PASSED [ 61%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_3_import_prints_init_path PASSED [ 69%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_4_cli_help_lists_subcommands PASSED [ 76%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports PASSED [ 84%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_6_no_side_channel_calls PASSED [ 92%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable PASSED [100%]
+
+============================== 13 passed in 0.12s ==============================

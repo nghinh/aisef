@@ -242,7 +242,11 @@ class _Gia(unittest.TestCase):
         R.KEEP_DIR = self.giu
         for k, v in self.cu.items():
             os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
-        self._tmp.cleanup()
+        try:
+            self._tmp.cleanup()
+        except OSError:                      # D-024 / F5: a late writer or a read-only object; the shared remover retries
+            from aisef.kit.fetch import remove_tree
+            remove_tree(self.tmp)
 
     def _goi(self) -> list[dict]:
         return [json.loads(x) for x in self.log.read_text(encoding="utf-8").splitlines()]

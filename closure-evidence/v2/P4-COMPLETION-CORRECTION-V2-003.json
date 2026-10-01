@@ -1,0 +1,1682 @@
+{
+ "record": "AISEF V2 — P4 COMPLETION CORRECTION (ARCHITECTURE-EXCEPTION-V2-003)",
+ "authority": "owner decision 'AISEF V2 — OWNER DECISION ON ARCHITECTURE EXCEPTION V2-003' (2026-09-23): OPTION 1 — PROVENANCE-SPLIT approved with refinements",
+ "supersedes": {
+  "path": "closure-evidence/v2/P4-COMPLETION.json",
+  "sha256": "18864746d3592e9a62cb08abd27aff45e1db1257740cff4db36efe7dac2e50d6",
+  "verdict": "P4 STOPPED — ARCHITECTURE EXCEPTION REQUIRED (V2-003); everything else green",
+  "rule": "the historical P4 STOP record is unchanged; it remains what P4 delivered before V2-003"
+ },
+ "original_p4": {
+  "candidate": "d234be9181254021cc2fea4ba0379422cbd54348",
+  "completion_record_commit": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0"
+ },
+ "corrected_candidate": {
+  "commit": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+  "tree": "c14973c3acd5b660855d66f38bee182620a23481",
+  "aisef2_tree": "2e082bef0fb9039335c01926cc9772915b0a2a24",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+ },
+ "exception": {
+  "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+  "sha256": "8dcc296574f9978d28822bff51ecd94dadf005c31ffb98e2b8da308765f0c2f9",
+  "status": "APPROVED — APPLIED",
+  "promoted_from": {
+   "path": "docs/implementation/v2/ARCHITECTURE-EXCEPTION-V2-003-PROPOSAL.md",
+   "sha256": "2d61d3e9f2f9cfe6ec4fa032d57c071fb69df65bc73b15263d01cf428a4a927d"
+  }
+ },
+ "amendment": {
+  "path": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+  "sha256": "b8f618a235e7f508d70547ccc4cc6c79c7651df5d9e03c5ba3378c0c09fb3cfb",
+  "frozen_items_changed": [
+   "F1",
+   "F2",
+   "F5"
+  ]
+ },
+ "frozen_item_impact": {
+  "F1": {
+   "verdict": "AFFECTED — declared, and no format version bump is required",
+   "question": "§6 of the owner decision: is IndeterminateReason serialized in an event payload, in an event schema, or in an F1 enum catalog used to interpret existing journals?",
+   "determined_mechanically": {
+    "IndeterminateReason": "NO. The payload enums of journal format 1 are ControlProjection, FailureCode, ObligationRole, Owner and StoryAdmissionDisposition (aisef2/journal/event.py SCHEMAS); format 2 adds Enforcement, IdentityGrade, OperationOutcome, ReleaseStatus, ResourceKind and SignalProvenance (aisef2/journal/format2.py). IndeterminateReason, BehaviorVerdict and ProbeResult appear nowhere under aisef2/journal, and F1's conformance catalog (F1.payload_enum.*) lists Vacuity, Relevance, AdequacyOutcome, TestExecutionStatus, TestOutcome and TestSelection. The new reason therefore touches F2's vocabulary, not F1's.",
+    "FailureCode": "YES. failure/observed carries code: _enum(FailureCode), so the taxonomy is a typed enumeration carried in an event payload, and F1 freezes those. Adding NON_CONTROLLER_SIGNAL grows it, so F1 is declared affected."
+   },
+   "compatibility": [
+    "no existing member changes meaning, so no existing event is reinterpreted — the reason F1 freezes payload enums at all",
+    "no journal written before this amendment can contain the new value; old journals remain valid under their original format identity and read byte-identically",
+    "a reader that does not know the member refuses the event (fail closed), never misreads it",
+    "no new event type and no new payload field, so §35 requires no format version bump; the frozen compatibility mechanism (journal format 2) is unchanged and still reads format-1 journals"
+   ]
+  },
+  "F2": "the owner routing table gains one measurement-point-aware row per point for INDETERMINATE(NON_CONTROLLER_SIGNAL) -> INTEGRATION, never retryable; §10.2 names the reason. PRECONDITION_ABSENT routing (V2-001) and the ContractSatisfaction derivation are unchanged.",
+  "F4": "no rule changes. The probe digest changes, so every python_callable ProductProofSpec derives a new semantic_hash; evidence under the old id stays valid for the old id and never satisfies the new one.",
+  "F5": "new §9.3: after DISPATCHED the controller's own signal ledger decides. Its own signal is an interruption with no ProbeResult; a signal it did not send is EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL). Before DISPATCHED §9.2 (V2-002) is unchanged."
+ },
+ "architecture_digests": {
+  "rfc_normative_digest": {
+   "before": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+   "after": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771"
+  },
+  "freeze_table_digest": {
+   "before": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114",
+   "after": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7"
+  },
+  "f1_row_sha256": {
+   "before": "b0b1b6d6914cda85c16ebc9538a8408e7360752dbdf880ca54987460329eb24b",
+   "after": "c7ef7e857d4dbafa17d8b0ed39f0d619a5c834f7f09460c74f17338f19cbc9b0"
+  },
+  "f2_row_sha256": {
+   "before": "e33271cd13c7752c6f2fe154cb827f9ee46586ac27d38257f9577470ab4188ca",
+   "after": "d129883bfdf9ce3ab795efdaf144e3d3af231f128c73bc62f1b5de78f0ada803"
+  },
+  "f5_row_sha256": {
+   "before": "5c1bf5f75fcb569908893539c7787a228cc865d18d87ee8408a67cd161742ec5",
+   "after": "92ba9a46280167855e2adb8c552062325432593b3a7e75f0ce3383a4a2483735"
+  },
+  "lineage": [
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "sha256": "b8f618a235e7f508d70547ccc4cc6c79c7651df5d9e03c5ba3378c0c09fb3cfb"
+   }
+  ],
+  "lineage_valid": true,
+  "effective": {
+   "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
+   "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7"
+  }
+ },
+ "probe_identity": {
+  "probe_id": "probe.python_callable",
+  "sources": [
+   "probe/protocol.py",
+   "probe/python_callable.py"
+  ],
+  "digest": {
+   "before": "27785f8af066298cee1098bedf981d4cc1e9f9000a29105f748c586ae5f3dc73",
+   "after": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "after_first_applied": "07281265f698ed00765119f27a0800e86c3c1807c6bf60428a112ed55fecca12",
+   "note": "the first applied form of §9.3 (digest 07281265…) carried a dead operand in _watch's end-of-protocol branch (`elif ended or tag == \"EOF\"`, the second operand unreachable); the corrected candidate removed it rather than audit a kernel mutant (tests/v2/p2/test_mutation_targets.py: only reference models are audited), so the probe digest changed once more to c335293e…; calibration was re-established by execution for it and every python_callable.py mutation target re-measured"
+  },
+  "committed_python_callable_specs_bound_to_the_real_digest": 0,
+  "semantic_hash_regeneration": {
+   "committed_identities_regenerated": 0,
+   "why": "every python_callable ProductProofSpec is derived by the compiler from the contract corpus; the committed corpus specs declare fixture probe identities, so no committed spec was bound to the real probe digest. The derivation itself changes, as measured below, and gen_specs.py --check passes on the corpus.",
+   "measured_example": {
+    "contract": "BC-ADD (python_callable app.calc:add returns 3)",
+    "old_spec_id": "PPS-912221c06f70",
+    "old_semantic_hash_prefix": "de29383096c00d7a",
+    "new_spec_id": "PPS-d35c7edabfa1",
+    "new_semantic_hash_prefix": "974f567eb4fde5d0",
+    "under_the_first_applied_digest_07281265": {
+     "spec_id": "PPS-b6878f7515f1",
+     "semantic_hash_prefix": "afaa99ccbc0a9895"
+    }
+   },
+   "rule": "§35: evidence under the old semantic_hash remains valid for the old id and MUST NOT be reused for the new one; a spec bound to the old digest is refused INVALID_SPEC (scenario D)"
+  }
+ },
+ "calibration": {
+  "re_established_by_execution": true,
+  "probe_digest": [
+   "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e"
+  ],
+  "observation_classes": [
+   "exists",
+   "returns",
+   "raises",
+   "blocks"
+  ],
+  "properties": {
+   "contrast_for_both_polarities": true,
+   "reference_probe_qualified_for_every_class": true,
+   "CAL_1_always_refuted_prohibition_probe_rejected": true,
+   "always_satisfied_probe_rejected_for_must_hold": true,
+   "PROBE_META_1_protocol_only_probe_calibrated": true,
+   "blocks_class_calibrated": true,
+   "spec_falsifiability_not_a_plan_freeze_input": true,
+   "f5_calibration_contracts_equal_rfc": true
+  },
+  "rule": "no calibration record was copied and re-digested: p2_evidence.py runs the calibration fixtures against the new digest (CAL-1 / CAL-2 unchanged; the protocol-only probe of V2-002 still calibrates)"
+ },
+ "sig_probe_cases": {
+  "SIG-PROBE-1 signal before DISPATCHED -> UNRUNNABLE / ENVIRONMENT": {
+   "status": "UNRUNNABLE",
+   "behavior_verdict": null,
+   "reason": null,
+   "contract_satisfaction": null,
+   "owner_at_candidate": "ENVIRONMENT",
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "ENVIRONMENT"
+   ]
+  },
+  "SIG-PROBE-2 controller stop -> interruption, no ProbeResult": {
+   "produced_a_result": null,
+   "interrupted": true,
+   "stage": "terminate",
+   "signal": 15,
+   "detail": "the controller stopped this observation (terminate): what the subject did is not known"
+  },
+  "SIG-PROBE-3/4 subject abort / self-signal -> EXECUTED + INDETERMINATE(NON_CONTROLLER_SIGNAL)": {
+   "status": "EXECUTED",
+   "behavior_verdict": "INDETERMINATE",
+   "reason": "NON_CONTROLLER_SIGNAL",
+   "contract_satisfaction": "INDETERMINATE",
+   "owner_at_candidate": "INTEGRATION",
+   "enforcement": "PARTIAL",
+   "owners_anywhere": [
+    "INTEGRATION"
+   ]
+  },
+  "SIG-PROBE-5 CANDIDATE": "NON_CONTROLLER_SIGNAL -> INTEGRATION, not retryable, no budget",
+  "SIG-PROBE-6 PARENT": "PROBE_INVALID, owner INTEGRATION; never READY or PRE_SATISFIED; no developer or provider request",
+  "SIG-PROBE-7 POST_MERGE": "INTEGRATION, not retryable; no regression inferred",
+  "SIG-PROBE-8 restoring post-dispatch signal -> UNRUNNABLE": "F5 conformance FAILS (measured in the test)",
+  "SIG-PROBE-9 routing the reason to DEVELOPER or ENVIRONMENT": "F2 conformance FAILS (measured in the test)",
+  "SIG-PROBE-10 same exit, different ledger": "interruption vs executed-indeterminate — provenance, not signal number",
+  "tests": [
+   "tests/v2/p2/test_signal_provenance.py",
+   "tests/v2/p2/test_python_callable.py"
+  ],
+  "properties": {
+   "SIG_PROBE_the_same_signal_exit_splits_by_provenance": true,
+   "SIG_PROBE_a_non_controller_signal_is_never_environment": true
+  }
+ },
+ "preserved_prior_cases": {
+  "V2-001 (measurement-point routing, PRECONDITION_ABSENT)": "OWNER-MP-1..4, CRED-1..4 — tests/v2/p1/test_routing.py, P1 evidence regenerated",
+  "V2-002 (harness timeout vs subject deadline)": "TIME-1..5, PROBE-ABS-1..5, PROBE-BIND-1/2, PROBE-META-1, NEG-1..3, CAL-1/CAL-2 — tests/v2/p2, P2 evidence regenerated",
+  "P4 (this phase)": "RUN-1..4, WIN-PID-1/2, PROC-OWN-1/2, SCOPE-1..3, D-024, SS-64, D-006, INTERRUPT-SIG-1..3 — every property true in the P4 evidence"
+ },
+ "p4_packages": {
+  "WP-4.1": {
+   "format_1_immutable_and_read_the_same": true,
+   "resource_order_enforced_by_the_journal": true,
+   "format_2_writer_keeps_the_p3_discipline": true,
+   "SCOPE_1_acquire_during_disposal_refused": true,
+   "SCOPE_2_remaining_resources_still_disposed_and_failure_recorded": true,
+   "SCOPE_3_same_graph_same_disposal_order": true,
+   "no_resource_escapes_unaccounted": true,
+   "story_scope_owns_no_journal_writer": true
+  },
+  "WP-4.2": {
+   "normal_tree_reaped_and_measured_empty": true,
+   "D_024_red_before": true,
+   "D_024_green_after": true,
+   "WIN_PID_1_cycle_terminates_bounded_nothing_unowned_targeted": true,
+   "WIN_PID_2_unrelated_process_never_targeted": true,
+   "PROC_OWN_1_controller_death_leaves_nothing_owned": true,
+   "PROC_OWN_1_runner_timeout_takes_the_tree_down": true,
+   "PROC_OWN_2_never_signalled_after_disposal": true,
+   "not_empty_is_residual_never_silent_success": true,
+   "every_case_green": true
+  },
+  "WP-4.3": {
+   "RUN_1_durable_run_end_without_clean_is_torn": true,
+   "RUN_2_a_held_lease_blocks_a_second_run": true,
+   "RUN_3_writer_close_failure_leaves_open": true,
+   "RUN_4_clean_failure_leaves_open": true,
+   "lease_released_last_on_every_path": true,
+   "P3_RESIDUAL_DISPOSAL_ORDER_enforced": true,
+   "story_scopes_dispose_before_run_finalisation": true,
+   "no_gate_may_cite_the_sentinel": true,
+   "f8_conformance_pass": true
+  },
+  "WP-4.4": {
+   "scenario_H_detected_for_verified_graded_attested_otherwise": true,
+   "OPAQUE_bars_Q6": true,
+   "enforcement_change_breaks_comparability": true,
+   "provider_and_model_identity_changes_visible": true,
+   "checkout_path_is_a_locator_never_identity_full_sha_authoritative": true,
+   "runspec_hash_stable_and_total": true,
+   "no_hidden_identity_fallback": true,
+   "every_case_green": true,
+   "f9_conformance_pass": true
+  },
+  "WP-4.5": {
+   "SS_64_cap_never_falls_through": true,
+   "D_006_no_developer_charge_for_credential_or_environment": true,
+   "PRE_SATISFIED_and_PLAN_CONTRADICTION_charge_no_developer_budget": true,
+   "only_typed_chargeable_outcomes_charge_their_budget": true,
+   "budgets_reconstruct_exactly_from_the_journal": true,
+   "no_side_retry_counter": true,
+   "every_case_green": true
+  },
+  "WP-4.6": {
+   "INTERRUPT_SIG_1_controller_stop_distinguishable": true,
+   "INTERRUPT_SIG_2_signal_exit_never_an_owner": true,
+   "INTERRUPT_SIG_3_unknown_is_outcome_unknown_not_started_before_dispatch": true,
+   "no_interruption_creates_a_gap": true,
+   "repair_idempotent_and_byte_identical": true,
+   "abandonment_explicit": true,
+   "scopes_dispose_before_run_finalisation_and_failures_stay_evidence": true,
+   "every_case_green": true
+  }
+ },
+ "evidence_recomputed": {
+  "closure-evidence/v2/P2-CALIBRATION.json": {
+   "before": "cce5be0610ab2bed69c047cd037d32d656c7975902b33730e8b9248c25c87cb7",
+   "after": "eac1dd8414ba04906c85552251e492444d9639d8249be40490af282e97f59383"
+  },
+  "closure-evidence/v2/P2-PROBE-PROTOCOL.json": {
+   "before": "905b1a27c2f32665d963ef8ee96588052cc3fb841665f2c7ed53c9b77c29dc30",
+   "after": "0ac798ca4776d1722a3e30814f4777831f568f8320c201cbdfb6e4cccc49ba26"
+  },
+  "closure-evidence/v2/P1-ROUTING-TABLE.json": {
+   "before": "de89fed966e38abb53704d264f53db47ad3c09eca0cfd17ba7a8724c8fcc8c83",
+   "after": "d7789f6b83df76ae7866084b3d23574d84d4092306996758717756694677c5be"
+  },
+  "closure-evidence/v2/P2-STORY-ADMISSION.json": {
+   "before": "ebba10c70600d9bc6fe39a85eb87e2ee8fcbf2db42ec96573c1bcbce259a2fdd",
+   "after": "ebba10c70600d9bc6fe39a85eb87e2ee8fcbf2db42ec96573c1bcbce259a2fdd"
+  },
+  "closure-evidence/v2/P1-OUTCOME-POLARITY.json": {
+   "before": "09f55499e5e4697517d45c1bd4a759701934fcd91a698a6555834b134c5cca74",
+   "after": "09f55499e5e4697517d45c1bd4a759701934fcd91a698a6555834b134c5cca74"
+  },
+  "closure-evidence/v2/F-CONFORMANCE.json": {
+   "before": "18563bc01d0fbdec410966faec57798f6b5dfe6216cd365dd753fdb2d801b169",
+   "after": "97c1354c5d195b6d8df70cd01bedcdc0fa3fd4efa9711c3dc5c899504053b598"
+  },
+  "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json": {
+   "before": "ef545eb8040f3928678676b4ddf63d6f2813086a5b99bdd45957013796d00aad",
+   "after": "f310d92da71c0e9b03c3554f10ad90e6a73fbbd434d0f22c3934ae2f5457e094"
+  },
+  "closure-evidence/v2/P2-STATIC-ADMISSION.json": {
+   "before": "c31658f748a7df560d8ae2a96f684508bb16a3b395637f8bb482f0ebabac006a",
+   "after": "c31658f748a7df560d8ae2a96f684508bb16a3b395637f8bb482f0ebabac006a"
+  },
+  "closure-evidence/v2/P1-SPEC-COMPILER.json": {
+   "before": "e541103de6cb2f6a40d9167a29186f11f5d268b665ddbd33d129f59a6ecfab7f",
+   "after": "e541103de6cb2f6a40d9167a29186f11f5d268b665ddbd33d129f59a6ecfab7f"
+  },
+  "closure-evidence/v2/P1-CONTRACT-SHAPES.json": {
+   "before": "44258486128028e00d5275c182c039b37e60ed4ed25a044aea09d6fbbfa3b560",
+   "after": "44258486128028e00d5275c182c039b37e60ed4ed25a044aea09d6fbbfa3b560"
+  },
+  "closure-evidence/v2/P2-PLAN-DRIFT.json": {
+   "before": "3ee55f8aaf7e6eaef85a987fd2030733d5c88066d7df98f956d67a59765ca071",
+   "after": "3ee55f8aaf7e6eaef85a987fd2030733d5c88066d7df98f956d67a59765ca071"
+  }
+ },
+ "mutation": {
+  "P1": {
+   "targets": 18,
+   "mutants": 761,
+   "killed": 761,
+   "survivors": 0
+  },
+  "P2": {
+   "targets": 41,
+   "mutants": 1211,
+   "killed": 1211,
+   "survivors": 0
+  },
+  "P3": {
+   "targets": 52,
+   "mutants": 1738,
+   "killed": 1730,
+   "survivors": 8
+  },
+  "P4": {
+   "targets": 98,
+   "mutants": 1590,
+   "killed": 1590,
+   "survivors": 0
+  }
+ },
+ "checker_calibration": {
+  "calibrated": 30,
+  "checkers": 30
+ },
+ "f1_f11": {
+  "current_phase": "P4",
+  "summary": {
+   "PASS": 10,
+   "PENDING": 1,
+   "FAIL": 0
+  },
+  "items": {
+   "F1": "PASS",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PASS",
+   "F6": "PASS",
+   "F7": "PASS",
+   "F8": "PASS",
+   "F9": "PASS",
+   "F10": "PENDING",
+   "F11": "PASS"
+  }
+ },
+ "process_ownership": {
+  "owned_processes_after_the_local_suite": 0,
+  "owned_escaped": [],
+  "owned_range_mechanism": "posix-session-and-group",
+  "ci": {
+   "before": 0,
+   "after": 0,
+   "escaped": 0,
+   "released_empty": true
+  },
+  "rule": "no P4 result is weakened by V2-003; the probe's harness now runs inside an owned range too"
+ },
+ "run_history": {
+  "path": "closure-evidence/v2/P4-RUN-HISTORY.json",
+  "attempts": 81,
+  "failed": 19,
+  "retries": 0,
+  "entries": [
+   {
+    "seq": 1,
+    "commit": "1d2261721c83b859323b97e0588bd8eec3b86216",
+    "where": "local",
+    "job": null,
+    "package": "P3 final seal (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 4168,
+    "classification": null
+   },
+   {
+    "seq": 2,
+    "commit": "1d2261721c83b859323b97e0588bd8eec3b86216",
+    "where": "ci",
+    "job": "lint",
+    "package": "P3 final seal (post-seal verification)",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 3,
+    "commit": "1d2261721c83b859323b97e0588bd8eec3b86216",
+    "where": "ci",
+    "job": "wheel",
+    "package": "P3 final seal (post-seal verification)",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 4,
+    "commit": "1d2261721c83b859323b97e0588bd8eec3b86216",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "P3 final seal (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 4165,
+    "classification": null
+   },
+   {
+    "seq": 5,
+    "commit": "1d2261721c83b859323b97e0588bd8eec3b86216",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "P3 final seal (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 4165,
+    "classification": null
+   },
+   {
+    "seq": 6,
+    "commit": "1d2261721c83b859323b97e0588bd8eec3b86216",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "P3 final seal (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 4165,
+    "classification": null
+   },
+   {
+    "seq": 7,
+    "commit": "1d2261721c83b859323b97e0588bd8eec3b86216",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "P3 final seal (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 4165,
+    "classification": null
+   },
+   {
+    "seq": 8,
+    "commit": "1d2261721c83b859323b97e0588bd8eec3b86216",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "P3 final seal (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 4162,
+    "classification": null
+   },
+   {
+    "seq": 9,
+    "commit": "affae7dad04a2b8c7e1882fb0a68bba2e4541097",
+    "where": "local",
+    "job": null,
+    "package": "WP-4.1",
+    "result": "PASS",
+    "tests_run": 4203,
+    "classification": null
+   },
+   {
+    "seq": 10,
+    "commit": "cfe14c03ec5bab05c8559628a249109f123bbc20",
+    "where": "local",
+    "job": null,
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": 4228,
+    "classification": null
+   },
+   {
+    "seq": 11,
+    "commit": "cfe14c03ec5bab05c8559628a249109f123bbc20",
+    "where": "ci",
+    "job": "lint",
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 12,
+    "commit": "cfe14c03ec5bab05c8559628a249109f123bbc20",
+    "where": "ci",
+    "job": "wheel",
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 13,
+    "commit": "cfe14c03ec5bab05c8559628a249109f123bbc20",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "WP-4.2",
+    "result": "FAIL",
+    "tests_run": 4225,
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 14,
+    "commit": "cfe14c03ec5bab05c8559628a249109f123bbc20",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "WP-4.2",
+    "result": "FAIL",
+    "tests_run": 4225,
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 15,
+    "commit": "cfe14c03ec5bab05c8559628a249109f123bbc20",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "WP-4.2",
+    "result": "FAIL",
+    "tests_run": 4225,
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 16,
+    "commit": "cfe14c03ec5bab05c8559628a249109f123bbc20",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "WP-4.2",
+    "result": "FAIL",
+    "tests_run": 4225,
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 17,
+    "commit": "cfe14c03ec5bab05c8559628a249109f123bbc20",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "WP-4.2",
+    "result": "FAIL",
+    "tests_run": 0,
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 18,
+    "commit": "844ffc9fca4fd885101339efb95e52636d8e534c",
+    "where": "local",
+    "job": null,
+    "package": "WP-4.2",
+    "result": "FAIL",
+    "tests_run": 4230,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 19,
+    "commit": "7f63051368e5500311cde12640788df4f330487f",
+    "where": "local",
+    "job": null,
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": 4230,
+    "classification": null
+   },
+   {
+    "seq": 20,
+    "commit": "7f63051368e5500311cde12640788df4f330487f",
+    "where": "ci",
+    "job": "lint",
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 21,
+    "commit": "7f63051368e5500311cde12640788df4f330487f",
+    "where": "ci",
+    "job": "wheel",
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 22,
+    "commit": "7f63051368e5500311cde12640788df4f330487f",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": 4227,
+    "classification": null
+   },
+   {
+    "seq": 23,
+    "commit": "7f63051368e5500311cde12640788df4f330487f",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": 4227,
+    "classification": null
+   },
+   {
+    "seq": 24,
+    "commit": "7f63051368e5500311cde12640788df4f330487f",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": 4227,
+    "classification": null
+   },
+   {
+    "seq": 25,
+    "commit": "7f63051368e5500311cde12640788df4f330487f",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "WP-4.2",
+    "result": "PASS",
+    "tests_run": 4227,
+    "classification": null
+   },
+   {
+    "seq": 26,
+    "commit": "7f63051368e5500311cde12640788df4f330487f",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "WP-4.2",
+    "result": "FAIL",
+    "tests_run": 4224,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 27,
+    "commit": "0e34a1ad071a196860a219a1a8acf237fd339701",
+    "where": "local",
+    "job": null,
+    "package": "WP-4.1/4.2",
+    "result": "PASS",
+    "tests_run": 4230,
+    "classification": null
+   },
+   {
+    "seq": 28,
+    "commit": "0e34a1ad071a196860a219a1a8acf237fd339701",
+    "where": "ci",
+    "job": "lint",
+    "package": "WP-4.1/4.2",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 29,
+    "commit": "0e34a1ad071a196860a219a1a8acf237fd339701",
+    "where": "ci",
+    "job": "wheel",
+    "package": "WP-4.1/4.2",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 30,
+    "commit": "0e34a1ad071a196860a219a1a8acf237fd339701",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "WP-4.1/4.2",
+    "result": "PASS",
+    "tests_run": 4227,
+    "classification": null
+   },
+   {
+    "seq": 31,
+    "commit": "0e34a1ad071a196860a219a1a8acf237fd339701",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "WP-4.1/4.2",
+    "result": "PASS",
+    "tests_run": 4227,
+    "classification": null
+   },
+   {
+    "seq": 32,
+    "commit": "0e34a1ad071a196860a219a1a8acf237fd339701",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "WP-4.1/4.2",
+    "result": "PASS",
+    "tests_run": 4227,
+    "classification": null
+   },
+   {
+    "seq": 33,
+    "commit": "0e34a1ad071a196860a219a1a8acf237fd339701",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "WP-4.1/4.2",
+    "result": "PASS",
+    "tests_run": 4227,
+    "classification": null
+   },
+   {
+    "seq": 34,
+    "commit": "0e34a1ad071a196860a219a1a8acf237fd339701",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "WP-4.1/4.2",
+    "result": "PASS",
+    "tests_run": 4224,
+    "classification": null
+   },
+   {
+    "seq": 35,
+    "commit": "224caa466148c86cf8eebc3fade3a2b50fc38711",
+    "where": "local",
+    "job": null,
+    "package": "WP-4.3..4.6 (P4 candidate)",
+    "result": "PASS",
+    "tests_run": 4280,
+    "classification": null
+   },
+   {
+    "seq": 36,
+    "commit": "224caa466148c86cf8eebc3fade3a2b50fc38711",
+    "where": "ci",
+    "job": "lint",
+    "package": "WP-4.3..4.6 (P4 candidate)",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 37,
+    "commit": "224caa466148c86cf8eebc3fade3a2b50fc38711",
+    "where": "ci",
+    "job": "wheel",
+    "package": "WP-4.3..4.6 (P4 candidate)",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 38,
+    "commit": "224caa466148c86cf8eebc3fade3a2b50fc38711",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "WP-4.3..4.6 (P4 candidate)",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 39,
+    "commit": "224caa466148c86cf8eebc3fade3a2b50fc38711",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "WP-4.3..4.6 (P4 candidate)",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 40,
+    "commit": "224caa466148c86cf8eebc3fade3a2b50fc38711",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "WP-4.3..4.6 (P4 candidate)",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 41,
+    "commit": "224caa466148c86cf8eebc3fade3a2b50fc38711",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "WP-4.3..4.6 (P4 candidate)",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 42,
+    "commit": "224caa466148c86cf8eebc3fade3a2b50fc38711",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "WP-4.3..4.6 (P4 candidate)",
+    "result": "FAIL",
+    "tests_run": 4274,
+    "classification": "PRODUCT"
+   },
+   {
+    "seq": 43,
+    "commit": "d234be9181254021cc2fea4ba0379422cbd54348",
+    "where": "local",
+    "job": null,
+    "package": "P4 candidate",
+    "result": "PASS",
+    "tests_run": 4280,
+    "classification": null
+   },
+   {
+    "seq": 44,
+    "commit": "d234be9181254021cc2fea4ba0379422cbd54348",
+    "where": "ci",
+    "job": "lint",
+    "package": "P4 candidate",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 45,
+    "commit": "d234be9181254021cc2fea4ba0379422cbd54348",
+    "where": "ci",
+    "job": "wheel",
+    "package": "P4 candidate",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 46,
+    "commit": "d234be9181254021cc2fea4ba0379422cbd54348",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "P4 candidate",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 47,
+    "commit": "d234be9181254021cc2fea4ba0379422cbd54348",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "P4 candidate",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 48,
+    "commit": "d234be9181254021cc2fea4ba0379422cbd54348",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "P4 candidate",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 49,
+    "commit": "d234be9181254021cc2fea4ba0379422cbd54348",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "P4 candidate",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 50,
+    "commit": "d234be9181254021cc2fea4ba0379422cbd54348",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "P4 candidate",
+    "result": "PASS",
+    "tests_run": 4274,
+    "classification": null
+   },
+   {
+    "seq": 51,
+    "commit": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0",
+    "where": "local",
+    "job": null,
+    "package": "P4 completion record",
+    "result": "PASS",
+    "tests_run": 4280,
+    "classification": null
+   },
+   {
+    "seq": 52,
+    "commit": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0",
+    "where": "ci",
+    "job": "lint",
+    "package": "P4 completion record",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 53,
+    "commit": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0",
+    "where": "ci",
+    "job": "wheel",
+    "package": "P4 completion record",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 54,
+    "commit": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "P4 completion record",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 55,
+    "commit": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "P4 completion record",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 56,
+    "commit": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "P4 completion record",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 57,
+    "commit": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "P4 completion record",
+    "result": "PASS",
+    "tests_run": 4277,
+    "classification": null
+   },
+   {
+    "seq": 58,
+    "commit": "b9ca4575a8b92abe83cb59fa2edd9cfc0d6e6cd0",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "P4 completion record",
+    "result": "PASS",
+    "tests_run": 4274,
+    "classification": null
+   },
+   {
+    "seq": 59,
+    "commit": "2f7f93bca745fb3eee73ea3e603498e695522e8d",
+    "where": "ci",
+    "job": "lint",
+    "package": "V2-003 correction — diagnostic commit (P4-FINDING-011 safety fix)",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 60,
+    "commit": "2f7f93bca745fb3eee73ea3e603498e695522e8d",
+    "where": "ci",
+    "job": "wheel",
+    "package": "V2-003 correction — diagnostic commit (P4-FINDING-011 safety fix)",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 61,
+    "commit": "2f7f93bca745fb3eee73ea3e603498e695522e8d",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "V2-003 correction — diagnostic commit (P4-FINDING-011 safety fix)",
+    "result": "FAIL",
+    "tests_run": 4300,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 62,
+    "commit": "2f7f93bca745fb3eee73ea3e603498e695522e8d",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "V2-003 correction — diagnostic commit (P4-FINDING-011 safety fix)",
+    "result": "FAIL",
+    "tests_run": 4286,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 63,
+    "commit": "2f7f93bca745fb3eee73ea3e603498e695522e8d",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "V2-003 correction — diagnostic commit (P4-FINDING-011 safety fix)",
+    "result": "FAIL",
+    "tests_run": 4300,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 64,
+    "commit": "2f7f93bca745fb3eee73ea3e603498e695522e8d",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "V2-003 correction — diagnostic commit (P4-FINDING-011 safety fix)",
+    "result": "FAIL",
+    "tests_run": 4300,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 65,
+    "commit": "2f7f93bca745fb3eee73ea3e603498e695522e8d",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "V2-003 correction — diagnostic commit (P4-FINDING-011 safety fix)",
+    "result": "FAIL",
+    "tests_run": 4300,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 66,
+    "commit": "a4136fba6a9b361e030fa5a8b7917cdf98e99ab2",
+    "where": "ci",
+    "job": "wheel",
+    "package": "V2-003 correction — diagnostic commit 2 (CI-found defects fixed)",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 67,
+    "commit": "a4136fba6a9b361e030fa5a8b7917cdf98e99ab2",
+    "where": "ci",
+    "job": "lint",
+    "package": "V2-003 correction — diagnostic commit 2 (CI-found defects fixed)",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 68,
+    "commit": "a4136fba6a9b361e030fa5a8b7917cdf98e99ab2",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "V2-003 correction — diagnostic commit 2 (CI-found defects fixed)",
+    "result": "FAIL",
+    "tests_run": 4300,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 69,
+    "commit": "a4136fba6a9b361e030fa5a8b7917cdf98e99ab2",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "V2-003 correction — diagnostic commit 2 (CI-found defects fixed)",
+    "result": "FAIL",
+    "tests_run": 4300,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 70,
+    "commit": "a4136fba6a9b361e030fa5a8b7917cdf98e99ab2",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "V2-003 correction — diagnostic commit 2 (CI-found defects fixed)",
+    "result": "FAIL",
+    "tests_run": 4300,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 71,
+    "commit": "a4136fba6a9b361e030fa5a8b7917cdf98e99ab2",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "V2-003 correction — diagnostic commit 2 (CI-found defects fixed)",
+    "result": "FAIL",
+    "tests_run": 4297,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 72,
+    "commit": "a4136fba6a9b361e030fa5a8b7917cdf98e99ab2",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "V2-003 correction — diagnostic commit 2 (CI-found defects fixed)",
+    "result": "FAIL",
+    "tests_run": 4300,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 73,
+    "commit": "e137aa36dae4753597b8395f2b40db76f1819fc7",
+    "where": "local",
+    "job": null,
+    "package": "V2-003 correction candidate",
+    "result": "FAIL",
+    "tests_run": 4309,
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 74,
+    "commit": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+    "where": "local",
+    "job": null,
+    "package": "V2-003 correction candidate",
+    "result": "PASS",
+    "tests_run": 4309,
+    "classification": null
+   },
+   {
+    "seq": 75,
+    "commit": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+    "where": "ci",
+    "job": "lint",
+    "package": "V2-003 correction candidate",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 76,
+    "commit": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+    "where": "ci",
+    "job": "wheel",
+    "package": "V2-003 correction candidate",
+    "result": "PASS",
+    "tests_run": null,
+    "classification": null
+   },
+   {
+    "seq": 77,
+    "commit": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "V2-003 correction candidate",
+    "result": "PASS",
+    "tests_run": 4306,
+    "classification": null
+   },
+   {
+    "seq": 78,
+    "commit": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "V2-003 correction candidate",
+    "result": "PASS",
+    "tests_run": 4306,
+    "classification": null
+   },
+   {
+    "seq": 79,
+    "commit": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "V2-003 correction candidate",
+    "result": "PASS",
+    "tests_run": 4306,
+    "classification": null
+   },
+   {
+    "seq": 80,
+    "commit": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "V2-003 correction candidate",
+    "result": "PASS",
+    "tests_run": 4306,
+    "classification": null
+   },
+   {
+    "seq": 81,
+    "commit": "f870196bfab285189be7baa31ff3cc94613c1fb9",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "V2-003 correction candidate",
+    "result": "PASS",
+    "tests_run": 4303,
+    "classification": null
+   }
+  ]
+ },
+ "ci": {
+  "run": 35879455419,
+  "url": "https://github.com/nghinh/aisef/actions/runs/35879455419",
+  "conclusion": "success",
+  "jobs": [
+   [
+    "lint",
+    107243830492,
+    null
+   ],
+   [
+    "wheel",
+    107243830057,
+    null
+   ],
+   [
+    "unit (ubuntu-latest, 3.11)",
+    107243831066,
+    4306
+   ],
+   [
+    "unit (ubuntu-latest, 3.12)",
+    107243830593,
+    4306
+   ],
+   [
+    "unit (ubuntu-latest, 3.13)",
+    107243830516,
+    4306
+   ],
+   [
+    "unit (ubuntu-latest, 3.14)",
+    107243830696,
+    4306
+   ],
+   [
+    "unit (windows-latest, 3.11)",
+    107243830826,
+    4303
+   ]
+  ],
+  "owned_processes_each_job": {
+   "before": 0,
+   "after": 0,
+   "escaped": 0,
+   "released_empty": true
+  },
+  "v1_pf_001_recurred": false
+ },
+ "v1_evidence": {
+  "w0_byte_identical": true,
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "guard": true
+ },
+ "v1_pf_001": {
+  "recurrences": 0,
+  "ci_search": true
+ },
+ "architecture_exceptions": [
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-001",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-002",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-003",
+   "status": "APPROVED — APPLIED"
+  }
+ ],
+ "p4_finding_011": {
+  "id": "P4-FINDING-011",
+  "class": "HARNESS_SAFETY",
+  "severity": "P0",
+  "status": "CLOSED",
+  "measured_incident": {
+   "when": "2026-09-23 15:38:28.709 – 15:38:29.166 (+07:00)",
+   "signal": "SIGKILL",
+   "sender": "Python[93138]",
+   "victims": 170,
+   "victims_named": [
+    "gui/501/application.com.google.Chrome.452621.365018633",
+    "gui/501/com.apple.AMPArtworkAgent",
+    "gui/501/com.apple.AirPlayUIAgent",
+    "gui/501/com.apple.AuthenticationServicesCore.AuthenticationServicesAgent",
+    "gui/501/com.apple.CallHistoryPluginHelper",
+    "gui/501/com.apple.CommCenter",
+    "gui/501/com.apple.ContextStoreAgent",
+    "gui/501/com.apple.CoreLocationAgent",
+    "gui/501/com.apple.FileProvider",
+    "gui/501/com.apple.Finder",
+    "gui/501/com.apple.FontWorker",
+    "gui/501/com.apple.GamePolicyAgent",
+    "gui/501/com.apple.IOUIAgent",
+    "gui/501/com.apple.MTLAssetUpgraderD",
+    "gui/501/com.apple.Maps.mapssyncd",
+    "gui/501/com.apple.ModelCatalogAgent",
+    "gui/501/com.apple.ReportCrash",
+    "gui/501/com.apple.Safari.PasswordBreachAgent",
+    "gui/501/com.apple.SoftwareUpdateNotificationManager",
+    "gui/501/com.apple.Spotlight",
+    "gui/501/com.apple.SystemUIServer.agent",
+    "gui/501/com.apple.TextInputMenuAgent",
+    "gui/501/com.apple.TextInputSwitcher",
+    "gui/501/com.apple.UserEventAgent-Aqua",
+    "gui/501/com.apple.UserNotificationCenterAgent",
+    "gui/501/com.apple.WindowManager.agent",
+    "gui/501/com.apple.amsondevicestoraged",
+    "gui/501/com.apple.ap.promotedcontentd",
+    "gui/501/com.apple.apfsuseragent",
+    "gui/501/com.apple.applespell",
+    "gui/501/com.apple.appplaceholdersyncd",
+    "gui/501/com.apple.appstoreagent",
+    "gui/501/com.apple.assistant_cdmd",
+    "gui/501/com.apple.assistantd",
+    "gui/501/com.apple.audio.AudioComponentRegistrar",
+    "gui/501/com.apple.avatarsd",
+    "gui/501/com.apple.bird",
+    "gui/501/com.apple.bluetoothuserd",
+    "gui/501/com.apple.calaccessd",
+    "gui/501/com.apple.cdpd",
+    "gui/501/com.apple.chronod",
+    "gui/501/com.apple.cloudd",
+    "gui/501/com.apple.cloudphotod",
+    "gui/501/com.apple.cmfsyncagent",
+    "gui/501/com.apple.cmio.ContinuityCaptureAgent",
+    "gui/501/com.apple.commerce",
+    "gui/501/com.apple.contacts.donation-agent",
+    "gui/501/com.apple.contacts.postersyncd",
+    "gui/501/com.apple.controlcenter",
+    "gui/501/com.apple.coreservices.uiagent",
+    "gui/501/com.apple.coreservices.useractivityd",
+    "gui/501/com.apple.corespeechd",
+    "gui/501/com.apple.diagnostics_agent",
+    "gui/501/com.apple.dprivacyd",
+    "gui/501/com.apple.duetexpertd",
+    "gui/501/com.apple.familycircled",
+    "gui/501/com.apple.filevaultd",
+    "gui/501/com.apple.financed",
+    "gui/501/com.apple.followupd",
+    "gui/501/com.apple.gamed",
+    "gui/501/com.apple.generativeexperiencesd",
+    "gui/501/com.apple.homeenergyd",
+    "gui/501/com.apple.icdd",
+    "gui/501/com.apple.icloud.searchpartyuseragent",
+    "gui/501/com.apple.iconservices.iconservicesagent",
+    "gui/501/com.apple.imcore.imtransferagent",
+    "gui/501/com.apple.imklaunchagent",
+    "gui/501/com.apple.inputanalyticsd",
+    "gui/501/com.apple.intelligencecontextd",
+    "gui/501/com.apple.intelligenceflowd",
+    "gui/501/com.apple.intelligenceplatformd",
+    "gui/501/com.apple.intelligentroutingd",
+    "gui/501/com.apple.itunescloudd",
+    "gui/501/com.apple.keyboardservicesd",
+    "gui/501/com.apple.knowledge-agent",
+    "gui/501/com.apple.managedcorespotlightd.1617C020-9697-E4D1-A738-9AD94AB2D070",
+    "gui/501/com.apple.mediaremoteagent",
+    "gui/501/com.apple.mlhostd",
+    "gui/501/com.apple.naturallanguaged",
+    "gui/501/com.apple.networkserviceproxy",
+    "gui/501/com.apple.nsurlsessiond",
+    "gui/501/com.apple.parsecd",
+    "gui/501/com.apple.passd",
+    "gui/501/com.apple.pbs",
+    "gui/501/com.apple.peopled",
+    "gui/501/com.apple.photoanalysisd",
+    "gui/501/com.apple.protectedcloudstorage.protectedcloudkeysyncing",
+    "gui/501/com.apple.rapportd",
+    "gui/501/com.apple.replayd",
+    "gui/501/com.apple.routined",
+    "gui/501/com.apple.scopedbookmarksagent.xpc",
+    "gui/501/com.apple.sharingd",
+    "gui/501/com.apple.shazamd",
+    "gui/501/com.apple.siriinferenced",
+    "gui/501/com.apple.siriknowledged",
+    "gui/501/com.apple.sociallayerd",
+    "gui/501/com.apple.studentd",
+    "gui/501/com.apple.swtransparencyd",
+    "gui/501/com.apple.uikitsystemapp",
+    "gui/501/com.apple.universalaccessd",
+    "gui/501/com.apple.usernoted",
+    "gui/501/com.apple.wallpaper.agent",
+    "gui/501/com.apple.wifi.WiFiAgent",
+    "gui/501/com.apple.xtyped",
+    "gui/501/org.chromium.chromoting",
+    "pid/42023/com.apple.extensionkitservice",
+    "pid/42023/com.apple.wallpaper.extension.aerials",
+    "pid/42026/com.apple.PressAndHold",
+    "pid/42026/com.apple.inputmethod.EmojiFunctionRowItem",
+    "pid/42026/com.apple.inputmethod.VietnameseIM",
+    "pid/42029/com.apple.MessagesBlastDoorService.4B6E6F77-6E53-656E-6465-7200556E6B6E",
+    "pid/42032/com.apple.audio.SandboxHelper",
+    "pid/42033/com.apple.IDSBlastDoorService",
+    "pid/42034/com.apple.quicklook.QuickLookUIService",
+    "pid/42038/com.apple.wifi.WiFiCloudAssetsXPCService",
+    "pid/42039/com.apple.dock.extra",
+    "pid/42040/com.apple.siri.embeddedspeech.4D30CC1C-CCF9-0B3B-13C2-C5D87AC8888F",
+    "pid/42040/com.apple.speech.localspeechrecognition",
+    "pid/42042/com.apple.SiriNCService",
+    "pid/42043/com.apple.LoginUserService",
+    "pid/42044/com.apple.filesystems.netfs.PlugInLibraryService",
+    "pid/42045/com.apple.StocksKitService",
+    "pid/42059/com.apple.intelligenceplatform.IntelligencePlatformComputeService",
+    "pid/42075/com.apple.FaceTime.FTConversationService",
+    "pid/42079/com.apple.FileProviderDaemon.FPCKService",
+    "pid/42104/com.apple.extensionkitservice",
+    "pid/42119/com.apple.coremedia.videodecoder",
+    "pid/42132/com.apple.SetStoreUpdateService",
+    "pid/42161/com.apple.audio.SandboxHelper",
+    "pid/42161/com.apple.coremedia.videodecoder",
+    "pid/42161/com.apple.mediaanalysisd-access",
+    "pid/42162/com.apple.proactive.AppPredictionIntentsHelperService",
+    "pid/42170/com.apple.siri.SuggestionsBookkeepingService",
+    "pid/42203/com.apple.SetStoreUpdateService",
+    "pid/42263/com.apple.filesystems.netfs.PlugInLibraryService",
+    "pid/42273/com.apple.appleintelligencereporting.processing",
+    "pid/42364/com.apple.extensionkitservice",
+    "pid/42364/com.apple.lighthouse.BiomeSELFIngestor",
+    "pid/42364/com.apple.lighthouse.IFTelemetrySELFIngestor",
+    "pid/42364/com.apple.siri.GMSSELFIngestor",
+    "pid/42371/com.apple.extensionkitservice",
+    "pid/42623/com.apple.CloudTelemetryService.xpc",
+    "pid/42869/com.apple.textkit.nsattributedstringagent",
+    "pid/43077/com.apple.AuthenticationServices.ASConfigurationSubscriber",
+    "pid/43077/com.apple.SafariShared.SafariConfigurationSubscriber",
+    "pid/43077/com.apple.remotemanagement.AccountSubscriber",
+    "pid/43077/com.apple.remotemanagement.InteractiveLegacyProfilesSubscriber",
+    "pid/43077/com.apple.remotemanagement.LegacyProfilesSubscriber",
+    "pid/43077/com.apple.remotemanagement.ManagedAppsSubscriber",
+    "pid/43077/com.apple.remotemanagement.ManagedSettingsSubscriber",
+    "pid/43077/com.apple.remotemanagement.ManagementTestSubscriber",
+    "pid/43077/com.apple.remotemanagement.ScreenSharingSubscriber",
+    "pid/43077/com.apple.remotemanagement.SecuritySubscriber",
+    "pid/43993/com.apple.DPSubmissionService",
+    "pid/44454/com.apple.appkit.xpc.ThemeWidgetControlViewService",
+    "pid/44454/com.apple.speech.SpeechSynthesisServerXPC",
+    "pid/44476/com.apple.MTLCompilerService.A258C164-1432-4774-B77B-5FF5690CBFC3",
+    "pid/55702/com.apple.CloudTelemetryService.xpc",
+    "pid/95278/com.apple.speech.SpeechSynthesisServerXPC",
+    "user/501/com.apple.CoreAuthentication.agent",
+    "user/501/com.apple.TrustedPeersHelper",
+    "user/501/com.apple.carboncore.csnameddata",
+    "user/501/com.apple.distnoted.xpc.agent",
+    "user/501/com.apple.geod",
+    "user/501/com.apple.mdworker.shared.02000000-0300-0000-0000-000000000000",
+    "user/501/com.apple.mdworker.shared.05000000-0300-0000-0000-000000000000",
+    "user/501/com.apple.mdworker.shared.0A000000-0200-0000-0000-000000000000",
+    "user/501/com.apple.metadata.mdbulkimport",
+    "user/501/com.apple.secd",
+    "user/501/com.apple.trustd.agent"
+   ],
+   "well_known_among_them": {
+    "Dock": true,
+    "Finder": true,
+    "Chrome": true,
+    "remoting": false,
+    "Claude": false,
+    "loginwindow": false,
+    "WindowServer": false
+   },
+   "host_rebooted": false,
+   "evidence": "/usr/bin/log show 15:38:00–15:40:00, predicate eventMessage CONTAINS 'sent by Python[93138]' — every line is a launchd-owned service of the user exiting due to SIGKILL; `last reboot` 2026-09-20; loginwindow/WindowServer started 2026-09-20 13:07:46 and still running; no panic, no JetsamEvent",
+   "mutant_in_flight": {
+    "target": "aisef2/runtime/process_range.py::_Posix.escaped",
+    "mutant": "L155 Eq->NotEq",
+    "diff": "inside = {p.pid for p in table.values() if p.group != self.group} | {anchor}",
+    "recovered_from": "/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmp64t79smu/tree (process_range.py written 15:38:22, six seconds before the first kill)"
+   },
+   "path": "PROC-OWN-1 (tests/v2/p4/test_process_range.py) loads validation/v2/mutation.py inside the kill-test process and runs _run_tests there, so the runner's cleanup ran with the mutated module as its view of the host, trusted escaped() and signalled every group it reported"
+  },
+  "root_cause": "the mutation runner's cleanup trusted the mutated implementation's view of the host (process ownership, escapee discovery, group ids) — a mutant could expand the runner's cleanup authority",
+  "safety_fix": {
+   "cleanup_authority": {
+    "path": "validation/v2/cleanup_authority.py",
+    "sha256": "b2d071491ee4221c46e261fd863f2b2acb6acda068d437fff85ae2a641952b41",
+    "imports": [
+     "__future__",
+     "dataclasses",
+     "os",
+     "signal",
+     "subprocess",
+     "time"
+    ],
+    "imports_aisef2_or_mutation": false
+   },
+   "mutation_runner": {
+    "path": "validation/v2/mutation.py",
+    "sha256": "77784dfa50c3cfcef47eccc08af9a31b80ed661d7cf0e3415f857dbc800c233d",
+    "own_signal_calls": 0
+   },
+   "tests": {
+    "path": "tests/v2/p4/test_mutation_safety.py",
+    "sha256": "00457f5c80f2da6e9e6b870f3b9227086499cd75efcba290b5f8bb15016b84a0"
+   },
+   "rule": "a member, escapee, stray or group reported by code under mutation is signalled only when the authority's own reading of the host proves it — parent chain to the runner AND born after the boundary; a group only through its leader — else RESIDUAL_OWNERSHIP_UNKNOWN: not signalled, the target fails"
+  },
+  "mut_safe": {
+   "results": {
+    "test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own": "PASSED",
+    "test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled": "PASSED",
+    "test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused": "PASSED",
+    "test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed": "PASSED",
+    "test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives": "PASSED",
+    "test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set": "PASSED",
+    "test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set": "PASSED",
+    "test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it": "PASSED"
+   },
+   "summary": "============================== 8 passed in 10.44s ==============================",
+   "syscalls_spied": true
+  },
+  "old_mutant_safe_reproduction": {
+   "mutant": "L155 Eq->NotEq",
+   "processes_the_mutant_reported_as_escaped": 664,
+   "canary_among_them": true,
+   "login_session_agents_among_them": 610,
+   "selected_by_the_authority": [],
+   "selection_within_owned_set": true,
+   "refused": 1328,
+   "canary_alive_after": true,
+   "dry_run": true
+  },
+  "canary_survival": true,
+  "cleanup_authority_proof": {
+   "live_runs": "A3 (9 range targets) and B3 (7 probe targets) with the fixed runner",
+   "signals": 0,
+   "targets_in_error": [],
+   "proof_consistent": true,
+   "signalled_commands": []
+  },
+  "unrelated_process_signalled_after_fix": {
+   "since": "2026-09-23 16:35:27",
+   "launchd_owned_processes_signalled_by_python": 0,
+   "lines": []
+  },
+  "verdict": "CLOSED"
+ },
+ "stop_rules_triggered": [],
+ "anti_loop": {
+  "new_owner": false,
+  "new_probe_execution_status": false,
+  "new_behavior_verdict": false,
+  "new_story_admission_disposition": false,
+  "contract_satisfaction_polarity_changed": false,
+  "subject_absence_changed": false,
+  "p4_process_ownership_weakened": false,
+  "p3_journal_authority_rewritten": false,
+  "unrelated_f_items_changed": false,
+  "v1_evidence_reopened": false,
+  "note": "one new IndeterminateReason and one new FailureCode, both required by the approved decision; F1 declared affected because FailureCode is a payload enum"
+ },
+ "exit_checks": [
+  {
+   "check": "architecture lineage: approval -> V2-001 -> V2-002 -> V2-003",
+   "command": "python -P validation/v2/freeze_manifest.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "freeze manifest: PASS"
+  },
+  {
+   "check": "architecture catalog --check",
+   "command": "python -P validation/v2/gen_arch_catalog.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "architecture catalog: PASS"
+  },
+  {
+   "check": "F1-F11 conformance at CURRENT_PHASE=P4 (ratchet)",
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "summary {'PASS': 10, 'PENDING': 1, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "check": "plan_validate: zero problems, generated docs in sync",
+   "command": "python -P validation/v2/plan_validate.py --validate --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "generated artefacts in sync"
+  },
+  {
+   "check": "Q0 checker calibration",
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "calibrated 30/30; always-PASS mutants rejected 30/30"
+  },
+  {
+   "check": "compiler --check",
+   "command": "python -P validation/v2/gen_specs.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "specs: PASS"
+  },
+  {
+   "check": "P1 evidence records current",
+   "command": "python -P validation/v2/p1_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p1 evidence: PASS"
+  },
+  {
+   "check": "P2 evidence records current",
+   "command": "python -P validation/v2/p2_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p2 evidence: PASS"
+  },
+  {
+   "check": "P3 evidence records current",
+   "command": "python -P validation/v2/p3_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p3 evidence: PASS"
+  },
+  {
+   "check": "P4 evidence records current",
+   "command": "python -P validation/v2/p4_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p4 evidence: PASS"
+  },
+  {
+   "check": "P4-FINDING-011 safety record: CLOSED",
+   "command": "python -P -c import json,sys; r=json.load(open('closure-evidence/v2/P4-FINDING-011-SAFETY.json')); sys.exit(0 if r['verdict']=='CLOSED' else 1)",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": ""
+  },
+  {
+   "check": "mutation records current (P1-P4); every target killed or its survivor audited",
+   "command": "python -P validation/v2/mutation.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "check": "kernel static checks",
+   "command": "python -P validation/v2/kernel_static_checks.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "check": "reference models import nothing of the implementation",
+   "command": "python -P validation/v2/refmodel_independence.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "refmodel independence: PASS"
+  },
+  {
+   "check": "run history: P1-P3 sealed; P4 append-only and policy-consistent",
+   "command": "python -P validation/v2/run_history.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "run history: PASS"
+  },
+  {
+   "check": "V1 evidence guard, detective",
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  }
+ ],
+ "p5_started": false,
+ "verdict": "P4 CORRECTED / READY FOR OWNER ACCEPTANCE"
+}

@@ -1,0 +1,507 @@
+{
+ "record": "P7-FINDING-001 diagnosis",
+ "finding": "P7-FINDING-001",
+ "owner_authorization": "AISEF V2 — P7-FINDING-001 DIAGNOSTIC AUTHORIZATION / P8 REMAINS BLOCKED (§1-§15)",
+ "written": "2026-09-27T06:08:56Z",
+ "symptom": {
+  "history_entry": "P7-RUN-HISTORY seq 65: e0b6862, unit (ubuntu-latest, 3.11), tests run 36287167965 job 108529999137 — kept UNKNOWN (§11)",
+  "case": "tests.v2.test_p6_orchestration.Orchestration.test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back",
+  "observed": "S2 failure code VERIFIER_DISAGREEMENT (INTEGRATION, not retryable) where POST_MERGE_REGRESSION was expected"
+ },
+ "subject": {
+  "semantic_candidate": "097daefefd9229eafeacaca321b7a008a581899b",
+  "kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+  "semantic_candidate_status": "UNCHANGED",
+  "diagnostic_candidate": "874d3b12792efd0c8e494bfa9e32d4c6f6af0d6e",
+  "diagnostic_candidate_kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+  "diagnostic_candidate_tests_v2_tree": "02cc6d56a324178e008159627a949edae4b814bb",
+  "diagnostic_candidate_qualification_tree": "dd8d6f8dcc24fc503a4e5c20e05bf0f78d11e56b"
+ },
+ "instrumentation": {
+  "files": [
+   "tests/v2/test_p6_orchestration.py (ProofObserver, checkout_facts, disagreement_evidence, DIAG-1..3, Dev(before_commit=))",
+   "validation/qualification/diag_orch9.py",
+   ".github/workflows/diagnostic.yml"
+  ],
+  "observational": "the wrapper reads the two checkouts before the real prove() and assembles evidence after it returned; no argument, timeout, ordering, process lifetime, retry or result is touched (§3)",
+  "kernel_changed": false,
+  "architecture_changed": false
+ },
+ "mechanism": {
+  "M1_harness_writes_bytecode_into_the_observed_checkout": {
+   "site": [
+    "aisef2/probe/python_callable.py:245 — the harness is launched with -I",
+    "aisef2/probe/python_callable.py:389 — its environment sets PYTHONDONTWRITEBYTECODE=1",
+    "aisef2/quality/test_execution.py:437,451 — the test runner: PYTHONDONTWRITEBYTECODE=1 under -E"
+   ],
+   "measured": "-I (and -E) discard every PYTHON* variable: sys.dont_write_bytecode is False in the harness (DIAG-1 measures it on every platform); the admission probes of S0 write app/__pycache__/calc.<tag>.pyc, compiled from the 32-byte parent source, into wt-S0",
+   "kernel_intent_defeated": true
+  },
+  "M2_the_revision_carries_bytecode_of_another_source": {
+   "measured": "the developer double commits the checkout (git add -A; no ignore rules in the fixture repository); S0's candidate and merged revision hold app/__pycache__/calc.<tag>.pyc with header (mtime = S0's checkout second, size 32) beside app/calc.py of 66 bytes (DIAG-1 reads the blob back from the revision and decodes header and code)",
+   "who": "developer capability (test double here; any real developer that commits __pycache__ produces the same revision)"
+  },
+  "M3_cpython_takes_bytecode_by_mtime_second_and_size": {
+   "rule": "importlib validates a timestamp .pyc by the source's mtime in whole seconds and its size (a 32-bit field each)",
+   "measured": "S2's developer writes app/calc.py at 32 bytes (a + b). The implementer's checkout is the developer's: calc.py dated at the developer's write, never rewritten by the kernel's forced checkouts (stat matches the index). The verifier's checkout dates calc.py at its own checkout (rewritten again at the move to the merged revision). Collision: the developer's write in the same second as S0's checkout (the bytecode's header second) while the verifier's checkout is in another second → implementer reads the stale bytecode (sub(3,1) == 2: SATISFIED), verifier compiles the source (4: REFUTED) → results differ under identical instrument identity and identical revision → VERIFIER_DISAGREEMENT at post-merge C0 → rollback"
+  },
+  "M4_constructed_reproduction": "DIAG-2 dates the developer's file to the bytecode's header second before the commit (product-state construction, no timing change) and reproduces the symptom on every run: implementer SATISFIED / verifier REFUTED at one merged revision, both checkouts' HEAD equal to it, instrument identical, both parties EXECUTED",
+  "M5_owner_§7_as_a_check": "DIAG-3 runs the natural flow observed: a proof diverges exactly when one checkout reads stale bytecode and the other does not; the story's outcome is the one the checkouts' facts imply",
+  "M6_the_masked_case": "when BOTH checkouts read the stale bytecode (developer write and verifier checkout in the bytecode's second) both parties report SATISFIED and the regression is invisible: S2 would COMMIT a post-merge regression of a PRESERVE obligation — never observed on CI (it needs the whole S0 story plus S2's admission, developer write and verifier checkout inside one second) but implied by the same rule",
+  "timing_window": {
+   "needs": "S0 checkout → S2 developer write inside one wall-clock second (D < 1 s) with the verifier's checkout in the next",
+   "local_darwin": "D ≈ 2.6 s: never reproduces here (24/24 earlier runs under load; the reproducer's runs)",
+   "ci": {
+    "jobs": [
+     {
+      "platform": "linux-py3.11",
+      "shard": 1,
+      "ci_run": "36297897423",
+      "runs": 63,
+      "reproduced": 1,
+      "predicted_divergences": 1,
+      "unexplained_divergences": 0,
+      "other_failures": 0,
+      "runs_with_D_under_1000ms": 25,
+      "D_ms": {
+       "min": 972.7,
+       "median": 1032.9,
+       "max": 2324.9
+      },
+      "stopped_on": "REPRODUCED",
+      "record": "v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard1.json",
+      "record_sha256": "a239f113ae77c762c7054bee99b05c76adda9cec1c40ddff1d2f9ee8cb1a3da2"
+     },
+     {
+      "platform": "linux-py3.11",
+      "shard": 2,
+      "ci_run": "36297897423",
+      "runs": 4,
+      "reproduced": 1,
+      "predicted_divergences": 1,
+      "unexplained_divergences": 0,
+      "other_failures": 0,
+      "runs_with_D_under_1000ms": 4,
+      "D_ms": {
+       "min": 752.6,
+       "median": 775.85,
+       "max": 964.4
+      },
+      "stopped_on": "REPRODUCED",
+      "record": "v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard2.json",
+      "record_sha256": "b51a84423af3aee1350cec7a89ba3a0221b9efeac85ecf7a2de4fe08afba2967"
+     },
+     {
+      "platform": "linux-py3.11",
+      "shard": 3,
+      "ci_run": "36297897423",
+      "runs": 250,
+      "reproduced": 0,
+      "predicted_divergences": 0,
+      "unexplained_divergences": 0,
+      "other_failures": 0,
+      "runs_with_D_under_1000ms": 0,
+      "D_ms": {
+       "min": 1239.9,
+       "median": 1269.8000000000002,
+       "max": 1359.4
+      },
+      "stopped_on": null,
+      "record": "v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard3.json",
+      "record_sha256": "dbfe9034fe197794d738090142332194495f7b1a0556115a1ac3ba648da4b597"
+     },
+     {
+      "platform": "linux-py3.11",
+      "shard": 4,
+      "ci_run": "36297897423",
+      "runs": 250,
+      "reproduced": 0,
+      "predicted_divergences": 0,
+      "unexplained_divergences": 0,
+      "other_failures": 0,
+      "runs_with_D_under_1000ms": 0,
+      "D_ms": {
+       "min": 1246.6,
+       "median": 1268.9,
+       "max": 1337.5
+      },
+      "stopped_on": null,
+      "record": "v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard4.json",
+      "record_sha256": "33d4be52ee8d244c915adac22aed795be81b92e99021ebb250366ae932def521"
+     },
+     {
+      "platform": "linux-py3.12",
+      "shard": 1,
+      "ci_run": "36297897423",
+      "runs": 250,
+      "reproduced": 0,
+      "predicted_divergences": 0,
+      "unexplained_divergences": 0,
+      "other_failures": 0,
+      "runs_with_D_under_1000ms": 0,
+      "D_ms": {
+       "min": 1385.4,
+       "median": 1429.35,
+       "max": 2671.4
+      },
+      "stopped_on": null,
+      "record": "v2/P7-FINDING-001/diag-orch9-linux-py3.12-shard1.json",
+      "record_sha256": "5653c19a07b9479b6a2e1b6f5f26b77f333e3c059f1c8f1d71ed9c92e54baa8f"
+     },
+     {
+      "platform": "linux-py3.13",
+      "shard": 1,
+      "ci_run": "36297897423",
+      "runs": 250,
+      "reproduced": 0,
+      "predicted_divergences": 0,
+      "unexplained_divergences": 0,
+      "other_failures": 0,
+      "runs_with_D_under_1000ms": 0,
+      "D_ms": {
+       "min": 1452.7,
+       "median": 1494.45,
+       "max": 2491.6
+      },
+      "stopped_on": null,
+      "record": "v2/P7-FINDING-001/diag-orch9-linux-py3.13-shard1.json",
+      "record_sha256": "94ab969e4bb2756ddb4416ba957c62412642cbe13a8b5556db9577ab50660a50"
+     },
+     {
+      "platform": "linux-py3.14",
+      "shard": 1,
+      "ci_run": "36297897423",
+      "runs": 28,
+      "reproduced": 1,
+      "predicted_divergences": 1,
+      "unexplained_divergences": 0,
+      "other_failures": 0,
+      "runs_with_D_under_1000ms": 8,
+      "D_ms": {
+       "min": 978.1,
+       "median": 1010.7,
+       "max": 4454.6
+      },
+      "stopped_on": "REPRODUCED",
+      "record": "v2/P7-FINDING-001/diag-orch9-linux-py3.14-shard1.json",
+      "record_sha256": "e8e23b382e68f2e923b43ba6c048efa5c82c41d3405ae93d041f9a2cd2044895"
+     },
+     {
+      "platform": "windows-py3.11",
+      "shard": 1,
+      "ci_run": "36297897423",
+      "runs": 250,
+      "reproduced": 0,
+      "predicted_divergences": 0,
+      "unexplained_divergences": 0,
+      "other_failures": 0,
+      "runs_with_D_under_1000ms": 0,
+      "D_ms": {
+       "min": 2722.4,
+       "median": 2950.3,
+       "max": 15823.3
+      },
+      "stopped_on": null,
+      "record": "v2/P7-FINDING-001/diag-orch9-windows-py3.11-shard1.json",
+      "record_sha256": "2a2d9715d31aa19c0f18751842935593b331387d3a18cea185a67a1c092d8c12"
+     }
+    ],
+    "totals": {
+     "runs": 1345,
+     "reproduced": 3,
+     "predicted_divergences": 3,
+     "unexplained_divergences": 0,
+     "other_failures": 0,
+     "runs_with_D_under_1000ms": 37,
+     "both_parties_read_stale_bytecode (the masked case)": 0,
+     "reproductions_predicted_by_the_checkout_facts": 3,
+     "reproductions_with_identical_revision_and_instrument": 3
+    }
+   }
+  }
+ },
+ "natural_reproductions": [
+  {
+   "platform": "linux-py3.11",
+   "shard": 1,
+   "run": 63,
+   "criterion_id": "C0",
+   "measurement_point": "POST_MERGE",
+   "revision": "b334e7e600546ad42e12f7c1b6eb2372468a2045",
+   "implementer": {
+    "execution_status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "revision": "b334e7e600546ad42e12f7c1b6eb2372468a2045",
+    "record_digest": "0499f8f3dbe3fad56f6bb978d031a39eb10628447c1ed692b2993f65f52fab45"
+   },
+   "verifier": {
+    "execution_status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "revision": "b334e7e600546ad42e12f7c1b6eb2372468a2045",
+    "record_digest": "332df0bdd3f5a194a69470f9b40c9751b807ac6f41fe3aa4b011a2c602c6ff00"
+   },
+   "instrument_identical": true,
+   "checkout_heads": [
+    "b334e7e600546ad42e12f7c1b6eb2372468a2045",
+    "b334e7e600546ad42e12f7c1b6eb2372468a2045"
+   ],
+   "predicted_divergence": {
+    "implementer_reads_stale_bytecode": true,
+    "verifier_reads_stale_bytecode": false,
+    "divergence": true
+   },
+   "implementer_before": {
+    "source_mtime_s": 1790487779,
+    "source_size": 32,
+    "bytecode_header": {
+     "magic_current": true,
+     "flags": 0,
+     "source_mtime": 1790487779,
+     "source_size": 32
+    },
+    "bytecode_valid_for_source": true,
+    "bytecode_stale": true
+   },
+   "verifier_before": {
+    "source_mtime_s": 1790487780,
+    "source_size": 32,
+    "bytecode_header": {
+     "magic_current": true,
+     "flags": 0,
+     "source_mtime": 1790487779,
+     "source_size": 32
+    },
+    "bytecode_valid_for_source": false,
+    "bytecode_stale": true
+   },
+   "probe_evaluated_seqs": [
+    122,
+    125
+   ],
+   "proof_verified_seq": 126,
+   "event_seq_interval": [
+    75,
+    126
+   ],
+   "journal_prefix_sha256": "ae23e11232b2433aef0325ee1d866fadbdbce4173eae2ac3a1f30a026003ed9a",
+   "affected_preserve": {
+    "C0": [
+     "S0",
+     "PPS-d42a70b70496524b34db830312ce9912f5d9f6a2f82f1d7d4ed2fd1b1306207a"
+    ]
+   },
+   "interval": {
+    "D_ms": 984.4,
+    "W_ms": 106.6,
+    "bytecode_header_second": 1790487779,
+    "S2_developer_second": 1790487779,
+    "S2_verifier_second": 1790487780,
+    "implementer_same_second_as_bytecode": true,
+    "verifier_same_second_as_bytecode": false
+   }
+  },
+  {
+   "platform": "linux-py3.11",
+   "shard": 2,
+   "run": 4,
+   "criterion_id": "C0",
+   "measurement_point": "POST_MERGE",
+   "revision": "f3ab9459b3e6537dd48c965bd42dc1b536476674",
+   "implementer": {
+    "execution_status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "revision": "f3ab9459b3e6537dd48c965bd42dc1b536476674",
+    "record_digest": "da086556bff507a203d3dbfa350357f88c7666e92536b20957cdef5271106743"
+   },
+   "verifier": {
+    "execution_status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "revision": "f3ab9459b3e6537dd48c965bd42dc1b536476674",
+    "record_digest": "c8a0390fe2a7b97ce4a5d6fe65fe18d97e281d523f09ffe6c94743e01501ab76"
+   },
+   "instrument_identical": true,
+   "checkout_heads": [
+    "f3ab9459b3e6537dd48c965bd42dc1b536476674",
+    "f3ab9459b3e6537dd48c965bd42dc1b536476674"
+   ],
+   "predicted_divergence": {
+    "implementer_reads_stale_bytecode": true,
+    "verifier_reads_stale_bytecode": false,
+    "divergence": true
+   },
+   "implementer_before": {
+    "source_mtime_s": 1790487666,
+    "source_size": 32,
+    "bytecode_header": {
+     "magic_current": true,
+     "flags": 0,
+     "source_mtime": 1790487666,
+     "source_size": 32
+    },
+    "bytecode_valid_for_source": true,
+    "bytecode_stale": true
+   },
+   "verifier_before": {
+    "source_mtime_s": 1790487667,
+    "source_size": 32,
+    "bytecode_header": {
+     "magic_current": true,
+     "flags": 0,
+     "source_mtime": 1790487666,
+     "source_size": 32
+    },
+    "bytecode_valid_for_source": false,
+    "bytecode_stale": true
+   },
+   "probe_evaluated_seqs": [
+    122,
+    125
+   ],
+   "proof_verified_seq": 126,
+   "event_seq_interval": [
+    75,
+    126
+   ],
+   "journal_prefix_sha256": "96101ce3814733a91eea7e86bf9224a742d880de5ebf90fcea835bd97e0ed800",
+   "affected_preserve": {
+    "C0": [
+     "S0",
+     "PPS-d42a70b70496524b34db830312ce9912f5d9f6a2f82f1d7d4ed2fd1b1306207a"
+    ]
+   },
+   "interval": {
+    "D_ms": 752.6,
+    "W_ms": 557.5,
+    "bytecode_header_second": 1790487666,
+    "S2_developer_second": 1790487666,
+    "S2_verifier_second": 1790487667,
+    "implementer_same_second_as_bytecode": true,
+    "verifier_same_second_as_bytecode": false
+   }
+  },
+  {
+   "platform": "linux-py3.14",
+   "shard": 1,
+   "run": 28,
+   "criterion_id": "C0",
+   "measurement_point": "POST_MERGE",
+   "revision": "7046fb37f4b5b75a64060f52d5da137bb21a7f93",
+   "implementer": {
+    "execution_status": "EXECUTED",
+    "behavior_verdict": "SATISFIED",
+    "reason": null,
+    "revision": "7046fb37f4b5b75a64060f52d5da137bb21a7f93",
+    "record_digest": "bfe87fd1156467e5e2f6ee7a8e89ac7f5c4c78c3cc4349c8e18fa7a57640c42b"
+   },
+   "verifier": {
+    "execution_status": "EXECUTED",
+    "behavior_verdict": "REFUTED",
+    "reason": null,
+    "revision": "7046fb37f4b5b75a64060f52d5da137bb21a7f93",
+    "record_digest": "baa581d8fd4193048ca1be920ad5a60db2c65af900b8f994d009e7b4f833088b"
+   },
+   "instrument_identical": true,
+   "checkout_heads": [
+    "7046fb37f4b5b75a64060f52d5da137bb21a7f93",
+    "7046fb37f4b5b75a64060f52d5da137bb21a7f93"
+   ],
+   "predicted_divergence": {
+    "implementer_reads_stale_bytecode": true,
+    "verifier_reads_stale_bytecode": false,
+    "divergence": true
+   },
+   "implementer_before": {
+    "source_mtime_s": 1790487714,
+    "source_size": 32,
+    "bytecode_header": {
+     "magic_current": true,
+     "flags": 0,
+     "source_mtime": 1790487714,
+     "source_size": 32
+    },
+    "bytecode_valid_for_source": true,
+    "bytecode_stale": true
+   },
+   "verifier_before": {
+    "source_mtime_s": 1790487715,
+    "source_size": 32,
+    "bytecode_header": {
+     "magic_current": true,
+     "flags": 0,
+     "source_mtime": 1790487714,
+     "source_size": 32
+    },
+    "bytecode_valid_for_source": false,
+    "bytecode_stale": true
+   },
+   "probe_evaluated_seqs": [
+    122,
+    125
+   ],
+   "proof_verified_seq": 126,
+   "event_seq_interval": [
+    75,
+    126
+   ],
+   "journal_prefix_sha256": "f81c30a5f208b0645d6d51f936a0b62db5e1a5ea747ef9247cf1b4604ba82f23",
+   "affected_preserve": {
+    "C0": [
+     "S0",
+     "PPS-d42a70b70496524b34db830312ce9912f5d9f6a2f82f1d7d4ed2fd1b1306207a"
+    ]
+   },
+   "interval": {
+    "D_ms": 978.2,
+    "W_ms": 10.2,
+    "bytecode_header_second": 1790487714,
+    "S2_developer_second": 1790487714,
+    "S2_verifier_second": 1790487715,
+    "implementer_same_second_as_bytecode": true,
+    "verifier_same_second_as_bytecode": false
+   }
+  }
+ ],
+ "audits": {
+  "§8_revision_binding": "HOLDS: merged = m.merge.revision (a full SHA read from the merge worktree's HEAD after update-ref); both checkouts are moved to it (git checkout --detach --force <sha>) before reprove(); each party's record binds revision = that SHA; bound_result() refuses a record at another revision; format-3 _verified refuses a proof whose records are not both at the candidate; no branch, HEAD or latest-evidence lookup occurs between the two measurements; the affected PRESERVE set (C0 of S0) binds the same merged SHA. Evidence: every captured disagreement has revision == implementer.revision == verifier.revision == both checkouts' HEAD",
+  "§9_scope_independence": "HOLDS AS DESIGNED, AND IS THE CARRIER: two worktrees (wt-S2, verifier-wt-S2), two process ranges (probe <spec> [C0/POST_MERGE implementer|verifier]), one StoryScope, one immutable target revision. The two checkouts differ in a property the revision does not fix — the mtime of app/calc.py — and the interpreter reads the committed bytecode by that property",
+  "§10_v2_006_on_both_executions": "DISPROVED AS A CAUSE: both parties EXECUTED with a definite verdict (a complete RESULT line each; an incomplete stream is HARNESS_FAILED → Unrunnable, and an exit without RESULT after DISPATCHED is REFUTED for the implementer too, which is not what the captured records show: the implementer reported SATISFIED); the constructed reproduction happens with the V2-006 reader untouched; RACE-10 measured 0 divergence in 102 observations × 3 orderings on five platforms at this probe digest (invalidated Q3 records, measurements not disputed)"
+ },
+ "classification": {
+  "category": "B",
+  "statement": "kernel/orchestration defect: the observation mechanism writes bytecode into the checkout it observes although the kernel configures it not to (M1), and the two-party proof's outcome depends on a property of the checkout the revision does not fix (file dates) whenever the revision carries bytecode of another source (M2, M3) — the proof is then not a function of the revision, and the same rule can mask a real post-merge regression (M6)",
+  "co_factor_not_excusing_the_kernel": "the test fixture's developer double commits __pycache__ (git add -A, no ignore rules): this is how the revision came to carry bytecode here; a real developer capability that commits __pycache__ produces the same revision, and the kernel has no defence against it. A fixture-only correction (an ignore rule) would remove the symptom from ORCH_9_and_10 and leave M1 and M3 in the kernel",
+  "why_not_A": "M1 is the kernel's own setting defeated by its own launch flag; M3 is a property of the kernel's proof, not of the test",
+  "why_not_C": "no environment or capability was absent; both parties executed; the OS and interpreter behaved as specified",
+  "why_not_D": "instrument identity (probe id, digest, enforcement, semantic hash) was identical in every captured disagreement; PROBE_MISMATCH did not apply"
+ },
+ "correction": {
+  "applied": false,
+  "authorized": false,
+  "candidates_for_the_owner": [
+   "harness and test runner: pass -B on the command line (the flag -I/-E do not discard), so the kernel never writes bytecode into the observed checkout (M1)",
+   "harness and test runner: -X pycache_prefix=<scratch of the story> so the interpreter neither reads in-tree __pycache__ nor writes it — the proof becomes a function of the revision's sources even when a developer commits bytecode (M1 + M3)",
+   "workspace policy: refuse or strip __pycache__ (and other derived artefacts) from a candidate before proof — a product-state rule the RFC does not state today"
+  ],
+  "note": "any of these changes aisef2/ → a new semantic candidate → Q0 restarts (owner §4, §6 B)"
+ },
+ "p7_status": "STOPPED at the diagnostic candidate (owner §6 B); Q0-Q3 not rerun on it; P8/Q4 not started",
+ "history": {
+  "e0b6862_entry": "kept UNKNOWN exactly (§11)",
+  "p6_unknown_entries": "abfe99d/6099a81/a466345 predate V2-006 and involve single-story cases (32→66-byte rewrite, no same-size collision): not explained by this mechanism, consistent with P6-FINDING-001's; not relabeled",
+  "diagnostic_candidate_attempts": {
+   "d9a7bb7": "local gate FAIL HARNESS (test_meta: DIAG-1's subprocess call declared no encoding) — seq 77; never pushed",
+   "874d3b1": {
+    "local_gate": "4722 OK — seq 78",
+    "tests_run": 36297902515,
+    "tests_run_outcome": "6 PASS; unit (windows-latest, 3.11) FAIL HARNESS — DIAG-1/2 asserted the bytecode's source size as the LF length (32) where write_text makes 34 bytes on Windows; both cases reached their last assertion, the mechanism held — seq 79-85",
+    "diagnostic_run": 36297897423,
+    "diagnostic_run_outcome": "8/8 success, DIAGNOSTIC_ONLY — seq 86-93"
+   },
+   "next": "the commit carrying this record makes the two assertions take the platform's size; its own attempts are appended by the next evidence-writing commit"
+  }
+ }
+}

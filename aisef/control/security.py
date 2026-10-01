@@ -31,6 +31,7 @@ _LINE = re.compile(
 #: Categories dropped entirely from the report. Borrowed from
 #: `claude-code-security-review`: these are almost always noise on a
 #: story-sized diff, and a noisy report goes unread.
+NOISE_FLOOR = ("critical", "high")   # findings at these severities are never filtered by wording (SS-27)
 NOISE = (
     ("từ chối dịch vụ", "denial of service", "dos ", "cạn bộ nhớ",
      "cạn cpu", "resource exhaustion"),
@@ -59,6 +60,10 @@ class SecurityReport:
     #: disclosing what was filtered makes the filter itself unauditable.
     filtered: list[Finding] = field(default_factory=list)
     error: str = ""
+    #: Why the security reviewer did **not execute** on this candidate (cut, moved tree, modified tree, budget,
+    #: no structured verdict after the schema retry) — "" when it did. A reviewer that did not run has said
+    #: nothing about the code: not a BLOCK, not a PASS, never a reason to reopen the developer (SS-13, INV-G.2).
+    unrunnable: str = ""
 
     def of(self, *severities: str) -> list[Finding]:
         want = {s.lower() for s in severities}
@@ -111,7 +116,8 @@ def parse(text: str) -> SecurityReport:
         if not m:
             continue
         f = Finding(m.group("sev").lower(), m.group("body").strip())
-        (rep.filtered if is_noise(f.text) else rep.findings).append(f)
+        # SS-27 / INV-F.2: wording never removes a blocking-severity finding — the noise filter has a severity floor
+        (rep.filtered if is_noise(f.text) and f.severity not in NOISE_FLOOR else rep.findings).append(f)
 
     rep.findings.sort(key=lambda f: -f.rank)
     if not rep.findings and not rep.filtered:

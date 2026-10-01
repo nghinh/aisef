@@ -1,0 +1,16 @@
+{
+  "gate": "ux-spec",
+  "artifact": "DESIGN.md, EXPERIENCE.md",
+  "artifact_sha256": "50537d3f11830a5e32529f894187dbbd1aa4ba02cc4ca2610054b1c98b6e54ac",
+  "status": "approved",
+  "seq": 3,
+  "decided_by": "auto",
+  "decided_at": "2026-09-15T13:11:41+00:00",
+  "note": "auto-approved (--auto-approve)",
+  "machine_checks": {
+    "bmad_status": "complete",
+    "machine gate": "pass",
+    "warnings": "verify: no route declared — the mockup gate will require one; snapshot: no route declared — the mockup gate will require one; apply: no route declared — the mockup gate will require one; repair-tail: no route declared — the mockup gate will require one; help-version: no route declared — the mockup gate will require one"
+  },
+  "history": []
+}

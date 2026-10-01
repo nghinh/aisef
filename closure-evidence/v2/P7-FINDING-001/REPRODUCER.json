@@ -1,0 +1,96 @@
+{
+ "record": "P7-FINDING-001 deterministic reproducer — old candidate vs corrected candidate",
+ "finding": "P7-FINDING-001",
+ "written": "2026-09-27T08:47:37Z",
+ "head": "7037ecfa2c19eaa90f8a3d3130ac0e89a6113775",
+ "scenario": "tests/v2/test_p7_finding_001.py PYC-1: source B beside bytecode of source A (same size), the source dated to the bytecode's header second; spec returns 2 (the source); the stale bytecode returns 1",
+ "constructed_state": {
+  "header_mtime": 1790498856,
+  "header_size": 22,
+  "source_mtime_s": 1790498856,
+  "source_size": 22,
+  "collision": true
+ },
+ "old_candidate": {
+  "commit": "097daefefd9229eafeacaca321b7a008a581899b",
+  "probe_sources_sha256": {
+   "probe/protocol.py": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+   "probe/python_callable.py": "bde62e675c10902d577c8d2a6301c8bd0589228f26c8acf746b8831b5e6e94e5"
+  },
+  "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+  "digest_is_the_one_the_candidate_declared": true
+ },
+ "corrected_candidate": {
+  "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "checkout_byte_identical_after_the_proof": false
+ },
+ "runs": {
+  "old_candidate": {
+   "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+   "record_digest": "012205825e5a75f2601990f03a7425c56e424a42be4c4b488785326207754dce",
+   "execution_status": "EXECUTED",
+   "behavior_verdict": "REFUTED",
+   "detail": null,
+   "harness_argv_flags": [
+    "-I",
+    "-c"
+   ],
+   "external_pycache_prefix": false,
+   "dont_write_bytecode": false,
+   "observes_the_source": false
+  },
+  "corrected": {
+   "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "record_digest": "dc537a16ca4db485f3f1aba8d1c92b85e27fc96c14f1d4473d619432e7a83f2f",
+   "execution_status": "EXECUTED",
+   "behavior_verdict": "SATISFIED",
+   "detail": null,
+   "harness_argv_flags": [
+    "-I",
+    "-B",
+    "-X",
+    "-c"
+   ],
+   "external_pycache_prefix": true,
+   "dont_write_bytecode": true,
+   "observes_the_source": true
+  },
+  "corrected_without_B (external cache alone)": {
+   "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "record_digest": "dc537a16ca4db485f3f1aba8d1c92b85e27fc96c14f1d4473d619432e7a83f2f",
+   "execution_status": "EXECUTED",
+   "behavior_verdict": "SATISFIED",
+   "detail": null,
+   "harness_argv_flags": [
+    "-I",
+    "-X",
+    "-c"
+   ],
+   "external_pycache_prefix": true,
+   "dont_write_bytecode": false,
+   "observes_the_source": true
+  },
+  "corrected_without_external_cache (-B alone)": {
+   "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "record_digest": "caf915b64452e83f9c0ae397ef2026a41a635358bd4dcd5532d2eb876c927c7e",
+   "execution_status": "EXECUTED",
+   "behavior_verdict": "REFUTED",
+   "detail": null,
+   "harness_argv_flags": [
+    "-I",
+    "-B",
+    "-c"
+   ],
+   "external_pycache_prefix": false,
+   "dont_write_bytecode": true,
+   "observes_the_source": false
+  }
+ },
+ "verdicts": {
+  "old_candidate_fails_the_reproducer": true,
+  "corrected_candidate_passes_the_reproducer": true,
+  "external_cache_alone_carries_correctness": true,
+  "B_alone_does_not": true
+ },
+ "conclusion": "ESTABLISHED: the old candidate observes the stale bytecode, the corrected one the source; the external bytecode cache is the load-bearing control and -B alone is not"
+}

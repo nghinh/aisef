@@ -1,0 +1,14 @@
+{"seq": 1, "step": "attempt.started", "at": 1789791841.668, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789791842.111, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-gpt55-ro-1/.aisef/worktrees/STORY-01-05"}, "undo": {"worktree.remove": "STORY-01-05"}}
+{"seq": 3, "step": "status.running", "at": 1789791842.112, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789792185.208, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/__init__.py", "ledgerlock/ledger.py", "tests/test_ledger.py"], "preexisting_excluded": [], "count": 3}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789792185.208, "attempt": 1, "data": {"luot": 1, "sha": "37c287e707274b3eeef483aed0c3e5b6a1377834", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "changes.detected", "at": 1789792577.795, "attempt": 1, "data": {"luot": 2, "files": ["ledgerlock/__init__.py", "ledgerlock/ledger.py", "tests/test_ledger.py"], "preexisting_excluded": [], "count": 3}, "undo": {}}
+{"seq": 7, "step": "candidate.frozen", "at": 1789792577.796, "attempt": 1, "data": {"luot": 2, "sha": "6188021b15988714530267a53b1e5b63e82451d5", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 8, "step": "changes.detected", "at": 1789792972.463, "attempt": 1, "data": {"luot": 3, "files": ["ledgerlock/__init__.py", "ledgerlock/ledger.py", "tests/test_ledger.py"], "preexisting_excluded": [], "count": 3}, "undo": {}}
+{"seq": 9, "step": "candidate.frozen", "at": 1789792972.464, "attempt": 1, "data": {"luot": 3, "sha": "c02921da40029ce490624ff6ea96d07b04d2a62d", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 10, "step": "verification.completed", "at": 1789793091.422, "attempt": 1, "data": {"ok": true, "attempts": 3, "cost_usd": 0.0, "candidate": "c02921da40029ce490624ff6ea96d07b04d2a62d"}, "undo": {}}
+{"seq": 11, "step": "review.completed", "at": 1789793091.422, "attempt": 1, "data": {"blocked": ["[block] ledgerlock/ledger.py:18 — append reads the tail hash and writes the new line without any shared lock, so concurrent appenders can both commit lines with the same prev_hash", "[block] ledgerlock/ledger.py:20 — fcntl.flock does not serialize concurrent append calls from different threads in the same process, so they can still read the same tail hash and commit two lines with the same prev_hash"], "outcome": "PASS", "review_executions": 3, "developer_attempts": 3}, "undo": {}}
+{"seq": 12, "step": "attempt.aborted", "at": 1789793091.428, "attempt": 1, "data": {"reason": "abnormal termination"}, "undo": {}}
+{"seq": 13, "step": "merge.completed", "at": 1789793091.491, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 14, "step": "attempt.committed", "at": 1789793091.859, "attempt": 1, "data": {}, "undo": {}}

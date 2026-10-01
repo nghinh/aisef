@@ -1,0 +1,53 @@
+name: diagnostic
+# P7-FINDING-001 — the targeted real-path reproducer (owner's diagnostic authorization §5): the real ORCH_9_and_10
+# case, run many times on the qualification platforms, ubuntu 3.11 first and widest. Runs only for a push whose commit
+# message carries "[diagnose]". Each job prints its record into the log (validation/qualification/common.py::emit);
+# nothing is downloaded from it. A reproduction stops that job's loop; the job's exit status flags only an unexplained
+# divergence or a failure of another kind.
+on:
+  push:
+    branches: [hardening/systematic-v1]
+jobs:
+  orch9:
+    if: contains(github.event.head_commit.message, '[diagnose]')
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11"]
+        shard: [1, 2, 3, 4]
+        include:
+          - os: ubuntu-latest
+            python-version: "3.12"
+            shard: 1
+          - os: ubuntu-latest
+            python-version: "3.13"
+            shard: 1
+          - os: ubuntu-latest
+            python-version: "3.14"
+            shard: 1
+          - os: windows-latest
+            python-version: "3.11"
+            shard: 1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: harness digest before execution (owner §25)
+        run: python -P -c "import sys; sys.path.insert(0, '.'); from validation.qualification import common as C; print(C.harness_digest()['sha256'])"
+      - name: 250 real ORCH_9_and_10 executions in the owned range
+        run: python -P validation/v2/owned_run.py --out owned-run.json -- python -P validation/qualification/diag_orch9.py --runs 250 --shard ${{ matrix.shard }} --print
+      - name: owned-range measurement of the whole run
+        if: always()
+        run: python -c "import json,sys; print('===AISEF-OWNED-RUN===' + json.dumps(json.load(open('owned-run.json'))) + '===END===')"
+      - name: V1 evidence untouched by the run
+        if: always()
+        run: python -P validation/v2/v1_evidence_guard.py --check
+      - name: the tree after the run
+        if: always()
+        run: git status --porcelain

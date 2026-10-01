@@ -1,0 +1,21 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests/test_nfc_normalization.py:1:1
+  |
+1 | / from __future__ import annotations
+2 | |
+3 | | import subprocess
+4 | | import unittest
+5 | | import unicodedata
+6 | | from pathlib import Path
+  | |________________________^
+help: Organize imports
+  |
+3 | import subprocess
+4 + import unicodedata
+5 | import unittest
+  - import unicodedata
+6 | from pathlib import Path
+  |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.

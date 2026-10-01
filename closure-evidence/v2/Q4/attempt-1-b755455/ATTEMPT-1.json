@@ -1,0 +1,17 @@
+{
+ "record": "AISEF V2 — Q4 attempt 1 (execution commit b755455): FAILED before any chunk record was written",
+ "written": "2026-09-27T23:37:38Z",
+ "what": "all ten chunk workers evaluated their 10,000 seeds (295 s each, five at a time) and then failed to write their record: the worker's header held the armed-invariant registry as a frozenset of enums, which JSON cannot serialise (TypeError at C.render); no chunk-*.json exists for attempt 1",
+ "classification": "HARNESS (q4.py record serialisation); no kernel change; no trace outcome recorded, so none is claimed",
+ "evidence": {
+  "subject_frozen": "SUBJECT.json (harness digest of b755455)",
+  "conformance": [
+   "CONFORMANCE-start.json",
+   "CONFORMANCE-end.json"
+  ],
+  "aggregation": "DIFFERENTIAL.json (FAILED: chunks present [])",
+  "resources": "RESOURCES.json (workers_max 10 = five workers and their five owned-range wrappers, both matching the monitor's pattern; disk free min 59659 MB; memory free min 6766 MB)",
+  "owned_ranges": "../owned/chunk-K.attempt-1.json (exit 1, no residual process, released empty)"
+ },
+ "correction": "the worker records the registry as its tier and the sorted invariant ids and renders its header before the first trace; the monitor counts the worker processes only; a new harness commit; the subject re-frozen; every chunk rerun as attempt 2 (a rerun never erases attempt 1)"
+}

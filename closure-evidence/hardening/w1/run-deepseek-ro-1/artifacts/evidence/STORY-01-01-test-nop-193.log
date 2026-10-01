@@ -1,0 +1,114 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 5 items / 1 error
+
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path FAILED [ 20%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_module_help_lists_subcommands FAILED [ 40%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_imports FAILED [ 60%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_6_no_side_channel_calls FAILED [ 80%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_7_import_Ledger_and_ConflictError FAILED [100%]
+
+==================================== ERRORS ====================================
+_______________ ERROR collecting tests/test_nfc_normalization.py _______________
+ImportError while importing test module '/workspace/tests/test_nfc_normalization.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_nfc_normalization.py:6: in <module>
+    from ledgerlock.format import normalize_key
+E   ModuleNotFoundError: No module named 'ledgerlock'
+=================================== FAILURES ===================================
+____ SkeletonTests.test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path ____
+
+self = <tests.test_skeleton.SkeletonTests testMethod=test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path>
+
+    def test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path(self):
+        proc = subprocess.run(
+            [sys.executable, "-c", "import ledgerlock; print(ledgerlock.__file__)"],
+            capture_output=True,
+            text=True,
+            cwd=_PKG_ROOT,
+            check=False,
+        )
+>       self.assertEqual(proc.returncode, 0, proc.stderr)
+E       AssertionError: 1 != 0 : Traceback (most recent call last):
+E         File "<string>", line 1, in <module>
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_skeleton.py:20: AssertionError
+______ SkeletonTests.test_AC_STORY_01_01_4_module_help_lists_subcommands _______
+
+self = <tests.test_skeleton.SkeletonTests testMethod=test_AC_STORY_01_01_4_module_help_lists_subcommands>
+
+    def test_AC_STORY_01_01_4_module_help_lists_subcommands(self):
+        proc = subprocess.run(
+            [sys.executable, "-m", "ledgerlock", "--help"],
+            capture_output=True,
+            text=True,
+            cwd=_PKG_ROOT,
+            check=False,
+        )
+>       self.assertEqual(proc.returncode, 0, proc.stderr)
+E       AssertionError: 1 != 0 : /usr/local/bin/python3: No module named ledgerlock
+
+tests/test_skeleton.py:35: AssertionError
+___________ SkeletonTests.test_AC_STORY_01_01_5_no_forbidden_imports ___________
+
+self = <tests.test_skeleton.SkeletonTests testMethod=test_AC_STORY_01_01_5_no_forbidden_imports>
+
+    def test_AC_STORY_01_01_5_no_forbidden_imports(self):
+        pattern = (
+            r"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl"
+            r"|multiprocessing|ctypes|http\.server|http\.client|socketserver)"
+        )
+        proc = subprocess.run(
+            ["grep", "-RE", pattern, "ledgerlock"],
+            capture_output=True,
+            text=True,
+            cwd=_PKG_ROOT,
+            check=False,
+        )
+>       self.assertEqual(proc.returncode, 1, proc.stdout)
+E       AssertionError: 2 != 1 :
+
+tests/test_skeleton.py:51: AssertionError
+__________ SkeletonTests.test_AC_STORY_01_01_6_no_side_channel_calls ___________
+
+self = <tests.test_skeleton.SkeletonTests testMethod=test_AC_STORY_01_01_6_no_side_channel_calls>
+
+    def test_AC_STORY_01_01_6_no_side_channel_calls(self):
+        pattern = r"os\.system|subprocess\.|socket\."
+        proc = subprocess.run(
+            ["grep", "-RE", pattern, "ledgerlock"],
+            capture_output=True,
+            text=True,
+            cwd=_PKG_ROOT,
+            check=False,
+        )
+>       self.assertEqual(proc.returncode, 1, proc.stdout)
+E       AssertionError: 2 != 1 :
+
+tests/test_skeleton.py:62: AssertionError
+_____ SkeletonTests.test_AC_STORY_01_01_7_import_Ledger_and_ConflictError ______
+
+self = <tests.test_skeleton.SkeletonTests testMethod=test_AC_STORY_01_01_7_import_Ledger_and_ConflictError>
+
+    def test_AC_STORY_01_01_7_import_Ledger_and_ConflictError(self):
+>       from ledgerlock import ConflictError, Ledger
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_skeleton.py:65: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path
+FAILED tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_module_help_lists_subcommands
+FAILED tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_imports
+FAILED tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_6_no_side_channel_calls
+FAILED tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_7_import_Ledger_and_ConflictError
+ERROR tests/test_nfc_normalization.py
+========================== 5 failed, 1 error in 0.08s ==========================

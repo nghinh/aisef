@@ -1,0 +1,26 @@
+{
+ "record": "W0 INVALIDATION \u2014 separate from and not a rewrite of the original record",
+ "created": "2026-09-18T18:28:59+0700",
+ "owner_decision": "FIX SS-81 FAMILY, VOID W0, THEN REQUALIFY (2026-09-18), section 1",
+ "original_w0": {
+  "path": "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json",
+  "sha256_of_the_file_as_preserved": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "candidate_sha": "0a7cab86086ebc496bcda1559142082c89506c29",
+  "generated": "2026-09-18T05:06:30+00:00",
+  "qualified_as_written": true,
+  "criteria_count": 11
+ },
+ "original_kernel": {
+  "candidate_sha_frozen": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+  "aisef_tree_digest": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+  "wheel_sha256": "2e08d43b61d6647692b731943741f64f7fa8f107e53dacf06bb92bbc1c9bfe8e"
+ },
+ "defect": "SS-81 (P1, PRODUCT_KERNEL): the 'tests verify story' / TDD controls can PASS on tests that never executed at the parent SHA; sibling SS-82 (P3)",
+ "reason": "assurance invariant invalidated \u2014 absence of execution was accepted as proof; W0 requires 0 OPEN P1 over the complete current register (INV-T.QUALIFICATION-REGISTER)",
+ "no_historical_false_pass_observed": {
+  "evidence": "closure-evidence/hardening/w1/ss81/IMPACT-REMEASURE-accepted-runs.json",
+  "summary": "6 DONE stories whose control rested on nothing having executed were re-run at their real parent SHAs with every test file collected: 0 AC-coded tests green at the parent"
+ },
+ "status": "VOID FOR CURRENT QUALIFICATION PURPOSES",
+ "statement": "Future qualification claims may not rely on the W0 record at the path above. It is preserved byte-for-byte as historical evidence. The W1 safety measurements taken on that kernel remain historical measured evidence; they are not sufficient to qualify a kernel with an open P1."
+}

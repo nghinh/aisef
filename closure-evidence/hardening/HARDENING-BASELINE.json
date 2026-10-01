@@ -1,0 +1,67 @@
+{
+ "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
+ "phase": "8B — HARDENING-BASELINE (pre-fix qualification of the machinery)",
+ "recorded": "2026-09-16T10:39:40+00:00",
+ "branch": "hardening/systematic-v1",
+ "qualification_pr": "https://github.com/nghinh/aisef/pull/6 (draft, DO NOT MERGE)",
+ "ci_run": {
+  "id": 35083739241,
+  "workflow": "tests",
+  "head_sha": "62c210bf512b75746a3b3961b1e538dc4831b40a",
+  "conclusion": "success",
+  "jobs": {
+   "unit (ubuntu-latest, 3.11)": {
+    "result": "success",
+    "tests": 3305,
+    "skipped": 79,
+    "expected_failures": 69,
+    "seconds": 126.1
+   },
+   "unit (ubuntu-latest, 3.12)": {
+    "result": "success"
+   },
+   "unit (ubuntu-latest, 3.13)": {
+    "result": "success"
+   },
+   "unit (ubuntu-latest, 3.14)": {
+    "result": "success",
+    "tests": 3305,
+    "skipped": 79,
+    "expected_failures": 69,
+    "seconds": 121.8
+   },
+   "unit (windows-latest, 3.11)": {
+    "result": "success",
+    "tests": 3305,
+    "skipped": 84,
+    "expected_failures": 69,
+    "seconds": 1371.1
+   },
+   "lint": {
+    "result": "success",
+    "detail": "All checks passed!"
+   },
+   "wheel": {
+    "result": "success",
+    "detail": "aisef-1.7.6 wheel + sdist built; packaged runtime data OK"
+   }
+  }
+ },
+ "expected_red_policy": "every expectedFailure at this stage is tagged with a confirmed defect id (SS-xx, D-035, AD-xx) or the fix family (F1/F5) or the MISSING invariant (Phase 17); none unexplained",
+ "expected_red_count_in_ci": 69,
+ "local_at_head_sha": {
+  "tests/hardening": "44 passed · 69 expected-red · 18 subtests (259e587/62c210b)",
+  "state_model": "10 000 traces, 105 949 transitions, 0 violations",
+  "differential": "400 traces, 270 matched, 130 attributed, 0 unexplained"
+ },
+ "since_baseline_local_only": {
+  "commits": [
+   "eb48335 mutation harness + F1 plan",
+   "cdf7bef scale contract + P16/P17 plans",
+   "a8e068f compound faults (SS-61)",
+   "1bb1e51 adapter conformance (AD-01/03/04/05)"
+  ],
+  "note": "these add tests and evidence only; the next push re-qualifies them on the matrix"
+ },
+ "verdict": "HARDENING MACHINERY QUALIFIED on Linux 3.11–3.14 and Windows 3.11; no unexplained CI failure; kernel changes (Phase 10) may begin"
+}

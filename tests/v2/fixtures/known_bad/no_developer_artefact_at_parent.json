@@ -1,0 +1,9 @@
+{
+ "checker": "no_developer_artefact_at_parent",
+ "package": "WP-5.5 (invariant IX)",
+ "kind": "kernel_source",
+ "rule": "NO_DEVELOPER_ARTEFACT_AT_PARENT",
+ "path": "aisef2/control/gate.py",
+ "source": "from aisef2.quality.test_execution import UNITTEST, execute\n\n\ndef red_at(parent, tests, deps):\n    return execute(UNITTEST, parent, tests, deps)  # the V1 RED-at-parent gate, rebuilt in the kernel\n",
+ "expect": "NO_DEVELOPER_ARTEFACT_AT_PARENT aisef2/control/gate.py:4"
+}

@@ -1,0 +1,860 @@
+{
+ "generated": "2026-09-20T17:08:24+0700",
+ "invariant": "INV-N.DEFAULT-CAPABILITY",
+ "rule": "AUTO_SELECTED(tool, stack, profile) => AVAILABLE(tool, resolved_environment); for every capability declared == selected == provisioned == probed_successfully == executed (real images, production path, no mocks)",
+ "git_sha": "2f2be734f5a87f4a1d0faefdcdbd579bf7d5e92f",
+ "aisef_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+ "aisef_dirty": [],
+ "registry_sha256": "08ac5be228bea89b548850c59aae315cd48b4f01f4e18dc399e34836987ad9a8",
+ "docker": "29.8.0 arm64",
+ "profiles": [
+  {
+   "stack": "node",
+   "markers": [
+    "package.json"
+   ],
+   "base": "node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32",
+   "managed": false,
+   "image": "node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32",
+   "image_id": "sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32",
+   "recipe_digest": "",
+   "dockerfile": "",
+   "environment_error": "",
+   "environment_seconds": 0.2,
+   "runtime": [
+    {
+     "argv": [
+      "node",
+      "--version"
+     ],
+     "expect": "v22.23.2",
+     "exit": 0,
+     "observed": "v22.23.2",
+     "ok": true,
+     "provider_error": ""
+    },
+    {
+     "argv": [
+      "npm",
+      "--version"
+     ],
+     "expect": "10.9.8",
+     "exit": 0,
+     "observed": "10.9.8",
+     "ok": true,
+     "provider_error": ""
+    }
+   ],
+   "roles": {
+    "test": {
+     "tool_id": "npm-test",
+     "command": "npm test --silent",
+     "provision": "project",
+     "version": "",
+     "version_policy": "the project's own lockfile",
+     "evidence": "the project's `test` script",
+     "required": true,
+     "note": "selected only when package.json declares a `test` script",
+     "resolved_mode": "auto",
+     "resolved_command": "npm test --silent",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "v22.23.2",
+     "probe_detail": "npm-test: the node runtime; the script is the project's (selected only when package.json declares a `test` script)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 5.9,
+      "tail": ""
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    },
+    "lint": {
+     "tool_id": "npm-lint",
+     "command": "npm run lint --silent",
+     "provision": "project",
+     "version": "",
+     "version_policy": "the project's own lockfile",
+     "evidence": "the project's `lint` script",
+     "required": true,
+     "note": "selected only when package.json declares `lint` (else `typecheck`: `npm run typecheck --silent`)",
+     "resolved_mode": "auto",
+     "resolved_command": "npm run lint --silent",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "v22.23.2",
+     "probe_detail": "npm-lint: the node runtime; the script is the project's (selected only when package.json declares `lint` (else `typecheck`: `npm run typecheck --silent`))",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 5.6,
+      "tail": ""
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    },
+    "sast": {
+     "tool_id": "none-sast",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": false,
+     "note": "no default Node SAST: `npm audit` is a dependency audit that needs the npm registry, and the security sandbox has no network (measured 2026-09-17 in node:22-alpine: `EAI_AGAIN registry.npmjs.org`); declare `tools.sast` to run a project scanner",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no default Node SAST: `npm audit` is a dependency audit that needs the npm registry, and the security sandbox has no network (measured 2026-09-17 in node:22-alpine: `EAI_AGAIN registry.npmjs.org`); declare `tools.sast` to run a project scanner",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    }
+   },
+   "status": "QUALIFIED"
+  },
+  {
+   "stack": "python",
+   "markers": [
+    "pyproject.toml",
+    "setup.py"
+   ],
+   "base": "python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea",
+   "managed": true,
+   "image": "aisef-verify-python:84adf1d8eaf9",
+   "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+   "recipe_digest": "84adf1d8eaf9772af6abee78ae305905afeae0da489b6900f957e04c7b128361",
+   "dockerfile": "FROM python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea\nRUN pip install --no-cache-dir --disable-pip-version-check pytest==9.1.1 pytest-cov==7.1.0 ruff==0.16.7 bandit==1.9.4\n",
+   "environment_error": "",
+   "environment_seconds": 0.1,
+   "runtime": [],
+   "roles": {
+    "test": {
+     "tool_id": "pytest",
+     "command": "pytest -q",
+     "provision": "managed",
+     "version": "9.1.1",
+     "version_policy": "pinned 9.1.1",
+     "evidence": "test results",
+     "required": true,
+     "note": "",
+     "resolved_mode": "auto",
+     "resolved_command": "pytest -q",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "pytest 9.1.1",
+     "probe_detail": "pytest (pinned 9.1.1)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 0.7,
+      "tail": ".                                                                        [100%]\n1 passed in 0.02s"
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    },
+    "lint": {
+     "tool_id": "ruff",
+     "command": "ruff check .",
+     "provision": "managed",
+     "version": "0.16.7",
+     "version_policy": "pinned 0.16.7",
+     "evidence": "lint findings",
+     "required": true,
+     "note": "",
+     "resolved_mode": "auto",
+     "resolved_command": "ruff check .",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "ruff 0.16.7",
+     "probe_detail": "ruff (pinned 0.16.7)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 0.4,
+      "tail": "All checks passed!"
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    },
+    "sast": {
+     "tool_id": "bandit",
+     "command": "bandit -q -r .",
+     "provision": "managed",
+     "version": "1.9.4",
+     "version_policy": "pinned 1.9.4",
+     "evidence": "static security findings",
+     "required": false,
+     "note": "",
+     "resolved_mode": "auto",
+     "resolved_command": "bandit -q -r .",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "bandit 1.9.4",
+     "probe_detail": "bandit (pinned 1.9.4)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 0.6,
+      "tail": ""
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    }
+   },
+   "status": "QUALIFIED"
+  },
+  {
+   "stack": "go",
+   "markers": [
+    "go.mod"
+   ],
+   "base": "golang:1.26-alpine@sha256:ce864e7223ac17b1775e6fd0b4c0db580c2eb50e7953a427916379e4b92a1628",
+   "managed": true,
+   "image": "aisef-verify-go:6a26aba68eaa",
+   "image_id": "sha256:83a2677a619a55e3f8649061c8e44068854ff5b17639ff294afe7b70c12627b2",
+   "recipe_digest": "6a26aba68eaa027435cc725d4c7d1b233a821391cdaefdd064ff9da8b8db75ae",
+   "dockerfile": "FROM golang:1.26-alpine@sha256:ce864e7223ac17b1775e6fd0b4c0db580c2eb50e7953a427916379e4b92a1628\nRUN CGO_ENABLED=0 GOBIN=/usr/local/bin GOFLAGS=-trimpath go install github.com/securego/gosec/v2/cmd/gosec@v2.29.0\nENV GOCACHE=/tmp/go-build\n",
+   "environment_error": "",
+   "environment_seconds": 0.1,
+   "runtime": [],
+   "roles": {
+    "test": {
+     "tool_id": "go-test",
+     "command": "go test ./...",
+     "provision": "toolchain",
+     "version": "",
+     "version_policy": "pinned by the base image digest",
+     "evidence": "test results",
+     "required": true,
+     "note": "",
+     "resolved_mode": "auto",
+     "resolved_command": "go test ./...",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "go version go1.26.8 linux/arm64",
+     "probe_detail": "go-test (pinned by the base image digest)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 3.9,
+      "tail": "ok  \texample.com/calc\t0.001s"
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    },
+    "lint": {
+     "tool_id": "go-vet",
+     "command": "go vet ./...",
+     "provision": "toolchain",
+     "version": "",
+     "version_policy": "pinned by the base image digest",
+     "evidence": "lint findings",
+     "required": true,
+     "note": "",
+     "resolved_mode": "auto",
+     "resolved_command": "go vet ./...",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "/usr/local/go/pkg/tool/linux_arm64/vet",
+     "probe_detail": "go-vet (pinned by the base image digest)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 3.1,
+      "tail": ""
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    },
+    "sast": {
+     "tool_id": "gosec",
+     "command": "gosec ./...",
+     "provision": "managed",
+     "version": "2.29.0",
+     "version_policy": "pinned 2.29.0",
+     "evidence": "static security findings",
+     "required": false,
+     "note": "",
+     "resolved_mode": "auto",
+     "resolved_command": "gosec ./...",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "/usr/local/bin/gosec: go1.26.8",
+     "probe_detail": "gosec (pinned 2.29.0)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 0.5,
+      "tail": "[gosec] 2026/09/20 10:08:13 Excluding rules: default\n[gosec] 2026/09/20 10:08:13 Including analyzers: default\n[gosec] 2026/09/20 10:08:13 Excluding analyzers: default\n[gosec] 2026/09/20 10:08:13 Import directory: /workspace\n[gosec] 2026/09/20 10:08:13 Checking package: calc\n[gosec] 2026/09/20 10:08:13 Checking file: /workspace/calc.go"
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    }
+   },
+   "status": "QUALIFIED"
+  },
+  {
+   "stack": "rust",
+   "markers": [
+    "Cargo.toml"
+   ],
+   "base": "rust:1-alpine@sha256:1716b3aa042d735f4566d14dc54e8037de9d69556e2d5dd58131d93a613d173d",
+   "managed": true,
+   "image": "aisef-verify-rust:33cd9daabc13",
+   "image_id": "sha256:1d9f70d506ab2c5b8380668abf9b61b4260c15c62d8c3c75485311862aa44efe",
+   "recipe_digest": "33cd9daabc1313fa6acca47154a2d1a03a3a24fa5d76998a21b4734fc310a124",
+   "dockerfile": "FROM rust:1-alpine@sha256:1716b3aa042d735f4566d14dc54e8037de9d69556e2d5dd58131d93a613d173d\nRUN rustup component add clippy\nRUN cargo install cargo-audit --locked --version 0.22.2 --root /usr/local\nRUN mkdir -p /usr/local/share/advisory-db && wget -qO- https://github.com/rustsec/advisory-db/archive/f58ccfe51a5954186716998f01360d1079a8a3a5.tar.gz | tar -xz --strip-components=1 -C /usr/local/share/advisory-db\n",
+   "environment_error": "",
+   "environment_seconds": 0.1,
+   "runtime": [],
+   "roles": {
+    "test": {
+     "tool_id": "cargo-test",
+     "command": "cargo test",
+     "provision": "toolchain",
+     "version": "",
+     "version_policy": "pinned by the base image digest",
+     "evidence": "test results",
+     "required": true,
+     "note": "",
+     "resolved_mode": "auto",
+     "resolved_command": "cargo test",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+     "probe_detail": "cargo-test (pinned by the base image digest)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 1.2,
+      "tail": "\n\n   Compiling calc v0.1.0 (/workspace)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.76s\n     Running unittests src/lib.rs (target/debug/deps/calc-61168daa189953a8)\n   Doc-tests calc"
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    },
+    "lint": {
+     "tool_id": "clippy",
+     "command": "cargo clippy -- -D warnings",
+     "provision": "managed",
+     "version": "0.1.98",
+     "version_policy": "pinned 0.1.98",
+     "evidence": "lint findings",
+     "required": true,
+     "note": "",
+     "resolved_mode": "auto",
+     "resolved_command": "cargo clippy -- -D warnings",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "clippy 0.1.98 (48a229ceae 2026-09-01)",
+     "probe_detail": "clippy (pinned 0.1.98)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 0.5,
+      "tail": "Checking calc v0.1.0 (/workspace)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.13s"
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    },
+    "sast": {
+     "tool_id": "cargo-audit",
+     "command": "cargo audit --no-fetch --stale --no-yanked --db /usr/local/share/advisory-db",
+     "provision": "managed",
+     "version": "0.22.2",
+     "version_policy": "pinned 0.22.2",
+     "evidence": "known-vulnerability findings for Cargo.lock (rustsec advisory-db f58ccfe51a59, baked in)",
+     "required": false,
+     "note": "",
+     "resolved_mode": "auto",
+     "resolved_command": "cargo audit --no-fetch --stale --no-yanked --db /usr/local/share/advisory-db",
+     "declared": true,
+     "selected": true,
+     "provisioned": true,
+     "probe_state": "present",
+     "probe_observed": "cargo-audit-audit 0.22.2",
+     "probe_detail": "cargo-audit (pinned 0.22.2)",
+     "exec": {
+      "exit": 0,
+      "ok": true,
+      "unrunnable": "",
+      "skipped": "",
+      "outcome": "",
+      "seconds": 0.7,
+      "tail": "Loaded 1247 security advisories (from /usr/local/share/advisory-db)\n    Scanning Cargo.lock for vulnerabilities (1 crate dependencies)"
+     },
+     "executed": true,
+     "status": "QUALIFIED"
+    }
+   },
+   "status": "QUALIFIED"
+  },
+  {
+   "stack": "ruby",
+   "markers": [
+    "Gemfile"
+   ],
+   "base": "ruby:3-alpine@sha256:c5a5064d190055633011c03aa800170cc36945ff3afb5f6c915329f92d6f1e00",
+   "managed": false,
+   "image": "ruby:3-alpine@sha256:c5a5064d190055633011c03aa800170cc36945ff3afb5f6c915329f92d6f1e00",
+   "image_id": "sha256:c5a5064d190055633011c03aa800170cc36945ff3afb5f6c915329f92d6f1e00",
+   "recipe_digest": "",
+   "dockerfile": "",
+   "environment_error": "",
+   "environment_seconds": 0.1,
+   "runtime": [
+    {
+     "argv": [
+      "ruby",
+      "--version"
+     ],
+     "expect": "ruby 3.4.10",
+     "exit": 0,
+     "observed": "ruby 3.4.10 (2026-06-30 revision 2b0b7728dc) +PRISM [aarch64-linux-musl]",
+     "ok": true,
+     "provider_error": ""
+    },
+    {
+     "argv": [
+      "bundle",
+      "--version"
+     ],
+     "expect": "2.6.9",
+     "exit": 0,
+     "observed": "Bundler version 2.6.9",
+     "ok": true,
+     "provider_error": ""
+    }
+   ],
+   "roles": {
+    "test": {
+     "tool_id": "none-test",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": true,
+     "note": "no default Ruby tool: `bundle exec rspec/rubocop/brakeman` run the project's own gems, which ruby:3-alpine does not carry and the offline sandbox cannot install (measured 2026-09-17: none present); declare `tools.*` and a `sandbox.image` carrying the bundle",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no default Ruby tool: `bundle exec rspec/rubocop/brakeman` run the project's own gems, which ruby:3-alpine does not carry and the offline sandbox cannot install (measured 2026-09-17: none present); declare `tools.*` and a `sandbox.image` carrying the bundle",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    },
+    "lint": {
+     "tool_id": "none-lint",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": true,
+     "note": "no default Ruby tool: `bundle exec rspec/rubocop/brakeman` run the project's own gems, which ruby:3-alpine does not carry and the offline sandbox cannot install (measured 2026-09-17: none present); declare `tools.*` and a `sandbox.image` carrying the bundle",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no default Ruby tool: `bundle exec rspec/rubocop/brakeman` run the project's own gems, which ruby:3-alpine does not carry and the offline sandbox cannot install (measured 2026-09-17: none present); declare `tools.*` and a `sandbox.image` carrying the bundle",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    },
+    "sast": {
+     "tool_id": "none-sast",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": false,
+     "note": "no default Ruby tool: `bundle exec rspec/rubocop/brakeman` run the project's own gems, which ruby:3-alpine does not carry and the offline sandbox cannot install (measured 2026-09-17: none present); declare `tools.*` and a `sandbox.image` carrying the bundle",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no default Ruby tool: `bundle exec rspec/rubocop/brakeman` run the project's own gems, which ruby:3-alpine does not carry and the offline sandbox cannot install (measured 2026-09-17: none present); declare `tools.*` and a `sandbox.image` carrying the bundle",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    }
+   },
+   "status": "QUALIFIED"
+  },
+  {
+   "stack": "php",
+   "markers": [
+    "composer.json"
+   ],
+   "base": "php:8-cli-alpine@sha256:dae77e6aa4934d22b903da93e0e506c34032f5d8f8f91693d2cbf6e2724ddf73",
+   "managed": false,
+   "image": "php:8-cli-alpine@sha256:dae77e6aa4934d22b903da93e0e506c34032f5d8f8f91693d2cbf6e2724ddf73",
+   "image_id": "sha256:dae77e6aa4934d22b903da93e0e506c34032f5d8f8f91693d2cbf6e2724ddf73",
+   "recipe_digest": "",
+   "dockerfile": "",
+   "environment_error": "",
+   "environment_seconds": 0.1,
+   "runtime": [
+    {
+     "argv": [
+      "php",
+      "--version"
+     ],
+     "expect": "PHP 8.5.10",
+     "exit": 0,
+     "observed": "PHP 8.5.10 (cli) (built: Sep 15 2026 21:18:52) (NTS)",
+     "ok": true,
+     "provider_error": ""
+    }
+   ],
+   "roles": {
+    "test": {
+     "tool_id": "none-test",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": true,
+     "note": "no default PHP tool: `composer test/lint` need composer, absent from php:8-cli-alpine (measured 2026-09-17), and the project's vendor tree; declare `tools.*` and a `sandbox.image` that carries them",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no default PHP tool: `composer test/lint` need composer, absent from php:8-cli-alpine (measured 2026-09-17), and the project's vendor tree; declare `tools.*` and a `sandbox.image` that carries them",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    },
+    "lint": {
+     "tool_id": "none-lint",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": true,
+     "note": "no default PHP tool: `composer test/lint` need composer, absent from php:8-cli-alpine (measured 2026-09-17), and the project's vendor tree; declare `tools.*` and a `sandbox.image` that carries them",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no default PHP tool: `composer test/lint` need composer, absent from php:8-cli-alpine (measured 2026-09-17), and the project's vendor tree; declare `tools.*` and a `sandbox.image` that carries them",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    },
+    "sast": {
+     "tool_id": "none-sast",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": false,
+     "note": "no default PHP tool: `composer test/lint` need composer, absent from php:8-cli-alpine (measured 2026-09-17), and the project's vendor tree; declare `tools.*` and a `sandbox.image` that carries them",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no default PHP tool: `composer test/lint` need composer, absent from php:8-cli-alpine (measured 2026-09-17), and the project's vendor tree; declare `tools.*` and a `sandbox.image` that carries them",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    }
+   },
+   "status": "QUALIFIED"
+  },
+  {
+   "stack": "flutter",
+   "markers": [
+    "pubspec.yaml"
+   ],
+   "base": "alpine:latest",
+   "managed": false,
+   "image": "alpine:latest",
+   "image_id": "sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11",
+   "recipe_digest": "",
+   "dockerfile": "",
+   "environment_error": "",
+   "environment_seconds": 0.2,
+   "runtime": [],
+   "roles": {
+    "test": {
+     "tool_id": "none-test",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": true,
+     "note": "no managed Flutter environment: the fallback image carries no flutter (measured 2026-09-17); declare `tools.*` and a `sandbox.image` carrying the SDK",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no managed Flutter environment: the fallback image carries no flutter (measured 2026-09-17); declare `tools.*` and a `sandbox.image` carrying the SDK",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    },
+    "lint": {
+     "tool_id": "none-lint",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": true,
+     "note": "no managed Flutter environment: the fallback image carries no flutter (measured 2026-09-17); declare `tools.*` and a `sandbox.image` carrying the SDK",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no managed Flutter environment: the fallback image carries no flutter (measured 2026-09-17); declare `tools.*` and a `sandbox.image` carrying the SDK",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    },
+    "sast": {
+     "tool_id": "none-sast",
+     "command": "",
+     "provision": "none",
+     "version": "",
+     "version_policy": "n/a",
+     "evidence": "",
+     "required": false,
+     "note": "no managed Flutter environment: the fallback image carries no flutter (measured 2026-09-17); declare `tools.*` and a `sandbox.image` carrying the SDK",
+     "resolved_mode": "auto",
+     "resolved_command": "",
+     "declared": true,
+     "selected": true,
+     "provisioned": null,
+     "probe_state": "n/a",
+     "executed": null,
+     "exec": {
+      "skipped": "project has not declared a command for this tool — no managed Flutter environment: the fallback image carries no flutter (measured 2026-09-17); declare `tools.*` and a `sandbox.image` carrying the SDK",
+      "ran": false
+     },
+     "status": "NONE_DECLARED"
+    }
+   },
+   "status": "QUALIFIED"
+  }
+ ],
+ "presets": [
+  {
+   "preset": "react",
+   "image": "node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32",
+   "checks": [
+    {
+     "key": "tools.test",
+     "command": "npx vitest run --reporter=verbose",
+     "state": "UNJUDGED",
+     "mode": "explicit",
+     "observed": "",
+     "detail": "project-local runner: unmeasured here; the story's first tool run is the proof"
+    },
+    {
+     "key": "tools.lint",
+     "command": "npx eslint . --max-warnings=0 --ignore-pattern \"**/.claude/**\" --ignore-pattern \"**/.aisef/**\" --ignore-pattern \"**/.opencode/**\"",
+     "state": "UNJUDGED",
+     "mode": "explicit",
+     "observed": "",
+     "detail": "project-local runner: unmeasured here; the story's first tool run is the proof"
+    }
+   ],
+   "status": "QUALIFIED",
+   "failures": []
+  },
+  {
+   "preset": "python",
+   "image": "aisef-verify-python:84adf1d8eaf9",
+   "checks": [
+    {
+     "key": "tools.test",
+     "command": "python3 -m pytest -v",
+     "state": "present",
+     "mode": "explicit",
+     "observed": "",
+     "detail": "the project's declared command"
+    },
+    {
+     "key": "tools.lint",
+     "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+     "state": "present",
+     "mode": "explicit",
+     "observed": "/usr/local/bin/ruff",
+     "detail": "the project's declared command"
+    },
+    {
+     "key": "tools.sast",
+     "command": "bandit -q -r .",
+     "state": "present",
+     "mode": "auto",
+     "observed": "bandit 1.9.4",
+     "detail": "bandit (pinned 1.9.4)"
+    }
+   ],
+   "status": "QUALIFIED",
+   "failures": []
+  },
+  {
+   "preset": "go",
+   "image": "aisef-verify-go:6a26aba68eaa",
+   "checks": [
+    {
+     "key": "tools.test",
+     "command": "go test -v ./...",
+     "state": "present",
+     "mode": "explicit",
+     "observed": "/usr/local/go/bin/go",
+     "detail": "the project's declared command"
+    },
+    {
+     "key": "tools.lint",
+     "command": "go vet ./...",
+     "state": "present",
+     "mode": "explicit",
+     "observed": "/usr/local/go/bin/go",
+     "detail": "the project's declared command"
+    },
+    {
+     "key": "tools.sast",
+     "command": "gosec ./...",
+     "state": "present",
+     "mode": "auto",
+     "observed": "/usr/local/bin/gosec: go1.26.8",
+     "detail": "gosec (pinned 2.29.0)"
+    }
+   ],
+   "status": "QUALIFIED",
+   "failures": []
+  },
+  {
+   "preset": "node",
+   "image": "node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32",
+   "checks": [
+    {
+     "key": "tools.test",
+     "command": "npm test",
+     "state": "UNJUDGED",
+     "mode": "explicit",
+     "observed": "",
+     "detail": "project-local runner: unmeasured here; the story's first tool run is the proof"
+    },
+    {
+     "key": "tools.lint",
+     "command": "npx eslint . --max-warnings=0 --ignore-pattern \"**/.claude/**\" --ignore-pattern \"**/.aisef/**\" --ignore-pattern \"**/.opencode/**\"",
+     "state": "UNJUDGED",
+     "mode": "explicit",
+     "observed": "",
+     "detail": "project-local runner: unmeasured here; the story's first tool run is the proof"
+    }
+   ],
+   "status": "QUALIFIED",
+   "failures": []
+  }
+ ],
+ "totals": {
+  "profiles": 7,
+  "capabilities": 21,
+  "qualified": 11,
+  "none_declared": 10,
+  "failed": [],
+  "presets_failed": []
+ },
+ "elapsed_s": 39.0,
+ "pass": true
+}

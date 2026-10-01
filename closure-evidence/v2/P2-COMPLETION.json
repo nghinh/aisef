@@ -1,0 +1,586 @@
+{
+ "record": "AISEF V2 — P2 COMPLETION",
+ "authority": "AISEF V2 — FINAL P1 HYGIENE BEFORE P2, §5 (P2 automatically authorized on a green P1 seal)",
+ "p1_seal": {
+  "path": "closure-evidence/v2/P1-FINAL-SEAL.json",
+  "sha256": "247b595cae4e78de5addbef623f5ad98c051391b2e8834d6d8cebb01cee8d8b2",
+  "verdict": "P1 FINAL SEALED"
+ },
+ "candidate": {
+  "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+  "tree": "1353400d4cd8384d5a6ea9f07e960b0d88e92f7f",
+  "aisef2_tree": "209f1ef32d86218a8a6c3194fd60e23492b86ade",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+ },
+ "packages": {
+  "WP-2.1": {
+   "evidence": "AISEF V2 — P2 PROBE PROTOCOL",
+   "properties": {
+    "PROBE_ABS_1_harness_failure_is_unrunnable_environment_no_verdict": true,
+    "PROBE_ABS_2_requires_subject_absent_is_indeterminate_precondition_absent": true,
+    "PROBE_ABS_3_positive_existence_absent_is_unsatisfied": true,
+    "PROBE_ABS_4_negative_existence_absent_is_satisfied": true,
+    "PROBE_ABS_5_one_absence_not_forced_to_one_satisfaction": true,
+    "subject_absence_never_unrunnable": true,
+    "present_subject_is_observed": true,
+    "unsupported_class_refused_not_degraded": true,
+    "developer_path_rejected": true,
+    "stale_digest_binding_refused": true,
+    "insufficient_enforcement_refused_not_degraded": true,
+    "enforcement_bound_into_every_result": true,
+    "digest_stable_across_processes": true,
+    "digest_bound_into_the_spec": true,
+    "layout_invariance": true,
+    "f5_probe_protocol_equals_rfc": true
+   }
+  },
+  "WP-2.2": {
+   "evidence": "AISEF V2 — P2 CALIBRATION",
+   "properties": {
+    "contrast_for_both_polarities": true,
+    "reference_probe_qualified_for_every_class": true,
+    "CAL_1_always_refuted_prohibition_probe_rejected": true,
+    "always_satisfied_probe_rejected_for_must_hold": true,
+    "spec_falsifiability_not_a_plan_freeze_input": true,
+    "f5_calibration_contracts_equal_rfc": true
+   }
+  },
+  "WP-2.3": {
+   "evidence": "AISEF V2 — P2 STATIC ADMISSION",
+   "properties": {
+    "nine_checks_implemented_in_rfc_order": true,
+    "well_formed_plan_admitted": true,
+    "each_check_rejects_its_case": true,
+    "result_digest_stable": true,
+    "no_probe_executes_in_the_engine": true,
+    "no_future_parent_sha_invented": true,
+    "CAL_2_no_plan_freeze_path_needs_spec_falsifiability": true,
+    "planning_code_never_names_the_raw_verdict": true,
+    "f6_plan_obligation_equals_rfc": true
+   }
+  },
+  "WP-2.4": {
+   "evidence": "AISEF V2 — P2 STORY ADMISSION",
+   "properties": {
+    "every_rfc_row_reproduced": true,
+    "disposition_table_total": true,
+    "unadmissible_role_expectation_pairs_fail_closed": true,
+    "probe_unrunnable_is_environment": true,
+    "invalid_spec_is_probe_invalid_integration": true,
+    "preserve_unsatisfied_is_precondition_broken": true,
+    "bare_indeterminate_is_probe_invalid_never_developer": true,
+    "neg_1_2_3": true,
+    "real_probe_at_the_parent": true,
+    "abbreviated_parent_sha_refused": true,
+    "no_provider_request_before_admission": true,
+    "routes_on_satisfaction_never_the_raw_verdict": true,
+    "f7_dispositions_equal_rfc": true
+   }
+  },
+  "WP-2.5": {
+   "evidence": "AISEF V2 — P2 PLAN DRIFT",
+   "properties": {
+    "scenario_A_pre_satisfied_and_attributed_upstream": true,
+    "scenario_A_continues_on_the_remainder": true,
+    "scenario_K_story_already_satisfied_developer_skipped": true,
+    "scenario_K_every_obligation_still_verified": true,
+    "pre_satisfied_charges_no_developer_budget": true,
+    "no_provider_request_before_admission": true,
+    "unattributed_when_none_or_ambiguous": true,
+    "plan_quality_not_claimed_without_preregistered_thresholds": true
+   }
+  }
+ },
+ "phase_exit_checks": {
+  "CAL-1 and CAL-2 green": true,
+  "PROBE-ABS-1..5 green: missing harness vs missing subject separated; absence decided per spec": true,
+  "probe UNRUNNABLE -> ENVIRONMENT; INVALID_SPEC -> PLAN/INTEGRATION": true,
+  "no provider/request before story admission": true,
+  "scenarios A and K green": true,
+  "test-layout invariance: product verdicts identical across layouts": true
+ },
+ "phase_exit_checks_unmapped": [],
+ "mutation": {
+  "targets": 25,
+  "mutants": 783,
+  "killed": 783,
+  "audited": 0,
+  "by_target": {
+   "aisef2/plan/drift.py::attribute": "15/15",
+   "aisef2/plan/drift.py::budget_problems": "74/74",
+   "aisef2/plan/drift.py::continue_story": "53/53",
+   "aisef2/plan/drift.py::plan_quality": "37/37",
+   "aisef2/plan/static_admission.py::_cycle": "21/21",
+   "aisef2/plan/static_admission.py::admit": "21/21",
+   "aisef2/plan/static_admission.py::check_contract_spec_integrity": "13/13",
+   "aisef2/plan/static_admission.py::check_contradictions": "32/32",
+   "aisef2/plan/static_admission.py::check_dependency_dag": "9/9",
+   "aisef2/plan/static_admission.py::check_ownership": "20/20",
+   "aisef2/plan/static_admission.py::check_plan_structure": "8/8",
+   "aisef2/plan/static_admission.py::check_probe_calibration": "18/18",
+   "aisef2/plan/static_admission.py::check_proof_capability": "16/16",
+   "aisef2/plan/static_admission.py::check_requirement_coverage": "6/6",
+   "aisef2/plan/static_admission.py::check_traceability": "11/11",
+   "aisef2/plan/static_admission.py::depends_on_story": "12/12",
+   "aisef2/plan/static_admission.py::story_graph": "4/4",
+   "aisef2/plan/story_admission.py::admit_story": "96/96",
+   "aisef2/plan/story_admission.py::classify": "65/65",
+   "aisef2/plan/story_admission.py::ordering_problems": "75/75",
+   "aisef2/plan/story_admission.py::request_developer": "67/67",
+   "aisef2/probe/calibration.py::calibrate": "40/40",
+   "aisef2/probe/calibration.py::demonstrates_contrast": "5/5",
+   "aisef2/probe/protocol.py::classify_failure": "26/26",
+   "aisef2/probe/protocol.py::run_probe": "39/39"
+  }
+ },
+ "checker_calibration": {
+  "calibrated": 20,
+  "checkers": 20
+ },
+ "f1_f11": {
+  "current_phase": "P2",
+  "summary": {
+   "PASS": 6,
+   "PENDING": 5,
+   "FAIL": 0
+  },
+  "items": {
+   "F1": "PENDING",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PASS",
+   "F6": "PASS",
+   "F7": "PASS",
+   "F8": "PENDING",
+   "F9": "PENDING",
+   "F10": "PENDING",
+   "F11": "PENDING"
+  }
+ },
+ "rfc_lineage": {
+  "links": [
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+    "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+    "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+    "frozen_items_changed": [
+     "F2"
+    ],
+    "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+    "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+   }
+  ],
+  "lineage_valid": true,
+  "rfc_last_changed_by": "0afcfe275eb8466b56b7be160abaddf468ac22b1"
+ },
+ "run_history": {
+  "path": "closure-evidence/v2/P2-RUN-HISTORY.json",
+  "attempts": 20,
+  "failed": 0,
+  "retries": 0,
+  "entries": [
+   {
+    "seq": 1,
+    "commit": "4a10c09c62a78690ebf972d95e24f7cfff3e6253",
+    "where": "local",
+    "job": null,
+    "package": "P1 seal commit (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 3926
+   },
+   {
+    "seq": 2,
+    "commit": "3a4340bb01b49830bab4287c1cf3ec2b4c2db438",
+    "where": "local",
+    "job": null,
+    "package": "WP-2.1",
+    "result": "PASS",
+    "tests_run": 3969
+   },
+   {
+    "seq": 3,
+    "commit": "18c508d1569a8b8d5efd4a113b2e003adacef118",
+    "where": "local",
+    "job": null,
+    "package": "WP-2.2",
+    "result": "PASS",
+    "tests_run": 3988
+   },
+   {
+    "seq": 4,
+    "commit": "4a10c09c62a78690ebf972d95e24f7cfff3e6253",
+    "where": "ci",
+    "job": "lint",
+    "package": "P1 seal commit (post-seal verification)",
+    "result": "PASS",
+    "tests_run": null
+   },
+   {
+    "seq": 5,
+    "commit": "4a10c09c62a78690ebf972d95e24f7cfff3e6253",
+    "where": "ci",
+    "job": "wheel",
+    "package": "P1 seal commit (post-seal verification)",
+    "result": "PASS",
+    "tests_run": null
+   },
+   {
+    "seq": 6,
+    "commit": "4a10c09c62a78690ebf972d95e24f7cfff3e6253",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "P1 seal commit (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 3923
+   },
+   {
+    "seq": 7,
+    "commit": "4a10c09c62a78690ebf972d95e24f7cfff3e6253",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "P1 seal commit (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 3923
+   },
+   {
+    "seq": 8,
+    "commit": "4a10c09c62a78690ebf972d95e24f7cfff3e6253",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "P1 seal commit (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 3923
+   },
+   {
+    "seq": 9,
+    "commit": "4a10c09c62a78690ebf972d95e24f7cfff3e6253",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "P1 seal commit (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 3923
+   },
+   {
+    "seq": 10,
+    "commit": "4a10c09c62a78690ebf972d95e24f7cfff3e6253",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "P1 seal commit (post-seal verification)",
+    "result": "PASS",
+    "tests_run": 3920
+   },
+   {
+    "seq": 11,
+    "commit": "6d0da0c1ab446c76080e0c97c2b6a43d99249dbc",
+    "where": "local",
+    "job": null,
+    "package": "WP-2.3",
+    "result": "PASS",
+    "tests_run": 4015
+   },
+   {
+    "seq": 12,
+    "commit": "aaff978056618581b5c7a18bd5d0dfb23130b0ef",
+    "where": "local",
+    "job": null,
+    "package": "WP-2.4",
+    "result": "PASS",
+    "tests_run": 4036
+   },
+   {
+    "seq": 13,
+    "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+    "where": "local",
+    "job": null,
+    "package": "WP-2.5 (P2 candidate)",
+    "result": "PASS",
+    "tests_run": 4051
+   },
+   {
+    "seq": 14,
+    "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+    "where": "ci",
+    "job": "lint",
+    "package": "WP-2.5 (P2 candidate)",
+    "result": "PASS",
+    "tests_run": null
+   },
+   {
+    "seq": 15,
+    "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+    "where": "ci",
+    "job": "wheel",
+    "package": "WP-2.5 (P2 candidate)",
+    "result": "PASS",
+    "tests_run": null
+   },
+   {
+    "seq": 16,
+    "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "package": "WP-2.5 (P2 candidate)",
+    "result": "PASS",
+    "tests_run": 4048
+   },
+   {
+    "seq": 17,
+    "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "package": "WP-2.5 (P2 candidate)",
+    "result": "PASS",
+    "tests_run": 4048
+   },
+   {
+    "seq": 18,
+    "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "package": "WP-2.5 (P2 candidate)",
+    "result": "PASS",
+    "tests_run": 4048
+   },
+   {
+    "seq": 19,
+    "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "package": "WP-2.5 (P2 candidate)",
+    "result": "PASS",
+    "tests_run": 4048
+   },
+   {
+    "seq": 20,
+    "commit": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "package": "WP-2.5 (P2 candidate)",
+    "result": "PASS",
+    "tests_run": 4045
+   }
+  ]
+ },
+ "ci": {
+  "run": 35618755244,
+  "jobs": [
+   [
+    "lint",
+    106396179745,
+    null
+   ],
+   [
+    "wheel",
+    106396180025,
+    null
+   ],
+   [
+    "unit (ubuntu-latest, 3.11)",
+    106396180074,
+    4048
+   ],
+   [
+    "unit (ubuntu-latest, 3.12)",
+    106396180102,
+    4048
+   ],
+   [
+    "unit (ubuntu-latest, 3.13)",
+    106396180089,
+    4048
+   ],
+   [
+    "unit (ubuntu-latest, 3.14)",
+    106396180105,
+    4048
+   ],
+   [
+    "unit (windows-latest, 3.11)",
+    106396180034,
+    4045
+   ]
+  ],
+  "v1_pf_001_recurred": false
+ },
+ "v1_evidence": {
+  "w0_byte_identical": true,
+  "guard": true
+ },
+ "v1_pf_001": {
+  "status": "OPEN_IN_V1",
+  "recurrences_in_p2": 0
+ },
+ "implementation_decisions_for_owner_review": [
+  "ProbeResult fields unchanged; enforcement is bound by ProbeRecord (run_probe returns one for every evaluation)",
+  "HarnessProbe.observation_class(spec) is harness API outside the frozen Probe protocol (calibration is per class)",
+  "RevisionRef requires an absolute checkout root (a relative root was resolved twice by the harness)",
+  "python_callable: a hanging subject times out -> UNRUNNABLE / ENVIRONMENT (RFC §9 lists timeout as a harness failure); a signal kill mid-observation -> UNRUNNABLE",
+  "StaticPlanAdmission check 5 rejects a role/expected pair outside §13's table (fail closed, no meaning derived)",
+  "PLAN_CONTRADICTION: §22 names no failure code; it blocks the story and charges no owner",
+  "PLAN_DRIFT attribution: completed upstream (DAG) story that flipped the spec; none or several -> UNATTRIBUTED",
+  "developer budget: a provider/request names the criteria it charges; only READY criteria may be charged"
+ ],
+ "exit_checks": [
+  {
+   "check": "plan_validate: zero problems, generated docs in sync",
+   "command": "python -P validation/v2/plan_validate.py --validate --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "generated artefacts in sync"
+  },
+  {
+   "check": "PLANDEP-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 32"
+  },
+  {
+   "check": "PLANDEP-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANDEP-3: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-3",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANDEP-4: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-4",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANSEM-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANSEM-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANSEM-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANSEM-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 4"
+  },
+  {
+   "check": "freeze manifest: RFC digests equal the end of the approval lineage",
+   "command": "python -P validation/v2/freeze_manifest.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "freeze manifest: PASS"
+  },
+  {
+   "check": "architecture catalog --check",
+   "command": "python -P validation/v2/gen_arch_catalog.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "architecture catalog: PASS"
+  },
+  {
+   "check": "F1-F11 conformance at CURRENT_PHASE=P2 (ratchet)",
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "summary {'PASS': 6, 'PENDING': 5, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "check": "Q0 checker calibration",
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "calibrated 20/20; always-PASS mutants rejected 20/20"
+  },
+  {
+   "check": "compiler --check",
+   "command": "python -P validation/v2/gen_specs.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "specs: PASS"
+  },
+  {
+   "check": "P1 evidence records current",
+   "command": "python -P validation/v2/p1_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p1 evidence: PASS"
+  },
+  {
+   "check": "P2 evidence records current, every property true",
+   "command": "python -P validation/v2/p2_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p2 evidence: PASS"
+  },
+  {
+   "check": "mutation records current (P1 and P2), every target fully killed",
+   "command": "python -P validation/v2/mutation.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "check": "kernel static checks",
+   "command": "python -P validation/v2/kernel_static_checks.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "check": "run history: P1 sealed, P2 append-only and policy-consistent",
+   "command": "python -P validation/v2/run_history.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "run history: PASS"
+  },
+  {
+   "check": "V1 evidence guard, detective",
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  }
+ ],
+ "architecture_exceptions": [
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-001",
+   "status": "APPROVED — APPLIED"
+  }
+ ],
+ "new_architecture_exceptions": [],
+ "stop_rules_triggered": [],
+ "p3_started": false,
+ "verdict": "P2 COMPLETE"
+}

@@ -1,0 +1,11 @@
+Progress: 2/16 stories done (13 not started)
+Active epics: EPIC-01
+
+  done        2
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 22 · max_turns 3
+
+✗ 1 stories not passing:
+    STORY-01-03      failed   deadlock due to plan, reviewer verified: [stuck] ledgerlock/format.py:36 — __all__ does not list line_hash; adding the function without extending __all__ violates the public-API expectation in architecture.md. Fixable inside write_scope once the function is added (finding #1).. Fix the acceptance criteria or the story's write_scope, then re-run — retrying will not resolve this.

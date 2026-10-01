@@ -1,0 +1,92 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 7 items
+
+tests/test_nfc_normalization.py::ACStory0101NfcNormalizationTests::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte FAILED [ 14%]
+tests/test_nfc_normalization.py::ACStory0101NfcNormalizationTests::test_AC_STORY_01_01_2_nfc_and_nfd_forms_normalize_to_identical FAILED [ 28%]
+tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path FAILED [ 42%]
+tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands FAILED [ 57%]
+tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_5_no_forbidden_top_level_imports PASSED [ 71%]
+tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_6_no_forbidden_runtime_calls PASSED [ 85%]
+tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_7_ledger_and_conflict_error_exported FAILED [100%]
+
+=================================== FAILURES ===================================
+_ ACStory0101NfcNormalizationTests.test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte _
+
+self = <tests.test_nfc_normalization.ACStory0101NfcNormalizationTests testMethod=test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte>
+
+    def test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte(self) -> None:
+>       from ledgerlock.format import normalize_key
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_nfc_normalization.py:9: ModuleNotFoundError
+_ ACStory0101NfcNormalizationTests.test_AC_STORY_01_01_2_nfc_and_nfd_forms_normalize_to_identical _
+
+self = <tests.test_nfc_normalization.ACStory0101NfcNormalizationTests testMethod=test_AC_STORY_01_01_2_nfc_and_nfd_forms_normalize_to_identical>
+
+    def test_AC_STORY_01_01_2_nfc_and_nfd_forms_normalize_to_identical(self) -> None:
+>       from ledgerlock.format import normalize_key
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_nfc_normalization.py:27: ModuleNotFoundError
+_ ACStory0101SkeletonTests.test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path _
+
+self = <tests.test_skeleton.ACStory0101SkeletonTests testMethod=test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path>
+
+    def test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path(self) -> None:
+        result = subprocess.run(
+            [sys.executable, "-c", "import ledgerlock; print(ledgerlock.__file__)"],
+            capture_output=True,
+            text=True,
+            cwd=str(REPO_ROOT),
+            check=False,
+        )
+>       self.assertEqual(
+            result.returncode,
+            0,
+            msg=f"stdout={result.stdout!r} stderr={result.stderr!r}",
+        )
+E       AssertionError: 1 != 0 : stdout='' stderr='Traceback (most recent call last):\n  File "<string>", line 1, in <module>\nModuleNotFoundError: No module named \'ledgerlock\'\n'
+
+tests/test_skeleton.py:22: AssertionError
+_ ACStory0101SkeletonTests.test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands _
+
+self = <tests.test_skeleton.ACStory0101SkeletonTests testMethod=test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands>
+
+    def test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands(self) -> None:
+        result = subprocess.run(
+            [sys.executable, "-m", "ledgerlock", "--help"],
+            capture_output=True,
+            text=True,
+            cwd=str(REPO_ROOT),
+            check=False,
+        )
+>       self.assertEqual(
+            result.returncode,
+            0,
+            msg=f"stdout={result.stdout!r} stderr={result.stderr!r}",
+        )
+E       AssertionError: 1 != 0 : stdout='' stderr='/usr/local/bin/python3: No module named ledgerlock\n'
+
+tests/test_skeleton.py:37: AssertionError
+_ ACStory0101SkeletonTests.test_AC_STORY_01_01_7_ledger_and_conflict_error_exported _
+
+self = <tests.test_skeleton.ACStory0101SkeletonTests testMethod=test_AC_STORY_01_01_7_ledger_and_conflict_error_exported>
+
+    def test_AC_STORY_01_01_7_ledger_and_conflict_error_exported(self) -> None:
+>       from ledgerlock import ConflictError, Ledger  # noqa: F401
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ModuleNotFoundError: No module named 'ledgerlock'
+
+tests/test_skeleton.py:78: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_nfc_normalization.py::ACStory0101NfcNormalizationTests::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte
+FAILED tests/test_nfc_normalization.py::ACStory0101NfcNormalizationTests::test_AC_STORY_01_01_2_nfc_and_nfd_forms_normalize_to_identical
+FAILED tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path
+FAILED tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands
+FAILED tests/test_skeleton.py::ACStory0101SkeletonTests::test_AC_STORY_01_01_7_ledger_and_conflict_error_exported
+========================= 5 failed, 2 passed in 0.08s ==========================

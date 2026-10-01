@@ -1,0 +1,260 @@
+{
+ "record": "AISEF V2 — CYCLE-2 C2-P6 CLOSURE (QP-2.6 requalified: Q0-Q3 evidence-complete and GREEN)",
+ "id": "AISEF-V2-CYCLE2-C2-P6-CLOSURE",
+ "authority": "owner ruling 2026-09-30 B ('QP-2.6 MUST BE REQUALIFIED ON THE NEW EXACT CANDIDATE'; if GREEN, proceed automatically into [QP-2.7 -> QP-2.8 -> QP-2.9] || [WP-2.10.1 -> WP-2.10.2])",
+ "written": "2026-10-01T01:35:48Z",
+ "candidate": {
+  "commit": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "subject_trees": {
+   "validation/v2": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+   "tests/v2": "a7d2fb385721891beabab3ac200b974ad81a221c"
+  },
+  "harness_commit": "bfc4f37d8d04fe193c8867e76a5577366d19d989",
+  "integration": {
+   "path": "closure-evidence/v2/cycle2/C2-INTEGRATION-R2.json",
+   "sha256": "cf4c2e8ef921bb01167a7d6ab49bc4e0f6cb2775d1731ebc6a672e12743757c1"
+  },
+  "orchestration_repair": {
+   "path": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+   "sha256": "065e6c539da02384777cc49ecb160f2a0d7be483fcc321794fcaec71c2c60dde"
+  },
+  "v1_pf_001_decision": {
+   "path": "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1-DECISION.json",
+   "sha256": "56c9cf91dea2c123cb53916dffc9f3603bc6e4d88e8db7ac0f17020f138f2306"
+  },
+  "c2_p5_acceptance": {
+   "path": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+   "sha256": "69c23b49f393276117c957f598f811a91a81e36595d60c7bf9fc0af5f414453d"
+  }
+ },
+ "lineage": [
+  {
+   "attempt": "1",
+   "candidate": "63112544f1146097b69c538d98e09e5a52c547c1",
+   "records": "closure-evidence/v2/cycle2/Q0-Q3",
+   "outcome": "GREEN on five platforms — VALID HISTORICAL QUALIFICATION EVIDENCE, not the gate candidate (owner ruling B, Ruling 2)"
+  },
+  {
+   "attempt": "R2",
+   "candidate": "ac4a6c75b461e409f024965391ce77e7689c0e08",
+   "harness": "9d855a5b66942db0d917b094ea190745cbebf076",
+   "records": "closure-evidence/v2/cycle2/Q0-Q3-R2",
+   "outcome": "FAILED: Windows Q0 48/51 — validation/qualification/v1_pf_001_policy.py repo_path returned the runner's absolute path (PRODUCT, C2-P6 seq 27, 34); Linux 3.11-3.14 GREEN; kept, never overwritten"
+  },
+  {
+   "attempt": "R3",
+   "candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+   "harness": "bfc4f37d8d04fe193c8867e76a5577366d19d989",
+   "records": "closure-evidence/v2/cycle2/Q0-Q3-R3",
+   "outcome": "GREEN on Linux 3.11-3.14 and Windows 3.11 — the gate"
+  }
+ ],
+ "qualification": {
+  "summary": {
+   "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/SUMMARY.json",
+   "sha256": "247251e84f0ed2fded57f85d6e69139a770d324e778e4bab4359401ae1d28ecb",
+   "verdict": "GREEN",
+   "rungs": {
+    "Q0": "GREEN",
+    "Q1": "GREEN",
+    "Q2": "GREEN",
+    "Q3": "GREEN"
+   }
+  },
+  "ci_run": 36796758932,
+  "tests_ci_run": 36796763565,
+  "platforms_required": [
+   "linux",
+   "windows"
+  ],
+  "records": [
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/linux-py3.11.json",
+    "sha256": "34a6136912ddbd56fdb0c9fed7254be710773244b3ee0055fa1df24f91203bac"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/linux-py3.12.json",
+    "sha256": "c1c65bfa036326b41cbd1d9338790a4bcc8f78af51de41d3844c676fcb332db9"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/linux-py3.13.json",
+    "sha256": "fe5762789e5fc38a9f304dfcaaf2274609d2c34703242b14445f4cea0f8637c1"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/linux-py3.14.json",
+    "sha256": "05a531b3ed154f520f3a2ba20e1d9fc194ba29be3f425253d0b2b326ed46fc93"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/windows-py3.11.json",
+    "sha256": "3371c794c24bcede5a0081411a2cc34569895c48feb496c88b8a7d473afa1da1"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-darwin-py3.14.json",
+    "sha256": "3b91f500bbc3f44131d49ab4fc47b5fce59d331fe1f47bc8224959f2dcfa4330"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-linux-py3.11.json",
+    "sha256": "5c2f03cd2c0b970500e2dd6069996ca552d58d3ead5f8f7b56c7a73077ede4cf"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-linux-py3.12.json",
+    "sha256": "c5964f26a7b926603e5d16c06fc5130e03f17bac5e5a02e551914d0bb0840027"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-linux-py3.13.json",
+    "sha256": "3e4148c5a8e6e50a3302fc92da2f038f97177670f2b1784bafe7340396b3bb56"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-linux-py3.14.json",
+    "sha256": "f652eff4d6692d4304f47cf9c8d73f9a530de4cef0033d6186dfe2d3dff916cd"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-windows-py3.11.json",
+    "sha256": "76ec5bc2b7c6555419d425cdd43fcc87fe3534d42b8ce75f82d8b90c9ad8e2d1"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-linux-py3.11.json",
+    "sha256": "d62d71863346c384ef24043701e530a58a2fc56250a3b55d1c3f225d36049e71"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-linux-py3.12.json",
+    "sha256": "025025d8e3ee5cb9caed49e5bfd6122c6a1b0172440a9f18d6eb74d65013cbdf"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-linux-py3.13.json",
+    "sha256": "a4325d609cea3cb107382e5f0e8d54088ed4c5e72a24c32fb6e925c402daf418"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-linux-py3.14.json",
+    "sha256": "ebfd7d2be9317825a812b3e06271a4b6712acb6035eed59e06d8249d5027fe02"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-windows-py3.11.json",
+    "sha256": "0c8401c55e463c7dbb8d6488fe7b2c9eb8d2302b396bee4dc3815a9dff335155"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-linux-py3.11.json",
+    "sha256": "b688d9e10223b5aee1877724e1dd335479d91257d99b1db95a60e54e9a8b7cfb"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-linux-py3.12.json",
+    "sha256": "5b085063256c4ce8be26efcb7d74a49cd34b9141a24cca77f0f33958596dad22"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-linux-py3.13.json",
+    "sha256": "a89d880208a4727f8610d07fa5e3cdd9afcc2be25e4640f797669522d6e19574"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-linux-py3.14.json",
+    "sha256": "3349c3bbb8fa21eee6dea0e6976acf5009c22442a05cb3c08c7c48edc896ee5f"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-windows-py3.11.json",
+    "sha256": "7069bb5ea0a3286d348b7f27e333f257a691504ba2301bbdd5df37f065aea01e"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-linux-py3.11.json",
+    "sha256": "889cfce1fc7e38f98a812a47faf1aab899c0587492bbfde382c02a59be96efae"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-linux-py3.12.json",
+    "sha256": "9d8297ac28a6cd95edeb9e4ca3e4d5544725b829b6479e4b0d8ecb1e6cb88884"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-linux-py3.13.json",
+    "sha256": "4068cd06c18d6d8f273708f3da4d8c325043c374b08b63694b5edb07633d8ff2"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-linux-py3.14.json",
+    "sha256": "ddd0f4de766fed1f32afdff6b52c5be07b039c1668faaae8a1a15c967523a6e7"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-windows-py3.11.json",
+    "sha256": "c151e75026ba1f48e3f053c7b848df2c748d27ae7ced694be8b15aa5aa931c01"
+   }
+  ],
+  "v1_pf_001_family_containment": {
+   "linux-py3.11": {
+    "ok": true,
+    "mechanism": "posix-session-and-group",
+    "trees": 30,
+    "residual": 0,
+    "v1_walker_calls": 0
+   },
+   "linux-py3.12": {
+    "ok": true,
+    "mechanism": "posix-session-and-group",
+    "trees": 30,
+    "residual": 0,
+    "v1_walker_calls": 0
+   },
+   "linux-py3.13": {
+    "ok": true,
+    "mechanism": "posix-session-and-group",
+    "trees": 30,
+    "residual": 0,
+    "v1_walker_calls": 0
+   },
+   "linux-py3.14": {
+    "ok": true,
+    "mechanism": "posix-session-and-group",
+    "trees": 30,
+    "residual": 0,
+    "v1_walker_calls": 0
+   },
+   "windows-py3.11": {
+    "ok": true,
+    "mechanism": "windows-job",
+    "trees": 30,
+    "residual": 0,
+    "v1_walker_calls": 0
+   }
+  }
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/cycle2/C2-P6-RUN-HISTORY.json",
+  "total_attempts": 47,
+  "sha256": "1ecf3d689c973914969247f4589cf535ffcc2ce3029412ce9ff18c2457219d3b",
+  "failed": [
+   {
+    "seq": 6,
+    "commit": "a76177e",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT",
+    "known_defect": "V1-PF-001",
+    "gate_effect": "STOP"
+   },
+   {
+    "seq": 27,
+    "commit": "9d855a5",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT",
+    "known_defect": null,
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 34,
+    "commit": "9d855a5",
+    "where": "ci",
+    "job": "qualification: qualify (windows-latest, 3.11)",
+    "classification": "PRODUCT",
+    "known_defect": null,
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 39,
+    "commit": "bfc4f37",
+    "where": "ci",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "classification": "HARNESS",
+    "known_defect": null,
+    "gate_effect": "COUNTS"
+   }
+  ],
+  "rule": "closed at this count when the requalified QP-2.6 was evidence-complete; the evidence commit's attempts go to C2-P7-RUN-HISTORY.json (LANE-Q); nothing rewritten"
+ },
+ "status": "QP-2.6 GREEN on the requalified candidate — LANE-Q (QP-2.7 -> QP-2.8 -> QP-2.9) and LANE-X (WP-2.10.1 -> WP-2.10.2) start from it"
+}

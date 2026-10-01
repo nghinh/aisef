@@ -1,0 +1,123 @@
+{
+ "generated": "2026-09-20T01:39:00+0700",
+ "run": "minimax-ro-2",
+ "profile": "PROFILE-W1-OC-MINIMAXM3-T80-RO",
+ "profile_id": "sha256:ae9adf64987f08ed498c0672325e81defa596d14e30822b8b8970847a320b1f3",
+ "valid_run": true,
+ "valid_because": "provider preflight PASS; fresh trunk; prepare verified the frozen kernel and the profile digest; mapping errors 0; repair 0; orphan 0; drift 0; terminal project state with no provider interruption",
+ "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+ "delivery_complete": false,
+ "progress": {
+  "done": 7,
+  "total": 16
+ },
+ "stories": {
+  "STORY-01-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-02": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-03": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-04": {
+   "status": "done",
+   "attempts": 2
+  },
+  "STORY-01-05": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-06": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-02-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-02-02": {
+   "status": "failed",
+   "attempts": 2
+  }
+ },
+ "stop": {
+  "story": "STORY-02-02",
+  "kernel_reason": "deadlock due to plan, reviewer verified: [stuck] tests/test_snapshot_determinism.py:37 — AC-2 requires put(k,r1) then delete(k,r2) — different rids. §4.5 (docs/requirements.md:88) mandates ConflictError on different-rid mutation of the same key. So the AC's scenario cannot be reproduced: ConflictErr",
+  "attempt_1": "developer max_turns 80 (work graded); test still failing; review block: the AC-2 test errors before snapshot() because delete(k, r2) after put(k, r1) raises ConflictError",
+  "attempt_2": "review `[stuck]`: AC-STORY-02-02-2 (put(k, r1) then delete(k, r2), snapshot has no k) contradicts docs/requirements.md §4.5 (that delete MUST conflict); the developer had rewritten the test to delete a never-put key. The kernel ended the story as a plan deadlock — `retrying will not resolve this`"
+ },
+ "block_legitimacy_measured": {
+  "method": "read the story's criterion against the requirements it realizes",
+  "evidence": {
+   "AC-STORY-02-02-2": "Given put(\"k\", \"v\", r1, t1) followed by delete(\"k\", r2, t2), snapshot() returns a dict with no key \"k\"",
+   "requirements §4.5": "A put on key k with rid=r1, then a delete on key k with rid=r2 — the second MUST conflict."
+  },
+  "verdict": "the criterion is unsatisfiable together with the requirements it belongs to — a plan (story decomposition) defect; the reviewer's `[stuck]` and the kernel's plan-deadlock stop are correct — NOT a false BLOCK; SS-95 candidate measurement at d84d7583: false block 0"
+ },
+ "oracle_at_trunk": {
+  "false_pass_count": 0,
+  "mapping_error_count": 0,
+  "red_classes": {
+   "INCOMPLETE_DELIVERY_EXPECTED_RED": 9
+  }
+ },
+ "false_block_count": 0,
+ "manual_state_repair": 0,
+ "orphan_state_count": 0,
+ "drift_records": [],
+ "resumes_forced": 1,
+ "run_metrics": {
+  "developer_agent_runs": 10,
+  "developer_retries": 2,
+  "reviewer_executions": 10,
+  "reviewer_retries": 0,
+  "security_executions": 10,
+  "security_retries": 0,
+  "max_turn_events": 1,
+  "human_arbitrations_during_the_run": 0,
+  "stories_done": 7,
+  "stories_failed": [
+   "STORY-02-02"
+  ],
+  "stories_never_started": 8,
+  "false_block": [],
+  "false_block_count": 0,
+  "false_block_measurable_for": [
+   "STORY-01-01",
+   "STORY-01-02",
+   "STORY-01-03",
+   "STORY-01-05",
+   "STORY-01-06",
+   "STORY-02-01",
+   "STORY-02-02"
+  ],
+  "false_block_measured_at_candidate_for": [
+   "STORY-02-02"
+  ]
+ },
+ "turns": {
+  "developer_sessions": 10,
+  "max": 80,
+  "max_turn_events": 1,
+  "distribution": [
+   21,
+   36,
+   39,
+   43,
+   45,
+   46,
+   62,
+   65,
+   66,
+   80
+  ]
+ },
+ "runtime_seconds": 4906.1,
+ "output_tokens_logged_by_the_kernel": 99192,
+ "cost_usd_reported": 0.0
+}

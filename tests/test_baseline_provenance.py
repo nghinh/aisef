@@ -243,7 +243,10 @@ class TestBaselineProducer(unittest.TestCase):
         self.assertEqual(recs[1].detail["parent"], self.entry)
         self.assertEqual(recs[1].detail.get("root"), self.entry)
 
-    def test_H_a_new_epoch_without_the_integrated_parent_fails_closed_instead_of_rebaselining(self):
+    def test_H_a_new_epoch_without_the_integrated_parent_is_captured_at_the_parent_never_at_the_storys_build(self):
+        """1.7.5 failed closed here (BASELINE_UNAVAILABLE). F1 / SS-18 (INV-C.3): the root is known, so the
+        baseline is captured THERE through a temporary worktree; what stays forbidden is a baseline taken at
+        the story's own build."""
         self._run()
         c1 = self._commit("b.py")
         self.story.acceptance_criteria = ["AC one", "AC two (owner arbitration)"]   # contract changed, HEAD ≠ parent
@@ -251,10 +254,12 @@ class TestBaselineProducer(unittest.TestCase):
         recs = self._records()
         self.assertEqual(len(recs), 2)
         d = recs[1].detail
-        self.assertTrue(str(d.get("unrunnable", "")).startswith("BASELINE_UNAVAILABLE"), d)
-        self.assertNotIn("test_ids", d, "no test run at the story's own build")
+        self.assertFalse(str(d.get("unrunnable", "")), d)
+        self.assertEqual(d.get("parent"), d.get("root"), "captured at the integrated parent")
+        self.assertNotEqual(d.get("parent"), c1, "never at the story's own build")
+        self.assertEqual(d.get("captured_at"), "temporary worktree at root")
         ev = EvidenceStore(self.root).read(SID)
-        self.assertIs(gate._baseline_check(ev, c1).outcome, Outcome.UNRUNNABLE)
+        self.assertIsNot(gate._baseline_check(ev, c1).outcome, Outcome.UNRUNNABLE)
 
 
 if __name__ == "__main__":

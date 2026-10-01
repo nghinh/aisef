@@ -1,0 +1,6457 @@
+{
+ "record": "AISEF V2 — C2-P5 WP-2.5.1 LEDGERLOCK PLAN-V2.2 PROPOSAL, requirements-grounded (P5 correction)",
+ "work_package": "WP-2.5.1",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER REVIEW / P1-P4 ACCEPTED / C2-P5 NOT ACCEPTED / P5 CORRECTION AUTHORIZED / QP-2.6 REMAINS BLOCKED' (2026-09-30)",
+ "status": "PROPOSAL — NOT APPROVED, NOT APPLIED; no owner approval recorded; LedgerLock not run; QP-2.6 not started",
+ "normative_priority": [
+  "frozen requirements",
+  "approved Behavior Contract semantics",
+  "ProductProofSpec",
+  "plan / story decomposition",
+  "developer tests"
+ ],
+ "identities": {
+  "aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+  "compiler": {
+   "id": "aisef2.product.compiler/1",
+   "digest": "f31a4602a61d412d834890f46dcc9ca4d0ce240a106a4772dc9a1e8e7fb8ea76"
+  },
+  "admission_engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+  "catalog": {
+   "probe.python_callable": {
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "kind": "python_callable",
+    "active": false,
+    "cycle": 1
+   },
+   "probe.file_artifact": {
+    "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "kind": "file_artifact",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.python_callable_v2": {
+    "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+    "kind": "python_callable",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.cli_invocation": {
+    "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+    "kind": "cli_invocation",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.process_effect": {
+    "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "kind": "process_effect",
+    "active": true,
+    "cycle": 2
+   }
+  },
+  "requirements": {
+   "path": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md",
+   "sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc"
+  },
+  "requirements_map": {
+   "path": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS-MAP.json",
+   "sha256": "a1a56ca50d946f4ee03c8ffdd7f7e9afcc903cd4a91f7f26988e5cf4a9dfcd23"
+  },
+  "owner_decisions": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "v1_audit": {
+   "path": "closure-evidence/hardening/W1-PLAN-V2.1-AUDIT.json",
+   "sha256": "ee4a36272cb42774df6f144b9ea6f9ab96784729289404bbbc79f42834705110"
+  },
+  "p10_workload": {
+   "path": "closure-evidence/v2/P10/WORKLOAD.json",
+   "sha256": "d43211043dd141d388250eb756e2e6d40720093d8f091042944da4babd861463"
+  },
+  "p5_mutants": {
+   "path": "tests/v2/fixtures/workloads/ledgerlock-p5-mutants/MUTANTS.json",
+   "sha256": "af4db880671a8e031cf88e6c75fed003d4e289b782bbed05166f4b2967af1cf2"
+  },
+  "authoring_aid": {
+   "path": "validation/qualification/p10_contracts.py",
+   "sha256": "969a014dbe87a71b1c39088ed4a94fd555aecd8352abccb99628678746ad6e8f"
+  },
+  "calibration_records": [
+   {
+    "path": "closure-evidence/v2/cycle2/P1-FILE-ARTIFACT-CALIBRATION.json",
+    "sha256": "25e7e3b7d9a9928ee890531c1b790ad8225945ec85f5bc5be00d1dabe6624fff"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/P2-CLI-CALIBRATION.json",
+    "sha256": "3fd60e88b077b4dcaddf5f9d8705b8d667234b195dc958b2d749fb0afc69f7ee"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/P3-EFFECT-CALIBRATION.json",
+    "sha256": "769b67f5aabd40d22a9c20be7e840b631e79321162c0342b6cb48f0ac036c62c"
+   },
+   {
+    "path": "closure-evidence/v2/cycle2/P4-PYTHON-CALLABLE-V2-CALIBRATION.json",
+    "sha256": "ea23497680a582efb662a09552f6ca41dc4a8f4942a3be3a14ae10a6b9709ea5"
+   }
+  ]
+ },
+ "requirements": {
+  "R-10": {
+   "hash": "6c817ae4a601d90e6e91eefaf0e18c22ba2872e7f5b158df60cd2b795c266ae8"
+  },
+  "R-12": {
+   "hash": "e7bfdb8bad608a892ac8f17ad54aa5d7209151d437e4b6358e5775b2b9664b97"
+  },
+  "R-13": {
+   "hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628"
+  },
+  "R-3.1": {
+   "hash": "a4ac9bf2fbf1a7fe3f03756cc3efd166edea178a0bcee20a3a8fe9931eb22350"
+  },
+  "R-3.2": {
+   "hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd"
+  },
+  "R-3.3": {
+   "hash": "be0d7544856cc1167e82ea62c58f3ade134ed5cff17ea5906860a414635dc828"
+  },
+  "R-3.4": {
+   "hash": "8469f6fed56497fc3ba429a96b54fa136ad816c9b3d270c4fb04e73200202990"
+  },
+  "R-4.2": {
+   "hash": "d47de2b8b3f81c11fdc2066b0363a8e2f88f748b20553e170c36879342e47faf"
+  },
+  "R-4.3": {
+   "hash": "b8755e2dcc213a9e6c2e64b020127e4008780615459cd9a8467d97a9905dbc30"
+  },
+  "R-4.4": {
+   "hash": "4dc976c81613e7399d903bf2ad307d444434abc695b92d194632a5f60c397834"
+  },
+  "R-4.5": {
+   "hash": "4564c6180cce0b410713a1c1848a703a6e9596748d81361f259c421ee4cd9f2f"
+  },
+  "R-5": {
+   "hash": "149b0c9e3535d8137c4a1642aaf1cd4c69141a0766de88c11c5f98f744c76b19"
+  },
+  "R-6": {
+   "hash": "df0076d9f57a6bb80107ad48cf15c6ebf90cde55571b2ec00e0f3b532345e4f3"
+  },
+  "R-7": {
+   "hash": "2c8ba425c7eb2b8101b9a1413843adbdc92ce3187790d275b8705d1980085270"
+  },
+  "R-9": {
+   "hash": "1c3334c2708155246ddd1237b18103419c764df2c74fd7d7163c50fb1f4fe2e5"
+  }
+ },
+ "interface_bindings": {
+  "IB-CLI": {
+   "binding": "python -m ledgerlock verify <ledger> | snapshot <ledger> [--out <file>] | apply --batch <file> <ledger> | repair-tail <ledger>, exit codes 0/2/3/4/5",
+   "source": "§14 items 1-4, §6, §5, §7, §9",
+   "fixed_by_requirements": true
+  },
+  "IB-JSONL": {
+   "binding": "the ledger is one JSON object per line with the fields op, key, value (put), ts, id, hash, prev_hash; key NFC; ts an integer; lines newline-terminated",
+   "source": "§3.2, §3.1, §7 (a truncated line is one whose last byte is not a newline)",
+   "fixed_by_requirements": true
+  },
+  "IB-NAMES": {
+   "binding": "ledgerlock/ledger.py defines Ledger, ConflictError, append, verify, snapshot, apply_batch; a conflicting mutation raises ConflictError",
+   "source": "§13, §4.3",
+   "fixed_by_requirements": true
+  },
+  "IB-LEDGER": {
+   "binding": "a Ledger is constructed with its ledger file path, Ledger(<path>), and offers apply_batch(ops), snapshot() and verify() as methods; ops are (op, key, value, rid, ts) delivered as 5-element JSON arrays (a contract stimulus is JSON data)",
+   "source": "§5 names apply_batch(ops) and its tuple shape, §6 snapshot(), §3.4 verify from the library, §12 'the configured ledger path', §13 the class Ledger",
+   "fixed_by_requirements": false,
+   "gap": "the requirements do not say how a Ledger is bound to its path, nor that an implementation must accept arrays where they say tuples; every process_effect spec depends on this binding (the reference and PLAN-V2.1 read it the same way) — open normative gap OG-IB-LEDGER"
+  },
+  "IB-ELEMENTS": {
+   "binding": "a delete element carries null in its value slot; ts is an integer the caller supplies",
+   "source": "§5 gives every element the shape (op, key, value, rid, ts); §3.2 gives a delete line no value",
+   "fixed_by_requirements": false,
+   "gap": "the requirements do not say what a delete's value slot holds"
+  },
+  "IB-EMPTY": {
+   "binding": "a zero-byte file is a fresh, empty ledger (a valid chain of no lines)",
+   "source": "§14 item 1 'a fresh ledger'; §3.3 (ok when every line verifies)",
+   "fixed_by_requirements": false,
+   "gap": "a 'fresh ledger' could also be a path that does not exist yet, which §9 makes an I/O error (RISK-4); the specs on an empty ledger (S-5-a, S-6-d, S-7-d, S-9-a, S-9-c, S-9-e) read it as a zero-byte file"
+  }
+ },
+ "approvals": {
+  "given": [],
+  "synthetic_identity": "human:SYNTHETIC-TEST-FIXTURE-NOT-AN-APPROVAL",
+  "authority": "NON-AUTHORITATIVE TEST FIXTURE DATA: the schema mechanically requires the human: namespace (aisef2/product/approval.py HUMAN_PREFIX); these approvals exist in memory only, are never persisted as a ContractApproval or as owner approval evidence, and the 9/9 admission they give means only that the proposal WOULD admit once valid required approvals exist"
+ },
+ "plan": {
+  "id": "LEDGERLOCK-PLAN-V2.2-PROPOSAL",
+  "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+  "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "obligations": 67,
+  "stories": 9,
+  "obligations_by_role": {
+   "INTRODUCE": 57,
+   "PRESERVE": 10
+  },
+  "story_edges_added": {
+   "STORY-03-01": [
+    "STORY-02-02"
+   ]
+  },
+  "plan_quality_policy": "NOT_PREREGISTERED (DECISION-5)"
+ },
+ "counts": {
+  "specs_retained": 59,
+  "specs_by_status": {
+   "COMPILED": 59
+  },
+  "specs_by_kind": {
+   "cli_invocation": 10,
+   "file_artifact": 9,
+   "process_effect": 34,
+   "python_callable": 6
+  },
+  "specs_by_quantifier": {
+   "bounded_witness_measurement": 44,
+   "exhaustive_finite_domain": 15
+  },
+  "criteria_by_class": {
+   "ENGINEERING_TEST_REQUIREMENT": 4,
+   "NORMATIVE_PRODUCT_REQUIREMENT": 45,
+   "PLAN_ONLY_DETAIL": 21,
+   "UNSUPPORTED_FOR_FULL_ENFORCEMENT": 7
+  },
+  "clauses_by_class": {
+   "DESCRIPTIVE": 4,
+   "ENGINEERING_TEST_REQUIREMENT": 4,
+   "NORMATIVE_PRODUCT_REQUIREMENT": 30,
+   "UNSUPPORTED_FOR_FULL_ENFORCEMENT": 16
+  }
+ },
+ "old_vs_new": {
+  "old_specs": 64,
+  "old_record": {
+   "commit": "0f779956f98f38abf4d4c33c6db4cadd819d8640",
+   "sha256": "13283389e04c220342aba95add2cc8935af407ee406ef6a251f6278117a7d23d",
+   "reason": "owner ruling 2026-09-30: C2-P5 NOT ACCEPTED — the proposal was rebuilt from the frozen requirements"
+  },
+  "new_specs": 59
+ },
+ "decision_3_mappings": [
+  {
+   "ac_id": "AC-STORY-05-01-1",
+   "criterion": "Given the library at this point in the epic chain, when the property test runs 50 random mutation sequences against a temp JSONL (each sequence a list of `(op, key, value, rid, ts)` tuples; seeded with a fixed seed for reproducibility), then for every sequence that did not raise `ConflictError`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` AND two calls to `snapshot()` return equal dicts.",
+   "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "before": {
+    "subject_kind": "process_effect",
+    "locator": "tests.test_property_roundtrip:run",
+    "p10_status": "REFUSED_BY_CONTRACT_RULE"
+   },
+   "after": [
+    {
+     "spec_id": "S-D3-05-01-1",
+     "measured": "after a fixed conflict-free sequence of mutations (puts, a tombstone, replays, an NFD/NFC replay) the chain the product wrote verifies (`verify` exits 0) and holds exactly the five committed lines",
+     "requirement": "R-3.3",
+     "clause": "R-3.3/2"
+    }
+   ],
+   "approved": false
+  },
+  {
+   "ac_id": "AC-STORY-05-01-2",
+   "criterion": "Given the same property test, when a sequence raises `ConflictError`, the JSONL on disk after the sequence is byte-identical to its pre-sequence state for any prefix up to (and including) the offending element, and the chain length did not grow past that prefix.",
+   "classification": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "before": {
+    "subject_kind": "process_effect",
+    "locator": "tests.test_property_roundtrip:run",
+    "p10_status": "REFUSED_BY_CONTRACT_RULE"
+   },
+   "after": [
+    {
+     "spec_id": "S-D3-05-01-2",
+     "measured": "a sequence whose element conflicts leaves the ledger as the prefix committed it: two lines",
+     "requirement": "R-5",
+     "clause": "R-4.3/2"
+    }
+   ],
+   "approved": false
+  },
+  {
+   "ac_id": "AC-STORY-05-01-3",
+   "criterion": "Given the same property test, when it is executed under `python -m unittest discover` and again under `pytest`, both runs report the same total passed/failed counts for the property-test module.",
+   "classification": "ENGINEERING_TEST_REQUIREMENT",
+   "before": {
+    "subject_kind": "process_effect",
+    "locator": "tests.test_property_roundtrip:run",
+    "p10_status": "REFUSED_BY_CONTRACT_RULE"
+   },
+   "after": "unittest/pytest agreement of a test module (DECISION-3; R-11)",
+   "approved": false
+  },
+  {
+   "ac_id": "AC-STORY-05-02-1",
+   "criterion": "Given the full test suite at this point in the epic chain, `coverage run -m unittest discover && coverage report --include=ledgerlock/*` shows a `ledgerlock/` total line coverage ≥85%.",
+   "classification": "ENGINEERING_TEST_REQUIREMENT",
+   "before": {
+    "subject_kind": "process_effect",
+    "locator": "coverage:report",
+    "p10_status": "REFUSED_BY_CONTRACT_RULE"
+   },
+   "after": "line coverage >= 85% (DECISION-3; R-11)",
+   "approved": false
+  },
+  {
+   "ac_id": "AC-STORY-05-02-2",
+   "criterion": "Given the same full test suite, `pytest` discovers and runs the same suite and reports the same total passed/failed counts as `python -m unittest discover`.",
+   "classification": "ENGINEERING_TEST_REQUIREMENT",
+   "before": {
+    "subject_kind": "process_effect",
+    "locator": "pytest:main",
+    "p10_status": "REFUSED_BY_CONTRACT_RULE"
+   },
+   "after": "suite-level runner agreement (DECISION-3; R-11)",
+   "approved": false
+  },
+  {
+   "ac_id": "AC-STORY-05-02-3",
+   "criterion": "Given the full test suite at this point, the `tests/` source itself is excluded from the coverage measurement.",
+   "classification": "ENGINEERING_TEST_REQUIREMENT",
+   "before": {
+    "subject_kind": "process_effect",
+    "locator": "coverage:report",
+    "p10_status": "REFUSED_BY_CONTRACT_RULE"
+   },
+   "after": "coverage configuration (DECISION-3; R-11)",
+   "approved": false
+  }
+ ],
+ "owner_rulings_applied": {
+  "OD-D4": "applied: 02-02-1 / 02-02-5 rewritten at the requirement level (S-6-a two calls, S-6-d two invocations); the format-module criteria are PLAN_ONLY_DETAIL; no probe added",
+  "OD-GREP": "measured: MUST_NOT_HOLD of grep_count {matches: 0} is satisfied exactly when the observation is REFUTED — a count other than 0, OR a non-UTF-8 file (count unestablished) OR an expired window (and a file holding a NUL byte is skipped) — so it expresses 'at least one match' only up to those two causes; not needed: §10/§12 state the prohibitions as absence, so the contracts are MUST_HOLD {matches: 0}, exact",
+  "OD-RETURN": "applied: no return shape is prescribed; 'returns the same result' is UNSUPPORTED (R-4.2/2, R-4.4/3)",
+  "OD-REFUSE": "applied: refusal is the CLI's exit 5 (§9) and the unchanged file (S-7-e, S-7-f); return-vs-raise is not tested",
+  "OD-BATCH": "applied: no batch-file shape is frozen; only the missing-file I/O error is tested (S-9-e); exit 4 and the CLI batch success are UNSUPPORTED",
+  "OD-01-01-6": "applied: Ledger and ConflictError are two atomic contracts (S-13-d, S-13-e)",
+  "OD-02-01-4": "applied: first_bad_index is UNSUPPORTED (R-3.3/3); no convention promoted",
+  "OD-03-01-5": "applied: the crash clause R-5/2 is UNSUPPORTED; no surfacing mechanism is required",
+  "OD-STORE": "applied: ledgerlock.store is PLAN_ONLY; its normative content is re-expressed (S-9-d, S-9-a) or UNSUPPORTED",
+  "OD-FACETS": "applied: every retained spec observes one clause; multi-clause criteria map to several atomic specs",
+  "OD-STRONGER": "applied: no digest value or GENESIS form is asserted (R-3.2/2, R-3.2/4 UNSUPPORTED)"
+ },
+ "requirement_risks": {
+  "RISK-1": "a key with a committed put can never be deleted or changed (a same-rid delete replays, another rid conflicts): R-6's 'unless tombstoned by a later delete' is unreachable for a put key; tombstones exist only as a first mutation",
+  "RISK-2": "R-4.5 'replays of either MUST NOT conflict' holds only for the committed put (S-4.5-b); the refused delete replayed is again another rid (R-4.3)",
+  "RISK-3": "replay scope rid alone or rid+key: no spec reuses a rid across keys",
+  "RISK-4": "'verify: any other exit code is a bug' vs 2 and 3; 'fresh ledger' consistent only as an existing empty file (IB-EMPTY)",
+  "RISK-5": "'any modification detected' vs hashing canonical bytes: only semantic edits are testable (S-3.3-* edit value, op, hash, prev_hash)",
+  "RISK-6": "the GENESIS form is both 'the literal' and an implementation choice (R-3.2/4 UNSUPPORTED)",
+  "RISK-7": "§12 file confinement vs §5's sibling temp file (R-12/2 UNSUPPORTED)",
+  "RISK-8": "'under the lock' is undefined (R-5/0 UNSUPPORTED)",
+  "RISK-9": "a newline-terminated corrupt last line is neither truncated nor 'in the middle' (AC-STORY-03-02-4 UNSUPPORTED)",
+  "RISK-10": "conflicts and replays between elements of one batch: R-4.3 judges against committed mutations (S-5-a conflicts against a committed line)",
+  "RISK-11": "§10's allowed set omits __future__ (which §10 requires) and the package's own modules: S-10-a admits both",
+  "RISK-12": "§3.2's line shapes omit hash and prev_hash, which every line carries",
+  "RISK-13": "module functions vs methods; append/put/delete signatures and ts provenance open (IB-LEDGER, IB-ELEMENTS)",
+  "RISK-14": "durability, crash atomicity, file confinement and the interpreter version are outside every probe",
+  "RISK-15": "'0 — success (append …)' names a CLI append no clause specifies",
+  "RISK-16": "'no third-party imports succeed at runtime' reads as an environment property (R-14 item 6 mapped to S-10-a)"
+ },
+ "audit": {
+  "record": "closure-evidence/v2/cycle2/P5-CORRECTION-AUDIT.json",
+  "rule": "LANE-P5C's read-only audit is a reviewer's report, not evidence; its points adopted and its disagreements are recorded there"
+ },
+ "findings": [
+  {
+   "id": "C2-P5-FINDING-001",
+   "class": "DEVELOPER (the authoring aid of WP-2.5.1, candidate ec473d1)",
+   "found_by": "a diagnostic trial run of the WP-2.5.2 falsifiability runner over the reference fixture",
+   "defect": "ec473d1 compiled the four source-tree prohibitions as grep_count {matches: 0} under polarity MUST_NOT_HOLD: the contracts demanded at least one matching line",
+   "measured": "reproduced in P5-FALSIFIABILITY.json (5c608bf's reproduction; kept)",
+   "correction": "5c608bf: the aid refuses a MUST_NOT_HOLD contract whose observable is not declared to state the forbidden behaviour; this correction states the prohibitions from the requirements (MUST_HOLD {matches: 0}) and keeps the adversarial case (INVERTED_FORM)",
+   "criteria": [
+    "AC-STORY-01-01-4",
+    "AC-STORY-01-01-5",
+    "AC-STORY-05-03-1",
+    "AC-STORY-05-03-2"
+   ]
+  }
+ ],
+ "supersedes": [
+  {
+   "commit": "ec473d1742bb41206d34a72542d7ef0d8a19aa4a",
+   "sha256": "6caf0deb8a556f10f3bb4a62c1d2591d73e15d48c86c4d0788eab08bbc60a851",
+   "reason": "C2-P5-FINDING-001"
+  },
+  {
+   "commit": "0f779956f98f38abf4d4c33c6db4cadd819d8640",
+   "sha256": "13283389e04c220342aba95add2cc8935af407ee406ef6a251f6278117a7d23d",
+   "reason": "owner ruling 2026-09-30: C2-P5 NOT ACCEPTED — the proposal was rebuilt from the frozen requirements"
+  }
+ ],
+ "static_admission": {
+  "with_synthetic_approvals": {
+   "engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+   "admitted": true,
+   "result_digest": "4bc6b1c2ffe2546d993264cf86343d9cce16ec07fdc58094aff8479f3872ea25",
+   "checks": [
+    {
+     "number": 1,
+     "name": "requirement_coverage",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 2,
+     "name": "contract_spec_integrity",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 3,
+     "name": "ownership",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 4,
+     "name": "dependency_dag",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 5,
+     "name": "contradictions",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 6,
+     "name": "proof_capability",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 7,
+     "name": "traceability",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 8,
+     "name": "plan_structure",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 9,
+     "name": "probe_calibration",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    }
+   ]
+  },
+  "without_approvals": {
+   "engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+   "admitted": false,
+   "result_digest": "1ce2c40a4e64268f141c46df26c4202893650ec1b9d05b13d57ca5738f0077ce",
+   "checks": [
+    {
+     "number": 1,
+     "name": "requirement_coverage",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 2,
+     "name": "contract_spec_integrity",
+     "passed": false,
+     "problems_count": 59,
+     "problems": [
+      "contract BC-V22-S-10-a does not compile: contract BC-V22-S-10-a is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-10-b does not compile: contract BC-V22-S-10-b is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-10-c does not compile: contract BC-V22-S-10-c is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-12-a does not compile: contract BC-V22-S-12-a is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-12-b does not compile: contract BC-V22-S-12-b is not approved: R-12: no approval binds requirement_hash and contract_hash"
+     ]
+    },
+    {
+     "number": 3,
+     "name": "ownership",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 4,
+     "name": "dependency_dag",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 5,
+     "name": "contradictions",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 6,
+     "name": "proof_capability",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 7,
+     "name": "traceability",
+     "passed": false,
+     "problems_count": 67,
+     "problems": [
+      "criterion S-3.1-a: contract BC-V22-S-3.1-a is not approved: contract BC-V22-S-3.1-a is not approved: R-3.1: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.1-b: contract BC-V22-S-3.1-b is not approved: contract BC-V22-S-3.1-b is not approved: R-3.1: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.1-c: contract BC-V22-S-3.1-c is not approved: contract BC-V22-S-3.1-c is not approved: R-3.1: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-a: contract BC-V22-S-3.2-a is not approved: contract BC-V22-S-3.2-a is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-b: contract BC-V22-S-3.2-b is not approved: contract BC-V22-S-3.2-b is not approved: R-3.2: no approval binds requirement_hash and contract_hash"
+     ]
+    },
+    {
+     "number": 8,
+     "name": "plan_structure",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    },
+    {
+     "number": 9,
+     "name": "probe_calibration",
+     "passed": true,
+     "problems_count": 0,
+     "problems": []
+    }
+   ]
+  }
+ },
+ "clauses": [
+  {
+   "id": "R-1/1",
+   "requirement": "R-1",
+   "clause": "purpose",
+   "class": "DESCRIPTIVE",
+   "specs": [],
+   "reason": "descriptive; the behaviours are R-3..R-9"
+  },
+  {
+   "id": "R-2/1",
+   "requirement": "R-2",
+   "clause": "non-goals (no network listener, database, client/server, third-party deps)",
+   "class": "DESCRIPTIVE",
+   "specs": [],
+   "reason": "descriptive; the side-channel half is measured under R-12, the dependency half under R-10"
+  },
+  {
+   "id": "R-3.1/1",
+   "requirement": "R-3.1",
+   "clause": "all keys are normalized to Unicode NFC before storage, lookup, hashing, serialization",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.1-a"
+   ]
+  },
+  {
+   "id": "R-3.1/2",
+   "requirement": "R-3.1",
+   "clause": "strings differing only in NFC/NFD are the same key",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.1-b",
+    "S-3.1-c"
+   ]
+  },
+  {
+   "id": "R-3.2/1",
+   "requirement": "R-3.2",
+   "clause": "a single JSONL file; each line {op, key <nfc>, value, ts <int>, id <rid>}",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.2-d",
+    "S-3.2-e",
+    "S-3.2-f",
+    "S-3.2-g",
+    "S-3.2-h"
+   ]
+  },
+  {
+   "id": "R-3.2/2",
+   "requirement": "R-3.2",
+   "clause": "hash = SHA-256(prev_hash || '|' || canonical_bytes), hash fields emptied",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "the canonical bytes encoding is not fixed: no harness can recompute a hash value independently; the product's own consistency is observed through its verify (S-3.2-a, S-3.3-*)"
+  },
+  {
+   "id": "R-3.2/3",
+   "requirement": "R-3.2",
+   "clause": "prev_hash of the next line = this hash",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.2-a"
+   ],
+   "note": "observed through the product's full verify; no observable compares two fields of a file"
+  },
+  {
+   "id": "R-3.2/4",
+   "requirement": "R-3.2",
+   "clause": "first prev_hash is 'GENESIS' or 64 zeros, an implementation choice, documented and constant",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "a disjunctive expected value: every file shape compares one value; fixing one form would enforce a stronger property than the requirement (OD-STRONGER)"
+  },
+  {
+   "id": "R-3.2/5",
+   "requirement": "R-3.2",
+   "clause": "append-only: existing records MUST NOT be rewritten in place",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.2-b",
+    "S-3.2-c"
+   ]
+  },
+  {
+   "id": "R-3.3/1",
+   "requirement": "R-3.3",
+   "clause": "a mutated value, swapped op or modified hash on a committed line is detected by a full verify",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.3-a",
+    "S-3.3-b",
+    "S-3.3-c"
+   ]
+  },
+  {
+   "id": "R-3.3/2",
+   "requirement": "R-3.3",
+   "clause": "ok iff every recomputed hash matches AND every prev_hash matches the previous stored hash",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.2-a",
+    "S-3.3-d",
+    "S-D3-05-01-1"
+   ]
+  },
+  {
+   "id": "R-3.3/3",
+   "requirement": "R-3.3",
+   "clause": "ok=False and first_bad_index=<i> on the first violation",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "the verdict's representation is open (the CLI exposes the exit code only); no class reads one field of an arbitrary returned object; a fixed-shape comparison would prescribe a representation (OD-02-01-4)"
+  },
+  {
+   "id": "R-3.4/1",
+   "requirement": "R-3.4",
+   "clause": "verify reads no in-memory state set by append; recomputes from disk, CLI or library",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.4-a"
+   ]
+  },
+  {
+   "id": "R-4.1/1",
+   "requirement": "R-4.1",
+   "clause": "a rid is a non-empty UTF-8 string supplied by the caller",
+   "class": "DESCRIPTIVE",
+   "specs": [],
+   "reason": "a definition of the caller's input; the requirements prescribe no behaviour for a violation (the reference's refusal of an empty rid is its interpretation)"
+  },
+  {
+   "id": "R-4.2/1",
+   "requirement": "R-4.2",
+   "clause": "a replayed rid MUST NOT append a new line",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.2-a",
+    "S-4.2-b",
+    "S-3.1-c",
+    "S-4.4-b",
+    "S-4.5-b"
+   ]
+  },
+  {
+   "id": "R-4.2/2",
+   "requirement": "R-4.2",
+   "clause": "the second call MUST return the same result",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "the result's representation is open; the only comparator of two results needs a JSON form, which would prescribe one (OD-RETURN)"
+  },
+  {
+   "id": "R-4.3/1",
+   "requirement": "R-4.3",
+   "clause": "another rid on a key last mutated by another rid MUST raise ConflictError",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.3-a",
+    "S-3.1-b"
+   ]
+  },
+  {
+   "id": "R-4.3/2",
+   "requirement": "R-4.3",
+   "clause": "... and MUST NOT append a new line",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.3-b",
+    "S-D3-05-01-2"
+   ]
+  },
+  {
+   "id": "R-4.3/3",
+   "requirement": "R-4.3",
+   "clause": "or return an error result depending on CLI surface (exit 4, §9)",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "the only mutating CLI invocation is `apply --batch <file>`, whose file shape the requirements do not fix (OD-BATCH)"
+  },
+  {
+   "id": "R-4.4/1",
+   "requirement": "R-4.4",
+   "clause": "a put with another rid after a tombstone MUST conflict",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.4-a"
+   ]
+  },
+  {
+   "id": "R-4.4/2",
+   "requirement": "R-4.4",
+   "clause": "a put with the tombstone's rid is a no-op replay",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.4-b"
+   ]
+  },
+  {
+   "id": "R-4.4/3",
+   "requirement": "R-4.4",
+   "clause": "... returning the same result as the delete",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "as R-4.2/2 (OD-RETURN)"
+  },
+  {
+   "id": "R-4.5/1",
+   "requirement": "R-4.5",
+   "clause": "put k r1 then delete k r2: the second MUST conflict",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.5-a",
+    "S-6-b"
+   ]
+  },
+  {
+   "id": "R-4.5/2",
+   "requirement": "R-4.5",
+   "clause": "replays of either MUST NOT conflict",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.5-b"
+   ]
+  },
+  {
+   "id": "R-5/0",
+   "requirement": "R-5",
+   "clause": "apply_batch runs 'under the lock'",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "the requirements define no lock and nothing observable depends on one"
+  },
+  {
+   "id": "R-5/1",
+   "requirement": "R-5",
+   "clause": "apply_batch writes all lines to a sibling temp file, fsyncs it, renames it over the path",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "the mechanism is not observable by any class (no step traces the subject's own files)"
+  },
+  {
+   "id": "R-5/2",
+   "requirement": "R-5",
+   "clause": "a crash at any point leaves the full batch or the pre-batch bytes, never a partial batch",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "a fault step makes the faulted call either return (call) or raise (expect_raises); the requirements fix neither, only the post-crash state, and a fault the implementation does not use (os.replace vs os.rename) never fires (OD-03-01-5)"
+  },
+  {
+   "id": "R-5/3",
+   "requirement": "R-5",
+   "clause": "all or nothing without a crash: a refused batch commits nothing; an accepted one every element",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-5-a",
+    "S-5-b"
+   ]
+  },
+  {
+   "id": "R-5/4",
+   "requirement": "R-5",
+   "clause": "the CLI `apply --batch <file>` performs the same atomic operation",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "the batch-file shape is not fixed (OD-BATCH); the file-absent I/O error is measured (S-9-e)"
+  },
+  {
+   "id": "R-6/1",
+   "requirement": "R-6",
+   "clause": "the snapshot is deterministic, byte-stable for a given chain",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-6-a",
+    "S-6-d"
+   ]
+  },
+  {
+   "id": "R-6/2",
+   "requirement": "R-6",
+   "clause": "the materialised state: each key's most recent committed put unless tombstoned",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-6-b",
+    "S-6-c"
+   ],
+   "note": "measured relationally (a refused delete and a tombstone leave the state unchanged)"
+  },
+  {
+   "id": "R-6/3",
+   "requirement": "R-6",
+   "clause": "sorted by NFC key in UTF-8 byte order; a JSON document",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "the document's layout and representation are open: its content and key order are observable only through bytes or a representation no requirement fixes"
+  },
+  {
+   "id": "R-6/4",
+   "requirement": "R-6",
+   "clause": "the CLI `snapshot --out <file>` writes this same document",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "no class compares a written file with a library value, and the file's bytes are layout-open"
+  },
+  {
+   "id": "R-7/1",
+   "requirement": "R-7",
+   "clause": "a truncated final line is removed and the chain verifies cleanly afterwards",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-7-a",
+    "S-7-b",
+    "S-7-c"
+   ]
+  },
+  {
+   "id": "R-7/2",
+   "requirement": "R-7",
+   "clause": "no other content may be modified",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "the preserved lines were written by the product: their bytes are unknown to the harness (S-7-a measures that they remain)"
+  },
+  {
+   "id": "R-7/3",
+   "requirement": "R-7",
+   "clause": "on a clean chain repair-tail is a no-op",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-7-d"
+   ]
+  },
+  {
+   "id": "R-7/4",
+   "requirement": "R-7",
+   "clause": "on mid-chain corruption repair-tail MUST refuse",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-7-e",
+    "S-7-f"
+   ]
+  },
+  {
+   "id": "R-8/1",
+   "requirement": "R-8",
+   "clause": "after a successful append the bytes are durably on disk (fsync) before return",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "durability is not observable from outside the process (the reference fixture treats R-8 as static)"
+  },
+  {
+   "id": "R-9/0",
+   "requirement": "R-9",
+   "clause": "exit 0 on success",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-a",
+    "S-3.2-a",
+    "S-7-a",
+    "S-7-d"
+   ]
+  },
+  {
+   "id": "R-9/2",
+   "requirement": "R-9",
+   "clause": "exit 2 on a usage error",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-b",
+    "S-9-c"
+   ]
+  },
+  {
+   "id": "R-9/3",
+   "requirement": "R-9",
+   "clause": "exit 3 on an I/O error",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-d",
+    "S-9-e"
+   ]
+  },
+  {
+   "id": "R-9/4",
+   "requirement": "R-9",
+   "clause": "exit 4 on a conflict",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "as R-4.3/3 (OD-BATCH)"
+  },
+  {
+   "id": "R-9/5",
+   "requirement": "R-9",
+   "clause": "exit 5 on corruption (verify not ok, repair-tail non-tail corruption)",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-f",
+    "S-3.3-a",
+    "S-3.3-b",
+    "S-3.3-c",
+    "S-3.3-d",
+    "S-7-e"
+   ]
+  },
+  {
+   "id": "R-10/1",
+   "requirement": "R-10",
+   "clause": "stdlib only; the allowed modules",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-10-a"
+   ]
+  },
+  {
+   "id": "R-10/2",
+   "requirement": "R-10",
+   "clause": "use `from __future__ import annotations`",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-10-b",
+    "S-10-c"
+   ]
+  },
+  {
+   "id": "R-10/3",
+   "requirement": "R-10",
+   "clause": "no pip install of a runtime dependency",
+   "class": "ENGINEERING_TEST_REQUIREMENT",
+   "specs": [],
+   "reason": "an installation practice; its product consequence is R-10/1"
+  },
+  {
+   "id": "R-10/4",
+   "requirement": "R-10",
+   "clause": "Python 3.11+ required",
+   "class": "ENGINEERING_TEST_REQUIREMENT",
+   "specs": [],
+   "reason": "a property of the runtime environment the harness chooses, not of the product's behaviour"
+  },
+  {
+   "id": "R-11/1",
+   "requirement": "R-11",
+   "clause": "unit tests, >=85% coverage, unittest/pytest agreement",
+   "class": "ENGINEERING_TEST_REQUIREMENT",
+   "specs": [],
+   "reason": "DEVELOPER_TEST_REQUIREMENT: a requirement on the product's own tests, outside ProductProof by invariant IX; not satisfied by this classification"
+  },
+  {
+   "id": "R-12/1",
+   "requirement": "R-12",
+   "clause": "no socket, no subprocess, no os.system",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-12-a",
+    "S-12-b",
+    "S-12-c"
+   ]
+  },
+  {
+   "id": "R-12/2",
+   "requirement": "R-12",
+   "clause": "no opening of files outside the ledger, batch and snapshot paths",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "reason": "no class observes which files a subject opens"
+  },
+  {
+   "id": "R-13/1",
+   "requirement": "R-13",
+   "clause": "ledgerlock/__init__.py, ledger.py, cli.py",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-13-a",
+    "S-13-b",
+    "S-13-c"
+   ]
+  },
+  {
+   "id": "R-13/2",
+   "requirement": "R-13",
+   "clause": "ledger.py: Ledger, ConflictError, append, verify, snapshot, apply_batch",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-13-d",
+    "S-13-e",
+    "S-13-f",
+    "S-13-g",
+    "S-13-h",
+    "S-13-i"
+   ]
+  },
+  {
+   "id": "R-13/3",
+   "requirement": "R-13",
+   "clause": "tests/test_*.py, docs/requirements.md, README.md, pyproject.toml",
+   "class": "ENGINEERING_TEST_REQUIREMENT",
+   "specs": [],
+   "reason": "repository deliverables: the developer's tests (R-11) and packaging/documentation files, not product behaviour; the reference fixture carries the package tree only"
+  },
+  {
+   "id": "R-14/1",
+   "requirement": "R-14",
+   "clause": "acceptance items 1-6",
+   "class": "DESCRIPTIVE",
+   "specs": [
+    "S-9-a",
+    "S-6-d",
+    "S-7-a",
+    "S-10-a"
+   ],
+   "reason": "a summary of R-3..R-12: item 1 S-9-a, 2 S-6-d, 3 R-5/4 (unsupported, OD-BATCH), 4 S-7-a, 5 R-11 (engineering), 6 S-10-a"
+  }
+ ],
+ "criteria": [
+  {
+   "ac_id": "AC-STORY-01-01-1",
+   "story": "STORY-01-01",
+   "v1_requirement": "FR-1",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given any string `s`, `from ledgerlock.format import normalize_key; normalize_key(s)` returns `unicodedata.normalize(\"NFC\", s)` byte-for-byte.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.1-a"
+   ],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)"
+   ],
+   "unsupported": [],
+   "reason": "NFC normalization (R-3.1/1), observed on the stored line; 'any string' is a bounded witness (DECISION-1)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-01-2",
+   "story": "STORY-01-01",
+   "v1_requirement": "FR-1",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given the NFC string `\"\\u00e9\"` (U+00E9) and its NFD decomposition `\"e\\u0301\"`, calling `normalize_key` on each returns byte-identical results equal to `\"\\u00e9\"`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.1-a",
+    "S-3.1-b"
+   ],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)"
+   ],
+   "unsupported": [],
+   "reason": "NFC/NFD are one key (R-3.1/2)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-01-3",
+   "story": "STORY-01-01",
+   "v1_requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a fresh `pyproject.toml` declaring `name = \"ledgerlock\"` and `requires-python = \">=3.11\"`, an empty `ledgerlock/` package, and an empty `tests/` directory, `python -c \"import ledgerlock; print(ledgerlock.__file__)\"` prints a path ending in `ledgerlock/__init__.py` with no exception.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-13-a"
+   ],
+   "plan_only": [
+    "the pyproject.toml / empty tests/ givens (engineering scaffolding)"
+   ],
+   "unsupported": [],
+   "reason": "the package's __init__.py (R-13/1)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-01-4",
+   "story": "STORY-01-01",
+   "v1_requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` exits `1` (zero matches).",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-10-a",
+    "S-12-a",
+    "S-12-b"
+   ],
+   "plan_only": [
+    "the grep command form"
+   ],
+   "unsupported": [],
+   "reason": "network and process modules are outside §10's allowed set; socket/subprocess (§12)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-01-5",
+   "story": "STORY-01-01",
+   "v1_requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "criterion": "Given the `ledgerlock/` package source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` exits `1` (zero matches).",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-12-a",
+    "S-12-b",
+    "S-12-c"
+   ],
+   "plan_only": [
+    "the grep command form"
+   ],
+   "unsupported": [],
+   "reason": "§12, split per prohibited name (OD-FACETS)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-01-6",
+   "story": "STORY-01-01",
+   "v1_requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given an `__init__.py`, `from ledgerlock import Ledger, ConflictError` returns both names without exception and `Ledger` is a callable class.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-13-d",
+    "S-13-e"
+   ],
+   "plan_only": [
+    "the package-level re-export `from ledgerlock import`"
+   ],
+   "unsupported": [],
+   "reason": "two independent names, two atomic contracts (OD-01-01-6)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-01-7",
+   "story": "STORY-01-01",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given the registered CLI, `python -m ledgerlock verify <ledger> <extra-positional>` in a subprocess exits `2` and writes nothing to stdout (argparse reports a usage error on stderr).",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-c"
+   ],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "a usage error exits 2 (R-9/2)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-02-1",
+   "story": "STORY-01-02",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a dict `line` whose `hash` and `prev_hash` are unset, `canonical_bytes(line)` returns exactly `json.dumps(line, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\")`.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)",
+    "the exact canonical encoding json.dumps(sort_keys, compact, ensure_ascii=False)"
+   ],
+   "unsupported": [],
+   "reason": "§3.2 leaves the canonical bytes open",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-02-2",
+   "story": "STORY-01-02",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a second dict element-equal to the first, `canonical_bytes` on it returns bytes byte-identical to the first call's bytes.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)"
+   ],
+   "unsupported": [],
+   "reason": "a property of a plan function; the chain's consistency is observed through verify (S-3.2-a)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-02-3",
+   "story": "STORY-01-02",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a dict whose value includes a non-ASCII string (e.g. `\"é\"` U+00E9), `canonical_bytes` encodes it as UTF-8 literal (`\\xc3\\xa9`, not `\\u00e9`) and is byte-stable across two invocations.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)",
+    "the UTF-8-literal encoding choice"
+   ],
+   "unsupported": [],
+   "reason": "encoding choice",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-02-4",
+   "story": "STORY-01-02",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given two dicts whose keys differ only in insertion order, `canonical_bytes` returns byte-identical bytes.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)"
+   ],
+   "unsupported": [],
+   "reason": "a property of a plan function (DECISION-4 criterion; OD-D4)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-02-5",
+   "story": "STORY-01-02",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `from ledgerlock.format import GENESIS`, `GENESIS == \"GENESIS\"` (literal seven-character string, distinct from any 64-char hex string).",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)",
+    "the literal 'GENESIS' (the requirements allow it or 64 zeros)"
+   ],
+   "unsupported": [],
+   "reason": "OD-STRONGER",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-02-6",
+   "story": "STORY-01-02",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `canonical_bytes` called twice on the same dict after round-tripping through `json.loads`, the returned bytes equal the original bytes.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)"
+   ],
+   "unsupported": [],
+   "reason": "a property of a plan function (DECISION-4 criterion; OD-D4)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-03-1",
+   "story": "STORY-01-03",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a `prev_hash` string and a line dict with hash fields emptied, `line_hash(prev_hash, line)` returns exactly 64 lowercase hex characters.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)",
+    "the digest's exact value / 64-lowercase-hex form"
+   ],
+   "unsupported": [],
+   "reason": "OD-STRONGER: the canonical bytes are open",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-03-2",
+   "story": "STORY-01-03",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given two distinct `prev_hash` values against the same line, `line_hash` on each returns different results.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)"
+   ],
+   "unsupported": [],
+   "reason": "a property of a plan function (DECISION-4; OD-D4); linkage detection is S-3.3-d",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-03-3",
+   "story": "STORY-01-03",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a line dict whose `hash` and `prev_hash` are already set, `line_hash` ignores them (it operates on a copy with those fields emptied).",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)"
+   ],
+   "unsupported": [],
+   "reason": "a property of a plan function",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-03-4",
+   "story": "STORY-01-03",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given the same `(prev_hash, line)` pair, `line_hash` returns the same digest across two invocations.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)"
+   ],
+   "unsupported": [],
+   "reason": "a property of a plan function (DECISION-4; OD-D4)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-03-5",
+   "story": "STORY-01-03",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a `prev_hash` of literal `\"GENESIS\"`, `line_hash` accepts the non-hex seven-character string without raising.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.format and its functions are PLAN-V2.1 topology (§13 names ledger.py and cli.py only)"
+   ],
+   "unsupported": [],
+   "reason": "a property of a plan function",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-04-1",
+   "story": "STORY-01-04",
+   "v1_requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL with N lines, `store.read_lines(path)` returns a list of N `bytes` objects, each line's trailing `\\n` stripped.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.store is PLAN-V2.1 topology (OD-STORE)"
+   ],
+   "unsupported": [],
+   "reason": "OD-STORE",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-04-2",
+   "story": "STORY-01-04",
+   "v1_requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a missing file path, `store.read_lines(path)` raises `FileNotFoundError`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-d"
+   ],
+   "plan_only": [
+    "the module ledgerlock.store is PLAN-V2.1 topology (OD-STORE)"
+   ],
+   "unsupported": [],
+   "reason": "a missing ledger file is an I/O error (R-9/3)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-04-3",
+   "story": "STORY-01-04",
+   "v1_requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given an empty file (zero bytes), `store.read_lines(path)` returns an empty list.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-a"
+   ],
+   "plan_only": [
+    "the module ledgerlock.store is PLAN-V2.1 topology (OD-STORE)"
+   ],
+   "unsupported": [],
+   "reason": "an empty file is an empty (valid) chain (R-3.3, R-9/0)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-04-4",
+   "story": "STORY-01-04",
+   "v1_requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `store.write_atomic(path, [b\"{...}\\n\", b\"{...}\\n\"])`, the path's bytes equal the concatenation and a separate `read_lines` call returns the two lines.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.store is PLAN-V2.1 topology (OD-STORE)"
+   ],
+   "unsupported": [],
+   "reason": "OD-STORE",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-04-5",
+   "story": "STORY-01-04",
+   "v1_requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `store.write_atomic` called with a non-empty existing path, a simulated crash between temp-write and `os.replace` (e.g. patching `os.replace` to raise) leaves the original path byte-identical.",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.store is PLAN-V2.1 topology (OD-STORE)"
+   ],
+   "unsupported": [
+    "R-5/2 crash atomicity (DECISION-2 fault; OD-03-01-5)"
+   ],
+   "reason": "the post-crash state cannot be observed without fixing how the crash surfaces",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-04-6",
+   "story": "STORY-01-04",
+   "v1_requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a call to `store.write_atomic`, the temp file used is created in the same directory as the target path (so `os.replace` is atomic on POSIX).",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "plan_only": [
+    "the module ledgerlock.store is PLAN-V2.1 topology (OD-STORE)"
+   ],
+   "unsupported": [
+    "R-5/1 the sibling temp file"
+   ],
+   "reason": "the mechanism is not observable",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-05-1",
+   "story": "STORY-01-05",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a fresh `Ledger(path)` whose JSONL does not yet exist, `append((\"put\", \"k\", {\"v\": 1}, \"r1\", 100))` creates the file with exactly one line terminated by `\\n` whose `op == \"put\"`, `key == \"k\"`, `id == \"r1\"`, `ts == 100`, `value == {\"v\": 1}`, `prev_hash == \"GENESIS\"`, and `hash == format.line_hash(\"GENESIS\", line_with_hash_fields_emptied)`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.2-d",
+    "S-3.2-e",
+    "S-3.2-f",
+    "S-3.2-g",
+    "S-3.2-h",
+    "S-3.1-a"
+   ],
+   "plan_only": [
+    "append((op, key, value, rid, ts)) as one tuple is PLAN-V2.1's signature"
+   ],
+   "unsupported": [
+    "R-3.2/4 the GENESIS form",
+    "R-3.2/2 the hash value"
+   ],
+   "reason": "the stored line's fields (R-3.2/1)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-05-2",
+   "story": "STORY-01-05",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a second `append` after the first, the new line's `prev_hash` equals the first line's stored `hash` and its own `hash` equals `line_hash(first_hash, new_line_emptied)`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.2-a"
+   ],
+   "plan_only": [
+    "append((op, key, value, rid, ts)) as one tuple is PLAN-V2.1's signature"
+   ],
+   "unsupported": [
+    "R-3.2/2 the hash value"
+   ],
+   "reason": "linkage (R-3.2/3) through verify",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-05-3",
+   "story": "STORY-01-05",
+   "v1_requirement": "FR-1",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `append((\"put\", \"\", \"v\", \"r\", 1))` against an empty ledger, `ValueError` is raised and no file is created.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "an empty key raising ValueError: the requirements say nothing about empty keys"
+   ],
+   "unsupported": [],
+   "reason": "",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-05-4",
+   "story": "STORY-01-05",
+   "v1_requirement": "FR-2",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given an existing JSONL written by a previous `Ledger` instance, a fresh `Ledger` opened on the same path computes its first `append`'s `prev_hash` from the tail of the file (the new instance reads the tail from disk, not from any in-memory state).",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.2-a"
+   ],
+   "plan_only": [
+    "append((op, key, value, rid, ts)) as one tuple is PLAN-V2.1's signature"
+   ],
+   "unsupported": [
+    "a second, fresh instance (one construct per scenario; a harness-written chain presumes the canonical encoding)"
+   ],
+   "reason": "the tail link (R-3.2/3, R-3.4)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-05-5",
+   "story": "STORY-01-05",
+   "v1_requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `append` returns successfully on an empty path, a separate process opening the same path finds the new line present and the file terminated by `\\n`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.2-h",
+    "S-3.2-a"
+   ],
+   "plan_only": [
+    "append((op, key, value, rid, ts)) as one tuple is PLAN-V2.1's signature"
+   ],
+   "unsupported": [
+    "R-8/1 durability"
+   ],
+   "reason": "the line is visible to a separate process (the CLI verify) and newline-terminated",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-06-1",
+   "story": "STORY-01-06",
+   "v1_requirement": "FR-3",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a committed `put(\"k\", \"v1\", \"r1\", 100)`, `append((\"put\", \"k\", \"anything\", \"r1\", 999))` (same `rid`, different value and ts) returns the original line dict byte-for-byte with `replayed is True`, `committed is False`, and the chain length is unchanged.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.2-a"
+   ],
+   "plan_only": [
+    "append((op, key, value, rid, ts)) as one tuple is PLAN-V2.1's signature",
+    "the returned value's shape (OD-RETURN)"
+   ],
+   "unsupported": [
+    "R-4.2/2 the same result"
+   ],
+   "reason": "replay appends nothing (R-4.2/1)",
+   "contradicts_requirements": "a replay flagged replayed=True / committed=False is not 'the same result' as the first call (R-4.2)"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-2",
+   "story": "STORY-01-06",
+   "v1_requirement": "FR-4",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given the same committed line, `append((\"put\", \"k\", \"v2\", \"r2\", 200))` (different `rid`) raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index is None`, and the JSONL is byte-identical to its pre-call state.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.3-a",
+    "S-4.3-b"
+   ],
+   "plan_only": [
+    "append((op, key, value, rid, ts)) as one tuple is PLAN-V2.1's signature",
+    "the ConflictError attributes key / incoming_rid / committed_rid / batch_index"
+   ],
+   "unsupported": [],
+   "reason": "conflict raises and appends nothing (R-4.3/1, R-4.3/2)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-06-3",
+   "story": "STORY-01-06",
+   "v1_requirement": "FR-5",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r2\", 200))` (different `rid`) raises `ConflictError`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.4-a"
+   ],
+   "plan_only": [
+    "append((op, key, value, rid, ts)) as one tuple is PLAN-V2.1's signature"
+   ],
+   "unsupported": [],
+   "reason": "R-4.4/1",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-01-06-4",
+   "story": "STORY-01-06",
+   "v1_requirement": "FR-5",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given the same committed `delete(\"k\", \"r1\", 100)`, `append((\"put\", \"k\", \"v\", \"r1\", 200))` (same `rid`) returns the delete line dict byte-for-byte with `replayed is True`, `committed is False`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.4-b"
+   ],
+   "plan_only": [
+    "append((op, key, value, rid, ts)) as one tuple is PLAN-V2.1's signature",
+    "the returned value's shape (OD-RETURN)"
+   ],
+   "unsupported": [
+    "R-4.4/3 the same result as the delete"
+   ],
+   "reason": "R-4.4/2",
+   "contradicts_requirements": "as AC-STORY-01-06-1, against 'returning the same result as the delete' (R-4.4)"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-5",
+   "story": "STORY-01-06",
+   "v1_requirement": "FR-3",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a key committed with NFC form `\"\\u00e9\"` (U+00E9) and `rid == \"r1\"`, `append((\"put\", \"e\\u0301\", \"v2\", \"r1\", 200))` (NFD form, same `rid`) is a replay: the returned line dict's `key` equals `\"\\u00e9\"` byte-exact, `replayed is True`, and the chain length is unchanged.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.1-c"
+   ],
+   "plan_only": [
+    "append((op, key, value, rid, ts)) as one tuple is PLAN-V2.1's signature",
+    "the returned value's shape (OD-RETURN)"
+   ],
+   "unsupported": [],
+   "reason": "an NFD replay of an NFC rid appends nothing (R-3.1/2, R-4.2/1)",
+   "contradicts_requirements": "as AC-STORY-01-06-1"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-1",
+   "story": "STORY-02-01",
+   "v1_requirement": "FR-6",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL with N valid lines written through `Ledger.append`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.2-a"
+   ],
+   "plan_only": [
+    "verify() returning the dict {ok, first_bad_index}"
+   ],
+   "unsupported": [],
+   "reason": "a product-written chain verifies",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-02-01-2",
+   "story": "STORY-02-01",
+   "v1_requirement": "FR-6",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a zero-byte JSONL, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` without raising.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-a"
+   ],
+   "plan_only": [
+    "the dict return"
+   ],
+   "unsupported": [],
+   "reason": "an empty chain verifies",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-02-01-3",
+   "story": "STORY-02-01",
+   "v1_requirement": "FR-6",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a missing JSONL file path, `verify()` raises `FileNotFoundError`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-d"
+   ],
+   "plan_only": [
+    "FileNotFoundError from the library"
+   ],
+   "unsupported": [],
+   "reason": "a missing ledger is an I/O error",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-02-01-4",
+   "story": "STORY-02-01",
+   "v1_requirement": "FR-7",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL whose line at index `i` has had its `hash` field overwritten with `\"0\" * 64` out-of-band after `append` returned, `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}` (or the earlier index whose chain is now broken).",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.3-c"
+   ],
+   "plan_only": [
+    "the dict return"
+   ],
+   "unsupported": [
+    "R-3.3/3 first_bad_index (OD-02-01-4)"
+   ],
+   "reason": "a modified hash is detected",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-02-01-5",
+   "story": "STORY-02-01",
+   "v1_requirement": "FR-7",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL whose `value` field on line `i` is mutated out-of-band after `append` (e.g. `\"v1\"` → `\"v2\"`), `verify()` from a fresh `Ledger` instance returns `{\"ok\": False, \"first_bad_index\": i}`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.3-a"
+   ],
+   "plan_only": [
+    "the dict return"
+   ],
+   "unsupported": [
+    "R-3.3/3 first_bad_index"
+   ],
+   "reason": "a mutated value is detected",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-02-02-1",
+   "story": "STORY-02-02",
+   "v1_requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `put(\"a\", 1, r, t)`, `put(\"c\", 3, r, t)`, `put(\"b\", 2, r, t)` written in that order, two calls to `snapshot()` with no intervening mutations return equal dicts and `json.dumps(result, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False)` lists keys in `a, b, c` order.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-6-a"
+   ],
+   "plan_only": [],
+   "unsupported": [
+    "R-6/3 key order"
+   ],
+   "reason": "snapshot stability (DECISION-4 criterion rewritten at the requirement level with an existing observable, OD-D4)",
+   "contradicts_requirements": "if its single rid r is literal, only the first put commits under rid-keyed replay, so a, b, c cannot all appear"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-2",
+   "story": "STORY-02-02",
+   "v1_requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a committed `put(\"k\", \"v\", \"r1\", t1)`, `delete(\"k\", \"r2\", t2)` raises `ConflictError` (requirements §4.5: a different `rid` mutating the same key MUST conflict) and a following `snapshot()` still returns `{\"k\": \"v\"}` — the refused delete changed nothing.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.5-a",
+    "S-6-b"
+   ],
+   "plan_only": [],
+   "unsupported": [
+    "R-6/3 the snapshot's content {k: v}"
+   ],
+   "reason": "the refused delete conflicts and changes nothing",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-02-02-3",
+   "story": "STORY-02-02",
+   "v1_requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `delete(\"k2\", \"r3\", t3)` on a key with no committed mutation (a tombstone, requirements §4.4), `snapshot()` returns a dict with no key `\"k2\"`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-6-c"
+   ],
+   "plan_only": [],
+   "unsupported": [
+    "R-6/3 content"
+   ],
+   "reason": "a tombstone on a never-mutated key leaves the state unchanged",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-02-02-4",
+   "story": "STORY-02-02",
+   "v1_requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `put(\"e\\u0301\", \"v\", r, t)` (NFD form) and a follow-up `put(\"\\u00e9\", \"v2\", r, t)` with the same `rid` (idempotent replay), `snapshot()` returns a dict with the NFC key `\"\\u00e9\"` and value `\"v\"`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.1-a",
+    "S-3.1-c"
+   ],
+   "plan_only": [],
+   "unsupported": [
+    "R-6/3 the snapshot's content"
+   ],
+   "reason": "NFC storage and the NFD/NFC replay",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-02-02-5",
+   "story": "STORY-02-02",
+   "v1_requirement": "FR-9",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given two `Ledger` instances opened in succession over the same on-disk chain, each `snapshot()` returns equal dicts.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-6-a",
+    "S-6-d"
+   ],
+   "plan_only": [],
+   "unsupported": [
+    "two instances in one scenario (one construct)"
+   ],
+   "reason": "determinism across calls and across processes (DECISION-4; OD-D4)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-03-01-1",
+   "story": "STORY-03-01",
+   "v1_requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given an empty ledger and a batch of 3 conflict-free `put` elements, `apply_batch(ops)` produces a JSONL with exactly 3 new lines whose chain verifies end-to-end and whose first batch line's `prev_hash` equals `\"GENESIS\"`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-5-b",
+    "S-3.2-a"
+   ],
+   "plan_only": [],
+   "unsupported": [
+    "R-3.2/4 the GENESIS form"
+   ],
+   "reason": "a batch commits every element and verifies",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-03-01-2",
+   "story": "STORY-03-01",
+   "v1_requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a ledger with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch `[(\"put\", \"k\", \"v2\", \"r1\", 200), (\"put\", \"k2\", 2, \"r2\", 201)]`, the first element is an idempotent replay against the pre-batch state and the batch appends exactly one new line (for `k2`); the JSONL gains exactly one line.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.2-b"
+   ],
+   "plan_only": [],
+   "unsupported": [],
+   "reason": "a replay inside a batch",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-03-01-3",
+   "story": "STORY-03-01",
+   "v1_requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given an empty ledger and a batch `[(\"put\", \"k\", \"v1\", \"r1\", 100), (\"put\", \"k\", \"v2\", \"r2\", 200)]`, `apply_batch` raises `ConflictError` with `key == \"k\"`, `incoming_rid == \"r2\"`, `committed_rid == \"r1\"`, `batch_index == 1`, and the JSONL on disk is byte-identical to its pre-batch state.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-5-a"
+   ],
+   "plan_only": [
+    "the ConflictError attributes",
+    "a conflict between two elements of one batch (RISK-10: R-4.3 judges against the last COMMITTED mutation)"
+   ],
+   "unsupported": [],
+   "reason": "a refused batch commits nothing",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-03-01-4",
+   "story": "STORY-03-01",
+   "v1_requirement": "FR-8",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a ledger whose most recent committed mutation on `k` has `rid == \"r1\"` and a batch whose element 0 targets `k` with `rid == \"r2\"`, `apply_batch` raises `ConflictError` with `batch_index == 0` and the JSONL is unchanged.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-4.3-a",
+    "S-4.3-b"
+   ],
+   "plan_only": [
+    "batch_index 0"
+   ],
+   "unsupported": [],
+   "reason": "element 0 conflicts: raise, no line",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-03-01-5",
+   "story": "STORY-03-01",
+   "v1_requirement": "FR-13",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a simulated crash between temp-file write and `os.replace` (e.g. by patching `os.replace` to raise), `apply_batch` against a non-empty ledger leaves the JSONL byte-identical to its pre-batch state and `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`.",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "plan_only": [
+    "os.replace as the mechanism"
+   ],
+   "unsupported": [
+    "R-5/2 crash atomicity (DECISION-2; OD-03-01-5)"
+   ],
+   "reason": "",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-03-02-1",
+   "story": "STORY-03-02",
+   "v1_requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL whose last line is truncated (last byte is not `\\n` OR the last line does not parse) and whose preceding lines form a valid chain, `repair_tail()` rewrites the JSONL with the truncated final line removed: every preserved line's bytes are unchanged and a subsequent `verify()` returns `{\"ok\": True, \"first_bad_index\": None}`; the new final byte is `\\n`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-7-a",
+    "S-7-b",
+    "S-7-c"
+   ],
+   "plan_only": [
+    "the library method repair_tail() (§7 names the CLI)"
+   ],
+   "unsupported": [
+    "R-7/2 byte identity of the preserved lines"
+   ],
+   "reason": "three atomic clauses (OD-FACETS)",
+   "contradicts_requirements": "truncation defined with OR (last byte not newline OR does not parse); §7 requires both, so an unterminated but valid last record would be removed"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-2",
+   "story": "STORY-03-02",
+   "v1_requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a clean JSONL whose every line parses and verifies, `repair_tail()` returns without raising and the file is byte-identical before and after.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-7-d"
+   ],
+   "plan_only": [
+    "the library method"
+   ],
+   "unsupported": [],
+   "reason": "a clean chain is a no-op",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-03-02-3",
+   "story": "STORY-03-02",
+   "v1_requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL with a truncated final line AND a mid-chain corruption at an earlier index `i < len(lines) - 1`, `repair_tail()` does NOT modify the file (byte-identical before and after) and the verify verdict reports the earlier corruption.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-7-e",
+    "S-7-f"
+   ],
+   "plan_only": [
+    "the library method"
+   ],
+   "unsupported": [
+    "R-3.3/3 the verdict names the corruption"
+   ],
+   "reason": "refusal: exit 5 and nothing modified (OD-REFUSE: the CLI's exit code is the requirement's refusal)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-03-02-4",
+   "story": "STORY-03-02",
+   "v1_requirement": "FR-10",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL whose last line parses but whose own `hash` is broken (a tail tampering, not a truncation), `repair_tail()` does not modify the file and reports the corruption via the verdict.",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "plan_only": [
+    "the library method"
+   ],
+   "unsupported": [
+    "a terminated tail line whose hash is broken: the requirements define truncation and mid-chain refusal only; every probe running repair-tail asserts an exit code the requirements leave open for this case"
+   ],
+   "reason": "",
+   "contradicts_requirements": "when the tampered last line is unterminated, §7 makes it a truncated line to remove; the plan requires no modification"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-1",
+   "story": "STORY-04-01",
+   "v1_requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `snapshot` invoked without `--out`, the CLI exits `2`.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "`snapshot` without --out exiting 2 CONTRADICTS §14 item 2 (`snapshot <ledger>` is a documented invocation)"
+   ],
+   "unsupported": [],
+   "reason": "",
+   "contradicts_requirements": "R-14 item 2 documents `snapshot <ledger>` without --out as a successful invocation; the plan requires exit 2"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-2",
+   "story": "STORY-04-01",
+   "v1_requirement": "FR-12",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "criterion": "Given any subcommand invoked with the wrong number of positional arguments, the CLI exits with code `2` and writes nothing to stdout.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-b",
+    "S-9-c"
+   ],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "a wrong positional count exits 2 (bounded witnesses)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-01-3",
+   "story": "STORY-04-01",
+   "v1_requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given the same checkout, `python -m ledgerlock --help` in a subprocess exits `0` and the stdout argparse usage line contains each of the literal strings `verify`, `snapshot`, `apply`, and `repair-tail`.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "the --help output"
+   ],
+   "unsupported": [],
+   "reason": "not in the requirements",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-01-4",
+   "story": "STORY-04-01",
+   "v1_requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a fresh JSONL written via `Ledger.append`, `python -m ledgerlock verify <ledger>` in a subprocess exits `0`, stdout is empty, and stderr contains exactly one line whose first word is `verify` and which contains the substring `ok`.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-a",
+    "S-3.2-a"
+   ],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "verify exits 0 on a fresh / product-written ledger",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-01-5",
+   "story": "STORY-04-01",
+   "v1_requirement": "FR-11",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given the same fresh JSONL, `python -m ledgerlock snapshot <ledger> --out <snap>` exits `0`, stdout is empty, and the contents of `<snap>` equal `json.dumps(Ledger.snapshot(), sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).encode(\"utf-8\") + b\"\\n\"` byte-for-byte.",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "plan_only": [
+    "the json.dumps byte form of the --out file"
+   ],
+   "unsupported": [
+    "R-6/4 the file equals the library document"
+   ],
+   "reason": "",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-01-6",
+   "story": "STORY-04-01",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a `batch.json` containing three conflict-free `put` elements and a fresh ledger, `python -m ledgerlock apply --batch <batch.json> <ledger>` exits `0`, stdout is empty, and the JSONL contains exactly the lines from the batch (verified by `verify()`).",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [
+    "R-5/4 the batch-file shape (OD-BATCH)"
+   ],
+   "reason": "",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-01-7",
+   "story": "STORY-04-01",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a clean JSONL, `python -m ledgerlock repair-tail <ledger>` exits `0`, stdout is empty, and the JSONL is byte-identical before and after.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-7-d"
+   ],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "repair-tail on a clean chain: exit 0, byte-identical",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-02-1",
+   "story": "STORY-04-02",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given `apply --batch` invoked with a missing batch file, the CLI exits `3` and writes nothing to stdout.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-9-e"
+   ],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "a missing batch file: exit 3",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-02-2",
+   "story": "STORY-04-02",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL with one committed `put(\"k\", \"v1\", \"r1\", 100)` and a batch file whose element 0 is `(\"put\", \"k\", \"v2\", \"r2\", 200)`, `apply --batch <b.json> <ledger>` exits `4`, writes nothing to stdout, and leaves the JSONL byte-identical to its pre-call state.",
+   "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+   "specs": [],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [
+    "R-9/4 exit 4 needs a batch file (OD-BATCH)"
+   ],
+   "reason": "",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-02-3",
+   "story": "STORY-04-02",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL whose line 17 has been mutated out-of-band on disk, `verify` exits `5` and writes nothing to stdout.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-3.3-a",
+    "S-9-f"
+   ],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements",
+    "'line 17'"
+   ],
+   "unsupported": [],
+   "reason": "verify of a corrupt chain exits 5",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-02-4",
+   "story": "STORY-04-02",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given a JSONL with mid-chain corruption at line 17, `repair-tail` exits `5` and writes nothing to stdout.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-7-e"
+   ],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements",
+    "'line 17'"
+   ],
+   "unsupported": [],
+   "reason": "repair-tail refuses mid-chain corruption: exit 5",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-03-1",
+   "story": "STORY-04-03",
+   "v1_requirement": "FR-12",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "criterion": "Given every success path for `verify ok`, the CLI writes nothing to stdout and a single line beginning with `verify` to stderr.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "DECISION-1 criterion; the stderr shape is not a requirement",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-03-2",
+   "story": "STORY-04-03",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given every success path for `apply` (atomic batch committed), the CLI writes nothing to stdout and a single line beginning with `apply` to stderr that mentions the count of appended lines.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "DECISION-1 criterion",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-03-3",
+   "story": "STORY-04-03",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given every success path for `snapshot`, the CLI writes nothing to stdout and a single line beginning with `snapshot` to stderr that mentions the destination path.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "DECISION-1 criterion",
+   "contradicts_requirements": "no stdout on every snapshot success path, while §14 item 2's form without --out produces the bytes (on stdout)"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-4",
+   "story": "STORY-04-03",
+   "v1_requirement": "FR-12",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given every success path for `repair-tail` (clean chain or successful repair), the CLI writes nothing to stdout and a single line beginning with `repair-tail` to stderr.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "DECISION-1 criterion",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-04-03-5",
+   "story": "STORY-04-03",
+   "v1_requirement": "FR-12",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "criterion": "Given any success path, the captured stdout via `subprocess.PIPE` equals `b\"\"`.",
+   "class": "PLAN_ONLY_DETAIL",
+   "specs": [],
+   "plan_only": [
+    "silent stdout / stderr status lines are not in the requirements"
+   ],
+   "unsupported": [],
+   "reason": "DECISION-1 criterion",
+   "contradicts_requirements": "as AC-STORY-04-03-3, for every success path"
+  },
+  {
+   "ac_id": "AC-STORY-05-01-1",
+   "story": "STORY-05-01",
+   "v1_requirement": "FR-2",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "criterion": "Given the library at this point in the epic chain, when the property test runs 50 random mutation sequences against a temp JSONL (each sequence a list of `(op, key, value, rid, ts)` tuples; seeded with a fixed seed for reproducibility), then for every sequence that did not raise `ConflictError`, `verify()` returns `{\"ok\": True, \"first_bad_index\": None}` AND two calls to `snapshot()` return equal dicts.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-D3-05-01-1"
+   ],
+   "plan_only": [
+    "the property test as the subject (DECISION-3: engineering)"
+   ],
+   "unsupported": [],
+   "reason": "DECISION-3 mapping",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-05-01-2",
+   "story": "STORY-05-01",
+   "v1_requirement": "FR-8",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "criterion": "Given the same property test, when a sequence raises `ConflictError`, the JSONL on disk after the sequence is byte-identical to its pre-sequence state for any prefix up to (and including) the offending element, and the chain length did not grow past that prefix.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-D3-05-01-2"
+   ],
+   "plan_only": [
+    "the property test as the subject"
+   ],
+   "unsupported": [],
+   "reason": "DECISION-3 mapping",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-05-01-3",
+   "story": "STORY-05-01",
+   "v1_requirement": "FR-14",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "criterion": "Given the same property test, when it is executed under `python -m unittest discover` and again under `pytest`, both runs report the same total passed/failed counts for the property-test module.",
+   "class": "ENGINEERING_TEST_REQUIREMENT",
+   "specs": [],
+   "plan_only": [],
+   "unsupported": [],
+   "reason": "unittest/pytest agreement of a test module (DECISION-3; R-11)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-05-02-1",
+   "story": "STORY-05-02",
+   "v1_requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given the full test suite at this point in the epic chain, `coverage run -m unittest discover && coverage report --include=ledgerlock/*` shows a `ledgerlock/` total line coverage ≥85%.",
+   "class": "ENGINEERING_TEST_REQUIREMENT",
+   "specs": [],
+   "plan_only": [],
+   "unsupported": [],
+   "reason": "line coverage >= 85% (DECISION-3; R-11)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-05-02-2",
+   "story": "STORY-05-02",
+   "v1_requirement": "FR-14",
+   "v1_mode": "PRESERVE_REQUIRED",
+   "criterion": "Given the same full test suite, `pytest` discovers and runs the same suite and reports the same total passed/failed counts as `python -m unittest discover`.",
+   "class": "ENGINEERING_TEST_REQUIREMENT",
+   "specs": [],
+   "plan_only": [],
+   "unsupported": [],
+   "reason": "suite-level runner agreement (DECISION-3; R-11)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-05-02-3",
+   "story": "STORY-05-02",
+   "v1_requirement": "FR-14",
+   "v1_mode": "CHANGE_REQUIRED",
+   "criterion": "Given the full test suite at this point, the `tests/` source itself is excluded from the coverage measurement.",
+   "class": "ENGINEERING_TEST_REQUIREMENT",
+   "specs": [],
+   "plan_only": [],
+   "unsupported": [],
+   "reason": "coverage configuration (DECISION-3; R-11)",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-05-03-1",
+   "story": "STORY-05-03",
+   "v1_requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"^(import|from) (socket|subprocess|requests|http|urllib|asyncio|ssl|multiprocessing|ctypes|http\\.server|http\\.client|socketserver)\" ledgerlock/` returns no matches and the test passes.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-10-a",
+    "S-12-a",
+    "S-12-b"
+   ],
+   "plan_only": [
+    "'and the test passes' (engineering)"
+   ],
+   "unsupported": [],
+   "reason": "PRESERVE of 01-01-4",
+   "contradicts_requirements": null
+  },
+  {
+   "ac_id": "AC-STORY-05-03-2",
+   "story": "STORY-05-03",
+   "v1_requirement": "FR-14",
+   "v1_mode": "NEGATIVE_INVARIANT",
+   "criterion": "Given the `ledgerlock/` source tree, `grep -RE \"os\\.system|subprocess\\.|socket\\.\" ledgerlock/` returns no matches and the test passes.",
+   "class": "NORMATIVE_PRODUCT_REQUIREMENT",
+   "specs": [
+    "S-12-a",
+    "S-12-b",
+    "S-12-c"
+   ],
+   "plan_only": [
+    "'and the test passes' (engineering)"
+   ],
+   "unsupported": [],
+   "reason": "PRESERVE of 01-01-5",
+   "contradicts_requirements": null
+  }
+ ],
+ "specs": [
+  {
+   "spec_id": "S-3.1-a",
+   "requirement": "R-3.1",
+   "clause": "R-3.1/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the key of the stored line is the NFC form of an NFD key",
+   "witness": "one NFD key (e + U+0301)",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "line": 0,
+       "field": "key",
+       "equals": "é"
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-01-1",
+    "AC-STORY-01-01-2",
+    "AC-STORY-01-05-1",
+    "AC-STORY-02-02-4"
+   ],
+   "falsifiability_mutant": "M5-3.1-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.1-a",
+   "contract_hash": "5283f2ad56d21d0dbc24b4d63220729161506f88044a1b214727b0f1fbf7798a",
+   "spec_hash_id": "PPS-65d059abcd7bdb6aa4ae2bc1baacc5266397c4e603f2445fcb0eceeb1b7cd685",
+   "semantic_hash": "84714ebc49a5f4c6902c84953472d3472e67ff650376ba2faf34a5843a1390c8",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.1-b",
+   "requirement": "R-3.1",
+   "clause": "R-3.1/2",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "an NFD spelling of an NFC-committed key is the same key: another rid on it raises ConflictError",
+   "witness": "the pair U+00E9 / e + U+0301",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "expect_raises",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "exception": "ConflictError"
+     }
+    ]
+   },
+   "observable": {
+    "raises": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-01-2"
+   ],
+   "falsifiability_mutant": "M5-3.1-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.1-b",
+   "contract_hash": "f6870cbe6bdd7a1fe1f7d6a1999deb8309bf7dcd21ec3fac7d7ed2c4cd581d07",
+   "spec_hash_id": "PPS-810d70f8680ef0143b3c99f951cf5a36a17ec6fb381464c8b04257c9a7e12072",
+   "semantic_hash": "c0e582d4d043cecf7c5a816bf943930b6c048371bbae460b97e277b456166e48",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_raises",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.1-c",
+   "requirement": "R-3.1",
+   "clause": "R-3.1/2",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the NFD spelling with the committed rid is a replay of the NFC-committed key: no line is appended",
+   "witness": "the pair U+00E9 / e + U+0301 under one rid",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         "v1",
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         "v2",
+         "r1",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-06-5",
+    "AC-STORY-02-02-4"
+   ],
+   "falsifiability_mutant": "M5-3.1-c",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.1-c",
+   "contract_hash": "045baeac607993963fcc812c8b02771bac54014f899ce69810abeb2866476baa",
+   "spec_hash_id": "PPS-e8786e89d9c8d608ecb8b3422f4d962581b71c405a88677cd298ed8d73d4aa04",
+   "semantic_hash": "deaf2299e735b528208adccfaa4f69e2d5d3770bcbdb7eb40722473acdc65fef",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.2-a",
+   "requirement": "R-3.2",
+   "clause": "R-3.2/3",
+   "clauses_also": [],
+   "story": "STORY-04-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a chain the product wrote in two batches links (the second batch's line to the stored tail) as its own verify checks: `verify` exits 0",
+   "witness": "a two-line chain from two calls",
+   "unmeasured": [],
+   "note": "the link is observed through the product's full verify (§3.3): no observable compares two fields, and the hash value depends on the open canonical bytes",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-05-2",
+    "AC-STORY-01-05-4",
+    "AC-STORY-01-05-5",
+    "AC-STORY-02-01-1",
+    "AC-STORY-03-01-1",
+    "AC-STORY-04-01-4"
+   ],
+   "falsifiability_mutant": "M5-3.2-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.2-a",
+   "contract_hash": "5d31e8be89a758d1baa94a64fe3546e9955b9a166cc295257a43b8d72f937f48",
+   "spec_hash_id": "PPS-6fb67922e547bc2418a84f30b9eceda641440b06d427c80b8fa75350ba67341c",
+   "semantic_hash": "747282a3d8b8dc25aa70794a1921e3930baee40aa730fe0f0eb41eb5fa2c1834",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.2-b",
+   "requirement": "R-3.2",
+   "clause": "R-3.2/5",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a second batch appends: the committed line stays, two lines",
+   "witness": "two single-put batches",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [],
+   "falsifiability_mutant": "M5-3.2-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.2-b",
+   "contract_hash": "44a961ee7c8bcc1eb337f4c6de5589b3edecbd84622f0071c286a4a5f7914892",
+   "spec_hash_id": "PPS-163fb6867c732cc0910fc7cb0aa41dc00e333ffa863e3e20c290e89044694435",
+   "semantic_hash": "619730a279e212db9898909d4c581a90b57fa3ffc97666769f0e2836821f46f9",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.2-c",
+   "requirement": "R-3.2",
+   "clause": "R-3.2/5",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the committed record is not rewritten out of place: line 0 is still the first mutation",
+   "witness": "two single-put batches",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "line": 0,
+       "field": "id",
+       "equals": "r1"
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [],
+   "falsifiability_mutant": "M5-3.2-c",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.2-c",
+   "contract_hash": "cd45f863f6e2e65cce6b4f881855d89cd7564e238d40398cb59a3403946b1275",
+   "spec_hash_id": "PPS-75b12a5444f2f7af7002c3117377649819b64b3d717b9dbd47d31adb9c5d33f1",
+   "semantic_hash": "58f05a9dde521bd9dfc926d1fee9134514b4745210e9fe4a1e9eae55be1ca278",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.2-d",
+   "requirement": "R-3.2",
+   "clause": "R-3.2/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the stored line's op is \"put\"",
+   "witness": "one put",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         {
+          "v": 1
+         },
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "line": 0,
+       "field": "op",
+       "equals": "put"
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-05-1"
+   ],
+   "falsifiability_mutant": "M5-3.2-d",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.2-d",
+   "contract_hash": "d5e0bab4b51180e30e83edde37d2e668e0a83e3253e6e8b822690cb9466b3466",
+   "spec_hash_id": "PPS-2262384034b21519c6a2a3e48d3928eee26cb57eb12b9b8c74db7c7e72ffbb5e",
+   "semantic_hash": "8d50f888076871ea1c7bbde563f02bda56d5ece6ab202c030d01bf9bbd45efd0",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.2-e",
+   "requirement": "R-3.2",
+   "clause": "R-3.2/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the stored line's value is the JSON value put",
+   "witness": "one put",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         {
+          "v": 1
+         },
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "line": 0,
+       "field": "value",
+       "equals": {
+        "v": 1
+       }
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-05-1"
+   ],
+   "falsifiability_mutant": "M5-3.2-e",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.2-e",
+   "contract_hash": "b163f4c1c59e61bd7888ed3cefcfa5fb1ef417e989a39c73fb24243ea070d2d5",
+   "spec_hash_id": "PPS-3fcd647712352b2cf0e8c569f89d039e6d4b6eee5b45801bf1c4a6965494a4cd",
+   "semantic_hash": "879e3baa597e5a481b02ec9fdb0cfbc088b2b41b1f99f31f80203e60603a41db",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.2-f",
+   "requirement": "R-3.2",
+   "clause": "R-3.2/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the stored line's ts is the integer given",
+   "witness": "one put",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         {
+          "v": 1
+         },
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "line": 0,
+       "field": "ts",
+       "equals": 100
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-05-1"
+   ],
+   "falsifiability_mutant": "M5-3.2-f",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.2-f",
+   "contract_hash": "ec6b8915bd37d4eee5a5f20097ba8acafacfcd8fb9add876d8fd46aa921b0d7d",
+   "spec_hash_id": "PPS-c03399bb5a08910e909b1170b8dabf7cea87f9f1c74588cfb3d25ca3cc0c82e2",
+   "semantic_hash": "fbc7cf7c928de540c1d63ec85eed8ed44b2c3da72ce93a669349a16af49e7f1b",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.2-g",
+   "requirement": "R-3.2",
+   "clause": "R-3.2/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the stored line's id is the rid given",
+   "witness": "one put",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         {
+          "v": 1
+         },
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "line": 0,
+       "field": "id",
+       "equals": "r1"
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-05-1"
+   ],
+   "falsifiability_mutant": "M5-3.2-g",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.2-g",
+   "contract_hash": "b9726e9aa93672e0416002fb9ee75de845d1fab13f7a59eb357c3ff20e69ee47",
+   "spec_hash_id": "PPS-48d94aa56e303126c572596f4f18b171bf5b3d570b60882ea3d913ddf0f29aa7",
+   "semantic_hash": "ce2c6283d2be3c7d06da5adf5abcd66450f533437075305468134d1f0be9b05b",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.2-h",
+   "requirement": "R-3.2",
+   "clause": "R-3.2/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "every stored line is newline-terminated: the ledger's last byte is a newline",
+   "witness": "a two-put batch",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "final_byte": "\n"
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-05-1",
+    "AC-STORY-01-05-5"
+   ],
+   "falsifiability_mutant": "M5-3.2-h",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.2-h",
+   "contract_hash": "d86bc1fa22bdc2bc18d27f1b2dce74d85584b8ab20c6913397800c3b46e48780",
+   "spec_hash_id": "PPS-79eb2e82003c7aaad2412a035af5931ab81d49d8d050dc4df1b3efff28168bfa",
+   "semantic_hash": "5e6e7dd06d3ad28a311c9b73f2cb71e715ecc232f104fbe19b660ff9c93f4d37",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.3-a",
+   "requirement": "R-3.3",
+   "clause": "R-3.3/1",
+   "clauses_also": [],
+   "story": "STORY-04-02",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a mutated value on a committed line is detected: `verify` exits 5",
+   "witness": "a three-line chain, line 1's value changed on disk",
+   "unmeasured": [
+    "first_bad_index (R-3.3/3: the verdict's representation is open)"
+   ],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "edit_jsonl",
+      "path": "<ws>/l.jsonl",
+      "line": 1,
+      "field": "value",
+      "value": 20
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 5
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-02-01-5",
+    "AC-STORY-04-02-3"
+   ],
+   "falsifiability_mutant": "M5-3.3-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.3-a",
+   "contract_hash": "d02bd60c3304859b4a69d3758867c1a18ea8beb3103e5330dc31de1c5b161b5d",
+   "spec_hash_id": "PPS-249d9aac810991ad250ad76be4e8ae791c1cd66ed70be4a097c6e842fb17cdce",
+   "semantic_hash": "6d829a9d7d756a0b37d2c9db6979fd656b1a5aad7620802db62ec5e3bb3b816d",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.3-b",
+   "requirement": "R-3.3",
+   "clause": "R-3.3/1",
+   "clauses_also": [],
+   "story": "STORY-04-02",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a swapped op on a committed line is detected: `verify` exits 5",
+   "witness": "a three-line chain, line 1's op changed on disk",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "edit_jsonl",
+      "path": "<ws>/l.jsonl",
+      "line": 1,
+      "field": "op",
+      "value": "delete"
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 5
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [],
+   "falsifiability_mutant": "M5-3.3-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.3-b",
+   "contract_hash": "898072c0919379bb8107887a04f765e83c90cf321f6656f77db2575aa6b7f8c0",
+   "spec_hash_id": "PPS-3a187fb9c232f40735c52deab24f1a6a4c343b487a2eed8b3a5b5eca837b797a",
+   "semantic_hash": "3a0f3c5d915c0af4c11620808e4010e0fad2b8e165bf5c5278c9c7bffd6f5f55",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.3-c",
+   "requirement": "R-3.3",
+   "clause": "R-3.3/1",
+   "clauses_also": [],
+   "story": "STORY-04-02",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a modified hash is detected by recomputation: `verify` exits 5",
+   "witness": "a three-line chain, the LAST line's hash changed (no later link could reveal it)",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "edit_jsonl",
+      "path": "<ws>/l.jsonl",
+      "line": 2,
+      "field": "hash",
+      "value": "0000000000000000000000000000000000000000000000000000000000000000"
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 5
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-02-01-4"
+   ],
+   "falsifiability_mutant": "M5-3.3-c",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.3-c",
+   "contract_hash": "8ecabe8b3010bbf74dc9415d610b9a9f1ee3107e6947ce6d22644ee83fd9a756",
+   "spec_hash_id": "PPS-b35f6d40ba01f56fb575a776cd8347c34cde7c8b2c5d635976e6b9789ec45e7b",
+   "semantic_hash": "d14ed7caa9908e37a2e6b2709098de4513beb09f0b24de6f5d59d935315cd885",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.3-d",
+   "requirement": "R-3.3",
+   "clause": "R-3.3/2",
+   "clauses_also": [],
+   "story": "STORY-04-02",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a prev_hash that is not the previous line's stored hash is detected: `verify` exits 5",
+   "witness": "a three-line chain, line 1's prev_hash changed (its own hash still matches its content)",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "edit_jsonl",
+      "path": "<ws>/l.jsonl",
+      "line": 1,
+      "field": "prev_hash",
+      "value": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 5
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [],
+   "falsifiability_mutant": "M5-3.3-d",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.3-d",
+   "contract_hash": "ad460741e1f46214e8e0ceb59744911d0c9d393695299a8f17a8eb53ece350b1",
+   "spec_hash_id": "PPS-2ab21163d87a1a2939203dea178c47e710d1ee602696e75f5fa5a01a75295451",
+   "semantic_hash": "7039c7f0c9fc9162879b61bc5692ea5431cc3b93ac1a477aadd6999b85c2061f",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-3.4-a",
+   "requirement": "R-3.4",
+   "clause": "R-3.4/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the verdict of the SAME instance after an on-disk change is not the verdict it gave before: verify reads the disk, not what the instance remembers",
+   "witness": "an instance that wrote the chain, one value changed on disk between its two verify calls",
+   "unmeasured": [],
+   "note": "MUST_NOT_HOLD over the equality of the two verdicts (the forbidden behaviour: equal verdicts); representation-agnostic among JSON-shaped verdicts. Caveat: a scenario that fails before its comparison also satisfies a MUST_NOT_HOLD contract; the pristine reference and the witness complete every step",
+   "polarity": "MUST_NOT_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "verify",
+      "args": [],
+      "kwargs": {},
+      "as": "before"
+     },
+     {
+      "step": "edit_jsonl",
+      "path": "<ws>/l.jsonl",
+      "line": 1,
+      "field": "value",
+      "value": 20
+     },
+     {
+      "step": "call",
+      "method": "verify",
+      "args": [],
+      "kwargs": {},
+      "as": "after"
+     }
+    ]
+   },
+   "observable": {
+    "returns_name": "after",
+    "equals_name": "before",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [],
+   "falsifiability_mutant": "M5-3.4-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-3.4-a",
+   "contract_hash": "0d1400398fcd566f9c403b4f67ee76f9e7735470e3ade14741e1182321bae0d0",
+   "spec_hash_id": "PPS-9a902e79dbf7c4b212f84dd24ff6c544cb0d9c7d6855c5ff6498de6054752b9b",
+   "semantic_hash": "c0f5d5baad51699f15b5ebd2ca388cc847d67a5a42fd674fba3bf63dbb26462a",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_returns",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-4.2-a",
+   "requirement": "R-4.2",
+   "clause": "R-4.2/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a replayed rid (another value and ts) appends no line",
+   "witness": "one replay",
+   "unmeasured": [
+    "the replay returns the same result (R-4.2/2)"
+   ],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "anything",
+         "r1",
+         999
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-06-1"
+   ],
+   "falsifiability_mutant": "M5-4.2-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-4.2-a",
+   "contract_hash": "33eb9ffb2af9132f2bc7ed0fc8340929f35c8eec6e9b8af53688eb1ca19cdad9",
+   "spec_hash_id": "PPS-b2363ec360a30b7d13ad6affe219aea7b1eb8394d8a75ea31de74895734d7bf1",
+   "semantic_hash": "3e2bc49d2e6c14f2cd57f8b25788c5dc8d740375e6585858ad9b785d887e9f66",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-4.2-b",
+   "requirement": "R-4.2",
+   "clause": "R-4.2/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a replayed element inside a batch appends nothing; the batch's new element appends one line",
+   "witness": "a two-element batch whose first element replays",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v2",
+         "r1",
+         200
+        ],
+        [
+         "put",
+         "k2",
+         2,
+         "r2",
+         201
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-03-01-2"
+   ],
+   "falsifiability_mutant": "M5-4.2-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-4.2-b",
+   "contract_hash": "893bcc1fb56d7c085f6e6f88ad85aac4482ebeab43186d23378cb4424cea8826",
+   "spec_hash_id": "PPS-1afb7c134205830634e1475eb8243f898d3f27f2d97c357ed508c99b55c98ef7",
+   "semantic_hash": "e4e2afc10623f8b1207440c5bb89995ab00d79225e19b069daa5b0e763e30fcf",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-4.3-a",
+   "requirement": "R-4.3",
+   "clause": "R-4.3/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "another rid on a committed key raises ConflictError",
+   "witness": "one conflicting put",
+   "unmeasured": [
+    "the error's attributes (not in the requirements)"
+   ],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "expect_raises",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v2",
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "exception": "ConflictError"
+     }
+    ]
+   },
+   "observable": {
+    "raises": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-06-2",
+    "AC-STORY-03-01-4"
+   ],
+   "falsifiability_mutant": "M5-4.3-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-4.3-a",
+   "contract_hash": "355692e9bc9c9d1e4c9d6b6339bed6d07c9bfab66fd11d3202ecef3dc3ec5051",
+   "spec_hash_id": "PPS-776c49de9eddd417972d7615a7f7dd7ce1e50e38a37dd0aa70d9a71711b05f92",
+   "semantic_hash": "01f7217c33f825d138e6fa1aeb5d5fa073e284837722f4f0fbef0d4674b8e404",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_raises",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-4.3-b",
+   "requirement": "R-4.3",
+   "clause": "R-4.3/2",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the conflicting mutation appends no line",
+   "witness": "one conflicting put",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "expect_raises",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v2",
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "exception": "ConflictError"
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-06-2",
+    "AC-STORY-03-01-4"
+   ],
+   "falsifiability_mutant": "M5-4.3-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-4.3-b",
+   "contract_hash": "b787520e03590c70018c9a3d0764ccd2303f97543e0ff60a033ad0779fac5c31",
+   "spec_hash_id": "PPS-f5caa8ad200d3849be60bd861f139678bbbd9f53534e859607ae84e34c5c0d6a",
+   "semantic_hash": "f031277ba5fd4b1e034693336d6875aa894818054be3df6a33799c042390a611",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-4.4-a",
+   "requirement": "R-4.4",
+   "clause": "R-4.4/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a put with another rid after a tombstone raises ConflictError",
+   "witness": "a tombstone on a never-mutated key, then a put",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "expect_raises",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "exception": "ConflictError"
+     }
+    ]
+   },
+   "observable": {
+    "raises": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-06-3"
+   ],
+   "falsifiability_mutant": "M5-4.4-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-4.4-a",
+   "contract_hash": "dbaab960e7112c7dc00a90789c6c99dbe0e842c1526bdeac8b55a212d308a83f",
+   "spec_hash_id": "PPS-130df03b6e64d882a2b283367f0c58736ed84b017f59da3c296464f37edf0dff",
+   "semantic_hash": "93c8561b37a7c9f30c860acb4290d3edc36ab04e64af0f9c8b2bcb6d06c2e3ff",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_raises",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-4.4-b",
+   "requirement": "R-4.4",
+   "clause": "R-4.4/2",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a put with the tombstone's rid is a no-op: no line",
+   "witness": "a tombstone, then a put under its rid",
+   "unmeasured": [
+    "the result equals the delete's result (R-4.2/2: representation open)"
+   ],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         200
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-06-4"
+   ],
+   "falsifiability_mutant": "M5-4.4-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-4.4-b",
+   "contract_hash": "c5715f552b5de4c31b11874ade0bb32d5604f46dfd5bccc9838e40367a84cbea",
+   "spec_hash_id": "PPS-696a93c595369a88fee8230a492502fd7f7330c4d2e208c8aa0ea0c2f7487662",
+   "semantic_hash": "72e2567ef81582835eb2c2c84b9ebbd7a3bcf05d4fd97bd0f878bbea30e97a0f",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-4.5-a",
+   "requirement": "R-4.5",
+   "clause": "R-4.5/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a delete with another rid after a put raises ConflictError",
+   "witness": "a put, then a delete",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "expect_raises",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "exception": "ConflictError"
+     }
+    ]
+   },
+   "observable": {
+    "raises": true,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-02-02-2"
+   ],
+   "falsifiability_mutant": "M5-4.5-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-4.5-a",
+   "contract_hash": "0490cb0b735b155ab7b9f92ffd5762c9753a47956142388f60ef466409a76699",
+   "spec_hash_id": "PPS-b0c5328235c22b8bcd473329e501fe8d59b6245f50974950e550b2887bf4d540",
+   "semantic_hash": "8231017045bbfcf62b06f652cfc51cd08e92320564bc83b1df83a22972beb62b",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_raises",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-4.5-b",
+   "requirement": "R-4.5",
+   "clause": "R-4.5/2",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "after the refused delete, a replay of the put does not conflict and appends nothing",
+   "witness": "a put, a refused delete, the put replayed",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "expect_raises",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "exception": "ConflictError"
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         300
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [],
+   "falsifiability_mutant": "M5-4.5-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-4.5-b",
+   "contract_hash": "ceb02e5dfcaa22704c6707909c6a9d935c09b9fca2e2c8da29995fad6310b9d3",
+   "spec_hash_id": "PPS-e3a1fd208c077746eb99c3513ba8e730f58b3937336d839e04457dad734ca644",
+   "semantic_hash": "3e3c2dd23d4bb79983ee33582c8b85860f22030f47cb1c093997d2b0a640099e",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-5-a",
+   "requirement": "R-5",
+   "clause": "R-5/3",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a batch refused at its second element commits nothing, not even its acceptable first element: one line",
+   "witness": "a committed key, then a batch whose second element conflicts with it (a conflict against a COMMITTED mutation: RISK-10 leaves conflicts between two elements of one batch open)",
+   "unmeasured": [
+    "the refusal's error attributes (not in the requirements)"
+   ],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "expect_raises",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k2",
+         2,
+         "r2",
+         101
+        ],
+        [
+         "put",
+         "k",
+         "v2",
+         "r3",
+         102
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "exception": "ConflictError"
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-03-01-3"
+   ],
+   "falsifiability_mutant": "M5-5-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-5-a",
+   "contract_hash": "dd2ec91c8fe3c30c0d5c34ca58b56262bde538d9b3e7906952626331b00f4809",
+   "spec_hash_id": "PPS-3f801acc0c3ad4640f99b2c72a2d28feab81c2b6e3b37996709a3734232d5a89",
+   "semantic_hash": "3b5de7d325f1a8770ff29408aa0182ef350bfbf1fad5ed88f44fbb95b58e4956",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-5-b",
+   "requirement": "R-5",
+   "clause": "R-5/3",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "an accepted batch commits every element: three lines",
+   "witness": "a three-put batch on a fresh ledger",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {}
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-03-01-1"
+   ],
+   "falsifiability_mutant": "M5-5-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-5-b",
+   "contract_hash": "aaf2615b650e397222ab0cae7cde5e6223d03614a46410ead06c538fc361271a",
+   "spec_hash_id": "PPS-9f0fe5cf930f01cdcf87af1f128aa97d17215688a5408eee6a17541777896939",
+   "semantic_hash": "d7d29b8cc8f448b1f40cd01bf87affee7c551eb9b319974849851f7b2acb6c49",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-6-a",
+   "requirement": "R-6",
+   "clause": "R-6/1",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "two snapshots of one chain are equal (byte-stable)",
+   "witness": "two calls on one instance",
+   "unmeasured": [],
+   "note": "the two results are compared as the probe reports them (bytes as hex, a str or a JSON value): representation-agnostic among the forms a JSON document can take",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "snapshot",
+      "args": [],
+      "kwargs": {},
+      "as": "before"
+     },
+     {
+      "step": "call",
+      "method": "snapshot",
+      "args": [],
+      "kwargs": {},
+      "as": "after"
+     }
+    ]
+   },
+   "observable": {
+    "returns_name": "after",
+    "equals_name": "before",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-02-02-1",
+    "AC-STORY-02-02-5"
+   ],
+   "falsifiability_mutant": "M5-6-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-6-a",
+   "contract_hash": "c092996feed7333c0472a3a97aa8a00284da15a45bf99e9fe741b05360673edd",
+   "spec_hash_id": "PPS-c0136d891545f89f462cfa6ad7df93065d842b73a566c9cf7bbe3d30ce8dc682",
+   "semantic_hash": "1105a5130c448327cc645d44db2b51da9b5db991bc5c0ebf31e3226d3eb5a189",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_returns",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-6-b",
+   "requirement": "R-6",
+   "clause": "R-6/2",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a refused delete does not change the materialised state",
+   "witness": "a put, a snapshot, a refused delete, a snapshot",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "snapshot",
+      "args": [],
+      "kwargs": {},
+      "as": "before"
+     },
+     {
+      "step": "expect_raises",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "exception": "ConflictError"
+     },
+     {
+      "step": "call",
+      "method": "snapshot",
+      "args": [],
+      "kwargs": {},
+      "as": "after"
+     }
+    ]
+   },
+   "observable": {
+    "returns_name": "after",
+    "equals_name": "before",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-02-02-2"
+   ],
+   "falsifiability_mutant": "M5-6-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-6-b",
+   "contract_hash": "14479819963f6fe0a91dbee8adf76174b37d73f72c85d18e43fb289b464b43f1",
+   "spec_hash_id": "PPS-7eb6897129a4419d85e86d09c314073280f9f2e42f7f9967b3b5b6acefcddafa",
+   "semantic_hash": "95c6e63fe4e2d4454ca63e1dfbf366f482f4eee7a356b69a1a6c0faadef73952",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_returns",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-6-c",
+   "requirement": "R-6",
+   "clause": "R-6/2",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a tombstone on a never-mutated key leaves the materialised state unchanged (the key does not appear)",
+   "witness": "a put, a snapshot, a tombstone on another key, a snapshot",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "snapshot",
+      "args": [],
+      "kwargs": {},
+      "as": "before"
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "delete",
+         "k2",
+         null,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "snapshot",
+      "args": [],
+      "kwargs": {},
+      "as": "after"
+     }
+    ]
+   },
+   "observable": {
+    "returns_name": "after",
+    "equals_name": "before",
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-02-02-3"
+   ],
+   "falsifiability_mutant": "M5-6-c",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-6-c",
+   "contract_hash": "e492fda9883bbf94562b9cba2a48e57f805a6173e72408bb765999b0a6bab04f",
+   "spec_hash_id": "PPS-d87f76a65c1d2d69c1b4a367b8ec19e9cb743645f487f629d67cbc13d44e2375",
+   "semantic_hash": "b53197b0273faf9d3ae340965d108eab92876b43a4f0461b3e7a952b8012d1c5",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_returns",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-6-d",
+   "requirement": "R-6",
+   "clause": "R-6/1",
+   "clauses_also": [],
+   "story": "STORY-04-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "`snapshot <ledger>` produces the same bytes in two independent invocations (§14 item 2)",
+   "witness": "two invocations over an empty ledger, each in a fresh evaluation directory (DECISION-4)",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {},
+   "observable": {
+    "equality": {
+     "stimulus_a": {
+      "argv": [
+       "snapshot",
+       "<ws>/l.jsonl"
+      ],
+      "workspace": {
+       "l.jsonl": {
+        "bytes_hex": ""
+       }
+      }
+     },
+     "stimulus_b": {
+      "argv": [
+       "snapshot",
+       "<ws>/l.jsonl"
+      ],
+      "workspace": {
+       "l.jsonl": {
+        "bytes_hex": ""
+       }
+      }
+     },
+     "normalization": {},
+     "comparator": "bytes_equal"
+    },
+    "streams": [
+     "stdout"
+    ],
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-02-02-5"
+   ],
+   "falsifiability_mutant": "M5-6-d",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-6-d",
+   "contract_hash": "34d83cdc992858205c6ef3b6a4b4b3656d456c423b30edb9f9ce958bf823a968",
+   "spec_hash_id": "PPS-4a7450884db9c3b82dab5604469f98058db02ce2360f7d458756a6c9a2600ba4",
+   "semantic_hash": "6bdcb2ec9e83a401cadce5f31c3af747f19e654ac180ab4ef11678b34f5972aa",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "equality",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "bounded_witness_measurement"
+  },
+  {
+   "spec_id": "S-7-a",
+   "requirement": "R-7",
+   "clause": "R-7/1",
+   "clauses_also": [],
+   "story": "STORY-04-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "repair-tail removes the truncated final line: two lines remain",
+   "witness": "a two-line chain the product wrote, then an unterminated line that does not parse",
+   "unmeasured": [
+    "the preserved lines' bytes (R-7/2: the harness does not know the bytes the product wrote)"
+   ],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "write",
+      "path": "<ws>/l.jsonl",
+      "bytes_hex": "7b226f70223a22707574222c226b6579223a226422",
+      "append": true
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "repair-tail",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-03-02-1"
+   ],
+   "falsifiability_mutant": "M5-7-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-7-a",
+   "contract_hash": "119a643e028c49583a995ea3d74eda90234e86cba9f09dd3eaf710ea140f0922",
+   "spec_hash_id": "PPS-420e7ad407224beb963f2d769d04882579aa064a4b5c6e5767a20074c940bfe6",
+   "semantic_hash": "f4b22f927d61e6f7f0e5bf80fea10017e002b13fc33e31edde2f92dc76299c9e",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-7-b",
+   "requirement": "R-7",
+   "clause": "R-7/1",
+   "clauses_also": [],
+   "story": "STORY-04-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "after repair-tail the chain verifies: `verify` exits 0",
+   "witness": "as S-7-a, then verify",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "write",
+      "path": "<ws>/l.jsonl",
+      "bytes_hex": "7b226f70223a22707574222c226b6579223a226422",
+      "append": true
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "repair-tail",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-03-02-1"
+   ],
+   "falsifiability_mutant": "M5-7-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-7-b",
+   "contract_hash": "5eac63ed6818afd43ada5b014c96ea30b9a648bf21e15308d01eb80a6c10a3e2",
+   "spec_hash_id": "PPS-828ef030c2a8432c8f7bbeb19f3bea2fb383064da59f4fd3a06171c65c1380cf",
+   "semantic_hash": "2033a571eed7e0f6ff8fe1b73c530fed53e43797c282c140933df3823826b102",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-7-c",
+   "requirement": "R-7",
+   "clause": "R-7/1",
+   "clauses_also": [],
+   "story": "STORY-04-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "after repair-tail the ledger ends with a newline (only complete lines remain)",
+   "witness": "as S-7-a",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "write",
+      "path": "<ws>/l.jsonl",
+      "bytes_hex": "7b226f70223a22707574222c226b6579223a226422",
+      "append": true
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "repair-tail",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "final_byte": "\n"
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-03-02-1"
+   ],
+   "falsifiability_mutant": "M5-7-c",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-7-c",
+   "contract_hash": "c32ef2fda0e9a3c681aa892f65249dee80692f4ca74fec3f5eaaaae5fbda70fc",
+   "spec_hash_id": "PPS-d094dfe207adf4c1b225c4255b4e27246a884332953ce2a18aa00fa3ec865387",
+   "semantic_hash": "4d8e4e99153a25d062d2de8db0d4852830ccc4367581bf1067bf4a7b15c53a53",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-7-d",
+   "requirement": "R-7",
+   "clause": "R-7/3",
+   "clauses_also": [],
+   "story": "STORY-04-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "repair-tail on a clean chain is a no-op: exit 0, the ledger byte-identical",
+   "witness": "the empty (clean) chain",
+   "unmeasured": [
+    "a non-empty clean chain byte-identical (only the product knows its bytes)"
+   ],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "repair-tail",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": ""
+     }
+    }
+   },
+   "observable": {
+    "exit_code": 0,
+    "files": {
+     "<ws>/l.jsonl": {
+      "equals_before": true
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-03-02-2",
+    "AC-STORY-04-01-7"
+   ],
+   "falsifiability_mutant": "M5-7-d",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-7-d",
+   "contract_hash": "b82e216e96267a93197b528cae5f404f927ab7580569eb25e21c325129c13b93",
+   "spec_hash_id": "PPS-a191c7367820fb7cd78fd9a0f523af8f348788941e3bddd2b9465af6002a7850",
+   "semantic_hash": "2bdb1dd656de8d39d2633029acd325bec4c3be2799da1717974055b7e8ae4ee6",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-7-e",
+   "requirement": "R-7",
+   "clause": "R-7/4",
+   "clauses_also": [],
+   "story": "STORY-04-02",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "repair-tail refuses mid-chain corruption: exit 5 (§9)",
+   "witness": "line 0 corrupt (its hash is wrong under any encoding), a later line, a truncated tail",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "repair-tail",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": "7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227231222c226b6579223a2261222c226f70223a22707574222c22707265765f68617368223a2247454e45534953222c227473223a312c2276616c7565223a317d0a7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227232222c226b6579223a2262222c226f70223a22707574222c22707265765f68617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c227473223a322c2276616c7565223a327d0a7b226f70223a22707574222c226b6579223a226422"
+     }
+    }
+   },
+   "observable": {
+    "exit_code": 5,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-03-02-3",
+    "AC-STORY-04-02-4"
+   ],
+   "falsifiability_mutant": "M5-7-e",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-7-e",
+   "contract_hash": "ce767da4da05cc1bbb35fa6d4622113f4c3838257d9654cec2d57902c2ad7ad5",
+   "spec_hash_id": "PPS-43483423030653d241413c1c094c32e846de3732498ab497a016565e33fe68a3",
+   "semantic_hash": "b7ba1a35c20a62481b7e288bae3f5617e73a46d63e606cb1f217bc74c400943a",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-7-f",
+   "requirement": "R-7",
+   "clause": "R-7/4",
+   "clauses_also": [],
+   "story": "STORY-04-02",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "the refusal modifies nothing: the ledger is byte-identical",
+   "witness": "as S-7-e",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "repair-tail",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": "7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227231222c226b6579223a2261222c226f70223a22707574222c22707265765f68617368223a2247454e45534953222c227473223a312c2276616c7565223a317d0a7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227232222c226b6579223a2262222c226f70223a22707574222c22707265765f68617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c227473223a322c2276616c7565223a327d0a7b226f70223a22707574222c226b6579223a226422"
+     }
+    }
+   },
+   "observable": {
+    "exit_code": 5,
+    "files": {
+     "<ws>/l.jsonl": {
+      "equals_before": true
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-03-02-3"
+   ],
+   "falsifiability_mutant": "M5-7-f",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-7-f",
+   "contract_hash": "ee6e495fd94913d255411abd75f30a49eaed844966f96f280e5fd36eb0dcc71a",
+   "spec_hash_id": "PPS-7dcfdcbb13ccefa37dd810c72bd0b8a6c121881b6839b4b3448996b0aa7cd550",
+   "semantic_hash": "d6e3346e39e9b04a34c6237f19c1395f7446513c178f5e7c4ad887f5728ae90c",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-9-a",
+   "requirement": "R-9",
+   "clause": "R-9/0",
+   "clauses_also": [],
+   "story": "STORY-04-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "`verify` of a fresh (empty) ledger exits 0 (§14 item 1)",
+   "witness": "a zero-byte ledger",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": ""
+     }
+    }
+   },
+   "observable": {
+    "exit_code": 0,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-04-3",
+    "AC-STORY-02-01-2",
+    "AC-STORY-04-01-4"
+   ],
+   "falsifiability_mutant": "M5-9-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-9-a",
+   "contract_hash": "12d16f4df83cf829b286bbff5ab22ac21427de9473c5bbb659433700084939cb",
+   "spec_hash_id": "PPS-ebd3b11fd02a74fd3724c195f5ece4eaf6c13485e346a436dfbdbf1bcbd7aa15",
+   "semantic_hash": "abebe16e33fa17cf5c29a49597aa7536cabe20dde3aa915b2a9d9cfa3cafe62a",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-9-b",
+   "requirement": "R-9",
+   "clause": "R-9/2",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a missing required argument is a usage error: exit 2",
+   "witness": "`verify` without its ledger argument",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify"
+    ]
+   },
+   "observable": {
+    "exit_code": 2,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-04-01-2"
+   ],
+   "falsifiability_mutant": "M5-9-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-9-b",
+   "contract_hash": "ca26c75c3a43788f2d9917e67188d6b3ad9d71168957b29efb60dd39bd3fb64a",
+   "spec_hash_id": "PPS-81369279af03544a8906bb7e3438dbcad2d2cb30bcdc1d6a01c6336af2d8b31c",
+   "semantic_hash": "82531d8da6bf353fb75dc8c2382affb37e24c284972ccf275349ff0382c7d328",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-9-c",
+   "requirement": "R-9",
+   "clause": "R-9/2",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "an extra positional argument is a usage error: exit 2",
+   "witness": "`verify <ledger> extra`",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/l.jsonl",
+     "extra"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": ""
+     }
+    }
+   },
+   "observable": {
+    "exit_code": 2,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-01-7",
+    "AC-STORY-04-01-2"
+   ],
+   "falsifiability_mutant": "M5-9-c",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-9-c",
+   "contract_hash": "acfc6a041d05ea6e7154f1092de4b55a4ddd236811e1b2ceacfcbbd601467e04",
+   "spec_hash_id": "PPS-5a6b99a28ae4d26308a06536b021253b0cb6f3a965c4ce45aaf2c56738414720",
+   "semantic_hash": "6bee956abc61dbd7aa4f81680990472ad1627609f14995b73b4522e4bca58ec8",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-9-d",
+   "requirement": "R-9",
+   "clause": "R-9/3",
+   "clauses_also": [],
+   "story": "STORY-04-02",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a ledger file that does not exist is an I/O error: exit 3",
+   "witness": "`verify` of a missing file",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/missing.jsonl"
+    ]
+   },
+   "observable": {
+    "exit_code": 3,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-04-2",
+    "AC-STORY-02-01-3"
+   ],
+   "falsifiability_mutant": "M5-9-d",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-9-d",
+   "contract_hash": "93a9c4c6ff432ba06970e76ff85a56a6d2ccbda668b849b90c607c596593ad19",
+   "spec_hash_id": "PPS-e825d561178e2874d1ca950b0af95a5a4fd2897c0406dae6850e7da204a76ee8",
+   "semantic_hash": "efce139724be8e296fd7fa98920e053e9b958a98fef52f34cb564f986a81a3f7",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-9-e",
+   "requirement": "R-9",
+   "clause": "R-9/3",
+   "clauses_also": [],
+   "story": "STORY-04-02",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a batch file that does not exist is an I/O error: exit 3",
+   "witness": "`apply --batch` of a missing file (no batch-file shape is needed)",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "apply",
+     "--batch",
+     "<ws>/missing.json",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": ""
+     }
+    }
+   },
+   "observable": {
+    "exit_code": 3,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-04-02-1"
+   ],
+   "falsifiability_mutant": "M5-9-e",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-9-e",
+   "contract_hash": "df97abc858bfd3054672956fa2dfbe7651bcc785e83028baafff289f4e446a44",
+   "spec_hash_id": "PPS-e9e4783931d2a93ba6a911c9bfbcf769c5c3f65498fc6c9753fbf5c000525525",
+   "semantic_hash": "1a22147544f145b582d78fb2d552dfc40a6633e40b817090d4516aee686959ca",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-9-f",
+   "requirement": "R-9",
+   "clause": "R-9/5",
+   "clauses_also": [],
+   "story": "STORY-04-02",
+   "role": "INTRODUCE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "`verify` of a corrupt chain exits 5",
+   "witness": "one line whose hash is wrong under any encoding",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "cli_invocation",
+   "locator": "ledgerlock:__main__",
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": "7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227231222c226b6579223a2261222c226f70223a22707574222c22707265765f68617368223a2247454e45534953222c227473223a312c2276616c7565223a317d0a"
+     }
+    }
+   },
+   "observable": {
+    "exit_code": 5,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-04-02-3"
+   ],
+   "falsifiability_mutant": "M5-9-f",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-9-f",
+   "contract_hash": "0c88d6dbd9b52c3716a8beb3c9b497b4c8abb20e06a1d3e9a2fd9b72ca9027c0",
+   "spec_hash_id": "PPS-b4b13254279c00c21ee6625d58a186377463dbacb9035686748c346178e05cc6",
+   "semantic_hash": "64ffbff36c8b78983ec96ae838964a8ff426ea44f52a48beb9be1c0b15dd548a",
+   "probe_id": "probe.cli_invocation",
+   "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "observation_class": "exits",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-10-a",
+   "requirement": "R-10",
+   "clause": "R-10/1",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "no import statement of the package names a module outside the allowed set (§10)",
+   "witness": "every .py file of the package tree at the revision is scanned: the domain is finite and read entirely",
+   "unmeasured": [
+    "an import statement is inspected on its first named module: a second module of a comma list, and a dynamic __import__ / importlib call, escape the pattern"
+   ],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "path:ledgerlock",
+   "stimulus": {
+    "grep": "^\\s*(?:import|from)\\s+(?!(?:hashlib|json|os|sys|pathlib|tempfile|argparse|unittest|typing|unicodedata|uuid|__future__|ledgerlock)\\b|\\.)[A-Za-z_]",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-01-4",
+    "AC-STORY-05-03-1"
+   ],
+   "falsifiability_mutant": "M5-10-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-10-a",
+   "contract_hash": "e36258c68051219eb917cc3c67b29d577c0db3d94aed9ff189d320255e6b9227",
+   "spec_hash_id": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+   "semantic_hash": "0c1aa8e1b6bcbc20e1b1ca514b44de592b18f4610357c465b32f6f79bec99b04",
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "grep_count",
+   "enforcement": "FULL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-10-b",
+   "requirement": "R-10",
+   "clause": "R-10/2",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledger.py uses `from __future__ import annotations`",
+   "witness": "the file ledgerlock/ledger.py",
+   "unmeasured": [],
+   "note": "the reference acceptance (A-10-a) requires it of ledger.py and cli.py",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "path:ledgerlock/ledger.py",
+   "stimulus": {
+    "grep": "^from __future__ import annotations\\b",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "observable": {
+    "matches": 1,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [],
+   "falsifiability_mutant": "M5-10-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-10-b",
+   "contract_hash": "a5db9327e2b952b52dfa753e203b874b119423757ddd4737b430608b593768f9",
+   "spec_hash_id": "PPS-64c46ebaed2d255c26a9e79c34c803fe2609161938311dfb237f066b36a67867",
+   "semantic_hash": "5daeb0eac00dbe0ab0bdfb6a3e163a513a7dd0a2a3ac26aefe38912ee977e93e",
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "grep_count",
+   "enforcement": "FULL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-10-c",
+   "requirement": "R-10",
+   "clause": "R-10/2",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "cli.py uses `from __future__ import annotations`",
+   "witness": "the file ledgerlock/cli.py",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "path:ledgerlock/cli.py",
+   "stimulus": {
+    "grep": "^from __future__ import annotations\\b",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "observable": {
+    "matches": 1,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [],
+   "falsifiability_mutant": "M5-10-c",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-10-c",
+   "contract_hash": "ac4fdec1f51cd32ed941ed06a777a5aec58e4cf94c0786579ac60ff87afd0770",
+   "spec_hash_id": "PPS-8ab146580469d11dbb6c20443dd9c2070da4ecb2f7c2222f33ba127775898894",
+   "semantic_hash": "be4bcade9818a3e343537d479fadbf9053a8cae3cbbce79326309f11f0ef8b5c",
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "grep_count",
+   "enforcement": "FULL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-12-a",
+   "requirement": "R-12",
+   "clause": "R-12/1",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "no socket in the package source",
+   "witness": "every .py file of the package tree at the revision is scanned: the domain is finite and read entirely",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "path:ledgerlock",
+   "stimulus": {
+    "grep": "^\\s*(?:import\\s+socket\\b|from\\s+socket\\b)|\\bsocket\\.\\w",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-01-4",
+    "AC-STORY-01-01-5",
+    "AC-STORY-05-03-1",
+    "AC-STORY-05-03-2"
+   ],
+   "falsifiability_mutant": "M5-12-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-12-a",
+   "contract_hash": "f755586d9b58a9cd6c0e17bca058d80ec0d552a7782428a3270828a4451ec888",
+   "spec_hash_id": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+   "semantic_hash": "59d9b16fb41b5e512daaf817e603e484815c577b7872f102ba3b9131bd667da8",
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "grep_count",
+   "enforcement": "FULL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-12-b",
+   "requirement": "R-12",
+   "clause": "R-12/1",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "no subprocess in the package source",
+   "witness": "every .py file of the package tree at the revision is scanned: the domain is finite and read entirely",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "path:ledgerlock",
+   "stimulus": {
+    "grep": "^\\s*(?:import\\s+subprocess\\b|from\\s+subprocess\\b)|\\bsubprocess\\.\\w",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-01-4",
+    "AC-STORY-01-01-5",
+    "AC-STORY-05-03-1",
+    "AC-STORY-05-03-2"
+   ],
+   "falsifiability_mutant": "M5-12-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-12-b",
+   "contract_hash": "521ab1eaa1728ce90e27cf67f6bba2a4e16550fde9ecc34bbda9b52dee2713c8",
+   "spec_hash_id": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+   "semantic_hash": "e7f83ac157533d0c6b5de11d46a1f3e40feceb33200c583c08382ccce4bf266f",
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "grep_count",
+   "enforcement": "FULL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-12-c",
+   "requirement": "R-12",
+   "clause": "R-12/1",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "no os.system in the package source",
+   "witness": "every .py file of the package tree at the revision is scanned: the domain is finite and read entirely",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "path:ledgerlock",
+   "stimulus": {
+    "grep": "\\bos\\.system\\s*\\(",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-01-01-5",
+    "AC-STORY-05-03-2"
+   ],
+   "falsifiability_mutant": "M5-12-c",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-12-c",
+   "contract_hash": "07e80a71ceec44f8c183d13bfd759418031852b8459c75493b1717cc34e44831",
+   "spec_hash_id": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+   "semantic_hash": "222515f27c24b9b5c27bb2bbe85b8a3e06f5aefefe4c4d50c661d51489bef13f",
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "grep_count",
+   "enforcement": "FULL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-13-a",
+   "requirement": "R-13",
+   "clause": "R-13/1",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledgerlock/__init__.py exists",
+   "witness": "the path",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "path:ledgerlock/__init__.py",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "criteria": [
+    "AC-STORY-01-01-3"
+   ],
+   "falsifiability_mutant": "M5-13-a",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-13-a",
+   "contract_hash": "a531eb70f78333f96b5422c771447f2e2362df775f2bd1bdaea76741a281f238",
+   "spec_hash_id": "PPS-c70151a34378bac3b90ea06dc632037dd9908f97e0b5b9a9f94fea1f158a0292",
+   "semantic_hash": "7ab0ea2bbe8e9e3be503ad047da70604ac768f545ec86d5e0ed603c816a35ada",
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "exists",
+   "enforcement": "FULL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-13-b",
+   "requirement": "R-13",
+   "clause": "R-13/1",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledgerlock/ledger.py exists",
+   "witness": "the path",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "path:ledgerlock/ledger.py",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "criteria": [],
+   "falsifiability_mutant": "M5-13-b",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-13-b",
+   "contract_hash": "19041ea1858dc1afabc3f303213f12fe32a41d267a98086e171d896be387c378",
+   "spec_hash_id": "PPS-7e99202d7849d4f22d2a4da4728b0f9000ebdb5d8507e2dec7e03c38e3f7547e",
+   "semantic_hash": "a6cc35a216a8c5c6f86b2d647cc4a03e8444efc742f7971fdde64b8d7be1807e",
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "exists",
+   "enforcement": "FULL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-13-c",
+   "requirement": "R-13",
+   "clause": "R-13/1",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledgerlock/cli.py exists",
+   "witness": "the path",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "file_artifact",
+   "locator": "path:ledgerlock/cli.py",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "criteria": [],
+   "falsifiability_mutant": "M5-13-c",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-13-c",
+   "contract_hash": "8816d44f0607c91e21a735873dc7ae27953b6a64f51a21bb9a1da702a18c5d6e",
+   "spec_hash_id": "PPS-9cc8e42134b41d39f3e9b94b976290ffb97c28384525cb18e210ca8ee8e574f6",
+   "semantic_hash": "3d1d6512ded0e9b8bd3295aaf30d3c24cde29c74415f5ee718f5b5cb629b86bb",
+   "probe_id": "probe.file_artifact",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "observation_class": "exists",
+   "enforcement": "FULL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-13-d",
+   "requirement": "R-13",
+   "clause": "R-13/2",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledger.py defines Ledger",
+   "witness": "the name",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "criteria": [
+    "AC-STORY-01-01-6"
+   ],
+   "falsifiability_mutant": "M5-13-d",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-13-d",
+   "contract_hash": "c4a4c24caa62368e40d7863aa41beb2bbec2efc8c02f5bd6fe655099beb24ee0",
+   "spec_hash_id": "PPS-b573709fccf5f6ced92b5aa4d8638c27d434141fe9ba1f1d880f1d698ab577ed",
+   "semantic_hash": "6399812ad648f19461ef5be450b8b8d6f19602231a61df9c074a92368a40edd4",
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "exists",
+   "enforcement": "PARTIAL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-13-e",
+   "requirement": "R-13",
+   "clause": "R-13/2",
+   "clauses_also": [],
+   "story": "STORY-01-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledger.py defines ConflictError",
+   "witness": "the name",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.ledger:ConflictError",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "criteria": [
+    "AC-STORY-01-01-6"
+   ],
+   "falsifiability_mutant": "M5-13-e",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-13-e",
+   "contract_hash": "b405da05d3e34c3e2253c96e38fc65acb68d588dbad8fca7b5d84ed7eddfab4c",
+   "spec_hash_id": "PPS-e2189b7dadd035417eed5d47363cb0a9f1f2d8373eb4b085a516cba572b4780f",
+   "semantic_hash": "032c67ab8ece7991690b5d730389719f371d4e55c06dfe02a29684ea59a58157",
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "exists",
+   "enforcement": "PARTIAL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-13-f",
+   "requirement": "R-13",
+   "clause": "R-13/2",
+   "clauses_also": [],
+   "story": "STORY-01-05",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledger.py defines append",
+   "witness": "the name",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.ledger:append",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "criteria": [],
+   "falsifiability_mutant": "M5-13-f",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-13-f",
+   "contract_hash": "6fb98de03ea0e6bc5fbd50d01cccf6ef5be73457dac73bea59466c8caa47e24e",
+   "spec_hash_id": "PPS-85b98ccc7a5c2646588b6e4075a93541a21be2a2a246c24746359c23ca80aaa9",
+   "semantic_hash": "26ebbd8446be3f92ffa681808f6d6234934c6aceea84627610caf8d53e23f890",
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "exists",
+   "enforcement": "PARTIAL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-13-g",
+   "requirement": "R-13",
+   "clause": "R-13/2",
+   "clauses_also": [],
+   "story": "STORY-02-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledger.py defines verify",
+   "witness": "the name",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.ledger:verify",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "criteria": [],
+   "falsifiability_mutant": "M5-13-g",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-13-g",
+   "contract_hash": "ad50cc875100fdc9f55a25b826cc9f190c01048286228e2aa9936d808da1891c",
+   "spec_hash_id": "PPS-baccecf95521389460b05a2eacb1bf62a90286fbdd336e03ba9576661646b730",
+   "semantic_hash": "5370b765a9d99292dbcc98cef84c08d59fa440754e7b914fe951e75367d10dee",
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "exists",
+   "enforcement": "PARTIAL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-13-h",
+   "requirement": "R-13",
+   "clause": "R-13/2",
+   "clauses_also": [],
+   "story": "STORY-02-02",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledger.py defines snapshot",
+   "witness": "the name",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.ledger:snapshot",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "criteria": [],
+   "falsifiability_mutant": "M5-13-h",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-13-h",
+   "contract_hash": "cba9339296d628f75b0678590ca1a37aa761ecda93211a5bed84840db1b4c643",
+   "spec_hash_id": "PPS-53ca471b36753ac39ac8744a1f9fc143612c61e387751b8e79539b655a38a5d3",
+   "semantic_hash": "249c9703dfbc33b74873bfc1f55ffb59c8c1f52bd2091ec6f925ead67440a21e",
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "exists",
+   "enforcement": "PARTIAL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-13-i",
+   "requirement": "R-13",
+   "clause": "R-13/2",
+   "clauses_also": [],
+   "story": "STORY-03-01",
+   "role": "INTRODUCE",
+   "quantifier": "exhaustive_finite_domain",
+   "measured": "ledger.py defines apply_batch",
+   "witness": "the name",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "python_callable",
+   "locator": "ledgerlock.ledger:apply_batch",
+   "stimulus": {},
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "criteria": [],
+   "falsifiability_mutant": "M5-13-i",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-13-i",
+   "contract_hash": "7156ebf0b71337aa71864f8e11119466ade76dba1040bf713c19bed2fe438dce",
+   "spec_hash_id": "PPS-0528ad5eb0576a4ec11976977458231c270b770a38142f4c40475b2968a09c12",
+   "semantic_hash": "47bc8c18046253e18c07f52c3e43d5c0599a6e52e2effabf7f8e35445c783651",
+   "probe_id": "probe.python_callable_v2",
+   "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "observation_class": "exists",
+   "enforcement": "PARTIAL",
+   "class_quantifier": null
+  },
+  {
+   "spec_id": "S-D3-05-01-1",
+   "requirement": "R-3.3",
+   "clause": "R-3.3/2",
+   "clauses_also": [
+    "R-4.2/1",
+    "R-4.4/2"
+   ],
+   "story": "STORY-05-01",
+   "role": "PRESERVE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "after a fixed conflict-free sequence of mutations (puts, a tombstone, replays, an NFD/NFC replay) the chain the product wrote verifies (`verify` exits 0) and holds exactly the five committed lines",
+   "witness": "one fixed eight-call sequence (nothing random at evaluation) stands for the property test's seeded sequences",
+   "unmeasured": [
+    "two snapshot() calls equal after each sequence (S-6-a measures snapshot stability)"
+   ],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "s1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "s2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "s1",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "delete",
+         "d",
+         null,
+         "s5",
+         4
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "c",
+         [
+          1,
+          2
+         ],
+         "s3",
+         5
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         "x",
+         "s4",
+         6
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         "y",
+         "s4",
+         7
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "delete",
+         "b",
+         null,
+         "s2",
+         8
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "subprocess",
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 5
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-05-01-1"
+   ],
+   "falsifiability_mutant": "M5-D3-05-01-1",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-D3-05-01-1",
+   "contract_hash": "f3b3368d6e0af847c96f4af65f1b78ac36ccc93a5a694dca194fe7e9b946ea94",
+   "spec_hash_id": "PPS-b3407979dd38c3b08a8bbae4199e4aee2bd4a7b747bb87a6f0ac80f276279404",
+   "semantic_hash": "62bd14736bfde206901c6ae17e2691e7ab732241c4cf5bbaddf96b37c676af62",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  },
+  {
+   "spec_id": "S-D3-05-01-2",
+   "requirement": "R-5",
+   "clause": "R-4.3/2",
+   "clauses_also": [],
+   "story": "STORY-05-01",
+   "role": "PRESERVE",
+   "quantifier": "bounded_witness_measurement",
+   "measured": "a sequence whose element conflicts leaves the ledger as the prefix committed it: two lines",
+   "witness": "a two-element prefix, then a delete of 'a' under another rid",
+   "unmeasured": [],
+   "note": "",
+   "polarity": "MUST_HOLD",
+   "subject_kind": "process_effect",
+   "locator": "ledgerlock.ledger:Ledger",
+   "stimulus": {
+    "scenario": [
+     {
+      "step": "construct",
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "call",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "s1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "s2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {}
+     },
+     {
+      "step": "expect_raises",
+      "method": "apply_batch",
+      "args": [
+       [
+        [
+         "delete",
+         "a",
+         null,
+         "s9",
+         10
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "exception": "ConflictError"
+     }
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "subject_absence": "REQUIRES_SUBJECT",
+   "criteria": [
+    "AC-STORY-05-01-2"
+   ],
+   "falsifiability_mutant": "M5-D3-05-01-2",
+   "status": "COMPILED",
+   "contract_id": "BC-V22-S-D3-05-01-2",
+   "contract_hash": "050f975b4efe4176e06e13c15cfd8f2cf970fa2417e31c78734ea95f14a0aa51",
+   "spec_hash_id": "PPS-cd03ddb94c8f8a97a4c5fdb700ab6b84634082ef6746e75d309ab57996f29249",
+   "semantic_hash": "4350d6c0cb45caf041fe13bfa5acaa51a69bbb11ed92a6d2688e92067efb2fe4",
+   "probe_id": "probe.process_effect",
+   "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+   "observation_class": "scenario_files",
+   "enforcement": "PARTIAL",
+   "class_quantifier": "exhaustive_finite_domain"
+  }
+ ],
+ "proposal_digest": "856ed25dcf10df2b7c1c3e45c125ca0642a6f8aef6b913ae84bba13cdfd1e3f9",
+ "problems": [],
+ "verdict": "PROPOSAL ADMITTED STATICALLY (synthetic, non-authoritative approvals); OWNER REVIEW PENDING"
+}

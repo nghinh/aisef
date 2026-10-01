@@ -1,0 +1,170 @@
+{
+ "level": "W0",
+ "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
+ "candidate_sha": "0a7cab86086ebc496bcda1559142082c89506c29",
+ "generated": "2026-09-18T05:49:42+00:00",
+ "qualified": false,
+ "criteria": [
+  {
+   "criterion": "0 P0/P1 open",
+   "holds": false,
+   "measured": {
+    "open_p0_p1": [
+     "SS-81"
+    ],
+    "scanned": 92,
+    "additions_after_freeze_scanned": 25
+   }
+  },
+  {
+   "criterion": "0 unfixed confirmed defects from the frozen set",
+   "holds": false,
+   "measured": {
+    "open": [
+     "SS-81",
+     "SS-82"
+    ],
+    "counts": {
+     "FIXED": 85,
+     "SUPERSEDED": 1
+    },
+    "scan_agrees_with_declared_counts": false,
+    "members_without_an_explicit_status": []
+   }
+  },
+  {
+   "criterion": "0 NEEDS_TEST fault cells",
+   "holds": true,
+   "measured": {
+    "fault_matrix": {
+     "GREEN": 79
+    }
+   }
+  },
+  {
+   "criterion": "fault matrix GREEN",
+   "holds": true,
+   "measured": {
+    "cells": 79,
+    "fault_matrix": {
+     "GREEN": 79
+    }
+   }
+  },
+  {
+   "criterion": "0 MISSING/PARTIAL invariants",
+   "holds": true,
+   "measured": {
+    "registry": {
+     "PROVEN": 52,
+     "PARTIAL": 0,
+     "MISSING": 0,
+     "registered": 52
+    }
+   }
+  },
+  {
+   "criterion": "default tool capabilities qualified on real images for this product tree (INV-N.DEFAULT-CAPABILITY)",
+   "holds": true,
+   "measured": {
+    "matrix": {
+     "generated": "2026-09-17T22:07:03+0700",
+     "aisef_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+     "pass": true,
+     "totals": {
+      "profiles": 7,
+      "capabilities": 21,
+      "qualified": 11,
+      "none_declared": 10,
+      "failed": [],
+      "presets_failed": []
+     }
+    },
+    "candidate_aisef_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488"
+   }
+  },
+  {
+   "criterion": "0 expected-red tests",
+   "holds": true,
+   "measured": {
+    "files_with_red_markers": []
+   }
+  },
+  {
+   "criterion": "0 unexplained model/kernel gaps (100 000 traces)",
+   "holds": true,
+   "measured": {
+    "differential": {
+     "traces": 100000,
+     "matched": 100000,
+     "unexplained": 0,
+     "invariant_violations": 0,
+     "exceptions": 0,
+     "silent_skips": 0,
+     "traces_per_s": 4.23,
+     "elapsed_s": 23632.5,
+     "chunks": 10,
+     "manifest": {
+      "path": "closure-evidence/hardening/phase12/PHASE12-DATASET-MANIFEST.json",
+      "pass": true,
+      "kernel_digests": [
+       "02a34e0e63ed6e1bee9cbfe30897fa41e7440488"
+      ]
+     },
+     "coverage": {
+      "reachable_transitions": 26,
+      "reachable_total": 26,
+      "typed_outcomes": 10,
+      "fault_kinds": "28/28",
+      "compound_pairs": "378/378"
+     }
+    }
+   }
+  },
+  {
+   "criterion": "KNOWN_DEVIATIONS empty",
+   "holds": true,
+   "measured": {
+    "known_deviations": []
+   }
+  },
+  {
+   "criterion": "0 safety-significant mutation survivors",
+   "holds": true,
+   "measured": {
+    "mutation": {
+     "mutations_generated": 271,
+     "killed": 265,
+     "survived": 0,
+     "equivalent": 6
+    },
+    "unclassified_survivors": []
+   }
+  },
+  {
+   "criterion": "Linux + Windows CI green on the candidate",
+   "holds": true,
+   "measured": {
+    "ci": {
+     "run_id": "35284491057",
+     "head_sha": "0a7cab86086ebc496bcda1559142082c89506c29",
+     "candidate_sha": "0a7cab86086ebc496bcda1559142082c89506c29",
+     "head_matches_candidate": true,
+     "jobs": {
+      "unit (ubuntu-latest, 3.12)": "success",
+      "unit (ubuntu-latest, 3.11)": "success",
+      "lint": "success",
+      "unit (ubuntu-latest, 3.14)": "success",
+      "wheel": "success",
+      "unit (ubuntu-latest, 3.13)": "success",
+      "unit (windows-latest, 3.11)": "success"
+     },
+     "all_green": true
+    }
+   }
+  }
+ ],
+ "hidden_oracle": "reference model (tests/hardening/model.py) + differential harness (tests/hardening/differential.py)",
+ "repeat_runs": "1 (deterministic; seeds recorded in the differential chunk files)",
+ "known_deviations": []
+}

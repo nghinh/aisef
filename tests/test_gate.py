@@ -11,8 +11,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.control.outcome import Outcome
+from tests import obligations  # noqa: E402
 from aisef.control.gate import evaluate  # noqa: E402
-from aisef.harness.observe import MOCKUP_MAP, NOTE, EvidenceStore, Event  # noqa: E402
+from aisef.harness.observe import MOCKUP_MAP, NOTE, TOOL_RUN, EvidenceStore, Event  # noqa: E402
 
 
 class GateTestCase(unittest.TestCase):
@@ -27,6 +28,7 @@ class GateTestCase(unittest.TestCase):
         self.store.file_change("S-01", "src/a.py")
         self.store.tool_run("S-01", "test", ok=True)
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def gate(self, **kw):
         params = {
@@ -51,6 +53,7 @@ class TestKhongOnDinh(GateTestCase):
     def ghi(self, **d):
         store = EvidenceStore(self._tmp.name, candidate="aaa")
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         store.record("S-01", Event(kind=NOTE, name="verify-only.repeat", ok=False, detail={
             "k": 3, "checks": ["test"], "flaky_ids": [], "stable_red": [], "flaky_checks": [], **d}))
 
@@ -96,11 +99,13 @@ class TestHappyPath(GateTestCase):
 class TestTests(GateTestCase):
     def test_no_test_run_fails(self):
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         self.assertFalse(self.gate().passed)
 
     def test_red_test_fails(self):
         self.store.tool_run("S-01", "test", ok=False)
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         self.assertFalse(self.gate().passed)
 
     def test_edit_after_green_fails(self):
@@ -217,6 +222,7 @@ class TestGuardCoChay(unittest.TestCase):
         self.store = EvidenceStore(self._tmp.name)
         self.store.tool_run("S-01", "test", ok=True)
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def tearDown(self):
         self._tmp.cleanup()
@@ -263,6 +269,7 @@ class TestTieuChiCoTest(GateTestCase):
         self.store.tool_run("S-01", "test", ok=True,
                             detail={"test_format": fmt, "test_ids": ids, **extra})
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def muc(self, g):
         return next(c for c in g.checks if c.name == "criteria have tests")
@@ -284,13 +291,17 @@ class TestTieuChiCoTest(GateTestCase):
                             detail={"test_format": "node-spec", "test_ids": [],
                                     "command": "node --test"})
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         m = self.muc(self.gate(acceptance=1))
         self.assertIn("node --test", m.detail)
         self.assertIn("e2e", m.detail)
 
     def test_all_criteria_covered_passes(self):
         self.green_with_ids(["AC-S-01-1: a", "nhóm > AC-S-01-2: b 3ms"])
-        self.assertTrue(self.gate(acceptance=2).passed)
+        g = self.gate(acceptance=2)
+        self.assertIs(self.muc(g).outcome, Outcome.PASSED)
+        # SS-89: with no nop record the gate does not pass — `tests verify story` never ran for this candidate
+        self.assertIn("tests verify story", [c.name for c in g.failures])
 
     def test_unreadable_reporter_is_unconfigured_not_pass_not_fail(self):
         self.green_with_ids([], fmt="", test_note="vitest reporter mặc định không in tên test — thêm `--reporter=verbose`")
@@ -324,6 +335,7 @@ class TestTieuChiCoTestOBoKhac(GateTestCase):
             "command": "node --test",
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         if qa is not None:
             store.tool_run("S-01", "qa:e2e", ok=qa_ok, detail={
                 "test_format": "playwright-list", "test_ids": list(qa),
@@ -381,6 +393,7 @@ class TestBangChungCuCuaLoaiKhongChamKhongLamOi(GateTestCase):
         moi.file_change("S-01", "src/a.py")
         moi.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"]})
         moi.tool_run("S-01", "lint", ok=True)
+        moi.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         g = self.gate(candidate="aaa", contract=contract)
         return next(c for c in g.checks if c.name == "evidence matches candidate")
 
@@ -412,6 +425,7 @@ class TestBangChungCuCuaLoaiKhongChamKhongLamOi(GateTestCase):
         moi.file_change("S-01", "src/a.py")
         moi.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"]})
         moi.tool_run("S-01", "lint", ok=True)
+        moi.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         g = self.gate(candidate="aaa", contract=["unit", "e2e", "accessibility", "mockup-map"])
         m = next(c for c in g.checks if c.name == "evidence matches candidate")
         self.assertIs(m.outcome, Outcome.PASSED, m.detail)
@@ -432,6 +446,7 @@ class TestBangChungCuCuaLoaiKhongChamKhongLamOi(GateTestCase):
         """`test`/`lint`/`review` không phải `qa:*`: chúng luôn được chấm."""
         cu = EvidenceStore(self._tmp.name, candidate="cu00000")
         cu.tool_run("S-01", "lint", ok=True)
+        cu.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         moi = EvidenceStore(self._tmp.name, candidate="aaa")
         moi.file_change("S-01", "src/a.py")
         moi.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"]})
@@ -447,6 +462,7 @@ class TestCoverageMin(GateTestCase):
         self.store.file_change("S-01", "src/a.py")
         self.store.tool_run("S-01", "test", ok=True, detail={"test_format": "pytest", "test_ids": ["t"], "coverage": value})
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         return next(c for c in self.gate(coverage_min=0.85).checks if c.name == "coverage")
 
     def test_no_number_is_unconfigured_with_the_fix(self):
@@ -477,9 +493,18 @@ class TestTDD(GateTestCase):
         self.assertIn("green on first run", g.feedback())
 
     def test_red_then_green_passes(self):
+        self.green_story()
+        self.store.tool_run("S-01", "test", ok=False, detail={
+            "test_format": "pytest", "test_ids": ["tests/x.test.js::t"], "failed_ids": ["tests/x.test.js::t"]})
+        EvidenceStore(self._tmp.name).tool_run("S-01", "test", ok=True, detail={
+            "test_format": "pytest", "test_ids": ["tests/x.test.js::t"], "failed_ids": []})
+        self.assertTrue(self.gate(added_tests=["tests/x.test.js"]).passed)
+
+    def test_a_bare_red_run_is_not_the_storys_red(self):
+        """SS-83: a red run with no names — a tool that never started, an environment failure — proved TDD."""
         self.store.tool_run("S-01", "test", ok=False)
         self.green_story()
-        self.assertTrue(self.gate(added_tests=["tests/x.test.js"]).passed)
+        self.assertIn("TDD", [c.name for c in self.gate(added_tests=["tests/x.test.js"]).failures])
 
     def test_no_new_tests_is_not_applicable(self):
         self.green_story()
@@ -520,11 +545,17 @@ class TestTDDVaNopControl(GateTestCase):
             "test_format": "pytest", "test_ids": [self.AC, "t1"], "failed_ids": [],
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         store.tool_run("S-01", "test:nop", ok=not nop_failed, detail={
             "nop": True, "parent": "cha0000", "files": ["tests/test_a.py"],
             "test_format": "pytest", "test_ids": list(nop_ids), "failed_ids": list(nop_failed),
+            # SS-81: why the story's test is absent there — its own file cannot import the story's module
+            "collection_errors": [] if self.AC in nop_ids else [
+                {"file": "tests/test_a.py", "error": "module_not_found", "missing_module": "src.a", "missing_name": ""}],
+            "absent_at_parent": ["src/a.py"],
         })
-        return self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"])
+        return self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"],
+                         ac_proof=obligations("S-01", 1))
 
     def test_nop_dat_thi_tdd_dat_theo(self):
         g = self.dung_canh(["t1"])                    # test của story vắng ở SHA cha
@@ -534,6 +565,32 @@ class TestTDDVaNopControl(GateTestCase):
         self.assertIs(tdd.outcome, Outcome.PASSED, tdd.detail)
         self.assertIn("nop control", tdd.detail)
         self.assertTrue(tdd.evidence, "phải trỏ vào bằng chứng nop, không để trống")
+        self.assertIn(nop.detail, tdd.detail,
+                      "TDD đạt nhờ nop thì phải chở **lý do của nop**, không phải câu mặc định")
+
+    def test_tdd_tro_vao_dung_cac_luot_chay_test(self):
+        """Bằng chứng của một verdict là thứ người đọc lần theo. TDD đọc thứ tự
+        đỏ-trước-xanh trên **các lượt chạy test**, nên nó phải trỏ vào đúng các
+        lượt ấy — trỏ sang lint là trỏ vào một câu hỏi khác."""
+        self.dung_canh([self.AC, "t1"])
+        ev = self.store.read("S-01")
+        runs = {e.seq for e in ev.of(TOOL_RUN, "test")}
+        g = self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"],
+                      ac_proof=obligations("S-01", 1))
+        tdd = next(c for c in g.checks if c.name == "TDD")
+        self.assertTrue(runs, "phép kiểm này vô nghĩa nếu không có lượt chạy test nào")
+        self.assertEqual(set(tdd.evidence) & runs, runs)
+
+    def test_story_khong_co_tieu_chi_nao_can_thay_doi_thi_tdd_khong_ap_dung(self):
+        """KHÔNG PHẢI `PASSED`: story chỉ bảo toàn hành vi sẵn có thì không có gì
+        để thấy đỏ trước, nên TDD **không chứng minh được gì** — ghi là đã đạt
+        tức là khẳng định một bằng chứng chưa từng tồn tại."""
+        self.dung_canh(["t1"])
+        g = self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"],
+                      ac_proof=obligations("S-01", 1, mode="PRESERVE_REQUIRED"))
+        tdd = next(c for c in g.checks if c.name == "TDD")
+        self.assertIs(tdd.outcome, Outcome.NOT_APPLICABLE, tdd.detail)
+        self.assertIsNot(tdd.outcome, Outcome.PASSED)
 
     def test_nop_truot_thi_tdd_van_truot(self):
         g = self.dung_canh([self.AC, "t1"])           # xanh ở SHA cha: không kiểm được gì
@@ -542,10 +599,15 @@ class TestTDDVaNopControl(GateTestCase):
             {"TDD", "tests verify story"},
         )
 
-    def test_nop_khong_chay_duoc_thi_tdd_dung_mot_minh(self):
-        """UNRUNNABLE/NOT_APPLICABLE nghĩa là phép đo trực tiếp **chưa trả lời**
-        — không phải đã thông. Đây đúng là ca STORY-01-01: nop không chạy được
-        ở SHA cha vì worktree không có node_modules."""
+    def test_nop_khong_chay_duoc_thi_tdd_cung_khong_tra_loi_duoc(self):
+        """UNRUNNABLE nghĩa là phép đo trực tiếp **chưa trả lời** — không phải đã
+        thông, và cũng không phải developer làm sai. Đây đúng là ca STORY-01-01:
+        nop không chạy được ở SHA cha vì worktree không có node_modules.
+
+        SS-96: trước đây chỗ này trả FAILED. Hai cổng đọc **cùng một** bằng chứng,
+        mà `_absent_stages` dừng ngay khi có bất kỳ cổng nào FAILED — nên một môi
+        trường không trả lời được bị tính vào ngân sách chất lượng của developer và
+        story kết thúc QUALITY_BLOCK. Vắng mặt thì chặn, nhưng chặn với đúng kiểu."""
         self.store.tool_run("S-01", "test:baseline", ok=True, detail={
             "baseline": True, "test_format": "pytest", "test_ids": ["t1"],
             "failed_ids": [], "skipped_ids": [],
@@ -556,16 +618,27 @@ class TestTDDVaNopControl(GateTestCase):
             "test_format": "pytest", "test_ids": [self.AC, "t1"], "failed_ids": [],
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         store.tool_run("S-01", "test:nop", ok=False, detail={
             "nop": True, "parent": "cha0000", "files": ["tests/test_a.py"],
             "unrunnable": "no runnable setup in this tree",
         })
         g = self.gate(candidate="aaa", acceptance=1, added_tests=["tests/test_a.py"])
-        self.assertIs(next(c for c in g.checks if c.name == "TDD").outcome, Outcome.FAILED)
+        tdd = next(c for c in g.checks if c.name == "TDD")
+        nop = next(c for c in g.checks if c.name == "tests verify story")
+        self.assertIs(tdd.outcome, Outcome.UNRUNNABLE)
+        self.assertTrue(tdd.outcome.blocks, "an absence still blocks — it just is not the developer's failure")
+        self.assertIn("TDD", [c.name for c in g.failures])
+        self.assertNotIn("green on first run", tdd.detail)
+        self.assertIn(nop.detail, tdd.detail,
+                      "phải nói **vì sao** phép đo không chạy được, lấy nguyên văn lý do của nop")
 
     def test_do_truoc_xanh_van_du_mot_minh_khi_khong_co_nop(self):
-        self.store.tool_run("S-01", "test", ok=False)
         self.green_story()
+        self.store.tool_run("S-01", "test", ok=False, detail={
+            "test_format": "pytest", "test_ids": ["tests/x.test.js::t"], "failed_ids": ["tests/x.test.js::t"]})
+        EvidenceStore(self._tmp.name).tool_run("S-01", "test", ok=True, detail={
+            "test_format": "pytest", "test_ids": ["tests/x.test.js::t"], "failed_ids": []})
         self.assertTrue(self.gate(added_tests=["tests/x.test.js"]).passed)
 
 
@@ -574,6 +647,7 @@ class TestTestKhongChayDuoc(GateTestCase):
         self.store.file_change("S-01", "src/a.py")
         self.store.tool_run("S-01", "test", ok=False, detail={"unrunnable": "công cụ chưa cài hoặc không nạp được (module_not_found)"})
         self.store.tool_run("S-01", "lint", ok=True)
+        self.store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         g = self.gate()
         m = next(c for c in g.checks if c.name == "test")
         self.assertIs(m.outcome, Outcome.UNRUNNABLE)
@@ -616,6 +690,7 @@ class TestKhongLamDoTestCoSan(GateTestCase):
             "test_format": "pytest", "test_ids": list(ids), "failed_ids": list(failed), **detail,
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def muc(self, g):
         return next(c for c in g.checks if c.name == self.TEN)
@@ -764,10 +839,20 @@ class TestDuAnMoiTinh(GateTestCase):
         EvidenceStore(self._tmp.name, candidate="aaa").tool_run(
             "S-01", "test:nop", ok=False,
             detail={"nop": True, "parent": "cha0000", "files": ["tests/a.py"],
-                    "unrunnable": self.KHONG_DU_AN})
+                    "unrunnable": self.KHONG_DU_AN, "absent_at_parent": ["package.json", "src/a.py"]})
         m = self.muc("tests verify story", acceptance=1)
         self.assertIs(m.outcome, Outcome.PASSED, m.detail)
-        self.assertIn("nothing to run", m.detail)
+        self.assertIn("this story creates it", m.detail)
+
+    def test_no_project_at_the_parent_is_not_proof_unless_the_story_creates_it(self):
+        """SS-81 family: a missing manifest the story did NOT add is an environment problem, not the story's red."""
+        self.store.file_change("S-01", "src/a.py")
+        EvidenceStore(self._tmp.name, candidate="aaa").tool_run("S-01", "test", ok=True)
+        EvidenceStore(self._tmp.name, candidate="aaa").tool_run(
+            "S-01", "test:nop", ok=False,
+            detail={"nop": True, "parent": "cha0000", "files": ["tests/a.py"],
+                    "unrunnable": self.KHONG_DU_AN, "absent_at_parent": ["src/a.py"]})
+        self.assertIs(self.muc("tests verify story", acceptance=1).outcome, Outcome.UNRUNNABLE)
 
     def test_missing_dependencies_do_not_prove_nop_failure(self):
         self.store.file_change("S-01", "src/a.py")
@@ -789,8 +874,14 @@ class TestDuAnMoiTinh(GateTestCase):
         """`node_modules` nằm trong worktree mà chính story này sắp dựng: ở
         commit gốc không có gì chạy được, nên không có test nào từng xanh."""
         self.store.tool_run("S-01", "test:baseline", ok=False, detail={
-            "baseline": True, "unrunnable": self.KHONG_PHU_THUOC})
+            "baseline": True, "unrunnable": self.KHONG_PHU_THUOC, "test_files_in_tree": 0})
         self.assertIs(self.muc("no baseline regression").outcome, Outcome.NOT_APPLICABLE)
+
+    def test_tests_that_existed_but_could_not_run_at_baseline_are_unobserved(self):
+        """SS-85: the old rule read any NO_SETUP baseline as 'no test was ever green there'."""
+        self.store.tool_run("S-01", "test:baseline", ok=False, detail={
+            "baseline": True, "unrunnable": self.KHONG_PHU_THUOC, "test_files_in_tree": 3})
+        self.assertIs(self.muc("no baseline regression").outcome, Outcome.UNRUNNABLE)
 
     def test_thieu_cong_cu_that_van_chan(self):
         """Đối chứng: `npm: command not found` vẫn là môi trường hỏng."""
@@ -807,6 +898,10 @@ class TestTestCoKiemDuocStory(GateTestCase):
 
     TEN = "tests verify story"
     AC = "tests/test_a.py::test_AC_S_01_1_x"       # mang mã AC-S-01-1 của story S-01
+    #: SS-81: what the harness records when the story's own test file cannot import the story's new module at the
+    #: parent — the only way an absent test counts as red
+    BOUND = {"collection_errors": [{"file": "tests/test_a.py", "error": "module_not_found", "missing_module": "src.a",
+                                    "missing_name": ""}], "absent_at_parent": ["src/a.py"]}
 
     def baseline(self, ids, failed=(), skipped=(), **detail):
         self.store.tool_run("S-01", "test:baseline", ok=not failed, detail={
@@ -821,6 +916,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
             "test_format": "pytest", "test_ids": list(ids), "failed_ids": list(failed), **detail,
         })
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def nop(self, ids=None, failed=(), sha="aaa", ok=None, files=("tests/test_a.py",), **detail):
         d = {"nop": True, "parent": "cha0000", "files": list(files), **detail}
@@ -833,6 +929,10 @@ class TestTestCoKiemDuocStory(GateTestCase):
         return next(c for c in g.checks if c.name == self.TEN)
 
     def cham(self, **kw):
+        # Policy V2: the plan declares what each criterion must show. These cases are policy V1's questions, so
+        # they declare the obligation V1 assumed for every criterion — CHANGE_REQUIRED — and must answer identically.
+        n = int(kw.get("acceptance", 1))
+        kw.setdefault("ac_proof", obligations("S-01", n))
         return self.muc(self.gate(candidate="aaa", acceptance=1, **kw))
 
     # ---- cấp 1
@@ -874,7 +974,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         test của story đã xanh sẵn — không phải "gắn mã vào test có sẵn"."""
         self.baseline([self.AC, "t1"], parent="bbb", base_ref="aaa0")
         self.ung_vien([self.AC, "t1"])
-        self.nop(["t1"])
+        self.nop(["t1"], **self.BOUND)
         m = self.cham()
         self.assertIs(m.outcome, Outcome.PASSED, m.detail)
         self.assertIn("level 1 cannot compare", m.detail)
@@ -888,10 +988,13 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.baseline(["t1"])
         self.ung_vien([self.AC, "t1"])
         self.nop([self.AC, "t1"])
-        g = self.gate(candidate="aaa", acceptance=1)
+        g = self.gate(candidate="aaa", acceptance=1, ac_proof=obligations("S-01", 1))
         m = self.muc(g)
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("still green without story code", m.detail)
+        # V2 says the same thing with the owner named: the criterion the plan calls CHANGE_REQUIRED is already
+        # satisfied at the story's entry, so no code the developer writes can make its test red there.
+        self.assertIn("PLAN_OVERLAP", m.detail)
+        self.assertIn("GREEN -> GREEN", m.detail)
         self.assertIn(self.AC, m.detail)
         self.assertIn("cha0000"[:7], m.detail)
         self.assertIn(self.AC, g.feedback(), "tên test phải vào feedback lượt sau")
@@ -899,20 +1002,34 @@ class TestTestCoKiemDuocStory(GateTestCase):
     def test_do_hoac_khong_ton_tai_o_sha_cha_la_dat(self):
         self.baseline(["t1"])
         self.ung_vien([self.AC, "t1"])
-        self.nop(["t1"])                            # lỗi import ở SHA cha: test không tồn tại
+        self.nop(["t1"], **self.BOUND)              # lỗi import ở SHA cha, do chính mã của story vắng
         m = self.cham()
         self.assertIs(m.outcome, Outcome.PASSED)
-        self.assertIn("red or absent", m.detail)
+        self.assertIn("each showed what their obligation asks at parent SHA", m.detail)
+        self.assertEqual(m.data["proof"]["AC-S-01-1"]["tests"][self.AC]["state"], "RED_COLLECTION_BOUND_TO_STORY")
         self.nop([self.AC, "t1"], failed=[self.AC])   # có mặt nhưng đỏ
         self.assertIs(self.cham().outcome, Outcome.PASSED)
+
+    def test_an_absent_test_with_no_recorded_cause_proves_nothing(self):
+        """SS-81 (B): the old rule read 'absent at the parent' as red — including a test that never ran because
+        pytest stopped the session at another file's import error."""
+        self.baseline(["t1"])
+        self.ung_vien([self.AC, "t1"])
+        self.nop(["t1"])
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("ABSENT", m.detail)
+        self.nop(["t1"], collection_aborted=True)
+        self.assertIn("COLLECTION_ABORTED", self.cham().detail)
 
     def test_nop_lay_lan_moi_nhat_o_dung_ung_vien(self):
         self.baseline(["t1"])
         self.ung_vien([self.AC, "t1"])
         self.nop([self.AC, "t1"], sha="bbb")          # bản khác: không dùng để chấm bản này
         m = self.cham()
-        self.assertIs(m.outcome, Outcome.NOT_APPLICABLE)
-        self.assertIn("ran no nop", m.detail)
+        # SS-89: no nop for THIS candidate means the control never ran here — it blocks instead of stepping aside
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("no nop control was recorded for this candidate", m.detail)
 
     def test_chua_co_test_mang_ma_xanh_o_ung_vien_thi_khong_co_gi_de_kiem(self):
         self.baseline(["t1"])
@@ -920,7 +1037,8 @@ class TestTestCoKiemDuocStory(GateTestCase):
         self.nop(["t1", "t2"])
         m = self.cham()
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("criteria have tests", m.detail)
+        self.assertIn("no test at the candidate carries this criterion's code", m.detail)
+        self.assertIn("DEVELOPER", m.detail)
 
     def test_khong_chay_duoc_la_moi_truong_khong_phai_story(self):
         self.baseline(["t1"])
@@ -935,8 +1053,19 @@ class TestTestCoKiemDuocStory(GateTestCase):
         vẫn in được tên test khác → là đỏ hợp lệ, không phải môi trường."""
         self.baseline(["t1"])
         self.ung_vien([self.AC, "t1"])
-        self.nop(["t1"], ok=False, unrunnable="công cụ chưa cài (cannot find module)")
+        self.nop(["t1"], ok=False, unrunnable="công cụ chưa cài (cannot find module)", **self.BOUND)
         self.assertIs(self.cham().outcome, Outcome.PASSED)
+
+    def test_a_third_party_import_failure_at_the_parent_is_unrunnable_not_red(self):
+        """SS-81 (A): unrunnable + test_format fell through to 'red or absent' and PASSED."""
+        self.baseline(["t1"])
+        self.ung_vien([self.AC, "t1"])
+        self.nop(["t1"], ok=False, unrunnable="no runnable setup in this tree — the project's dependencies are not installed here",
+                 collection_errors=[{"file": "tests/test_a.py", "error": "module_not_found", "missing_module": "hypothesis",
+                                     "missing_name": ""}], absent_at_parent=["src/a.py"])
+        m = self.cham()
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
+        self.assertIn("DEPENDENCY_UNRUNNABLE", m.detail)
 
     def test_khong_them_sua_test_thi_khong_ap_dung(self):
         self.baseline(["t1"])
@@ -968,6 +1097,7 @@ class TestTestCoKiemDuocStory(GateTestCase):
         store = EvidenceStore(self._tmp.name, candidate="aaa")
         store.tool_run("S-01", "test", ok=True)
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
         self.nop(ok=True)
         m = self.cham()
         self.assertIs(m.outcome, Outcome.FAILED)
@@ -1097,6 +1227,7 @@ class TestMotPhepThuHaiMa(GateTestCase):
         store.tool_run("S-01", "test", ok=True, detail={
             "test_format": "pytest", "test_ids": list(ids), "failed_ids": []})
         store.tool_run("S-01", "lint", ok=True)
+        store.tool_run("S-01", "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is recorded
 
     def muc(self, acceptance=2):
         return next(c for c in self.gate(candidate="aaa", acceptance=acceptance).checks

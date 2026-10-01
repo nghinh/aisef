@@ -1,0 +1,1054 @@
+{
+ "record": "AISEF V2 — Q5 REPRODUCTION (real execution; the model stream alone replayed)",
+ "rung": "Q5",
+ "authority": "owner's P9 / QP-9 EXECUTION AUTHORIZATION (2026-09-28)",
+ "aggregated": "2026-09-28T02:20:11Z",
+ "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+ "kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+ "execution_commit": "609371d74f2444c4cdb971203343c30f2e4c220e",
+ "reproduction_head": "609371d74f2444c4cdb971203343c30f2e4c220e",
+ "aisef2_tree_at_reproduction": "4d6081940f5b9dae47439f73f0157161e028d804",
+ "harness_digest": "f9013014ff730fc55924279c05143aeb3818902f14e42dc02fa9519e08b418ca",
+ "fixture_digest": "6b7be925719dbf63743a32eae69147f6abcab57974a298ead641141780d31290",
+ "corpus_digest": "c548882525c6a59ba3493b020e220e6ea87d39d2a3686ce4501e580a25ef028b",
+ "replay_digest": "c5ae9252ecc3e70fcc9149b78b2e2d4b9502c82081ab22ba0ad8bf638f608c6c",
+ "request_class_catalog_digest": "70052790d0520311e82721c00df26922da823044a0c14d52c64d0cb9d0c00de9",
+ "normalization_digest": "076f05bf0f5e097238b6562b8e539fa93d636754783a96596ecc9c9d86b361cb",
+ "tool_adapters": {
+  "python": {
+   "path_token": "<PY>",
+   "sha256": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634",
+   "version": "3.14.7",
+   "implementation": "CPython"
+  },
+  "git": {
+   "sha256": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537",
+   "version": "git version 2.53.0"
+  },
+  "scanner_script_sha256": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c",
+  "runner": "unittest (-E -s -B)",
+  "developer": "model stream (VERIFIED by the digest of its answer stream)",
+  "reviewer": "model stream (VERIFIED by the digest of its answer stream)"
+ },
+ "probe": {
+  "id": "probe.python_callable",
+  "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "corrected": true,
+  "historical_absent": true
+ },
+ "f1_identity": "34eb00bbb74ade41bebc98e7c06437c1c6833bb6f95d30b1d64b04ad905e37fc",
+ "f9_identity": "2f00a8b02918bc45eeec4549d0bd04b74fa9211c60060a2d32319beaa0b7baeb",
+ "one_identity": "6433296388866350e266721fb739acd6ee6d3af84551e8f4c1a51e0582a39c75",
+ "subject": {
+  "path": "closure-evidence/v2/Q5/SUBJECT.json",
+  "sha256": "10c887a1af4e450592847ac9eadf5b69124b88c4aee948ed93393effc59fd5aa",
+  "one_identity": "6433296388866350e266721fb739acd6ee6d3af84551e8f4c1a51e0582a39c75"
+ },
+ "corpus": {
+  "developer-outage-rollback": {
+   "sha256": "bdcd2e8af2929635e56403e1ac5c8ce84f3d986074174b858b1de36639faaa7b",
+   "ledger_digest": "fd961a67b8cffa47b3bede896ab6a9249904fd59079ffca694c8242c27c6a350",
+   "model_calls": 2,
+   "tool_calls": 0,
+   "final_workspace": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+   "events": 51,
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   }
+  },
+  "normal-completion": {
+   "sha256": "5c5e221e982b98a22ef4b9fc02746eaf2240c37a8c0babe97d1b52f8711ad2f4",
+   "ledger_digest": "1ca2f56cdf1c21fc781865e442c745395ef645f04fffe209021ef2d085f2f087",
+   "model_calls": 2,
+   "tool_calls": 1,
+   "final_workspace": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+   "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+   "events": 63,
+   "outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   }
+  },
+  "post-merge-regression": {
+   "sha256": "43d6416efb352f5a09d83ba937792772c73b1b7e287ae6fad49f3d0ffda53f52",
+   "ledger_digest": "a21b7af5013b0fabe882c762ef050a070fa1a0bd2c7a57d765ccac7f5eb68f7f",
+   "model_calls": 4,
+   "tool_calls": 2,
+   "final_workspace": "cda0adbf757d843fde2113ff337ead44d875aaadc146aa904aaff63aff0680a9",
+   "final_tip": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+   "events": 143,
+   "outcomes": {
+    "S0": [
+     "COMMIT"
+    ],
+    "S2": [
+     "ROLLBACK"
+    ]
+   }
+  },
+  "pre-satisfied": {
+   "sha256": "77aecc2751923bc552954b9fcc0710bc649362035d0b82778ca448b4176fa362",
+   "ledger_digest": "5e228c5bb27ef0eacffd800ee164722b7d9666158ed1c1a8139b67b3882a76cc",
+   "model_calls": 1,
+   "tool_calls": 1,
+   "final_workspace": "df73c14d40bd36af82d0ea58cd2726e67163a81c48cf337008101f33fbb617e4",
+   "final_tip": "6722fb28d2c35a5a820d9c5575feecf0a6b66072",
+   "events": 61,
+   "outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   }
+  },
+  "retry-then-commit": {
+   "sha256": "1ff7a87fe1495e463f6394e9f9d6d9196d9e6364ed1ec0488e103baf1a7ff153",
+   "ledger_digest": "86cf7ff2f6cba003b7d736fcb6020fd9cd00b2f3fe83abaee8407356bcec13bf",
+   "model_calls": 3,
+   "tool_calls": 1,
+   "final_workspace": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+   "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+   "events": 91,
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "COMMIT"
+    ]
+   }
+  },
+  "review-finding-rollback": {
+   "sha256": "ba4d790f6851164364e26cc0b6816836a9d3d9992a3628315c5a426f87e1f91a",
+   "ledger_digest": "78a9f31d301acfd9322cf196cb784e7466fd2d95588161d4e36b7a7d1be51c81",
+   "model_calls": 4,
+   "tool_calls": 0,
+   "final_workspace": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+   "events": 89,
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   }
+  },
+  "security-finding-rollback": {
+   "sha256": "a7693de96f8a7dcd7ce4630febe94c646c116a9983edaddc27b5bf987ae50eb8",
+   "ledger_digest": "8f370de4f5385157b852647aeaa60b7ddd7c383465e6d4ceb68cc05b68f3e8b7",
+   "model_calls": 4,
+   "tool_calls": 2,
+   "final_workspace": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+   "events": 99,
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   }
+  }
+ },
+ "coverage": {
+  "normal-completion": [
+   "normal story completion",
+   "developer tool execution",
+   "candidate proof",
+   "independent verification",
+   "review path",
+   "security path",
+   "merge path",
+   "post-merge path"
+  ],
+  "retry-then-commit": [
+   "retry path",
+   "candidate proof refuted",
+   "developer budget"
+  ],
+  "review-finding-rollback": [
+   "review path",
+   "retry path",
+   "rollback path",
+   "review budget"
+  ],
+  "pre-satisfied": [
+   "PRE_SATISFIED / no developer call",
+   "candidate proof",
+   "review path",
+   "security path"
+  ],
+  "security-finding-rollback": [
+   "security path",
+   "tool execution",
+   "retry path",
+   "rollback path",
+   "security budget"
+  ],
+  "developer-outage-rollback": [
+   "provider failure",
+   "retry path",
+   "rollback path"
+  ],
+  "post-merge-regression": [
+   "merge path",
+   "post-merge path",
+   "PRESERVE re-proof",
+   "rollback path",
+   "two stories"
+  ]
+ },
+ "items": {
+  "developer-outage-rollback": {
+   "item": "developer-outage-rollback",
+   "status": "GREEN",
+   "errors": {
+    "replay_request_mismatch": 0,
+    "assert_consumed_failure": 0,
+    "tool_diff": 0,
+    "subprocess_diff": 0,
+    "workspace_diff": 0,
+    "probe_product_diff": 0,
+    "control_diff": 0,
+    "capability_mismatch": 0,
+    "harness_error": 0,
+    "invariant_violation": 0,
+    "exception": 0,
+    "residual_process": 0
+   },
+   "journal_events": {
+    "expected": 51,
+    "observed": 51
+   },
+   "tool_executions": 0,
+   "tool_diffs": 0,
+   "subprocesses": {
+    "expected": {
+     "probe": 2,
+     "tests": 0,
+     "tool": 0,
+     "worktree": 4,
+     "scratch": 2
+    },
+    "observed": {
+     "probe": 2,
+     "tests": 0,
+     "tool": 0,
+     "worktree": 4,
+     "scratch": 2
+    }
+   },
+   "subprocess_diffs": 0,
+   "probe_product_diffs": 0,
+   "workspace": {
+    "initial": {
+     "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "diff": []
+    },
+    "final": {
+     "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "tip_expected": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "tip_observed": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "diff": []
+    }
+   },
+   "model_calls": {
+    "expected": 2,
+    "observed": 2,
+    "request_hash_mismatches": 0,
+    "consumption": {
+     "expected": 2,
+     "consumed": 2,
+     "missing_unconsumed": [],
+     "extra_requests": [],
+     "duplicate_consumptions": 0,
+     "mismatches": 0,
+     "ok": true
+    },
+    "drift_total": 0,
+    "drift_bound": 0
+   },
+   "outcomes": {
+    "expected": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "observed": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    }
+   },
+   "network": {
+    "guarded": true,
+    "socket_attempts": 0
+   },
+   "replay_failure": null,
+   "expected_ledger_digest": "fd961a67b8cffa47b3bede896ab6a9249904fd59079ffca694c8242c27c6a350",
+   "kernel_tree_after": "4d6081940f5b9dae47439f73f0157161e028d804"
+  },
+  "normal-completion": {
+   "item": "normal-completion",
+   "status": "GREEN",
+   "errors": {
+    "replay_request_mismatch": 0,
+    "assert_consumed_failure": 0,
+    "tool_diff": 0,
+    "subprocess_diff": 0,
+    "workspace_diff": 0,
+    "probe_product_diff": 0,
+    "control_diff": 0,
+    "capability_mismatch": 0,
+    "harness_error": 0,
+    "invariant_violation": 0,
+    "exception": 0,
+    "residual_process": 0
+   },
+   "journal_events": {
+    "expected": 63,
+    "observed": 63
+   },
+   "tool_executions": 1,
+   "tool_diffs": 0,
+   "subprocesses": {
+    "expected": {
+     "probe": 5,
+     "tests": 3,
+     "tool": 1,
+     "worktree": 2,
+     "scratch": 1
+    },
+    "observed": {
+     "probe": 5,
+     "tests": 3,
+     "tool": 1,
+     "worktree": 2,
+     "scratch": 1
+    }
+   },
+   "subprocess_diffs": 0,
+   "probe_product_diffs": 0,
+   "workspace": {
+    "initial": {
+     "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "diff": []
+    },
+    "final": {
+     "expected": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+     "observed": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+     "tip_expected": "a22a6d5e482fb74eff13c869f90542385829b473",
+     "tip_observed": "a22a6d5e482fb74eff13c869f90542385829b473",
+     "diff": []
+    }
+   },
+   "model_calls": {
+    "expected": 2,
+    "observed": 2,
+    "request_hash_mismatches": 0,
+    "consumption": {
+     "expected": 2,
+     "consumed": 2,
+     "missing_unconsumed": [],
+     "extra_requests": [],
+     "duplicate_consumptions": 0,
+     "mismatches": 0,
+     "ok": true
+    },
+    "drift_total": 0,
+    "drift_bound": 0
+   },
+   "outcomes": {
+    "expected": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "observed": {
+     "S1": [
+      "COMMIT"
+     ]
+    }
+   },
+   "network": {
+    "guarded": true,
+    "socket_attempts": 0
+   },
+   "replay_failure": null,
+   "expected_ledger_digest": "1ca2f56cdf1c21fc781865e442c745395ef645f04fffe209021ef2d085f2f087",
+   "kernel_tree_after": "4d6081940f5b9dae47439f73f0157161e028d804"
+  },
+  "post-merge-regression": {
+   "item": "post-merge-regression",
+   "status": "GREEN",
+   "errors": {
+    "replay_request_mismatch": 0,
+    "assert_consumed_failure": 0,
+    "tool_diff": 0,
+    "subprocess_diff": 0,
+    "workspace_diff": 0,
+    "probe_product_diff": 0,
+    "control_diff": 0,
+    "capability_mismatch": 0,
+    "harness_error": 0,
+    "invariant_violation": 0,
+    "exception": 0,
+    "residual_process": 0
+   },
+   "journal_events": {
+    "expected": 143,
+    "observed": 143
+   },
+   "tool_executions": 2,
+   "tool_diffs": 0,
+   "subprocesses": {
+    "expected": {
+     "probe": 17,
+     "tests": 6,
+     "tool": 2,
+     "worktree": 4,
+     "scratch": 2
+    },
+    "observed": {
+     "probe": 17,
+     "tests": 6,
+     "tool": 2,
+     "worktree": 4,
+     "scratch": 2
+    }
+   },
+   "subprocess_diffs": 0,
+   "probe_product_diffs": 0,
+   "workspace": {
+    "initial": {
+     "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "diff": []
+    },
+    "final": {
+     "expected": "cda0adbf757d843fde2113ff337ead44d875aaadc146aa904aaff63aff0680a9",
+     "observed": "cda0adbf757d843fde2113ff337ead44d875aaadc146aa904aaff63aff0680a9",
+     "tip_expected": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+     "tip_observed": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+     "diff": []
+    }
+   },
+   "model_calls": {
+    "expected": 4,
+    "observed": 4,
+    "request_hash_mismatches": 0,
+    "consumption": {
+     "expected": 4,
+     "consumed": 4,
+     "missing_unconsumed": [],
+     "extra_requests": [],
+     "duplicate_consumptions": 0,
+     "mismatches": 0,
+     "ok": true
+    },
+    "drift_total": 0,
+    "drift_bound": 0
+   },
+   "outcomes": {
+    "expected": {
+     "S0": [
+      "COMMIT"
+     ],
+     "S2": [
+      "ROLLBACK"
+     ]
+    },
+    "observed": {
+     "S0": [
+      "COMMIT"
+     ],
+     "S2": [
+      "ROLLBACK"
+     ]
+    }
+   },
+   "network": {
+    "guarded": true,
+    "socket_attempts": 0
+   },
+   "replay_failure": null,
+   "expected_ledger_digest": "a21b7af5013b0fabe882c762ef050a070fa1a0bd2c7a57d765ccac7f5eb68f7f",
+   "kernel_tree_after": "4d6081940f5b9dae47439f73f0157161e028d804"
+  },
+  "pre-satisfied": {
+   "item": "pre-satisfied",
+   "status": "GREEN",
+   "errors": {
+    "replay_request_mismatch": 0,
+    "assert_consumed_failure": 0,
+    "tool_diff": 0,
+    "subprocess_diff": 0,
+    "workspace_diff": 0,
+    "probe_product_diff": 0,
+    "control_diff": 0,
+    "capability_mismatch": 0,
+    "harness_error": 0,
+    "invariant_violation": 0,
+    "exception": 0,
+    "residual_process": 0
+   },
+   "journal_events": {
+    "expected": 61,
+    "observed": 61
+   },
+   "tool_executions": 1,
+   "tool_diffs": 0,
+   "subprocesses": {
+    "expected": {
+     "probe": 5,
+     "tests": 3,
+     "tool": 1,
+     "worktree": 2,
+     "scratch": 1
+    },
+    "observed": {
+     "probe": 5,
+     "tests": 3,
+     "tool": 1,
+     "worktree": 2,
+     "scratch": 1
+    }
+   },
+   "subprocess_diffs": 0,
+   "probe_product_diffs": 0,
+   "workspace": {
+    "initial": {
+     "expected": "df73c14d40bd36af82d0ea58cd2726e67163a81c48cf337008101f33fbb617e4",
+     "observed": "df73c14d40bd36af82d0ea58cd2726e67163a81c48cf337008101f33fbb617e4",
+     "diff": []
+    },
+    "final": {
+     "expected": "df73c14d40bd36af82d0ea58cd2726e67163a81c48cf337008101f33fbb617e4",
+     "observed": "df73c14d40bd36af82d0ea58cd2726e67163a81c48cf337008101f33fbb617e4",
+     "tip_expected": "6722fb28d2c35a5a820d9c5575feecf0a6b66072",
+     "tip_observed": "6722fb28d2c35a5a820d9c5575feecf0a6b66072",
+     "diff": []
+    }
+   },
+   "model_calls": {
+    "expected": 1,
+    "observed": 1,
+    "request_hash_mismatches": 0,
+    "consumption": {
+     "expected": 1,
+     "consumed": 1,
+     "missing_unconsumed": [],
+     "extra_requests": [],
+     "duplicate_consumptions": 0,
+     "mismatches": 0,
+     "ok": true
+    },
+    "drift_total": 0,
+    "drift_bound": 0
+   },
+   "outcomes": {
+    "expected": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "observed": {
+     "S1": [
+      "COMMIT"
+     ]
+    }
+   },
+   "network": {
+    "guarded": true,
+    "socket_attempts": 0
+   },
+   "replay_failure": null,
+   "expected_ledger_digest": "5e228c5bb27ef0eacffd800ee164722b7d9666158ed1c1a8139b67b3882a76cc",
+   "kernel_tree_after": "4d6081940f5b9dae47439f73f0157161e028d804"
+  },
+  "retry-then-commit": {
+   "item": "retry-then-commit",
+   "status": "GREEN",
+   "errors": {
+    "replay_request_mismatch": 0,
+    "assert_consumed_failure": 0,
+    "tool_diff": 0,
+    "subprocess_diff": 0,
+    "workspace_diff": 0,
+    "probe_product_diff": 0,
+    "control_diff": 0,
+    "capability_mismatch": 0,
+    "harness_error": 0,
+    "invariant_violation": 0,
+    "exception": 0,
+    "residual_process": 0
+   },
+   "journal_events": {
+    "expected": 91,
+    "observed": 91
+   },
+   "tool_executions": 1,
+   "tool_diffs": 0,
+   "subprocesses": {
+    "expected": {
+     "probe": 8,
+     "tests": 3,
+     "tool": 1,
+     "worktree": 4,
+     "scratch": 2
+    },
+    "observed": {
+     "probe": 8,
+     "tests": 3,
+     "tool": 1,
+     "worktree": 4,
+     "scratch": 2
+    }
+   },
+   "subprocess_diffs": 0,
+   "probe_product_diffs": 0,
+   "workspace": {
+    "initial": {
+     "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "diff": []
+    },
+    "final": {
+     "expected": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+     "observed": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+     "tip_expected": "a22a6d5e482fb74eff13c869f90542385829b473",
+     "tip_observed": "a22a6d5e482fb74eff13c869f90542385829b473",
+     "diff": []
+    }
+   },
+   "model_calls": {
+    "expected": 3,
+    "observed": 3,
+    "request_hash_mismatches": 0,
+    "consumption": {
+     "expected": 3,
+     "consumed": 3,
+     "missing_unconsumed": [],
+     "extra_requests": [],
+     "duplicate_consumptions": 0,
+     "mismatches": 0,
+     "ok": true
+    },
+    "drift_total": 0,
+    "drift_bound": 0
+   },
+   "outcomes": {
+    "expected": {
+     "S1": [
+      "RETRY",
+      "COMMIT"
+     ]
+    },
+    "observed": {
+     "S1": [
+      "RETRY",
+      "COMMIT"
+     ]
+    }
+   },
+   "network": {
+    "guarded": true,
+    "socket_attempts": 0
+   },
+   "replay_failure": null,
+   "expected_ledger_digest": "86cf7ff2f6cba003b7d736fcb6020fd9cd00b2f3fe83abaee8407356bcec13bf",
+   "kernel_tree_after": "4d6081940f5b9dae47439f73f0157161e028d804"
+  },
+  "review-finding-rollback": {
+   "item": "review-finding-rollback",
+   "status": "GREEN",
+   "errors": {
+    "replay_request_mismatch": 0,
+    "assert_consumed_failure": 0,
+    "tool_diff": 0,
+    "subprocess_diff": 0,
+    "workspace_diff": 0,
+    "probe_product_diff": 0,
+    "control_diff": 0,
+    "capability_mismatch": 0,
+    "harness_error": 0,
+    "invariant_violation": 0,
+    "exception": 0,
+    "residual_process": 0
+   },
+   "journal_events": {
+    "expected": 89,
+    "observed": 89
+   },
+   "tool_executions": 0,
+   "tool_diffs": 0,
+   "subprocesses": {
+    "expected": {
+     "probe": 6,
+     "tests": 6,
+     "tool": 0,
+     "worktree": 4,
+     "scratch": 2
+    },
+    "observed": {
+     "probe": 6,
+     "tests": 6,
+     "tool": 0,
+     "worktree": 4,
+     "scratch": 2
+    }
+   },
+   "subprocess_diffs": 0,
+   "probe_product_diffs": 0,
+   "workspace": {
+    "initial": {
+     "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "diff": []
+    },
+    "final": {
+     "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "tip_expected": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "tip_observed": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "diff": []
+    }
+   },
+   "model_calls": {
+    "expected": 4,
+    "observed": 4,
+    "request_hash_mismatches": 0,
+    "consumption": {
+     "expected": 4,
+     "consumed": 4,
+     "missing_unconsumed": [],
+     "extra_requests": [],
+     "duplicate_consumptions": 0,
+     "mismatches": 0,
+     "ok": true
+    },
+    "drift_total": 0,
+    "drift_bound": 0
+   },
+   "outcomes": {
+    "expected": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "observed": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    }
+   },
+   "network": {
+    "guarded": true,
+    "socket_attempts": 0
+   },
+   "replay_failure": null,
+   "expected_ledger_digest": "78a9f31d301acfd9322cf196cb784e7466fd2d95588161d4e36b7a7d1be51c81",
+   "kernel_tree_after": "4d6081940f5b9dae47439f73f0157161e028d804"
+  },
+  "security-finding-rollback": {
+   "item": "security-finding-rollback",
+   "status": "GREEN",
+   "errors": {
+    "replay_request_mismatch": 0,
+    "assert_consumed_failure": 0,
+    "tool_diff": 0,
+    "subprocess_diff": 0,
+    "workspace_diff": 0,
+    "probe_product_diff": 0,
+    "control_diff": 0,
+    "capability_mismatch": 0,
+    "harness_error": 0,
+    "invariant_violation": 0,
+    "exception": 0,
+    "residual_process": 0
+   },
+   "journal_events": {
+    "expected": 99,
+    "observed": 99
+   },
+   "tool_executions": 2,
+   "tool_diffs": 0,
+   "subprocesses": {
+    "expected": {
+     "probe": 6,
+     "tests": 6,
+     "tool": 2,
+     "worktree": 4,
+     "scratch": 2
+    },
+    "observed": {
+     "probe": 6,
+     "tests": 6,
+     "tool": 2,
+     "worktree": 4,
+     "scratch": 2
+    }
+   },
+   "subprocess_diffs": 0,
+   "probe_product_diffs": 0,
+   "workspace": {
+    "initial": {
+     "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "diff": []
+    },
+    "final": {
+     "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+     "tip_expected": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "tip_observed": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "diff": []
+    }
+   },
+   "model_calls": {
+    "expected": 4,
+    "observed": 4,
+    "request_hash_mismatches": 0,
+    "consumption": {
+     "expected": 4,
+     "consumed": 4,
+     "missing_unconsumed": [],
+     "extra_requests": [],
+     "duplicate_consumptions": 0,
+     "mismatches": 0,
+     "ok": true
+    },
+    "drift_total": 0,
+    "drift_bound": 0
+   },
+   "outcomes": {
+    "expected": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "observed": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    }
+   },
+   "network": {
+    "guarded": true,
+    "socket_attempts": 0
+   },
+   "replay_failure": null,
+   "expected_ledger_digest": "8f370de4f5385157b852647aeaa60b7ddd7c383465e6d4ceb68cc05b68f3e8b7",
+   "kernel_tree_after": "4d6081940f5b9dae47439f73f0157161e028d804"
+  }
+ },
+ "workspaces": {
+  "developer-outage-rollback": {
+   "initial": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7"
+  },
+  "normal-completion": {
+   "initial": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+   "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473"
+  },
+  "post-merge-regression": {
+   "initial": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final": "cda0adbf757d843fde2113ff337ead44d875aaadc146aa904aaff63aff0680a9",
+   "final_tip": "a2d4e83ca3c4ce6ba687aba9425506a176377b03"
+  },
+  "pre-satisfied": {
+   "initial": "df73c14d40bd36af82d0ea58cd2726e67163a81c48cf337008101f33fbb617e4",
+   "final": "df73c14d40bd36af82d0ea58cd2726e67163a81c48cf337008101f33fbb617e4",
+   "final_tip": "6722fb28d2c35a5a820d9c5575feecf0a6b66072"
+  },
+  "retry-then-commit": {
+   "initial": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+   "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473"
+  },
+  "review-finding-rollback": {
+   "initial": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7"
+  },
+  "security-finding-rollback": {
+   "initial": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7"
+  }
+ },
+ "totals": {
+  "replay_request_mismatch": 0,
+  "assert_consumed_failure": 0,
+  "tool_diff": 0,
+  "subprocess_diff": 0,
+  "workspace_diff": 0,
+  "probe_product_diff": 0,
+  "control_diff": 0,
+  "capability_mismatch": 0,
+  "harness_error": 0,
+  "invariant_violation": 0,
+  "exception": 0,
+  "residual_process": 0,
+  "items": 7,
+  "green": 7,
+  "expected_model_calls": 20,
+  "consumed_model_calls": 20,
+  "missing_replay_calls": 0,
+  "extra_model_calls": 0,
+  "request_hash_mismatches": 0,
+  "drift_total": 0,
+  "tool_executions": 7,
+  "tool_result_replays": 0,
+  "tool_diffs": 0,
+  "subprocess_executions": 119,
+  "workspace_diffs": 0,
+  "socket_attempts": 0
+ },
+ "assert_consumed": true,
+ "only_model_stream_replayed": true,
+ "replay_mechanism": "validation/qualification/q5.py ModelStream (developer and reviewer answers only; git, probes, tests, scanner, merge execute again)",
+ "network": {
+  "guard": "in-process socket refusal during every item",
+  "socket_attempts": 0
+ },
+ "residual_processes": {
+  "from_journal": 0,
+  "owned_range": "see the owned-run record beside this file"
+ },
+ "conformance": {
+  "start": {
+   "when": "2026-09-28T02:19:42Z",
+   "head": "609371d74f2444c4cdb971203343c30f2e4c220e",
+   "kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "freeze_conformance": {
+    "problems": [],
+    "statuses": {
+     "F1": "PASS",
+     "F2": "PASS",
+     "F3": "PASS",
+     "F4": "PASS",
+     "F5": "PASS",
+     "F6": "PASS",
+     "F7": "PASS",
+     "F8": "PASS",
+     "F9": "PASS",
+     "F10": "PASS",
+     "F11": "PASS"
+    },
+    "summary": {
+     "PASS": 11,
+     "PENDING": 0,
+     "FAIL": 0
+    },
+    "ratchet_violations": [],
+    "pass": true,
+    "f1_f2_f11": {
+     "F1": "PASS",
+     "F2": "PASS",
+     "F11": "PASS"
+    }
+   },
+   "v1_evidence_guard": {
+    "problems": [],
+    "pass": true
+   },
+   "w0": {
+    "path": "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json",
+    "sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+    "expected": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+    "unchanged": true
+   },
+   "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "f9": "PASS"
+  },
+  "end": {
+   "when": "2026-09-28T02:20:11Z",
+   "head": "609371d74f2444c4cdb971203343c30f2e4c220e",
+   "kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "freeze_conformance": {
+    "problems": [],
+    "statuses": {
+     "F1": "PASS",
+     "F2": "PASS",
+     "F3": "PASS",
+     "F4": "PASS",
+     "F5": "PASS",
+     "F6": "PASS",
+     "F7": "PASS",
+     "F8": "PASS",
+     "F9": "PASS",
+     "F10": "PASS",
+     "F11": "PASS"
+    },
+    "summary": {
+     "PASS": 11,
+     "PENDING": 0,
+     "FAIL": 0
+    },
+    "ratchet_violations": [],
+    "pass": true,
+    "f1_f2_f11": {
+     "F1": "PASS",
+     "F2": "PASS",
+     "F11": "PASS"
+    }
+   },
+   "v1_evidence_guard": {
+    "problems": [],
+    "pass": true
+   },
+   "w0": {
+    "path": "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json",
+    "sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+    "expected": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+    "unchanged": true
+   },
+   "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "f9": "PASS"
+  }
+ },
+ "calibration": {
+  "path": "closure-evidence/v2/Q5/CALIBRATION.json",
+  "all_rejected": true
+ },
+ "p8_evidence": {
+  "closure-evidence/v2/Q4/DIFFERENTIAL.json": "2a07619255e0f754ffad6d7be79193275f899773915d66c71024dafdf3633b10",
+  "closure-evidence/v2/Q4/SUBJECT.json": "4f99a4df0a89e019c4f886dd70ec11f0fe12a10660b34f2082ef97479126ed29"
+ },
+ "p7_evidence": {
+  "closure-evidence/v2/Q0-Q3/SUMMARY.json": "5f03687299447a24affa43d638b3ba04d24df071273eb63b831bdb98da4097d2",
+  "closure-evidence/v2/P7-FINDING-001/CORRECTION.json": "3da6d2a60e381613ea14670454a0a85e536606f750404dd1f2e0c3de85ee20e7",
+  "closure-evidence/v2/P7-ACCEPTANCE.json": "c7144a2353e18d844a69f1739c133678fc79bfbc60645d1808fceb2846a66edf"
+ },
+ "seals": {
+  "closure-evidence/v2/P4-FINAL-SEAL.json": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+  "closure-evidence/v2/P5-FINAL-SEAL.json": "d06d4ae57e1797f6658b1cc3148200865aada86a0d3165aeb9f7f98a6e3e250c",
+  "closure-evidence/v2/P6-FINAL-SEAL.json": "9362029864f011d7c727d57ab4f99815e0c440071833285a2964053fa651ea60"
+ },
+ "v1_evidence": {
+  "baseline": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb",
+  "w0": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+ },
+ "platform": {
+  "system": "darwin",
+  "release": "25.5.0",
+  "machine": "arm64",
+  "python": "3.14.7"
+ },
+ "problems": [],
+ "status": "GREEN"
+}

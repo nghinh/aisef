@@ -135,7 +135,10 @@ class TestCoverageVaLa(unittest.TestCase):
 
     def test_evidence_shape(self):
         ev = parse(fx("node-test-fail")).to_evidence()
-        self.assertEqual(set(ev), {"test_format", "test_ids", "failed_ids", "skipped_ids", "coverage"})
+        self.assertEqual(set(ev), {"test_format", "test_ids", "failed_ids", "skipped_ids", "coverage",
+                                   # SS-81 family: what did not execute, and why — the same shape for every format
+                                   "errored_ids", "collection_errors", "collection_aborted", "failure_imports",
+                                   "output_complete"})
         self.assertEqual(ev["failed_ids"], ["AC-STORY-01-01-3: thất bại"])
 
 
@@ -179,7 +182,10 @@ class TestCtrf(unittest.TestCase):
 
     def test_evidence_shape_giong_dinh_dang_khac(self):
         ev = parse((FIX / "ctrf-pytest.json").read_text(encoding="utf-8")).to_evidence()
-        self.assertEqual(set(ev), {"test_format", "test_ids", "failed_ids", "skipped_ids", "coverage"})
+        self.assertEqual(set(ev), {"test_format", "test_ids", "failed_ids", "skipped_ids", "coverage",
+                                   # SS-81 family: what did not execute, and why — the same shape for every format
+                                   "errored_ids", "collection_errors", "collection_aborted", "failure_imports",
+                                   "output_complete"})
 
 
 class TestPlaywright(unittest.TestCase):

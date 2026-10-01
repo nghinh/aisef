@@ -1,0 +1,11 @@
+Progress: 0/16 stories done (15 not started)
+Active epics: EPIC-01
+
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 18
+Skill: bmad-review ×3 · bmad-code-review ×2 · verification-before-completion ×1
+
+✗ 1 stories not passing:
+    STORY-01-01      failed   REVIEW_UNRUNNABLE: the reviewer did not produce a verdict on candidate 72aabd59 in 3 executions — last: reviewer modified the working tree (uv.lock) — reverted; this review attempt does not count. Review is a report, not a fix.. Deterministic checks passed and the candidate is kept; no developer change is needed. Re-run the review stage when the reviewer can run: `/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/python3.14 -m aisef.cli run --verify-only --story STORY-01-01`.

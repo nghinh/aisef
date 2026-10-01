@@ -1,0 +1,78 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv/bin/python
+rootdir: /Users/nghinh/Downloads/projects/ai-sdlc
+configfile: pyproject.toml
+collecting ... collected 9 items
+
+oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger FAILED [ 11%]
+oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic FAILED [ 22%]
+oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically FAILED [ 33%]
+oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption FAILED [ 44%]
+oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover PASSED [ 55%]
+oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime PASSED [ 66%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli FAILED [ 77%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value FAILED [ 88%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts FAILED [100%]
+
+=================================== FAILURES ===================================
+__________ TestAcceptance.test_14_1_verify_exits_0_on_a_fresh_ledger ___________
+oracle/test_oracle.py:77: in test_14_1_verify_exits_0_on_a_fresh_ledger
+    self.assertEqual(r.returncode, 3, f"§9: file not found is an I/O error, exit 3: {r.stderr[-400:]}")
+E   AssertionError: 0 != 3 : §9: file not found is an I/O error, exit 3:
+___________ TestAcceptance.test_14_2_snapshot_is_byte_deterministic ____________
+oracle/test_oracle.py:83: in test_14_2_snapshot_is_byte_deterministic
+    self.assertEqual(r.returncode, 4, f"§3.1 + §4.3 + §9: the NFD form is the SAME key, so a new rid conflicts: {r.stderr[-300:]}")
+E   AssertionError: 0 != 4 : §3.1 + §4.3 + §9: the NFD form is the SAME key, so a new rid conflicts:
+___________ TestAcceptance.test_14_3_apply_batch_commits_atomically ____________
+oracle/test_oracle.py:98: in test_14_3_apply_batch_commits_atomically
+    before = self.ledger.read_bytes()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py:777: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py:771: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpen6439qq/ledger.jsonl'
+_ TestAcceptance.test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption _
+oracle/test_oracle.py:111: in test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+    good = self.ledger.read_bytes()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py:777: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py:771: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmp3fnur35k/ledger.jsonl'
+_ TestIdempotencyAndConflict.test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli _
+oracle/test_oracle.py:214: in test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli
+    self.assertEqual(r.returncode, 4, f"§9: a conflict exits 4: {r.stderr[-200:]}")
+E   AssertionError: 0 != 4 : §9: a conflict exits 4:
+___ TestIdempotencyAndConflict.test_a_tombstone_conflicts_like_a_live_value ____
+oracle/test_oracle.py:198: in test_a_tombstone_conflicts_like_a_live_value
+    led.apply_batch([("delete", "t", None, "d1", 1)])  # §4.4: a delete produces a tombstone line
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../aisef-qualification-ws/tmpinom7eit/delivered/ledgerlock/ledger.py:91: in apply_batch
+    _, key, rid, ts = operation
+    ^^^^^^^^^^^^^^^
+E   ValueError: too many values to unpack (expected 4, got 5)
+_ TestIdempotencyAndConflict.test_replay_is_idempotent_and_a_different_rid_conflicts _
+oracle/test_oracle.py:188: in test_replay_is_idempotent_and_a_different_rid_conflicts
+    with self.assertRaises(self.L.ConflictError, msg="§4.3: another rid on the key"):
+                           ^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ledgerlock.ledger' has no attribute 'ConflictError'
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover
+PASSED oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts
+========================= 7 failed, 2 passed in 0.82s ==========================
+
+--- stderr ---

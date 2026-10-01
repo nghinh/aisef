@@ -1,0 +1,16 @@
+{
+  "gate": "mockups",
+  "artifact": "design-contract.json",
+  "artifact_sha256": "72c3bf3623cf772c96981b41bb4580e6962209c23d66ca686dd7d0291dfb3932",
+  "status": "approved",
+  "seq": 9,
+  "decided_by": "auto",
+  "decided_at": "2026-09-15T13:31:22+00:00",
+  "note": "auto-approved (--auto-approve); this step always needs human review",
+  "machine_checks": {
+    "screens": "5",
+    "machine gate": "pass",
+    "warnings": "verify: mockup has no verifiable components; snapshot: mockup has no verifiable components; apply: mockup has no verifiable components; repair-tail: mockup has no verifiable components; help-version: mockup has no verifiable components"
+  },
+  "history": []
+}

@@ -1,0 +1,624 @@
+{
+ "phase": 13,
+ "note": "decision-critical kernel functions; every mutant must be killed by the named tests or justified as equivalent; 2026-09-18: F7 proof model targets added (SS-81 family) 2026-09-20: F8 targets added for the AC proof obligation model (TDD proof policy V2).",
+ "targets": [
+  {
+   "module": "aisef/control/identity.py",
+   "function": "fresh",
+   "tests": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/hardening/test_evidence_schema.py"
+   ]
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_stale_for",
+   "tests": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ]
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_latest_per_check",
+   "tests": [
+    "tests/hardening/test_verdict_freshness.py",
+    "tests/hardening/test_fault_matrix.py::TestEvidenceValidityFaults",
+    "tests/test_gate.py"
+   ]
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "verdict_recorded",
+   "tests": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults"
+   ]
+  },
+  {
+   "module": "aisef/control/closure.py",
+   "function": "_is_ancestor",
+   "tests": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ]
+  },
+  {
+   "module": "aisef/control/closure.py",
+   "function": "probe_review_and_security",
+   "tests": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict",
+    "tests/test_closure.py"
+   ]
+  },
+  {
+   "module": "aisef/control/closure.py",
+   "function": "probe_evidence_at_candidate",
+   "tests": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry",
+    "tests/test_closure.py"
+   ]
+  },
+  {
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.status",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/hardening/test_compound_faults.py::TestCF13OwnerArbitrationIsAnEpoch",
+    "tests/test_approvals.py"
+   ]
+  },
+  {
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore.content_hash",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval",
+    "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness",
+    "tests/test_approvals.py"
+   ]
+  },
+  {
+   "module": "aisef/control/approvals.py",
+   "function": "ApprovalStore._upstream_stale",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream",
+    "tests/hardening/test_compound_faults.py::TestCF12ApprovalInvalidationDuringResume",
+    "tests/test_approvals.py",
+    "tests/test_approvals.py::TestGatesOutsideTheOrderHaveNoUpstream"
+   ]
+  },
+  {
+   "module": "aisef/control/state.py",
+   "function": "claim_is_live",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_dogfood_ledgerlock.py::TestOrphanedRunningClaimIsReclaimedOnTheNextRun",
+    "tests/test_state.py::TestLeaseEdges"
+   ]
+  },
+  {
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "tests": [
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_state.py",
+    "tests/test_state.py::TestLeaseEdges"
+   ]
+  },
+  {
+   "module": "aisef/control/budget.py",
+   "function": "_reservation_live",
+   "tests": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py"
+   ]
+  },
+  {
+   "module": "aisef/control/budget.py",
+   "function": "_check_caps",
+   "tests": [
+    "tests/test_budget.py",
+    "tests/hardening/scan8a/test_group_d.py",
+    "tests/test_budget.py::TestWallClockCap"
+   ]
+  },
+  {
+   "module": "aisef/harness/ownership.py",
+   "function": "classify",
+   "tests": [
+    "tests/hardening/test_ownership.py"
+   ]
+  },
+  {
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "tests": [
+    "tests/hardening/test_process_owner.py",
+    "tests/hardening/test_process_owner.py::TestReapTerminatesGracefullyBeforeItKills"
+   ]
+  },
+  {
+   "module": "aisef/harness/process_owner.py",
+   "function": "survivors",
+   "tests": [
+    "tests/hardening/test_process_owner.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults",
+    "tests/hardening/test_judgment.py::TestDeadlockPairSurvivesAnInfraAttempt",
+    "tests/hardening/test_judgment.py::TestInScopeRepeatIsNotStuck"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/test_same_complaint_finding.py",
+    "tests/test_findings.py",
+    "tests/hardening/test_judgment.py::TestLegacyTokenOverlapRule"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "_paths_outside",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_sibling_scan.py::TestSS25ScopeVerdictComesFromFindingsNotProse",
+    "tests/hardening/test_judgment.py::TestPathsOutsideEdges"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "finding_bound",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "Verdict.bound_blocking",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "structured_plan_defects",
+   "tests": [
+    "tests/hardening/test_judgment.py",
+    "tests/hardening/test_differential.py"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "_verifier_budget_cap",
+   "tests": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults",
+    "tests/hardening/test_judgment.py::TestVerifierBudgetCapReadsBothVerifiers"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "_absent_stages",
+   "tests": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestReviewFaults",
+    "tests/hardening/test_fault_matrix.py::TestSecurityFaults"
+   ]
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "nop_deadlock",
+   "tests": [
+    "tests/hardening/test_differential.py",
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults",
+    "tests/test_implement.py::TestBeTacDoKeHoachTheoNopControl",
+    "tests/hardening/scan8a/test_group_a.py::TestSS32DeadlockDiagnosisReadsDataNotProse",
+    "tests/hardening/test_judgment.py::TestNopDeadlockPositions"
+   ]
+  },
+  {
+   "module": "aisef/clients/stream.py",
+   "function": "exit_status_of",
+   "tests": [
+    "tests/hardening/adapters/test_conformance.py",
+    "tests/test_clients.py",
+    "tests/test_stream.py::TestExitStatus",
+    "tests/test_stream.py::TestExitStatusBranches"
+   ]
+  },
+  {
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "tests": [
+    "tests/test_tools.py",
+    "tests/hardening/scan8a/test_group_c.py",
+    "tests/test_tools.py::TestUnrunnableReasonBranches"
+   ]
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "classify",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_tdd.py",
+    "tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "bound",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/hardening/test_sibling_scan.py::TestSS26EnvironmentFailureIsNotErasedBySubstring"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "story_file_for",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_implement.py::TestHappyPath::test_thieu_chinh_ma_cua_story_o_parent_la_do_hop_le"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "not_green",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_ledger.py",
+    "tests/test_preservation.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "executed_green",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "aborted",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "files_of",
+   "tests": [
+    "tests/hardening/test_ss81_family.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "summarize",
+   "tests": [
+    "tests/hardening/test_ss81_family.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/proof.py",
+   "function": "run_proves_red",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tdd.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_nop_check",
+   "tests": [
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_gate_qualification.py"
+   ],
+   "decision": "F7 proof model (SS-81 family) + F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_tdd_check",
+   "tests": [
+    "tests/hardening/test_unrunnable_routing.py",
+    "tests/hardening/test_policy_v2_conformance.py",
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_tdd.py"
+   ],
+   "decision": "SS-96 absence routing — the proxy check that reads the nop control's evidence must defer to the control both ways and never turn an absence into a verdict against the developer (INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE)"
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_baseline_check",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_gate.py",
+    "tests/test_gate_qualification.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/gate.py",
+   "function": "_preservation_check",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_preservation.py",
+    "tests/test_gate.py",
+    "tests/test_gate_qualification.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/tdd.py",
+   "function": "proven_red_before_green",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tdd.py",
+    "tests/test_gate.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/tdd.py",
+   "function": "runs_before_last_green",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tdd.py",
+    "tests/hardening/scan8a/test_group_b.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/tdd.py",
+   "function": "tdd_subjects",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tdd.py",
+    "tests/test_gate.py",
+    "tests/hardening/test_ac_proof_policy.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/ledger.py",
+   "function": "_observe_tests",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_ledger.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/tools.py",
+   "function": "collection_continuation_args",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_tools.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "missing_import",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "_pytest",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "_pytest_blocks",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "_unittest_errors",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/harness/testlog.py",
+   "function": "_js_import_errors",
+   "tests": [
+    "tests/hardening/test_ss81_family.py",
+    "tests/test_testlog.py"
+   ],
+   "decision": "F7 proof model (SS-81 family)"
+  },
+  {
+   "module": "aisef/control/obligation.py",
+   "function": "evaluate",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_machine_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/obligation.py",
+   "function": "side",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_machine_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/obligation.py",
+   "function": "story_contribution",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_machine_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/obligation.py",
+   "function": "judge",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/hardening/test_ac_proof_machine_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/machine_gate.py",
+   "function": "ac_proof_defects",
+   "tests": [
+    "tests/hardening/test_ac_proof_machine_gate.py",
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/test_machine_gate.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/preflight.py",
+   "function": "ac_proof_defect",
+   "tests": [
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/test_preflight.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/phases/implement.py",
+   "function": "plan_owned_criteria",
+   "tests": [
+    "tests/hardening/test_ac_proof_gate.py",
+    "tests/test_implement.py::TestTestCoKiemDuocStory"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  },
+  {
+   "module": "aisef/control/normalize.py",
+   "function": "ac_proof",
+   "tests": [
+    "tests/hardening/test_ac_proof_policy.py",
+    "tests/test_story_split.py"
+   ],
+   "decision": "F8 AC proof obligation (TDD proof policy V2)"
+  }
+ ],
+ "equivalent": [
+  {
+   "id": "a328285194",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "site": "line 120: drop call time.sleep(...)",
+   "why": "dropping the sleep inside `while monotonic() < deadline and any(alive)` turns the grace wait into a busy wait with the same deadline and the same exit condition; the outcome (which pids are dead, and when) is unchanged."
+  },
+  {
+   "id": "6365821dcd",
+   "module": "aisef/harness/process_owner.py",
+   "function": "reap",
+   "site": "line 126: drop call time.sleep(...)",
+   "why": "dropping the sleep inside `while monotonic() < deadline and any(alive)` turns the grace wait into a busy wait with the same deadline and the same exit condition; the outcome (which pids are dead, and when) is unchanged."
+  },
+  {
+   "id": "76f145ab0f",
+   "module": "aisef/phases/implement.py",
+   "function": "deadlock_reason",
+   "site": "review_findings check: or → and",
+   "why": "`if not last.review_findings or not prev.review_findings: return \"\"` → with `and`, a single empty list falls through to `_same_complaint(x, [])`, which iterates nothing and returns False — the same \"\"; no decision changes."
+  },
+  {
+   "id": "fed654c05c",
+   "module": "aisef/phases/implement.py",
+   "function": "_same_complaint",
+   "site": "token loop: `not x or not y` → and",
+   "why": "with `and`, a pair where exactly one token set is empty is not skipped, but `chung = x & y` is then empty and `len(_rieng(∅)) < 2` skips it anyway — the same result for every input."
+  },
+  {
+   "id": "98ed31b7a6",
+   "module": "aisef/control/ledger.py",
+   "function": "_observe_tests",
+   "site": "line 711: drop call cov.setdefault(...)",
+   "why": "aisef/control/ledger.py::_observe_tests `cov.setdefault(i, [])` is dead: `cov = ac_coverage(story_id, line.acceptance, ids)` returns a key for EVERY i in 1..line.acceptance (control/acceptance.py::coverage), and `_linked(led, story_id, ids)` yields only i in 1..led.stories[story_id].acceptance — the same StoryLine, so every linked i is already a key. Dropping the call changes no state."
+  },
+  {
+   "id": "2b5fc3de4b",
+   "module": "aisef/harness/testlog.py",
+   "function": "_js_import_errors",
+   "site": "line 443: and ↔ or",
+   "why": "aisef/harness/testlog.py::_js_import_errors `importer.endswith(f) and f != importer` -> `or`: `f` is either a failed file the importer ends with, or the importer itself, so `importer.endswith(f)` is always True; when f == importer the original gives \"\" and the mutant gives importer[:-len(importer)] == \"\" — identical in every reachable state."
+  },
+  {
+   "id": "c8447deeb9",
+   "module": "aisef/control/obligation.py",
+   "function": "story_contribution",
+   "site": "line 182: True → False",
+   "why": "the mutated flag is `strict=True` in `zip(codes, declared, strict=True)`; `declared` is built by a comprehension over `codes`, so the two are always the same length and strict=False cannot change any observable behaviour."
+  }
+ ],
+ "not_significant": [
+  {
+   "id": "192e5a90e3",
+   "module": "aisef/control/state.py",
+   "function": "StateStore.transition",
+   "site": "TransitionError message: `owner or 'an unattributed writer'` → and",
+   "why": "inside the f-string of the refusal message only; the refusal itself (raise) is unchanged and is asserted by TestLeaseEdges."
+  },
+  {
+   "id": "5b479bdc93",
+   "module": "aisef/harness/tools.py",
+   "function": "unrunnable_reason",
+   "site": "final message: `hit or 'exit 127'` → and",
+   "why": "the wording of the generic unrunnable reason; control reads only that the reason is non-empty (UNRUNNABLE), which is unchanged."
+  }
+ ]
+}

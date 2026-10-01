@@ -1,0 +1,102 @@
+{
+ "record": "AISEF V2 — P4 STORY SCOPE",
+ "work_package": "WP-4.1",
+ "rfc_sections": [
+  "17",
+  "17.1",
+  "18",
+  "35"
+ ],
+ "frozen_items": [
+  "F1",
+  "F8"
+ ],
+ "semantics": "docs/implementation/v2/P4-LIFETIME-SEMANTICS.md §1, §2",
+ "journal_format": {
+  "version": 2,
+  "format_1_version": 1,
+  "new_schemas": [
+   "capability/resolved",
+   "provider/result",
+   "run/spec-resolved",
+   "story/resource-acquired",
+   "story/resource-released",
+   "tool/invoked",
+   "tool/result"
+  ],
+  "re_declared_format_1_types": [
+   "run/begin",
+   "run/end",
+   "run/interrupted"
+  ],
+  "still_unwritable": [
+   "invariant/violated",
+   "plan/static-admitted",
+   "proof/verified",
+   "tests/adequacy"
+  ],
+  "p3_fixtures": {
+   "known_log.jsonl": "read the same by both readers",
+   "known_type_marked_ignorable.jsonl": "read the same by both readers",
+   "malformed_known.jsonl": "read the same by both readers",
+   "mixed_stream_new_ignorable.jsonl": "read the same by both readers",
+   "mixed_stream_new_required.jsonl": "read the same by both readers",
+   "mixed_stream_second_declaration.jsonl": "read the same by both readers",
+   "newer_schema_field.jsonl": "read the same by both readers",
+   "torn_tail.jsonl": "read the same by both readers",
+   "unknown_ignorable.jsonl": "read the same by both readers",
+   "unknown_required.jsonl": "read the same by both readers",
+   "version_mismatch.jsonl": "declares format 2: format 1 refuses it, format 2 reads it"
+  }
+ },
+ "disposal_rank": {
+  "SESSION": 0,
+  "TOOL_GRANT": 0,
+  "REVIEW_SCOPE": 0,
+  "PROCESS_RANGE": 1,
+  "SANDBOX": 2,
+  "WORKTREE": 3,
+  "SCRATCH": 4
+ },
+ "format_cases": {
+  "test_every_p3_fixture_reads_the_same_through_the_format_2_reader_but_one_that_declares_format_2": true,
+  "test_format_1_schemas_are_the_same_objects_and_only_three_types_are_re_declared": true,
+  "test_a_format_1_type_in_a_format_2_journal_is_judged_by_the_format_1_validator": true,
+  "test_a_format_neither_1_nor_2_is_refused": true,
+  "test_the_format_1_writer_does_not_extend_a_format_2_journal_nor_the_format_2_writer_a_format_1_one": true,
+  "test_a_format_2_journal_round_trips_and_keeps_the_format_1_reader_rules": true,
+  "test_synthetic_is_written_only_as_true_and_only_in_format_2": true
+ },
+ "journal_rules": {
+  "test_acquisition_needs_a_begun_attempt_is_once_per_resource_and_is_in_non_increasing_rank": true,
+  "test_release_is_in_reverse_order_of_the_right_resource_once": true,
+  "test_an_acquisition_while_the_story_disposes_is_refused_and_a_new_attempt_starts_fresh": true
+ },
+ "writer": {
+  "test_the_surface_has_no_update_or_delete_verb_and_every_append_is_fsyncd": true,
+  "test_a_failed_write_or_fsync_leaves_the_log_unchanged_and_poisons_the_writer": true,
+  "test_a_torn_tail_or_an_unknown_type_is_never_extended_and_the_seq_is_assigned_here": true
+ },
+ "scope_cases": {
+  "test_ordered_acquire_and_reverse_dispose_round_trip_through_the_journal": true,
+  "test_SCOPE_1_acquisition_during_or_after_disposal_is_refused_and_the_offer_released": true,
+  "test_an_acquisition_out_of_disposal_order_is_refused_and_released": true,
+  "test_SCOPE_2_a_failing_first_disposer_does_not_stop_the_rest_and_stays_recorded": true,
+  "test_a_range_not_proved_empty_makes_what_it_could_write_to_residual_and_nothing_else": true,
+  "test_a_hanging_release_is_residual_at_its_bound_and_disposal_goes_on": true,
+  "test_abandonment_names_every_remaining_resource_residual": true,
+  "test_a_broken_journal_during_disposal_still_releases_everything": true,
+  "test_SCOPE_3_the_same_resource_graph_gives_the_same_disposal_order_whatever_each_release_takes": true,
+  "test_a_story_scope_owns_no_journal_writer": true
+ },
+ "properties": {
+  "format_1_immutable_and_read_the_same": true,
+  "resource_order_enforced_by_the_journal": true,
+  "format_2_writer_keeps_the_p3_discipline": true,
+  "SCOPE_1_acquire_during_disposal_refused": true,
+  "SCOPE_2_remaining_resources_still_disposed_and_failure_recorded": true,
+  "SCOPE_3_same_graph_same_disposal_order": true,
+  "no_resource_escapes_unaccounted": true,
+  "story_scope_owns_no_journal_writer": true
+ }
+}

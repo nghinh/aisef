@@ -1,0 +1,100 @@
+{
+ "profile": "PROFILE-W1-OC-MYCOMBO-T40",
+ "profile_id": "sha256:0772d02636746abafd8086b309df372dc38abc9d901e0825f15ab943ff0cbb7e",
+ "identity": {
+  "kernel": {
+   "candidate_sha": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+   "product_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+   "wheel_sha256": "2e08d43b61d6647692b731943741f64f7fa8f107e53dacf06bb92bbc1c9bfe8e"
+  },
+  "client": "opencode",
+  "client_version": "1.18.31",
+  "routes": {
+   "developer": "9router/mycombo",
+   "reviewer": "9router/mycombo",
+   "security": "9router/mycombo",
+   "designer": "9router/mycombo"
+  },
+  "max_turns": 40,
+  "max_retries": 2,
+  "max_infra_retries": -1,
+  "context_window": {
+   "developer": {
+    "context": 200000,
+    "output": 32768
+   },
+   "reviewer": {
+    "context": 200000,
+    "output": 32768
+   },
+   "security": {
+    "context": 200000,
+    "output": 32768
+   },
+   "designer": {
+    "context": 200000,
+    "output": 32768
+   }
+  },
+  "small_model": "9router/fast",
+  "sandbox_tool_profile": {
+   "sandbox.image": "aisef-verify-python:84adf1d8eaf9",
+   "tools": {
+    "tools.disabled": [],
+    "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+    "tools.sast": "",
+    "tools.test": "python3 -m pytest -v"
+   },
+   "capability_matrix_sha256": "1cf70d1e09bc7e4af55adec18355edade0f38a3afd08604d892c79be6faf72f9"
+  },
+  "guard_digest": "6bb33819798f8aa3e1ed1491005279be344f624b8f9926eab3f9a0330d77800f",
+  "prompt_catalog_digest": "c613e68adb58f368202b4f6f78b8b127ea0ff38dbc91fae9e7f27294c0065db2",
+  "client_config_digest": "4543f6dc31e8938f22a65e531fe6de51ee0e459dfe0a3292881dfcd8e55f2937",
+  "cost_cap_usd": 80.0,
+  "route_config": {
+   "developer": "",
+   "reviewer": "",
+   "security": "",
+   "designer": ""
+  },
+  "project_opencode": null,
+  "route_resolution": {
+   "developer": {
+    "route_kind": "DYNAMIC_COMBO",
+    "resolved_model": "UNRESOLVABLE",
+    "evidence": "router lists mycombo as owned_by 'combo'; MiniMax-M3 answered 3/3 probes on 2026-09-18, which does not identify the model behind any call in runs 1-3"
+   },
+   "reviewer": {
+    "route_kind": "DYNAMIC_COMBO",
+    "resolved_model": "UNRESOLVABLE",
+    "evidence": "router lists mycombo as owned_by 'combo'; MiniMax-M3 answered 3/3 probes on 2026-09-18, which does not identify the model behind any call in runs 1-3"
+   },
+   "security": {
+    "route_kind": "DYNAMIC_COMBO",
+    "resolved_model": "UNRESOLVABLE",
+    "evidence": "router lists mycombo as owned_by 'combo'; MiniMax-M3 answered 3/3 probes on 2026-09-18, which does not identify the model behind any call in runs 1-3"
+   },
+   "designer": {
+    "route_kind": "DYNAMIC_COMBO",
+    "resolved_model": "UNRESOLVABLE",
+    "evidence": "router lists mycombo as owned_by 'combo'; MiniMax-M3 answered 3/3 probes on 2026-09-18, which does not identify the model behind any call in runs 1-3"
+   }
+  }
+ },
+ "non_fixed_model_profile": true,
+ "measured_from": "the three W1 run copies w1-run-1/2/3 \u2014 identical on every profile field",
+ "result": {
+  "kernel_safety": "PASS",
+  "delivery_reliability": "FAIL",
+  "runs_complete": "0/3",
+  "runs": {
+   "1": "11/16 LEGITIMATE_MODEL_PROJECT_STOP",
+   "2": "0/16 LEGITIMATE_MODEL_PROJECT_STOP",
+   "3": "2/16 LEGITIMATE_MODEL_PROJECT_STOP"
+  },
+  "max_turn_events": 28,
+  "evidence": "closure-evidence/hardening/AISEF-W1-QUALIFICATION.json"
+ },
+ "owner_classification": "owner decision 'KERNEL ACCEPTED, EXECUTION PROFILE NOT QUALIFIED' (2026-09-18): kernel safety QUALIFIED for the tested envelope; this profile NOT QUALIFIED for W1 delivery reliability",
+ "rerun_policy": "do not rerun this profile hoping for a better random outcome (owner section 4)"
+}

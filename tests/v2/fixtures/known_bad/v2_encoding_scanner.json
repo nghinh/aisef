@@ -1,0 +1,3 @@
+{"checker": "v2_encoding_scanner", "package": "WP-0.4", "kind": "python_source",
+"source": "import subprocess\nsubprocess.run([\"git\"], capture_output=True, text=True)\n",
+"expect": "line 2"}

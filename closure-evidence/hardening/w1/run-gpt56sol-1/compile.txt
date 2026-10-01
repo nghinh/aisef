@@ -1,0 +1,15 @@
+client: opencode
+  second-tier in V1: cost/turns not measurable from harness — supported, does not block release
+  wrote /Users/nghinh/Downloads/projects/w1-run-gpt56sol-1/.opencode/plugin/aisef-guard.ts
+  guards blocking before action: destructive, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope
+  guards blocking at other hooks: diff-scope (PostToolUse)
+  ⚠️  guards post-hoc only: completion
+     — not wired into this client's hooks at all; the rule is re-asked afterwards from evidence (story gate, `aisef verify`), which cannot stop the action, only fail the story
+  capabilities not at native level:
+     dir_allowlist: unsupported
+     tool_allowlist: emulated
+     turn_limit: unsupported
+
+report: /Users/nghinh/Downloads/projects/w1-run-gpt56sol-1/_bmad-output/compile-report.json
+
+⚠️  some clients can only be checked later — lower assurance, noted in report

@@ -1,0 +1,8 @@
+{
+ "checker": "refmodel_independence",
+ "package": "WP-3.5",
+ "kind": "refmodel_source",
+ "path": "tests/v2/refmodel/budgets.py",
+ "source": "from aisef2.journal.projections.budgets import Budgets\n\n\ndef model(events):\n    return Budgets()\n",
+ "expect": "REFMODEL_INDEPENDENT tests/v2/refmodel/budgets.py:1 imports aisef2.journal.projections.budgets"
+}

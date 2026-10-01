@@ -212,10 +212,13 @@ DEFAULTS: dict[str, Any] = {
     # ADR-003 mechanism B (experimental): inline the highest-scored skill content
     # into the prompt instead of just offering it via the ``Skill`` tool — measure
     # before deciding.
-    # project commands — empty means auto-detect from files in the project
+    # project commands — empty means AUTO: the stack profile decides (aisef/harness/capabilities.py, SS-65).
+    # Empty never means "off": a role is switched off only by naming it in `tools.disabled` (typed, recorded);
+    # `test` and `lint` are required and cannot be disabled.
     "tools.test": "",
     "tools.lint": "",
     "tools.sast": "",
+    "tools.disabled": [],
     # sandbox — empty image means auto-select based on the project's stack
     "sandbox.image": "",
     "sandbox.tools_network": False,
@@ -310,6 +313,7 @@ _TYPES: dict[str, type | tuple[type, ...]] = {
     "tools.test": str,
     "tools.lint": str,
     "tools.sast": str,
+    "tools.disabled": list,
     "sandbox.image": str,
     "sandbox.tools_network": bool,
     "sandbox.allow_hosts": list,
@@ -421,6 +425,11 @@ def _validate(values: dict[str, Any]) -> None:
         raise ConfigError("improve.cost_cap_usd must be >= 0 (0 = unlimited)")
     if values["cost.warn_multiple"] <= 1.0:
         raise ConfigError("cost.warn_multiple must be > 1 for the warning to be meaningful")
+    from .harness.capabilities import CapabilityConfigError, validate as _validate_tools
+    try:
+        _validate_tools(values)
+    except CapabilityConfigError as e:
+        raise ConfigError(str(e)) from e
 
 
 @dataclass

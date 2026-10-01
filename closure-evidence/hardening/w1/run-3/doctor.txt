@@ -1,0 +1,29 @@
+Environment:
+  ✅ python >= 3.11 — 3.14.7
+  ✅ git
+  ✅ claude CLI — /opt/homebrew/bin/claude
+  ✅ opencode CLI — /Users/nghinh/.opencode/bin/opencode
+  ✅ agent credential — ANTHROPIC_BASE_URL set in the environment — these outrank the client's own login; unset them to use it
+  ✅ docker daemon — running
+  ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts
+Project:
+  ✅ project directory — /Users/nghinh/Downloads/projects/w1-run-3
+  ✅ sandbox provider — docker — guarantees at WORKSPACE_WRITE: network_none, non_root, secrets_absent
+  ✅ sandbox image — aisef-verify-python:84adf1d8eaf9 — built by the harness: pinned base, pinned tool versions
+  · role test — explicit → `python3 -m pytest -v`
+  · role lint — explicit → `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`
+  · role sast — auto: bandit (managed, pinned 1.9.4) → `bandit -q -r .`
+  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:84adf1d8eaf9
+  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:84adf1d8eaf9
+  ✅ tool tools.sast — `tools.sast` = `bandit -q -r .` — present in aisef-verify-python:84adf1d8eaf9
+  ✅ docs/requirements.md — /Users/nghinh/Downloads/projects/w1-run-3/docs/requirements.md
+  ✅ config — defaults → /Users/nghinh/Downloads/projects/w1-run-3/.ai/config.json
+  ○ budget cap above recorded spend — no `_bmad-output/budget.json` yet — nothing to compare; the first settled call writes it
+  ○ test command prints coverage — `tools.test` = `python3 -m pytest -v` does not print coverage — gate coverage check will be **not configured** (add `--coverage` / `--cov` / `--experimental-test-coverage`)
+  ✅ test command prints test names — gate can read test names (no evidence yet — guessing from command flags)
+Installed skills:
+  ✅ has skills — 158 directories
+  ✅ framework skills up to date — matches source
+  ✅ no offensive skills — clean
+
+✅ ready

@@ -1,0 +1,86 @@
+{
+ "generated": "2026-09-19T20:24:28+0700",
+ "route": "9router/max/MiniMax-M3",
+ "listing": {
+  "http": 200,
+  "listed": true,
+  "owned_by": "max",
+  "route_kind": "FIXED_MODEL"
+ },
+ "chat_probes": [
+  {
+   "http": 200,
+   "seconds": 1.8,
+   "answered_by": "MiniMax-M3",
+   "usage": {
+    "prompt_tokens": 2049,
+    "completion_tokens": 2,
+    "total_tokens": 2051
+   }
+  },
+  {
+   "http": 200,
+   "seconds": 4.1,
+   "answered_by": "MiniMax-M3",
+   "usage": {
+    "prompt_tokens": 2049,
+    "completion_tokens": 2,
+    "total_tokens": 2051
+   }
+  },
+  {
+   "http": 200,
+   "seconds": 4.0,
+   "answered_by": "MiniMax-M3",
+   "usage": {
+    "prompt_tokens": 2049,
+    "completion_tokens": 2,
+    "total_tokens": 2051
+   }
+  }
+ ],
+ "tool_smokes": [
+  {
+   "ok": true,
+   "file_written": true,
+   "tools": [
+    "write",
+    "bash"
+   ],
+   "errors": [],
+   "exit": 0,
+   "seconds": 19.6
+  },
+  {
+   "ok": true,
+   "file_written": true,
+   "tools": [
+    "write",
+    "bash"
+   ],
+   "errors": [],
+   "exit": 0,
+   "seconds": 12.1
+  }
+ ],
+ "stage_env_check": null,
+ "requirements": {
+  "exact_fixed_route_resolves": true,
+  "no_4xx_or_other_error_on_any_probe": true,
+  "tool_calling_works": true,
+  "model_identity_constant_between_probes": true,
+  "reviewer_read_only_environment_clean": "not measured here (driver preflight row)"
+ },
+ "pass": true,
+ "summary_for_identity": {
+  "route": "9router/max/MiniMax-M3",
+  "route_kind": "FIXED_MODEL",
+  "resolved_model": "MiniMax-M3",
+  "chat_probes": "3/3",
+  "tool_smokes": "2/2",
+  "declared_limit": {
+   "context": 200000,
+   "output": 32768
+  }
+ }
+}

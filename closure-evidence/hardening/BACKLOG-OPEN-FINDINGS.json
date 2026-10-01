@@ -1,0 +1,137 @@
+{
+ "record": "OPEN BACKLOG FINDINGS — visible, not fixed in this cycle",
+ "decision": "OWNER DECISION — CONTINUE W1 PROFILE QUALIFICATION, KERNEL FROZEN (2026-09-19), section 2",
+ "recorded": "2026-09-19T10:27:49+0700",
+ "rule": "do not reopen the product kernel for these in this cycle; do not mark them FIXED; do not weaken any current invariant merely to register them (so they are not linked into the frozen defect register, whose PROVEN invariants they would contradict)",
+ "findings": [
+  {
+   "id": "SS-92",
+   "severity": "P2",
+   "defect_class": "PRODUCT_KERNEL",
+   "family": "FAM-TYPED-OUTCOMES (sibling of SS-23)",
+   "invariants_it_would_downgrade": [
+    "INV-F.3",
+    "INV-N.1"
+   ],
+   "site": "aisef/harness/tools.py::unrunnable_reason",
+   "statement": "a lint or sast run that EXECUTED and reported findings is recorded TOOL_UNRUNNABLE ('tool not installed or cannot load (not found)') when its findings quote source text containing a MISSING_TOOL marker; SS-23 fixed the same shape for `test` only",
+   "measured": "run 1: bandit scanned 51 187 lines, 1039/31/26 low/medium/high issues, exit 1 — recorded TOOL_UNRUNNABLE because a quoted test line reads `assert \"not found: Ghost\" in err` (evidence/STORY-01-01-sast-62.log)",
+   "impact_in_this_run": "none on any gate: every story's contract is ['unit']; the sast runs were the developer's own `aisef tool sast` checks (implement prompt step 4) — the developer was told its scanner is missing",
+   "worst_case": "fail-closed misrouting: with a `security` contract or at pre-deploy, a finding-bearing scan (or a lint failure quoting such a line) is UNRUNNABLE instead of FAILED — the tool stage is retried as an environment problem, the developer never receives the findings; never a false PASS",
+   "reproducer": "closure-evidence/hardening/w1/run-gpt56sol-ro-1/repro_SS92_quoted_source_reads_as_missing_tool.py (2 FAIL on the frozen wheel, control OK)",
+   "status": "OPEN",
+   "disposition": "P2 backlog — fail-closed, no false PASS in the run that found it"
+  },
+  {
+   "id": "SS-93",
+   "severity": "P2",
+   "defect_class": "PRODUCT_KERNEL",
+   "family": "FAM-OWNERSHIP (bug 113's family)",
+   "invariants_it_would_downgrade": [
+    "INV-I.1"
+   ],
+   "site": "aisef/harness/capabilities.py (python SAST capability `bandit -q -r .`) vs aisef/phases/qa.py::_KHUNG",
+   "statement": "the default python sast command scans the framework directories the kernel itself declares are not the project's code (.claude/, .opencode/, .aisef/, _bmad-output/)",
+   "measured": "run 1: 1 093 of 1 096 bandit findings located under ./.claude (the workload's installed skills)",
+   "impact_in_this_run": "none on any gate (no `security` contract)",
+   "worst_case": "a story or pre-deploy with a `security` contract is FAILED on findings in files the developer does not own — fail-closed, delivery-blocking noise; never a false PASS",
+   "reproducer": "closure-evidence/hardening/w1/run-gpt56sol-ro-1/repro_SS93_default_sast_scans_framework_dirs.py (FAIL on the frozen wheel)",
+   "status": "OPEN",
+   "disposition": "P2 backlog — fail-closed, no false PASS in the run that found it"
+  },
+  {
+   "id": "OBS-CI-2026-09-20-1",
+   "severity": "P3",
+   "defect_class": "TEST_INFRASTRUCTURE_OBSERVATION",
+   "status": "OBSERVED_NOT_REPRODUCED",
+   "site": "tests/test_run.py::RunTestCase.tearDown (TemporaryDirectory.cleanup)",
+   "statement": "CI of 93ec460 (evidence-only commit), unit (ubuntu-latest, 3.14): test_run.TestDoneChiSauMerge.test_merge_dung_thi_verified_khong_phai_done errored in tearDown — `OSError: [Errno 39] Directory not empty: '/tmp/.../.git'` (something wrote into .git while it was being removed)",
+   "measured": "first occurrence in the branch's CI history (5 earlier failed runs checked: none); the failed job re-run passed (run 35457412276 attempt 2); 0 failures in 40 local runs of the class on Python 3.14; the product's wave workers run inside `with ThreadPoolExecutor(...)` (aisef/phases/run.py:699), so no worker thread outlives run_sprint; remaining unmeasured candidate: a detached git housekeeping process (gc/maintenance --auto) on the runner",
+   "action": "none in this cycle — kernel frozen; not a kernel defect on this evidence; watch for recurrence"
+  },
+  {
+   "id": "OBS-CI-2026-09-20-2",
+   "severity": "P3",
+   "defect_class": "TEST_INFRASTRUCTURE_OBSERVATION",
+   "status": "OBSERVED_NOT_REPRODUCED",
+   "site": "tests/bench/_runner.py::materialize (remove_tree then dest.mkdir) over aisef/kit/fetch.py::remove_tree",
+   "statement": "CI of ad04de8 (kernel(3)), unit (ubuntu-latest, 3.13): bench.test_bench.TestTuKiemDuongOng.test_selfcheck_dat_het_va_khong_goi_model failed with `FileExistsError: [Errno 17] File exists: '/tmp/tmpng30kdc7/bench/run/opencode/bug-a2-multi-2/a1'` — the directory survived remove_tree and the mkdir right after it (no exist_ok) reported the survival as the error",
+   "measured": "the failed job re-run passed (run 35485771466); reproduced locally: PASSED (1 passed, 73 deselected); mechanism candidate MEASURED: aisef/kit/fetch.py::remove_tree passes `_force`, which swallows OSError, to shutil.rmtree — a path it cannot remove leaves the tree behind and rmtree still returns normally, so the next mkdir raises FileExistsError instead of the real reason; candidates measured and INNOCENT: no concurrency inside the bench runner (0 ThreadPoolExecutor/Thread/multiprocessing/fork in tests/bench/*.py, the attempt loop at tests/bench/_runner.py:386 is sequential) and no second bench process (the dest is inside the test's own TemporaryDirectory, and the CLI already refuses a second run on the same AISEF_BENCH_DIR — tests/bench/test_bench.py::TestMotDotDoMotLuc); remaining unmeasured candidate: a runner-side writer or a transient EBUSY/ENOTEMPTY under /tmp on the hosted runner, the same family as OBS-CI-2026-09-20-1",
+   "impact_in_this_run": "none on any gate — bench is measurement infrastructure, not the product path, and the failure is fail-closed (a red test, never a false PASS)",
+   "action": "none in this cycle — the kernel is frozen for qualification and remove_tree is product code (aisef/kit/fetch.py, used by `aisef setup`); touching it would invalidate the mutation run and the capability matrix just recorded on tree 42a29853. Backlog: make remove_tree report what it could not remove instead of swallowing it, and let the caller's mkdir say so.",
+   "disposition": "P3 backlog — watch for recurrence with OBS-CI-2026-09-20-1"
+  },
+  {
+   "id": "SS-96",
+   "severity": "P1",
+   "defect_class": "OUTCOME_MISCLASSIFICATION / RETRY_ROUTING (FAM-OUTCOME, FAM-RETRY)",
+   "status": "FIXED",
+   "site": "aisef/control/gate.py::evaluate — the TDD check's final branch",
+   "statement": "Two checks read the SAME evidence. When the nop control could not run, `tests verify story` correctly reported UNRUNNABLE (owner ENVIRONMENT) while `TDD` reported FAILED (\"tests green on first run — not proven to verify anything\"). `_absent_stages` returns nothing as soon as any check FAILED, so the attempt was routed to the developer: the quality budget was charged, no stage was re-run, and the story terminated as QUALITY_BLOCK.",
+   "measured": "TDD-POLICY-V2-CONFORMANCE.json scenarios G and H on tree 42a29853: check outcome UNRUNNABLE, every blocking row owner=ENVIRONMENT, developer sessions 2, quality attempts 2, terminal QUALITY_BLOCK. The PLAN owner IS routed correctly in the same suite (scenarios B and J: terminal PLAN_CONFLICT, 1 developer session, no retry spent)",
+   "impact_in_this_run": "none on correctness — fail-closed, 0 false PASS; costs one developer retry and mislabels the terminal",
+   "worst_case": "a story blocked by an environment that cannot answer is reported as a developer quality failure, and one retry of the model's budget is spent on a condition no code change can fix",
+   "why_not_fixed_now": "the owner decision of 2026-09-20 specifies retry routing for the PLAN owner only (section 12: 'Do not spend developer retry budget on a planning contradiction'). Routing the ENVIRONMENT owner is an extension of the approved semantics, not a defect against them, and the behaviour predates policy V2 — V2 only gave the condition a name. Section 22 asks for no scope creep; the kernel is frozen for qualification",
+   "disposition": "FIXED in this cycle; the product tree changes, so mutation, fault matrix, suite, ruff, CI and the full 100 000-trace Phase 12 all re-run on the new kernel",
+   "severity_history": "opened P2 on 2026-09-20 on the reasoning that the decision's section 12 named only the PLAN owner and that the behaviour predated policy V2. The owner rejected both: the approved routing contract requires UNRUNNABLE evidence to retry the stage and never to consume developer quality retries, and age is irrelevant to severity. Re-measured as a lifecycle defect and raised to P1.",
+   "measured_before": {
+    "reproducer": "closure-evidence/hardening/ss96/ — a story whose candidate is correct, whose parent evidence is DEPENDENCY_UNRUNNABLE for a reason outside the story",
+    "max_retries_2": {
+     "developer_sessions": 3,
+     "quality_attempts": 3,
+     "stage_retries": 0,
+     "terminal": "QUALITY_BLOCK",
+     "checks_FAILED": [
+      "TDD"
+     ],
+     "checks_UNRUNNABLE": [
+      "tests verify story"
+     ]
+    },
+    "test_tool_absent": {
+     "developer_sessions": 2,
+     "quality_attempts": 2,
+     "stage_retries": 0,
+     "terminal": "QUALITY_BLOCK",
+     "checks_FAILED": [
+      "TDD"
+     ]
+    },
+    "siblings_already_correct": {
+     "lint": "ENVIRONMENT_FAILURE, 3 stage retries, 1 quality attempt",
+     "review": "UNRUNNABLE, 2 stage retries, 1 quality attempt",
+     "security": "UNRUNNABLE, 2 stage retries, 1 quality attempt"
+    }
+   },
+   "measured_after": {
+    "max_retries_2": {
+     "developer_sessions": 1,
+     "quality_attempts": 1,
+     "stage_retries": 3,
+     "terminal": "ENVIRONMENT_FAILURE",
+     "checks_FAILED": [],
+     "checks_UNRUNNABLE": [
+      "TDD",
+      "tests verify story"
+     ]
+    },
+    "test_tool_absent": {
+     "developer_sessions": 1,
+     "quality_attempts": 1,
+     "stage_retries": 3,
+     "terminal": "ENVIRONMENT_FAILURE",
+     "checks_FAILED": []
+    },
+    "controls_unchanged": {
+     "genuine candidate failure": "QUALITY_BLOCK, 2 quality attempts (charged)",
+     "plan overlap": "PLAN_CONFLICT, 1 quality attempt",
+     "environment then recovery then a genuine failure": "1 stage re-verify, then QUALITY_BLOCK charged for the 2 graded attempts"
+    }
+   },
+   "fix": "aisef/control/gate.py::evaluate — when no red run was recorded AND the nop control is UNRUNNABLE, the TDD check is UNRUNNABLE with the control's own reason instead of FAILED. One branch; the kernel's existing stage routing (_absent_stages -> _stage_of -> bounded re-verify -> ENVIRONMENT_FAILURE) then applies, which is why lint, review and security never had the defect.",
+   "invariant": "INV-ABSENCE-NEVER-A-DEVELOPER-FAILURE (new, P1): no gate check may report FAILED for evidence that did not execute; only a check that FAILED on evidence that did execute may charge the developer's quality budget.",
+   "regression_tests": "tests/hardening/test_unrunnable_routing.py (owner section 7, cases A-I) and conformance scenarios O, P, Q, R, S, T",
+   "why_the_conformance_suite_missed_it": "the reference model mirrored the kernel on the two fields that would have caught it: the budget rule was written as 'anything blocking that is not PLAN-owned spends a developer session' after observing the kernel do exactly that, and each scenario's terminal was hand-written from its observed run. The model now derives both from the failure owner, and two fields that were never compared — the environment/stage budget and the retry target — are compared as well."
+  }
+ ]
+}

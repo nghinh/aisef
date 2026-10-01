@@ -14,7 +14,7 @@ aisef doctor | setup | init | compile | run | status | dashboard | guard |
 
 New subcommands may be added; existing ones keep their flags and exit codes.
 
-### Config keys (70 keys)
+### Config keys (71 keys)
 
 Every key in `aisef.config.DEFAULTS` is part of the public contract. Keys may
 be **added** but never removed or renamed. Type and default may not change
@@ -24,6 +24,11 @@ files.
 Groups: `app.*`, `clients.*`, `context.*`, `cost.*`, `coverage.*`,
 `improve.*`, `memory.*`, `review.*`, `route.*`, `run.*`, `sandbox.*`,
 `security.*`, `skills.*`, `story.*`, `tools.*`, `verify.*`.
+
+`tools.disabled` (added 2026-09-17, SS-65) is the only way to switch an optional evidence tool off; an empty
+`tools.<role>` keeps its one meaning, AUTO. Which tool AUTO selects per stack, and the environment that carries it, is
+the contract in [TOOL-CAPABILITIES.md](TOOL-CAPABILITIES.md) (rendered from `aisef/harness/capabilities.py`); a change
+there is a change of product behaviour and is qualified on real images before release.
 
 ### Guards (10 guards)
 

@@ -1,0 +1,140 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 45 items
+
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineTest::test_AC_STORY_01_06_1_same_rid_replay_returns_original_line_dict_byte_for_byte PASSED [  2%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictErrorTest::test_AC_STORY_01_06_2_different_rid_raises_ConflictError_and_no_write PASSED [  4%]
+tests/test_conflict.py::AC_STORY_01_06_3_PutAfterDeleteDifferentRidRaisesTest::test_AC_STORY_01_06_3_put_after_delete_with_different_rid_raises_ConflictError PASSED [  6%]
+tests/test_conflict.py::AC_STORY_01_06_4_PutAfterDeleteSameRidReplaysTombstoneTest::test_AC_STORY_01_06_4_put_after_delete_with_same_rid_returns_delete_line PASSED [  8%]
+tests/test_conflict.py::AC_STORY_01_06_5_NFDKeySameRidReplaysTest::test_AC_STORY_01_06_5_NFD_form_key_with_same_rid_is_replay_with_NFC_key PASSED [ 11%]
+tests/test_conflict.py::AC_STORY_01_06_DeleteLineShapeHasNoValueFieldTest::test_AC_STORY_01_06_delete_line_dict_has_no_value_field_and_chains PASSED [ 13%]
+tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesEqualsJsonDumpsTest::test_AC_STORY_01_02_1_canonical_bytes_matches_json_dumps_reference PASSED [ 15%]
+tests/test_format.py::AC_STORY_01_02_2_ByteStabilityTest::test_AC_STORY_01_02_2_canonical_bytes_is_byte_stable PASSED [ 17%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8LiteralTest::test_AC_STORY_01_02_3_non_ascii_uses_utf8_literal PASSED [ 20%]
+tests/test_format.py::AC_STORY_01_02_4_KeyOrderInvarianceTest::test_AC_STORY_01_02_4_key_insertion_order_does_not_affect_bytes PASSED [ 22%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstantTest::test_AC_STORY_01_02_5_genesis_is_literal_seven_character_string PASSED [ 24%]
+tests/test_format.py::AC_STORY_01_02_6_JsonRoundTripByteStabilityTest::test_AC_STORY_01_02_6_canonical_bytes_stable_through_json_round_trip PASSED [ 26%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendOnEmptyLedgerTest::test_AC_STORY_01_05_1_append_on_fresh_ledger_writes_single_hash_chained_line PASSED [ 28%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsToFirstTest::test_AC_STORY_01_05_2_second_append_chains_prev_hash_to_first_lines_hash PASSED [ 31%]
+tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueErrorTest::test_AC_STORY_01_05_3_empty_key_raises_ValueError_and_no_file_created PASSED [ 33%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDiskTest::test_AC_STORY_01_05_4_fresh_Leder_reads_prev_hash_from_disk_not_memory PASSED [ 35%]
+tests/test_ledger.py::AC_STORY_01_05_5_FsyncEnsuresBytesDurableBeforeReturnTest::test_AC_STORY_01_05_5_subprocess_after_append_sees_new_line_and_trailing_newline PASSED [ 37%]
+tests/test_ledger.py::LedgerAppendFsyncBeforeReturnTest::test_append_calls_fsync_before_return PASSED [ 40%]
+tests/test_line_hash.py::AC_STORY_01_03_1_Sha256HexLengthTest::test_AC_STORY_01_03_1_line_hash_returns_64_lowercase_hex_chars PASSED [ 42%]
+tests/test_line_hash.py::AC_STORY_01_03_2_DifferentPrevHashTest::test_AC_STORY_01_03_2_different_prev_hash_yields_different_digest PASSED [ 44%]
+tests/test_line_hash.py::AC_STORY_01_03_3_HashFieldsIgnoredTest::test_AC_STORY_01_03_3_existing_hash_and_prev_hash_fields_are_ignored PASSED [ 46%]
+tests/test_line_hash.py::AC_STORY_01_03_4_DeterminismTest::test_AC_STORY_01_03_4_same_inputs_return_same_digest PASSED [ 48%]
+tests/test_line_hash.py::AC_STORY_01_03_5_GenesisPrevHashTest::test_AC_STORY_01_03_5_genesis_non_hex_prev_hash_is_accepted PASSED [ 51%]
+tests/test_nfc_normalization.py::AC_STORY_01_01_1_IdentityTest::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte PASSED [ 53%]
+tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCEquivalenceTest::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical PASSED [ 55%]
+tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_5_no_forbidden_top_level_imports PASSED [ 57%]
+tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_6_no_forbidden_calls PASSED [ 60%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportTest::test_AC_STORY_01_01_3_import_ledgerlock_returns_init_path PASSED [ 62%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CLIHelpTest::test_AC_STORY_01_01_4_cli_help_lists_subcommands PASSED [ 64%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PackageExportsTest::test_AC_STORY_01_01_7_ledger_and_conflicterror_exported PASSED [ 66%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_1_SnapshotKeyOrderTest::test_AC_STORY_02_02_1_snapshot_returns_dict_with_keys_in_NFC_sorted_order FAILED [ 68%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_2_SnapshotAfterDeleteOmitsKeyTest::test_AC_STORY_02_02_2_snapshot_after_delete_omits_the_key FAILED [ 71%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_3_NFDThenSameRidKeepsNFCKeyAndOriginalValueTest::test_AC_STORY_02_02_3_NFD_followed_by_same_rid_replay_keeps_NFC_key_and_original_value FAILED [ 73%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_4_TwoInstancesOnSameChainReturnEqualSnapshotsTest::test_AC_STORY_02_02_4_two_Ledger_instances_on_same_chain_return_equal_snapshots FAILED [ 75%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesTest::test_AC_STORY_01_04_1_read_lines_returns_bytes_per_line_without_newline PASSED [ 77%]
+tests/test_store.py::AC_STORY_01_04_2_MissingFileRaisesTest::test_AC_STORY_01_04_2_read_lines_missing_path_raises_FileNotFoundError PASSED [ 80%]
+tests/test_store.py::AC_STORY_01_04_3_EmptyFileReturnsEmptyListTest::test_AC_STORY_01_04_3_read_lines_empty_file_returns_empty_list PASSED [ 82%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicThenReadLinesRoundTripTest::test_AC_STORY_01_04_4_write_atomic_writes_bytes_and_round_trips PASSED [ 84%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalTest::test_AC_STORY_01_04_5_crash_between_temp_write_and_replace_leaves_original PASSED [ 86%]
+tests/test_store.py::AC_STORY_01_04_6_TempFileInSameDirectoryTest::test_AC_STORY_01_04_6_temp_file_created_in_target_directory PASSED [ 88%]
+tests/test_verify_independent.py::AC_STORY_02_01_1_VerifyOnFreshLedgerTest::test_AC_STORY_02_01_1_verify_on_ledger_with_N_valid_lines_returns_ok_True PASSED [ 91%]
+tests/test_verify_independent.py::AC_STORY_02_01_2_VerifyOnZeroByteJsonlTest::test_AC_STORY_02_01_2_verify_on_zero_byte_jsonl_returns_ok_True PASSED [ 93%]
+tests/test_verify_independent.py::AC_STORY_02_01_3_VerifyOnMissingFileTest::test_AC_STORY_02_01_3_verify_on_missing_path_raises_FileNotFoundError PASSED [ 95%]
+tests/test_verify_independent.py::AC_STORY_02_01_4_VerifyDetectsOutOfBandHashMutationTest::test_AC_STORY_02_01_4_verify_from_fresh_instance_detects_hash_field_mutation PASSED [ 97%]
+tests/test_verify_independent.py::AC_STORY_02_01_5_VerifyDetectsOutOfBandValueMutationTest::test_AC_STORY_02_01_5_verify_from_fresh_instance_detects_value_field_mutation PASSED [100%]
+
+=================================== FAILURES ===================================
+_ AC_STORY_02_02_1_SnapshotKeyOrderTest.test_AC_STORY_02_02_1_snapshot_returns_dict_with_keys_in_NFC_sorted_order _
+
+self = <tests.test_snapshot_determinism.AC_STORY_02_02_1_SnapshotKeyOrderTest testMethod=test_AC_STORY_02_02_1_snapshot_returns_dict_with_keys_in_NFC_sorted_order>
+
+    def test_AC_STORY_02_02_1_snapshot_returns_dict_with_keys_in_NFC_sorted_order(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(path))
+    
+            ledger.append(("put", "a", 1, "r_a", 100))
+            ledger.append(("put", "c", 3, "r_c", 200))
+            ledger.append(("put", "b", 2, "r_b", 300))
+    
+>           first = ledger.snapshot()
+                    ^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'snapshot'
+
+tests/test_snapshot_determinism.py:23: AttributeError
+_ AC_STORY_02_02_2_SnapshotAfterDeleteOmitsKeyTest.test_AC_STORY_02_02_2_snapshot_after_delete_omits_the_key _
+
+self = <tests.test_snapshot_determinism.AC_STORY_02_02_2_SnapshotAfterDeleteOmitsKeyTest testMethod=test_AC_STORY_02_02_2_snapshot_after_delete_omits_the_key>
+
+    def test_AC_STORY_02_02_2_snapshot_after_delete_omits_the_key(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(path))
+    
+            ledger.append(("put", "keep", "v", "r_keep", 100))
+            ledger.append(("delete", "k", "r1", 200))
+            ledger.append(("put", "other", "v2", "r_other", 300))
+    
+>           snap = ledger.snapshot()
+                   ^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'snapshot'
+
+tests/test_snapshot_determinism.py:47: AttributeError
+_ AC_STORY_02_02_3_NFDThenSameRidKeepsNFCKeyAndOriginalValueTest.test_AC_STORY_02_02_3_NFD_followed_by_same_rid_replay_keeps_NFC_key_and_original_value _
+
+self = <tests.test_snapshot_determinism.AC_STORY_02_02_3_NFDThenSameRidKeepsNFCKeyAndOriginalValueTest testMethod=test_AC_STORY_02_02_3_NFD_followed_by_same_rid_replay_keeps_NFC_key_and_original_value>
+
+    def test_AC_STORY_02_02_3_NFD_followed_by_same_rid_replay_keeps_NFC_key_and_original_value(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+            ledger = Ledger(str(path))
+    
+            ledger.append(("put", "e\u0301", "v", "r", 100))
+            ledger.append(("put", "\u00e9", "v2", "r", 200))
+    
+>           snap = ledger.snapshot()
+                   ^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'snapshot'
+
+tests/test_snapshot_determinism.py:66: AttributeError
+_ AC_STORY_02_02_4_TwoInstancesOnSameChainReturnEqualSnapshotsTest.test_AC_STORY_02_02_4_two_Ledger_instances_on_same_chain_return_equal_snapshots _
+
+self = <tests.test_snapshot_determinism.AC_STORY_02_02_4_TwoInstancesOnSameChainReturnEqualSnapshotsTest testMethod=test_AC_STORY_02_02_4_two_Ledger_instances_on_same_chain_return_equal_snapshots>
+
+    def test_AC_STORY_02_02_4_two_Ledger_instances_on_same_chain_return_equal_snapshots(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+    
+            first = Ledger(str(path))
+            first.append(("put", "alpha", 1, "r1", 100))
+            first.append(("put", "beta", 2, "r2", 200))
+            first.append(("put", "gamma", 3, "r3", 300))
+    
+            second = Ledger(str(path))
+>           second_snap = second.snapshot()
+                          ^^^^^^^^^^^^^^^
+E           AttributeError: 'Ledger' object has no attribute 'snapshot'
+
+tests/test_snapshot_determinism.py:86: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_snapshot_determinism.py::AC_STORY_02_02_1_SnapshotKeyOrderTest::test_AC_STORY_02_02_1_snapshot_returns_dict_with_keys_in_NFC_sorted_order
+FAILED tests/test_snapshot_determinism.py::AC_STORY_02_02_2_SnapshotAfterDeleteOmitsKeyTest::test_AC_STORY_02_02_2_snapshot_after_delete_omits_the_key
+FAILED tests/test_snapshot_determinism.py::AC_STORY_02_02_3_NFDThenSameRidKeepsNFCKeyAndOriginalValueTest::test_AC_STORY_02_02_3_NFD_followed_by_same_rid_replay_keeps_NFC_key_and_original_value
+FAILED tests/test_snapshot_determinism.py::AC_STORY_02_02_4_TwoInstancesOnSameChainReturnEqualSnapshotsTest::test_AC_STORY_02_02_4_two_Ledger_instances_on_same_chain_return_equal_snapshots
+========================= 4 failed, 41 passed in 0.35s =========================

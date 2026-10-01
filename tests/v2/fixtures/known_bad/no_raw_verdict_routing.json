@@ -1,0 +1,9 @@
+{
+ "checker": "no_raw_verdict_routing",
+ "package": "WP-1.3",
+ "kind": "kernel_source",
+ "rule": "NO_RAW_VERDICT_ROUTING",
+ "path": "aisef2/plan/bad.py",
+ "source": "from aisef2.arch.enums import BehaviorVerdict\n\n\ndef admit(result):\n    return result.behavior_verdict is BehaviorVerdict.SATISFIED\n",
+ "expect": "NO_RAW_VERDICT_ROUTING aisef2/plan/bad.py:5"
+}

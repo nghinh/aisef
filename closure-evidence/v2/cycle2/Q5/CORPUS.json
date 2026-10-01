@@ -1,0 +1,267 @@
+{
+ "record": "AISEF V2 — Q5 CORPUS (frozen before any reproduction)",
+ "recorded": "2026-10-01T03:04:34Z",
+ "execution_commit": "74dffbc8ea601080a06261e4295c9adc836c207f",
+ "items": {
+  "bytes-returning-python-callable": {
+   "sha256": "44e9a2e5aa3654253401465b4daa809c6891406f6f52d67a3d0a66e920d8ab36",
+   "ledger_digest": "970834bb7e2a158e3d00934d26cdf57849df69cbdfbd8562ab27bcd6bcd195fb",
+   "model_calls": 2,
+   "tool_calls": 1,
+   "final_workspace": "62d4c4bc22336f7b62226145870f2c8c448a92a875b439fb8d2f6d2580490265",
+   "final_tip": "00883720eb60e45d453fee7b7213466d5873f74c",
+   "events": 63,
+   "outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   }
+  },
+  "cli-proved-story": {
+   "sha256": "8e590575edf9b8e5eb454d81dc497cd1cb20869f1c801ac7442b8679fd9fc9d8",
+   "ledger_digest": "3d39c333fe0a427aeb5952228baa560cd40e5b1da3824b8da081c4ba3ca92536",
+   "model_calls": 2,
+   "tool_calls": 1,
+   "final_workspace": "dec4bd9b00a8a32db06ea1755980fb2e76da5e1e4048082b28b2d299a7efe822",
+   "final_tip": "67fe973b7daf1b54d53eb69e615b726b233b4bd7",
+   "events": 63,
+   "outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   }
+  },
+  "cli-refuted-then-commit": {
+   "sha256": "511bf832e7aa12d346b8c8755e33b039e32edb9456543063f1af452d3a137cfb",
+   "ledger_digest": "3be8b8e69abdbc82947dd236ea6ed99444a68d0abfd597d1a015de6ac5606539",
+   "model_calls": 3,
+   "tool_calls": 1,
+   "final_workspace": "dec4bd9b00a8a32db06ea1755980fb2e76da5e1e4048082b28b2d299a7efe822",
+   "final_tip": "67fe973b7daf1b54d53eb69e615b726b233b4bd7",
+   "events": 91,
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "COMMIT"
+    ]
+   }
+  },
+  "developer-outage-rollback": {
+   "sha256": "73ce01af6bbddc0b85e33d91365faf0d09ff0a122bcda73013ca0f3b216e36aa",
+   "ledger_digest": "fd961a67b8cffa47b3bede896ab6a9249904fd59079ffca694c8242c27c6a350",
+   "model_calls": 2,
+   "tool_calls": 0,
+   "final_workspace": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+   "events": 51,
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   }
+  },
+  "file-artifact-prohibition": {
+   "sha256": "a42c8f844edc0c13efd89dfeadee3ff2e430c4e28976b86661b1ead170d0b0ce",
+   "ledger_digest": "a88bf4f1bf412b2804cd33769aa37c592e38b212724632eea8806bb204097f0c",
+   "model_calls": 2,
+   "tool_calls": 1,
+   "final_workspace": "3174b942901b0d92838836bdd70b4e3cb3d24d517506881deaef67e44ed03bbf",
+   "final_tip": "02e0336e762506e4a432dcbd530755d5f038ff4a",
+   "events": 53,
+   "outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   }
+  },
+  "normal-completion": {
+   "sha256": "2bfe7b2905690299ccb752e01ea7e8c5d2ddb4c33a52687659828f04d3bf009e",
+   "ledger_digest": "1ca2f56cdf1c21fc781865e442c745395ef645f04fffe209021ef2d085f2f087",
+   "model_calls": 2,
+   "tool_calls": 1,
+   "final_workspace": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+   "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+   "events": 63,
+   "outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   }
+  },
+  "post-merge-regression": {
+   "sha256": "fadbda15a395f1a9ef29982529664ba21d64f3acd58a6982ab190ed34b2535ca",
+   "ledger_digest": "a21b7af5013b0fabe882c762ef050a070fa1a0bd2c7a57d765ccac7f5eb68f7f",
+   "model_calls": 4,
+   "tool_calls": 2,
+   "final_workspace": "cda0adbf757d843fde2113ff337ead44d875aaadc146aa904aaff63aff0680a9",
+   "final_tip": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+   "events": 143,
+   "outcomes": {
+    "S0": [
+     "COMMIT"
+    ],
+    "S2": [
+     "ROLLBACK"
+    ]
+   }
+  },
+  "pre-satisfied": {
+   "sha256": "c56c9cb4b52bb39c38bdbe7b325cdc27d1fe2c830a45ca5f5b47ddd529b0efad",
+   "ledger_digest": "5e228c5bb27ef0eacffd800ee164722b7d9666158ed1c1a8139b67b3882a76cc",
+   "model_calls": 1,
+   "tool_calls": 1,
+   "final_workspace": "df73c14d40bd36af82d0ea58cd2726e67163a81c48cf337008101f33fbb617e4",
+   "final_tip": "6722fb28d2c35a5a820d9c5575feecf0a6b66072",
+   "events": 61,
+   "outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   }
+  },
+  "retry-then-commit": {
+   "sha256": "94afb9906379b7e0322cded78bd676b0c5af77b151ce86f9f9e365a57f83dede",
+   "ledger_digest": "86cf7ff2f6cba003b7d736fcb6020fd9cd00b2f3fe83abaee8407356bcec13bf",
+   "model_calls": 3,
+   "tool_calls": 1,
+   "final_workspace": "c2aea052e3c7fab7d9382ed45848253d969c45efa4e2da92c0be9c8646056fe1",
+   "final_tip": "a22a6d5e482fb74eff13c869f90542385829b473",
+   "events": 91,
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "COMMIT"
+    ]
+   }
+  },
+  "review-finding-rollback": {
+   "sha256": "c0915a64a03b08bc73448299848361111d706f9d00df52b299f5ca96ae60e3c4",
+   "ledger_digest": "78a9f31d301acfd9322cf196cb784e7466fd2d95588161d4e36b7a7d1be51c81",
+   "model_calls": 4,
+   "tool_calls": 0,
+   "final_workspace": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+   "events": 89,
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   }
+  },
+  "scenario-proved-story": {
+   "sha256": "b41f705e0b4b3dd89f2d7e5eceeca3590beddbe4f91d149e8bb49fb7bf91ca51",
+   "ledger_digest": "9677445d4f2d7878d397a65177eddd235eae2d8606252671dfa86c5be7a1d4a6",
+   "model_calls": 2,
+   "tool_calls": 1,
+   "final_workspace": "65719a034d3e9ac90a9763f9b8fb48ba024566ca0fab8278dc226fb8692be001",
+   "final_tip": "613fb770fb9d1f65266258be83f80d219534633c",
+   "events": 63,
+   "outcomes": {
+    "S1": [
+     "COMMIT"
+    ]
+   }
+  },
+  "security-finding-rollback": {
+   "sha256": "95f0cbe7873b073490d77b3b33579e75f8736e8baf0839057a3e61c7461ad979",
+   "ledger_digest": "8f370de4f5385157b852647aeaa60b7ddd7c383465e6d4ceb68cc05b68f3e8b7",
+   "model_calls": 4,
+   "tool_calls": 2,
+   "final_workspace": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "final_tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+   "events": 99,
+   "outcomes": {
+    "S1": [
+     "RETRY",
+     "ROLLBACK"
+    ]
+   }
+  }
+ },
+ "corpus_digest": "614c81687a213c4fef16644fde4c24fb0c16b0a69ad935337a837e5790754924",
+ "replay_digest": "aa9e5ff8a43c2ef63702a16fcd1ffd515484ede1bea4cd531dc8199939bf964b",
+ "coverage": {
+  "normal-completion": [
+   "normal story completion",
+   "developer tool execution",
+   "candidate proof",
+   "independent verification",
+   "review path",
+   "security path",
+   "merge path",
+   "post-merge path"
+  ],
+  "retry-then-commit": [
+   "retry path",
+   "candidate proof refuted",
+   "developer budget"
+  ],
+  "review-finding-rollback": [
+   "review path",
+   "retry path",
+   "rollback path",
+   "review budget"
+  ],
+  "pre-satisfied": [
+   "PRE_SATISFIED / no developer call",
+   "candidate proof",
+   "review path",
+   "security path"
+  ],
+  "security-finding-rollback": [
+   "security path",
+   "tool execution",
+   "retry path",
+   "rollback path",
+   "security budget"
+  ],
+  "developer-outage-rollback": [
+   "provider failure",
+   "retry path",
+   "rollback path"
+  ],
+  "post-merge-regression": [
+   "merge path",
+   "post-merge path",
+   "PRESERVE re-proof",
+   "rollback path",
+   "two stories"
+  ],
+  "cli-proved-story": [
+   "probe.cli_invocation",
+   "candidate proof",
+   "independent verification",
+   "review path",
+   "security path",
+   "merge path",
+   "post-merge path"
+  ],
+  "cli-refuted-then-commit": [
+   "probe.cli_invocation",
+   "candidate proof refuted",
+   "retry path",
+   "developer budget"
+  ],
+  "file-artifact-prohibition": [
+   "probe.file_artifact",
+   "prohibition (grep_count 0)",
+   "candidate proof",
+   "merge path",
+   "post-merge path"
+  ],
+  "scenario-proved-story": [
+   "probe.process_effect",
+   "scenario (construct, call, call)",
+   "candidate proof",
+   "post-merge path"
+  ],
+  "bytes-returning-python-callable": [
+   "probe.python_callable_v2",
+   "returns_bytes_hex",
+   "candidate proof",
+   "post-merge path"
+  ]
+ }
+}

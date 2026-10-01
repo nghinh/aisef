@@ -1,0 +1,46 @@
+{
+ "record": "AISEF V2 — CYCLE-2 C2-P1 LANE CLOSURE (LANE A, WP-2.1.1)",
+ "id": "AISEF-V2-CYCLE2-C2-P1-LANE-CLOSURE",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P0 ACCEPTED / AUTHORIZE MAXIMUM SAFE PARALLEL EXECUTION' (2026-09-29): independent lanes, each with its own worktree, branch, evidence and attempt history, integrated into ONE candidate preserving lane histories and evidence identities",
+ "written": "2026-09-29T16:40:03Z",
+ "phase": "C2-P1",
+ "packages": [
+  "WP-2.1.1"
+ ],
+ "lane": {
+  "branch": "cycle2/lane-a-file-artifact",
+  "base": "77a437609fd59cd3c8d61d28472460ab9aa157f0",
+  "head": "ef0ebe9a5bd43ead45620bf8d12fe28ab3dcc441",
+  "commits": [
+   "20b0f01cdecae78abfc684e09112913000bda4b5",
+   "6ae6875dc3e29d808519025d3ea394dccfc8bed7",
+   "ef0ebe9a5bd43ead45620bf8d12fe28ab3dcc441"
+  ],
+  "aisef2_tree": "4fcb3d74409145b9ec444fe071a5574df7685008",
+  "ci_pull_request": {
+   "number": 7,
+   "repository": "nghinh/aisef",
+   "draft": true,
+   "purpose": "CI only (tests workflow on Linux 3.11-3.14 and Windows 3.11); never merged"
+  }
+ },
+ "evidence_records": {
+  "P1-FILE-ARTIFACT-CALIBRATION.json": {
+   "path": "closure-evidence/v2/cycle2/P1-FILE-ARTIFACT-CALIBRATION.json",
+   "sha256": "25e7e3b7d9a9928ee890531c1b790ad8225945ec85f5bc5be00d1dabe6624fff",
+   "git_blob": "bfb3769703dc7be60c26dfa563eafe366575db72",
+   "verdict": "CALIBRATED: 3/3 classes, tests OK, mutation killed or audited, static PASS",
+   "problems": [],
+   "execution_commit": "6ae6875dc3e29d808519025d3ea394dccfc8bed7",
+   "cross_platform_run": 36518153211
+  }
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/cycle2/C2-P1-RUN-HISTORY.json",
+  "total_attempts": 15,
+  "sha256": "c46cec67677233218d4d474dac056af50eae5743060ab02432667372151915a2",
+  "failed": [],
+  "rule": "closed at this count when the lane was merged into the integration candidate; attempts of the integration candidate go to C2-INTEGRATION-RUN-HISTORY.json; nothing rewritten"
+ },
+ "status": "LANE CLOSED AT INTEGRATION — the phase awaits the owner's acceptance"
+}

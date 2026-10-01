@@ -668,9 +668,16 @@ _AND_PREFIX = re.compile(
 )
 #: `- write_scope: src/notes/, src/db/schema.ts` — including when labels are bold.
 _META_ITEM = re.compile(
-    r"^[-*]?\s*\*{0,2}(covers|write[_ ]scope|depends[_ ]on|screens?|verification[_ ]contract)\*{0,2}\s*[:：]\s*(.+?)\s*$",
+    r"^[-*]?\s*\*{0,2}(covers|write[_ ]scope|depends[_ ]on|screens?|verification[_ ]contract"
+    r"|ac[_ ]proof|story[_ ]type)\*{0,2}\s*[:：]\s*(.+?)\s*$",
     re.MULTILINE | re.IGNORECASE,
 )
+#: `- ac_proof: 1=CHANGE_REQUIRED/FR-12, 2=PRESERVE_REQUIRED/FR-9` — what each criterion must SHOW between the
+#: story's parent and its candidate (TDD proof policy V2, owner decision 2026-09-20 section 9). Planning data: the
+#: kernel never reads a criterion's wording to decide this. The index may be written bare (`2=`) or as the full
+#: criterion code (`AC-STORY-01-02-2=`); anything unparsable is kept verbatim so the machine gate can name it.
+_AC_PROOF_ITEM = re.compile(
+    r"^\s*(?:AC[-_][A-Za-z0-9]+[-_]\d+[-_]\d+[-_])?(\d+)\s*=\s*([A-Za-z_]+)\s*(?:[/(]\s*([^)]*?)\s*\)?)?$")
 _STORY_REF = re.compile(r"\b(\d+)\.(\d+)\b")
 #: Coverage map lines that explicitly say there is **no** story. Skip them:
 #: a real BMAD line is "FR-13 -> NO STORY. ... Binds AR-18 at Story 1.2",
@@ -710,6 +717,12 @@ def epic_id(n: int | str) -> str:
     return f"EPIC-{int(n):02d}"
 
 
+def _ac_order(code: str) -> tuple[int, str]:
+    """Criterion codes in criterion order, unparsable ones last but never dropped."""
+    tail = code.rsplit("-", 1)[-1]
+    return (int(tail), "") if tail.isdigit() else (10**6, code)
+
+
 def story_id(epic: int | str, seq: int | str) -> str:
     return f"STORY-{int(epic):02d}-{int(seq):02d}"
 
@@ -739,6 +752,11 @@ class Story:
     #: just making explicit what "done" means for **this story**, instead of
     #: a single default for all stories.
     verification_contract: list[str] = field(default_factory=list)
+    #: Criterion code -> its declared proof obligation (TDD proof policy V2): what that criterion must SHOW between
+    #: this story's parent and its candidate. Planning data, validated by the machine gate; never inferred at runtime.
+    ac_proof: dict = field(default_factory=dict)
+    #: NORMAL (must contribute at least one CHANGE_REQUIRED criterion) or VERIFICATION_ONLY.
+    story_type: str = "NORMAL"
     body: str = ""
 
     @property
@@ -758,6 +776,8 @@ class Story:
             "covers": self.covers,
             "write_scope": self.write_scope,
             "verification_contract": self.verification_contract,
+            "ac_proof": [self.ac_proof[c] for c in sorted(self.ac_proof, key=_ac_order)],
+            "story_type": self.story_type,
             "depends_on": self.depends_on,
             "screens": self.screens,
         }
@@ -840,7 +860,29 @@ def _parse_story_meta(body: str, epic_n: int) -> dict[str, list[str]]:
             meta["screens"] = [
                 slugify(v) for v in values if v.lower() not in ("none", "không")
             ]
+        elif key == "ac_proof":
+            meta["ac_proof"] = values
+        elif key == "story_type":
+            meta["story_type"] = [v.strip().upper() for v in values if v.strip()][:1]
     return meta
+
+
+def ac_proof(entries: list[str], story: str, n: int) -> dict[str, dict]:
+    """`['1=CHANGE_REQUIRED/FR-12', ...]` -> AC code -> {ac_id, requirement, proof_mode}.
+
+    Only shape is parsed here; whether a mode is known, whether every criterion has one and whether the requirement
+    exists are the machine gate's questions (a gate can name what it refuses; a parser that drops the line cannot).
+    An entry whose index is outside 1..n keeps its raw text under the index it claims, so a stale plan is visible."""
+    out: dict[str, dict] = {}
+    for raw in entries or []:
+        m = _AC_PROOF_ITEM.match(raw)
+        if not m:
+            out[f"?{len(out) + 1}"] = {"ac_id": None, "proof_mode": None, "requirement": "", "raw": raw}
+            continue
+        i, mode, req = int(m.group(1)), m.group(2).strip().upper(), (m.group(3) or "").strip()
+        code = f"AC-{story}-{i}"
+        out[code] = {"ac_id": code, "proof_mode": mode, "requirement": req, "raw": raw}
+    return out
 
 
 def _refs_to_story_ids(text: str, default_epic: int) -> list[str]:
@@ -936,6 +978,8 @@ def parse_epics(text: str) -> EpicPlan:
             story.depends_on = [d for d in meta.get("depends_on", []) if d != story.id]
             story.screens = meta.get("screens", [])
             story.verification_contract = meta.get("verification_contract", [])
+            story.ac_proof = ac_proof(meta.get("ac_proof", []), story.id, len(story.acceptance_criteria))
+            story.story_type = (meta.get("story_type") or ["NORMAL"])[0]
 
             epic.stories.append(story)
 

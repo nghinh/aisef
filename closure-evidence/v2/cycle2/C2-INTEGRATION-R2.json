@@ -1,0 +1,247 @@
+{
+ "record": "AISEF V2 — CYCLE-2 INTEGRATION CANDIDATE (LANE-R + LANE-O, owner ruling 2026-09-30 B)",
+ "authority": "owner ruling 2026-09-30 B ('Integration' steps 1-6); owner choice 2026-10-01 (narrow provenance rule)",
+ "head": "ac4a6c75b461e409f024965391ce77e7689c0e08",
+ "candidate": "ac4a6c75b461e409f024965391ce77e7689c0e08",
+ "head_is_candidate_or_its_evidence_child": true,
+ "lanes": {
+  "base": "45136086c3e4a98534f975e6db979f94165af5f3",
+  "LANE-R": {
+   "head": "ade198e7612c66655ff911ebb73a8c288e9575d2",
+   "files": [
+    "closure-evidence/v2/cycle2/C2-OWNER-RULING-2026-09-30-B.json",
+    "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE-CORRIGENDUM-1.json",
+    "closure-evidence/v2/cycle2/V1-PF-001-POLICY-CALIBRATION.json",
+    "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1-DECISION.json",
+    "closure-evidence/v2/cycle2/V2-RETRY-POLICY-AMENDMENT-1.json",
+    "tests/v2/test_c2_v1_pf_001_policy.py",
+    "validation/qualification/p5_corrigendum.py",
+    "validation/qualification/v1_pf_001_policy.py",
+    "validation/v2/checker_calibration.py",
+    "validation/v2/run_history.py"
+   ]
+  },
+  "LANE-O": {
+   "head": "cacaa6bd65a0c627bdb18e1a9fc8c29b98695676",
+   "files": [
+    "aisef2/orchestrate/proof.py",
+    "aisef2/orchestrate/story_runner.py",
+    "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json",
+    "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+    "tests/v2/test_c2_orchestration_conformance.py",
+    "validation/qualification/c2_orchestration_repair.py",
+    "validation/v2/mutation.py"
+   ]
+  },
+  "overlap": [],
+  "merge": "6368ae57ec8ada335546bfd6ee979d98ed80615a",
+  "merge_kind": "mechanical --no-ff, no conflict",
+  "after_merge": {
+   "commit": "ac4a6c75b461e409f024965391ce77e7689c0e08",
+   "files": [
+    "tests/v2/test_c2_p5_acceptance.py",
+    "tests/v2/test_p5_plan_v22_proposal.py",
+    "validation/qualification/p5_acceptance.py"
+   ],
+   "why": "the C2-P5 kernel provenance rule (owner choice 2026-10-01): the accepted proposal's identities.aisef2_tree is authoring provenance; nothing semantic tolerated"
+  }
+ },
+ "trees": {
+  "aisef": {
+   "base": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "lane_r": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "lane_o": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "candidate": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "aisef2": {
+   "base": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+   "lane_r": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+   "lane_o": "37bf6457f350dd720a2214f04f3896c554ad0904",
+   "candidate": "37bf6457f350dd720a2214f04f3896c554ad0904"
+  },
+  "aisef2/probe": {
+   "base": "1aa9301285ccc964ee31d508089ea0119f49b629",
+   "lane_r": "1aa9301285ccc964ee31d508089ea0119f49b629",
+   "lane_o": "1aa9301285ccc964ee31d508089ea0119f49b629",
+   "candidate": "1aa9301285ccc964ee31d508089ea0119f49b629"
+  },
+  "validation/v2": {
+   "base": "60920999bdc44dc9530e7a6fe14d1341f5615a07",
+   "lane_r": "77f578c890cb36512ca8f018d936036c0adc8432",
+   "lane_o": "887beccd1ddb7cb268305aa7453673cc25e45ecc",
+   "candidate": "2fd461971dd6c92637d45df3948668ec7de59ccd"
+  },
+  "tests/v2": {
+   "base": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330",
+   "lane_r": "f65bb3a8e0a9a5743ca1cc697fc8dfc6cd1b7d45",
+   "lane_o": "397e65a96968fb70d0213d6445c15108ab52cff4",
+   "candidate": "f6b04e08d6da55ad5e626087ebd4d1639960eb62"
+  }
+ },
+ "identities": {
+  "contracts": 59,
+  "equal_to_accepted_record": true,
+  "contract_spec_semantic_digest": "83a73da271805c470db4da55f50f542950494aa8b50a31e5b6f07e5364415745",
+  "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+  "proposal_digest": "856ed25dcf10df2b7c1c3e45c125ca0642a6f8aef6b913ae84bba13cdfd1e3f9",
+  "catalog": {
+   "probe.python_callable": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf (inactive)",
+   "probe.file_artifact": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe.python_callable_v2": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "probe.cli_invocation": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "probe.process_effect": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+  },
+  "semantic_change": "NONE",
+  "cycle1_drift": {
+   "probe_id": "probe.python_callable",
+   "catalog_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "module_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "active": false,
+   "active_for_kind": "probe.python_callable_v2",
+   "frozen": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "ok": true
+  },
+  "proposal_kernel_provenance": {
+   "differing_paths": [
+    "identities.aisef2_tree"
+   ],
+   "committed_kernel": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+   "derived_kernel": "37bf6457f350dd720a2214f04f3896c554ad0904",
+   "accepted_kernel": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+   "provenance_only": true,
+   "current": true,
+   "rule": "the proposal names the kernel it was authored on; a later authorized kernel changes that field only — tolerated when it is the one differing path and the committed value is the accepted candidate's kernel"
+  }
+ },
+ "frozen_evidence_blobs": {
+  "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1.json": {
+   "base": "d2c5dfd31c6aff9c2bc353269a35f96224df6fb6",
+   "head": "d2c5dfd31c6aff9c2bc353269a35f96224df6fb6"
+  },
+  "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json": {
+   "base": "a72c49ee9ae42676c872149ea47a1caa355b2e55",
+   "head": "a72c49ee9ae42676c872149ea47a1caa355b2e55"
+  },
+  "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json": {
+   "base": "08a66b00dc5f4bfbbab5fd8c39c59233a0f88a31",
+   "head": "08a66b00dc5f4bfbbab5fd8c39c59233a0f88a31"
+  },
+  "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json": {
+   "base": "517894da476e7c19e944ffb61b9df3eec492ee33",
+   "head": "517894da476e7c19e944ffb61b9df3eec492ee33"
+  },
+  "closure-evidence/v2/cycle2/P5-FALSIFIABILITY.json": {
+   "base": "5e72c67cc5590c0648ad12be21a4f7ab135b6eec",
+   "head": "5e72c67cc5590c0648ad12be21a4f7ab135b6eec"
+  },
+  "closure-evidence/v2/cycle2/Q0-Q3/SUMMARY.json": {
+   "base": "493ec2c0304f1f10952f67b6c7b32196e237fd78",
+   "head": "493ec2c0304f1f10952f67b6c7b32196e237fd78"
+  },
+  "closure-evidence/v2/cycle2/C2-P6-RUN-HISTORY.json": {
+   "base": "d195d1239579bc6b5775bf418f074417839ddef5",
+   "head": "d195d1239579bc6b5775bf418f074417839ddef5"
+  },
+  "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json": {
+   "base": "794a0a86a8afee8f2d4db87f0f92f40808fc5aed",
+   "head": "794a0a86a8afee8f2d4db87f0f92f40808fc5aed"
+  },
+  "closure-evidence/v2/V2-RETRY-POLICY.json": {
+   "base": "9791084e1e31fb60e7fcdde559e51fc162e22bc9",
+   "head": "9791084e1e31fb60e7fcdde559e51fc162e22bc9"
+  },
+  "closure-evidence/v2/P6-MUTATION.json": {
+   "base": "ebb17806cf15e4ba37fb7087ff6d1e1586580f99",
+   "head": "ebb17806cf15e4ba37fb7087ff6d1e1586580f99"
+  },
+  "closure-evidence/v2/P6-MIGRATION-TABLE.json": {
+   "base": "3bf11bcd2dcba1bd61ec9034272ee1206e84c71b",
+   "head": "3bf11bcd2dcba1bd61ec9034272ee1206e84c71b"
+  },
+  "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json": {
+   "base": "2b808b6694a66b168df8b3561a5db8467839d01e",
+   "head": "2b808b6694a66b168df8b3561a5db8467839d01e"
+  }
+ },
+ "guards": {
+  "cycle2_baseline": {
+   "command": "python -P validation/v2/cycle2_baseline.py --check",
+   "exit": 0,
+   "tail": [
+    "cycle-2 baseline guard: PASS"
+   ],
+   "seconds": 0.4
+  },
+  "checker_calibration": {
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "exit": 0,
+   "tail": [
+    "OK   protocol_channel_discipline clean=True rejects=True always-pass-mutant-caught=True",
+    "calibrated 46/46; always-PASS mutants rejected 46/46"
+   ],
+   "seconds": 182.9
+  },
+  "f1_f11": {
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "exit": 0,
+   "tail": [
+    "PASS     F11 ",
+    "summary {'PASS': 11, 'PENDING': 0, 'FAIL': 0} | ratchet violations 0"
+   ],
+   "seconds": 10.4
+  },
+  "v1_guard": {
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "exit": 0,
+   "tail": [
+    "V1 evidence guard (DETECTIVE): PASS"
+   ],
+   "seconds": 0.1
+  },
+  "run_history": {
+   "command": "python -P validation/v2/run_history.py check",
+   "exit": 0,
+   "tail": [
+    "run history: PASS"
+   ],
+   "seconds": 2.2
+  },
+  "mutation": {
+   "command": "python -P validation/v2/mutation.py --check",
+   "exit": 0,
+   "tail": [
+    "SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::run_story: historical, taken over by C2-ORCH",
+    "mutation: PASS"
+   ],
+   "seconds": 0.1
+  },
+  "orchestration_repair_record": {
+   "command": "python -P validation/qualification/c2_orchestration_repair.py --check",
+   "exit": 0,
+   "tail": [
+    "c2 orchestration repair: PASS"
+   ],
+   "seconds": 1.0
+  }
+ },
+ "orchestration_adversarial_suite": {
+  "module": "tests.v2.test_c2_orchestration_conformance",
+  "exit": 0,
+  "result": [
+   "Ran 23 tests in 127.458s",
+   "OK"
+  ],
+  "seconds": 128.0,
+  "owned": {
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "escaped": [],
+   "released_empty": true
+  }
+ },
+ "problems": [],
+ "verdict": "INTEGRATION CANDIDATE VERIFIED — semantic identities unchanged",
+ "seconds": 325.9,
+ "at": "2026-09-30T22:07:06Z"
+}

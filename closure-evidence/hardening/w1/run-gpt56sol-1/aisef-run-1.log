@@ -1,0 +1,55 @@
+EPIC-01 · wave 1
+STORY-01-01: NOT DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 7 tests with criteria codes are red or absent at parent SHA c9ae298
+    ✅ tests verify story — 7 tests with criteria codes are red or absent at parent SHA c9ae298
+    ✅ security
+    ⚠ review — reviewer did not run (reviewer modified the working tree (uv.lock) — reverted; this review attempt does not count. Review is a report, not a fix.) — no verdict about the candidate
+    – preservation — story does not touch any VERIFIED behaviour of other stories
+  [re-verify] gate failed
+  candidate 72aabd5: reran test:nop, test, lint, qa:fake-tests, review, security · kept —
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 7 tests with criteria codes are red or absent at parent SHA c9ae298
+    ✅ tests verify story — 7 tests with criteria codes are red or absent at parent SHA c9ae298
+    ✅ security
+    ⚠ review — reviewer did not run (reviewer modified the working tree (uv.lock) — reverted; this review attempt does not count. Review is a report, not a fix.) — no verdict about the candidate
+    – preservation — story does not touch any VERIFIED behaviour of other stories
+  [re-verify] gate failed
+  candidate 72aabd5: reran test:nop, review · kept test, lint, qa:fake-tests, security
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 7 tests with criteria codes are red or absent at parent SHA c9ae298
+    ✅ tests verify story — 7 tests with criteria codes are red or absent at parent SHA c9ae298
+    ✅ security
+    ⚠ review — reviewer did not run (reviewer modified the working tree (uv.lock) — reverted; this review attempt does not count. Review is a report, not a fix.) — no verdict about the candidate
+    – preservation — story does not touch any VERIFIED behaviour of other stories
+  ✗ REVIEW_UNRUNNABLE: the reviewer did not produce a verdict on candidate 72aabd59 in 3 executions — last: reviewer modified the working tree (uv.lock) — reverted; this review attempt does not count. Review is a report, not a fix.. Deterministic checks passed and the candidate is kept; no developer change is needed. Re-run the review stage when the reviewer can run: `/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/python3.14 -m aisef.cli run --verify-only --story STORY-01-01`.
+
+⏸ stopped at EPIC-01 · wave 1

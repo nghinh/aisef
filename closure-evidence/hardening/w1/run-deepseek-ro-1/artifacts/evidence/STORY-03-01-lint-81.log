@@ -1,0 +1,24 @@
+SIM115 Use a context manager for opening files
+   --> ledgerlock/ledger.py:100:16
+    |
+ 98 |     def _write_batch(self, new_lines):
+ 99 |         jsonl = self.path
+100 |         temp = tempfile.NamedTemporaryFile(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+101 |             mode="wb",
+102 |             dir=str(jsonl.parent),
+    |
+
+SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+   --> tests/test_atomic_batch.py:107:9
+    |
+105 |           before = self.path.read_bytes()
+106 |
+107 | /         with mock.patch("ledgerlock.ledger.os.replace", side_effect=OSError("crash")):
+108 | |             with self.assertRaises(OSError):
+    | |____________________________________________^
+109 |                   ledger.apply_batch([("put", "k2", "v2", "r2", 200)])
+    |
+help: Combine `with` statements
+
+Found 2 errors.

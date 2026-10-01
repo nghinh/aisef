@@ -1,0 +1,74 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv/bin/python
+rootdir: /Users/nghinh/Downloads/projects/ai-sdlc
+configfile: pyproject.toml
+collecting ... collected 9 items
+
+oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger FAILED [ 11%]
+oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic FAILED [ 22%]
+oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically FAILED [ 33%]
+oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption FAILED [ 44%]
+oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover PASSED [ 55%]
+oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime FAILED [ 66%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli FAILED [ 77%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value FAILED [ 88%]
+oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts FAILED [100%]
+
+=================================== FAILURES ===================================
+__________ TestAcceptance.test_14_1_verify_exits_0_on_a_fresh_ledger ___________
+oracle/test_oracle.py:75: in test_14_1_verify_exits_0_on_a_fresh_ledger
+    self.assertEqual(r.returncode, 0, f"§14.1 / §9: {r.stderr[-400:]}")
+E   AssertionError: 2 != 0 : §14.1 / §9: usage: ledgerlock [-h] {verify,snapshot,apply,repair-tail} ...
+E   ledgerlock: error: unrecognized arguments: /var/folders/y9/frkyw6m14_q020cmyzsh16jm0000gn/T/tmpc7xixow2/ledger.jsonl
+___________ TestAcceptance.test_14_2_snapshot_is_byte_deterministic ____________
+oracle/test_oracle.py:81: in test_14_2_snapshot_is_byte_deterministic
+    self.assertEqual(self._put(k, {"n": i}, f"r{i}").returncode, 0)
+E   AssertionError: 2 != 0
+___________ TestAcceptance.test_14_3_apply_batch_commits_atomically ____________
+oracle/test_oracle.py:97: in test_14_3_apply_batch_commits_atomically
+    self.assertEqual(self._put("k0", 0, "r0").returncode, 0)
+E   AssertionError: 2 != 0
+_ TestAcceptance.test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption _
+oracle/test_oracle.py:109: in test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+    self.assertEqual(self._put("k0", 0, "r0").returncode, 0)
+E   AssertionError: 2 != 0
+__________ TestAcceptance.test_14_6_no_third_party_imports_at_runtime __________
+oracle/test_oracle.py:149: in test_14_6_no_third_party_imports_at_runtime
+    self.assertEqual(sorted(imported - set(sys.stdlib_module_names)), [], "§2 / §10 / §14.6: a non-stdlib import")
+E   AssertionError: Lists differ: ['ledgerlock'] != []
+E   
+E   First list contains 1 additional elements.
+E   First extra element 0:
+E   'ledgerlock'
+E   
+E   - ['ledgerlock']
+E   + [] : §2 / §10 / §14.6: a non-stdlib import
+_ TestIdempotencyAndConflict.test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli _
+oracle/test_oracle.py:209: in test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli
+    led.apply_batch([("put", "k", 1, "r1", 1)])
+    ^^^^^^^^^^^^^^^
+E   AttributeError: 'Ledger' object has no attribute 'apply_batch'
+___ TestIdempotencyAndConflict.test_a_tombstone_conflicts_like_a_live_value ____
+oracle/test_oracle.py:198: in test_a_tombstone_conflicts_like_a_live_value
+    led.apply_batch([("delete", "t", None, "d1", 1)])  # §4.4: a delete produces a tombstone line
+    ^^^^^^^^^^^^^^^
+E   AttributeError: 'Ledger' object has no attribute 'apply_batch'
+_ TestIdempotencyAndConflict.test_replay_is_idempotent_and_a_different_rid_conflicts _
+oracle/test_oracle.py:183: in test_replay_is_idempotent_and_a_different_rid_conflicts
+    first = led.apply_batch([("put", "k", 1, "r1", 1)])
+            ^^^^^^^^^^^^^^^
+E   AttributeError: 'Ledger' object has no attribute 'apply_batch'
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED oracle/test_oracle.py::TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_2_snapshot_is_byte_deterministic
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_3_apply_batch_commits_atomically
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption
+FAILED oracle/test_oracle.py::TestAcceptance::test_14_6_no_third_party_imports_at_runtime
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value
+FAILED oracle/test_oracle.py::TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts
+========================= 8 failed, 1 passed in 1.66s ==========================
+
+--- stderr ---

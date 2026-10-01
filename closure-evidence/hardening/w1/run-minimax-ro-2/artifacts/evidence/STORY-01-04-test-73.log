@@ -1,0 +1,35 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 24 items
+
+tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesEqualsJsonDumpsTest::test_AC_STORY_01_02_1_canonical_bytes_matches_json_dumps_reference PASSED [  4%]
+tests/test_format.py::AC_STORY_01_02_2_ByteStabilityTest::test_AC_STORY_01_02_2_canonical_bytes_is_byte_stable PASSED [  8%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8LiteralTest::test_AC_STORY_01_02_3_non_ascii_uses_utf8_literal PASSED [ 12%]
+tests/test_format.py::AC_STORY_01_02_4_KeyOrderInvarianceTest::test_AC_STORY_01_02_4_key_insertion_order_does_not_affect_bytes PASSED [ 16%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstantTest::test_AC_STORY_01_02_5_genesis_is_literal_seven_character_string PASSED [ 20%]
+tests/test_format.py::AC_STORY_01_02_6_JsonRoundTripByteStabilityTest::test_AC_STORY_01_02_6_canonical_bytes_stable_through_json_round_trip PASSED [ 25%]
+tests/test_line_hash.py::AC_STORY_01_03_1_Sha256HexLengthTest::test_AC_STORY_01_03_1_line_hash_returns_64_lowercase_hex_chars PASSED [ 29%]
+tests/test_line_hash.py::AC_STORY_01_03_2_DifferentPrevHashTest::test_AC_STORY_01_03_2_different_prev_hash_yields_different_digest PASSED [ 33%]
+tests/test_line_hash.py::AC_STORY_01_03_3_HashFieldsIgnoredTest::test_AC_STORY_01_03_3_existing_hash_and_prev_hash_fields_are_ignored PASSED [ 37%]
+tests/test_line_hash.py::AC_STORY_01_03_4_DeterminismTest::test_AC_STORY_01_03_4_same_inputs_return_same_digest PASSED [ 41%]
+tests/test_line_hash.py::AC_STORY_01_03_5_GenesisPrevHashTest::test_AC_STORY_01_03_5_genesis_non_hex_prev_hash_is_accepted PASSED [ 45%]
+tests/test_nfc_normalization.py::AC_STORY_01_01_1_IdentityTest::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte PASSED [ 50%]
+tests/test_nfc_normalization.py::AC_STORY_01_01_2_NFCEquivalenceTest::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical PASSED [ 54%]
+tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_5_no_forbidden_top_level_imports PASSED [ 58%]
+tests/test_nfc_normalization.py::SideChannelsGuardTest::test_AC_STORY_01_01_6_no_forbidden_calls PASSED [ 62%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportTest::test_AC_STORY_01_01_3_import_ledgerlock_returns_init_path PASSED [ 66%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CLIHelpTest::test_AC_STORY_01_01_4_cli_help_lists_subcommands PASSED [ 70%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PackageExportsTest::test_AC_STORY_01_01_7_ledger_and_conflicterror_exported PASSED [ 75%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesTest::test_AC_STORY_01_04_1_read_lines_returns_bytes_per_line_without_newline PASSED [ 79%]
+tests/test_store.py::AC_STORY_01_04_2_MissingFileRaisesTest::test_AC_STORY_01_04_2_read_lines_missing_path_raises_FileNotFoundError PASSED [ 83%]
+tests/test_store.py::AC_STORY_01_04_3_EmptyFileReturnsEmptyListTest::test_AC_STORY_01_04_3_read_lines_empty_file_returns_empty_list PASSED [ 87%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicThenReadLinesRoundTripTest::test_AC_STORY_01_04_4_write_atomic_writes_bytes_and_round_trips PASSED [ 91%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalTest::test_AC_STORY_01_04_5_crash_between_temp_write_and_replace_leaves_original PASSED [ 95%]
+tests/test_store.py::AC_STORY_01_04_6_TempFileInSameDirectoryTest::test_AC_STORY_01_04_6_temp_file_created_in_target_directory PASSED [100%]
+
+============================== 24 passed in 0.13s ==============================

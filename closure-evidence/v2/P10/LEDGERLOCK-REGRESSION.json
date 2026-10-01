@@ -1,0 +1,584 @@
+{
+ "record": "AISEF V2 — P10 LEDGERLOCK REGRESSION (DEVELOPMENT / REGRESSION BENCHMARK ONLY)",
+ "rung": "P10 / QP-10",
+ "authority": "owner's P10 / QP-10 EXECUTION AUTHORIZATION (2026-09-28)",
+ "written": "2026-09-28T05:20:41Z",
+ "purpose": "does the current framework regress on this known development workload? — not: how well would AISEF perform on unseen projects",
+ "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+ "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+ "head_kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+ "repository_execution_commit": "ebc1a6fae22af94955109f7a89591a24423d658f",
+ "harness_digest": "eb9db7298668fce5d6b6c02edd7f39a8247ae492ac7350e4721addf03fce917d",
+ "workload": {
+  "id": "LedgerLock",
+  "benchmark_class": "DEVELOPMENT_REGRESSION",
+  "repository": {
+   "repo": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2",
+   "present": true,
+   "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "baseline_is_the_plan_commit": true,
+   "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+   "requirements_match_frozen": true,
+   "epics_sha256": "4f2c920ef4853cf98254f7c2ad582a2bfdc8b90becc8bd45f44e3c262cd81376",
+   "tree": "d4560f79d0b6cc9e9b685c9cb6150ab73afb4971"
+  },
+  "plan_freeze": "closure-evidence/hardening/W1-PLAN-V2.1-FREEZE.json",
+  "plan_commit": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+  "criteria_source": "closure-evidence/hardening/W1-PLAN-V2.1-AUDIT.json",
+  "v2_table_digest": "ef48d07b727e610bfe07c6013b94960349387716705604ac8244a4fffa558c3d"
+ },
+ "requirements_hash": "a32fbec46b13310c497538e82934dbdea03dc616c9b14d7bc866a30f6c591e43",
+ "plan_identity": {
+  "id": "W1-LEDGERLOCK-PLAN-V2.1",
+  "plan_hash": "bc71a701dd84f7227e8a474b9c9e0aec05ca3e10c0eb53168bcdba0bb8242a32",
+  "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "stories": 16,
+  "criteria": 77,
+  "obligations_by_role": {
+   "INTRODUCE": 66,
+   "PRESERVE": 11,
+   "VERIFY": 0
+  },
+  "v1_modes": {
+   "CHANGE_REQUIRED": 66,
+   "NEGATIVE_INVARIANT": 4,
+   "PRESERVE_REQUIRED": 7
+  }
+ },
+ "execution_profile": {
+  "runspec_hash": "9bb19a5291d8e3c312dc63d69501e643dfcc0474460060010c97a5cd37d0f943",
+  "aggregate_min_grade": "OPAQUE",
+  "q6_eligible": false,
+  "capabilities": [
+   {
+    "name": "developer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "route": "9router/mycombo",
+     "version": "1.18.31"
+    }
+   },
+   {
+    "name": "git",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+    }
+   },
+   {
+    "name": "kernel",
+    "grade": "VERIFIED",
+    "enforcement": "FULL",
+    "binding": {
+     "digest": "3e9248f6c4c0b64b4365069c2da0f0de2c71fe35b44e63f9c4b7876281079500",
+     "tree": "4d6081940f5b9dae47439f73f0157161e028d804"
+    }
+   },
+   {
+    "name": "probe.python_callable",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "37ab1acf83b8b0eef5ea958b49a90a123ff07ebd39454970245569aa56817d79"
+    }
+   },
+   {
+    "name": "python",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634",
+     "version": "3.14.7"
+    }
+   },
+   {
+    "name": "reviewer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode",
+     "route": "9router/mycombo",
+     "version": "1.18.31"
+    }
+   },
+   {
+    "name": "scanner",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "mode": "lint as an informational scanner",
+     "tool": "ruff"
+    }
+   }
+  ],
+  "model": {
+   "client": "opencode",
+   "binary": "/Users/nghinh/.opencode/bin/opencode",
+   "binary_sha256": "16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198",
+   "version": "1.18.31",
+   "declared_route": "9router/mycombo",
+   "endpoint": "https://9router.vnteki.com/v1",
+   "provider_config_digest_without_secrets": "e471c8f750f88e544112105b2846b5bb4af59fa48c6d1c7ec436ad2064278cee",
+   "grade": "OPAQUE",
+   "why_opaque": "declared route and client only: no request was made, so no preflight fingerprint was measured (RFC §23)"
+  },
+  "probe": {
+   "id": "probe.python_callable",
+   "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "kinds_with_a_probe": [
+    "python_callable"
+   ],
+   "kinds_without_a_probe": [
+    "cli_invocation",
+    "file_artifact",
+    "http_route",
+    "process_effect"
+   ]
+  }
+ },
+ "run_identity": {
+  "run_id": null,
+  "journal": null,
+  "note": "no RunScope began: the plan was not admitted; there is no journal to name"
+ },
+ "static_admission": {
+  "engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+  "admitted": false,
+  "result_digest": "eac4a152eb6c9d240d43ea6457f76ad876b5a1fda08bb65dcf7a047251b75788",
+  "checks": [
+   {
+    "number": 1,
+    "name": "requirement_coverage",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 2,
+    "name": "contract_spec_integrity",
+    "passed": false,
+    "problems": [
+     "contract BC-AC-STORY-01-01-4 does not compile: no probe declared for subject kind file_artifact",
+     "contract BC-AC-STORY-01-01-5 does not compile: no probe declared for subject kind file_artifact",
+     "contract BC-AC-STORY-01-01-7 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-01-04-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-04-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-04-6 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-05-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-01-06-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-01-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-02-02-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-01-5 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-02-1 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-02-2 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-02-3 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-03-02-4 does not compile: no probe declared for subject kind process_effect",
+     "contract BC-AC-STORY-04-01-1 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-2 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-3 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-4 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-5 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-6 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-01-7 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-02-1 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-02-2 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-02-3 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-02-4 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-1 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-2 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-3 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-4 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-04-03-5 does not compile: no probe declared for subject kind cli_invocation",
+     "contract BC-AC-STORY-05-03-1 does not compile: no probe declared for subject kind file_artifact",
+     "contract BC-AC-STORY-05-03-2 does not compile: no probe declared for subject kind file_artifact"
+    ]
+   },
+   {
+    "number": 3,
+    "name": "ownership",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 4,
+    "name": "dependency_dag",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 5,
+    "name": "contradictions",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 6,
+    "name": "proof_capability",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 7,
+    "name": "traceability",
+    "passed": true,
+    "problems": []
+   },
+   {
+    "number": 8,
+    "name": "plan_structure",
+    "passed": false,
+    "problems": [
+     "criterion AC-STORY-01-01-4 is an orphan: spec NO-SPEC-AC-STORY-01-01-4 is not in the committed derivation",
+     "criterion AC-STORY-01-01-5 is an orphan: spec NO-SPEC-AC-STORY-01-01-5 is not in the committed derivation",
+     "criterion AC-STORY-01-01-7 is an orphan: spec NO-SPEC-AC-STORY-01-01-7 is not in the committed derivation",
+     "criterion AC-STORY-01-04-4 is an orphan: spec NO-SPEC-AC-STORY-01-04-4 is not in the committed derivation",
+     "criterion AC-STORY-01-04-5 is an orphan: spec NO-SPEC-AC-STORY-01-04-5 is not in the committed derivation",
+     "criterion AC-STORY-01-04-6 is an orphan: spec NO-SPEC-AC-STORY-01-04-6 is not in the committed derivation",
+     "criterion AC-STORY-01-05-1 is an orphan: spec NO-SPEC-AC-STORY-01-05-1 is not in the committed derivation",
+     "criterion AC-STORY-01-05-2 is an orphan: spec NO-SPEC-AC-STORY-01-05-2 is not in the committed derivation",
+     "criterion AC-STORY-01-05-3 is an orphan: spec NO-SPEC-AC-STORY-01-05-3 is not in the committed derivation",
+     "criterion AC-STORY-01-05-4 is an orphan: spec NO-SPEC-AC-STORY-01-05-4 is not in the committed derivation",
+     "criterion AC-STORY-01-05-5 is an orphan: spec NO-SPEC-AC-STORY-01-05-5 is not in the committed derivation",
+     "criterion AC-STORY-01-06-1 is an orphan: spec NO-SPEC-AC-STORY-01-06-1 is not in the committed derivation",
+     "criterion AC-STORY-01-06-2 is an orphan: spec NO-SPEC-AC-STORY-01-06-2 is not in the committed derivation",
+     "criterion AC-STORY-01-06-3 is an orphan: spec NO-SPEC-AC-STORY-01-06-3 is not in the committed derivation",
+     "criterion AC-STORY-01-06-4 is an orphan: spec NO-SPEC-AC-STORY-01-06-4 is not in the committed derivation",
+     "criterion AC-STORY-01-06-5 is an orphan: spec NO-SPEC-AC-STORY-01-06-5 is not in the committed derivation",
+     "criterion AC-STORY-02-01-1 is an orphan: spec NO-SPEC-AC-STORY-02-01-1 is not in the committed derivation",
+     "criterion AC-STORY-02-01-2 is an orphan: spec NO-SPEC-AC-STORY-02-01-2 is not in the committed derivation",
+     "criterion AC-STORY-02-01-3 is an orphan: spec NO-SPEC-AC-STORY-02-01-3 is not in the committed derivation",
+     "criterion AC-STORY-02-01-4 is an orphan: spec NO-SPEC-AC-STORY-02-01-4 is not in the committed derivation",
+     "criterion AC-STORY-02-01-5 is an orphan: spec NO-SPEC-AC-STORY-02-01-5 is not in the committed derivation",
+     "criterion AC-STORY-02-02-1 is an orphan: spec NO-SPEC-AC-STORY-02-02-1 is not in the committed derivation",
+     "criterion AC-STORY-02-02-2 is an orphan: spec NO-SPEC-AC-STORY-02-02-2 is not in the committed derivation",
+     "criterion AC-STORY-02-02-3 is an orphan: spec NO-SPEC-AC-STORY-02-02-3 is not in the committed derivation",
+     "criterion AC-STORY-02-02-4 is an orphan: spec NO-SPEC-AC-STORY-02-02-4 is not in the committed derivation",
+     "criterion AC-STORY-02-02-5 is an orphan: spec NO-SPEC-AC-STORY-02-02-5 is not in the committed derivation",
+     "criterion AC-STORY-03-01-1 is an orphan: spec NO-SPEC-AC-STORY-03-01-1 is not in the committed derivation",
+     "criterion AC-STORY-03-01-2 is an orphan: spec NO-SPEC-AC-STORY-03-01-2 is not in the committed derivation",
+     "criterion AC-STORY-03-01-3 is an orphan: spec NO-SPEC-AC-STORY-03-01-3 is not in the committed derivation",
+     "criterion AC-STORY-03-01-4 is an orphan: spec NO-SPEC-AC-STORY-03-01-4 is not in the committed derivation",
+     "criterion AC-STORY-03-01-5 is an orphan: spec NO-SPEC-AC-STORY-03-01-5 is not in the committed derivation",
+     "criterion AC-STORY-03-02-1 is an orphan: spec NO-SPEC-AC-STORY-03-02-1 is not in the committed derivation",
+     "criterion AC-STORY-03-02-2 is an orphan: spec NO-SPEC-AC-STORY-03-02-2 is not in the committed derivation",
+     "criterion AC-STORY-03-02-3 is an orphan: spec NO-SPEC-AC-STORY-03-02-3 is not in the committed derivation",
+     "criterion AC-STORY-03-02-4 is an orphan: spec NO-SPEC-AC-STORY-03-02-4 is not in the committed derivation",
+     "criterion AC-STORY-04-01-1 is an orphan: spec NO-SPEC-AC-STORY-04-01-1 is not in the committed derivation",
+     "criterion AC-STORY-04-01-2 is an orphan: spec NO-SPEC-AC-STORY-04-01-2 is not in the committed derivation",
+     "criterion AC-STORY-04-01-3 is an orphan: spec NO-SPEC-AC-STORY-04-01-3 is not in the committed derivation",
+     "criterion AC-STORY-04-01-4 is an orphan: spec NO-SPEC-AC-STORY-04-01-4 is not in the committed derivation",
+     "criterion AC-STORY-04-01-5 is an orphan: spec NO-SPEC-AC-STORY-04-01-5 is not in the committed derivation",
+     "criterion AC-STORY-04-01-6 is an orphan: spec NO-SPEC-AC-STORY-04-01-6 is not in the committed derivation",
+     "criterion AC-STORY-04-01-7 is an orphan: spec NO-SPEC-AC-STORY-04-01-7 is not in the committed derivation",
+     "criterion AC-STORY-04-02-1 is an orphan: spec NO-SPEC-AC-STORY-04-02-1 is not in the committed derivation",
+     "criterion AC-STORY-04-02-2 is an orphan: spec NO-SPEC-AC-STORY-04-02-2 is not in the committed derivation",
+     "criterion AC-STORY-04-02-3 is an orphan: spec NO-SPEC-AC-STORY-04-02-3 is not in the committed derivation",
+     "criterion AC-STORY-04-02-4 is an orphan: spec NO-SPEC-AC-STORY-04-02-4 is not in the committed derivation",
+     "criterion AC-STORY-04-03-1 is an orphan: spec NO-SPEC-AC-STORY-04-03-1 is not in the committed derivation",
+     "criterion AC-STORY-04-03-2 is an orphan: spec NO-SPEC-AC-STORY-04-03-2 is not in the committed derivation",
+     "criterion AC-STORY-04-03-3 is an orphan: spec NO-SPEC-AC-STORY-04-03-3 is not in the committed derivation",
+     "criterion AC-STORY-04-03-4 is an orphan: spec NO-SPEC-AC-STORY-04-03-4 is not in the committed derivation",
+     "criterion AC-STORY-04-03-5 is an orphan: spec NO-SPEC-AC-STORY-04-03-5 is not in the committed derivation",
+     "criterion AC-STORY-05-01-1 is an orphan: spec NO-SPEC-AC-STORY-05-01-1 is not in the committed derivation",
+     "criterion AC-STORY-05-01-2 is an orphan: spec NO-SPEC-AC-STORY-05-01-2 is not in the committed derivation",
+     "criterion AC-STORY-05-01-3 is an orphan: spec NO-SPEC-AC-STORY-05-01-3 is not in the committed derivation",
+     "criterion AC-STORY-05-02-1 is an orphan: spec NO-SPEC-AC-STORY-05-02-1 is not in the committed derivation",
+     "criterion AC-STORY-05-02-2 is an orphan: spec NO-SPEC-AC-STORY-05-02-2 is not in the committed derivation",
+     "criterion AC-STORY-05-02-3 is an orphan: spec NO-SPEC-AC-STORY-05-02-3 is not in the committed derivation",
+     "criterion AC-STORY-05-03-1 is an orphan: spec NO-SPEC-AC-STORY-05-03-1 is not in the committed derivation",
+     "criterion AC-STORY-05-03-2 is an orphan: spec NO-SPEC-AC-STORY-05-03-2 is not in the committed derivation"
+    ]
+   },
+   {
+    "number": 9,
+    "name": "probe_calibration",
+    "passed": false,
+    "problems": [
+     "spec PPS-0b31ba2649b14c11e9cf601d11492df9cd1438cc17d7687373570b507b28a5b6: probe.python_callable does not support the observation it asks for",
+     "spec PPS-1664c77dd60487cb7bc80f5cb8632ad942df84f874d6afb17e10070369e47000: probe.python_callable does not support the observation it asks for",
+     "spec PPS-1d54791d23342301fb95f570099408194d635339201f22e7d7c0b4bc0da96b61: probe.python_callable does not support the observation it asks for",
+     "spec PPS-1df14f7043a731f9e524e27c2e3a9113c3e27ba71b41e58d91ee628641ca1123: probe.python_callable does not support the observation it asks for",
+     "spec PPS-2600578f3026bcbb48ba034fecb4136553443e9c56d74a4da749592d1512067f: probe.python_callable does not support the observation it asks for",
+     "spec PPS-3c5b41e2504d466bbe0aa0710f4a54d8af39b26e586a649f4b95ec8fec677cf5: probe.python_callable does not support the observation it asks for",
+     "spec PPS-44fe05e546b1a64f83592d1b6e99fbe8fd377e7d10e35781df2f58d273e94f25: probe.python_callable does not support the observation it asks for",
+     "spec PPS-d742dd6338d9ff3940b59174283320a834716030b0d80397695cb712d17724fd: probe.python_callable does not support the observation it asks for"
+    ]
+   }
+  ]
+ },
+ "workload_fit": {
+  "counts_by_v2_status": {
+   "COMPILED": 10,
+   "REFUSED_BY_COMPILER": 53,
+   "UNSUPPORTED_OBSERVATION": 8,
+   "REFUSED_BY_CONTRACT_RULE": 6
+  },
+  "counts_by_subject_kind": {
+   "python_callable": 18,
+   "file_artifact": 4,
+   "cli_invocation": 17,
+   "process_effect": 38
+  },
+  "expressible_by_cycle1_probe": [
+   "AC-STORY-01-01-1",
+   "AC-STORY-01-01-2",
+   "AC-STORY-01-01-3",
+   "AC-STORY-01-01-6",
+   "AC-STORY-01-03-1",
+   "AC-STORY-01-03-2",
+   "AC-STORY-01-03-3",
+   "AC-STORY-01-03-4",
+   "AC-STORY-01-03-5",
+   "AC-STORY-01-04-2"
+  ],
+  "kinds_without_a_probe": [
+   "cli_invocation",
+   "file_artifact",
+   "http_route",
+   "process_effect"
+  ]
+ },
+ "execution": {
+  "attempted": false,
+  "reason": "the StaticPlanAdmissionEngine did not admit the plan: no story begins, no provider request is made, delivery is not reached (RFC §12: a plan freezes only if admitted)",
+  "model_requests": 0,
+  "provider_calls": 0
+ },
+ "cohort_state": "DEVELOPMENT",
+ "benchmark_class": "DEVELOPMENT_REGRESSION",
+ "generalization_claim": "NONE",
+ "verdict": {
+  "delivery_verdict": "NOT_REACHED",
+  "plan_quality_verdict": "NOT_CLAIMED"
+ },
+ "delivery_verdict_derivation": "from the run's journal events and the plan admission only; no plan-quality input",
+ "plan_quality_metrics": {
+  "introduce_obligations": 66,
+  "pre_satisfied_introduce": 0,
+  "pre_satisfied_introduce_ratio": 0.0,
+  "fully_pre_satisfied_stories": 0,
+  "fully_pre_satisfied_story_ids": [],
+  "unattributed_plan_drift": 0,
+  "attributed_plan_drift": 0,
+  "delivery_complete_stories": [],
+  "failed_stories": [],
+  "retries": {},
+  "provider_requests_by_budget": {},
+  "note": "observations of the journal; without preregistered thresholds they produce no plan-quality PASS/FAIL"
+ },
+ "plan_quality_policy": {
+  "preregistered": false,
+  "path": null,
+  "preregistered_at": null,
+  "thresholds": {
+   "max_pre_satisfied_introduce_ratio": null,
+   "max_fully_pre_satisfied_stories": null,
+   "max_unattributed_plan_drift": null
+  }
+ },
+ "current_product_correctness": {
+  "stories_total": 16,
+  "stories_delivered": 0,
+  "stories_failed": 0,
+  "stories_pre_satisfied": 0,
+  "retries": 0,
+  "rollbacks": 0,
+  "product_proof_results": [],
+  "verifier_agreements": 0,
+  "verifier_disagreements": 0,
+  "engineering_adequacy": [],
+  "review_findings": [],
+  "security_findings": [],
+  "post_merge_reproof": [],
+  "note": "no story ran: nothing is summarised away; every count is zero because delivery was not reached"
+ },
+ "prohibitions": {
+  "SEALED": "REJECTED: LedgerLock is a DEVELOPMENT_REGRESSION workload in state DEVELOPMENT: it cannot become SEALED (RFC §30: permanently development; no re-labelling is available and none may be sought)",
+  "HOLDOUT": "REJECTED: LedgerLock is a DEVELOPMENT_REGRESSION workload in state DEVELOPMENT: it cannot become HOLDOUT (RFC §30: permanently development; no re-labelling is available and none may be sought)",
+  "EVALUATING": "REJECTED: LedgerLock is a DEVELOPMENT_REGRESSION workload in state DEVELOPMENT: it cannot become EVALUATING (RFC §30: permanently development; no re-labelling is available and none may be sought)",
+  "generalization_claim=POSITIVE": "REJECTED: generalization_claim is NONE: LedgerLock backs no generalization (RFC §28.6, §30)",
+  "qualification_sample_size": "REJECTED: a LedgerLock record cannot carry 'qualification_sample_size': no sample size, seal, holdout or single score exists for a development benchmark",
+  "overall_verdict": "REJECTED: delivery and plan quality are never collapsed into one score (RFC §29: the distinction is mandatory)"
+ },
+ "regression_summary": {
+  "question": "does the cycle-1 V2 framework regress on LedgerLock?",
+  "finding": "the plan is not admitted by the V2 StaticPlanAdmissionEngine (checks failing: ['contract_spec_integrity', 'plan_structure', 'probe_calibration']); 10 of 77 criteria are provable by the one cycle-1 probe kind (python_callable: exists / returns / raises over JSON arguments); the rest need cli_invocation, process_effect and file_artifact probes the cycle-1 kernel does not implement, or observables (bytes, a constant's value, instance-method effects) the probe has no class for",
+  "regression_relative_to_v1": "V1 (aisef 1.7.6) ran this plan end to end (best run 11/16 stories done); V2 cycle 1 reaches no story: a proof-kind coverage regression, typed by the engine, not a delivery verdict",
+  "historical_runs": [
+   {
+    "run": "1",
+    "generated": "2026-09-18T10:56:26+0700",
+    "kernel": "V1 aisef 1.7.6 (f52df75, tree 4359f347)",
+    "stories_recorded": 12,
+    "done": 11,
+    "failed": 1,
+    "progress": {
+     "done": 11,
+     "total": 16
+    },
+    "classification": "DEVELOPMENT / REGRESSION (V1, PLAN-V2 or V2.1; no generalization)"
+   },
+   {
+    "run": "2",
+    "generated": "2026-09-18T10:56:29+0700",
+    "kernel": "V1 aisef 1.7.6 (f52df75, tree 4359f347)",
+    "stories_recorded": 1,
+    "done": 0,
+    "failed": 1,
+    "progress": {
+     "done": 0,
+     "total": 16
+    },
+    "classification": "DEVELOPMENT / REGRESSION (V1, PLAN-V2 or V2.1; no generalization)"
+   },
+   {
+    "run": "3",
+    "generated": "2026-09-18T10:56:32+0700",
+    "kernel": "V1 aisef 1.7.6 (f52df75, tree 4359f347)",
+    "stories_recorded": 3,
+    "done": 2,
+    "failed": 1,
+    "progress": {
+     "done": 2,
+     "total": 16
+    },
+    "classification": "DEVELOPMENT / REGRESSION (V1, PLAN-V2 or V2.1; no generalization)"
+   },
+   {
+    "run": "v21-run1",
+    "generated": "2026-09-21T05:32:54+0700",
+    "kernel": "V1 aisef 1.7.6 (f52df75, tree 4359f347)",
+    "stories_recorded": 1,
+    "done": 0,
+    "failed": 1,
+    "progress": {
+     "done": 0,
+     "total": 16
+    },
+    "classification": "DEVELOPMENT / REGRESSION (V1, PLAN-V2 or V2.1; no generalization)"
+   },
+   {
+    "run": "v21-run2",
+    "generated": "2026-09-21T07:20:44+0700",
+    "kernel": "V1 aisef 1.7.6 (f52df75, tree 4359f347)",
+    "stories_recorded": 11,
+    "done": 10,
+    "failed": 1,
+    "progress": {
+     "done": 10,
+     "total": 16
+    },
+    "classification": "DEVELOPMENT / REGRESSION (V1, PLAN-V2 or V2.1; no generalization)"
+   }
+  ],
+  "label": "DEVELOPMENT / REGRESSION; no generalization, no ranking of models or providers"
+ },
+ "conformance": {
+  "when": "2026-09-28T05:20:41Z",
+  "head": "ebc1a6fae22af94955109f7a89591a24423d658f",
+  "kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+  "freeze_conformance": {
+   "problems": [],
+   "statuses": {
+    "F1": "PASS",
+    "F2": "PASS",
+    "F3": "PASS",
+    "F4": "PASS",
+    "F5": "PASS",
+    "F6": "PASS",
+    "F7": "PASS",
+    "F8": "PASS",
+    "F9": "PASS",
+    "F10": "PASS",
+    "F11": "PASS"
+   },
+   "summary": {
+    "PASS": 11,
+    "PENDING": 0,
+    "FAIL": 0
+   },
+   "ratchet_violations": [],
+   "pass": true,
+   "f1_f2_f11": {
+    "F1": "PASS",
+    "F2": "PASS",
+    "F11": "PASS"
+   }
+  },
+  "v1_evidence_guard": {
+   "problems": [],
+   "pass": true
+  },
+  "w0": {
+   "path": "closure-evidence/hardening/AISEF-W0-QUALIFICATION.json",
+   "sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+   "expected": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+   "unchanged": true
+  },
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+ },
+ "p9_evidence": {
+  "closure-evidence/v2/Q5/REPRODUCTION.json": "5f0ba2f7e615b8a703ce6c824fb47c0c268bbabea9929b392c9fc88ce57087ce",
+  "closure-evidence/v2/P9-ACCEPTANCE.json": "7c508afcf63b5d84cb3ac6b907f68ac29295a31eabf47cf47f7719e921fd2eea"
+ },
+ "p8_evidence": {
+  "closure-evidence/v2/Q4/DIFFERENTIAL.json": "2a07619255e0f754ffad6d7be79193275f899773915d66c71024dafdf3633b10"
+ },
+ "p7_evidence": {
+  "closure-evidence/v2/Q0-Q3/SUMMARY.json": "5f03687299447a24affa43d638b3ba04d24df071273eb63b831bdb98da4097d2",
+  "closure-evidence/v2/P7-FINDING-001/CORRECTION.json": "3da6d2a60e381613ea14670454a0a85e536606f750404dd1f2e0c3de85ee20e7",
+  "closure-evidence/v2/P7-ACCEPTANCE.json": "c7144a2353e18d844a69f1739c133678fc79bfbc60645d1808fceb2846a66edf"
+ },
+ "seals": {
+  "closure-evidence/v2/P4-FINAL-SEAL.json": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+  "closure-evidence/v2/P5-FINAL-SEAL.json": "d06d4ae57e1797f6658b1cc3148200865aada86a0d3165aeb9f7f98a6e3e250c",
+  "closure-evidence/v2/P6-FINAL-SEAL.json": "9362029864f011d7c727d57ab4f99815e0c440071833285a2964053fa651ea60"
+ },
+ "v1_evidence": {
+  "baseline": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb",
+  "w0": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0"
+ },
+ "residual_processes": {
+  "from_journal": 0,
+  "owned_range": "see the owned-run record beside this file"
+ },
+ "platform": {
+  "system": "darwin",
+  "python": "3.14.7"
+ },
+ "stop_rules": {
+  "kernel_tree_is_the_candidates": true,
+  "plan_retuned": false,
+  "kernel_repaired": false,
+  "historical_evidence_rewritten": false,
+  "cohort_sealed": false,
+  "generalization_claimed": false
+ },
+ "finished": "2026-09-28T05:20:41Z",
+ "delivery_verdict": "NOT_REACHED",
+ "plan_quality_verdict": "NOT_CLAIMED"
+}

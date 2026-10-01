@@ -17,6 +17,7 @@ import ast
 import hashlib
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -63,9 +64,17 @@ def stub_reads(ctx):
     return CL.Probed(Outcome.PASSED if text else Outcome.FAILED, "read the evidence")
 
 
+#: Every git the tests run is told not to spawn background work: `git commit` otherwise starts a detached
+#: `git maintenance run --auto` (git >= 2.47; `git gc --auto` before) that writes into `.git` while the test is
+#: already removing its temporary repository (measured on CI: `OSError: [Errno 39] Directory not empty: '.../.git'`
+#: from TemporaryDirectory.cleanup, ubuntu 3.14, candidate 175ba3a).
+_NO_BACKGROUND_GIT = {"GIT_CONFIG_COUNT": "2", "GIT_CONFIG_KEY_0": "maintenance.auto", "GIT_CONFIG_VALUE_0": "false",
+                      "GIT_CONFIG_KEY_1": "gc.auto", "GIT_CONFIG_VALUE_1": "0"}
+
+
 def git(root: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-C", str(root), *args], capture_output=True,
-                          text=True, encoding="utf-8", errors="replace")
+                          text=True, encoding="utf-8", errors="replace", env={**os.environ, **_NO_BACKGROUND_GIT})
 
 
 def crit(cid: str, probe: str, **kw) -> dict:
@@ -629,7 +638,8 @@ class TestG3Conformance(unittest.TestCase):
     def table(self, *, days_old: int = 1, passing: bool = True):
         runs = []
         for client in CF.RELEASE_CLIENTS:
-            run = CF.ClientRun(client=client, version="1.0", at="2026-09-08T00:00:00+00:00")
+            at = (date.today() - timedelta(days=days_old)).isoformat()  # as old as the table: never a fixed date
+            run = CF.ClientRun(client=client, version="1.0", at=f"{at}T00:00:00+00:00")
             for i, (pid, *_rest) in enumerate(CF.PROBES):
                 run.results.append(CF.ProbeResult(pid, passing or i != 0))
             runs.append(run)

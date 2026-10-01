@@ -1,0 +1,10 @@
+{"seq": 1, "step": "attempt.started", "at": 1789826588.79, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789826589.358, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-minimax-ro-1/.aisef/worktrees/STORY-01-04"}, "undo": {"worktree.remove": "STORY-01-04"}}
+{"seq": 3, "step": "status.running", "at": 1789826589.364, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789826983.88, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/store.py", "tests/test_store.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789826983.881, "attempt": 1, "data": {"luot": 1, "sha": "23f1e391cc808537ebf43a3a01f8d3a2f23e391b", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "verification.completed", "at": 1789827221.186, "attempt": 1, "data": {"ok": true, "attempts": 1, "cost_usd": 0.0, "candidate": "23f1e391cc808537ebf43a3a01f8d3a2f23e391b"}, "undo": {}}
+{"seq": 7, "step": "review.completed", "at": 1789827221.186, "attempt": 1, "data": {"blocked": [], "outcome": "PASS", "review_executions": 1, "developer_attempts": 1}, "undo": {}}
+{"seq": 8, "step": "attempt.aborted", "at": 1789827221.194, "attempt": 1, "data": {"reason": "abnormal termination"}, "undo": {}}
+{"seq": 9, "step": "merge.completed", "at": 1789827221.266, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 10, "step": "attempt.committed", "at": 1789827221.822, "attempt": 1, "data": {}, "undo": {}}

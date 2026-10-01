@@ -1,0 +1,24 @@
+SIM115 Use a context manager for opening files
+  --> ledgerlock/store.py:20:17
+   |
+18 |     target = Path(path)
+19 |     temp_path = None
+20 |     temp_file = tempfile.NamedTemporaryFile(
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+21 |         mode="wb",
+22 |         dir=target.parent,
+   |
+
+SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+  --> tests/test_store.py:53:13
+   |
+51 |               path.write_bytes(original)
+52 |
+53 | /             with mock.patch.object(store.os, "replace", side_effect=RuntimeError("crash")):
+54 | |                 with self.assertRaises(RuntimeError):
+   | |_____________________________________________________^
+55 |                       store.write_atomic(path, [b"new-line\n"])
+   |
+help: Combine `with` statements
+
+Found 2 errors.

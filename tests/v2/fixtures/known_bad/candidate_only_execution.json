@@ -1,0 +1,9 @@
+{
+ "checker": "candidate_only_execution",
+ "package": "WP-5.3 (invariant IX)",
+ "kind": "kernel_source",
+ "rule": "CANDIDATE_ONLY_EXECUTION",
+ "path": "aisef2/quality/vacuity.py",
+ "source": "from aisef2.quality.test_execution import execute\n\n\ndef evaluate(runner, candidate, parent, tests, deps):\n    return execute(runner, parent, tests, deps)  # runs the developer's tests at the parent revision\n",
+ "expect": "CANDIDATE_ONLY_EXECUTION aisef2/quality/vacuity.py:4"
+}

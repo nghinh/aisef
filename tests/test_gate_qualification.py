@@ -32,6 +32,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.control.gate import CHECK_KIND, CHECK_NAMES, CONTROLS, evaluate, qualification_table  # noqa: E402
+from tests import obligations  # noqa: E402
 from aisef.control.outcome import CHECK_KINDS, Outcome  # noqa: E402
 from aisef.control.security import Finding, SecurityReport  # noqa: E402
 from aisef.harness.observe import GUARD_SEEN, MOCKUP_MAP, TOOL_RUN, Event, EvidenceStore  # noqa: E402
@@ -69,6 +70,9 @@ class Muc(unittest.TestCase):
     def gate(self, **kw):
         p = {"changed": ["src/a.py"], "write_scope": ["src"], "screens": [], "review_blocking": []}
         p.update(kw)
+        # Every plan declares what each criterion must show (TDD proof policy V2). These cases ask policy V1's
+        # question, so they declare V1's implicit obligation and must get V1's answer.
+        p.setdefault("ac_proof", obligations("S-01", int(p.get("acceptance") or 0)))
         return evaluate("S-01", self.store.read("S-01"), **p)
 
     def muc(self, g, ten: str | None = None):
@@ -99,14 +103,25 @@ class TestBangChungDungCandidate(Muc):
         self.assertIn("test", [c.name for c in g.failures], "lần test ở bbb không được dùng cho aaa")
 
     def test_env_stale_la_unrunnable_neu_dung_hai_sha(self):
-        self.xanh(sha="aaa")
-        cu = self.kho("bbb").tool_run("S-01", "test", ok=True)
-        m = self.muc(self.gate(candidate="aaa"))
+        """F1 (INV-A.2/D.1): freshness, not recency, decides. A check with no record for THIS candidate but a
+        record at another SHA is stale — named with both SHAs, pointing at the foreign record."""
+        self.xanh(sha="aaa")                                   # test + lint at aaa
+        self.kho("bbb").tool_run("S-01", "test", ok=True)      # bbb: a test run, no lint run
+        cu = [e for e in self.store.read("S-01").events if e.name == "lint"][-1]
+        m = self.muc(self.gate(candidate="bbb"))
         self.assertIs(m.outcome, Outcome.UNRUNNABLE)
         self.assertTrue(m.outcome.must_be_named)
         self.assertIn("bbb", m.detail)
         self.assertIn("aaa", m.detail)
         self.assertEqual(m.evidence, [cu.seq], "trỏ đúng sự kiện stale, không trỏ cả tệp")
+
+    def test_env_ban_ghi_cu_dung_candidate_van_hop_le_du_co_ban_ghi_moi_o_sha_khac(self):
+        """The inverse (CF-06): a record fresh for this candidate stays valid however many records of OTHER
+        builds were appended later — sequence is audit metadata, never correctness."""
+        self.xanh(sha="aaa")
+        self.kho("bbb").tool_run("S-01", "test", ok=True)
+        m = self.muc(self.gate(candidate="aaa"))
+        self.assertIs(m.outcome, Outcome.PASSED, m.detail)
 
 
 class TestGuardCoChay(Muc):
@@ -313,14 +328,14 @@ class TestTestThat(Muc):
         self.assertIn("tests/test_a.py", m.detail)
 
     def test_env_chua_quet_thi_khong_tro_su_kien_nao(self):
-        """`run_attempt` luôn ghi `qa:fake-tests`; chỉ chạy tay mới không có.
-        Hôm nay mã cho PASSED khi vắng quét (SOLUTION §12 ghi ✗ — lệch, ghi ở
-        ADR-005 §9 V9); control này giữ điều đúng ở cả hai: không quét thì
-        `evidence` rỗng, người đọc `gate:verdict` thấy ngay mục không trỏ gì."""
+        """`run_attempt` luôn ghi `qa:fake-tests`, và từ F2 (SS-01) `qa.run_suite`
+        cũng ghi cả khi sạch; chỉ bằng chứng chép tay mới thiếu. Vắng quét là
+        "quét chưa chạy", không phải "quét sạch": UNRUNNABLE, `evidence` rỗng
+        (INV-T.1 — vắng mặt không bao giờ sinh PASS)."""
         self.xanh()
         m = self.muc(self.gate())
         self.assertEqual(m.evidence, [])
-        self.assertFalse(m.outcome.blocks)
+        self.assertIs(m.outcome, Outcome.UNRUNNABLE)
 
 
 class TestTieuChiCoTest(Muc):
@@ -378,12 +393,20 @@ class TestTDD(Muc):
     TEN = "TDD"
 
     def test_positive_do_truoc_xanh(self):
-        do = self.store.tool_run("S-01", "test", ok=False)
-        xanh = self.xanh()
-        m = self.muc(self.gate(added_tests=["tests/x.test.js"]))
+        # SS-83: the red run must show the story's own test red by name — a bare non-ok run is no longer enough
+        t = "tests/test_x.py::test_a"
+        do = self.store.tool_run("S-01", "test", ok=False, detail={"test_format": "pytest", "test_ids": [t], "failed_ids": [t]})
+        xanh = self.xanh(ids=[t])
+        m = self.muc(self.gate(added_tests=["tests/test_x.py"]))
         self.assertIs(m.outcome, Outcome.PASSED)
         self.assertEqual(m.evidence, [do.seq, xanh.seq])
         self.assertIs(self.muc(self.gate(added_tests=[])).outcome, Outcome.NOT_APPLICABLE)
+
+    def test_negative_lan_do_tran_khong_ten_khong_chung_minh_gi(self):
+        """SS-83: a non-ok run with no test names (a crash, an unreadable reporter) shows nothing about the story."""
+        self.store.tool_run("S-01", "test", ok=False)
+        self.xanh(ids=["tests/test_x.py::test_a"])
+        self.assertIs(self.muc(self.gate(added_tests=["tests/test_x.py"])).outcome, Outcome.FAILED)
 
     def test_negative_xanh_ngay_lan_dau(self):
         self.xanh()
@@ -555,7 +578,7 @@ class TestTestCoKiemDuocStory(Muc):
         self.nop([self.AC, "t1"])
         m = self.muc(self.gate(candidate="aaa", acceptance=1))
         self.assertIs(m.outcome, Outcome.FAILED)
-        self.assertIn("still green without story code", m.detail)
+        self.assertIn("PLAN_OVERLAP", m.detail)        # V2: already satisfied at the story's entry
         self.assertIn(self.AC, m.detail)
         # cấp 1: mã gắn vào test đã xanh ở baseline — ✗ dù nop đỏ
         self.baseline([self.AC, "t1"])
@@ -651,6 +674,10 @@ class TestBangChungNhan(Muc):
         st.record("S-01", Event(kind=MOCKUP_MAP, name="danh-sach", ok=True,
                                 detail={"missing": [], "missing_data_roles": []}))
         st.tool_run("S-01", "qa:e2e", ok=True)
+        # SS-89: the nop control is part of complete evidence — the criterion test executed red at the parent
+        st.tool_run("S-01", "test:nop", ok=False, detail={"nop": True, "parent": "cha0000", "files": ["tests/test_a.py"],
+                                                          "test_format": "pytest", "test_ids": ["AC-S-01-1: a"],
+                                                          "failed_ids": ["AC-S-01-1: a"], "output_complete": True})
         return self.gate(candidate="aaa", screens=["danh-sach"], contract=["unit", "e2e"],
                          security=SecurityReport(), guard_expected=True, acceptance=1,
                          coverage_min=0.85, added_tests=["tests/test_a.py"],

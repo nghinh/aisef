@@ -27,6 +27,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from ..clients.stream import exit_status_of
+from ..control.identity import CONTROL_FIELDS, CURRENT, NON_CANDIDATE_NOTES, SESSION_FIELDS, EvidenceIdentity, fresh
 
 EVIDENCE_DIR = "evidence"
 
@@ -55,6 +56,8 @@ class Event:
     cost_usd: float = 0.0
     tokens: dict = field(default_factory=dict)
     detail: dict = field(default_factory=dict)
+    #: the identity tuple this record was written under (control/identity.py); {} = schema 1
+    identity: dict = field(default_factory=dict)
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -75,12 +78,36 @@ class Evidence:
 
     @property
     def candidate(self) -> str:
-        """Most recent candidate SHA the evidence points to (ADR-004 R1)."""
+        """Candidate of record: the SHA of the most recent **grading or freeze** (ADR-004 R1). Notes that
+        merely mention a candidate — a recovery, an invalidation — are not gradings (SS-C2)."""
         for e in reversed(self.events):
+            if e.kind == NOTE and e.name in NON_CANDIDATE_NOTES:
+                continue
             sha = str(e.detail.get("candidate") or "")
             if sha:
                 return sha
         return ""
+
+    def for_identity(self, current: EvidenceIdentity, fields: tuple[str, ...] = CONTROL_FIELDS) -> "Evidence":
+        """Evidence usable for deciding on `current`: records that are fresh for it, plus unbound
+        observations (no candidate, no session — guard self-records of legacy hooks, manual tool runs);
+        a record bound to another identity, or lacking a field the decider binds on, is dropped."""
+        keep = []
+        for e in self.events:
+            ident = EvidenceIdentity.of(e, self.story_id)
+            if not ident.bound or fresh(e, current, fields, story_id=self.story_id).ok:
+                keep.append(e)
+            elif ident.session_id and not ident.candidate_sha and fresh(e, current, SESSION_FIELDS, story_id=self.story_id).ok:
+                keep.append(e)      # a proof of THIS session (guard heartbeat, file change) — it names no candidate yet
+        return Evidence(story_id=self.story_id, events=keep)
+
+    def last_fresh(self, kind: str, name: str, current: EvidenceIdentity,
+                   fields: tuple[str, ...] = CONTROL_FIELDS) -> Event | None:
+        """The most recent record of a check that is fresh for `current` — the only "latest" a decision may read."""
+        for e in reversed(self.of(kind, name)):
+            if fresh(e, current, fields, story_id=self.story_id).ok:
+                return e
+        return None
 
     def for_candidate(self, sha: str) -> "Evidence":
         """Evidence usable for grading build ``sha``.
@@ -194,7 +221,17 @@ class EvidenceStore:
     caller that forgets silently produces evidence bound to no build.
     """
 
-    def __init__(self, artifact_root: Path | str, *, candidate: str = ""):
+    def __init__(self, artifact_root: Path | str, *, candidate: str = "",
+                 identity: EvidenceIdentity | None = None):
+        if identity is None:
+            now = CURRENT.get()
+            # a store built with a bare candidate inside a verified attempt stamps that attempt's identity —
+            # for the same candidate; a different candidate is a different state and keeps schema 1
+            if now is not None and (not candidate or candidate == now.candidate_sha):
+                identity = now
+        if identity is not None and not candidate:
+            candidate = identity.candidate_sha
+        self.identity = identity
         self.root = Path(artifact_root) / EVIDENCE_DIR
         self.candidate = candidate
 
@@ -210,6 +247,8 @@ class EvidenceStore:
         event.at = event.at or time.time()
         if self.candidate and not event.detail.get("candidate"):
             event.detail = {**event.detail, "candidate": self.candidate}
+        if self.identity is not None and not event.identity:
+            event.identity = self.identity.as_dict()
         # Open in append mode and write one line: a short line under PIPE_BUF
         # is atomic on POSIX, so no separate lock is needed.
         with path.open("a", encoding="utf-8") as fh:
@@ -283,6 +322,7 @@ class EvidenceStore:
                     cost_usd=float(data.get("cost_usd") or 0.0),
                     tokens=data.get("tokens") or {},
                     detail=data.get("detail") or {},
+                    identity=data.get("identity") if isinstance(data.get("identity"), dict) else {},
                 )
             )
         # By time **then** sequence. Files written before the fix above carry

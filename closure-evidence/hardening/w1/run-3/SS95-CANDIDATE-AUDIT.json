@@ -1,0 +1,18 @@
+{
+ "run": "3",
+ "generated": "2026-09-19T20:08:55+0700",
+ "finding": "SS-95",
+ "finish_record_false_block_count": 0,
+ "false_block_count": 0,
+ "false_block": [],
+ "measured_at_candidate_for": [
+  "STORY-01-03"
+ ],
+ "candidates": {
+  "STORY-01-03": {
+   "sha": "f495d7e1c4fbf91584c0fe1beefb1fd7007792d8",
+   "parse_complete": true,
+   "note": null
+  }
+ }
+}

@@ -1,0 +1,104 @@
+↺ STORY-03-02: undo — incomplete run at `status.running`, cleaned up and back to pending
+EPIC-01 · wave 1
+  ○ STORY-01-01: already done, skipped
+EPIC-01 · wave 2
+  ○ STORY-01-02: already done, skipped
+EPIC-01 · wave 3
+  ○ STORY-01-03: already done, skipped
+EPIC-01 · wave 4
+  ○ STORY-01-04: already done, skipped
+EPIC-01 · wave 5
+  ○ STORY-01-05: already done, skipped
+EPIC-01 · wave 6
+  ○ STORY-01-06: already done, skipped
+EPIC-02 · wave 1
+  ○ STORY-02-01: already done, skipped
+EPIC-02 · wave 2
+  ○ STORY-02-02: already done, skipped
+EPIC-03 · wave 1
+  ○ STORY-03-01: already done, skipped
+EPIC-03 · wave 2
+STORY-03-02: DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✗ test — the most recent test run is still failing, the story cannot be finished.
+    ✅ no baseline regression
+    ✗ lint — BLE001 Do not catch blind exception: `Exception`
+     --> tests/test_repair_tail.py:128:20
+      |
+  126 |             try:
+  127 |                 Ledger(str(path)).repair_tail()
+  128 |             except Exception as exc:
+      |                    ^^^^^^^^^
+  129 |                 self.fail(f"repair_tail on c
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✗ criteria have tests — no green test run yet
+    ○ coverage — no green test run to measure
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 3 tests with criteria codes are red or absent at parent SHA e6ee21f
+    ✅ tests verify story — 3 tests with criteria codes are red or absent at parent SHA e6ee21f
+    ✅ security
+    ✗ review — 1 blocking items: [block] tests/test_repair_tail.py:75 — AC-1 test compares after[:-1].split(b'\n') (a 2-element list of separate line bytes) to [kept_line_bytes] (a 1-element list containing all preserved lines joined
+    ✅ preservation — 31 behaviours of other stories still green
+  [attempt 2] ok
+EPIC-04 · wave 1
+STORY-04-01: DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✗ test — the most recent test run is still failing, the story cannot be finished.
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✗ criteria have tests — no green test run yet
+    ○ coverage — no green test run to measure
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/test_cli_exit_codes.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — no tests with criteria codes green at candidate — nothing to verify at parent SHA (see criteria have tests check)
+    ✅ security
+    ✗ review — 5 blocking items: [block] ledgerlock/cli.py:22 — cli.main only parses args and returns 0 — none of the four subcommands (verify/snapshot/apply/repair-tail) accept a positional ledger path, none accept --out/--batch, an
+    ✅ preservation — 10 behaviours of other stories still green
+  [attempt 2] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✅ TDD — no red run recorded, but the nop control proves the same thing directly — 4 tests with criteria codes are red or absent at parent SHA 4fbf24d
+    ✅ tests verify story — 4 tests with criteria codes are red or absent at parent SHA 4fbf24d
+    ✅ security
+    ⚠ review — reviewer did not run (max_turns: stopped at 40 turns (cap 40)) — no verdict about the candidate
+    ✅ preservation — 10 behaviours of other stories still green
+  [re-verify] ok
+  candidate 1436b86: reran review · kept test:nop, test, lint, qa:fake-tests, security
+EPIC-04 · wave 2
+STORY-04-02: NOT DONE
+  [attempt 1] gate failed
+    ✅ evidence matches candidate
+    ✅ guard ran
+    ✅ test
+    ✅ no baseline regression
+    ✅ lint
+    ✅ write scope
+    – mockup map — story has no UI
+    ✅ real tests
+    ✅ criteria have tests
+    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command
+    ✗ TDD — tests green on first run — not proven to verify anything (tests/test_cli_exit_codes.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.
+    ✗ tests verify story — tests verify nothing — still green without story code (parent SHA 1436b86): tests/test_cli_exit_codes.py::TestCliUsageErrors::test_AC_STORY_04_02_1_wrong_positional_arg_count_exits_two_and_writes_nothing_to_stdout, tests/test_cli_exit_codes.py::TestCliApplyMissingBatchFile::test_AC_STORY_04_02_2_apply_batch_with_missing_batch_file_exits_three_and_writes_nothing_to_stdout, tests/test_cli_exit_codes.py::TestCliApplyConflictExitsFour::test_AC_STORY_04_02_3_apply_with_conflicting_batch_element_exits_four_and_leaves_jsonl_unchanged, tests/test_cli_exit_codes.py::TestCliVerifyExitsFiveOnCorruption::test_AC_STORY_04_02_4_verify_on_mutated_line_seventeen_exits_five_and_writes_nothing_to_stdout, tests/test_cli_exit_codes.py::TestCliSnapshotWithoutOutExitsTwo::test_AC_STORY_04_02_6_snapshot_without_out_exits_two_and_writes_nothing_to_stdout
+    ✅ security
+    ⚠ review — reviewer did not run (max_turns: stopped at 40 turns (cap 40)) — no verdict about the candidate
+    ✅ preservation — 15 behaviours of other stories still green
+  [attempt 2] max_turns: stopped at 40 turns (cap 40)
+  [attempt 3] max_turns: stopped at 40 turns (cap 40)
+  ✗ tried 3 attempts, still did not pass gate
+
+⏸ stopped at EPIC-04 · wave 2

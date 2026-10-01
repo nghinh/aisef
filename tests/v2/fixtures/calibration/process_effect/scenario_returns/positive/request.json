@@ -1,0 +1,40 @@
+{
+ "subject": {
+  "kind": "process_effect",
+  "locator": "tally:Tally"
+ },
+ "stimulus": {
+  "scenario": [
+   {
+    "step": "construct",
+    "args": [
+     "<ws>/tally.jsonl"
+    ],
+    "kwargs": {}
+   },
+   {
+    "step": "call",
+    "method": "add",
+    "args": [
+     "a",
+     2
+    ],
+    "kwargs": {}
+   },
+   {
+    "step": "call",
+    "method": "add",
+    "args": [
+     "b",
+     3
+    ],
+    "kwargs": {}
+   }
+  ]
+ },
+ "observable": {
+  "returns": 5,
+  "within_s": 10
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}

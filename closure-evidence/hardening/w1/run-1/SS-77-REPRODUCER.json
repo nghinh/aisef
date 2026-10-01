@@ -1,0 +1,25 @@
+{
+ "defect": "SS-77",
+ "old_derivation": "done = stories parsed out of `aisef status` whose column reads 'done'",
+ "old_done_set": [],
+ "old_done_count": 0,
+ "framework_state_source": "_bmad-output/sprint-status.json",
+ "real_done_set": [
+  "STORY-01-01",
+  "STORY-01-02",
+  "STORY-01-03",
+  "STORY-01-04",
+  "STORY-01-05",
+  "STORY-01-06",
+  "STORY-02-01",
+  "STORY-02-02",
+  "STORY-03-01",
+  "STORY-03-02",
+  "STORY-04-01"
+ ],
+ "real_done_count": 11,
+ "why": "`aisef status` lists only stories that are NOT passing, so the old set is empty however many stories are done",
+ "consequence": "the W1 exit rule `owners and all(o in done for o in owners)` could not fire on any partial run: false_pass would read 0 for a reason unrelated to whether a false pass happened",
+ "red_before_fix": true,
+ "green_after_fix": true
+}

@@ -1,0 +1,979 @@
+{
+ "run": 3,
+ "project": "/Users/nghinh/Downloads/projects/w1-run-3",
+ "phases": {
+  "prepare": {
+   "at": "2026-09-18T10:25:11+0700",
+   "aisef_version": "aisef 1.7.6",
+   "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
+   "aisef_from_the_wheel_not_the_checkout": true,
+   "venv_packages": "[{\"name\": \"aisef\", \"version\": \"1.7.6\"}, {\"name\": \"iniconfig\", \"version\": \"2.3.0\"}, {\"name\": \"packaging\", \"version\": \"26.3\"}, {\"name\": \"pip\", \"version\": \"26.2.1\"}, {\"name\": \"pluggy\", \"version\": \"1.6.0\"}, {\"name\": \"Pygments\", \"version\": \"2.21.0\"}, {\"name\": \"pytest\", \"version\": \"9.1.1\"}]\n",
+   "freeze": {
+    "generated": "2026-09-18T06:58:42+0700",
+    "candidate_sha": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+    "aisef_tree_digest": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+    "PHASE12_KERNEL_DIGEST": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+    "tree_equals_phase12_kernel": true,
+    "version_string": "aisef 1.7.6",
+    "wheel": {
+     "file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/dist/aisef-1.7.6-py3-none-any.whl",
+     "sha256": "2e08d43b61d6647692b731943741f64f7fa8f107e53dacf06bb92bbc1c9bfe8e",
+     "bytes": 667615,
+     "built_with": "build 1.6.1 (/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/build-venv/lib/python3.14/site-packages/build)"
+    },
+    "run_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv",
+     "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
+     "installed_from_the_wheel": true
+    },
+    "oracle_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv",
+     "packages": [
+      {
+       "name": "coverage",
+       "version": "7.16.1"
+      },
+      {
+       "name": "pytest",
+       "version": "9.1.1"
+      }
+     ]
+    },
+    "docker_image": {
+     "name": "aisef-verify-python:84adf1d8eaf9",
+     "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+    },
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "opencode_version": "1.18.31",
+    "ci": {
+     "run": "35287072415",
+     "sha": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+     "conclusion": "success",
+     "jobs": {
+      "wheel": "success",
+      "unit (ubuntu-latest, 3.14)": "success",
+      "lint": "success",
+      "unit (ubuntu-latest, 3.12)": "success",
+      "unit (windows-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.13)": "success"
+     }
+    },
+    "ci_matches_candidate": true,
+    "w0": {
+     "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/AISEF-W0-QUALIFICATION.json",
+     "qualified": true,
+     "sha": "0a7cab86086ebc496bcda1559142082c89506c29",
+     "aisef_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+     "tree_matches_frozen": true
+    },
+    "no_tag_no_publish": true,
+    "rule": "W1 runs use run_venv's aisef only; any aisef/ change after this record voids it and the W1 runs that rest on it",
+    "pass": true
+   },
+   "project_git": {
+    "head": "53a6425d7cdafb3741571194ff8acc2c72dc45a5",
+    "branch": "master",
+    "status": [],
+    "log": [
+     "53a6425 w1-run-3: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "2655265 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "8ff9f13 epics.md: split to 16 stories (each ≤7 AC, ≤16 complexity) — second plan attempt passed",
+     "35f33e7 evidence: initial AISEF plan attempt, machine-gate failures captured",
+     "6a8d60c docs: initial LedgerLock requirements (NFC, hash chain, idempotency, atomic batch, exit codes, 3.11+ stdlib)"
+    ]
+   },
+   "config": {
+    "tools.test": "python3 -m pytest -v",
+    "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+    "sandbox.image": "aisef-verify-python:84adf1d8eaf9",
+    "sandbox.allow_hosts": [
+     "pypi.org",
+     "files.pythonhosted.org"
+    ],
+    "run.cost_cap_usd": 80.0
+   },
+   "opencode_version": "1.18.31",
+   "opencode_binary": "/Users/nghinh/.opencode/bin/opencode",
+   "docker_image": {
+    "name": "aisef-verify-python:84adf1d8eaf9",
+    "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "doctor": {
+    "cmd": [
+     "aisef",
+     "doctor"
+    ],
+    "exit": 0,
+    "seconds": 2.6,
+    "stdout_tail": "Environment:\n  ✅ python >= 3.11 — 3.14.7\n  ✅ git\n  ✅ claude CLI — /opt/homebrew/bin/claude\n  ✅ opencode CLI — /Users/nghinh/.opencode/bin/opencode\n  ✅ agent credential — ANTHROPIC_BASE_URL set in the environment — these outrank the client's own login; unset them to use it\n  ✅ docker daemon — running\n  ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts\nProject:\n  ✅ project directory — /Users/nghinh/Downloads/projects/w1-run-3\n  ✅ sandbox provider — docker — guarantees at WORKSPACE_WRITE: network_none, non_root, secrets_absent\n  ✅ sandbox image — aisef-verify-python:84adf1d8eaf9 — built by the harness: pinned base, pinned tool versions\n  · role test — explicit → `python3 -m pytest -v`\n  · role lint — explicit → `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`\n  · role sast — auto: bandit (managed, pinned 1.9.4) → `bandit -q -r .`\n  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.sast — `tools.sast` = `bandit -q -r .` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ docs/requirements.md — /Users/nghinh/Downloads/projects/w1-run-3/docs/requirements.md\n  ✅ config — defaults → /Users/nghinh/Downloads/projects/w1-run-3/.ai/config.json\n  ○ budget cap above recorded spend — no `_bmad-output/budget.json` yet — nothing to compare; the first settled call writes it\n  ○ test command prints coverage — `tools.test` = `python3 -m pytest -v` does not print coverage — gate coverage check will be **not configured** (add `--coverage` / `--cov` / `--experimental-test-coverage`)\n  ✅ test command prints test names — gate can read test names (no evidence yet — guessing from command flags)\nInstalled skills:\n  ✅ has skills — 158 directories\n  ✅ framework skills up to date — matches source\n  ✅ no offensive skills — clean\n\n✅ ready\n",
+    "stderr_tail": ""
+   },
+   "doctor_red": [],
+   "oracle": {
+    "sha256_now": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "sha256_pinned": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "independence_verdict": "PASS"
+   },
+   "oracle_ok": true,
+   "compile": {
+    "cmd": [
+     "aisef",
+     "compile",
+     "--client",
+     "opencode",
+     "--bin",
+     "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/aisef"
+    ],
+    "exit": 0,
+    "seconds": 0.1,
+    "stdout_tail": "client: opencode\n  second-tier in V1: cost/turns not measurable from harness — supported, does not block release\n  wrote /Users/nghinh/Downloads/projects/w1-run-3/.opencode/plugin/aisef-guard.ts\n  guards blocking before action: destructive, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope\n  guards blocking at other hooks: diff-scope (PostToolUse)\n  ⚠️  guards post-hoc only: completion\n     — not wired into this client's hooks at all; the rule is re-asked afterwards from evidence (story gate, `aisef verify`), which cannot stop the action, only fail the story\n  capabilities not at native level:\n     dir_allowlist: unsupported\n     tool_allowlist: emulated\n     turn_limit: unsupported\n\nreport: /Users/nghinh/Downloads/projects/w1-run-3/_bmad-output/compile-report.json\n\n⚠️  some clients can only be checked later — lower assurance, noted in report\n",
+    "stderr_tail": ""
+   },
+   "guard_commit": "c3ab20f59f18145a27e29d2bb6e79c561f331c8b",
+   "guard_plugin": {
+    "tracked_now": true,
+    "sha256": "ac496617b64a3c3d1ec31893431df732f481253da6dd4c72a8fb25beee4efdec",
+    "bin_line": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/aisef\"]",
+    "compile_report": {
+     "clients": [
+      {
+       "client": "opencode",
+       "written": [
+        ".opencode/plugin/aisef-guard.ts"
+       ],
+       "guards_wired": [
+        "destructive",
+        "diff-scope",
+        "egress",
+        "git-stage",
+        "injection",
+        "process-ref",
+        "secret",
+        "tool-bypass",
+        "write-scope"
+       ],
+       "guards_post_hoc": [
+        "completion"
+       ],
+       "blocks_at_source": false,
+       "degradations": [
+        "dir_allowlist: unsupported",
+        "tool_allowlist: emulated",
+        "turn_limit: unsupported"
+       ]
+      }
+     ]
+    }
+   },
+   "fresh_topology": {
+    "head_branch": "master",
+    "master": "c3ab20f59f18145a27e29d2bb6e79c561f331c8b",
+    "commits_after_8ff9f13": [
+     "c3ab20f w1-run-3: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "53a6425 w1-run-3: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "2655265 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)"
+    ],
+    "ledgerlock_dir_absent_at_master": true,
+    "remotes": [],
+    "branches": [
+     "master"
+    ]
+   },
+   "fresh_topology_ok": true,
+   "capability_preflight": {
+    "resolved": [
+     {
+      "role": "test",
+      "mode": "explicit",
+      "command": "python3 -m pytest -v",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "lint",
+      "mode": "explicit",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "sast",
+      "mode": "auto",
+      "command": "bandit -q -r .",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "bandit",
+      "provision": "managed",
+      "version": "1.9.4"
+     }
+    ],
+    "checks": [
+     {
+      "key": "tools.test",
+      "command": "python3 -m pytest -v",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.lint",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "/usr/local/bin/ruff",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.sast",
+      "command": "bandit -q -r .",
+      "state": "present",
+      "ok": true,
+      "mode": "auto",
+      "tool": "bandit",
+      "version": "1.9.4",
+      "observed": "bandit 1.9.4",
+      "detail": "bandit (pinned 1.9.4)",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     }
+    ],
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "expected_python_image": "aisef-verify-python:84adf1d8eaf9"
+   },
+   "section4_measured": {
+    "wheel": "/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/dist/aisef-1.7.6-py3-none-any.whl",
+    "wheel_sha256_in_freeze": "2e08d43b61d6647692b731943741f64f7fa8f107e53dacf06bb92bbc1c9bfe8e",
+    "aisef_tree_digest": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+    "PHASE12_KERNEL_DIGEST": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+    "aisef_tree_at_the_candidate_sha": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+    "run_max_turns": 40,
+    "capability_matrix": {
+     "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/tool-capability-matrix.json",
+     "pass": true,
+     "aisef_tree": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+     "totals": {
+      "profiles": 7,
+      "capabilities": 21,
+      "qualified": 11,
+      "none_declared": 10,
+      "failed": [],
+      "presets_failed": []
+     }
+    },
+    "stale_evidence_dirs": [],
+    "arb1": {
+     "artifacts": [
+      "stories.index.json",
+      "design-contract.json"
+     ],
+     "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+     "digest_recomputed_by_the_signed_method": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+     "byte_identical_to_what_was_signed": true,
+     "current_method_digest": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+     "stale_caused_by_the_hash_method_alone": true
+    }
+   },
+   "preflight": {
+    "trunk_is_the_approved_fresh_root": true,
+    "zero_prior_delivery_commits": true,
+    "expected_story_count": true,
+    "expected_story_state_none_registered": true,
+    "no_candidate_branches": true,
+    "artifacts_match_frozen_requirements": true,
+    "client_is_opencode": true,
+    "expected_opencode_version": true,
+    "expected_model_route": true,
+    "guard_plugin_bound_to_the_frozen_candidate": true,
+    "no_stale_story_worktrees": true,
+    "sandbox_image_is_the_frozen_candidates_python_environment": true,
+    "every_selected_tool_probed_present_before_the_first_model_call": true,
+    "sandbox_image_present": true,
+    "environment_identity_matches_freeze": true,
+    "no_remotes": true,
+    "frozen_wheel_digest_identical": true,
+    "product_tree_digest_identical": true,
+    "same_max_turn_configuration": true,
+    "same_capability_matrix": true,
+    "no_stale_evidence": true,
+    "readiness_hash_migration_check_passes_mechanically": true
+   },
+   "preflight_measured": {
+    "model": "9router/mycombo",
+    "opencode_version": "1.18.31",
+    "plugin_bin": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/af94372dd186/w1-venv/bin/aisef\"]",
+    "worktrees": [
+     "/Users/nghinh/Downloads/projects/w1-run-3 c3ab20f [master]"
+    ],
+    "stories": 16,
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "preflight_ok": true,
+   "gates": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "agent_starts_before": 5,
+   "story_evidence_before": [],
+   "ok": true
+  },
+  "kernel_first": {
+   "at": "2026-09-18T10:25:17+0700",
+   "agent_starts_before": 5,
+   "evidence_before": [],
+   "gates_before": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "run": {
+    "cmd": [
+     "aisef",
+     "run",
+     "--client",
+     "opencode"
+    ],
+    "exit": 2,
+    "seconds": 0.2,
+    "stdout_tail": "",
+    "stderr_tail": "✗ gate not approved: readiness\n  aisef review readiness\n"
+   },
+   "agent_starts_after": 5,
+   "evidence_after": [],
+   "refused_on_readiness": true,
+   "no_agent_call": true,
+   "ok": true,
+   "classification": "kernel refused the STALE gate before any agent call (ARB-1 kernel path first)"
+  },
+  "approve": {
+   "at": "2026-09-18T10:25:18+0700",
+   "gates_before": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "arb1_measured": {
+    "artifacts": [
+     "stories.index.json",
+     "design-contract.json"
+    ],
+    "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+    "digest_recomputed_by_the_signed_method": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+    "byte_identical_to_what_was_signed": true,
+    "current_method_digest": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+    "stale_caused_by_the_hash_method_alone": true
+   },
+   "approve": {
+    "cmd": [
+     "aisef",
+     "approve",
+     "readiness",
+     "--note",
+     "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json"
+    ],
+    "exit": 0,
+    "seconds": 3.2,
+    "stdout_tail": "\n✗ 2/16 stories not yet eligible:\n  MISSING EVIDENCE STORY-02-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n  MISSING EVIDENCE STORY-03-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n✅ readiness approved by nghinh\n",
+    "stderr_tail": ""
+   },
+   "gates_after": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "approved",
+    "pre-deploy": "pending"
+   },
+   "approval_record": {
+    "gate": "readiness",
+    "artifact": "stories.index.json, design-contract.json",
+    "artifact_sha256": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+    "status": "approved",
+    "seq": 11,
+    "decided_by": "nghinh",
+    "decided_at": "2026-09-18T03:25:21+00:00",
+    "note": "ARB-1 OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL: re-approval for byte-identical content after the hash-method change (SS-55 verifier-config digest); not a waiver; kernel refusal recorded first; conditions measured in closure-evidence/hardening/w1/ARBITRATION-PREDECLARED.json",
+    "machine_checks": {},
+    "history": [
+     {
+      "status": "approved",
+      "decided_by": "nghinh",
+      "decided_at": "2026-09-15T13:32:32+00:00",
+      "note": "",
+      "artifact_sha256": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838"
+     }
+    ]
+   },
+   "changed_gates": [
+    "readiness"
+   ],
+   "ok": true
+  },
+  "run": {
+   "at": "2026-09-18T10:25:28+0700",
+   "invocations": [
+    {
+     "k": 1,
+     "pid": 59086,
+     "pgid": 59086,
+     "started": "2026-09-18T10:25:28+0700",
+     "t0": 1789701928.647854,
+     "crashed_driver": true
+    }
+   ],
+   "resumes": [],
+   "markers_pending": [
+    "wave=EPIC-01/w3 DONE",
+    "wave=EPIC-03/w1 DONE"
+   ],
+   "runlog_offset_at_start": 9298,
+   "reconstructed_after_SS80": {
+    "what_happened": "the driver read the 'wave=EPIC-01/w3 DONE' marker at 10:46:15 and signalled the process group, but the aisef run had already ended by itself at 10:46:13 (sprint DONE). os.killpg raised PermissionError and the driver died before writing the invocation's exit code.",
+    "measured_now": {
+     "processes_left_in_pgid_59086": 0,
+     "aisef_or_driver_processes_alive": 0,
+     "sprint_terminal_line": "[2026-09-18 10:46:13] sprint DONE $0.00 stopped=EPIC-01 · wave 3"
+    },
+    "exit_code_of_the_aisef_run": null,
+    "exit_code_not_recorded_because": "the driver crashed before reading it; it is left null rather than assumed from runs 1-2",
+    "run_outcome_is_unaffected": "the sprint had already reached its own terminal state; no story work happened after 10:46:13",
+    "defect": "SS-80"
+   }
+  },
+  "finish": {
+   "at": "2026-09-18T10:56:29+0700",
+   "status": {
+    "cmd": [
+     "aisef",
+     "status"
+    ],
+    "exit": 2,
+    "seconds": 0.2,
+    "stdout_tail": "Progress: 2/16 stories done (13 not started)\nActive epics: EPIC-01\n\n  done        2\n  failed      1\n\nCost: $0.00\nAgent runs: ok 22 · max_turns 3\n\n✗ 1 stories not passing:\n    STORY-01-03      failed   deadlock due to plan, reviewer verified: [stuck] ledgerlock/format.py:36 — __all__ does not list line_hash; adding the function without extending __all__ violates the public-API expectation in architecture.md. Fixable inside write_scope once the function is added (finding #1).. Fix the acceptance criteria or the story's write_scope, then re-run — retrying will not resolve this.\n",
+    "stderr_tail": ""
+   },
+   "gates": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "approved",
+    "pre-deploy": "pending"
+   },
+   "cost": {
+    "cmd": [
+     "aisef",
+     "cost",
+     "--out",
+     "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-3/cost.md"
+    ],
+    "exit": 0,
+    "seconds": 0.1,
+    "stdout_tail": "er 1M input tokens and `q` = per 1M output:\n\n    cost ≈ 31.87 × p + 0.149 × q\n\nCache reads are 0% of prompt tokens (0 cached vs 31,868,689 fresh); most price lists charge them far less, so they are counted separately.\n\n⚠ At 0% cache, this client bills re-sent context as fresh `input`: the totals below are a sum over turns of the whole prompt and are **not** comparable with a corpus that caches.\n\nNet VERIFIED per M input tokens: **0.53**\n\n17 verified · 5 gap · 0 reopened → net **17** behaviours for 31,868,689 across 25 sessions (435 turns).\n\n## Where the spend went\n\n| class | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| passed | 5 | 80 | 5,335,419 | 17% |\n| gate-blocked | 5 | 87 | 5,755,875 | 18% |\n| turn-cap | 3 | 120 | 8,267,436 | 26% |\n| planning | 12 | 148 | 12,509,959 | 39% |\n\nSpend on stories that ended with a net VERIFIED behaviour: **61%**.\n\n## Per story\n\nLedger columns **overlap** between stories (one FR can be covered by two), so they do not sum to the corpus counts above.\n\n| story | attempts | tokens | share | passed | gate-blocked | turn-cap | env-failed | no-verdict | verified | gap | reopened | net |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| STORY-01-01 | 2 | 13,921,849 | 44% | 2,749,838 | 2,904,575 | 8,267,436 | — | — | 10 | 0 | 0 | 10 |\n| plan-epics | 0 | 5,687,131 | 18% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| STORY-01-03 | 1 | 2,851,300 | 9% | — | 2,851,300 | — | — | — | 1 | 5 | 0 | 1 |\n| STORY-01-02 | 1 | 2,585,581 | 8% | 2,585,581 | — | — | — | — | 7 | 0 | 0 | 7 |\n| plan-architecture | 0 | 1,344,422 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-apply | 0 | 1,142,062 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-project-context | 0 | 960,795 | 3% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-ux | 0 | 675,905 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-prd | 0 | 642,950 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-help-version | 0 | 634,922 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-snapshot | 0 | 553,491 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-verify | 0 | 500,041 | 2% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-repair-tail | 0 | 368,240 | 1% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| STORY-01-05 | 0 | 0 | 0% | — | — | — | — | — | 2 | 0 | 0 | 2 |\n| STORY-05-01 | 0 | 0 | 0% | — | — | — | — | — | 1 | 0 | 0 | 1 |\n| STORY-05-02 | 0 | 0 | 0% | — | — | — | — | — | 1 | 0 | 0 | 1 |\n| STORY-05-03 | 0 | 0 | 0% | — | — | — | — | — | 1 | 0 | 0 | 1 |\n\n## What the gate blocked on\n\n| check | blocks |\n|---|---|\n| lint | 2 |\n| criteria have tests | 1 |\n| no baseline regression | 1 |\n| preservation | 1 |\n| review | 1 |\n| test | 1 |\n| tests verify story | 1 |\n\n## By role\n\n| role | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| ? | 12 | 148 | 12,509,959 | 39% |\n| developer | 5 | 155 | 10,495,299 | 33% |\n| review | 4 | 110 | 7,498,353 | 24% |\n| security | 4 | 22 | 1,365,078 | 4% |\n\n\n/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-3/cost.md\n",
+    "stderr_tail": ""
+   },
+   "cost_semantics": {
+    "provider_pricing_coverage_pct": 0,
+    "usd_recorded_by_the_provider": 0.0,
+    "cost_cap_usd": 80.0,
+    "cost_cap_status": "UNVERIFIABLE",
+    "cost_cap_note": "the provider priced no session on this route, so no dollar figure exists: the cap is neither reached nor not reached, and this run is not proof that the cap holds for this route",
+    "usage_measured": {
+     "sessions": 25,
+     "turns": 435,
+     "input_tokens_fresh": 31868689,
+     "input_tokens_cached": 0,
+     "output_tokens": 149000
+    },
+    "prices_estimated": false,
+    "recompute_rule": "cost = input_tokens/1e6 * price_per_M_input + output_tokens/1e6 * price_per_M_output, once the route publishes prices"
+   },
+   "project_git": {
+    "head": "b1599804ad28b514906135cc0b1b8c35c4adb1e1",
+    "branch": "master",
+    "branches": [
+     "*",
+     "master",
+     "story/STORY-01-01",
+     "story/STORY-01-02",
+     "story/STORY-01-03"
+    ],
+    "status": [
+     "M .DS_Store",
+     " M _bmad-output/approvals/readiness.json",
+     " M _bmad-output/run.log",
+     "?? _bmad-output/INDEX.md",
+     "?? _bmad-output/complexity.json",
+     "?? _bmad-output/evidence/STORY-01-01-lint-134.log",
+     "?? _bmad-output/evidence/STORY-01-01-lint-140.log",
+     "?? _bmad-output/evidence/STORY-01-01-lint-185.log",
+     "?? _bmad-output/evidence/STORY-01-01-lint-435.log",
+     "?? _bmad-output/evidence/STORY-01-01-lint-441.log",
+     "?? _bmad-output/evidence/STORY-01-01-test-nop-183.log",
+     "?? _bmad-output/evidence/STORY-01-01-test-nop-478.log",
+     "?? _bmad-output/evidence/STORY-01-01.jsonl",
+     "?? _bmad-output/evidence/STORY-01-02-sast-49.log",
+     "?? _bmad-output/evidence/STORY-01-02-sast-60.log",
+     "?? _bmad-output/evidence/STORY-01-02-sast-66.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-25.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-37.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-90.log",
+     "?? _bmad-output/evidence/STORY-01-02-test-nop-89.log",
+     "?? _bmad-output/evidence/STORY-01-02.jsonl",
+     "?? _bmad-output/evidence/STORY-01-03-lint-34.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-33.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-baseline-2.log",
+     "?? _bmad-output/evidence/STORY-01-03-test-nop-32.log",
+     "?? _bmad-output/evidence/STORY-01-03.jsonl",
+     "?? _bmad-output/journal/",
+     "?? _bmad-output/ledger.json",
+     "?? _bmad-output/replay/",
+     "?? _bmad-output/reviews/",
+     "?? _bmad-output/sprint-status.json",
+     "?? _bmad-output/sprint-status.json.lock"
+    ],
+    "master_log": [
+     "b159980 STORY-01-02: add canonical_bytes and GENESIS constant",
+     "463b807 STORY-01-01: candidate attempt 3",
+     "21a8bff STORY-01-01: candidate attempt 1",
+     "c3ab20f w1-run-3: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "53a6425 w1-run-3: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "2655265 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "8ff9f13 epics.md: split to 16 stories (each ≤7 AC, ≤16 complexity) — second plan attempt passed",
+     "35f33e7 evidence: initial AISEF plan attempt, machine-gate failures captured",
+     "6a8d60c docs: initial LedgerLock requirements (NFC, hash chain, idempotency, atomic batch, exit codes, 3.11+ stdlib)"
+    ]
+   },
+   "drift_records": [],
+   "progress": {
+    "done": 2,
+    "total": 16
+   },
+   "stories": {
+    "STORY-01-03": {
+     "status": "failed",
+     "reason": "deadlock due to plan, reviewer verified: [stuck] ledgerlock/format.py:36 — __all__ does not list line_hash; adding the function without extending __all__ violates the public-API expectation in architecture.md. Fixable inside write_scope once the function is added (finding #1).. Fix the acceptance cr",
+     "journal_last_step": "attempt.committed",
+     "journal_records": 8,
+     "state_status": "failed",
+     "attempts": 1
+    },
+    "STORY-01-01": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 12,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 3
+    },
+    "STORY-01-02": {
+     "journal_last_step": "attempt.committed",
+     "journal_records": 10,
+     "status": "done",
+     "state_status": "done",
+     "attempts": 1
+    }
+   },
+   "delivered": {
+    "master_head": "b1599804ad28b514906135cc0b1b8c35c4adb1e1",
+    "has_package": true,
+    "files": [
+     ".claude/skills/achieving-cmmc-level-2-compliance/scripts/process.py",
+     ".claude/skills/analyzing-sbom-for-supply-chain-vulnerabilities/scripts/agent.py",
+     ".claude/skills/bmad-advanced-elicitation/scripts/pick_methods.py",
+     ".claude/skills/bmad-advanced-elicitation/scripts/tests/test_pick_methods.py",
+     ".claude/skills/bmad-architecture/scripts/lint_spine.py",
+     ".claude/skills/bmad-architecture/scripts/tests/test_lint_spine.py",
+     ".claude/skills/bmad-brainstorming/scripts/brain.py",
+     ".claude/skills/bmad-brainstorming/scripts/tests/test_brain.py",
+     ".claude/skills/bmad-customize/scripts/list_customizable_skills.py",
+     ".claude/skills/bmad-customize/scripts/tests/test_list_customizable_skills.py",
+     ".claude/skills/bmad-deep-recon/scripts/recon_kit.py",
+     ".claude/skills/bmad-deep-recon/scripts/tests/test_recon_kit.py",
+     ".claude/skills/bmad-forge-idea/scripts/resolve_personas.py",
+     ".claude/skills/bmad-forge-idea/scripts/tests/test_resolve_personas.py",
+     ".claude/skills/bmad-party-mode/scripts/resolve_party.py",
+     ".claude/skills/bmad-party-mode/scripts/tests/test_resolve_party.py",
+     ".claude/skills/bmad-retrospective/scripts/git_evidence.py",
+     ".claude/skills/bmad-retrospective/scripts/sprint_status.py",
+     ".claude/skills/bmad-retrospective/scripts/tests/test_git_evidence.py",
+     ".claude/skills/bmad-retrospective/scripts/tests/test_sprint_status.py",
+     ".claude/skills/bmad-review/scripts/tests/test_word_metrics.py",
+     ".claude/skills/bmad-review/scripts/word_metrics.py",
+     ".claude/skills/bmad-sprint-planning/scripts/sprint_plan.py",
+     ".claude/skills/bmad-sprint-planning/scripts/tests/test_sprint_plan.py",
+     ".claude/skills/brand/scripts/tests/test_sync_brand_to_tokens.py",
+     ".claude/skills/building-devsecops-pipeline-with-gitlab-ci/scripts/agent.py",
+     ".claude/skills/building-devsecops-pipeline-with-gitlab-ci/scripts/process.py",
+     ".claude/skills/building-patch-tuesday-response-process/scripts/agent.py",
+     ".claude/skills/building-patch-tuesday-response-process/scripts/process.py",
+     ".claude/skills/building-vulnerability-aging-and-sla-tracking/scripts/agent.py",
+     ".claude/skills/building-vulnerability-aging-and-sla-tracking/scripts/process.py",
+     ".claude/skills/building-vulnerability-dashboard-with-defectdojo/scripts/agent.py",
+     ".claude/skills/building-vulnerability-dashboard-with-defectdojo/scripts/process.py",
+     ".claude/skills/building-vulnerability-exception-tracking-system/scripts/agent.py",
+     ".claude/skills/building-vulnerability-exception-tracking-system/scripts/process.py",
+     ".claude/skills/conducting-cyber-risk-assessment-with-nist-800-30/scripts/process.py",
+     ".claude/skills/conducting-gdpr-compliance-assessment/scripts/article30_parser.py",
+     ".claude/skills/conducting-gdpr-compliance-assessment/scripts/article30_validator.py",
+     ".claude/skills/conducting-gdpr-compliance-assessment/scripts/generate_ropa_report.py",
+     ".claude/skills/configuring-certificate-authority-with-openssl/scripts/agent.py",
+     ".claude/skills/configuring-certificate-authority-with-openssl/scripts/process.py",
+     ".claude/skills/configuring-hsm-for-key-storage/scripts/agent.py",
+     ".claude/skills/configuring-hsm-for-key-storage/scripts/process.py",
+     ".claude/skills/configuring-tls-1-3-for-secure-communications/scripts/agent.py",
+     ".claude/skills/configuring-tls-1-3-for-secure-communications/scripts/process.py",
+     ".claude/skills/design-system/scripts/fetch-background.py",
+     ".claude/skills/design-system/scripts/generate-slide.py",
+     ".claude/skills/design-system/scripts/html-token-validator.py",
+     ".claude/skills/design-system/scripts/search-slides.py",
+     ".claude/skills/design-system/scripts/slide-token-validator.py",
+     ".claude/skills/design-system/scripts/slide_search_core.py",
+     ".claude/skills/design-system/scripts/tests/test_validate_tokens.py",
+     ".claude/skills/design/scripts/cip/core.py",
+     ".claude/skills/design/scripts/cip/generate.py",
+     ".claude/skills/design/scripts/cip/render-html.py",
+     ".claude/skills/design/scripts/cip/search.py",
+     ".claude/skills/design/scripts/icon/generate.py",
+     ".claude/skills/design/scripts/logo/core.py",
+     ".claude/skills/design/scripts/logo/generate.py",
+     ".claude/skills/design/scripts/logo/search.py",
+     ".claude/skills/design/scripts/logo/tests/test_generate.py",
+     ".claude/skills/detecting-api-enumeration-attacks/scripts/agent.py",
+     ".claude/skills/detecting-broken-object-property-level-authorization/scripts/agent.py",
+     ".claude/skills/detecting-dependency-confusion/scripts/agent.py",
+     ".claude/skills/detecting-malicious-npm-packages/scripts/agent.py",
+     ".claude/skills/detecting-shadow-api-endpoints/scripts/agent.py",
+     ".claude/skills/detecting-typosquatting-packages-in-npm-pypi/scripts/agent.py",
+     ".claude/skills/detecting-typosquatting-packages/scripts/agent.py",
+     ".claude/skills/executing-nist-rmf-authorization-to-operate/scripts/process.py",
+     ".claude/skills/generating-and-analyzing-sboms/scripts/agent.py",
+     ".claude/skills/implementing-aes-encryption-for-data-at-rest/scripts/agent.py",
+     ".claude/skills/implementing-aes-encryption-for-data-at-rest/scripts/process.py",
+     ".claude/skills/implementing-api-abuse-detection-with-rate-limiting/scripts/agent.py",
+     ".claude/skills/implementing-api-gateway-security-controls/scripts/agent.py",
+     ".claude/skills/implementing-api-key-security-controls/scripts/agent.py",
+     ".claude/skills/implementing-api-rate-limiting-and-throttling/scripts/agent.py",
+     ".claude/skills/implementing-api-schema-validation-security/scripts/agent.py",
+     ".claude/skills/implementing-api-security-posture-management/scripts/agent.py",
+     ".claude/skills/implementing-api-security-testing-with-42crunch/scripts/agent.py",
+     ".claude/skills/implementing-api-threat-protection-with-apigee/scripts/agent.py"
+    ]
+   },
+   "oracle": {
+    "sha256": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "exit": 1,
+    "results": {
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "FAILED",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically": "FAILED",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "FAILED",
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "FAILED",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "FAILED",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "FAILED",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "FAILED"
+    },
+    "pytest_totals": {
+     "failed": 9
+    },
+    "parse_complete": true,
+    "parse_note": "",
+    "observations": []
+   },
+   "story_state_source": "_bmad-output/sprint-status.json",
+   "oracle_classification": {
+    "reds": [
+     {
+      "test": "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-6",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-02-01",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-02-01', 'STORY-04-01', 'STORY-04-02', 'STORY-04-03']"
+     },
+     {
+      "test": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-1",
+       "FR-4",
+       "FR-9",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-01-01",
+       "STORY-01-05",
+       "STORY-01-06",
+       "STORY-02-02",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-05', 'STORY-01-06', 'STORY-02-02', 'STORY-04-01', 'STORY-04-02', 'STORY-04-03', 'STORY-05-01']"
+     },
+     {
+      "test": "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-2",
+       "FR-8",
+       "FR-11"
+      ],
+      "owners": [
+       "STORY-01-02",
+       "STORY-01-03",
+       "STORY-01-05",
+       "STORY-03-01",
+       "STORY-04-01",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-03', 'STORY-01-05', 'STORY-03-01', 'STORY-04-01', 'STORY-05-01']"
+     },
+     {
+      "test": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-2",
+       "FR-6",
+       "FR-10",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-01-02",
+       "STORY-01-03",
+       "STORY-01-05",
+       "STORY-02-01",
+       "STORY-03-02",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-03', 'STORY-01-05', 'STORY-02-01', 'STORY-03-02', 'STORY-04-01', 'STORY-04-02', 'STORY-04-03', 'STORY-05-01']"
+     },
+     {
+      "test": "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
+      "ownership": "PROJECT_GLOBAL",
+      "frs": [],
+      "owners": [],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "the project terminated incomplete"
+     },
+     {
+      "test": "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-14"
+      ],
+      "owners": [
+       "STORY-01-01",
+       "STORY-05-02",
+       "STORY-05-03"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-05-02', 'STORY-05-03']"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-4",
+       "FR-8",
+       "FR-11",
+       "FR-12"
+      ],
+      "owners": [
+       "STORY-01-06",
+       "STORY-03-01",
+       "STORY-04-01",
+       "STORY-04-02",
+       "STORY-04-03",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-06', 'STORY-03-01', 'STORY-04-01', 'STORY-04-02', 'STORY-04-03', 'STORY-05-01']"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-3",
+       "FR-4",
+       "FR-5"
+      ],
+      "owners": [
+       "STORY-01-06",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-06', 'STORY-05-01']"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
+      "ownership": "STORY_OWNED",
+      "frs": [
+       "FR-3",
+       "FR-4",
+       "FR-6"
+      ],
+      "owners": [
+       "STORY-01-06",
+       "STORY-02-01",
+       "STORY-05-01"
+      ],
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_RED",
+      "why": "owner stories not done: ['STORY-01-06', 'STORY-02-01', 'STORY-05-01']"
+     }
+    ],
+    "counts": {
+     "INCOMPLETE_DELIVERY_EXPECTED_RED": 9
+    },
+    "delivery_complete": false,
+    "skipped": [],
+    "oracle_not_executed": [],
+    "oracle_not_executed_count": 0,
+    "oracle_passed_completely": false,
+    "false_pass": [],
+    "false_pass_count": 0,
+    "oracle_mapping_errors": [],
+    "oracle_mapping_error_count": 0,
+    "story_owned_reds_expected": [
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts"
+    ],
+    "project_global_reds_expected": [
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+    ],
+    "classifiable": true
+   },
+   "exit_criteria": {
+    "false_pass": [],
+    "false_pass_count": 0,
+    "oracle_mapping_errors": [],
+    "oracle_mapping_error_count": 0,
+    "oracle_red_classes": {
+     "INCOMPLETE_DELIVERY_EXPECTED_RED": 9
+    },
+    "oracle_skipped": [],
+    "oracle_not_executed_count": 0,
+    "oracle_passed_completely": false,
+    "story_owned_reds_expected_due_incomplete_owners": [
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts"
+    ],
+    "project_global_reds_expected_due_incomplete_delivery": [
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+    ],
+    "manual_state_repair": 0,
+    "manual_state_repair_note": "the driver never writes _bmad-output; the only project writes are the guard commit and the ARB-1 re-approval through the CLI",
+    "orphan_state": [],
+    "orphan_state_count": 0,
+    "drift_records": [],
+    "oracle_ran": true,
+    "resumes_forced": 0,
+    "markers_not_reached": null,
+    "stops": [
+     "[2026-09-18 10:46:13] epic=EPIC-01 STOPPED at=EPIC-01 · wave 3"
+    ],
+    "story_state_source": "_bmad-output/sprint-status.json",
+    "false_block_count": 0,
+    "false_block": [],
+    "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+    "safety_violations": [],
+    "stops_source": "read from the run's own run.log: the driver's in-memory epic lines were lost when it crashed (SS-80)"
+   },
+   "safety_violations": [],
+   "run_metrics": {
+    "developer_agent_runs": 5,
+    "developer_retries": 2,
+    "reviewer_executions": 4,
+    "reviewer_retries": 0,
+    "security_executions": 4,
+    "security_retries": 0,
+    "max_turn_events": 3,
+    "human_arbitrations_during_the_run": 0,
+    "stories_done": 2,
+    "stories_failed": [
+     "STORY-01-03"
+    ],
+    "stories_never_started": 13,
+    "false_block": [],
+    "false_block_count": 0,
+    "false_block_measurable_for": [
+     "STORY-01-01",
+     "STORY-01-02",
+     "STORY-01-03"
+    ]
+   },
+   "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "oracle_aggregate_reportable_as_delivery_quality": false,
+   "ok": true
+  }
+ },
+ "updated": "2026-09-18T10:56:32+0700"
+}

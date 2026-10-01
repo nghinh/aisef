@@ -240,8 +240,7 @@ class TestSplitFailures(SplitTestCase):
 
     def test_dependency_cycle_is_reported_not_hidden(self):
         text = (self.root / "epics.md").read_text(encoding="utf-8")
-        text = text.replace("- covers: FR-1\n- write_scope: src/notes/, src/db/\n- depends_on: none",
-                            "- covers: FR-1\n- write_scope: src/notes/, src/db/\n- depends_on: 1.2")
+        text = text.replace("- depends_on: none", "- depends_on: 1.2", 1)   # story 1.1 now depends on 1.2
         (self.root / "epics.md").write_text(text, encoding="utf-8")
         r = split(self.root)
         self.assertFalse(r.ok)

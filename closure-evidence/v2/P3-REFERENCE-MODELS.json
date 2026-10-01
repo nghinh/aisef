@@ -1,0 +1,253 @@
+{
+ "record": "AISEF V2 — P3 REFERENCE MODELS",
+ "work_package": "WP-3.5",
+ "rfc_sections": [
+  "21",
+  "27 (Q1)"
+ ],
+ "frozen_items": [
+  "F11"
+ ],
+ "authorship": "authored in a separate work session from the RFC and docs/implementation/v2/P3-PROJECTION-SEMANTICS.md, in a clone holding neither aisef2/journal/fold.py nor aisef2/journal/projections/ (the manifest's WP-3.5 authorship constraint)",
+ "independence_rule": "validation/v2/refmodel_independence.py: stdlib and the package only; no aisef2, no other tests module, no importlib / __import__ / exec / eval / compile",
+ "models": {
+  "story_state": {
+   "calibration_cases": [
+    "a blocked admission keeps the story in BEGIN",
+    "a blocked story cannot commit",
+    "a committed story never begins again",
+    "a retry's next begin is a new, unadmitted attempt",
+    "an attempt is admitted once",
+    "no developer call precedes the admission (§13)",
+    "an adequacy record belongs to an ACTIVE attempt and moves it nowhere (V2-005)",
+    "no adequacy is recorded before the attempt is admitted (V2-005)",
+    "a verified proof belongs to the ACTIVE attempt it was measured in and moves it nowhere (V2-005)",
+    "nothing is verified before the attempt is admitted (V2-005)",
+    "a blocked story still records its drift (§14)",
+    "no drift before the attempt's admission",
+    "a blocked story makes no developer call",
+    "a post-merge failure follows ENDED"
+   ]
+  },
+  "failure_owner": {
+   "calibration_cases": [
+    "a rollback's owner is its cited failure's, not the latest failure's",
+    "a failure after the citation does not change the attempt's owner",
+    "the latest failure speaks for the attempt until one is cited",
+    "a citation of an earlier attempt's failure refuses",
+    "a failure of a story that never began refuses",
+    "a post-merge failure speaks for the committed attempt (INTEGRATION)",
+    "a later citation in the same attempt replaces the earlier",
+    "a committed attempt reports the latest failure it observed"
+   ]
+  },
+  "budgets": {
+   "calibration_cases": [
+    "a PRE_SATISFIED criterion is never charged developer budget (§14)",
+    "a retry of a non-retryable failure has no budget (D-006)",
+    "a retry cannot reach past a newer non-retryable failure (D-006)",
+    "a retry citing an older retryable failure refuses: only the latest is the target",
+    "a retry charges one budget: its cited (latest) failure's owner",
+    "a new attempt is admitted again before the developer is called",
+    "developer consumption accumulates across attempts; begin drops the attempt's failures",
+    "a retry citing an earlier attempt's failure refuses",
+    "a format-3 request is charged to its budget_owner: REVIEW and SECURITY never touch the developer",
+    "a format-3 DEVELOPER request is still charged READY criteria only (§14)",
+    "a security request before the attempt's admission is refused",
+    "a review request names criteria of the story's admission only"
+   ]
+  },
+  "retry_target": {
+   "calibration_cases": [
+    "a non-retryable failure names no retry budget",
+    "the latest failure decides, even a non-retryable one",
+    "a new attempt starts with no retry target",
+    "a failure of a story that never began refuses",
+    "the target is the story's own latest failure"
+   ]
+  },
+  "terminal_state": {
+   "calibration_cases": [
+    "nothing may follow run/end, not even an event this projection does not read",
+    "a committed story never begins again",
+    "a rolled-back story never begins again",
+    "a running story is already in an attempt",
+    "a retried story is OPEN between attempts, not terminal",
+    "an outcome stays pending, the story RUNNING, until story/end",
+    "one decision per attempt",
+    "an outcome needs an open attempt",
+    "no story begins once disposal has started (§18)",
+    "a decided story still ends during disposal",
+    "an abandoned run is final",
+    "a first interrupt never abandons, even during disposal",
+    "a second interrupt abandons (§20.2)",
+    "a second interrupt abandons straight from INTERRUPTED"
+   ]
+  },
+  "qualification_counters": {
+   "calibration_cases": [
+    "the plan-quality ratio reads each story's latest admission, once",
+    "UNATTRIBUTED drift is read from attributed_to, ambiguous candidates included",
+    "drift counts the latest entry per story and criterion, not drift events",
+    "a re-admission clears the story's drift: drift belongs to the latest admission",
+    "a blocked story's PRE_SATISFIED criterion still drifts",
+    "drift is only for a PRE_SATISFIED criterion of the latest admission",
+    "PRE_SATISFIED only on an INTRODUCE criterion (§13)",
+    "a fully pre-satisfied story has every disposition PRE_SATISFIED",
+    "the ratio is null when there is no INTRODUCE obligation",
+    "a run freezes one plan",
+    "an admission names only criteria of the frozen plan",
+    "an admission before the plan is frozen refuses"
+   ]
+  }
+ },
+ "calibration_problems": {
+  "story_state": [],
+  "failure_owner": [],
+  "budgets": [],
+  "retry_target": [],
+  "terminal_state": [],
+  "qualification_counters": []
+ },
+ "implementation_disagrees_with_calibration": {
+  "story_state": [],
+  "failure_owner": [],
+  "budgets": [],
+  "retry_target": [],
+  "terminal_state": [],
+  "qualification_counters": []
+ },
+ "differential": {
+  "generated_traces": 120,
+  "divergent_by_model": {
+   "story_state": 0,
+   "failure_owner": 0,
+   "budgets": 0,
+   "retry_target": 0,
+   "terminal_state": 0,
+   "qualification_counters": 0
+  },
+  "edited_traces": {
+   "compared": 528,
+   "refused_by_both": 82,
+   "divergent": 0
+  }
+ },
+ "REF_1_injected_defects": {
+  "story_state": {
+   "defect": "_commit_from_begin",
+   "divergent_traces": 4
+  },
+  "failure_owner": {
+   "defect": "_latest_not_cited",
+   "divergent_traces": 15
+  },
+  "budgets": {
+   "defect": "_charges_anything",
+   "divergent_traces": 7
+  },
+  "retry_target": {
+   "defect": "_budget_ignores_retryable",
+   "divergent_traces": 136
+  },
+  "terminal_state": {
+   "defect": "_retry_ends_retry",
+   "divergent_traces": 39
+  },
+  "qualification_counters": {
+   "defect": "_counts_every_admission",
+   "divergent_traces": 43
+  }
+ },
+ "mutation_by_target": {
+  "tests/v2/refmodel/budgets.py::_walk": {
+   "killed": "92/92",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/budgets.py::model": {
+   "killed": "43/44",
+   "audited_equivalent": {
+    "L75 True->False": "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict never decides anything"
+   }
+  },
+  "tests/v2/refmodel/failure_owner.py::_attempts": {
+   "killed": "12/12",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/failure_owner.py::_read": {
+   "killed": "45/45",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/failure_owner.py::model": {
+   "killed": "7/7",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/qualification_counters.py::_COUNTED": {
+   "killed": "6/6",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/qualification_counters.py::metrics": {
+   "killed": "28/30",
+   "audited_equivalent": {
+    "L15 element 0 dropped": "`pre` is read only through len(pre): a one-element tuple per entry counts the same",
+    "L15 element 1 dropped": "`pre` is read only through len(pre): a one-element tuple per entry counts the same"
+   }
+  },
+  "tests/v2/refmodel/qualification_counters.py::model": {
+   "killed": "76/78",
+   "audited_equivalent": {
+    "L41 sorted() -> list()": "`unplanned` is read only for truthiness and inside the refusal message",
+    "L44 sorted() -> list()": "`misplaced` is read only for truthiness and inside the refusal message"
+   }
+  },
+  "tests/v2/refmodel/retry_target.py::model": {
+   "killed": "45/45",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/story_state.py::_TABLE": {
+   "killed": "58/63",
+   "audited_equivalent": {
+    "L19 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "L20 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "L21 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "L22 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "L23 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
+   }
+  },
+  "tests/v2/refmodel/story_state.py::model": {
+   "killed": "91/91",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/terminal_state.py::_INTERRUPT": {
+   "killed": "16/16",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/terminal_state.py::_OUTCOME": {
+   "killed": "6/6",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/terminal_state.py::_RUN": {
+   "killed": "30/30",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/terminal_state.py::_SETTLED": {
+   "killed": "6/6",
+   "audited_equivalent": {}
+  },
+  "tests/v2/refmodel/terminal_state.py::model": {
+   "killed": "76/76",
+   "audited_equivalent": {}
+  }
+ },
+ "properties": {
+  "six_of_six_reference_models": true,
+  "no_import_constraint_mechanically_enforced": true,
+  "six_of_six_calibrated": true,
+  "the_implementation_reproduces_every_calibration_answer": true,
+  "REF_2_an_always_agree_model_fails_calibration": true,
+  "implementation_equals_reference_model_over_generated_traces": true,
+  "on_edited_traces_both_refuse_or_agree": true,
+  "REF_1_every_injected_projection_defect_is_caught": true,
+  "reference_model_mutation_killed_or_audited_equivalent": true
+ }
+}

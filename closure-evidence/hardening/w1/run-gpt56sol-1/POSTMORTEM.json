@@ -1,0 +1,16 @@
+{
+ "run": "gpt56sol-1",
+ "profile": "PROFILE-W1-OC-GPT56SOL-T80",
+ "terminal": "LEGITIMATE_MODEL_PROJECT_STOP \u2014 STORY-01-01 UNRUNNABLE after retrying review on candidate 72aabd59; EPIC-01 stopped at wave 1",
+ "read_only": true,
+ "what_passed": "attempt 1 (no developer retry): test PASS, lint PASS, security PASS 0 findings, TDD PASS, tests verify story PASS (a legitimate red: the story's own package ledgerlock is absent at the parent \u2014 though see SS-81 for why the record could not prove it)",
+ "what_stopped_it": "all 3 review executions mutated the story worktree (uv.lock); the kernel reverted each mutation, counted the review UNRUNNABLE ('Review is a report, not a fix') and retried the REVIEW stage, not the developer, until its budget was spent \u2014 the modeled REVIEW_MUTATE path, behaving as designed",
+ "cause_measured": "the reviewer and its OpenCode subagents (@vnpt-review-auditor, @general \u2014 agents from the operator's global OpenCode setup) followed the workload's own BMAD review skill, which runs `uv run ./_bmad/scripts/resolve_customization.py`; `uv run` writes uv.lock. 15 `uv run` calls in this run; 0 in all three T40 runs, whose reviewers made 0 tree mutations in 28 review executions",
+ "owner_section_9_categories": {
+  "primary": "F. environment/tooling \u2014 the workload ships a skill whose script side-effects the tree when run the ordinary way",
+  "secondary": "A. model behaviour \u2014 this model follows project skills where the T40 route did not"
+ },
+ "kernel_behaviour": "correct: a reviewer that changes the tree produces no verdict, and the kernel neither accepted it nor charged the developer for it",
+ "not_budget_exhaustion": "0 max-turn events at max_turns 80",
+ "stopped_profile_because": "a new reproducible P1 kernel defect (SS-81) was found in this run's gate record \u2014 owner section 7 early-stop condition. Runs 2 and 3 of this profile were not started."
+}

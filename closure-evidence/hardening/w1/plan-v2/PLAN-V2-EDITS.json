@@ -1,0 +1,439 @@
+{
+ "plan": "W1-LEDGERLOCK-PLAN-V2",
+ "source": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2/_bmad-output/epics.md",
+ "edits": [
+  {
+   "id": "PLAN-V2-01",
+   "story": "2.2",
+   "kind": "criterion_replaced",
+   "finding": "AC-STORY-02-02-2 contradicts requirements §4.5 (a delete with a different rid MUST conflict), so no implementation can satisfy both; measured on run minimax-ro-2, where the reviewer verified the contradiction and the kernel ended the story as a plan deadlock",
+   "traces_to": "requirements §4.5 and §6",
+   "old": "Given `put(\"k\", \"v\", r1, t1)` followed by `delete(\"k\", r2, t2)`, `snapshot()` returns a dict with no key `\"k\"`.",
+   "new": "Given a committed `put(\"k\", \"v\", \"r1\", t1)`, `delete(\"k\", \"r2\", t2)` raises `ConflictError` (requirements §4.5: a different `rid` mutating the same key MUST conflict) and a following `snapshot()` still returns `{\"k\": \"v\"}` — the refused delete changed nothing."
+  },
+  {
+   "id": "PLAN-V2-02",
+   "story": "2.2",
+   "kind": "criterion_added",
+   "finding": "with the contradiction removed the story no longer covered the tombstone path of §6 at all",
+   "traces_to": "requirements §4.4 and §6",
+   "after": "Given a committed `put(\"k\", \"v\", \"r1\", t1)`, `delete(\"k\", \"r2\", t2)` raises `ConflictError` (requirements §4.5: a different `rid` mutating the same key MUST conflict) and a following `snapshot()` still returns `{\"k\": \"v\"}` — the refused delete changed nothing.",
+   "new": "Given `delete(\"k2\", \"r3\", t3)` on a key with no committed mutation (a tombstone, requirements §4.4), `snapshot()` returns a dict with no key `\"k2\"`."
+  },
+  {
+   "id": "PLAN-V2-03",
+   "story": "1.1",
+   "kind": "criterion_moved",
+   "to": "4.1",
+   "finding": "the CLI surface criterion in the skeleton story invited it to build the whole CLI: measured on minimax-ro-1, STORY-01-01 wrote all of ledgerlock/cli.py (commit cfc462c), which left every STORY-04-01 criterion already satisfied at that story's entry",
+   "traces_to": "FR-11 (CLI subcommands) owns the command surface",
+   "old": "Given the same checkout, `python -m ledgerlock --help` in a subprocess exits `0` and the stdout argparse usage line contains each of the literal strings `verify`, `snapshot`, `apply`, and `repair-tail`.",
+   "new": "Given the same checkout, `python -m ledgerlock --help` in a subprocess exits `0` and the stdout argparse usage line contains each of the literal strings `verify`, `snapshot`, `apply`, and `repair-tail`."
+  },
+  {
+   "id": "PLAN-V2-07",
+   "story": "4.2",
+   "kind": "criterion_moved",
+   "to": "4.1",
+   "finding": "the usage-error exit code is delivered by the argparse parser itself, so the story that builds the parser is where the criterion can be red first; declaring it in a later story made it a criterion no implementation of that story could turn red (measured: deepseek-ro-1/2 and minimax-ro-1 all refused STORY-04-02 attempt 1 on exactly this criterion)",
+   "traces_to": "FR-12 realized by the parser FR-11 creates",
+   "old": "Given any subcommand invoked with the wrong number of positional arguments, the CLI exits with code `2` and writes nothing to stdout.",
+   "new": "Given any subcommand invoked with the wrong number of positional arguments, the CLI exits with code `2` and writes nothing to stdout."
+  },
+  {
+   "id": "PLAN-V2-08",
+   "story": "4.2",
+   "kind": "criterion_moved",
+   "to": "4.1",
+   "finding": "same as PLAN-V2-07 for the missing required option",
+   "traces_to": "FR-12",
+   "old": "Given `snapshot` invoked without `--out`, the CLI exits `2`.",
+   "new": "Given `snapshot` invoked without `--out`, the CLI exits `2`."
+  },
+  {
+   "id": "PLAN-V2-09",
+   "story": "4.1",
+   "kind": "covers_extended",
+   "finding": "STORY-04-01 now delivers the two usage-error exit codes as well as the command surface",
+   "traces_to": "PLAN-V2-07, PLAN-V2-08",
+   "old": "- covers: FR-11",
+   "new": "- covers: FR-11, FR-12"
+  },
+  {
+   "id": "PLAN-V2-10",
+   "story": "5.1",
+   "kind": "covers_extended",
+   "finding": "the property test asserts the atomic-batch guarantee and runs under both runners, which its criteria name — the story must declare those requirements to be traceable",
+   "traces_to": "FR-8, FR-14",
+   "old": "- covers: FR-2, FR-3, FR-4, FR-9",
+   "new": "- covers: FR-2, FR-3, FR-4, FR-8, FR-9, FR-14"
+  },
+  {
+   "id": "PLAN-V2-04",
+   "story": "5.3",
+   "kind": "criterion_dropped",
+   "finding": "duplicate of AC-STORY-05-02-2 (runner parity), which STORY-05-02 owns",
+   "traces_to": "FR-14",
+   "old": "Given the same test module, when it is executed under `python -m unittest discover` and again under `pytest`, both runners discover and execute the test."
+  },
+  {
+   "id": "PLAN-V2-05",
+   "story": "1.1",
+   "kind": "write_scope_narrowed",
+   "finding": "the skeleton no longer declares the CLI surface, so it no longer needs to write the CLI module",
+   "traces_to": "PLAN-V2-03",
+   "old": "ledgerlock/cli.py, ",
+   "new": ""
+  },
+  {
+   "id": "PLAN-V2-06",
+   "story": "4.1",
+   "kind": "story_note",
+   "finding": "STORY-04-02 owns the error exit codes; a CLI story that maps them early makes that story's CHANGE_REQUIRED criteria already satisfied at entry (PLAN_OVERLAP)",
+   "traces_to": "FR-11 vs FR-12 ownership",
+   "new": "Scope note: the **error** exit codes (`3` I/O, `4` conflict, `5` corruption) are STORY-04-02's contract, and the stderr status shapes beyond `verify` are STORY-04-03's. Implement the success paths here; do not pre-empt them."
+  }
+ ],
+ "obligations": {
+  "1.1": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-1"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-1"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-14"
+   ],
+   "4": [
+    "NEGATIVE_INVARIANT",
+    "FR-14"
+   ],
+   "5": [
+    "NEGATIVE_INVARIANT",
+    "FR-14"
+   ],
+   "6": [
+    "CHANGE_REQUIRED",
+    "FR-14"
+   ]
+  },
+  "1.2": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "5": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "6": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ]
+  },
+  "1.3": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "5": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ]
+  },
+  "1.4": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-13"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-13"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-13"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-13"
+   ],
+   "5": [
+    "CHANGE_REQUIRED",
+    "FR-13"
+   ],
+   "6": [
+    "CHANGE_REQUIRED",
+    "FR-13"
+   ]
+  },
+  "1.5": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-1"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-2"
+   ],
+   "5": [
+    "CHANGE_REQUIRED",
+    "FR-13"
+   ]
+  },
+  "1.6": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-3"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-4"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-5"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-5"
+   ],
+   "5": [
+    "CHANGE_REQUIRED",
+    "FR-3"
+   ]
+  },
+  "2.1": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-6"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-6"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-6"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-7"
+   ],
+   "5": [
+    "CHANGE_REQUIRED",
+    "FR-7"
+   ]
+  },
+  "2.2": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-9"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-9"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-9"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-9"
+   ],
+   "5": [
+    "CHANGE_REQUIRED",
+    "FR-9"
+   ]
+  },
+  "3.1": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-8"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-8"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-8"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-8"
+   ],
+   "5": [
+    "CHANGE_REQUIRED",
+    "FR-13"
+   ]
+  },
+  "3.2": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-10"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-10"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-10"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-10"
+   ]
+  },
+  "4.1": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-11"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-11"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-11"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-11"
+   ],
+   "5": [
+    "CHANGE_REQUIRED",
+    "FR-11"
+   ],
+   "6": [
+    "CHANGE_REQUIRED",
+    "FR-12"
+   ],
+   "7": [
+    "CHANGE_REQUIRED",
+    "FR-12"
+   ]
+  },
+  "4.2": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-12"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-12"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-12"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-12"
+   ]
+  },
+  "4.3": {
+   "1": [
+    "PRESERVE_REQUIRED",
+    "FR-12"
+   ],
+   "2": [
+    "CHANGE_REQUIRED",
+    "FR-12"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-12"
+   ],
+   "4": [
+    "CHANGE_REQUIRED",
+    "FR-12"
+   ],
+   "5": [
+    "PRESERVE_REQUIRED",
+    "FR-12"
+   ]
+  },
+  "5.1": {
+   "1": [
+    "PRESERVE_REQUIRED",
+    "FR-2"
+   ],
+   "2": [
+    "PRESERVE_REQUIRED",
+    "FR-8"
+   ],
+   "3": [
+    "PRESERVE_REQUIRED",
+    "FR-14"
+   ]
+  },
+  "5.2": {
+   "1": [
+    "CHANGE_REQUIRED",
+    "FR-14"
+   ],
+   "2": [
+    "PRESERVE_REQUIRED",
+    "FR-14"
+   ],
+   "3": [
+    "CHANGE_REQUIRED",
+    "FR-14"
+   ]
+  },
+  "5.3": {
+   "1": [
+    "NEGATIVE_INVARIANT",
+    "FR-14"
+   ],
+   "2": [
+    "NEGATIVE_INVARIANT",
+    "FR-14"
+   ]
+  }
+ },
+ "story_type": {
+  "5.1": "VERIFICATION_ONLY",
+  "5.3": "VERIFICATION_ONLY"
+ }
+}

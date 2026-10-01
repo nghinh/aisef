@@ -1,0 +1,10 @@
+Progress: 0/16 stories done (15 not started)
+Active epics: EPIC-01
+
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 16 · max_turns 3
+
+✗ 1 stories not passing:
+    STORY-01-01      failed   tried 3 attempts, still did not pass gate

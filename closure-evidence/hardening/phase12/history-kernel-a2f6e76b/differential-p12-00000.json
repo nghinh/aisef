@@ -1,0 +1,160 @@
+{
+ "traces": 10000,
+ "workers": 8,
+ "elapsed_s": 2565.5,
+ "traces_per_s": 3.9,
+ "model_transitions": 73155,
+ "real_stage_events": 48846,
+ "matched": 10000,
+ "mismatched_attributed": {},
+ "unexplained_count": 0,
+ "unexplained": [],
+ "invariant_violations": 0,
+ "exceptions": 0,
+ "silent_skips": 0,
+ "known_deviations": [],
+ "vocabulary": {
+  "developer": [
+   [
+    "CHANGED",
+    30
+   ],
+   [
+    "CHANGED_RED",
+    8
+   ],
+   [
+    "CHANGED_ARTIFACT",
+    3
+   ],
+   [
+    "CHANGED_ORPHAN",
+    3
+   ],
+   [
+    "NOOP",
+    8
+   ],
+   [
+    "TIMEOUT",
+    4
+   ],
+   [
+    "CRASH",
+    4
+   ],
+   [
+    "RATE_LIMIT",
+    2
+   ],
+   [
+    "CONTEXT",
+    3
+   ],
+   [
+    "AUTH",
+    2
+   ],
+   [
+    "SCOPE_VIOLATION",
+    6
+   ],
+   [
+    "TRUNK_COMMIT",
+    1
+   ],
+   [
+    "ZERO_OUTPUT",
+    2
+   ],
+   [
+    "MAX_TURNS_WORK",
+    3
+   ],
+   [
+    "MAX_TURNS_UNTOUCHED",
+    3
+   ],
+   [
+    "BUDGET",
+    2
+   ]
+  ],
+  "review": [
+   [
+    "PASS",
+    30
+   ],
+   [
+    "BLOCK",
+    7
+   ],
+   [
+    "BLOCK_OUTSIDE",
+    4
+   ],
+   [
+    "STUCK",
+    2
+   ],
+   [
+    "MALFORMED",
+    4
+   ],
+   [
+    "UNRUNNABLE",
+    5
+   ],
+   [
+    "MUTATE",
+    2
+   ],
+   [
+    "COMMIT",
+    2
+   ],
+   [
+    "BUDGET",
+    1
+   ],
+   [
+    "BLOCK_UNBOUND",
+    2
+   ]
+  ],
+  "security": [
+   [
+    "PASS",
+    30
+   ],
+   [
+    "BLOCK",
+    6
+   ],
+   [
+    "UNRUNNABLE",
+    4
+   ],
+   [
+    "MALFORMED",
+    3
+   ],
+   [
+    "BUDGET",
+    1
+   ]
+  ]
+ },
+ "kernel": {
+  "head": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
+  "dirty_aisef": [],
+  "started_at": "2026-09-18T20:52:11+0700",
+  "aisef_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+  "aisef_content_sha256": "3667146955fb4837f312450d34479d68449258fe325aa77097ac56bc5f599c85",
+  "invariants_registry_sha256": "797761c47fd31cd54d6529469e50dab5f04ca79712f80d2045b37def75d3a218",
+  "synthetic_adapter_sha256": "8aeb2319363c3f80ce812e48f3a8d7116fc632fcc613c5d58f295be5605caa33",
+  "model_sha256": "983dc3bb479f6484125a91e64e13f8b7715563ab112f53ddf1a52ac055b00890",
+  "comparator_sha256": "f8f3a954bc206e2753f28202a92c9a2411b2b82cda0268737c464ac7d346db79",
+  "hygiene_case_sha256": "59308863db2b45a9972ae6deb69b9822945fcf67fc361bf08cf19985cc6afbd6"
+ }
+}

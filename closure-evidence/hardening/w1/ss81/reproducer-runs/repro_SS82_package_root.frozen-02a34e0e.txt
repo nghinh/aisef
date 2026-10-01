@@ -1,0 +1,17 @@
+F
+======================================================================
+FAIL: test_the_missing_package_binds_to_the_storys_init (__main__.SS82PackageRootIsTheStorys.test_the_missing_package_binds_to_the_storys_init)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_SS82_package_root.py", line 24, in test_the_missing_package_binds_to_the_storys_init
+    self.assertEqual(I._vang_ma_cua_story(res, STORY), "ledgerlock/__init__.py")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '' != 'ledgerlock/__init__.py'
++ ledgerlock/__init__.py
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
+exit=1

@@ -1,0 +1,49 @@
+{
+ "record": "AISEF V2 — C2-P10 RUN HISTORY",
+ "policy": "closure-evidence/v2/V2-RETRY-POLICY.json",
+ "rule": "append-only; every full-suite and CI attempt, failed or not; see validation/v2/run_history.py",
+ "entries": [
+  {
+   "seq": 1,
+   "commit": "8d6ab04ccf55073821402bddc0b98423b999fa8c",
+   "package": "WP-2.10.1 (LANE-X, c2/lane-x-p10)",
+   "attempt": 1,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "lane full suite (LANE-X worktree)",
+   "tests_run": 5080,
+   "gate_effect": "COUNTS",
+   "result": "FAIL",
+   "failing_tests": [
+    "test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story (v2.test_c2_orchestration_conformance.Record)"
+   ],
+   "classification": "INTEGRATION",
+   "classification_evidence": "the lane's own full suite (its log kept by the integrator): 1 failure, tests.v2.test_c2_orchestration_conformance Record.test_15 — the C2-ORCHESTRATION-CONFORMANCE-REPAIR record binds the bytes of validation/v2/mutation.py, where the lane had to register its C2-P10 mutation phase (the C2-ORCH targets and their record unchanged); an integration conflict between two bindings, resolved at the final integration by re-deriving the repair record (7e901f0)",
+   "known_defect": null
+  },
+  {
+   "seq": 2,
+   "commit": "6353aa815cdfbea3af477a0eadfae43130be6820",
+   "package": "WP-2.10.2 (LANE-X, c2/lane-x-p10)",
+   "attempt": 1,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "lane full suite (LANE-X worktree)",
+   "tests_run": 5093,
+   "gate_effect": "COUNTS",
+   "result": "FAIL",
+   "failing_tests": [
+    "test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story (v2.test_c2_orchestration_conformance.Record)"
+   ],
+   "classification": "INTEGRATION",
+   "classification_evidence": "the lane's own full suite (its log kept by the integrator): 1 failure, tests.v2.test_c2_orchestration_conformance Record.test_15 — the C2-ORCHESTRATION-CONFORMANCE-REPAIR record binds the bytes of validation/v2/mutation.py, where the lane had to register its C2-P10 mutation phase (the C2-ORCH targets and their record unchanged); an integration conflict between two bindings, resolved at the final integration by re-deriving the repair record (7e901f0)",
+   "known_defect": null
+  }
+ ]
+}

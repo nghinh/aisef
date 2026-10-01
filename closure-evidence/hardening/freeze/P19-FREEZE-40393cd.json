@@ -1,0 +1,63 @@
+{
+ "generated": "2026-09-19T05:35:11+0700",
+ "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
+ "aisef_tree_digest": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+ "PHASE12_KERNEL_DIGEST": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+ "tree_equals_phase12_kernel": true,
+ "version_string": "aisef 1.7.6",
+ "wheel": {
+  "file": "/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/dist/aisef-1.7.6-py3-none-any.whl",
+  "sha256": "3f0fd6519a9f21b790eeaadcf39a95436dfb9ba75878f9bb411e376ebfc116a6",
+  "bytes": 678728,
+  "built_with": "build 1.6.1 (/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/build-venv/lib/python3.14/site-packages/build)"
+ },
+ "run_venv": {
+  "path": "/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/w1-venv",
+  "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/40393cda89db/w1-venv/lib/python3.14/site-packages/aisef/__init__.py",
+  "installed_from_the_wheel": true
+ },
+ "oracle_venv": {
+  "path": "/Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv",
+  "packages": [
+   {
+    "name": "coverage",
+    "version": "7.16.1"
+   },
+   {
+    "name": "pytest",
+    "version": "9.1.1"
+   }
+  ]
+ },
+ "docker_image": {
+  "name": "aisef-verify-python:84adf1d8eaf9",
+  "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+ },
+ "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+ "opencode_version": "1.18.31",
+ "ci": {
+  "run": "35352745052",
+  "sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
+  "conclusion": "success",
+  "jobs": {
+   "wheel": "success",
+   "unit (ubuntu-latest, 3.12)": "success",
+   "lint": "success",
+   "unit (ubuntu-latest, 3.13)": "success",
+   "unit (ubuntu-latest, 3.11)": "success",
+   "unit (ubuntu-latest, 3.14)": "success",
+   "unit (windows-latest, 3.11)": "success"
+  }
+ },
+ "ci_matches_candidate": true,
+ "w0": {
+  "path": "closure-evidence/hardening/AISEF-W0-QUALIFICATION-d32031d.json",
+  "qualified": true,
+  "sha": "d32031dbe2081d0a34368b63b992ec5a5cd3694e",
+  "aisef_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+  "tree_matches_frozen": true
+ },
+ "no_tag_no_publish": true,
+ "rule": "W1 runs use run_venv's aisef only; any aisef/ change after this record voids it and the W1 runs that rest on it",
+ "pass": true
+}

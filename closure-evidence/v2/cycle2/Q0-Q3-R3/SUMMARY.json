@@ -1,0 +1,1390 @@
+{
+ "record": "AISEF V2 — CYCLE-2 Q0–Q3 QUALIFICATION SUMMARY (QP-2.6)",
+ "work_package": "QP-2.6",
+ "rfc_sections": [
+  "27"
+ ],
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P5 ACCEPTED WITH EXPLICIT CONTRACT INTERPRETATIONS / AUTHORIZE QP-2.6 AND AUTOMATIC DOWNSTREAM EXECUTION' (2026-09-30)",
+ "verdict": "GREEN",
+ "rung_status_model": {
+  "GREEN": "every applicable case passed on every qualification platform",
+  "FAILED": "a case executed and failed",
+  "UNRUNNABLE": "could not execute or measure; never presented as FAILED"
+ },
+ "subject": {
+  "seal_commit": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "head_at_assembly": "bfc4f37d8d04fe193c8867e76a5577366d19d989",
+  "head_kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "rfc": {
+   "effective_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "effective_freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "lineage": [
+    "AISEF-V2-RFC-APPROVAL.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-005.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-006.json"
+   ],
+   "lineage_end": "AISEF-V2-RFC-AMENDMENT-V2-006.json",
+   "broken_links": []
+  },
+  "probe": {
+   "id": "probe.python_callable",
+   "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+  },
+  "probes": {
+   "probe.python_callable": {
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "kind": "python_callable",
+    "active": false,
+    "cycle": 1
+   },
+   "probe.file_artifact": {
+    "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "kind": "file_artifact",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.python_callable_v2": {
+    "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+    "kind": "python_callable",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.cli_invocation": {
+    "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+    "kind": "cli_invocation",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.process_effect": {
+    "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "kind": "process_effect",
+    "active": true,
+    "cycle": 2
+   }
+  },
+  "subject_trees": {
+   "validation/v2": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+   "tests/v2": "a7d2fb385721891beabab3ac200b974ad81a221c"
+  },
+  "cycle1": {
+   "seal_commit": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "records": "closure-evidence/v2/Q0-Q3"
+  },
+  "harness": {
+   "files": {
+    "validation/qualification/__init__.py": "40f613b3d5ffa39b5807ae0aec2878be51870891f5bd7dd76aae025e73e48f91",
+    "validation/qualification/c2_cli_calibration.py": "9c2ab78e85a8ad55d373b00c90285651fd38b413871c5bb5bc1103e78bad4864",
+    "validation/qualification/c2_cli_harness.py": "eb8c19a1831840e15bc6f1b644730a92b4cf340c913e75bb14ba06236c772293",
+    "validation/qualification/c2_effect_calibration.py": "209ea08c1c65ee4c7b0dc841d207c8518988c5ba48b5207b6451bbefc16216ca",
+    "validation/qualification/c2_effect_harness.py": "1078e3236294245aff0ebe1e9226a931a0e30d7031d7ca51d3e59c4d90273495",
+    "validation/qualification/c2_file_artifact.py": "1027f3db09055e905224ca6cfda3ef39948fd0f1ee9bf126b67178bffddcd0b5",
+    "validation/qualification/c2_integration.py": "1fbb214fc191abb2640bdd311a7b66ba47035f78ee87e37c74fbac529508f734",
+    "validation/qualification/c2_integration_r2.py": "7744d97ee2c332f4accaaebbc3ed0ce5060fef41b27f6979dc8d9def7a8c891d",
+    "validation/qualification/c2_orchestration_repair.py": "be526067bd56cdd9c3d66ff10db7f55f7959c3abf93753eef0e81e9bc5bdaafb",
+    "validation/qualification/c2_python_callable_v2.py": "798134ee826773b17147b39b163e64782177909bd6fce39432baef3a56908de8",
+    "validation/qualification/common.py": "d99345ec4e2e8a2fa747a284f4d9bac67d84b683289fddbff59644183b2d703a",
+    "validation/qualification/diag_orch9.py": "2f6d9524dacbafb90ca47990310a5b1e08116ab2bb1cdf8705b7f6c6f5c3bd23",
+    "validation/qualification/p0_reference_fixture.py": "0546e895bd890703c2e923b7872415df3f924e669f7feff9f521c4c97cb1810f",
+    "validation/qualification/p10.py": "208dc6f18a96523752ee8067740101a2c9ad18f93c1960ea2338cc65c2c2e0a0",
+    "validation/qualification/p10_contracts.py": "969a014dbe87a71b1c39088ed4a94fd555aecd8352abccb99628678746ad6e8f",
+    "validation/qualification/p5_acceptance.py": "ae98ddfe8ebc5175e88881e3794130906c624a5754ef58071c97c167dfe88fae",
+    "validation/qualification/p5_corrigendum.py": "144e157ab34cfaac01d7dbcbae05e6fbe76a9fb5a9c737362001dac9381a53f3",
+    "validation/qualification/p5_falsifiability.py": "dff3755bc28d4c10f0c5afaca666f4926fd4dbcabcc5acfb8c3d092ed1444bc4",
+    "validation/qualification/p7_finding_001_reproducer.py": "2cb9b13292ce94bfc8c8d78efba97839b73c065805e7bd9aa50a2ef29bc80363",
+    "validation/qualification/q0.py": "5dabdbf9415e1896a5f48038a5466875dd8af83de97fe3c382fe763a4baa9125",
+    "validation/qualification/q1.py": "63921b7ef48ac9297611b512c7502af94045ebc0c88eb5fbfc906dda175a302d",
+    "validation/qualification/q2.py": "5bbfe26d46c351512c9a23d8427b6c4b06d03457e06f6c6908ec93a3c989ca08",
+    "validation/qualification/q3.py": "440689d3f7fd1511fbc3859a9b6e8e82cf49311054b062fa4f0c747f86ca4458",
+    "validation/qualification/q4.py": "1fd9425c6a93ba163300af60ea152261712c63c51eabc280599eaeede34e30ff",
+    "validation/qualification/q4_aggregate.py": "b437489c7c7b6e2eb5a76c2a2a6bbcef1726039ba604ddcc9c7429bfe27c128f",
+    "validation/qualification/q5.py": "9de93fd23e60d746d28054fa9d6fda1e9ad351704f4677eebce70e87260ac9a3",
+    "validation/qualification/run.py": "baa82a3c3f7e0716855806d1ce8a78972f62792b8ad220f93c40a5860df28f90",
+    "validation/qualification/summary.py": "7ec9e8a4eb3588a65378702a65e647c532a3fc6b3f4f83464afe3e858e0362d9",
+    "validation/qualification/v1_pf_001_policy.py": "54d04d3b4ac1566fb2c445fa5b2350f1d78edc2fa2887e2b0ce6bf10cdd54650"
+   },
+   "sha256": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines, sorted"
+  }
+ },
+ "rungs": {
+  "Q0": {
+   "status": "GREEN",
+   "qualification_platforms_required": [
+    "linux",
+    "windows"
+   ],
+   "missing_platforms": [],
+   "unbound_records": [],
+   "records": {
+    "darwin-py3.14": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-darwin-py3.14.json",
+     "sha256": "3b91f500bbc3f44131d49ab4fc47b5fce59d331fe1f47bc8224959f2dcfa4330",
+     "status": "GREEN",
+     "os": "darwin",
+     "python": "3.14.7",
+     "ci_run": null,
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 52,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 214.8,
+     "qualification_platform": false
+    },
+    "linux-py3.11": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-linux-py3.11.json",
+     "sha256": "5c2f03cd2c0b970500e2dd6069996ca552d58d3ead5f8f7b56c7a73077ede4cf",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.11.16",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 52,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 228.2,
+     "qualification_platform": true
+    },
+    "linux-py3.12": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-linux-py3.12.json",
+     "sha256": "c5964f26a7b926603e5d16c06fc5130e03f17bac5e5a02e551914d0bb0840027",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.12.14",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 52,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 222.4,
+     "qualification_platform": true
+    },
+    "linux-py3.13": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-linux-py3.13.json",
+     "sha256": "3e4148c5a8e6e50a3302fc92da2f038f97177670f2b1784bafe7340396b3bb56",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.13.15",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 52,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 205.3,
+     "qualification_platform": true
+    },
+    "linux-py3.14": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-linux-py3.14.json",
+     "sha256": "f652eff4d6692d4304f47cf9c8d73f9a530de4cef0033d6186dfe2d3dff916cd",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.14.7",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 52,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 236.9,
+     "qualification_platform": true
+    },
+    "windows-py3.11": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q0/Q0-windows-py3.11.json",
+     "sha256": "76ec5bc2b7c6555419d425cdd43fcc87fe3534d42b8ce75f82d8b90c9ad8e2d1",
+     "status": "GREEN",
+     "os": "windows",
+     "python": "3.11.9",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 52,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 244.5,
+     "qualification_platform": true
+    }
+   }
+  },
+  "Q1": {
+   "status": "GREEN",
+   "qualification_platforms_required": [
+    "linux",
+    "windows"
+   ],
+   "missing_platforms": [],
+   "unbound_records": [],
+   "records": {
+    "linux-py3.11": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-linux-py3.11.json",
+     "sha256": "d62d71863346c384ef24043701e530a58a2fc56250a3b55d1c3f225d36049e71",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.11.16",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 396,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 289.4,
+     "qualification_platform": true
+    },
+    "linux-py3.12": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-linux-py3.12.json",
+     "sha256": "025025d8e3ee5cb9caed49e5bfd6122c6a1b0172440a9f18d6eb74d65013cbdf",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.12.14",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 396,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 283.2,
+     "qualification_platform": true
+    },
+    "linux-py3.13": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-linux-py3.13.json",
+     "sha256": "a4325d609cea3cb107382e5f0e8d54088ed4c5e72a24c32fb6e925c402daf418",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.13.15",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 396,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 220.7,
+     "qualification_platform": true
+    },
+    "linux-py3.14": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-linux-py3.14.json",
+     "sha256": "ebfd7d2be9317825a812b3e06271a4b6712acb6035eed59e06d8249d5027fe02",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.14.7",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 396,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 378.9,
+     "qualification_platform": true
+    },
+    "windows-py3.11": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q1/Q1-windows-py3.11.json",
+     "sha256": "0c8401c55e463c7dbb8d6488fe7b2c9eb8d2302b396bee4dc3815a9dff335155",
+     "status": "GREEN",
+     "os": "windows",
+     "python": "3.11.9",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 396,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 0
+     },
+     "seconds": 528.3,
+     "qualification_platform": true
+    }
+   }
+  },
+  "Q2": {
+   "status": "GREEN",
+   "qualification_platforms_required": [
+    "linux",
+    "windows"
+   ],
+   "missing_platforms": [],
+   "unbound_records": [],
+   "records": {
+    "linux-py3.11": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-linux-py3.11.json",
+     "sha256": "b688d9e10223b5aee1877724e1dd335479d91257d99b1db95a60e54e9a8b7cfb",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.11.16",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 189,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 2
+     },
+     "seconds": 100.4,
+     "qualification_platform": true
+    },
+    "linux-py3.12": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-linux-py3.12.json",
+     "sha256": "5b085063256c4ce8be26efcb7d74a49cd34b9141a24cca77f0f33958596dad22",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.12.14",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 189,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 2
+     },
+     "seconds": 99.2,
+     "qualification_platform": true
+    },
+    "linux-py3.13": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-linux-py3.13.json",
+     "sha256": "a89d880208a4727f8610d07fa5e3cdd9afcc2be25e4640f797669522d6e19574",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.13.15",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 189,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 2
+     },
+     "seconds": 83.6,
+     "qualification_platform": true
+    },
+    "linux-py3.14": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-linux-py3.14.json",
+     "sha256": "3349c3bbb8fa21eee6dea0e6976acf5009c22442a05cb3c08c7c48edc896ee5f",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.14.7",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 189,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 2
+     },
+     "seconds": 131.9,
+     "qualification_platform": true
+    },
+    "windows-py3.11": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q2/Q2-windows-py3.11.json",
+     "sha256": "7069bb5ea0a3286d348b7f27e333f257a691504ba2301bbdd5df37f065aea01e",
+     "status": "GREEN",
+     "os": "windows",
+     "python": "3.11.9",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 178,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 13
+     },
+     "seconds": 124.9,
+     "qualification_platform": true
+    }
+   }
+  },
+  "Q3": {
+   "status": "GREEN",
+   "qualification_platforms_required": [
+    "linux",
+    "windows"
+   ],
+   "missing_platforms": [],
+   "unbound_records": [],
+   "records": {
+    "linux-py3.11": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-linux-py3.11.json",
+     "sha256": "889cfce1fc7e38f98a812a47faf1aab899c0587492bbfde382c02a59be96efae",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.11.16",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 559,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 1
+     },
+     "seconds": 195.6,
+     "qualification_platform": true
+    },
+    "linux-py3.12": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-linux-py3.12.json",
+     "sha256": "9d8297ac28a6cd95edeb9e4ca3e4d5544725b829b6479e4b0d8ecb1e6cb88884",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.12.14",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 559,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 1
+     },
+     "seconds": 207.6,
+     "qualification_platform": true
+    },
+    "linux-py3.13": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-linux-py3.13.json",
+     "sha256": "4068cd06c18d6d8f273708f3da4d8c325043c374b08b63694b5edb07633d8ff2",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.13.15",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 559,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 1
+     },
+     "seconds": 181.8,
+     "qualification_platform": true
+    },
+    "linux-py3.14": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-linux-py3.14.json",
+     "sha256": "ddd0f4de766fed1f32afdff6b52c5be07b039c1668faaae8a1a15c967523a6e7",
+     "status": "GREEN",
+     "os": "linux",
+     "python": "3.14.7",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 559,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 1
+     },
+     "seconds": 240.2,
+     "qualification_platform": true
+    },
+    "windows-py3.11": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/Q3/Q3-windows-py3.11.json",
+     "sha256": "c151e75026ba1f48e3f053c7b848df2c748d27ae7ced694be8b15aa5aa931c01",
+     "status": "GREEN",
+     "os": "windows",
+     "python": "3.11.9",
+     "ci_run": "36796758932",
+     "bound_to_subject": true,
+     "harness_digest": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+     "counts": {
+      "PASS": 541,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "NOT_APPLICABLE": 19
+     },
+     "seconds": 492.3,
+     "qualification_platform": true
+    }
+   }
+  }
+ },
+ "q0": {
+  "checker_calibration_count": 46,
+  "checkers_discovered": 46,
+  "f1_f11": {
+   "PASS": 11,
+   "PENDING": 0,
+   "FAIL": 0
+  },
+  "v2_006": {
+   "lineage_ends_at_V2_006": true,
+   "f5_row_sha256": {
+    "rfc_now": "05915110dcdc7f4f2b1effee5e4eb8ffbe1a04533ac1d0faa8ee8cc08bfb0f55",
+    "amendment_after": "05915110dcdc7f4f2b1effee5e4eb8ffbe1a04533ac1d0faa8ee8cc08bfb0f55",
+    "match": true
+   },
+   "probe_digest": {
+    "now": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "v2_006_exception_after": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "correction_before": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "correction_after": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "old": {
+     "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e": "pre-V2-006",
+     "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0": "V2-006 to the P7-FINDING-001 correction"
+    },
+    "match": true
+   }
+  }
+ },
+ "q2": {
+  "mutation": {
+   "targets": 581,
+   "mutants": 14883,
+   "killed": 14873,
+   "survivors": 10,
+   "unaudited": 0,
+   "killed_by_timeout_named": 39
+  },
+  "mutation_records": {
+   "P1": {
+    "path": "closure-evidence/v2/P1-MUTATION.json",
+    "sha256": "60bd41b03d9c66edaed6df6052029a7b03f35cd4068ccdf4ad619d8d85ab4819"
+   },
+   "P2": {
+    "path": "closure-evidence/v2/P2-MUTATION.json",
+    "sha256": "6b58ce0c1b45f8be1c7ba2b4cc2056e79615fdc91a5b3ede90c004c07a0656d7"
+   },
+   "P3": {
+    "path": "closure-evidence/v2/P3-MUTATION.json",
+    "sha256": "3a8d00522b154719bb0457d3adb77dc212f48ba74817b41fefbee4d506b31ce4"
+   },
+   "P4": {
+    "path": "closure-evidence/v2/P4-MUTATION.json",
+    "sha256": "0c339b531e5274d8c70f997d8f36bd292ed750ff064f13253352080bce23ce38"
+   },
+   "P5": {
+    "path": "closure-evidence/v2/P5-MUTATION.json",
+    "sha256": "76abd54f9be68833800f91fefb17c3d387af4cefd6f065120275bcf9b8e4364c"
+   },
+   "P6": {
+    "path": "closure-evidence/v2/P6-MUTATION.json",
+    "sha256": "6c4045276c2f5084d92e01f5fee48c138ad37a33420b4a5dc7956da2e9c9504c"
+   },
+   "C2-P1": {
+    "path": "closure-evidence/v2/cycle2/P1-MUTATION.json",
+    "sha256": "d5643478b074273efb530d1b7a1d162e767b7c45c8e5a8d20764303f9648df38"
+   },
+   "C2-P2": {
+    "path": "closure-evidence/v2/cycle2/P2-MUTATION.json",
+    "sha256": "583e1725628185bbd6d6ba471695e27ac13445c72f0a987a26c25ecd8edf68bf"
+   },
+   "C2-P3": {
+    "path": "closure-evidence/v2/cycle2/P3-MUTATION.json",
+    "sha256": "cf5ad825a6d90589fe54f0189193cef8e04084429a63966823e12d2b219021b4"
+   },
+   "C2-P4": {
+    "path": "closure-evidence/v2/cycle2/P4-MUTATION.json",
+    "sha256": "4ea250797a49626778ede9723dadf5eed5acd47c74d47b526d353777858873d1"
+   },
+   "C2-ORCH": {
+    "path": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json",
+    "sha256": "56940fea58adc10f80ab3ccb470cfd50cf69292ca7b2dc0b9e4591bfaf568bd6"
+   }
+  },
+  "calibration_inventory": [
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "exists",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/exists/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/exists/negative",
+    "qualified": true
+   },
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "returns",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/returns/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/returns/negative",
+    "qualified": true
+   },
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "raises",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/raises/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/raises/negative",
+    "qualified": true
+   },
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "blocks",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/negative",
+    "qualified": true
+   }
+  ],
+  "calibration_digest": "14457eab8ffabc4c2e435b915dead562c6917f31d76027dc29694e43e117e1cb"
+ },
+ "q3": {
+  "fault_matrix_rows": 99,
+  "fault_matrix_classes": [
+   "bytecode",
+   "bytecode_cycle2",
+   "clean_failure",
+   "cli_harness",
+   "cli_stream",
+   "cli_subject",
+   "credentials",
+   "disposal_failure",
+   "file_artifact",
+   "interruption",
+   "lease_conflict",
+   "merge_conflict",
+   "plan_contradiction",
+   "post_merge_regression",
+   "process_effect",
+   "provider",
+   "resource_acquisition",
+   "reviewer_security_environment",
+   "sandbox_environment",
+   "signal_provenance",
+   "tool",
+   "unknown_flattening",
+   "verifier_disagreement",
+   "writer_close_failure"
+  ],
+  "fault_matrix_digest": "505b9a81b33851a08d8248947abfe916a96579bb4547b17b3e6763453be70c5b",
+  "v1_matrix_cells": 102,
+  "race_10_observations": 102
+ },
+ "cycle2": {
+  "q0": {
+   "probes": {
+    "probe.cli_invocation": {
+     "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "kind": "cli_invocation",
+     "active": true,
+     "cycle": 2,
+     "module": "aisef2.probe.cli_invocation"
+    },
+    "probe.file_artifact": {
+     "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "kind": "file_artifact",
+     "active": true,
+     "cycle": 2,
+     "module": "aisef2.probe.file_artifact"
+    },
+    "probe.process_effect": {
+     "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "kind": "process_effect",
+     "active": true,
+     "cycle": 2,
+     "module": "aisef2.probe.process_effect"
+    },
+    "probe.python_callable": {
+     "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "kind": "python_callable",
+     "active": false,
+     "cycle": 1,
+     "module": "aisef2.probe.python_callable"
+    },
+    "probe.python_callable_v2": {
+     "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "kind": "python_callable",
+     "active": true,
+     "cycle": 2,
+     "module": "aisef2.probe.python_callable_v2"
+    }
+   },
+   "active_by_kind": {
+    "file_artifact": "probe.file_artifact",
+    "python_callable": "probe.python_callable_v2",
+    "cli_invocation": "probe.cli_invocation",
+    "process_effect": "probe.process_effect"
+   },
+   "active_expected": {
+    "file_artifact": "probe.file_artifact",
+    "python_callable": "probe.python_callable_v2",
+    "cli_invocation": "probe.cli_invocation",
+    "process_effect": "probe.process_effect"
+   },
+   "catalog_problems": [],
+   "cycle1_probe": {
+    "id": "probe.python_callable",
+    "frozen_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "catalog_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "module_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "active": false,
+    "resolvable_and_inactive": true
+   },
+   "probe_rule_checkers": {
+    "probe_catalog_closure": {
+     "package": "WP-2.0.1",
+     "clean_passes": true,
+     "rejects_known_bad": true,
+     "rejects_for_the_expected_reason": true,
+     "calibrated": true,
+     "always_pass_mutant_rejected": true
+    },
+    "no_clock_in_probe_facts": {
+     "package": "WP-2.0.1",
+     "clean_passes": true,
+     "rejects_known_bad": true,
+     "rejects_for_the_expected_reason": true,
+     "calibrated": true,
+     "always_pass_mutant_rejected": true
+    },
+    "no_test_artefact_in_probes": {
+     "package": "WP-2.0.1",
+     "clean_passes": true,
+     "rejects_known_bad": true,
+     "rejects_for_the_expected_reason": true,
+     "calibrated": true,
+     "always_pass_mutant_rejected": true
+    },
+    "closed_dispatch_in_scenario_probes": {
+     "package": "WP-2.0.1",
+     "clean_passes": true,
+     "rejects_known_bad": true,
+     "rejects_for_the_expected_reason": true,
+     "calibrated": true,
+     "always_pass_mutant_rejected": true
+    },
+    "single_placeholder_token": {
+     "package": "WP-2.0.1",
+     "clean_passes": true,
+     "rejects_known_bad": true,
+     "rejects_for_the_expected_reason": true,
+     "calibrated": true,
+     "always_pass_mutant_rejected": true
+    },
+    "protocol_channel_discipline": {
+     "package": "WP-2.0.1",
+     "clean_passes": true,
+     "rejects_known_bad": true,
+     "rejects_for_the_expected_reason": true,
+     "calibrated": true,
+     "always_pass_mutant_rejected": true
+    },
+    "cycle2_baseline": {
+     "package": "WP-2.0.1",
+     "clean_passes": true,
+     "rejects_known_bad": true,
+     "rejects_for_the_expected_reason": true,
+     "calibrated": true,
+     "always_pass_mutant_rejected": true
+    }
+   },
+   "c2_p5_acceptance": {
+    "record": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+    "sha256": "69c23b49f393276117c957f598f811a91a81e36595d60c7bf9fc0af5f414453d",
+    "verdict": "C2-P5 ACCEPTED BY THE OWNER — ACCEPTANCE BOUNDARY RECORDED",
+    "re_derivation_problems": [],
+    "approvals": 59,
+    "aggregate_digest": "73e3644949a95810a43d4e91df8a91e91cef0bf434f6ce8bfc9217b862d139d5",
+    "cases": [
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:Acceptance.test_the_acceptance_re_derives_on_this_tree",
+      "outcome": "PASS",
+      "seconds": 0.275
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:Acceptance.test_the_admission_holds_only_under_every_real_approval",
+      "outcome": "PASS",
+      "seconds": 0.001
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:Approvals.test_a_synthetic_approver_is_refused",
+      "outcome": "PASS",
+      "seconds": 0.001
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:Approvals.test_a_tampered_approval_is_refused",
+      "outcome": "PASS",
+      "seconds": 0.002
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:Approvals.test_one_real_approval_per_retained_contract_by_the_owner",
+      "outcome": "PASS",
+      "seconds": 0.012
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:KernelProvenance.test_a_committed_kernel_that_is_not_the_accepted_one_is_refused",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:KernelProvenance.test_a_derived_kernel_that_is_not_this_tree_is_refused",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:KernelProvenance.test_any_semantic_difference_is_refused_with_or_without_the_provenance",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:KernelProvenance.test_identical_records_are_current",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:KernelProvenance.test_on_this_tree_the_committed_proposal_is_current",
+      "outcome": "PASS",
+      "seconds": 0.074
+     },
+     {
+      "id": "tests.v2.test_c2_p5_acceptance:KernelProvenance.test_only_the_provenance_differs_from_the_accepted_kernel_is_current",
+      "outcome": "PASS",
+      "seconds": 0.0
+     }
+    ]
+   }
+  },
+  "q1_properties": {
+   "expired_window_verdict_per_class": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.test_c2_file_artifact:ObjectStoreRule.test_every_class_means_REFUTED_by_an_expired_window",
+      "outcome": "PASS"
+     },
+     {
+      "id": "tests.v2.test_c2_cli_verdicts:Classes.test_the_class_vocabulary_and_the_expired_window_verdicts",
+      "outcome": "PASS"
+     },
+     {
+      "id": "tests.v2.test_probe_process_effect_units:Decision.test_the_window_expired_with_the_process_present_or_gone",
+      "outcome": "PASS"
+     },
+     {
+      "id": "tests.v2.test_python_callable_v2:Cycle1Semantics.test_PCV2_8_the_deadline_verdict_of_every_class",
+      "outcome": "PASS"
+     }
+    ]
+   },
+   "subject_absent_under_the_declaration": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.test_c2_file_artifact:Absence.test_FA_2_a_MUST_NOT_HOLD_prohibition_over_an_absent_path_is_decided",
+      "outcome": "PASS"
+     },
+     {
+      "id": "tests.v2.test_c2_file_artifact:Absence.test_FA_2_REQUIRES_SUBJECT_drops_the_offered_verdict",
+      "outcome": "PASS"
+     },
+     {
+      "id": "tests.v2.test_c2_cli_invocation:Harness.test_CLI_6_an_absent_subject_is_SUBJECT_ABSENT_and_the_contract_decides",
+      "outcome": "PASS"
+     },
+     {
+      "id": "tests.v2.test_probe_process_effect:Scenario.test_PE_6_an_absent_subject_before_any_step_a_missing_method_at_call_time",
+      "outcome": "PASS"
+     },
+     {
+      "id": "tests.v2.test_python_callable_v2:Cycle1Semantics.test_PCV2_8_absence_exit_and_forgery_are_what_they_were",
+      "outcome": "PASS"
+     }
+    ]
+   },
+   "test_layout_invariance": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.test_c2_cli_invocation:Identity.test_product_verdicts_are_identical_across_developer_test_layouts",
+      "outcome": "PASS"
+     },
+     {
+      "id": "tests.v2.test_probe_process_effect:Identity.test_product_verdicts_are_identical_across_developer_test_layouts",
+      "outcome": "PASS"
+     },
+     {
+      "id": "tests.v2.test_python_callable_v2:LayoutInvariance.test_PCV2_7_product_verdicts_are_identical_across_test_layouts",
+      "outcome": "PASS"
+     }
+    ]
+   },
+   "design_check_1": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.test_c2_cli_invocation:Harness.test_CLI_4_DESIGN_CHECK_1_the_same_result_under_every_scheduling_of_exit_and_file_close",
+      "outcome": "PASS"
+     }
+    ]
+   }
+  },
+  "q2_calibration": {
+   "probes": {
+    "probe.python_callable": {
+     "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "active": false,
+     "classes": [
+      "exists",
+      "returns",
+      "raises",
+      "blocks"
+     ]
+    },
+    "probe.file_artifact": {
+     "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "active": true,
+     "classes": [
+      "exists",
+      "content",
+      "grep_count"
+     ]
+    },
+    "probe.python_callable_v2": {
+     "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "active": true,
+     "classes": [
+      "exists",
+      "returns",
+      "raises",
+      "blocks",
+      "returns_bytes",
+      "equals",
+      "raises_attrs"
+     ]
+    },
+    "probe.cli_invocation": {
+     "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "active": true,
+     "classes": [
+      "exits",
+      "exits_streams",
+      "exits_files",
+      "blocks",
+      "equality"
+     ]
+    },
+    "probe.process_effect": {
+     "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "active": true,
+     "classes": [
+      "scenario_returns",
+      "scenario_raises",
+      "scenario_files"
+     ]
+    }
+   },
+   "in_use": [
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "blocks"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "equality"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "exits"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "exits_files"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "exits_streams"
+    ],
+    [
+     "probe.file_artifact",
+     "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "content"
+    ],
+    [
+     "probe.file_artifact",
+     "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "exists"
+    ],
+    [
+     "probe.file_artifact",
+     "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "grep_count"
+    ],
+    [
+     "probe.process_effect",
+     "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "scenario_files"
+    ],
+    [
+     "probe.process_effect",
+     "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "scenario_raises"
+    ],
+    [
+     "probe.process_effect",
+     "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "scenario_returns"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "blocks"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "exists"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "raises"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "returns"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "blocks"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "equals"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "exists"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "raises"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "raises_attrs"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "returns"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "returns_bytes"
+    ]
+   ],
+   "all_calibrated_fresh": true,
+   "problems": []
+  },
+  "q2_falsifiability": {
+   "specs": 59,
+   "qualified": 59,
+   "by_probe": {
+    "probe.cli_invocation": 10,
+    "probe.file_artifact": 9,
+    "probe.process_effect": 34,
+    "probe.python_callable_v2": 6
+   },
+   "approvals": {
+    "count": 59,
+    "approver": [
+     "human:owner"
+    ]
+   },
+   "problems": []
+  },
+  "q3_rows_by_class": {
+   "bytecode": 9,
+   "bytecode_cycle2": 3,
+   "clean_failure": 2,
+   "cli_harness": 4,
+   "cli_stream": 6,
+   "cli_subject": 6,
+   "credentials": 3,
+   "disposal_failure": 9,
+   "file_artifact": 6,
+   "interruption": 9,
+   "lease_conflict": 2,
+   "merge_conflict": 1,
+   "plan_contradiction": 1,
+   "post_merge_regression": 2,
+   "process_effect": 10,
+   "provider": 2,
+   "resource_acquisition": 3,
+   "reviewer_security_environment": 1,
+   "sandbox_environment": 4,
+   "signal_provenance": 6,
+   "tool": 6,
+   "unknown_flattening": 1,
+   "verifier_disagreement": 2,
+   "writer_close_failure": 1
+  }
+ },
+ "platform_identities": {
+  "Q0": {
+   "darwin-py3.14": {
+    "os": "darwin",
+    "python": "3.14.7",
+    "ci_run": null,
+    "status": "GREEN"
+   },
+   "linux-py3.11": {
+    "os": "linux",
+    "python": "3.11.16",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.12": {
+    "os": "linux",
+    "python": "3.12.14",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.13": {
+    "os": "linux",
+    "python": "3.13.15",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.14": {
+    "os": "linux",
+    "python": "3.14.7",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "windows-py3.11": {
+    "os": "windows",
+    "python": "3.11.9",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   }
+  },
+  "Q1": {
+   "linux-py3.11": {
+    "os": "linux",
+    "python": "3.11.16",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.12": {
+    "os": "linux",
+    "python": "3.12.14",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.13": {
+    "os": "linux",
+    "python": "3.13.15",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.14": {
+    "os": "linux",
+    "python": "3.14.7",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "windows-py3.11": {
+    "os": "windows",
+    "python": "3.11.9",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   }
+  },
+  "Q2": {
+   "linux-py3.11": {
+    "os": "linux",
+    "python": "3.11.16",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.12": {
+    "os": "linux",
+    "python": "3.12.14",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.13": {
+    "os": "linux",
+    "python": "3.13.15",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.14": {
+    "os": "linux",
+    "python": "3.14.7",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "windows-py3.11": {
+    "os": "windows",
+    "python": "3.11.9",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   }
+  },
+  "Q3": {
+   "linux-py3.11": {
+    "os": "linux",
+    "python": "3.11.16",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.12": {
+    "os": "linux",
+    "python": "3.12.14",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.13": {
+    "os": "linux",
+    "python": "3.13.15",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "linux-py3.14": {
+    "os": "linux",
+    "python": "3.14.7",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   },
+   "windows-py3.11": {
+    "os": "windows",
+    "python": "3.11.9",
+    "ci_run": "36796758932",
+    "status": "GREEN"
+   }
+  }
+ },
+ "residual_processes": {
+  "linux-py3.11": {
+   "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/linux-py3.11.json",
+   "sha256": "34a6136912ddbd56fdb0c9fed7254be710773244b3ee0055fa1df24f91203bac",
+   "exit": 0,
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "escaped": 0,
+   "released_empty": true,
+   "mechanism": "posix-session-and-group",
+   "ci_run": 36796758932,
+   "os": "linux"
+  },
+  "linux-py3.12": {
+   "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/linux-py3.12.json",
+   "sha256": "c1c65bfa036326b41cbd1d9338790a4bcc8f78af51de41d3844c676fcb332db9",
+   "exit": 0,
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "escaped": 0,
+   "released_empty": true,
+   "mechanism": "posix-session-and-group",
+   "ci_run": 36796758932,
+   "os": "linux"
+  },
+  "linux-py3.13": {
+   "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/linux-py3.13.json",
+   "sha256": "fe5762789e5fc38a9f304dfcaaf2274609d2c34703242b14445f4cea0f8637c1",
+   "exit": 0,
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "escaped": 0,
+   "released_empty": true,
+   "mechanism": "posix-session-and-group",
+   "ci_run": 36796758932,
+   "os": "linux"
+  },
+  "linux-py3.14": {
+   "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/linux-py3.14.json",
+   "sha256": "05a531b3ed154f520f3a2ba20e1d9fc194ba29be3f425253d0b2b326ed46fc93",
+   "exit": 0,
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "escaped": 0,
+   "released_empty": true,
+   "mechanism": "posix-session-and-group",
+   "ci_run": 36796758932,
+   "os": "linux"
+  },
+  "windows-py3.11": {
+   "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/PLATFORMS/windows-py3.11.json",
+   "sha256": "3371c794c24bcede5a0081411a2cc34569895c48feb496c88b8a7d473afa1da1",
+   "exit": 0,
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "escaped": 0,
+   "released_empty": true,
+   "mechanism": "windows-job",
+   "ci_run": 36796758932,
+   "os": "windows"
+  }
+ },
+ "problems": [],
+ "at": "2026-10-01T01:34:26Z"
+}

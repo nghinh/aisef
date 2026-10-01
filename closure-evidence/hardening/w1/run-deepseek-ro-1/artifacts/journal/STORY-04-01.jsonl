@@ -1,0 +1,12 @@
+{"seq": 1, "step": "attempt.started", "at": 1789810115.93, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789810116.582, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-deepseek-ro-1/.aisef/worktrees/STORY-04-01"}, "undo": {"worktree.remove": "STORY-04-01"}}
+{"seq": 3, "step": "status.running", "at": 1789810116.583, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789810611.146, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/cli.py", "tests/test_cli_exit_codes.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789810611.146, "attempt": 1, "data": {"luot": 1, "sha": "a9dfe06d397720959419837afecda325121766ee", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "changes.detected", "at": 1789811154.883, "attempt": 1, "data": {"luot": 2, "files": ["ledgerlock/cli.py", "tests/test_cli_exit_codes.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 7, "step": "candidate.frozen", "at": 1789811154.883, "attempt": 1, "data": {"luot": 2, "sha": "1367d6daf16b5d99d9ad1685b0cb3ea5a6035473", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 8, "step": "verification.completed", "at": 1789811390.676, "attempt": 1, "data": {"ok": true, "attempts": 2, "cost_usd": 0.0, "candidate": "1367d6daf16b5d99d9ad1685b0cb3ea5a6035473"}, "undo": {}}
+{"seq": 9, "step": "review.completed", "at": 1789811390.676, "attempt": 1, "data": {"blocked": [], "outcome": "PASS", "review_executions": 2, "developer_attempts": 2}, "undo": {}}
+{"seq": 10, "step": "attempt.aborted", "at": 1789811390.684, "attempt": 1, "data": {"reason": "abnormal termination"}, "undo": {}}
+{"seq": 11, "step": "merge.completed", "at": 1789811390.748, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 12, "step": "attempt.committed", "at": 1789811391.198, "attempt": 1, "data": {}, "undo": {}}

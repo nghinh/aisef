@@ -1,0 +1,4 @@
+{"chain":"703ab9b57c4250897bfb971d837c7e4fb1356e3322f2ddf80fa9186069bd4cec","event":{"data":{"journal_format":1,"run_id":"fixture"},"ignorable":false,"seq":0,"source_seqs":[],"time":0.0,"type":"run/begin"}}
+{"chain":"cca8d120f9deb126e41ff72d392f03b62b59f37c381e65c37eb742425a54a13d","event":{"data":{"parent":"cccccccccccccccccccccccccccccccccccccccc","story_id":"S1"},"ignorable":false,"seq":1,"source_seqs":[],"time":1.0,"type":"story/begin"}}
+{"chain":"92f114ca12d4a32ee198fc6686460cf4cbc799665a09ab7aa27d835929447b6c","event":{"data":{"journal_format":2,"run_id":"fixture"},"ignorable":false,"seq":2,"source_seqs":[],"time":2.0,"type":"run/begin"}}
+{"chain":"91a64d175e30dd7d7e99f9804da4bc18c394c891425d9984f208258421030a5e","event":{"data":{"story_id":"S1"},"ignorable":false,"seq":3,"source_seqs":[],"time":3.0,"type":"story/checkpoint"}}

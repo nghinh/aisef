@@ -1,0 +1,45 @@
+{
+ "subject": {
+  "kind": "process_effect",
+  "locator": "tally:Tally"
+ },
+ "stimulus": {
+  "scenario": [
+   {
+    "step": "construct",
+    "args": [
+     "<ws>/tally.jsonl"
+    ],
+    "kwargs": {}
+   },
+   {
+    "step": "call",
+    "method": "add",
+    "args": [
+     "a",
+     2
+    ],
+    "kwargs": {}
+   },
+   {
+    "step": "expect_raises",
+    "method": "add",
+    "args": [
+     "x",
+     -1
+    ],
+    "kwargs": {},
+    "exception": "Refused",
+    "attrs": {
+     "name": "x",
+     "amount": -1
+    }
+   }
+  ]
+ },
+ "observable": {
+  "raises": true,
+  "within_s": 10
+ },
+ "subject_absence": "REQUIRES_SUBJECT"
+}

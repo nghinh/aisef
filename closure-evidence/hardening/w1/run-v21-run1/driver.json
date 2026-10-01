@@ -1,0 +1,1153 @@
+{
+ "run": "v21-run1",
+ "project": "/Users/nghinh/Downloads/projects/w1-run-v21-run1",
+ "phases": {
+  "prepare": {
+   "at": "2026-09-21T05:26:08+0700",
+   "aisef_version": "aisef 1.7.6",
+   "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/lib/python3.13/site-packages/aisef/__init__.py",
+   "aisef_from_the_wheel_not_the_checkout": true,
+   "venv_packages": "[{\"name\": \"aisef\", \"version\": \"1.7.6\"}, {\"name\": \"pip\", \"version\": \"25.3\"}]\n",
+   "freeze": {
+    "generated": "2026-09-21T00:37:13+0700",
+    "candidate_sha": "f52df75ff242a8565b4c995e82e25a94016e95d1",
+    "aisef_tree_digest": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "PHASE12_KERNEL_DIGEST": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "tree_equals_phase12_kernel": true,
+    "version_string": "aisef 1.7.6",
+    "wheel": {
+     "file": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/dist/aisef-1.7.6-py3-none-any.whl",
+     "sha256": "8cae5c7e8d9aea1ecceb7d5d48d360cf2285b4f6db7560ff71aae99b9b182eac",
+     "bytes": 689027,
+     "built_with": "build 1.6.0 (/Users/nghinh/Downloads/projects/ai-sdlc/.venv/lib/python3.13/site-packages/build)"
+    },
+    "run_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv",
+     "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/lib/python3.13/site-packages/aisef/__init__.py",
+     "installed_from_the_wheel": true
+    },
+    "oracle_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv",
+     "packages": [
+      {
+       "name": "coverage",
+       "version": "7.16.1"
+      },
+      {
+       "name": "pytest",
+       "version": "9.1.1"
+      }
+     ]
+    },
+    "docker_image": {
+     "name": "aisef-verify-python:84adf1d8eaf9",
+     "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+    },
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "opencode_version": "1.18.31",
+    "ci": {
+     "run": "35524771363",
+     "sha": "f52df75ff242a8565b4c995e82e25a94016e95d1",
+     "conclusion": "success",
+     "jobs": {
+      "wheel": "success",
+      "unit (ubuntu-latest, 3.13)": "success",
+      "lint": "success",
+      "unit (windows-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.14)": "success",
+      "unit (ubuntu-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.12)": "success"
+     }
+    },
+    "ci_matches_candidate": true,
+    "w0": {
+     "path": "closure-evidence/hardening/AISEF-W0-QUALIFICATION-f52df75.json",
+     "qualified": true,
+     "sha": "f52df75ff242a8565b4c995e82e25a94016e95d1",
+     "aisef_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+     "tree_matches_frozen": true
+    },
+    "no_tag_no_publish": true,
+    "rule": "W1 runs use run_venv's aisef only; any aisef/ change after this record voids it and the W1 runs that rest on it",
+    "pass": true
+   },
+   "project_git": {
+    "head": "829c48b831d7d60e424c57bdba3a866ab940bbd8",
+    "branch": "master",
+    "status": [],
+    "log": [
+     "829c48b w1-run-v21-run1: execution profile PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO applied (run.max_turns, route.<role>_model, project model declaration — an execution-profile setting, not an AISEF change)",
+     "0bed57c w1-run-v21-run1: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "05e3784 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "136a68d W1-LEDGERLOCK-PLAN-V2.1: the usage-error exit is owned by the story whose argparse surface introduces it (STORY-01-01, FR-12), and STORY-04-01 preserves it instead of claiming to introduce it",
+     "1621a2b W1-LEDGERLOCK-PLAN-V2: acceptance criteria carry their proof obligation; STORY-02-02 AC-2 corrected to requirements 4.5; CLI surface and usage-error criteria moved to the story that builds the parser"
+    ]
+   },
+   "config": {
+    "tools.test": "python3 -m pytest -v",
+    "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+    "sandbox.image": "aisef-verify-python:84adf1d8eaf9",
+    "sandbox.allow_hosts": [
+     "pypi.org",
+     "files.pythonhosted.org"
+    ],
+    "run.cost_cap_usd": 80.0,
+    "run.max_turns": 80,
+    "route.developer_model": "9router/ds/deepseek-v4-pro",
+    "route.reviewer_model": "9router/ds/deepseek-v4-pro",
+    "route.security_model": "9router/ds/deepseek-v4-pro",
+    "route.designer_model": "9router/ds/deepseek-v4-pro"
+   },
+   "opencode_version": "1.18.31",
+   "opencode_binary": "/Users/nghinh/.opencode/bin/opencode",
+   "docker_image": {
+    "name": "aisef-verify-python:84adf1d8eaf9",
+    "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "doctor": {
+    "cmd": [
+     "aisef",
+     "doctor"
+    ],
+    "exit": 0,
+    "seconds": 2.9,
+    "stdout_tail": "Environment:\n  ✅ python >= 3.11 — 3.13.12\n  ✅ git\n  ✅ claude CLI — /opt/homebrew/bin/claude\n  ✅ opencode CLI — /Users/nghinh/.opencode/bin/opencode\n  ✅ agent credential — ANTHROPIC_BASE_URL set in the environment — these outrank the client's own login; unset them to use it\n  ✅ docker daemon — running\n  ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts\nProject:\n  ✅ project directory — /Users/nghinh/Downloads/projects/w1-run-v21-run1\n  ✅ sandbox provider — docker — guarantees at WORKSPACE_WRITE: network_none, non_root, secrets_absent\n  ✅ sandbox image — aisef-verify-python:84adf1d8eaf9 — built by the harness: pinned base, pinned tool versions\n  · role test — explicit → `python3 -m pytest -v`\n  · role lint — explicit → `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`\n  · role sast — auto: bandit (managed, pinned 1.9.4) → `bandit -q -r .`\n  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.sast — `tools.sast` = `bandit -q -r .` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ docs/requirements.md — /Users/nghinh/Downloads/projects/w1-run-v21-run1/docs/requirements.md\n  ✅ config — defaults → /Users/nghinh/Downloads/projects/w1-run-v21-run1/.ai/config.json\n  ○ budget cap above recorded spend — no `_bmad-output/budget.json` yet — nothing to compare; the first settled call writes it\n  ○ test command prints coverage — `tools.test` = `python3 -m pytest -v` does not print coverage — gate coverage check will be **not configured** (add `--coverage` / `--cov` / `--experimental-test-coverage`)\n  ✅ test command prints test names — gate can read test names (no evidence yet — guessing from command flags)\nInstalled skills:\n  ✅ has skills — 158 directories\n  ✅ framework skills up to date — matches source\n  ✅ no offensive skills — clean\n\n✅ ready\n",
+    "stderr_tail": ""
+   },
+   "doctor_red": [],
+   "oracle": {
+    "sha256_now": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "sha256_pinned": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "independence_verdict": "PASS"
+   },
+   "oracle_ok": true,
+   "compile": {
+    "cmd": [
+     "aisef",
+     "compile",
+     "--client",
+     "opencode",
+     "--bin",
+     "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/bin/aisef"
+    ],
+    "exit": 0,
+    "seconds": 0.1,
+    "stdout_tail": "client: opencode\n  second-tier in V1: cost/turns not measurable from harness — supported, does not block release\n  wrote /Users/nghinh/Downloads/projects/w1-run-v21-run1/.opencode/plugin/aisef-guard.ts\n  guards blocking before action: destructive, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope\n  guards blocking at other hooks: diff-scope (PostToolUse)\n  ⚠️  guards post-hoc only: completion\n     — not wired into this client's hooks at all; the rule is re-asked afterwards from evidence (story gate, `aisef verify`), which cannot stop the action, only fail the story\n  capabilities not at native level:\n     dir_allowlist: unsupported\n     tool_allowlist: emulated\n     turn_limit: unsupported\n\nreport: /Users/nghinh/Downloads/projects/w1-run-v21-run1/_bmad-output/compile-report.json\n\n⚠️  some clients can only be checked later — lower assurance, noted in report\n",
+    "stderr_tail": ""
+   },
+   "guard_commit": "ad2aa2bf950e26e74584aa4f34bde3ed85c4aa15",
+   "guard_plugin": {
+    "tracked_now": true,
+    "sha256": "a2c1f47f9d5289a68d491813e98b92138766148153464d874511bd634e955681",
+    "bin_line": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/bin/aisef\"]",
+    "compile_report": {
+     "clients": [
+      {
+       "client": "opencode",
+       "written": [
+        ".opencode/plugin/aisef-guard.ts"
+       ],
+       "guards_wired": [
+        "destructive",
+        "diff-scope",
+        "egress",
+        "git-stage",
+        "injection",
+        "process-ref",
+        "secret",
+        "tool-bypass",
+        "write-scope"
+       ],
+       "guards_post_hoc": [
+        "completion"
+       ],
+       "blocks_at_source": false,
+       "degradations": [
+        "dir_allowlist: unsupported",
+        "tool_allowlist: emulated",
+        "turn_limit: unsupported"
+       ]
+      }
+     ]
+    }
+   },
+   "fresh_topology": {
+    "head_branch": "master",
+    "master": "ad2aa2bf950e26e74584aa4f34bde3ed85c4aa15",
+    "plan_base": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+    "commits_after_plan_base": [
+     "ad2aa2b w1-run-v21-run1: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "829c48b w1-run-v21-run1: execution profile PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO applied (run.max_turns, route.<role>_model, project model declaration — an execution-profile setting, not an AISEF change)",
+     "0bed57c w1-run-v21-run1: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "05e3784 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)"
+    ],
+    "ledgerlock_dir_absent_at_master": true,
+    "remotes": [],
+    "branches": [
+     "master"
+    ]
+   },
+   "fresh_topology_ok": true,
+   "capability_preflight": {
+    "resolved": [
+     {
+      "role": "test",
+      "mode": "explicit",
+      "command": "python3 -m pytest -v",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "lint",
+      "mode": "explicit",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "sast",
+      "mode": "auto",
+      "command": "bandit -q -r .",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "bandit",
+      "provision": "managed",
+      "version": "1.9.4"
+     }
+    ],
+    "checks": [
+     {
+      "key": "tools.test",
+      "command": "python3 -m pytest -v",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.lint",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "/usr/local/bin/ruff",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.sast",
+      "command": "bandit -q -r .",
+      "state": "present",
+      "ok": true,
+      "mode": "auto",
+      "tool": "bandit",
+      "version": "1.9.4",
+      "observed": "bandit 1.9.4",
+      "detail": "bandit (pinned 1.9.4)",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     }
+    ],
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "expected_python_image": "aisef-verify-python:84adf1d8eaf9"
+   },
+   "execution_profile": {
+    "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/profiles/PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO.json",
+    "expected": {
+     "model": "9router/ds/deepseek-v4-pro",
+     "max_turns": 80
+    },
+    "check": {
+     "profile": "PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO",
+     "profile_id": "sha256:15105ab9ad3ac9179a7cf6ffdf468cf8295b76ec3de02d2dad014122cacb445e",
+     "copy_id": "sha256:15105ab9ad3ac9179a7cf6ffdf468cf8295b76ec3de02d2dad014122cacb445e",
+     "matches": true,
+     "differences": {}
+    }
+   },
+   "stage_env_check": {
+    "command": "uv run {p}/_bmad/scripts/resolve_customization.py --skill {p}/.claude/skills/bmad-code-review --project-root {p} --key workflow",
+    "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin:/Users/nghinh/.local/bin:/Users/nghinh/.antigravity-ide/antigravity-ide/bin:/Users/nghinh/bin:/Users/nghinh/Library/Android/sdk/platform-tools:/Users/nghinh/Library/Android/sdk/cmdline-tools/latest/bin:/Users/nghinh/.opencode/bin:/Users/nghinh/.local/bin:/opt/homebrew/bin:/Users/nghinh/.npm-global/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/opt/homebrew/bin:/Users/nghinh/.nvm/versions/node/v22.22.1/bin:/Users/nghinh/Library/pnpm:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_012ABz1xjgtJYWKrcJkXW6ad/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_014WxCYbLf7f3uw2isHFR9US/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_0155zZVATbJU3jHUmPP9NvMC/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01AYHYqVLaZRH2Vi6aHgDwEw/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01SfWJSiw6JtGbsuW75PKvPK/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01XXJmxLXPEhPMmnxmrgntNw/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/397c6835-34b1-4b78-b008-f94d2f58ee90/1c625eaa-3cc7-4f27-a610-c53b8cda189b/bin:/Users/nghinh/.claude/plugins/cache/karpathy-skills/andrej-karpathy-skills/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/gopls-lsp/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/ponytail/ponytail/4.9.0/bin:/Users/nghinh/.claude/plugins/cache/claude-community/eli5/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/playwright/unknown/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown/bin",
+    "stage_env": {
+     "resolved_uv": "closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv",
+     "wrapper_sha256": "f3fbbf214533a9d3fa497cac668d2760f99fd1c23ccf1d647f6f776f7bdd984e",
+     "real_uv": "/Users/nghinh/.local/bin/uv",
+     "real_uv_version": "uv 0.11.3 (45da18ac3 2026-04-01 aarch64-apple-darwin)"
+    },
+    "per_role_shell": {
+     "reviewer /bin/sh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-v21-run1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "reviewer /bin/zsh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-v21-run1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "reviewer /bin/zsh -ic": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-v21-run1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "security /bin/sh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-v21-run1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "security /bin/zsh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-v21-run1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "security /bin/zsh -ic": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-v21-run1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     }
+    },
+    "developer_control": {
+     "developer_tree_changed": true,
+     "new": [
+      ".venv",
+      "ledgerlock.egg-info",
+      "uv.lock"
+     ]
+    },
+    "pass": true
+   },
+   "section4_measured": {
+    "wheel": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/dist/aisef-1.7.6-py3-none-any.whl",
+    "wheel_sha256_in_freeze": "8cae5c7e8d9aea1ecceb7d5d48d360cf2285b4f6db7560ff71aae99b9b182eac",
+    "aisef_tree_digest": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "PHASE12_KERNEL_DIGEST": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "aisef_tree_at_the_candidate_sha": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "run_max_turns": 80,
+    "capability_matrix": {
+     "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/tool-capability-matrix.json",
+     "pass": true,
+     "aisef_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+     "totals": {
+      "profiles": 7,
+      "capabilities": 21,
+      "qualified": 11,
+      "none_declared": 10,
+      "failed": [],
+      "presets_failed": []
+     }
+    },
+    "stale_evidence_dirs": [],
+    "arb1": {
+     "artifacts": [
+      "stories.index.json",
+      "design-contract.json"
+     ],
+     "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+     "digest_recomputed_by_the_signed_method": "7c027d5b793b1b8475f50d743697a87157185702ca4403baa27b87057ac3c3dd",
+     "byte_identical_to_what_was_signed": false,
+     "current_method_digest": "ed4dbef8d701f5b0b3cfe3cc62f61c0d417dabdf8da6b65302a5b026f9387e09",
+     "stale_caused_by_the_hash_method_alone": false,
+     "plan_v2": {
+      "gate": "readiness",
+      "plan_base": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+      "artifacts": [
+       "_bmad-output/stories.index.json",
+       "_bmad-output/design-contract.json"
+      ],
+      "tracked_at_the_plan_base": [
+       "_bmad-output/stories.index.json",
+       "_bmad-output/design-contract.json"
+      ],
+      "blob_at_the_plan_base": {
+       "_bmad-output/stories.index.json": "b44a28a026ba4be48ff682a66e0d7839cbf03ee8",
+       "_bmad-output/design-contract.json": "7b897724f310c9a6ae6ee9daae46e3be825bec52"
+      },
+      "changed_since_the_plan_base": [],
+      "content_is_exactly_the_approved_plan_base": true
+     },
+     "reapproval_basis": "APPROVED_PLAN_BASE"
+    }
+   },
+   "preflight": {
+    "trunk_is_the_approved_fresh_root": true,
+    "zero_prior_delivery_commits": true,
+    "expected_story_count": true,
+    "expected_story_state_none_registered": true,
+    "no_candidate_branches": true,
+    "artifacts_match_frozen_requirements": true,
+    "client_is_opencode": true,
+    "expected_opencode_version": true,
+    "expected_model_route": true,
+    "guard_plugin_bound_to_the_frozen_candidate": true,
+    "no_stale_story_worktrees": true,
+    "sandbox_image_is_the_frozen_candidates_python_environment": true,
+    "every_selected_tool_probed_present_before_the_first_model_call": true,
+    "sandbox_image_present": true,
+    "environment_identity_matches_freeze": true,
+    "no_remotes": true,
+    "frozen_wheel_digest_identical": true,
+    "product_tree_digest_identical": true,
+    "same_max_turn_configuration": true,
+    "execution_profile_identity_matches": true,
+    "same_capability_matrix": true,
+    "no_stale_evidence": true,
+    "every_stale_gate_has_a_measured_basis": true,
+    "reviewer_dependency_command_leaves_the_tree_byte_identical": true
+   },
+   "stale_gate_bases": {
+    "mockups": {
+     "gate": "mockups",
+     "plan_base": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+     "artifacts": [
+      "_bmad-output/design-contract.json"
+     ],
+     "tracked_at_the_plan_base": [
+      "_bmad-output/design-contract.json"
+     ],
+     "blob_at_the_plan_base": {
+      "_bmad-output/design-contract.json": "7b897724f310c9a6ae6ee9daae46e3be825bec52"
+     },
+     "changed_since_the_plan_base": [],
+     "content_is_exactly_the_approved_plan_base": true
+    },
+    "readiness": {
+     "gate": "readiness",
+     "plan_base": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+     "artifacts": [
+      "_bmad-output/stories.index.json",
+      "_bmad-output/design-contract.json"
+     ],
+     "tracked_at_the_plan_base": [
+      "_bmad-output/stories.index.json",
+      "_bmad-output/design-contract.json"
+     ],
+     "blob_at_the_plan_base": {
+      "_bmad-output/stories.index.json": "b44a28a026ba4be48ff682a66e0d7839cbf03ee8",
+      "_bmad-output/design-contract.json": "7b897724f310c9a6ae6ee9daae46e3be825bec52"
+     },
+     "changed_since_the_plan_base": [],
+     "content_is_exactly_the_approved_plan_base": true
+    }
+   },
+   "preflight_measured": {
+    "model": "9router/ds/deepseek-v4-pro",
+    "opencode_version": "1.18.31",
+    "plugin_bin": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/bin/aisef\"]",
+    "worktrees": [
+     "/Users/nghinh/Downloads/projects/w1-run-v21-run1 ad2aa2b [master]"
+    ],
+    "stories": 16,
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "preflight_ok": true,
+   "gates": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "stale",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "agent_starts_before": 5,
+   "story_evidence_before": [],
+   "ok": true
+  },
+  "kernel_first": {
+   "at": "2026-09-21T05:26:20+0700",
+   "agent_starts_before": 5,
+   "evidence_before": [],
+   "gates_before": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "stale",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "run": {
+    "cmd": [
+     "aisef",
+     "run",
+     "--client",
+     "opencode"
+    ],
+    "exit": 2,
+    "seconds": 0.1,
+    "stdout_tail": "",
+    "stderr_tail": "✗ gate not approved: mockups, readiness\n  aisef review mockups\n"
+   },
+   "agent_starts_after": 5,
+   "evidence_after": [],
+   "stale_gates": [
+    "mockups",
+    "readiness"
+   ],
+   "named_in_the_refusal": [
+    "mockups",
+    "readiness"
+   ],
+   "refused_on_readiness": true,
+   "no_agent_call": true,
+   "ok": true,
+   "classification": "kernel refused the STALE gate before any agent call (kernel path first)"
+  },
+  "approve": {
+   "at": "2026-09-21T05:26:20+0700",
+   "gates_before": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "stale",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "arb1_measured": {
+    "artifacts": [
+     "stories.index.json",
+     "design-contract.json"
+    ],
+    "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+    "digest_recomputed_by_the_signed_method": "7c027d5b793b1b8475f50d743697a87157185702ca4403baa27b87057ac3c3dd",
+    "byte_identical_to_what_was_signed": false,
+    "current_method_digest": "ed4dbef8d701f5b0b3cfe3cc62f61c0d417dabdf8da6b65302a5b026f9387e09",
+    "stale_caused_by_the_hash_method_alone": false,
+    "plan_v2": {
+     "gate": "readiness",
+     "plan_base": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+     "artifacts": [
+      "_bmad-output/stories.index.json",
+      "_bmad-output/design-contract.json"
+     ],
+     "tracked_at_the_plan_base": [
+      "_bmad-output/stories.index.json",
+      "_bmad-output/design-contract.json"
+     ],
+     "blob_at_the_plan_base": {
+      "_bmad-output/stories.index.json": "b44a28a026ba4be48ff682a66e0d7839cbf03ee8",
+      "_bmad-output/design-contract.json": "7b897724f310c9a6ae6ee9daae46e3be825bec52"
+     },
+     "changed_since_the_plan_base": [],
+     "content_is_exactly_the_approved_plan_base": true
+    },
+    "reapproval_basis": "APPROVED_PLAN_BASE"
+   },
+   "stale_gates": [
+    "mockups",
+    "readiness"
+   ],
+   "bases": {
+    "mockups": {
+     "basis": "APPROVED_PLAN_BASE",
+     "measured": {
+      "gate": "mockups",
+      "plan_base": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+      "artifacts": [
+       "_bmad-output/design-contract.json"
+      ],
+      "tracked_at_the_plan_base": [
+       "_bmad-output/design-contract.json"
+      ],
+      "blob_at_the_plan_base": {
+       "_bmad-output/design-contract.json": "7b897724f310c9a6ae6ee9daae46e3be825bec52"
+      },
+      "changed_since_the_plan_base": [],
+      "content_is_exactly_the_approved_plan_base": true
+     }
+    },
+    "readiness": {
+     "basis": "APPROVED_PLAN_BASE",
+     "measured": {
+      "gate": "readiness",
+      "plan_base": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+      "artifacts": [
+       "_bmad-output/stories.index.json",
+       "_bmad-output/design-contract.json"
+      ],
+      "tracked_at_the_plan_base": [
+       "_bmad-output/stories.index.json",
+       "_bmad-output/design-contract.json"
+      ],
+      "blob_at_the_plan_base": {
+       "_bmad-output/stories.index.json": "b44a28a026ba4be48ff682a66e0d7839cbf03ee8",
+       "_bmad-output/design-contract.json": "7b897724f310c9a6ae6ee9daae46e3be825bec52"
+      },
+      "changed_since_the_plan_base": [],
+      "content_is_exactly_the_approved_plan_base": true
+     }
+    }
+   },
+   "approvals": {
+    "mockups": {
+     "note": "W1-LEDGERLOCK-PLAN-V2 re-approval of `mockups`: the artifacts this gate signs are byte-identical to the approved plan base 136a68dcdc3f, so the previous plan's signature is stale for that reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first (closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)",
+     "cli": {
+      "cmd": [
+       "aisef",
+       "approve",
+       "mockups",
+       "--note",
+       "W1-LEDGERLOCK-PLAN-V2 re-approval of `mockups`: the artifacts this gate signs are byte-identical to the approved plan base 136a68dcdc3f, so the previous plan's signature is stale for that reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first (closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)"
+      ],
+      "exit": 0,
+      "seconds": 0.1,
+      "stdout_tail": "✅ mockups approved by nghinh\n",
+      "stderr_tail": ""
+     }
+    },
+    "readiness": {
+     "note": "W1-LEDGERLOCK-PLAN-V2 re-approval of `readiness`: the artifacts this gate signs are byte-identical to the approved plan base 136a68dcdc3f, so the previous plan's signature is stale for that reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first (closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)",
+     "cli": {
+      "cmd": [
+       "aisef",
+       "approve",
+       "readiness",
+       "--note",
+       "W1-LEDGERLOCK-PLAN-V2 re-approval of `readiness`: the artifacts this gate signs are byte-identical to the approved plan base 136a68dcdc3f, so the previous plan's signature is stale for that reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first (closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)"
+      ],
+      "exit": 0,
+      "seconds": 4.1,
+      "stdout_tail": "\n✗ 2/16 stories not yet eligible:\n  MISSING EVIDENCE STORY-02-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n  MISSING EVIDENCE STORY-03-01\n    - verify.e2e — story declares in `verification_contract`. configure `verify.e2e`\n✅ readiness approved by nghinh\n",
+      "stderr_tail": ""
+     }
+    }
+   },
+   "gates_after": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "approved",
+    "pre-deploy": "pending"
+   },
+   "approval_records": {
+    "mockups": {
+     "gate": "mockups",
+     "artifact": "design-contract.json",
+     "artifact_sha256": "72c3bf3623cf772c96981b41bb4580e6962209c23d66ca686dd7d0291dfb3932",
+     "status": "approved",
+     "seq": 15,
+     "decided_by": "nghinh",
+     "decided_at": "2026-09-20T22:26:21+00:00",
+     "note": "W1-LEDGERLOCK-PLAN-V2 re-approval of `mockups`: the artifacts this gate signs are byte-identical to the approved plan base 136a68dcdc3f, so the previous plan's signature is stale for that reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first (closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)",
+     "machine_checks": {
+      "screens": "5",
+      "machine gate": "pass",
+      "warnings": "verify: mockup has no verifiable components; snapshot: mockup has no verifiable components; apply: mockup has no verifiable components; repair-tail: mockup has no verifiable components; help-version: mockup has no verifiable components"
+     },
+     "history": [
+      {
+       "status": "approved",
+       "decided_by": "auto",
+       "decided_at": "2026-09-15T13:31:22+00:00",
+       "note": "auto-approved (--auto-approve); this step always needs human review",
+       "artifact_sha256": "72c3bf3623cf772c96981b41bb4580e6962209c23d66ca686dd7d0291dfb3932"
+      }
+     ]
+    },
+    "readiness": {
+     "gate": "readiness",
+     "artifact": "stories.index.json, design-contract.json",
+     "artifact_sha256": "ed4dbef8d701f5b0b3cfe3cc62f61c0d417dabdf8da6b65302a5b026f9387e09",
+     "status": "approved",
+     "seq": 16,
+     "decided_by": "nghinh",
+     "decided_at": "2026-09-20T22:26:25+00:00",
+     "note": "W1-LEDGERLOCK-PLAN-V2 re-approval of `readiness`: the artifacts this gate signs are byte-identical to the approved plan base 136a68dcdc3f, so the previous plan's signature is stale for that reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first (closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)",
+     "machine_checks": {},
+     "history": [
+      {
+       "status": "approved",
+       "decided_by": "nghinh",
+       "decided_at": "2026-09-15T13:32:32+00:00",
+       "note": "",
+       "artifact_sha256": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838"
+      }
+     ]
+    }
+   },
+   "changed_gates": [
+    "mockups",
+    "readiness"
+   ],
+   "ok": true
+  },
+  "run": {
+   "at": "2026-09-21T05:26:25+0700",
+   "invocations": [
+    {
+     "k": 1,
+     "pid": 89725,
+     "pgid": 89725,
+     "started": "2026-09-21T05:26:25+0700",
+     "t0": 1789943185.600566,
+     "exit": 2,
+     "ended": "2026-09-21T05:32:50+0700",
+     "seconds": 385.4,
+     "killed": null,
+     "stdout_tail": [
+      "EPIC-01 · wave 1",
+      "STORY-01-01: NOT DONE",
+      "  [attempt 1] gate failed",
+      "    ✅ evidence matches candidate",
+      "    ✅ guard ran",
+      "    ✅ test",
+      "    ✅ no baseline regression",
+      "    ✅ lint",
+      "    ✅ write scope",
+      "    – mockup map — story has no UI",
+      "    ✅ real tests",
+      "    ✅ criteria have tests",
+      "    ○ coverage — runner did not print coverage — add `--coverage` (vitest/c8) or `--cov` (pytest) to the test command",
+      "    ✗ TDD — tests green on first run — not proven to verify anything (tests/__init__.py, tests/test_nfc_normalization.py, tests/test_skeleton.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.",
+      "    ✗ tests verify story — at parent SHA ad2aa2b: AC-STORY-01-01-4 [NEGATIVE_INVARIANT, FR-14] RED -> GREEN (parent RED_COLLECTION_BOUND_TO_STORY / candidate GREEN_EXECUTED), expected GREEN -> GREEN → PLAN_PRECONDITION_MISSING (PLAN): the prohibition is already violated at this story's parent (red) — a plan defect, not this story's [tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_no_forbidden_module_imports]; AC-STORY-01-01-5 [NEGATIVE_INVARIANT, FR-14] RED -> GREEN (parent RED_COLLECTION_BOUND_TO_STORY / candidate GREEN_EXECUTED), expected GREEN -> GREEN → PLAN_PRECONDITION_MISSING (PLAN): the prohibition is already violated at this story's parent (red) — a plan defect, not this story's [tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_5_no_side_effect_calls]",
+      "    ✅ security",
+      "    ✅ review",
+      "    – preservation — story does not touch any VERIFIED behaviour of other stories",
+      "  ✗ deadlock due to plan: AC-STORY-01-01-4 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is already violated at this story's parent (red) — a plan defect, not this story's; AC-STORY-01-01-5 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is already violated at this story's parent (red) — a plan defect, not this story's. The criterion cannot be satisfied by writing code — correct the plan (its proof obligation, its owning story, or the criterion itself), then re-run.",
+      "",
+      "⏸ stopped at EPIC-01 · wave 1"
+     ]
+    }
+   ],
+   "resumes": [],
+   "markers_pending": [
+    "wave=EPIC-01/w3 DONE",
+    "wave=EPIC-03/w1 DONE"
+   ],
+   "runlog_offset_at_start": 9298,
+   "ended": "2026-09-21T05:32:50+0700",
+   "terminal_exit": 2,
+   "markers_not_reached": [
+    "wave=EPIC-01/w3 DONE",
+    "wave=EPIC-03/w1 DONE"
+   ],
+   "runlog_lines_epic": [
+    "[2026-09-21 05:26:27] epic=EPIC-01 START",
+    "[2026-09-21 05:26:27] wave=EPIC-01/w1 START stories=STORY-01-01",
+    "[2026-09-21 05:32:50] wave=EPIC-01/w1 DONE 0/1 passed $0.00",
+    "[2026-09-21 05:32:50] epic=EPIC-01 STOPPED at=EPIC-01 · wave 1"
+   ],
+   "ok": true
+  },
+  "finish": {
+   "at": "2026-09-21T05:32:51+0700",
+   "status": {
+    "cmd": [
+     "aisef",
+     "status"
+    ],
+    "exit": 2,
+    "seconds": 0.1,
+    "stdout_tail": "Progress: 0/16 stories done (15 not started)\nActive epics: EPIC-01\n\n  failed      1\n\nCost: $0.00\nAgent runs: ok 15\n\n✗ 1 stories not passing:\n    STORY-01-01      failed   deadlock due to plan: AC-STORY-01-01-4 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is already violated at this story's parent (red) — a plan defect, not this story's; AC-STORY-01-01-5 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is already violated at this story's parent (red) — a plan defect, not this story's. The criterion cannot be satisfied by writing code — correct the plan (its proof obligation, its owning story, or the criterion itself), then re-run.\n",
+    "stderr_tail": ""
+   },
+   "gates": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "approved",
+    "readiness": "approved",
+    "pre-deploy": "pending"
+   },
+   "cost": {
+    "cmd": [
+     "aisef",
+     "cost",
+     "--out",
+     "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-v21-run1/cost.md"
+    ],
+    "exit": 0,
+    "seconds": 0.1,
+    "stdout_tail": " attribution — `w1-run-v21-run1`\n\nUnit: **input tokens** — the provider priced 0% of 15 sessions (0.00 USD recorded in total), so dollars here would be invented. With `p` = price per 1M input tokens and `q` = per 1M output:\n\n    cost ≈ 12.67 × p + 0.112 × q\n\nCache reads are 14% of prompt tokens (2,115,456 cached vs 12,673,198 fresh); most price lists charge them far less, so they are counted separately.\n\n⚠ At 14% cache, this client bills re-sent context as fresh `input`: the totals below are a sum over turns of the whole prompt and are **not** comparable with a corpus that caches.\n\nNet VERIFIED per M input tokens: **0.00**\n\n0 verified · 11 gap · 0 reopened → net **0** behaviours for 12,673,198 across 15 sessions (176 turns).\n\n## Where the spend went\n\n| class | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| gate-blocked | 3 | 28 | 163,239 | 1% |\n| planning | 12 | 148 | 12,509,959 | 99% |\n\nSpend on stories that ended with a net VERIFIED behaviour: **0%**.\n\n## Per story\n\nLedger columns **overlap** between stories (one FR can be covered by two), so they do not sum to the corpus counts above.\n\n| story | attempts | tokens | share | passed | gate-blocked | turn-cap | env-failed | no-verdict | verified | gap | reopened | net |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| plan-epics | 0 | 5,687,131 | 45% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-architecture | 0 | 1,344,422 | 11% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-apply | 0 | 1,142,062 | 9% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-project-context | 0 | 960,795 | 8% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-ux | 0 | 675,905 | 5% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| plan-prd | 0 | 642,950 | 5% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-help-version | 0 | 634,922 | 5% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-snapshot | 0 | 553,491 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-verify | 0 | 500,041 | 4% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| mockup-repair-tail | 0 | 368,240 | 3% | — | — | — | — | — | 0 | 0 | 0 | 0 |\n| STORY-01-01 | 1 | 163,239 | 1% | — | 163,239 | — | — | — | 0 | 11 | 0 | 0 |\n| STORY-01-05 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n| STORY-04-01 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n| STORY-04-02 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n| STORY-04-03 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n| STORY-05-01 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n| STORY-05-02 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n| STORY-05-03 | 0 | 0 | 0% | — | — | — | — | — | 0 | 1 | 0 | 0 |\n\n## What the gate blocked on\n\n| check | blocks |\n|---|---|\n| TDD | 1 |\n| tests verify story | 1 |\n\n## By role\n\n| role | sessions | turns | tokens | share |\n|---|---|---|---|---|\n| ? | 12 | 148 | 12,509,959 | 99% |\n| developer | 1 | 21 | 119,659 | 1% |\n| review | 1 | 5 | 32,478 | 0% |\n| security | 1 | 2 | 11,102 | 0% |\n\n\n/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-v21-run1/cost.md\n",
+    "stderr_tail": ""
+   },
+   "cost_semantics": {
+    "provider_pricing_coverage_pct": 0,
+    "usd_recorded_by_the_provider": 0.0,
+    "cost_cap_usd": 80.0,
+    "cost_cap_status": "UNVERIFIABLE",
+    "cost_cap_note": "the provider priced no session on this route, so no dollar figure exists: the cap is neither reached nor not reached, and this run is not proof that the cap holds for this route",
+    "usage_measured": {
+     "sessions": 15,
+     "turns": 176,
+     "input_tokens_fresh": 12673198,
+     "input_tokens_cached": 2115456,
+     "output_tokens": 112000
+    },
+    "prices_estimated": false,
+    "recompute_rule": "cost = input_tokens/1e6 * price_per_M_input + output_tokens/1e6 * price_per_M_output, once the route publishes prices"
+   },
+   "project_git": {
+    "head": "ad2aa2bf950e26e74584aa4f34bde3ed85c4aa15",
+    "branch": "master",
+    "branches": [
+     "*",
+     "master",
+     "story/STORY-01-01"
+    ],
+    "status": [
+     "M .DS_Store",
+     " M _bmad-output/approvals/mockups.json",
+     " M _bmad-output/approvals/readiness.json",
+     " M _bmad-output/run.log",
+     "?? _bmad-output/INDEX.md",
+     "?? _bmad-output/complexity.json",
+     "?? _bmad-output/evidence/STORY-01-01-lint-102.log",
+     "?? _bmad-output/evidence/STORY-01-01-sast-104.log",
+     "?? _bmad-output/evidence/STORY-01-01-sast-128.log",
+     "?? _bmad-output/evidence/STORY-01-01-test-63.log",
+     "?? _bmad-output/evidence/STORY-01-01-test-nop-162.log",
+     "?? _bmad-output/evidence/STORY-01-01.jsonl",
+     "?? _bmad-output/journal/",
+     "?? _bmad-output/ledger.json",
+     "?? _bmad-output/replay/",
+     "?? _bmad-output/reviews/",
+     "?? _bmad-output/sprint-status.json",
+     "?? _bmad-output/sprint-status.json.lock"
+    ],
+    "master_log": [
+     "ad2aa2b w1-run-v21-run1: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "829c48b w1-run-v21-run1: execution profile PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO applied (run.max_turns, route.<role>_model, project model declaration — an execution-profile setting, not an AISEF change)",
+     "0bed57c w1-run-v21-run1: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "05e3784 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "136a68d W1-LEDGERLOCK-PLAN-V2.1: the usage-error exit is owned by the story whose argparse surface introduces it (STORY-01-01, FR-12), and STORY-04-01 preserves it instead of claiming to introduce it",
+     "1621a2b W1-LEDGERLOCK-PLAN-V2: acceptance criteria carry their proof obligation; STORY-02-02 AC-2 corrected to requirements 4.5; CLI surface and usage-error criteria moved to the story that builds the parser",
+     "8ff9f13 epics.md: split to 16 stories (each ≤7 AC, ≤16 complexity) — second plan attempt passed",
+     "35f33e7 evidence: initial AISEF plan attempt, machine-gate failures captured",
+     "6a8d60c docs: initial LedgerLock requirements (NFC, hash chain, idempotency, atomic batch, exit codes, 3.11+ stdlib)"
+    ]
+   },
+   "drift_records": [],
+   "progress": {
+    "done": 0,
+    "total": 16
+   },
+   "stories": {
+    "STORY-01-01": {
+     "status": "failed",
+     "reason": "deadlock due to plan: AC-STORY-01-01-4 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is already violated at this story's parent (red) — a plan defect, not this story's; AC-STORY-01-01-5 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is",
+     "journal_last_step": "attempt.committed",
+     "journal_records": 8,
+     "state_status": "failed",
+     "attempts": 1
+    }
+   },
+   "delivered": {
+    "master_head": "ad2aa2bf950e26e74584aa4f34bde3ed85c4aa15",
+    "has_package": false,
+    "files": [
+     ".claude/skills/achieving-cmmc-level-2-compliance/scripts/process.py",
+     ".claude/skills/analyzing-sbom-for-supply-chain-vulnerabilities/scripts/agent.py",
+     ".claude/skills/bmad-advanced-elicitation/scripts/pick_methods.py",
+     ".claude/skills/bmad-advanced-elicitation/scripts/tests/test_pick_methods.py",
+     ".claude/skills/bmad-architecture/scripts/lint_spine.py",
+     ".claude/skills/bmad-architecture/scripts/tests/test_lint_spine.py",
+     ".claude/skills/bmad-brainstorming/scripts/brain.py",
+     ".claude/skills/bmad-brainstorming/scripts/tests/test_brain.py",
+     ".claude/skills/bmad-customize/scripts/list_customizable_skills.py",
+     ".claude/skills/bmad-customize/scripts/tests/test_list_customizable_skills.py",
+     ".claude/skills/bmad-deep-recon/scripts/recon_kit.py",
+     ".claude/skills/bmad-deep-recon/scripts/tests/test_recon_kit.py",
+     ".claude/skills/bmad-forge-idea/scripts/resolve_personas.py",
+     ".claude/skills/bmad-forge-idea/scripts/tests/test_resolve_personas.py",
+     ".claude/skills/bmad-party-mode/scripts/resolve_party.py",
+     ".claude/skills/bmad-party-mode/scripts/tests/test_resolve_party.py",
+     ".claude/skills/bmad-retrospective/scripts/git_evidence.py",
+     ".claude/skills/bmad-retrospective/scripts/sprint_status.py",
+     ".claude/skills/bmad-retrospective/scripts/tests/test_git_evidence.py",
+     ".claude/skills/bmad-retrospective/scripts/tests/test_sprint_status.py",
+     ".claude/skills/bmad-review/scripts/tests/test_word_metrics.py",
+     ".claude/skills/bmad-review/scripts/word_metrics.py",
+     ".claude/skills/bmad-sprint-planning/scripts/sprint_plan.py",
+     ".claude/skills/bmad-sprint-planning/scripts/tests/test_sprint_plan.py",
+     ".claude/skills/brand/scripts/tests/test_sync_brand_to_tokens.py",
+     ".claude/skills/building-devsecops-pipeline-with-gitlab-ci/scripts/agent.py",
+     ".claude/skills/building-devsecops-pipeline-with-gitlab-ci/scripts/process.py",
+     ".claude/skills/building-patch-tuesday-response-process/scripts/agent.py",
+     ".claude/skills/building-patch-tuesday-response-process/scripts/process.py",
+     ".claude/skills/building-vulnerability-aging-and-sla-tracking/scripts/agent.py",
+     ".claude/skills/building-vulnerability-aging-and-sla-tracking/scripts/process.py",
+     ".claude/skills/building-vulnerability-dashboard-with-defectdojo/scripts/agent.py",
+     ".claude/skills/building-vulnerability-dashboard-with-defectdojo/scripts/process.py",
+     ".claude/skills/building-vulnerability-exception-tracking-system/scripts/agent.py",
+     ".claude/skills/building-vulnerability-exception-tracking-system/scripts/process.py",
+     ".claude/skills/conducting-cyber-risk-assessment-with-nist-800-30/scripts/process.py",
+     ".claude/skills/conducting-gdpr-compliance-assessment/scripts/article30_parser.py",
+     ".claude/skills/conducting-gdpr-compliance-assessment/scripts/article30_validator.py",
+     ".claude/skills/conducting-gdpr-compliance-assessment/scripts/generate_ropa_report.py",
+     ".claude/skills/configuring-certificate-authority-with-openssl/scripts/agent.py",
+     ".claude/skills/configuring-certificate-authority-with-openssl/scripts/process.py",
+     ".claude/skills/configuring-hsm-for-key-storage/scripts/agent.py",
+     ".claude/skills/configuring-hsm-for-key-storage/scripts/process.py",
+     ".claude/skills/configuring-tls-1-3-for-secure-communications/scripts/agent.py",
+     ".claude/skills/configuring-tls-1-3-for-secure-communications/scripts/process.py",
+     ".claude/skills/design-system/scripts/fetch-background.py",
+     ".claude/skills/design-system/scripts/generate-slide.py",
+     ".claude/skills/design-system/scripts/html-token-validator.py",
+     ".claude/skills/design-system/scripts/search-slides.py",
+     ".claude/skills/design-system/scripts/slide-token-validator.py",
+     ".claude/skills/design-system/scripts/slide_search_core.py",
+     ".claude/skills/design-system/scripts/tests/test_validate_tokens.py",
+     ".claude/skills/design/scripts/cip/core.py",
+     ".claude/skills/design/scripts/cip/generate.py",
+     ".claude/skills/design/scripts/cip/render-html.py",
+     ".claude/skills/design/scripts/cip/search.py",
+     ".claude/skills/design/scripts/icon/generate.py",
+     ".claude/skills/design/scripts/logo/core.py",
+     ".claude/skills/design/scripts/logo/generate.py",
+     ".claude/skills/design/scripts/logo/search.py",
+     ".claude/skills/design/scripts/logo/tests/test_generate.py",
+     ".claude/skills/detecting-api-enumeration-attacks/scripts/agent.py",
+     ".claude/skills/detecting-broken-object-property-level-authorization/scripts/agent.py",
+     ".claude/skills/detecting-dependency-confusion/scripts/agent.py",
+     ".claude/skills/detecting-malicious-npm-packages/scripts/agent.py",
+     ".claude/skills/detecting-shadow-api-endpoints/scripts/agent.py",
+     ".claude/skills/detecting-typosquatting-packages-in-npm-pypi/scripts/agent.py",
+     ".claude/skills/detecting-typosquatting-packages/scripts/agent.py",
+     ".claude/skills/executing-nist-rmf-authorization-to-operate/scripts/process.py",
+     ".claude/skills/generating-and-analyzing-sboms/scripts/agent.py",
+     ".claude/skills/implementing-aes-encryption-for-data-at-rest/scripts/agent.py",
+     ".claude/skills/implementing-aes-encryption-for-data-at-rest/scripts/process.py",
+     ".claude/skills/implementing-api-abuse-detection-with-rate-limiting/scripts/agent.py",
+     ".claude/skills/implementing-api-gateway-security-controls/scripts/agent.py",
+     ".claude/skills/implementing-api-key-security-controls/scripts/agent.py",
+     ".claude/skills/implementing-api-rate-limiting-and-throttling/scripts/agent.py",
+     ".claude/skills/implementing-api-schema-validation-security/scripts/agent.py",
+     ".claude/skills/implementing-api-security-posture-management/scripts/agent.py",
+     ".claude/skills/implementing-api-security-testing-with-42crunch/scripts/agent.py",
+     ".claude/skills/implementing-api-threat-protection-with-apigee/scripts/agent.py"
+    ]
+   },
+   "oracle": {
+    "sha256": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "exit": 0,
+    "results": {
+     "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "SKIPPED",
+     "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "SKIPPED",
+     "TestAcceptance::test_14_3_apply_batch_commits_atomically": "SKIPPED",
+     "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "SKIPPED",
+     "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "SKIPPED",
+     "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "SKIPPED",
+     "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "SKIPPED",
+     "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "SKIPPED",
+     "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "SKIPPED"
+    },
+    "pytest_totals": {
+     "skipped": 9
+    },
+    "parse_complete": true,
+    "parse_note": "",
+    "observations": []
+   },
+   "story_state_source": "_bmad-output/sprint-status.json",
+   "oracle_classification": {
+    "reds": [],
+    "counts": {},
+    "delivery_complete": false,
+    "skipped": [
+     {
+      "test": "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     }
+    ],
+    "oracle_not_executed": [],
+    "oracle_not_executed_count": 0,
+    "oracle_passed_completely": false,
+    "false_pass": [],
+    "false_pass_count": 0,
+    "oracle_mapping_errors": [],
+    "oracle_mapping_error_count": 0,
+    "story_owned_reds_expected": [],
+    "project_global_reds_expected": [],
+    "classifiable": true
+   },
+   "exit_criteria": {
+    "false_pass": [],
+    "false_pass_count": 0,
+    "oracle_mapping_errors": [],
+    "oracle_mapping_error_count": 0,
+    "oracle_red_classes": {},
+    "oracle_skipped": [
+     {
+      "test": "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     },
+     {
+      "test": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
+      "verdict": "SKIPPED",
+      "classification": "INCOMPLETE_DELIVERY_EXPECTED_SKIP"
+     }
+    ],
+    "oracle_not_executed_count": 0,
+    "oracle_passed_completely": false,
+    "story_owned_reds_expected_due_incomplete_owners": [],
+    "project_global_reds_expected_due_incomplete_delivery": [],
+    "manual_state_repair": 0,
+    "manual_state_repair_note": "the driver never writes _bmad-output; the only project writes are the guard commit and the ARB-1 re-approval through the CLI",
+    "orphan_state": [],
+    "orphan_state_count": 0,
+    "drift_records": [],
+    "oracle_ran": true,
+    "resumes_forced": 0,
+    "markers_not_reached": [
+     "wave=EPIC-01/w3 DONE",
+     "wave=EPIC-03/w1 DONE"
+    ],
+    "stops": [
+     "[2026-09-21 05:32:50] epic=EPIC-01 STOPPED at=EPIC-01 · wave 1"
+    ],
+    "story_state_source": "_bmad-output/sprint-status.json",
+    "false_block_count": 0,
+    "false_block": [],
+    "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+    "safety_violations": []
+   },
+   "safety_violations": [],
+   "candidate_oracle": {
+    "STORY-01-01": {
+     "sha": "2b256e8a84cb2688be3481eec1fc5a7a8252e583",
+     "results": {
+      "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "FAILED",
+      "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+      "TestAcceptance::test_14_3_apply_batch_commits_atomically": "FAILED",
+      "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "FAILED",
+      "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED",
+      "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "PASSED",
+      "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "FAILED",
+      "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "FAILED",
+      "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "FAILED"
+     },
+     "parse_complete": true
+    }
+   },
+   "run_metrics": {
+    "developer_agent_runs": 1,
+    "developer_retries": 0,
+    "reviewer_executions": 1,
+    "reviewer_retries": 0,
+    "security_executions": 1,
+    "security_retries": 0,
+    "max_turn_events": 0,
+    "human_arbitrations_during_the_run": 0,
+    "stories_done": 0,
+    "stories_failed": [
+     "STORY-01-01"
+    ],
+    "stories_never_started": 15,
+    "false_block": [],
+    "false_block_count": 0,
+    "false_block_measurable_for": [
+     "STORY-01-01"
+    ],
+    "false_block_measured_at_candidate_for": [
+     "STORY-01-01"
+    ]
+   },
+   "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "oracle_aggregate_reportable_as_delivery_quality": false,
+   "ok": true
+  }
+ },
+ "updated": "2026-09-21T05:32:54+0700"
+}

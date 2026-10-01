@@ -1,0 +1,106 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 29 items
+
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps PASSED [  3%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_byte_identical_across_element_equal_dicts PASSED [  6%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_encoded_as_utf8_literal PASSED [ 10%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_key_order_independent PASSED [ 13%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_literal_seven_char_string PASSED [ 17%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads PASSED [ 20%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex PASSED [ 24%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_distinct_digest PASSED [ 27%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 31%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_deterministic_across_invocations PASSED [ 34%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_accepts_genesis_prev_hash PASSED [ 37%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_1_first_append_writes_single_chained_line FAILED [ 41%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_2_second_append_chains_prev_hash FAILED [ 44%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_3_empty_key_raises_value_error_no_file FAILED [ 48%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_4_fresh_instance_reads_tail_from_disk FAILED [ 51%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_5_other_instance_sees_line_and_trailing_newline FAILED [ 55%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte PASSED [ 58%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_equivalent PASSED [ 62%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_3_import_prints_init_path PASSED [ 65%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_4_cli_help_lists_subcommands PASSED [ 68%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports PASSED [ 72%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_6_no_side_channel_calls PASSED [ 75%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable PASSED [ 79%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_returns_n_bytes_with_trailing_newline_stripped PASSED [ 82%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found PASSED [ 86%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 89%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_writes_concatenation_and_round_trips PASSED [ 93%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_before_replace_leaves_original_intact PASSED [ 96%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory PASSED [100%]
+
+=================================== FAILURES ===================================
+_ TestLedgerAppend.test_AC_STORY_01_05_1_first_append_writes_single_chained_line _
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_1_first_append_writes_single_chained_line>
+
+    def test_AC_STORY_01_05_1_first_append_writes_single_chained_line(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+>           ledger = Ledger(path)
+                     ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:14: TypeError
+____ TestLedgerAppend.test_AC_STORY_01_05_2_second_append_chains_prev_hash _____
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_2_second_append_chains_prev_hash>
+
+    def test_AC_STORY_01_05_2_second_append_chains_prev_hash(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+>           ledger = Ledger(path)
+                     ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:35: TypeError
+_ TestLedgerAppend.test_AC_STORY_01_05_3_empty_key_raises_value_error_no_file __
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_3_empty_key_raises_value_error_no_file>
+
+    def test_AC_STORY_01_05_3_empty_key_raises_value_error_no_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+>           ledger = Ledger(path)
+                     ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:51: TypeError
+__ TestLedgerAppend.test_AC_STORY_01_05_4_fresh_instance_reads_tail_from_disk __
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_4_fresh_instance_reads_tail_from_disk>
+
+    def test_AC_STORY_01_05_4_fresh_instance_reads_tail_from_disk(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+>           first = Ledger(path)
+                    ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:59: TypeError
+_ TestLedgerAppend.test_AC_STORY_01_05_5_other_instance_sees_line_and_trailing_newline _
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_5_other_instance_sees_line_and_trailing_newline>
+
+    def test_AC_STORY_01_05_5_other_instance_sees_line_and_trailing_newline(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+>           writer = Ledger(path)
+                     ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:71: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_1_first_append_writes_single_chained_line
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_2_second_append_chains_prev_hash
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_3_empty_key_raises_value_error_no_file
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_4_fresh_instance_reads_tail_from_disk
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_5_other_instance_sees_line_and_trailing_newline
+========================= 5 failed, 24 passed in 0.23s =========================

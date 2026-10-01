@@ -1,0 +1,708 @@
+{
+ "record": "AISEF V2 — P6 FINAL SEAL",
+ "id": "P6-FINAL-SEAL",
+ "authority": "AISEF V2 — WP-6.3 EXECUTION AUTHORIZATION / OLD-PATH REMOVAL / NO DUAL AUTHORITY / P6 CLOSURE (owner decision, 2026-09-26) §26–§27, on 'AISEF V2 — WP-6.2 COMPLETE UNDER V2-005 / READY FOR WP-6.3 AUTHORIZATION' (accepted 2026-09-26); and AISEF V2 — OWNER RESOLUTION OF P6-FINDING-001 / ARCHITECTURE EXCEPTION V2-006 / PROBE HARNESS READY/EOF ORDERING (2026-09-26): WP-6.3 accepted, the seal bound to a candidate carrying V2-006, historical seals preserved",
+ "owner_acceptance": "pending: this seal makes P6 ready for owner acceptance; P7 (QP-7) is NOT authorized by it",
+ "p6_candidate": {
+  "commit": "097daefefd9229eafeacaca321b7a008a581899b",
+  "tree": "09b76a4329bcf43def20ecfea208cbaac337c881",
+  "aisef2_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+  "orchestrate_tree": "1e61189f3351c4d150596524304e006bb33fa5e4",
+  "journal_tree": "457c92865efa88223704d65ef8ecfdf92909fc55",
+  "validation_v2_tree": "27805183e802c00f7c66b2c25452ff6c25497087",
+  "tests_v2_tree": "fb781d8ff444ad3065a2e5528f917463a86beea7",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_unchanged_since_p5_seal": true,
+  "semantic_trees_unchanged_since": true,
+  "wp_candidates": {
+   "WP-6.1": "116b92a39ef5bff2846ab8978550276f446d8a5d",
+   "WP-6.2 stage A (V2-005: format 3, nine codes, budget_owner)": "175ba3a87233b347dc89defcfee1ddfb822fde8f",
+   "WP-6.2 stage A test-race helpers": "bf01663c6464b52e6702aa660852daf16e036392",
+   "WP-6.2 stage B": "abfe99df27293fbfd2f820799d8cf235c2ee9a3d (failed first CI: windows 3.11 HARNESS, ubuntu 3.13 UNKNOWN; kept)",
+   "WP-6.2 stage B correction": "c07acbaac8c74d6a548568ac1a0056a24b18834a",
+   "WP-6.3": "6099a81637a3c1ae68ff3d656fd802876cb38b6a (failed first CI: windows 3.11 HARNESS, ubuntu 3.12 UNKNOWN; kept)",
+   "WP-6.3 correction": "a4663457930edced1c9ab939a512d007f86e4297 (failed first CI: windows 3.11 HARNESS, ubuntu 3.12 UNKNOWN; kept)",
+   "WP-6.3 correction 2": "b41a01e1b545bfad0c56f26616138506fb11bc9e (failed first CI: ubuntu 3.11 PRODUCT — P6-FINDING-001; kept, not sealed)",
+   "V2-006 (P6-FINDING-001 and P6-FINDING-002)": "65dc6435dc78f390faddc8de5152dd781f0eec5c (failed its local gate: HARNESS — the new F5 stream check aborted conformance evaluation under a drifted protocol; never pushed; kept)",
+   "V2-006 correction": "c1d21f6c1a0fa1062ae5350ad898bf831f61fb1c (failed first CI: windows 3.11 HARNESS — fake ranges answered before the deadline, a POSIX-only builder case; kept)",
+   "V2-006 correction 2": "097daefefd9229eafeacaca321b7a008a581899b"
+  }
+ },
+ "p6_evidence": {
+  "P6-MIGRATION-TABLE": {
+   "path": "closure-evidence/v2/P6-MIGRATION-TABLE.json",
+   "sha256": "157b46f6786d849591f9c08b02a39f48a08c18d69d9e34cf7c3c98ccd5a6752f",
+   "every_property_true": null,
+   "generated_checked": true
+  },
+  "P6-V2-005-SCHEMA": {
+   "path": "closure-evidence/v2/P6-V2-005-SCHEMA.json",
+   "sha256": "8fe3c142d01603a9a19bcb52ac4e8d51e4d3bd780964d82c05952e308f775071",
+   "every_property_true": true,
+   "generated_checked": null
+  },
+  "P6-ORCHESTRATION": {
+   "path": "closure-evidence/v2/P6-ORCHESTRATION.json",
+   "sha256": "4173d55004448892665c4f2749117177afbe61340b1b9dd2f0b1a014b0371235",
+   "every_property_true": true,
+   "generated_checked": null
+  },
+  "P6-AUTHORITY-INVENTORY": {
+   "path": "closure-evidence/v2/P6-AUTHORITY-INVENTORY.json",
+   "sha256": "8c632a145c8b4f76ca0e5c462e2fa545cd07f05f71dd58da9f53ef6d7c20c592",
+   "every_property_true": null,
+   "generated_checked": null,
+   "summary": {
+    "ACTIVE_V2_AUTHORITY": 64,
+    "COMPATIBILITY_NONAUTHORITATIVE": 37,
+    "HISTORICAL_ONLY": 2,
+    "REMOVED": 0,
+    "UNREACHABLE": 140,
+    "UNCLASSIFIABLE": 0
+   }
+  },
+  "P6-OLD-PATH-REMOVAL": {
+   "path": "closure-evidence/v2/P6-OLD-PATH-REMOVAL.json",
+   "sha256": "18ea78a8d5040754688ac2316976db57b053dd09a8bdad227ff5db862bff8055",
+   "every_property_true": true,
+   "generated_checked": null
+  },
+  "P6-V2-006-PROBE-HARNESS": {
+   "path": "closure-evidence/v2/P6-V2-006-PROBE-HARNESS.json",
+   "sha256": "a9de1c3b03be48776d39dfe13c25a8cc20f5ab88e100f7f55908254f64a2b9f2",
+   "every_property_true": true,
+   "generated_checked": null
+  }
+ },
+ "no_dual_authority": {
+  "six_proofs": {
+   "NO_OLD_GATE_AUTHORITY": true,
+   "NO_DEVELOPER_TEST_PRODUCT_AUTHORITY": true,
+   "NO_PARENT_DEVELOPER_EXECUTION": true,
+   "NO_RECENCY_EVIDENCE_SELECTION": true,
+   "NO_SIDE_RETRY_COUNTER": true,
+   "ALL_CONTROL_DECISIONS_JOURNAL_BACKED": true
+  },
+  "all_true": true,
+  "inventory": {
+   "ACTIVE_V2_AUTHORITY": 64,
+   "COMPATIBILITY_NONAUTHORITATIVE": 37,
+   "HISTORICAL_ONLY": 2,
+   "REMOVED": 0,
+   "UNREACHABLE": 140,
+   "UNCLASSIFIABLE": 0
+  },
+  "rows": 243,
+  "seam": "aisef2/orchestrate/seam.py: COMPATIBILITY_NONAUTHORITATIVE",
+  "old_v1_authorities": "every aisef/ row UNREACHABLE from aisef2/orchestrate/story_runner.py::run_story; named symbols no longer present are REMOVED; aisef/ not edited",
+  "audit": "validation/v2/old_path_audit.py --check (fails closed in both directions) + tests/v2/test_no_dual_authority.py (runtime poisoning of every V1 family, R2–R6)"
+ },
+ "v2_006": {
+  "exception": {
+   "path": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
+   "sha256": "8036c7c73fd6e397af726309c89f7002025b34747ab65aac0e1d43e4ba4fa35a"
+  },
+  "amendment": {
+   "path": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json",
+   "sha256": "09bb03a34f9b95083414625a4da46684d6d2319a5f6d52e54e1033d2bc33fb17"
+  },
+  "probe_digest": {
+   "before": "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e",
+   "after": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0"
+  },
+  "record": {
+   "path": "closure-evidence/v2/P6-V2-006-PROBE-HARNESS.json",
+   "every_property_true": true
+  },
+  "anchor_watchdog": "P6-FINDING-002 — the range anchor's watchdog lived inside main, the function it guards: main ending any way but os._exit (an exception, a loop that stops reading) left the anchor alive with nobody reading stdin",
+  "historical_seals": "P1–P5 seal bytes preserved (identity in P6-V2-006-PROBE-HARNESS.historical_files_byte_identical); V2-006 changed a component exercised in P2 (the probe harness) and P4 (the range anchor): its mutation targets, calibration, F5 conformance and lifecycle tests were re-run on this candidate and are bound here"
+ },
+ "invariants": {
+  "registered": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "V",
+   "VI",
+   "VII",
+   "VIII",
+   "IX"
+  ],
+  "registry_digest": "a5ef12d7009538d5e7d3b3ae98ea70934d2aede284a0b118b1be4bcc4162d7f3",
+  "mechanism_digest": "a943d5eafbba94f80f31db49c0d15fb83eeed3d3981d5a9996448bf64f59b0a8",
+  "registry_source": {
+   "path": "aisef2/invariants/registry.py",
+   "sha256": "2932ec292168b92f641e43dfbe8c2e03533b58b2cee56d2fe54eaa5513d158a7"
+  },
+  "except_boundaries": {
+   "counts": {
+    "RERAISES": 7,
+    "STRUCTURAL": 44
+   },
+   "problems": []
+  },
+  "unchanged_since_p5_seal": {
+   "registry_digest": true,
+   "mechanism_digest": false
+  }
+ },
+ "architecture_lineage": {
+  "links": [
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+    "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+    "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+    "frozen_items_changed": [
+     "F2"
+    ],
+    "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+    "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+    "frozen_items_changed": [
+     "F5"
+    ],
+    "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+    "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "sha256": "b8f618a235e7f508d70547ccc4cc6c79c7651df5d9e03c5ba3378c0c09fb3cfb",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+    "frozen_items_changed": [
+     "F1",
+     "F2",
+     "F5"
+    ],
+    "rfc_normative_digest": "7abda8ecf8352dd99d96e8ceb990e1ae3fd44225283204d983413e9d2c4ce771",
+    "freeze_table_digest": "333b3175f39a26d52dfec57f70000678e288b61a7a1e5a72b8e3767a80a29bc7"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",
+    "sha256": "9b8636a22875c14211ef6fb974ef9c03f39600721aa8cf9020c7d41a37b6dad1",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json",
+    "frozen_items_changed": [
+     "F1"
+    ],
+    "rfc_normative_digest": "eea2e10fa0b40cf9e04da3282441e485883df146ddff70ee5ad9949f32f7574a",
+    "freeze_table_digest": "92605a0ea18da992efeab69357ebbfaa9c898b5f17ad75e172864874df70c688"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json",
+    "sha256": "09bb03a34f9b95083414625a4da46684d6d2319a5f6d52e54e1033d2bc33fb17",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
+    "frozen_items_changed": [
+     "F5"
+    ],
+    "rfc_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+    "freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831"
+   }
+  ],
+  "lineage_valid": true,
+  "ends_at": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json",
+  "effective": {
+   "rfc_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831"
+  },
+  "equals_lineage_end": true,
+  "rfc_last_changed_by": "65dc6435dc78f390faddc8de5152dd781f0eec5c"
+ },
+ "freeze_manifest": {
+  "path": "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json",
+  "sha256": "10e2e163e2081081a787dd2dadcd4f0a1c5996007a694e2b8d04a185fdabcdba"
+ },
+ "p4_seal": {
+  "path": "closure-evidence/v2/P4-FINAL-SEAL.json",
+  "sha256": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+  "verdict": "P4 FINAL SEALED",
+  "kept": "byte-identical, not modified",
+  "equals_p5_seal_binding": true
+ },
+ "p5_seal": {
+  "path": "closure-evidence/v2/P5-FINAL-SEAL.json",
+  "sha256": "d06d4ae57e1797f6658b1cc3148200865aada86a0d3165aeb9f7f98a6e3e250c",
+  "verdict": "P5 FINAL SEALED",
+  "kept": "byte-identical, not modified",
+  "p5_candidate": "88b8e52ba57ddd067f44a4cffeb45b6a9ac1415d"
+ },
+ "mutation": {
+  "P1": {
+   "path": "closure-evidence/v2/P1-MUTATION.json",
+   "sha256": "60bd41b03d9c66edaed6df6052029a7b03f35cd4068ccdf4ad619d8d85ab4819",
+   "targets": 19,
+   "mutants": 1151,
+   "killed": 1151,
+   "audited_equivalent": {}
+  },
+  "P2": {
+   "path": "closure-evidence/v2/P2-MUTATION.json",
+   "sha256": "d173209d7b30d7ceb4601aaf5d0e28b47939cf5f63d42ec1a7cc45f6e05a7eb3",
+   "targets": 43,
+   "mutants": 1269,
+   "killed": 1269,
+   "audited_equivalent": {}
+  },
+  "P3": {
+   "path": "closure-evidence/v2/P3-MUTATION.json",
+   "sha256": "3a8d00522b154719bb0457d3adb77dc212f48ba74817b41fefbee4d506b31ce4",
+   "targets": 52,
+   "mutants": 1842,
+   "killed": 1832,
+   "audited_equivalent": {
+    "tests/v2/refmodel/budgets.py::model L75 True->False": "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict never decides anything",
+    "tests/v2/refmodel/qualification_counters.py::metrics L15 element 0 dropped": "`pre` is read only through len(pre): a one-element tuple per entry counts the same",
+    "tests/v2/refmodel/qualification_counters.py::metrics L15 element 1 dropped": "`pre` is read only through len(pre): a one-element tuple per entry counts the same",
+    "tests/v2/refmodel/qualification_counters.py::model L41 sorted() -> list()": "`unplanned` is read only for truthiness and inside the refusal message",
+    "tests/v2/refmodel/qualification_counters.py::model L44 sorted() -> list()": "`misplaced` is read only for truthiness and inside the refusal message",
+    "tests/v2/refmodel/story_state.py::_TABLE L19 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "tests/v2/refmodel/story_state.py::_TABLE L20 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "tests/v2/refmodel/story_state.py::_TABLE L21 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "tests/v2/refmodel/story_state.py::_TABLE L22 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+    "tests/v2/refmodel/story_state.py::_TABLE L23 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
+   }
+  },
+  "P4": {
+   "path": "closure-evidence/v2/P4-MUTATION.json",
+   "sha256": "0c339b531e5274d8c70f997d8f36bd292ed750ff064f13253352080bce23ce38",
+   "targets": 98,
+   "mutants": 1594,
+   "killed": 1594,
+   "audited_equivalent": {}
+  },
+  "P5": {
+   "path": "closure-evidence/v2/P5-MUTATION.json",
+   "sha256": "f5658c5f74c95a4234e515531edbe727515a33a044759eeb40af476fe8c99d21",
+   "targets": 58,
+   "mutants": 1577,
+   "killed": 1577,
+   "audited_equivalent": {}
+  },
+  "P6": {
+   "path": "closure-evidence/v2/P6-MUTATION.json",
+   "sha256": "fec915d0db3d4279886715f2f6640cb28aaeeeac66081a3d0720c5befb24e3de",
+   "targets": 118,
+   "mutants": 3570,
+   "killed": 3570,
+   "audited_equivalent": {}
+  }
+ },
+ "checker_calibration": {
+  "calibrated": 39,
+  "checkers": 39
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/P6-RUN-HISTORY.json",
+  "sha256_at_seal": "c201e29e4d6b4ab47b220040a58ea0489b3c67ff550360149b6619b7e7eacf39",
+  "total_attempts": 89,
+  "failed_attempts": 11,
+  "failed": [
+   {
+    "seq": 21,
+    "commit": "175ba3a87233",
+    "job": "unit (ubuntu-latest, 3.14)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 23,
+    "commit": "175ba3a87233",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 35,
+    "commit": "abfe99df2729",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 39,
+    "commit": "abfe99df2729",
+    "job": "unit (ubuntu-latest, 3.13)",
+    "classification": "UNKNOWN",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 55,
+    "commit": "6099a81637a3",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "classification": "UNKNOWN",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 56,
+    "commit": "6099a81637a3",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 60,
+    "commit": "a4663457930e",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 61,
+    "commit": "a4663457930e",
+    "job": "unit (ubuntu-latest, 3.12)",
+    "classification": "UNKNOWN",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 68,
+    "commit": "b41a01e1b545",
+    "job": "unit (ubuntu-latest, 3.11)",
+    "classification": "PRODUCT",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 73,
+    "commit": "65dc6435dc78",
+    "job": "gate (full suite in the owned range)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS"
+   },
+   {
+    "seq": 81,
+    "commit": "c1d21f6c1a0f",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS",
+    "gate_effect": "COUNTS"
+   }
+  ],
+  "erased_attempts": 0,
+  "retries": 0,
+  "committed_versions_checked": 11,
+  "gate_green": {
+   "116b92a39ef5": true,
+   "c07acbaac8c7": true,
+   "097daefefd92": true
+  },
+  "closed": "sealed at total_attempts: run_history.py --check fails if an entry is added or removed",
+  "seal_commit_verification": "the seal cannot contain its own verification; the seal commit's local and CI attempts are the first entries of P7-RUN-HISTORY.json"
+ },
+ "owned_processes": {
+  "at_the_candidate": {
+   "gate (full suite in the owned range)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": "posix-session-and-group"
+   },
+   "unit (ubuntu-latest, 3.14)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": "posix-session"
+   },
+   "unit (windows-latest, 3.11)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": "windows-job"
+   },
+   "unit (ubuntu-latest, 3.11)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": "posix-session"
+   },
+   "unit (ubuntu-latest, 3.12)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": "posix-session"
+   },
+   "unit (ubuntu-latest, 3.13)": {
+    "after": 0,
+    "escaped": 0,
+    "mechanism": "posix-session"
+   }
+  },
+  "linux_zero_residual": true,
+  "windows_zero_residual": true
+ },
+ "f1_f11": {
+  "current_phase": "P6",
+  "summary": {
+   "PASS": 11,
+   "PENDING": 0,
+   "FAIL": 0
+  },
+  "ratchet_violations": [],
+  "items": {
+   "F1": "PASS",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PASS",
+   "F6": "PASS",
+   "F7": "PASS",
+   "F8": "PASS",
+   "F9": "PASS",
+   "F10": "PASS",
+   "F11": "PASS"
+  }
+ },
+ "v1_evidence_identity": {
+  "detective_guard": true,
+  "guard": {
+   "path": "validation/v2/v1_evidence_guard.py",
+   "sha256": "2a3135e9669101894f8b334f5fa15d7fb73ed3435e5d79c50fdf3cd451148ede"
+  },
+  "baseline": {
+   "path": "closure-evidence/v2/V1-EVIDENCE-BASELINE.json",
+   "sha256": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb"
+  },
+  "w0_qualification_byte_identical": true,
+  "w0_sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_unchanged": true
+ },
+ "v1_pf_001": {
+  "status": "CLOSED IN V2 BY WP-4.2 (WIN-PID-1/2); V1 code frozen and unchanged",
+  "recurrences_in_p6": 0,
+  "ci_attempts_searched": 77,
+  "search": "_kill_tree_win32|MemoryError in every CI job log"
+ },
+ "exit_checks": [
+  {
+   "check": "plan_validate: zero problems, generated docs in sync",
+   "command": "python -P validation/v2/plan_validate.py --validate --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "generated artefacts in sync"
+  },
+  {
+   "check": "freeze manifest: RFC digests equal the end of the approval lineage (V2-005)",
+   "command": "python -P validation/v2/freeze_manifest.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "freeze manifest: PASS"
+  },
+  {
+   "check": "architecture catalog --check",
+   "command": "python -P validation/v2/gen_arch_catalog.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "architecture catalog: PASS"
+  },
+  {
+   "check": "F1-F11 conformance at CURRENT_PHASE=P6 (ratchet)",
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "summary {'PASS': 11, 'PENDING': 0, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "check": "Q0 checker calibration",
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "calibrated 39/39; always-PASS mutants rejected 39/39"
+  },
+  {
+   "check": "compiler --check",
+   "command": "python -P validation/v2/gen_specs.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "specs: PASS"
+  },
+  {
+   "check": "WP-6.1 migration table --check (generated, no hand edit, no defaulted row)",
+   "command": "python -P validation/v2/gen_migration_table.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "migration table: PASS"
+  },
+  {
+   "check": "WP-6.3 authority inventory --check (both directions, six static proofs)",
+   "command": "python -P validation/v2/old_path_audit.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "old path audit: PASS"
+  },
+  {
+   "check": "P1 evidence records current",
+   "command": "python -P validation/v2/p1_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p1 evidence: PASS"
+  },
+  {
+   "check": "P2 evidence records current",
+   "command": "python -P validation/v2/p2_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p2 evidence: PASS"
+  },
+  {
+   "check": "P3 evidence records current",
+   "command": "python -P validation/v2/p3_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p3 evidence: PASS"
+  },
+  {
+   "check": "P4 evidence records current",
+   "command": "python -P validation/v2/p4_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p4 evidence: PASS"
+  },
+  {
+   "check": "P5 evidence records current",
+   "command": "python -P validation/v2/p5_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p5 evidence: PASS"
+  },
+  {
+   "check": "P6 evidence records current",
+   "command": "python -P validation/v2/p6_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p6 evidence: PASS"
+  },
+  {
+   "check": "mutation records current (P1-P6); every target killed or its survivor audited",
+   "command": "python -P validation/v2/mutation.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "check": "kernel static checks",
+   "command": "python -P validation/v2/kernel_static_checks.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "check": "except boundaries: no kernel boundary can hold an InvariantError",
+   "command": "python -P validation/v2/except_boundaries.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "except boundaries: PASS"
+  },
+  {
+   "check": "invariants document in sync with the registry",
+   "command": "python -P validation/v2/invariants_doc.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "invariants document: PASS"
+  },
+  {
+   "check": "destructive authority ledgered",
+   "command": "python -P validation/v2/destructive_authority.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "destructive authority: PASS"
+  },
+  {
+   "check": "cleanup authority",
+   "command": "python -P validation/v2/cleanup_authority.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": ""
+  },
+  {
+   "check": "reference models import nothing of the implementation",
+   "command": "python -P validation/v2/refmodel_independence.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "refmodel independence: PASS"
+  },
+  {
+   "check": "run history: P1-P6 append-only, policy-consistent, P1-P5 sealed at their counts",
+   "command": "python -P validation/v2/run_history.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "run history: PASS"
+  },
+  {
+   "check": "V1 evidence guard, detective",
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  }
+ ],
+ "architecture_exceptions": [
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-001",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-002",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-003",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-004",
+   "status": "SUPERSEDED — NEVER APPLIED (no amendment; lineage V2-003 -> V2-005)"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-005",
+   "status": "APPROVED — APPLIED (WP-6.2 stage A)"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-006",
+   "status": "APPROVED — APPLIED (P6-FINDING-001; lineage end)"
+  }
+ ],
+ "unapproved_architecture_exceptions": [],
+ "stop_rules_triggered": [],
+ "p7": {
+  "authorization": "NOT AUTHORIZED: owner review of this seal first",
+  "started_at_seal": false
+ },
+ "p6_evidence_check_mode": {
+  "at_the_candidate": "re-derived current (its local gate and first CI ran p6_evidence --check through Q0)",
+  "from_the_seal": "identity against this seal: the seal commit appends the candidate's attempts to the history P6-OLD-PATH-REMOVAL cites",
+  "records_as_at_candidate": {
+   "P6-MIGRATION-TABLE": true,
+   "P6-V2-005-SCHEMA": true,
+   "P6-ORCHESTRATION": true,
+   "P6-AUTHORITY-INVENTORY": true,
+   "P6-OLD-PATH-REMOVAL": true,
+   "P6-V2-006-PROBE-HARNESS": true
+  }
+ },
+ "verdict": "P6 FINAL SEALED"
+}

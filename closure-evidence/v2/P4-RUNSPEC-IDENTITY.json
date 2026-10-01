@@ -1,0 +1,54 @@
+{
+ "record": "AISEF V2 — P4 RUNSPEC IDENTITY",
+ "work_package": "WP-4.4",
+ "rfc_sections": [
+  "23",
+  "24"
+ ],
+ "frozen_items": [
+  "F9"
+ ],
+ "semantics": "docs/implementation/v2/P4-LIFETIME-SEMANTICS.md §5",
+ "grades": {
+  "VERIFIED": "a sha256 digest computed locally over the executed artefact (a version label is refused alone)",
+  "ATTESTED": [
+   "provider",
+   "endpoint",
+   "declared_model",
+   "route",
+   "client",
+   "fingerprint",
+   "deployment when exposed"
+  ],
+  "OPAQUE": "what is known; bars Q6 and sealed cohorts"
+ },
+ "f9_conformance": {
+  "state": "PASS",
+  "detail": "RunSpec and CapabilityIdentity equal the RFC; the four cited identities are bound; the aggregate is the minimum grade; enforcement enters runspec_hash and comparability; OPAQUE bars Q6"
+ },
+ "grade_cases": {
+  "test_verified_binds_a_locally_computed_digest_and_a_version_label_alone_is_refused": true,
+  "test_attested_binds_the_whole_tuple_and_a_measured_fingerprint": true,
+  "test_opaque_binds_what_is_known_and_the_shape_is_checked": true,
+  "test_a_digest_covers_a_file_or_a_tree_and_there_is_no_fallback_for_a_missing_artefact": true,
+  "test_the_resolved_payload_names_the_identity": true
+ },
+ "spec_cases": {
+  "test_the_aggregate_is_the_weakest_grade_and_opaque_bars_q6": true,
+  "test_runspec_hash_is_stable_and_total": true,
+  "test_a_location_is_never_identity_and_the_full_revision_is_required": true,
+  "test_scenario_H_the_implementation_changes_and_the_version_string_does_not": true,
+  "test_comparability_needs_the_same_tuples_grades_and_enforcement": true
+ },
+ "properties": {
+  "scenario_H_detected_for_verified_graded_attested_otherwise": true,
+  "OPAQUE_bars_Q6": true,
+  "enforcement_change_breaks_comparability": true,
+  "provider_and_model_identity_changes_visible": true,
+  "checkout_path_is_a_locator_never_identity_full_sha_authoritative": true,
+  "runspec_hash_stable_and_total": true,
+  "no_hidden_identity_fallback": true,
+  "every_case_green": true,
+  "f9_conformance_pass": true
+ }
+}

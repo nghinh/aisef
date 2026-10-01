@@ -1,0 +1,203 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 29 items
+
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps PASSED [  3%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_byte_identical PASSED [  6%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal PASSED [ 10%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_insertion_order_independent PASSED [ 13%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads PASSED [ 17%]
+tests/test_format.py::TestGenesisConstant::test_AC_STORY_01_02_5_genesis_is_literal PASSED [ 20%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex PASSED [ 24%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_yields_distinct_digest PASSED [ 27%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_ignores_set_hash_fields PASSED [ 31%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_deterministic_across_invocations PASSED [ 34%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_accepts_genesis_non_hex PASSED [ 37%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_1_append_creates_single_hash_chained_line FAILED [ 41%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_2_second_append_chains_prev_hash FAILED [ 44%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_3_append_empty_key_raises_valueerror_no_file FAILED [ 48%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_4_fresh_ledger_reads_prev_hash_from_disk_tail FAILED [ 51%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_5_append_durable_and_visible_to_new_reader FAILED [ 55%]
+tests/test_ledger.py::TestLedgerAppend::test_append_normalizes_key_to_nfc FAILED [ 58%]
+tests/test_nfc_normalization.py::TestNfcNormalization::test_AC_STORY_01_01_1_normalize_key_is_nfc 
+tests/test_nfc_normalization.py::TestNfcNormalization::test_AC_STORY_01_01_1_normalize_key_is_nfc PASSED [ 62%]
+tests/test_nfc_normalization.py::TestNfcNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_are_identical PASSED [ 65%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_3_import_prints_init_file_path PASSED [ 68%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_6_ledger_and_conflict_error_importable PASSED [ 72%]
+tests/test_skeleton.py::TestNoSideChannels::test_AC_STORY_01_01_4_no_forbidden_imports PASSED [ 75%]
+tests/test_skeleton.py::TestNoSideChannels::test_AC_STORY_01_01_5_no_forbidden_calls PASSED [ 79%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_read_lines_returns_bytes_with_newlines_stripped PASSED [ 82%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_read_lines_missing_file_raises PASSED [ 86%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_read_lines_empty_file_returns_empty_list PASSED [ 89%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_write_atomic_bytes_and_read_round_trip PASSED [ 93%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_between_write_and_replace_keeps_original PASSED [ 96%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_in_same_directory_as_target PASSED [100%]
+
+=================================== FAILURES ===================================
+_ TestLedgerAppend.test_AC_STORY_01_05_1_append_creates_single_hash_chained_line _
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_1_append_creates_single_hash_chained_line>
+
+    def test_AC_STORY_01_05_1_append_creates_single_hash_chained_line(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+>           Ledger(path).append(("put", "k", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:16: TypeError
+____ TestLedgerAppend.test_AC_STORY_01_05_2_second_append_chains_prev_hash _____
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_2_second_append_chains_prev_hash>
+
+    def test_AC_STORY_01_05_2_second_append_chains_prev_hash(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+>           ledger = Ledger(path)
+                     ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:34: TypeError
+_ TestLedgerAppend.test_AC_STORY_01_05_3_append_empty_key_raises_valueerror_no_file _
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_3_append_empty_key_raises_valueerror_no_file>
+
+    def test_AC_STORY_01_05_3_append_empty_key_raises_valueerror_no_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+>           ledger = Ledger(path)
+                     ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:48: TypeError
+_ TestLedgerAppend.test_AC_STORY_01_05_4_fresh_ledger_reads_prev_hash_from_disk_tail _
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_4_fresh_ledger_reads_prev_hash_from_disk_tail>
+
+    def test_AC_STORY_01_05_4_fresh_ledger_reads_prev_hash_from_disk_tail(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+>           Ledger(path).append(("put", "k", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:56: TypeError
+_ TestLedgerAppend.test_AC_STORY_01_05_5_append_durable_and_visible_to_new_reader _
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_AC_STORY_01_05_5_append_durable_and_visible_to_new_reader>
+
+    def test_AC_STORY_01_05_5_append_durable_and_visible_to_new_reader(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+>           with patch("ledgerlock.ledger.os.fsync") as fsync_mock:
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ledger.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/unittest/mock.py:1451: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ledgerlock.ledger.os'
+
+    def resolve_name(name):
+        """
+        Resolve a name to an object.
+    
+        It is expected that `name` will be a string in one of the following
+        formats, where W is shorthand for a valid Python identifier and dot stands
+        for a literal period in these pseudo-regexes:
+    
+        W(.W)*
+        W(.W)*:(W(.W)*)?
+    
+        The first form is intended for backward compatibility only. It assumes that
+        some part of the dotted name is a package, and the rest is an object
+        somewhere within that package, possibly nested inside other objects.
+        Because the place where the package stops and the object hierarchy starts
+        can't be inferred by inspection, repeated attempts to import must be done
+        with this form.
+    
+        In the second form, the caller makes the division point clear through the
+        provision of a single colon: the dotted name to the left of the colon is a
+        package to be imported, and the dotted name to the right is the object
+        hierarchy within that package. Only one import is needed in this form. If
+        it ends with the colon, then a module object is returned.
+    
+        The function will return an object (which might be a module), or raise one
+        of the following exceptions:
+    
+        ValueError - if `name` isn't in a recognised format
+        ImportError - if an import failed when it shouldn't have
+        AttributeError - if a failure occurred when traversing the object hierarchy
+                         within the imported package to get to the desired object.
+        """
+        global _NAME_PATTERN
+        if _NAME_PATTERN is None:
+            # Lazy import to speedup Python startup time
+            import re
+            dotted_words = r'(?!\d)(\w+)(\.(?!\d)(\w+))*'
+            _NAME_PATTERN = re.compile(f'^(?P<pkg>{dotted_words})'
+                                       f'(?P<cln>:(?P<obj>{dotted_words})?)?$',
+                                       re.UNICODE)
+    
+        m = _NAME_PATTERN.match(name)
+        if not m:
+            raise ValueError(f'invalid format: {name!r}')
+        gd = m.groupdict()
+        if gd.get('cln'):
+            # there is a colon - a one-step import is all that's needed
+            mod = importlib.import_module(gd['pkg'])
+            parts = gd.get('obj')
+            parts = parts.split('.') if parts else []
+        else:
+            # no colon - have to iterate to find the package boundary
+            parts = name.split('.')
+            modname = parts.pop(0)
+            # first part *must* be a module/package.
+            mod = importlib.import_module(modname)
+            while parts:
+                p = parts[0]
+                s = f'{modname}.{p}'
+                try:
+                    mod = importlib.import_module(s)
+                    parts.pop(0)
+                    modname = s
+                except ImportError:
+                    break
+        # if we reach this point, mod is the module, already imported, and
+        # parts is the list of parts in the object hierarchy to be traversed, or
+        # an empty list if just the module is wanted.
+        result = mod
+        for p in parts:
+>           result = getattr(result, p)
+                     ^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ledgerlock' has no attribute 'ledger'. Did you mean: 'Ledger'?
+
+/usr/local/lib/python3.12/pkgutil.py:528: AttributeError
+______________ TestLedgerAppend.test_append_normalizes_key_to_nfc ______________
+
+self = <tests.test_ledger.TestLedgerAppend testMethod=test_append_normalizes_key_to_nfc>
+
+    def test_append_normalizes_key_to_nfc(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.jsonl"
+>           Ledger(path).append(("put", "e\u0301", {"v": 1}, "r1", 100))
+            ^^^^^^^^^^^^
+E           TypeError: Ledger() takes no arguments
+
+tests/test_ledger.py:78: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_1_append_creates_single_hash_chained_line
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_2_second_append_chains_prev_hash
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_3_append_empty_key_raises_valueerror_no_file
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_4_fresh_ledger_reads_prev_hash_from_disk_tail
+FAILED tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_5_append_durable_and_visible_to_new_reader
+FAILED tests/test_ledger.py::TestLedgerAppend::test_append_normalizes_key_to_nfc
+=============== 6 failed, 23 passed, 8 subtests passed in 0.22s ================

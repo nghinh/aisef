@@ -1,0 +1,30 @@
+{
+ "family": "F7 — EXECUTION EVIDENCE VALIDITY (owner: 'NOP / TDD CONTROL EVIDENCE VALIDITY')",
+ "owner_decision": "FIX SS-81 FAMILY, VOID W0, THEN REQUALIFY (2026-09-18), section 7",
+ "question": "where does the kernel infer correctness from absent test ids, an empty collected set, collection errors, import errors, missing modules, 'not found' text, test_format, nop/TDD evidence or criteria coverage — and in which of those places does absence == red, not collected == failed, collection failure == behaviour failure, package-name match == story proof, or not executed == green?",
+ "method": "read every consumer of tool_run test / test:baseline / test:nop evidence and of testlog's id lists; for each suspected semantic, a deterministic reproducer on the frozen kernel (0 model calls) using the suite's own fixtures; a candidate counts only when its reproducer fails",
+ "confirmed": {
+  "SS-81": {"severity": "P1", "form": "absence == red; collection failure == behaviour failure", "where": "gate._nop_check + run_nop"},
+  "SS-82": {"severity": "P3", "form": "package root not recognised (log contradicts gate)", "where": "implement._vang_ma_cua_story"},
+  "SS-83": {"severity": "P1", "form": "environment failure / unrelated red == TDD red", "where": "tdd.red_before_green"},
+  "SS-84": {"severity": "P2", "form": "any red at parent == proof (no criteria)", "where": "gate._nop_check acceptance<=0"},
+  "SS-85": {"severity": "P2", "form": "not executed at baseline == nothing to regress", "where": "gate._baseline_check"},
+  "SS-86": {"severity": "P1", "form": "skipped at candidate == not regressed", "where": "gate._baseline_check"},
+  "SS-87": {"severity": "P1", "form": "skipped == still green", "where": "gate._preservation_check"},
+  "SS-88": {"severity": "P2", "form": "skipped == verified", "where": "ledger._observe_tests"},
+  "SS-89": {"severity": "P3", "form": "control absent == not applicable (non-blocking)", "where": "gate._nop_check nop is None"}
+ },
+ "audited_and_refuted": {
+  "gate 'criteria have tests'": "green = executed PASS only (failed and skipped excluded) — positive evidence required",
+  "implement.evidence_for_review (proven-tests list for the reviewer)": "excludes failed and skipped ids",
+  "gate 'coverage'": "no green run or no printed number -> UNCONFIGURED; testlog nulls coverage when no test ran",
+  "gate 'test' at the candidate": "exit-code based; a collection error exits non-zero -> FAILED (conservative direction)",
+  "tools.unrunnable_reason (SS-23 'any named test proves the runner ran')": "classifies a run, does not prove behaviour; its interplay with test_format is SS-81 (A), fixed there",
+  "gate flaky detection (--repeat)": "compares executed outcomes across repeats",
+  "machine_gate zero-criteria block": "plan-time protection that keeps SS-84 at P2",
+  "implement._nop_at (reuse of nop evidence)": "keeps only non-unrunnable results; will additionally require the new proof schema (part of the fix, not a separate defect)",
+  "pytest -q at parent vs -v at candidate": "unreachable: the nop runs the same configured command as the candidate",
+  "implement.nop_deadlock": "reads the gate's structured still_green data (SS-32), not absence"
+ },
+ "reproducers": "closure-evidence/hardening/w1/ss81/repro_*.py — each FAILS on the frozen kernel 02a34e0e"
+}

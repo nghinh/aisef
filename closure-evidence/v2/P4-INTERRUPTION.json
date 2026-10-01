@@ -1,0 +1,51 @@
+{
+ "record": "AISEF V2 — P4 INTERRUPTION",
+ "work_package": "WP-4.6",
+ "rfc_sections": [
+  "17.1",
+  "20.2"
+ ],
+ "frozen_items": [
+  "F1",
+  "F8"
+ ],
+ "semantics": "docs/implementation/v2/P4-LIFETIME-SEMANTICS.md §7",
+ "provenance": "a tool's signal exit is CONTROLLER when its range's ledger holds that signal, UNKNOWN otherwise; the tool layer writes no failure code for it",
+ "closers": {
+  "dispatched, completion unknown": "OUTCOME_UNKNOWN",
+  "never dispatched": "NOT_STARTED",
+  "unreleased resource (repair)": "RESIDUAL",
+  "every closer": "synthetic: true, at the last real event's time"
+ },
+ "real_signal_cases": "RealSignals (SIGINT and SIGKILL to a controller mid-story) run on every POSIX CI job; they are not part of this record, which is rebuilt identically on Windows",
+ "live_cases": {
+  "test_a_tool_that_finishes_is_measured_and_its_range_released": true,
+  "test_INTERRUPT_SIG_1_a_controller_stop_is_attributed_to_the_controller": true,
+  "test_INTERRUPT_SIG_2_a_subject_signal_exit_never_becomes_an_owner": true,
+  "test_the_outcome_table": true,
+  "test_INTERRUPT_SIG_3_closers_distinguish_not_started_from_outcome_unknown_and_leave_no_gap": true,
+  "test_an_interrupted_run_disposes_its_scopes_before_it_finishes_and_stays_torn": true,
+  "test_a_second_interrupt_during_disposal_abandons_and_says_so": true,
+  "test_interruptible_turns_a_keyboard_interrupt_into_an_interruption": true
+ },
+ "repair_cases": {
+  "test_repair_closes_everything_open_synthetically_at_the_last_real_time": true,
+  "test_repair_is_idempotent_and_byte_identical": true,
+  "test_a_run_already_interrupted_is_abandoned_by_repair": true,
+  "test_repair_refuses_what_it_cannot_extend": true
+ },
+ "residuals_closed": {
+  "P2-RESIDUAL-SIGNAL-SOURCE": "for every process P4 owns (tools in ranges): provenance recorded, a signal exit never an owner; the P2 probe path is closed by ARCHITECTURE-EXCEPTION-V2-003 (RFC §9.3): the harness runs in a range whose ledger decides — SIG-PROBE-1..10",
+  "P3-RESIDUAL-DISPOSAL-ORDER": "WP-4.3: a successful shutdown is refused while a story is open; an interruption closes and names instead"
+ },
+ "properties": {
+  "INTERRUPT_SIG_1_controller_stop_distinguishable": true,
+  "INTERRUPT_SIG_2_signal_exit_never_an_owner": true,
+  "INTERRUPT_SIG_3_unknown_is_outcome_unknown_not_started_before_dispatch": true,
+  "no_interruption_creates_a_gap": true,
+  "repair_idempotent_and_byte_identical": true,
+  "abandonment_explicit": true,
+  "scopes_dispose_before_run_finalisation_and_failures_stay_evidence": true,
+  "every_case_green": true
+ }
+}

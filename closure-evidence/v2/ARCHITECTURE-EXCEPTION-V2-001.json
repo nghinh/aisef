@@ -1,0 +1,72 @@
+{
+ "record": "AISEF V2 — ARCHITECTURE EXCEPTION",
+ "id": "ARCHITECTURE-EXCEPTION-V2-001",
+ "status": "APPROVED — APPLIED",
+ "frozen_item_affected": "F2 — the owner routing table for typed proof outcomes",
+ "contradiction_discovered": "The frozen §10 row routed EXECUTED + INDETERMINATE to 'PLAN or INTEGRATION, by reason'. The same observation, INDETERMINATE(PRECONDITION_ABSENT), means different things at different measurement points: at the parent it is the expected pre-state of an INTRODUCE obligation; at the candidate it is the admitted implementation's failure to establish the subject. The frozen row cannot express DEVELOPER at all, so a correct implementation could not conform.",
+ "discovered_in": {
+  "phase": "P1 owner review",
+  "candidate": "91bb48d14ece8d2f7f005499328f8db3cc1c0425",
+  "implementation": "aisef2/control/owner.py TAXONOMY row PRECONDITION_ABSENT -> PLAN (derived from the frozen row)",
+  "flagged_by_implementation": "P1-COMPLETION.json owner_review_items[0]"
+ },
+ "concrete_reproducer": [
+  "obligation role INTRODUCE",
+  "contract SubjectAbsence = REQUIRES_SUBJECT",
+  "at the parent the subject is absent",
+  "StoryAdmission correctly returns READY",
+  "the developer runs",
+  "at the candidate the subject is still absent",
+  "the probe returns EXECUTED + INDETERMINATE(PRECONDITION_ABSENT)",
+  "frozen routing assigned PLAN; correct ownership is DEVELOPER — the admitted implementation failed to establish the subject required for candidate proof"
+ ],
+ "why_implementation_cannot_conform": "Owner routing keyed on (status, verdict, reason) is not a function of the facts that decide ownership: identical keys require PLAN (parent PRESERVE/VERIFY), no owner (parent INTRODUCE), DEVELOPER (candidate) and INTEGRATION (post-merge). The frozen row permits none of the correct candidate or post-merge owners.",
+ "replacement": {
+  "summary": "Owner routing is keyed by the typed MeasurementPoint (PARENT, CANDIDATE, POST_MERGE — the §26 concept, now typed) and, at the parent, by ObligationRole (F6). Never by INDETERMINATE reason alone.",
+  "semantics": {
+   "PARENT + INTRODUCE + REQUIRES_SUBJECT + subject absent": "READY; no failure owner; expected pre-state",
+   "PARENT + PRESERVE/VERIFY + required subject absent": "PRECONDITION_BROKEN; PLAN",
+   "CANDIDATE + admitted obligation + required subject absent": "DEVELOPER",
+   "POST_MERGE + subject verified at candidate now absent": "INTEGRATION",
+   "observation harness cannot run (UNRUNNABLE)": "ENVIRONMENT"
+  },
+  "rfc_text": "§10 table (REFUTED and INDETERMINATE owner cells), new §10.3 with class MeasurementPoint and its table, freeze-table F2 row, adversarial cases OWNER-MP-1..4",
+  "no_new_plane_or_owner": true,
+  "regression_cases": [
+   "OWNER-MP-1",
+   "OWNER-MP-2",
+   "OWNER-MP-3",
+   "OWNER-MP-4"
+  ]
+ },
+ "evidence_compatibility_impact": {
+  "is_evidence_compatibility_change": true,
+  "what_changes": "The owner assigned to EXECUTED + INDETERMINATE(PRECONDITION_ABSENT): at the candidate PLAN -> DEVELOPER; post-merge rows added (INTEGRATION, as §26 already stated for regressions); at the parent the obligation role decides READY vs PRECONDITION_BROKEN/PLAN. The rfc_normative_digest and the freeze-table digest change.",
+  "evidence_written_under_the_old_row": "No V2 journal, verdict or failure/observed record exists (the journal is P3), so no recorded failure is re-interpreted. V1 evidence is untouched: V1 routing is separate and frozen.",
+  "superseded_records": "closure-evidence/v2/P1-ROUTING-TABLE.json as committed at 91bb48d (routing under the old row) is historical; P1-COMPLETION.json stays byte-identical and is superseded by P1-COMPLETION-CORRECTION-V2-001.json",
+  "unaffected": "ContractSatisfaction derivation, NEG-1/2/3, semantic_hash and every spec identity (F4), the Owner set (F3), no raw-verdict routing"
+ },
+ "digests": {
+  "rfc_normative_digest": {
+   "before": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+   "after": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708"
+  },
+  "freeze_table_digest": {
+   "before": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+   "after": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+  }
+ },
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "AISEF V2 — P1 OWNER REVIEW CORRECTION / ARCHITECTURE EXCEPTION V2-001",
+  "date": "2026-09-21",
+  "terms": [
+   "freeze the measurement-point semantics",
+   "update F2 mechanically",
+   "update its freeze digest / approval lineage through the architecture-exception mechanism",
+   "no new architecture plane or Owner",
+   "do not redesign V2",
+   "do not start P2"
+  ]
+ }
+}

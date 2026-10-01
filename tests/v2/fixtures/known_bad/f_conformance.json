@@ -1,0 +1,3 @@
+{"checker": "f_conformance", "package": "WP-0.3", "kind": "rfc_edit",
+"find": "REVIEW = \"REVIEW\"; ", "replace": "",
+"expect": "F3 FAIL"}

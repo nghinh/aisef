@@ -1,0 +1,32 @@
+{
+ "checker": "owned_run",
+ "package": "WP-4.2",
+ "kind": "measurement",
+ "note": "a suite that exited 0 and left one owned harness process alive (the P2-RESIDUAL-ORPHAN-SUBJECT shape)",
+ "measurement": {
+  "command": [
+   "python",
+   "-m",
+   "unittest"
+  ],
+  "exit": 0,
+  "mechanism": "posix-session-and-group",
+  "owned_before": 0,
+  "owned_at_exit": 1,
+  "owned_after": 1,
+  "residual": [
+   {
+    "pid": 4242,
+    "command": "python -I -c <harness> json.loads(sys.stdin.read())"
+   }
+  ],
+  "escaped": [],
+  "ladder": [
+   "cooperative"
+  ],
+  "released_empty": true,
+  "harness_orphans_before": 0,
+  "harness_orphans_after": 0
+ },
+ "expect": "1 owned process(es) outlived the command"
+}

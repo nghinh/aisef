@@ -1,0 +1,282 @@
+{
+ "title": "AISEF W1 DELIVERY FAILURE DECOMPOSITION",
+ "generated": "2026-09-20T01:40:40+0700",
+ "owner_decision": "CONTINUE W1 PROFILE QUALIFICATION, KERNEL FROZEN (2026-09-19)",
+ "stop_condition": "section 11 C / section 9: two serious fixed-model profiles failed W1 delivery qualification — PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO (0/2 valid runs delivered) and PROFILE-W1-OC-MINIMAXM3-T80-RO (0/2); cx/gpt-5.5 was abandoned for provider instability before any valid run (section 6)",
+ "kernel": {
+  "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
+  "product_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+  "wheel_sha256": "3f0fd6519a9f21b790eeaadcf39a95436dfb9ba75878f9bb411e376ebfc116a6",
+  "w0": "AISEF-W0-QUALIFICATION-d32031d.json QUALIFIED 11/11",
+  "unchanged_during_this_cycle": true
+ },
+ "profiles": {
+  "PROFILE-W1-OC-GPT56SOL-T80-RO": {
+   "id": "sha256:f56e6f6625e5a904d6c65ced24687935d950b6e06c518d27deba0723cf818780",
+   "result": "route refused by the provider (400) — run gpt56sol-ro-1 ENVIRONMENT_OR_PROVIDER_STOP, excluded"
+  },
+  "PROFILE-W1-OC-GPT55-T80-RO": {
+   "id": "sha256:90e26847497ee7eda49044f89f86c81f000bb9e919f69e6605cfe22c4c31f2e7",
+   "result": "ABANDONED — 2 provider interruptions (429 usage limit mid-run in gpt55-ro-1; still 429 at the bounded retry preflight after the provider's announced reset); 0 valid runs"
+  },
+  "PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO": {
+   "id": "sha256:9f99ce5b057d229403c89e1958c41ee044dc977cd6fce9854b741f8ba691d147",
+   "result": "FAILED — valid runs deepseek-ro-1 (11/16), deepseek-ro-2 (11/16); 0 DELIVERY_COMPLETE"
+  },
+  "PROFILE-W1-OC-MINIMAXM3-T80-RO": {
+   "id": "sha256:ae9adf64987f08ed498c0672325e81defa596d14e30822b8b8970847a320b1f3",
+   "result": "FAILED — valid runs minimax-ro-1 (11/16), minimax-ro-2 (7/16); 0 DELIVERY_COMPLETE"
+  }
+ },
+ "runs": {
+  "gpt56sol-ro-1": {
+   "class": "ENVIRONMENT_OR_PROVIDER_STOP",
+   "progress": "2/16",
+   "runtime_min": 74,
+   "out_tokens": 31280,
+   "dev_sessions": 8,
+   "dev_turns_max": 39,
+   "dev_turns_median": 22,
+   "dev_at_80": 0,
+   "review_sessions": 7,
+   "review_at_80": 0,
+   "security_sessions": 7,
+   "developer_retries": 2,
+   "max_turn_events": 0,
+   "false_pass": 0,
+   "false_block": 0,
+   "mapping_errors": 0,
+   "repair": 0,
+   "orphan": 0,
+   "drift": 0
+  },
+  "gpt55-ro-1": {
+   "class": "ENVIRONMENT_OR_PROVIDER_STOP",
+   "progress": "7/16",
+   "runtime_min": 176,
+   "out_tokens": 83860,
+   "dev_sessions": 15,
+   "dev_turns_max": 54,
+   "dev_turns_median": 19,
+   "dev_at_80": 0,
+   "review_sessions": 12,
+   "review_at_80": 0,
+   "security_sessions": 12,
+   "developer_retries": 5,
+   "max_turn_events": 0,
+   "false_pass": 0,
+   "false_block": 0,
+   "mapping_errors": 0,
+   "repair": 0,
+   "orphan": 0,
+   "drift": 0
+  },
+  "deepseek-ro-1": {
+   "class": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "progress": "11/16",
+   "runtime_min": 167,
+   "out_tokens": 75110,
+   "dev_sessions": 15,
+   "dev_turns_max": 80,
+   "dev_turns_median": 21,
+   "dev_at_80": 1,
+   "review_sessions": 15,
+   "review_at_80": 0,
+   "security_sessions": 15,
+   "developer_retries": 3,
+   "max_turn_events": 1,
+   "false_pass": 0,
+   "false_block": 0,
+   "mapping_errors": 0,
+   "repair": 0,
+   "orphan": 0,
+   "drift": 0
+  },
+  "deepseek-ro-2": {
+   "class": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "progress": "11/16",
+   "runtime_min": 140,
+   "out_tokens": 68282,
+   "dev_sessions": 14,
+   "dev_turns_max": 55,
+   "dev_turns_median": 22,
+   "dev_at_80": 0,
+   "review_sessions": 12,
+   "review_at_80": 0,
+   "security_sessions": 12,
+   "developer_retries": 0,
+   "max_turn_events": 0,
+   "false_pass": 0,
+   "false_block": 0,
+   "mapping_errors": 0,
+   "repair": 0,
+   "orphan": 0,
+   "drift": 0
+  },
+  "minimax-ro-1": {
+   "class": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "progress": "11/16",
+   "runtime_min": 227,
+   "out_tokens": 270233,
+   "dev_sessions": 20,
+   "dev_turns_max": 80,
+   "dev_turns_median": 75,
+   "dev_at_80": 6,
+   "review_sessions": 19,
+   "review_at_80": 2,
+   "security_sessions": 18,
+   "developer_retries": 7,
+   "max_turn_events": 8,
+   "false_pass": 0,
+   "false_block": 0,
+   "mapping_errors": 0,
+   "repair": 0,
+   "orphan": 0,
+   "drift": 0
+  },
+  "minimax-ro-2": {
+   "class": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "progress": "7/16",
+   "runtime_min": 82,
+   "out_tokens": 99192,
+   "dev_sessions": 10,
+   "dev_turns_max": 80,
+   "dev_turns_median": 46,
+   "dev_at_80": 1,
+   "review_sessions": 10,
+   "review_at_80": 0,
+   "security_sessions": 10,
+   "developer_retries": 2,
+   "max_turn_events": 1,
+   "false_pass": 0,
+   "false_block": 0,
+   "mapping_errors": 0,
+   "repair": 0,
+   "orphan": 0,
+   "drift": 0
+  }
+ },
+ "excluded_runs": {
+  "gpt56sol-ro-1": "provider refused the route (400)",
+  "gpt55-ro-1": "provider 429 usage limit",
+  "gpt55-ro-2": "no run created — provider preflight failed twice (429)"
+ },
+ "safety_across_all_runs": {
+  "false_pass": 0,
+  "false_block": "0 — measured at trunk AND at every refused story's own last candidate (SS-95), each refusal also checked by hand against FR-12 / the requirements",
+  "oracle_mapping_errors": 0,
+  "manual_state_repair": 0,
+  "orphan_state": 0,
+  "material_drift": 0,
+  "new_P0_P1_kernel_defects": 0
+ },
+ "terminal_cause_per_valid_run": {
+  "deepseek-ro-1": {
+   "story": "STORY-04-02",
+   "chain": [
+    "E+C: attempt 1 refused by TDD/nop — AC-1 (wrong positional count -> exit 2) was already met at the parent by argparse from STORY-04-01",
+    "D: attempt 2 developer hit 80 turns (work graded)",
+    "A: attempts 2-3 refused by review for real FR-12 defects (non-JSON / wrong-type JSON corruption exits 2, not 5) — reproduced by hand at 4c8dd82d"
+   ],
+   "primary": "A"
+  },
+  "deepseek-ro-2": {
+   "story": "STORY-04-02",
+   "chain": [
+    "E+C: attempt 1 refused by TDD/nop — AC-1 and AC-6 already met at the parent (argparse)",
+    "A: the attempt-1 candidate also violated FR-12 (exit 1 crash on wrong-type JSON, exit 2 on non-JSON) and the reviewer (same model) passed it",
+    "A+B: two sessions (55, 35 turns) wrote nothing — the model found no test design that the nop rule accepts; the kernel blocked `2 no-op sessions in a row`"
+   ],
+   "primary": "E+C (with A)"
+  },
+  "minimax-ro-1": {
+   "story": "STORY-04-02",
+   "chain": [
+    "E+C: attempts 1-2 refused by TDD/nop — AC-1, AC-4, AC-6 tests green at the parent",
+    "A: review blocks for real FR-12 defects (no exception wrapper; missing ledger exits 1); final candidate 12d0de0d still exits 2 on non-JSON corruption",
+    "D: developer 80-turn caps in all three attempts; reviewer 80-turn cap -> review UNRUNNABLE in attempt 2",
+    "A: one 68-turn no-op session"
+   ],
+   "primary": "A+D (with E+C)"
+  },
+  "minimax-ro-2": {
+   "story": "STORY-02-02",
+   "chain": [
+    "D: attempt 1 developer 80-turn cap",
+    "C: AC-STORY-02-02-2 (put(k, r1) then delete(k, r2), snapshot has no k) contradicts docs/requirements.md §4.5 (that delete MUST conflict); the reviewer verified `[stuck]` and the kernel ended the story as a plan deadlock"
+   ],
+   "primary": "C"
+  }
+ },
+ "categories": {
+  "A_model_capability": {
+   "weight": "primary or co-primary terminal cause in 3 of 4 valid runs",
+   "evidence": [
+    "real FR-12 exit-code defects in every refused STORY-04-02 candidate (4c8dd82d, 96e5133e, 12d0de0d — reproduced by hand)",
+    "the reviewer (same model as the developer, owner section 4) passed defective candidates twice (deepseek-ro-1 #1, deepseek-ro-2 #1); the kernel refused them for another reason",
+    "no-op sessions: 2 (deepseek-ro-2), 1 (minimax-ro-1)",
+    "scope over-delivery: in minimax-ro-1 STORY-01-01 wrote the whole CLI (cfc462c), which left every STORY-04-01 criterion already met"
+   ]
+  },
+  "B_prompt_context_quality": {
+   "weight": "contributing, never alone",
+   "evidence": [
+    "the TDD message says `tests green on first run` although a recorded run had 5 of 6 criterion tests red (deepseek-ro-1 STORY-04-02 #1, evidence seq 55); neither message says the still-green criterion is ALREADY MET at the parent, nor how to prove it (bind its test to behaviour this story adds) — the deepseek-ro-2 sessions then spent 90 turns writing nothing"
+   ],
+   "site": "framework-authored gate feedback (aisef/control/gate.py) — product text; not reopened (only G may)"
+  },
+  "C_story_decomposition": {
+   "weight": "sole terminal cause in 1 run; root of the nop refusals in the other 3",
+   "evidence": [
+    "STORY-02-02 AC-2 contradicts requirements §4.5 (a plan defect in the workload; the kernel detected it)",
+    "STORY-04-02 AC-1 / AC-6 are delivered by STORY-04-01's argparse parser; STORY-04-01's criteria can be delivered by STORY-01-01's CLI skeleton — overlapping criteria across stories",
+    "STORY-01-01 AC-5 / AC-6 are absence criteria (`grep ... exits 1`) that hold on an empty tree, so they can never be red at the parent",
+    "the workload's own 2026-09-15 split already flagged STORY-02-01 and STORY-04-02 as placeholder criteria (run.log line 17)"
+   ]
+  },
+  "D_turn_budget_mechanics": {
+   "weight": "large cost for MiniMax-M3, contributing terminal factor in minimax-ro-1",
+   "evidence": [
+    "developer sessions at the 80-turn cap: deepseek 1 of 29; minimax 7 of 30 (median 75 turns in minimax-ro-1)",
+    "reviewer at the cap: minimax-ro-1 2 (review UNRUNNABLE, retried stage-locally)"
+   ]
+  },
+  "E_verifier_overconstraint": {
+   "weight": "consumed 8 failed attempts across 3 runs; no correct candidate was refused by it (SS-95: 0 false blocks)",
+   "evidence": [
+    "INV-TDD-NOP-PROOF requires every criterion test to be proven red without the story's code; criteria already met at the parent (C) or absence criteria cannot be red there, so a correct story must bundle new behaviour into those tests (deepseek-ro-1 #2 did: empty-key batch element -> exit 2)",
+    "still-green tests by run: deepseek-ro-1 (04-01 AC-4; 04-02 AC-1), deepseek-ro-2 (04-02 AC-1, AC-6), minimax-ro-1 (01-01 AC-5, AC-6; 04-01 AC-1..4; 04-02 AC-1, AC-4, AC-6)"
+   ],
+   "note": "a designed safeguard against tests that verify nothing (bug 23->24); changing it is a product decision, not a defect"
+  },
+  "F_environment_tooling": {
+   "weight": "decisive for route availability, never terminal in a valid run",
+   "evidence": [
+    "provider: cx/gpt-5.6-sol refused (400), cx/gpt-5.5 429 usage limit x2 — runs excluded",
+    "SS-92 (bandit output read as `not found` -> TOOL_UNRUNNABLE in developer sessions) and SS-93 (bandit scans .claude/.aisef, ~52 000 lines) observed again — OPEN P2, not gating (tools.sast empty)"
+   ]
+  },
+  "G_framework_orchestration": {
+   "weight": "none found",
+   "evidence": [
+    "every terminal was the kernel acting as designed and correctly: plan deadlock detected and ended (STORY-02-02); no-op sessions charged to the infra budget then blocked; reviewer max_turns -> UNRUNNABLE -> stage-local re-review; infra budget on provider outage; no false pass, no false block, no orphan, no drift, no manual repair",
+    "SS-95 was a qualification-infrastructure measurement gap (driver), fixed; re-measurement changed no result"
+   ],
+   "reopens_product_work": false
+  }
+ },
+ "only_G_may_reopen_product_work": "no G finding — the kernel stays frozen; no product change made or proposed as a fix",
+ "owner_decisions_the_evidence_points_to": [
+  "C: the W1 workload's plan carries a requirements contradiction (STORY-02-02 AC-2 vs §4.5) and overlapping / absence criteria — a workload issue independent of any profile",
+  "E: whether the nop proof rule should accept criteria already met at the parent (e.g. proven by the story's own preservation) — a product policy question, not a defect",
+  "B: gate feedback for the already-met case (product text)",
+  "D: the 80-turn budget for MiniMax-M3"
+ ],
+ "backlog_open": {
+  "SS-92": "OPEN P2",
+  "SS-93": "OPEN P2"
+ },
+ "fixed_this_cycle_outside_the_kernel": {
+  "SS-95": "P1 qualification infrastructure — FIXED"
+ }
+}

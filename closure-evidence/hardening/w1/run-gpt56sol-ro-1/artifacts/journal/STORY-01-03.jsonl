@@ -1,0 +1,14 @@
+{"seq": 1, "step": "attempt.started", "at": 1789774204.618, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789774205.202, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-gpt56sol-ro-1/.aisef/worktrees/STORY-01-03"}, "undo": {"worktree.remove": "STORY-01-03"}}
+{"seq": 3, "step": "status.running", "at": 1789774205.203, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789774483.52, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/format.py", "tests/test_format.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789774483.521, "attempt": 1, "data": {"luot": 1, "sha": "ce54fa8359440aed9de725f152a9b6836eb57370", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "verification.completed", "at": 1789775460.708, "attempt": 1, "data": {"ok": false, "attempts": 1, "cost_usd": 0.0, "candidate": "ce54fa8359440aed9de725f152a9b6836eb57370"}, "undo": {}}
+{"seq": 7, "step": "review.completed", "at": 1789775460.708, "attempt": 1, "data": {"blocked": [], "outcome": "REVIEW_UNRUNNABLE", "review_executions": 3, "developer_attempts": 1}, "undo": {}}
+{"seq": 8, "step": "attempt.committed", "at": 1789775460.713, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 9, "step": "attempt.started", "at": 1789775474.413, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 10, "step": "worktree.created", "at": 1789775475.348, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-gpt56sol-ro-1/.aisef/worktrees/STORY-01-03"}, "undo": {"worktree.remove": "STORY-01-03"}}
+{"seq": 11, "step": "status.running", "at": 1789775475.349, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 12, "step": "verification.completed", "at": 1789775837.897, "attempt": 1, "data": {"ok": false, "attempts": 0, "cost_usd": 0.0, "candidate": ""}, "undo": {}}
+{"seq": 13, "step": "review.completed", "at": 1789775837.898, "attempt": 1, "data": {"blocked": [], "outcome": "NONE", "review_executions": 0, "developer_attempts": 0}, "undo": {}}
+{"seq": 14, "step": "attempt.committed", "at": 1789775837.907, "attempt": 1, "data": {}, "undo": {}}

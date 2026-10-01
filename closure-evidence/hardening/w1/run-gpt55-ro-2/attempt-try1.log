@@ -1,0 +1,9 @@
+[2026-09-19 13:59:41] attempt gpt55-ro-2 profile=PROFILE-W1-OC-GPT55-T80-RO.json route=9router/cx/gpt-5.5
+ok exact_fixed_route_resolves
+!! no_4xx_or_other_error_on_any_probe
+!! tool_calling_works
+!! model_identity_constant_between_probes
+.. reviewer_read_only_environment_clean (not measured here (driver preflight row))
+provider preflight FAIL | {"route": "9router/cx/gpt-5.5", "route_kind": "FIXED_MODEL", "resolved_model": [], "chat_probes": "0/3", "tool_smokes": "0/2", "declared_limit": {"context": 200000, "output": 32768}}
+PROVIDER PREFLIGHT FAILED — no run created
+exit=3

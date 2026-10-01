@@ -1,0 +1,3 @@
+{"checker": "state_model_prover", "package": "WP-0.4", "kind": "test_source_edit", "base": "6ac6f74",
+"find": "self.assertEqual(self.violations, [])", "replace": "self.assertEqual(self.violations, None)",
+"expect": "normalised_trees_identical"}

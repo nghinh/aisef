@@ -1,0 +1,111 @@
+{
+ "record": "AISEF V2 — P7-FINDING-001 KERNEL CORRECTION (python_callable bytecode isolation)",
+ "authority": "owner decision 'AISEF V2 — P7-FINDING-001 KERNEL CORRECTION AUTHORIZATION / PYTHON PROBE BYTECODE ISOLATION' (2026-09-27): classification B accepted; kernel correction authorized; no V2-007",
+ "written": "2026-09-27T08:46:01Z",
+ "finding": {
+  "id": "P7-FINDING-001",
+  "status": "ROOT_CAUSE_CONFIRMED / KERNEL_DEFECT",
+  "diagnosis": {
+   "path": "closure-evidence/v2/P7-FINDING-001/DIAGNOSIS.json",
+   "sha256": "4904d97d7b62b9ec285c0e64cff94ad4d9bfde66ea168a2e5c2d1dd259c25e3a"
+  },
+  "reproducer": {
+   "path": "closure-evidence/v2/P7-FINDING-001/REPRODUCER.json",
+   "sha256": "5c3a1c13e2fd58450a5fd020724778c84aecd4790380556829c3a47b51ecf71a"
+  },
+  "history_entry": "P7-RUN-HISTORY seq 65 (e0b6862, ubuntu 3.11) — kept UNKNOWN exactly"
+ },
+ "lineage": {
+  "p6_seal": {
+   "path": "closure-evidence/v2/P6-FINAL-SEAL.json",
+   "sha256": "9362029864f011d7c727d57ab4f99815e0c440071833285a2964053fa651ea60",
+   "commit": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
+   "rule": "P6 was sealed on the evidence available then and is not rewritten; P7 discovered a latent defect; the corrected candidate is post-P6 corrective lineage, not the P6 candidate"
+  },
+  "old_semantic_candidate": {
+   "commit": "097daefefd9229eafeacaca321b7a008a581899b",
+   "aisef2_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+   "status": "historical, P7-failed; not amended, not relabeled"
+  },
+  "new_semantic_candidate": {
+   "commit": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "supersedes": "097daefefd9229eafeacaca321b7a008a581899b"
+  }
+ },
+ "correction": {
+  "mechanism": "every python_callable evaluation runs the harness with -I -B -X pycache_prefix=<fresh empty directory of the evaluation's own>: the interpreter reads and writes cached bytecode only under that prefix, so in-tree __pycache__ (committed by a developer or left by anything) is never the subject and the checkout is never written; the prefix lies under the story's controller-owned scratch when the probe was given one (disposed with that StoryScope resource) else under a temporary directory of the probe's own; it is never reused across evaluations, parties, criteria, revisions or attempts, and an evaluation directory inside the checkout is refused",
+  "primary_control": "external fresh pycache prefix (-X pycache_prefix, command line — survives -I/-E)",
+  "defence_in_depth": "-B (no bytecode written), also on the developer-test runners (-E -s -B; -B -m pytest)",
+  "not_relied_on": [
+   "PYTHONDONTWRITEBYTECODE",
+   "PYTHONPYCACHEPREFIX"
+  ],
+  "rejected": "stripping derived artefacts from the candidate before proof (owner §5): the proof observes the committed revision",
+  "kernel_files": [
+   "aisef2/probe/python_callable.py",
+   "aisef2/orchestrate/story_runner.py",
+   "aisef2/quality/test_execution.py"
+  ],
+  "probe_protocol_shape": "unchanged (Probe, ProbeResult, ExecutionEnv, RevisionRef, HarnessProbe as before; the probe's constructor gained the harness-owned `scratch` hook beside `on_range`, outside the frozen protocol as PROBE-META-1 places `on_range`)",
+  "story_inputs_contract": "a probe factory is called with (on_range, scratch) — the story's scratch directory — instead of (on_range)"
+ },
+ "probe_digest": {
+  "before": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+  "after": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+  "sources": [
+   "probe/protocol.py",
+   "probe/python_callable.py"
+  ],
+  "semantic_hash_impact": {
+   "rule": "F4: semantic_hash incorporates probe_digest; every ProductProofSpec bound to the probe gets a new semantic_hash",
+   "example_exists_spec": {
+    "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0": "20fbca952de40f5c9bd660bcef5eb5ba3c387aadf29dd32106fca2e44fdf706f",
+    "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf": "336c452571722cf8ccc46caacf9383791f8a3c55e2039a247ef2e93b62e7bd07"
+   },
+   "differs": true
+  },
+  "historical_digests": {
+   "c335293e03a0f3b7175a39371fe2fb3b6331d5a29d349409fb72470d8c46278e": "pre-V2-006",
+   "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0": "V2-006 to this correction"
+  }
+ },
+ "frozen_rows": {
+  "rfc_normative_digest": {
+   "effective": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "amendment_V2_006_after": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "unchanged": true
+  },
+  "freeze_table_digest": {
+   "effective": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "amendment_V2_006_after": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "unchanged": true
+  },
+  "f5_row_sha256": {
+   "rfc_now": "05915110dcdc7f4f2b1effee5e4eb8ffbe1a04533ac1d0faa8ee8cc08bfb0f55",
+   "amendment_V2_006_after": "05915110dcdc7f4f2b1effee5e4eb8ffbe1a04533ac1d0faa8ee8cc08bfb0f55",
+   "unchanged": true
+  },
+  "f4": "semantic definition unchanged; values change through the probe_digest input",
+  "f5": "implementation identity (probe_digest) changes; the normative row is unchanged",
+  "lineage_end": "AISEF-V2-RFC-AMENDMENT-V2-006.json",
+  "broken_links": [],
+  "architecture_exception": "none required (owner §10: protocol shape, result shape, harness/subject split, execution-status semantics, routing, compiler contract and F1-F11 definitions unchanged)"
+ },
+ "regenerated_for_the_new_digest": [
+  "closure-evidence/v2/P2-CALIBRATION.json (fresh ProbeCapabilityCalibration, executed)",
+  "closure-evidence/v2/P2-PROBE-PROTOCOL.json",
+  "closure-evidence/v2/F-CONFORMANCE.json",
+  "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json",
+  "closure-evidence/v2/P2-MUTATION.json, P5-MUTATION.json, P6-MUTATION.json (every target of the three changed modules re-measured)"
+ ],
+ "historical_not_rewritten": [
+  "closure-evidence/v2/P6-FINAL-SEAL.json",
+  "closure-evidence/v2/P6-V2-006-PROBE-HARNESS.json",
+  "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
+  "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json",
+  "P6 evidence records bound by the P6 seal",
+  "closure-evidence/v2/P7-FINDING-001/DIAGNOSIS.json and the diagnostic run records (old digest, as measured)"
+ ],
+ "qualification": "every prior P7 Q0-Q3 result remains invalidated; Q0→Q3 restart from scratch on the new candidate (owner §23); P8/Q4 not authorized"
+}

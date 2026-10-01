@@ -47,7 +47,7 @@ GENERATED = ("PKG-INFO", "setup.cfg")
 
 
 def _run(*argv: str, cwd: Path | None = None, timeout: int = 1800) -> tuple[int, str]:
-    p = subprocess.run(argv, cwd=cwd or ROOT, capture_output=True, text=True, timeout=timeout)
+    p = subprocess.run(argv, cwd=cwd or ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout)
     return p.returncode, (p.stdout or "") + (p.stderr or "")
 
 

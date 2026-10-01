@@ -1,0 +1,9 @@
+{
+ "checker": "no_prose_control",
+ "package": "WP-1.1",
+ "kind": "kernel_source",
+ "rule": "NO_PROSE_CONTROL",
+ "path": "aisef2/plan/bad.py",
+ "source": "def admit(contract):\n    return 'must' in contract.rationale\n",
+ "expect": "NO_PROSE_CONTROL aisef2/plan/bad.py:2"
+}

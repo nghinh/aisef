@@ -1,0 +1,34 @@
+F401 [*] `hashlib` imported but unused
+ --> tests/test_format.py:3:8
+  |
+1 | from __future__ import annotations
+2 |
+3 | import hashlib
+  |        ^^^^^^^
+4 | import json
+5 | import unittest
+  |
+help: Remove unused import: `hashlib`
+  |
+2 |
+  - import hashlib
+3 | import json
+  |
+
+F401 [*] `ledgerlock.format.line_hash` imported but unused
+ --> tests/test_format.py:7:57
+  |
+5 | import unittest
+6 |
+7 | from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+  |                                                         ^^^^^^^^^
+help: Remove unused import: `ledgerlock.format.line_hash`
+  |
+6 |
+  - from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+7 + from ledgerlock.format import GENESIS, canonical_bytes
+8 |
+  |
+
+Found 2 errors.
+[*] 2 fixable with the `--fix` option.

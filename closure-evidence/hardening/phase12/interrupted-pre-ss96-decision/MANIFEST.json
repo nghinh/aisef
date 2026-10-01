@@ -1,0 +1,105 @@
+{
+ "artifact": "PHASE12-INTERRUPTED-PRE-SS96-DECISION",
+ "status": "PRE-SS96-DECISION / NOT FINAL QUALIFICATION EVIDENCE",
+ "why": "The owner stopped this run before it completed, to resolve SS-96 first (owner decision 2026-09-20, \"STOP PHASE 12 CLEANLY — SS-96 MUST BE RESOLVED FIRST\"). These traces are preserved in full and are NOT qualification evidence for any kernel. If SS-96 is P1 the product tree changes and this dataset can never be final evidence; it must not be resumed into a new kernel (section 9).",
+ "planned": {
+  "traces": 100000,
+  "chunks": 10,
+  "chunk_size": 10000,
+  "workers": 8
+ },
+ "completed_chunks": 2,
+ "completed_traces": 20000,
+ "interrupted_chunk": {
+  "seed_start": 20000,
+  "seed_range": [
+   20000,
+   29999
+  ],
+  "traces_planned": 10000,
+  "elapsed_s_at_stop": 246,
+  "output_written": false,
+  "log": "phase12/diff-p12-20000.log (empty: the runner writes its summary at the end)"
+ },
+ "not_started_chunks": [
+  30000,
+  40000,
+  50000,
+  60000,
+  70000,
+  80000,
+  90000
+ ],
+ "seed_ranges_are_disjoint": true,
+ "product_tree_digest": "42a29853a3a8a10e5c58b319c5a181f2898be1d5",
+ "git_sha_at_run": "aef52ba857dcf83ed9d293d64b75b1b7550fe8a8",
+ "stop": {
+  "method": "driver SIGTERM first so no further chunk could start, then SIGINT and SIGTERM to the chunk process, then SIGTERM/SIGKILL to its eight pool workers; 0 processes left behind",
+  "completed_chunk_artifacts": "untouched (the runner writes each chunk file only when that chunk finishes, so the interrupted chunk produced no file to truncate)"
+ },
+ "chunks": [
+  {
+   "file": "differential-p12-00000.json",
+   "seed_start": 0,
+   "traces": 10000,
+   "seed_range": [
+    0,
+    9999
+   ],
+   "matched": 10000,
+   "unexplained_count": 0,
+   "invariant_violations": 0,
+   "exceptions": 0,
+   "silent_skips": 0,
+   "elapsed_s": 2283.0,
+   "workers": 8,
+   "kernel": {
+    "head": "aef52ba857dcf83ed9d293d64b75b1b7550fe8a8",
+    "dirty_aisef": [],
+    "started_at": "2026-09-20T13:57:02+0700",
+    "aisef_tree": "42a29853a3a8a10e5c58b319c5a181f2898be1d5",
+    "aisef_content_sha256": "f9b17cd971349ea2bd9f19dde17bd908e3b0f48c55d37a76a87e2dd458bd37e7",
+    "invariants_registry_sha256": "3c06bed8d8149218ebaefd73e6a9f5f12904b14415045b9ba2af80ed33939d56",
+    "synthetic_adapter_sha256": "8aeb2319363c3f80ce812e48f3a8d7116fc632fcc613c5d58f295be5605caa33",
+    "model_sha256": "983dc3bb479f6484125a91e64e13f8b7715563ab112f53ddf1a52ac055b00890",
+    "comparator_sha256": "f8f3a954bc206e2753f28202a92c9a2411b2b82cda0268737c464ac7d346db79",
+    "hygiene_case_sha256": "59308863db2b45a9972ae6deb69b9822945fcf67fc361bf08cf19985cc6afbd6"
+   }
+  },
+  {
+   "file": "differential-p12-10000.json",
+   "seed_start": 10000,
+   "traces": 10000,
+   "seed_range": [
+    10000,
+    19999
+   ],
+   "matched": 10000,
+   "unexplained_count": 0,
+   "invariant_violations": 0,
+   "exceptions": 0,
+   "silent_skips": 0,
+   "elapsed_s": 2212.7,
+   "workers": 8,
+   "kernel": {
+    "head": "aef52ba857dcf83ed9d293d64b75b1b7550fe8a8",
+    "dirty_aisef": [],
+    "started_at": "2026-09-20T14:35:05+0700",
+    "aisef_tree": "42a29853a3a8a10e5c58b319c5a181f2898be1d5",
+    "aisef_content_sha256": "f9b17cd971349ea2bd9f19dde17bd908e3b0f48c55d37a76a87e2dd458bd37e7",
+    "invariants_registry_sha256": "3c06bed8d8149218ebaefd73e6a9f5f12904b14415045b9ba2af80ed33939d56",
+    "synthetic_adapter_sha256": "8aeb2319363c3f80ce812e48f3a8d7116fc632fcc613c5d58f295be5605caa33",
+    "model_sha256": "983dc3bb479f6484125a91e64e13f8b7715563ab112f53ddf1a52ac055b00890",
+    "comparator_sha256": "f8f3a954bc206e2753f28202a92c9a2411b2b82cda0268737c464ac7d346db79",
+    "hygiene_case_sha256": "59308863db2b45a9972ae6deb69b9822945fcf67fc361bf08cf19985cc6afbd6"
+   }
+  }
+ ],
+ "per_trace_rows": {
+  "files": [
+   "differential-p12-00000.rows.jsonl",
+   "differential-p12-10000.rows.jsonl"
+  ],
+  "kept": "on disk beside this manifest, not committed — the repository has never carried the per-trace row files (15 MB for two chunks); the committed chunk records carry the counters and the digests"
+ }
+}

@@ -1,0 +1,2083 @@
+{
+ "record": "AISEF V2 — WP-2.0.3 REFERENCE FIXTURE (LedgerLock reference workload, acceptance and mutants)",
+ "work_package": "WP-2.0.3",
+ "authority": "owner decision 'AISEF V2 — CYCLE-2 WP-2.0.3 EXECUTION AUTHORIZATION / REFERENCE LEDGERLOCK WORKLOAD FIXTURE' (2026-09-28)",
+ "freeze": {
+  "path": "closure-evidence/v2/cycle2/P0-REFERENCE-FIXTURE-FREEZE.json",
+  "sha256": "8bd6da2c5b9aea67c9abc35bdb24eed80e6f824cf4f45e12100646788a40e0b9",
+  "deviations": [
+   "assertion A-3.3-f not in the plan",
+   "planned mutant M-4.3-2 not committed",
+   "mutant M-10-1 not in the plan",
+   "mutant M-12-1 not in the plan",
+   "mutant M-13-1 not in the plan",
+   "M-3.1-1: planned as 'normalisation returns the raw key'; committed as 'normalises to NFD instead of NFC' — the raw-key form left the unicodedata import unused (a lint-visible, not a behavioural, difference); the NFD form is a defect of the same requirement with the same target assertion",
+   "M-4.3-2: planned as 'the line is written before the conflict is raised'; not committed — moving the write is not a one-line change, and the 'no line appended' half of R-4.3 is measured by A-4.3-a's line count under M-4.3-1",
+   "A-3.3-f: assertion added beyond the plan: a removed middle line (A-3.3-e) is caught by the hash recomputation alone, so the prev_hash-equals-previous-hash rule of R-3.3 needed its own observation (a changed prev_hash field); without it M-3.3-2 was equivalent under the suite and would have been rejected",
+   "M-10-1: added by the owner's C2-P0 correction (2026-09-29): R-10 had no negative witness; a used disallowed import cannot honestly be one changed line (the import statement and its use), so it is two",
+   "M-12-1: added by the owner's C2-P0 correction (2026-09-29): R-12 had no negative witness",
+   "M-13-1: added by the owner's C2-P0 correction (2026-09-29): R-13 had no negative witness; renaming the required definition alone would break the package import and hide the layout defect behind an import failure in every observation, so the package re-export is changed with it (two lines)"
+  ]
+ },
+ "identities": {
+  "head": "4c28172617021a4f584d5eaa66100d86095ea371",
+  "aisef2_tree": "2c67d47a7c8fc9ce80f0db86dbdc48ffe60ece70",
+  "cycle2_manifest": {
+   "path": "docs/implementation/v2/cycle2/cycle2-manifest.json",
+   "sha256": "f4293366e53853259c58306b55c4992c7bd45e26fe2dea0bf92e4c8cf050bbc7"
+  },
+  "cycle2_freeze_manifest": {
+   "path": "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json",
+   "sha256": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad"
+  },
+  "owner_decisions": {
+   "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+   "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c"
+  },
+  "wp_2_0_1_acceptance": {
+   "path": "closure-evidence/v2/cycle2/WP-2.0.1-ACCEPTANCE.json",
+   "sha256": "665e1ff327d7c3b5eef040c585b122a91565b0bb8b94a0b0ab5fb2337122462f"
+  },
+  "cycle1": {
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "probe": {
+    "id": "probe.python_callable",
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+   }
+  },
+  "rfc": {
+   "rfc_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831"
+  },
+  "hash_rule": "every sha256 here is over bytes with CRLF normalised to LF; git_blob = sha1 of the blob header and the same bytes"
+ },
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin"
+ },
+ "requirements": {
+  "sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+  "fixture_copy_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+  "interpretation": {
+   "R-1": "DESCRIPTIVE",
+   "R-2": "DESCRIPTIVE",
+   "R-3": "CONTAINER",
+   "R-4": "CONTAINER",
+   "R-3.1": "BEHAVIOUR",
+   "R-3.2": "BEHAVIOUR",
+   "R-3.3": "BEHAVIOUR",
+   "R-3.4": "BEHAVIOUR",
+   "R-4.1": "BEHAVIOUR",
+   "R-4.2": "BEHAVIOUR",
+   "R-4.3": "BEHAVIOUR",
+   "R-4.4": "BEHAVIOUR",
+   "R-4.5": "BEHAVIOUR",
+   "R-5": "BEHAVIOUR",
+   "R-6": "BEHAVIOUR",
+   "R-7": "BEHAVIOUR",
+   "R-9": "BEHAVIOUR",
+   "R-8": "STATIC (durability is asserted on the reference's source: fsync in every write path; not observable from outside the process)",
+   "R-10": "STATIC (allowed imports and the __future__ import, asserted on the source)",
+   "R-12": "STATIC (no socket / subprocess / os.system, asserted on the source)",
+   "R-13": "STATIC (package layout and the names ledger.py must define)",
+   "R-11": "DEVELOPER_TEST_REQUIREMENT (unit tests, coverage, runner agreement: a requirement on the product's own tests; outside ProductProof by invariant IX and outside this fixture, which measures product behaviour only — the DECISION-3 domain)",
+   "R-14": "MAPPED (items 1-4 and 6 are the assertions named in REQUIREMENTS-MAP.json; item 5 is R-11's coverage requirement)"
+  }
+ },
+ "fixture": {
+  "REQUIREMENTS.md": {
+   "sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+   "git_blob": "3c248a48755d6255733e02ff3bb74017ec969033"
+  },
+  "acceptance.py": {
+   "sha256": "0af0149258a50597c357ced4f36d2757bff9f2f09f5d241d6d48899045cea39d",
+   "git_blob": "0de8b6882ac56d789610816bf0d47cda63411ddb"
+  },
+  "MUTANTS.json": {
+   "sha256": "fa1f3dbd32242ccce5195e6a12647425148b0121ee0ae69b52a0f62c1d0b335f",
+   "git_blob": "8421c45f0e939629640b6ee660a20b87b9eafd7d"
+  },
+  "REQUIREMENTS-MAP.json": {
+   "sha256": "a1a56ca50d946f4ee03c8ffdd7f7e9afcc903cd4a91f7f26988e5cf4a9dfcd23",
+   "git_blob": "f1c4d9fca2c13a452898205f8fc896e1ed3e7dc2"
+  },
+  "reference/ledgerlock/__init__.py": {
+   "sha256": "aa4b3a7b00f2cceae8a23a0832844069e08b03f0029615c0d46edd7438039656",
+   "git_blob": "dde1862e0801ccdae8873923daf5e37217b8f3ad"
+  },
+  "reference/ledgerlock/__main__.py": {
+   "sha256": "1af99bc34b952a403b35736ced7fe12146dc5e9ce08438422cca1ce15ad4c740",
+   "git_blob": "722548be97c9df2830a5461ab2c34de86abe7f12"
+  },
+  "reference/ledgerlock/ledger.py": {
+   "sha256": "e6f23259eae0ea57cbf2b9289d92a5032ca78a16e11a6ac3aa0dca408bdbdc16",
+   "git_blob": "5b0b41d7030f395ea5b6e3e6b9e56209dace2563"
+  },
+  "reference/ledgerlock/cli.py": {
+   "sha256": "49cc3fbb6c60eb8afee6628a5a7c6030967620ff3ef89f5a3eb73dea1e0ef075",
+   "git_blob": "60542ac38d4ac58b1189eebc1ee88967e2d75d8d"
+  },
+  "mutants/M-3.1-1/ledger.py": {
+   "sha256": "bcbfea65139375215c82898e0681f6955f5bed5dc17c4fee34f576efe5f7e965",
+   "git_blob": "8a86298a2045af81e23470478ec4c9143b56c27d"
+  },
+  "mutants/M-3.2-1/ledger.py": {
+   "sha256": "9cfecface0647390f507d154c36192bcab7980b5108eceb1c50e6f386517bcd6",
+   "git_blob": "358a3ab71a634d00bccfcfe8a08a19b4225ac71f"
+  },
+  "mutants/M-3.2-2/ledger.py": {
+   "sha256": "0df95b31fc42fefd08e51ec690cabbd6265f176429bba735563ae48bdd876b26",
+   "git_blob": "079afab771446aa3d760c3dda599695edadd75a2"
+  },
+  "mutants/M-3.3-1/ledger.py": {
+   "sha256": "db1fcb87cc2d2d27b08ea046f88e09109c9dfba245da03a9a00541588c0ef3be",
+   "git_blob": "cd847eb15b5ca4c4b5fa47735dc54086a92b97be"
+  },
+  "mutants/M-3.3-2/ledger.py": {
+   "sha256": "0b949dec541d272f1f7819bb8e4b26445cd910d8099d60c00a66a8fe1914dfd8",
+   "git_blob": "8f45e853d7c84422e786c3c4f4994e64caa03a58"
+  },
+  "mutants/M-3.3-3/ledger.py": {
+   "sha256": "00d2ce61c41d86a807047080f91c397ae262d52f90b4f992008d202ac4c58d62",
+   "git_blob": "e3e164f1fa044ed4056549781e66d72adb8e994a"
+  },
+  "mutants/M-3.4-1/ledger.py": {
+   "sha256": "978ca1c594b2758b18a8baa4b09ff8ee0391cd5d23dd60d9ece7c2182b094aa8",
+   "git_blob": "d7894c5cbb9b2b846c831046293e0c4ff9135f20"
+  },
+  "mutants/M-4.1-1/ledger.py": {
+   "sha256": "6e5411b61d67f2dafc0781ce455d7a325a27d6f75adb279e29da9246f2c20499",
+   "git_blob": "e3dbd92b84d63501ccd274ccf8ae104021f33076"
+  },
+  "mutants/M-4.2-1/ledger.py": {
+   "sha256": "7eaf325c85772b8fec74ef5748c91337f755ed0b91feb08bf367d13fc4a7bfce",
+   "git_blob": "54038a9f1cf491c532652e40fd4c85239dac9c87"
+  },
+  "mutants/M-4.3-1/ledger.py": {
+   "sha256": "a73f3086ff537dbbb2ea1b119ad31ce163f85e980eaf47f05259b18a4a29f494",
+   "git_blob": "1d268a80618b52d821b595e449e98cecec9dc2a5"
+  },
+  "mutants/M-4.4-1/ledger.py": {
+   "sha256": "0320d01741f55ce869e515c2a6d778c6f5c4b22e5d02d8f2736de16831578835",
+   "git_blob": "5c53c1d17cf71c92e7912c22cbd88d0d100d60e8"
+  },
+  "mutants/M-4.5-1/ledger.py": {
+   "sha256": "aee539eb99fb4e30733b957ef8c9e8c017fed284b6804b66045c88591f98d054",
+   "git_blob": "a327a553dd30d187cd3ec0abef26bafe2d537659"
+  },
+  "mutants/M-5-1/ledger.py": {
+   "sha256": "f66e4597ae1c21a060be146402aa6755575a736d005927cae27ef8ddd2ed870d",
+   "git_blob": "b4211bc54b222b6cdd9b395b19a034ef1542e3fd"
+  },
+  "mutants/M-5-2/ledger.py": {
+   "sha256": "83c08f81e640fdc9121dd4e85fb81f79e8ba4e226c438f61e1b5aacce4a1abd8",
+   "git_blob": "5b1475b3265826fa261e9fd9c4d9366f92e64f8a"
+  },
+  "mutants/M-6-1/ledger.py": {
+   "sha256": "b4f396578cb26fea4466abdc32babd982bb792eeeb0380a268db4d1d607d5e6a",
+   "git_blob": "bfa45deb6582afa5aaf9667553f779f9acaa62a9"
+  },
+  "mutants/M-6-2/ledger.py": {
+   "sha256": "f01fd92d691c242b078734836664284e7e0504fd9ea805449766f3ab1b43c914",
+   "git_blob": "5227cf37cefecdfe17691b78701a69989430c11c"
+  },
+  "mutants/M-7-1/ledger.py": {
+   "sha256": "7f6c4698467aa673964081d20a2d760415e88651ca809fcbf3c7ba71cf43f03f",
+   "git_blob": "223fbc10b0b7cb88146faac629b4de9ef1647fc8"
+  },
+  "mutants/M-7-2/ledger.py": {
+   "sha256": "ee2bc929d9a17c1970e21301486549ce900787d6c2967aefe40bcbc7c983a7d3",
+   "git_blob": "c116cdfe07879c03e5f9e26b485a0e961c9f0f44"
+  },
+  "mutants/M-7-3/ledger.py": {
+   "sha256": "f0eb09eda0fb1f53468e50204859c3fc7bc769d8c2b4656bd77f744224fcf7e3",
+   "git_blob": "c9ca913ae215f9544ff23020a498b05624a62b94"
+  },
+  "mutants/M-8-1/ledger.py": {
+   "sha256": "493e68848fa64f93faf5cf737d18bf670362e1674433e87af2fdfed33c57b6ea",
+   "git_blob": "8fd16fe51cfdc13cb09da7d3d26442bd560e0f46"
+  },
+  "mutants/M-9-1/cli.py": {
+   "sha256": "f8efd13f5f68c84d1f9384c81f760e2edcc8c87f98a75c2a1b835a537f280054",
+   "git_blob": "82807a632cd6616200641d40993840a7d019747a"
+  },
+  "mutants/M-9-2/cli.py": {
+   "sha256": "2b82420215212854a8fb9284b49c7ba00d8b47a9bd14405a89c0cd68ccb132e5",
+   "git_blob": "52bf82f022ffacaaf3c838bbe457209a70b0c0c3"
+  },
+  "mutants/M-9-3/cli.py": {
+   "sha256": "fe5f9f624166e86971429af7dffdcde61045e067eda0076cedb4c047b878b42a",
+   "git_blob": "8e6d417b01352b300b25e071b3de9de4b1593268"
+  },
+  "mutants/M-10-1/ledger.py": {
+   "sha256": "0c2094df2d1027dc38c56f2056645427953928d173c7ad6c135ed5f57514ca77",
+   "git_blob": "dce4fbd49775f9663f244d74cac6675577744c9d"
+  },
+  "mutants/M-12-1/ledger.py": {
+   "sha256": "0f22b9b388be18b10d772d8836a6388da1dfe2cefe0d6b664801f0af4c6b13be",
+   "git_blob": "43a1867838f8c841a219f753a63498989ba179d8"
+  },
+  "mutants/M-13-1/__init__.py": {
+   "sha256": "40f1caf69ee27f65b98b913e97f549f6735b1c41b8b51c3b03e611e46b5cf645",
+   "git_blob": "396408133ba965a17e81404a7ed01ec60569f9e2"
+  },
+  "mutants/M-13-1/ledger.py": {
+   "sha256": "fe9c2e136802a064478985d6460b838bd6933686ea30baee667df06b5c0e5a65",
+   "git_blob": "1829a10fabfe79cba1f832bdd8c5e73e2d647c6b"
+  }
+ },
+ "requirement_map": [
+  {
+   "id": "R-1",
+   "heading": "Purpose",
+   "lines": [
+    3,
+    9
+   ],
+   "sha256": "f1af46969390765979ca43091a131dc8ae8fa45104d0743454b912d1394f8748",
+   "kind": "DESCRIPTIVE",
+   "reason": "purpose statement; the behaviours it names are R-3..R-9"
+  },
+  {
+   "id": "R-2",
+   "heading": "Non-Goals",
+   "lines": [
+    10,
+    16
+   ],
+   "sha256": "6e07aef17d190064b49f633d491b55f277e124914c8102236a8890fa7f3b9a11",
+   "kind": "DESCRIPTIVE",
+   "reason": "non-goals; the absence of network, server, UI and database is the shape of the reference, not a measured behaviour (R-12 measures the side-channel half)"
+  },
+  {
+   "id": "R-3",
+   "heading": "Storage",
+   "lines": [
+    17,
+    18
+   ],
+   "sha256": "c5cbd35556380c6875652afad65edb642312d02160eedea05543e0b36e18a83a",
+   "kind": "CONTAINER",
+   "reason": "heading of R-3.1..R-3.4"
+  },
+  {
+   "id": "R-3.1",
+   "heading": "Key normalization (Unicode NFC)",
+   "lines": [
+    19,
+    25
+   ],
+   "sha256": "082f7bc80a517c0ed2030d4f573b165be1807b4260c270c05638e02d9b6ef51d",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::normalize_key",
+    "ledgerlock/ledger.py::_plan"
+   ],
+   "behaviour": "every key is NFC before storage, lookup, hashing and serialisation; NFD and NFC spellings are one key",
+   "assertions": [
+    "A-3.1-a"
+   ],
+   "mutants": [
+    "M-3.1-1"
+   ]
+  },
+  {
+   "id": "R-3.2",
+   "heading": "JSONL hash chain",
+   "lines": [
+    26,
+    43
+   ],
+   "sha256": "1b9bb8062a3b74bb3a91d7a0689ec7ca25248587dc1d008217d253b26080e603",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::canonical_bytes",
+    "ledgerlock/ledger.py::line_hash",
+    "ledgerlock/ledger.py::encode_line",
+    "ledgerlock/ledger.py::Ledger.append"
+   ],
+   "behaviour": "one JSONL line per mutation with hash = SHA-256(prev_hash || '|' || canonical bytes with hash and prev_hash blank); the first prev_hash is the literal GENESIS; lines are appended, never rewritten",
+   "assertions": [
+    "A-3.2-a",
+    "A-3.2-b"
+   ],
+   "mutants": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "interpretation": "canonical bytes = JSON with sorted keys, no whitespace, non-ASCII kept; the constant is the literal string GENESIS"
+  },
+  {
+   "id": "R-3.3",
+   "heading": "Tamper evidence",
+   "lines": [
+    44,
+    53
+   ],
+   "sha256": "0fbf4ad694ddbd7d4de02645807f637c4b7dee479bbc3eba552d187bd5305e49",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::verify_records"
+   ],
+   "behaviour": "a full recomputation from disk detects a mutated value, a swapped op, a modified hash and a broken link, reporting the first bad index; a clean chain is ok",
+   "assertions": [
+    "A-3.3-a",
+    "A-3.3-b",
+    "A-3.3-c",
+    "A-3.3-d",
+    "A-3.3-e",
+    "A-3.3-f"
+   ],
+   "mutants": [
+    "M-3.3-1",
+    "M-3.3-2",
+    "M-3.3-3"
+   ]
+  },
+  {
+   "id": "R-3.4",
+   "heading": "Independent verify",
+   "lines": [
+    54,
+    59
+   ],
+   "sha256": "aee4d9bede00d0626ba9c445f24177d00a8c08703e90ae32de652cd0cf742e5e",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::Ledger.verify",
+    "ledgerlock/ledger.py::verify_raw"
+   ],
+   "behaviour": "verify reads the chain from disk and consults nothing the instance remembers, so a tamper after the same instance appended is detected",
+   "assertions": [
+    "A-3.4-a"
+   ],
+   "mutants": [
+    "M-3.4-1"
+   ]
+  },
+  {
+   "id": "R-4",
+   "heading": "Idempotency and Conflict Semantics",
+   "lines": [
+    60,
+    61
+   ],
+   "sha256": "088752d1132c01a898293b1c6002c2cfb9ca96b9468b842f76d4d5e928714f64",
+   "kind": "CONTAINER",
+   "reason": "heading of R-4.1..R-4.5"
+  },
+  {
+   "id": "R-4.1",
+   "heading": "Request IDs",
+   "lines": [
+    62,
+    67
+   ],
+   "sha256": "2bc80e4df25272460a161d6d4d287d5eca5432237f6873ee7c9f0302c01d81ac",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan"
+   ],
+   "behaviour": "a rid is a non-empty string; an empty rid is refused (ValueError; CLI exit 2) and nothing is written",
+   "assertions": [
+    "A-4.1-a"
+   ],
+   "mutants": [
+    "M-4.1-1"
+   ]
+  },
+  {
+   "id": "R-4.2",
+   "heading": "Idempotency",
+   "lines": [
+    68,
+    72
+   ],
+   "sha256": "c80e3017ae106a49b7829b058344ea79f7c8e01c13d4048d05736770d7670607",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan",
+    "ledgerlock/ledger.py::_by_rid"
+   ],
+   "behaviour": "a replayed rid returns the same result and appends nothing",
+   "assertions": [
+    "A-4.2-a"
+   ],
+   "mutants": [
+    "M-4.2-1"
+   ],
+   "interpretation": "a rid is replayed when any committed line carries it, whatever its op or key"
+  },
+  {
+   "id": "R-4.3",
+   "heading": "Conflict",
+   "lines": [
+    73,
+    78
+   ],
+   "sha256": "34968dc3a08936ca9892b2990a41a769d645e91e9fffe1af6bf24b1b16443ae2",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan",
+    "ledgerlock/ledger.py::_last_mutation",
+    "ledgerlock/ledger.py::Ledger.append"
+   ],
+   "behaviour": "a different rid on a key whose last committed mutation used another rid raises ConflictError (CLI exit 4) and appends nothing",
+   "assertions": [
+    "A-4.3-a"
+   ],
+   "mutants": [
+    "M-4.3-1"
+   ]
+  },
+  {
+   "id": "R-4.4",
+   "heading": "Tombstones",
+   "lines": [
+    79,
+    85
+   ],
+   "sha256": "f21f6a2745f56e333aaee15f385201ed51c74621e32fc385f8ed9308f6ba5951",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan",
+    "ledgerlock/ledger.py::snapshot_records"
+   ],
+   "behaviour": "a delete is a tombstone line; a put with a different rid conflicts against it; a put with the tombstone's rid is a no-op returning the delete's result; the key is absent from the snapshot",
+   "assertions": [
+    "A-4.4-a"
+   ],
+   "mutants": [
+    "M-4.4-1"
+   ]
+  },
+  {
+   "id": "R-4.5",
+   "heading": "Key-with-different-rid-different-op semantics",
+   "lines": [
+    86,
+    90
+   ],
+   "sha256": "81650a0029ca93a13bf92336ab95571619242cf47f58cc8c9e340cce8dc5fdcc",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan"
+   ],
+   "behaviour": "put with r1 then delete with r2 conflicts; replays of the committed put do not conflict",
+   "assertions": [
+    "A-4.5-a"
+   ],
+   "mutants": [
+    "M-4.5-1"
+   ]
+  },
+  {
+   "id": "R-5",
+   "heading": "Atomic Batch Mutation",
+   "lines": [
+    91,
+    101
+   ],
+   "sha256": "f65328ddec084132544dd4832af82fdb0da86f624baf96e9071a4c6dc3037f58",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::Ledger.apply_batch",
+    "ledgerlock/ledger.py::_fsync_write",
+    "ledgerlock/cli.py::dispatch",
+    "ledgerlock/cli.py::_batch_ops"
+   ],
+   "behaviour": "a batch is planned against the chain and itself, then written as a whole through a sibling temp file, fsync and rename: all lines or none; a conflict anywhere commits nothing; a replay inside the batch appends once",
+   "assertions": [
+    "A-5-a",
+    "A-5-b",
+    "A-5-c",
+    "A-5-d"
+   ],
+   "mutants": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "interpretation": "the CLI batch file is a JSON list of {op, key, value, rid, ts}; 'under the lock' is single-process serialisation (no threading module is allowed by R-10); a crash cannot be injected from outside, so atomicity is measured by its observable postconditions (bytes unchanged on refusal, old bytes a prefix on success, no temp sibling left)"
+  },
+  {
+   "id": "R-6",
+   "heading": "Deterministic Snapshot",
+   "lines": [
+    102,
+    111
+   ],
+   "sha256": "e5a61514bb95110d7841b5cbc4761e26883af2275ad03775d37ffc771589353e",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::snapshot_records",
+    "ledgerlock/ledger.py::Ledger.snapshot",
+    "ledgerlock/cli.py::dispatch"
+   ],
+   "behaviour": "the snapshot holds the latest committed put per key unless tombstoned, keys sorted in UTF-8 byte order, byte-stable across calls; the CLI writes the same bytes",
+   "assertions": [
+    "A-6-a",
+    "A-6-b"
+   ],
+   "mutants": [
+    "M-6-1",
+    "M-6-2"
+   ]
+  },
+  {
+   "id": "R-7",
+   "heading": "Repair-tail",
+   "lines": [
+    112,
+    119
+   ],
+   "sha256": "9988bcd3f69219ab71c3a660968953733a95e5ba6727d58c2720d9b94b9fb525",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::Ledger.repair_tail",
+    "ledgerlock/ledger.py::scan"
+   ],
+   "behaviour": "a truncated final line is removed and the chain verifies afterwards; a clean chain is a no-op; corruption not confined to the tail is refused with the file untouched",
+   "assertions": [
+    "A-7-a",
+    "A-7-b",
+    "A-7-c"
+   ],
+   "mutants": [
+    "M-7-1",
+    "M-7-2",
+    "M-7-3"
+   ],
+   "interpretation": "truncated = the final line is unterminated and does not parse or hash; a complete last line that fails its hash is corruption, refused"
+  },
+  {
+   "id": "R-8",
+   "heading": "Durability",
+   "lines": [
+    120,
+    126
+   ],
+   "sha256": "6b3c72e04a9684c6d7bbf64c387ba751c45f170729ba10c21078c6e4f078c918",
+   "kind": "STATIC",
+   "reference": [
+    "ledgerlock/ledger.py::_append_bytes",
+    "ledgerlock/ledger.py::_fsync_write"
+   ],
+   "behaviour": "every function that opens the ledger for writing flushes and fsyncs before it returns",
+   "assertions": [
+    "A-8-a"
+   ],
+   "mutants": [
+    "M-8-1"
+   ],
+   "interpretation": "durability cannot be observed from outside the process; the assertion reads the source of the tree"
+  },
+  {
+   "id": "R-9",
+   "heading": "CLI Exit Codes (exact contract)",
+   "lines": [
+    127,
+    139
+   ],
+   "sha256": "95dcf2833569669f287aeeefc76c6665ef5f041f49af38c8b41ecf2c26daadb6",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/cli.py::main",
+    "ledgerlock/cli.py::dispatch"
+   ],
+   "behaviour": "exit 0 on success, 2 on a usage error, 3 on an I/O error, 4 on a conflict, 5 on corruption (verify not ok, repair-tail refusal)",
+   "assertions": [
+    "A-9-a",
+    "A-9-b",
+    "A-9-c",
+    "A-9-d",
+    "A-9-e",
+    "A-9-f",
+    "A-9-g",
+    "A-9-h"
+   ],
+   "mutants": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ]
+  },
+  {
+   "id": "R-10",
+   "heading": "Language / Runtime",
+   "lines": [
+    140,
+    146
+   ],
+   "sha256": "d2e76a9c009fe8482706ec196dd438e2c730dbefb363b7e02e00a43754c74e56",
+   "kind": "STATIC",
+   "reference": [
+    "ledgerlock/__init__.py",
+    "ledgerlock/__main__.py",
+    "ledgerlock/ledger.py",
+    "ledgerlock/cli.py"
+   ],
+   "behaviour": "imports only the allowed standard-library modules; ledger.py and cli.py start with `from __future__ import annotations`",
+   "assertions": [
+    "A-10-a"
+   ],
+   "mutants": [
+    "M-10-1"
+   ],
+   "interpretation": "the negative witness is a used import of a module outside the allowed set (M-10-1, two inserted lines: the import and its use)"
+  },
+  {
+   "id": "R-11",
+   "heading": "Tests and Coverage",
+   "lines": [
+    147,
+    154
+   ],
+   "sha256": "d916b45c9c635f474fa8c8d7dfa5082ea1604d18e0f0583b885ecf7b7522062b",
+   "kind": "DEVELOPER_TEST_REQUIREMENT",
+   "reason": "unit tests, 85% coverage and runner agreement are requirements on the product's own test suite; ProductProof never depends on developer tests (invariant IX) and this fixture measures product behaviour only; the mapping of test-named criteria is the DECISION-3 domain"
+  },
+  {
+   "id": "R-12",
+   "heading": "No Side Channels",
+   "lines": [
+    155,
+    160
+   ],
+   "sha256": "4a9dee25fdd7d7cc5e2ac46a95a411513f6ddbeeec8ebdd1acc5283a95141b9c",
+   "kind": "STATIC",
+   "reference": [
+    "ledgerlock/ledger.py",
+    "ledgerlock/cli.py"
+   ],
+   "behaviour": "no socket, no subprocess, no os.system in the tree; the only files touched are the ledger, the batch input and the snapshot output",
+   "assertions": [
+    "A-12-a"
+   ],
+   "mutants": [
+    "M-12-1"
+   ],
+   "interpretation": "the negative witness is an os.system call in the write path (M-12-1); the file-access half is a property of the reference's design (its opens name only those paths) and has no separate mutant"
+  },
+  {
+   "id": "R-13",
+   "heading": "Repository layout",
+   "lines": [
+    161,
+    175
+   ],
+   "sha256": "671900e55a604ec6f3c7096de6b7590cf1de1caa40121a95897b23659487bda8",
+   "kind": "STATIC",
+   "reference": [
+    "ledgerlock/__init__.py",
+    "ledgerlock/ledger.py",
+    "ledgerlock/cli.py"
+   ],
+   "behaviour": "the package has __init__.py, ledger.py (Ledger, ConflictError, append, verify, snapshot, apply_batch) and cli.py; the imported package resolves inside the tree under evaluation",
+   "assertions": [
+    "A-13-a"
+   ],
+   "mutants": [
+    "M-13-1"
+   ],
+   "interpretation": "the negative witness for the layout half is M-13-1 (ledger.py no longer defines apply_batch; the package re-exports a renamed function under that name); the in-tree resolution half cannot be violated by a product tree under python -I isolation and is witnessed by a harness calibration (the harness importing another tree is rejected by A-13-a). __main__.py is added so that `python -m ledgerlock` (R-9) runs; tests/, docs/, README and pyproject are the product repository's concern, not the reference's"
+  },
+  {
+   "id": "R-14",
+   "heading": "Acceptance",
+   "lines": [
+    176,
+    185
+   ],
+   "sha256": "bb432ea3d1c0fe928da971cb42303772a3a324377293537967aaa610509a254d",
+   "kind": "MAPPED",
+   "assertions": [
+    "A-9-a",
+    "A-6-a",
+    "A-6-b",
+    "A-5-a",
+    "A-7-a",
+    "A-10-a"
+   ],
+   "reason": "items 1-4 and 6 are measured by the assertions named; item 5 (coverage) is R-11"
+  }
+ ],
+ "mutant_catalog": [
+  {
+   "id": "M-3.1-1",
+   "target": "R-3.1",
+   "module": "ledger.py",
+   "category": "missing normalisation",
+   "before": "    return unicodedata.normalize(\"NFC\", key)",
+   "after": "    return unicodedata.normalize(\"NFD\", key)",
+   "consequence": "keys are normalised to NFD instead of NFC: the spellings still meet, but the stored and snapshotted key is not the NFC form the requirement fixes; every snapshot keyed by an NFC non-ASCII key shows the NFD form",
+   "expect_fail": [
+    "A-3.1-a"
+   ],
+   "consequential": [
+    "A-6-a"
+   ]
+  },
+  {
+   "id": "M-3.2-1",
+   "target": "R-3.2",
+   "module": "ledger.py",
+   "category": "incorrect hash handling",
+   "before": "    return hashlib.sha256(prev_hash.encode(\"utf-8\") + b\"|\" + canonical_bytes(record)).hexdigest()",
+   "after": "    return hashlib.sha256(prev_hash.encode(\"utf-8\") + canonical_bytes(record)).hexdigest()",
+   "consequence": "every hash is computed without the '|' separator; the chain is self-consistent but not the specified one, so only an independent recomputation sees it",
+   "expect_fail": [
+    "A-3.2-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-3.2-2",
+   "target": "R-3.2",
+   "module": "ledger.py",
+   "category": "wrong state transition",
+   "before": "        prev = records[-1][\"hash\"] if records else GENESIS",
+   "after": "        prev = GENESIS",
+   "consequence": "append never chains: every line's prev_hash is GENESIS; verify (which recomputes linkage) rejects any chain of two or more appended lines, so every observation that verifies a multi-line chain or repairs one sees it",
+   "expect_fail": [
+    "A-3.2-a"
+   ],
+   "consequential": [
+    "A-3.3-d",
+    "A-5-a",
+    "A-7-a",
+    "A-7-b",
+    "A-9-a"
+   ]
+  },
+  {
+   "id": "M-3.3-1",
+   "target": "R-3.3",
+   "module": "ledger.py",
+   "category": "missing validation",
+   "before": "        intact = rec.get(\"hash\") == line_hash(prev, rec)",
+   "after": "        intact = rec.get(\"hash\") is not None",
+   "consequence": "verify never recomputes a hash: a mutated value, op or hash field passes; corruption anywhere in a well-linked chain is invisible, so repair-tail no longer refuses mid-chain corruption and the CLI never exits 5 for it",
+   "expect_fail": [
+    "A-3.3-a",
+    "A-3.3-b",
+    "A-3.3-c"
+   ],
+   "consequential": [
+    "A-3.4-a",
+    "A-7-c",
+    "A-9-b",
+    "A-9-g"
+   ]
+  },
+  {
+   "id": "M-3.3-2",
+   "target": "R-3.3",
+   "module": "ledger.py",
+   "category": "missing validation",
+   "before": "        linked = rec.get(\"prev_hash\") == prev",
+   "after": "        linked = rec.get(\"prev_hash\") is not None",
+   "consequence": "verify never checks that prev_hash equals the previous line's hash: a changed prev_hash field goes unnoticed (a removed line is still caught by the hash recomputation, whose input is the previous line's hash)",
+   "expect_fail": [
+    "A-3.3-f"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-3.3-3",
+   "target": "R-3.3",
+   "module": "ledger.py",
+   "category": "ordering error",
+   "before": "            return Verdict(False, i, total)",
+   "after": "            return Verdict(False, i + 1, total)",
+   "consequence": "first_bad_index is one too high; repair-tail, which compares it with the last index, refuses a genuinely truncated tail",
+   "expect_fail": [
+    "A-3.3-a",
+    "A-3.3-c",
+    "A-3.3-e",
+    "A-3.3-f"
+   ],
+   "consequential": [
+    "A-3.3-b",
+    "A-3.4-a",
+    "A-7-a"
+   ]
+  },
+  {
+   "id": "M-3.4-1",
+   "target": "R-3.4",
+   "module": "ledger.py",
+   "category": "cached metadata trusted",
+   "before": "        return verify_raw(raw)",
+   "after": "        return verify_raw(raw) if self._known_length is None else Verdict(True, None, self._known_length)",
+   "consequence": "after this instance appended, verify answers from what it remembers instead of the disk",
+   "expect_fail": [
+    "A-3.4-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-4.1-1",
+   "target": "R-4.1",
+   "module": "ledger.py",
+   "category": "missing validation",
+   "before": "    if not isinstance(rid, str) or rid == \"\":",
+   "after": "    if not isinstance(rid, str):",
+   "consequence": "an empty rid is accepted and a line is written with it",
+   "expect_fail": [
+    "A-4.1-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-4.2-1",
+   "target": "R-4.2",
+   "module": "ledger.py",
+   "category": "incorrect duplicate handling",
+   "before": "    if rid in seen:",
+   "after": "    if rid in seen and seen[rid][1][\"key\"] != key:",
+   "consequence": "a replayed rid on the same key is treated as new and appends again; every replay-based no-op (tombstone replay, NFC replay, in-batch replay, replay after a refused delete) appends instead",
+   "expect_fail": [
+    "A-4.2-a"
+   ],
+   "consequential": [
+    "A-3.1-a",
+    "A-4.4-a",
+    "A-4.5-a",
+    "A-5-c"
+   ]
+  },
+  {
+   "id": "M-4.3-1",
+   "target": "R-4.3",
+   "module": "ledger.py",
+   "category": "incorrect rejection/acceptance",
+   "before": "    if last_rec is not None and last_rec[\"id\"] != rid:",
+   "after": "    if last_rec is not None and last_rec[\"id\"] == rid:",
+   "consequence": "the conflict condition is inverted and can never hold after the replay check, so no mutation conflicts: tombstones and different-op mutations are accepted, batches with a conflict commit, and the CLI never exits 4",
+   "expect_fail": [
+    "A-4.3-a"
+   ],
+   "consequential": [
+    "A-3.1-a",
+    "A-4.4-a",
+    "A-4.5-a",
+    "A-5-b",
+    "A-9-e",
+    "A-9-f"
+   ]
+  },
+  {
+   "id": "M-4.4-1",
+   "target": "R-4.4",
+   "module": "ledger.py",
+   "category": "incorrect rejection/acceptance",
+   "before": "    if last_rec is not None and last_rec[\"id\"] != rid:",
+   "after": "    if last_rec is not None and last_rec[\"id\"] != rid and last_rec[\"op\"] == \"put\":",
+   "consequence": "only a live value conflicts; a tombstone no longer blocks a different rid",
+   "expect_fail": [
+    "A-4.4-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-4.5-1",
+   "target": "R-4.5",
+   "module": "ledger.py",
+   "category": "incorrect rejection/acceptance",
+   "before": "    if last_rec is not None and last_rec[\"id\"] != rid:",
+   "after": "    if last_rec is not None and last_rec[\"id\"] != rid and last_rec[\"op\"] == op:",
+   "consequence": "a different rid conflicts only when it repeats the last op: delete-after-put and put-after-tombstone with a different rid are accepted",
+   "expect_fail": [
+    "A-4.5-a"
+   ],
+   "consequential": [
+    "A-4.4-a"
+   ]
+  },
+  {
+   "id": "M-5-1",
+   "target": "R-5",
+   "module": "ledger.py",
+   "category": "persistence error",
+   "before": "                raise ConflictError(f\"batch op {len(results)}: key {normalize_key(key)!r} was last mutated by another rid\")",
+   "after": "                break",
+   "consequence": "a conflict inside a batch ends the batch instead of refusing it: the ops before the conflict are committed (a partial batch) and the CLI exits 0",
+   "expect_fail": [
+    "A-5-b"
+   ],
+   "consequential": [
+    "A-9-f"
+   ]
+  },
+  {
+   "id": "M-5-2",
+   "target": "R-5",
+   "module": "ledger.py",
+   "category": "incorrect duplicate handling",
+   "before": "            seen[rid] = (index, payload)",
+   "after": null,
+   "consequence": "a rid first seen inside the batch is not remembered, so its replay later in the same batch appends a second line",
+   "expect_fail": [
+    "A-5-c"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-6-1",
+   "target": "R-6",
+   "module": "ledger.py",
+   "category": "ordering error",
+   "before": "    items = sorted(state.items(), key=lambda kv: kv[0].encode(\"utf-8\"))",
+   "after": "    items = list(state.items())",
+   "consequence": "the snapshot lists keys in insertion order, not UTF-8 byte order",
+   "expect_fail": [
+    "A-6-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-6-2",
+   "target": "R-6",
+   "module": "ledger.py",
+   "category": "malformed output behaviour",
+   "before": "            state.pop(rec[\"key\"], None)",
+   "after": "            state[rec[\"key\"]] = state.get(rec[\"key\"])",
+   "consequence": "a tombstoned key stays in the snapshot; every snapshot that must exclude a deleted key shows it",
+   "expect_fail": [
+    "A-6-a"
+   ],
+   "consequential": [
+    "A-4.4-a",
+    "A-5-a"
+   ]
+  },
+  {
+   "id": "M-7-1",
+   "target": "R-7",
+   "module": "ledger.py",
+   "category": "incorrect rejection/acceptance",
+   "before": "        if verdict.ok:",
+   "after": "        if verdict.ok is None:",
+   "consequence": "the clean-chain no-op never applies: repair-tail on an intact chain removes its last line",
+   "expect_fail": [
+    "A-7-b"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-7-2",
+   "target": "R-7",
+   "module": "ledger.py",
+   "category": "incorrect rejection/acceptance",
+   "before": "        if not (unterminated and verdict.first_bad_index == total - 1):",
+   "after": "        if not unterminated:",
+   "consequence": "repair-tail no longer requires the first violation to be the last line: an unterminated file with mid-chain corruption is 'repaired' by dropping its tail instead of refused",
+   "expect_fail": [
+    "A-7-c"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-7-3",
+   "target": "R-7",
+   "module": "ledger.py",
+   "category": "ordering error",
+   "before": "        head = raw.split(b\"\\n\")[:total - 1]",
+   "after": "        head = raw.split(b\"\\n\")[:total - 2]",
+   "consequence": "repair-tail removes two lines instead of the truncated one",
+   "expect_fail": [
+    "A-7-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-8-1",
+   "target": "R-8",
+   "module": "ledger.py",
+   "category": "persistence error",
+   "before": "        os.fsync(f.fileno())",
+   "after": null,
+   "consequence": "an append returns before its bytes are durable: no fsync in the append path",
+   "expect_fail": [
+    "A-8-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-9-1",
+   "target": "R-9",
+   "module": "cli.py",
+   "category": "malformed output behaviour",
+   "before": "        return EXIT_CONFLICT",
+   "after": "        return EXIT_CORRUPT",
+   "consequence": "a conflict exits 5 instead of 4; every CLI observation of a conflict sees the wrong code",
+   "expect_fail": [
+    "A-9-e",
+    "A-9-f"
+   ],
+   "consequential": [
+    "A-3.1-a",
+    "A-4.3-a",
+    "A-4.4-a",
+    "A-4.5-a",
+    "A-5-b"
+   ]
+  },
+  {
+   "id": "M-9-2",
+   "target": "R-9",
+   "module": "cli.py",
+   "category": "malformed output behaviour",
+   "before": "        return EXIT_IO",
+   "after": "        return 1",
+   "consequence": "an I/O error exits 1 instead of 3",
+   "expect_fail": [
+    "A-9-d"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-9-3",
+   "target": "R-9",
+   "module": "cli.py",
+   "category": "malformed output behaviour",
+   "before": "        return EXIT_OK if verdict.ok else EXIT_CORRUPT",
+   "after": "        return EXIT_OK",
+   "consequence": "verify exits 0 whatever the verdict (the verdict on stdout is still correct)",
+   "expect_fail": [
+    "A-9-b"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-10-1",
+   "target": "R-10",
+   "module": [
+    "ledger.py"
+   ],
+   "category": "disallowed import",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "import tempfile",
+     "after": [
+      "import tempfile",
+      "import time"
+     ]
+    },
+    {
+     "module": "ledger.py",
+     "before": "        self._known_length = None   # what this instance last wrote; informative only, never a verdict's input",
+     "after": [
+      "        self._known_length = None   # what this instance last wrote; informative only, never a verdict's input",
+      "        self._opened_at = time.time()   # a convenience field: when this instance was opened"
+     ]
+    }
+   ],
+   "multi_line_rationale": "a disallowed module that is actually used needs its import statement and its use; joining them on one line with a semicolon would be an artificial one-line form, so the mutation is two inserted lines",
+   "consequence": "ledger.py imports `time`, a module outside the allowed standard-library set of R-10, to stamp when a Ledger instance was opened; behaviour is otherwise unchanged",
+   "expect_fail": [
+    "A-10-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-12-1",
+   "target": "R-12",
+   "module": "ledger.py",
+   "category": "side channel",
+   "before": "    os.replace(tmp, path)",
+   "after": [
+    "    os.system(\"sync\")",
+    "    os.replace(tmp, path)"
+   ],
+   "consequence": "the atomic write shells out through os.system to flush the disks before the rename: a forbidden side channel (R-12: no os.system); the ledger's bytes are unchanged",
+   "expect_fail": [
+    "A-12-a"
+   ],
+   "consequential": []
+  },
+  {
+   "id": "M-13-1",
+   "target": "R-13",
+   "module": [
+    "ledger.py",
+    "__init__.py"
+   ],
+   "category": "layout",
+   "changes": [
+    {
+     "module": "ledger.py",
+     "before": "def apply_batch(path: str, ops) -> typing.List[Result]:",
+     "after": "def batch_apply(path: str, ops) -> typing.List[Result]:"
+    },
+    {
+     "module": "__init__.py",
+     "before": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, apply_batch, snapshot, verify,",
+     "after": "    ConflictError, CorruptionError, Ledger, Result, Verdict, append, batch_apply as apply_batch, snapshot, verify,"
+    }
+   ],
+   "multi_line_rationale": "renaming the required definition alone would break the package import and turn every observation red for an import error, hiding the layout defect; re-exporting the renamed function under the required name keeps the tree runnable so the acceptance sees exactly the violation: ledger.py no longer defines apply_batch",
+   "consequence": "ledger.py no longer defines the required name apply_batch (it defines batch_apply); the package hides it by re-exporting the new name as apply_batch, so nothing else observes the change",
+   "expect_fail": [
+    "A-13-a"
+   ],
+   "consequential": []
+  }
+ ],
+ "static": {
+  "stdlib_only": true,
+  "independence": true,
+  "one_line_mutants": true,
+  "mapping_closed": true
+ },
+ "reference_acceptance": {
+  "green": true,
+  "failures": [],
+  "assertions": {
+   "A-3.1-a": true,
+   "A-3.2-a": true,
+   "A-3.2-b": true,
+   "A-3.3-a": true,
+   "A-3.3-b": true,
+   "A-3.3-c": true,
+   "A-3.3-d": true,
+   "A-3.3-e": true,
+   "A-3.3-f": true,
+   "A-3.4-a": true,
+   "A-4.1-a": true,
+   "A-4.2-a": true,
+   "A-4.3-a": true,
+   "A-4.4-a": true,
+   "A-4.5-a": true,
+   "A-5-a": true,
+   "A-5-b": true,
+   "A-5-c": true,
+   "A-5-d": true,
+   "A-6-a": true,
+   "A-6-b": true,
+   "A-7-a": true,
+   "A-7-b": true,
+   "A-7-c": true,
+   "A-8-a": true,
+   "A-9-a": true,
+   "A-9-b": true,
+   "A-9-c": true,
+   "A-9-d": true,
+   "A-9-e": true,
+   "A-9-f": true,
+   "A-9-g": true,
+   "A-9-h": true,
+   "A-10-a": true,
+   "A-12-a": true,
+   "A-13-a": true
+  },
+  "deterministic_two_runs": true
+ },
+ "mutants": {
+  "M-3.1-1": {
+   "target": "R-3.1",
+   "expected_failing": [
+    "A-3.1-a"
+   ],
+   "consequential_declared": [
+    "A-6-a"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.1-a",
+    "A-6-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.1-a": "codes 0,0,4; lines 1; snapshot keys ['é']; same result True",
+    "A-6-a": "keys ['Z', 'a', 'b', 'é']; values ok False; stable True"
+   }
+  },
+  "M-3.2-1": {
+   "target": "R-3.2",
+   "expected_failing": [
+    "A-3.2-a"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.2-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.2-a": "prev0 'GENESIS'; hash0 ok False; prev1 linked True; hash1 ok False"
+   }
+  },
+  "M-3.2-2": {
+   "target": "R-3.2",
+   "expected_failing": [
+    "A-3.2-a"
+   ],
+   "consequential_declared": [
+    "A-3.3-d",
+    "A-5-a",
+    "A-7-a",
+    "A-7-b",
+    "A-9-a"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.2-a",
+    "A-3.3-d",
+    "A-7-a",
+    "A-7-b",
+    "A-9-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.2-a": "prev0 'GENESIS'; hash0 ok True; prev1 linked False; hash1 ok False",
+    "A-3.3-d": "verdict {'first_bad_index': 1, 'length': 2, 'ok': False}",
+    "A-7-a": "repair 5; bytes == first two lines False; verdict {'first_bad_index': 1, 'length': 3, 'ok': False}",
+    "A-7-b": "repair 5; identical True",
+    "A-9-a": "exit 5"
+   }
+  },
+  "M-3.3-1": {
+   "target": "R-3.3",
+   "expected_failing": [
+    "A-3.3-a",
+    "A-3.3-b",
+    "A-3.3-c"
+   ],
+   "consequential_declared": [
+    "A-3.4-a",
+    "A-7-c",
+    "A-9-b",
+    "A-9-g"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.3-a",
+    "A-3.3-b",
+    "A-3.3-c",
+    "A-3.4-a",
+    "A-7-c",
+    "A-9-b",
+    "A-9-g"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.3-a": "cli verdict {'first_bad_index': None, 'length': 2, 'ok': True}; library verdict {'ok': True, 'first_bad_index': None}; expected first_bad_index 0",
+    "A-3.3-b": "cli verdict {'first_bad_index': None, 'length': 2, 'ok': True}; library verdict {'ok': True, 'first_bad_index': None}; expected first_bad_index 0",
+    "A-3.3-c": "cli verdict {'first_bad_index': None, 'length': 2, 'ok': True}; library verdict {'ok': True, 'first_bad_index': None}; expected first_bad_index 1",
+    "A-3.4-a": "{'subs': 1, 'ok': True, 'first_bad_index': None}",
+    "A-7-c": "terminated: exit 0 untouched True; truncated tail too: exit 0 untouched False",
+    "A-9-b": "exit 0",
+    "A-9-g": "exit 0"
+   }
+  },
+  "M-3.3-2": {
+   "target": "R-3.3",
+   "expected_failing": [
+    "A-3.3-f"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.3-f"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.3-f": "cli verdict {'first_bad_index': None, 'length': 2, 'ok': True}; library verdict {'ok': True, 'first_bad_index': None}; expected first_bad_index 1"
+   }
+  },
+  "M-3.3-3": {
+   "target": "R-3.3",
+   "expected_failing": [
+    "A-3.3-a",
+    "A-3.3-c",
+    "A-3.3-e",
+    "A-3.3-f"
+   ],
+   "consequential_declared": [
+    "A-3.3-b",
+    "A-3.4-a",
+    "A-7-a"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.3-a",
+    "A-3.3-b",
+    "A-3.3-c",
+    "A-3.3-e",
+    "A-3.3-f",
+    "A-3.4-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.3-a": "cli verdict {'first_bad_index': 1, 'length': 2, 'ok': False}; library verdict {'ok': False, 'first_bad_index': 1}; expected first_bad_index 0",
+    "A-3.3-b": "cli verdict {'first_bad_index': 1, 'length': 2, 'ok': False}; library verdict {'ok': False, 'first_bad_index': 1}; expected first_bad_index 0",
+    "A-3.3-c": "cli verdict {'first_bad_index': 2, 'length': 2, 'ok': False}; library verdict {'ok': False, 'first_bad_index': 2}; expected first_bad_index 1",
+    "A-3.3-e": "cli verdict {'first_bad_index': 2, 'length': 2, 'ok': False}; library verdict {'ok': False, 'first_bad_index': 2}; expected first_bad_index 1",
+    "A-3.3-f": "cli verdict {'first_bad_index': 2, 'length': 2, 'ok': False}; library verdict {'ok': False, 'first_bad_index': 2}; expected first_bad_index 1",
+    "A-3.4-a": "{'subs': 1, 'ok': False, 'first_bad_index': 1}"
+   }
+  },
+  "M-3.4-1": {
+   "target": "R-3.4",
+   "expected_failing": [
+    "A-3.4-a"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.4-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.4-a": "{'subs': 1, 'ok': True, 'first_bad_index': None}"
+   }
+  },
+  "M-4.1-1": {
+   "target": "R-4.1",
+   "expected_failing": [
+    "A-4.1-a"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-4.1-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-4.1-a": "library {'raised': None}; cli exit 0; a line was written True"
+   }
+  },
+  "M-4.2-1": {
+   "target": "R-4.2",
+   "expected_failing": [
+    "A-4.2-a"
+   ],
+   "consequential_declared": [
+    "A-3.1-a",
+    "A-4.4-a",
+    "A-4.5-a",
+    "A-5-c"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.1-a",
+    "A-4.2-a",
+    "A-4.4-a",
+    "A-4.5-a",
+    "A-5-c"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.1-a": "codes 0,0,4; lines 2; snapshot keys ['é']; same result False",
+    "A-4.2-a": "codes 0,0; lines 2; same result False",
+    "A-4.4-a": "delete 0 op 'delete'; put r3 4 lines 1; put r2 0 lines 2; same result False; snapshot {'k': 1}",
+    "A-4.5-a": "codes 0,4,0,4; lines 1,2",
+    "A-5-c": "library {'n': 2, 'same': False}; lines 2"
+   }
+  },
+  "M-4.3-1": {
+   "target": "R-4.3",
+   "expected_failing": [
+    "A-4.3-a"
+   ],
+   "consequential_declared": [
+    "A-3.1-a",
+    "A-4.4-a",
+    "A-4.5-a",
+    "A-5-b",
+    "A-9-e",
+    "A-9-f"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.1-a",
+    "A-4.3-a",
+    "A-4.4-a",
+    "A-4.5-a",
+    "A-5-b",
+    "A-9-e",
+    "A-9-f"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.1-a": "codes 0,0,0; lines 2; snapshot keys ['é']; same result True",
+    "A-4.3-a": "codes 0,0; lines 2,3; library {'raised': None}",
+    "A-4.4-a": "delete 0 op 'delete'; put r3 0 lines 2; put r2 0 lines 2; same result True; snapshot {'k': 1}",
+    "A-4.5-a": "codes 0,0,0,0; lines 2,2",
+    "A-5-b": "apply 0; bytes identical False; lines 4",
+    "A-9-e": "exit 0",
+    "A-9-f": "exit 0"
+   }
+  },
+  "M-4.4-1": {
+   "target": "R-4.4",
+   "expected_failing": [
+    "A-4.4-a"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-4.4-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-4.4-a": "delete 0 op 'delete'; put r3 0 lines 2; put r2 0 lines 2; same result True; snapshot {'k': 1}"
+   }
+  },
+  "M-4.5-1": {
+   "target": "R-4.5",
+   "expected_failing": [
+    "A-4.5-a"
+   ],
+   "consequential_declared": [
+    "A-4.4-a"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-4.4-a",
+    "A-4.5-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-4.4-a": "delete 0 op 'delete'; put r3 0 lines 2; put r2 0 lines 2; same result True; snapshot {'k': 1}",
+    "A-4.5-a": "codes 0,0,0,0; lines 2,2"
+   }
+  },
+  "M-5-1": {
+   "target": "R-5",
+   "expected_failing": [
+    "A-5-b"
+   ],
+   "consequential_declared": [
+    "A-9-f"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-5-b",
+    "A-9-f"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-5-b": "apply 0; bytes identical False; lines 2",
+    "A-9-f": "exit 0"
+   }
+  },
+  "M-5-2": {
+   "target": "R-5",
+   "expected_failing": [
+    "A-5-c"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 0
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-5-c"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-5-c": "library {'n': 2, 'same': False}; lines 2"
+   }
+  },
+  "M-6-1": {
+   "target": "R-6",
+   "expected_failing": [
+    "A-6-a"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-6-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-6-a": "keys ['b', 'a', 'é', 'Z']; values ok True; stable True"
+   }
+  },
+  "M-6-2": {
+   "target": "R-6",
+   "expected_failing": [
+    "A-6-a"
+   ],
+   "consequential_declared": [
+    "A-4.4-a",
+    "A-5-a"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-4.4-a",
+    "A-5-a",
+    "A-6-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-4.4-a": "delete 0 op 'delete'; put r3 4 lines 1; put r2 0 lines 1; same result True; snapshot {'k': None}",
+    "A-5-a": "apply 0; lines 3; verdict {'first_bad_index': None, 'length': 3, 'ok': True}; snapshot {'a': 1, 'b': 2, 'c': None}",
+    "A-6-a": "keys ['Z', 'a', 'b', 'd', 'é']; values ok False; stable True"
+   }
+  },
+  "M-7-1": {
+   "target": "R-7",
+   "expected_failing": [
+    "A-7-b"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-7-b"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-7-b": "repair 5; identical True"
+   }
+  },
+  "M-7-2": {
+   "target": "R-7",
+   "expected_failing": [
+    "A-7-c"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-7-c"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-7-c": "terminated: exit 5 untouched True; truncated tail too: exit 5 untouched False"
+   }
+  },
+  "M-7-3": {
+   "target": "R-7",
+   "expected_failing": [
+    "A-7-a"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-7-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-7-a": "repair 0; bytes == first two lines False; verdict {'first_bad_index': None, 'length': 1, 'ok': True}"
+   }
+  },
+  "M-8-1": {
+   "target": "R-8",
+   "expected_failing": [
+    "A-8-a"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 1,
+     "added": 0
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-8-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-8-a": "writing functions ['_fsync_write', '_append_bytes']; without fsync ['_append_bytes']"
+   }
+  },
+  "M-9-1": {
+   "target": "R-9",
+   "expected_failing": [
+    "A-9-e",
+    "A-9-f"
+   ],
+   "consequential_declared": [
+    "A-3.1-a",
+    "A-4.3-a",
+    "A-4.4-a",
+    "A-4.5-a",
+    "A-5-b"
+   ],
+   "changes": 1,
+   "lines_changed": {
+    "cli.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-3.1-a",
+    "A-4.3-a",
+    "A-4.4-a",
+    "A-4.5-a",
+    "A-5-b",
+    "A-9-e",
+    "A-9-f"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-3.1-a": "codes 0,0,5; lines 1; snapshot keys ['é']; same result True",
+    "A-4.3-a": "codes 0,5; lines 1,1; library {'raised': 'ConflictError'}",
+    "A-4.4-a": "delete 0 op 'delete'; put r3 5 lines 1; put r2 0 lines 1; same result True; snapshot {}",
+    "A-4.5-a": "codes 0,5,0,5; lines 1,1",
+    "A-5-b": "apply 5; bytes identical True; lines 1",
+    "A-9-e": "exit 5",
+    "A-9-f": "exit 5"
+   }
+  },
+  "M-9-2": {
+   "target": "R-9",
+   "expected_failing": [
+    "A-9-d"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "cli.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-9-d"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-9-d": "exits 1,1,1"
+   }
+  },
+  "M-9-3": {
+   "target": "R-9",
+   "expected_failing": [
+    "A-9-b"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "cli.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-9-b"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-9-b": "exit 0"
+   }
+  },
+  "M-10-1": {
+   "target": "R-10",
+   "expected_failing": [
+    "A-10-a"
+   ],
+   "consequential_declared": [],
+   "changes": 2,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 0,
+     "added": 2
+    }
+   },
+   "one_line": false,
+   "multi_line_rationale": "a disallowed module that is actually used needs its import statement and its use; joining them on one line with a semicolon would be an artificial one-line form, so the mutation is two inserted lines",
+   "observed_failing": [
+    "A-10-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-10-a": "imports outside the allowed set {'ledger.py': ['time']}; __future__ {'cli.py': True, 'ledger.py': True}"
+   }
+  },
+  "M-12-1": {
+   "target": "R-12",
+   "expected_failing": [
+    "A-12-a"
+   ],
+   "consequential_declared": [],
+   "changes": 1,
+   "lines_changed": {
+    "ledger.py": {
+     "removed": 0,
+     "added": 1
+    }
+   },
+   "one_line": true,
+   "multi_line_rationale": null,
+   "observed_failing": [
+    "A-12-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-12-a": "['ledger.py:133: os.system']"
+   }
+  },
+  "M-13-1": {
+   "target": "R-13",
+   "expected_failing": [
+    "A-13-a"
+   ],
+   "consequential_declared": [],
+   "changes": 2,
+   "lines_changed": {
+    "__init__.py": {
+     "removed": 1,
+     "added": 1
+    },
+    "ledger.py": {
+     "removed": 1,
+     "added": 1
+    }
+   },
+   "one_line": false,
+   "multi_line_rationale": "renaming the required definition alone would break the package import and turn every observation red for an import error, hiding the layout defect; re-exporting the renamed function under the required name keeps the tree runnable so the acceptance sees exactly the violation: ledger.py no longer defines apply_batch",
+   "observed_failing": [
+    "A-13-a"
+   ],
+   "red_on_target": true,
+   "undeclared_failures": [],
+   "valid": true,
+   "observed_detail": {
+    "A-13-a": "files {'__init__.py': True, 'ledger.py': True, 'cli.py': True}; missing names ['apply_batch']; module inside the tree True"
+   }
+  }
+ },
+ "mutant_count": 26,
+ "all_mutants_red_on_target": true,
+ "harness_calibration": {
+  "vacuous_runner_rejected": true,
+  "in_tree_resolution_rejected": true,
+  "rule": "a runner whose every assertion passes reports no RED for a mutant; the run refuses to qualify under it. The in-tree half of A-13-a cannot be violated by a product tree under python -I isolation, so its negative witness is the harness importing another tree, which A-13-a must reject"
+ },
+ "supersedes": {
+  "path": "closure-evidence/v2/cycle2/P0-REFERENCE-FIXTURE.json",
+  "commit": "002fdb773c57a5c247b9ae900cb5ad7aa72bac08",
+  "reason": "owner ruling 'CYCLE-2 C2-P0 CORRECTION / WP-2.0.3 COMPLETION DEFECT ONLY': R-10, R-12 and R-13 had no negative witness; this run adds M-10-1, M-12-1, M-13-1 and the in-tree harness calibration"
+ },
+ "problems": [],
+ "verdict": "REFERENCE GREEN, EVERY MUTANT RED ON TARGET",
+ "cross_platform": {
+  "rule": "the implementation commit's CI runs tests/v2/test_p0_reference_fixture.py, which executes the whole reference-and-mutant matrix on every platform of the matrix; the fixture bytes it measured are the ones this record binds by digest (the evidence commit changes evidence files only)",
+  "ci": {
+   "run": 36489940683,
+   "commit": "4c28172617021a4f584d5eaa66100d86095ea371",
+   "attempts": [
+    {
+     "attempt": 1,
+     "jobs": [
+      {
+       "job": "lint",
+       "job_id": 109155855971,
+       "conclusion": "success",
+       "started_at": "2026-09-28T22:02:18Z",
+       "completed_at": "2026-09-28T22:02:25Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.11)",
+       "job_id": 109155856087,
+       "conclusion": "success",
+       "started_at": "2026-09-28T22:02:19Z",
+       "completed_at": "2026-09-28T22:20:53Z",
+       "tests_run": 4779,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.12)",
+       "job_id": 109155855837,
+       "conclusion": "success",
+       "started_at": "2026-09-28T22:02:17Z",
+       "completed_at": "2026-09-28T22:21:20Z",
+       "tests_run": 4779,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.13)",
+       "job_id": 109155855921,
+       "conclusion": "success",
+       "started_at": "2026-09-28T22:02:17Z",
+       "completed_at": "2026-09-28T22:21:31Z",
+       "tests_run": 4779,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (ubuntu-latest, 3.14)",
+       "job_id": 109155855933,
+       "conclusion": "success",
+       "started_at": "2026-09-28T22:02:17Z",
+       "completed_at": "2026-09-28T22:21:52Z",
+       "tests_run": 4779,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      },
+      {
+       "job": "unit (windows-latest, 3.11)",
+       "job_id": 109155855880,
+       "conclusion": "success",
+       "started_at": "2026-09-28T22:02:18Z",
+       "completed_at": "2026-09-28T22:51:57Z",
+       "tests_run": 4776,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+       ]
+      },
+      {
+       "job": "wheel",
+       "job_id": 109155855570,
+       "conclusion": "success",
+       "started_at": "2026-09-28T22:02:18Z",
+       "completed_at": "2026-09-28T22:02:41Z",
+       "tests_run": null,
+       "log_available": true,
+       "failing_tests": [],
+       "annotations": [
+        "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "platforms": [
+   "linux",
+   "windows"
+  ]
+ }
+}

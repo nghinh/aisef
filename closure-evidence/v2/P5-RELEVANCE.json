@@ -1,0 +1,35 @@
+{
+ "record": "AISEF V2 — P5 RELEVANCE",
+ "work_package": "WP-5.2",
+ "rfc": "§15.2 (F1 payload enum Relevance: RELEVANT, IRRELEVANT, UNMEASURABLE; §24 capability levels)",
+ "implementation": "aisef2/quality/relevance.py",
+ "measurement": {
+  "line-addressable": "a .py artefact: executable lines of its own code objects, required capability line-coverage",
+  "non-line-addressable": "any other artefact: artefact-access (the case opened it), no line approximation",
+  "branch": "branch-coverage arcs from a changed executable line, recorded as stronger evidence, never required",
+  "runner": "the harness-owned unittest runner under --measure: sys.settrace + threading.settrace + an open() audit hook, per case; it declares FULL, PARTIAL (a case replaced the tracer) or UNAVAILABLE (no --measure); the pytest adapter declares nothing"
+ },
+ "properties": {
+  "REL_1_typed_and_real": true,
+  "REL_2_typed_and_real": true,
+  "REL_3_typed_and_real": true,
+  "REL_4_typed_and_real": true,
+  "REL_5_typed_and_real": true,
+  "REL_6_typed_and_real": true,
+  "REL_7_typed_and_real": true,
+  "REL_8_typed_and_real": true,
+  "capability_absence_is_UNMEASURABLE_never_IRRELEVANT": true,
+  "branch_coverage_never_required": true,
+  "non_line_addressable_uses_its_own_measurement_or_UNMEASURABLE": true,
+  "test_layout_invariance": true,
+  "no_execution_no_relevance_success": true,
+  "developer_test_files_are_not_the_product_change": true,
+  "story_diff_and_executable_lines_are_typed": true,
+  "threads_are_measured": true,
+  "no_product_verdict_reached": true,
+  "REL_DEL_1_pure_deletion_UNMEASURABLE_never_IRRELEVANT_typed_and_real": true,
+  "REL_DEL_2_3_ordinary_modifications_IRRELEVANT_or_RELEVANT": true,
+  "REL_DEL_4_tests_only_diff_IRRELEVANT_by_a_possible_measurement_and_distinct_from_deletion": true
+ },
+ "deletion_rationale": "WP52-002: a removal-only hunk or a deleted file leaves no candidate line or file for the cycle-1 candidate-side measurement to observe and §15.2 defines no deletion-specific capability, so a pure deletion is UNMEASURABLE (measurement inability), never IRRELEVANT; a tests-only diff has an empty product change set that the required measurement fully covers and proves empty, so it is IRRELEVANT by the frozen definition, and it is not a deletion"
+}

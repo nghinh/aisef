@@ -1,0 +1,88 @@
+{
+ "record": "AISEF V2 — V2-RETRY-POLICY AMENDMENT 1: the V1-PF-001 lifecycle after its WP-4.2 replacement",
+ "id": "V2-RETRY-POLICY-AMENDMENT-1",
+ "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / V1-PF-001 POST-WP-4.2 POLICY RESOLVED / ORCHESTRATION CONFORMANCE REPAIR AUTHORIZED / QP-2.6 MUST BE REQUALIFIED ON THE NEW EXACT CANDIDATE' (2026-09-30), Ruling 1 and the policy conflict correction",
+ "amends": {
+  "path": "closure-evidence/v2/V2-RETRY-POLICY.json",
+  "sha256": "605f6d044d0746812e3b70b909d48cacf0abc0a1e507b8f81cccf67598e255db",
+  "rule": "the preregistered policy stays byte-identical (the P1 seal binds it); validation/v2/run_history.py overlays this amendment; without it every V1-PF-001 recurrence must STOP (fail closed)"
+ },
+ "conflict_resolved": {
+  "register": "V1-POST-FREEZE-DEFECTS.json: STOP on recurrence before WP-4.2 is complete",
+  "checker_before": "run_history.entry_problems: any recorded recurrence must STOP, unconditionally",
+  "correction": "a narrow validation/policy correction; frozen V1 code and V1 evidence untouched"
+ },
+ "known_defect_lifecycle": {
+  "V1-PF-001": {
+   "signature": "MemoryError raised inside aisef/clients/base.py::_kill_tree_win32",
+   "error_type": "MemoryError",
+   "component": "aisef/clients/base.py::_kill_tree_win32",
+   "legacy_code_prefix": "aisef/",
+   "v2_code_prefix": "aisef2/",
+   "v2_test_prefix": "tests/v2/",
+   "frozen_v1_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "replacement": {
+    "work_package": "WP-4.2",
+    "evidence": [
+     {
+      "path": "closure-evidence/v2/P4-FINAL-SEAL.json",
+      "key": "verdict",
+      "equals": "P4 FINAL SEALED"
+     },
+     {
+      "path": "closure-evidence/v2/P4-RANGE-EMPTINESS.json",
+      "key": "residuals_closed",
+      "has": "V1-PF-001"
+     }
+    ]
+   },
+   "effects": {
+    "before_replacement": "STOP",
+    "after_replacement_exact_legacy_signature_and_path": "RECORD_ONLY",
+    "recurrence_in_the_v2_path": "STOP",
+    "changed_or_unknown_signature": "STOP",
+    "v1_frozen_identity_drift": "STOP",
+    "missing_or_untyped_fact": "STOP"
+   },
+   "record_only_classification": [
+    "KNOWN_LEGACY_RECURRENCE",
+    "NON_BLOCKING_AFTER_REPLACEMENT",
+    "RECORD_ONLY_FOR_CYCLE2_GATE"
+   ],
+   "record_only_is_not": [
+    "PASS",
+    "FIXED_IN_V1",
+    "NOT_REPRODUCED",
+    "ERASED",
+    "WAIVED_AS_NONEXISTENT"
+   ],
+   "record_only_requires": [
+    "the replacement is complete: every replacement evidence file holds its stated fact",
+    "every failing test of the attempt fails with the known error type, innermost product frame the known component",
+    "every product frame of every failing traceback lies in the frozen V1 tree (aisef/), none in aisef2/",
+    "no failing test lies under tests/v2/",
+    "the attempt's V1 product tree and the tree being checked equal the frozen V1 tree",
+    "no Cycle-1 frozen evidence changed (the attempt's v1_evidence_changed and the fact both false)",
+    "a V2 process-range / ownership qualification record is named by path and sha256, holds that sha256 and says GREEN",
+    "no attempt of the history shows the error in the V2 path"
+   ],
+   "typed_facts": {
+    "field": "recurrence_facts",
+    "shape": {
+     "failing": "[{test, error_type, product_frames: ['<repo path>::<function>', ...innermost last], test_frames: [...]}]",
+     "v1_product_tree": "git tree of aisef at the attempt",
+     "cycle1_evidence_changed": "bool",
+     "v2_process_range_qualification": "{path, sha256}"
+    }
+   }
+  }
+ },
+ "gate_effects_added": [
+  "RECORD_ONLY"
+ ],
+ "rules": [
+  "An attempt attributed to V1-PF-001 carries gate_effect STOP, or RECORD_ONLY only when the lifecycle derives RECORD_ONLY from its typed facts; STOP is always admissible (a stricter recorder is never wrong).",
+  "RECORD_ONLY keeps the attempt a FAIL: it is recorded, never counted as a pass, never a retry, never erased; it does not block a Cycle-2 gate.",
+  "The decision derives from typed defect identity, replacement state, code-path ownership and immutable tree identity; never from a CI run id or a commit id."
+ ]
+}

@@ -1,0 +1,250 @@
+{
+ "record": "AISEF V2 — P5 INVARIANTS",
+ "work_package": "WP-5.5",
+ "rfc": "§4 (F10: InvariantId I..IX, the frozen titles, every one armed with a named mechanism); §31",
+ "implementation": "aisef2/invariants/registry.py, aisef2/invariants/evidence.py, aisef2/errors.py, validation/v2/except_boundaries.py, kernel rule NO_DEVELOPER_ARTEFACT_AT_PARENT",
+ "registry": {
+  "invariants": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "V",
+   "VI",
+   "VII",
+   "VIII",
+   "IX"
+  ],
+  "mechanisms": {
+   "I": [
+    "I.approval-binds-both-hashes (code) aisef2.product.approval:require_approved",
+    "I.binding-problems (code) aisef2.product.approval:binding_problems",
+    "I.no-prose-control (static-rule) kernel_static_checks:NO_PROSE_CONTROL",
+    "I.sealed-record (code) aisef2.probe.protocol:ProbeRecord"
+   ],
+   "II": [
+    "II.harness-owned-probes (code) aisef2.probe.protocol:run_probe",
+    "II.seq-not-time (static-rule) kernel_static_checks:NO_TIME_IN_PROJECTIONS",
+    "II.from-scratch-fold (code) aisef2.journal.fold:fold",
+    "II.one-signal-authority (static-rule) kernel_static_checks:ONE_SIGNAL_AUTHORITY",
+    "II.deterministic-child-env (code) aisef2.probe.protocol:ExecutionEnv",
+    "II.runspec-hash (code) aisef2.runtime.runspec:runspec_hash"
+   ],
+   "III": [
+    "III.verifier-scope (code) aisef2.runtime.story_scope:StoryScope",
+    "III.bound-result (code) aisef2.probe.protocol:bound_result",
+    "III.result-only-through-binding (static-rule) kernel_static_checks:RESULT_ONLY_THROUGH_BINDING",
+    "III.confinement-from-env (code) aisef2.probe.protocol:ExecutionEnv",
+    "III.developer-tests-are-not-product-proof (code) aisef2.quality.adequacy:assemble"
+   ],
+   "IV": [
+    "IV.taxonomy (code) aisef2.control.owner:classify",
+    "IV.charge-from-journal (code) aisef2.control.budget:charge",
+    "IV.retryable-only-in-taxonomy (static-rule) kernel_static_checks:RETRYABLE_ONLY_IN_TAXONOMY",
+    "IV.no-side-retry-counter (static-rule) kernel_static_checks:NO_SIDE_RETRY_COUNTER",
+    "IV.adequacy-charges-only-inadequate (code) aisef2.quality.adequacy:assemble"
+   ],
+   "V": [
+    "V.comparable (code) aisef2.runtime.runspec:comparable",
+    "V.runspec-hash (code) aisef2.runtime.runspec:runspec_hash",
+    "V.capability-identity (code) aisef2.runtime.capability:CapabilityIdentity",
+    "V.capability-resolved (code) aisef2.runtime.runspec:RunSpec.resolved"
+   ],
+   "VI": [
+    "VI.full-sha (code) aisef2.probe.protocol:RevisionRef",
+    "VI.revision-in-runspec (code) aisef2.runtime.runspec:resolve",
+    "VI.journal-append-only (code) aisef2.journal.format2:JournalWriter2",
+    "VI.record-digest (code) aisef2.probe.protocol:ProbeRecord",
+    "VI.semantic-hash (code) aisef2.product.spec:ProductProofSpec",
+    "VI.frozen-artefacts (checker) validation/v2/freeze_manifest.py:check"
+   ],
+   "VII": [
+    "VII.flatten-to-unknown (code) aisef2.control.owner:flatten",
+    "VII.typed-classify (code) aisef2.control.owner:classify",
+    "VII.no-prose-control (static-rule) kernel_static_checks:NO_PROSE_CONTROL",
+    "VII.no-raw-verdict-routing (static-rule) kernel_static_checks:NO_RAW_VERDICT_ROUTING",
+    "VII.typed-collection-causes (code) aisef2.quality.test_execution:classify"
+   ],
+   "VIII": [
+    "VIII.evidence-admission (code) aisef2.invariants.evidence:admit",
+    "VIII.evidence-field (code) aisef2.invariants.evidence:EvidenceField",
+    "VIII.journal-event (code) aisef2.journal.event:Event"
+   ],
+   "IX": [
+    "IX.candidate-only-execution (static-rule) kernel_static_checks:CANDIDATE_ONLY_EXECUTION",
+    "IX.no-developer-artefact-at-parent (static-rule) kernel_static_checks:NO_DEVELOPER_ARTEFACT_AT_PARENT",
+    "IX.probe-refuses-test-artefacts (code) aisef2.product.contract:names_test_artefact",
+    "IX.probe-api (code) aisef2.probe.protocol:run_probe",
+    "IX.candidate-side-vacuity (code) aisef2.quality.vacuity:evaluate"
+   ]
+  },
+  "uncontainable": [
+   "all.invariant-error-is-base-exception (code) aisef2.errors:InvariantError",
+   "all.except-boundary-audit (checker) validation/v2/except_boundaries.py:check"
+  ],
+  "tiers": [
+   "tests/v2",
+   "tests/v2/conformance",
+   "tests/v2/p0",
+   "tests/v2/p1",
+   "tests/v2/p2",
+   "tests/v2/p3",
+   "tests/v2/p4",
+   "tests/v2/p5",
+   "tests/v2/plan"
+  ],
+  "registry_digest": "a5ef12d7009538d5e7d3b3ae98ea70934d2aede284a0b118b1be4bcc4162d7f3",
+  "mechanism_digest": "b59d6c1125057606c073721e652e0ba8a86ed8907879b17f78195697964e305f",
+  "document": "docs/implementation/v2/INVARIANTS-V2.md"
+ },
+ "arming": {
+  "tests/v2": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ],
+  "tests/v2/conformance": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ],
+  "tests/v2/p0": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ],
+  "tests/v2/p1": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ],
+  "tests/v2/p2": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ],
+  "tests/v2/p3": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ],
+  "tests/v2/p4": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ],
+  "tests/v2/p5": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ],
+  "tests/v2/plan": [
+   "I",
+   "II",
+   "III",
+   "IV",
+   "IX",
+   "V",
+   "VI",
+   "VII",
+   "VIII"
+  ]
+ },
+ "except_boundaries": {
+  "counts": {
+   "RERAISES": 7,
+   "STRUCTURAL": 32
+  },
+  "problems": [],
+  "invariant_error_base": [
+   "BaseException"
+  ]
+ },
+ "properties": {
+  "I_to_IX_registered_with_resolved_mechanisms": true,
+  "registration_fails_closed": true,
+  "INV_REG_1": true,
+  "INV_REG_2": true,
+  "INV_REG_3": true,
+  "INV_MECH_1": true,
+  "registry_docs_synchronized": true,
+  "armed_in_every_tier_before_the_tier_mounts": true,
+  "runtime_guards_fail_closed_unarmed": true,
+  "INV_EXC_1": true,
+  "INV_EXC_2": true,
+  "violation_escapes_the_kernels_own_boundaries": true,
+  "except_boundary_audit_clean": true,
+  "audit_flags_every_swallowing_pattern": true,
+  "InvariantError_uncatchable_by_except_Exception": true,
+  "INV_I_1": true,
+  "INV_I_2": true,
+  "INV_I_3": true,
+  "INV_I_4": true,
+  "INV_II_1": true,
+  "INV_II_2": true,
+  "INV_II_3": true,
+  "INV_II_4": true,
+  "INV_III_1": true,
+  "INV_III_2": true,
+  "INV_III_3": true,
+  "INV_III_4": true,
+  "INV_IV_cross_charge_impossible": true,
+  "INV_V_comparability_rejects_mismatch": true,
+  "INV_VI_immutable_provenance": true,
+  "INV_PROSE_1": true,
+  "INV_VII_no_prose_control": true,
+  "INV_MEM_1": true,
+  "INV_VIII_evidence_origin_boundary": true,
+  "INV_PARENT_1": true,
+  "INV_IX_candidate_only": true,
+  "INV_MUTATION_AUTHORITY_intact": true
+ }
+}

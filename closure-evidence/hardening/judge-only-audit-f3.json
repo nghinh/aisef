@@ -1,0 +1,200 @@
+{
+ "criterion": "G2.4b",
+ "generated": "2026-09-16",
+ "statement": "a judge-only block is identifiable, distinguishable, overridable, and cannot masquerade as deterministic",
+ "judge_only_definition": "blocking checks == {'review'}",
+ "regenerate": "python3 -m aisef.control.reviewer_qual --audit <project>/_bmad-output [...]",
+ "properties": {
+  "G2.4b-i": {
+   "mechanism": "note `gate:verdict` records every check with its `outcome` and `kind` (ADR-005 V9), so the blocking set of one attempt is read from one event",
+   "assertions": [
+    [
+     "the judge-only test is a named predicate over one record, not a reading of prose: `gate.judge_only` — blocking checks == {'review'}",
+     true
+    ],
+    [
+     "every recorded check carries a kind",
+     true
+    ],
+    [
+     "the corpus contains judge-only blocks to identify",
+     true
+    ],
+    [
+     "`reviewer_qual.classify` names the same thing per review session as `block uncorroborated`",
+     true
+    ]
+   ],
+   "holds": true,
+   "statement": "a judge-only block is explicitly identifiable in evidence"
+  },
+  "G2.4b-ii": {
+   "mechanism": "`gate.CHECK_KIND` classifies every name in `CHECK_NAMES` into one of `outcome.CHECK_KINDS`",
+   "assertions": [
+    [
+     "every gate check has a kind",
+     true
+    ],
+    [
+     "every kind is from the closed vocabulary",
+     true
+    ],
+    [
+     "`review` is the only model-judge check",
+     true
+    ],
+    [
+     "the other checks are deterministic, structural or security",
+     true
+    ],
+    [
+     "the kinds are distinguishable in the record too, not only in code",
+     true
+    ]
+   ],
+   "holds": true,
+   "statement": "it is distinguishable from deterministic blocking"
+  },
+  "G2.4b-iii": {
+   "mechanism": "`review:waiver` — a person signs an override at a named candidate via `aisef gate <story> --waive-review --reason ...`; `gate.review_waiver` reads it and nothing else does",
+   "assertions": [
+    [
+     "the override is a callable mechanism, not a description",
+     true
+    ],
+    [
+     "without a waiver the judge-only block is FAILED and blocks",
+     true
+    ],
+    [
+     "a waiver with no reason is ignored",
+     true
+    ],
+    [
+     "a waiver signed for another candidate does not apply",
+     true
+    ],
+    [
+     "a signed waiver makes the check WAIVED, and WAIVED does not block",
+     true
+    ],
+    [
+     "the waived check names the person and the reason",
+     true
+    ]
+   ],
+   "holds": true,
+   "statement": "it has a human escape / override path"
+  },
+  "G2.4b-iv": {
+   "mechanism": "the override produces `Outcome.WAIVED`, a distinct symbol that is `counts_as_done` but never `PASSED`, and it is consulted only in the `review` branch",
+   "assertions": [
+    [
+     "WAIVED and PASSED are different outcomes with different marks",
+     true
+    ],
+    [
+     "an advisory finding cannot be authored with agent trust (ADR-007 §3, same posture as `contract_authority`)",
+     true
+    ],
+    [
+     "the waived check is WAIVED, not PASSED, in the record",
+     true
+    ],
+    [
+     "the waived check keeps kind=model-judge",
+     true
+    ],
+    [
+     "a waiver cannot rescue a deterministic check",
+     true
+    ],
+    [
+     "the waiver is read from evidence, and the check points at the event",
+     true
+    ]
+   ],
+   "holds": true,
+   "statement": "it cannot masquerade as a deterministic guarantee"
+  }
+ },
+ "all_hold": true,
+ "measured": {
+  "gate_records": 164,
+  "blocking_records": 131,
+  "judge_only_records": 18,
+  "judge_only_share": 0.1374,
+  "checks_recorded": 2678,
+  "checks_by_kind": {
+   "structural": 984,
+   "deterministic": 1366,
+   "security": 164,
+   "model-judge": 164
+  },
+  "checks_without_kind": 0,
+  "by_corpus": {
+   "marks-cli": {
+    "gate_records": 19,
+    "blocking": 12,
+    "judge_only": 1
+   },
+   "todo": {
+    "gate_records": 56,
+    "blocking": 53,
+    "judge_only": 2
+   },
+   "todo-cli": {
+    "gate_records": 37,
+    "blocking": 30,
+    "judge_only": 0
+   },
+   "todo-e2e": {
+    "gate_records": 28,
+    "blocking": 19,
+    "judge_only": 15
+   },
+   "todo-oc": {
+    "gate_records": 24,
+    "blocking": 17,
+    "judge_only": 0
+   }
+  },
+  "review_sessions": {
+   "total": 164,
+   "clean pass": 55,
+   "miss": 30,
+   "block corroborated": 34,
+   "block uncorroborated": 21,
+   "false block": 6,
+   "undecided": 18,
+   "blocks scored": 61,
+   "passes scored": 85,
+   "blocks whose reversal was testable": 60,
+   "false block rate": 0.0984,
+   "false block rate (testable only)": 0.1,
+   "miss rate": 0.3529,
+   "same-tree consecutive pairs": 20,
+   "same-tree verdict reversals": 11,
+   "undecided share": 0.1098,
+   "findings declared (id-deduped)": 423,
+   "lines the gate acted on": 185
+  },
+  "corpora": [
+   "marks-cli",
+   "todo",
+   "todo-cli",
+   "todo-e2e",
+   "todo-oc"
+  ],
+  "denominators": {
+   "judge_only_share": "judge-only gate records ÷ gate records that blocked",
+   "review_sessions.block uncorroborated": "review sessions whose block no other layer corroborated ÷ `blocks scored`. PROJECT-CLOSURE-GATE quotes 21 of 57 (36.8 %) measured on the four todo* corpora; adding marks-cli moves the denominator, not the numerator."
+  }
+ },
+ "regenerated": "2026-09-16 — F3 (D-002 disposition): same five corpora as closure-evidence/judge-only-audit.json (2026-09-14)",
+ "fifth_property": {
+  "statement": "a judge-only block binds to a file, a behavior_id or a criterion code of THIS candidate; an unbound blocker is `review:unbound` and never scored; an unbound-only verdict is REVIEW_UNRUNNABLE after one reminder",
+  "enforcement": "aisef/phases/implement.py::Verdict.bound_blocking / finding_bound / _with_schema / _reconcile",
+  "tests": "tests/hardening/test_judgment.py"
+ }
+}

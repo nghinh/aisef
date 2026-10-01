@@ -1,0 +1,34 @@
+{
+ "record": "P7 qualification verdict invalidation",
+ "owner_decision": "AISEF V2 — P7-FINDING-001 DIAGNOSTIC AUTHORIZATION / P8 REMAINS BLOCKED, §4: a new qualification candidate (test and qualification code changes) invalidates the old P7 phase verdict; Q0 restarts on the new candidate",
+ "written": "2026-09-27T04:49:59Z",
+ "invalidated": {
+  "qualification_candidate": "9f825f5196c81546f37cdcaeebfac38184a03b05",
+  "qualification_run": 36283800027,
+  "harness_digest": "dafc15db18ed205c45b8aec972e2b5ddd0fade178e03c49053e5858b49c0262f",
+  "summary_sha256": "f2578b7d3fa3f8e45ecf45b50813f42461c0df2a352d197a18959b0b1dad0c4e",
+  "verdict_was": "GREEN (Q0, Q1, Q2, Q3 GREEN on linux 3.11/3.12/3.13/3.14 and windows 3.11)",
+  "records_moved_to": "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/",
+  "measurements_stand": "the measurements those records hold are not disputed and are not rewritten; the verdict they support no longer names the qualification candidate under test"
+ },
+ "semantic_candidate": {
+  "sha": "097daefefd9229eafeacaca321b7a008a581899b",
+  "kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+  "status": "UNCHANGED"
+ },
+ "new_qualification_candidate": {
+  "what_changed": [
+   "tests/v2/test_p6_orchestration.py: ProofObserver (observational instrumentation of ORCH_9_and_10), DIAG-1..3",
+   "validation/qualification/diag_orch9.py (the targeted real-path reproducer)",
+   ".github/workflows/diagnostic.yml",
+   "tests/v2/test_p6_orchestration.py Dev(before_commit=) fixture hook"
+  ],
+  "sha": "the commit carrying this record; recorded by seal-time identity in every fresh Q0-Q3 record"
+ },
+ "finding": {
+  "id": "P7-FINDING-001",
+  "history_entry": "P7-RUN-HISTORY seq for e0b6862 ubuntu 3.11 (UNKNOWN, kept exactly)",
+  "status_at_this_record": "OPEN — under diagnosis"
+ },
+ "next": "Q0 -> Q1 -> Q2 -> Q3 measured afresh on the new qualification candidate after the finding is explained or corrected (§12); no Q4 before both (§14)"
+}

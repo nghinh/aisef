@@ -1,0 +1,11 @@
+progress worker seeds=60007.. done=250/1250
+progress worker seeds=60001.. done=250/1250
+progress worker seeds=60004.. done=250/1250
+progress worker seeds=60002.. done=250/1250
+progress worker seeds=60003.. done=250/1250
+progress worker seeds=60000.. done=250/1250
+progress worker seeds=60006.. done=250/1250
+progress worker seeds=60005.. done=250/1250
+progress worker seeds=60007.. done=500/1250
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/resource_tracker.py:475: UserWarning: resource_tracker: There appear to be 5 leaked semaphore objects to clean up at shutdown: {'/mp-s4so2358', '/mp-12bvcvy2', '/mp-af5vtbgn', '/mp-zzwhblpx', '/mp-ooz0nznx'}
+  warnings.warn(

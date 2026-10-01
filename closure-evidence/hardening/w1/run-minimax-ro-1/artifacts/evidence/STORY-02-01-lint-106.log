@@ -1,0 +1,23 @@
+BLE001 Do not catch blind exception: `Exception`
+  --> tests/test_verify_independent.py:90:20
+   |
+88 |             try:
+89 |                 verdict = ledger.verify()
+90 |             except Exception as exc:
+   |                    ^^^^^^^^^
+91 |                 self.fail(f"verify must not raise on a valid ledger; raised {exc!r}")
+92 |             self.assertIsInstance(verdict, dict)
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> tests/test_verify_independent.py:118:20
+    |
+116 |             try:
+117 |                 verdict = Ledger(str(target)).verify()
+118 |             except Exception as exc:
+    |                    ^^^^^^^^^
+119 |                 self.fail(f"verify must not raise on zero-byte file; raised {exc!r}")
+120 |             self.assertEqual(verdict["ok"], True)
+    |
+
+Found 2 errors.

@@ -102,12 +102,13 @@ class TestPortLease(unittest.TestCase):
             fd = acquire_port_lease(root, "r1", "http://127.0.0.1:55555")
             self.assertIsNotNone(fd)
             lease_dir = root / ".aisef" / "lease"
-            self.assertTrue((lease_dir / "port-r1.lock").exists())
-            self.assertTrue((lease_dir / "port-r1.lock.owner").exists())
-            # Release removes both files; fd is closed too.
+            lock = lease_dir / "port-127.0.0.1-55555.lock"      # F5 / SS-51: the lease is keyed by the PORT, not the run
+            self.assertTrue(lock.exists())
+            self.assertTrue(lock.with_suffix(".lock.owner").exists())
+            # Release removes both files (found through the run's owner record); fd is closed too.
             release_port_lease(root, "r1", fd)
-            self.assertFalse((lease_dir / "port-r1.lock").exists())
-            self.assertFalse((lease_dir / "port-r1.lock.owner").exists())
+            self.assertFalse(lock.exists())
+            self.assertFalse(lock.with_suffix(".lock.owner").exists())
 
     def test_other_run_owns_port(self):
         with _tempdir() as root:

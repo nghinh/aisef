@@ -1,0 +1,14 @@
+{"seq": 1, "step": "attempt.started", "at": 1789793584.762, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 2, "step": "worktree.created", "at": 1789793585.2, "attempt": 1, "data": {"path": "/Users/nghinh/Downloads/projects/w1-run-gpt55-ro-1/.aisef/worktrees/STORY-02-01"}, "undo": {"worktree.remove": "STORY-02-01"}}
+{"seq": 3, "step": "status.running", "at": 1789793585.201, "attempt": 1, "data": {}, "undo": {"status.reset": "pending"}}
+{"seq": 4, "step": "changes.detected", "at": 1789793842.193, "attempt": 1, "data": {"luot": 1, "files": ["ledgerlock/ledger.py", "tests/test_verify_independent.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 5, "step": "candidate.frozen", "at": 1789793842.193, "attempt": 1, "data": {"luot": 1, "sha": "1a1856029d381ed4109c9f4a0c22554e1532b7fc", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 6, "step": "changes.detected", "at": 1789794983.218, "attempt": 1, "data": {"luot": 2, "files": ["ledgerlock/ledger.py", "tests/test_verify_independent.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 7, "step": "candidate.frozen", "at": 1789794983.218, "attempt": 1, "data": {"luot": 2, "sha": "209b17f2d95dbac1992f1a6a104608d95a716505", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 8, "step": "changes.detected", "at": 1789795356.632, "attempt": 1, "data": {"luot": 3, "files": ["ledgerlock/ledger.py", "tests/test_verify_independent.py"], "preexisting_excluded": [], "count": 2}, "undo": {}}
+{"seq": 9, "step": "candidate.frozen", "at": 1789795356.632, "attempt": 1, "data": {"luot": 3, "sha": "08a483fc86d51298a7ea18c1bee693b7498a095b", "error": "", "verify_only": false}, "undo": {}}
+{"seq": 10, "step": "verification.completed", "at": 1789795520.574, "attempt": 1, "data": {"ok": true, "attempts": 3, "cost_usd": 0.0, "candidate": "08a483fc86d51298a7ea18c1bee693b7498a095b"}, "undo": {}}
+{"seq": 11, "step": "review.completed", "at": 1789795520.575, "attempt": 1, "data": {"blocked": ["[block] ledgerlock/ledger.py:53 — verify() can pass an out-of-band byte mutation that rewrites a committed line into non-canonical but semantically identical JSON", "[block] ledgerlock/ledger.py:52 — verify() raises on malformed mutated ledger bytes instead of returning the first bad line verdict", "[block] ledgerlock/ledger.py:58 — verify() raises for syntactically valid JSONL lines that are not ledger objects instead of returning the first bad line verdict"], "outcome": "PASS", "review_executions": 3, "developer_attempts": 3}, "undo": {}}
+{"seq": 12, "step": "attempt.aborted", "at": 1789795520.583, "attempt": 1, "data": {"reason": "abnormal termination"}, "undo": {}}
+{"seq": 13, "step": "merge.completed", "at": 1789795520.644, "attempt": 1, "data": {}, "undo": {}}
+{"seq": 14, "step": "attempt.committed", "at": 1789795521.031, "attempt": 1, "data": {}, "undo": {}}

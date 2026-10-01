@@ -1,0 +1,495 @@
+{
+ "record": "AISEF V2 — DESTRUCTIVE-CALL-SITE LEDGER (INV-MUTATION-AUTHORITY)",
+ "authority": "owner authorization 'AISEF V2 — POST-SEAL HYGIENE / INV-MUTATION-AUTHORITY ENFORCEMENT' (2026-09-24) §4",
+ "checker": "validation/v2/destructive_authority.py",
+ "rule": "every destructive call site under aisef2/, validation/v2/ and tests/v2/ has exactly one row; a row declares the authority source the target is derived from, and the checker validates that derivation — the ledger is not an allowlist; a destructive callable handed by reference to a cleanup/callback registration (addCleanup, ExitStack.callback, partial, register, finalize) is a site like a call is (WP52-001)",
+ "authority_sources": [
+  "CONTROLLER_CREATED_HANDLE",
+  "CONTROLLER_CREATED_PID",
+  "CONTROLLER_CREATED_PROCESS_GROUP",
+  "INDEPENDENT_HOST_TABLE",
+  "SCOPE_OWNED_PATH",
+  "TEST_CREATED_HANDLE",
+  "TEST_CREATED_PATH",
+  "DELEGATION",
+  "GUARD_NEGATIVE_PROBE",
+  "LIVENESS_PROBE_SIGNAL_0",
+  "COLLECTION_METHOD"
+ ],
+ "sites": [
+  {
+   "path": "aisef2/runtime/process_range.py",
+   "scope": "_Job.signal",
+   "callable": "self.terminate",
+   "target": "self",
+   "target_kind": "process",
+   "authority_source": "DELEGATION",
+   "justification": "the job signals by terminating itself: _Job.terminate is the ledgered site",
+   "enforcement": "static: the method is a ledgered site of the same class"
+  },
+  {
+   "path": "aisef2/runtime/process_range.py",
+   "scope": "_Job.abort",
+   "callable": "self.terminate",
+   "target": "self",
+   "target_kind": "process",
+   "authority_source": "DELEGATION",
+   "justification": "abort delegates to _Job.terminate",
+   "enforcement": "static: the method is a ledgered site of the same class"
+  },
+  {
+   "path": "aisef2/runtime/process_range.py",
+   "scope": "_Posix.signal",
+   "callable": "os.killpg",
+   "target": "self.group",
+   "target_kind": "process_group",
+   "authority_source": "CONTROLLER_CREATED_PROCESS_GROUP",
+   "justification": "self.group is the anchor's pid, adopted from the controller's own Popen (adopt(self._anchor.pid)); the anchor leads the session the controller started it in",
+   "enforcement": "static: self.group assigned only in adopt(), adopt() called only with self._anchor.pid; runtime: emptiness measured by wait_empty, never assumed"
+  },
+  {
+   "path": "aisef2/runtime/process_range.py",
+   "scope": "_Posix.abort",
+   "callable": "os.killpg",
+   "target": "anchor.pid",
+   "target_kind": "process_group",
+   "authority_source": "CONTROLLER_CREATED_PID",
+   "justification": "the pid of the anchor Popen the controller created, passed as a subprocess.Popen parameter",
+   "enforcement": "static: parameter annotated subprocess.Popen"
+  },
+  {
+   "path": "aisef2/runtime/process_range.py",
+   "scope": "_Job.terminate",
+   "callable": "self._k.TerminateJobObject",
+   "target": "self.handle",
+   "target_kind": "job",
+   "authority_source": "CONTROLLER_CREATED_HANDLE",
+   "justification": "the job handle the controller created (CreateJobObjectW) and holds",
+   "enforcement": "static: self.handle bound in the class from CreateJobObjectW("
+  },
+  {
+   "path": "aisef2/runtime/range_anchor.py",
+   "scope": "_die",
+   "callable": "os.killpg",
+   "target": "os.getpgrp()",
+   "target_kind": "process_group",
+   "authority_source": "CONTROLLER_CREATED_PROCESS_GROUP",
+   "justification": "the anchor's own group: the controller starts it with start_new_session=True, so the group is the anchor's session and nothing else",
+   "enforcement": "static: process_range.py starts the anchor with start_new_session=True"
+  },
+  {
+   "path": "aisef2/runtime/story_scope.py",
+   "scope": "Directory.release",
+   "callable": "shutil.rmtree",
+   "target": "self.path",
+   "target_kind": "path",
+   "authority_source": "SCOPE_OWNED_PATH",
+   "justification": "the path the scope registered at construction; Directory is constructed nowhere in aisef2, so no tool, probe or story output ever names it",
+   "enforcement": "static: __init__ binds self.path from its parameter; no Directory( construction in aisef2"
+  },
+  {
+   "path": "validation/v2/checker_calibration.py",
+   "scope": "_cleanup_authority.clean",
+   "callable": "child.kill",
+   "target": "child",
+   "target_kind": "process",
+   "authority_source": "CONTROLLER_CREATED_HANDLE",
+   "justification": "the calibration's own subprocess.Popen child",
+   "enforcement": "static: child bound to subprocess.Popen( in the function"
+  },
+  {
+   "path": "validation/v2/cleanup_authority.py",
+   "scope": "signal_owned",
+   "callable": "os.killpg",
+   "target": "leader.pid",
+   "target_kind": "process_group",
+   "authority_source": "INDEPENDENT_HOST_TABLE",
+   "justification": "leader comes from owned(): the authority's own host table, parent chain to the runner, born after the boundary, leader of its group",
+   "enforcement": "static: bound from mine.get()/owned(); module stdlib-only; runtime: MUT-SAFE-1..7"
+  },
+  {
+   "path": "validation/v2/cleanup_authority.py",
+   "scope": "signal_owned",
+   "callable": "os.kill",
+   "target": "leader.pid",
+   "target_kind": "process",
+   "authority_source": "INDEPENDENT_HOST_TABLE",
+   "justification": "as above, a single proved process",
+   "enforcement": "static: bound from mine.get()/owned(); runtime: MUT-SAFE-1..7"
+  },
+  {
+   "path": "validation/v2/cleanup_authority.py",
+   "scope": "signal_member",
+   "callable": "os.kill",
+   "target": "member.pid",
+   "target_kind": "process",
+   "authority_source": "INDEPENDENT_HOST_TABLE",
+   "justification": "a claimed pid proved by prove_member(): in a group whose leader is proved the runner's, born after the boundary",
+   "enforcement": "static: bound from prove_member(); runtime: MUT-AUTH-NEG-2"
+  },
+  {
+   "path": "tests/v2/p0/test_arch_catalog.py",
+   "scope": "ArchCatalog.test_removing_a_member_from_code_fails",
+   "callable": "code['StoryAdmissionDisposition'][2].remove",
+   "target": "code['StoryAdmissionDisposition'][2]",
+   "target_kind": "collection",
+   "authority_source": "COLLECTION_METHOD",
+   "justification": "list.remove on an in-memory catalog copy",
+   "enforcement": "static: receiver is a subscripted in-memory value"
+  },
+  {
+   "path": "tests/v2/p1/test_spec_corpus.py",
+   "scope": "Corpus.test_a_missing_or_orphan_spec_fails",
+   "callable": "sorted((c / 'specs').glob('*.json'))[0].unlink",
+   "target": "sorted((c / 'specs').glob('*.json'))[0]",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "c is the temporary copy of the corpus that _drift makes for the edit callback",
+   "enforcement": "static: parameter of the callback; _drift creates the copy (copytree/TemporaryDirectory)",
+   "derivation_via": "_drift"
+  },
+  {
+   "path": "tests/v2/p4/test_interruption.py",
+   "scope": "RealSignals.start",
+   "callable": "c.kill",
+   "target": "c",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the controller subprocess the test started (cleanup)",
+   "enforcement": "static: c bound to subprocess.Popen( in the class"
+  },
+  {
+   "path": "tests/v2/p4/test_interruption.py",
+   "scope": "RealSignals.test_SIGINT_mid_story_is_an_interruption_with_no_gap_and_nothing_left_running",
+   "callable": "c.send_signal",
+   "target": "c",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "c = self.start(): the Popen the test started",
+   "enforcement": "static: bound via start(), which creates the Popen"
+  },
+  {
+   "path": "tests/v2/p4/test_interruption.py",
+   "scope": "RealSignals.test_SIGKILL_mid_story_leaves_a_journal_that_repair_closes_and_a_tool_that_does_not_survive",
+   "callable": "c.kill",
+   "target": "c",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "c = self.start(): the Popen the test started",
+   "enforcement": "static: bound via start(), which creates the Popen"
+  },
+  {
+   "path": "tests/v2/p4/test_mutation_safety.py",
+   "scope": "CleanupAuthority.setUp",
+   "callable": "self.canary.kill",
+   "target": "self.canary",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the canary is the test's own sleeper Popen (cleanup)",
+   "enforcement": "static: bound via _sleeper(), which creates the Popen"
+  },
+  {
+   "path": "tests/v2/p4/test_mutation_safety.py",
+   "scope": "CleanupAuthority.setUp",
+   "callable": "self.mine.kill",
+   "target": "self.mine",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the test's own worker Popen (cleanup)",
+   "enforcement": "static: bound via _sleeper(), which creates the Popen"
+  },
+  {
+   "path": "tests/v2/p4/test_process_range.py",
+   "scope": "alive",
+   "callable": "os.kill",
+   "target": "pid",
+   "target_kind": "process",
+   "authority_source": "LIVENESS_PROBE_SIGNAL_0",
+   "justification": "kill(pid, 0) asks whether a process exists; no signal is delivered",
+   "enforcement": "static: second argument is the literal 0"
+  },
+  {
+   "path": "tests/v2/p4/test_process_range.py",
+   "scope": "Range.test_an_orphan_the_range_adopts_is_reaped_when_it_dies",
+   "callable": "os.kill",
+   "target": "grandchild",
+   "target_kind": "process",
+   "authority_source": "LIVENESS_PROBE_SIGNAL_0",
+   "justification": "kill(pid, 0) polls until the reaped orphan is gone; the signal that ends it goes through cleanup_authority.signal_member after proof",
+   "enforcement": "static: second argument is the literal 0"
+  },
+  {
+   "path": "tests/v2/p4/test_process_range.py",
+   "scope": "Range.test_D_024_red_before_a_writing_grandchild_outlives_a_cleanup_that_trusts_the_direct_child",
+   "callable": "shutil.rmtree",
+   "target": "wt",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "wt = self.dir / 'worktree': under the test's TemporaryDirectory",
+   "enforcement": "static: bound from self.dir, which setUp creates with TemporaryDirectory("
+  },
+  {
+   "path": "tests/v2/p4/test_process_range.py",
+   "scope": "Range.test_PROC_OWN_1_a_controller_that_dies_leaves_no_owned_process_alive",
+   "callable": "c.kill",
+   "target": "c",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the controller subprocess the test started (cleanup, and the SIGKILL the case is about)",
+   "enforcement": "static: c bound to subprocess.Popen( in the function",
+   "occurrences": 2
+  },
+  {
+   "path": "tests/v2/p4/test_process_range.py",
+   "scope": "Range.test_wait_says_none_at_once_when_the_anchor_is_gone_and_keeps_saying_it",
+   "callable": "r._anchor.kill",
+   "target": "r._anchor",
+   "target_kind": "process",
+   "authority_source": "CONTROLLER_CREATED_HANDLE",
+   "justification": "the range's own anchor Popen, r = self.range(...) which the test class creates with ProcessRange(",
+   "enforcement": "static: r bound via range(), which creates the ProcessRange"
+  },
+  {
+   "path": "tests/v2/p4/test_process_range.py",
+   "scope": "Range.test_a_controller_that_returns_without_disposing_exits_and_its_range_goes_with_it",
+   "callable": "c.kill",
+   "target": "c",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the controller subprocess the test started (cleanup)",
+   "enforcement": "static: c bound to subprocess.Popen( in the function"
+  },
+  {
+   "path": "tests/v2/p4/test_process_range.py",
+   "scope": "Anchor.test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group",
+   "callable": "a.kill",
+   "target": "a",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the anchor subprocess the test started (cleanup, only if it failed to end itself)",
+   "enforcement": "static: a bound to subprocess.Popen( in the function",
+   "occurrences": 1
+  },
+  {
+   "path": "tests/v2/p4/test_run_scope.py",
+   "scope": "Lifetime.test_RUN_2_a_held_lease_blocks_a_second_run_even_with_run_end_written",
+   "callable": "holder.kill",
+   "target": "holder",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the lease holder subprocess the test started",
+   "enforcement": "static: holder bound to subprocess.Popen( in the function",
+   "occurrences": 2
+  },
+  {
+   "path": "tests/v2/test_v1_evidence_guard.py",
+   "scope": "Preventive.test_remove_is_refused_before_it_reaches_the_filesystem",
+   "callable": "os.remove",
+   "target": "ABSENT",
+   "target_kind": "path",
+   "authority_source": "GUARD_NEGATIVE_PROBE",
+   "justification": "an attempt on a V1-evidence path that never exists; the preventive guard must raise before the filesystem is reached",
+   "enforcement": "static: inside assertRaises; target named never-exists"
+  },
+  {
+   "path": "tests/v2/test_v1_evidence_guard.py",
+   "scope": "Preventive.test_rmtree_of_protected_dir_is_refused",
+   "callable": "shutil.rmtree",
+   "target": "HARDENING / '__v1_guard_probe_dir_never_exists__'",
+   "target_kind": "path",
+   "authority_source": "GUARD_NEGATIVE_PROBE",
+   "justification": "as above, for a directory removal",
+   "enforcement": "static: inside assertRaises; target named never-exists"
+  },
+  {
+   "path": "tests/v2/test_v1_evidence_guard.py",
+   "scope": "Preventive.test_writing_under_v2_is_permitted",
+   "callable": "probe.unlink",
+   "target": "probe",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "the probe file this test writes under closure-evidence/v2 and removes again",
+   "enforcement": "static: the function writes probe before unlinking it"
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "Shape.test_project_top_level_names_packages_and_modules_at_the_root_and_under_src",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree this test makes for project_top_level; removed by the cleanup it registers",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "RealRunner.run_",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project(files): the candidate tree run_ makes for one real run; removed by the cleanup it registers",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "empty",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "empty = project({}): an empty tree whose non-existent interpreter path stands for an absent interpreter",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "PytestAdapter.test_the_junit_result_set_is_read_typed",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = tempfile.mkdtemp(): the directory holding the junit fixture file the test writes",
+   "enforcement": "static: bound from tempfile.mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_test_execution.py",
+   "scope": "PytestAdapter.test_pytest_for_real",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree pytest runs at",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_relevance.py",
+   "scope": "Typed.setUp",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "self.d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "self.d = project({}): the candidate tree every typed relevance case measures against",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_relevance.py",
+   "scope": "Parsing.test_executable_lines_are_the_code_objects_own",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the tree whose executable lines are analysed",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_relevance.py",
+   "scope": "ForReal.run_",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project(files): the candidate tree run_ makes for one real measured run",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "ForReal.story",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project(files): the candidate tree one vacuity experiment starts from",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "ForReal.test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "scratch.parent",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "scratch = Path(tempfile.mkdtemp(...)) / 'tree': the scratch root the test makes to inspect the neutralised tree",
+   "enforcement": "static: bound from tempfile.mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "parent",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "parent = <candidate>-parent, a directory the test creates (parent.mkdir()) to stand for an unrunnable parent revision that must never be read",
+   "enforcement": "static: the function creates it with parent.mkdir("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d2",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d2 = project({...}): a second candidate tree for the run beside the fake parent",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_neutralisation_touches_exactly_the_story_product_artefacts",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree whose neutralisation is measured file by file",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_neutralisation_touches_exactly_the_story_product_artefacts",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "scratch.parent",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "scratch = Path(tempfile.mkdtemp(...)) / 'tree': the scratch root holding the three neutralised trees",
+   "enforcement": "static: bound from tempfile.mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_a_baseline_that_does_not_pass_has_no_counterfactual",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree of the baseline cases",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project({...}): the candidate tree that carries the symbolic link",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_vacuity.py",
+   "scope": "Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "scratch.parent",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "scratch = Path(tempfile.mkdtemp(...)) / 'tree': the scratch root of the copy",
+   "enforcement": "static: bound from tempfile.mkdtemp("
+  },
+  {
+   "path": "tests/v2/p5/test_adequacy.py",
+   "scope": "ForReal.run_",
+   "callable": "addCleanup->shutil.rmtree",
+   "target": "d",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "d = project(files): the candidate tree one end-to-end adequacy assembly starts from",
+   "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  }
+ ]
+}

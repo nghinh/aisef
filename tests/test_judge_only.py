@@ -67,6 +67,7 @@ class Nen(unittest.TestCase):
         """Một lượt như `verify_candidate` ghi: phép kiểm → gate:input → verdict."""
         self.store.file_change(SID, "src/a.py")
         self.store.tool_run(SID, "test", ok=True)
+        self.store.tool_run(SID, "qa:fake-tests", ok=True, detail={"files": []})   # SS-01: the scan is always recorded
         self.store.tool_run(SID, "lint", ok=lint_ok, detail={"tail": "E501"})
         kw = self.kwargs(review_blocking=list(CHAN))
         self.store.record(SID, Event(kind=NOTE, name="gate:input",

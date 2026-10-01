@@ -27,6 +27,9 @@ from .observe import TOOL_RUN
 
 ENV_WRITE_SCOPE = "AISEF_WRITE_SCOPE"
 ENV_STORY_ID = "AISEF_STORY_ID"
+#: the developer session this hook runs inside (control/identity.py) and its attempt number
+ENV_SESSION_ID = "AISEF_SESSION_ID"
+ENV_ATTEMPT = "AISEF_ATTEMPT"
 ENV_BASE_REF = "AISEF_BASE_REF"
 #: Story working tree. The harness **knows** this path — it creates the
 #: worktree itself — so there is no need to ask the client. If the client
@@ -739,27 +742,18 @@ def changed_files(
     skipped: an agent sneaking edits to the PRD or visual contract while
     writing code must be visible.
     """
-    paths: list[str] = []
-    seen: set[str] = set()
+    from .ownership import NOT_A_WRITE, classify, porcelain_entries
 
-    # `git status` includes untracked files — which `git diff` does not see.
-    for entry in _git_lines(
-        project_root, ["status", "--porcelain", "-z", "--untracked-files=all"]
-    ):
-        if len(entry) > 3:
-            paths.append(entry[3:])
-
-    # `git diff <base>` compares the **working tree** against the fork point,
-    # so it covers both committed and uncommitted work.
+    paths: list[str] = [p for _, p in porcelain_entries(project_root)]     # renames yield the real path (SS-35)
     if base_ref:
         paths += _git_lines(project_root, ["diff", "--name-only", "-z", base_ref])
-
+    seen: set[str] = set()
     out: list[str] = []
     for path in paths:
         if path in seen:
             continue
         seen.add(path)
-        if is_tool_artifact(path):
+        if classify(path) in NOT_A_WRITE:                                    # harness, tool artifact, vendor, client (F4)
             continue
         if any(_within(path, skip) or skip in Path(path).parts for skip in ignore):
             continue
@@ -1162,18 +1156,27 @@ def record_outcome(
             run_log(artifact_root, f"guard {verdict.rule or kind} BLOCK "
                     + one_line(f"{event.get('tool_name') or '?'} · {verdict.reason}"))
         return
+    from ..control.identity import SESSION_FIELDS, EvidenceIdentity, fresh
     from .observe import GUARD_BLOCK, GUARD_CHECK, GUARD_SEEN, TOOL_RUN, EvidenceStore, Event
 
-    store = EvidenceStore(artifact_root)
+    # The guard runs inside the client's session: its records bind to that session (SS-02), so a heartbeat
+    # left by attempt N cannot prove attempt N+1's hook ran.
+    _env = env if env is not None else os.environ
+    session = EvidenceIdentity(story_id=story, session_id=str(_env.get(ENV_SESSION_ID) or ""),
+                               attempt=int(_env.get(ENV_ATTEMPT) or 0))
+    store = EvidenceStore(artifact_root, identity=session if session.session_id else None)
     tool_input = event.get("tool_input") or {}
     tool = str(event.get("tool_name") or "")
     hien_co = store.read(story)
 
-    # Heartbeat: once per story. Measured on `par`: sessions using only Bash
+    # Heartbeat: once per session. Measured on `par`: sessions using only Bash
     # to write files have no Write/Edit going through `write-scope`, and
     # nothing gets blocked — evidence is empty despite the hook running 17
     # times. "Hook reachable" must be its own event, not inferred from others.
-    if not hien_co.of(GUARD_SEEN):
+    seen = hien_co.of(GUARD_SEEN)
+    if session.session_id:
+        seen = [e for e in seen if fresh(e, session, SESSION_FIELDS).ok]
+    if not seen:
         store.record(story, Event(kind=GUARD_SEEN, name=kind, detail={"tool": tool}))
 
     store.record(story, Event(

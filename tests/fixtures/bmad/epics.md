@@ -66,6 +66,7 @@ So that tôi ghi lại được ý nghĩ trước khi quên.
 
 **Story metadata:**
 - covers: FR-1
+- ac_proof: 1=CHANGE_REQUIRED/FR-1, 2=CHANGE_REQUIRED/FR-1
 - write_scope: src/notes/, src/db/
 - depends_on: none
 - screens: danh-sach, soan-thao
@@ -85,6 +86,7 @@ So that tôi không mất chữ đã gõ.
 
 **Story metadata:**
 - covers: FR-2
+- ac_proof: 1=CHANGE_REQUIRED/FR-2
 - write_scope: src/notes/
 - depends_on: 1.1
 
@@ -102,6 +104,7 @@ So that xoá nhầm còn khôi phục được.
 
 **Story metadata:**
 - covers: FR-3
+- ac_proof: 1=CHANGE_REQUIRED/FR-3
 - write_scope: src/notes/, src/trash/
 - depends_on: 1.1
 
@@ -119,6 +122,7 @@ So that tôi mở lại được thứ đã viết.
 
 **Story metadata:**
 - covers: FR-4
+- ac_proof: 1=CHANGE_REQUIRED/FR-4
 - write_scope: src/list/
 - depends_on: 1.1
 - screens: danh-sach
@@ -142,6 +146,7 @@ So that tôi không phải cuộn tay.
 
 **Story metadata:**
 - covers: FR-5, FR-6
+- ac_proof: 1=CHANGE_REQUIRED/FR-5
 - write_scope: src/search/
 - depends_on: 1.4
 - screens: tim-kiem
@@ -160,6 +165,7 @@ So that tôi chọn đúng ghi chú cần mở.
 
 **Story metadata:**
 - covers: FR-7
+- ac_proof: 1=CHANGE_REQUIRED/FR-7
 - write_scope: src/search/, src/list/
 - depends_on: 2.1
 
@@ -181,6 +187,7 @@ So that tôi nhóm được theo chủ đề.
 
 **Story metadata:**
 - covers: FR-8
+- ac_proof: 1=CHANGE_REQUIRED/FR-8
 - write_scope: src/tags/
 - depends_on: 1.1
 
@@ -198,6 +205,7 @@ So that tôi thấy đúng nhóm cần xem.
 
 **Story metadata:**
 - covers: FR-9
+- ac_proof: 1=CHANGE_REQUIRED/FR-9
 - write_scope: src/tags/, src/list/
 - depends_on: 3.1
 
@@ -215,6 +223,7 @@ So that danh sách thẻ không loạn.
 
 **Story metadata:**
 - covers: FR-10
+- ac_proof: 1=CHANGE_REQUIRED/FR-10
 - write_scope: src/tags/
 - depends_on: 3.1
 
@@ -236,6 +245,7 @@ So that ghi chú không phụ thuộc kết nối.
 
 **Story metadata:**
 - covers: FR-11
+- ac_proof: 1=CHANGE_REQUIRED/FR-11
 - write_scope: src/pwa/, public/
 - depends_on: 1.1
 
@@ -253,6 +263,7 @@ So that tôi không hiểu nhầm là dữ liệu đã đồng bộ.
 
 **Story metadata:**
 - covers: FR-12
+- ac_proof: 1=CHANGE_REQUIRED/FR-12
 - write_scope: src/status/
 - depends_on: 4.1
 
@@ -274,5 +285,6 @@ So that tôi không mất dữ liệu.
 
 **Story metadata:**
 - covers: FR-16, FR-17
+- ac_proof: 1=CHANGE_REQUIRED/FR-16, 2=CHANGE_REQUIRED/FR-16
 - write_scope: src/export/, src/status/
 - depends_on: 1.1

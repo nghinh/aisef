@@ -1,0 +1,876 @@
+{
+ "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
+ "phase": 2,
+ "generated": "2026-09-16T08:42:45+00:00",
+ "note": "Defect ids sharing an architectural cause are one family; closure is by family. 'previous_fix' says whether the shipped fix removed the symptom (local) or the cause for every sibling (family-wide).",
+ "families": {
+  "FAM-IDENTITY": {
+   "name": "Identity by recency or position",
+   "cause": "A control decision selects its evidence by chronological recency (`last`, newest, HEAD) or by position/spelling instead of by an exact identity (story epoch, candidate, baseline root, artifact digest, cohort directory).",
+   "invariants": [
+    "INV-D",
+    "INV-E",
+    "INV-C",
+    "INV-R"
+   ]
+  },
+  "FAM-OUTCOME": {
+   "name": "Outcome misclassification (absence / unrunnable read as pass or fail)",
+   "cause": "An absence, an environment failure or a non-verdict is mapped onto the two-valued pass/fail axis instead of a typed outcome (UNRUNNABLE, UNCONFIGURED, NOT_APPLICABLE, INFRA, HUMAN_REQUIRED).",
+   "invariants": [
+    "INV-F",
+    "INV-N",
+    "INV-T"
+   ]
+  },
+  "FAM-PROSE": {
+   "name": "Prose parsed into control state",
+   "cause": "Free-form model or tool text is matched by substring/regex and the match creates control state, outranking or standing in for a structured source.",
+   "invariants": [
+    "INV-F",
+    "INV-Q"
+   ]
+  },
+  "FAM-RETRY": {
+   "name": "Retry locality and budget accounting",
+   "cause": "A failure of one stage (reviewer, provider, tool, environment) is routed to a retry of another stage or charged to the wrong budget; the loop's only recovery path is 'open a developer session again'.",
+   "invariants": [
+    "INV-G",
+    "INV-H"
+   ]
+  },
+  "FAM-RECOVERY": {
+   "name": "Recovery and resume semantics",
+   "cause": "A resume or recovery action recomputes or changes evaluated state (baseline, worktree contents, candidate) without the evidence that depended on the previous state being invalidated or refreshed — or leaves the state unrecovered for the next attempt.",
+   "invariants": [
+    "INV-K",
+    "INV-E",
+    "INV-C",
+    "INV-B"
+   ]
+  },
+  "FAM-OWNERSHIP": {
+   "name": "Workspace ownership and generated files",
+   "cause": "Paths written by the harness, tools, generated client config or pre-existing dirt are attributed to the developer/story (or blamed on the wrong owner), so scope checks, freezes, diffs and merges act on files nobody authored.",
+   "invariants": [
+    "INV-I",
+    "INV-J"
+   ]
+  },
+  "FAM-TOOL": {
+   "name": "Tool declared but not available",
+   "cause": "A configured or inferred verification command is trusted to be runnable in the declared execution environment; its absence is read as a behavioural result.",
+   "invariants": [
+    "INV-N",
+    "INV-F"
+   ]
+  },
+  "FAM-PROCESS": {
+   "name": "Process lifecycle and liveness",
+   "cause": "A parent process, lock or claim is treated as the whole: children survive their parent's death, a claim survives its process, cleanup races a writer.",
+   "invariants": [
+    "INV-L",
+    "INV-M"
+   ]
+  },
+  "FAM-SCHEDULER": {
+   "name": "Scheduler uses declared scope, not effective scope",
+   "cause": "Two rules for one truth: the scheduler partitions waves by declared write_scope while the guard grants additional shared paths.",
+   "invariants": [
+    "INV-O",
+    "INV-J"
+   ]
+  },
+  "FAM-APPROVAL": {
+   "name": "Approval and pre-registration binding",
+   "cause": "A human decision (approval, frozen rule, acceptance scope) is bound to memory, mtime or an implicit default rather than to an exact artifact digest or an explicit declaration.",
+   "invariants": [
+    "INV-P",
+    "INV-Q"
+   ]
+  },
+  "FAM-RELEASE": {
+   "name": "Release and closure identity",
+   "cause": "Product identity is conflated with repository HEAD, platform-dependent spellings or a second implementation of the same digest, so recording evidence or moving platforms changes 'what was released'.",
+   "invariants": [
+    "INV-R"
+   ]
+  },
+  "FAM-BENCH": {
+   "name": "Benchmark integrity",
+   "cause": "Bench artifacts, cohorts and stop rules leak across directories/experiments or depend on the operator; infrastructure failures are written as results.",
+   "invariants": [
+    "INV-R",
+    "INV-F"
+   ]
+  },
+  "FAM-JUDGE": {
+   "name": "Model output as control authority",
+   "cause": "A model verdict is the sole basis of a blocking decision or a plan conflict, or model failure is indistinguishable from framework misclassification.",
+   "invariants": [
+    "INV-F",
+    "INV-Q",
+    "INV-T"
+   ]
+  }
+ },
+ "members": [
+  {
+   "id": "D-001",
+   "title": "no readable test results recorded as regressions of other stories",
+   "symptom": "a run with unreadable output flipped VERIFIED requirements of earlier stories to REOPENED",
+   "root_cause": "absence of readable results rolled up as 'not green' (`ledger._observe_tests` readable=false path)",
+   "family": "FAM-OUTCOME",
+   "missing_invariants": [
+    "INV-F",
+    "INV-E"
+   ],
+   "previous_fix": "local (the unreadable branch) after a family fix for row 155",
+   "remaining_sibling_risk": "any consumer that folds 'no result' into the boolean axis",
+   "current_coverage": "validation/o3_preservation_radius.py + tests/test_preservation.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-002",
+   "title": "a blocking gate decision can rest on the model reviewer alone",
+   "symptom": "17 of 122 blocks were judge-alone",
+   "root_cause": "the review check is a model-judge check with no deterministic co-signature requirement",
+   "family": "FAM-JUDGE",
+   "missing_invariants": [
+    "INV-F",
+    "INV-T"
+   ],
+   "previous_fix": "none — measured and published as a property (G2.4b, owner ruling 1)",
+   "remaining_sibling_risk": "judge-only blocks remain possible by design; a malformed or unrunnable verdict must never become one (D-032)",
+   "current_coverage": "closure G2.4b (judge-only audit), tests/test_run2_review_recovery.py",
+   "status": "OPEN P2 — disposition due in Phase 8"
+  },
+  {
+   "id": "D-003",
+   "title": "bench cut-session analysis merges cohorts sharing task names",
+   "symptom": "`.bench` and `.bench-c1b` land on one key",
+   "root_cause": "regex captured (condition, task, attempt) and discarded the cohort directory",
+   "family": "FAM-BENCH",
+   "missing_invariants": [
+    "INV-R"
+   ],
+   "previous_fix": "not fixed (published reports quote the output)",
+   "remaining_sibling_risk": "sibling of D-016 (fixed for session metrics, not for this helper)",
+   "current_coverage": "none",
+   "status": "OPEN P2 — disposition due in Phase 8"
+  },
+  {
+   "id": "D-004",
+   "title": "criterion identity positional: a test became proof of a different criterion",
+   "symptom": "AC-…-1 tests asserted another story's behaviour and still satisfied `criteria have tests`",
+   "root_cause": "criterion identity was its position in the list",
+   "family": "FAM-IDENTITY",
+   "missing_invariants": [
+    "INV-D",
+    "INV-B"
+   ],
+   "previous_fix": "family-wide: stable criterion codes (`ac_code`) + shift detector",
+   "remaining_sibling_risk": "renumbering/reordering criteria still changes codes; epoch fingerprint (1.7.5) now makes that explicit",
+   "current_coverage": "tests/test_acceptance*.py, tests/test_gate.py",
+   "status": "CLOSED",
+   "false_pass": true
+  },
+  {
+   "id": "D-005",
+   "title": "a 401 named the credential source, not the client/model",
+   "symptom": "misdiagnosis: the wrong client was blamed",
+   "root_cause": "auth hint listed env names present, asserting they were used",
+   "family": "FAM-OUTCOME",
+   "missing_invariants": [
+    "INV-D"
+   ],
+   "previous_fix": "local",
+   "remaining_sibling_risk": "any diagnostic that infers cause from presence",
+   "current_coverage": "tests/test_clients.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-006",
+   "title": "credential rejection charged to quality attempts",
+   "symptom": "a 401 consumed a developer attempt",
+   "root_cause": "classifying a status controlled accounting but not whether a retry happened",
+   "family": "FAM-RETRY",
+   "missing_invariants": [
+    "INV-G"
+   ],
+   "previous_fix": "local (`auth` → infra+fatal)",
+   "remaining_sibling_risk": "other non-transient infra statuses that still retry",
+   "current_coverage": "tests/test_implement.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-007",
+   "title": "closure bookkeeping bound to a commit can never be current once committed",
+   "symptom": "G2.1 UNRUNNABLE 'recorded at X, HEAD is Y' forever",
+   "root_cause": "evidence validity compared against HEAD, which the act of recording moves",
+   "family": "FAM-RELEASE",
+   "missing_invariants": [
+    "INV-R",
+    "INV-E"
+   ],
+   "previous_fix": "family-wide with D-022 (planes model: identity = product digest, not HEAD)",
+   "remaining_sibling_risk": "any probe comparing HEAD instead of a plane digest",
+   "current_coverage": "tests/test_release_identity.py, tests/test_closure.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-008",
+   "title": "a CLI with no UI treated as having one",
+   "symptom": "browser E2E demanded from a command-line tool",
+   "root_cause": "stack inference from file detection ignored the settled plan (screens: [])",
+   "family": "FAM-OUTCOME",
+   "missing_invariants": [
+    "INV-F"
+   ],
+   "previous_fix": "local",
+   "remaining_sibling_risk": "other applicability inferences from heuristics rather than plan artifacts",
+   "current_coverage": "tests/test_deploy.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-009",
+   "title": "inferred verification command used without checking the tool exists",
+   "symptom": "mutation FAILED because npx could not download stryker offline",
+   "root_cause": "`command_for_kind` returned a default unconditionally; missing tool → FAILED",
+   "family": "FAM-TOOL",
+   "missing_invariants": [
+    "INV-N",
+    "INV-F"
+   ],
+   "previous_fix": "family-wide for inferred defaults (project-local resolution) — but bandit auto-detection remained (Run #2 Finding B)",
+   "remaining_sibling_risk": "auto-detected defaults not verified by doctor (bandit); host PATH vs sandbox PATH",
+   "current_coverage": "tests/test_tools.py, tests/test_deploy.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-010",
+   "title": "a kind proven inapplicable still counted as unconfigured",
+   "symptom": "release_ready unreachable without a waiver",
+   "root_cause": "absence and 'proven not applicable' shared one state",
+   "family": "FAM-OUTCOME",
+   "missing_invariants": [
+    "INV-F"
+   ],
+   "previous_fix": "family-wide (Outcome enum with NOT_APPLICABLE)",
+   "remaining_sibling_risk": "new checks bypassing the enum with booleans",
+   "current_coverage": "tests/test_gate*.py, tests/test_qa*.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-011",
+   "title": "a bench run writes artifacts into the framework repository root",
+   "symptom": "`_bmad-output/` appeared at the AISEF repo root during a bench run",
+   "root_cause": "an aisef tool invocation resolved the project root to the cwd/repo instead of the session workspace",
+   "family": "FAM-OWNERSHIP",
+   "missing_invariants": [
+    "INV-I"
+   ],
+   "previous_fix": "deterministic guard only; trigger not reproduced without a paid session",
+   "remaining_sibling_risk": "root resolution from cwd in any CLI path; dirty tree blocks pin_target",
+   "current_coverage": "none for the trigger",
+   "status": "OPEN P2 — disposition due in Phase 8"
+  },
+  {
+   "id": "D-012",
+   "title": "verification applicability not derivable; blanket waiver the only exit",
+   "symptom": "5 kinds unconfigured with no way to say they do not apply",
+   "root_cause": "applicability had one rule (needs_ui); no derivation from approved artifacts",
+   "family": "FAM-OUTCOME",
+   "missing_invariants": [
+    "INV-F",
+    "INV-P"
+   ],
+   "previous_fix": "family-wide (derive from verification_contract + covers, never prose)",
+   "remaining_sibling_risk": "new kinds without a derivation rule",
+   "current_coverage": "tests/test_deploy.py, tests/test_preflight.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-013",
+   "title": "a verification tool had to join the product's dependency tree",
+   "symptom": "installing stryker raised npm audit findings",
+   "root_cause": "one image for all kinds",
+   "family": "FAM-TOOL",
+   "missing_invariants": [
+    "INV-N"
+   ],
+   "previous_fix": "family-wide (`verify.tool_images`, per-kind image + entrypoint)",
+   "remaining_sibling_risk": "images without pinned digests in evidence (F-9)",
+   "current_coverage": "tests/test_sandbox*.py, tests/test_deploy.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-014",
+   "title": "whole-plan acceptance scope could only be implied",
+   "symptom": "G4.6 FAILED 'report declares no acceptance scope'",
+   "root_cause": "None meant both 'entire plan' and 'nothing declared'",
+   "family": "FAM-APPROVAL",
+   "missing_invariants": [
+    "INV-P"
+   ],
+   "previous_fix": "local (explicit {'epic': 'all'})",
+   "remaining_sibling_risk": "other implicit-default declarations",
+   "current_coverage": "tests/test_deploy.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-015",
+   "title": "relative AISEF_BENCH_DIR made a cohort unrunnable and the failures looked like results",
+   "symptom": "72/72 FAIL, 0 turns, written to results.jsonl",
+   "root_cause": "path anchored to cwd; infra failure recorded as outcome FAIL",
+   "family": "FAM-BENCH",
+   "missing_invariants": [
+    "INV-F",
+    "INV-R"
+   ],
+   "previous_fix": "local (anchor to ROOT) + classification",
+   "remaining_sibling_risk": "any bench failure with 0 turns still typed FAIL",
+   "current_coverage": "tests/bench/*",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-016",
+   "title": "bench session metrics merged cohorts",
+   "symptom": "a cut-session rate belonged to another experiment",
+   "root_cause": "directory discarded from the key; conditions taken from model-printed strings",
+   "family": "FAM-BENCH",
+   "missing_invariants": [
+    "INV-R",
+    "INV-D"
+   ],
+   "previous_fix": "local to session metrics (D-003 helper left as is)",
+   "remaining_sibling_risk": "D-003",
+   "current_coverage": "tests/bench/*",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-017",
+   "title": "frozen early-stop rule enforced only by the operator remembering it",
+   "symptom": "C-2 continued 7 hours past a fired stop rule",
+   "root_cause": "the rule was prose in a pre-registration, not data evaluated by the runner",
+   "family": "FAM-APPROVAL",
+   "missing_invariants": [
+    "INV-P"
+   ],
+   "previous_fix": "family-wide for bench stop rules (stop_rule.json with source digest)",
+   "remaining_sibling_risk": "other pre-registered decisions still in prose",
+   "current_coverage": "tests/bench/test_stop_rule*.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-018",
+   "title": "retired-claim audit matched substrings",
+   "symptom": "missed `±0,08`, flagged an explanation as a claim",
+   "root_cause": "substring matching stood in for declared status",
+   "family": "FAM-PROSE",
+   "missing_invariants": [
+    "INV-F"
+   ],
+   "previous_fix": "family-wide for claims (claim_registry + fenced regions)",
+   "remaining_sibling_risk": "other doc audits by substring",
+   "current_coverage": "tests/test_closure.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-019",
+   "title": "CI checked out shallow; tests rebuilding history errored",
+   "symptom": "v1.7.0 release run failed on `git archive <old sha>`",
+   "root_cause": "environment (fetch depth) not part of the test's stated requirements",
+   "family": "FAM-RELEASE",
+   "missing_invariants": [
+    "INV-N",
+    "INV-S"
+   ],
+   "previous_fix": "local (fetch-depth 0)",
+   "remaining_sibling_risk": "other environment assumptions of assurance tests",
+   "current_coverage": ".github/workflows/tests.yml",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-020",
+   "title": "POSIX assumptions in test helpers broke Windows CI",
+   "symptom": "16 Windows failures",
+   "root_cause": "newline translation; shell shebang in a fake client",
+   "family": "FAM-RELEASE",
+   "missing_invariants": [
+    "INV-R"
+   ],
+   "previous_fix": "local ×2 (newline='', Python runner)",
+   "remaining_sibling_risk": "recurred in 1.7.5 (fixture `#!/bin/sh`) — the rule is not enforced by a lint",
+   "current_coverage": "Windows CI job",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-021",
+   "title": "pin key and reported path carried the platform separator",
+   "symptom": "one file, two identities in a committed pin",
+   "root_cause": "`str(path.relative_to())` instead of `as_posix()`",
+   "family": "FAM-IDENTITY",
+   "missing_invariants": [
+    "INV-R"
+   ],
+   "previous_fix": "local + regression (no backslash in keys)",
+   "remaining_sibling_risk": "any path used as a key without as_posix()",
+   "current_coverage": "tests/test_closure.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-022",
+   "title": "release identity conflated with HEAD",
+   "symptom": "a docs commit made G1.0 FAIL; no fixed point",
+   "root_cause": "filename allowlist stood in for a model of the product",
+   "family": "FAM-RELEASE",
+   "missing_invariants": [
+    "INV-R"
+   ],
+   "previous_fix": "family-wide (planes + manifest bound to tag + PyPI)",
+   "remaining_sibling_risk": "unresolved paths (blocked by name — good); manifest members vs wheel contents",
+   "current_coverage": "tests/test_release_identity.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-023",
+   "title": "G6.1 read the onboarding digest under a key its writer never wrote",
+   "symptom": "latent false FAIL",
+   "root_cause": "two implementations of one digest, two spellings of one key",
+   "family": "FAM-IDENTITY",
+   "missing_invariants": [
+    "INV-D",
+    "INV-R"
+   ],
+   "previous_fix": "local (probe deleted, single implementation)",
+   "remaining_sibling_risk": "other probe/writer pairs",
+   "current_coverage": "tests/test_closure.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-024",
+   "title": "TemporaryDirectory cleanup races a writer inside a session's .git",
+   "symptom": "OSError Directory not empty after assertions passed (3 CI occurrences)",
+   "root_cause": "an unidentified writer (git?) still active at cleanup — process lifecycle of the fake session not owned",
+   "family": "FAM-PROCESS",
+   "missing_invariants": [
+    "INV-L"
+   ],
+   "previous_fix": "none (recorded)",
+   "remaining_sibling_risk": "any test that tears down a workspace while a child may still write",
+   "current_coverage": "none",
+   "status": "OPEN P2 — disposition due in Phase 8"
+  },
+  {
+   "id": "D-025",
+   "title": "`aisef status` said `running` for a dead claim",
+   "symptom": "39 minutes of RUNNING about a dead process",
+   "root_cause": "claimed_by carried HOST:PID that status never read; no lease",
+   "family": "FAM-PROCESS",
+   "missing_invariants": [
+    "INV-M"
+   ],
+   "previous_fix": "local (status reads liveness; reconcile on next run)",
+   "remaining_sibling_risk": "RUNNING still has no lease/heartbeat; remote host claims cannot be checked",
+   "current_coverage": "tests/test_dogfood_ledgerlock.py (TestStatusNamesADeadClaim)",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-026",
+   "title": "`[stuck] doesn't apply` in prose became a terminal plan deadlock",
+   "symptom": "epic stopped after one attempt, 'reviewer verified' which it had not",
+   "root_cause": "prose tag split from a sentence, exempt from path rule, unioned with the JSON verdict",
+   "family": "FAM-PROSE",
+   "missing_invariants": [
+    "INV-F",
+    "INV-Q"
+   ],
+   "previous_fix": "family-wide for plan deadlock (structured_plan_defects only)",
+   "remaining_sibling_risk": "text items still feed `blocking_findings` for the review check (merged with JSON); other tags",
+   "current_coverage": "tests/test_dogfood_ledgerlock.py, tests/test_implement.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-027",
+   "title": "turn cap not enforced through a launcher (opencode.CMD)",
+   "symptom": "sessions ran 75–186 turns against cap 40",
+   "root_cause": "kill() hit the shim; node kept the pipe",
+   "family": "FAM-PROCESS",
+   "missing_invariants": [
+    "INV-L"
+   ],
+   "previous_fix": "family-wide (own process group + kill_tree; Win32 snapshot)",
+   "remaining_sibling_risk": "platform-specific kill paths; measured flake fixed in cfee273",
+   "current_coverage": "tests/test_clients.py (kill tree), Windows CI",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-028",
+   "title": "python preset image had neither pytest nor ruff; doctor said 'matches stack'",
+   "symptom": "no Python project could verify in the sandbox",
+   "root_cause": "preset paired tools with a base image that lacks them; doctor checked the image name, not capability",
+   "family": "FAM-TOOL",
+   "missing_invariants": [
+    "INV-N"
+   ],
+   "previous_fix": "family-wide for the python preset (pinned verify image + per-tool probes)",
+   "remaining_sibling_risk": "other stacks' presets; user-supplied images",
+   "current_coverage": "tests/test_verify_image*.py, qualification (doctor)",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-029",
+   "title": "`No module named pytest` read as tests still failing",
+   "symptom": "three sessions told their tests were red",
+   "root_cause": "MISSING_TOOL knew exit 127 and shell 'not found' only",
+   "family": "FAM-OUTCOME",
+   "missing_invariants": [
+    "INV-F",
+    "INV-N"
+   ],
+   "previous_fix": "local pattern add + typed `outcome_kind`",
+   "remaining_sibling_risk": "other interpreters' missing-module phrasings; localized shells",
+   "current_coverage": "tests/test_dogfood_ledgerlock.py (TestMissingTestRunnerIsUnrunnableNotRed), tests/test_tools.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-030",
+   "title": "`.coverage` counted as the agent's change",
+   "symptom": "21 diff-scope blocks; data file frozen into candidates",
+   "root_cause": "VENDOR_PATHS excluded the directory, not the data file",
+   "family": "FAM-OWNERSHIP",
+   "missing_invariants": [
+    "INV-I"
+   ],
+   "previous_fix": "family-wide-ish (`is_tool_artifact` names/suffixes/prefixes)",
+   "remaining_sibling_risk": "new tool artifacts not in the list (name-based)",
+   "current_coverage": "tests/test_dogfood_ledgerlock.py, tests/test_guardrails.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-031",
+   "title": "scheduler waved by declared scope while the guard granted conftest.py/pytest.ini to every story",
+   "symptom": "three same-wave stories created conflicting files",
+   "root_cause": "two rules for one truth",
+   "family": "FAM-SCHEDULER",
+   "missing_invariants": [
+    "INV-O",
+    "INV-J"
+   ],
+   "previous_fix": "family-wide (bootstrap_grants + _effective_waves)",
+   "remaining_sibling_risk": "other harness-added paths (verification dirs) in parallel waves",
+   "current_coverage": "tests/test_run.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-032",
+   "title": "review execution failure scored as a review verdict",
+   "symptom": "story re-entered the developer stage and died by no-op",
+   "root_cause": "'reviewer said no' and 'reviewer did not run' shared one slot; only recovery = developer",
+   "family": "FAM-RETRY",
+   "missing_invariants": [
+    "INV-G",
+    "INV-F"
+   ],
+   "previous_fix": "family-wide for review (REVIEW_PASS/BLOCK/REVIEW_UNRUNNABLE, bounded review retry)",
+   "remaining_sibling_risk": "security stage has no equivalent UNRUNNABLE retry; other stages",
+   "current_coverage": "tests/test_run2_review_recovery.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-033",
+   "title": "resumed story re-baselined at its own candidate",
+   "symptom": "renaming its own tests scored as 'lost 2 tests present at baseline'",
+   "root_cause": "baseline recorded at HEAD on every invocation; gate read the newest record",
+   "family": "FAM-IDENTITY",
+   "missing_invariants": [
+    "INV-C",
+    "INV-B",
+    "INV-E"
+   ],
+   "previous_fix": "family-wide for baseline (epoch + root, authoritative selection, fail closed)",
+   "remaining_sibling_risk": "other `last(...)` consumers (Phase 3 sweep)",
+   "current_coverage": "tests/test_baseline_provenance.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-034",
+   "title": "out-of-scope dirt of a failed attempt poisoned every retry",
+   "symptom": "guard blocked 100% of tool calls in attempts 2–3",
+   "root_cause": "freeze kept only in-scope paths and nothing restored the rest before the next attempt",
+   "family": "FAM-RECOVERY",
+   "missing_invariants": [
+    "INV-K",
+    "INV-I"
+   ],
+   "previous_fix": "family-wide for developer dirt (record + path-specific restore + fail closed on unattributed)",
+   "remaining_sibling_risk": "recovery did not invalidate the dependent verdict → D-035",
+   "current_coverage": "tests/test_retry_hygiene.py",
+   "status": "CLOSED"
+  },
+  {
+   "id": "D-035",
+   "title": "no-op retry ends the story on a stale verdict after hygiene",
+   "symptom": "clean complete candidate never re-graded; 'would return the verdict it already returned'",
+   "root_cause": "no-op shortcut keyed on candidate SHA having any verdict; recovery changed the evaluated state without invalidating the verdict",
+   "family": "FAM-RECOVERY",
+   "missing_invariants": [
+    "INV-E",
+    "INV-H",
+    "INV-K"
+   ],
+   "previous_fix": "none yet (Phase 8, abstraction level)",
+   "remaining_sibling_risk": "any verdict consumer keyed on SHA alone (`_pending_review`, `_unfinished_review`, `verify_candidate keep`)",
+   "current_coverage": "tests/hardening/test_verdict_freshness.py (expectedFailure)",
+   "status": "OPEN P1"
+  },
+  {
+   "id": "F-7",
+   "title": "reviewer `block` with only should-fix findings",
+   "symptom": "story failed on a soft review",
+   "root_cause": "model failure; fail-closed by design",
+   "family": "FAM-JUDGE",
+   "missing_invariants": [
+    "INV-F"
+   ],
+   "previous_fix": "none (P3 wording)",
+   "remaining_sibling_risk": "structured severity is what the gate reads — verify no prose escalation",
+   "current_coverage": "tests/test_implement.py (findings)",
+   "status": "NOT_A_FRAMEWORK_DEFECT"
+  },
+  {
+   "id": "F-9",
+   "title": "sandbox image mutated mid-run, unattributed; no image digest in evidence",
+   "symptom": "tools appeared in the image at 14:40/14:55",
+   "root_cause": "environment identity not recorded",
+   "family": "FAM-TOOL",
+   "missing_invariants": [
+    "INV-N",
+    "INV-S"
+   ],
+   "previous_fix": "1.7.3 records image/image_id in evidence",
+   "remaining_sibling_risk": "images without digest pin in config",
+   "current_coverage": "tests/test_sandbox*.py",
+   "status": "PARTIAL"
+  },
+  {
+   "id": "Run2-B",
+   "title": "bandit not declared; `command_for` auto-detects `bandit -q -r .`; agent called it 12 times, all TOOL_UNRUNNABLE",
+   "symptom": "noise; correct fail-closed",
+   "root_cause": "auto-detected default not verified by doctor",
+   "family": "FAM-TOOL",
+   "missing_invariants": [
+    "INV-N"
+   ],
+   "previous_fix": "none (backlog)",
+   "remaining_sibling_risk": "any auto-detected default",
+   "current_coverage": "none",
+   "status": "BACKLOG P3"
+  },
+  {
+   "id": "OBS-OC-2",
+   "title": "plan deadlock diagnosis not raised when the same criterion fails `tests verify story` twice across runs",
+   "symptom": "story exhausted attempts instead of HUMAN_REQUIRED",
+   "root_cause": "deadlock detection keyed on attempts within one run",
+   "family": "FAM-JUDGE",
+   "missing_invariants": [
+    "INV-Q"
+   ],
+   "previous_fix": "none (backlog)",
+   "remaining_sibling_risk": "resume boundaries hide repeated verdicts",
+   "current_coverage": "none",
+   "status": "BACKLOG P3"
+  },
+  {
+   "id": "OBS-OC-merge",
+   "title": "merge refused when the worktree held generated client config",
+   "symptom": "message named the wrong cause",
+   "root_cause": "generated config counted as project change at merge",
+   "family": "FAM-OWNERSHIP",
+   "missing_invariants": [
+    "INV-I"
+   ],
+   "previous_fix": "none (backlog); replay used .git/info/exclude",
+   "remaining_sibling_risk": "any generated artifact not in HARNESS_OWNED",
+   "current_coverage": "tests/test_worktree.py (_carry_client_config)",
+   "status": "BACKLOG P3"
+  },
+  {
+   "id": "OBS-R13",
+   "title": "verify-only on an old candidate rebaselined after the last test and failed guard/baseline/TDD/nop checks",
+   "symptom": "false failures on re-verify (pre-1.7.5)",
+   "root_cause": "recomputation of immutable state on verify-only",
+   "family": "FAM-RECOVERY",
+   "missing_invariants": [
+    "INV-C",
+    "INV-E"
+   ],
+   "previous_fix": "1.7.5 baseline reuse covers baseline; verify-only derived checks on stale state not re-measured",
+   "remaining_sibling_risk": "TDD/nop checks on verify-only",
+   "current_coverage": "tests/test_baseline_provenance.py (D verify-only)",
+   "status": "PARTIAL"
+  },
+  {
+   "id": "REPLAY-DRIFT",
+   "title": "replay ran with client=claude and uncompiled guards instead of opencode",
+   "symptom": "mixed-client replay rejected by owner",
+   "root_cause": "no replay manifest; conditions not bound or checked before execution",
+   "family": "FAM-RELEASE",
+   "missing_invariants": [
+    "INV-S"
+   ],
+   "previous_fix": "none (recorded as REPLAY_CONDITION_DRIFT)",
+   "remaining_sibling_risk": "every future replay",
+   "current_coverage": "none — Phase 10",
+   "status": "OPEN (design)"
+  },
+  {
+   "id": "AC4-ARBITRATION",
+   "title": "STORY-04-01 AC-4 was non-falsifiable (clean-file no-op)",
+   "symptom": "story exhausted; owner arbitration replaced the criterion",
+   "root_cause": "requirement defect; the harness lacked HUMAN_REQUIRED for a criterion that cannot be red at the parent",
+   "family": "FAM-JUDGE",
+   "missing_invariants": [
+    "INV-Q"
+   ],
+   "previous_fix": "none (project fix)",
+   "remaining_sibling_risk": "criteria green at parent should route to arbitration, not attempts",
+   "current_coverage": "gate `tests verify story` (detects), no transition",
+   "status": "PROJECT / design gap"
+  },
+  {
+   "id": "lỗi-42",
+   "title": "evidence sequence numbers reset mid-file; gate read an old attempt's result",
+   "symptom": "wrong verdict",
+   "root_cause": "seq used as identity",
+   "family": "FAM-IDENTITY",
+   "missing_invariants": [
+    "INV-D"
+   ],
+   "previous_fix": "local (monotonic seq)",
+   "remaining_sibling_risk": "seq remains an audit order, not an identity — Phase 9",
+   "current_coverage": "tests/test_observe.py",
+   "status": "CLOSED (historical)"
+  },
+  {
+   "id": "lỗi-15/13",
+   "title": "npm died, node lived and held the port; stray dir mistaken for a worktree",
+   "symptom": "wrong app answered; false gate",
+   "root_cause": "process group / trust boundary",
+   "family": "FAM-PROCESS",
+   "missing_invariants": [
+    "INV-L",
+    "INV-I"
+   ],
+   "previous_fix": "local",
+   "remaining_sibling_risk": "see D-027",
+   "current_coverage": "tests/test_mockup_map.py, tests/test_worktree.py",
+   "status": "CLOSED (historical)"
+  },
+  {
+   "id": "lỗi-38/37",
+   "title": "diff-scope counted pre-existing dirt; reviewer diff included harness files",
+   "symptom": "false scope blocks; reviewer noise",
+   "root_cause": "no ownership of dirty paths",
+   "family": "FAM-OWNERSHIP",
+   "missing_invariants": [
+    "INV-I",
+    "INV-J"
+   ],
+   "previous_fix": "local (baseline_dirty env; changed filter)",
+   "remaining_sibling_risk": "D-034/D-035 are the same family at the retry boundary",
+   "current_coverage": "tests/test_guardrails.py",
+   "status": "CLOSED (historical)"
+  },
+  {
+   "id": "lỗi-25/28",
+   "title": "`aisef improve` wrote stories → approved gates went stale → next call blocked itself",
+   "symptom": "self-inflicted stale approvals",
+   "root_cause": "approval digest bound to a whole artifact that the loop itself rewrites",
+   "family": "FAM-APPROVAL",
+   "missing_invariants": [
+    "INV-P"
+   ],
+   "previous_fix": "local (added story not stale; edited story stale)",
+   "remaining_sibling_risk": "digest granularity",
+   "current_coverage": "tests/test_approvals.py",
+   "status": "CLOSED (historical)"
+  }
+ ],
+ "summary": {
+  "FAM-IDENTITY": [
+   "D-004",
+   "D-021",
+   "D-023",
+   "D-033",
+   "lỗi-42"
+  ],
+  "FAM-OUTCOME": [
+   "D-001",
+   "D-005",
+   "D-008",
+   "D-010",
+   "D-012",
+   "D-029"
+  ],
+  "FAM-PROSE": [
+   "D-018",
+   "D-026"
+  ],
+  "FAM-RETRY": [
+   "D-006",
+   "D-032"
+  ],
+  "FAM-RECOVERY": [
+   "D-034",
+   "D-035",
+   "OBS-R13"
+  ],
+  "FAM-OWNERSHIP": [
+   "D-011",
+   "D-030",
+   "OBS-OC-merge",
+   "lỗi-38/37"
+  ],
+  "FAM-TOOL": [
+   "D-009",
+   "D-013",
+   "D-028",
+   "F-9",
+   "Run2-B"
+  ],
+  "FAM-PROCESS": [
+   "D-024",
+   "D-025",
+   "D-027",
+   "lỗi-15/13"
+  ],
+  "FAM-SCHEDULER": [
+   "D-031"
+  ],
+  "FAM-APPROVAL": [
+   "D-014",
+   "D-017",
+   "lỗi-25/28"
+  ],
+  "FAM-RELEASE": [
+   "D-007",
+   "D-019",
+   "D-020",
+   "D-022",
+   "REPLAY-DRIFT"
+  ],
+  "FAM-BENCH": [
+   "D-003",
+   "D-015",
+   "D-016"
+  ],
+  "FAM-JUDGE": [
+   "D-002",
+   "F-7",
+   "OBS-OC-2",
+   "AC4-ARBITRATION"
+  ]
+ }
+}

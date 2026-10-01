@@ -1,0 +1,305 @@
+{
+ "record": "AISEF V2 — QP-2.9 ATTEMPT 2: PER-STORY ACCOUNT (derived from JOURNAL.json; descriptive, no verdict of its own)",
+ "source": {
+  "journal": {
+   "path": "closure-evidence/v2/cycle2/P10/attempt-2/JOURNAL.json",
+   "sha256": "eda76b7b07ef01596066aab62f15a61443a98607a259fb4d0f453bf5f35250ff"
+  },
+  "regression_record": {
+   "path": "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json",
+   "sha256": "b4ad12f52a061d6a1726304416f3809eed7c065a1c962201a341a079bb8f2ff7"
+  }
+ },
+ "delivery_verdict": "FAIL",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "generalization": "NONE",
+ "stories": {
+  "STORY-01-01": {
+   "admissions": [
+    {
+     "seq": 34,
+     "admitted": true,
+     "developer_call_permitted": true,
+     "dispositions": {
+      "READY": 13
+     }
+    },
+    {
+     "seq": 96,
+     "admitted": true,
+     "developer_call_permitted": true,
+     "dispositions": {
+      "READY": 13
+     }
+    }
+   ],
+   "failures": [
+    {
+     "seq": 68,
+     "code": "SUBJECT_ABSENT_AT_CANDIDATE",
+     "owner": "DEVELOPER",
+     "detail": "proof of S-10-b: SUBJECT_ABSENT_AT_CANDIDATE"
+    },
+    {
+     "seq": 126,
+     "code": "CONTRACT_UNSATISFIED",
+     "owner": "DEVELOPER",
+     "detail": "proof of S-10-a: CONTRACT_UNSATISFIED"
+    }
+   ],
+   "outcome": "ROLLBACK",
+   "developer_requests": 2,
+   "reviewer_requests": 0
+  },
+  "STORY-01-05": {
+   "admissions": [
+    {
+     "seq": 139,
+     "admitted": true,
+     "developer_call_permitted": true,
+     "dispositions": {
+      "READY": 1
+     }
+    },
+    {
+     "seq": 167,
+     "admitted": true,
+     "developer_call_permitted": true,
+     "dispositions": {
+      "READY": 1
+     }
+    }
+   ],
+   "failures": [
+    {
+     "seq": 154,
+     "code": "CONTRACT_UNSATISFIED",
+     "owner": "DEVELOPER",
+     "detail": "proof of S-13-f: CONTRACT_UNSATISFIED"
+    }
+   ],
+   "outcome": "COMMIT",
+   "developer_requests": 2,
+   "reviewer_requests": 1
+  },
+  "STORY-02-01": {
+   "admissions": [
+    {
+     "seq": 1822,
+     "admitted": true,
+     "developer_call_permitted": false,
+     "dispositions": {
+      "PRE_SATISFIED": 1
+     }
+    },
+    {
+     "seq": 1854,
+     "admitted": true,
+     "developer_call_permitted": false,
+     "dispositions": {
+      "PRE_SATISFIED": 1
+     }
+    }
+   ],
+   "failures": [
+    {
+     "seq": 1841,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    },
+    {
+     "seq": 1873,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    }
+   ],
+   "outcome": "ROLLBACK",
+   "developer_requests": 0,
+   "reviewer_requests": 0
+  },
+  "STORY-02-02": {
+   "admissions": [
+    {
+     "seq": 1886,
+     "admitted": true,
+     "developer_call_permitted": false,
+     "dispositions": {
+      "PRE_SATISFIED": 1
+     }
+    },
+    {
+     "seq": 1918,
+     "admitted": true,
+     "developer_call_permitted": false,
+     "dispositions": {
+      "PRE_SATISFIED": 1
+     }
+    }
+   ],
+   "failures": [
+    {
+     "seq": 1905,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    },
+    {
+     "seq": 1937,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    }
+   ],
+   "outcome": "ROLLBACK",
+   "developer_requests": 0,
+   "reviewer_requests": 0
+  },
+  "STORY-03-01": {
+   "admissions": [
+    {
+     "seq": 1998,
+     "admitted": true,
+     "developer_call_permitted": true,
+     "dispositions": {
+      "PRE_SATISFIED": 13,
+      "READY": 12
+     }
+    }
+   ],
+   "failures": [],
+   "outcome": "COMMIT",
+   "developer_requests": 1,
+   "reviewer_requests": 1
+  },
+  "STORY-04-01": {
+   "admissions": [
+    {
+     "seq": 4089,
+     "admitted": false,
+     "developer_call_permitted": false,
+     "dispositions": {
+      "PRECONDITION_BROKEN": 1,
+      "READY": 7,
+      "PRE_SATISFIED": 1
+     }
+    }
+   ],
+   "failures": [
+    {
+     "seq": 4102,
+     "code": "PRECONDITION_BROKEN",
+     "owner": "PLAN",
+     "detail": "admission: PRECONDITION_BROKEN"
+    }
+   ],
+   "outcome": "ROLLBACK",
+   "developer_requests": 0,
+   "reviewer_requests": 0
+  },
+  "STORY-04-02": {
+   "admissions": [
+    {
+     "seq": 4131,
+     "admitted": true,
+     "developer_call_permitted": true,
+     "dispositions": {
+      "READY": 9
+     }
+    },
+    {
+     "seq": 4255,
+     "admitted": true,
+     "developer_call_permitted": true,
+     "dispositions": {
+      "READY": 9
+     }
+    }
+   ],
+   "failures": [
+    {
+     "seq": 4226,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    }
+   ],
+   "outcome": "COMMIT",
+   "developer_requests": 2,
+   "reviewer_requests": 1
+  },
+  "STORY-05-01": {
+   "admissions": [
+    {
+     "seq": 6044,
+     "admitted": true,
+     "developer_call_permitted": true,
+     "dispositions": {
+      "READY": 2
+     }
+    },
+    {
+     "seq": 6091,
+     "admitted": true,
+     "developer_call_permitted": true,
+     "dispositions": {
+      "READY": 2
+     }
+    }
+   ],
+   "failures": [
+    {
+     "seq": 6076,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    },
+    {
+     "seq": 6123,
+     "code": "TESTS_INADEQUATE",
+     "owner": "DEVELOPER",
+     "detail": "engineering quality: TESTS_INADEQUATE"
+    }
+   ],
+   "outcome": "ROLLBACK",
+   "developer_requests": 2,
+   "reviewer_requests": 0
+  },
+  "STORY-05-03": {
+   "admissions": [
+    {
+     "seq": 6140,
+     "admitted": false,
+     "developer_call_permitted": false,
+     "dispositions": {
+      "PRECONDITION_BROKEN": 1,
+      "READY": 5
+     }
+    }
+   ],
+   "failures": [
+    {
+     "seq": 6143,
+     "code": "PRECONDITION_BROKEN",
+     "owner": "PLAN",
+     "detail": "admission: PRECONDITION_BROKEN"
+    }
+   ],
+   "outcome": "ROLLBACK",
+   "developer_requests": 0,
+   "reviewer_requests": 0
+  }
+ },
+ "harness_choices_that_bear_on_the_outcome": {
+  "story_tests": "each story's developer tests are declared as tests/test_<story>.py (validation/qualification/c2_p9.py test_path) and the tests policy is blocking (TestsPolicy(True))",
+  "consequence_observed": "STORY-02-01 and STORY-02-02 were admitted fully PRE_SATISFIED (STORY-01-05's developer had already implemented verify and snapshot: 4 UNATTRIBUTED plan-drift events), so the kernel made no developer call; with no developer there is no tests/test_<story>.py, the engineering-quality check answered TESTS_INADEQUATE and the blocking policy rolled both back. Their product obligations were proved at the candidate; the rollback is the tests policy, not a product refutation. (S-13-g and S-13-h: both parties agree, verdict SATISFIED, at candidate 800b085d)",
+  "not_changed_after_the_fact": "the choices were fixed in the harness commit before the run; no third attempt is made to turn them into a pass (retry policy: no rerun-to-green)"
+ },
+ "reading": {
+  "STORY-01-01": "the developer did not create ledgerlock/ledger.py (S-10-b SUBJECT_ABSENT_AT_CANDIDATE), then imported outside the allowed standard-library modules (S-10-a CONTRACT_UNSATISFIED): rolled back. Measured: the write_scope of epics Story 1.1 lists pyproject.toml, ledgerlock/__init__.py, __main__.py, format.py and tests — not ledger.py — while PLAN-V2.2 places the R-10/2 and R-13/1 obligations over ledger.py on this story",
+  "STORY-04-01": "refused at admission, owner PLAN, no developer call: PRECONDITION_BROKEN on the PRESERVE obligation AC-STORY-04-01-2:S-9-b (R-9/2, exit 2 on a usage error) — the behaviour STORY-01-01 was to introduce and, rolled back, did not",
+  "STORY-05-01": "TESTS_INADEQUATE twice with developer sessions: rolled back by the blocking tests policy",
+  "STORY-05-03": "refused at admission, owner PLAN, no developer call: PRECONDITION_BROKEN on the PRESERVE obligation AC-STORY-05-03-1:S-10-a (R-10/1, standard library only) — STORY-01-01's obligation, not holding at the parent"
+ }
+}

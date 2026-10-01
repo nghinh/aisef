@@ -1,0 +1,10 @@
+{
+ "checker": "closed_dispatch_in_scenario_probes",
+ "package": "WP-2.0.1",
+ "kind": "probe_source",
+ "rule": "CLOSED_DISPATCH_IN_SCENARIO_PROBES",
+ "path": "aisef2/probe/bad.py",
+ "facts": {"subject_process": "child_of_harness", "stimulus_shape": "scenario"},
+ "source": "def run(step):\n    if step == \"write\":\n        return 1\n    elif step == \"call\":\n        return 2\n    else:\n        return 0\n",
+ "expect": "CLOSED_DISPATCH_IN_SCENARIO_PROBES aisef2/probe/bad.py:2"
+}

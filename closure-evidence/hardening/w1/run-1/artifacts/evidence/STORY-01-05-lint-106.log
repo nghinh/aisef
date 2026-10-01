@@ -1,0 +1,32 @@
+PYI034 `__enter__` methods in classes like `_TrackedFile` usually return `self` at runtime
+   --> tests/test_ledger.py:186:21
+    |
+184 |                     self._real_handle = real_handle
+185 |
+186 |                 def __enter__(self) -> "_TrackedFile":
+    |                     ^^^^^^^^^
+187 |                     self._real_handle.__enter__()
+188 |                     return self
+    |
+help: Use `Self` as return type
+
+UP037 [*] Remove quotes from type annotation
+   --> tests/test_ledger.py:186:40
+    |
+184 |                     self._real_handle = real_handle
+185 |
+186 |                 def __enter__(self) -> "_TrackedFile":
+    |                                        ^^^^^^^^^^^^^^
+187 |                     self._real_handle.__enter__()
+188 |                     return self
+    |
+help: Remove quotes
+    |
+185 |
+    -                 def __enter__(self) -> "_TrackedFile":
+186 +                 def __enter__(self) -> _TrackedFile:
+187 |                     self._real_handle.__enter__()
+    |
+
+Found 2 errors.
+[*] 1 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).

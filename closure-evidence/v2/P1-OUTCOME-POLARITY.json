@@ -1,0 +1,129 @@
+{
+ "record": "AISEF V2 — P1 OUTCOME POLARITY",
+ "work_package": "WP-1.3",
+ "rfc_sections": [
+  "10",
+  "10.1",
+  "10.2"
+ ],
+ "neg_cases": [
+  {
+   "case": "NEG-1",
+   "contract": "BC-QUIET-STDOUT",
+   "candidate_expectation": "REFUTED",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "observation": "fixture: the CLI writes to stdout",
+   "observed_verdict": "SATISFIED",
+   "reason": null,
+   "contract_satisfaction": "UNSATISFIED"
+  },
+  {
+   "case": "NEG-2",
+   "contract": "BC-NO-TELEMETRY",
+   "candidate_expectation": "REFUTED",
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "observation": "fixture: existence observable over the absent module -> REFUTED",
+   "observed_verdict": "REFUTED",
+   "reason": null,
+   "contract_satisfaction": "SATISFIED"
+  },
+  {
+   "case": "NEG-3",
+   "contract": "BC-QUIET-STDOUT",
+   "candidate_expectation": "REFUTED",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "observation": "none: REQUIRES_SUBJECT, the subject is absent",
+   "observed_verdict": "INDETERMINATE",
+   "reason": "PRECONDITION_ABSENT",
+   "contract_satisfaction": "INDETERMINATE"
+  }
+ ],
+ "same_absence_by_contract": {
+  "BC-LICENSE": "UNSATISFIED",
+  "BC-NO-TELEMETRY": "SATISFIED"
+ },
+ "note": "NEG dispositions (READY / PRE_SATISFIED / PRECONDITION_BROKEN) are StoryAdmission's (WP-2.4); this record proves the satisfaction each disposition is routed on",
+ "rfc_oracle": {
+  "state": "PASS",
+  "detail": "equals the RFC §10.1 function on all 10 (result, expectation) pairs",
+  "table": [
+   [
+    "EXECUTED",
+    "SATISFIED",
+    "SATISFIED",
+    "SATISFIED"
+   ],
+   [
+    "EXECUTED",
+    "SATISFIED",
+    "REFUTED",
+    "UNSATISFIED"
+   ],
+   [
+    "EXECUTED",
+    "REFUTED",
+    "SATISFIED",
+    "UNSATISFIED"
+   ],
+   [
+    "EXECUTED",
+    "REFUTED",
+    "REFUTED",
+    "SATISFIED"
+   ],
+   [
+    "EXECUTED",
+    "INDETERMINATE",
+    "SATISFIED",
+    "INDETERMINATE"
+   ],
+   [
+    "EXECUTED",
+    "INDETERMINATE",
+    "REFUTED",
+    "INDETERMINATE"
+   ],
+   [
+    "UNRUNNABLE",
+    null,
+    "SATISFIED",
+    "InvariantError"
+   ],
+   [
+    "UNRUNNABLE",
+    null,
+    "REFUTED",
+    "InvariantError"
+   ],
+   [
+    "INVALID_SPEC",
+    null,
+    "SATISFIED",
+    "InvariantError"
+   ],
+   [
+    "INVALID_SPEC",
+    null,
+    "REFUTED",
+    "InvariantError"
+   ]
+  ]
+ },
+ "properties": {
+  "NEG_1_unsatisfied_never_satisfied": true,
+  "NEG_2_satisfied": true,
+  "NEG_3_indeterminate_precondition_absent": true,
+  "verdict_only_inside_executed": true,
+  "indeterminate_requires_typed_reason": true,
+  "satisfaction_undefined_without_execution": true,
+  "satisfaction_equals_rfc_function": true,
+  "absence_is_an_observation_never_unrunnable": true,
+  "requires_subject_absent_is_indeterminate_precondition_absent": true,
+  "requires_subject_refuses_a_vacuous_verdict": true,
+  "decidable_absence_verdict_is_the_observation": true,
+  "decidable_absence_has_no_default_verdict": true,
+  "same_absence_positive_existence_unsatisfied_negative_existence_satisfied": true,
+  "no_kernel_code_infers_a_verdict_from_the_absence_declaration": true,
+  "no_planning_module_routes_on_raw_verdict": true
+ }
+}

@@ -1,0 +1,78 @@
+{
+ "generated": "2026-09-18T20:50:09+0700",
+ "image": "aisef-verify-python:84adf1d8eaf9",
+ "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+ "pytest_in_image": "pytest 9.1.1",
+ "command": "python -m pytest -v -p no:cacheprovider",
+ "runs": {
+  "with_strategy": {
+   "extra_args": [
+    "--continue-on-collection-errors"
+   ],
+   "exit": 1,
+   "collection_aborted": false,
+   "output_complete": true,
+   "collection_errors": [
+    {
+     "file": "tests/test_a.py",
+     "module": "tests.test_a",
+     "error": "module_not_found",
+     "missing_module": "src",
+     "missing_name": ""
+    }
+   ],
+   "test_ids": [
+    "tests/test_b.py::test_AC_S_01_2_y"
+   ],
+   "states": {
+    "tests/test_a.py::test_AC_S_01_1_x": {
+     "state": "RED_COLLECTION_BOUND_TO_STORY",
+     "why": "its file tests/test_a.py cannot import src \u2014 src/a.py is this story's"
+    },
+    "tests/test_b.py::test_AC_S_01_2_y": {
+     "state": "GREEN_EXECUTED",
+     "why": "ran and passed"
+    }
+   },
+   "control_verdict": "FAILED (tautology observed green)",
+   "tail": "    from src.a import f          # src/a.py: this story's, absent at the parent\n    ^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'src'\n=========================== short test summary info ============================\nERROR tests/test_a.py\n========================== 1 passed, 1 error in 0.01s =========================="
+  },
+  "runner_default": {
+   "extra_args": [],
+   "exit": 2,
+   "collection_aborted": true,
+   "output_complete": true,
+   "collection_errors": [
+    {
+     "file": "tests/test_a.py",
+     "module": "tests.test_a",
+     "error": "module_not_found",
+     "missing_module": "src",
+     "missing_name": ""
+    }
+   ],
+   "test_ids": [],
+   "states": {
+    "tests/test_a.py::test_AC_S_01_1_x": {
+     "state": "RED_COLLECTION_BOUND_TO_STORY",
+     "why": "its file tests/test_a.py cannot import src \u2014 src/a.py is this story's"
+    },
+    "tests/test_b.py::test_AC_S_01_2_y": {
+     "state": "COLLECTION_ABORTED",
+     "why": "the session stopped at collection before reaching it"
+    }
+   },
+   "control_verdict": "UNRUNNABLE (no proof)",
+   "tail": "    ^^^^^^^^^^^^^^^^^^^\nE   ModuleNotFoundError: No module named 'src'\n=========================== short test summary info ============================\nERROR tests/test_a.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.06s ==============================="
+  }
+ },
+ "requirements": {
+  "strategy_is_the_flag_the_kernel_appends": true,
+  "file_b_executes_although_file_a_fails_to_collect": true,
+  "tautology_observed_green_and_control_fails": true,
+  "file_a_bound_to_the_story_only": true,
+  "every_ac_has_an_explicit_state": true,
+  "control_without_strategy_aborts_and_proves_nothing": true
+ },
+ "pass": true
+}

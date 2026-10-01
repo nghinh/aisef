@@ -1,0 +1,20 @@
+{
+  "gate": "readiness",
+  "artifact": "stories.index.json, design-contract.json",
+  "artifact_sha256": "ed4dbef8d701f5b0b3cfe3cc62f61c0d417dabdf8da6b65302a5b026f9387e09",
+  "status": "approved",
+  "seq": 16,
+  "decided_by": "nghinh",
+  "decided_at": "2026-09-20T22:36:21+00:00",
+  "note": "W1-LEDGERLOCK-PLAN-V2 re-approval of `readiness`: the artifacts this gate signs are byte-identical to the approved plan base 136a68dcdc3f, so the previous plan's signature is stale for that reason alone; not a waiver; the kernel's refusal on the stale gate is recorded first (closure-evidence/hardening/W1-PLAN-V2-AUDIT.json)",
+  "machine_checks": {},
+  "history": [
+    {
+      "status": "approved",
+      "decided_by": "nghinh",
+      "decided_at": "2026-09-15T13:32:32+00:00",
+      "note": "",
+      "artifact_sha256": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838"
+    }
+  ]
+}

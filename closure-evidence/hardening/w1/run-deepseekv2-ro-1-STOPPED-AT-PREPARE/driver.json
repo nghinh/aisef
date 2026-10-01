@@ -1,0 +1,420 @@
+{
+ "run": "deepseekv2-ro-1",
+ "project": "/Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1",
+ "phases": {
+  "prepare": {
+   "at": "2026-09-21T00:41:34+0700",
+   "aisef_version": "aisef 1.7.6",
+   "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/lib/python3.13/site-packages/aisef/__init__.py",
+   "aisef_from_the_wheel_not_the_checkout": true,
+   "venv_packages": "[{\"name\": \"aisef\", \"version\": \"1.7.6\"}, {\"name\": \"pip\", \"version\": \"25.3\"}]\n",
+   "freeze": {
+    "generated": "2026-09-21T00:37:13+0700",
+    "candidate_sha": "f52df75ff242a8565b4c995e82e25a94016e95d1",
+    "aisef_tree_digest": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "PHASE12_KERNEL_DIGEST": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "tree_equals_phase12_kernel": true,
+    "version_string": "aisef 1.7.6",
+    "wheel": {
+     "file": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/dist/aisef-1.7.6-py3-none-any.whl",
+     "sha256": "8cae5c7e8d9aea1ecceb7d5d48d360cf2285b4f6db7560ff71aae99b9b182eac",
+     "bytes": 689027,
+     "built_with": "build 1.6.0 (/Users/nghinh/Downloads/projects/ai-sdlc/.venv/lib/python3.13/site-packages/build)"
+    },
+    "run_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv",
+     "aisef_file": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/lib/python3.13/site-packages/aisef/__init__.py",
+     "installed_from_the_wheel": true
+    },
+    "oracle_venv": {
+     "path": "/Users/nghinh/Downloads/projects/aisef-freeze/oracle-venv",
+     "packages": [
+      {
+       "name": "coverage",
+       "version": "7.16.1"
+      },
+      {
+       "name": "pytest",
+       "version": "9.1.1"
+      }
+     ]
+    },
+    "docker_image": {
+     "name": "aisef-verify-python:84adf1d8eaf9",
+     "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+    },
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "opencode_version": "1.18.31",
+    "ci": {
+     "run": "35524771363",
+     "sha": "f52df75ff242a8565b4c995e82e25a94016e95d1",
+     "conclusion": "success",
+     "jobs": {
+      "wheel": "success",
+      "unit (ubuntu-latest, 3.13)": "success",
+      "lint": "success",
+      "unit (windows-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.14)": "success",
+      "unit (ubuntu-latest, 3.11)": "success",
+      "unit (ubuntu-latest, 3.12)": "success"
+     }
+    },
+    "ci_matches_candidate": true,
+    "w0": {
+     "path": "closure-evidence/hardening/AISEF-W0-QUALIFICATION-f52df75.json",
+     "qualified": true,
+     "sha": "f52df75ff242a8565b4c995e82e25a94016e95d1",
+     "aisef_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+     "tree_matches_frozen": true
+    },
+    "no_tag_no_publish": true,
+    "rule": "W1 runs use run_venv's aisef only; any aisef/ change after this record voids it and the W1 runs that rest on it",
+    "pass": true
+   },
+   "project_git": {
+    "head": "144c712536eecd1045d2ee9a727af20600c19457",
+    "branch": "master",
+    "status": [],
+    "log": [
+     "144c712 w1-run-deepseekv2-ro-1: execution profile PROFILE-W1V2-OC-DEEPSEEKV4PRO-T80-RO applied (run.max_turns, route.<role>_model, project model declaration — an execution-profile setting, not an AISEF change)",
+     "e8ff13d w1-run-deepseekv2-ro-1: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "c9d9863 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)",
+     "1621a2b W1-LEDGERLOCK-PLAN-V2: acceptance criteria carry their proof obligation; STORY-02-02 AC-2 corrected to requirements 4.5; CLI surface and usage-error criteria moved to the story that builds the parser",
+     "8ff9f13 epics.md: split to 16 stories (each ≤7 AC, ≤16 complexity) — second plan attempt passed"
+    ]
+   },
+   "config": {
+    "tools.test": "python3 -m pytest -v",
+    "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+    "sandbox.image": "aisef-verify-python:84adf1d8eaf9",
+    "sandbox.allow_hosts": [
+     "pypi.org",
+     "files.pythonhosted.org"
+    ],
+    "run.cost_cap_usd": 80.0,
+    "run.max_turns": 80,
+    "route.developer_model": "9router/ds/deepseek-v4-pro",
+    "route.reviewer_model": "9router/ds/deepseek-v4-pro",
+    "route.security_model": "9router/ds/deepseek-v4-pro",
+    "route.designer_model": "9router/ds/deepseek-v4-pro"
+   },
+   "opencode_version": "1.18.31",
+   "opencode_binary": "/Users/nghinh/.opencode/bin/opencode",
+   "docker_image": {
+    "name": "aisef-verify-python:84adf1d8eaf9",
+    "id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "doctor": {
+    "cmd": [
+     "aisef",
+     "doctor"
+    ],
+    "exit": 0,
+    "seconds": 3.1,
+    "stdout_tail": "Environment:\n  ✅ python >= 3.11 — 3.13.12\n  ✅ git\n  ✅ claude CLI — /opt/homebrew/bin/claude\n  ✅ opencode CLI — /Users/nghinh/.opencode/bin/opencode\n  ✅ agent credential — ANTHROPIC_BASE_URL set in the environment — these outrank the client's own login; unset them to use it\n  ✅ docker daemon — running\n  ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts\nProject:\n  ✅ project directory — /Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1\n  ✅ sandbox provider — docker — guarantees at WORKSPACE_WRITE: network_none, non_root, secrets_absent\n  ✅ sandbox image — aisef-verify-python:84adf1d8eaf9 — built by the harness: pinned base, pinned tool versions\n  · role test — explicit → `python3 -m pytest -v`\n  · role lint — explicit → `ruff check . --exclude .claude --exclude .aisef --exclude .opencode`\n  · role sast — auto: bandit (managed, pinned 1.9.4) → `bandit -q -r .`\n  ✅ tool tools.test — `tools.test` = `python3 -m pytest -v` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.lint — `tools.lint` = `ruff check . --exclude .claude --exclude .aisef --exclude .opencode` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ tool tools.sast — `tools.sast` = `bandit -q -r .` — present in aisef-verify-python:84adf1d8eaf9\n  ✅ docs/requirements.md — /Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/docs/requirements.md\n  ✅ config — defaults → /Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/.ai/config.json\n  ○ budget cap above recorded spend — no `_bmad-output/budget.json` yet — nothing to compare; the first settled call writes it\n  ○ test command prints coverage — `tools.test` = `python3 -m pytest -v` does not print coverage — gate coverage check will be **not configured** (add `--coverage` / `--cov` / `--experimental-test-coverage`)\n  ✅ test command prints test names — gate can read test names (no evidence yet — guessing from command flags)\nInstalled skills:\n  ✅ has skills — 158 directories\n  ✅ framework skills up to date — matches source\n  ✅ no offensive skills — clean\n\n✅ ready\n",
+    "stderr_tail": ""
+   },
+   "doctor_red": [],
+   "oracle": {
+    "sha256_now": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "sha256_pinned": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+    "independence_verdict": "PASS"
+   },
+   "oracle_ok": true,
+   "compile": {
+    "cmd": [
+     "aisef",
+     "compile",
+     "--client",
+     "opencode",
+     "--bin",
+     "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/bin/aisef"
+    ],
+    "exit": 0,
+    "seconds": 0.2,
+    "stdout_tail": "client: opencode\n  second-tier in V1: cost/turns not measurable from harness — supported, does not block release\n  wrote /Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/.opencode/plugin/aisef-guard.ts\n  guards blocking before action: destructive, egress, git-stage, injection, process-ref, secret, tool-bypass, write-scope\n  guards blocking at other hooks: diff-scope (PostToolUse)\n  ⚠️  guards post-hoc only: completion\n     — not wired into this client's hooks at all; the rule is re-asked afterwards from evidence (story gate, `aisef verify`), which cannot stop the action, only fail the story\n  capabilities not at native level:\n     dir_allowlist: unsupported\n     tool_allowlist: emulated\n     turn_limit: unsupported\n\nreport: /Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/_bmad-output/compile-report.json\n\n⚠️  some clients can only be checked later — lower assurance, noted in report\n",
+    "stderr_tail": ""
+   },
+   "guard_commit": "31588448130ee92de2b30ce41959b5329840535e",
+   "guard_plugin": {
+    "tracked_now": true,
+    "sha256": "d8d7b56617887a490527835060b4984a5a6940510596c8993f394ff9e057fe10",
+    "bin_line": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/bin/aisef\"]",
+    "compile_report": {
+     "clients": [
+      {
+       "client": "opencode",
+       "written": [
+        ".opencode/plugin/aisef-guard.ts"
+       ],
+       "guards_wired": [
+        "destructive",
+        "diff-scope",
+        "egress",
+        "git-stage",
+        "injection",
+        "process-ref",
+        "secret",
+        "tool-bypass",
+        "write-scope"
+       ],
+       "guards_post_hoc": [
+        "completion"
+       ],
+       "blocks_at_source": false,
+       "degradations": [
+        "dir_allowlist: unsupported",
+        "tool_allowlist: emulated",
+        "turn_limit: unsupported"
+       ]
+      }
+     ]
+    }
+   },
+   "fresh_topology": {
+    "head_branch": "master",
+    "master": "31588448130ee92de2b30ce41959b5329840535e",
+    "plan_base": "1621a2bce231d158c08a3b60e6c9b4f4b96ec8d0",
+    "commits_after_plan_base": [
+     "3158844 w1-run-deepseekv2-ro-1: guard plugin compiled by aisef 1.7.6 — a story worktree is a fresh checkout (P20 preparation, not an AISEF change)",
+     "144c712 w1-run-deepseekv2-ro-1: execution profile PROFILE-W1V2-OC-DEEPSEEKV4PRO-T80-RO applied (run.max_turns, route.<role>_model, project model declaration — an execution-profile setting, not an AISEF change)",
+     "e8ff13d w1-run-deepseekv2-ro-1: sandbox.image re-pinned to the frozen candidate's python environment aisef-verify-python:84adf1d8eaf9 (SS-65: the recipe now carries bandit)",
+     "c9d9863 w1-run-1: run.cost_cap_usd=80 (W1 plan §cost: a stop, not a waiver)"
+    ],
+    "ledgerlock_dir_absent_at_master": true,
+    "remotes": [],
+    "branches": [
+     "master"
+    ]
+   },
+   "fresh_topology_ok": true,
+   "capability_preflight": {
+    "resolved": [
+     {
+      "role": "test",
+      "mode": "explicit",
+      "command": "python3 -m pytest -v",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "lint",
+      "mode": "explicit",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "",
+      "provision": "",
+      "version": ""
+     },
+     {
+      "role": "sast",
+      "mode": "auto",
+      "command": "bandit -q -r .",
+      "stack": "python",
+      "image": "aisef-verify-python:84adf1d8eaf9",
+      "why": "",
+      "tool": "bandit",
+      "provision": "managed",
+      "version": "1.9.4"
+     }
+    ],
+    "checks": [
+     {
+      "key": "tools.test",
+      "command": "python3 -m pytest -v",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.lint",
+      "command": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+      "state": "present",
+      "ok": true,
+      "mode": "explicit",
+      "tool": "",
+      "version": "",
+      "observed": "/usr/local/bin/ruff",
+      "detail": "the project's declared command",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     },
+     {
+      "key": "tools.sast",
+      "command": "bandit -q -r .",
+      "state": "present",
+      "ok": true,
+      "mode": "auto",
+      "tool": "bandit",
+      "version": "1.9.4",
+      "observed": "bandit 1.9.4",
+      "detail": "bandit (pinned 1.9.4)",
+      "where": "aisef-verify-python:84adf1d8eaf9"
+     }
+    ],
+    "image": "aisef-verify-python:84adf1d8eaf9",
+    "image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546",
+    "expected_python_image": "aisef-verify-python:84adf1d8eaf9"
+   },
+   "execution_profile": {
+    "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/profiles/PROFILE-W1V2-OC-DEEPSEEKV4PRO-T80-RO.json",
+    "expected": {
+     "model": "9router/ds/deepseek-v4-pro",
+     "max_turns": 80
+    },
+    "check": {
+     "profile": "PROFILE-W1V2-OC-DEEPSEEKV4PRO-T80-RO",
+     "profile_id": "sha256:15105ab9ad3ac9179a7cf6ffdf468cf8295b76ec3de02d2dad014122cacb445e",
+     "copy_id": "sha256:15105ab9ad3ac9179a7cf6ffdf468cf8295b76ec3de02d2dad014122cacb445e",
+     "matches": true,
+     "differences": {}
+    }
+   },
+   "stage_env_check": {
+    "command": "uv run {p}/_bmad/scripts/resolve_customization.py --skill {p}/.claude/skills/bmad-code-review --project-root {p} --key workflow",
+    "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin:/Users/nghinh/.local/bin:/Users/nghinh/.antigravity-ide/antigravity-ide/bin:/Users/nghinh/bin:/Users/nghinh/Library/Android/sdk/platform-tools:/Users/nghinh/Library/Android/sdk/cmdline-tools/latest/bin:/Users/nghinh/.opencode/bin:/Users/nghinh/.local/bin:/opt/homebrew/bin:/Users/nghinh/.npm-global/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/opt/homebrew/bin:/Users/nghinh/.nvm/versions/node/v22.22.1/bin:/Users/nghinh/Library/pnpm:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_012ABz1xjgtJYWKrcJkXW6ad/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_014WxCYbLf7f3uw2isHFR9US/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_0155zZVATbJU3jHUmPP9NvMC/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01AYHYqVLaZRH2Vi6aHgDwEw/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01SfWJSiw6JtGbsuW75PKvPK/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01XXJmxLXPEhPMmnxmrgntNw/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/397c6835-34b1-4b78-b008-f94d2f58ee90/1c625eaa-3cc7-4f27-a610-c53b8cda189b/bin:/Users/nghinh/.claude/plugins/cache/karpathy-skills/andrej-karpathy-skills/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/gopls-lsp/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/ponytail/ponytail/4.9.0/bin:/Users/nghinh/.claude/plugins/cache/claude-community/eli5/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/playwright/unknown/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown/bin",
+    "stage_env": {
+     "resolved_uv": "closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv",
+     "wrapper_sha256": "f3fbbf214533a9d3fa497cac668d2760f99fd1c23ccf1d647f6f776f7bdd984e",
+     "real_uv": "/Users/nghinh/.local/bin/uv",
+     "real_uv_version": "uv 0.11.3 (45da18ac3 2026-04-01 aarch64-apple-darwin)"
+    },
+    "per_role_shell": {
+     "reviewer /bin/sh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "reviewer /bin/zsh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "reviewer /bin/zsh -ic": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "security /bin/sh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "security /bin/zsh -c": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     },
+     "security /bin/zsh -ic": {
+      "identical": true,
+      "exit": 2,
+      "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+     }
+    },
+    "developer_control": {
+     "developer_tree_changed": true,
+     "new": [
+      ".venv",
+      "ledgerlock.egg-info",
+      "uv.lock"
+     ]
+    },
+    "pass": true
+   },
+   "section4_measured": {
+    "wheel": "/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/dist/aisef-1.7.6-py3-none-any.whl",
+    "wheel_sha256_in_freeze": "8cae5c7e8d9aea1ecceb7d5d48d360cf2285b4f6db7560ff71aae99b9b182eac",
+    "aisef_tree_digest": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "PHASE12_KERNEL_DIGEST": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "aisef_tree_at_the_candidate_sha": "4359f347378e84fcac2d213128c7c26f282c13c0",
+    "run_max_turns": 80,
+    "capability_matrix": {
+     "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/tool-capability-matrix.json",
+     "pass": true,
+     "aisef_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+     "totals": {
+      "profiles": 7,
+      "capabilities": 21,
+      "qualified": 11,
+      "none_declared": 10,
+      "failed": [],
+      "presets_failed": []
+     }
+    },
+    "stale_evidence_dirs": [],
+    "arb1": {
+     "artifacts": [
+      "stories.index.json",
+      "design-contract.json"
+     ],
+     "signed_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+     "digest_recomputed_by_the_signed_method": "2f1020ecf159f6e4fedda62c59e9d0eb2b92099d06d7288c8b11e18ad17e26cd",
+     "byte_identical_to_what_was_signed": false,
+     "current_method_digest": "1093bf7cdcb7dddecfd00bd784ecbdaac225c8658c5c2e89cdc937d56e0709a1",
+     "stale_caused_by_the_hash_method_alone": false
+    }
+   },
+   "preflight": {
+    "trunk_is_the_approved_fresh_root": true,
+    "zero_prior_delivery_commits": true,
+    "expected_story_count": true,
+    "expected_story_state_none_registered": true,
+    "no_candidate_branches": true,
+    "artifacts_match_frozen_requirements": true,
+    "client_is_opencode": true,
+    "expected_opencode_version": true,
+    "expected_model_route": true,
+    "guard_plugin_bound_to_the_frozen_candidate": true,
+    "no_stale_story_worktrees": true,
+    "sandbox_image_is_the_frozen_candidates_python_environment": true,
+    "every_selected_tool_probed_present_before_the_first_model_call": true,
+    "sandbox_image_present": true,
+    "environment_identity_matches_freeze": true,
+    "no_remotes": true,
+    "frozen_wheel_digest_identical": true,
+    "product_tree_digest_identical": true,
+    "same_max_turn_configuration": true,
+    "execution_profile_identity_matches": true,
+    "same_capability_matrix": true,
+    "no_stale_evidence": true,
+    "readiness_hash_migration_check_passes_mechanically": false,
+    "reviewer_dependency_command_leaves_the_tree_byte_identical": true
+   },
+   "preflight_measured": {
+    "model": "9router/ds/deepseek-v4-pro",
+    "opencode_version": "1.18.31",
+    "plugin_bin": "const BIN = [\"/Users/nghinh/Downloads/projects/aisef-freeze/f52df75ff242/w1-venv/bin/aisef\"]",
+    "worktrees": [
+     "/Users/nghinh/Downloads/projects/w1-run-deepseekv2-ro-1 3158844 [master]"
+    ],
+    "stories": 16,
+    "docker_image_id": "sha256:37c5e07a7bc754d1480319148757debcc3f0af65957f674bdb2c04ae11509546"
+   },
+   "preflight_ok": false,
+   "gates": {
+    "prd": "approved",
+    "architecture": "approved",
+    "ux-spec": "approved",
+    "epics": "approved",
+    "stories": "approved",
+    "mockups": "stale",
+    "readiness": "stale",
+    "pre-deploy": "pending"
+   },
+   "agent_starts_before": 5,
+   "story_evidence_before": [],
+   "ok": false
+  }
+ },
+ "updated": "2026-09-21T00:41:45+0700"
+}

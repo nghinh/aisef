@@ -1,0 +1,13 @@
+{
+ "checker": "p2_evidence",
+ "package": "WP-2.1",
+ "kind": "evidence_record",
+ "record": {
+  "work_package": "WP-2.1",
+  "properties": {
+   "PROBE_ABS_1_harness_failure_is_unrunnable_environment_no_verdict": true,
+   "subject_absence_never_unrunnable": false
+  }
+ },
+ "expect": "property subject_absence_never_unrunnable is false"
+}

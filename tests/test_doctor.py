@@ -164,6 +164,21 @@ class TestDoctorTranNganSachSoVoiSoChi(unittest.TestCase):
         self.assertIn("$1.25", ra)
         self.assertIn("$5.00", ra)
 
+    def test_live_reservations_are_listed_with_their_owner(self):
+        """F5 / SS-52: `doctor` names every live reservation and its owner, and counts the dead or expired ones
+        it would release (it writes nothing)."""
+        import os
+        import socket
+        import time
+        now = time.time()
+        ra = self._chay({"run.cost_cap_usd": 5.0}, {"spent_usd": 1.0, "reservations": [
+            {"id": "r-live", "owner": f"{socket.gethostname()}:{os.getpid()}", "est_usd": 0.75, "expires_at": now + 600},
+            {"id": "r-old", "owner": "other-host:1", "est_usd": 2.0, "expires_at": now - 1}]})
+        self.assertIn("budget reservations", ra)
+        self.assertIn("1 live: r-live by", ra)
+        self.assertIn("1 dead or expired", ra)
+        self.assertNotIn("r-old by", ra)
+
     def test_tran_thap_hon_so_da_tieu_thi_chan(self):
         ra = self._chay({"run.cost_cap_usd": 0.5}, {"spent_usd": 1.25})
         self.assertIn(f"✗ {self.NHAN}", ra)

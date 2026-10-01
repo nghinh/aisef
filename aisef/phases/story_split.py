@@ -94,6 +94,20 @@ def to_scheduler(stories: list[Story]) -> list[SchedStory]:
     ]
 
 
+#: What a criterion must SHOW, printed on the card the developer reads (TDD proof policy V2, owner section 11):
+#: "prove it red first" is right for a behaviour this story adds and wrong for one it only has to keep working.
+_PROOF_NOTE = {
+    "CHANGE_REQUIRED": "this story must make it pass — its test must fail without this story's code",
+    "PRESERVE_REQUIRED": "already works: keep it working — its test passes before and after",
+    "NEGATIVE_INVARIANT": "must stay true: its test passes before and after; do not make it fail to 'prove' TDD",
+}
+
+
+def _proof_tag(story: Story, i: int) -> str:
+    mode = ((story.ac_proof or {}).get(ac_code(story.id, i)) or {}).get("proof_mode")
+    return f" **[{mode}]**" if mode else ""
+
+
 def render_story(story: Story, prd: PRD | None, root: Path | None = None) -> str:
     """Render story file content — the contract an agent reads before writing code."""
     out = [f"# {story.id}: {story.title}", ""]
@@ -107,10 +121,16 @@ def render_story(story: Story, prd: PRD | None, root: Path | None = None) -> str
         ]
 
     out += ["## Acceptance Criteria", ""]
-    out += [f"{i}. [{ac_code(story.id, i)}] {ac}" for i, ac in enumerate(story.acceptance_criteria, 1)] or [
-        "_(none — machine gate will block)_"
-    ]
+    out += [f"{i}. [{ac_code(story.id, i)}]{_proof_tag(story, i)} {ac}"
+            for i, ac in enumerate(story.acceptance_criteria, 1)] or ["_(none — machine gate will block)_"]
     out.append("")
+
+    modes = sorted({((story.ac_proof or {}).get(ac_code(story.id, i)) or {}).get("proof_mode")
+                    for i in range(1, len(story.acceptance_criteria) + 1)} - {None})
+    if modes:
+        out += ["What each criterion must show:", ""]
+        out += [f"- **{m}** — {_PROOF_NOTE[m]}" for m in modes if m in _PROOF_NOTE]
+        out.append("")
 
     out += ["## Recorded Scope", ""]
     if story.write_scope:
@@ -241,6 +261,8 @@ def split(
         story_fr_map={s.id: s.covers for s in stories},
         story_ac_count={s.id: len(s.acceptance_criteria) for s in stories},
         story_ac_text={s.id: list(s.acceptance_criteria) for s in stories},
+        story_ac_proof={s.id: dict(s.ac_proof) for s in stories},
+        story_type={s.id: s.story_type for s in stories},
     )
 
     # Is the story executable — computed in code, before spending any money.

@@ -1,0 +1,57 @@
+{
+ "record": "AISEF V1 — POST-FREEZE DEFECTS",
+ "authority": "OWNER DECISION 'AISEF V2 — OWNER ACCEPTS P0 / AUTHORIZE P1 SEMANTIC CORE' §1",
+ "rules": {
+  "frozen_v1_register_untouched": "The frozen V1 defect register and every V1 qualification/defect record stay byte-identical; post-freeze knowledge lives only here.",
+  "reporting_distinction": {
+   "historical": "0 known P0/P1 at the historical V1 freeze — a statement about what was known when V1 froze; it remains true of that freeze",
+   "current": "current knowledge includes post-freeze V1-PF-001 (P0, OPEN_IN_V1)",
+   "rule": "every current report MUST state both and MUST NOT present the historical statement as current knowledge"
+  }
+ },
+ "defects": [
+  {
+   "defect_id": "V1-PF-001",
+   "source_observation": "P0-OBS-001",
+   "source_observation_record": {
+    "path": "closure-evidence/v2/P0-OBS-001.json",
+    "sha256": "1f8800437b5adf4467b42adfa1020baeceeb29a5300ad85c03af3c6595326f3a"
+   },
+   "component": "aisef/clients/base.py::_kill_tree_win32",
+   "related": "aisef/harness/process_owner.py::_snapshot_win32 (records th32ParentProcessID unvalidated)",
+   "platform": "Windows",
+   "severity": "P0",
+   "status": "OPEN_IN_V1",
+   "discovered_after_v1_freeze": true,
+   "v1_product_code_frozen": true,
+   "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "v1_fix": "none",
+   "v2_resolution_owner": "WP-4.2",
+   "classification": "LATENT PRODUCT DEFECT WITH NONDETERMINISTIC TRIGGER",
+   "not_classified_as": "CI FLAKE",
+   "severity_rationale": [
+    "stale PPID + PID reuse can form an unbounded traversal",
+    "observed MemoryError (CI run 35565857461, attempt 1, commit b96cc06, unit (windows-latest, 3.11))",
+    "more importantly, stale ancestry can cause termination of a process that is not owned by the target process range",
+    "this is a process-isolation / safety violation"
+   ],
+   "reproduction": "P0-OBS-001: the unmodified V1 function on synthetic snapshots — a cycle through the root never terminates; a non-cyclic stale edge selects an unrelated live process for TerminateProcess",
+   "v2_acceptance_obligations": [
+    "WIN-PID-1",
+    "WIN-PID-2"
+   ],
+   "v2_frozen_acceptance_property": "PID equality alone MUST NOT establish ownership. Process ownership must be established using an ownership mechanism robust against PID reuse.",
+   "recurrence_rule": "If V1-PF-001 recurs before WP-4.2 is complete: STOP the current phase gate and report it. Do not retry-until-green.",
+   "occurrences": [
+    {
+     "ci_run": 35565857461,
+     "attempt": 1,
+     "commit": "b96cc06068b18382aeabfa17bb1137c7afa38396",
+     "job": "unit (windows-latest, 3.11)",
+     "test": "tests/hardening/adapters/test_conformance.py::TestC05Timeout (setUpClass)",
+     "error": "MemoryError at order.append(pid) in _kill_tree_win32"
+    }
+   ]
+  }
+ ]
+}

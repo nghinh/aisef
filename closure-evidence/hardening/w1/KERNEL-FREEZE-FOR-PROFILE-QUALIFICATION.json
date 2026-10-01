@@ -1,0 +1,18 @@
+{
+ "owner_decision": "KERNEL ACCEPTED, EXECUTION PROFILE NOT QUALIFIED (2026-09-18), section 2",
+ "KERNEL_CANDIDATE": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+ "PRODUCT_TREE": "02a34e0e63ed6e1bee9cbfe30897fa41e7440488",
+ "wheel_sha256": "2e08d43b61d6647692b731943741f64f7fa8f107e53dacf06bb92bbc1c9bfe8e",
+ "rule": "every qualification from here is execution-profile qualification against this kernel; any change to the aisef/ tree invalidates this program and requires owner approval",
+ "checked_mechanically_by": [
+  "w1_driver.py preflight: frozen_wheel_digest_identical, product_tree_digest_identical",
+  "execution_profile.py: `kernel` is a profile field, so a different kernel is a different profile and fails verification"
+ ],
+ "kernel_safety_classification": "QUALIFIED for the tested W1 envelope (owner, section A)",
+ "run_2_owner_judgement": {
+  "accepted_as": "LEGITIMATE_MODEL_PROJECT_STOP",
+  "rule": "the framework is not required to convert ordinary developer attempt exhaustion into HUMAN_REQUIRED; HUMAN_REQUIRED is for semantic decisions (requirement ambiguity, plan conflict, owner policy, merge/contract arbitration)",
+  "typed_reason_check": "the kernel's terminal reason for exhaustion is 'tried N attempts, still did not pass gate' (aisef/phases/implement.py:3595) with an EXHAUSTED log line \u2014 accurate, not an incorrectly typed reason, so no product change is authorized or made",
+  "backlog": "docs/ROADMAP-POST-1.0.md \u2014 a distinct typed terminal reason (DELIVERY_ATTEMPTS_EXHAUSTED / MODEL_CAPABILITY_EXHAUSTED) as a UX improvement, not a kernel defect"
+ }
+}

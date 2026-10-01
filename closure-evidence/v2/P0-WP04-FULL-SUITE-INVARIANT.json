@@ -1,0 +1,27 @@
+{
+ "record": "WP-0.4 EXIT — FULL-SUITE INVARIANT",
+ "candidate": "fc3c846e801328e74f9b5650219788531f34464a",
+ "invocation": "python -m unittest discover -s tests -q   (CI's exact invocation), then python -P validation/v2/v1_evidence_guard.py --check",
+ "guard_armed_during_suite": "enforce (tests/v2/test_v1_evidence_guard.py, at discovery)",
+ "suite": {
+  "ran": 3766,
+  "result": "OK",
+  "skipped": 20,
+  "exit": 0
+ },
+ "detective_check": {
+  "result": "PASS",
+  "exit": 0
+ },
+ "protected_set_changes_after_suite": [],
+ "baseline_files_digest_sha256": "a80100d092a4cd8b578ef938013b560fdac137e76502d220c73ad1074fd6998d",
+ "baseline_file_count": 2306,
+ "exit_criterion": "a full-suite run produces zero changes under closure-evidence/ outside v2/",
+ "exit_criterion_met": true,
+ "prior_attempt": {
+  "candidate": "a7b014d9211acb5374a4f57778f851513ae14899",
+  "suite": "FAILED (failures=1) — V1 meta rule: a V2 subprocess call lacked encoding=\"utf-8\"; fixed in fc3c846",
+  "detective_check": "PASS",
+  "protected_set_changes_after_suite": []
+ }
+}

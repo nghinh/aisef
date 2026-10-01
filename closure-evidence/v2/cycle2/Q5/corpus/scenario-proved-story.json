@@ -1,0 +1,1168 @@
+{
+ "record": "AISEF V2 — Q5 corpus item (a real execution, its model stream recorded)",
+ "item": "scenario-proved-story",
+ "covers": [
+  "probe.process_effect",
+  "scenario (construct, call, call)",
+  "candidate proof",
+  "post-merge path"
+ ],
+ "definition": {
+  "stories": [
+   {
+    "id": "S1",
+    "obligations": [
+     [
+      "C5",
+      "INTRODUCE"
+     ]
+    ],
+    "tests": [
+     "tests/test_s1.py"
+    ],
+    "regressions": [
+     "tests/test_other.py"
+    ],
+    "tests_block": false
+   }
+  ],
+  "developer": [
+   {
+    "kind": "COMPLETED",
+    "files": {
+     "app/counter.py": "class Counter:\n    def __init__(self):\n        self.n = 0\n\n    def incr(self):\n        self.n += 1\n        return self.n\n",
+     "tests/test_s1.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    def test_package(self):\n        import app\n        self.assertTrue(app.__name__)\n"
+    },
+    "message": "S1: C5",
+    "detail": "implemented 2 files"
+   }
+  ],
+  "reviewer": [
+   {
+    "kind": "COMPLETED",
+    "findings": [],
+    "detail": "reviewed"
+   }
+  ],
+  "pre_landed": {},
+  "scanner_findings": [],
+  "limits": {},
+  "expected_outcomes": {
+   "S1": [
+    "COMMIT"
+   ]
+  }
+ },
+ "platform": "darwin",
+ "python": "3.14.7",
+ "execution_commit": "74dffbc8ea601080a06261e4295c9adc836c207f",
+ "mode": "record",
+ "variant": null,
+ "errors": {
+  "replay_request_mismatch": 0,
+  "assert_consumed_failure": 0,
+  "tool_diff": 0,
+  "subprocess_diff": 0,
+  "workspace_diff": 0,
+  "probe_product_diff": 0,
+  "control_diff": 0,
+  "capability_mismatch": 0,
+  "harness_error": 0,
+  "invariant_violation": 0,
+  "exception": 0,
+  "residual_process": 0
+ },
+ "started": "2026-10-01T03:04:29Z",
+ "initial_workspace": {
+  "branch": "main",
+  "tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+  "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+  "files": {
+   "app/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "app/calc.py": {
+    "mode": "100644",
+    "blob": "312b477d18e86322d223001d940fc5a0b3758fc0"
+   },
+   "tests/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "tests/test_other.py": {
+    "mode": "100644",
+    "blob": "3db64f878468b50e6fa1d7573c0316e6e0e15ba6"
+   }
+  },
+  "status": "",
+  "status_note": "git status of the fixture repository's own checkout against its index (the branch moves by update-ref; the checkout stays at the base)",
+  "worktrees": 1,
+  "ws_entries": [],
+  "digest": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866"
+ },
+ "final_workspace": {
+  "branch": "main",
+  "tip": "613fb770fb9d1f65266258be83f80d219534633c",
+  "tree": "640ccb1e03d7acea40fcbdbb22cea837e81df693",
+  "files": {
+   "app/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "app/calc.py": {
+    "mode": "100644",
+    "blob": "312b477d18e86322d223001d940fc5a0b3758fc0"
+   },
+   "app/counter.py": {
+    "mode": "100644",
+    "blob": "39d2963fcba289d7961f2d9b3b74537693ed25a9"
+   },
+   "tests/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "tests/test_other.py": {
+    "mode": "100644",
+    "blob": "3db64f878468b50e6fa1d7573c0316e6e0e15ba6"
+   },
+   "tests/test_s1.py": {
+    "mode": "100644",
+    "blob": "f057bdf51abf7e9a827f4e36adf806c6abc5d72d"
+   }
+  },
+  "status": "D  app/counter.py\nD  tests/test_s1.py",
+  "status_note": "git status of the fixture repository's own checkout against its index (the branch moves by update-ref; the checkout stays at the base)",
+  "worktrees": 1,
+  "ws_entries": [],
+  "digest": "65719a034d3e9ac90a9763f9b8fb48ba024566ca0fab8278dc226fb8692be001"
+ },
+ "network": {
+  "guarded": true,
+  "socket_attempts": 0
+ },
+ "journal": [
+  {
+   "seq": 0,
+   "type": "run/begin",
+   "data": {
+    "journal_format": 3,
+    "run_id": "q5-scenario-proved-story"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 1,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "200008f0be21460d36a6c1870bcca6178b7aeb446ab3f075d32f899f2d36fdba",
+     "route": "MODEL_STREAM"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "4f131a2db1001cc2dc096b7f5322814c1d959463a0b96c78338d8fad386ae0b1",
+    "name": "developer"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 2,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "5faddbb6c18e9e8367ff426e1d708237d78c6b8f320a497c74aa5b9b67b5659c",
+    "name": "git"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 3,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "732bc8ba289b2a68df7786e23cf40b5645c0abe2d32ef375b2bee1b89138a8ef",
+     "tree": "37bf6457f350dd720a2214f04f3896c554ad0904"
+    },
+    "enforcement": "FULL",
+    "grade": "VERIFIED",
+    "identity": "47de78dc3d69f345b4f59960184ab89259ee2cbc7c822127ac536be884bf57f0",
+    "name": "kernel"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 4,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634",
+     "version": "3.14.7"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "5f34b937df4725ab238ce4b6b1e08ecf7e1cc4263b17445bd80993e0bc06aa38",
+    "name": "python"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 5,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "c7110116de216e4f0f67f38ae589070b2415dd25b5cfad3de85360d5627378f8",
+     "route": "MODEL_STREAM"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "c2ff0a7125c1ee8844ef0c142e377989865799cb5ed84b1ac6a090d0cd27e23c",
+    "name": "reviewer"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 6,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c"
+    },
+    "enforcement": "FULL",
+    "grade": "VERIFIED",
+    "identity": "c4869c506e599411c8a570a867d8806f534944fdebfce14f9c685c402e3f5795",
+    "name": "scanner"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 7,
+   "type": "run/spec-resolved",
+   "data": {
+    "aggregate_min_grade": "VERIFIED",
+    "capabilities": [
+     "developer",
+     "git",
+     "kernel",
+     "python",
+     "reviewer",
+     "scanner"
+    ],
+    "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "runspec_hash": "46a7f4a2db87e68e46e0f224385f025006b37b394d3050945e1325fb8b0eccd9"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 8,
+   "type": "plan/frozen",
+   "data": {
+    "plan_hash": "d202eac4e92964e20d50f7ba8b8aa8df82881a667dfe0869c045fc11cb503238",
+    "plan_id": "PLAN-scenario-proved-story",
+    "roles": {
+     "C5": "INTRODUCE"
+    }
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 9,
+   "type": "story/begin",
+   "data": {
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 10,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "SCRATCH",
+    "resource": "scratch-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 11,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "wt-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 12,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 13,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [admission 1]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 14,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C5",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "probe_id": "probe.process_effect",
+     "record_digest": "9010406532a94cf8fb6301d927e10cd9bf91d7a57035961e7d1d24f7bcdc1100",
+     "result": {
+      "behavior_verdict": "INDETERMINATE",
+      "reason": "PRECONDITION_ABSENT"
+     },
+     "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "semantic_hash": "8e076642878e27795ae59ac2ee9585a03abfecad2fae7c93cf33b17418a9176e",
+     "spec_id": "PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 15,
+   "type": "story/admitted",
+   "data": {
+    "admitted": true,
+    "developer_call_permitted": true,
+    "dispositions": {
+     "C5": "READY"
+    },
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 16,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [admission 1]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    13
+   ]
+  },
+  {
+   "seq": 17,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:admission",
+    "detail": "admitted",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 18,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "DEVELOPER",
+    "criteria": [
+     "C5"
+    ],
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 19,
+   "type": "provider/result",
+   "data": {
+    "detail": "implemented 2 files",
+    "outcome": "COMPLETED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    18
+   ]
+  },
+  {
+   "seq": 20,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:developer",
+    "detail": "implemented 2 files",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 21,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [C5/CANDIDATE implementer]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 22,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [C5/CANDIDATE implementer]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    21
+   ]
+  },
+  {
+   "seq": 23,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C5",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "probe_id": "probe.process_effect",
+     "record_digest": "3894841d2580a771d439941e15537c82d724638fb1496e26a30a3b9c0c469159",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "8c124f13d1aeda49a6cf04687e370c822a1f329f",
+     "semantic_hash": "8e076642878e27795ae59ac2ee9585a03abfecad2fae7c93cf33b17418a9176e",
+     "spec_id": "PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 24,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [C5/CANDIDATE verifier]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 25,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [C5/CANDIDATE verifier]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    24
+   ]
+  },
+  {
+   "seq": 26,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C5",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "probe_id": "probe.process_effect",
+     "record_digest": "3894841d2580a771d439941e15537c82d724638fb1496e26a30a3b9c0c469159",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "8c124f13d1aeda49a6cf04687e370c822a1f329f",
+     "semantic_hash": "8e076642878e27795ae59ac2ee9585a03abfecad2fae7c93cf33b17418a9176e",
+     "spec_id": "PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 27,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "8c124f13d1aeda49a6cf04687e370c822a1f329f",
+    "criterion_id": "C5",
+    "semantic_hash": "8e076642878e27795ae59ac2ee9585a03abfecad2fae7c93cf33b17418a9176e",
+    "spec_id": "PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c",
+    "story_id": "S1",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    23,
+    26
+   ]
+  },
+  {
+   "seq": 28,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:proof:C5",
+    "detail": "verified",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 29,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 1]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 30,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 2]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 31,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 3]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 32,
+   "type": "tests/adequacy",
+   "data": {
+    "developer_chargeable": true,
+    "execution": {
+     "outcome": "PASSED",
+     "owner_on_failure": null,
+     "reason": "1 story-owned test(s) ran; 0 failed",
+     "selection": "STORY_TESTS_RAN",
+     "status": "EXECUTED"
+    },
+    "may_block": true,
+    "outcome": "INADEQUATE",
+    "owner": "DEVELOPER",
+    "regressions": {
+     "outcome": "PASSED",
+     "owner_on_failure": null,
+     "reason": "1 story-owned test(s) ran; 0 failed",
+     "selection": "STORY_TESTS_RAN",
+     "status": "EXECUTED"
+    },
+    "relevance": "IRRELEVANT",
+    "story_id": "S1",
+    "vacuity": "VACUOUS"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 33,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 3]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    31
+   ]
+  },
+  {
+   "seq": 34,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 2]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    30
+   ]
+  },
+  {
+   "seq": 35,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 1]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    29
+   ]
+  },
+  {
+   "seq": 36,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:quality",
+    "detail": "INADEQUATE",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 37,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "REVIEW",
+    "criteria": [
+     "C5"
+    ],
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 38,
+   "type": "provider/result",
+   "data": {
+    "detail": "reviewed",
+    "outcome": "COMPLETED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    37
+   ]
+  },
+  {
+   "seq": 39,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:review",
+    "detail": "reviewed: no finding",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 40,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tool scan-S1#1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 41,
+   "type": "tool/invoked",
+   "data": {
+    "call_id": "scan-S1#1",
+    "story_id": "S1",
+    "tool": "scan"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 42,
+   "type": "tool/result",
+   "data": {
+    "call_id": "scan-S1#1",
+    "detail": "",
+    "outcome": "COMPLETED",
+    "provenance": "NONE",
+    "signal": 0,
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    41
+   ]
+  },
+  {
+   "seq": 43,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tool scan-S1#1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    40
+   ]
+  },
+  {
+   "seq": 44,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:security",
+    "detail": "scan ran: no finding",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 45,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:merge",
+    "detail": "merged at 613fb770fb9d1f65266258be83f80d219534633c",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 46,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [C5/POST_MERGE implementer]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 47,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [C5/POST_MERGE implementer]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    46
+   ]
+  },
+  {
+   "seq": 48,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C5",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "probe_id": "probe.process_effect",
+     "record_digest": "02858c6ff70aaaae3c03dc90e210a74b666d1b05bd47b082858900c0fa8cb9b1",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "613fb770fb9d1f65266258be83f80d219534633c",
+     "semantic_hash": "8e076642878e27795ae59ac2ee9585a03abfecad2fae7c93cf33b17418a9176e",
+     "spec_id": "PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 49,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [C5/POST_MERGE verifier]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 50,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c [C5/POST_MERGE verifier]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    49
+   ]
+  },
+  {
+   "seq": 51,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C5",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "probe_id": "probe.process_effect",
+     "record_digest": "02858c6ff70aaaae3c03dc90e210a74b666d1b05bd47b082858900c0fa8cb9b1",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "613fb770fb9d1f65266258be83f80d219534633c",
+     "semantic_hash": "8e076642878e27795ae59ac2ee9585a03abfecad2fae7c93cf33b17418a9176e",
+     "spec_id": "PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 52,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "613fb770fb9d1f65266258be83f80d219534633c",
+    "criterion_id": "C5",
+    "semantic_hash": "8e076642878e27795ae59ac2ee9585a03abfecad2fae7c93cf33b17418a9176e",
+    "spec_id": "PPS-9295a9f4a894e041f3ef90b46ea94ff7de157b6f2a264768c7f4348827f3a03c",
+    "story_id": "S1",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    48,
+    51
+   ]
+  },
+  {
+   "seq": 53,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:post-merge:C5",
+    "detail": "re-proved at the merged revision",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 54,
+   "type": "gate/decision",
+   "data": {
+    "gate": "story",
+    "passed": true,
+    "projections": [
+     "story_state",
+     "budgets",
+     "failure_owner",
+     "retry_target"
+    ]
+   },
+   "source_seqs": [
+    17,
+    20,
+    28,
+    36,
+    39,
+    44,
+    45,
+    53
+   ]
+  },
+  {
+   "seq": 55,
+   "type": "story/commit",
+   "data": {
+    "revision": "613fb770fb9d1f65266258be83f80d219534633c",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 56,
+   "type": "story/dispose",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 57,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    12
+   ]
+  },
+  {
+   "seq": 58,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "wt-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    11
+   ]
+  },
+  {
+   "seq": 59,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "SCRATCH",
+    "resource": "scratch-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    10
+   ]
+  },
+  {
+   "seq": 60,
+   "type": "story/end",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 61,
+   "type": "run/dispose-begin",
+   "data": {},
+   "source_seqs": []
+  },
+  {
+   "seq": 62,
+   "type": "run/end",
+   "data": {},
+   "source_seqs": []
+  }
+ ],
+ "journal_raw_digest": "9b06680b5ed64fa953d03b2c8b98f00779f926ed9327e9e608f89100ec4d146f",
+ "subprocesses": {
+  "probe": 5,
+  "tests": 3,
+  "tool": 1,
+  "worktree": 2,
+  "scratch": 1
+ },
+ "residual_from_journal": 0,
+ "run_trace": [
+  "lease",
+  "sentinel OPEN",
+  "journal writer",
+  "RunSpec",
+  "execution",
+  "story scopes disposed",
+  "run/dispose-begin",
+  "run/end",
+  "journal writer closed",
+  "sentinel CLEAN",
+  "lease released"
+ ],
+ "outcomes": {
+  "S1": [
+   "COMMIT"
+  ]
+ },
+ "model_ledger": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "289eaa5d3c2ceec91e0fcd35224bd5b1d3df6edb32a9f7fa1b7cca5657a8cf21",
+   "request": {
+    "header_class": "DEVELOPER_IMPLEMENT",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "200008f0be21460d36a6c1870bcca6178b7aeb446ab3f075d32f899f2d36fdba",
+     "reviewer": "c7110116de216e4f0f67f38ae589070b2415dd25b5cfad3de85360d5627378f8"
+    },
+    "story_id": "S1",
+    "criteria": [
+     "C5"
+    ],
+    "attempt": 1,
+    "prior_failures": [],
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+    "semantic_hashes": {
+     "C5": "8e076642878e27795ae59ac2ee9585a03abfecad2fae7c93cf33b17418a9176e"
+    },
+    "plan_hash": "d202eac4e92964e20d50f7ba8b8aa8df82881a667dfe0869c045fc11cb503238",
+    "tool_schema": "b0a95b22b87abbdf6bfc57b55850896031dfbfdd955e3156abc946792424106d",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "probe_id": "probe.process_effect"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "COMPLETED",
+    "files": {
+     "app/counter.py": "class Counter:\n    def __init__(self):\n        self.n = 0\n\n    def incr(self):\n        self.n += 1\n        return self.n\n",
+     "tests/test_s1.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    def test_package(self):\n        import app\n        self.assertTrue(app.__name__)\n"
+    },
+    "message": "S1: C5",
+    "detail": "implemented 2 files"
+   }
+  },
+  {
+   "seq": 2,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "4dcd2499b71528df60e9f6884661ac20fd90681ac58e22bd3d9d1d7094384831",
+   "request": {
+    "header_class": "REVIEWER_REVIEW",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "200008f0be21460d36a6c1870bcca6178b7aeb446ab3f075d32f899f2d36fdba",
+     "reviewer": "c7110116de216e4f0f67f38ae589070b2415dd25b5cfad3de85360d5627378f8"
+    },
+    "story_id": "S1",
+    "criteria": [
+     "C5"
+    ],
+    "attempt": 1,
+    "prior_failures": [],
+    "parent": "8c124f13d1aeda49a6cf04687e370c822a1f329f",
+    "files": [
+     "app/__init__.py",
+     "app/calc.py",
+     "app/counter.py",
+     "tests/__init__.py",
+     "tests/test_other.py",
+     "tests/test_s1.py"
+    ],
+    "content": "9d6c00b2ebc9b71f93f5409fa9a449c0666829f5b4e0d06ee4e20c37100a8abb",
+    "semantic_hashes": {
+     "C5": "8e076642878e27795ae59ac2ee9585a03abfecad2fae7c93cf33b17418a9176e"
+    },
+    "plan_hash": "d202eac4e92964e20d50f7ba8b8aa8df82881a667dfe0869c045fc11cb503238",
+    "tool_schema": "ea5a37d14b8bcc5551b06bdffdc8b35a5d53776db59d5c0840e18a3557a8965e",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "probe_id": "probe.process_effect"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "COMPLETED",
+    "findings": [],
+    "detail": "reviewed"
+   }
+  }
+ ],
+ "model_requests": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "289eaa5d3c2ceec91e0fcd35224bd5b1d3df6edb32a9f7fa1b7cca5657a8cf21",
+   "matched": 1
+  },
+  {
+   "seq": 2,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "4dcd2499b71528df60e9f6884661ac20fd90681ac58e22bd3d9d1d7094384831",
+   "matched": 2
+  }
+ ],
+ "consumption": {
+  "expected": 2,
+  "consumed": 2,
+  "missing_unconsumed": [],
+  "extra_requests": [],
+  "duplicate_consumptions": 0,
+  "mismatches": 0,
+  "ok": true
+ },
+ "model_mismatches": [],
+ "tool_ledger": [
+  {
+   "tool": "scan",
+   "story_id": "S1",
+   "argv": [
+    "<PY>",
+    "<SCRIPT>",
+    "<REPORT>",
+    "[]"
+   ],
+   "scope_files": [
+    "app/__init__.py",
+    "app/calc.py",
+    "app/counter.py",
+    "tests/__init__.py",
+    "tests/test_other.py",
+    "tests/test_s1.py"
+   ],
+   "scope_content": "9d6c00b2ebc9b71f93f5409fa9a449c0666829f5b4e0d06ee4e20c37100a8abb",
+   "script_sha256": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c",
+   "input_digest": "7dce44b7ebe023f9afc6d8d0f169c8494287ef45612cf933d6e024a802ed94c6",
+   "exit_code": 0,
+   "report_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "report_bytes": 2,
+   "executed": true
+  }
+ ],
+ "notes": [],
+ "finished": "2026-10-01T03:04:32Z",
+ "ledger_digest": "9677445d4f2d7878d397a65177eddd235eae2d8606252671dfa86c5be7a1d4a6"
+}

@@ -1,0 +1,86 @@
+{
+ "generated": "2026-09-19T10:57:46+0700",
+ "route": "9router/cx/gpt-5.5",
+ "listing": {
+  "http": 200,
+  "listed": true,
+  "owned_by": "cx",
+  "route_kind": "FIXED_MODEL"
+ },
+ "chat_probes": [
+  {
+   "http": 200,
+   "seconds": 1.9,
+   "answered_by": "gpt-5.5",
+   "usage": {
+    "prompt_tokens": 2492,
+    "completion_tokens": 5,
+    "total_tokens": 2497
+   }
+  },
+  {
+   "http": 200,
+   "seconds": 2.1,
+   "answered_by": "gpt-5.5",
+   "usage": {
+    "prompt_tokens": 2492,
+    "completion_tokens": 5,
+    "total_tokens": 2497
+   }
+  },
+  {
+   "http": 200,
+   "seconds": 1.7,
+   "answered_by": "gpt-5.5",
+   "usage": {
+    "prompt_tokens": 2492,
+    "completion_tokens": 5,
+    "total_tokens": 2497
+   }
+  }
+ ],
+ "tool_smokes": [
+  {
+   "ok": true,
+   "file_written": true,
+   "tools": [
+    "apply_patch",
+    "bash"
+   ],
+   "errors": [],
+   "exit": 0,
+   "seconds": 23.9
+  },
+  {
+   "ok": true,
+   "file_written": true,
+   "tools": [
+    "apply_patch",
+    "bash"
+   ],
+   "errors": [],
+   "exit": 0,
+   "seconds": 20.7
+  }
+ ],
+ "stage_env_check": null,
+ "requirements": {
+  "exact_fixed_route_resolves": true,
+  "no_4xx_or_other_error_on_any_probe": true,
+  "tool_calling_works": true,
+  "model_identity_constant_between_probes": true,
+  "reviewer_read_only_environment_clean": "not measured here (driver preflight row)"
+ },
+ "pass": true,
+ "summary_for_identity": {
+  "route": "9router/cx/gpt-5.5",
+  "route_kind": "FIXED_MODEL",
+  "resolved_model": "gpt-5.5",
+  "chat_probes": "3/3",
+  "tool_smokes": "2/2",
+  "declared_limit": {
+   "context": 200000,
+   "output": 32768
+  }
+ }
+}

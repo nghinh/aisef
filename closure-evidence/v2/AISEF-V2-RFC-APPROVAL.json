@@ -1,0 +1,56 @@
+{
+ "record": "AISEF V2 — ARCHITECTURE RFC OWNER APPROVAL",
+ "decision": "AISEF V2 — OWNER ARCHITECTURE FREEZE / AUTHORIZE IMPLEMENTATION PLANNING",
+ "status": "APPROVED — FROZEN",
+ "approved_at": "2026-09-21",
+ "approver": "owner",
+ "rfc": {
+  "path": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
+  "reviewed_commit": "2fe672c7ecdefa349e08353fa9bd67d627077d6e",
+  "reviewed_content_sha256": "fc9377d35b7060ade1d199ebac85702207b45dbe2dc8f6baede3ecf77e06b209",
+  "reviewed_git_blob": "cb94530fbcd28cc3c87c374b041a5f169b355788",
+  "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+  "normative_body_rule": "sha256 over the file from the first occurrence of '## 1. Executive architecture decision' to EOF; everything above it is non-normative status metadata",
+  "note": "Approval binds the content reviewed at 2fe672c. The status header was updated afterwards; rfc_normative_digest is identical before and after, which is the mechanical proof that recording approval changed no normative content."
+ },
+ "freeze_table": {
+  "items": "F1-F11",
+  "count": 11,
+  "digest_sha256": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+  "digest_rule": "sha256 over the RFC text from '## Normative freeze table' up to '## Adversarial regression cases'"
+ },
+ "v1_frozen_kernel": {
+  "product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "candidate_sha": "f52df75ff242a8565b4c995e82e25a94016e95d1",
+  "wheel_sha256": "8cae5c7e8d9aea1ecceb7d5d48d360cf2285b4f6db7560ff71aae99b9b182eac",
+  "freeze_record": "closure-evidence/hardening/P19-FREEZE.json",
+  "freeze_record_sha256": "6676f4d2b1e5c9b282b128da8e49d85ed3549a5f2574b42b3a7b11303e42435c"
+ },
+ "v1_w0": {
+  "status": "QUALIFIED",
+  "criteria": "12 of 12",
+  "record": "closure-evidence/hardening/AISEF-W0-QUALIFICATION-f52df75.json",
+  "record_sha256": "7bb8380e0bebc1662e9551934ea7f5ecbe3ec93300f762017add3174dca29fd0"
+ },
+ "change_rule": {
+  "implementation_bug": "fix implementation",
+  "missing_test": "add test",
+  "missing_verifier_already_required_by_rfc": "add verifier",
+  "frozen_semantic_contradiction": "STOP and report",
+  "f_item_change_requires": [
+   "frozen item affected",
+   "contradiction discovered",
+   "concrete reproducer",
+   "why implementation cannot conform",
+   "evidence compatibility impact",
+   "proposed replacement",
+   "owner approval"
+  ],
+  "default": "no architecture exception is approved by default"
+ },
+ "constraints": [
+  "do not redesign the architecture",
+  "do not reinterpret frozen semantics",
+  "do not modify V1 closure evidence"
+ ]
+}

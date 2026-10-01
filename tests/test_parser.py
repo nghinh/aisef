@@ -20,8 +20,11 @@ class TestBuildParser(unittest.TestCase):
         self.assertIsInstance(self.parser, argparse.ArgumentParser)
 
     def test_project_defaults_to_dot(self):
+        # F4 (D-011): the parser leaves an ABSENT --project as None so `main` can tell an implicit project from an
+        # explicit `--project .`; `main` resolves None to the current directory and flags `project_defaulted`
         args = self.parser.parse_args(["doctor"])
-        self.assertEqual(args.project, ".")
+        self.assertIsNone(args.project)
+        self.assertEqual(self.parser.parse_args(["--project", ".", "doctor"]).project, ".")
 
     def test_subcommands_parse(self):
         simple = [

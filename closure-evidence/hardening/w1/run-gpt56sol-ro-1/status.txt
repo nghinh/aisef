@@ -1,0 +1,12 @@
+Progress: 2/16 stories done (13 not started)
+Active epics: EPIC-01
+
+  done        2
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 25 · infra 9
+Skill: bmad-review ×6 · bmad-code-review ×3 · verification-before-completion ×1
+
+✗ 1 stories not passing:
+    STORY-01-03      failed   recurring infrastructure error: APIError: [codex/gpt-5.6-sol] [400]: {"detail":"The 'gpt-5.6-sol' model is not supported when using Codex with a ChatGPT account."} (reset after 30s) (HTTP 503)

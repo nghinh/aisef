@@ -1,0 +1,156 @@
+{
+ "profile": "PROFILE-W1-OC-MINIMAXM3-T80-RO",
+ "profile_id": "sha256:ae9adf64987f08ed498c0672325e81defa596d14e30822b8b8970847a320b1f3",
+ "status": "FAILED_W1_DELIVERY_QUALIFICATION",
+ "identity": {
+  "kernel": {
+   "candidate_sha": "40393cda89dbfbb887c9c901872256a5fdc5bea0",
+   "product_tree": "a2f6e76bf0ec20713179108350b392bb3a80f9ba",
+   "wheel_sha256": "3f0fd6519a9f21b790eeaadcf39a95436dfb9ba75878f9bb411e376ebfc116a6"
+  },
+  "client": "opencode",
+  "client_version": "1.18.31",
+  "routes": {
+   "developer": "9router/max/MiniMax-M3",
+   "reviewer": "9router/max/MiniMax-M3",
+   "security": "9router/max/MiniMax-M3",
+   "designer": "9router/max/MiniMax-M3"
+  },
+  "max_turns": 80,
+  "max_retries": 2,
+  "max_infra_retries": -1,
+  "context_window": {
+   "developer": {
+    "context": 200000,
+    "output": 32768
+   },
+   "reviewer": {
+    "context": 200000,
+    "output": 32768
+   },
+   "security": {
+    "context": 200000,
+    "output": 32768
+   },
+   "designer": {
+    "context": 200000,
+    "output": 32768
+   }
+  },
+  "small_model": "9router/fast",
+  "sandbox_tool_profile": {
+   "sandbox.image": "aisef-verify-python:84adf1d8eaf9",
+   "tools": {
+    "tools.disabled": [],
+    "tools.lint": "ruff check . --exclude .claude --exclude .aisef --exclude .opencode",
+    "tools.sast": "",
+    "tools.test": "python3 -m pytest -v"
+   },
+   "capability_matrix_sha256": "53074dea8d5eebad3bae0d01e263d94bcfe26a092d1854413251d09b68f04bab"
+  },
+  "guard_digest": "3f9cc9b5f3024e9d61948ff3668812b09a85131359414b6531773c8d2d3801fc",
+  "prompt_catalog_digest": "c613e68adb58f368202b4f6f78b8b127ea0ff38dbc91fae9e7f27294c0065db2",
+  "client_config_digest": "21e0eb879caf3515680b8f8628729020482edc8ff4f447f5c69a0072b6b1d534",
+  "cost_cap_usd": 80.0,
+  "stage_env": {
+   "resolved_uv": "closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv",
+   "wrapper_sha256": "f3fbbf214533a9d3fa497cac668d2760f99fd1c23ccf1d647f6f776f7bdd984e",
+   "real_uv": "/Users/nghinh/.local/bin/uv",
+   "real_uv_version": "uv 0.11.3 (45da18ac3 2026-04-01 aarch64-apple-darwin)"
+  },
+  "route_config": {
+   "developer": "9router/max/MiniMax-M3",
+   "reviewer": "9router/max/MiniMax-M3",
+   "security": "9router/max/MiniMax-M3",
+   "designer": "9router/max/MiniMax-M3"
+  },
+  "project_opencode": {
+   "$schema": "https://opencode.ai/config.json",
+   "model": "9router/max/MiniMax-M3",
+   "provider": {
+    "9router": {
+     "models": {
+      "max/MiniMax-M3": {
+       "name": "max/MiniMax-M3",
+       "limit": {
+        "context": 200000,
+        "output": 32768
+       }
+      }
+     }
+    }
+   }
+  },
+  "route_resolution": {
+   "developer": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "MiniMax-M3",
+    "evidence": "profiles/PROVIDER-PREFLIGHT-MINIMAXM3-definition.json: router /models lists max/MiniMax-M3 owned_by 'max' (context_length 1048576, max_completion_tokens 512000); 3/3 chat probes answered_by 'MiniMax-M3'; OpenCode tool smokes 3/3"
+   },
+   "reviewer": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "MiniMax-M3",
+    "evidence": "profiles/PROVIDER-PREFLIGHT-MINIMAXM3-definition.json: router /models lists max/MiniMax-M3 owned_by 'max' (context_length 1048576, max_completion_tokens 512000); 3/3 chat probes answered_by 'MiniMax-M3'; OpenCode tool smokes 3/3"
+   },
+   "security": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "MiniMax-M3",
+    "evidence": "profiles/PROVIDER-PREFLIGHT-MINIMAXM3-definition.json: router /models lists max/MiniMax-M3 owned_by 'max' (context_length 1048576, max_completion_tokens 512000); 3/3 chat probes answered_by 'MiniMax-M3'; OpenCode tool smokes 3/3"
+   },
+   "designer": {
+    "route_kind": "FIXED_MODEL",
+    "resolved_model": "MiniMax-M3",
+    "evidence": "profiles/PROVIDER-PREFLIGHT-MINIMAXM3-definition.json: router /models lists max/MiniMax-M3 owned_by 'max' (context_length 1048576, max_completion_tokens 512000); 3/3 chat probes answered_by 'MiniMax-M3'; OpenCode tool smokes 3/3"
+   }
+  },
+  "provider_preflight": {
+   "route": "9router/max/MiniMax-M3",
+   "route_kind": "FIXED_MODEL",
+   "resolved_model": "MiniMax-M3",
+   "chat_probes": "3/3",
+   "tool_smokes": "3/3",
+   "declared_limit": {
+    "context": 200000,
+    "output": 32768
+   }
+  }
+ },
+ "owner_decision": "CONTINUE W1 PROFILE QUALIFICATION, KERNEL FROZEN (2026-09-19), sections 6 and 9: the next fixed route after PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO failed W1 delivery qualification (0/2 valid runs delivered)",
+ "defined_from": "a rehearsal copy prepared exactly like a run copy (prepare_run_copy.sh + PROFILE, `aisef compile` with the frozen wheel) that never ran, measured with the profile's PATH",
+ "route_choice": "9router/max/MiniMax-M3 — a fixed model (owned_by 'max', not a combo) that worked end to end on 2026-09-18 (profiles/ROUTE-RESOLUTION-2026-09-18.json), through the same router provider as the two previous profiles so only the model changes; the direct minimax provider would also change the client's provider configuration",
+ "differs_from_PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO_in": [
+  "routes",
+  "client_config_digest",
+  "route_config",
+  "project_opencode",
+  "route_resolution",
+  "provider_preflight"
+ ],
+ "same_as_PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO": "kernel, client 1.18.31, max_turns 80, declared context window 200000/32768 (below the route's 1048576/512000, pinned so only the model changes), stage_env (same wrapper digest), sandbox/tools/guard, cost cap, small_model, one model for every role",
+ "oracle": "independent oracle v2 (closure-evidence/hardening/w1/oracle/test_oracle.py)",
+ "provider_preflight_attempts": [
+  {
+   "file": "PROVIDER-PREFLIGHT-MINIMAXM3-definition.json",
+   "result": "PASS — 3/3 chat probes (MiniMax-M3), 3/3 tool smokes, reviewer read-only environment clean (per-role shells identical + developer control)"
+  }
+ ],
+ "run_rule": "each run re-runs the provider preflight first (probes + smokes); a failing route creates no run copy",
+ "qualification_result": {
+  "decided": "2026-09-20T01:39:00+0700",
+  "valid_runs": [
+   "minimax-ro-1",
+   "minimax-ro-2"
+  ],
+  "delivery_complete": 0,
+  "excluded_provider_interrupted_runs": [],
+  "rule": "owner section 8: >= 2 of 3 valid runs DELIVERY_COMPLETE",
+  "why_no_third_run": "0 of 2 valid runs delivered; a third cannot reach 2 of 3",
+  "stopped_at": {
+   "minimax-ro-1": "STORY-04-02 (11/16)",
+   "minimax-ro-2": "STORY-02-02 (7/16, plan deadlock)"
+  },
+  "false_pass": 0,
+  "false_block": 0,
+  "section_9": "the second fixed-model profile to fail W1 delivery qualification (after PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO) -> STOP and DELIVERY FAILURE DECOMPOSITION"
+ }
+}

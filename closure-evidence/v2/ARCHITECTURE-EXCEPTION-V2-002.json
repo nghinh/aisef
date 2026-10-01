@@ -1,0 +1,71 @@
+{
+ "record": "AISEF V2 — ARCHITECTURE EXCEPTION",
+ "id": "ARCHITECTURE-EXCEPTION-V2-002",
+ "status": "APPROVED — APPLIED",
+ "frozen_item_affected": "F5 — Probe protocol: observation-harness / subject semantics",
+ "contradiction_discovered": "RFC §9 listed 'probe timeout' among observation-harness failures that MUST produce UNRUNNABLE. Read literally, a subject that hangs becomes UNRUNNABLE -> ENVIRONMENT: the subject's behaviour is charged to the environment budget and never to DEVELOPER, which is exactly what the harness/subject split exists to prevent. A timeout of the observation harness and a deadline reached by the subject are different facts; the frozen wording did not distinguish them.",
+ "discovered_in": {
+  "phase": "P2 owner review",
+  "candidate": "7c7f7dd8e1dd46ba24b09b3b3c6993ed287c6aa8",
+  "implementation": "aisef2/probe/python_callable.py: subprocess.TimeoutExpired -> HARNESS_FAILED -> UNRUNNABLE, for a hang before or after the subject was touched",
+  "flagged_by_implementation": "closure-evidence/v2/P2-COMPLETION.json implementation_decisions_for_owner_review[3]; P2-PROBE-PROTOCOL.json residuals[0]"
+ },
+ "concrete_reproducer": [
+  "contract: MUST_HOLD, python_callable app.calc:hang returns 3",
+  "the harness launches, prints READY and dispatches the subject",
+  "the subject never returns",
+  "the old probe: TimeoutExpired -> HARNESS_FAILED -> UNRUNNABLE -> PROBE_UNRUNNABLE, owner ENVIRONMENT, retryable",
+  "correct: EXECUTED; the observable 'returns 3 within the window' was not observed -> REFUTED -> UNSATISFIED; at the candidate DEVELOPER"
+ ],
+ "why_implementation_cannot_conform": "An implementation that maps a subject hang to anything but UNRUNNABLE contradicts the frozen §9 bullet ('probe timeout MUST produce UNRUNNABLE'); one that follows it charges product behaviour to ENVIRONMENT. Neither conforms to the harness/subject split F5 freezes.",
+ "replacement": {
+  "summary": "Freeze the distinction. Harness failure or harness timeout (the observation mechanism cannot operate or cannot obtain an observation) -> UNRUNNABLE / ENVIRONMENT, no verdict. Subject observation deadline (the harness dispatched and observed the subject, which did not complete or emit the expected observation within the spec's bounded window) -> EXECUTED, with the verdict the spec's observable assigns to an expired window. No global 'subject timeout -> REFUTED' and no 'subject timeout -> UNRUNNABLE'; a spec that cannot give its bounded window a meaning is INVALID_SPEC, rejected as early as possible (StaticPlanAdmission).",
+  "semantics": {
+   "harness cannot launch / tool unavailable / sandbox unavailable / probe or watchdog fails or times out before an observation": "UNRUNNABLE; ENVIRONMENT; no BehaviorVerdict",
+   "subject dispatched, the spec's observation window expires": "EXECUTED; the verdict the spec's observable assigns to an expired window",
+   "spec whose observable cannot assign semantics to its bounded window": "INVALID_SPEC; rejected at StaticPlanAdmission (check 9) and by the probe"
+  },
+  "rfc_text": "§9 harness-failure bullets, new §9.2, freeze-table F5 row and marker sentence, adversarial cases TIME-1..5, status header",
+  "no_new_plane_or_owner": true,
+  "regression_cases": [
+   "TIME-1",
+   "TIME-2",
+   "TIME-3",
+   "TIME-4",
+   "TIME-5"
+  ]
+ },
+ "evidence_compatibility_impact": {
+  "is_evidence_compatibility_change": true,
+  "what_changes": "The outcome of a subject that exceeds its window: UNRUNNABLE/ENVIRONMENT -> EXECUTED with the observable's verdict. python_callable specs now declare their window (observable 'within_s'); the reference probe's digest changes, so every spec bound to the old digest is refused (INVALID_SPEC, scenario D) and must be recompiled. rfc_normative_digest, freeze_table_digest and the F5 row digest change.",
+  "evidence_written_under_the_old_wording": "No V2 journal exists (P3). The P2 evidence records at 7c7f7dd (P2-PROBE-PROTOCOL.json fault_injection 'probe timeout' -> UNRUNNABLE) are historical; P2-COMPLETION.json stays byte-identical and is superseded by P2-COMPLETION-CORRECTION-V2-002.json. V1 evidence is untouched.",
+  "unaffected": "ProbeExecutionStatus x BehaviorVerdict (F2), the Owner set (F3), the Probe protocol members and signatures, ProbeResult fields, the calibration contracts, subject-absence semantics (§10.2)"
+ },
+ "digests": {
+  "rfc_normative_digest": {
+   "before": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+   "after": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3"
+  },
+  "freeze_table_digest": {
+   "before": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a",
+   "after": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114"
+  },
+  "f5_row_sha256": {
+   "before": "9e67f78a1529d4b437fad27806e545799f3e552985c0163d52ee5846f13d7bac",
+   "after": "5c1bf5f75fcb569908893539c7787a228cc865d18d87ee8408a67cd161742ec5"
+  }
+ },
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "AISEF V2 — P2 OWNER REVIEW CORRECTION / ARCHITECTURE EXCEPTION V2-002",
+  "date": "2026-09-22",
+  "terms": [
+   "freeze the harness-timeout / subject-deadline distinction",
+   "no global subject timeout -> REFUTED, no subject timeout -> UNRUNNABLE",
+   "a spec that cannot assign semantics to its bounded window is INVALID_SPEC, rejected as early as possible",
+   "no new Owner, no new architecture plane",
+   "normative cases TIME-1..5",
+   "do not redesign V2; do not start P3"
+  ]
+ }
+}

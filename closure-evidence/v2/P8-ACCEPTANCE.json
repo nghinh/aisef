@@ -1,0 +1,37 @@
+{
+ "record": "AISEF V2 — P8 ACCEPTANCE (Q4 fresh 100,000-trace differential accepted by the owner)",
+ "id": "AISEF-V2-P8-ACCEPTANCE",
+ "authority": "owner decision 'AISEF V2 — P9 / QP-9 EXECUTION AUTHORIZATION / Q5 REAL-EXECUTION REPRODUCTION' (2026-09-28): P8 / Q4 ACCEPTED and COMPLETE",
+ "written": "2026-09-28T01:46:49Z",
+ "qualified_semantic_candidate": {
+  "commit": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804"
+ },
+ "p8_evidence": {
+  "differential": {
+   "path": "closure-evidence/v2/Q4/DIFFERENTIAL.json",
+   "sha256": "2a07619255e0f754ffad6d7be79193275f899773915d66c71024dafdf3633b10"
+  },
+  "subject": {
+   "path": "closure-evidence/v2/Q4/SUBJECT.json",
+   "sha256": "4f99a4df0a89e019c4f886dd70ec11f0fe12a10660b34f2082ef97479126ed29"
+  },
+  "execution_commit": "ae5ffb159a9b0b16bec6ef14c79623879e81309f",
+  "evidence_commit": "8f1d32a0cb394faeeb04b6fe624fcbd172bd4905"
+ },
+ "p7_acceptance": {
+  "path": "closure-evidence/v2/P7-ACCEPTANCE.json",
+  "sha256": "c7144a2353e18d844a69f1739c133678fc79bfbc60645d1808fceb2846a66edf"
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/P8-RUN-HISTORY.json",
+  "total_attempts": 45,
+  "sha256": "4611a693fe3d8a871892106b1680059ef22f513b05d6c5e7619f68a93a492ff5",
+  "rule": "closed at this count; 8f1d32a's completed attempts open P9-RUN-HISTORY (owner §3); nothing rewritten"
+ },
+ "p9": {
+  "status": "AUTHORIZED — Q5 real-execution reproduction on 7114177",
+  "history": "closure-evidence/v2/P9-RUN-HISTORY.json"
+ },
+ "verdict": "P8 ACCEPTED"
+}

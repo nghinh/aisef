@@ -1,0 +1,6 @@
+{"chain":"703ab9b57c4250897bfb971d837c7e4fb1356e3322f2ddf80fa9186069bd4cec","event":{"data":{"journal_format":1,"run_id":"fixture"},"ignorable":false,"seq":0,"source_seqs":[],"time":0.0,"type":"run/begin"}}
+{"chain":"5fb4e1aeb7c103d4e63076799859ec0806a0ce64580f4389358998c4897dc3e2","event":{"data":{"done":1,"of":3},"ignorable":true,"seq":1,"source_seqs":[],"time":1.0,"type":"report/progress"}}
+{"chain":"fef94befa7a18643245665e146f3cbef4354fdf56be6df23252dc279820f1646","event":{"data":{"parent":"cccccccccccccccccccccccccccccccccccccccc","story_id":"S1"},"ignorable":false,"seq":2,"source_seqs":[],"time":2.0,"type":"story/begin"}}
+{"chain":"206ec1cac285bec70a94e0f5d278fb51501d053753f4d607e156d242ab8d29fb","event":{"data":{"done":1,"of":3},"ignorable":true,"seq":3,"source_seqs":[],"time":3.0,"type":"report/progress"}}
+{"chain":"b1b42e17f4e95dd90eb7daabe15605ce9bfa832ffdb654cb97918a3e28f0ece6","event":{"data":{"code":"PROBE_UNRUNNABLE","detail":"interpreter absent","owner":"ENVIRONMENT","retryable":true,"story_id":"S1"},"ignorable":false,"seq":4,"source_seqs":[],"time":4.0,"type":"failure/observed"}}
+{"chain":"ff4e92245030e17c0fc05c190a52ada38c5a8f707cdc752c4995ba0eff6d5c2e","event":{"data":{"story_id":"S1"},"ignorable":false,"seq":5,"source_seqs":[4],"time":5.0,"type":"story/retry"}}

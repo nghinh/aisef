@@ -1,0 +1,143 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 34 items
+
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_1_put_same_rid_replays_original_line_byte_for_byte FAILED [  2%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_2_put_different_rid_raises_conflict FAILED [  5%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_3_delete_then_put_different_rid_raises_conflict FAILED [  8%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_4_delete_same_rid_replays_delete_line_byte_for_byte FAILED [ 11%]
+tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_5_nfd_same_rid_replays_nfc_key_byte_exact FAILED [ 14%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps PASSED [ 17%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_byte_identical_across_element_equal_dicts PASSED [ 20%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_encoded_as_utf8_literal PASSED [ 23%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_key_order_independent PASSED [ 26%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_literal_seven_char_string PASSED [ 29%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads PASSED [ 32%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex PASSED [ 35%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_distinct_digest PASSED [ 38%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 41%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_deterministic_across_invocations PASSED [ 44%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_accepts_genesis_prev_hash PASSED [ 47%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_1_first_append_writes_single_chained_line PASSED [ 50%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_2_second_append_chains_prev_hash PASSED [ 52%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_3_empty_key_raises_value_error_no_file PASSED [ 55%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_4_fresh_instance_reads_tail_from_disk PASSED [ 58%]
+tests/test_ledger.py::TestLedgerAppend::test_AC_STORY_01_05_5_other_instance_sees_line_and_trailing_newline PASSED [ 61%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_byte_for_byte PASSED [ 64%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_equivalent PASSED [ 67%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_3_import_prints_init_path PASSED [ 70%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_4_cli_help_lists_subcommands PASSED [ 73%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports PASSED [ 76%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_6_no_side_channel_calls PASSED [ 79%]
+tests/test_skeleton.py::TestSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable PASSED [ 82%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_returns_n_bytes_with_trailing_newline_stripped PASSED [ 85%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found PASSED [ 88%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 91%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_writes_concatenation_and_round_trips PASSED [ 94%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_before_replace_leaves_original_intact PASSED [ 97%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory PASSED [100%]
+
+=================================== FAILURES ===================================
+_ TestAppendReplayConflict.test_AC_STORY_01_06_1_put_same_rid_replays_original_line_byte_for_byte _
+
+self = <tests.test_conflict.TestAppendReplayConflict testMethod=test_AC_STORY_01_06_1_put_same_rid_replays_original_line_byte_for_byte>
+
+    def test_AC_STORY_01_06_1_put_same_rid_replays_original_line_byte_for_byte(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            ledger = Ledger(path)
+            original = ledger.append(("put", "k", "v1", "r1", 100))
+>           self.assertTrue(original["committed"])
+                            ^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'committed'
+
+tests/test_conflict.py:19: KeyError
+_ TestAppendReplayConflict.test_AC_STORY_01_06_2_put_different_rid_raises_conflict _
+
+self = <tests.test_conflict.TestAppendReplayConflict testMethod=test_AC_STORY_01_06_2_put_different_rid_raises_conflict>
+
+    def test_AC_STORY_01_06_2_put_different_rid_raises_conflict(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "k", "v1", "r1", 100))
+            before = path.read_bytes()
+    
+>           with self.assertRaises(ConflictError) as ctx:
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: ConflictError not raised
+
+tests/test_conflict.py:38: AssertionError
+_ TestAppendReplayConflict.test_AC_STORY_01_06_3_delete_then_put_different_rid_raises_conflict _
+
+self = <tests.test_conflict.TestAppendReplayConflict testMethod=test_AC_STORY_01_06_3_delete_then_put_different_rid_raises_conflict>
+
+    def test_AC_STORY_01_06_3_delete_then_put_different_rid_raises_conflict(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            ledger = Ledger(path)
+>           ledger.append(("delete", "k", "r1", 100))
+
+tests/test_conflict.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ledgerlock.ledger.Ledger object at 0xffffb91f7f80>
+op = ('delete', 'k', 'r1', 100)
+
+    def append(self, op: tuple) -> dict:
+>       op_name, key, value, rid, ts = op
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 4)
+
+ledgerlock/ledger.py:22: ValueError
+_ TestAppendReplayConflict.test_AC_STORY_01_06_4_delete_same_rid_replays_delete_line_byte_for_byte _
+
+self = <tests.test_conflict.TestAppendReplayConflict testMethod=test_AC_STORY_01_06_4_delete_same_rid_replays_delete_line_byte_for_byte>
+
+    def test_AC_STORY_01_06_4_delete_same_rid_replays_delete_line_byte_for_byte(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            ledger = Ledger(path)
+>           ledger.append(("delete", "k", "r1", 100))
+
+tests/test_conflict.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ledgerlock.ledger.Ledger object at 0xffffb938e6f0>
+op = ('delete', 'k', 'r1', 100)
+
+    def append(self, op: tuple) -> dict:
+>       op_name, key, value, rid, ts = op
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 4)
+
+ledgerlock/ledger.py:22: ValueError
+_ TestAppendReplayConflict.test_AC_STORY_01_06_5_nfd_same_rid_replays_nfc_key_byte_exact _
+
+self = <tests.test_conflict.TestAppendReplayConflict testMethod=test_AC_STORY_01_06_5_nfd_same_rid_replays_nfc_key_byte_exact>
+
+    def test_AC_STORY_01_06_5_nfd_same_rid_replays_nfc_key_byte_exact(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "\u00e9", "v1", "r1", 100))
+            before = path.read_bytes()
+    
+            result = ledger.append(("put", "e\u0301", "v2", "r1", 200))
+    
+>           self.assertTrue(result["replayed"])
+                            ^^^^^^^^^^^^^^^^^^
+E           KeyError: 'replayed'
+
+tests/test_conflict.py:83: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_1_put_same_rid_replays_original_line_byte_for_byte
+FAILED tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_2_put_different_rid_raises_conflict
+FAILED tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_3_delete_then_put_different_rid_raises_conflict
+FAILED tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_4_delete_same_rid_replays_delete_line_byte_for_byte
+FAILED tests/test_conflict.py::TestAppendReplayConflict::test_AC_STORY_01_06_5_nfd_same_rid_replays_nfc_key_byte_exact
+========================= 5 failed, 29 passed in 0.33s =========================

@@ -27,6 +27,9 @@ from aisef.control.preflight import (  # noqa: E402
 )
 
 
+from tests import obligations
+
+
 class PreflightTestCase(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
@@ -53,7 +56,9 @@ class PreflightTestCase(unittest.TestCase):
             write_scope=["src/a.ts"],
         )
         base.update(kw)
-        return Story(**base)
+        st = Story(**base)
+        st.ac_proof = obligations(st.id, len(st.acceptance_criteria))
+        return st
 
     def check(self, story, **cfg):
         return check_story(story, project=self.project, config=self.config(**cfg))

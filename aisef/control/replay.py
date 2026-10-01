@@ -24,6 +24,8 @@ from .gate import StoryGate, evaluate
 from .outcome import Outcome
 from .security import parse as parse_security
 
+from .replay_manifest import DRIFT_RECORD, Drift, ReplayManifest, capture, preflight  # noqa: F401 — Phase 17 replay contract
+
 GATE_INPUT = "gate:input"
 GATE_VERDICT = "gate:verdict"
 

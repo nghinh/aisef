@@ -1,0 +1,156 @@
+{
+ "generated": "2026-09-19T10:55:18+0700",
+ "route": "9router/cx/gpt-5.5",
+ "listing": {
+  "http": 200,
+  "listed": true,
+  "owned_by": "cx",
+  "route_kind": "FIXED_MODEL"
+ },
+ "chat_probes": [
+  {
+   "http": 200,
+   "seconds": 2.1,
+   "answered_by": "gpt-5.5",
+   "usage": {
+    "prompt_tokens": 2492,
+    "completion_tokens": 5,
+    "total_tokens": 2497
+   }
+  },
+  {
+   "http": 200,
+   "seconds": 1.8,
+   "answered_by": "gpt-5.5",
+   "usage": {
+    "prompt_tokens": 2492,
+    "completion_tokens": 5,
+    "total_tokens": 2497
+   }
+  },
+  {
+   "http": 200,
+   "seconds": 2.2,
+   "answered_by": "gpt-5.5",
+   "usage": {
+    "prompt_tokens": 2492,
+    "completion_tokens": 5,
+    "total_tokens": 2497
+   }
+  }
+ ],
+ "tool_smokes": [
+  {
+   "ok": true,
+   "file_written": true,
+   "tools": [
+    "apply_patch",
+    "bash",
+    "bash",
+    "bash"
+   ],
+   "errors": [],
+   "exit": 0,
+   "seconds": 34.2
+  },
+  {
+   "ok": true,
+   "file_written": true,
+   "tools": [
+    "apply_patch",
+    "bash",
+    "bash",
+    "bash",
+    "bash",
+    "bash",
+    "bash",
+    "bash",
+    "bash"
+   ],
+   "errors": [],
+   "exit": 0,
+   "seconds": 64.3
+  },
+  {
+   "ok": true,
+   "file_written": true,
+   "tools": [
+    "apply_patch",
+    "bash"
+   ],
+   "errors": [],
+   "exit": 0,
+   "seconds": 21.5
+  }
+ ],
+ "stage_env_check": {
+  "command": "uv run {p}/_bmad/scripts/resolve_customization.py --skill {p}/.claude/skills/bmad-code-review --project-root {p} --key workflow",
+  "path": "/Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin:/Users/nghinh/.local/bin:/Users/nghinh/.antigravity-ide/antigravity-ide/bin:/Users/nghinh/bin:/Users/nghinh/Library/Android/sdk/platform-tools:/Users/nghinh/Library/Android/sdk/cmdline-tools/latest/bin:/Users/nghinh/.opencode/bin:/Users/nghinh/.local/bin:/opt/homebrew/bin:/Users/nghinh/.npm-global/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/opt/homebrew/bin:/Users/nghinh/.nvm/versions/node/v22.22.1/bin:/Users/nghinh/Library/pnpm:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_012ABz1xjgtJYWKrcJkXW6ad/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_014WxCYbLf7f3uw2isHFR9US/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_0155zZVATbJU3jHUmPP9NvMC/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01AYHYqVLaZRH2Vi6aHgDwEw/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01SfWJSiw6JtGbsuW75PKvPK/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/1c625eaa-3cc7-4f27-a610-c53b8cda189b/397c6835-34b1-4b78-b008-f94d2f58ee90/rpm/plugin_01XXJmxLXPEhPMmnxmrgntNw/bin:/Users/nghinh/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/397c6835-34b1-4b78-b008-f94d2f58ee90/1c625eaa-3cc7-4f27-a610-c53b8cda189b/bin:/Users/nghinh/.claude/plugins/cache/karpathy-skills/andrej-karpathy-skills/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/gopls-lsp/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/ponytail/ponytail/4.9.0/bin:/Users/nghinh/.claude/plugins/cache/claude-community/eli5/1.0.0/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/playwright/unknown/bin:/Users/nghinh/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown/bin",
+  "stage_env": {
+   "resolved_uv": "closure-evidence/hardening/w1/profiles/stage-env-ro-uv/bin/uv",
+   "wrapper_sha256": "f3fbbf214533a9d3fa497cac668d2760f99fd1c23ccf1d647f6f776f7bdd984e",
+   "real_uv": "/Users/nghinh/.local/bin/uv",
+   "real_uv_version": "uv 0.11.3 (45da18ac3 2026-04-01 aarch64-apple-darwin)"
+  },
+  "per_role_shell": {
+   "reviewer /bin/sh -c": {
+    "identical": true,
+    "exit": 2,
+    "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/aisef-qualification-ws/profile-rehearsal-gpt55/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+   },
+   "reviewer /bin/zsh -c": {
+    "identical": true,
+    "exit": 2,
+    "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/aisef-qualification-ws/profile-rehearsal-gpt55/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+   },
+   "reviewer /bin/zsh -ic": {
+    "identical": true,
+    "exit": 2,
+    "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/aisef-qualification-ws/profile-rehearsal-gpt55/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+   },
+   "security /bin/sh -c": {
+    "identical": true,
+    "exit": 2,
+    "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/aisef-qualification-ws/profile-rehearsal-gpt55/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+   },
+   "security /bin/zsh -c": {
+    "identical": true,
+    "exit": 2,
+    "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/aisef-qualification-ws/profile-rehearsal-gpt55/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+   },
+   "security /bin/zsh -ic": {
+    "identical": true,
+    "exit": 2,
+    "tail": "error: Failed to spawn: `/Users/nghinh/Downloads/projects/aisef-qualification-ws/profile-rehearsal-gpt55/_bmad/scripts/resolve_customization.py`\n  Caused by: No such file or directory (os error 2)"
+   }
+  },
+  "developer_control": {
+   "developer_tree_changed": true,
+   "new": [
+    ".venv",
+    "ledgerlock.egg-info",
+    "uv.lock"
+   ]
+  },
+  "pass": true
+ },
+ "requirements": {
+  "exact_fixed_route_resolves": true,
+  "no_4xx_or_other_error_on_any_probe": true,
+  "tool_calling_works": true,
+  "model_identity_constant_between_probes": true,
+  "reviewer_read_only_environment_clean": true
+ },
+ "pass": true,
+ "summary_for_identity": {
+  "route": "9router/cx/gpt-5.5",
+  "route_kind": "FIXED_MODEL",
+  "resolved_model": "gpt-5.5",
+  "chat_probes": "3/3",
+  "tool_smokes": "3/3",
+  "declared_limit": {
+   "context": 200000,
+   "output": 32768
+  }
+ }
+}

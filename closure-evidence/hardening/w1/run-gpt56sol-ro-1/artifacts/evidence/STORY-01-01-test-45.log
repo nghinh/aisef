@@ -1,0 +1,86 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 7 items
+
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_matches_unicodedata_nfc_byte_for_byte FAILED [ 14%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_identical FAILED [ 28%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_3_package_import_reports_init_path FAILED [ 42%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_4_module_help_lists_all_subcommands FAILED [ 57%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_5_runtime_has_no_forbidden_imports PASSED [ 71%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_6_runtime_has_no_forbidden_calls PASSED [ 85%]
+tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error FAILED [100%]
+
+=================================== FAILURES ===================================
+_ NormalizeKeyTests.test_AC_STORY_01_01_1_matches_unicodedata_nfc_byte_for_byte _
+
+self = <tests.test_nfc_normalization.NormalizeKeyTests testMethod=test_AC_STORY_01_01_1_matches_unicodedata_nfc_byte_for_byte>
+
+    def test_AC_STORY_01_01_1_matches_unicodedata_nfc_byte_for_byte(self):
+>       from ledgerlock.format import normalize_key
+E       ModuleNotFoundError: No module named 'ledgerlock.format'
+
+tests/test_nfc_normalization.py:7: ModuleNotFoundError
+___ NormalizeKeyTests.test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_identical ____
+
+self = <tests.test_nfc_normalization.NormalizeKeyTests testMethod=test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_identical>
+
+    def test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_identical(self):
+>       from ledgerlock.format import normalize_key
+E       ModuleNotFoundError: No module named 'ledgerlock.format'
+
+tests/test_nfc_normalization.py:16: ModuleNotFoundError
+_ PackageSkeletonTests.test_AC_STORY_01_01_3_package_import_reports_init_path __
+
+self = <tests.test_skeleton.PackageSkeletonTests testMethod=test_AC_STORY_01_01_3_package_import_reports_init_path>
+
+    def test_AC_STORY_01_01_3_package_import_reports_init_path(self):
+        result = subprocess.run(
+            [sys.executable, "-c", "import ledgerlock; print(ledgerlock.__file__)"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    
+        self.assertEqual(result.returncode, 0, result.stderr)
+>       self.assertTrue(result.stdout.strip().endswith("ledgerlock/__init__.py"))
+E       AssertionError: False is not true
+
+tests/test_skeleton.py:23: AssertionError
+_ PackageSkeletonTests.test_AC_STORY_01_01_4_module_help_lists_all_subcommands _
+
+self = <tests.test_skeleton.PackageSkeletonTests testMethod=test_AC_STORY_01_01_4_module_help_lists_all_subcommands>
+
+    def test_AC_STORY_01_01_4_module_help_lists_all_subcommands(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "ledgerlock", "--help"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    
+>       self.assertEqual(result.returncode, 0, result.stderr)
+E       AssertionError: 1 != 0 : /usr/local/bin/python3: No module named ledgerlock.__main__; 'ledgerlock' is a package and cannot be directly executed
+
+tests/test_skeleton.py:34: AssertionError
+_ PackageSkeletonTests.test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error _
+
+self = <tests.test_skeleton.PackageSkeletonTests testMethod=test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error>
+
+    def test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error(self):
+>       from ledgerlock import ConflictError, Ledger
+E       ImportError: cannot import name 'ConflictError' from 'ledgerlock' (unknown location)
+
+tests/test_skeleton.py:58: ImportError
+=========================== short test summary info ============================
+FAILED tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_matches_unicodedata_nfc_byte_for_byte
+FAILED tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_forms_are_identical
+FAILED tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_3_package_import_reports_init_path
+FAILED tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_4_module_help_lists_all_subcommands
+FAILED tests/test_skeleton.py::PackageSkeletonTests::test_AC_STORY_01_01_7_public_api_exports_callable_ledger_and_error
+========================= 5 failed, 2 passed in 0.11s ==========================

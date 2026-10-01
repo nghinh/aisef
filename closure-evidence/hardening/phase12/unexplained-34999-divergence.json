@@ -1,0 +1,105 @@
+{
+ "seed": 34999,
+ "first_divergence_step": 7,
+ "first_divergence": "after the retried security session hit the budget cap, the model stopped (INV-G.5) and the kernel opened a developer session",
+ "governing_contract": "INV-G.5 — a budget cap reached inside a verifier session is a run-level condition: no further session may be opened, whatever else the gate says (registry; SS-12's rule, F2); transition table: no T-row opens a session after a cap",
+ "classification": "A — REAL KERNEL DEFECT (the model follows the approved invariant; the kernel violated it)",
+ "severity": "P2 — no false PASS; in production the BudgetGuard refuses the paid call, so no money past the cap, but one quality attempt was charged and the terminal came one attempt late",
+ "defect_id": "SS-64",
+ "family": "FAM-BUDGET (fix family F2)",
+ "invariant": "INV-G.5",
+ "root_cause_site": "aisef/phases/implement.py::_review_stage — `if absent and _verifier_budget_cap(attempt)`: the cap check gated on absences; `_absent_stages` is empty once any check FAILED (here the retried review's BLOCK)",
+ "sibling": "run_verify_only path typed the same cap as a stage that could not run (UNRUNNABLE, 'retry when it can') instead of BUDGET; fixed by the same precedence",
+ "sibling_search": {
+  "same divergence at another stage?": "the verify-only path (fixed); the main routing checks the cap on the record it routes (covered); the no-op re-grade returns the record it grades (covered)",
+  "tied to review/security only accidentally?": "the cap can be reached in either verifier; `_verifier_budget_cap` reads both; the gating on absence was the only site",
+  "cause class": "typed outcome precedence (a run-level condition subordinated to a stage-level absence), not recency, staleness, ownership, process lifecycle or identity"
+ },
+ "steps": [
+  {
+   "step": 1,
+   "input_event": "developer CHANGED_ARTIFACT (session 1)",
+   "model_pre": "pending→running/DEVELOP, epoch 1, quality 2, infra n",
+   "kernel_pre": "same (attempt 1 opens)",
+   "model_outcome": "DEVELOP_CHANGED→PASS; FREEZE (T5→T13)",
+   "kernel_outcome": "changes.detected; candidate.frozen d30ee132fb45",
+   "model_post": "VERIFY, candidate C1",
+   "kernel_post": "VERIFY, candidate d30ee132fb45",
+   "budgets": "quality 2/2 both",
+   "evidence": "C1 bound both",
+   "identity_diff": "none"
+  },
+  {
+   "step": 2,
+   "input_event": "test PASS",
+   "model_outcome": "TEST_PASS→PASS (T15)",
+   "kernel_outcome": "test ok on C1",
+   "model_post": "REVIEW",
+   "kernel_post": "REVIEW",
+   "budgets": "unchanged",
+   "evidence": "test fresh for C1 both",
+   "identity_diff": "none"
+  },
+  {
+   "step": 3,
+   "input_event": "review COMMIT (reviewer commits on the candidate)",
+   "model_outcome": "REVIEW_MUTATE→UNRUNNABLE (T20: tree restored, that execution said nothing)",
+   "kernel_outcome": "review_unrunnable='candidate changed during review session' (evidence:invalidated review:candidate-moved recorded)",
+   "model_post": "review execution 1 counted, no verdict",
+   "kernel_post": "same; soft reset, selective restore",
+   "budgets": "review retries 1 used both",
+   "evidence": "review absent both",
+   "identity_diff": "none"
+  },
+  {
+   "step": 4,
+   "input_event": "security UNRUNNABLE",
+   "model_outcome": "SECURITY_UNRUNNABLE→UNRUNNABLE",
+   "kernel_outcome": "security.unrunnable (execution 1)",
+   "model_post": "GATE",
+   "kernel_post": "GATE",
+   "budgets": "security executions 1 both",
+   "evidence": "security absent both",
+   "identity_diff": "none"
+  },
+  {
+   "step": 5,
+   "input_event": "gate over C1",
+   "model_outcome": "GATE_EVALUATE→UNRUNNABLE (only absences: T26 → review stage)",
+   "kernel_outcome": "gate: review + security UNRUNNABLE → _review_stage (absent=[review, security])",
+   "model_post": "REVIEW again on C1",
+   "kernel_post": "REVIEW again on C1 (re-graded record `lai`, attempt 1)",
+   "budgets": "unchanged",
+   "evidence": "unchanged",
+   "identity_diff": "none"
+  },
+  {
+   "step": 6,
+   "input_event": "review BLOCK (retry)",
+   "model_outcome": "REVIEW_BLOCK→QUALITY_BLOCK (T18)",
+   "kernel_outcome": "review verdict BLOCK on C1 (execution 2)",
+   "model_post": "SECURITY",
+   "kernel_post": "SECURITY",
+   "budgets": "review executions 2 both",
+   "evidence": "review verdict fresh for C1 both",
+   "identity_diff": "none"
+  },
+  {
+   "step": 7,
+   "input_event": "security BUDGET (retry) — the cap",
+   "model_outcome": "SECURITY_BUDGET→HUMAN_REQUIRED: run-level cap (INV-G.5), story blocked:budget cap; NO further session",
+   "kernel_outcome": "security.unrunnable='could not run: budget exceeded' on record `lai`; `_absent_stages(lai)` = [] because the review check FAILED; the review stage's cap check was gated on `absent` → not taken; `lai` returned to quality routing",
+   "model_post": "TERMINAL blocked:budget cap (dev 1, review 2, security 2, quality 1, candidates 1)",
+   "kernel_post": "QUALITY_BLOCK → DEVELOP: attempt 2 opens (dev 2), review 3, security 3 (cap again), quality 2, candidates 2 → blocked:budget cap one attempt late",
+   "budgets": "model: quality 1 used; kernel: quality 2 used (one charged past the cap)",
+   "evidence": "kernel adds candidate C2 5ee064a8782a and its verdicts — none should exist",
+   "identity_diff": "kernel: a second candidate identity; model: none",
+   "FIRST_SEMANTIC_DIVERGENCE": true
+  }
+ ],
+ "fix": "cap precedence over absence in _review_stage and in the verify-only path (2026-09-17)",
+ "reproducers": [
+  "tests/hardening/test_differential.py::TestSeed34999ACapInsideARegradedVerifierStopsTheRun",
+  "tests/hardening/test_differential.py::TestSS64SiblingVerifyOnlyCapIsABudgetStop"
+ ]
+}

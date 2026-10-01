@@ -1,0 +1,3332 @@
+{
+ "record": "AISEF V2 — C2-P10 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/cohort/lifecycle.py::DEMOTED",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L43 CohortState.EXPOSED->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L43 CohortState.EXPOSED->EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L43 CohortState.EXPOSED->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L43 CohortState.DEVELOPMENT->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L43 CohortState.DEVELOPMENT->EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L43 CohortState.DEVELOPMENT->EXPOSED",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::EvaluationCohort.__post_init__",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 169,
+   "killed": 169,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L59 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L62 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L65 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L71 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L74 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L76 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L79 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L59 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L65 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L67 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L67 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L67 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L69 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L71 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L74 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L76 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L79 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L80 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L82 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'preregistration' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L67 string 'runs_completed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L67 string 'invalidated_runs' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L67 string 'stale_inputs' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L69 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L74 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L74 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L76 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L76 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L80 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L82 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L60 Refusal.OPAQUE_PROFILE->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L60 string 'an OPAQUE aggregate_min_grade never seals (RFC §28 rule 5)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L63 Refusal.DEVELOPMENT_REGRESSION->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Refusal.COHORT_INCONSISTENT->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 string 'state is a CohortState' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L69 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L69 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L69 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Refusal.COHORT_INCONSISTENT->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L72 string 'more runs than were preregistered' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L74 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L74 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L75 Refusal.COHORT_INCONSISTENT->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L75 string 'results_read_at is a finite timestamp or None' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L76 CohortState.SEALED->EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L76 CohortState.SEALED->EXPOSED",
+     "killed": true
+    },
+    {
+     "mutant": "L76 CohortState.SEALED->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L76 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Refusal.COHORT_INCONSISTENT->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L77 string 'a SEALED cohort has run nothing and read nothing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L80 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L70 Refusal.COHORT_INCONSISTENT->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L81 Refusal.COHORT_INCONSISTENT->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L83 Refusal.COHORT_INCONSISTENT->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string 'execution_profile' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L70 string ' is a tuple of distinct names' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L74 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L74 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L81 string ' records its exposed_reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L83 string ' has no exposed_reason' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L69 And swapped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::EvaluationCohort.frozen_inputs",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L95 returns None",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::EvaluationCohort.id",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L87 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string 'cohort_id' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::EvaluationCohort.plan_quality_policy",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L107 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'plan_quality_policy' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::EvaluationCohort.planned_runs",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L99 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L99 string 'run_count' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::EvaluationCohort.preregistration_hash",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L91 returns None",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::EvaluationCohort.threshold",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L103 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'delivery' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'thresholds' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::EvaluationCohort.workload",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L111 returns None",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::NEXT",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 18,
+   "killed": 18,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L41 CohortState.SEALED->EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.SEALED->EXPOSED",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.SEALED->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.EVALUATING->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.EVALUATING->EXPOSED",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.EVALUATING->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L42 CohortState.EXPOSED->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L42 CohortState.EXPOSED->EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L42 CohortState.EXPOSED->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.EVALUATING->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.EVALUATING->EXPOSED",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.EVALUATING->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.EXPOSED->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.EXPOSED->EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L41 CohortState.EXPOSED->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L42 CohortState.DEVELOPMENT->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L42 CohortState.DEVELOPMENT->EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L42 CohortState.DEVELOPMENT->EXPOSED",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::_complete",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L180 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L180 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L180 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L180 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L180 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L181 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L180 CohortState.EVALUATING->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L180 CohortState.EVALUATING->EXPOSED",
+     "killed": true
+    },
+    {
+     "mutant": "L180 CohortState.EVALUATING->DEVELOPMENT",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::_live",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 35,
+   "killed": 35,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L142 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L144 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L142 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L142 CohortState.EVALUATING->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L142 CohortState.EVALUATING->EXPOSED",
+     "killed": true
+    },
+    {
+     "mutant": "L142 CohortState.EVALUATING->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.NOT_EVALUATING->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L145 Refusal.PREREGISTRATION_STALE->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 string ' is ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L146 string ' changed: a fresh preregistration is required' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L146 string ', ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::advance",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 20,
+   "killed": 20,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L135 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L138 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L135 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L136 Refusal.NOT_FORWARD->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L138 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L137 string ' -> ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L137 string ': one way, one step at a time' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L137 string 'value' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::generalization",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 40,
+   "killed": 40,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L191 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L193 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L197 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L191 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L197 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L197 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L197 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L195 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L195 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L195 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L197 string 'workloads' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L197 string 'workload_count' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L197 string 'sample_size_total' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L188 string ' is not a completed sealed evaluation' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L188 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L189 string ' and ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L189 string ' are one workload (same ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L189 string ')' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L190 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L190 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Refusal.GENERALIZATION_REFUSED->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L195 string 'cohort' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L195 string 'preregistration_hash' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L195 string 'sample_size' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L192 string ' sealed workload(s); a generalization requires at least ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L194 string '; ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L197 string 'sample_size' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L189 string ', ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::observe_inputs",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 19,
+   "killed": 19,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L169 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L171 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L174 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L168 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L169 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L170 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L171 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L172 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L169 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L169 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L175 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L168 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L172 CohortState.EXPOSED->SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L172 CohortState.EXPOSED->EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L172 CohortState.EXPOSED->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L175 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L173 string 'frozen inputs changed after results were read at ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L173 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L173 string ', ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::read_results",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L162 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L162 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L162 IsNot->Is",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::record_run",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 36,
+   "killed": 36,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L152 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L154 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L156 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L152 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L154 GtE->Lt",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Refusal.RUN_DUPLICATE->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Refusal.RUNS_COMPLETE->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L156 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L156 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L153 string ' is already recorded' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L155 string 'all ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L155 string ' preregistered runs are recorded' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/lifecycle.py::seal",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+   "mutants": 72,
+   "killed": 72,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L130 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L120 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L122 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L124 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L126 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L128 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L118 CohortState.SEALED->EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L118 CohortState.SEALED->EXPOSED",
+     "killed": true
+    },
+    {
+     "mutant": "L118 CohortState.SEALED->DEVELOPMENT",
+     "killed": true
+    },
+    {
+     "mutant": "L120 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L122 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L124 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L126 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L128 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L123 Refusal.WORKLOAD_DEMOTED->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L125 Refusal.WORKLOAD_OBSERVED->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Refusal.WORKLOAD_ALREADY_SEALED->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->PREREGISTRATION_INVALID",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L129 Refusal.PREREGISTRATION_REUSED->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L123 string ' is ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L123 string ': its workload never seals again' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string ' read its results at ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string ' still holds the workload (' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string ')' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L129 string ' was invalidated under this preregistration' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::CohortRefused.__init__",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L57 string ': ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::DEVELOPMENT_REGRESSION",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 21,
+   "killed": 21,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L103 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'label' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L104 string 'requirements_sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string 'plan_baseline' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string 'plan_hash' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'requirements_source' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L108 string 'workload_record' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'workload_record_sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'LedgerLock' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L104 string '3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string '136a68dcdc3f416b2a76c561a7df12d1282ad4d5' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string 'bc71a701dd84f7227e8a474b9c9e0aec05ca3e10c0eb53168bcdba0bb8242a32' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L108 string 'closure-evidence/v2/P10/WORKLOAD.json' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'd43211043dd141d388250eb756e2e6d40720093d8f091042944da4babd861463' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::IDENTITY",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L98 string 'requirements_sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L98 string 'plan_baseline' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L98 string 'plan_hash' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::SHAPES",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 34,
+   "killed": 34,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L84 string 'kernel' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L85 string 'workload' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'requirements' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string 'plan_policy' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L88 string 'execution_profile' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L89 string 'prompts' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L90 string 'model_route' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L91 string 'run_count' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L92 string 'thresholds' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L93 string 'oracle' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L94 string 'metrics' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L95 string 'plan_quality_policy' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L84 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L85 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L85 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L85 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L86 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L87 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L89 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L90 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L90 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L92 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L93 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L84 string 'aisef2_tree' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L85 string 'name' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L85 string 'plan_baseline' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L85 string 'plan_hash' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string 'sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L89 string 'sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L90 string 'capability' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L90 string 'route' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L92 string 'delivery' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L93 string 'sha256' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::_HEX40",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L32 string '[0-9a-f]{40}' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::_HEX64",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L33 string '[0-9a-f]{64}' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::_count",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L75 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L75 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L75 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L75 GtE->Lt",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::_hex40",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L63 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L63 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L63 IsNot->Is",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::_hex64",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L67 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L67 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L67 IsNot->Is",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::_name",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L71 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L71 And swapped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::_names",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L79 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L79 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L79 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L79 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L79 element 1 dropped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::development_regression",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 5,
+   "killed": 5,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L212 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L213 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L213 string ' is a development / regression benchmark permanently (RFC §30); same ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L213 string 'label' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L213 string ', ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::execution_profile",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L115 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L115 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'capabilities' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string 'aggregate_min_grade' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string 'settings' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L117 string 'runspec_hash' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::frozen_inputs",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L193 returns None",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::policy_of",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 33,
+   "killed": 33,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L138 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L138 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L141 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L138 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L138 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L139 Refusal.PREREGISTRATION_INVALID->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L139 string 'plan_quality_policy is malformed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L143 Refusal.PREREGISTRATION_INVALID->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L143 string 'plan_quality_policy: ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::preregistration_hash",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L188 returns None",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::problems",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 56,
+   "killed": 56,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L148 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L152 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L154 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L172 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L176 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L148 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L149 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L152 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L154 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L156 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L156 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L157 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L160 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L164 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L166 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L166 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L166 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L166 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L167 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L172 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L174 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L150 string 'schema' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L150 string 'cohort_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L157 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L164 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L166 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L166 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L166 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L166 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L167 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L174 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L149 string 'a preregistration is a JSON object' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L152 string 'schema' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L155 string 'cohort_id is not a name' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L157 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L157 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L163 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L166 string 'execution_profile' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L166 string 'plan_quality_policy' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L151 string 'missing ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L151 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L151 string 'unknown ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L151 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L153 string 'schema is not ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L154 string 'cohort_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L163 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L173 string 'route' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L174 string 'route' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L175 string 'model_route is not a route the execution profile binds' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L165 string ' is malformed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L174 string 'capability' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L174 string 'model_route' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L174 string 'model_route' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L163 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L163 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L173 string 'execution_profile' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::runspec_of",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 42,
+   "killed": 42,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L131 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L133 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L131 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L129 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L129 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L129 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string 'value' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Refusal.PREREGISTRATION_INVALID->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L132 string 'execution_profile does not re-derive from its content' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string 'settings' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string 'revision' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Refusal.PREREGISTRATION_INVALID->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L124 string 'name' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L124 string 'tuple' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'capabilities' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'execution_profile: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L124 string 'grade' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L124 string 'enforcement' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::shared",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L204 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L204 Eq->NotEq",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::validate",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 16,
+   "killed": 16,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L182 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L184 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->OPAQUE_PROFILE",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->DEVELOPMENT_REGRESSION",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->WORKLOAD_DEMOTED",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->WORKLOAD_OBSERVED",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->WORKLOAD_ALREADY_SEALED",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_REUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->COHORT_INCONSISTENT",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->NOT_FORWARD",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->NOT_EVALUATING",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->PREREGISTRATION_STALE",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->RUN_DUPLICATE",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->RUNS_COMPLETE",
+     "killed": true
+    },
+    {
+     "mutant": "L183 Refusal.PREREGISTRATION_INVALID->GENERALIZATION_REFUSED",
+     "killed": true
+    },
+    {
+     "mutant": "L183 string '; ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/cohort/preregistration.py::workload_identity",
+   "kill_tests": [
+    "tests/v2/test_c2_p10_cohort.py"
+   ],
+   "source_sha256": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+   "mutants": 13,
+   "killed": 13,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L198 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L198 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L198 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L198 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string 'requirements_sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L199 string 'plan_baseline' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L199 string 'plan_hash' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string 'sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L199 string 'plan_baseline' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L199 string 'plan_hash' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string 'requirements' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L199 string 'workload' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L199 string 'workload' emptied",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

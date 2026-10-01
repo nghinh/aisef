@@ -1,0 +1,9 @@
+{
+ "checker": "old_path_audit",
+ "package": "WP-6.3",
+ "kind": "hand_edit",
+ "path": "closure-evidence/v2/P6-AUTHORITY-INVENTORY.json",
+ "find": "\"id\": \"aisef/control/gate.py::judge_only\"",
+ "replace": "\"id\": \"aisef/control/gate.py::judge_nobody\"",
+ "expect": "STALE inventory row: aisef/control/gate.py::judge_nobody"
+}

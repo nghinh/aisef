@@ -55,7 +55,8 @@ def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProc
     return proc
 
 
-def commit_paths(path: Path, message: str, *, paths: list[str] | None = None) -> bool:
+def commit_paths(path: Path, message: str, *, paths: list[str] | None = None,
+                 exclude: list[str] | None = None) -> bool:
     """Commit remaining uncommitted work in a working tree. False means nothing to commit.
 
     Stage **only the declared write scope**, not `add -A` (invariant 5).
@@ -81,6 +82,10 @@ def commit_paths(path: Path, message: str, *, paths: list[str] | None = None) ->
                    if (path / p).exists() or _git(path, "ls-files", "-z", "--", spec).stdout]
         if matched:
             _git(path, "add", "-A", "--", *matched)
+    if exclude:
+        # F4 / SS-41: paths that were already there before the session opened are PREEXISTING, not the developer's
+        # work — unstaged (kept in the tree), never part of the candidate
+        _git(path, "reset", "-q", "--", *[f":(literal){e}" for e in exclude], check=False)
     _unstage_tool_artifacts(path)
     if not _git(path, "diff", "--cached", "--name-only", check=False).stdout.strip():
         return False
@@ -489,10 +494,16 @@ class WorktreeManager:
         if expected_candidate is not None:
             actual = _git(self.repo, "rev-parse", branch, check=False).stdout.strip()
             path = self.path_for(story_id)
-            dirty = path.is_dir() and _git(path, "status", "--porcelain").stdout.strip()
-            if not expected_candidate or actual != expected_candidate or dirty:
+            from ..harness.ownership import NOT_A_WRITE, classify, porcelain_entries
+            dirty = ([p for _, p in porcelain_entries(path) if classify(p) not in NOT_A_WRITE]
+                     if path.is_dir() else [])                                # a tool artifact never blocks a merge (SS-17)
+            if not expected_candidate or actual != expected_candidate:
                 return MergeResult(story_id, branch, False,
                                    message="candidate changed or missing; re-verification required")
+            if dirty:
+                return MergeResult(story_id, branch, False,
+                                   message=f"the story worktree carries uncommitted writes ({', '.join(dirty[:3])}); "
+                                           "re-verification required")
         if into:
             _git(self.repo, "checkout", "-q", into)
 

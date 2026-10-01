@@ -1,0 +1,99 @@
+{
+ "record": "TDD PROOF POLICY V2",
+ "generated": "2026-09-20T07:31:06+0700",
+ "owner_decision": "STOP PROFILE HUNTING, FIX W1 PLAN + TDD PROOF POLICY (2026-09-20)",
+ "supersedes": {
+  "policy": "TDD_POLICY_V1",
+  "rule": "every criterion test of a story must be PROVEN RED at the story-entry parent",
+  "evidence_marker": "closure-evidence/hardening/W1-WORKLOAD-V1-POLICY-V1-MARKER.json"
+ },
+ "why": "measured on W1 workload V1 across three model profiles: 8 attempts refused for criteria an upstream story legitimately delivered, criteria the story only had to preserve, and prohibitions that hold on an empty tree — planning facts reported as the developer's failure; 0 of them a false block (W1-DELIVERY-FAILURE-DECOMPOSITION.json, categories C and E)",
+ "model": {
+  "CHANGE_REQUIRED": {
+   "transition": "parent PROVEN RED -> candidate GREEN",
+   "meaning": "this story contributes the behaviour",
+   "already_satisfied_at_entry": "PLAN_OVERLAP (owner PLAN) — the story ends as a plan conflict without spending a developer attempt"
+  },
+  "PRESERVE_REQUIRED": {
+   "transition": "parent GREEN -> candidate GREEN",
+   "meaning": "the story must not break what it inherits",
+   "broken": "DEVELOPER_REGRESSION (owner DEVELOPER)",
+   "credit": "none toward the story's own contribution"
+  },
+  "NEGATIVE_INVARIANT": {
+   "transition": "parent GREEN -> candidate GREEN",
+   "meaning": "a prohibition that holds before and after",
+   "broken": "DEVELOPER_REGRESSION (owner DEVELOPER)",
+   "note": "no red state is manufactured to satisfy TDD"
+  }
+ },
+ "planning_data": {
+  "syntax": "- ac_proof: <i>=<MODE>/<requirement>, …  and  - story_type: NORMAL | VERIFICATION_ONLY",
+  "parsed_by": "aisef/control/normalize.py::ac_proof (plan time only)",
+  "carried_in": [
+   "Story.ac_proof",
+   "stories.index.json",
+   "the story card",
+   "the replayable gate:input record"
+  ],
+  "never": "inferred from the criterion's wording at runtime (owner section 9)"
+ },
+ "one_proof_engine": "both sides are read through aisef/control/proof.py (the SS-81 states); obligation.py consumes them and re-reads no test run",
+ "enforcement_points": {
+  "plan time": "aisef/control/machine_gate.py::ac_proof_defects — missing/unknown obligation, stale obligation, unknown requirement, requirement outside the story's covers, a normal story with no CHANGE_REQUIRED",
+  "before the first model call": "aisef/control/preflight.py::ac_proof_defect — STORY_NOT_EXECUTABLE",
+  "runtime": "aisef/control/gate.py::_nop_check (per-criterion rows) and the TDD check restricted to CHANGE_REQUIRED criteria",
+  "routing": "aisef/phases/implement.py::plan_owned_criteria — a PLAN-owned criterion ends the story as PLAN_CONFLICT",
+  "generated stories": [
+   "aisef/phases/improve.py (repair stories)",
+   "aisef/control/change.py (change stories)"
+  ]
+ },
+ "gate_report_fields": [
+  "ac_id",
+  "requirement",
+  "proof_mode",
+  "parent (observed SS-81 states)",
+  "candidate (observed SS-81 states)",
+  "expected_transition",
+  "actual_transition",
+  "outcome",
+  "owner",
+  "tests"
+ ],
+ "invariants": {
+  "added": [
+   "INV-AC-PROOF-OBLIGATION",
+   "INV-PLAN-STORY-CONTRIBUTION"
+  ],
+  "narrowed": [
+   "INV-TDD-NOP-PROOF — now scoped to CHANGE_REQUIRED criteria"
+  ]
+ },
+ "family_regressions": {
+  "A..J": "tests/hardening/test_ac_proof_policy.py",
+  "H, K, L, routing, preflight": "tests/hardening/test_ac_proof_gate.py",
+  "migration control": "V2 with every criterion CHANGE_REQUIRED answers exactly as V1 (test_policy_v2_with_every_criterion_change_required_answers_exactly_as_policy_v1)"
+ },
+ "fault_matrix": [
+  "FM-P-06",
+  "FM-P-07",
+  "FM-P-08",
+  "FM-T-17",
+  "FM-T-18"
+ ],
+ "mutation_targets_added": [
+  "obligation.evaluate",
+  "obligation.side",
+  "obligation.story_contribution",
+  "obligation.judge",
+  "gate._nop_check",
+  "machine_gate.ac_proof_defects",
+  "preflight.ac_proof_defect",
+  "implement.plan_owned_criteria",
+  "normalize.ac_proof"
+ ],
+ "compatibility": "a plan that declares no obligations is refused, loudly, at the machine gate, at preflight and at the story gate — the kernel never falls back to V1's universal rule, so no old plan can satisfy the new gate silently; every project must re-plan",
+ "differential_coverage_note": "the Phase 12 differential drives the control plane with `tools.test = true`, so the nop control is NOT_APPLICABLE there under both policies: the obligation model is covered by the deterministic family regressions, the fault matrix and mutation, not by the 100 000 traces, which measure the state machine the policy does not change",
+ "kernel_commit_introducing_it": "35d51781021aa4f622e70833c2ea733b36b4ee58"
+}

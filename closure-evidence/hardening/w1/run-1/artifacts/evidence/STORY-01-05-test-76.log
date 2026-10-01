@@ -1,0 +1,86 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collecting ... collected 32 items
+
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_1_matches_json_dumps_contract PASSED [  3%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_2_element_equal_dicts_produce_identical_bytes PASSED [  6%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_3_non_ascii_utf8_literal_and_byte_stable PASSED [  9%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_4_insertion_order_irrelevant PASSED [ 12%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_5_genesis_is_seven_character_literal PASSED [ 15%]
+tests/test_format.py::TestCanonicalBytes::test_AC_STORY_01_02_6_round_trip_through_json_loads_is_byte_stable PASSED [ 18%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters PASSED [ 21%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_2_distinct_prev_hash_yields_distinct_digest PASSED [ 25%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_3_existing_hash_and_prev_hash_fields_are_ignored PASSED [ 28%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_4_same_input_produces_same_digest PASSED [ 31%]
+tests/test_format.py::TestLineHash::test_AC_STORY_01_03_5_genesis_non_hex_seven_char_string_accepted PASSED [ 34%]
+tests/test_ledger.py::TestLedgerAppendFreshFile::test_AC_STORY_01_05_1_first_append_creates_file_with_genesis_chain FAILED [ 37%]
+tests/test_ledger.py::TestLedgerAppendChain::test_AC_STORY_01_05_2_second_append_links_prev_hash_to_first_hash PASSED [ 40%]
+tests/test_ledger.py::TestLedgerAppendValidation::test_AC_STORY_01_05_3_empty_key_raises_value_error_and_does_not_create_file PASSED [ 43%]
+tests/test_ledger.py::TestLedgerAppendReloadTail::test_AC_STORY_01_05_4_fresh_instance_reads_prev_hash_from_existing_file PASSED [ 46%]
+tests/test_ledger.py::TestLedgerAppendFsyncAndChildView::test_AC_STORY_01_05_5_separate_process_reads_appended_line_terminated_by_newline PASSED [ 50%]
+tests/test_ledger.py::TestLedgerAppendFsync::test_append_calls_os_fsync_on_file_descriptor PASSED [ 53%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_byte_for_byte 
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_byte_for_byte PASSED [ 56%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_bytes 
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_1_normalize_key_returns_nfc_bytes PASSED [ 59%]
+tests/test_nfc_normalization.py::TestNFCNormalization::test_AC_STORY_01_01_2_nfc_and_nfd_collide_to_nfc PASSED [ 62%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_3_import_ledgerlock_prints_init_path PASSED [ 65%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands 
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_4_python_m_ledgerlock_help_lists_subcommands PASSED [ 68%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_5_no_forbidden_imports_in_package PASSED [ 71%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_6_no_forbidden_calls_in_package PASSED [ 75%]
+tests/test_skeleton.py::TestPackageSkeleton::test_AC_STORY_01_01_7_ledger_and_conflict_error_importable PASSED [ 78%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_1_jsonl_with_n_lines_returns_n_bytes_with_newline_stripped PASSED [ 81%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_2_missing_file_raises_file_not_found PASSED [ 84%]
+tests/test_store.py::TestReadLines::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 87%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_write_atomic_overwrites_existing_content PASSED [ 90%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_4_writes_concatenated_bytes_and_read_lines_returns_them PASSED [ 93%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_5_crash_between_temp_write_and_replace_leaves_original_intact PASSED [ 96%]
+tests/test_store.py::TestWriteAtomic::test_AC_STORY_01_04_6_temp_file_created_in_same_directory_as_target PASSED [100%]
+
+=================================== FAILURES ===================================
+_ TestLedgerAppendFreshFile.test_AC_STORY_01_05_1_first_append_creates_file_with_genesis_chain _
+
+self = <tests.test_ledger.TestLedgerAppendFreshFile testMethod=test_AC_STORY_01_05_1_first_append_creates_file_with_genesis_chain>
+
+    def test_AC_STORY_01_05_1_first_append_creates_file_with_genesis_chain(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "ledger.jsonl"
+            ledger = Ledger(str(path))
+            ledger.append(("put", "k", {"v": 1}, "r1", 100))
+    
+            self.assertTrue(path.is_file(), msg=f"file not created at {path}")
+            raw = path.read_bytes()
+            self.assertTrue(
+                raw.endswith(b"\n"),
+                msg=f"file must be terminated by newline; bytes={raw!r}",
+            )
+            self.assertEqual(raw.count(b"\n"), 1)
+            line_bytes = raw.split(b"\n", 1)[0]
+    
+            line = json.loads(line_bytes)
+            self.assertEqual(line["op"], "put")
+            self.assertEqual(line["key"], "k")
+            self.assertEqual(line["id"], "r1")
+            self.assertEqual(line["ts"], 100)
+            self.assertEqual(line["value"], {"v": 1})
+            self.assertEqual(line["prev_hash"], GENESIS)
+    
+            stripped = copy.deepcopy(line)
+            stripped["hash"] = ""
+            stripped["prev_hash"] = ""
+            expected_hash = line_hash(GENESIS, stripped)
+            self.assertEqual(line["hash"], expected_hash)
+    
+            recomputed_canonical = canonical_bytes(stripped)
+>           self.assertEqual(line_bytes, recomputed_canonical)
+E           AssertionError: b'{"hash":"f5bcf5686b5c7371eed56f32607bfae00329d8ea5[99 chars]:1}}' != b'{"hash":"","id":"r1","key":"k","op":"put","prev_ha[28 chars]:1}}'
+
+tests/test_ledger.py:63: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_ledger.py::TestLedgerAppendFreshFile::test_AC_STORY_01_05_1_first_append_creates_file_with_genesis_chain
+=============== 1 failed, 31 passed, 16 subtests passed in 0.22s ===============

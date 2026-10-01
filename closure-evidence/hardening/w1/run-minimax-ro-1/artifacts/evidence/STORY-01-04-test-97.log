@@ -1,0 +1,50 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 37 items
+
+tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesBaseline::test_AC_STORY_01_02_1_matches_documented_json_dumps PASSED [  2%]
+tests/test_format.py::AC_STORY_01_02_2_DeterminismForEqualDicts::test_AC_STORY_01_02_2_two_equal_dicts_byte_identical PASSED [  5%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_byte_stable_across_invocations PASSED [  8%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_non_ascii_is_utf8_literal PASSED [ 10%]
+tests/test_format.py::AC_STORY_01_02_4_InsertionOrderIndependence::test_AC_STORY_01_02_4_insertion_order_independent PASSED [ 13%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_distinct_from_64_char_hex PASSED [ 16%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_is_literal_string PASSED [ 18%]
+tests/test_format.py::AC_STORY_01_02_6_RoundTripStability::test_AC_STORY_01_02_6_roundtrip_through_json_loads PASSED [ 21%]
+tests/test_format.py::AC_STORY_01_03_1_64LowercaseHexChars::test_AC_STORY_01_03_1_returns_64_lower_hex PASSED [ 24%]
+tests/test_format.py::AC_STORY_01_03_2_PrevHashChangesDigest::test_AC_STORY_01_03_2_distinct_prev_hash_distinct_digest PASSED [ 27%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_does_not_mutate_input PASSED [ 29%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 32%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_matches_documented_sha256_formula PASSED [ 35%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_repeatable_across_invocations PASSED [ 37%]
+tests/test_format.py::AC_STORY_01_03_5_GenesisAccepted::test_AC_STORY_01_03_5_genesis_non_hex_accepted PASSED [ 40%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_1_already_nfc_is_unchanged PASSED [ 43%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_2_combining_marks_collapse PASSED [ 45%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_byte_for_byte PASSED [ 48%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input 
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input PASSED [ 51%]
+tests/test_skeleton.py::AC_STORY_01_01_2_NfcNfdEquivalence::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical PASSED [ 54%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportable::test_AC_STORY_01_01_3_subprocess_import_resolves PASSED [ 56%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands 
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands PASSED [ 59%]
+tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenImports::test_AC_STORY_01_01_5_grep_returns_no_matches PASSED [ 62%]
+tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenCalls::test_AC_STORY_01_01_6_grep_returns_no_matches PASSED [ 64%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PublicApi::test_AC_STORY_01_01_7_ledger_is_callable_class PASSED [ 67%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_each_element_is_bytes PASSED [ 70%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_preserves_inner_newlines_as_bytes PASSED [ 72%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_strips_only_trailing_newline PASSED [ 75%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_three_lines_returns_three_bytes PASSED [ 78%]
+tests/test_store.py::AC_STORY_01_04_2_MissingFileRaisesFileNotFoundError::test_AC_STORY_01_04_2_missing_path_raises PASSED [ 81%]
+tests/test_store.py::AC_STORY_01_04_3_EmptyFileReturnsEmptyList::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 83%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_empty_list_produces_empty_file PASSED [ 86%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_single_line PASSED [ 89%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_two_lines_byte_concat PASSED [ 91%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_crash_leaves_original_intact PASSED [ 94%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_no_stray_temp_files_after_crash PASSED [ 97%]
+tests/test_store.py::AC_STORY_01_04_6_TempFileLivesInSameDirectory::test_AC_STORY_01_04_6_tempfile_dir_is_target_parent PASSED [100%]
+
+==================== 37 passed, 9 subtests passed in 0.40s =====================

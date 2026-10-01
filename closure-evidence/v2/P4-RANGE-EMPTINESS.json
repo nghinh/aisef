@@ -1,0 +1,65 @@
+{
+ "record": "AISEF V2 — P4 RANGE EMPTINESS",
+ "work_package": "WP-4.2",
+ "rfc_sections": [
+  "17.1"
+ ],
+ "frozen_items": [
+  "F8"
+ ],
+ "semantics": "docs/implementation/v2/P4-LIFETIME-SEMANTICS.md §3",
+ "frozen_acceptance_property": "PID equality alone MUST NOT establish ownership",
+ "ownership_mechanism": {
+  "posix": "the session and process group of the anchor, the controller's unreaped child: the group id cannot be reused while it can be signalled; members measured from /proc (Linux) or ps (macOS); Linux: the anchor is a child subreaper, so orphaned escapees are seen; the anchor reaps every child but its target, as init would, so a killed orphan never lingers as a zombie",
+  "windows": "a Job object with KILL_ON_JOB_CLOSE and no breakaway; the anchor is assigned before the target starts; members and emptiness from the job's process list",
+  "controller_death": "POSIX: the anchor sees end of file on its control pipe and kills its own group; Windows: the job closes with the controller and kills every member"
+ },
+ "ladder": {
+  "posix": [
+   "cooperative SIGINT",
+   "grace",
+   "SIGTERM",
+   "grace",
+   "SIGKILL",
+   "wait (unbounded unless bounded by the caller)"
+  ],
+  "windows": [
+   "TerminateJobObject",
+   "wait"
+  ]
+ },
+ "os_asserted_on": "every job of the CI matrix runs tests/v2/p4/test_process_range.py (Linux 3.11-3.14, Windows 3.11) and the whole suite inside validation/v2/owned_run.py; the completion record binds those runs",
+ "cases": {
+  "test_a_normal_tree_is_reaped_and_measured_empty": true,
+  "test_a_tree_that_exits_by_itself_is_released_without_a_signal": true,
+  "test_a_running_target_is_stopped_graceful_first": true,
+  "test_a_range_that_will_not_empty_is_residual_never_a_silent_success_and_blocks_by_default": true,
+  "test_D_024_red_before_a_writing_grandchild_outlives_a_cleanup_that_trusts_the_direct_child": true,
+  "test_D_024_green_after_the_range_is_proved_empty_before_the_worktree_is_removed": true,
+  "test_PROC_OWN_1_a_controller_that_dies_leaves_no_owned_process_alive": true,
+  "test_PROC_OWN_1_the_mutation_runner_timeout_takes_the_whole_tree_down": true,
+  "test_PROC_OWN_2_after_disposal_the_range_never_signals_again": true,
+  "test_start_failures_are_refused_and_leave_nothing_running": true
+ },
+ "pid_cases": {
+  "test_WIN_PID_1_a_stale_parent_cycle_terminates_bounded_and_targets_nothing_unowned": true,
+  "test_WIN_PID_2_a_stale_parent_without_a_cycle_never_selects_the_unrelated_process": true,
+  "test_the_walk_keeps_true_edges_and_self_parents_and_unknown_times": true
+ },
+ "residuals_closed": {
+  "V1-PF-001": "WIN-PID-1/2: ownership is the OS mechanism; the only process-table walk reports and never selects",
+  "P2-RESIDUAL-ORPHAN-SUBJECT": "every mutation kill-test run is a process range; a timeout or a dead controller takes the whole tree down"
+ },
+ "properties": {
+  "normal_tree_reaped_and_measured_empty": true,
+  "D_024_red_before": true,
+  "D_024_green_after": true,
+  "WIN_PID_1_cycle_terminates_bounded_nothing_unowned_targeted": true,
+  "WIN_PID_2_unrelated_process_never_targeted": true,
+  "PROC_OWN_1_controller_death_leaves_nothing_owned": true,
+  "PROC_OWN_1_runner_timeout_takes_the_tree_down": true,
+  "PROC_OWN_2_never_signalled_after_disposal": true,
+  "not_empty_is_residual_never_silent_success": true,
+  "every_case_green": true
+ }
+}

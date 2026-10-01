@@ -1,0 +1,28 @@
+RUF022 [*] `__all__` is not sorted
+ --> ledgerlock/__init__.py:3:11
+  |
+1 | from __future__ import annotations
+2 |
+3 | __all__ = ["Ledger", "ConflictError"]
+  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Apply an isort-style sorting to `__all__`
+  |
+2 |
+  - __all__ = ["Ledger", "ConflictError"]
+3 + __all__ = ["ConflictError", "Ledger"]
+4 |
+  |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> tests/test_skeleton.py:55:16
+   |
+54 |     def test_AC_STORY_01_01_7_verify_extra_positional_exits_2(self) -> None:
+55 |         proc = subprocess.run(
+   |                ^^^^^^^^^^^^^^
+56 |             [sys.executable, "-m", "ledgerlock", "verify", "ledger.jsonl", "extra"],
+57 |             cwd=str(ROOT),
+   |
+help: Add explicit `check=False`
+
+Found 2 errors.
+[*] 1 fixable with the `--fix` option.

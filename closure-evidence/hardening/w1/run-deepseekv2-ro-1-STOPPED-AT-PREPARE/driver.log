@@ -1,0 +1,3 @@
+[2026-09-21T00:41:34+0700] phase prepare
+[2026-09-21T00:41:45+0700] prepare ok=False aisef=aisef 1.7.6 wheel=True oracle=True guard=True topology=True preflight=False failed=['readiness_hash_migration_check_passes_mechanically'] gates={'prd': 'approved', 'architecture': 'approved', 'ux-spec': 'approved', 'epics': 'approved', 'stories': 'approved', 'mockups': 'stale', 'readiness': 'stale', 'pre-deploy': 'pending'} doctor_red=[]
+[2026-09-21T00:41:45+0700] STOP at phase prepare — see /Users/nghinh/Downloads/projects/ai-sdlc/closure-evidence/hardening/w1/run-deepseekv2-ro-1/driver.json

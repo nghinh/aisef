@@ -1,0 +1,17 @@
+F................
+======================================================================
+FAIL: test_a_missing_control_does_not_let_the_gate_pass (__main__.S10_NoNopRecord.test_a_missing_control_does_not_let_the_gate_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_S10_no_nop_record.py", line 15, in test_a_missing_control_does_not_let_the_gate_pass
+    self.assertTrue(m.outcome.blocks, "the control did not run, so it cannot be allowed to not block")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : the control did not run, so it cannot be allowed to not block
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.024s
+
+FAILED (failures=1)
+
+S10 nop: Outcome.NOT_APPLICABLE | blocks: False | harness ran no nop (manual run, journal before ADR-005 V3) — cannot compare
+exit=1

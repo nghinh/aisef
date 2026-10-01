@@ -1,0 +1,10 @@
+{
+ "checker": "single_placeholder_token",
+ "package": "WP-2.0.1",
+ "kind": "probe_source",
+ "rule": "SINGLE_PLACEHOLDER_TOKEN",
+ "path": "aisef2/probe/bad.py",
+ "facts": {"subject_process": "child_of_harness", "stimulus_shape": "scenario"},
+ "source": "OUT = \"<tmp>/out.txt\"\n",
+ "expect": "SINGLE_PLACEHOLDER_TOKEN aisef2/probe/bad.py:1"
+}

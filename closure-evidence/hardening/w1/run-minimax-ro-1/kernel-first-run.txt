@@ -1,0 +1,4 @@
+
+--- stderr ---
+✗ gate not approved: readiness
+  aisef review readiness

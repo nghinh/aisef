@@ -1,0 +1,3 @@
+{"checker": "freeze_manifest", "package": "WP-0.1", "kind": "rfc_edit",
+"find": "The `Owner` set is **capped**", "replace": "The `Owner` set is **open**",
+"expect": "RFC normative body differs from the approved content"}

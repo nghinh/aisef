@@ -1,0 +1,23 @@
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> tests/test_conflict.py:117:13
+    |
+115 |               try:
+116 |                   ledger.append(("put", "k", "v2", "r2", 200))
+117 | /             except Exception:
+118 | |                 pass
+    | |____________________^
+119 |
+120 |               self.assertEqual(_lines_on_disk(target), before)
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> tests/test_conflict.py:117:20
+    |
+115 |             try:
+116 |                 ledger.append(("put", "k", "v2", "r2", 200))
+117 |             except Exception:
+    |                    ^^^^^^^^^
+118 |                 pass
+    |
+
+Found 2 errors.

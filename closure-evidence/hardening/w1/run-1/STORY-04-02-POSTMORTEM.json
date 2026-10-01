@@ -1,0 +1,121 @@
+{
+ "story": "STORY-04-02",
+ "title": "Exact exit-code contract for the CLI",
+ "covers": [
+  "FR-12"
+ ],
+ "epic": "EPIC-04",
+ "read_only": "nothing in the run copy was modified; every line below is quoted from the run's own records",
+ "owner_question": "classify the terminal reason (owner decision 'COMPLETE W1 RUNS 2-3', section 3)",
+ "classification": "MODEL_QUALITY_FAILURE",
+ "why_this_class_and_not_the_others": {
+  "MODEL_QUALITY_FAILURE": "chosen: the developer agent hit its 40-turn cap on all three attempts (out_tokens 9470, 4391, 2427 — falling, not converging); on attempts 2 and 3 it returned without touching the tree at all. On attempt 1 it produced a test file that was already green at the parent SHA, which is a quality failure in the work, not in the judging.",
+  "PROJECT_IMPLEMENTATION_FAILURE": "rejected: no implementation was ever produced to be wrong — two of three attempts changed nothing.",
+  "REQUIREMENT_AMBIGUITY": "rejected: the six acceptance criteria name exact exit codes (2, 3, 4, 5) with exact preconditions and 'writes nothing to stdout'; nothing there requires arbitration.",
+  "ENVIRONMENT_FAILURE": "rejected: every tool ran and returned a verdict in the sandbox — test PASS, lint PASS, security PASS (0 findings). No MISSING_TOOL, NO_NETWORK, NO_WRITABLE_CACHE or SANDBOX_REFUSED marker appears.",
+  "FRAMEWORK_MISCLASSIFICATION": "rejected: the framework's three gate verdicts are each correct about the evidence in front of them — see the gate table below; in particular it refused to read an unrunnable reviewer as a pass."
+ },
+ "attempts": [
+  {
+   "attempt": 1,
+   "candidate_sha": "b2da33f43995763fd0cb6bc03fb0487f46a8a70e",
+   "changed_files": [
+    "ledgerlock/cli.py",
+    "tests/test_cli_exit_codes.py"
+   ],
+   "developer": "max_turns: stopped at 40 turns (cap 40), work left in the tree — graded (out_tokens 9470)",
+   "deterministic_gates": {
+    "test": "PASS",
+    "lint": "PASS",
+    "security": "PASS findings=0 filtered=0",
+    "TDD": "FAIL — tests green on first run, not proven to verify anything (tests/test_cli_exit_codes.py)",
+    "tests verify story": "FAIL — still green without the story code at parent SHA 1436b86",
+    "review": "UNRUNNABLE — reviewer did not run (max_turns at 40), no verdict about the candidate"
+   },
+   "gate_result": "FAILED: TDD, tests verify story, review"
+  },
+  {
+   "attempt": 2,
+   "candidate_sha": null,
+   "changed_files": [],
+   "developer": "max_turns at 40, tree untouched — nothing to grade (out_tokens 4391)",
+   "deterministic_gates": {},
+   "gate_result": "FAIL: max_turns, no candidate"
+  },
+  {
+   "attempt": 3,
+   "candidate_sha": null,
+   "changed_files": [],
+   "developer": "max_turns at 40, tree untouched — nothing to grade (out_tokens 2427)",
+   "deterministic_gates": {},
+   "gate_result": "FAIL: max_turns, no candidate — EXHAUSTED after 3 attempts (max_retries=2)"
+  }
+ ],
+ "review_findings": "none recorded: the reviewer never produced a verdict on any attempt (max_turns). The framework recorded UNRUNNABLE, not a pass — 'absence of a structured verdict can never PASS'.",
+ "security_findings": "attempt 1: PASS, 0 findings, 0 filtered (bandit 1.9.4 in aisef-verify-python:84adf1d8eaf9). Attempts 2-3: no candidate to scan.",
+ "same_unresolved_behaviour_remained": true,
+ "same_unresolved_behaviour_detail": "the exit-code contract (FR-12) was never implemented or verified: attempt 1's tests pass at the parent SHA, so they prove nothing about it, and attempts 2 and 3 produced no change at all. Nothing regressed either — the story's write scope stayed out of master.",
+ "state_and_retry_transitions_followed_the_kernel_model": true,
+ "state_and_retry_transitions_evidence": {
+  "observed_path": "attempt 1 DEVELOP max-turns WITH work -> graded -> TDD/tests-verify FAIL + REVIEW UNRUNNABLE -> gate FAILED; attempts 2-3 DEVELOP max-turns UNTOUCHED -> no candidate; EXHAUSTED at max_retries=2 -> story failed -> wave/epic STOPPED",
+  "model_vocabulary": "every event here is in the approved model's own vocabulary (tests/hardening/model.py): DEVELOP_MAX_TURNS_WORK, DEVELOP_MAX_TURNS_UNTOUCHED, REVIEW_UNRUNNABLE, MAX_RETRIES=2",
+  "measured_in_the_phase_12_dataset": {
+   "traces_with_this_exact_shape": 18,
+   "terminal": "failed:did not pass gate",
+   "model_and_real_kernel_agreed_on_all_of_them": true,
+   "example_seeds": [
+    13619,
+    23227,
+    24265,
+    25563,
+    29241
+   ],
+   "dataset": "100 000 traces on kernel 02a34e0e (closure-evidence/hardening/differential-p12-*.rows.jsonl.gz)"
+  },
+  "conclusion": "the run-1 path is one the approved model predicts and the kernel was proven to reproduce; it is not a new transition"
+ },
+ "run_level_consequence": "the wave stopped at EPIC-04 wave 2 rather than proceeding past a story with no verified work — the intended behaviour",
+ "owner_rule_applied": "MODEL_QUALITY_FAILURE -> continue to run 2 (no owner arbitration required, no kernel defect demonstrated)",
+ "quoted_run_log": [
+  "[2026-09-15 20:17:10] phase=split attempt=1 GATE-FAIL stories=17 stories whose criteria describe a placeholder: STORY-02-01: no-op; STORY-04-02: no-op — scaffolding is not behaviour. Verified into the ledger it makes preservation block the story that replaces it, and its blanket failure answers later error-path criteria so their tests cannot be red at the branch point. Fold the scaffolding into the first story that delivers real behaviour through it",
+  "[2026-09-15 20:24:32] phase=split attempt=3 GATE-FAIL stories=13 stories whose criteria describe a placeholder: STORY-01-02: no-op; STORY-01-04: no-op — scaffolding is not behaviour. Verified into the ledger it makes preservation block the story that replaces it, and its blanket failure answers later error-path criteria so their tests cannot be red at the branch point. Fold the scaffolding into the first story that delivers real behaviour through it; stories with two criteria that are the same criterion: STORY-01-01: criteria 13, 16; criteria 15, 18; STORY-01-03: criteria 13, 16; STORY-01-04: criteria 7, 10; criteria 16, 19; criteria 18, 27; STORY-02-01: criteria 2, 5, 8; criteria 3, 6; STORY-02-02: criteria 5, 8, 14; STORY-03-01: criteria 5, 8, 11; STORY-03-02: criteria 2, 5, 8, 11; STORY-04-02: criteria 2, 5, 17, 20; STORY-05-01: criteria 4, 7; STORY-05-02: criteria 7, 10, 13; criteria 9, 12, 15; STORY-05-03: criteria 1, 4; criteria 2, 5 — a criterion's stable identity is the fingerprint of its text, so duplicates share one identity: reordering them is undetectable and a test named after either proves both. Merge them, or state what actually differs; STORY-01-01 has 18 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-01-02 has 18 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-01-03 has 24 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-01-04 has 27 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-02-01 has 16 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-02-02 has 15 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-03-01 has 18 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-03-02 has 12 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-04-01 has 12 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-04-02 has 24 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-05-01 has 9 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-05-02 has 15 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY-05-03 has 9 acceptance criteria, exceeding limit 8 — split it, an oversized story will overflow context in a single session; STORY_NOT_EXECUTABLE STORY-01-01: size — size score 23 = acceptance 18×1 = 18 + write_scope 8×0.5 = 4 (`ledgerlock/__init__.py`, `ledgerlock/__main__.py`, `ledgerlock/format.py`, `ledgerlock/cli.py`…) + fan_in 1×1 = 1 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–9, next story keeps AC 10–18; divide `write_scope` to match the two groups (8 paths); STORY_NOT_EXECUTABLE STORY-01-02: size — size score 20 = acceptance 18×1 = 18 + write_scope 2×0.5 = 1 (`ledgerlock/format.py`, `tests/test_format.py`) + fan_in 1×1 = 1 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–9, next story keeps AC 10–18; divide `write_scope` to match the two groups (2 paths); STORY_NOT_EXECUTABLE STORY-01-03: size — size score 28 = acceptance 24×1 = 24 + write_scope 6×0.5 = 3 (`ledgerlock/ledger.py`, `ledgerlock/store.py`, `ledgerlock/__init__.py`, `tests/test_ledger.py`…) + fan_in 1×1 = 1 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–12, next story keeps AC 13–24; divide `write_scope` to match the two groups (6 paths); STORY_NOT_EXECUTABLE STORY-01-04: size — size score 29.5 = acceptance 27×1 = 27 + write_scope 3×0.5 = 1.5 (`ledgerlock/ledger.py`, `tests/test_ledger.py`, `tests/test_conflict.py`) + fan_in 1×1 = 1 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–14, next story keeps AC 15–27; divide `write_scope` to match the two groups (3 paths); STORY_NOT_EXECUTABLE STORY-02-01: size — size score 20 = acceptance 16×1 = 16 + write_scope 4×0.5 = 2 (`ledgerlock/ledger.py`, `ledgerlock/store.py`, `tests/test_ledger.py`, `tests/test_verify_independent.py`) + fan_in 2×1 = 2 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–8, next story keeps AC 9–16; divide `write_scope` to match the two groups (4 paths); STORY_NOT_EXECUTABLE STORY-02-02: size — size score 16.5 = acceptance 15×1 = 15 + write_scope 3×0.5 = 1.5 (`ledgerlock/ledger.py`, `tests/test_ledger.py`, `tests/test_snapshot_determinism.py`) exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–8, next story keeps AC 9–15; divide `write_scope` to match the two groups (3 paths); STORY_NOT_EXECUTABLE STORY-03-01: size — size score 22 = acceptance 18×1 = 18 + write_scope 4×0.5 = 2 (`ledgerlock/ledger.py`, `ledgerlock/store.py`, `tests/test_ledger.py`, `tests/test_atomic_batch.py`) + fan_in 2×1 = 2 exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–9, next story keeps AC 10–18; divide `write_scope` to match the two groups (4 paths); STORY_NOT_EXECUTABLE STORY-04-02: size — size score 25 = acceptance 24×1 = 24 + write_scope 2×0.5 = 1 (`ledgerlock/cli.py`, `tests/test_cli_exit_codes.py`) exceeds `story.max_complexity` = 16. split by acceptance criteria group — first story keeps AC 1–12, next story keeps AC 13–24; divide `write_scope` to match the two groups (2 paths)",
+  "[2026-09-18 08:59:09] wave=EPIC-04/w2 START stories=STORY-04-02",
+  "[2026-09-18 08:59:13] story=STORY-04-02 START max_retries=2",
+  "[2026-09-18 08:59:13] story=STORY-04-02 baseline START",
+  "[2026-09-18 08:59:14] story=STORY-04-02 baseline DONE ok=True red_before=0",
+  "[2026-09-18 08:59:14] story=STORY-04-02 attempt=1 START",
+  "[2026-09-18 08:59:14] story=STORY-04-02#1 agent START timeout=1800s scope=ledgerlock/cli.py,tests/test_cli_exit_codes.py,pyproject.toml,tests,test,poetry.lock,uv.lock,pdm.lock",
+  "[2026-09-18 09:03:19] story=STORY-04-02#1 agent DONE ok=False $0.00 turns=40 out_tokens=9470 err=max_turns: stopped at 40 turns (cap 40)",
+  "[2026-09-18 09:03:19] story=STORY-04-02#1 max_turns but the session left work in the tree — grading it",
+  "[2026-09-18 09:03:19] story=STORY-04-02#1 changed_files=2",
+  "[2026-09-18 09:03:19] story=STORY-04-02#1 candidate frozen sha=b2da33f4",
+  "[2026-09-18 09:03:19] story=STORY-04-02#1 verify START sha=b2da33f4",
+  "[2026-09-18 09:03:19] story=STORY-04-02 nop START parent=1436b86c test_files=1",
+  "[2026-09-18 09:03:22] story=STORY-04-02 nop DONE tests red at parent (expected) 1272ms",
+  "[2026-09-18 09:03:23] story=STORY-04-02#1 test PASS",
+  "[2026-09-18 09:03:24] story=STORY-04-02#1 lint PASS",
+  "[2026-09-18 09:03:24] story=STORY-04-02#1 review START changed=2",
+  "[2026-09-18 09:03:24] story=STORY-04-02#1 review agent START prompt=28035ch",
+  "[2026-09-18 09:06:17] story=STORY-04-02#1 review agent DONE ok=False $0.00 turns=40",
+  "[2026-09-18 09:06:17] story=STORY-04-02#1 review UNRUNNABLE (execution 1) · max_turns: stopped at 40 turns (cap 40)",
+  "[2026-09-18 09:06:18] story=STORY-04-02#1 security START changed=2",
+  "[2026-09-18 09:06:18] story=STORY-04-02#1 security agent START prompt=23989ch",
+  "[2026-09-18 09:07:18] story=STORY-04-02#1 security agent DONE ok=True $0.00 turns=11",
+  "[2026-09-18 09:07:18] story=STORY-04-02#1 security PASS findings=0 filtered=0",
+  "[2026-09-18 09:07:18] story=STORY-04-02#1 gate FAILED: TDD,tests verify story,review",
+  "[2026-09-18 09:07:18] story=STORY-04-02#1 gate ✗ TDD · failed · tests green on first run — not proven to verify anything (tests/test_cli_exit_codes.py). Write tests first, run them through the recorded tool, see them fail, then write code — a run the harness did not record cannot prove anything.",
+  "[2026-09-18 09:07:18] story=STORY-04-02#1 gate ✗ tests verify story · failed · tests verify nothing — still green without story code (parent SHA 1436b86): tests/test_cli_exit_codes.py::TestCliUsageErrors::test_AC_STORY_04_02_1_wrong_positional_arg_count_exits_two_and_writes_nothing_to_stdout, tests/test_cli_exit_codes.py::TestCliApplyMissingBatchFile::test_AC_STORY_04_02_2_apply_batch_with_missing_batch_file_exits_three_and_writes_nothing_to_stdout, tests/test_cli_exit_codes.py::TestCliApplyConflictExitsFour::test_AC_STORY_04_02_3_apply_with_conflicting_batch_element_exits …(+342 chars, see evidence)",
+  "[2026-09-18 09:07:18] story=STORY-04-02#1 gate ✗ review · unrunnable · reviewer did not run (max_turns: stopped at 40 turns (cap 40)) — no verdict about the candidate",
+  "[2026-09-18 09:07:18] story=STORY-04-02 attempt=1 FAIL $0.00 gate=TDD,tests verify story,review",
+  "[2026-09-18 09:07:18] story=STORY-04-02 attempt=2 START",
+  "[2026-09-18 09:07:19] story=STORY-04-02#2 agent START timeout=1800s scope=ledgerlock/cli.py,tests/test_cli_exit_codes.py,pyproject.toml,tests,test,poetry.lock,uv.lock,pdm.lock",
+  "[2026-09-18 09:09:43] story=STORY-04-02#2 agent DONE ok=False $0.00 turns=40 out_tokens=4391 err=max_turns: stopped at 40 turns (cap 40)",
+  "[2026-09-18 09:09:43] story=STORY-04-02#2 max_turns and the tree is untouched — nothing to grade",
+  "[2026-09-18 09:09:43] story=STORY-04-02 attempt=2 FAIL $0.00 gate=max_turns: stopped at 40 turns (cap 40)",
+  "[2026-09-18 09:09:43] story=STORY-04-02 attempt=3 START",
+  "[2026-09-18 09:09:43] story=STORY-04-02#3 agent START timeout=1800s scope=ledgerlock/cli.py,tests/test_cli_exit_codes.py,pyproject.toml,tests,test,poetry.lock,uv.lock,pdm.lock",
+  "[2026-09-18 09:11:44] story=STORY-04-02#3 agent DONE ok=False $0.00 turns=40 out_tokens=2427 err=max_turns: stopped at 40 turns (cap 40)",
+  "[2026-09-18 09:11:44] story=STORY-04-02#3 max_turns and the tree is untouched — nothing to grade",
+  "[2026-09-18 09:11:44] story=STORY-04-02 EXHAUSTED 3 attempts $0.00"
+ ]
+}

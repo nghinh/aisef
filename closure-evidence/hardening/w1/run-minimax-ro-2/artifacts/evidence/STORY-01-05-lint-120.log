@@ -1,0 +1,64 @@
+UP035 `typing.Tuple` is deprecated, use `tuple` instead
+ --> ledgerlock/ledger.py:5:1
+  |
+3 | import json
+4 | import os
+5 | from typing import Tuple
+  | ^^^^^^^^^^^^^^^^^^^^^^^^
+6 |
+7 | from ledgerlock.format import GENESIS, canonical_bytes, line_hash, normalize_key
+  |
+
+UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+  --> ledgerlock/ledger.py:30:26
+   |
+28 |         return tail_hash
+29 |
+30 |     def append(self, op: Tuple[str, str, object, str, int]) -> dict:
+   |                          ^^^^^
+31 |         op_name, key, value, rid, ts = op
+32 |         normalized_key = normalize_key(key)
+   |
+help: Replace with `tuple`
+   |
+29 |
+   -     def append(self, op: Tuple[str, str, object, str, int]) -> dict:
+30 +     def append(self, op: tuple[str, str, object, str, int]) -> dict:
+31 |         op_name, key, value, rid, ts = op
+   |
+
+F401 [*] `ledgerlock.format.canonical_bytes` imported but unused
+  --> tests/test_ledger.py:10:40
+   |
+ 9 | from ledgerlock import Ledger
+10 | from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+   |                                        ^^^^^^^^^^^^^^^
+11 | from ledgerlock.store import read_lines
+   |
+help: Remove unused import: `ledgerlock.format.canonical_bytes`
+   |
+9  | from ledgerlock import Ledger
+   - from ledgerlock.format import GENESIS, canonical_bytes, line_hash
+10 + from ledgerlock.format import GENESIS, line_hash
+11 | from ledgerlock.store import read_lines
+   |
+
+F401 [*] `ledgerlock.ledger` imported but unused
+   --> tests/test_ledger.py:154:42
+    |
+152 | class LedgerAppendFsyncBeforeReturnTest(unittest.TestCase):
+153 |     def test_append_calls_fsync_before_return(self) -> None:
+154 |         from ledgerlock import ledger as ledger_mod
+    |                                          ^^^^^^^^^^
+155 |
+156 |         with tempfile.TemporaryDirectory() as tmp:
+    |
+help: Remove unused import: `ledgerlock.ledger`
+    |
+153 |     def test_append_calls_fsync_before_return(self) -> None:
+    -         from ledgerlock import ledger as ledger_mod
+154 |
+    |
+
+Found 4 errors.
+[*] 3 fixable with the `--fix` option.

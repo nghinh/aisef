@@ -1,0 +1,9 @@
+{
+ "checker": "mutation",
+ "package": "WP-1.1",
+ "kind": "weak_tests",
+ "target": "aisef2/cal/m.py::positive",
+ "module": "def positive(x):\n    return x > 0\n",
+ "test": "import sys, pathlib, unittest\nsys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))\nfrom aisef2.cal.m import positive\n\n\nclass T(unittest.TestCase):\n    def test_runs(self):\n        positive(5)\n",
+ "expect": "unaudited survivor"
+}

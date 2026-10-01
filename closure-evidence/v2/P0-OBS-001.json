@@ -1,0 +1,49 @@
+{
+ "record": "AISEF V2 — P0 OBSERVATION: latent V1 Windows defect in kill_tree (PID reuse)",
+ "id": "P0-OBS-001",
+ "status": "OBSERVED — NOT FIXED (V1 product code is frozen); owner decision required",
+ "where": {
+  "function": "aisef/clients/base.py::_kill_tree_win32",
+  "snapshot": "aisef/harness/process_owner.py::_snapshot_win32",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0 (unchanged)"
+ },
+ "observed": {
+  "ci_run": 35565857461,
+  "attempt": 1,
+  "commit": "b96cc06068b18382aeabfa17bb1137c7afa38396",
+  "job": "unit (windows-latest, 3.11)",
+  "test": "tests/hardening/adapters/test_conformance.py::TestC05Timeout (setUpClass)",
+  "error": "MemoryError at `order.append(pid)` in _kill_tree_win32, reached from _stream_with_timeout after a 1 s timeout"
+ },
+ "mechanism": "The walk follows a parent->children map built from one toolhelp snapshot, with no visited set. Windows keeps a process's th32ParentProcessID after that parent exits, and reuses PIDs. When the cmd.exe being killed (R) is given a PID equal to the stale parent PID recorded by one of the calling process's own ancestors (e.g. the runner's shell), the map contains R -> ancestor -> ... -> test process -> R: a cycle through R, so the walk never ends and grows until MemoryError. Without a cycle, the same stale edge makes kill_tree TerminateProcess processes that are not R's descendants.",
+ "reproduction": {
+  "how": "the UNMODIFIED V1 function run on macOS with Win32 mocked and synthetic snapshots; the walk is bounded at 10 000 lookups",
+  "results": {
+   "control, no PID reuse": "terminates; would TerminateProcess [R, fake CLI]",
+   "stale ppid == R's pid (ancestor chain)": "walk does not terminate",
+   "stale ppid == R's pid, no cycle": "terminates; would ALSO TerminateProcess an unrelated live process"
+  },
+  "source": "\"\"\"Run the UNMODIFIED V1 aisef.clients.base._kill_tree_win32 on synthetic toolhelp snapshots (macOS, mocked Win32).\"\"\"\nimport sys\nfrom unittest import mock\nsys.path.insert(0, \"/Users/nghinh/Downloads/projects/ai-sdlc\")\nimport aisef.clients.base as base          # noqa: E402\nimport aisef.harness.process_owner as po   # noqa: E402\n\nclass Bounded(dict):\n    \"\"\"A snapshot that stops the walk after 10 000 lookups instead of letting it exhaust memory.\"\"\"\n    calls = 0\n    def get(self, k, d=None):\n        Bounded.calls += 1\n        if Bounded.calls > 10_000:\n            raise RuntimeError(\"walk did not terminate (10 000 lookups)\")\n        return super().get(k, d)\n\nclass FakeK32:\n    killed = []\n    def __init__(self, *a, **k):\n        self.OpenProcess = mock.Mock(side_effect=lambda acc, inh, pid: pid)\n        self.TerminateProcess = mock.Mock(side_effect=lambda h, c: FakeK32.killed.append(h))\n        self.CloseHandle = mock.Mock()\n\ndef run(label, snapshot, root):\n    Bounded.calls, FakeK32.killed = 0, []\n    with mock.patch.object(sys, \"platform\", \"win32\"), mock.patch(\"ctypes.WinDLL\", FakeK32, create=True), \\\n         mock.patch.object(po, \"_snapshot_win32\", lambda: Bounded(snapshot)):\n        try:\n            base._kill_tree_win32(root)\n            print(f\"{label}: terminated; would TerminateProcess {FakeK32.killed}\")\n        except RuntimeError as e:\n            print(f\"{label}: {e}\")\n\n# pids: RUNNER=10 (live), SHELL=20 (runner's pwsh, its recorded ppid 500 belongs to a long-dead launcher),\n# T=30 (python -m unittest, child of SHELL), R=500 (cmd.exe the test spawned; Windows REUSED pid 500), F=600 (fake CLI)\nacyclic = {10: [20], 20: [30], 30: [500], 500: [600]}              # launcher pid 500 NOT reused: normal tree\nreused  = {500: [20, 600], 10: [], 20: [30], 30: [500]}            # SHELL.ppid==500 (stale) and R.pid==500\nrun(\"control, no PID reuse   \", acyclic, 500)\nrun(\"stale ppid == R's pid   \", reused, 500)\n# an unrelated live process 700 whose long-dead parent also had pid 500: no cycle, but it is not R's descendant\nrun(\"stale ppid, no cycle    \", {10: [20], 20: [30], 30: [500], 500: [600, 700]}, 500)\n"
+ },
+ "history": {
+  "same_test_on_windows_at_f16dabb": "passed (run 35562902663)",
+  "earlier_failed_runs_checked": 9,
+  "earlier_occurrences_in_kill_tree": 0,
+  "note": "run 35345117442 has 'MemoryError' but it is aisef.memory.MemoryError (path escape), unrelated"
+ },
+ "candidate_causes_measured": {
+  "V1 evidence guard audit hook": "innocent: keeps no state; per-event locals only; cannot make an acyclic walk unbounded",
+  "freeze_manifest CRLF fix (b96cc06)": "innocent: not on the kill_tree path",
+  "closure-gate plane rules, .gitattributes, .githooks": "innocent: data / checkout attributes / opt-in hook not active in CI",
+  "P0 test additions": "not a cause; they add git subprocesses, which marginally raises PID churn (not measured)"
+ },
+ "not": [
+  "an architecture exception",
+  "a P0 change to V1 product code, evidence, verdicts or identities"
+ ],
+ "input_for": "WP-4.2 (measured process-range emptiness, Windows): a V2 tree walk must carry a visited set and must not treat a stale parent PID as ancestry (e.g. compare creation times). Recorded as input only; the plan is unchanged.",
+ "owner_decision_needed": [
+  "whether to register this as a V1 defect (the V1 defect register is frozen V1 evidence)",
+  "whether Windows CI green on a rerun of the failed job is acceptable for the P0 gate"
+ ]
+}

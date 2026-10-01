@@ -1,0 +1,27 @@
+SIM117 [*] Use a single `with` statement with multiple contexts instead of nested `with` statements
+   --> ledgerlock/ledger.py:225:9
+    |
+223 |       def _write(self, line):
+224 |           data = format.canonical_bytes(line) + b"\n"
+225 | /         with self._lock:
+226 | |             with open(self._path, "ab") as handle:
+    | |__________________________________________________^
+227 |                   handle.write(data)
+228 |                   handle.flush()
+    |
+help: Combine `with` statements
+    |
+224 |         data = format.canonical_bytes(line) + b"\n"
+    -         with self._lock:
+    -             with open(self._path, "ab") as handle:
+    -                 handle.write(data)
+    -                 handle.flush()
+    -                 os.fsync(handle.fileno())
+225 +         with self._lock, open(self._path, "ab") as handle:
+226 +             handle.write(data)
+227 +             handle.flush()
+228 +             os.fsync(handle.fileno())
+    |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.

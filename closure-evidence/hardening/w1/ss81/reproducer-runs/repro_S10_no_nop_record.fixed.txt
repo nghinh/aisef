@@ -1,0 +1,8 @@
+...................
+----------------------------------------------------------------------
+Ran 19 tests in 0.026s
+
+OK
+
+S10 nop: Outcome.UNRUNNABLE | blocks: True | no nop control was recorded for this candidate — the story's tests were never run at the parent SHA,
+exit=0

@@ -1,0 +1,546 @@
+{
+ "program": "AISEF SYSTEMATIC HARDENING v1",
+ "phase": "8A — discovery debt",
+ "generated": "2026-09-16",
+ "method": "one deterministic test per NEEDS_TEST site asserting the invariant; red on the 1.7.6 baseline → CONFIRMED (expectedFailure under the SS id), green → NOT_A_DEFECT kept as a negative control",
+ "summary": {
+  "sites": 38,
+  "confirmed": 37,
+  "not_a_defect": 1,
+  "new_sites_from_harness": [
+   "SS-59",
+   "SS-60",
+   "SS-61",
+   "AD-01",
+   "AD-03",
+   "AD-04",
+   "AD-05"
+  ],
+  "fault_cells_resolved": {
+   "FM-A-03": "RED (SS-55)",
+   "FM-P-05": "RED (SS-49)",
+   "FM-W-05": "RED (SS-09, SS-16)"
+  }
+ },
+ "sites": {
+  "SS-01": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS01RealTestsNeedsARecordedScan::test_no_fake_tests_record_is_not_a_pass",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS01RealTestsNeedsARecordedScan::test_no_fake_tests_record_is_not_a_pass",
+    "tests/hardening/scan8a/test_group_a.py::TestSS01StoryPathAlwaysRecordsTheScan::test_verify_candidate_records_a_clean_scan_when_no_test_file_changed"
+   ],
+   "negative_controls": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS01StoryPathAlwaysRecordsTheScan::test_verify_candidate_records_a_clean_scan_when_no_test_file_changed"
+   ],
+   "notes_8a": "absence of the qa:fake-tests record scores PASSED; the story path always writes the record (green control), so a design gap"
+  },
+  "SS-06": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry::test_a_candidate_on_an_unmerged_branch_is_not_in_the_corpus_history",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS06CorpusHistoryMeansAncestry::test_a_candidate_on_an_unmerged_branch_is_not_in_the_corpus_history"
+   ],
+   "negative_controls": [],
+   "notes_8a": "G4.5 object existence stands in for ancestry: a candidate parked on an unmerged branch passes 'in the corpus history'"
+  },
+  "SS-07": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict::test_an_unrunnable_review_record_does_not_count_as_review_recorded",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS07ARecordedReviewIsAVerdict::test_an_unrunnable_review_record_does_not_count_as_review_recorded"
+   ],
+   "negative_controls": [],
+   "notes_8a": "G4.4 counts an UNRUNNABLE review record (the loop's own D-032 shape) as 'review recorded'"
+  },
+  "SS-08": {
+   "classification": "NOT_A_DEFECT",
+   "severity_proposed": "",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS08MergeAuthorizationBindsTheVerifiedSha::test_a_branch_tip_that_moved_after_verification_is_not_merged",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS08MergeAuthorizationBindsTheVerifiedSha::test_a_branch_tip_that_moved_after_verification_is_not_merged"
+   ],
+   "negative_controls": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS08MergeAuthorizationBindsTheVerifiedSha::test_a_branch_tip_that_moved_after_verification_is_not_merged"
+   ],
+   "notes_8a": "merge_story merges the frozen SHA, never the branch tip; a moved tip is refused (worktree.py 489-495) — the missing SHA in verification.completed has no exploitable path"
+  },
+  "SS-09": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS09ResumeRefreshDoesNotSilentlyInvalidateTheCandidate::test_resume_after_main_advanced_retries_the_review_or_records_the_invalidation",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS09ResumeRefreshDoesNotSilentlyInvalidateTheCandidate::test_resume_after_main_advanced_retries_the_review_or_records_the_invalidation"
+   ],
+   "negative_controls": [],
+   "notes_8a": "resume refresh moved HEAD to a merge commit; a REVIEW_UNRUNNABLE candidate was abandoned for a developer session with no invalidation record"
+  },
+  "SS-16": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS16WaveEndCommitOfAFailedStoryIsRecorded::test_leftover_work_committed_at_wave_end_is_named_by_a_record",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS16WaveEndCommitOfAFailedStoryIsRecorded::test_leftover_work_committed_at_wave_end_is_named_by_a_record"
+   ],
+   "negative_controls": [],
+   "notes_8a": "wave-end commit_story of a failed story moves the branch tip past the frozen candidate; no evidence or journal names the new SHA"
+  },
+  "SS-19": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS19CoBlockingUnrunnableKeepsTheReviewerAbsenceAtTheReviewStage::test_two_unrunnable_checks_never_open_a_developer",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS19CoBlockingUnrunnableKeepsTheReviewerAbsenceAtTheReviewStage::test_two_unrunnable_checks_never_open_a_developer"
+   ],
+   "negative_controls": [],
+   "notes_8a": "review UNRUNNABLE + preservation UNRUNNABLE (nothing FAILED) reopened a developer instead of retrying the review stage"
+  },
+  "SS-20": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS20ReviewRetryScoresThePinnedPreservationList::test_the_review_stage_retry_uses_the_list_the_attempt_was_pinned_to",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS20ReviewRetryScoresThePinnedPreservationList::test_the_review_stage_retry_uses_the_list_the_attempt_was_pinned_to"
+   ],
+   "negative_controls": [],
+   "notes_8a": "the review-stage retry rescored the same attempt against a recomputed preservation list (fails closed, identity drifts)"
+  },
+  "SS-21": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS21BudgetLockContentionIsInfraNotACap::test_a_held_ledger_lock_is_an_environment_outcome",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS21BudgetLockContentionIsInfraNotACap::test_a_held_ledger_lock_is_an_environment_outcome"
+   ],
+   "negative_controls": [],
+   "notes_8a": "a held budget-ledger lock raised BudgetExceeded before dispatch: infra=False, charged to quality, message claims a cap"
+  },
+  "SS-22": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS22NopParentMatchesTheBaselineRoot::test_the_nop_control_runs_at_the_baseline_root_or_records_the_mismatch",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS22NopParentMatchesTheBaselineRoot::test_the_nop_control_runs_at_the_baseline_root_or_records_the_mismatch"
+   ],
+   "negative_controls": [],
+   "notes_8a": "after refresh the nop control ran at the new fork point while the baseline root is the story-entry parent; no mismatch record"
+  },
+  "SS-29": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS29ResolvedIsAStatusNotASubstring::test_an_open_p1_blocker_worded_unresolved_does_not_pass_g6_3",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS29ResolvedIsAStatusNotASubstring::test_an_open_p1_blocker_worded_unresolved_does_not_pass_g6_3"
+   ],
+   "negative_controls": [],
+   "notes_8a": "G6.3: 'unresolved', 'not resolved', 'will be fixed', 'unfixed' all contain the RESOLVED marker — an open P1 onboarding blocker passes the release gate"
+  },
+  "SS-31": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS31NoSurfaceIsAnchoredToTheStatement::test_a_line_that_announces_screens_is_not_headless",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS31NoSurfaceIsAnchoredToTheStatement::test_a_line_that_announces_screens_is_not_headless"
+   ],
+   "negative_controls": [],
+   "notes_8a": "_NO_SURFACE's lazy 120-char window reads 'Screens: none of the legacy screens … billing API' as headless; a screen table always wins, so bounded"
+  },
+  "SS-32": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS32DeadlockDiagnosisReadsDataNotProse::test_rewording_the_gate_sentence_does_not_silence_the_diagnosis",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS32DeadlockDiagnosisReadsDataNotProse::test_rewording_the_gate_sentence_does_not_silence_the_diagnosis"
+   ],
+   "negative_controls": [],
+   "notes_8a": "nop_deadlock re-derives the still-green criteria from gate.py's sentence; rewording silences the diagnosis (Check has no structured field). Also: _MA_TIEU_CHI needs dashed AC ids, pytest ids carry underscores — silent for every Python corpus"
+  },
+  "SS-33": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_a.py::TestSS33TruncationNeverYieldsAVacuousPass::test_a_baseline_green_test_beyond_the_cut_turning_red_is_not_a_pass",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_a.py::TestSS33TruncationNeverYieldsAVacuousPass::test_a_baseline_green_test_beyond_the_cut_turning_red_is_not_a_pass",
+    "tests/hardening/scan8a/test_group_a.py::TestSS33TruncationNeverYieldsAVacuousPass::test_a_baseline_test_deleted_beyond_the_cut_is_not_a_pass"
+   ],
+   "negative_controls": [],
+   "notes_8a": "600-test suite, victim at 550: a baseline-green test turning red beyond the 500-id cut passes 'no baseline regression' vacuously; a deleted one passes the WHOLE gate"
+  },
+  "SS-34": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS34UnrunnableQaKindIsNotAFailedCheck::test_a_missing_runner_scores_the_qa_kind_unrunnable_not_failed",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS34UnrunnableQaKindIsNotAFailedCheck::test_a_missing_runner_scores_the_qa_kind_unrunnable_not_failed"
+   ],
+   "negative_controls": [],
+   "notes_8a": "qa:e2e with `playwright: command not found` (exit 127) is scored FAILED, not UNRUNNABLE; `unit` is exempt (KHONG_PHAI_QA), every other contract kind is affected"
+  },
+  "SS-37": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS37StorySessionDeclaresPreexistingDirt::test_operator_dirt_outside_scope_does_not_block_the_developers_first_tool_call",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_c.py::TestSS37StorySessionDeclaresPreexistingDirt::test_operator_dirt_outside_scope_does_not_block_the_developers_first_tool_call"
+   ],
+   "negative_controls": [],
+   "notes_8a": "story sessions never declare pre-existing dirt (only plan/mockup do) and recover_out_of_scope is gated on isolation; under --no-isolate the guard blocks the developer's first tool call"
+  },
+  "SS-38": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS38ClientLocalSettingsAreClientOwned::test_settings_local_json_is_not_a_story_change",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_c.py::TestSS38ClientLocalSettingsAreClientOwned::test_settings_local_json_is_not_a_story_change"
+   ],
+   "negative_controls": [],
+   "notes_8a": ".claude/settings.local.json (written by Claude Code) is attributed to the story; only settings.json is HARNESS_OWNED"
+  },
+  "SS-40": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS40VerifyWithoutScopeIsNotAPass::test_bare_verify_as_generated_for_ci_does_not_exit_ok",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_c.py::TestSS40VerifyWithoutScopeIsNotAPass::test_bare_verify_as_generated_for_ci_does_not_exit_ok"
+   ],
+   "negative_controls": [],
+   "notes_8a": "the generated CI step is `aisef verify` with no scope and no base ref: exit 0 on every committed checkout"
+  },
+  "SS-41": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS41PreexistingInScopeFileIsNotSweptIntoTheCandidate::test_an_untracked_operator_fixture_under_scope_is_not_committed_as_the_developers_work",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_c.py::TestSS41PreexistingInScopeFileIsNotSweptIntoTheCandidate::test_an_untracked_operator_fixture_under_scope_is_not_committed_as_the_developers_work"
+   ],
+   "negative_controls": [],
+   "notes_8a": "commit_paths `git add -A -- src` sweeps a pre-existing untracked operator fixture into the candidate with no attribution"
+  },
+  "SS-42": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS42DevsecopsSessionCarriesAWriteScope::test_the_guard_env_handed_to_the_devsecops_client_allows_writing_the_dockerfile",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_c.py::TestSS42DevsecopsSessionCarriesAWriteScope::test_the_guard_env_handed_to_the_devsecops_client_allows_writing_the_dockerfile"
+   ],
+   "negative_controls": [],
+   "notes_8a": "the devsecops RunSpec.env is {}; the guard falls back to PLANNING_SCOPE and blocks Dockerfile — a deterministic pre-deploy deadlock"
+  },
+  "SS-43": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS43PreDeployGradesOneTree::test_an_uncommitted_dockerfile_is_not_a_pass_bound_to_head",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_c.py::TestSS43PreDeployGradesOneTree::test_an_uncommitted_dockerfile_is_not_a_pass_bound_to_head"
+   ],
+   "negative_controls": [],
+   "notes_8a": "pre-deploy's Dockerfile check reads the working tree and PASSES bound to a HEAD that has no Dockerfile"
+  },
+  "SS-45": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS45AutoDetectedToolsAreProbed::test_the_default_sast_command_of_a_python_project_is_probed",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS45AutoDetectedToolsAreProbed::test_the_default_sast_command_of_a_python_project_is_probed"
+   ],
+   "negative_controls": [],
+   "notes_8a": "doctor probes configured commands only; `bandit -q -r .` (auto-detected sast default) is never probed"
+  },
+  "SS-46": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage::test_a_stack_image_is_probed_even_when_not_declared",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS46PreflightProbeRunsWithoutADeclaredImage::test_a_stack_image_is_probed_even_when_not_declared"
+   ],
+   "negative_controls": [],
+   "notes_8a": "_missing_tools returns [] without sandbox.image although image_for picks a stack image: the run pays for a session in an unprobed image"
+  },
+  "SS-47": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS47UnjudgeableProbeIsNotPresent::test_a_tool_the_probe_cannot_build_is_not_reported_present",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS47UnjudgeableProbeIsNotPresent::test_a_tool_the_probe_cannot_build_is_not_reported_present"
+   ],
+   "negative_controls": [],
+   "notes_8a": "probe None → ok=True: `npx vitest run` reported present without measurement"
+  },
+  "SS-48": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS48ProvisionedMeansRunnable::test_a_test_command_the_probe_reports_missing_does_not_provision_verify_unit",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS48ProvisionedMeansRunnable::test_a_test_command_the_probe_reports_missing_does_not_provision_verify_unit"
+   ],
+   "negative_controls": [],
+   "notes_8a": "a tools.test string the probe reports MISSING still provisions verify.unit"
+  },
+  "SS-49": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS49ReconcileDoesNotResetALiveClaim::test_a_running_claim_whose_owner_is_alive_is_left_alone",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS49ReconcileDoesNotResetALiveClaim::test_a_running_claim_whose_owner_is_alive_is_left_alone"
+   ],
+   "negative_controls": [],
+   "notes_8a": "reconcile_story reset a RUNNING claim whose owner pid is alive (this process) to pending — resolves FM-P-05"
+  },
+  "SS-50": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS50TransitionIsBoundToTheClaimHolder::test_a_non_owner_cannot_move_a_claimed_story",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS50TransitionIsBoundToTheClaimHolder::test_a_non_owner_cannot_move_a_claimed_story"
+   ],
+   "negative_controls": [],
+   "notes_8a": "transition() has no owner parameter: host-b moved a story claimed by host-a"
+  },
+  "SS-51": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS51OneBaseUrlOneLease::test_a_second_run_contending_for_the_same_base_url_is_refused",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS51OneBaseUrlOneLease::test_a_second_run_contending_for_the_same_base_url_is_refused",
+    "tests/hardening/scan8a/test_group_d.py::TestSS51OneBaseUrlOneLease::test_a_404_from_the_server_does_not_prove_identity"
+   ],
+   "negative_controls": [],
+   "notes_8a": "two runs hold the same base_url via two lock files; AppServer.start ignores a refused lease; a 404 responder is accepted as the run's server"
+  },
+  "SS-52": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS52ReservationsOfADeadRunDoNotCountForever::test_a_killed_runs_reservation_does_not_block_the_next_run",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS52ReservationsOfADeadRunDoNotCountForever::test_a_killed_runs_reservation_does_not_block_the_next_run"
+   ],
+   "negative_controls": [],
+   "notes_8a": "a SIGKILLed child's reservation still counts: 'cost cap reached: spent=$0.00, reserved=$0.90'"
+  },
+  "SS-53": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_c.py::TestSS53SchedulerReadsTheEffectiveScope::test_stories_sharing_a_granted_path_do_not_share_a_wave",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_c.py::TestSS53SchedulerReadsTheEffectiveScope::test_stories_sharing_a_granted_path_do_not_share_a_wave"
+   ],
+   "negative_controls": [],
+   "notes_8a": "two stories with disjoint declared scopes share a wave while both may write pyproject.toml/lockfiles/tests/ — deliberate in normalize.effective_write_scope; INV-O.1 to be refined to file grants (manifests, lockfiles) in Family 4"
+  },
+  "SS-54": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval::test_under_auto_a_new_repair_story_is_covered_by_a_gate_digest",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS54RepairStoriesAreCoveredByAnApproval::test_under_auto_a_new_repair_story_is_covered_by_a_gate_digest"
+   ],
+   "negative_controls": [],
+   "notes_8a": "a repair story enters the index under --auto (and on round 1) with no gate digest change; readiness stays approved"
+  },
+  "SS-55": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness::test_weakening_coverage_min_after_readiness_approval_makes_it_stale",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS55GateConfigIsBoundByReadiness::test_weakening_coverage_min_after_readiness_approval_makes_it_stale"
+   ],
+   "negative_controls": [],
+   "notes_8a": "coverage.min 0.85→0.1 and block_severities narrowed after readiness approval: readiness still APPROVED — resolves FM-A-03"
+  },
+  "SS-56": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream::test_editing_the_prd_makes_the_approved_architecture_stale",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_d.py::TestSS56UpstreamContentEditStalesDownstream::test_editing_the_prd_makes_the_approved_architecture_stale"
+   ],
+   "negative_controls": [],
+   "notes_8a": "architecture approved against PRD v1 reports APPROVED programmatically after the PRD changed (CLI blocking() compensates)"
+  },
+  "SS-A10": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS10ResetAfterAMovedCandidateIsRecorded::test_dirt_destroyed_by_the_reset_is_preserved_or_named",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS10ResetAfterAMovedCandidateIsRecorded::test_dirt_destroyed_by_the_reset_is_preserved_or_named",
+    "tests/hardening/scan8a/test_group_b.py::TestSS10ResetAfterAMovedCandidateIsRecorded::test_a_failing_reset_is_recorded"
+   ],
+   "negative_controls": [],
+   "notes_8a": "reset --hard after a reviewer commit destroyed out-of-scope dirt with no record; a failing reset leaves HEAD on the reviewer's commit unrecorded"
+  },
+  "SS-A15": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSS15RefusedFreezeIsNotGradedUnderTheParent::test_a_refused_freeze_does_not_grade_the_tree_under_the_parent_sha",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSS15RefusedFreezeIsNotGradedUnderTheParent::test_a_refused_freeze_does_not_grade_the_tree_under_the_parent_sha"
+   ],
+   "negative_controls": [],
+   "notes_8a": "candidate:frozen ok=False yet gate:input.candidate is the parent SHA and test/lint ran on the dirty tree under it (merge later refused)"
+  },
+  "SS-C2": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSSC2CandidateOfRecordIsTheGradedCandidate::test_a_recovery_note_after_the_gate_does_not_change_the_candidate_of_record",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSSC2CandidateOfRecordIsTheGradedCandidate::test_a_recovery_note_after_the_gate_does_not_change_the_candidate_of_record"
+   ],
+   "negative_controls": [],
+   "notes_8a": "Evidence.candidate returned the retry:recovery SHA written after gate:input"
+  },
+  "SS-T1": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSST1TddVerdictFollowsPositionAndCandidateNotSeq::test_a_red_run_positioned_after_the_green_does_not_prove_tdd",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSST1TddVerdictFollowsPositionAndCandidateNotSeq::test_a_red_run_positioned_after_the_green_does_not_prove_tdd",
+    "tests/hardening/scan8a/test_group_b.py::TestSST1TddVerdictFollowsPositionAndCandidateNotSeq::test_control_a_red_run_at_another_candidate_is_filtered_before_the_seq_comparison"
+   ],
+   "negative_controls": [
+    "tests/hardening/scan8a/test_group_b.py::TestSST1TddVerdictFollowsPositionAndCandidateNotSeq::test_control_a_red_run_at_another_candidate_is_filtered_before_the_seq_comparison"
+   ],
+   "notes_8a": "candidate binding is filtered first (green control); residual: seq decides over position — green(at=1,seq=5), red(at=2,seq=1) proves TDD"
+  },
+  "SS-X1": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "reproducer": "tests/hardening/scan8a/test_group_b.py::TestSSX1WaiverBindsToTheStorysCandidate::test_a_waiver_is_refused_or_bound_to_the_story_branch_tip_not_the_latest_scoring",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_b.py::TestSSX1WaiverBindsToTheStorysCandidate::test_a_waiver_is_refused_or_bound_to_the_story_branch_tip_not_the_latest_scoring"
+   ],
+   "negative_controls": [],
+   "notes_8a": "`gate --waive-review` exit 0 bound the waiver to the trunk SHA of a later gate:input, not the story branch tip"
+  },
+  "SS-59": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.1",
+    "INV-G.4"
+   ],
+   "site": "aisef/phases/implement.py::run_attempt (zero-output check reads changed_files(base_ref))",
+   "semantic_context": "on a retry the zero-output check diffs against the base branch, sees the frozen candidate's files and never fires; the session is recorded as a no-op decision instead of a fatal environment failure",
+   "reproducer": "tests/hardening/test_fault_matrix.py::TestDeveloperFaults::test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision",
+   "reproducers": [
+    "tests/hardening/test_fault_matrix.py::TestDeveloperFaults::test_zero_output_on_a_retry_is_still_fatal_not_a_noop_decision"
+   ],
+   "notes_8a": "found by the Phase 12 differential harness (seed 19) before any project hit it"
+  },
+  "SS-60": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "family": "FAM-IDENTITY",
+   "invariants": [
+    "INV-A.2",
+    "INV-D.1"
+   ],
+   "site": "aisef/phases/implement.py::freeze_candidate → gate `evidence matches candidate` NOT_APPLICABLE on an empty candidate",
+   "semantic_context": "a failed freeze (cannot read HEAD) leaves candidate \"\"; the identity check is NOT_APPLICABLE and the story completes DONE bound to no candidate (merge refuses later — fail-closed downstream)",
+   "reproducer": "tests/hardening/scan8a/test_group_e.py::TestSS60ADoneStoryHasAFrozenCandidate::test_a_story_whose_freeze_failed_is_not_done",
+   "reproducers": [
+    "tests/hardening/scan8a/test_group_e.py::TestSS60ADoneStoryHasAFrozenCandidate::test_a_story_whose_freeze_failed_is_not_done"
+   ],
+   "notes_8a": "found by group A's fixture check while resolving SS-01 (2026-09-16)"
+  },
+  "SS-61": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "family": "FAM-RECOVERY",
+   "invariants": [
+    "INV-E.1",
+    "INV-H.2",
+    "INV-K.2"
+   ],
+   "site": "aisef/phases/implement.py::run_attempt (no-op shortcut) + control/journal reconcile (attempt.aborted → pending)",
+   "semantic_context": "the gate PASSED and gate:verdict was written, the process died before verification.completed; the rerun reconciles the transaction to pending, the developer's identical write is a no-op 'returning the verdict it already returned' (a PASS!), and the story ends FAILED 'sessions kept producing nothing to grade' — a fully verified candidate needs manual intervention",
+   "reproducer": "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration",
+   "reproducers": [
+    "tests/hardening/test_compound_faults.py::TestCF05EvidenceWrittenThenCrashBeforeStateUpdate::test_the_rerun_converges_to_done_with_exactly_one_integration"
+   ],
+   "notes_8a": "found by Phase 14 compound fault CF-05 (evidence write + crash before state update) on 2026-09-16; the no-op path never reads the verdict's OUTCOME, only its existence (D-035's sibling in the passing direction)"
+  },
+  "AD-01": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.1",
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (empty stream + exit 0)",
+   "semantic_context": "an OpenCode child that exits 0 having emitted zero events returns ok=True — a result with nothing in it; Claude's adapter returns infra 'stream ended without a result event'",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC03EmptyResponse::test_opencode"
+   ],
+   "notes_8a": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  "AD-03": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.4",
+    "INV-G.4"
+   ],
+   "site": "aisef/clients/opencode.py::OpenCodeAdapter.run (child death / truncated stream)",
+   "semantic_context": "an OpenCode child dying mid-line or with exit 3 and a stderr heap-limit message is classified `error` (quality, charged to the developer) while Claude's adapter classifies the same death `infra`",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC11PartialStream::test_opencode"
+   ],
+   "notes_8a": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  "AD-04": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P3",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (no result event)",
+   "semantic_context": "when the Claude child dies without a result event the exit code and stderr are dropped (raw_result={}) — the operator cannot tell a heap crash from a cut",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC12ProcessDeath::test_claude"
+   ],
+   "notes_8a": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  "AD-05": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P1",
+   "family": "FAM-OUTCOME",
+   "invariants": [
+    "INV-F.4",
+    "INV-L.1"
+   ],
+   "site": "aisef/clients/claude_code.py::ClaudeCodeAdapter.run (result event after the timeout kill)",
+   "semantic_context": "a result event that arrives after the adapter decided timeout flips ok=True while error still says 'exceeded 1s' — a cut session is reported as a successful one",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC13LateOutputAfterTimeout::test_claude"
+   ],
+   "notes_8a": "found by the Phase 15 adapter conformance suite (recorded streams, real adapter run()) on 2026-09-16"
+  },
+  "SS-28-adapter": {
+   "classification": "CONFIRMED",
+   "severity_proposed": "P2",
+   "family": "FAM-PROSE",
+   "invariants": [
+    "INV-F.4"
+   ],
+   "site": "aisef/clients/stream.py::exit_status_of via ClaudeCodeAdapter (502 + final text mentioning 401)",
+   "alias_of": "SS-28",
+   "semantic_context": "AD-02: the same SS-28 defect reproduced through the real Claude adapter — a 502 with a final text about a 401 handler is classified `auth`; OpenCode's adapter says `infra`",
+   "reproducer": "tests/hardening/adapters/test_conformance.py::TestC06bProviderErrorWithAuthProse::test_claude",
+   "reproducers": [
+    "tests/hardening/adapters/test_conformance.py::TestC06bProviderErrorWithAuthProse::test_claude"
+   ],
+   "notes_8a": "Phase 15; not a new defect id — SS-28's adapter-level reproducer"
+  }
+ }
+}

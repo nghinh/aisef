@@ -1,0 +1,59 @@
+{
+ "generated": "2026-09-19T14:46:24+0700",
+ "route": "9router/cx/gpt-5.5",
+ "listing": {
+  "http": 200,
+  "listed": true,
+  "owned_by": "cx",
+  "route_kind": "FIXED_MODEL"
+ },
+ "chat_probes": [
+  {
+   "http": 503,
+   "seconds": 2.7,
+   "error": "{\"error\":{\"message\":\"[codex/gpt-5.5] [429]: The usage limit has been reached (reset after 29m 59s)\"}}"
+  },
+  {
+   "http": 503,
+   "seconds": 0.3,
+   "error": "{\"error\":{\"message\":\"[codex/gpt-5.5] [429]: The usage limit has been reached (reset after 29m 59s)\"}}"
+  },
+  {
+   "http": 503,
+   "seconds": 0.3,
+   "error": "{\"error\":{\"message\":\"[codex/gpt-5.5] [429]: The usage limit has been reached (reset after 29m 59s)\"}}"
+  }
+ ],
+ "tool_smokes": [
+  {
+   "ok": false,
+   "timeout": true,
+   "seconds": 300
+  },
+  {
+   "ok": false,
+   "timeout": true,
+   "seconds": 300
+  }
+ ],
+ "stage_env_check": null,
+ "requirements": {
+  "exact_fixed_route_resolves": true,
+  "no_4xx_or_other_error_on_any_probe": false,
+  "tool_calling_works": false,
+  "model_identity_constant_between_probes": false,
+  "reviewer_read_only_environment_clean": "not measured here (driver preflight row)"
+ },
+ "pass": false,
+ "summary_for_identity": {
+  "route": "9router/cx/gpt-5.5",
+  "route_kind": "FIXED_MODEL",
+  "resolved_model": [],
+  "chat_probes": "0/3",
+  "tool_smokes": "0/2",
+  "declared_limit": {
+   "context": 200000,
+   "output": 32768
+  }
+ }
+}

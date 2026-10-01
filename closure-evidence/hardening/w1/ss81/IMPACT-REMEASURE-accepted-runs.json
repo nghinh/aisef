@@ -1,0 +1,76 @@
+[
+ {
+  "run": "w1-run-1",
+  "story": "STORY-01-02",
+  "parent": "3f074f9b",
+  "candidate": "7c33573b",
+  "test_files": [
+   "tests/test_format.py"
+  ],
+  "passed_at_parent_with_all_files_collected": [],
+  "ac_coded_tests_green_at_parent": [],
+  "tail": "=============================== 1 error in 0.02s ==============================="
+ },
+ {
+  "run": "w1-run-1",
+  "story": "STORY-01-03",
+  "parent": "7c33573b",
+  "candidate": "ad584612",
+  "test_files": [
+   "tests/test_format.py"
+  ],
+  "passed_at_parent_with_all_files_collected": [],
+  "ac_coded_tests_green_at_parent": [],
+  "tail": "=============================== 1 error in 0.03s ==============================="
+ },
+ {
+  "run": "w1-run-1",
+  "story": "STORY-01-04",
+  "parent": "ad584612",
+  "candidate": "013cede6",
+  "test_files": [
+   "tests/test_store.py"
+  ],
+  "passed_at_parent_with_all_files_collected": [],
+  "ac_coded_tests_green_at_parent": [],
+  "tail": "=============================== 1 error in 0.02s ==============================="
+ },
+ {
+  "run": "w1-run-1",
+  "story": "STORY-01-06",
+  "parent": "9dcf9461",
+  "candidate": "715ba260",
+  "test_files": [
+   "tests/test_conflict.py"
+  ],
+  "passed_at_parent_with_all_files_collected": [],
+  "ac_coded_tests_green_at_parent": [],
+  "tail": "=============================== 1 error in 0.02s ==============================="
+ },
+ {
+  "run": "w1-run-3",
+  "story": "STORY-01-01",
+  "parent": "c3ab20f5",
+  "candidate": "463b8071",
+  "test_files": [
+   "tests/test_skeleton.py",
+   "tests/__init__.py",
+   "tests/test_nfc_normalization.py"
+  ],
+  "passed_at_parent_with_all_files_collected": [],
+  "ac_coded_tests_green_at_parent": [],
+  "tail": "========================== 5 failed, 1 error in 0.10s =========================="
+ },
+ {
+  "run": "w1-run-3",
+  "story": "STORY-01-02",
+  "parent": "463b8071",
+  "candidate": "b1599804",
+  "test_files": [
+   "tests/test_format.py"
+  ],
+  "passed_at_parent_with_all_files_collected": [],
+  "ac_coded_tests_green_at_parent": [],
+  "tail": "=============================== 1 error in 0.01s ==============================="
+ }
+]

@@ -1,0 +1,72 @@
+{
+ "record": "AISEF V2 — P1 SPEC COMPILER",
+ "work_package": "WP-1.2",
+ "rfc_sections": [
+  "8",
+  "35"
+ ],
+ "compiler": {
+  "id": "aisef2.product.compiler/1",
+  "digest": "f31a4602a61d412d834890f46dcc9ca4d0ce240a106a4772dc9a1e8e7fb8ea76",
+  "sources": [
+   "product/compiler.py",
+   "product/spec.py",
+   "product/contract.py",
+   "product/approval.py"
+  ]
+ },
+ "corpus": {
+  "BC-LICENSE": {
+   "spec_id": "PPS-c294f510e56e6729fdf56638e6d305c42edb2c28503e014e5a3aaa1f7a95896e",
+   "semantic_hash": "2379be90bb0bb10cd22bfeff3a25d419b192353e5ca28998918cfba4abea876a",
+   "candidate_expectation": "SATISFIED",
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  "BC-NO-TELEMETRY": {
+   "spec_id": "PPS-6c4caa4edae5f7b47e7ee2abf6328c213c035924dc0155596070fd56c7dd7b90",
+   "semantic_hash": "32e0c2bb54b2cc97a5bb15b8ec1ec5469c7681bf85aa3b305ae72e5d4c77d5a4",
+   "candidate_expectation": "REFUTED",
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  "BC-QUIET-STDOUT": {
+   "spec_id": "PPS-0470ce72e0357d09ee001f7be4304c3207d45b2b2218e5fd3a61c69b324ed33f",
+   "semantic_hash": "15933038dabfac31998f7ed1a2104b4edf58e29cc92af46f59855a725feaea8e",
+   "candidate_expectation": "REFUTED",
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  "BC-VERSION": {
+   "spec_id": "PPS-94fce8bd31e58dd3bdf9949ce3abec02bbbfec03162f026f60d4567bbc9e0a6c",
+   "semantic_hash": "ca8924aefa83fea50506086e596639c6e5a81af31ea550f27ebfc0acbd33e28a",
+   "candidate_expectation": "SATISFIED",
+   "subject_absence": "REQUIRES_SUBJECT"
+  }
+ },
+ "semantic_hash_changes_with": {
+  "subject": true,
+  "stimulus": true,
+  "observable": true,
+  "polarity": true,
+  "subject_absence": true,
+  "probe_digest": true
+ },
+ "cross_process": {
+  "seeds": [
+   "0",
+   "1",
+   "2024"
+  ],
+  "identical": true
+ },
+ "properties": {
+  "shape_equals_rfc": true,
+  "no_plan_fact": true,
+  "plan_field_is_a_type_error": true,
+  "expectation_follows_polarity": true,
+  "unapproved_contract_cannot_compile": true,
+  "every_semantic_change_changes_semantic_hash": true,
+  "semantic_hash_binds_subject_absence": true,
+  "prose_edit_keeps_semantic_hash": true,
+  "deterministic_across_processes": true,
+  "check_round_trip_byte_identical": true
+ }
+}

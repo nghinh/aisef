@@ -1,0 +1,29 @@
+{
+ "record": "owned-range measurement of a P7-FINDING-001 diagnostic job",
+ "job": "orch9 (ubuntu-latest, 3.11, 3)",
+ "job_id": 108646063857,
+ "ci_run": 36328601427,
+ "attempt": 1,
+ "conclusion": "success",
+ "command": [
+  "python",
+  "-P",
+  "validation/qualification/diag_orch9.py",
+  "--runs",
+  "250",
+  "--shard",
+  "3",
+  "--print"
+ ],
+ "exit": 0,
+ "mechanism": "posix-session-and-group",
+ "owned_before": 0,
+ "owned_at_exit": 0,
+ "owned_after": 0,
+ "residual": [],
+ "escaped": [],
+ "ladder": [],
+ "released_empty": true,
+ "harness_orphans_before": 0,
+ "harness_orphans_after": 0
+}

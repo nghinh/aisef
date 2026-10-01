@@ -1,0 +1,14 @@
+{
+ "run": "gpt56sol-1",
+ "profile": "PROFILE-W1-OC-GPT56SOL-T80",
+ "disposition": "PROFILE ATTEMPT \u2014 NOT QUALIFICATION EVIDENCE FOR THE NEW KERNEL",
+ "owner_decision": "FIX SS-81 FAMILY, VOID W0, THEN REQUALIFY, section 13",
+ "measured_facts_kept": [
+  "developer candidate passed on the first attempt",
+  "0 developer retries",
+  "0 max-turn events",
+  "reviewer tree mutation (uv.lock via `uv run`) caused the stop",
+  "the kernel rejected the reviewer mutation correctly"
+ ],
+ "counts_toward_the_three_required_runs": false
+}

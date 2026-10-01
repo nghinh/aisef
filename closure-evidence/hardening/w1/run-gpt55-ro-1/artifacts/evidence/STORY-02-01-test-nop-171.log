@@ -1,0 +1,197 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 43 items
+
+tests/test_conflict.py::LedgerConflictTests::test_AC_STORY_01_06_1_put_same_rid_replays_original_line PASSED [  2%]
+tests/test_conflict.py::LedgerConflictTests::test_AC_STORY_01_06_2_put_different_rid_conflicts_without_writing PASSED [  4%]
+tests/test_conflict.py::LedgerConflictTests::test_AC_STORY_01_06_3_put_after_delete_different_rid_conflicts PASSED [  6%]
+tests/test_conflict.py::LedgerConflictTests::test_AC_STORY_01_06_4_put_after_delete_same_rid_replays_delete_line PASSED [  9%]
+tests/test_conflict.py::LedgerConflictTests::test_AC_STORY_01_06_5_nfd_key_same_rid_replays_nfc_line PASSED [ 11%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_1_matches_json_dumps_contract PASSED [ 13%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_2_equal_dicts_return_byte_identical_bytes PASSED [ 16%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_3_non_ascii_is_utf8_literal_and_stable PASSED [ 18%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_4_insertion_order_does_not_change_bytes PASSED [ 20%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_5_genesis_is_literal_string PASSED [ 23%]
+tests/test_format.py::CanonicalBytesTests::test_AC_STORY_01_02_6_json_round_trip_preserves_canonical_bytes PASSED [ 25%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_1_returns_64_lowercase_hex_characters PASSED [ 27%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_2_distinct_prev_hash_values_change_digest PASSED [ 30%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 32%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_4_same_input_returns_same_digest PASSED [ 34%]
+tests/test_format.py::LineHashTests::test_AC_STORY_01_03_5_accepts_genesis_prev_hash PASSED [ 37%]
+tests/test_ledger.py::LedgerAppendTests::test_AC_STORY_01_05_1_first_append_creates_genesis_hash_chained_line PASSED [ 39%]
+tests/test_ledger.py::LedgerAppendTests::test_AC_STORY_01_05_2_concurrent_appends_do_not_share_prev_hash PASSED [ 41%]
+tests/test_ledger.py::LedgerAppendTests::test_AC_STORY_01_05_2_second_append_chains_to_first_hash PASSED [ 44%]
+tests/test_ledger.py::LedgerAppendTests::test_AC_STORY_01_05_2_threaded_appends_do_not_share_prev_hash PASSED [ 46%]
+tests/test_ledger.py::LedgerAppendTests::test_AC_STORY_01_05_3_empty_key_raises_value_error_and_creates_no_file PASSED [ 48%]
+tests/test_ledger.py::LedgerAppendTests::test_AC_STORY_01_05_4_fresh_instance_reads_tail_hash_from_disk PASSED [ 51%]
+tests/test_ledger.py::LedgerAppendTests::test_AC_STORY_01_05_5_successful_append_is_visible_to_separate_process PASSED [ 53%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc 
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_1_normalize_key_matches_unicodedata_nfc PASSED [ 55%]
+tests/test_nfc_normalization.py::NormalizeKeyTests::test_AC_STORY_01_01_2_nfc_and_nfd_e_acute_normalize_identically PASSED [ 58%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_3_package_import_prints_init_file_path PASSED [ 60%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_4_module_help_lists_required_subcommands PASSED [ 62%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_5_runtime_has_no_forbidden_imports PASSED [ 65%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_6_runtime_has_no_forbidden_process_or_socket_calls PASSED [ 67%]
+tests/test_skeleton.py::SkeletonTests::test_AC_STORY_01_01_7_package_exports_ledger_and_conflict_error PASSED [ 69%]
+tests/test_store.py::StoreReadLinesTests::test_AC_STORY_01_04_1_returns_bytes_lines_with_trailing_newlines_stripped PASSED [ 72%]
+tests/test_store.py::StoreReadLinesTests::test_AC_STORY_01_04_2_missing_path_raises_file_not_found PASSED [ 74%]
+tests/test_store.py::StoreReadLinesTests::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 76%]
+tests/test_store.py::StoreWriteAtomicTests::test_AC_STORY_01_04_4_writes_bytes_and_read_lines_returns_written_lines PASSED [ 79%]
+tests/test_store.py::StoreWriteAtomicTests::test_AC_STORY_01_04_5_replace_failure_leaves_existing_path_byte_identical PASSED [ 81%]
+tests/test_store.py::StoreWriteAtomicTests::test_AC_STORY_01_04_6_temp_file_is_created_in_same_directory_as_target PASSED [ 83%]
+tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_1_valid_jsonl_written_through_append_verifies_ok FAILED [ 86%]
+tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_2_zero_byte_jsonl_verifies_ok FAILED [ 88%]
+tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_3_missing_jsonl_raises_file_not_found FAILED [ 90%]
+tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_4_malformed_mutated_line_returns_bad_index FAILED [ 93%]
+tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_4_out_of_band_hash_mutation_breaks_fresh_verify FAILED [ 95%]
+tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_5_non_canonical_same_value_bytes_break_fresh_verify FAILED [ 97%]
+tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_5_out_of_band_value_mutation_breaks_fresh_verify FAILED [100%]
+
+=================================== FAILURES ===================================
+_ LedgerVerifyIndependentTests.test_AC_STORY_02_01_1_valid_jsonl_written_through_append_verifies_ok _
+
+self = <tests.test_verify_independent.LedgerVerifyIndependentTests testMethod=test_AC_STORY_02_01_1_valid_jsonl_written_through_append_verifies_ok>
+
+    def test_AC_STORY_02_01_1_valid_jsonl_written_through_append_verifies_ok(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "k1", "v1", "r1", 100))
+            ledger.append(("put", "k2", "v2", "r2", 101))
+    
+            self.assertEqual(
+                {"ok": True, "first_bad_index": None},
+>               Ledger(path).verify(),
+                ^^^^^^^^^^^^^^^^^^^
+            )
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:30: AttributeError
+_ LedgerVerifyIndependentTests.test_AC_STORY_02_01_2_zero_byte_jsonl_verifies_ok _
+
+self = <tests.test_verify_independent.LedgerVerifyIndependentTests testMethod=test_AC_STORY_02_01_2_zero_byte_jsonl_verifies_ok>
+
+    def test_AC_STORY_02_01_2_zero_byte_jsonl_verifies_ok(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "ledger.jsonl"
+            path.write_bytes(b"")
+    
+            self.assertEqual(
+                {"ok": True, "first_bad_index": None},
+>               Ledger(path).verify(),
+                ^^^^^^^^^^^^^^^^^^^
+            )
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:40: AttributeError
+_ LedgerVerifyIndependentTests.test_AC_STORY_02_01_3_missing_jsonl_raises_file_not_found _
+
+self = <tests.test_verify_independent.LedgerVerifyIndependentTests testMethod=test_AC_STORY_02_01_3_missing_jsonl_raises_file_not_found>
+
+    def test_AC_STORY_02_01_3_missing_jsonl_raises_file_not_found(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "missing.jsonl"
+    
+            with self.assertRaises(FileNotFoundError):
+>               Ledger(path).verify()
+                ^^^^^^^^^^^^^^^^^^^
+E               AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:48: AttributeError
+_ LedgerVerifyIndependentTests.test_AC_STORY_02_01_4_malformed_mutated_line_returns_bad_index _
+
+self = <tests.test_verify_independent.LedgerVerifyIndependentTests testMethod=test_AC_STORY_02_01_4_malformed_mutated_line_returns_bad_index>
+
+    def test_AC_STORY_02_01_4_malformed_mutated_line_returns_bad_index(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "k1", "v1", "r1", 100))
+            path.write_bytes(b'{"hash":"not-json"\n')
+    
+            self.assertEqual(
+                {"ok": False, "first_bad_index": 0},
+>               Ledger(path).verify(),
+                ^^^^^^^^^^^^^^^^^^^
+            )
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:102: AttributeError
+_ LedgerVerifyIndependentTests.test_AC_STORY_02_01_4_out_of_band_hash_mutation_breaks_fresh_verify _
+
+self = <tests.test_verify_independent.LedgerVerifyIndependentTests testMethod=test_AC_STORY_02_01_4_out_of_band_hash_mutation_breaks_fresh_verify>
+
+    def test_AC_STORY_02_01_4_out_of_band_hash_mutation_breaks_fresh_verify(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "k1", "v1", "r1", 100))
+            ledger.append(("put", "k2", "v2", "r2", 101))
+            lines = load_jsonl(path)
+            lines[1]["hash"] = "0" * 64
+            write_jsonl(path, lines)
+    
+            self.assertEqual(
+                {"ok": False, "first_bad_index": 1},
+>               Ledger(path).verify(),
+                ^^^^^^^^^^^^^^^^^^^
+            )
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:62: AttributeError
+_ LedgerVerifyIndependentTests.test_AC_STORY_02_01_5_non_canonical_same_value_bytes_break_fresh_verify _
+
+self = <tests.test_verify_independent.LedgerVerifyIndependentTests testMethod=test_AC_STORY_02_01_5_non_canonical_same_value_bytes_break_fresh_verify>
+
+    def test_AC_STORY_02_01_5_non_canonical_same_value_bytes_break_fresh_verify(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "k1", "v1", "r1", 100))
+            line = load_jsonl(path)[0]
+            path.write_text(json.dumps(line, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    
+            self.assertEqual(
+                {"ok": False, "first_bad_index": 0},
+>               Ledger(path).verify(),
+                ^^^^^^^^^^^^^^^^^^^
+            )
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:90: AttributeError
+_ LedgerVerifyIndependentTests.test_AC_STORY_02_01_5_out_of_band_value_mutation_breaks_fresh_verify _
+
+self = <tests.test_verify_independent.LedgerVerifyIndependentTests testMethod=test_AC_STORY_02_01_5_out_of_band_value_mutation_breaks_fresh_verify>
+
+    def test_AC_STORY_02_01_5_out_of_band_value_mutation_breaks_fresh_verify(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "ledger.jsonl"
+            ledger = Ledger(path)
+            ledger.append(("put", "k1", "v1", "r1", 100))
+            ledger.append(("put", "k2", "v1", "r2", 101))
+            lines = load_jsonl(path)
+            lines[1]["value"] = "v2"
+            write_jsonl(path, lines)
+    
+            self.assertEqual(
+                {"ok": False, "first_bad_index": 1},
+>               Ledger(path).verify(),
+                ^^^^^^^^^^^^^^^^^^^
+            )
+E           AttributeError: 'Ledger' object has no attribute 'verify'
+
+tests/test_verify_independent.py:77: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_1_valid_jsonl_written_through_append_verifies_ok
+FAILED tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_2_zero_byte_jsonl_verifies_ok
+FAILED tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_3_missing_jsonl_raises_file_not_found
+FAILED tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_4_malformed_mutated_line_returns_bad_index
+FAILED tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_4_out_of_band_hash_mutation_breaks_fresh_verify
+FAILED tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_5_non_canonical_same_value_bytes_break_fresh_verify
+FAILED tests/test_verify_independent.py::LedgerVerifyIndependentTests::test_AC_STORY_02_01_5_out_of_band_value_mutation_breaks_fresh_verify
+=============== 7 failed, 36 passed, 6 subtests passed in 0.88s ================

@@ -1,0 +1,9 @@
+{
+ "checker": "result_only_through_binding",
+ "package": "P2 correction (PROBE-BIND-1)",
+ "kind": "kernel_source",
+ "rule": "RESULT_ONLY_THROUGH_BINDING",
+ "path": "aisef2/plan/bad.py",
+ "source": "def admit(record, spec):\n    return record.result\n",
+ "expect": "RESULT_ONLY_THROUGH_BINDING aisef2/plan/bad.py:2"
+}

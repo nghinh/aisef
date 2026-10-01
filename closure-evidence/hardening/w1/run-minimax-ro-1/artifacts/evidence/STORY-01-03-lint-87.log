@@ -1,0 +1,28 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> ledgerlock/format.py:3:1
+  |
+1 |   """NFC normalization, canonical bytes, and hash chain primitives."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | from typing import Any
+6 | |
+7 | | import hashlib
+8 | | import json
+9 | | import unicodedata
+  | |__________________^
+help: Organize imports
+  |
+4 |
+  - from typing import Any
+  -
+5 | import hashlib
+6 | import json
+7 | import unicodedata
+  -
+8 + from typing import Any
+9 |
+  |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.

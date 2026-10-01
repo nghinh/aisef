@@ -1,0 +1,10 @@
+Progress: 0/16 stories done (15 not started)
+Active epics: EPIC-01
+
+  failed      1
+
+Cost: $0.00
+Agent runs: ok 15
+
+✗ 1 stories not passing:
+    STORY-01-01      failed   deadlock due to plan: AC-STORY-01-01-4 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is already violated at this story's parent (red) — a plan defect, not this story's; AC-STORY-01-01-5 [NEGATIVE_INVARIANT] RED -> GREEN → PLAN_PRECONDITION_MISSING: the prohibition is already violated at this story's parent (red) — a plan defect, not this story's. The criterion cannot be satisfied by writing code — correct the plan (its proof obligation, its owning story, or the criterion itself), then re-run.

@@ -1,0 +1,8 @@
+{
+ "checker": "except_boundaries",
+ "package": "WP-5.5 (RFC §4 uncontainable)",
+ "kind": "kernel_source",
+ "path": "aisef2/runtime/release.py",
+ "source": "def release(resource):\n    try:\n        resource.release()\n    except BaseException:\n        return None  # swallows everything, an invariant violation included\n",
+ "expect": "EXCEPT_BOUNDARY aisef2/runtime/release.py:4 except BaseException: could hold an InvariantError (BaseException) and does not re-raise it"
+}

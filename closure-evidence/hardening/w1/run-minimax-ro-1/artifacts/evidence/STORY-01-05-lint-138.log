@@ -1,0 +1,67 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> ledgerlock/__init__.py:3:1
+  |
+1 |   """LedgerLock public API."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | from .ledger import Ledger
+  | |__________________________^
+6 |
+7 |   class ConflictError(Exception):
+  |
+help: Organize imports
+  |
+6 |
+7 +
+8 | class ConflictError(Exception):
+  |
+
+F401 [*] `ledgerlock.Ledger` imported but unused
+   --> tests/test_ledger.py:242:32
+    |
+241 |     def test_AC_STORY_01_05_5_other_process_finds_line(self) -> None:
+242 |         from ledgerlock import Ledger
+    |                                ^^^^^^
+243 |
+244 |         with tempfile.TemporaryDirectory() as tmp:
+    |
+help: Remove unused import: `ledgerlock.Ledger`
+    |
+241 |     def test_AC_STORY_01_05_5_other_process_finds_line(self) -> None:
+    -         from ledgerlock import Ledger
+242 |
+    |
+
+F841 Local variable `completed` is assigned to but never used
+   --> tests/test_ledger.py:256:13
+    |
+254 |             )
+255 |
+256 |             completed = subprocess.run(
+    |             ^^^^^^^^^
+257 |                 [sys.executable, str(driver)],
+258 |                 check=True,
+    |
+help: Remove assignment to unused variable `completed`
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> tests/test_ledger.py:277:9
+    |
+276 |     def test_AC_STORY_01_05_fsync_called_on_append_mode_handle(self) -> None:
+277 |         from ledgerlock import Ledger, ledger as ledger_module
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+278 |
+279 |         with tempfile.TemporaryDirectory() as tmp:
+    |
+help: Organize imports
+    |
+276 |     def test_AC_STORY_01_05_fsync_called_on_append_mode_handle(self) -> None:
+    -         from ledgerlock import Ledger, ledger as ledger_module
+277 +         from ledgerlock import Ledger
+278 +         from ledgerlock import ledger as ledger_module
+279 |
+    |
+
+Found 4 errors.
+[*] 3 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).

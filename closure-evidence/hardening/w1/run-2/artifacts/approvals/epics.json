@@ -1,0 +1,36 @@
+{
+  "gate": "epics",
+  "artifact": "epics.md",
+  "artifact_sha256": "b47e5698d7c1e68f218fa62f7f7be09913648e66c1ee58e35f0dc34f130529c5",
+  "status": "approved",
+  "seq": 7,
+  "decided_by": "auto",
+  "decided_at": "2026-09-15T13:27:08+00:00",
+  "note": "auto-approved (--auto-approve)",
+  "machine_checks": {
+    "bmad_status": "unreadable"
+  },
+  "history": [
+    {
+      "status": "approved",
+      "decided_by": "auto",
+      "decided_at": "2026-09-15T13:17:10+00:00",
+      "note": "auto-approved (--auto-approve)",
+      "artifact_sha256": "25319138c12b630776002b2efe45d2591e1f3936f2b4824d27b44a09e0cd876d"
+    },
+    {
+      "status": "approved",
+      "decided_by": "auto",
+      "decided_at": "2026-09-15T13:21:41+00:00",
+      "note": "auto-approved (--auto-approve)",
+      "artifact_sha256": "bb81462119301593b38ef6a6577eac13f89ce5e647d4d91e7b255cae60c15bc8"
+    },
+    {
+      "status": "approved",
+      "decided_by": "auto",
+      "decided_at": "2026-09-15T13:24:32+00:00",
+      "note": "auto-approved (--auto-approve)",
+      "artifact_sha256": "cc8e24c45be9f618f17ad08073c600da3d637d9e81389213993f06b0685b23d3"
+    }
+  ]
+}

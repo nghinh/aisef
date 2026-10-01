@@ -160,8 +160,14 @@ class AppServer:
                 return f"dev server exited early (code {self.proc.returncode}): {out.strip()}"
             if self.lease_root is not None and self.run_id:
                 from .server_identity import ready_with_identity
-                if ready_with_identity(
-                        self.base_url, self.run_id, attempts=1):
+                who = ready_with_identity(self.base_url, self.run_id, attempts=1)
+                if who is True:
+                    return ""
+                if who is False:               # SS-51: a responder that echoes ANOTHER id is not our server
+                    return f"another server answers at {self.base_url} (identity mismatch) — not this run's app"
+                # no identity endpoint: the port was free before OUR process was launched under OUR lease, so a
+                # responder now is ours by construction (the lease keeps other runs off this port)
+                if self._lease_fd is not None and _responds(self.base_url, timeout=2):
                     return ""
             elif _responds(self.base_url, timeout=2):
                 return ""

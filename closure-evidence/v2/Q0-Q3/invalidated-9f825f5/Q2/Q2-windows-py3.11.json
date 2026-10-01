@@ -1,0 +1,2599 @@
+{
+ "record": "AISEF V2 — Q2 ADEQUACY",
+ "rung": "Q2",
+ "status": "GREEN",
+ "at": "2026-09-27T00:58:51Z",
+ "subject": {
+  "seal_commit": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
+  "semantic_candidate": "097daefefd9229eafeacaca321b7a008a581899b",
+  "kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+  "head": "9f825f5196c81546f37cdcaeebfac38184a03b05",
+  "head_is_after_the_seal": true,
+  "head_kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+  "kernel_tree_is_the_candidates": true,
+  "candidate_kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_unchanged": true,
+  "validation_v2_tree": "8879faef0e14e0c6b32e24af06054a9aeb09a49d",
+  "tests_v2_tree": "fb781d8ff444ad3065a2e5528f917463a86beea7",
+  "working_tree_clean_outside_qualification_output": true,
+  "rfc": {
+   "effective_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "effective_freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "lineage": [
+    "AISEF-V2-RFC-APPROVAL.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-005.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-006.json"
+   ],
+   "lineage_end": "AISEF-V2-RFC-AMENDMENT-V2-006.json",
+   "broken_links": []
+  },
+  "probe": {
+   "id": "probe.python_callable",
+   "digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0"
+  },
+  "harness": {
+   "files": {
+    "validation/qualification/__init__.py": "40f613b3d5ffa39b5807ae0aec2878be51870891f5bd7dd76aae025e73e48f91",
+    "validation/qualification/common.py": "6816af440da1cf25a6d3d2ec634562e39c623090527108fd54c2d6dcee46d57c",
+    "validation/qualification/q0.py": "e31b897a576e622feed0f8407109d0d01d0bd71ead4874f36c7003cdac3e6cca",
+    "validation/qualification/q1.py": "66dfc17f07603057fb70210442b31359c3e7c80520a0bdcc9b5cb7af91a6d2ef",
+    "validation/qualification/q2.py": "0b17822096a4f4cb5a7e3c6be4c19ee1022a5892c689462c0a56d607d1d9cfdc",
+    "validation/qualification/q3.py": "5cbdccd0d99ab516a5d71001deb9785cd57b5933721902cb677c1fbecd2b3627",
+    "validation/qualification/run.py": "baa82a3c3f7e0716855806d1ce8a78972f62792b8ad220f93c40a5860df28f90",
+    "validation/qualification/summary.py": "d38d0e202f229645f79a6f21603a88c3d3552cecb7b19f7fa3a5fd7e1c73e58b"
+   },
+   "sha256": "dafc15db18ed205c45b8aec972e2b5ddd0fade178e03c49053e5858b49c0262f",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines, sorted"
+  }
+ },
+ "platform": {
+  "os": "windows",
+  "os_release": "10",
+  "python": "3.11.9",
+  "free_disk_gb": 157.6,
+  "implementation": "CPython",
+  "machine": "AMD64",
+  "runner_os": "Windows",
+  "ci_run": "36283800027",
+  "ci_job": "qualify",
+  "ci_attempt": "1",
+  "qualification_platform": true,
+  "range_mechanism": "windows-job",
+  "label": "windows-py3.11"
+ },
+ "product_mutation": {
+  "check_problems": [],
+  "phases": {
+   "P1": {
+    "path": "closure-evidence/v2/P1-MUTATION.json",
+    "sha256": "60bd41b03d9c66edaed6df6052029a7b03f35cd4068ccdf4ad619d8d85ab4819",
+    "targets": 19,
+    "mutants": 1151,
+    "killed": 1151,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": []
+   },
+   "P2": {
+    "path": "closure-evidence/v2/P2-MUTATION.json",
+    "sha256": "d173209d7b30d7ceb4601aaf5d0e28b47939cf5f63d42ec1a7cc45f6e05a7eb3",
+    "targets": 43,
+    "mutants": 1269,
+    "killed": 1269,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 9,
+    "timeouts": [
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L321 condition negated",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L321 not removed",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L318 string 'STREAM_CLOSED' emptied",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L324 GtE->Lt",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L324 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L324 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_pump",
+      "mutant": "L301 string 'STREAM_CLOSED' emptied",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_watch",
+      "mutant": "L264 element 0 dropped",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_watch",
+      "mutant": "L264 element 1 dropped",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     }
+    ],
+    "errors": []
+   },
+   "P3": {
+    "path": "closure-evidence/v2/P3-MUTATION.json",
+    "sha256": "3a8d00522b154719bb0457d3adb77dc212f48ba74817b41fefbee4d506b31ce4",
+    "targets": 52,
+    "mutants": 1842,
+    "killed": 1832,
+    "survivors": [
+     {
+      "target": "tests/v2/refmodel/budgets.py::model",
+      "mutant": "L75 True->False",
+      "audit": "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict never decides anything",
+      "source_sha256": "8cb4cde050c6c755edf3a83d2cd61f316d2516dc862799e155422d7aeb6d3a6b",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/qualification_counters.py::metrics",
+      "mutant": "L15 element 0 dropped",
+      "audit": "`pre` is read only through len(pre): a one-element tuple per entry counts the same",
+      "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/qualification_counters.py::metrics",
+      "mutant": "L15 element 1 dropped",
+      "audit": "`pre` is read only through len(pre): a one-element tuple per entry counts the same",
+      "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/qualification_counters.py::model",
+      "mutant": "L41 sorted() -> list()",
+      "audit": "`unplanned` is read only for truthiness and inside the refusal message",
+      "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/qualification_counters.py::model",
+      "mutant": "L44 sorted() -> list()",
+      "audit": "`misplaced` is read only for truthiness and inside the refusal message",
+      "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L19 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L20 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L21 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L22 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L23 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     }
+    ],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": []
+   },
+   "P4": {
+    "path": "closure-evidence/v2/P4-MUTATION.json",
+    "sha256": "0c339b531e5274d8c70f997d8f36bd292ed750ff064f13253352080bce23ce38",
+    "targets": 98,
+    "mutants": 1594,
+    "killed": 1594,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 26,
+    "timeouts": [
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L375 conditional negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L378 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L375 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L378 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L380 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L377 conditional negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L378 string 'EXITED' emptied",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L380 In->NotIn",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L377 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L380 element 0 dropped",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L380 string 'TIMEOUT' emptied",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L401 conditional negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L403 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L401 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L403 IsNot->Is",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L403 GtE->Lt",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::_Posix.abort",
+      "mutant": "L169 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::_Posix.abort",
+      "mutant": "L169 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::_Posix.members",
+      "mutant": "L150 And swapped",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::_Posix.members",
+      "mutant": "L150 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/range_anchor.py::main",
+      "mutant": "L106 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/range_anchor.py::main",
+      "mutant": "L106 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/range_anchor.py::main",
+      "mutant": "L106 string 'EXIT' emptied",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/range_anchor.py::main",
+      "mutant": "L103 string 'EXITED ' emptied",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/story_scope.py::StoryScope._release",
+      "mutant": "L167 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_story_scope.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/story_scope.py::StoryScope._release",
+      "mutant": "L167 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_story_scope.py"
+      ]
+     }
+    ],
+    "errors": []
+   },
+   "P5": {
+    "path": "closure-evidence/v2/P5-MUTATION.json",
+    "sha256": "f5658c5f74c95a4234e515531edbe727515a33a044759eeb40af476fe8c99d21",
+    "targets": 58,
+    "mutants": 1577,
+    "killed": 1577,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": []
+   },
+   "P6": {
+    "path": "closure-evidence/v2/P6-MUTATION.json",
+    "sha256": "fec915d0db3d4279886715f2f6640cb28aaeeeac66081a3d0720c5befb24e3de",
+    "targets": 118,
+    "mutants": 3570,
+    "killed": 3570,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": []
+   }
+  },
+  "totals": {
+   "targets": 388,
+   "mutants": 11003,
+   "killed": 10993,
+   "survivors": 10,
+   "unaudited": 0,
+   "killed_by_timeout_named": 35
+  },
+  "audited_equivalents_outside_the_reference_models": [],
+  "no_audit_targets": [
+   "aisef2/product/outcome.py::contract_satisfaction"
+  ],
+  "kernel_tree": "ac11f906669c75df634d83f4ce42488a0e27686c",
+  "binding": "every target carries the sha256 of the source it mutated; mutation.check re-derives each against this tree"
+ },
+ "inv_mutation_authority": {
+  "destructive_sites_problems": [],
+  "cases": [
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission",
+    "outcome": "NOT_APPLICABLE",
+    "seconds": 0.0,
+    "detail": "the authority reads a POSIX process table"
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number",
+    "outcome": "NOT_APPLICABLE",
+    "seconds": 0.0,
+    "detail": "the authority reads a POSIX process table"
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own",
+    "outcome": "NOT_APPLICABLE",
+    "seconds": 0.0,
+    "detail": "the authority reads a POSIX process table"
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled",
+    "outcome": "NOT_APPLICABLE",
+    "seconds": 0.0,
+    "detail": "the authority reads a POSIX process table"
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused",
+    "outcome": "NOT_APPLICABLE",
+    "seconds": 0.0,
+    "detail": "the authority reads a POSIX process table"
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed",
+    "outcome": "NOT_APPLICABLE",
+    "seconds": 0.0,
+    "detail": "the authority reads a POSIX process table"
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives",
+    "outcome": "NOT_APPLICABLE",
+    "seconds": 0.0,
+    "detail": "the authority reads a POSIX process table"
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set",
+    "outcome": "NOT_APPLICABLE",
+    "seconds": 0.0,
+    "detail": "the authority reads a POSIX process table"
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set",
+    "outcome": "NOT_APPLICABLE",
+    "seconds": 0.0,
+    "detail": "the authority reads a POSIX process table"
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:DependencyBoundary.test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it",
+    "outcome": "PASS",
+    "seconds": 0.016
+   },
+   {
+    "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_class_qualified_name_picks_that_class_method",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_reference_models_refusal_message_is_not_a_mutation_site",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_return_of_None_is_not_mutated_into_itself",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_mutation_targets:Locator.test_every_target_resolves",
+    "outcome": "PASS",
+    "seconds": 1.422
+   },
+   {
+    "id": "tests.v2.p5.test_invariants:MutationAuthority.test_INV_MUTATION_AUTHORITY_destructive_sites_of_the_invariant_code_are_ledgered",
+    "outcome": "PASS",
+    "seconds": 2.094
+   }
+  ]
+ },
+ "probe_capability_calibration": {
+  "probe_digests_in_use": [
+   [
+    "probe.python_callable",
+    "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0"
+   ]
+  ],
+  "observation_classes_in_use": [
+   "exists",
+   "returns",
+   "raises",
+   "blocks"
+  ],
+  "fresh": [
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "exists",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/exists/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/exists/negative",
+    "qualified": true
+   },
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "returns",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/returns/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/returns/negative",
+    "qualified": true
+   },
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "raises",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/raises/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/raises/negative",
+    "qualified": true
+   },
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "blocks",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/negative",
+    "qualified": true
+   }
+  ],
+  "committed_record_keys": [
+   [
+    "probe.python_callable",
+    "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "blocks"
+   ],
+   [
+    "probe.python_callable",
+    "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "exists"
+   ],
+   [
+    "probe.python_callable",
+    "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "raises"
+   ],
+   [
+    "probe.python_callable",
+    "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "returns"
+   ]
+  ],
+  "in_use_all_calibrated_fresh": true,
+  "old_digest_historical_only": true,
+  "contrast_table": {
+   "SATISFIED expected, SATISFIED observed": false,
+   "SATISFIED expected, REFUTED observed": true,
+   "SATISFIED expected, INDETERMINATE observed": false,
+   "REFUTED expected, SATISFIED observed": true,
+   "REFUTED expected, REFUTED observed": false,
+   "REFUTED expected, INDETERMINATE observed": false
+  },
+  "both_polarities_required": true,
+  "problems": []
+ },
+ "fixed_verdict_probes_rejected": {
+  "counts": {
+   "PASS": 17,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 0,
+   "NOT_APPLICABLE": 0
+  },
+  "cases": [
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected",
+    "outcome": "PASS",
+    "seconds": 0.016
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_a_probe_that_cannot_look_is_not_qualified",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_an_always_SATISFIED_probe_is_rejected_for_MUST_HOLD",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_an_honest_probe_is_qualified_for_its_class",
+    "outcome": "PASS",
+    "seconds": 0.015
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_refusing_to_run_is_not_a_demonstration",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_swapped_fixtures_qualify_nothing",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_must_ask_for_the_class_being_calibrated",
+    "outcome": "PASS",
+    "seconds": 0.016
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_spec_is_bound_to_the_probe_and_answers_no_contract",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Contrast.test_CAL_1_a_fixed_REFUTED_rule_would_have_passed_the_always_refuted_probe",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Contrast.test_an_expectation_is_satisfied_or_refuted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Contrast.test_the_counterexample_must_produce_the_opposite_verdict",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Falsifiability.test_evidence_must_contrast_with_the_specs_expectation",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Falsifiability.test_the_evidence_is_typed",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Metadata.test_a_protocol_only_probe_is_calibrated",
+    "outcome": "PASS",
+    "seconds": 0.016
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Metadata.test_an_unregistered_probe_or_digest_is_not_qualified",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Records.test_a_record_qualifies_only_its_probe_digest_and_class",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Records.test_the_record_shapes_are_the_rfcs",
+    "outcome": "PASS",
+    "seconds": 0.015
+   }
+  ]
+ },
+ "spec_falsifiability": {
+  "rule": "required for every spec whose probe is a registered executable probe; a declared fixture probe identity (fixture.*) has no executable probe in the registry and can back no qualified product evidence — classified, not waived",
+  "stored_spec_inventory": [
+   {
+    "where": "tests/v2/fixtures/p1/corpus/specs/BC-LICENSE.json",
+    "spec_id": "PPS-c294f510e56e6729fdf56638e6d305c42edb2c28503e014e5a3aaa1f7a95896e",
+    "contract_id": "BC-LICENSE",
+    "probe_id": "fixture.file_artifact",
+    "probe_digest": "77a1145ebe55e2595fc5c1635c77e568f578e9763075dbca513d725ea006abf4",
+    "semantic_hash": "2379be90bb0bb10cd22bfeff3a25d419b192353e5ca28998918cfba4abea876a",
+    "classification": "DECLARED_FIXTURE_PROBE_IDENTITY"
+   },
+   {
+    "where": "tests/v2/fixtures/p1/corpus/specs/BC-NO-TELEMETRY.json",
+    "spec_id": "PPS-6c4caa4edae5f7b47e7ee2abf6328c213c035924dc0155596070fd56c7dd7b90",
+    "contract_id": "BC-NO-TELEMETRY",
+    "probe_id": "fixture.file_artifact",
+    "probe_digest": "77a1145ebe55e2595fc5c1635c77e568f578e9763075dbca513d725ea006abf4",
+    "semantic_hash": "32e0c2bb54b2cc97a5bb15b8ec1ec5469c7681bf85aa3b305ae72e5d4c77d5a4",
+    "classification": "DECLARED_FIXTURE_PROBE_IDENTITY"
+   },
+   {
+    "where": "tests/v2/fixtures/p1/corpus/specs/BC-QUIET-STDOUT.json",
+    "spec_id": "PPS-0470ce72e0357d09ee001f7be4304c3207d45b2b2218e5fd3a61c69b324ed33f",
+    "contract_id": "BC-QUIET-STDOUT",
+    "probe_id": "fixture.cli_invocation",
+    "probe_digest": "ca3f07ab47e8a702770085050798289c801784d5763ebd63e95e8344b88bf85c",
+    "semantic_hash": "15933038dabfac31998f7ed1a2104b4edf58e29cc92af46f59855a725feaea8e",
+    "classification": "DECLARED_FIXTURE_PROBE_IDENTITY"
+   },
+   {
+    "where": "tests/v2/fixtures/p1/corpus/specs/BC-VERSION.json",
+    "spec_id": "PPS-94fce8bd31e58dd3bdf9949ce3abec02bbbfec03162f026f60d4567bbc9e0a6c",
+    "contract_id": "BC-VERSION",
+    "probe_id": "fixture.cli_invocation",
+    "probe_digest": "ca3f07ab47e8a702770085050798289c801784d5763ebd63e95e8344b88bf85c",
+    "semantic_hash": "ca8924aefa83fea50506086e596639c6e5a81af31ea550f27ebfc0acbd33e28a",
+    "classification": "DECLARED_FIXTURE_PROBE_IDENTITY"
+   }
+  ],
+  "inventory_counts": {
+   "EXECUTABLE_PROBE_CURRENT_DIGEST": 0,
+   "EXECUTABLE_PROBE_HISTORICAL_DIGEST": 0,
+   "DECLARED_FIXTURE_PROBE_IDENTITY": 4
+  },
+  "evidence": [
+   {
+    "spec_id": "PPS-7d2e9f37121c536a987040b11eb8caf1a3830a30926ee0108f3e3d3e7e4662f4",
+    "semantic_hash": "9d3fbd4ecd3ef480706df7304c31bdd30f2da07e77d0e09aa242fd6de15bfa11",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "exists",
+    "candidate_expectation": "SATISFIED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/exists/negative",
+    "observed": "REFUTED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-bb54a19e74c58f90590b2f633bcb86b7b306f7658b848d28319c645e8cf2815c",
+    "semantic_hash": "f8256285056088b754ae1cdc08bed04416b701e14ab6ea49a6cc471160680197",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "exists",
+    "candidate_expectation": "REFUTED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/exists/positive",
+    "observed": "SATISFIED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-be7ecb47ec644ed69801aed37bb1323280440461c8bab1553bb45acdda8851c1",
+    "semantic_hash": "c8db31bfc9b8bab13c4acc3a11e0243be33fa8fd987d05bb2128d27976202ed0",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "returns",
+    "candidate_expectation": "SATISFIED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/returns/negative",
+    "observed": "REFUTED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-1840bfd003e14ea5bdfc356d94b1c1eab95ca1c5a55a7df79bb775393094a8cd",
+    "semantic_hash": "6634d2bb17bb166222071a9265e90510fcfdbe77865cd03cb4af7a300c115133",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "returns",
+    "candidate_expectation": "REFUTED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/returns/positive",
+    "observed": "SATISFIED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-e59e4ca8445b06a1d24c9a2e26cacd9d8026709823371dbbc90a2c8b353cbd64",
+    "semantic_hash": "cafa6db6c584d8d2923d523a10b78eb08c8c3260a7aae161fb271131ce0410f6",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "raises",
+    "candidate_expectation": "SATISFIED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/raises/negative",
+    "observed": "REFUTED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-0990fe1be14309bf34c924949b62e3fbeca74916879ee6147cfcfea85cef2ce6",
+    "semantic_hash": "90b83f3c161187af20c02c36542e215fec45c608f5cee4431bcf8c77dabed1e2",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "raises",
+    "candidate_expectation": "REFUTED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/raises/positive",
+    "observed": "SATISFIED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-a807ff9a99c0c3c64f2c02e89c49428181ed721ce362fdc700ddbcd292230746",
+    "semantic_hash": "adae1f79064cf47ede2b0a5422e5629934173367ac1792fcbf8340867213717d",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "blocks",
+    "candidate_expectation": "SATISFIED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/blocks/negative",
+    "observed": "REFUTED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-6314f6f24fb46c254c37b94295a58362d340f29aa9e94c5b1ed5f6c5ebe9210b",
+    "semantic_hash": "a6b4ac2a828497f97cad76f2c54f9488873b93b49d7626f63e5ac6b09673c2e1",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "ac434a4260cdc1ebbd7e5841959a89c3de8edc2c8552e7714cb85962bc0922a0",
+    "observation_class": "blocks",
+    "candidate_expectation": "REFUTED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/blocks/positive",
+    "observed": "SATISFIED",
+    "problems": []
+   }
+  ],
+  "product_proof_spec_fields": [
+   "id",
+   "contract_id",
+   "probe_id",
+   "probe_digest",
+   "probe_input",
+   "candidate_expectation",
+   "compiler_id",
+   "compiler_digest",
+   "semantic_hash"
+  ],
+  "plan_fact_fields": [],
+  "problems": []
+ },
+ "engineering_quality": {
+  "properties": {
+   "TestExecution_two_axis_semantics": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_test_execution:Shape.test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_test_execution:Classify.test_no_did_not_run_to_developer_edge_exists",
+      "outcome": "PASS",
+      "seconds": 0.0
+     }
+    ]
+   },
+   "relevance": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_relevance:Typed.test_REL_3_coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
+      "outcome": "PASS",
+      "seconds": 0.125
+     }
+    ]
+   },
+   "vacuity": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
+      "outcome": "PASS",
+      "seconds": 0.875
+     },
+     {
+      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
+      "outcome": "PASS",
+      "seconds": 0.235
+     }
+    ]
+   },
+   "adequacy": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_adequacy:Exhaustive.test_assembly_is_total_and_follows_the_precedence",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
+      "outcome": "PASS",
+      "seconds": 0.0
+     }
+    ]
+   },
+   "no_parent_developer_artefact": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+      "outcome": "PASS",
+      "seconds": 0.5
+     },
+     {
+      "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_parent_developer_test_execution_is_refused_statically",
+      "outcome": "PASS",
+      "seconds": 0.156
+     },
+     {
+      "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_the_apis_are_structurally_candidate_only",
+      "outcome": "PASS",
+      "seconds": 0.141
+     },
+     {
+      "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_the_only_counterfactual_is_candidate_side_vacuity",
+      "outcome": "PASS",
+      "seconds": 0.0
+     }
+    ]
+   },
+   "INCOMPLETE_nonblocking": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_11_INDETERMINATE_vacuity_alone_is_INCOMPLETE_non_blocking_uncharged",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_12_UNMEASURABLE_relevance_alone_is_INCOMPLETE_non_blocking_uncharged",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
+      "outcome": "PASS",
+      "seconds": 0.046
+     },
+     {
+      "id": "tests.v2.test_p6_stages:Quality.test_INCOMPLETE_is_recorded_and_never_a_failure",
+      "outcome": "PASS",
+      "seconds": 0.422
+     }
+    ]
+   },
+   "UNRUNNABLE_no_AdequacyOutcome": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_3_regression_UNRUNNABLE_has_no_outcome_and_keeps_the_environment_owner",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.test_p6_stages:Quality.test_UNRUNNABLE_is_TESTS_UNRUNNABLE_with_environment_provenance_and_no_outcome",
+      "outcome": "PASS",
+      "seconds": 0.203
+     }
+    ]
+   },
+   "no_path_to_product_proof": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
+      "outcome": "PASS",
+      "seconds": 0.125
+     },
+     {
+      "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_14_a_change_of_engineering_adequacy_leaves_the_product_proof_unchanged",
+      "outcome": "PASS",
+      "seconds": 2.266
+     }
+    ]
+   }
+  },
+  "modules": {
+   "counts": {
+    "PASS": 115,
+    "FAIL": 0,
+    "ERROR": 0,
+    "SKIP": 0,
+    "NOT_APPLICABLE": 4
+   },
+   "cases": [
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_1_a_missing_runner_is_UNRUNNABLE_ENVIRONMENT_with_no_outcome_and_no_selection",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_2_failing_assertions_are_EXECUTED_FAILED_STORY_TESTS_RAN_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_a_passing_suite_is_EXECUTED_PASSED_STORY_TESTS_RAN_with_no_owner",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_a_story_file_the_runner_could_not_collect_is_never_hidden_by_the_story_files_that_ran",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_an_error_outcome_fails_the_story_like_a_failure",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_no_did_not_run_to_developer_edge_exists",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_reasons_are_the_typed_facts_spelled_out",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_3_no_story_test_matched_is_DEVELOPER_by_the_typed_value_and_distinct_from_UNRUNNABLE",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_collection_cause_in_the_projects_own_tree_is_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_collection_cause_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_undeterminable_collection_cause_is_INTEGRATION_never_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_5_regressions_use_the_identical_rules",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_the_outcome_is_the_storys_tests_never_another_files",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_pytest_for_real",
+     "outcome": "NOT_APPLICABLE",
+     "seconds": 0.0,
+     "detail": "pytest is not installed here (CI runs the stdlib runner)",
+     "optional_capability_absent": "pytest adapter (optional third-party runner)"
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_the_junit_result_set_is_read_typed",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_2_for_real",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_directory_target_is_discovered_and_a_node_id_selects_one_test",
+     "outcome": "PASS",
+     "seconds": 0.25
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_passing_suite_yields_EXECUTED_PASSED_STORY_TESTS_RAN",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_ended_by_a_signal_is_UNRUNNABLE",
+     "outcome": "NOT_APPLICABLE",
+     "seconds": 0.0,
+     "detail": "a runner that ends by a signal (POSIX)"
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_that_crashes_before_reporting_is_UNRUNNABLE",
+     "outcome": "PASS",
+     "seconds": 0.062
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_an_empty_selection_is_NO_STORY_TESTS_MATCHED_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.235
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+     "outcome": "PASS",
+     "seconds": 0.109
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_the_projects_own_tree_is_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.25
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_candidate_is_the_only_tree_execute_knows",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_harness_deadline_is_UNRUNNABLE_and_the_range_is_released",
+     "outcome": "PASS",
+     "seconds": 1.047
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_result_set_is_typed_and_carries_the_collection_detail",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_undeterminable_collection_cause_is_INTEGRATION",
+     "outcome": "PASS",
+     "seconds": 0.109
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_paths_are_normalised_and_ownership_is_by_whole_path_components",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_project_top_level_names_packages_and_modules_at_the_root_and_under_src",
+     "outcome": "PASS",
+     "seconds": 0.016
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_the_fields_are_the_rfcs",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_the_refusals_say_why",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_typed_inputs_refuse_untyped_causes_and_absolute_paths",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_2_for_real",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_3_for_real_the_runner_without_the_capability_declares_it",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_4_for_real_a_test_that_replaces_the_tracer_makes_the_measurement_PARTIAL",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_5_for_real_branch_evidence_is_recorded_and_the_value_is_the_lines",
+     "outcome": "PASS",
+     "seconds": 0.265
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_6_for_real_an_accessed_data_file",
+     "outcome": "PASS",
+     "seconds": 0.25
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_7_for_real_no_capability_for_the_data_file",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_8_for_real_the_same_tests_in_another_layout",
+     "outcome": "PASS",
+     "seconds": 0.235
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_DEL_1_for_real_the_story_deletes_executable_code_and_its_test_verifies_the_deletion",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_product_code_run_in_a_thread_is_measured",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_the_pytest_adapter_declares_no_measurement",
+     "outcome": "NOT_APPLICABLE",
+     "seconds": 0.0,
+     "detail": "pytest is not installed here (CI runs the stdlib runner)",
+     "optional_capability_absent": "pytest adapter (optional third-party runner)"
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Parsing.test_a_unified_diff_becomes_candidate_line_numbers",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Parsing.test_executable_lines_are_the_code_objects_own",
+     "outcome": "PASS",
+     "seconds": 0.015
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_2_measured_story_tests_with_zero_intersection_are_IRRELEVANT",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_3_coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_4_coverage_capability_PARTIAL_is_UNMEASURABLE",
+     "outcome": "PASS",
+     "seconds": 0.016
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_5_branch_evidence_is_recorded_when_present_and_never_required",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_6_a_non_line_addressable_artefact_uses_its_own_measurement",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_7_a_non_line_addressable_artefact_without_a_capability_is_UNMEASURABLE",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_8_the_same_coverage_under_another_test_layout_is_the_same_result",
+     "outcome": "PASS",
+     "seconds": 0.016
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_1_a_pure_executable_deletion_is_UNMEASURABLE_not_IRRELEVANT",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_2_and_3_ordinary_modifications_are_measured",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_4_a_tests_only_diff_is_measured_empty_and_is_not_a_deletion",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_a_test_that_did_not_execute_establishes_nothing",
+     "outcome": "PASS",
+     "seconds": 0.015
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_nothing_here_reaches_the_product_verdict",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_one_unmeasurable_artefact_never_hides_behind_the_others",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_reasons_are_the_measured_facts",
+     "outcome": "PASS",
+     "seconds": 0.016
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_the_developers_own_test_file_is_not_the_product_change",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_the_result_shape_refuses_every_contradiction",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_10_a_deletion_the_patch_does_not_carry_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.5
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_11_moving_the_developer_tests_does_not_change_the_result",
+     "outcome": "PASS",
+     "seconds": 1.0
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+     "outcome": "PASS",
+     "seconds": 0.5
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
+     "outcome": "PASS",
+     "seconds": 0.875
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
+     "outcome": "PASS",
+     "seconds": 0.25
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_3_a_tree_that_cannot_be_reconstructed_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_4_a_runner_unavailable_in_the_neutralised_run_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.203
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_5_a_story_test_that_no_longer_imports_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.25
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_6_intended_story_tests_that_do_not_actually_run_are_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.766
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_7_a_failure_not_attributable_to_the_neutralisation_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.625
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS",
+     "outcome": "PASS",
+     "seconds": 0.25
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_9_a_pure_deletion_the_patch_carries_is_reconstructed_and_classified_from_execution",
+     "outcome": "PASS",
+     "seconds": 0.5
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_a_baseline_that_does_not_pass_has_no_counterfactual",
+     "outcome": "PASS",
+     "seconds": 0.125
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
+     "outcome": "NOT_APPLICABLE",
+     "seconds": 0.0,
+     "detail": "symbolic links (POSIX)"
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+     "outcome": "PASS",
+     "seconds": 0.015
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_neutralisation_touches_exactly_the_story_product_artefacts",
+     "outcome": "PASS",
+     "seconds": 0.078
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_reverse_application_is_exact_or_refused",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_the_patch_is_typed_per_file",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_the_result_shape_refuses_every_contradiction",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_10_regressions_FAILED_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_11_INDETERMINATE_vacuity_alone_is_INCOMPLETE_non_blocking_uncharged",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_12_UNMEASURABLE_relevance_alone_is_INCOMPLETE_non_blocking_uncharged",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_13_FAILED_with_UNMEASURABLE_is_INADEQUATE_the_hard_defect_dominates",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_14_regressions_FAILED_with_INDETERMINATE_is_INADEQUATE",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_15_opposite_TDD_chronology_with_identical_typed_inputs_is_the_identical_result",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_1_all_green_is_ADEQUATE",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_3_regression_UNRUNNABLE_has_no_outcome_and_keeps_the_environment_owner",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_4_the_story_tests_FAILED_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_5_NO_STORY_TESTS_MATCHED_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.016
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_6_a_developer_caused_collection_failure_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_7_an_integration_owned_collection_failure_is_never_charged_to_the_developer",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_8_VACUOUS_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_9_IRRELEVANT_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Exhaustive.test_ADEQ_R_the_regression_dimension_follows_the_same_typed_rules",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Exhaustive.test_assembly_is_total_and_follows_the_precedence",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE",
+     "outcome": "PASS",
+     "seconds": 0.359
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_17_for_real_a_tests_only_diff_is_INADEQUATE_by_the_frozen_rules",
+     "outcome": "PASS",
+     "seconds": 0.375
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_1_for_real",
+     "outcome": "PASS",
+     "seconds": 0.359
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_2_for_real_the_story_runner_cannot_execute",
+     "outcome": "PASS",
+     "seconds": 0.204
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_3_for_real_the_regression_runner_cannot_execute",
+     "outcome": "PASS",
+     "seconds": 0.312
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_4_and_10_for_real",
+     "outcome": "PASS",
+     "seconds": 0.625
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner",
+     "outcome": "PASS",
+     "seconds": 0.484
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_R_for_real_regression_selection_and_collection_by_their_typed_owner",
+     "outcome": "PASS",
+     "seconds": 1.11
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
+     "outcome": "PASS",
+     "seconds": 0.14
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
+     "outcome": "PASS",
+     "seconds": 0.016
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Separation.test_no_prose_is_read_for_control_and_no_side_state_exists",
+     "outcome": "PASS",
+     "seconds": 0.016
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_EXECUTED_story_execution_carries_typed_measurements_of_tests_that_ran",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_UNRUNNABLE_regressions_carry_no_outcome",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_UNRUNNABLE_story_execution_carries_nothing_measured_and_no_outcome",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_both_EXECUTED_the_outcome_is_defined_and_is_what_the_facts_assemble_to",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_the_fields_are_the_rfcs",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_typed_executions_and_no_sensitivity",
+     "outcome": "PASS",
+     "seconds": 0.0
+    }
+   ]
+  },
+  "sensitivity": {
+   "status": "DEFERRED_BY_RFC",
+   "rfc_row": "Engineering-test **sensitivity** (mutation at story scope) | when Q2 mutation infrastructure is stable and its cost per story is measured",
+   "scope": "not measured in Q2 cycle 1; not expanded (owner §15)"
+  },
+  "optional_capabilities_absent_here": [
+   {
+    "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_pytest_for_real",
+    "capability": "pytest adapter (optional third-party runner)",
+    "reason": "pytest is not installed here (CI runs the stdlib runner)"
+   },
+   {
+    "id": "tests.v2.p5.test_relevance:ForReal.test_the_pytest_adapter_declares_no_measurement",
+    "capability": "pytest adapter (optional third-party runner)",
+    "reason": "pytest is not installed here (CI runs the stdlib runner)"
+   }
+  ],
+  "p5_records_identity_problems": []
+ },
+ "provider_calls": 0,
+ "problems": [],
+ "harness_problems": [],
+ "cases": [
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "the authority reads a POSIX process table"
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "the authority reads a POSIX process table"
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "the authority reads a POSIX process table"
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "the authority reads a POSIX process table"
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "the authority reads a POSIX process table"
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "the authority reads a POSIX process table"
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "the authority reads a POSIX process table"
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "the authority reads a POSIX process table"
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "the authority reads a POSIX process table"
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:DependencyBoundary.test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_class_qualified_name_picks_that_class_method",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_reference_models_refusal_message_is_not_a_mutation_site",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_return_of_None_is_not_mutated_into_itself",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_mutation_targets:Locator.test_every_target_resolves",
+   "outcome": "PASS",
+   "seconds": 1.422
+  },
+  {
+   "id": "tests.v2.p5.test_invariants:MutationAuthority.test_INV_MUTATION_AUTHORITY_destructive_sites_of_the_invariant_code_are_ledgered",
+   "outcome": "PASS",
+   "seconds": 2.094
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_a_probe_that_cannot_look_is_not_qualified",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_an_always_SATISFIED_probe_is_rejected_for_MUST_HOLD",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_an_honest_probe_is_qualified_for_its_class",
+   "outcome": "PASS",
+   "seconds": 0.015
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_refusing_to_run_is_not_a_demonstration",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_swapped_fixtures_qualify_nothing",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_must_ask_for_the_class_being_calibrated",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_spec_is_bound_to_the_probe_and_answers_no_contract",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Contrast.test_CAL_1_a_fixed_REFUTED_rule_would_have_passed_the_always_refuted_probe",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Contrast.test_an_expectation_is_satisfied_or_refuted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Contrast.test_the_counterexample_must_produce_the_opposite_verdict",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Falsifiability.test_evidence_must_contrast_with_the_specs_expectation",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Falsifiability.test_the_evidence_is_typed",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Metadata.test_a_protocol_only_probe_is_calibrated",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Metadata.test_an_unregistered_probe_or_digest_is_not_qualified",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Records.test_a_record_qualifies_only_its_probe_digest_and_class",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Records.test_the_record_shapes_are_the_rfcs",
+   "outcome": "PASS",
+   "seconds": 0.015
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_1_a_missing_runner_is_UNRUNNABLE_ENVIRONMENT_with_no_outcome_and_no_selection",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_2_failing_assertions_are_EXECUTED_FAILED_STORY_TESTS_RAN_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_a_passing_suite_is_EXECUTED_PASSED_STORY_TESTS_RAN_with_no_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_a_story_file_the_runner_could_not_collect_is_never_hidden_by_the_story_files_that_ran",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_an_error_outcome_fails_the_story_like_a_failure",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_no_did_not_run_to_developer_edge_exists",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_reasons_are_the_typed_facts_spelled_out",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_3_no_story_test_matched_is_DEVELOPER_by_the_typed_value_and_distinct_from_UNRUNNABLE",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_collection_cause_in_the_projects_own_tree_is_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_collection_cause_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_undeterminable_collection_cause_is_INTEGRATION_never_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_5_regressions_use_the_identical_rules",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_the_outcome_is_the_storys_tests_never_another_files",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_pytest_for_real",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "pytest is not installed here (CI runs the stdlib runner)",
+   "optional_capability_absent": "pytest adapter (optional third-party runner)"
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_the_junit_result_set_is_read_typed",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_2_for_real",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_directory_target_is_discovered_and_a_node_id_selects_one_test",
+   "outcome": "PASS",
+   "seconds": 0.25
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_passing_suite_yields_EXECUTED_PASSED_STORY_TESTS_RAN",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_ended_by_a_signal_is_UNRUNNABLE",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "a runner that ends by a signal (POSIX)"
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_that_crashes_before_reporting_is_UNRUNNABLE",
+   "outcome": "PASS",
+   "seconds": 0.062
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_an_empty_selection_is_NO_STORY_TESTS_MATCHED_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.235
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+   "outcome": "PASS",
+   "seconds": 0.109
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_the_projects_own_tree_is_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.25
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_candidate_is_the_only_tree_execute_knows",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_harness_deadline_is_UNRUNNABLE_and_the_range_is_released",
+   "outcome": "PASS",
+   "seconds": 1.047
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_result_set_is_typed_and_carries_the_collection_detail",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_undeterminable_collection_cause_is_INTEGRATION",
+   "outcome": "PASS",
+   "seconds": 0.109
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_paths_are_normalised_and_ownership_is_by_whole_path_components",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_project_top_level_names_packages_and_modules_at_the_root_and_under_src",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_the_fields_are_the_rfcs",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_the_refusals_say_why",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_typed_inputs_refuse_untyped_causes_and_absolute_paths",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_2_for_real",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_3_for_real_the_runner_without_the_capability_declares_it",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_4_for_real_a_test_that_replaces_the_tracer_makes_the_measurement_PARTIAL",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_5_for_real_branch_evidence_is_recorded_and_the_value_is_the_lines",
+   "outcome": "PASS",
+   "seconds": 0.265
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_6_for_real_an_accessed_data_file",
+   "outcome": "PASS",
+   "seconds": 0.25
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_7_for_real_no_capability_for_the_data_file",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_8_for_real_the_same_tests_in_another_layout",
+   "outcome": "PASS",
+   "seconds": 0.235
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_DEL_1_for_real_the_story_deletes_executable_code_and_its_test_verifies_the_deletion",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_product_code_run_in_a_thread_is_measured",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_the_pytest_adapter_declares_no_measurement",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "pytest is not installed here (CI runs the stdlib runner)",
+   "optional_capability_absent": "pytest adapter (optional third-party runner)"
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Parsing.test_a_unified_diff_becomes_candidate_line_numbers",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Parsing.test_executable_lines_are_the_code_objects_own",
+   "outcome": "PASS",
+   "seconds": 0.015
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_2_measured_story_tests_with_zero_intersection_are_IRRELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_3_coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_4_coverage_capability_PARTIAL_is_UNMEASURABLE",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_5_branch_evidence_is_recorded_when_present_and_never_required",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_6_a_non_line_addressable_artefact_uses_its_own_measurement",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_7_a_non_line_addressable_artefact_without_a_capability_is_UNMEASURABLE",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_8_the_same_coverage_under_another_test_layout_is_the_same_result",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_1_a_pure_executable_deletion_is_UNMEASURABLE_not_IRRELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_2_and_3_ordinary_modifications_are_measured",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_4_a_tests_only_diff_is_measured_empty_and_is_not_a_deletion",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_a_test_that_did_not_execute_establishes_nothing",
+   "outcome": "PASS",
+   "seconds": 0.015
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_nothing_here_reaches_the_product_verdict",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_one_unmeasurable_artefact_never_hides_behind_the_others",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_reasons_are_the_measured_facts",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_the_developers_own_test_file_is_not_the_product_change",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_the_result_shape_refuses_every_contradiction",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_10_a_deletion_the_patch_does_not_carry_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.5
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_11_moving_the_developer_tests_does_not_change_the_result",
+   "outcome": "PASS",
+   "seconds": 1.0
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+   "outcome": "PASS",
+   "seconds": 0.5
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.875
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.25
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_3_a_tree_that_cannot_be_reconstructed_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_4_a_runner_unavailable_in_the_neutralised_run_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.203
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_5_a_story_test_that_no_longer_imports_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.25
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_6_intended_story_tests_that_do_not_actually_run_are_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.766
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_7_a_failure_not_attributable_to_the_neutralisation_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.625
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.25
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_9_a_pure_deletion_the_patch_carries_is_reconstructed_and_classified_from_execution",
+   "outcome": "PASS",
+   "seconds": 0.5
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_a_baseline_that_does_not_pass_has_no_counterfactual",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "symbolic links (POSIX)"
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+   "outcome": "PASS",
+   "seconds": 0.015
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_neutralisation_touches_exactly_the_story_product_artefacts",
+   "outcome": "PASS",
+   "seconds": 0.078
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_reverse_application_is_exact_or_refused",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_the_patch_is_typed_per_file",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_the_result_shape_refuses_every_contradiction",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_10_regressions_FAILED_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_11_INDETERMINATE_vacuity_alone_is_INCOMPLETE_non_blocking_uncharged",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_12_UNMEASURABLE_relevance_alone_is_INCOMPLETE_non_blocking_uncharged",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_13_FAILED_with_UNMEASURABLE_is_INADEQUATE_the_hard_defect_dominates",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_14_regressions_FAILED_with_INDETERMINATE_is_INADEQUATE",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_15_opposite_TDD_chronology_with_identical_typed_inputs_is_the_identical_result",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_1_all_green_is_ADEQUATE",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_3_regression_UNRUNNABLE_has_no_outcome_and_keeps_the_environment_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_4_the_story_tests_FAILED_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_5_NO_STORY_TESTS_MATCHED_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_6_a_developer_caused_collection_failure_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_7_an_integration_owned_collection_failure_is_never_charged_to_the_developer",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_8_VACUOUS_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_9_IRRELEVANT_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_ADEQ_R_the_regression_dimension_follows_the_same_typed_rules",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_assembly_is_total_and_follows_the_precedence",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE",
+   "outcome": "PASS",
+   "seconds": 0.359
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_17_for_real_a_tests_only_diff_is_INADEQUATE_by_the_frozen_rules",
+   "outcome": "PASS",
+   "seconds": 0.375
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_1_for_real",
+   "outcome": "PASS",
+   "seconds": 0.359
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_2_for_real_the_story_runner_cannot_execute",
+   "outcome": "PASS",
+   "seconds": 0.204
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_3_for_real_the_regression_runner_cannot_execute",
+   "outcome": "PASS",
+   "seconds": 0.312
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_4_and_10_for_real",
+   "outcome": "PASS",
+   "seconds": 0.625
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner",
+   "outcome": "PASS",
+   "seconds": 0.484
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_R_for_real_regression_selection_and_collection_by_their_typed_owner",
+   "outcome": "PASS",
+   "seconds": 1.11
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
+   "outcome": "PASS",
+   "seconds": 0.14
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_prose_is_read_for_control_and_no_side_state_exists",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_EXECUTED_story_execution_carries_typed_measurements_of_tests_that_ran",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_UNRUNNABLE_regressions_carry_no_outcome",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_UNRUNNABLE_story_execution_carries_nothing_measured_and_no_outcome",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_both_EXECUTED_the_outcome_is_defined_and_is_what_the_facts_assemble_to",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_the_fields_are_the_rfcs",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_typed_executions_and_no_sensitivity",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_no_did_not_run_to_developer_edge_exists",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_3_coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.875
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.235
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_assembly_is_total_and_follows_the_precedence",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+   "outcome": "PASS",
+   "seconds": 0.5
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_parent_developer_test_execution_is_refused_statically",
+   "outcome": "PASS",
+   "seconds": 0.156
+  },
+  {
+   "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_the_apis_are_structurally_candidate_only",
+   "outcome": "PASS",
+   "seconds": 0.141
+  },
+  {
+   "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_the_only_counterfactual_is_candidate_side_vacuity",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_11_INDETERMINATE_vacuity_alone_is_INCOMPLETE_non_blocking_uncharged",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_12_UNMEASURABLE_relevance_alone_is_INCOMPLETE_non_blocking_uncharged",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
+   "outcome": "PASS",
+   "seconds": 0.046
+  },
+  {
+   "id": "tests.v2.test_p6_stages:Quality.test_INCOMPLETE_is_recorded_and_never_a_failure",
+   "outcome": "PASS",
+   "seconds": 0.422
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_3_regression_UNRUNNABLE_has_no_outcome_and_keeps_the_environment_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_p6_stages:Quality.test_UNRUNNABLE_is_TESTS_UNRUNNABLE_with_environment_provenance_and_no_outcome",
+   "outcome": "PASS",
+   "seconds": 0.203
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_14_a_change_of_engineering_adequacy_leaves_the_product_proof_unchanged",
+   "outcome": "PASS",
+   "seconds": 2.266
+  }
+ ],
+ "counts": {
+  "PASS": 162,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "NOT_APPLICABLE": 13
+ },
+ "seconds": 27.7,
+ "harness_digest_at_run": "dafc15db18ed205c45b8aec972e2b5ddd0fade178e03c49053e5858b49c0262f"
+}

@@ -1,0 +1,2745 @@
+{
+ "record": "AISEF V2 — Q1 SEMANTIC CONFORMANCE",
+ "rung": "Q1",
+ "status": "GREEN",
+ "at": "2026-09-27T14:38:27Z",
+ "subject": {
+  "seal_commit": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
+  "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+  "head": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "head_is_after_the_seal": true,
+  "head_kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+  "kernel_tree_is_the_candidates": true,
+  "candidate_kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_unchanged": true,
+  "validation_v2_tree": "c84b3d45643c4dfdd6c34839527da135036e6857",
+  "tests_v2_tree": "a20a31e07a5cdc74281c113741b2aa839a515b57",
+  "working_tree_clean_outside_qualification_output": false,
+  "rfc": {
+   "effective_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "effective_freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "lineage": [
+    "AISEF-V2-RFC-APPROVAL.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-005.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-006.json"
+   ],
+   "lineage_end": "AISEF-V2-RFC-AMENDMENT-V2-006.json",
+   "broken_links": []
+  },
+  "probe": {
+   "id": "probe.python_callable",
+   "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+  },
+  "harness": {
+   "files": {
+    "validation/qualification/__init__.py": "40f613b3d5ffa39b5807ae0aec2878be51870891f5bd7dd76aae025e73e48f91",
+    "validation/qualification/common.py": "ea0298c93551f78f84f2176cd54da988ab8d3e557693c4af0285417ea11b0135",
+    "validation/qualification/diag_orch9.py": "2f6d9524dacbafb90ca47990310a5b1e08116ab2bb1cdf8705b7f6c6f5c3bd23",
+    "validation/qualification/p7_finding_001_reproducer.py": "2cb9b13292ce94bfc8c8d78efba97839b73c065805e7bd9aa50a2ef29bc80363",
+    "validation/qualification/q0.py": "071530dea2e9860b536c325c56430ec74f8bdbbdb24b79a83bb8b04c1e4301bc",
+    "validation/qualification/q1.py": "66dfc17f07603057fb70210442b31359c3e7c80520a0bdcc9b5cb7af91a6d2ef",
+    "validation/qualification/q2.py": "0b17822096a4f4cb5a7e3c6be4c19ee1022a5892c689462c0a56d607d1d9cfdc",
+    "validation/qualification/q3.py": "524aaf847dd37e1074e66714be62f51ca680ee5ca386d332511569f70390716b",
+    "validation/qualification/run.py": "baa82a3c3f7e0716855806d1ce8a78972f62792b8ad220f93c40a5860df28f90",
+    "validation/qualification/summary.py": "d38d0e202f229645f79a6f21603a88c3d3552cecb7b19f7fa3a5fd7e1c73e58b"
+   },
+   "sha256": "504697cdb17b205833d1500a96986d4ef06325838e4f105d5a3a23bd83d41ab7",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines, sorted"
+  }
+ },
+ "platform": {
+  "os": "darwin",
+  "os_release": "25.5.0",
+  "python": "3.14.7",
+  "free_disk_gb": 60.3,
+  "implementation": "CPython",
+  "machine": "arm64",
+  "runner_os": null,
+  "ci_run": null,
+  "ci_job": null,
+  "ci_attempt": null,
+  "qualification_platform": false,
+  "range_mechanism": "posix-session-and-group",
+  "label": "darwin-py3.14"
+ },
+ "rfc_regression_cases": {
+  "NEG-1": {
+   "status": "GREEN",
+   "cases": [
+    {
+     "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_1_forbidden_behaviour_present_at_the_parent_is_UNSATISFIED_never_SATISFIED",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_forbidden_module_present_is_READY_and_absent_is_PRE_SATISFIED",
+     "outcome": "PASS",
+     "seconds": 0.381
+    }
+   ]
+  },
+  "NEG-2": {
+   "status": "GREEN",
+   "cases": [
+    {
+     "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_2_forbidden_module_absent_and_decidable_is_SATISFIED",
+     "outcome": "PASS",
+     "seconds": 0.0
+    }
+   ]
+  },
+  "NEG-3": {
+   "status": "GREEN",
+   "cases": [
+    {
+     "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_3_subject_required_but_absent_is_INDETERMINATE_PRECONDITION_ABSENT",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p2.test_story_admission:Table.test_NEG_3_absent_required_subject_by_role",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_introduce_over_an_absent_required_subject_is_READY",
+     "outcome": "PASS",
+     "seconds": 0.189
+    }
+   ]
+  },
+  "CAL-1": {
+   "status": "GREEN",
+   "cases": [
+    {
+     "id": "tests.v2.p2.test_calibration:Contrast.test_CAL_1_a_fixed_REFUTED_rule_would_have_passed_the_always_refuted_probe",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p2.test_calibration:Calibrate.test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected",
+     "outcome": "PASS",
+     "seconds": 0.002
+    },
+    {
+     "id": "tests.v2.p2.test_calibration:Calibrate.test_an_always_SATISFIED_probe_is_rejected_for_MUST_HOLD",
+     "outcome": "PASS",
+     "seconds": 0.001
+    }
+   ]
+  },
+  "CAL-2": {
+   "status": "GREEN",
+   "cases": [
+    {
+     "id": "tests.v2.p2.test_static_admission:StaticOnly.test_CAL_2_no_plan_freeze_path_requires_spec_falsifiability",
+     "outcome": "PASS",
+     "seconds": 0.009
+    }
+   ]
+  },
+  "TEST-1": {
+   "status": "GREEN",
+   "cases": [
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_1_a_missing_runner_is_UNRUNNABLE_ENVIRONMENT_with_no_outcome_and_no_selection",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
+     "outcome": "PASS",
+     "seconds": 0.179
+    }
+   ]
+  },
+  "TEST-2": {
+   "status": "GREEN",
+   "cases": [
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_2_failing_assertions_are_EXECUTED_FAILED_STORY_TESTS_RAN_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_2_for_real",
+     "outcome": "PASS",
+     "seconds": 0.172
+    }
+   ]
+  },
+  "RUN-1": {
+   "status": "GREEN",
+   "cases": [
+    {
+     "id": "tests.v2.p4.test_run_scope:Lifetime.test_RUN_1_a_process_killed_after_a_durable_run_end_and_before_CLEAN_is_torn",
+     "outcome": "PASS",
+     "seconds": 0.156
+    }
+   ]
+  },
+  "RUN-2": {
+   "status": "GREEN",
+   "cases": [
+    {
+     "id": "tests.v2.p4.test_run_scope:Lifetime.test_RUN_2_a_held_lease_blocks_a_second_run_even_with_run_end_written",
+     "outcome": "PASS",
+     "seconds": 0.072
+    }
+   ]
+  }
+ },
+ "scenarios": {
+  "A": {
+   "id": "tests.v2.p2.test_drift_scenarios:ScenarioA.test_early_upstream_implementation_is_pre_satisfied_attributed_and_charges_no_budget",
+   "outcome": "PASS",
+   "seconds": 0.748
+  },
+  "K": {
+   "id": "tests.v2.p2.test_drift_scenarios:ScenarioK.test_a_fully_pre_satisfied_story_skips_the_developer_and_still_verifies",
+   "outcome": "PASS",
+   "seconds": 0.75
+  },
+  "L": {
+   "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_11_scenario_L_INTRODUCE_PRESERVE_and_VERIFY_give_the_identical_product_verdict",
+   "outcome": "PASS",
+   "seconds": 6.272
+  },
+  "H": {
+   "id": "tests.v2.p4.test_runspec:Spec.test_scenario_H_the_implementation_changes_and_the_version_string_does_not",
+   "outcome": "PASS",
+   "seconds": 0.0
+  }
+ },
+ "v2_005_semantic_conformance": {
+  "counts": {
+   "PASS": 36,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 0,
+   "NOT_APPLICABLE": 0
+  },
+  "cases": [
+   {
+    "id": "tests.v2.test_v2_005:BudgetsV2.test_a_retry_charges_the_failures_own_owner_and_never_the_developer_for_review_or_security",
+    "outcome": "PASS",
+    "seconds": 0.011
+   },
+   {
+    "id": "tests.v2.test_v2_005:BudgetsV2.test_a_review_or_security_request_needs_the_admission_and_names_only_its_criteria",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.test_v2_005:BudgetsV2.test_nothing_defaults_a_missing_or_foreign_budget_owner_under_format_3",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.test_v2_005:BudgetsV2.test_the_reference_model_agrees_on_format_3_traces_and_its_V2_005_calibration",
+    "outcome": "PASS",
+    "seconds": 0.551
+   },
+   {
+    "id": "tests.v2.test_v2_005:BudgetsV2.test_under_formats_1_and_2_every_request_is_the_developers_as_frozen",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.test_v2_005:BudgetsV2.test_version_2_reads_the_declared_format_and_charges_a_format_3_request_to_its_budget_owner",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.test_v2_005:Catalog.test_FMT3_1_every_event_type_has_a_format_3_schema",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.test_v2_005:Catalog.test_FMT3_2_a_missing_schema_fails_the_catalog_check_and_the_reader",
+    "outcome": "PASS",
+    "seconds": 0.005
+   },
+   {
+    "id": "tests.v2.test_v2_005:Compatibility.test_FMT3_3_every_format_1_and_format_2_journal_reads_identically_through_the_format_3_reader",
+    "outcome": "PASS",
+    "seconds": 0.152
+   },
+   {
+    "id": "tests.v2.test_v2_005:Compatibility.test_FMT3_5_a_reader_reads_a_journal_under_its_declared_format_and_guesses_nothing",
+    "outcome": "PASS",
+    "seconds": 0.008
+   },
+   {
+    "id": "tests.v2.test_v2_005:Compatibility.test_FMT3_7_no_format_1_or_format_2_journal_is_rewritten_extended_or_upgraded",
+    "outcome": "PASS",
+    "seconds": 0.004
+   },
+   {
+    "id": "tests.v2.test_v2_005:Lineage.test_V2_005_is_the_fourth_link_after_V2_003_changing_exactly_F1",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.test_v2_005:Lineage.test_the_sealed_P5_records_are_verified_by_identity_never_rewritten",
+    "outcome": "PASS",
+    "seconds": 0.009
+   },
+   {
+    "id": "tests.v2.test_v2_005:Messages.test_a_writer_refuses_a_run_begin_that_declares_another_format",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.test_v2_005:Messages.test_citations_are_checked_by_count_type_and_key_with_exact_reasons",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.test_v2_005:Messages.test_the_reader_reads_text_only_skips_ignorable_unknowns_and_refuses_required_unknowns",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.test_v2_005:Messages.test_the_writer_names_why_it_refuses_untyped_failed_and_closed",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.test_v2_005:Messages.test_validate_names_the_seq_rule_the_ignorable_rule_and_the_first_event_rule",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.test_v2_005:Messages.test_verified_proof_reconstructs_a_proof_only",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.test_v2_005:Runtime.test_a_rerun_of_the_run_scope_reads_the_previous_format_3_journal_at_preflight",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.test_v2_005:Runtime.test_closers_release_every_story_in_story_order_whatever_the_journal_order",
+    "outcome": "PASS",
+    "seconds": 0.004
+   },
+   {
+    "id": "tests.v2.test_v2_005:Runtime.test_the_run_scope_writes_format_3_and_its_journal_is_read_and_repaired_as_format_3",
+    "outcome": "PASS",
+    "seconds": 0.005
+   },
+   {
+    "id": "tests.v2.test_v2_005:Schemas.test_FMT3_4_a_missing_required_field_refuses_the_append_before_the_log_grows",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.test_v2_005:Schemas.test_FMT3_6_a_format_3_provider_request_names_one_of_the_three_budget_owners",
+    "outcome": "PASS",
+    "seconds": 0.004
+   },
+   {
+    "id": "tests.v2.test_v2_005:Schemas.test_FMT3_8_the_context_of_an_invariant_violation_cannot_affect_any_projection",
+    "outcome": "PASS",
+    "seconds": 0.005
+   },
+   {
+    "id": "tests.v2.test_v2_005:Schemas.test_a_proof_is_two_cited_sealed_records_with_one_instrument_and_the_agreement_they_state",
+    "outcome": "PASS",
+    "seconds": 0.015
+   },
+   {
+    "id": "tests.v2.test_v2_005:Schemas.test_a_static_admission_is_the_typed_result_once_per_plan",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.test_v2_005:Schemas.test_an_adequacy_record_is_the_typed_assembly_under_the_two_axis_rules",
+    "outcome": "PASS",
+    "seconds": 0.006
+   },
+   {
+    "id": "tests.v2.test_v2_005:StoryStateV2.test_version_2_admits_a_proof_and_an_adequacy_record_in_an_active_attempt_only",
+    "outcome": "PASS",
+    "seconds": 0.004
+   },
+   {
+    "id": "tests.v2.test_v2_005:Taxonomy.test_FailureCode_is_exactly_the_thirteen_historical_codes_and_the_nine_of_V2_005",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.test_v2_005:Taxonomy.test_each_of_the_nine_has_one_owner_one_retryability_and_its_own_budget",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.test_v2_005:Taxonomy.test_formats_1_and_2_carry_only_the_thirteen_and_format_3_carries_all",
+    "outcome": "PASS",
+    "seconds": 0.023
+   },
+   {
+    "id": "tests.v2.test_v2_005:Taxonomy.test_no_call_site_supplies_owner_or_retryability_and_no_prose_becomes_a_code",
+    "outcome": "PASS",
+    "seconds": 0.163
+   },
+   {
+    "id": "tests.v2.test_v2_005:Taxonomy.test_the_conformance_subcheck_pins_the_table_and_rejects_a_swapped_owner_or_retryability",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.test_v2_005:Validators.test_checks_answers_False_on_every_malformed_shape_and_True_on_the_typed_result",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.test_v2_005:Validators.test_execution_answers_False_on_every_malformed_shape_and_True_on_the_typed_result",
+    "outcome": "PASS",
+    "seconds": 0.0
+   }
+  ]
+ },
+ "v2_006_race_semantics": {
+  "counts": {
+   "PASS": 19,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 0,
+   "NOT_APPLICABLE": 0
+  },
+  "structural": {
+   "exit_driven_reader_absent": true,
+   "drain_window_absent": true,
+   "stream_closed_marker": true,
+   "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+  },
+  "cases": [
+   {
+    "id": "tests.v2.test_v2_006:AnchorHoldsNoWriter.test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives",
+    "outcome": "PASS",
+    "seconds": 0.14
+   },
+   {
+    "id": "tests.v2.test_v2_006:AnchorHoldsNoWriter.test_a_descendant_holding_the_writer_keeps_the_stream_open_until_it_ends",
+    "outcome": "PASS",
+    "seconds": 1.213
+   },
+   {
+    "id": "tests.v2.test_v2_006:NextAndPump.test_a_protocol_tag_out_of_order_is_the_harness_breaking_its_protocol",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.test_v2_006:NextAndPump.test_a_stream_closed_while_the_process_runs_is_a_harness_timeout_at_the_watchdog",
+    "outcome": "PASS",
+    "seconds": 0.202
+   },
+   {
+    "id": "tests.v2.test_v2_006:NextAndPump.test_after_DISPATCHED_a_closed_stream_with_the_process_running_is_the_window_expiring",
+    "outcome": "PASS",
+    "seconds": 0.324
+   },
+   {
+    "id": "tests.v2.test_v2_006:NextAndPump.test_next_returns_only_complete_marked_lines_of_this_nonce",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.test_v2_006:NextAndPump.test_next_times_out_at_its_deadline_and_never_waits_past_it",
+    "outcome": "PASS",
+    "seconds": 0.206
+   },
+   {
+    "id": "tests.v2.test_v2_006:NextAndPump.test_the_pump_publishes_every_line_in_order_then_STREAM_CLOSED_once",
+    "outcome": "PASS",
+    "seconds": 0.004
+   },
+   {
+    "id": "tests.v2.test_v2_006:Race.test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump",
+    "outcome": "PASS",
+    "seconds": 0.886
+   },
+   {
+    "id": "tests.v2.test_v2_006:Race.test_RACE_2_READY_DISPATCHED_RESULT_then_immediate_exit_is_the_complete_result",
+    "outcome": "PASS",
+    "seconds": 1.23
+   },
+   {
+    "id": "tests.v2.test_v2_006:Race.test_RACE_3_the_exit_notice_before_the_pump_is_scheduled_gives_the_normal_result",
+    "outcome": "PASS",
+    "seconds": 0.383
+   },
+   {
+    "id": "tests.v2.test_v2_006:Race.test_RACE_4_one_party_late_the_other_normal_gives_identical_records",
+    "outcome": "PASS",
+    "seconds": 0.717
+   },
+   {
+    "id": "tests.v2.test_v2_006:StoryRace.test_RACE_4_a_story_with_one_party_late_on_every_proof_commits_with_agreement",
+    "outcome": "PASS",
+    "seconds": 2.556
+   },
+   {
+    "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_5_a_harness_that_emits_nothing_and_exits_0_did_not_start_after_the_stream_closed",
+    "outcome": "PASS",
+    "seconds": 0.829
+   },
+   {
+    "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_6_a_target_that_dies_before_READY_keeps_its_typed_outcome",
+    "outcome": "PASS",
+    "seconds": 0.53
+   },
+   {
+    "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_7_a_partial_READY_then_exit_is_no_READY_never_a_guess",
+    "outcome": "PASS",
+    "seconds": 0.851
+   },
+   {
+    "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_9_every_line_before_the_end_is_read_before_STREAM_CLOSED",
+    "outcome": "PASS",
+    "seconds": 0.421
+   },
+   {
+    "id": "tests.v2.test_v2_006:WaitContract.test_a_timed_out_wait_returns_only_once_the_monotonic_clock_has_passed_its_deadline",
+    "outcome": "PASS",
+    "seconds": 0.82
+   },
+   {
+    "id": "tests.v2.test_v2_006_repeat:Repeated.test_RACE_10_every_ordering_repeated_gives_the_normal_record",
+    "outcome": "PASS",
+    "seconds": 21.405
+   }
+  ],
+  "classification_rules": [
+   "complete marked lines only",
+   "STREAM_CLOSED is authoritative for stream completion",
+   "the exit is asked only after STREAM_CLOSED",
+   "'ended before READY' requires stream closed AND exit reported AND READY absent",
+   "no exit-driven reader, no drain window"
+  ]
+ },
+ "test_layout_invariance": {
+  "committed_cases": [
+   {
+    "id": "tests.v2.p2.test_python_callable:LayoutInvariance.test_product_verdicts_are_identical_across_test_layouts",
+    "outcome": "PASS",
+    "seconds": 3.796
+   },
+   {
+    "id": "tests.v2.p5.test_relevance:Typed.test_REL_8_the_same_coverage_under_another_test_layout_is_the_same_result",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p5.test_relevance:ForReal.test_REL_8_for_real_the_same_tests_in_another_layout",
+    "outcome": "PASS",
+    "seconds": 0.336
+   },
+   {
+    "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_11_moving_the_developer_tests_does_not_change_the_result",
+    "outcome": "PASS",
+    "seconds": 1.355
+   },
+   {
+    "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+    "outcome": "PASS",
+    "seconds": 0.005
+   },
+   {
+    "id": "tests.v2.p5.test_invariants:SemanticDeterminism.test_INV_II_1_developer_test_topology_is_not_an_input_of_the_product_verdict",
+    "outcome": "PASS",
+    "seconds": 0.001
+   }
+  ],
+  "harness_permutations": {
+   "layouts": 10,
+   "specs": [
+    "exists",
+    "absent",
+    "requires absent",
+    "returns",
+    "raises"
+   ],
+   "expected": {
+    "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+    "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+    "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+    "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+    "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+   },
+   "verdicts_by_layout": {
+    "no tests": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    },
+    "path: tests/ at the root": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    },
+    "path: tests inside the package": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    },
+    "nesting: tests/unit/calc/": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    },
+    "filename: check_arith.py, not test_*": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    },
+    "import: module-level": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    },
+    "import: function-level": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    },
+    "split: two files": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    },
+    "merge: one file": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    },
+    "broken tests and a conftest that exits": {
+     "exists": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "absent": "Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)",
+     "requires absent": "Executed(behavior_verdict=<BehaviorVerdict.INDETERMINATE: 'INDETERMINATE'>, reason=<IndeterminateReason.PRECONDITION_ABSENT: 'PRECONDITION_ABSENT'>)",
+     "returns": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)",
+     "raises": "Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)"
+    }
+   },
+   "divergent_layouts": [],
+   "identical": true
+  }
+ },
+ "six_reference_models": {
+  "fresh": {
+   "independence_problems": [],
+   "closed_list_of_six": true,
+   "models": [
+    "budgets",
+    "failure_owner",
+    "qualification_counters",
+    "retry_target",
+    "story_state",
+    "terminal_state"
+   ],
+   "calibration_problems": {
+    "story_state": [],
+    "failure_owner": [],
+    "budgets": [],
+    "retry_target": [],
+    "terminal_state": [],
+    "qualification_counters": []
+   },
+   "every_model_has_a_wrong_answer_case": {
+    "story_state": true,
+    "failure_owner": true,
+    "budgets": true,
+    "retry_target": true,
+    "terminal_state": true,
+    "qualification_counters": true
+   },
+   "differential": {
+    "traces": 80,
+    "divergences": [],
+    "prefix_traces": 24,
+    "prefix_divergences": [],
+    "incremental_vs_scratch_divergences": []
+   }
+  },
+  "committed_record_properties": {
+   "six_of_six_reference_models": true,
+   "no_import_constraint_mechanically_enforced": true,
+   "six_of_six_calibrated": true,
+   "the_implementation_reproduces_every_calibration_answer": true,
+   "REF_2_an_always_agree_model_fails_calibration": true,
+   "implementation_equals_reference_model_over_generated_traces": true,
+   "on_edited_traces_both_refuse_or_agree": true,
+   "REF_1_every_injected_projection_defect_is_caught": true,
+   "reference_model_mutation_killed_or_audited_equivalent": true
+  },
+  "cases": [
+   {
+    "id": "tests.v2.p3.test_reference_models:Calibration.test_REF_2_an_always_agree_model_fails_calibration",
+    "outcome": "PASS",
+    "seconds": 0.006
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Calibration.test_every_calibration_input_is_a_real_journal",
+    "outcome": "PASS",
+    "seconds": 0.026
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Calibration.test_every_model_is_calibrated",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Calibration.test_the_implementation_reproduces_every_calibration_answer",
+    "outcome": "PASS",
+    "seconds": 0.029
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Differential.test_an_admission_outside_its_one_place_is_refused_by_both",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Differential.test_implementation_equals_the_reference_model_at_every_prefix",
+    "outcome": "PASS",
+    "seconds": 4.514
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Differential.test_implementation_equals_the_reference_model_over_generated_traces",
+    "outcome": "PASS",
+    "seconds": 1.484
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Differential.test_on_edited_traces_both_refuse_or_both_agree",
+    "outcome": "PASS",
+    "seconds": 0.639
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Differential.test_the_answer_does_not_depend_on_payload_key_order",
+    "outcome": "PASS",
+    "seconds": 0.073
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Independence.test_six_models_each_with_calibration",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p3.test_reference_models:Independence.test_the_models_import_nothing_of_the_implementation",
+    "outcome": "PASS",
+    "seconds": 0.015
+   },
+   {
+    "id": "tests.v2.p3.test_reference_defects:InjectedDefects.test_REF_1_every_injected_projection_defect_is_caught",
+    "outcome": "PASS",
+    "seconds": 4.982
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Authority.test_the_incremental_state_is_the_fold_and_a_refused_event_never_reaches_the_log",
+    "outcome": "PASS",
+    "seconds": 0.026
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Caches.test_PROJ_1_a_row_that_differs_from_the_journal_is_discarded_and_the_journal_wins",
+    "outcome": "PASS",
+    "seconds": 0.041
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Caches.test_a_gate_reads_only_the_six_and_only_from_the_journal",
+    "outcome": "PASS",
+    "seconds": 0.011
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Caches.test_a_stale_row_is_a_shortcut_and_the_answer_is_the_full_fold",
+    "outcome": "PASS",
+    "seconds": 0.014
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Caches.test_the_seal_binds_every_field_by_name",
+    "outcome": "PASS",
+    "seconds": 0.018
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Oracle.test_FOLD_1_incremental_equals_full_fold_for_every_prefix",
+    "outcome": "PASS",
+    "seconds": 4.115
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Oracle.test_FOLD_2_wall_clock_time_is_not_control_state",
+    "outcome": "PASS",
+    "seconds": 0.224
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Oracle.test_an_interrupted_tail_folds_as_its_complete_prefix",
+    "outcome": "PASS",
+    "seconds": 0.01
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Oracle.test_empty_journal_one_event_and_replay_twice",
+    "outcome": "PASS",
+    "seconds": 0.039
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Oracle.test_large_generated_journals_at_sampled_decision_points",
+    "outcome": "PASS",
+    "seconds": 4.217
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Oracle.test_serialisation_is_deterministic_across_processes",
+    "outcome": "PASS",
+    "seconds": 0.186
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Oracle.test_the_oracle_sees_a_step_that_depends_on_history_it_should_not",
+    "outcome": "PASS",
+    "seconds": 0.014
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Purity.test_a_state_is_a_JSON_value",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Purity.test_a_step_cannot_change_the_state_it_is_given",
+    "outcome": "PASS",
+    "seconds": 0.007
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Purity.test_events_fold_in_seq_order",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.test_fold_oracle:Tamper.test_PROJ_2_an_edited_or_deleted_old_event_fails_reconstruction",
+    "outcome": "PASS",
+    "seconds": 0.022
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:Budgets.test_a_retry_charges_its_cited_failures_budget",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:Budgets.test_developer_budget_charges_ready_criteria_only",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:Budgets.test_the_initial_state",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:FailureOwner.test_a_new_attempt_starts_clean_and_cannot_cite_the_last_ones_failure",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:FailureOwner.test_a_rollback_carries_its_cited_failures_owner_never_a_later_one",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:FailureOwner.test_the_latest_failure_speaks_until_one_is_cited",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:Independence.test_every_story_folds_alone_to_its_entry_in_the_run",
+    "outcome": "PASS",
+    "seconds": 0.83
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:QualificationCounters.test_drift_belongs_to_the_latest_admission",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:QualificationCounters.test_the_delivery_counts",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:QualificationCounters.test_the_metrics_over_the_latest_admissions",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:QualificationCounters.test_the_plan_is_frozen_once_and_admissions_name_its_criteria",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:Registry.test_events_a_projection_does_not_name_leave_it_unchanged",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:Registry.test_six_stateless_projections_with_their_own_ids",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:RetryTarget.test_the_budget_a_retry_would_charge",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:StoryState.test_events_inside_a_story",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:StoryState.test_the_lifecycle",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:StoryState.test_what_is_not_a_transition_refuses",
+    "outcome": "PASS",
+    "seconds": 0.005
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:TerminalState.test_each_story",
+    "outcome": "PASS",
+    "seconds": 0.005
+   },
+   {
+    "id": "tests.v2.p3.test_control_projections:TerminalState.test_the_run",
+    "outcome": "PASS",
+    "seconds": 0.004
+   }
+  ]
+ },
+ "admission_engines_on_fixtures": {
+  "counts": {
+   "PASS": 114,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 0,
+   "NOT_APPLICABLE": 0
+  },
+  "cases": [
+   {
+    "id": "tests.v2.p2.test_story_admission:Ordering.test_an_admission_that_does_not_permit_a_call_refuses_one",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Ordering.test_events_record_each_evaluation_then_the_admission",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Ordering.test_no_provider_request_before_the_storys_admission",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Story.test_a_plan_contradiction_permits_no_developer_call",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Story.test_a_probe_missing_from_the_catalogue_is_PROBE_INVALID",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Story.test_all_pre_satisfied_is_admitted_without_a_developer_call",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Story.test_any_blocker_blocks_the_story",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Story.test_only_this_storys_obligations_run",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Story.test_ready_and_pre_satisfied_with_remaining_work_permit_the_developer_call",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Story.test_the_parent_is_a_full_sha_revision",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_NEG_3_absent_required_subject_by_role",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_PLAN_OWNER_1_a_plan_contradiction_always_carries_PLAN",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_PLAN_OWNER_2_a_plan_contradiction_consumes_no_retry_budget",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_PROBE_BIND_1_a_bare_result_is_never_classified",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_PROBE_BIND_2_a_record_under_other_enforcement_is_not_reused",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_a_preserve_that_contradicts_the_plans_own_record_is_PLAN_CONTRADICTION",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_an_indeterminate_with_no_declared_routing_is_PROBE_INVALID_never_developer",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_each_rfc_row_on_the_derived_satisfaction",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_probe_status_rows",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_the_raw_verdict_is_never_the_key",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission:Table.test_the_table_is_total_over_admissible_obligations_and_closed_elsewhere",
+    "outcome": "PASS",
+    "seconds": 0.003
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_early_implementation_is_PRE_SATISFIED_and_a_regression_breaks_the_precondition",
+    "outcome": "PASS",
+    "seconds": 0.588
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_forbidden_module_present_is_READY_and_absent_is_PRE_SATISFIED",
+    "outcome": "PASS",
+    "seconds": 0.385
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_introduce_over_an_absent_required_subject_is_READY",
+    "outcome": "PASS",
+    "seconds": 0.193
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_parent_checkout_failure_and_an_unrunnable_probe_are_environment",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_preserve_over_an_absent_required_subject_is_PRECONDITION_BROKEN",
+    "outcome": "PASS",
+    "seconds": 0.195
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Attribution.test_a_tie_is_never_resolved_by_blaming_one_story",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Attribution.test_attributed_to_the_upstream_story_that_flipped_the_spec",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Attribution.test_unattributed_when_none_can_be_identified",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Budget.test_a_developer_request_may_charge_only_ready_criteria",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Continuation.test_a_blocked_story_does_not_continue",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Continuation.test_a_fully_pre_satisfied_story_skips_the_developer_and_still_verifies_everything",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Continuation.test_a_story_with_nothing_pre_satisfied_continues_on_everything",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Continuation.test_pre_satisfied_is_recorded_attributed_and_never_developer_work",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Quality.test_each_preregistered_threshold_is_applied",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Quality.test_no_introduce_obligation_has_no_ratio",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Quality.test_no_preregistered_threshold_means_not_claimed",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Quality.test_only_stories_whose_every_obligation_is_pre_satisfied_count_as_full",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_drift:Quality.test_the_three_metrics",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_1_requirement_coverage",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_2_contract_spec_integrity",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_3_ownership",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_4_dependency_dag",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_5_contradictions",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_6_proof_capability_catches_scenario_D_statically",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_7_traceability",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_8_plan_structure",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_9_probe_calibration",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_PROBE_META_1_a_protocol_only_probe_is_admitted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_a_plan_that_is_not_admitted_cannot_freeze",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Admission.test_a_well_formed_plan_is_admitted_with_a_stable_digest",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_a_contract_with_several_committed_specs_lists_them_sorted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_a_result_is_immutable",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_requirements_and_contracts_are_reported_sorted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_specs_are_visited_sorted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_stories_and_expectations_are_listed_sorted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_story_order_is_transitive_and_a_bool",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Canonical.test_the_cycle_reported_does_not_depend_on_listing_order",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_hash_binds_everything_and_the_baseline_is_a_full_sha",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_obligation_fields_are_the_rfcs",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_quality_policy_has_no_universal_threshold",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:Shapes.test_the_expected_parent_is_a_satisfaction_expectation_never_a_verdict",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:StaticOnly.test_CAL_2_no_plan_freeze_path_requires_spec_falsifiability",
+    "outcome": "PASS",
+    "seconds": 0.009
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:StaticOnly.test_engine_and_result_are_distinct",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:StaticOnly.test_the_engine_executes_no_probe_and_no_process",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_static_admission:StaticOnly.test_the_engine_never_invents_a_parent_sha",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:NoRawVerdictRouting.test_no_planning_or_control_module_names_the_raw_verdict",
+    "outcome": "PASS",
+    "seconds": 0.061
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:NoRawVerdictRouting.test_the_rule_sees_each_spelling",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_1_forbidden_behaviour_present_at_the_parent_is_UNSATISFIED_never_SATISFIED",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_2_forbidden_module_absent_and_decidable_is_SATISFIED",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_3_subject_required_but_absent_is_INDETERMINATE_PRECONDITION_ABSENT",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:Polarity.test_an_undeclared_absence_is_refused",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:Polarity.test_subject_absence_is_an_observation_never_unrunnable",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:Satisfaction.test_indeterminate_stays_indeterminate_whatever_the_expectation",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:Satisfaction.test_it_is_derived_never_stored",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:Satisfaction.test_it_is_undefined_for_a_probe_that_did_not_execute",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:Satisfaction.test_satisfied_iff_the_verdict_equals_the_expectation",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_A_PROBE_ABS_3_same_absence_positive_existence_contract_is_UNSATISFIED",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_B_PROBE_ABS_4_same_absence_negative_existence_contract_is_SATISFIED",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_C_PROBE_ABS_2_requires_subject_is_INDETERMINATE_PRECONDITION_ABSENT",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_C_requires_subject_refuses_a_verdict_it_cannot_have",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_D_decidable_absence_has_no_default_verdict",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_D_no_kernel_code_infers_a_decided_verdict_from_the_absence_declaration",
+    "outcome": "PASS",
+    "seconds": 0.178
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_D_the_decidable_verdict_is_the_observation_never_the_declaration",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_PROBE_ABS_5_one_absence_is_not_forced_to_one_satisfaction",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_the_variants_differ_only_where_they_claim_to",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:TwoAxes.test_indeterminate_requires_a_typed_reason_and_only_it_carries_one",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:TwoAxes.test_six_legal_states_are_exactly_these",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_outcome:TwoAxes.test_the_verdict_exists_only_inside_executed",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:Credentials.test_CRED_1_missing_credential_never_consumes_developer_budget",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:Credentials.test_CRED_2_invalid_credential_never_consumes_developer_or_provider_budget",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:Credentials.test_CRED_3_invalid_credential_is_non_retryable",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:Credentials.test_CRED_4_provider_outage_is_distinct_from_invalid_credential",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_OWNER_MP_1_parent_INTRODUCE_is_READY_with_no_failure_owner",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_OWNER_MP_2_candidate_after_admitted_INTRODUCE_is_DEVELOPER_never_PLAN",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_OWNER_MP_3_post_merge_disappearance_is_INTEGRATION",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_OWNER_MP_4_harness_cannot_inspect_is_ENVIRONMENT_everywhere",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_a_parent_PRECONDITION_ABSENT_without_a_role_fails_closed",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_parent_PRESERVE_or_VERIFY_over_an_absent_subject_is_PRECONDITION_BROKEN_PLAN",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_the_reason_alone_never_decides_the_owner",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:RetryabilityIsTyped.test_only_the_taxonomy_decides_retryability",
+    "outcome": "PASS",
+    "seconds": 0.151
+   },
+   {
+    "id": "tests.v2.p1.test_routing:RoutingTable.test_REFUTED_never_routes_to_ENVIRONMENT",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p1.test_routing:RoutingTable.test_an_unmapped_outcome_fails_closed_and_never_defaults_to_DEVELOPER",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:RoutingTable.test_every_route_cites_its_rfc_basis",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p1.test_routing:RoutingTable.test_no_did_not_run_to_developer_edge",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p1.test_routing:RoutingTable.test_only_UNRUNNABLE_routes_to_ENVIRONMENT_and_never_to_DEVELOPER",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p1.test_routing:RoutingTable.test_routing_depends_on_satisfaction_never_on_the_raw_verdict",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:RoutingTable.test_the_rows",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:RoutingTable.test_total_over_the_legal_space",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:Taxonomy.test_every_code_has_exactly_its_pinned_owner_and_retryability",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:Taxonomy.test_foreign_values_flatten_to_UNKNOWN_and_are_kept_as_data",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:Taxonomy.test_no_retry_count_lives_in_the_taxonomy",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:Taxonomy.test_owner_set_is_exactly_the_frozen_F3_set",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p1.test_routing:Taxonomy.test_untyped_codes_fail_closed",
+    "outcome": "PASS",
+    "seconds": 0.0
+   }
+  ],
+  "project_admissions_executed": 0
+ },
+ "provider_calls": 0,
+ "problems": [],
+ "harness_problems": [],
+ "cases": [
+  {
+   "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_1_forbidden_behaviour_present_at_the_parent_is_UNSATISFIED_never_SATISFIED",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_forbidden_module_present_is_READY_and_absent_is_PRE_SATISFIED",
+   "outcome": "PASS",
+   "seconds": 0.381
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_2_forbidden_module_absent_and_decidable_is_SATISFIED",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_3_subject_required_but_absent_is_INDETERMINATE_PRECONDITION_ABSENT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_NEG_3_absent_required_subject_by_role",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_introduce_over_an_absent_required_subject_is_READY",
+   "outcome": "PASS",
+   "seconds": 0.189
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Contrast.test_CAL_1_a_fixed_REFUTED_rule_would_have_passed_the_always_refuted_probe",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_an_always_SATISFIED_probe_is_rejected_for_MUST_HOLD",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:StaticOnly.test_CAL_2_no_plan_freeze_path_requires_spec_falsifiability",
+   "outcome": "PASS",
+   "seconds": 0.009
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_1_a_missing_runner_is_UNRUNNABLE_ENVIRONMENT_with_no_outcome_and_no_selection",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
+   "outcome": "PASS",
+   "seconds": 0.179
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_2_failing_assertions_are_EXECUTED_FAILED_STORY_TESTS_RAN_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_2_for_real",
+   "outcome": "PASS",
+   "seconds": 0.172
+  },
+  {
+   "id": "tests.v2.p4.test_run_scope:Lifetime.test_RUN_1_a_process_killed_after_a_durable_run_end_and_before_CLEAN_is_torn",
+   "outcome": "PASS",
+   "seconds": 0.156
+  },
+  {
+   "id": "tests.v2.p4.test_run_scope:Lifetime.test_RUN_2_a_held_lease_blocks_a_second_run_even_with_run_end_written",
+   "outcome": "PASS",
+   "seconds": 0.072
+  },
+  {
+   "id": "tests.v2.p2.test_drift_scenarios:ScenarioA.test_early_upstream_implementation_is_pre_satisfied_attributed_and_charges_no_budget",
+   "outcome": "PASS",
+   "seconds": 0.748
+  },
+  {
+   "id": "tests.v2.p2.test_drift_scenarios:ScenarioK.test_a_fully_pre_satisfied_story_skips_the_developer_and_still_verifies",
+   "outcome": "PASS",
+   "seconds": 0.75
+  },
+  {
+   "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_11_scenario_L_INTRODUCE_PRESERVE_and_VERIFY_give_the_identical_product_verdict",
+   "outcome": "PASS",
+   "seconds": 6.272
+  },
+  {
+   "id": "tests.v2.p4.test_runspec:Spec.test_scenario_H_the_implementation_changes_and_the_version_string_does_not",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_v2_005:BudgetsV2.test_a_retry_charges_the_failures_own_owner_and_never_the_developer_for_review_or_security",
+   "outcome": "PASS",
+   "seconds": 0.011
+  },
+  {
+   "id": "tests.v2.test_v2_005:BudgetsV2.test_a_review_or_security_request_needs_the_admission_and_names_only_its_criteria",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.test_v2_005:BudgetsV2.test_nothing_defaults_a_missing_or_foreign_budget_owner_under_format_3",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.test_v2_005:BudgetsV2.test_the_reference_model_agrees_on_format_3_traces_and_its_V2_005_calibration",
+   "outcome": "PASS",
+   "seconds": 0.551
+  },
+  {
+   "id": "tests.v2.test_v2_005:BudgetsV2.test_under_formats_1_and_2_every_request_is_the_developers_as_frozen",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.test_v2_005:BudgetsV2.test_version_2_reads_the_declared_format_and_charges_a_format_3_request_to_its_budget_owner",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.test_v2_005:Catalog.test_FMT3_1_every_event_type_has_a_format_3_schema",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_v2_005:Catalog.test_FMT3_2_a_missing_schema_fails_the_catalog_check_and_the_reader",
+   "outcome": "PASS",
+   "seconds": 0.005
+  },
+  {
+   "id": "tests.v2.test_v2_005:Compatibility.test_FMT3_3_every_format_1_and_format_2_journal_reads_identically_through_the_format_3_reader",
+   "outcome": "PASS",
+   "seconds": 0.152
+  },
+  {
+   "id": "tests.v2.test_v2_005:Compatibility.test_FMT3_5_a_reader_reads_a_journal_under_its_declared_format_and_guesses_nothing",
+   "outcome": "PASS",
+   "seconds": 0.008
+  },
+  {
+   "id": "tests.v2.test_v2_005:Compatibility.test_FMT3_7_no_format_1_or_format_2_journal_is_rewritten_extended_or_upgraded",
+   "outcome": "PASS",
+   "seconds": 0.004
+  },
+  {
+   "id": "tests.v2.test_v2_005:Lineage.test_V2_005_is_the_fourth_link_after_V2_003_changing_exactly_F1",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.test_v2_005:Lineage.test_the_sealed_P5_records_are_verified_by_identity_never_rewritten",
+   "outcome": "PASS",
+   "seconds": 0.009
+  },
+  {
+   "id": "tests.v2.test_v2_005:Messages.test_a_writer_refuses_a_run_begin_that_declares_another_format",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.test_v2_005:Messages.test_citations_are_checked_by_count_type_and_key_with_exact_reasons",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.test_v2_005:Messages.test_the_reader_reads_text_only_skips_ignorable_unknowns_and_refuses_required_unknowns",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.test_v2_005:Messages.test_the_writer_names_why_it_refuses_untyped_failed_and_closed",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.test_v2_005:Messages.test_validate_names_the_seq_rule_the_ignorable_rule_and_the_first_event_rule",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.test_v2_005:Messages.test_verified_proof_reconstructs_a_proof_only",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.test_v2_005:Runtime.test_a_rerun_of_the_run_scope_reads_the_previous_format_3_journal_at_preflight",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.test_v2_005:Runtime.test_closers_release_every_story_in_story_order_whatever_the_journal_order",
+   "outcome": "PASS",
+   "seconds": 0.004
+  },
+  {
+   "id": "tests.v2.test_v2_005:Runtime.test_the_run_scope_writes_format_3_and_its_journal_is_read_and_repaired_as_format_3",
+   "outcome": "PASS",
+   "seconds": 0.005
+  },
+  {
+   "id": "tests.v2.test_v2_005:Schemas.test_FMT3_4_a_missing_required_field_refuses_the_append_before_the_log_grows",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.test_v2_005:Schemas.test_FMT3_6_a_format_3_provider_request_names_one_of_the_three_budget_owners",
+   "outcome": "PASS",
+   "seconds": 0.004
+  },
+  {
+   "id": "tests.v2.test_v2_005:Schemas.test_FMT3_8_the_context_of_an_invariant_violation_cannot_affect_any_projection",
+   "outcome": "PASS",
+   "seconds": 0.005
+  },
+  {
+   "id": "tests.v2.test_v2_005:Schemas.test_a_proof_is_two_cited_sealed_records_with_one_instrument_and_the_agreement_they_state",
+   "outcome": "PASS",
+   "seconds": 0.015
+  },
+  {
+   "id": "tests.v2.test_v2_005:Schemas.test_a_static_admission_is_the_typed_result_once_per_plan",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.test_v2_005:Schemas.test_an_adequacy_record_is_the_typed_assembly_under_the_two_axis_rules",
+   "outcome": "PASS",
+   "seconds": 0.006
+  },
+  {
+   "id": "tests.v2.test_v2_005:StoryStateV2.test_version_2_admits_a_proof_and_an_adequacy_record_in_an_active_attempt_only",
+   "outcome": "PASS",
+   "seconds": 0.004
+  },
+  {
+   "id": "tests.v2.test_v2_005:Taxonomy.test_FailureCode_is_exactly_the_thirteen_historical_codes_and_the_nine_of_V2_005",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_v2_005:Taxonomy.test_each_of_the_nine_has_one_owner_one_retryability_and_its_own_budget",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_v2_005:Taxonomy.test_formats_1_and_2_carry_only_the_thirteen_and_format_3_carries_all",
+   "outcome": "PASS",
+   "seconds": 0.023
+  },
+  {
+   "id": "tests.v2.test_v2_005:Taxonomy.test_no_call_site_supplies_owner_or_retryability_and_no_prose_becomes_a_code",
+   "outcome": "PASS",
+   "seconds": 0.163
+  },
+  {
+   "id": "tests.v2.test_v2_005:Taxonomy.test_the_conformance_subcheck_pins_the_table_and_rejects_a_swapped_owner_or_retryability",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.test_v2_005:Validators.test_checks_answers_False_on_every_malformed_shape_and_True_on_the_typed_result",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_v2_005:Validators.test_execution_answers_False_on_every_malformed_shape_and_True_on_the_typed_result",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_v2_006:AnchorHoldsNoWriter.test_RACE_8_the_output_stream_ends_when_the_target_ends_while_the_anchor_lives",
+   "outcome": "PASS",
+   "seconds": 0.14
+  },
+  {
+   "id": "tests.v2.test_v2_006:AnchorHoldsNoWriter.test_a_descendant_holding_the_writer_keeps_the_stream_open_until_it_ends",
+   "outcome": "PASS",
+   "seconds": 1.213
+  },
+  {
+   "id": "tests.v2.test_v2_006:NextAndPump.test_a_protocol_tag_out_of_order_is_the_harness_breaking_its_protocol",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_v2_006:NextAndPump.test_a_stream_closed_while_the_process_runs_is_a_harness_timeout_at_the_watchdog",
+   "outcome": "PASS",
+   "seconds": 0.202
+  },
+  {
+   "id": "tests.v2.test_v2_006:NextAndPump.test_after_DISPATCHED_a_closed_stream_with_the_process_running_is_the_window_expiring",
+   "outcome": "PASS",
+   "seconds": 0.324
+  },
+  {
+   "id": "tests.v2.test_v2_006:NextAndPump.test_next_returns_only_complete_marked_lines_of_this_nonce",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_v2_006:NextAndPump.test_next_times_out_at_its_deadline_and_never_waits_past_it",
+   "outcome": "PASS",
+   "seconds": 0.206
+  },
+  {
+   "id": "tests.v2.test_v2_006:NextAndPump.test_the_pump_publishes_every_line_in_order_then_STREAM_CLOSED_once",
+   "outcome": "PASS",
+   "seconds": 0.004
+  },
+  {
+   "id": "tests.v2.test_v2_006:Race.test_RACE_1_a_READY_written_before_exit_is_observed_however_late_the_pump",
+   "outcome": "PASS",
+   "seconds": 0.886
+  },
+  {
+   "id": "tests.v2.test_v2_006:Race.test_RACE_2_READY_DISPATCHED_RESULT_then_immediate_exit_is_the_complete_result",
+   "outcome": "PASS",
+   "seconds": 1.23
+  },
+  {
+   "id": "tests.v2.test_v2_006:Race.test_RACE_3_the_exit_notice_before_the_pump_is_scheduled_gives_the_normal_result",
+   "outcome": "PASS",
+   "seconds": 0.383
+  },
+  {
+   "id": "tests.v2.test_v2_006:Race.test_RACE_4_one_party_late_the_other_normal_gives_identical_records",
+   "outcome": "PASS",
+   "seconds": 0.717
+  },
+  {
+   "id": "tests.v2.test_v2_006:StoryRace.test_RACE_4_a_story_with_one_party_late_on_every_proof_commits_with_agreement",
+   "outcome": "PASS",
+   "seconds": 2.556
+  },
+  {
+   "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_5_a_harness_that_emits_nothing_and_exits_0_did_not_start_after_the_stream_closed",
+   "outcome": "PASS",
+   "seconds": 0.829
+  },
+  {
+   "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_6_a_target_that_dies_before_READY_keeps_its_typed_outcome",
+   "outcome": "PASS",
+   "seconds": 0.53
+  },
+  {
+   "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_7_a_partial_READY_then_exit_is_no_READY_never_a_guess",
+   "outcome": "PASS",
+   "seconds": 0.851
+  },
+  {
+   "id": "tests.v2.test_v2_006:TrueEnd.test_RACE_9_every_line_before_the_end_is_read_before_STREAM_CLOSED",
+   "outcome": "PASS",
+   "seconds": 0.421
+  },
+  {
+   "id": "tests.v2.test_v2_006:WaitContract.test_a_timed_out_wait_returns_only_once_the_monotonic_clock_has_passed_its_deadline",
+   "outcome": "PASS",
+   "seconds": 0.82
+  },
+  {
+   "id": "tests.v2.test_v2_006_repeat:Repeated.test_RACE_10_every_ordering_repeated_gives_the_normal_record",
+   "outcome": "PASS",
+   "seconds": 21.405
+  },
+  {
+   "id": "tests.v2.p2.test_python_callable:LayoutInvariance.test_product_verdicts_are_identical_across_test_layouts",
+   "outcome": "PASS",
+   "seconds": 3.796
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_8_the_same_coverage_under_another_test_layout_is_the_same_result",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_8_for_real_the_same_tests_in_another_layout",
+   "outcome": "PASS",
+   "seconds": 0.336
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_11_moving_the_developer_tests_does_not_change_the_result",
+   "outcome": "PASS",
+   "seconds": 1.355
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+   "outcome": "PASS",
+   "seconds": 0.005
+  },
+  {
+   "id": "tests.v2.p5.test_invariants:SemanticDeterminism.test_INV_II_1_developer_test_topology_is_not_an_input_of_the_product_verdict",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Calibration.test_REF_2_an_always_agree_model_fails_calibration",
+   "outcome": "PASS",
+   "seconds": 0.006
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Calibration.test_every_calibration_input_is_a_real_journal",
+   "outcome": "PASS",
+   "seconds": 0.026
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Calibration.test_every_model_is_calibrated",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Calibration.test_the_implementation_reproduces_every_calibration_answer",
+   "outcome": "PASS",
+   "seconds": 0.029
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Differential.test_an_admission_outside_its_one_place_is_refused_by_both",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Differential.test_implementation_equals_the_reference_model_at_every_prefix",
+   "outcome": "PASS",
+   "seconds": 4.514
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Differential.test_implementation_equals_the_reference_model_over_generated_traces",
+   "outcome": "PASS",
+   "seconds": 1.484
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Differential.test_on_edited_traces_both_refuse_or_both_agree",
+   "outcome": "PASS",
+   "seconds": 0.639
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Differential.test_the_answer_does_not_depend_on_payload_key_order",
+   "outcome": "PASS",
+   "seconds": 0.073
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Independence.test_six_models_each_with_calibration",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p3.test_reference_models:Independence.test_the_models_import_nothing_of_the_implementation",
+   "outcome": "PASS",
+   "seconds": 0.015
+  },
+  {
+   "id": "tests.v2.p3.test_reference_defects:InjectedDefects.test_REF_1_every_injected_projection_defect_is_caught",
+   "outcome": "PASS",
+   "seconds": 4.982
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Authority.test_the_incremental_state_is_the_fold_and_a_refused_event_never_reaches_the_log",
+   "outcome": "PASS",
+   "seconds": 0.026
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Caches.test_PROJ_1_a_row_that_differs_from_the_journal_is_discarded_and_the_journal_wins",
+   "outcome": "PASS",
+   "seconds": 0.041
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Caches.test_a_gate_reads_only_the_six_and_only_from_the_journal",
+   "outcome": "PASS",
+   "seconds": 0.011
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Caches.test_a_stale_row_is_a_shortcut_and_the_answer_is_the_full_fold",
+   "outcome": "PASS",
+   "seconds": 0.014
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Caches.test_the_seal_binds_every_field_by_name",
+   "outcome": "PASS",
+   "seconds": 0.018
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Oracle.test_FOLD_1_incremental_equals_full_fold_for_every_prefix",
+   "outcome": "PASS",
+   "seconds": 4.115
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Oracle.test_FOLD_2_wall_clock_time_is_not_control_state",
+   "outcome": "PASS",
+   "seconds": 0.224
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Oracle.test_an_interrupted_tail_folds_as_its_complete_prefix",
+   "outcome": "PASS",
+   "seconds": 0.01
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Oracle.test_empty_journal_one_event_and_replay_twice",
+   "outcome": "PASS",
+   "seconds": 0.039
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Oracle.test_large_generated_journals_at_sampled_decision_points",
+   "outcome": "PASS",
+   "seconds": 4.217
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Oracle.test_serialisation_is_deterministic_across_processes",
+   "outcome": "PASS",
+   "seconds": 0.186
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Oracle.test_the_oracle_sees_a_step_that_depends_on_history_it_should_not",
+   "outcome": "PASS",
+   "seconds": 0.014
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Purity.test_a_state_is_a_JSON_value",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Purity.test_a_step_cannot_change_the_state_it_is_given",
+   "outcome": "PASS",
+   "seconds": 0.007
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Purity.test_events_fold_in_seq_order",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.test_fold_oracle:Tamper.test_PROJ_2_an_edited_or_deleted_old_event_fails_reconstruction",
+   "outcome": "PASS",
+   "seconds": 0.022
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:Budgets.test_a_retry_charges_its_cited_failures_budget",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:Budgets.test_developer_budget_charges_ready_criteria_only",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:Budgets.test_the_initial_state",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:FailureOwner.test_a_new_attempt_starts_clean_and_cannot_cite_the_last_ones_failure",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:FailureOwner.test_a_rollback_carries_its_cited_failures_owner_never_a_later_one",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:FailureOwner.test_the_latest_failure_speaks_until_one_is_cited",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:Independence.test_every_story_folds_alone_to_its_entry_in_the_run",
+   "outcome": "PASS",
+   "seconds": 0.83
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:QualificationCounters.test_drift_belongs_to_the_latest_admission",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:QualificationCounters.test_the_delivery_counts",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:QualificationCounters.test_the_metrics_over_the_latest_admissions",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:QualificationCounters.test_the_plan_is_frozen_once_and_admissions_name_its_criteria",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:Registry.test_events_a_projection_does_not_name_leave_it_unchanged",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:Registry.test_six_stateless_projections_with_their_own_ids",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:RetryTarget.test_the_budget_a_retry_would_charge",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:StoryState.test_events_inside_a_story",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:StoryState.test_the_lifecycle",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:StoryState.test_what_is_not_a_transition_refuses",
+   "outcome": "PASS",
+   "seconds": 0.005
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:TerminalState.test_each_story",
+   "outcome": "PASS",
+   "seconds": 0.005
+  },
+  {
+   "id": "tests.v2.p3.test_control_projections:TerminalState.test_the_run",
+   "outcome": "PASS",
+   "seconds": 0.004
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Ordering.test_an_admission_that_does_not_permit_a_call_refuses_one",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Ordering.test_events_record_each_evaluation_then_the_admission",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Ordering.test_no_provider_request_before_the_storys_admission",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Story.test_a_plan_contradiction_permits_no_developer_call",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Story.test_a_probe_missing_from_the_catalogue_is_PROBE_INVALID",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Story.test_all_pre_satisfied_is_admitted_without_a_developer_call",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Story.test_any_blocker_blocks_the_story",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Story.test_only_this_storys_obligations_run",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Story.test_ready_and_pre_satisfied_with_remaining_work_permit_the_developer_call",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Story.test_the_parent_is_a_full_sha_revision",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_NEG_3_absent_required_subject_by_role",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_PLAN_OWNER_1_a_plan_contradiction_always_carries_PLAN",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_PLAN_OWNER_2_a_plan_contradiction_consumes_no_retry_budget",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_PROBE_BIND_1_a_bare_result_is_never_classified",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_PROBE_BIND_2_a_record_under_other_enforcement_is_not_reused",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_a_preserve_that_contradicts_the_plans_own_record_is_PLAN_CONTRADICTION",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_an_indeterminate_with_no_declared_routing_is_PROBE_INVALID_never_developer",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_each_rfc_row_on_the_derived_satisfaction",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_probe_status_rows",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_the_raw_verdict_is_never_the_key",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission:Table.test_the_table_is_total_over_admissible_obligations_and_closed_elsewhere",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_early_implementation_is_PRE_SATISFIED_and_a_regression_breaks_the_precondition",
+   "outcome": "PASS",
+   "seconds": 0.588
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_forbidden_module_present_is_READY_and_absent_is_PRE_SATISFIED",
+   "outcome": "PASS",
+   "seconds": 0.385
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_introduce_over_an_absent_required_subject_is_READY",
+   "outcome": "PASS",
+   "seconds": 0.193
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_parent_checkout_failure_and_an_unrunnable_probe_are_environment",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_story_admission_probes:RealParent.test_preserve_over_an_absent_required_subject_is_PRECONDITION_BROKEN",
+   "outcome": "PASS",
+   "seconds": 0.195
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Attribution.test_a_tie_is_never_resolved_by_blaming_one_story",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Attribution.test_attributed_to_the_upstream_story_that_flipped_the_spec",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Attribution.test_unattributed_when_none_can_be_identified",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Budget.test_a_developer_request_may_charge_only_ready_criteria",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Continuation.test_a_blocked_story_does_not_continue",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Continuation.test_a_fully_pre_satisfied_story_skips_the_developer_and_still_verifies_everything",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Continuation.test_a_story_with_nothing_pre_satisfied_continues_on_everything",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Continuation.test_pre_satisfied_is_recorded_attributed_and_never_developer_work",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Quality.test_each_preregistered_threshold_is_applied",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Quality.test_no_introduce_obligation_has_no_ratio",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Quality.test_no_preregistered_threshold_means_not_claimed",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Quality.test_only_stories_whose_every_obligation_is_pre_satisfied_count_as_full",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_drift:Quality.test_the_three_metrics",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_1_requirement_coverage",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_2_contract_spec_integrity",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_3_ownership",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_4_dependency_dag",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_5_contradictions",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_6_proof_capability_catches_scenario_D_statically",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_7_traceability",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_8_plan_structure",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_9_probe_calibration",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_PROBE_META_1_a_protocol_only_probe_is_admitted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_a_plan_that_is_not_admitted_cannot_freeze",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Admission.test_a_well_formed_plan_is_admitted_with_a_stable_digest",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_a_contract_with_several_committed_specs_lists_them_sorted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_a_result_is_immutable",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_requirements_and_contracts_are_reported_sorted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_specs_are_visited_sorted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_stories_and_expectations_are_listed_sorted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_story_order_is_transitive_and_a_bool",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Canonical.test_the_cycle_reported_does_not_depend_on_listing_order",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_hash_binds_everything_and_the_baseline_is_a_full_sha",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_obligation_fields_are_the_rfcs",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Shapes.test_plan_quality_policy_has_no_universal_threshold",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:Shapes.test_the_expected_parent_is_a_satisfaction_expectation_never_a_verdict",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:StaticOnly.test_CAL_2_no_plan_freeze_path_requires_spec_falsifiability",
+   "outcome": "PASS",
+   "seconds": 0.009
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:StaticOnly.test_engine_and_result_are_distinct",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:StaticOnly.test_the_engine_executes_no_probe_and_no_process",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_static_admission:StaticOnly.test_the_engine_never_invents_a_parent_sha",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:NoRawVerdictRouting.test_no_planning_or_control_module_names_the_raw_verdict",
+   "outcome": "PASS",
+   "seconds": 0.061
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:NoRawVerdictRouting.test_the_rule_sees_each_spelling",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_1_forbidden_behaviour_present_at_the_parent_is_UNSATISFIED_never_SATISFIED",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_2_forbidden_module_absent_and_decidable_is_SATISFIED",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Polarity.test_NEG_3_subject_required_but_absent_is_INDETERMINATE_PRECONDITION_ABSENT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Polarity.test_an_undeclared_absence_is_refused",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Polarity.test_subject_absence_is_an_observation_never_unrunnable",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Satisfaction.test_indeterminate_stays_indeterminate_whatever_the_expectation",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Satisfaction.test_it_is_derived_never_stored",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Satisfaction.test_it_is_undefined_for_a_probe_that_did_not_execute",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:Satisfaction.test_satisfied_iff_the_verdict_equals_the_expectation",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_A_PROBE_ABS_3_same_absence_positive_existence_contract_is_UNSATISFIED",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_B_PROBE_ABS_4_same_absence_negative_existence_contract_is_SATISFIED",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_C_PROBE_ABS_2_requires_subject_is_INDETERMINATE_PRECONDITION_ABSENT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_C_requires_subject_refuses_a_verdict_it_cannot_have",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_D_decidable_absence_has_no_default_verdict",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_D_no_kernel_code_infers_a_decided_verdict_from_the_absence_declaration",
+   "outcome": "PASS",
+   "seconds": 0.178
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_D_the_decidable_verdict_is_the_observation_never_the_declaration",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_PROBE_ABS_5_one_absence_is_not_forced_to_one_satisfaction",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:SubjectAbsenceSemantics.test_the_variants_differ_only_where_they_claim_to",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:TwoAxes.test_indeterminate_requires_a_typed_reason_and_only_it_carries_one",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:TwoAxes.test_six_legal_states_are_exactly_these",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_outcome:TwoAxes.test_the_verdict_exists_only_inside_executed",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:Credentials.test_CRED_1_missing_credential_never_consumes_developer_budget",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:Credentials.test_CRED_2_invalid_credential_never_consumes_developer_or_provider_budget",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:Credentials.test_CRED_3_invalid_credential_is_non_retryable",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:Credentials.test_CRED_4_provider_outage_is_distinct_from_invalid_credential",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_OWNER_MP_1_parent_INTRODUCE_is_READY_with_no_failure_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_OWNER_MP_2_candidate_after_admitted_INTRODUCE_is_DEVELOPER_never_PLAN",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_OWNER_MP_3_post_merge_disappearance_is_INTEGRATION",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_OWNER_MP_4_harness_cannot_inspect_is_ENVIRONMENT_everywhere",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_a_parent_PRECONDITION_ABSENT_without_a_role_fails_closed",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_parent_PRESERVE_or_VERIFY_over_an_absent_subject_is_PRECONDITION_BROKEN_PLAN",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:OwnerByMeasurementPoint.test_the_reason_alone_never_decides_the_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:RetryabilityIsTyped.test_only_the_taxonomy_decides_retryability",
+   "outcome": "PASS",
+   "seconds": 0.151
+  },
+  {
+   "id": "tests.v2.p1.test_routing:RoutingTable.test_REFUTED_never_routes_to_ENVIRONMENT",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p1.test_routing:RoutingTable.test_an_unmapped_outcome_fails_closed_and_never_defaults_to_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:RoutingTable.test_every_route_cites_its_rfc_basis",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p1.test_routing:RoutingTable.test_no_did_not_run_to_developer_edge",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p1.test_routing:RoutingTable.test_only_UNRUNNABLE_routes_to_ENVIRONMENT_and_never_to_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p1.test_routing:RoutingTable.test_routing_depends_on_satisfaction_never_on_the_raw_verdict",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:RoutingTable.test_the_rows",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:RoutingTable.test_total_over_the_legal_space",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:Taxonomy.test_every_code_has_exactly_its_pinned_owner_and_retryability",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:Taxonomy.test_foreign_values_flatten_to_UNKNOWN_and_are_kept_as_data",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:Taxonomy.test_no_retry_count_lives_in_the_taxonomy",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:Taxonomy.test_owner_set_is_exactly_the_frozen_F3_set",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p1.test_routing:Taxonomy.test_untyped_codes_fail_closed",
+   "outcome": "PASS",
+   "seconds": 0.0
+  }
+ ],
+ "counts": {
+  "PASS": 242,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "NOT_APPLICABLE": 0
+ },
+ "seconds": 93.2,
+ "harness_digest_at_run": "504697cdb17b205833d1500a96986d4ef06325838e4f105d5a3a23bd83d41ab7"
+}

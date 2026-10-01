@@ -1,0 +1,313 @@
+{
+ "record": "AISEF V2 — P0 COMPLETION",
+ "phase": "P0 — Freeze / conformance scaffolding",
+ "authorization": "AISEF V2 — OWNER AUTHORIZATION TO BEGIN P0",
+ "order_executed": [
+  "WP-0.1",
+  "WP-0.4",
+  "WP-0.2",
+  "WP-0.3",
+  "WP-0.5"
+ ],
+ "suite_commit": "b96cc06068b18382aeabfa17bb1137c7afa38396",
+ "commits": {
+  "WP-0.1": [
+   "6ac6f74",
+   "b96cc06"
+  ],
+  "WP-0.4": [
+   "a7b014d",
+   "fc3c846",
+   "85224d3",
+   "6460498"
+  ],
+  "WP-0.2": [
+   "e307b48"
+  ],
+  "WP-0.3": [
+   "f9020c2"
+  ],
+  "WP-0.5": [
+   "00661b5"
+  ],
+  "owner-approved plane rules (PLAN-FINDING-003)": [
+   "ebad09f"
+  ],
+  "wheel exclusion proof": [
+   "f16dabb"
+  ]
+ },
+ "owner_decisions": [
+  "AISEF V2 — OWNER AUTHORIZATION TO BEGIN P0",
+  "OWNER DECISION: add exactly ASSURANCE_AFFECTING aisef2/* and .githooks/* to docs/closure-gate.json; do not rename aisef2/",
+  "OWNER DECISION: pyproject exclusion moving HEAD build_config identity is ACCEPTED; not hidden, reclassified, waived or re-pinned",
+  "OWNER DECISION: prove HEAD wheel, clean install and wheel rebuilt from sdist exclude aisef2"
+ ],
+ "architecture_identity": {
+  "rfc_reviewed_commit": "2fe672c7ecdefa349e08353fa9bd67d627077d6e",
+  "rfc_normative_digest": {
+   "approved": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+   "computed": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f"
+  },
+  "freeze_table_digest": {
+   "approved": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",
+   "computed": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a"
+  },
+  "approval_record_sha256": {
+   "sidecar": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+   "computed": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a"
+  },
+  "freeze_items": 11
+ },
+ "v1_identity": {
+  "product_tree": {
+   "approved": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "computed": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "p19_freeze_record_sha256": {
+   "approved": "6676f4d2b1e5c9b282b128da8e49d85ed3549a5f2574b42b3a7b11303e42435c",
+   "computed": "6676f4d2b1e5c9b282b128da8e49d85ed3549a5f2574b42b3a7b11303e42435c"
+  },
+  "w0_qualification_record_sha256": {
+   "approved": "7bb8380e0bebc1662e9551934ea7f5ecbe3ec93300f762017add3174dca29fd0",
+   "computed": "7bb8380e0bebc1662e9551934ea7f5ecbe3ec93300f762017add3174dca29fd0"
+  },
+  "voided_w0_record_sha256": {
+   "required": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+   "computed": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3"
+  }
+ },
+ "v1_evidence_baseline": {
+  "source_revision": "b0d87c6f5f59a43dd72844a1aef72b678de865f1",
+  "file_count": 2306,
+  "files_digest_sha256": "a80100d092a4cd8b578ef938013b560fdac137e76502d220c73ad1074fd6998d",
+  "enforcement_grade": "DETECTIVE"
+ },
+ "v1_product_identity_at_head": {
+  "owner_accepted": true,
+  "statement": "pyproject.toml `exclude = [\"aisef2*\"]` moves the build_config sub-digest at HEAD; runtime_source and package_data are unchanged; historical V1 identities and evidence are unchanged; not hidden, reclassified, waived or re-pinned",
+  "candidate_f52df75": {
+   "digest": "2b5b33b4ba94adb0d89aa2d9b92f3cc70faebbadd6b4df49d963c2478c20c54a",
+   "parts": {
+    "build_config": "e293b4c4b00dea62fce208c6489ce6c432dd875a48e6daca3a397d921509cbb1",
+    "package_data": "9f3e9abb1147ffb3f806ca9639b8b1d5306f64c7d53248f57adb51c553a5278c",
+    "runtime_source": "a19181ff21d884ff0b858c357fbbbd95648fc33321fc373c0135c98dfc2087e2"
+   }
+  },
+  "head": {
+   "digest": "68f500984d2b0e8945df76247f54f56554966455b73259ed95b8dcdf7aa5d253",
+   "parts": {
+    "build_config": "feaf7640555322d761399bf1cc5cc5aeef811d50aaf6c5745e76883c729a1fe1",
+    "package_data": "9f3e9abb1147ffb3f806ca9639b8b1d5306f64c7d53248f57adb51c553a5278c",
+    "runtime_source": "a19181ff21d884ff0b858c357fbbbd95648fc33321fc373c0135c98dfc2087e2"
+   },
+   "unresolved": []
+  }
+ },
+ "wheel_exclusion": "PROVEN — HEAD wheel and the wheel rebuilt from the sdist exclude aisef2; neither clean install can import it",
+ "ci": {
+  "attempt": 2,
+  "attempts": [
+   {
+    "attempt": 1,
+    "cause": "P0-OBS-001 (latent V1 kill_tree PID-reuse defect; not a P0 change)",
+    "failed_job": "unit (windows-latest, 3.11)",
+    "result": "failure"
+   },
+   {
+    "attempt": 2,
+    "result": "success",
+    "scope": "failed job only (gh run rerun --failed)"
+   }
+  ],
+  "commit": "b96cc06068b18382aeabfa17bb1137c7afa38396",
+  "jobs": [
+   {
+    "conclusion": "success",
+    "name": "unit (windows-latest, 3.11)"
+   },
+   {
+    "conclusion": "success",
+    "name": "wheel"
+   },
+   {
+    "conclusion": "success",
+    "name": "unit (ubuntu-latest, 3.12)"
+   },
+   {
+    "conclusion": "success",
+    "name": "unit (ubuntu-latest, 3.14)"
+   },
+   {
+    "conclusion": "success",
+    "name": "lint"
+   },
+   {
+    "conclusion": "success",
+    "name": "unit (ubuntu-latest, 3.13)"
+   },
+   {
+    "conclusion": "success",
+    "name": "unit (ubuntu-latest, 3.11)"
+   }
+  ],
+  "previous_run": {
+   "commit": "f16dabb",
+   "result": "failure on Windows only: WP-0.1 CRLF hashing bug, fixed in b96cc06",
+   "run_id": 35562902663
+  },
+  "run_id": 35565857461,
+  "url": "https://github.com/nghinh/aisef/actions/runs/35565857461"
+ },
+ "full_suite": {
+  "invocation": "python -m unittest discover -s tests -q (the CI invocation), guard armed in enforce mode",
+  "commit": "b96cc06068b18382aeabfa17bb1137c7afa38396",
+  "ran": 3804,
+  "skipped": 20,
+  "exit": 0,
+  "detective_guard_after_suite_exit": 0,
+  "v1_evidence_changes_after_suite": []
+ },
+ "exit_checks": [
+  {
+   "check": "plan_validate: checks A-E, zero problems, generated docs in sync",
+   "command": "python -P validation/v2/plan_validate.py --validate --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "generated artefacts in sync"
+  },
+  {
+   "check": "PLANDEP-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 32"
+  },
+  {
+   "check": "PLANDEP-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANDEP-3: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-3",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANDEP-4: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-4",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "WP-0.1 freeze manifest digests equal the approval record",
+   "command": "python -P validation/v2/freeze_manifest.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "freeze manifest: PASS"
+  },
+  {
+   "check": "WP-0.2 architecture catalog --check (both directions)",
+   "command": "python -P validation/v2/gen_arch_catalog.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "architecture catalog: PASS"
+  },
+  {
+   "check": "WP-0.3 F1-F11 conformance: 11 definite, 0 FAIL, 0 ratchet violations",
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "summary {'PASS': 2, 'PENDING': 9, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "check": "WP-0.5 Q0 checker calibration --check",
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "calibrated 9/9; always-PASS mutants rejected 9/9"
+  },
+  {
+   "check": "WP-0.4 V1 evidence guard, detective",
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  },
+  {
+   "check": "V1 release-identity: every tracked path classified",
+   "command": "python -m unittest tests.test_release_identity.TestPlanes.test_every_tracked_path_of_this_repository_is_classified",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "OK"
+  },
+  {
+   "check": "PLANDEP-5/5b: a hand-edited generated table or prose block fails --check",
+   "command": "python -m unittest tests.v2.plan.test_plan_dependencies (PLANDEP_5, PLANDEP_5b)",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "OK"
+  }
+ ],
+ "f_conformance": {
+  "PASS": 2,
+  "PENDING": 9,
+  "FAIL": 0
+ },
+ "q0_calibration": {
+  "checkers": 9,
+  "calibrated": 9,
+  "always_pass_mutants_rejected": 9,
+  "uncovered_checker_modules": []
+ },
+ "findings": {
+  "PLAN-FINDING-001": "resolved in WP-0.4 (a7b014d): V1 test writes a scratch file in the temp directory; semantics proven unchanged (prove_state_model_fix.py HOLDS)",
+  "PLAN-FINDING-002": "resolved in WP-0.4 (6460498): .githooks/pre-commit created (nothing existed to extend); opt-in, grade unchanged",
+  "CI-WINDOWS-CRLF": "CI run 35562902663 red on Windows only: the WP-0.1 checker hashed the approval record's raw bytes and an autocrlf checkout made the manifest read stale; fixed in b96cc06 (committed LF form hashed; identity unchanged), regression test added",
+  "P0-OBS-001": "OPEN, not fixable under the V1 freeze: latent V1 Windows defect in aisef/clients/base.py::_kill_tree_win32 (PID reuse -> cycle -> MemoryError); surfaced on Windows attempt 1 of the b96cc06 CI run; mechanism reproduced on the unmodified function; owner decision required",
+  "PLAN-FINDING-003": "resolved in ebad09f by owner decision: aisef2/* and .githooks/* were UNRESOLVED in docs/closure-gate.json#planes (V1 release-identity test red since e307b48); two ASSURANCE_AFFECTING rules added; product digest unchanged at 939f2ab, f52df75, b0d87c6"
+ },
+ "evidence_artifacts_rule": "sha256 over the committed (LF) bytes",
+ "evidence_artifacts": {
+  "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+  "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json": "19768f6ab2404192c96fd4f12bf614cd69f1cdf271d1491a1051a8e3681380e3",
+  "closure-evidence/v2/V1-EVIDENCE-BASELINE.json": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb",
+  "closure-evidence/v2/P0-PLAN-FINDING-001-RESOLUTION.json": "06d696b375fd45905e346b2190c81000cba55df9a828e3030e0b9c7f1c6b1240",
+  "closure-evidence/v2/P0-WP04-FULL-SUITE-INVARIANT.json": "56ee6ecca0b6dbba32c51c2753b192d89f436176a6da20ff34b08e1bd0dd60c4",
+  "closure-evidence/v2/P0-PACKAGING-EXCLUDE.json": "99d26381fbdab53b9248135bec1e1183f868bd7be072f125791568a63db79b1f",
+  "docs/implementation/v2/arch-catalog.md": "938400e4f2ddabf9b083b666fa8417f86d87dbd78399ca81020e6d3a37545fce",
+  "closure-evidence/v2/F-CONFORMANCE.json": "79de0da5d7cc4aaabc496f97c7f1f193aeada625c39df5d3ff4c1199fcfbffd4",
+  "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json": "6aa20e5ebadb5176f4fde5eabff43a31d3033992fe63ef1ad4654ea4d0ccb606",
+  "closure-evidence/v2/P0-WHEEL-EXCLUSION.json": "5b89e31f66e5d80d22dd977389ec6676a547f58081135b16c9f827f031fce4e0",
+  "closure-evidence/v2/P0-OBS-001.json": "1f8800437b5adf4467b42adfa1020baeceeb29a5300ad85c03af3c6595326f3a"
+ },
+ "architecture_exceptions": [],
+ "stop_rules_triggered": [],
+ "p1_started": false,
+ "verdict": {
+  "identities_match": true,
+  "all_exit_checks_ok": true,
+  "suite_green": true,
+  "no_architecture_exception": true,
+  "ci_green_linux_and_windows": true,
+  "head_identity_classified": true,
+  "P0": "COMPLETE — awaiting owner review"
+ }
+}

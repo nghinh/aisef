@@ -110,11 +110,11 @@ class Developer(ClientAdapter):
     def run(self, spec: RunSpec) -> RunResult:
         dau = spec.prompt.lstrip().splitlines()[0] if spec.prompt.strip() else ""
         if dau.startswith("# Security review"):
-            return RunResult(ok=True, text="không có phát hiện bảo mật", cost_usd=0.1)
+            return RunResult(ok=True, text="không có phát hiện bảo mật\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n", cost_usd=0.1)
         if dau.startswith("# Review"):
             if self.reviewer_writes:
                 self.reviewer_writes(Path(spec.workdir))
-            return RunResult(ok=True, text="không có mục chặn", cost_usd=0.1)
+            return RunResult(ok=True, text="không có mục chặn\n\n```json\n{\"verdict\": \"pass\", \"findings\": []}\n```\n", cost_usd=0.1)
         work = Path(spec.workdir)
         self.develop_calls += 1
         if self.develop_calls == 1:

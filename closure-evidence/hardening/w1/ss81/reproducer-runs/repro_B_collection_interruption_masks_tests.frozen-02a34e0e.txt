@@ -1,0 +1,21 @@
+<repo>/closure-evidence/hardening/w1/ss81/repro_B_collection_interruption_masks_tests.py:15: ResourceWarning: unclosed file <_io.TextIOWrapper name='<repo>/closure-evidence/hardening/w1/ss81/reproB-pytest-at-parent.txt' mode='r' encoding='utf-8'>
+  parent = parse(open(f"{SP}/reproB-pytest-at-parent.txt").read()).to_evidence()   # the real pytest output at the parent
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+F
+======================================================================
+FAIL: test_B_a_tautological_ac_test_is_masked_by_another_files_import_error (__main__.ReproB.test_B_a_tautological_ac_test_is_masked_by_another_files_import_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_B_collection_interruption_masks_tests.py", line 23, in test_B_a_tautological_ac_test_is_masked_by_another_files_import_error
+    self.assertIsNot(m.outcome, Outcome.PASSED, "test_b's AC test is green without the story's code")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly identical: <Outcome.PASSED: 'passed'> : test_b's AC test is green without the story's code
+
+----------------------------------------------------------------------
+Ran 1 test in 0.006s
+
+FAILED (failures=1)
+
+parsed at parent: {'test_format': 'pytest', 'test_ids': [], 'failed_ids': []}
+B outcome: Outcome.PASSED | 2 tests with criteria codes are red or absent at parent SHA cha0000
+exit=1

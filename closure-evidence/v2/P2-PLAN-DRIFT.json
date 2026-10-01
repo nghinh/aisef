@@ -1,0 +1,89 @@
+{
+ "record": "AISEF V2 — P2 PLAN DRIFT",
+ "work_package": "WP-2.5",
+ "rfc_sections": [
+  "14",
+  "29"
+ ],
+ "frozen_items": [
+  "F7"
+ ],
+ "scenario_A_early_upstream_implementation": {
+  "dispositions": {
+   "C2": "PRE_SATISFIED",
+   "C3": "READY"
+  },
+  "developer_call_permitted": true,
+  "already_satisfied": false,
+  "developer_work": [
+   "C3"
+  ],
+  "verify_at_candidate": [
+   "C2",
+   "C3"
+  ],
+  "drift": [
+   {
+    "criterion_id": "C2",
+    "attributed_to": "S1",
+    "candidates": [
+     "S1"
+    ]
+   }
+  ],
+  "developer_request_refused": false,
+  "provider_requests": 1,
+  "budget_problems": [],
+  "ordering_problems": []
+ },
+ "scenario_K_fully_pre_satisfied_story": {
+  "dispositions": {
+   "C2": "PRE_SATISFIED"
+  },
+  "developer_call_permitted": false,
+  "already_satisfied": true,
+  "developer_work": [],
+  "verify_at_candidate": [
+   "C2"
+  ],
+  "drift": [
+   {
+    "criterion_id": "C2",
+    "attributed_to": "S1",
+    "candidates": [
+     "S1"
+    ]
+   }
+  ],
+  "developer_request_refused": true,
+  "provider_requests": 0,
+  "budget_problems": [],
+  "ordering_problems": []
+ },
+ "attribution_cases": {
+  "S1 flips the spec": "S1",
+  "a non-upstream story flips it": "UNATTRIBUTED",
+  "two upstream stories flip it": "UNATTRIBUTED",
+  "nothing measured": "UNATTRIBUTED"
+ },
+ "plan_quality_verdicts": {
+  "not preregistered": "NOT_CLAIMED",
+  "ratio 0.5 preregistered at 0.5": "PASS",
+  "ratio 0.5 preregistered at 0.4": "FAIL"
+ },
+ "implementation_decisions": [
+  "attribution: the introducer is the completed upstream (DAG) story measured not SATISFIED at its parent and SATISFIED at its merge; none or several such stories -> UNATTRIBUTED with the candidates kept (RFC §36 leaves tie-breaks to the implementation; a tie never blames one story)",
+  "the measurements are inputs; running probes at completed stories' revisions belongs to orchestration (P5)",
+  "developer budget is charged by provider/request events, each naming the criteria it works on; budget_problems rejects any that names a criterion not admitted READY"
+ ],
+ "properties": {
+  "scenario_A_pre_satisfied_and_attributed_upstream": true,
+  "scenario_A_continues_on_the_remainder": true,
+  "scenario_K_story_already_satisfied_developer_skipped": true,
+  "scenario_K_every_obligation_still_verified": true,
+  "pre_satisfied_charges_no_developer_budget": true,
+  "no_provider_request_before_admission": true,
+  "unattributed_when_none_or_ambiguous": true,
+  "plan_quality_not_claimed_without_preregistered_thresholds": true
+ }
+}

@@ -1,0 +1,2 @@
+{"checker": "v1_evidence_guard", "package": "WP-0.4", "kind": "throwaway_repo_committed_mutation",
+"expect": "committed mutation of protected evidence"}

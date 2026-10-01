@@ -1,0 +1,1199 @@
+{
+ "record": "AISEF V2 — CYCLE-2 FREEZE MANIFEST",
+ "work_package": "WP-2.0.1",
+ "authority": "owner decision 'AISEF V2 — CYCLE-2 OWNER DECISIONS / WP-2.0.1 AUTHORIZATION' (2026-09-28): the Cycle-2 architecture study accepted for implementation planning; the Cycle-1 semantic baseline immutable",
+ "cycle1": {
+  "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+  "aisef2_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+  "closing_commit": "503b3a22f872c212d237e70f03aaba7d83f54d67",
+  "probe": {
+   "id": "probe.python_callable",
+   "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+  },
+  "probe_sources": {
+   "aisef2/probe/protocol.py": {
+    "sha256": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+    "git_blob": "fe69b77392672aac3238b9219c2e4efb81c94bf7"
+   },
+   "aisef2/probe/python_callable.py": {
+    "sha256": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+    "git_blob": "c1d1390adda5ba67b748e075cceba2f3129a1598"
+   }
+  },
+  "rfc": {
+   "rfc_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "lineage": [
+    "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json"
+   ]
+  },
+  "f_conformance_at_freeze": {
+   "F1": "PASS",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PASS",
+   "F6": "PASS",
+   "F7": "PASS",
+   "F8": "PASS",
+   "F9": "PASS",
+   "F10": "PASS",
+   "F11": "PASS"
+  },
+  "attempt_histories_at_freeze": {
+   "P7": 151,
+   "P8": 45,
+   "P9": 11,
+   "P10": 19
+  },
+  "verified_by": [
+   "validation/v2/freeze_manifest.py (RFC)",
+   "validation/v2/freeze_conformance.py (F1–F11)",
+   "validation/v2/run_history.py (histories, seals)",
+   "validation/v2/v1_evidence_guard.py (V1)"
+  ]
+ },
+ "immutable": {
+  "hash": "every sha256 of this record is over the file bytes with CRLF normalised to LF (a Windows autocrlf checkout compares equal); git_blob = sha1 of the git blob header and the same bytes",
+  "files": {
+   "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json": {
+    "sha256": "10e2e163e2081081a787dd2dadcd4f0a1c5996007a694e2b8d04a185fdabcdba",
+    "git_blob": "cc609ebf5e0f961bccebbc943cc163d0fc9b838a"
+   },
+   "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json": {
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+    "git_blob": "62f6ed24a85fae7b6abc66bdb762179cb4dc5f24"
+   },
+   "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json": {
+    "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f",
+    "git_blob": "4020e11a22070674922b9ac23fbb7215990975e6"
+   },
+   "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json": {
+    "sha256": "b8f618a235e7f508d70547ccc4cc6c79c7651df5d9e03c5ba3378c0c09fb3cfb",
+    "git_blob": "2bee19a8bac0ad39d2bea66a3b665cd65175de94"
+   },
+   "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json": {
+    "sha256": "9b8636a22875c14211ef6fb974ef9c03f39600721aa8cf9020c7d41a37b6dad1",
+    "git_blob": "a7d1ba0e8b7c54711c99a22d410e88f1b7bc6b0a"
+   },
+   "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json": {
+    "sha256": "09bb03a34f9b95083414625a4da46684d6d2319a5f6d52e54e1033d2bc33fb17",
+    "git_blob": "f41124c0940398e65702d7bc261fa57e6bb63e71"
+   },
+   "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json": {
+    "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+    "git_blob": "7fcdb01f40a00dee321d8c1abae9367fc58014fb"
+   },
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json": {
+    "sha256": "2de596432375ba874ab17cfd34b507b9606e5af3fa6c88e48184fe7ab87d6d8c",
+    "git_blob": "4f747c93b3fa13da335c59084d85047572b635d6"
+   },
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json": {
+    "sha256": "400a753f392d60c158c53b3ffa263d207ee56e8495841bfc03be20e8a0e0350b",
+    "git_blob": "2e126fa674b0d820f833c444dbdc15940743cc17"
+   },
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json": {
+    "sha256": "8dcc296574f9978d28822bff51ecd94dadf005c31ffb98e2b8da308765f0c2f9",
+    "git_blob": "b5dda1f1fb87d0a1f473db3ccaf8c20f1457bd95"
+   },
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json": {
+    "sha256": "58b5d83d1eda61a6fc40237ac62a2b98906d8f2e7e8a11aa9f577dd5bc3dfff9",
+    "git_blob": "0ec568cd95a4c4cf6d3938830cbc696ccd56e227"
+   },
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json": {
+    "sha256": "8036c7c73fd6e397af726309c89f7002025b34747ab65aac0e1d43e4ba4fa35a",
+    "git_blob": "402ee33fcdcec6be784a22ebb5cfd9264872c0d3"
+   },
+   "closure-evidence/v2/P1-FINAL-SEAL.json": {
+    "sha256": "247b595cae4e78de5addbef623f5ad98c051391b2e8834d6d8cebb01cee8d8b2",
+    "git_blob": "7a7e161d829a5015f737e370d9c245ef6f99822d"
+   },
+   "closure-evidence/v2/P1-RUN-HISTORY.json": {
+    "sha256": "75eb18dac863acf19f85087575e6a5a79f78d7f03c90152f694fbf28a42e4511",
+    "git_blob": "14fe1654a8cdae17f93c1e90bd74dc60a4b0a4e3"
+   },
+   "closure-evidence/v2/P10-ACCEPTANCE.json": {
+    "sha256": "5a534173c838c7474c9e4d90fec83864284f160e6da5d3265267d35b9303cb90",
+    "git_blob": "8f7006e373886ec5121bb46ef2bf0249b9545563"
+   },
+   "closure-evidence/v2/P10-RUN-HISTORY.json": {
+    "sha256": "b7107acd44171dcdf00c395a7deb6833e63f05d3c8d9c95d6f5d62161f3ca8d5",
+    "git_blob": "d73564fb729c08f4a62273f651107e5c04ebaef7"
+   },
+   "closure-evidence/v2/P2-CALIBRATION.json": {
+    "sha256": "a8503695d023d5c6fb7eecaf3d762e46f8805254d239f9210d75846db657812c",
+    "git_blob": "10832f49e5f7d0352d8770a6a8aa2e59f156190f"
+   },
+   "closure-evidence/v2/P2-FINAL-SEAL.json": {
+    "sha256": "778c417066abb93119b51f9469c7b76120776ad65aa7964d6586d9144d98874b",
+    "git_blob": "dae853233d14d2680c3c8cb005647a7ac3ca12d9"
+   },
+   "closure-evidence/v2/P2-RUN-HISTORY.json": {
+    "sha256": "9a14f0976784a0e6307d8cd296a25ed52f18f43c195fd41437a1e787136f54e8",
+    "git_blob": "6aa270a48c13866790605f2883e79a4b2cd3538d"
+   },
+   "closure-evidence/v2/P3-FINAL-SEAL.json": {
+    "sha256": "c63622683a1d528fc82f3c81fa5091ff47abdbd9a141f076e98d4037bcce5d9e",
+    "git_blob": "df5a6993f2ba4e691b8dd2dceca0922ccc62369e"
+   },
+   "closure-evidence/v2/P3-RUN-HISTORY.json": {
+    "sha256": "0b1234e22875110c409907da446734ad393df516dba5d92713e5dfce981acbab",
+    "git_blob": "136fb5cec616bc4ba139f66099f9825107a62aee"
+   },
+   "closure-evidence/v2/P4-FINAL-SEAL.json": {
+    "sha256": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+    "git_blob": "cb6edb7a6e846948ac7f455a220458a17e5fa358"
+   },
+   "closure-evidence/v2/P4-RUN-HISTORY.json": {
+    "sha256": "0d07360ceadb1144a9effdeec989c65ce6bf652443357b1a4a58818378a7da1c",
+    "git_blob": "97f97541208d0c771fbfb69308c9841b4644ddb2"
+   },
+   "closure-evidence/v2/P5-FINAL-SEAL.json": {
+    "sha256": "d06d4ae57e1797f6658b1cc3148200865aada86a0d3165aeb9f7f98a6e3e250c",
+    "git_blob": "9541f0a4186fb1a56ec5349c9f9d13591fe7f3b1"
+   },
+   "closure-evidence/v2/P5-RUN-HISTORY.json": {
+    "sha256": "5fa4f510d5585db69f52699053f6b3e81bb74a00676962cb98b2f4bfc20e4471",
+    "git_blob": "9e650d0597a73cabed4a91d1fc71fc03a807a10e"
+   },
+   "closure-evidence/v2/P6-FINAL-SEAL.json": {
+    "sha256": "9362029864f011d7c727d57ab4f99815e0c440071833285a2964053fa651ea60",
+    "git_blob": "8b8f3d07e9f73965bf6e46c9528b313b140dd292"
+   },
+   "closure-evidence/v2/P6-MIGRATION-TABLE.json": {
+    "sha256": "157b46f6786d849591f9c08b02a39f48a08c18d69d9e34cf7c3c98ccd5a6752f",
+    "git_blob": "3bf11bcd2dcba1bd61ec9034272ee1206e84c71b"
+   },
+   "closure-evidence/v2/P6-RUN-HISTORY.json": {
+    "sha256": "c201e29e4d6b4ab47b220040a58ea0489b3c67ff550360149b6619b7e7eacf39",
+    "git_blob": "8ffed1a400600c2f64a7cf05c66f9e7770043ceb"
+   },
+   "closure-evidence/v2/P7-ACCEPTANCE.json": {
+    "sha256": "c7144a2353e18d844a69f1739c133678fc79bfbc60645d1808fceb2846a66edf",
+    "git_blob": "d76b69f575a173cb87020e03b80ac5570b04e556"
+   },
+   "closure-evidence/v2/P7-RUN-HISTORY.json": {
+    "sha256": "88037578dcfa7963a322d0dc0eb89eed84cc611f474aac9b484ab0ee69be11f8",
+    "git_blob": "16c0304bca2daf398bcf0b12a9b73c002840f550"
+   },
+   "closure-evidence/v2/P8-ACCEPTANCE.json": {
+    "sha256": "4f6e0b259bb3d07809e73e98e15fe4db6fa4526480334cfa958141bb02ee679d",
+    "git_blob": "2f93ec5b24f8d0aeead05711f90319943f10ac25"
+   },
+   "closure-evidence/v2/P8-RUN-HISTORY.json": {
+    "sha256": "4611a693fe3d8a871892106b1680059ef22f513b05d6c5e7619f68a93a492ff5",
+    "git_blob": "b30eaf306c51298468c8709c58ab5653760f26d6"
+   },
+   "closure-evidence/v2/P9-ACCEPTANCE.json": {
+    "sha256": "7c508afcf63b5d84cb3ac6b907f68ac29295a31eabf47cf47f7719e921fd2eea",
+    "git_blob": "9d57e51acd5e50cd4c60d7414a95db2a36d5b118"
+   },
+   "closure-evidence/v2/P9-RUN-HISTORY.json": {
+    "sha256": "8567c19ed77f55cdc4a166c5ac9d501eb9f553ee5475025115922cf7813e30c5",
+    "git_blob": "916c57c25d0b7d1efe735d1d7e827f08a72e466e"
+   },
+   "closure-evidence/v2/V1-EVIDENCE-BASELINE.json": {
+    "sha256": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb",
+    "git_blob": "f9df9aebb7c7e68c8ada2e96b14371ce9659fde1"
+   },
+   "closure-evidence/v2/Q0-Q3/INVALIDATION.json": {
+    "sha256": "32f314e1c91e2b9e978681ac4a659f9822ad4e11303788bf9bb1d7129cdc988b",
+    "git_blob": "21658d6fdb288f26bc497f81ec2cc66b6f70175f"
+   },
+   "closure-evidence/v2/Q0-Q3/PLATFORMS/linux-py3.11.json": {
+    "sha256": "8131fd82d87eb33349312c276ab292be2b5113853462ea992ba17dfc4cc60808",
+    "git_blob": "5ad8e47cd86636ba412915170df435d87d0d2991"
+   },
+   "closure-evidence/v2/Q0-Q3/PLATFORMS/linux-py3.12.json": {
+    "sha256": "bc34816a7c8bf99719ac70cc2506e16150df74287a91455a91bff77bc29fcf32",
+    "git_blob": "e943a1c774b85b58596de6fc5e9f99ba46963a4b"
+   },
+   "closure-evidence/v2/Q0-Q3/PLATFORMS/linux-py3.13.json": {
+    "sha256": "d82943af015c31e6beca6c5b87016e34807152cf742f2430e1c61191c99bb331",
+    "git_blob": "74e16a1a42f6afd053c401cf8f938a347d30ebd4"
+   },
+   "closure-evidence/v2/Q0-Q3/PLATFORMS/linux-py3.14.json": {
+    "sha256": "db27776243dfd978ffabe3313e8367bb05f18ef2d25c6e61c529de8f39c61b50",
+    "git_blob": "97465783713da631120c9bc4023c6b81b71b4fb5"
+   },
+   "closure-evidence/v2/Q0-Q3/PLATFORMS/windows-py3.11.json": {
+    "sha256": "1b7c8f23429cac2736b2871bf41e1ec6c8ab41c5b09c7e5c77ecea5bafdb2bf6",
+    "git_blob": "4859d597b93e61880c7120c7304b0d4c30f7da3d"
+   },
+   "closure-evidence/v2/Q0-Q3/Q0/Q0-darwin-py3.14.json": {
+    "sha256": "64b55d6cd7c560824e6ebf29e89356223e6166deddecdf8eb22681b90a113eed",
+    "git_blob": "5526ff4b89e5e539a752ed068aa7e1682151c0af"
+   },
+   "closure-evidence/v2/Q0-Q3/Q0/Q0-linux-py3.11.json": {
+    "sha256": "dc578e544e12807594778732e2f4b269c0499f3e02b557f65b067de37ee3be6d",
+    "git_blob": "35f00c2510998dc2e48ea34534228e5704352053"
+   },
+   "closure-evidence/v2/Q0-Q3/Q0/Q0-linux-py3.12.json": {
+    "sha256": "624f19259aec052327e1bbb309e63b6105e3f86bfb67db17308effff4b027eaf",
+    "git_blob": "65f12cc08e62c825babf24618c11eace6cce74b4"
+   },
+   "closure-evidence/v2/Q0-Q3/Q0/Q0-linux-py3.13.json": {
+    "sha256": "bee5f737f338b97432b4dfc2c1ad60705d67254145d4c4c0990c9ba3823c8cfb",
+    "git_blob": "108fd887e21705b8ae3b119ede95830df8fdc569"
+   },
+   "closure-evidence/v2/Q0-Q3/Q0/Q0-linux-py3.14.json": {
+    "sha256": "17543c90a9b397afb069cb7914f3a238ef4a497e334551e250e34c83366d5eda",
+    "git_blob": "5f89456631f8d90fa2d040ecec51d454d63ed2bf"
+   },
+   "closure-evidence/v2/Q0-Q3/Q0/Q0-windows-py3.11.json": {
+    "sha256": "3177f7769f74b8ec7b9ae1cd8b9f1d48dbe4ad4fcd064fd6eb2bf76ccab39762",
+    "git_blob": "5beedbe92900906278d7e035a0359bd50074b30e"
+   },
+   "closure-evidence/v2/Q0-Q3/Q1/Q1-darwin-py3.14.json": {
+    "sha256": "f0220860d24236a5729621b6705838fb5844baae4c328254a91bf7dd1f5a81c3",
+    "git_blob": "93e5db3e9b4cbf1adbb790540857690cd6d82ae0"
+   },
+   "closure-evidence/v2/Q0-Q3/Q1/Q1-linux-py3.11.json": {
+    "sha256": "5d4547efac09994b3ddeec5cfcdf67493edc2959b6206ba55dd656122bf930c1",
+    "git_blob": "07b300276fcf3cfd9e6d824955ded0db582a339e"
+   },
+   "closure-evidence/v2/Q0-Q3/Q1/Q1-linux-py3.12.json": {
+    "sha256": "dd852d1fcadab5ee71f244449cbe338e7b4e34b90c456e559827a510b619d387",
+    "git_blob": "ffff515967c8554b74308f2d21116f3fe956cebf"
+   },
+   "closure-evidence/v2/Q0-Q3/Q1/Q1-linux-py3.13.json": {
+    "sha256": "96275281585258632c4128ce15c6dd788e06853ba3d4f8978d3316a7654b034a",
+    "git_blob": "816b5e9b6397f78b74aa4f70a8913a55afd11c2b"
+   },
+   "closure-evidence/v2/Q0-Q3/Q1/Q1-linux-py3.14.json": {
+    "sha256": "5122dd9c2ee6efc9464760d2a027a260ff45e3fe3f711d7cbc5cd3ca9a7f4044",
+    "git_blob": "919c0d1ee5c7fe94e504a5b253655307440e6557"
+   },
+   "closure-evidence/v2/Q0-Q3/Q1/Q1-windows-py3.11.json": {
+    "sha256": "20d8eed50cdc9f0b4450be1d7292ec65cb45cd534592903087e6096bd40dc807",
+    "git_blob": "55f99cc745ca09df36f94664a95204245d732803"
+   },
+   "closure-evidence/v2/Q0-Q3/Q2/Q2-darwin-py3.14.json": {
+    "sha256": "a42782e738806ef36e0286e0ba6b324d4f7726164c31799be97d246a6f526b51",
+    "git_blob": "913c4d6b4ffaf0c2e460ab83b4690797ae253a6c"
+   },
+   "closure-evidence/v2/Q0-Q3/Q2/Q2-linux-py3.11.json": {
+    "sha256": "da3a3e2d865bdfe63d80c896985a01143efca5976a63df8468b5714b6ade314e",
+    "git_blob": "4815683cfb372cf7ff0d63528305912eb1081db6"
+   },
+   "closure-evidence/v2/Q0-Q3/Q2/Q2-linux-py3.12.json": {
+    "sha256": "0c6315127d77c8385fc374c37d5db2027346f28d0cd9f20ac6759b6d14d4bace",
+    "git_blob": "28980bea09c2b00de34a07022889b836d121b836"
+   },
+   "closure-evidence/v2/Q0-Q3/Q2/Q2-linux-py3.13.json": {
+    "sha256": "5cd7c3aef2e87fcf696ba05b2eb6f4d1e379c4eaa32bdc07d88d58db628c8b41",
+    "git_blob": "3b2ba622d30f03361f201827f7295600889a068e"
+   },
+   "closure-evidence/v2/Q0-Q3/Q2/Q2-linux-py3.14.json": {
+    "sha256": "f7af7f842a5d5a5f818e95cd53326cf1bb52f65868cb3bf5f8bf9e626ce1687b",
+    "git_blob": "780d555f501e7f5e5c2d2032ffd8e60e52d375ed"
+   },
+   "closure-evidence/v2/Q0-Q3/Q2/Q2-windows-py3.11.json": {
+    "sha256": "38efd2687cebdd5400878f4be61843fe7cb51a405dba32bed375a1837424fa0a",
+    "git_blob": "7f137a512febdb9f8af9463e4a13dc4c2f90d031"
+   },
+   "closure-evidence/v2/Q0-Q3/Q3/Q3-darwin-py3.14.json": {
+    "sha256": "d167466a4cd07698915b017c77e086203ee5c470c5bc5c7a71f8b82ae649c39f",
+    "git_blob": "0532f6e9bdb984d5f15549493235aca109b4b2a6"
+   },
+   "closure-evidence/v2/Q0-Q3/Q3/Q3-linux-py3.11.json": {
+    "sha256": "aebd8f741e12be1cc674c5aca8ae46fc0bed655edf0556126e929d3e861ce261",
+    "git_blob": "733771c3f59dd04e2aa65b03290c03e6d56d49ba"
+   },
+   "closure-evidence/v2/Q0-Q3/Q3/Q3-linux-py3.12.json": {
+    "sha256": "e18c0b83399a9a94c86c1b3a8d7f7fcce1e73673267f893d93fe6c94e85429b1",
+    "git_blob": "5f30f914408be2d1b30d7fae5618ca926cd0cb3d"
+   },
+   "closure-evidence/v2/Q0-Q3/Q3/Q3-linux-py3.13.json": {
+    "sha256": "d3d76a7816770785b2c33fb3a5284d7f3a5d4960f902c98ef307a905203842f7",
+    "git_blob": "e67db31d0e6e046e696f731b5eb1fe1b9afdaaa9"
+   },
+   "closure-evidence/v2/Q0-Q3/Q3/Q3-linux-py3.14.json": {
+    "sha256": "5c1dfa9361317b8020fa07cc68b4bf314627dee6970fc53151fff39596131773",
+    "git_blob": "c000f9c0d0dd43b6ebb4eff6ee8a693883dc1dbe"
+   },
+   "closure-evidence/v2/Q0-Q3/Q3/Q3-windows-py3.11.json": {
+    "sha256": "9607e0fdf9a8fe2e1155452b82a7b56c4712a294b5358017f22ea925d97e4798",
+    "git_blob": "71ac4a430d237675f9d763c466f3e5c1eae0d824"
+   },
+   "closure-evidence/v2/Q0-Q3/SUMMARY.json": {
+    "sha256": "5f03687299447a24affa43d638b3ba04d24df071273eb63b831bdb98da4097d2",
+    "git_blob": "1cc2148ec713c42f2538b48af056265871e505eb"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/darwin-py3.14.json": {
+    "sha256": "05146c6a7b021486b9e22c78e11cc7e499134da58d38c07e81f64ee74158f8db",
+    "git_blob": "a7c2d0692a85287e0e1acea24e28a83efefb79f6"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/linux-py3.11.json": {
+    "sha256": "78c129fd8bc61453064a0197ad8474a813f9163bbfc8f305fd53eb73f4d3acc4",
+    "git_blob": "b01d4384cc030f922e1fa7f9fcdd7742239e61c6"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/linux-py3.12.json": {
+    "sha256": "970b930641b9b9d89e2e3e84a04881a19efa8a2cbac6d1b731f58f4144241c0a",
+    "git_blob": "f7e96964eee5d3dd450ecedbe7fc907515aab05d"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/linux-py3.13.json": {
+    "sha256": "986489f298fc1052818c38ccea7790cf926adf94df1c270634ba1b6fd06a1dc5",
+    "git_blob": "310084fae00b081361a676846a29c59c54e163a8"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/linux-py3.14.json": {
+    "sha256": "ab02d21d6fda1f546a132ad24718614ff3cf44ea7d14adc95cb16d6eecd6425d",
+    "git_blob": "73c8d006af42a9a70d4d763af230561085f81260"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/windows-py3.11.json": {
+    "sha256": "3af429fd59e946395704d3eee72d9e6cea4e0bf82560ffb8ff3bbda232e29b22",
+    "git_blob": "7e15bee2118067e09d1880347f5765148d62385a"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-darwin-py3.14.json": {
+    "sha256": "62dbb1494b5d4a1f18125545d9004863f6e6573eafb3dd6a0ef9ef1d9b1e801a",
+    "git_blob": "5517ecf63eb78f344be2697a0edcb194cddf0d7b"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-linux-py3.11.json": {
+    "sha256": "08e72ed251110fa3d20d07d356a7c22fd83a83cb4f10445e47b9a2f4e48a2556",
+    "git_blob": "b47b40da3f3761102982d0d67c4145a1162f5258"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-linux-py3.12.json": {
+    "sha256": "7b10cc18cc1323833562ff2d241392fa1094e0a2544d24095d4b583e16020b03",
+    "git_blob": "a3912b650a91ad7d67af4a42466d3fed084eb4bd"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-linux-py3.13.json": {
+    "sha256": "e829bb62b2c7be3c55c3d31c511c73e25c7ec50d44b3c65b403c5f25bd872df2",
+    "git_blob": "ea4d41ee3ecb491e5bbf7f1530a25fd14c3f6eac"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-linux-py3.14.json": {
+    "sha256": "6d298105e75484df5848a7abc3fd66f3881a01bceeda50f08e37d26e00a04e72",
+    "git_blob": "1a0c2e605b5ef86baf9d242f7a5f9c241b6db4f5"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-windows-py3.11.json": {
+    "sha256": "a21f9395ee78686c8aa832d19b62c3479ca603996e0ea7eb8c54d02f8f259e7d",
+    "git_blob": "bfdcb186549f0e96c0823929f9ed3428565f9d67"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-darwin-py3.14.json": {
+    "sha256": "8ee8815f7c8170be020e0094fcc6998f082f187dada4a6bba8be3d8688e4bee3",
+    "git_blob": "a9858cc430f0e7c3ee466bde4ce2a484f3e17d4d"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-linux-py3.11.json": {
+    "sha256": "9c088369bce990e47f306b50a787c6197ad4040be27f3e370342a1aa706c334d",
+    "git_blob": "a9a106295be58473d1a200fe0ed969dc38f24840"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-linux-py3.12.json": {
+    "sha256": "ef95ba4bf8b3e7c6472acdd815ee4f3fa9b5825be247e06aea9f6da4ad7d59b0",
+    "git_blob": "abea7a8215d3c8a76b9435e033512a3b0a980cbd"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-linux-py3.13.json": {
+    "sha256": "ca09234bdc46984e9f4849601d653b6a6ed41ae2032dcd7d40ffdac0fb5e03e8",
+    "git_blob": "a7ecc7b7687677bab39bff3e7175176110ab0a78"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-linux-py3.14.json": {
+    "sha256": "74be633684aa04b81b2820f22b661e40a821950abca633ab5f3b45821bd73a9e",
+    "git_blob": "47f58b5afbc743afbdf077dd0a615cea2c9a15d4"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-windows-py3.11.json": {
+    "sha256": "d6374b2e989db2403daae9f2fe0e07b8053bacad3c7cd541a8e011989c56cc9e",
+    "git_blob": "8adafea6f37df040faa8695df892678f444c4b27"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-darwin-py3.14.json": {
+    "sha256": "22e022235cdaa4318eda4d2960c35ab71644ad90cad73a41d7be0b9c6d5b70f4",
+    "git_blob": "027a41fae1d4ae946548f12547c5f464ba20a21c"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-linux-py3.11.json": {
+    "sha256": "51b10fc3911e17b7fa69e884e0cd533212b1809f37b7c25bd98f4ffc71a3430b",
+    "git_blob": "a2d222a135dc6fdf9fd2a2a2a564b8c36160041b"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-linux-py3.12.json": {
+    "sha256": "f815dd14718b42deddd85db75b0a982c789480b72395b906a25587e55fafd62d",
+    "git_blob": "03bb311a78306a4f9f8eaf36a7c65782e2a48e69"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-linux-py3.13.json": {
+    "sha256": "9c9d687b11beb0a157ae7c1087b963450498f257e4971e59d9813ccd1751fcb0",
+    "git_blob": "e36f57d2e191429440af0ef9455e34e338af80e6"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-linux-py3.14.json": {
+    "sha256": "5fad93ee8b1567e50a9fa10505cea3a90f32040cf9280a6fd86ce447253144bf",
+    "git_blob": "5cf6c4701cfcd7eb8e3ea9caf36fe237fa0be97b"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-windows-py3.11.json": {
+    "sha256": "e7b25fa3a1ebb698400783d2fcfd6192e9b45e05baf81ae713a0a26e06993b8c",
+    "git_blob": "0c1fec641300d26a5531f6b31bc39c9ad19e038d"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-darwin-py3.14.json": {
+    "sha256": "4ce3af1d61efd7659d4650f2e6790d7b16a5005f952ab168fd7030b56004f192",
+    "git_blob": "aeb54bf3c0bb2da4a68b9c7b6c73994d8e190eb4"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-linux-py3.11.json": {
+    "sha256": "a5a7670db52e5c2fbb46f0350eb68bde90b826bc80be3dc8ded2a8376276b024",
+    "git_blob": "48161e869a4e902a5cfe589edebc520a42d113b5"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-linux-py3.12.json": {
+    "sha256": "00f121da8eff18abe8fec4bc6af704cd6d6fdfdba442f6bf79b9551dd8611472",
+    "git_blob": "c864fc9cd177958a4d0b5af4c919de2a69609b89"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-linux-py3.13.json": {
+    "sha256": "710c751e796cbf4e740f0ad39886e6d7ef1a2e6185190a491dbba145990e9e86",
+    "git_blob": "67191d48a99d19c7918f16a9b8b5013ffed803fe"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-linux-py3.14.json": {
+    "sha256": "d53650acf8a0d896bbaaedd9e0bbce2c4683788ad843c87c77ddedd96db58be4",
+    "git_blob": "5a9efa52102e75f2bbecb50df53fcdfc5a100343"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-windows-py3.11.json": {
+    "sha256": "c1ccb87edffaad68271e823a16e6897a2b2adf9f524e818475d16714075c071b",
+    "git_blob": "cee6dc9c5fc05b5b11fe772ae2fb9aa02262df97"
+   },
+   "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/SUMMARY.json": {
+    "sha256": "f2578b7d3fa3f8e45ecf45b50813f42461c0df2a352d197a18959b0b1dad0c4e",
+    "git_blob": "cb49541debdcc24145b923f85bffb11628b05234"
+   },
+   "closure-evidence/v2/Q4/CALIBRATION-post-run-ae5ffb1.json": {
+    "sha256": "49f4256ff86e50fe9379efd031bdd5c8cf8af17a6c5a75933c29f1b097df6f54",
+    "git_blob": "7b9aa0010c7224565d3c3308de9fca8d2ed33604"
+   },
+   "closure-evidence/v2/Q4/CALIBRATION.json": {
+    "sha256": "4ea49a35e1d02396766aecb8762ebb95a032c79657437c05efb32a60497966e4",
+    "git_blob": "e164165e568fcd3380fdadc625607dd564172354"
+   },
+   "closure-evidence/v2/Q4/CONFORMANCE-end.json": {
+    "sha256": "553d2a37437a0945fd22516522648f77733d583566b68e363887f6c344902129",
+    "git_blob": "e550ba84a45c351baa20a660773993487f0caad4"
+   },
+   "closure-evidence/v2/Q4/CONFORMANCE-start.json": {
+    "sha256": "ca31a8a8af6330919262ca4de7cfb3bcdc58e858d5b2bb4e071a8e88d1ff47c5",
+    "git_blob": "f00e3d5732946cfeb9ed5198dddd5da2447927b5"
+   },
+   "closure-evidence/v2/Q4/DIFFERENTIAL.json": {
+    "sha256": "2a07619255e0f754ffad6d7be79193275f899773915d66c71024dafdf3633b10",
+    "git_blob": "34bd65a391730741e51d5c850e96e5a8a4911e83"
+   },
+   "closure-evidence/v2/Q4/RESOURCES.json": {
+    "sha256": "26247420b4404515bd30cbe5f78f4dd9c2b1c851cff49112ac57e45bcde0d203",
+    "git_blob": "aae3e3796d43746d7775f1e2f3ec5bfa6bbbc6f6"
+   },
+   "closure-evidence/v2/Q4/SUBJECT.json": {
+    "sha256": "4f99a4df0a89e019c4f886dd70ec11f0fe12a10660b34f2082ef97479126ed29",
+    "git_blob": "8aed598cf633b2c626beea13b450c46ded53a623"
+   },
+   "closure-evidence/v2/Q4/attempt-1-b755455/ATTEMPT-1.json": {
+    "sha256": "9e9b7d13007f5c8e118578e68ea4c84b8dc2925e2e9af9a3c4669042ece8dba5",
+    "git_blob": "c02be08c0c661d12c05e38925e4fa6b6a4557ac0"
+   },
+   "closure-evidence/v2/Q4/attempt-1-b755455/CONFORMANCE-end.json": {
+    "sha256": "5433fb2430361c39d2c79dc48a3fc61cb217d8b0d2d8a8b2055bc5df8945def7",
+    "git_blob": "6bc680abdaa02768be1593772513857af927c525"
+   },
+   "closure-evidence/v2/Q4/attempt-1-b755455/CONFORMANCE-start.json": {
+    "sha256": "c5df6956d120e302b36972295a147fc95e4074d78c61716fe6dc6bfff0ad82d2",
+    "git_blob": "7fead51c7d05929151ef1628e007ea0bf65185df"
+   },
+   "closure-evidence/v2/Q4/attempt-1-b755455/DIFFERENTIAL.json": {
+    "sha256": "39e840df48b780f468375d943d167ff2fd5b8aac21f8191e7235410216c7dfb8",
+    "git_blob": "179e60b9ff8f9df0ad6ac6a0dd5a599608c630cb"
+   },
+   "closure-evidence/v2/Q4/attempt-1-b755455/RESOURCES.json": {
+    "sha256": "171ba3a33d60b6887f11b56b66b63a205e4803dd5f92e91d450bf4f05c5fb2db",
+    "git_blob": "81003e5c68b22722755121910c152dd6b6310eef"
+   },
+   "closure-evidence/v2/Q4/attempt-1-b755455/SUBJECT.json": {
+    "sha256": "25d3fef4b66e71bd475b2f4d931d5d63c7b2ae1aaee53f2c626bce884636ca08",
+    "git_blob": "ae0e0c8553eb64e66714cde496dbf4ebe558a66c"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-0.attempt-2.json": {
+    "sha256": "966eb89a613724092e56573bc982cbc55e1eac9cbd7b54507d31e1acf971bead",
+    "git_blob": "a6bda673ceaab8f07eefa1a85ad728003653d2d1"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-1.attempt-2.json": {
+    "sha256": "a6825a307a7fc9279b02b9c788e926ba0695582b48867218a1f706ca96af1176",
+    "git_blob": "b044280fc3425bad6612609847154dceb5322e41"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-2.attempt-2.json": {
+    "sha256": "efcbce373a090cb92332c7b172ac39287e69c279f1caf36ba7fb2a1f2e09eb30",
+    "git_blob": "a4e96a3674c662f32e454766b1e93423a5c95481"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-3.attempt-2.json": {
+    "sha256": "d79f5184576a294575737a68eb5c8f8fec0ae80a24b1012320d8d2cae66612ea",
+    "git_blob": "8df9023fd06aab6bde2783b6a970ae986b2fe5c1"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-4.attempt-2.json": {
+    "sha256": "5574cf622ee798d3481508c554510b08e765b0e55d55ad3ba5117363409165bd",
+    "git_blob": "e6ea0d06532bc32771032cf61b806ff8354bad57"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-5.attempt-2.json": {
+    "sha256": "6356af1a248de8885c64488aa2279c3ef94871451c6140709659321c63a58ac9",
+    "git_blob": "8a4f076f26a240c4435b259662925b4253d9a53e"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-6.attempt-2.json": {
+    "sha256": "233d07325babb3684072863e9d98d31811051480432abf0f55263188a7ac74ec",
+    "git_blob": "0a213dffdf7bc596845a59de954993e50ae67ab0"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-7.attempt-2.json": {
+    "sha256": "c43cfa58e86be5a797c2ef07415c5659f0180215b0b7b93d3be1bdd4384da867",
+    "git_blob": "b87e99cba8ad9ec5442d45a9c8b1dcecbcee9429"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-8.attempt-2.json": {
+    "sha256": "149d7028381bb43df05ee23435e11ab7540f62365ecfe6d3e4111f73730b5777",
+    "git_blob": "6688dbaf60e107e6cb4094a24c0e7f1f0fe24372"
+   },
+   "closure-evidence/v2/Q4/chunks/chunk-9.attempt-2.json": {
+    "sha256": "978fb65b53d7c22a99e0aaebba57486d71bc6b619ad5a20b2434bdff52efe9d4",
+    "git_blob": "8370c12a414b31ba92cbc9ac72399b50cfbcd4fa"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-0.attempt-1.json": {
+    "sha256": "dd09642672216e4066732b1a1bd77003a1a4fbc69cda1f5cd228f2a0e25c37b7",
+    "git_blob": "c6cd6e090ee4f978a4a87d9de75003fdbfbf00d3"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-0.attempt-2.json": {
+    "sha256": "9f3656d1c62b10058dd391767e9e579b7a2db299e89c7fa5df5382ea413acd84",
+    "git_blob": "a4cf74a7b7b2fdc6bf27c1f3d2b4ff9b780c1626"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-1.attempt-1.json": {
+    "sha256": "01043dfe58d9196a11846e1d887240d9480fd49562b88e3737aaa98daff56972",
+    "git_blob": "5ea33341172a2e144a9c4e8af7f9963ce2f3fd77"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-1.attempt-2.json": {
+    "sha256": "b231d180f1fc54bb8db63ca578559a14279acec6082e129763a703264c4189ea",
+    "git_blob": "b4794e038c28f2a0d593291721b79d1a04c67fbe"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-2.attempt-1.json": {
+    "sha256": "790ac9a8a1ed6fbbf92ab6e8142dc4f08aba3a4cea0e909481588c44f831afeb",
+    "git_blob": "cbd9a5898b327207a7b9936d38fe54d079617957"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-2.attempt-2.json": {
+    "sha256": "20ca2262e9a320699af979449c907a98294328042f2b0316aaf179d199544520",
+    "git_blob": "27657dfa723f0e53d63f80209cf2f49f6c2a42e4"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-3.attempt-1.json": {
+    "sha256": "7f831bafffca0d650ade87ca76597e96913be99d568710fb3da7c5ca1ec31e0c",
+    "git_blob": "0ed6d20bc17532b6a6818db9cca17aa5276fbce6"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-3.attempt-2.json": {
+    "sha256": "09215ea03381eff8c6f661419ecc95634f9c45b5391af290ad12d7134dd2cfd2",
+    "git_blob": "0895660882d2b7162f202dfc9e607c1438ccab9e"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-4.attempt-1.json": {
+    "sha256": "d38d21afba4f0a02932c08e64f0c90b9e16359e682a6f70bc774aa224ddb0abb",
+    "git_blob": "5318e907e47c70573e733d5932ebe9723621ac3d"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-4.attempt-2.json": {
+    "sha256": "dd475bc9ecde3b91c378d2777a37b727486172b52c3379417f2e0d915e167782",
+    "git_blob": "8ae4abafdaded71270b5ac08b0c80cce2c06110e"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-5.attempt-1.json": {
+    "sha256": "ffd2be3c987927c031571b3d5e715abb24b7ab33efeb23bb7fc2d848a84d4a12",
+    "git_blob": "621c061e637edaf22f3809cbb513e3318323f5af"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-5.attempt-2.json": {
+    "sha256": "a6598c6a40abb49899711cb4f538d1010e26e299dad542cbdec9404a5ab13ce7",
+    "git_blob": "c926ea8549ad780355a62ca3a856145738768199"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-6.attempt-1.json": {
+    "sha256": "2e7c46b96ccd38e9975e300ba3e3720c45675450ffa2450ba271729a26746359",
+    "git_blob": "bc553d7d70974a270695fe891db824a303f0ce04"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-6.attempt-2.json": {
+    "sha256": "fab0e0faa0f3eec77f4e265ec6bc6fd2537c2c18e43958a982e1cbe24faada41",
+    "git_blob": "c7617826f4001858fb9597850d2438a8e1844e89"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-7.attempt-1.json": {
+    "sha256": "02de056e190dee8148b668051b6535bf8828ff2cf029c83d44bd6f702c354dbe",
+    "git_blob": "c481a7b55f37a66035c75adc80c0e4ef12b3c453"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-7.attempt-2.json": {
+    "sha256": "00ccfd886b2562d60753208f770ccf4b16c93894a568966fc06b6c48e70d4eea",
+    "git_blob": "f90c209b90657b88084c4ce2c2d0e48bb40a96fc"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-8.attempt-1.json": {
+    "sha256": "1082c10843cb5bde700a910c7643b71d940e7d1179c13f4bd024b76d39d0b98c",
+    "git_blob": "1f59cf2c7e1763b033cb2d7e79867a780f243866"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-8.attempt-2.json": {
+    "sha256": "523c7ca3328eda7248fcd9989abe09786760c120639e0553b0793ac5b35f35f4",
+    "git_blob": "5bb7a85279dedd5786f2c7c9ea706df25a3b48fb"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-9.attempt-1.json": {
+    "sha256": "d9c39a64b28b17fbf4fc4b95afd164fd1653c25952fb326e9e22ab3f58dea59d",
+    "git_blob": "112de3cdf2a5356fd763e35cc80f26ed5582bef0"
+   },
+   "closure-evidence/v2/Q4/owned/chunk-9.attempt-2.json": {
+    "sha256": "51be52267c7018e840a000dbc79a5aaf9659125d77714741ae9339e233887df5",
+    "git_blob": "6020c829945ef8fed378bb3147903adaa8cde076"
+   },
+   "closure-evidence/v2/Q5/CALIBRATION.json": {
+    "sha256": "61c289088b9ebe2feda3a25af375bc825ad43082e78e686ce8ba443096eebc7c",
+    "git_blob": "31161270a53b8d485a4f34ab3a6fbd3a3206fdd4"
+   },
+   "closure-evidence/v2/Q5/CONFORMANCE-end.json": {
+    "sha256": "ff6133a2a8128e62e9b8af0635ad9ea8978b121e3e26378c8d1155708d2480dd",
+    "git_blob": "8a049a2ac852bdd6e14c6b0fd87129f489a9519c"
+   },
+   "closure-evidence/v2/Q5/CONFORMANCE-start.json": {
+    "sha256": "de33db0aad948751a583d3fd7e9eba0043759b1bfe5ab3c800ba913e69321994",
+    "git_blob": "dee8764aca545efea4d46a9521f2ecc22facb413"
+   },
+   "closure-evidence/v2/Q5/CORPUS.json": {
+    "sha256": "131e91cc83e540a304ceba288291e9c29a71144cc17c97a09c33975ae63d4a81",
+    "git_blob": "d833dd98fd4e7d0de151e5b9c74cb8fceeea90b9"
+   },
+   "closure-evidence/v2/Q5/REPRODUCTION.json": {
+    "sha256": "5f0ba2f7e615b8a703ce6c824fb47c0c268bbabea9929b392c9fc88ce57087ce",
+    "git_blob": "14830e967db118e7b3e5e15884edb80130596c7b"
+   },
+   "closure-evidence/v2/Q5/SUBJECT.json": {
+    "sha256": "10c887a1af4e450592847ac9eadf5b69124b88c4aee948ed93393effc59fd5aa",
+    "git_blob": "43f035fa61d51b6b93cd9fa696753f536c662050"
+   },
+   "closure-evidence/v2/Q5/corpus/developer-outage-rollback.json": {
+    "sha256": "bdcd2e8af2929635e56403e1ac5c8ce84f3d986074174b858b1de36639faaa7b",
+    "git_blob": "5bcfeabcf64343f5fc157bf6eab1be4fdd5bd770"
+   },
+   "closure-evidence/v2/Q5/corpus/normal-completion.json": {
+    "sha256": "5c5e221e982b98a22ef4b9fc02746eaf2240c37a8c0babe97d1b52f8711ad2f4",
+    "git_blob": "8dc2ecb9bbb0f5fa5b0f076d77f09e4f9a3c7036"
+   },
+   "closure-evidence/v2/Q5/corpus/post-merge-regression.json": {
+    "sha256": "43d6416efb352f5a09d83ba937792772c73b1b7e287ae6fad49f3d0ffda53f52",
+    "git_blob": "656e0dd407dc1f59fb88302ec4a55d490754c6b6"
+   },
+   "closure-evidence/v2/Q5/corpus/pre-satisfied.json": {
+    "sha256": "77aecc2751923bc552954b9fcc0710bc649362035d0b82778ca448b4176fa362",
+    "git_blob": "785b8dce455afcbab52bd7144b34472a614cd2e5"
+   },
+   "closure-evidence/v2/Q5/corpus/retry-then-commit.json": {
+    "sha256": "1ff7a87fe1495e463f6394e9f9d6d9196d9e6364ed1ec0488e103baf1a7ff153",
+    "git_blob": "4b2d7529e5002565e516f2090f503c521a262a85"
+   },
+   "closure-evidence/v2/Q5/corpus/review-finding-rollback.json": {
+    "sha256": "ba4d790f6851164364e26cc0b6816836a9d3d9992a3628315c5a426f87e1f91a",
+    "git_blob": "f34191c7d9125925b797cc3189c0a616aa19d39d"
+   },
+   "closure-evidence/v2/Q5/corpus/security-finding-rollback.json": {
+    "sha256": "a7693de96f8a7dcd7ce4630febe94c646c116a9983edaddc27b5bf987ae50eb8",
+    "git_blob": "3f908d6406599a4b5eb5d2769b2be1c769df0c47"
+   },
+   "closure-evidence/v2/Q5/owned/calibration.attempt-1.json": {
+    "sha256": "4337638879a5434887e3fbf3b119544afb300bff0b5f26a28fbfedceeeb2561d",
+    "git_blob": "c6d18ea7fb149ff39445b5a1e188a1bff7b819e3"
+   },
+   "closure-evidence/v2/Q5/owned/record.attempt-1.json": {
+    "sha256": "ef379701d6bff4cf456cabd8f7e3726f294a1256d3ddf1bf5d4a8f94ab0e24a1",
+    "git_blob": "831aa6e6df02450481e2e496ea6f8b3e63aae34f"
+   },
+   "closure-evidence/v2/Q5/owned/reproduction.attempt-1.json": {
+    "sha256": "f714aff01fe48ac4f602256f584dda122f2ca46285a3e29093a90e5397d52833",
+    "git_blob": "17b117d4200aa0d85bb6d29e4363446f6c8ee02d"
+   },
+   "closure-evidence/v2/Q5/reproduction/developer-outage-rollback.json": {
+    "sha256": "6c6581d0aa0f5a106bc111203c41d666ed5af454e0d08c40ea084799984098c6",
+    "git_blob": "03cd24886989887dbed170c1a30ef6e4921baf70"
+   },
+   "closure-evidence/v2/Q5/reproduction/normal-completion.json": {
+    "sha256": "774bf1a80f3a25b53f5947b3df8b30185b3971896f44f876f0988febe43d0972",
+    "git_blob": "c118af5ddc2d1c690d783a139350bc0431ae9084"
+   },
+   "closure-evidence/v2/Q5/reproduction/post-merge-regression.json": {
+    "sha256": "8a8d7b93de83305a55cce4e26cf42949f56d37390a5ae9c2ffb223feda03b524",
+    "git_blob": "6ac8263a01de02b17fb8ccb3d0d833d914c5e5cb"
+   },
+   "closure-evidence/v2/Q5/reproduction/pre-satisfied.json": {
+    "sha256": "e899572ffe13196da82146bd000a5f7277fdee38e2c0fdd1007fbd987715364f",
+    "git_blob": "621f947abb9e5154555a505d68257c9fd3eab5dd"
+   },
+   "closure-evidence/v2/Q5/reproduction/retry-then-commit.json": {
+    "sha256": "fb16066af5a27e6ae61493cb5b4c75547b0f7da8d191c26f47641df1a69ccc55",
+    "git_blob": "8fcd7a421c50828fcbe23c462f35ddf024bca7d4"
+   },
+   "closure-evidence/v2/Q5/reproduction/review-finding-rollback.json": {
+    "sha256": "532ad930aa2eca04670ddc91f089f5b417187a3719d5a3e5ae1b9f10f34cc58c",
+    "git_blob": "43b7407414640facc0afd385cc5ee386af29cbd0"
+   },
+   "closure-evidence/v2/Q5/reproduction/security-finding-rollback.json": {
+    "sha256": "0cc7ee9d707f9bfc7e40017d2dc981895691db750d4a1afdc95953d18e02aa08",
+    "git_blob": "0279fffd8fbb4a69593e92405767810126e7715e"
+   },
+   "closure-evidence/v2/P10/CONFORMANCE-end.json": {
+    "sha256": "8c627a5c7658113459f41b0fdf1c3fb1f333e419c2dc3152872231a1ae220fbc",
+    "git_blob": "e7bc915215e1a1ca3ecc34d49ad69fc61022e6fb"
+   },
+   "closure-evidence/v2/P10/CONFORMANCE-start.json": {
+    "sha256": "4a312f96c1e863235b60f2e646dc22097bd203e50e53794ed42ddd8d94230043",
+    "git_blob": "3a916233de6139eb773b16612f710eeca6770f27"
+   },
+   "closure-evidence/v2/P10/LEDGERLOCK-REGRESSION.json": {
+    "sha256": "5a0d2bddf52824beca0d6afef7a5e7acb10810cb1e2481bdf36c61ca98a2ccd9",
+    "git_blob": "e6c3a0132354c061be9622388bc1ff9fe2159c1c"
+   },
+   "closure-evidence/v2/P10/WORKLOAD.json": {
+    "sha256": "d43211043dd141d388250eb756e2e6d40720093d8f091042944da4babd861463",
+    "git_blob": "3c45a9b26c68a089a8a0e3e7a1801f1d450b30eb"
+   },
+   "closure-evidence/v2/P10/attempt-1-ac77be3/ATTEMPT-1.json": {
+    "sha256": "882c546ea88c281161cbc1cce146bb53af7fa23b5488cbb8b22834a713f22ffb",
+    "git_blob": "30bbccacf09f331746634dc6f1824682e30d7781"
+   },
+   "closure-evidence/v2/P10/attempt-1-ac77be3/CONFORMANCE-end.json": {
+    "sha256": "eb48e7da32ae7e1f2393e646eca390c952464099611d30e355fc91663371d473",
+    "git_blob": "cee4ed8e28fb6b3db3bccc26d0a8775acd6c8865"
+   },
+   "closure-evidence/v2/P10/attempt-1-ac77be3/CONFORMANCE-start.json": {
+    "sha256": "ed28e342d90aa237ae6312126cb135a2f3c23e0fb7b5e05265a68c989e73d2f5",
+    "git_blob": "ed7de42073899f12219cacd4d15657d1b1a02061"
+   },
+   "closure-evidence/v2/P10/attempt-1-ac77be3/LEDGERLOCK-REGRESSION.json": {
+    "sha256": "f6e6c74700f16b57e196c8d2575ab67c5797eb89f444bd0afe22884643cdbed3",
+    "git_blob": "ce06142988e2dd6c9dd046198b312ce0f4e646b9"
+   },
+   "closure-evidence/v2/P10/attempt-1-ac77be3/WORKLOAD.json": {
+    "sha256": "614619a60353353d3b243ce00b43b5c2aface244622992f4b4d120f0acc99693",
+    "git_blob": "3404f570d5a66cf6563ff8f2dcdf1887e00fd9b1"
+   },
+   "closure-evidence/v2/P10/owned/run.attempt-1.json": {
+    "sha256": "67002a25f350d30f7f24e90114e4b3c87dcf98095fa443b4a54839a32a139594",
+    "git_blob": "8d895befc074f7902cd40611e24d39ca02727edd"
+   },
+   "closure-evidence/v2/P10/owned/run.attempt-2.json": {
+    "sha256": "67002a25f350d30f7f24e90114e4b3c87dcf98095fa443b4a54839a32a139594",
+    "git_blob": "8d895befc074f7902cd40611e24d39ca02727edd"
+   },
+   "closure-evidence/v2/P7-FINDING-001/CORRECTION.json": {
+    "sha256": "3da6d2a60e381613ea14670454a0a85e536606f750404dd1f2e0c3de85ee20e7",
+    "git_blob": "5b0c9d5f7caf9d2f3e80c3322ae65eb41dc60d5a"
+   },
+   "closure-evidence/v2/P7-FINDING-001/DIAGNOSIS.json": {
+    "sha256": "4904d97d7b62b9ec285c0e64cff94ad4d9bfde66ea168a2e5c2d1dd259c25e3a",
+    "git_blob": "ac2eae0c0dcab3acb5be58cffc5682c370b467a8"
+   },
+   "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.11-shard1.json": {
+    "sha256": "c8d27597693083dc86f803a21f2c71ecb5aeebd7b80cf10cd7dfaa2f37fc3bdd",
+    "git_blob": "07721d10258febf3d6a4899e14e6aed5277d7cbd"
+   },
+   "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.11-shard2.json": {
+    "sha256": "1a2e2a6b7dedaf6ce3db2229ebdff47617284c10eff6032466fd58f645f78119",
+    "git_blob": "84f5cbc8d9db99ceb8a33bcd2d0326a503f59597"
+   },
+   "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.11-shard3.json": {
+    "sha256": "2a0af81b5d6e8f797af36c2d55ef804de9b1ade3a5fed3c8d801a0dffb9271c9",
+    "git_blob": "d6432d29380572b04d3feb380bf6e34c81c1cd18"
+   },
+   "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.11-shard4.json": {
+    "sha256": "069f881c01e87747a7a9a57e88bcec00f1bfa037845899224da1f60aac4f65ca",
+    "git_blob": "19382bbd8ef90be746afdbc498d571daddbba871"
+   },
+   "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.12-shard1.json": {
+    "sha256": "8eb890d5fc47107beee6ea8f43006b3dabb2db02bf0fe8c28a4c623d91aba1ba",
+    "git_blob": "d01ab56c829cb036c4e34ca5082b98a65001df5b"
+   },
+   "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.13-shard1.json": {
+    "sha256": "80e36dcd5686d113ce3152f5631f62ab1eaeadc19cb06fc4f1580fe19cbf4447",
+    "git_blob": "0133dbb93d329c679d95065ab5f709b94900e925"
+   },
+   "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.14-shard1.json": {
+    "sha256": "0b3ed53dde3d08dd4ed29bfb7bd2f4f91a169a319ca608c36c3432c465ecc3ce",
+    "git_blob": "c251e2a2c43b32d74e5cbad2c0c283915a81a80f"
+   },
+   "closure-evidence/v2/P7-FINDING-001/PLATFORMS/windows-py3.11-shard1.json": {
+    "sha256": "e027e2c75f469a3524e6bd49985f5aecc2e785c3cbaf6e0712d45046cb30cade",
+    "git_blob": "90d5486def1d10dd01d2af582dc9a8abd321fbdf"
+   },
+   "closure-evidence/v2/P7-FINDING-001/REPRODUCER.json": {
+    "sha256": "5c3a1c13e2fd58450a5fd020724778c84aecd4790380556829c3a47b51ecf71a",
+    "git_blob": "bc2ac9ce0a6e06ff455170ab45f4bed4708d13b5"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.11-shard1.json": {
+    "sha256": "18e33c7372118002cf6994886b1cc125a96e6a31f03f4d8d03bbcd9ef87714ae",
+    "git_blob": "73ec008cbec995ca6201d37fc174ad7a74675137"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.11-shard2.json": {
+    "sha256": "6626bf7192827f55881d43dbee7e23ff9244e09fc3ba16cdd4cb0e80e012381d",
+    "git_blob": "052fc90cfde69d5d20294c0d66ab69afae0ae023"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.11-shard3.json": {
+    "sha256": "2a751a67e159f651b3caacf35897acbba2afddb9eb8c79024071072dae3c5297",
+    "git_blob": "d90ec0b29e9a4faeba0dc458d3d651787256b55d"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.11-shard4.json": {
+    "sha256": "1d453235ded74f1cd65e2d5342ba844b6621bd4c07f6bba060590f00bb54cb76",
+    "git_blob": "39a21f826c16eec006736e07a4f0b2ccf7eaae68"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.12-shard1.json": {
+    "sha256": "af4f2d35e1fc847e6539866b2f6c27394f07873138b8a9c942381e5dbf68061d",
+    "git_blob": "07b129a52775c5e787bfe1d925636d8048f7a2f7"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.13-shard1.json": {
+    "sha256": "cc40ee240629ce19f6afdff707a32a2dd5485a0a8ff083ef02bfe3470f21bfc1",
+    "git_blob": "cc66541618c1dd8112313062c863fb1cfb8eff1a"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.14-shard1.json": {
+    "sha256": "c5242ffc5a33d4d37ee62eefeb8a6ba5609229e7cba54b0ea3fefb50d386414a",
+    "git_blob": "039eda5a401d753c45212877bf4b2782ad224ef8"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/windows-py3.11-shard1.json": {
+    "sha256": "3b0f8afb49060afb89a1cf753a093f7d442810967dd456a17c5d8f6d2072b2be",
+    "git_blob": "9c15d60383b7c4b4c24a0f34ad60a810bad9c028"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.11-shard1.json": {
+    "sha256": "3c95c4fd96e313d473e9c6788d6681de5ad0705d8678c0a5f5805b4c25ad9872",
+    "git_blob": "e640d3e146f190bba7036a7ae44658f83ff679e1"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.11-shard2.json": {
+    "sha256": "c9f5d0b4e5c1d0933c94e300718c2ec92e51ca6776d020b982651ae2ff42c89c",
+    "git_blob": "2e368b06c73c9c2e6321e49aa89a042e5e1d263c"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.11-shard3.json": {
+    "sha256": "99d05977f399f589dbee19728d0bcaabb3d85effc27f5d9a10858f595e66c576",
+    "git_blob": "4de71d48eafb00674ac395cca6b031f290758d01"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.11-shard4.json": {
+    "sha256": "d6b9dcc3559d21b7854541d4505164e83204d5894838a3c74f141ac3cfed6ec8",
+    "git_blob": "15ee51ac202c6945e861fe91b1ec038854589431"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.12-shard1.json": {
+    "sha256": "f312ac78bf1201f6e617f19d237197cf94bae51559707f34adbb95577286f8e9",
+    "git_blob": "36f1dfadebe6633ed06ada67f0dfd58381853ab4"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.13-shard1.json": {
+    "sha256": "b3d5e3b5b0b51de61e31fcf4f7e514f36a7d4307f07203de2fe3af842082f44a",
+    "git_blob": "a0d0c23b236ebe748bd5bf0a5d82c88aff193177"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.14-shard1.json": {
+    "sha256": "b1521866a04f44283406814f592ffca24d492573c58d919ff30989bf49084fcc",
+    "git_blob": "0959f489051e90cbd89c52fa5a91adf55c04dc9f"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-windows-py3.11-shard1.json": {
+    "sha256": "6732c9c1fa6acba9244103c5e73fb225f3691d39274f6084f64c94b3b532b7d6",
+    "git_blob": "a8cd67c74060af614943daa54d54f9ae6f2456e5"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.11-shard1.json": {
+    "sha256": "bd4bd2df18a35b7ef784a37ff40c8a79736fba47acaefcb5e469749886d1f571",
+    "git_blob": "deed9f16497c3b7f5c1a0f8194e1d023a81a6388"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.11-shard2.json": {
+    "sha256": "85e6bfef51b3870ea5f69fe6c8cc66180d6585e3f04b933b6df7b7e54844f33b",
+    "git_blob": "8c9b0ab385de28154968f7c95294fd6c251ba3ff"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.11-shard3.json": {
+    "sha256": "b8fbf68bfa186a228833c5ab0434244626ebfe77895fa5d783e264a660665a3b",
+    "git_blob": "47cf5431d3280b3d023c8575dd84430a49570744"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.11-shard4.json": {
+    "sha256": "49af5c301d57e221d4fbe7c1a1fda9c2e0ae673ea5aee095908352ae947ff0f2",
+    "git_blob": "ed877a6d1347ec53939b200a39726a7c47729c36"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.12-shard1.json": {
+    "sha256": "53348989d40991f1a380d8206c156760ad658fb3a7053bd39d7110d8f653c429",
+    "git_blob": "6f39ade273dee1a0dccfc4f41e2817dc6c7a0a11"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.13-shard1.json": {
+    "sha256": "bb822e9819bd65355c791eeafd77472506cf5eba93ce81e75dadbf46e048ee1a",
+    "git_blob": "2bdcbf3cd68fef3960efbdc357208523ad59c334"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.14-shard1.json": {
+    "sha256": "7ef7026f0062eedd94abb35ee78afe609ac3b27450f527278b74589998d10b9a",
+    "git_blob": "b56284e17b32264756ff9bc4b7b27299c8030aeb"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/windows-py3.11-shard1.json": {
+    "sha256": "7c383023d6f2abb99ff0b3d61ccdb6777a4fe1e14d54e2ce3a85f70003c88a48",
+    "git_blob": "20bc6884b8ec3005ef23c7b863e1ce49231a8bc9"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard1.json": {
+    "sha256": "de93a3c051083453931087e071c703f8cd3cfdeda6c413ab7baacacf47866f38",
+    "git_blob": "70f904f4cd743f5a608c7976a0bc2e18790a9da2"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard2.json": {
+    "sha256": "871d21db1799d010c85ca44c612aaecdcdd69745ab63771cb0f27888ad1b5a07",
+    "git_blob": "a48aead94d5a82c1cee6552e34b8583280283ce7"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard3.json": {
+    "sha256": "83695c247fac8760ad3bc67d2893274be2fd1c8f41d4c58a9cca729871745dea",
+    "git_blob": "5d2df8bdcee573edebf51291a7f950260e5fd507"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard4.json": {
+    "sha256": "fdb9a37f9daaf6cd1483c41f50db845adc4b3ac051052374f2b682609bb156ec",
+    "git_blob": "665592c418dd8f2f2ba02dfac7d0a2846ce0e275"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.12-shard1.json": {
+    "sha256": "56fa049bf49701b16c0d339fd5aa2a076cf5f7d0be73b615bb326a30b387da66",
+    "git_blob": "a4bac1629ad35ea7a1a0f64195e3e1472351dca6"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.13-shard1.json": {
+    "sha256": "e9dfe9feec439213341990fcb4f0811712fe5688a82f50b9216b22dfe69f9d8b",
+    "git_blob": "b3e0520df3df816e0387baa5c2d14f6fb6977948"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.14-shard1.json": {
+    "sha256": "1244e0919e1d97fea739616e9b39e8ba0514ecb4f0ff0fbc86c884f610ed3ca7",
+    "git_blob": "e5a83889996515a1e0eb138e1e0b2d3f0767c698"
+   },
+   "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-windows-py3.11-shard1.json": {
+    "sha256": "ca3a78c2babed884231ac0f5ce6f5e28df59d8546ba67fc7658e701c15afcbe1",
+    "git_blob": "2432212700eeeb25a9006a06baecb67e425dd6c3"
+   },
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard1.json": {
+    "sha256": "a239f113ae77c762c7054bee99b05c76adda9cec1c40ddff1d2f9ee8cb1a3da2",
+    "git_blob": "4047c37aaa93b83fdc15eae89aae413980c67850"
+   },
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard2.json": {
+    "sha256": "b51a84423af3aee1350cec7a89ba3a0221b9efeac85ecf7a2de4fe08afba2967",
+    "git_blob": "73dcb1c1582fc30a0c358407f872a9dc4fabb96f"
+   },
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard3.json": {
+    "sha256": "dbfe9034fe197794d738090142332194495f7b1a0556115a1ac3ba648da4b597",
+    "git_blob": "ed51e72a28c7b6bd25e05a9ca597352bac6c6aec"
+   },
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard4.json": {
+    "sha256": "33d4be52ee8d244c915adac22aed795be81b92e99021ebb250366ae932def521",
+    "git_blob": "c56ea77ac6286ffcb0664089124378c44f28b235"
+   },
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.12-shard1.json": {
+    "sha256": "5653c19a07b9479b6a2e1b6f5f26b77f333e3c059f1c8f1d71ed9c92e54baa8f",
+    "git_blob": "55f0c5f65d169e60fe9210e197afcda36081f097"
+   },
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.13-shard1.json": {
+    "sha256": "94ab969e4bb2756ddb4416ba957c62412642cbe13a8b5556db9577ab50660a50",
+    "git_blob": "0b08cc9d340a2ea2c5fa2c59ff84f1a65a78a49d"
+   },
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.14-shard1.json": {
+    "sha256": "e8e23b382e68f2e923b43ba6c048efa5c82c41d3405ae93d041f9a2cd2044895",
+    "git_blob": "a0f6a91710e20f95f0f0a89bcec66537752eb65e"
+   },
+   "closure-evidence/v2/P7-FINDING-001/diag-orch9-windows-py3.11-shard1.json": {
+    "sha256": "2a2d9715d31aa19c0f18751842935593b331387d3a18cea185a67a1c092d8c12",
+    "git_blob": "47df8b353d867b464945d947c4f6c9705e918124"
+   }
+  },
+  "trees": {
+   "closure-evidence/v2/Q0-Q3": [
+    "closure-evidence/v2/Q0-Q3/INVALIDATION.json",
+    "closure-evidence/v2/Q0-Q3/PLATFORMS/linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/PLATFORMS/linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/PLATFORMS/linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/PLATFORMS/linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/PLATFORMS/windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/Q0/Q0-darwin-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/Q0/Q0-linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/Q0/Q0-linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/Q0/Q0-linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/Q0/Q0-linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/Q0/Q0-windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/Q1/Q1-darwin-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/Q1/Q1-linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/Q1/Q1-linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/Q1/Q1-linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/Q1/Q1-linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/Q1/Q1-windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/Q2/Q2-darwin-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/Q2/Q2-linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/Q2/Q2-linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/Q2/Q2-linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/Q2/Q2-linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/Q2/Q2-windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/Q3/Q3-darwin-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/Q3/Q3-linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/Q3/Q3-linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/Q3/Q3-linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/Q3/Q3-linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/Q3/Q3-windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/SUMMARY.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/darwin-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/PLATFORMS/windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-darwin-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q0/Q0-windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-darwin-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q1/Q1-windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-darwin-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q2/Q2-windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-darwin-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-linux-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-linux-py3.12.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-linux-py3.13.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-linux-py3.14.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/Q3/Q3-windows-py3.11.json",
+    "closure-evidence/v2/Q0-Q3/invalidated-9f825f5/SUMMARY.json"
+   ],
+   "closure-evidence/v2/Q4": [
+    "closure-evidence/v2/Q4/CALIBRATION-post-run-ae5ffb1.json",
+    "closure-evidence/v2/Q4/CALIBRATION.json",
+    "closure-evidence/v2/Q4/CONFORMANCE-end.json",
+    "closure-evidence/v2/Q4/CONFORMANCE-start.json",
+    "closure-evidence/v2/Q4/DIFFERENTIAL.json",
+    "closure-evidence/v2/Q4/RESOURCES.json",
+    "closure-evidence/v2/Q4/SUBJECT.json",
+    "closure-evidence/v2/Q4/attempt-1-b755455/ATTEMPT-1.json",
+    "closure-evidence/v2/Q4/attempt-1-b755455/CONFORMANCE-end.json",
+    "closure-evidence/v2/Q4/attempt-1-b755455/CONFORMANCE-start.json",
+    "closure-evidence/v2/Q4/attempt-1-b755455/DIFFERENTIAL.json",
+    "closure-evidence/v2/Q4/attempt-1-b755455/RESOURCES.json",
+    "closure-evidence/v2/Q4/attempt-1-b755455/SUBJECT.json",
+    "closure-evidence/v2/Q4/chunks/chunk-0.attempt-2.json",
+    "closure-evidence/v2/Q4/chunks/chunk-1.attempt-2.json",
+    "closure-evidence/v2/Q4/chunks/chunk-2.attempt-2.json",
+    "closure-evidence/v2/Q4/chunks/chunk-3.attempt-2.json",
+    "closure-evidence/v2/Q4/chunks/chunk-4.attempt-2.json",
+    "closure-evidence/v2/Q4/chunks/chunk-5.attempt-2.json",
+    "closure-evidence/v2/Q4/chunks/chunk-6.attempt-2.json",
+    "closure-evidence/v2/Q4/chunks/chunk-7.attempt-2.json",
+    "closure-evidence/v2/Q4/chunks/chunk-8.attempt-2.json",
+    "closure-evidence/v2/Q4/chunks/chunk-9.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-0.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-0.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-1.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-1.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-2.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-2.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-3.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-3.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-4.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-4.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-5.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-5.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-6.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-6.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-7.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-7.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-8.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-8.attempt-2.json",
+    "closure-evidence/v2/Q4/owned/chunk-9.attempt-1.json",
+    "closure-evidence/v2/Q4/owned/chunk-9.attempt-2.json"
+   ],
+   "closure-evidence/v2/Q5": [
+    "closure-evidence/v2/Q5/CALIBRATION.json",
+    "closure-evidence/v2/Q5/CONFORMANCE-end.json",
+    "closure-evidence/v2/Q5/CONFORMANCE-start.json",
+    "closure-evidence/v2/Q5/CORPUS.json",
+    "closure-evidence/v2/Q5/REPRODUCTION.json",
+    "closure-evidence/v2/Q5/SUBJECT.json",
+    "closure-evidence/v2/Q5/corpus/developer-outage-rollback.json",
+    "closure-evidence/v2/Q5/corpus/normal-completion.json",
+    "closure-evidence/v2/Q5/corpus/post-merge-regression.json",
+    "closure-evidence/v2/Q5/corpus/pre-satisfied.json",
+    "closure-evidence/v2/Q5/corpus/retry-then-commit.json",
+    "closure-evidence/v2/Q5/corpus/review-finding-rollback.json",
+    "closure-evidence/v2/Q5/corpus/security-finding-rollback.json",
+    "closure-evidence/v2/Q5/owned/calibration.attempt-1.json",
+    "closure-evidence/v2/Q5/owned/record.attempt-1.json",
+    "closure-evidence/v2/Q5/owned/reproduction.attempt-1.json",
+    "closure-evidence/v2/Q5/reproduction/developer-outage-rollback.json",
+    "closure-evidence/v2/Q5/reproduction/normal-completion.json",
+    "closure-evidence/v2/Q5/reproduction/post-merge-regression.json",
+    "closure-evidence/v2/Q5/reproduction/pre-satisfied.json",
+    "closure-evidence/v2/Q5/reproduction/retry-then-commit.json",
+    "closure-evidence/v2/Q5/reproduction/review-finding-rollback.json",
+    "closure-evidence/v2/Q5/reproduction/security-finding-rollback.json"
+   ],
+   "closure-evidence/v2/P10": [
+    "closure-evidence/v2/P10/CONFORMANCE-end.json",
+    "closure-evidence/v2/P10/CONFORMANCE-start.json",
+    "closure-evidence/v2/P10/LEDGERLOCK-REGRESSION.json",
+    "closure-evidence/v2/P10/WORKLOAD.json",
+    "closure-evidence/v2/P10/attempt-1-ac77be3/ATTEMPT-1.json",
+    "closure-evidence/v2/P10/attempt-1-ac77be3/CONFORMANCE-end.json",
+    "closure-evidence/v2/P10/attempt-1-ac77be3/CONFORMANCE-start.json",
+    "closure-evidence/v2/P10/attempt-1-ac77be3/LEDGERLOCK-REGRESSION.json",
+    "closure-evidence/v2/P10/attempt-1-ac77be3/WORKLOAD.json",
+    "closure-evidence/v2/P10/owned/run.attempt-1.json",
+    "closure-evidence/v2/P10/owned/run.attempt-2.json"
+   ],
+   "closure-evidence/v2/P7-FINDING-001": [
+    "closure-evidence/v2/P7-FINDING-001/CORRECTION.json",
+    "closure-evidence/v2/P7-FINDING-001/DIAGNOSIS.json",
+    "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.11-shard2.json",
+    "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.11-shard3.json",
+    "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.11-shard4.json",
+    "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.12-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.13-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/PLATFORMS/linux-py3.14-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/PLATFORMS/windows-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/REPRODUCER.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.11-shard2.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.11-shard3.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.11-shard4.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.12-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.13-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/linux-py3.14-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/PLATFORMS/windows-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.11-shard2.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.11-shard3.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.11-shard4.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.12-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.13-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-linux-py3.14-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-9cdf4e3/diag-orch9-windows-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.11-shard2.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.11-shard3.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.11-shard4.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.12-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.13-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/linux-py3.14-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/PLATFORMS/windows-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard2.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard3.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard4.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.12-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.13-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.14-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-windows-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard2.json",
+    "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard3.json",
+    "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.11-shard4.json",
+    "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.12-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.13-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/diag-orch9-linux-py3.14-shard1.json",
+    "closure-evidence/v2/P7-FINDING-001/diag-orch9-windows-py3.11-shard1.json"
+   ]
+  }
+ },
+ "rules": [
+  "R1 parent: the Cycle-2 line starts at the Cycle-1 semantic candidate 7114177 (aisef2 tree 4d6081); a Cycle-2 candidate is a commit whose aisef2 tree differs from it and that passes this guard.",
+  "R2 probe: the Cycle-1 probe sources (aisef2/probe/protocol.py, aisef2/probe/python_callable.py) stay byte-identical to the parent's blobs, so probe.python_callable keeps digest 1961e84d… and every Cycle-1 ProductProofSpec / semantic_hash stays bound to it (DECISION-6).",
+  "R3 evidence: every file of the immutable set is byte-identical (CRLF-normalised) and no file is added to or removed from a Cycle-1 evidence tree; a mutation is restored from history, never accepted.",
+  "R4 identities: Cycle-2 code lives in new modules (a second probe identity never edits a Cycle-1 one) and Cycle-2 evidence under closure-evidence/v2/cycle2/; a Cycle-2 record names its own commit and aisef2 tree and never reuses a Cycle-1 identity.",
+  "R5 seals: the P4/P5/P6 seals and the P7/P8/P9/P10 acceptances are never re-signed, re-generated or re-interpreted; a Cycle-2 acceptance is a new record.",
+  "R6 catalogue: exactly one active probe per subject kind compiles (F4); a superseded identity stays registered for the evidence bound to it (aisef2/probe/catalog.py).",
+  "R7 guard: if a Cycle-2 change would require editing a frozen item (F1–F11), the probe protocol or ProbeResult shape, the harness/subject split, enforcement or execution-status semantics, owner routing or the compiler contract: STOP and draft an Architecture Exception; nothing is implemented around it."
+ ],
+ "owner_decisions": {
+  "path": "closure-evidence/v2/cycle2/OWNER-DECISIONS.json",
+  "sha256": "bf48abe90a26faf558bdb770e7e448b70bf87d9acbf67cdea3829bd5f5d8dc5c",
+  "ids": [
+   "DECISION-1",
+   "DECISION-2",
+   "DECISION-3",
+   "DECISION-4",
+   "DECISION-5",
+   "DECISION-6"
+  ]
+ },
+ "cycle2_manifest": {
+  "path": "docs/implementation/v2/cycle2/cycle2-manifest.json",
+  "sha256_at_freeze": "c3beacc57afc8b3e0a2e3f102f4fdcaba22d4d91c9366bef012345fc806cbb15",
+  "architecture_baseline_must_equal": [
+   "cycle1_semantic_candidate",
+   "cycle1_aisef2_tree",
+   "cycle1_closing_commit",
+   "cycle1_probe"
+  ]
+ }
+}

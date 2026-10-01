@@ -1,0 +1,89 @@
+UP035 [*] Import from `collections.abc` instead: `Iterable`
+ --> ledgerlock/store.py:6:1
+  |
+4 | import tempfile
+5 | from pathlib import Path
+6 | from typing import Iterable
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Import from `collections.abc`
+  |
+5 | from pathlib import Path
+  - from typing import Iterable
+6 + from collections.abc import Iterable
+7 |
+  |
+
+SIM115 Use a context manager for opening files
+  --> ledgerlock/store.py:16:11
+   |
+14 | def write_atomic(path: str | Path, lines: Iterable[bytes]) -> None:
+15 |     target = Path(path)
+16 |     tmp = tempfile.NamedTemporaryFile(
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+17 |         mode="wb",
+18 |         dir=target.parent,
+   |
+
+F401 [*] `os` imported but unused
+ --> tests/test_store.py:1:8
+  |
+1 | import os
+  |        ^^
+2 | import tempfile
+3 | import unittest
+  |
+help: Remove unused import: `os`
+  |
+  - import os
+1 | import tempfile
+  |
+
+SIM117 [*] Use a single `with` statement with multiple contexts instead of nested `with` statements
+  --> tests/test_store.py:45:13
+   |
+43 |               path = Path(d) / "out.jsonl"
+44 |               path.write_bytes(b"ORIGINAL\n")
+45 | /             with mock.patch(
+46 | |                 "ledgerlock.store.os.replace", side_effect=OSError("boom")
+47 | |             ):
+48 | |                 with self.assertRaises(OSError):
+   | |________________________________________________^
+49 |                       store.write_atomic(path, [b"NEW\n"])
+50 |               self.assertEqual(path.read_bytes(), b"ORIGINAL\n")
+   |
+help: Combine `with` statements
+   |
+46 |                 "ledgerlock.store.os.replace", side_effect=OSError("boom")
+   -             ):
+   -                 with self.assertRaises(OSError):
+   -                     store.write_atomic(path, [b"NEW\n"])
+47 +             ), self.assertRaises(OSError):
+48 +                 store.write_atomic(path, [b"NEW\n"])
+49 |             self.assertEqual(path.read_bytes(), b"ORIGINAL\n")
+   |
+
+SIM117 [*] Use a single `with` statement with multiple contexts instead of nested `with` statements
+  --> tests/test_store.py:63:13
+   |
+61 |                   raise OSError("simulated crash")
+62 |
+63 | /             with mock.patch(
+64 | |                 "ledgerlock.store.os.replace", side_effect=fake_replace
+65 | |             ):
+66 | |                 with self.assertRaises(OSError):
+   | |________________________________________________^
+67 |                       store.write_atomic(target, [b"line\n"])
+   |
+help: Combine `with` statements
+   |
+64 |                 "ledgerlock.store.os.replace", side_effect=fake_replace
+   -             ):
+   -                 with self.assertRaises(OSError):
+   -                     store.write_atomic(target, [b"line\n"])
+65 +             ), self.assertRaises(OSError):
+66 +                 store.write_atomic(target, [b"line\n"])
+67 |
+   |
+
+Found 5 errors.
+[*] 4 fixable with the `--fix` option.

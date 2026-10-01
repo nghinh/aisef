@@ -1,0 +1,152 @@
+{
+ "generated": "2026-09-18T10:57:57+0700",
+ "level": "W1",
+ "workload": "LedgerLock",
+ "candidate": "af94372dd1861e2fcac1c5f6e3c4102efa27e829",
+ "runs": {
+  "1": {
+   "classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "stories_done": 11,
+   "stories_total": 16,
+   "safety_violations": [],
+   "false_pass": 0,
+   "false_block": 0,
+   "manual_state_repair": 0,
+   "orphan_state": 0,
+   "drift_records": 0,
+   "oracle_mapping_errors": 0,
+   "oracle_not_executed": 0,
+   "oracle_passed_completely": false,
+   "oracle_results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "PASSED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "FAILED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "FAILED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "FAILED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "FAILED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "FAILED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "FAILED"
+   },
+   "oracle_parse_complete": true,
+   "cost_cap_status": "UNVERIFIABLE",
+   "usage": {
+    "sessions": 74,
+    "turns": 1733,
+    "input_tokens_fresh": 128476781,
+    "input_tokens_cached": 0,
+    "output_tokens": 513000
+   },
+   "phase_ok": true
+  },
+  "2": {
+   "classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "stories_done": 0,
+   "stories_total": 16,
+   "safety_violations": [],
+   "false_pass": 0,
+   "false_block": 0,
+   "manual_state_repair": 0,
+   "orphan_state": 0,
+   "drift_records": 0,
+   "oracle_mapping_errors": 0,
+   "oracle_not_executed": 0,
+   "oracle_passed_completely": false,
+   "oracle_results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "SKIPPED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "SKIPPED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "SKIPPED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "SKIPPED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "SKIPPED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "SKIPPED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "SKIPPED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "SKIPPED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "SKIPPED"
+   },
+   "oracle_parse_complete": true,
+   "cost_cap_status": "UNVERIFIABLE",
+   "usage": {
+    "sessions": 19,
+    "turns": 309,
+    "input_tokens_fresh": 23936975,
+    "input_tokens_cached": 0,
+    "output_tokens": 136000
+   },
+   "phase_ok": true
+  },
+  "3": {
+   "classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+   "stories_done": 2,
+   "stories_total": 16,
+   "safety_violations": [],
+   "false_pass": 0,
+   "false_block": 0,
+   "manual_state_repair": 0,
+   "orphan_state": 0,
+   "drift_records": 0,
+   "oracle_mapping_errors": 0,
+   "oracle_not_executed": 0,
+   "oracle_passed_completely": false,
+   "oracle_results": {
+    "TestAcceptance::test_14_1_verify_exits_0_on_a_fresh_ledger": "FAILED",
+    "TestAcceptance::test_14_2_snapshot_is_byte_deterministic": "FAILED",
+    "TestAcceptance::test_14_3_apply_batch_commits_atomically": "FAILED",
+    "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption": "FAILED",
+    "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover": "FAILED",
+    "TestAcceptance::test_14_6_no_third_party_imports_at_runtime": "FAILED",
+    "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli": "FAILED",
+    "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value": "FAILED",
+    "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts": "FAILED"
+   },
+   "oracle_parse_complete": true,
+   "cost_cap_status": "UNVERIFIABLE",
+   "usage": {
+    "sessions": 25,
+    "turns": 435,
+    "input_tokens_fresh": 31868689,
+    "input_tokens_cached": 0,
+    "output_tokens": 149000
+   },
+   "phase_ok": true
+  }
+ },
+ "A_kernel_safety": {
+  "criterion": "0 framework safety violations across every valid run",
+  "runs_measured": 3,
+  "per_run_safety_violations": {
+   "1": [],
+   "2": [],
+   "3": []
+  },
+  "totals": {
+   "false_pass": 0,
+   "manual_state_repair": 0,
+   "orphan_state": 0,
+   "drift_records": 0,
+   "oracle_mapping_errors": 0
+  },
+  "framework_failure_runs": [],
+  "every_run_measurable": true,
+  "holds": true
+ },
+ "B_delivery_reliability": {
+  "criterion": "at least one DELIVERY_COMPLETE run, and every such run passes the hidden oracle completely",
+  "delivery_complete_runs": [],
+  "oracle_complete_on_those": [],
+  "stories_done": {
+   "1": "11/16",
+   "2": "0/16",
+   "3": "2/16"
+  },
+  "holds": false
+ },
+ "C_hidden_oracle_correctness": {
+  "criterion": "every oracle check executed and classified; no red discarded, no skip counted as a pass",
+  "parse_complete_every_run": true,
+  "mapping_errors": 0,
+  "not_executed_on_a_complete_delivery": 0,
+  "holds": true
+ },
+ "D_w1_qualified": false,
+ "separation_rule": "kernel safety and model/route delivery reliability are separate verdicts; a legitimate model/project stop is not a kernel defect, and kernel safety is not delivery reliability"
+}

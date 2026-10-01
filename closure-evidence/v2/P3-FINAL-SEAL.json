@@ -1,0 +1,482 @@
+{
+ "record": "AISEF V2 — P3 FINAL SEAL",
+ "id": "P3-FINAL-SEAL",
+ "authority": "AISEF V2 — OWNER ACCEPTS P3 / AUTHORIZE P4 STORY / RUN TRANSACTION (owner decision, 2026-09-22)",
+ "owner_acceptance": "P3 is ACCEPTED and COMPLETE",
+ "completion_record": {
+  "path": "closure-evidence/v2/P3-COMPLETION.json",
+  "sha256": "1ebae76d509755176ea80f784bc932eea876f2def59315c278508b9f52dbdc8e",
+  "committed_in": "8d17039acb5ce1fc0c67878710171b12ac1d3065",
+  "verdict": "P3 COMPLETE",
+  "status_now": "accepted by the owner; sealed here; kept byte-identical"
+ },
+ "p3_candidate": {
+  "commit": "c1bf748b886f3dad94ea7be2e144571100ca2ece",
+  "tree": "07401011be5ee1aa6a37409fce61b0a870908c8b",
+  "aisef2_tree": "9cb86e43f141f71e1f03a1487e7ef828b062692a",
+  "journal_tree": "4812f7f90ef0b6b14f3321662c563eb6e57846b3",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "aisef2_and_reference_models_unchanged_since": true
+ },
+ "journal_format": {
+  "version": 1,
+  "modules": {
+   "aisef2/journal/event.py": "b28d384b6002785098a62ff0e00e865cac6a47ef0481d72d7e271a79095996a1",
+   "aisef2/journal/compat.py": "524c3693e1bf2679bd8e786df459f956623ac8945f77b6027dcdb5c3ff7cea9e",
+   "aisef2/journal/writer.py": "7e78eabc9a520dc33221ccaa31bf758d4c1571d93e9c76a4faa91a263d76730a",
+   "aisef2/journal/fold.py": "4fa87887544aaa78c9c3a81898bbdd1b298fb5509be2ab3cd3642ad773b987e8"
+  },
+  "writable_types": [
+   "failure/observed",
+   "gate/check",
+   "gate/decision",
+   "plan/frozen",
+   "probe/evaluated",
+   "provider/request",
+   "run/begin",
+   "run/dispose-begin",
+   "run/end",
+   "run/interrupted",
+   "story/admitted",
+   "story/begin",
+   "story/commit",
+   "story/dispose",
+   "story/end",
+   "story/plan-drift",
+   "story/retry",
+   "story/rollback"
+  ],
+  "unwritable_until_a_format_bump": [
+   "capability/resolved",
+   "invariant/violated",
+   "plan/static-admitted",
+   "proof/verified",
+   "provider/result",
+   "run/spec-resolved",
+   "story/resource-acquired",
+   "story/resource-released",
+   "tests/adequacy",
+   "tool/invoked",
+   "tool/result"
+  ],
+  "storage": "one canonical JSON line per event: {chain, event}; chain_n = sha256(chain_n-1 ‖ event_id_n) from GENESIS; UTF-8, LF",
+  "sample_event_id": "883690ccb0fae2e7cd54e3eec24cf99e0f07d6b3a400520f59d0606dd72bd067",
+  "immutable": "format 1 is frozen here: P4 may add a format through the frozen compatibility mechanism only"
+ },
+ "projections": {
+  "story_state": {
+   "version": 1,
+   "module": "aisef2/journal/projections/story_state.py",
+   "sha256": "3457c7bbf806cd7b6f8ed1878f7d2e44bbaf8c19a6cf437f87aadef64416a40b"
+  },
+  "failure_owner": {
+   "version": 1,
+   "module": "aisef2/journal/projections/failure_owner.py",
+   "sha256": "2fe8594069deefc41ebca8d158f2385df1801d8281c8d63731c3c0bfbec055b6"
+  },
+  "budgets": {
+   "version": 1,
+   "module": "aisef2/journal/projections/budgets.py",
+   "sha256": "aa4bf32303d8877928556ddaf6a2712d6c74916108be009c7e783a5d2e921c17"
+  },
+  "retry_target": {
+   "version": 1,
+   "module": "aisef2/journal/projections/retry_target.py",
+   "sha256": "d3f99e65389729f3ad4961076c52fdead5ca8b0f7151ef1a8b46610ef6d175cd"
+  },
+  "terminal_state": {
+   "version": 1,
+   "module": "aisef2/journal/projections/terminal_state.py",
+   "sha256": "3c77d50eb462cbaf72c4e8ad350060f0391b47be940e68ef00e241a471d345c3"
+  },
+  "qualification_counters": {
+   "version": 1,
+   "module": "aisef2/journal/projections/qualification_counters.py",
+   "sha256": "962962a899edc000044e4bfa2c9fe8f988036503cdc480ec10d3c3948196634c"
+  }
+ },
+ "projection_registry": {
+  "module": "aisef2/journal/projections/__init__.py",
+  "sha256": "4e370e87175beedf2329f1cf47cf9942dffe1edd51635f208bb33466cb56aaef"
+ },
+ "projection_semantics": {
+  "path": "docs/implementation/v2/P3-PROJECTION-SEMANTICS.md",
+  "sha256": "2cc00c1b23995d36418bd48d1cc773be1b2b9cd6fe75c43c5d0dcd455326b384"
+ },
+ "reference_models": {
+  "story_state": {
+   "module": "tests/v2/refmodel/story_state.py",
+   "sha256": "59ac5ff53206ecdcc648ad5843d3ecd94ab8f4db33812e5fe4c64d3ab02af77d"
+  },
+  "failure_owner": {
+   "module": "tests/v2/refmodel/failure_owner.py",
+   "sha256": "c3d541480d934b59923ea7de90aa76fb0fa5c023b6c1bbcb7a0facb09302d9a4"
+  },
+  "budgets": {
+   "module": "tests/v2/refmodel/budgets.py",
+   "sha256": "1817560322e0f76f5cf60cd105deb18be026a4bea331c58356e014878f15490a"
+  },
+  "retry_target": {
+   "module": "tests/v2/refmodel/retry_target.py",
+   "sha256": "0e9025ca46915f953fe64df425897c872ca1863f4adafb87143265f0a8ccf0bb"
+  },
+  "terminal_state": {
+   "module": "tests/v2/refmodel/terminal_state.py",
+   "sha256": "da06421d0c00009fdc66355384c907fcff05473f29a41d2a1e0812f2dea6c6de"
+  },
+  "qualification_counters": {
+   "module": "tests/v2/refmodel/qualification_counters.py",
+   "sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50"
+  },
+  "package": {
+   "module": "tests/v2/refmodel/__init__.py",
+   "sha256": "c703b38b04b094f9f12b9a25d72eb4efe3d4c998af7750614dd01c9a0e705bbb"
+  },
+  "independence_rule": {
+   "path": "validation/v2/refmodel_independence.py",
+   "sha256": "b7e6935c08af1581277280498ec370a5db881f03f6269ef3a844f84d59134884"
+  }
+ },
+ "architecture_lineage": {
+  "links": [
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "sha256": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+    "rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
+    "freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "sha256": "eaeb3130e2eefe9aa294bd0d88115aa5715d4313504351fc8988af7e00820b73",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+    "frozen_items_changed": [
+     "F2"
+    ],
+    "rfc_normative_digest": "564057137d0f5cd364b2d35cb03fb79f9b184a10cdf41f279410f461ff875708",
+    "freeze_table_digest": "6ea7e312e15acc02d649134e7732b9ee14069098b966813f8fa2bdc943a3600a"
+   },
+   {
+    "record": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "sha256": "eb1b9f1108fcf68a6079ef704dbaeeb23baf13a8fd38e71c7ad1c60f8477517f",
+    "exception": "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+    "frozen_items_changed": [
+     "F5"
+    ],
+    "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+    "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114"
+   }
+  ],
+  "lineage_valid": true,
+  "effective": {
+   "rfc_normative_digest": "1133dd2de2fd9f8edcf5663f7df7d27d1ae6d8a20ca4a23ed32fd704c256fab3",
+   "freeze_table_digest": "529f5986520e82b79930670ea23f597bc2225ba46bbeb8d002eb75ec85b8a114"
+  },
+  "equals_lineage_end": true,
+  "rfc_last_changed_by": "8a3a7cc95395c2a160fdbbde7895434394c12a6c"
+ },
+ "mutation": {
+  "path": "closure-evidence/v2/P3-MUTATION.json",
+  "sha256": "9343c2e36c8a244db8d2d6db03c32bd31c115ed18bc0e4d07d25921bfad29746",
+  "targets": 52,
+  "mutants": 1738,
+  "killed": 1730,
+  "audited_equivalent": {
+   "tests/v2/refmodel/budgets.py::model L56 True->False": "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict never decides anything",
+   "tests/v2/refmodel/qualification_counters.py::metrics L15 element 0 dropped": "`pre` is read only through len(pre): a one-element tuple per entry counts the same",
+   "tests/v2/refmodel/qualification_counters.py::metrics L15 element 1 dropped": "`pre` is read only through len(pre): a one-element tuple per entry counts the same",
+   "tests/v2/refmodel/qualification_counters.py::model L41 sorted() -> list()": "`unplanned` is read only for truthiness and inside the refusal message",
+   "tests/v2/refmodel/qualification_counters.py::model L44 sorted() -> list()": "`misplaced` is read only for truthiness and inside the refusal message",
+   "tests/v2/refmodel/story_state.py::_TABLE L18 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+   "tests/v2/refmodel/story_state.py::_TABLE L19 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+   "tests/v2/refmodel/story_state.py::_TABLE L20 False->True": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None"
+  },
+  "journal_fold_projection_targets_fully_killed": true
+ },
+ "checker_calibration": {
+  "calibrated": 24,
+  "checkers": 24
+ },
+ "attempt_history": {
+  "path": "closure-evidence/v2/P3-RUN-HISTORY.json",
+  "sha256_at_seal": "0b1234e22875110c409907da446734ad393df516dba5d92713e5dfce981acbab",
+  "total_attempts": 43,
+  "failed_attempts": 2,
+  "failed": [
+   {
+    "seq": 19,
+    "commit": "88b9554aa8aa",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS"
+   },
+   {
+    "seq": 27,
+    "commit": "fa5175c61305",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "HARNESS"
+   }
+  ],
+  "erased_attempts": 0,
+  "retries": 0,
+  "committed_versions_checked": 7,
+  "orphan_processes_after_each_local_suite": {
+   "fdc6827": null,
+   "f097ba1": 0,
+   "5bff6eb": 0,
+   "c6b9053": 0,
+   "88b9554": 0,
+   "fa5175c": 0,
+   "c1bf748": 0,
+   "8d17039": 0
+  },
+  "gate_green": {
+   "c1bf748b886f": true,
+   "8d17039acb5c": true
+  },
+  "closed": "sealed at total_attempts: run_history.py --check fails if an entry is added or removed",
+  "seal_commit_verification": "the seal cannot contain its own verification; the seal commit's local and CI attempts are the first entries of P4-RUN-HISTORY.json"
+ },
+ "f1_f11": {
+  "current_phase": "P3",
+  "summary": {
+   "PASS": 8,
+   "PENDING": 3,
+   "FAIL": 0
+  },
+  "items": {
+   "F1": "PASS",
+   "F2": "PASS",
+   "F3": "PASS",
+   "F4": "PASS",
+   "F5": "PASS",
+   "F6": "PASS",
+   "F7": "PASS",
+   "F8": "PENDING",
+   "F9": "PENDING",
+   "F10": "PENDING",
+   "F11": "PASS"
+  }
+ },
+ "v1_evidence_identity": {
+  "detective_guard": true,
+  "guard": {
+   "path": "validation/v2/v1_evidence_guard.py",
+   "sha256": "2a3135e9669101894f8b334f5fa15d7fb73ed3435e5d79c50fdf3cd451148ede"
+  },
+  "baseline": {
+   "path": "closure-evidence/v2/V1-EVIDENCE-BASELINE.json",
+   "sha256": "4bb690ffdc7fd1b36a8f7ae69e65b8a38a5248fe837d59fc91a7bd60314717fb"
+  },
+  "w0_qualification_byte_identical": true,
+  "w0_sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_unchanged": true
+ },
+ "v1_pf_001": {
+  "status": "OPEN_IN_V1",
+  "v2_resolution_owner": "WP-4.2",
+  "recurrences_in_p3": 0,
+  "ci_attempts_searched": 35,
+  "search": "_kill_tree_win32|MemoryError in every CI job log"
+ },
+ "carried_p4_residuals": [
+  {
+   "id": "P2-RESIDUAL-ORPHAN-SUBJECT",
+   "to": "WP-4.2",
+   "what": "harness/subject processes orphaned (parent PID 1) and left running: validation/v2/mutation.py stops only its direct child on timeout (subprocess.run(timeout=)), and a harness whose controller dies is not reaped — no process-range containment yet"
+  },
+  {
+   "id": "P2-RESIDUAL-SIGNAL-SOURCE",
+   "to": "WP-4.6",
+   "what": "a harness process killed by a signal after DISPATCHED is UNRUNNABLE: the probe cannot tell whether the subject or the environment sent the signal; this is not the expiry of the observation window"
+  },
+  {
+   "id": "V1-PF-001",
+   "to": "WP-4.2",
+   "what": "latent V1 _kill_tree_win32 PID-cycle defect; WIN-PID-1/2"
+  },
+  {
+   "id": "P3-RESIDUAL-DISPOSAL-ORDER",
+   "to": "WP-4.3 / WP-4.6",
+   "what": "format 1 accepts run/dispose-begin and run/end while a story is still RUNNING or holds a pending outcome; §18's every-story-reported rule belongs to the synthetic closers and typed residuals"
+  }
+ ],
+ "exit_checks": [
+  {
+   "check": "plan_validate: zero problems, generated docs in sync",
+   "command": "python -P validation/v2/plan_validate.py --validate --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "generated artefacts in sync"
+  },
+  {
+   "check": "PLANDEP-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 32"
+  },
+  {
+   "check": "PLANDEP-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANDEP-3: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-3",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANDEP-4: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANDEP-4",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 6"
+  },
+  {
+   "check": "PLANSEM-1: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANSEM-1",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 1"
+  },
+  {
+   "check": "PLANSEM-2: negative fixture must FAIL",
+   "command": "python -P validation/v2/plan_validate.py --validate --fixture PLANSEM-2",
+   "expected_exit": 1,
+   "exit": 1,
+   "ok": true,
+   "last_line": "total problems: 4"
+  },
+  {
+   "check": "freeze manifest: RFC digests equal the end of the approval lineage",
+   "command": "python -P validation/v2/freeze_manifest.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "freeze manifest: PASS"
+  },
+  {
+   "check": "architecture catalog --check",
+   "command": "python -P validation/v2/gen_arch_catalog.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "architecture catalog: PASS"
+  },
+  {
+   "check": "F1-F11 conformance at CURRENT_PHASE=P3 (ratchet)",
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "summary {'PASS': 8, 'PENDING': 3, 'FAIL': 0} | ratchet violations 0"
+  },
+  {
+   "check": "Q0 checker calibration",
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "calibrated 24/24; always-PASS mutants rejected 24/24"
+  },
+  {
+   "check": "compiler --check",
+   "command": "python -P validation/v2/gen_specs.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "specs: PASS"
+  },
+  {
+   "check": "P1 evidence records current",
+   "command": "python -P validation/v2/p1_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p1 evidence: PASS"
+  },
+  {
+   "check": "P2 evidence records current",
+   "command": "python -P validation/v2/p2_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p2 evidence: PASS"
+  },
+  {
+   "check": "P3 evidence records current, every property true",
+   "command": "python -P validation/v2/p3_evidence.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "p3 evidence: PASS"
+  },
+  {
+   "check": "mutation records current (P1-P3); every target killed or its survivor audited equivalent",
+   "command": "python -P validation/v2/mutation.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "mutation: PASS"
+  },
+  {
+   "check": "kernel static checks",
+   "command": "python -P validation/v2/kernel_static_checks.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "kernel static checks: PASS"
+  },
+  {
+   "check": "reference models import nothing of the implementation",
+   "command": "python -P validation/v2/refmodel_independence.py",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "refmodel independence: PASS"
+  },
+  {
+   "check": "run history: P1, P2 and P3 sealed, append-only, policy-consistent",
+   "command": "python -P validation/v2/run_history.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "run history: PASS"
+  },
+  {
+   "check": "V1 evidence guard, detective",
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "expected_exit": 0,
+   "exit": 0,
+   "ok": true,
+   "last_line": "V1 evidence guard (DETECTIVE): PASS"
+  }
+ ],
+ "architecture_exceptions": [
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-001",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-002",
+   "status": "APPROVED — APPLIED"
+  }
+ ],
+ "unapproved_architecture_exceptions": [],
+ "stop_rules_triggered": [],
+ "p4": {
+  "authorization": "AISEF V2 — OWNER ACCEPTS P3 / AUTHORIZE P4 STORY / RUN TRANSACTION (owner decision, 2026-09-22): P4 authorized after this seal; P5 not authorized",
+  "started_at_seal": false
+ },
+ "verdict": "P3 FINAL SEALED"
+}

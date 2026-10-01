@@ -55,6 +55,24 @@ MARK = {
     Outcome.NOT_APPLICABLE: "–",
 }
 
+#: The kernel's typed STAGE / SESSION outcomes (docs/ASSURANCE-KERNEL.md §4). A stage returns one of these, never a
+#: boolean or a sentence; the story loop routes on them; `StoryOutcome.terminal` is one of them.
+class StageOutcome(str, Enum):
+    PASS = "PASS"
+    QUALITY_BLOCK = "QUALITY_BLOCK"            # the work is wrong — the developer's
+    UNRUNNABLE = "UNRUNNABLE"                  # a verifier said nothing (cut, moved tree, no structured verdict) — retry THAT stage
+    ENVIRONMENT_FAILURE = "ENVIRONMENT_FAILURE"  # tool missing, context window, permission, provider cost cap — never quality
+    INFRA_FAILURE = "INFRA_FAILURE"            # provider cut, 5xx, rate limit, dead child, ledger lock — retried on the infra budget
+    AUTH_FAILURE = "AUTH_FAILURE"              # credential rejected — fatal, free
+    NOOP = "NOOP"                              # the session wrote nothing — F1 decides on a FRESH verdict
+    PLAN_CONFLICT = "PLAN_CONFLICT"            # stuck / deadlock — the owner's
+    HUMAN_REQUIRED = "HUMAN_REQUIRED"
+    ISOLATION_BREACH = "ISOLATION_BREACH"      # trunk written from inside a story — fatal
+    MERGE_CONFLICT = "MERGE_CONFLICT"
+    ORPHANED = "ORPHANED"
+    BUDGET = "BUDGET"                          # the kernel's cost cap — typed terminal, uncharged
+
+
 DEFAULT_REASON = {
     Outcome.FAILED: "failed",
     Outcome.UNRUNNABLE: "cannot run — environment not set up, not a red test",
@@ -91,6 +109,7 @@ class Check:
     detail: str = ""
     kind: str = ""
     evidence: list[int] = field(default_factory=list)
+    data: dict = field(default_factory=dict)   # typed payload a consumer may read (SS-32); `detail` stays prose for humans
 
     def __post_init__(self) -> None:
         if isinstance(self.outcome, bool):
@@ -115,4 +134,4 @@ class Check:
     def as_dict(self) -> dict:
         return {"name": self.name, "outcome": self.outcome.value, "passed": self.passed,
                 "skipped": self.skipped, "detail": self.detail,
-                "kind": self.kind, "evidence": list(self.evidence)}
+                "kind": self.kind, "evidence": list(self.evidence), **({"data": self.data} if self.data else {})}

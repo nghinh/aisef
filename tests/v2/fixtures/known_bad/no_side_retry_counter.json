@@ -1,0 +1,9 @@
+{
+ "checker": "no_side_retry_counter",
+ "package": "WP-4.5",
+ "kind": "kernel_source",
+ "rule": "NO_SIDE_RETRY_COUNTER",
+ "path": "aisef2/control/engine.py",
+ "source": "class Engine:\n    def on_failure(self, story):\n        self.retries[story] += 1\n",
+ "expect": "NO_SIDE_RETRY_COUNTER aisef2/control/engine.py:3"
+}

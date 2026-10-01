@@ -381,3 +381,27 @@ class TestGioiHanTanSuatChoTruocKhiThuLai(unittest.TestCase):
         from aisef.clients.stream import MAX_RETRY_DELAY_SECONDS, retry_delay_seconds
         r = RunResult(ok=False, error="retry after 86400s")
         self.assertEqual(retry_delay_seconds(r), MAX_RETRY_DELAY_SECONDS)
+
+
+class TestExitStatusBranches(unittest.TestCase):
+    """Phase 13 mutants of `exit_status_of`: each classification has a witness that only its own clause explains."""
+
+    def _r(self, error="", raw=None, permission_limited=False):
+        r = RunResult(ok=False, error=error, raw_result=raw or {})
+        if permission_limited:
+            r.denials = ["WebSearch"]          # `permission_limited` is derived: denials without a guard block
+        return r
+
+    def test_max_cost_alone_is_cost(self):
+        self.assertEqual(exit_status_of(self._r(error="stopped: max_cost reached")), "cost")
+
+    def test_a_429_status_alone_and_rate_limit_text_alone_are_rate_limit(self):
+        self.assertEqual(exit_status_of(self._r(error="request failed", raw={"api_error_status": "429"})), "rate_limit")
+        self.assertEqual(exit_status_of(self._r(error="rate limit exceeded, retry later")), "rate_limit")
+
+    def test_a_connection_message_alone_is_infra(self):
+        self.assertEqual(exit_status_of(self._r(error="connection reset by peer")), "infra")
+
+    def test_permission_limited_and_plain_error(self):
+        self.assertEqual(exit_status_of(self._r(error="tool denied", permission_limited=True)), "permission")
+        self.assertEqual(exit_status_of(self._r(error="something else")), "error")

@@ -1,0 +1,57 @@
+FFF................F................F................
+======================================================================
+FAIL: test_a_red_run_that_never_executed_the_story_tests_is_not_tdd_red (__main__.S4_TddCountsUnrunnableAsRed.test_a_red_run_that_never_executed_the_story_tests_is_not_tdd_red)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py", line 34, in test_a_red_run_that_never_executed_the_story_tests_is_not_tdd_red
+    self.assertIsNot(m.outcome, Outcome.PASSED)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly identical: <Outcome.PASSED: 'passed'>
+
+======================================================================
+FAIL: test_an_environment_failure_is_not_a_red_run (__main__.S4_TddCountsUnrunnableAsRed.test_an_environment_failure_is_not_a_red_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py", line 22, in test_an_environment_failure_is_not_a_red_run
+    self.assertIsNot(m.outcome, Outcome.PASSED)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly identical: <Outcome.PASSED: 'passed'>
+
+======================================================================
+FAIL: test_a_red_parent_run_is_not_proof_without_named_tests (__main__.S5_NoCriteriaAnyRedAtParent.test_a_red_parent_run_is_not_proof_without_named_tests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py", line 44, in test_a_red_parent_run_is_not_proof_without_named_tests
+    self.assertIsNot(m.outcome, Outcome.PASSED)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly identical: <Outcome.PASSED: 'passed'>
+
+======================================================================
+FAIL: test_an_aborted_baseline_cannot_prove_nothing_regressed (__main__.S6_BaselineAbortedCollection.test_an_aborted_baseline_cannot_prove_nothing_regressed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py", line 56, in test_an_aborted_baseline_cannot_prove_nothing_regressed
+    self.assertIsNot(m.outcome, Outcome.PASSED)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly identical: <Outcome.PASSED: 'passed'>
+
+======================================================================
+FAIL: test_a_skipped_ac_test_is_not_a_verified_criterion (__main__.S7_LedgerSkippedIsNotVerified.test_a_skipped_ac_test_is_not_a_verified_criterion)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/closure-evidence/hardening/w1/ss81/repro_S4_S5_S6_S7_siblings.py", line 73, in test_a_skipped_ac_test_is_not_a_verified_criterion
+    self.assertNotEqual(str(getattr(ac, "status", "")).lower(), "verified", "a skipped test verified nothing")
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'verified' == 'verified' : a skipped test verified nothing
+
+----------------------------------------------------------------------
+Ran 53 tests in 0.069s
+
+FAILED (failures=5)
+S4b TDD: Outcome.PASSED | 
+
+S4 TDD: Outcome.PASSED | 
+S5 nop(acceptance=0): Outcome.PASSED | test suite red at parent SHA cha0000 — story declares no criteria, not compared by code
+S6 baseline: Outcome.PASSED | 
+S7 ledger: {'AC-S-01-1': 'verified', 'FR-1': 'verified'}
+exit=1

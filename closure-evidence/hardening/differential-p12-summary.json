@@ -1,0 +1,87 @@
+{
+ "phase": 12,
+ "source": "validation/p12_integrity.py (this summary is derived from phase12/integrity.json — one consolidation)",
+ "chunks": 10,
+ "traces": 100000,
+ "matched": 100000,
+ "unexplained": 0,
+ "unexplained_historical": 0,
+ "unexplained_note": "historical = mismatches as the chunks recorded them (a chunk record is never edited); effective = after the targeted re-run of the minimum affected seed set following a registered fix superseded a seed's verdict with rows",
+ "reruns": {
+  "seeds": 0,
+  "matched": 0,
+  "mismatched": 0
+ },
+ "elapsed_s": 23110.0,
+ "model_transitions": 729414,
+ "real_stage_events": 487000,
+ "known_deviations": [],
+ "kernel_by_chunk": {
+  "00000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+  "10000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+  "20000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+  "30000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+  "40000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+  "50000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+  "60000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+  "70000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+  "80000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd",
+  "90000": "ac11bc7a1a351bc77a2fbfabe7ed7f171918fecd"
+ },
+ "seed_ranges": [
+  "00000",
+  "10000",
+  "20000",
+  "30000",
+  "40000",
+  "50000",
+  "60000",
+  "70000",
+  "80000",
+  "90000"
+ ],
+ "workers": 8,
+ "candidate_kernel_evidence": {
+  "chunks_on_the_candidate": [
+   "50000",
+   "60000",
+   "70000",
+   "80000",
+   "90000"
+  ],
+  "seeds_direct": 50000,
+  "seeds_rerun_on_the_candidate": 0,
+  "seeds_with_candidate_kernel_evidence": 50000,
+  "seeds_resting_on_the_measured_diff": 50000,
+  "kernel_classes": {
+   "10000": "NOT_AVAILABLE",
+   "20000": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "30000": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "40000": "DERIVABLE_FROM_RAW_EVIDENCE",
+   "50000": "DIRECTLY_RECORDED",
+   "60000": "DIRECTLY_RECORDED",
+   "70000": "DIRECTLY_RECORDED",
+   "80000": "DIRECTLY_RECORDED",
+   "90000": "DIRECTLY_RECORDED"
+  }
+ },
+ "manifest": {
+  "path": "closure-evidence/hardening/phase12/PHASE12-DATASET-MANIFEST.json",
+  "pass": true,
+  "kernel_digests": [
+   "4359f347378e84fcac2d213128c7c26f282c13c0"
+  ]
+ },
+ "invariant_violations": 0,
+ "exceptions": 0,
+ "silent_skips": 0,
+ "coverage": {
+  "reachable_transitions": 26,
+  "reachable_total": 26,
+  "typed_outcomes": 10,
+  "fault_kinds": "28/28",
+  "compound_pairs": "378/378"
+ },
+ "pass": true,
+ "traces_per_s": 4.33
+}

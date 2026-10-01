@@ -1,0 +1,177 @@
+{
+ "item": "post-merge-regression",
+ "status": "GREEN",
+ "errors": {
+  "replay_request_mismatch": 0,
+  "assert_consumed_failure": 0,
+  "tool_diff": 0,
+  "subprocess_diff": 0,
+  "workspace_diff": 0,
+  "probe_product_diff": 0,
+  "control_diff": 0,
+  "capability_mismatch": 0,
+  "harness_error": 0,
+  "invariant_violation": 0,
+  "exception": 0,
+  "residual_process": 0
+ },
+ "journal_diffs": [],
+ "journal_events": {
+  "expected": 143,
+  "observed": 143
+ },
+ "tool_ledger": [
+  {
+   "index": 0,
+   "tool": "scan",
+   "story_id": "S0",
+   "input_digest": {
+    "expected": "a319bbd5309226547fef72153bdc41a9d8384a581223398ebc4e33a8570fddf3",
+    "observed": "a319bbd5309226547fef72153bdc41a9d8384a581223398ebc4e33a8570fddf3"
+   },
+   "expected_result": {
+    "exit_code": 0,
+    "report_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "executed": true
+   },
+   "observed_result": {
+    "exit_code": 0,
+    "report_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "executed": true
+   },
+   "differing_fields": [],
+   "verdict": "MATCH"
+  },
+  {
+   "index": 1,
+   "tool": "scan",
+   "story_id": "S2",
+   "input_digest": {
+    "expected": "03746108660cd556c65e4a5d6219bac10185d2825cc970dd000c71a5c65c8fae",
+    "observed": "03746108660cd556c65e4a5d6219bac10185d2825cc970dd000c71a5c65c8fae"
+   },
+   "expected_result": {
+    "exit_code": 0,
+    "report_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "executed": true
+   },
+   "observed_result": {
+    "exit_code": 0,
+    "report_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "executed": true
+   },
+   "differing_fields": [],
+   "verdict": "MATCH"
+  }
+ ],
+ "tool_executions": 2,
+ "tool_diffs": 0,
+ "subprocesses": {
+  "expected": {
+   "probe": 17,
+   "tests": 6,
+   "tool": 2,
+   "worktree": 4,
+   "scratch": 2
+  },
+  "observed": {
+   "probe": 17,
+   "tests": 6,
+   "tool": 2,
+   "worktree": 4,
+   "scratch": 2
+  }
+ },
+ "subprocess_diffs": 0,
+ "probe_product_diffs": 0,
+ "workspace": {
+  "initial": {
+   "expected": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "observed": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866",
+   "diff": []
+  },
+  "final": {
+   "expected": "cda0adbf757d843fde2113ff337ead44d875aaadc146aa904aaff63aff0680a9",
+   "observed": "cda0adbf757d843fde2113ff337ead44d875aaadc146aa904aaff63aff0680a9",
+   "tip_expected": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+   "tip_observed": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+   "diff": []
+  }
+ },
+ "model_calls": {
+  "expected": 4,
+  "observed": 4,
+  "request_hash_mismatches": 0,
+  "consumption": {
+   "expected": 4,
+   "consumed": 4,
+   "missing_unconsumed": [],
+   "extra_requests": [],
+   "duplicate_consumptions": 0,
+   "mismatches": 0,
+   "ok": true
+  },
+  "drift_total": 0,
+  "drift_bound": 0
+ },
+ "outcomes": {
+  "expected": {
+   "S0": [
+    "COMMIT"
+   ],
+   "S2": [
+    "ROLLBACK"
+   ]
+  },
+  "observed": {
+   "S0": [
+    "COMMIT"
+   ],
+   "S2": [
+    "ROLLBACK"
+   ]
+  }
+ },
+ "network": {
+  "guarded": true,
+  "socket_attempts": 0
+ },
+ "replay_failure": null,
+ "notes": [],
+ "model_requests": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "d2f3e4a762222071b688d22ec2c2893a9995917477d23e2d4a74d3a7b236e376",
+   "matched": 1,
+   "replay_item_digest": "19ccb72034cfd7f953e0006a15cbc226863562390b08bc2bc03aa031ac7b73d1",
+   "drift": 0
+  },
+  {
+   "seq": 2,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "21722db4ec4195f35f5b1e8842a0d0a43bce66b6cda88ade1632da6af65a7cca",
+   "matched": 2,
+   "replay_item_digest": "651bbfea8cf8937c722e76edcde0e87674a7df4b51e1a2630ef22ff227ea2423",
+   "drift": 0
+  },
+  {
+   "seq": 3,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "fe4d1cc96d117939ab4b3ffd29d421ad01457e52f515c9dbe091342f316274bb",
+   "matched": 3,
+   "replay_item_digest": "ff6ba91b433326b301e0c570b8cbac76348fe7c507413cc8eb5ea185140f01e8",
+   "drift": 0
+  },
+  {
+   "seq": 4,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "da9b2879947d208c17a1fd8f4e99d88efa62492a8be5749bbd3fae50decce3fd",
+   "matched": 4,
+   "replay_item_digest": "aff84e774f3b017e2e1f7dfce6de06db7f56fea3a5133c045c6cd5f028ed4997",
+   "drift": 0
+  }
+ ],
+ "expected_ledger_digest": "a21b7af5013b0fabe882c762ef050a070fa1a0bd2c7a57d765ccac7f5eb68f7f",
+ "kernel_tree_after": "37bf6457f350dd720a2214f04f3896c554ad0904"
+}

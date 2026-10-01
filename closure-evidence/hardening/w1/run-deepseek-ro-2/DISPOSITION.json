@@ -1,0 +1,179 @@
+{
+ "generated": "2026-09-19T20:10:58+0700",
+ "run": "deepseek-ro-2",
+ "profile": "PROFILE-W1-OC-DEEPSEEKV4PRO-T80-RO",
+ "profile_id": "sha256:9f99ce5b057d229403c89e1958c41ee044dc977cd6fce9854b741f8ba691d147",
+ "valid_run": true,
+ "valid_because": "provider preflight PASS; fresh trunk; prepare verified the frozen kernel and the profile digest; mapping errors 0; repair 0; orphan 0; drift 0; terminal model/project state with no provider interruption",
+ "run_classification": "LEGITIMATE_MODEL_PROJECT_STOP",
+ "delivery_complete": false,
+ "progress": {
+  "done": 11,
+  "total": 16
+ },
+ "stories": {
+  "STORY-01-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-02": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-03": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-04": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-05": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-01-06": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-02-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-02-02": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-03-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-03-02": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-04-01": {
+   "status": "done",
+   "attempts": 1
+  },
+  "STORY-04-02": {
+   "status": "failed",
+   "attempts": 1
+  }
+ },
+ "stop": {
+  "story": "STORY-04-02",
+  "attempt_1": "review PASS, security PASS, tests/lint PASS; gate TDD + tests verify story FAILED: AC-STORY-04-02-1 (wrong positional count -> exit 2) and AC-STORY-04-02-6 (snapshot without --out -> exit 2) were already green at the parent 9203f29 (argparse, delivered by STORY-04-01)",
+  "attempts_2_3": "two developer sessions (55 and 35 turns) wrote nothing; the kernel charged them as no-op INFRA and BLOCKED the story `2 no-op sessions in a row`"
+ },
+ "block_legitimacy_measured": {
+  "method": "the only candidate, 96e5133e, extracted into the qualification workspace; 20-line ledger; line 17 mutated out of band; ledgerlock.cli.main",
+  "results": {
+   "clean": [
+    0,
+    0
+   ],
+   "value-tamper": [
+    5,
+    5
+   ],
+   "non-json": [
+    2,
+    2
+   ],
+   "json-list [1,2,3]": [
+    1,
+    1
+   ],
+   "json-number 42": [
+    1,
+    1
+   ],
+   "json-string \"x\"": [
+    1,
+    1
+   ],
+   "json {}": [
+    5,
+    5
+   ]
+  },
+  "verdict": "the refused candidate violates FR-12 (non-JSON corruption exits 2; wrong-type JSON crashes with exit 1 — 'Any other exit code is a bug'), although the reviewer passed it; the kernel's refusal (for a different reason) kept defective code out of trunk — NOT a false BLOCK",
+  "ss95_candidate_audit": {
+   "false_block_count": 0,
+   "candidate": {
+    "STORY-04-02": {
+     "sha": "96e5133ec0de3a4af73e59cb4d02ce84496ad725",
+     "parse_complete": true,
+     "note": null
+    }
+   }
+  }
+ },
+ "oracle_at_trunk": {
+  "false_pass_count": 0,
+  "mapping_error_count": 0,
+  "red_classes": {
+   "INCOMPLETE_DELIVERY_EXPECTED_RED": 9
+  }
+ },
+ "false_block_count": 0,
+ "manual_state_repair": 0,
+ "orphan_state_count": 0,
+ "drift_records": [],
+ "resumes_forced": 2,
+ "run_metrics": {
+  "developer_agent_runs": 14,
+  "developer_retries": 0,
+  "reviewer_executions": 12,
+  "reviewer_retries": 0,
+  "security_executions": 12,
+  "security_retries": 0,
+  "max_turn_events": 0,
+  "human_arbitrations_during_the_run": 0,
+  "stories_done": 11,
+  "stories_failed": [
+   "STORY-04-02"
+  ],
+  "stories_never_started": 4,
+  "false_block": [],
+  "false_block_count": 0,
+  "false_block_measurable_for": [
+   "STORY-01-01",
+   "STORY-01-02",
+   "STORY-01-03",
+   "STORY-01-05",
+   "STORY-01-06",
+   "STORY-02-01",
+   "STORY-02-02",
+   "STORY-03-01",
+   "STORY-03-02",
+   "STORY-04-01",
+   "STORY-04-02"
+  ]
+ },
+ "turns": {
+  "developer_sessions": 14,
+  "max": 55,
+  "max_turn_events": 0,
+  "distribution": [
+   14,
+   15,
+   15,
+   16,
+   18,
+   19,
+   22,
+   22,
+   25,
+   26,
+   26,
+   27,
+   35,
+   55
+  ]
+ },
+ "runtime_seconds": 8403.6,
+ "output_tokens_logged_by_the_kernel": 68282,
+ "cost_usd_reported": 0.0
+}

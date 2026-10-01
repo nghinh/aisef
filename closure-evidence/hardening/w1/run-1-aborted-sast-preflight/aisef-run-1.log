@@ -1,0 +1,1 @@
+run wave: ✗ verification tools missing where they will run — `tools.sast` = `bandit -q -r .` — MISSING in aisef-verify-python:b2c7afff2aed: exit 127 — fix the environment (`aisef doctor`) before paying for a session (D-028)

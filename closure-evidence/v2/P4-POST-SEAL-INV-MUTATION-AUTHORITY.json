@@ -1,0 +1,694 @@
+{
+ "record": "AISEF V2 — P4 POST-SEAL HYGIENE: INV-MUTATION-AUTHORITY ENFORCED",
+ "authority": "AISEF V2 — POST-SEAL HYGIENE / INV-MUTATION-AUTHORITY ENFORCEMENT (owner authorization, 2026-09-24)",
+ "invariant": {
+  "id": "INV-MUTATION-AUTHORITY",
+  "text": "Mutation, fault injection, test failure, probe result, or implementation-under-test output MUST NOT expand host-side destructive authority. Authority to kill, delete, clean, release, terminate, or mutate external resources MUST come exclusively from an independently established controller view.",
+  "recorded_in": "docs/implementation/v2/P4-LIFETIME-SEMANTICS.md (explanatory; RFC untouched)"
+ },
+ "p4_verdict": "UNCHANGED — P4 remains ACCEPTED / FINAL SEALED (closure-evidence/v2/P4-FINAL-SEAL.json, commit 89606c419ae72edbf3e383cc8efd3efc2fc65eeb); this record adds enforcement evidence and modifies no sealed artefact",
+ "p4_final_seal": {
+  "commit": "89606c419ae72edbf3e383cc8efd3efc2fc65eeb",
+  "sha256": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+  "verdict": "P4 FINAL SEALED"
+ },
+ "hygiene_commit": {
+  "commit": "7d195a5700d7eea4be342386546ced9b80b8ab3b",
+  "tree": "b9e2f55cd8074f7496119d90959e0bb7bc8fe485",
+  "files_changed_since_seal": [
+   "closure-evidence/v2/P5-RUN-HISTORY.json",
+   "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json",
+   "docs/implementation/v2/P4-LIFETIME-SEMANTICS.md",
+   "tests/v2/fixtures/known_bad/destructive_authority.json",
+   "tests/v2/p0/test_destructive_authority.py",
+   "tests/v2/p4/test_mutation_safety.py",
+   "tests/v2/p4/test_process_range.py",
+   "validation/v2/checker_calibration.py",
+   "validation/v2/cleanup_authority.py",
+   "validation/v2/destructive_authority.py",
+   "validation/v2/destructive_sites.json"
+  ]
+ },
+ "byte_identity": {
+  "aisef2_tree": {
+   "at_seal": "2e082bef0fb9039335c01926cc9772915b0a2a24",
+   "at_hygiene": "2e082bef0fb9039335c01926cc9772915b0a2a24"
+  },
+  "aisef_v1_tree": {
+   "at_seal": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "at_hygiene": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "p4_final_seal": {
+   "path": "closure-evidence/v2/P4-FINAL-SEAL.json",
+   "sha256_at_seal": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e",
+   "sha256_at_hygiene": "921c119e87156ff8d1c1ee9d65ebb0fe6fba6c2a5c5087cad4794f246dad6d7e"
+  },
+  "rfc": {
+   "path": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
+   "identical": true
+  },
+  "amendments_and_approval": {
+   "closure-evidence/v2/AISEF-V2-ARCHITECTURE-APPROVAL.json": true,
+   "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json": true,
+   "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json": true,
+   "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json": true,
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json": true,
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json": true,
+   "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json": true
+  },
+  "sealed_p4_evidence": {
+   "closure-evidence/v2/P4-COMPLETION.json": true,
+   "closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json": true,
+   "closure-evidence/v2/P4-MUTATION.json": true,
+   "closure-evidence/v2/P4-RUN-HISTORY.json": true,
+   "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json": true
+  },
+  "v1_evidence": {
+   "baseline_identical": true,
+   "hardening_dir_identical": true,
+   "w0_sha256": "a14c2f58083bd32dc7b7c3ce5e35bb22a4bba9e745d109538a877464df21fba3"
+  },
+  "all_identical": true
+ },
+ "scope_boundary": {
+  "aisef2_changed": false,
+  "rfc_changed": false,
+  "sealed_evidence_changed": false,
+  "v1_evidence_changed": false
+ },
+ "destructive_site_audit": {
+  "sites": 30,
+  "pass": 30,
+  "rows": [
+   {
+    "file": "aisef2/runtime/process_range.py",
+    "line": 257,
+    "scope": "_Job.signal",
+    "operation": "self.terminate",
+    "target": "self",
+    "target_kind": "process",
+    "authority_source": "DELEGATION",
+    "derivation": "the job signals by terminating itself: _Job.terminate is the ledgered site",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "aisef2/runtime/process_range.py",
+    "line": 260,
+    "scope": "_Job.abort",
+    "operation": "self.terminate",
+    "target": "self",
+    "target_kind": "process",
+    "authority_source": "DELEGATION",
+    "derivation": "abort delegates to _Job.terminate",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "aisef2/runtime/process_range.py",
+    "line": 160,
+    "scope": "_Posix.signal",
+    "operation": "os.killpg",
+    "target": "self.group",
+    "target_kind": "process_group",
+    "authority_source": "CONTROLLER_CREATED_PROCESS_GROUP",
+    "derivation": "self.group is the anchor's pid, adopted from the controller's own Popen (adopt(self._anchor.pid)); the anchor leads the session the controller started it in",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "aisef2/runtime/process_range.py",
+    "line": 170,
+    "scope": "_Posix.abort",
+    "operation": "os.killpg",
+    "target": "anchor.pid",
+    "target_kind": "process_group",
+    "authority_source": "CONTROLLER_CREATED_PID",
+    "derivation": "the pid of the anchor Popen the controller created, passed as a subprocess.Popen parameter",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "aisef2/runtime/process_range.py",
+    "line": 271,
+    "scope": "_Job.terminate",
+    "operation": "self._k.TerminateJobObject",
+    "target": "self.handle",
+    "target_kind": "job",
+    "authority_source": "CONTROLLER_CREATED_HANDLE",
+    "derivation": "the job handle the controller created (CreateJobObjectW) and holds",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "aisef2/runtime/range_anchor.py",
+    "line": 34,
+    "scope": "_die",
+    "operation": "os.killpg",
+    "target": "os.getpgrp()",
+    "target_kind": "process_group",
+    "authority_source": "CONTROLLER_CREATED_PROCESS_GROUP",
+    "derivation": "the anchor's own group: the controller starts it with start_new_session=True, so the group is the anchor's session and nothing else",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "aisef2/runtime/story_scope.py",
+    "line": 182,
+    "scope": "Directory.release",
+    "operation": "shutil.rmtree",
+    "target": "self.path",
+    "target_kind": "path",
+    "authority_source": "SCOPE_OWNED_PATH",
+    "derivation": "the path the scope registered at construction; Directory is constructed nowhere in aisef2, so no tool, probe or story output ever names it",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "validation/v2/checker_calibration.py",
+    "line": 242,
+    "scope": "_cleanup_authority.clean",
+    "operation": "child.kill",
+    "target": "child",
+    "target_kind": "process",
+    "authority_source": "CONTROLLER_CREATED_HANDLE",
+    "derivation": "the calibration's own subprocess.Popen child",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "validation/v2/cleanup_authority.py",
+    "line": 185,
+    "scope": "signal_member",
+    "operation": "os.kill",
+    "target": "member.pid",
+    "target_kind": "process",
+    "authority_source": "INDEPENDENT_HOST_TABLE",
+    "derivation": "a claimed pid proved by prove_member(): in a group whose leader is proved the runner's, born after the boundary",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "validation/v2/cleanup_authority.py",
+    "line": 218,
+    "scope": "signal_owned",
+    "operation": "os.killpg",
+    "target": "leader.pid",
+    "target_kind": "process_group",
+    "authority_source": "INDEPENDENT_HOST_TABLE",
+    "derivation": "leader comes from owned(): the authority's own host table, parent chain to the runner, born after the boundary, leader of its group",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "validation/v2/cleanup_authority.py",
+    "line": 220,
+    "scope": "signal_owned",
+    "operation": "os.kill",
+    "target": "leader.pid",
+    "target_kind": "process",
+    "authority_source": "INDEPENDENT_HOST_TABLE",
+    "derivation": "as above, a single proved process",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p0/test_arch_catalog.py",
+    "line": 47,
+    "scope": "ArchCatalog.test_removing_a_member_from_code_fails",
+    "operation": "code['StoryAdmissionDisposition'][2].remove",
+    "target": "code['StoryAdmissionDisposition'][2]",
+    "target_kind": "collection",
+    "authority_source": "COLLECTION_METHOD",
+    "derivation": "list.remove on an in-memory catalog copy",
+    "independently_established": false,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p1/test_spec_corpus.py",
+    "line": 56,
+    "scope": "Corpus.test_a_missing_or_orphan_spec_fails",
+    "operation": "sorted((c / 'specs').glob('*.json'))[0].unlink",
+    "target": "sorted((c / 'specs').glob('*.json'))[0]",
+    "target_kind": "path",
+    "authority_source": "TEST_CREATED_PATH",
+    "derivation": "c is the temporary copy of the corpus that _drift makes for the edit callback",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_interruption.py",
+    "line": 421,
+    "scope": "RealSignals.test_SIGINT_mid_story_is_an_interruption_with_no_gap_and_nothing_left_running",
+    "operation": "c.send_signal",
+    "target": "c",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "c = self.start(): the Popen the test started",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_interruption.py",
+    "line": 436,
+    "scope": "RealSignals.test_SIGKILL_mid_story_leaves_a_journal_that_repair_closes_and_a_tool_that_does_not_survive",
+    "operation": "c.kill",
+    "target": "c",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "c = self.start(): the Popen the test started",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_interruption.py",
+    "line": 412,
+    "scope": "RealSignals.start",
+    "operation": "c.kill",
+    "target": "c",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "the controller subprocess the test started (cleanup)",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_mutation_safety.py",
+    "line": 52,
+    "scope": "CleanupAuthority.setUp",
+    "operation": "self.canary.kill",
+    "target": "self.canary",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "the canary is the test's own sleeper Popen (cleanup)",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_mutation_safety.py",
+    "line": 56,
+    "scope": "CleanupAuthority.setUp",
+    "operation": "self.mine.kill",
+    "target": "self.mine",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "the test's own worker Popen (cleanup)",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_process_range.py",
+    "line": 230,
+    "scope": "Range.test_D_024_red_before_a_writing_grandchild_outlives_a_cleanup_that_trusts_the_direct_child",
+    "operation": "shutil.rmtree",
+    "target": "wt",
+    "target_kind": "path",
+    "authority_source": "TEST_CREATED_PATH",
+    "derivation": "wt = self.dir / 'worktree': under the test's TemporaryDirectory",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_process_range.py",
+    "line": 263,
+    "scope": "Range.test_PROC_OWN_1_a_controller_that_dies_leaves_no_owned_process_alive",
+    "operation": "c.kill",
+    "target": "c",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "the controller subprocess the test started (cleanup, and the SIGKILL the case is about)",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_process_range.py",
+    "line": 325,
+    "scope": "Range.test_wait_says_none_at_once_when_the_anchor_is_gone_and_keeps_saying_it",
+    "operation": "r._anchor.kill",
+    "target": "r._anchor",
+    "target_kind": "process",
+    "authority_source": "CONTROLLER_CREATED_HANDLE",
+    "derivation": "the range's own anchor Popen, r = self.range(...) which the test class creates with ProcessRange(",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_process_range.py",
+    "line": 42,
+    "scope": "alive",
+    "operation": "os.kill",
+    "target": "pid",
+    "target_kind": "process",
+    "authority_source": "LIVENESS_PROBE_SIGNAL_0",
+    "derivation": "kill(pid, 0) asks whether a process exists; no signal is delivered",
+    "independently_established": false,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_process_range.py",
+    "line": 143,
+    "scope": "Range.test_an_orphan_the_range_adopts_is_reaped_when_it_dies",
+    "operation": "os.kill",
+    "target": "grandchild",
+    "target_kind": "process",
+    "authority_source": "LIVENESS_PROBE_SIGNAL_0",
+    "derivation": "kill(pid, 0) polls until the reaped orphan is gone; the signal that ends it goes through cleanup_authority.signal_member after proof",
+    "independently_established": false,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_process_range.py",
+    "line": 258,
+    "scope": "Range.test_PROC_OWN_1_a_controller_that_dies_leaves_no_owned_process_alive",
+    "operation": "c.kill",
+    "target": "c",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "the controller subprocess the test started (cleanup, and the SIGKILL the case is about)",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_process_range.py",
+    "line": 380,
+    "scope": "Range.test_a_controller_that_returns_without_disposing_exits_and_its_range_goes_with_it",
+    "operation": "c.kill",
+    "target": "c",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "the controller subprocess the test started (cleanup)",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_run_scope.py",
+    "line": 169,
+    "scope": "Lifetime.test_RUN_2_a_held_lease_blocks_a_second_run_even_with_run_end_written",
+    "operation": "holder.kill",
+    "target": "holder",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "the lease holder subprocess the test started",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/p4/test_run_scope.py",
+    "line": 164,
+    "scope": "Lifetime.test_RUN_2_a_held_lease_blocks_a_second_run_even_with_run_end_written",
+    "operation": "holder.kill",
+    "target": "holder",
+    "target_kind": "process",
+    "authority_source": "TEST_CREATED_HANDLE",
+    "derivation": "the lease holder subprocess the test started",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/test_v1_evidence_guard.py",
+    "line": 77,
+    "scope": "Preventive.test_remove_is_refused_before_it_reaches_the_filesystem",
+    "operation": "os.remove",
+    "target": "ABSENT",
+    "target_kind": "path",
+    "authority_source": "GUARD_NEGATIVE_PROBE",
+    "derivation": "an attempt on a V1-evidence path that never exists; the preventive guard must raise before the filesystem is reached",
+    "independently_established": false,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/test_v1_evidence_guard.py",
+    "line": 90,
+    "scope": "Preventive.test_rmtree_of_protected_dir_is_refused",
+    "operation": "shutil.rmtree",
+    "target": "HARDENING / '__v1_guard_probe_dir_never_exists__'",
+    "target_kind": "path",
+    "authority_source": "GUARD_NEGATIVE_PROBE",
+    "derivation": "as above, for a directory removal",
+    "independently_established": false,
+    "verdict": "PASS",
+    "problems": []
+   },
+   {
+    "file": "tests/v2/test_v1_evidence_guard.py",
+    "line": 101,
+    "scope": "Preventive.test_writing_under_v2_is_permitted",
+    "operation": "probe.unlink",
+    "target": "probe",
+    "target_kind": "path",
+    "authority_source": "TEST_CREATED_PATH",
+    "derivation": "the probe file this test writes under closure-evidence/v2 and removes again",
+    "independently_established": true,
+    "verdict": "PASS",
+    "problems": []
+   }
+  ]
+ },
+ "ledger": {
+  "path": "validation/v2/destructive_sites.json",
+  "sha256": "b9282eac4c12cf3202539d5c7f6a2f950f6cdc25053f706de725ea0aaaa38d6c",
+  "rows": 28,
+  "sites_covered": 30,
+  "authority_sources_used": [
+   "COLLECTION_METHOD",
+   "CONTROLLER_CREATED_HANDLE",
+   "CONTROLLER_CREATED_PID",
+   "CONTROLLER_CREATED_PROCESS_GROUP",
+   "DELEGATION",
+   "GUARD_NEGATIVE_PROBE",
+   "INDEPENDENT_HOST_TABLE",
+   "LIVENESS_PROBE_SIGNAL_0",
+   "SCOPE_OWNED_PATH",
+   "TEST_CREATED_HANDLE",
+   "TEST_CREATED_PATH"
+  ]
+ },
+ "checker": {
+  "path": "validation/v2/destructive_authority.py",
+  "sha256": "7f507e53021288990f012f6e93419700fde6d2d362839f6191e6a6bb40051a4f",
+  "result": "PASS",
+  "behaviour_tests": {
+   "test_A_discovery_is_mechanical_and_names_the_site": "PASSED",
+   "test_B_a_site_with_no_row_fails": "PASSED",
+   "test_C_a_row_with_no_site_fails": "PASSED",
+   "test_D_a_declared_source_the_derivation_does_not_match_fails": "PASSED",
+   "test_E_an_ambiguous_derivation_fails": "PASSED",
+   "test_F_a_destructive_api_outside_the_taxonomy_fails_closed": "PASSED",
+   "test_this_tree_passes_and_every_site_is_ledgered": "PASSED"
+  },
+  "behaviour_summary": "============================== 7 passed in 1.63s ==============================="
+ },
+ "previously_violating_site": {
+  "test": "tests/v2/p4/test_process_range.py::Range::test_an_orphan_the_range_adopts_is_reaped_when_it_dies",
+  "before": "os.kill(grandchild, SIGKILL) with grandchild read from the subject's pid file",
+  "after": "the pid is a claim; cleanup_authority.signal_member(boundary, grandchild, r._anchor.pid) proves it in the range's group (a group the controller created, its leader proved by ancestry and birth), born after the boundary in the table's own clock, and only then signals it; otherwise the test fails with RESIDUAL_OWNERSHIP_UNKNOWN and nothing is signalled",
+  "result": "PASSED"
+ },
+ "mut_auth_neg_1": {
+  "fixture": "tests/v2/fixtures/known_bad/destructive_authority.json",
+  "expected": "is not bound in its scope to a handle the test created",
+  "observed": [
+   "tests/v2/p9/test_bad.py:10 [Bad.test_kills_what_the_subject_reported] os.kill(pid): target 'pid' is not bound in its scope to a handle the test created (('Popen(', 'ProcessRange(', 'CreateJobObjectW('))"
+  ],
+  "rejects_known_bad": true,
+  "rejects_for_the_expected_reason": true,
+  "checker_fails": true
+ },
+ "mut_auth_neg_2": {
+  "test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission": "PASSED",
+  "test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number": "PASSED"
+ },
+ "mut_safe": {
+  "results": {
+   "test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own": "PASSED",
+   "test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled": "PASSED",
+   "test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused": "PASSED",
+   "test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed": "PASSED",
+   "test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives": "PASSED",
+   "test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set": "PASSED",
+   "test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set": "PASSED",
+   "test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it": "PASSED"
+  },
+  "summary": "============================= 10 passed in 13.97s =============================="
+ },
+ "preserved_properties": {
+  "PROC-OWN": {
+   "test_PROC_OWN_1_a_controller_that_dies_leaves_no_owned_process_alive": "PASSED",
+   "test_PROC_OWN_1_the_mutation_runner_timeout_takes_the_whole_tree_down": "PASSED",
+   "test_PROC_OWN_2_after_disposal_the_range_never_signals_again": "PASSED"
+  },
+  "WIN-PID": {
+   "test_WIN_PID_1_a_stale_parent_cycle_terminates_bounded_and_targets_nothing_unowned": "PASSED",
+   "test_WIN_PID_2_a_stale_parent_without_a_cycle_never_selects_the_unrelated_process": "PASSED"
+  },
+  "D-024": {
+   "test_D_024_green_after_the_range_is_proved_empty_before_the_worktree_is_removed": "PASSED",
+   "test_D_024_red_before_a_writing_grandchild_outlives_a_cleanup_that_trusts_the_direct_child": "PASSED"
+  },
+  "RUN": {
+   "test_RUN_1_a_process_killed_after_a_durable_run_end_and_before_CLEAN_is_torn": "PASSED",
+   "test_RUN_2_a_held_lease_blocks_a_second_run_even_with_run_end_written": "PASSED",
+   "test_RUN_3_a_writer_that_fails_to_close_leaves_the_sentinel_open_and_the_lease_still_released_last": "PASSED",
+   "test_RUN_4_a_clean_that_cannot_be_recorded_leaves_the_sentinel_open": "PASSED"
+  },
+  "INTERRUPT-SIG": {
+   "test_INTERRUPT_SIG_1_a_controller_stop_is_attributed_to_the_controller": "PASSED",
+   "test_INTERRUPT_SIG_2_a_subject_signal_exit_never_becomes_an_owner": "PASSED",
+   "test_INTERRUPT_SIG_3_closers_distinguish_not_started_from_outcome_unknown_and_leave_no_gap": "PASSED",
+   "test_SIGINT_mid_story_is_an_interruption_with_no_gap_and_nothing_left_running": "PASSED",
+   "test_SIGKILL_mid_story_leaves_a_journal_that_repair_closes_and_a_tool_that_does_not_survive": "PASSED"
+  },
+  "summary": "=================== 61 passed, 12 subtests passed in 20.09s ===================="
+ },
+ "q0_calibration": {
+  "checker": {
+   "checker": "destructive_authority",
+   "package": "P4 post-seal hygiene (INV-MUTATION-AUTHORITY)",
+   "fixture": "tests/v2/fixtures/known_bad/destructive_authority.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "is not bound in its scope to a handle the test created",
+   "observed": [
+    "tests/v2/p9/test_bad.py:10 [Bad.test_kills_what_the_subject_reported] os.kill(pid): target 'pid' is not bound in its scope to a handle the test created (('Popen(', 'ProcessRange(', 'CreateJobObjectW('))"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  "calibrated": "31/31"
+ },
+ "full_suite": {
+  "local": {
+   "seq": 16,
+   "result": "PASS",
+   "tests_run": 4318,
+   "skipped": 21,
+   "detective_guard": "PASS"
+  }
+ },
+ "ci": {
+  "run": 35930230055,
+  "jobs": [
+   {
+    "job": "lint",
+    "id": 107414768943,
+    "result": "PASS",
+    "tests_run": null
+   },
+   {
+    "job": "wheel",
+    "id": 107414768718,
+    "result": "PASS",
+    "tests_run": null
+   },
+   {
+    "job": "unit (ubuntu-latest, 3.11)",
+    "id": 107414768820,
+    "result": "PASS",
+    "tests_run": 4315
+   },
+   {
+    "job": "unit (ubuntu-latest, 3.12)",
+    "id": 107414768946,
+    "result": "PASS",
+    "tests_run": 4315
+   },
+   {
+    "job": "unit (ubuntu-latest, 3.13)",
+    "id": 107414769024,
+    "result": "PASS",
+    "tests_run": 4315
+   },
+   {
+    "job": "unit (ubuntu-latest, 3.14)",
+    "id": 107414768839,
+    "result": "PASS",
+    "tests_run": 4315
+   },
+   {
+    "job": "unit (windows-latest, 3.11)",
+    "id": 107414769102,
+    "result": "PASS",
+    "tests_run": 4312
+   }
+  ]
+ },
+ "residual_processes": {
+  "local": {
+   "after": 0,
+   "escaped": []
+  },
+  "unit (ubuntu-latest, 3.11)": {
+   "after": 0,
+   "escaped": 0
+  },
+  "unit (ubuntu-latest, 3.12)": {
+   "after": 0,
+   "escaped": 0
+  },
+  "unit (ubuntu-latest, 3.13)": {
+   "after": 0,
+   "escaped": 0
+  },
+  "unit (ubuntu-latest, 3.14)": {
+   "after": 0,
+   "escaped": 0
+  },
+  "unit (windows-latest, 3.11)": {
+   "after": 0,
+   "escaped": 0
+  }
+ },
+ "v1_evidence_guard": "PASS",
+ "v1_pf_001": {
+  "recurrences": 0,
+  "search": "_kill_tree_win32|MemoryError in every CI job log"
+ },
+ "architecture_exceptions": [
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-001",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-002",
+   "status": "APPROVED — APPLIED"
+  },
+  {
+   "id": "ARCHITECTURE-EXCEPTION-V2-003",
+   "status": "APPROVED — APPLIED"
+  }
+ ],
+ "new_exception_required": false,
+ "stop_rules_triggered": [],
+ "p5": "NOT STARTED",
+ "verdict": "INV-MUTATION-AUTHORITY ENFORCED / READY FOR P5"
+}

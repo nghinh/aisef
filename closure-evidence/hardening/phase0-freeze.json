@@ -1,0 +1,54 @@
+{
+ "program": "AISEF SYSTEMATIC HARDENING PROGRAM v1",
+ "phase": 0,
+ "frozen_at": "2026-09-16T08:35:30+00:00",
+ "reference_baseline": {
+  "package": "aisef==1.7.6",
+  "tag": "v1.7.6",
+  "release_source_sha": "939f2abdfa1f3afe7a2ea083513edf6449cbfe67",
+  "closure": "24 passed · 3 unrunnable (G6.1–G6.3)",
+  "master_at_freeze": "671ef9b259c560bf07531bc5fed63b07dc28b323"
+ },
+ "defect_register": {
+  "file": "docs/DEFECT-REGISTER.json",
+  "frozen_copy": "closure-evidence/hardening/register-frozen-1.7.6.json",
+  "sha256": "f5865d17ed0d801469c8e480cfdec4bac0b43c550d55da2eeae60c3e86e9e9f5",
+  "defects": 34,
+  "open": [
+   {
+    "id": "D-002",
+    "severity": "P2",
+    "title": "A blocking gate decision can rest on the model reviewer alone"
+   },
+   {
+    "id": "D-003",
+    "severity": "P2",
+    "title": "`_analyze.cut_sessions` merges two bench cohorts on the three tasks they share"
+   },
+   {
+    "id": "D-011",
+    "severity": "P2",
+    "title": "a bench run writes artifacts into the framework repository root, outside its session workspaces"
+   },
+   {
+    "id": "D-024",
+    "severity": "P2",
+    "title": "bench-qualification test helper: TemporaryDirectory cleanup races a writer inside a session's .git (twice: 3.13, 3.14)"
+   }
+  ]
+ },
+ "ledgerlock_replay": {
+  "state": "FROZEN as evidence at 10/16 stories; not to be continued by this program",
+  "record": "closure-evidence/dogfood/ledgerlock-run2/replay-1.7.4-opencode/ (REPLAY-OPENCODE.json phases 1–7, OBS-OC-1..4)",
+  "master": "a4e3dc4",
+  "failed_story": "STORY-04-01 candidate de2d3244 (branch story/STORY-04-01), attempts 7",
+  "local_copy": "scratchpad/replay174-opencode (not to be modified)"
+ },
+ "candidate_defect": {
+  "id": "OBS-OC-4",
+  "provisional_family": "EVIDENCE/VERDICT FRESHNESS + RETRY/RECOVERY SEMANTICS",
+  "provisional_severity": "P1",
+  "reproducer_without_opencode": "tests/hardening/test_verdict_freshness.py (Phase 0)"
+ },
+ "preserved": "all release tags v1.7.1–v1.7.6, manifests closure-evidence/releases/*, bundles closure-evidence/external-validation/*, dogfood evidence — untouched by this program"
+}

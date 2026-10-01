@@ -1,0 +1,113 @@
+{
+ "generated": "2026-09-16T23:10:24Z",
+ "rule": "Do not let a predeclared arbitration become a hidden waiver.",
+ "arbitrations": [
+  {
+   "id": "ARB-1",
+   "gate": "readiness",
+   "kind": "framework rule (hash method) vs the frozen environment contract — NOT a conflict inside the LedgerLock requirements",
+   "conflicting_passages": [
+    {
+     "where": "aisef/control/approvals.py — module docstring",
+     "text": "Changing the hash method makes previously signed `stories`/`readiness` approvals stale **once** — stated here instead of leaving the user to guess."
+    },
+    {
+     "where": "aisef/control/approvals.py — ApprovalStore.content_hash",
+     "text": "readiness covers the verifier configuration (SS-55) … INV-P.1: the digest is what a person approved."
+    },
+    {
+     "where": "docs/SCALE-QUALIFICATION.md — What \"qualified\" means operationally, 2",
+     "text": "No AISEF change during the runs."
+    },
+    {
+     "where": "closure-evidence/hardening/family-plans/P20-w1-ledgerlock.md — Procedure 1",
+     "text": "confirm approvals (PRD, architecture, epics, stories, readiness) are APPROVED for that tree's digests"
+    }
+   ],
+   "why_objectively_present": {
+    "statement": "The owner signed `readiness` on 2026-09-15 under the 1.7.6 hash method (the two artifacts only). The hardened candidate adds `verifier-config:<digest>` to the readiness hash (SS-55 / Phase 16). The two artifacts are byte-identical to what was signed — recomputing the signed method over them reproduces the stored digest exactly — so the STALE reading is caused by the hash-method change alone, exactly as the module states.",
+    "measured": {
+     "status": "stale",
+     "stored_digest": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+     "stored_seq": 10,
+     "stored_decided_by": "nghinh",
+     "stored_decided_at": "2026-09-15T13:32:32+00:00",
+     "current_digest": "32736048f968b74ec2cce5f010d465f045b4048b097d36476d13d3e6ada6a206",
+     "digest_recomputed_by_the_signed_method": "4f2c3b84b3e3658cb9c0977d8085e9e57d191d63424f04a2b9d74393927a2838",
+     "artifacts_byte_identical_to_what_was_signed": true,
+     "artifacts": {
+      "stories.index.json": {
+       "sha256": "0e768828fe548fa565730ac388cc1aa13def4a8e17962801c36df47ba2df1df9",
+       "bytes": 29325
+      },
+      "design-contract.json": {
+       "sha256": "9d0f74fb9dd4a9d83ef68855d7520fbbe1c62bdb47044814a0b77b5d4b220aff",
+       "bytes": 2222
+      }
+     },
+     "verifier_config_digest_now_part_of_the_hash": "7dc71c3fe52b42d3"
+    },
+    "only_readiness_is_stale": true
+   },
+   "kernel_path_first": {
+    "rule": "The owner's rule: a predeclared arbitration must not become a hidden waiver; W1 must still detect and enter HUMAN_REQUIRED through the normal kernel path.",
+    "procedure": "At W1 start `aisef run` is invoked with NO re-approval and NO `--force`. The kernel's own readiness check must refuse or stop on the STALE gate before any agent call; its exit code, message and the absence of any agent session are recorded in the run's W1 record. Only after that observation is the gate re-approved. A run that proceeds past a STALE readiness without `--force` is a P0 finding and stops W1."
+   },
+   "decision": "Re-approve `readiness` for the byte-identical content through the normal CLI (`aisef approve readiness`), never a state edit; record seq, digest before/after, decided_by and a note naming this record (ARB-1) in W1-LEDGERLOCK-<n>.json.",
+   "owner_decision": {
+    "decision": "OWNER_APPROVED_HASH_MIGRATION_REAPPROVAL",
+    "given": "2026-09-17, owner message 'OWNER DECISION — FINALIZE PHASE 12 WITH SINGLE-KERNEL EVIDENCE' §1",
+    "scope": "ONLY the reported hash-method migration case; this is NOT a waiver; void if any content difference is found — the normal approval flow then runs",
+    "conditions_measured": {
+     "readiness_content_unchanged": true,
+     "both_bound_artifacts_unchanged": true,
+     "historical_hash_method_reproduces_stored_digest_exactly": true,
+     "stale_caused_only_by_the_framework_hash_method_change": true,
+     "no_requirement_story_architecture_ac_or_implementation_change_hidden": true
+    }
+   },
+   "decision_authority": {
+    "owner_decision_given_for_this_specific_re_approval": true,
+    "basis": [
+     "the content is byte-identical to what the owner (`nghinh`) signed on 2026-09-15T13:32:32+00:00",
+     "the approvals module states that a hash-method change stales `stories`/`readiness` once — the re-approval is the module's own documented remedy",
+     "the owner approved Phases 11–21 including three fresh W1 executions; without this re-approval no W1 run can start (`--force` is excluded)"
+    ],
+    "if_the_owner_rejects": "the re-approval and every W1 run that rests on it are void; W1 waits for the owner's own `aisef approve readiness`.",
+    "performed_by": "the operator (this program), recorded as `decided_by` of the new approval record"
+   },
+   "new_epoch": {
+    "value": false,
+    "reason": "story epochs are the stories' `acceptance.contract_fingerprint` (D-033); stories.index.json is byte-identical, so no contract fingerprint changes; a readiness approval is not part of any story's epoch"
+   },
+   "expected_approval_invalidation": {
+    "upstream": "none — a re-approval never touches upstream gates (prd … mockups stay approved for their digests)",
+    "downstream": "pre-deploy is pending and was never approved — nothing to invalidate",
+    "story_verdicts": "none exist at run start (fresh copy at 8ff9f13 + fd4c644)",
+    "verification": "the gate statuses are measured again right after the re-approval; any status other than readiness→approved is a finding"
+   },
+   "not_a_waiver": [
+    "no `--force`",
+    "no manual state edit",
+    "the kernel's STALE detection is observed and recorded first",
+    "any OTHER stale gate at W1 start is a finding, not an arbitration (measured now: [\"readiness\"])"
+   ]
+  }
+ ],
+ "requirement_ambiguities": {
+  "declared_in": "closure-evidence/hardening/w1/ORACLE-INDEPENDENCE.json → ambiguities (AMB-1 … AMB-4) and assumptions (A1 … A7)",
+  "predeclared_handling_during_a_run": [
+   "if a run enters HUMAN_REQUIRED citing a requirement ambiguity, the operator records the story, the reviewer's words and the passages, and does NOT edit the requirements, the stories, the config or the oracle; the run's terminal state stands as a correctly classified stop",
+   "the owner decides after the run whether the ambiguity is resolved by a requirements change (a new epoch, a new W1 series) or by accepting the delivery",
+   "an oracle ASSUMPTION failure (A1–A7) is escalated exactly as ORACLE-INDEPENDENCE.json predeclares — never a FALSE PASS, never a product failure, never an oracle edit"
+  ],
+  "anything_else": "any operator decision during a run that is not listed here is an UNPLANNED arbitration; it is reported as such in the run record and in the final report"
+ },
+ "checks": {
+  "artifacts_byte_identical_to_what_was_signed": true,
+  "only_readiness_is_stale": true,
+  "readiness_signed_by_a_person": true,
+  "owner_conditions_all_met": true
+ },
+ "verdict": "DECLARED"
+}

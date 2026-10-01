@@ -1,0 +1,2478 @@
+{
+ "record": "AISEF V2 — Q5 corpus item (a real execution, its model stream recorded)",
+ "item": "post-merge-regression",
+ "covers": [
+  "merge path",
+  "post-merge path",
+  "PRESERVE re-proof",
+  "rollback path",
+  "two stories"
+ ],
+ "definition": {
+  "stories": [
+   {
+    "id": "S0",
+    "obligations": [
+     [
+      "C1",
+      "INTRODUCE"
+     ],
+     [
+      "C0",
+      "PRESERVE"
+     ]
+    ],
+    "tests": [
+     "tests/test_s1.py"
+    ],
+    "regressions": [
+     "tests/test_other.py"
+    ],
+    "tests_block": true
+   },
+   {
+    "id": "S2",
+    "obligations": [
+     [
+      "C2",
+      "INTRODUCE"
+     ]
+    ],
+    "tests": [
+     "tests/test_s2.py"
+    ],
+    "regressions": [
+     "tests/test_other.py"
+    ],
+    "tests_block": false
+   }
+  ],
+  "developer": [
+   {
+    "kind": "COMPLETED",
+    "files": {
+     "app/calc.py": "def sub(a, b):\n    return a - b\n\n\ndef add(a, b):\n    return a + b\n",
+     "tests/test_s1.py": "import unittest\nfrom app import calc\n\n\nclass T(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(calc.add(1, 2), 3)\n"
+    },
+    "message": "S0: C1",
+    "detail": "implemented 2 files"
+   },
+   {
+    "kind": "COMPLETED",
+    "files": {
+     "app/mul.py": "def mul(a, b):\n    return a * b\n",
+     "tests/test_s2.py": "import unittest\nfrom app import mul\n\n\nclass T(unittest.TestCase):\n    def test_mul(self):\n        self.assertEqual(mul.mul(2, 3), 6)\n",
+     "app/calc.py": "def sub(a, b):\n    return a + b\n"
+    },
+    "message": "S2: C2",
+    "detail": "implemented 3 files"
+   }
+  ],
+  "reviewer": [
+   {
+    "kind": "COMPLETED",
+    "findings": [],
+    "detail": "reviewed"
+   },
+   {
+    "kind": "COMPLETED",
+    "findings": [],
+    "detail": "reviewed"
+   }
+  ],
+  "pre_landed": {},
+  "scanner_findings": [],
+  "limits": {},
+  "expected_outcomes": {
+   "S0": [
+    "COMMIT"
+   ],
+   "S2": [
+    "ROLLBACK"
+   ]
+  }
+ },
+ "platform": "darwin",
+ "python": "3.14.7",
+ "execution_commit": "74dffbc8ea601080a06261e4295c9adc836c207f",
+ "mode": "record",
+ "variant": null,
+ "errors": {
+  "replay_request_mismatch": 0,
+  "assert_consumed_failure": 0,
+  "tool_diff": 0,
+  "subprocess_diff": 0,
+  "workspace_diff": 0,
+  "probe_product_diff": 0,
+  "control_diff": 0,
+  "capability_mismatch": 0,
+  "harness_error": 0,
+  "invariant_violation": 0,
+  "exception": 0,
+  "residual_process": 0
+ },
+ "started": "2026-10-01T03:04:16Z",
+ "initial_workspace": {
+  "branch": "main",
+  "tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+  "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+  "files": {
+   "app/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "app/calc.py": {
+    "mode": "100644",
+    "blob": "312b477d18e86322d223001d940fc5a0b3758fc0"
+   },
+   "tests/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "tests/test_other.py": {
+    "mode": "100644",
+    "blob": "3db64f878468b50e6fa1d7573c0316e6e0e15ba6"
+   }
+  },
+  "status": "",
+  "status_note": "git status of the fixture repository's own checkout against its index (the branch moves by update-ref; the checkout stays at the base)",
+  "worktrees": 1,
+  "ws_entries": [],
+  "digest": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866"
+ },
+ "final_workspace": {
+  "branch": "main",
+  "tip": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+  "tree": "5c0957d33aeac6a137ca81914b2e38fbe54b8d45",
+  "files": {
+   "app/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "app/calc.py": {
+    "mode": "100644",
+    "blob": "16cb899cc5e6008534b5168064a53ab91973a4e8"
+   },
+   "tests/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "tests/test_other.py": {
+    "mode": "100644",
+    "blob": "3db64f878468b50e6fa1d7573c0316e6e0e15ba6"
+   },
+   "tests/test_s1.py": {
+    "mode": "100644",
+    "blob": "7c8e7fa5fdafa2315903482bb581f96fe55cf31f"
+   }
+  },
+  "status": "M  app/calc.py\nD  tests/test_s1.py",
+  "status_note": "git status of the fixture repository's own checkout against its index (the branch moves by update-ref; the checkout stays at the base)",
+  "worktrees": 1,
+  "ws_entries": [],
+  "digest": "cda0adbf757d843fde2113ff337ead44d875aaadc146aa904aaff63aff0680a9"
+ },
+ "network": {
+  "guarded": true,
+  "socket_attempts": 0
+ },
+ "journal": [
+  {
+   "seq": 0,
+   "type": "run/begin",
+   "data": {
+    "journal_format": 3,
+    "run_id": "q5-post-merge-regression"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 1,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "084c0b941f4ba56c5b6c37ce6e4580eeac8fb4399abc979daee78f7f06d9f7c7",
+     "route": "MODEL_STREAM"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "172512fa1811be4096506b641f6a2bd91e30cba052c65c0743df36836dbb54a8",
+    "name": "developer"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 2,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "5faddbb6c18e9e8367ff426e1d708237d78c6b8f320a497c74aa5b9b67b5659c",
+    "name": "git"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 3,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "732bc8ba289b2a68df7786e23cf40b5645c0abe2d32ef375b2bee1b89138a8ef",
+     "tree": "37bf6457f350dd720a2214f04f3896c554ad0904"
+    },
+    "enforcement": "FULL",
+    "grade": "VERIFIED",
+    "identity": "47de78dc3d69f345b4f59960184ab89259ee2cbc7c822127ac536be884bf57f0",
+    "name": "kernel"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 4,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634",
+     "version": "3.14.7"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "5f34b937df4725ab238ce4b6b1e08ecf7e1cc4263b17445bd80993e0bc06aa38",
+    "name": "python"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 5,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "a77551cdc2c7eaa9735a85503d2b55f7bccbdd526c30ddc428f82dd99b63e7d6",
+     "route": "MODEL_STREAM"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "c3d7d6835f288edc51005920e5902751e39c7a19028054d69a4118856e0444e6",
+    "name": "reviewer"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 6,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c"
+    },
+    "enforcement": "FULL",
+    "grade": "VERIFIED",
+    "identity": "c4869c506e599411c8a570a867d8806f534944fdebfce14f9c685c402e3f5795",
+    "name": "scanner"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 7,
+   "type": "run/spec-resolved",
+   "data": {
+    "aggregate_min_grade": "VERIFIED",
+    "capabilities": [
+     "developer",
+     "git",
+     "kernel",
+     "python",
+     "reviewer",
+     "scanner"
+    ],
+    "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "runspec_hash": "a58ecc4f641b6824ad8111f407c4344b239704abcb170a028acd0ee5a1a56736"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 8,
+   "type": "plan/frozen",
+   "data": {
+    "plan_hash": "2d9f66d252de7cb11c2449194ad313fa7a7ebe7cd3a1245c11ef02fca49e93b0",
+    "plan_id": "PLAN-post-merge-regression",
+    "roles": {
+     "C0": "PRESERVE",
+     "C1": "INTRODUCE",
+     "C2": "INTRODUCE"
+    }
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 9,
+   "type": "story/begin",
+   "data": {
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 10,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "SCRATCH",
+    "resource": "scratch-S0",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 11,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "wt-S0",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 12,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S0",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 13,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [admission 1]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 14,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C1",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "2bf082e42ac8bafd70e11101388376998473e9dc3734c257456f0e532aa28f19",
+     "result": {
+      "behavior_verdict": "INDETERMINATE",
+      "reason": "PRECONDITION_ABSENT"
+     },
+     "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "semantic_hash": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+     "spec_id": "PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 15,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [admission 2]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 16,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C0",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "4b55ec19e3dfd797ad3508ae449264046623e95c5466d45434051665b6b36d37",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+     "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 17,
+   "type": "story/admitted",
+   "data": {
+    "admitted": true,
+    "developer_call_permitted": true,
+    "dispositions": {
+     "C0": "READY",
+     "C1": "READY"
+    },
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 18,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [admission 2]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    15
+   ]
+  },
+  {
+   "seq": 19,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [admission 1]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    13
+   ]
+  },
+  {
+   "seq": 20,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:admission",
+    "detail": "admitted",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 21,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "DEVELOPER",
+    "criteria": [
+     "C1",
+     "C0"
+    ],
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 22,
+   "type": "provider/result",
+   "data": {
+    "detail": "implemented 2 files",
+    "outcome": "COMPLETED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    21
+   ]
+  },
+  {
+   "seq": 23,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:developer",
+    "detail": "implemented 2 files",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 24,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [C1/CANDIDATE implementer]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 25,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [C1/CANDIDATE implementer]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    24
+   ]
+  },
+  {
+   "seq": 26,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C1",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "6b4b95fc13473d9cb8f596891b7432d3c4f7580e89cc08ecc6bc07fd71387b4b",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "591a1824a2a18455f86cc5ac8a23ef2e48ed0cce",
+     "semantic_hash": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+     "spec_id": "PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 27,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [C1/CANDIDATE verifier]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 28,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [C1/CANDIDATE verifier]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    27
+   ]
+  },
+  {
+   "seq": 29,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C1",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "6b4b95fc13473d9cb8f596891b7432d3c4f7580e89cc08ecc6bc07fd71387b4b",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "591a1824a2a18455f86cc5ac8a23ef2e48ed0cce",
+     "semantic_hash": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+     "spec_id": "PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 30,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "591a1824a2a18455f86cc5ac8a23ef2e48ed0cce",
+    "criterion_id": "C1",
+    "semantic_hash": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+    "spec_id": "PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732",
+    "story_id": "S0",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    26,
+    29
+   ]
+  },
+  {
+   "seq": 31,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:proof:C1",
+    "detail": "verified",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 32,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/CANDIDATE implementer]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 33,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/CANDIDATE implementer]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    32
+   ]
+  },
+  {
+   "seq": 34,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C0",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "b581a697cb58742ceb4ff3b964cb9fb0674a7cf3fe2131eb8cc3221aeff6fb8e",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "591a1824a2a18455f86cc5ac8a23ef2e48ed0cce",
+     "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+     "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 35,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/CANDIDATE verifier]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 36,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/CANDIDATE verifier]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    35
+   ]
+  },
+  {
+   "seq": 37,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C0",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "b581a697cb58742ceb4ff3b964cb9fb0674a7cf3fe2131eb8cc3221aeff6fb8e",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "591a1824a2a18455f86cc5ac8a23ef2e48ed0cce",
+     "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+     "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 38,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "591a1824a2a18455f86cc5ac8a23ef2e48ed0cce",
+    "criterion_id": "C0",
+    "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+    "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58",
+    "story_id": "S0",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    34,
+    37
+   ]
+  },
+  {
+   "seq": 39,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:proof:C0",
+    "detail": "verified",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 40,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S0 [tests 1]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 41,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S0 [tests 2]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 42,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S0 [tests 3]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 43,
+   "type": "tests/adequacy",
+   "data": {
+    "developer_chargeable": false,
+    "execution": {
+     "outcome": "PASSED",
+     "owner_on_failure": null,
+     "reason": "1 story-owned test(s) ran; 0 failed",
+     "selection": "STORY_TESTS_RAN",
+     "status": "EXECUTED"
+    },
+    "may_block": false,
+    "outcome": "INCOMPLETE",
+    "owner": null,
+    "regressions": {
+     "outcome": "PASSED",
+     "owner_on_failure": null,
+     "reason": "1 story-owned test(s) ran; 0 failed",
+     "selection": "STORY_TESTS_RAN",
+     "status": "EXECUTED"
+    },
+    "relevance": "RELEVANT",
+    "story_id": "S0",
+    "vacuity": "INDETERMINATE"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 44,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S0 [tests 3]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    42
+   ]
+  },
+  {
+   "seq": 45,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S0 [tests 2]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    41
+   ]
+  },
+  {
+   "seq": 46,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S0 [tests 1]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    40
+   ]
+  },
+  {
+   "seq": 47,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:quality",
+    "detail": "INCOMPLETE",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 48,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "REVIEW",
+    "criteria": [
+     "C1",
+     "C0"
+    ],
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 49,
+   "type": "provider/result",
+   "data": {
+    "detail": "reviewed",
+    "outcome": "COMPLETED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    48
+   ]
+  },
+  {
+   "seq": 50,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:review",
+    "detail": "reviewed: no finding",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 51,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tool scan-S0#1",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 52,
+   "type": "tool/invoked",
+   "data": {
+    "call_id": "scan-S0#1",
+    "story_id": "S0",
+    "tool": "scan"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 53,
+   "type": "tool/result",
+   "data": {
+    "call_id": "scan-S0#1",
+    "detail": "",
+    "outcome": "COMPLETED",
+    "provenance": "NONE",
+    "signal": 0,
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    52
+   ]
+  },
+  {
+   "seq": 54,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tool scan-S0#1",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    51
+   ]
+  },
+  {
+   "seq": 55,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:security",
+    "detail": "scan ran: no finding",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 56,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:merge",
+    "detail": "merged at a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 57,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [C1/POST_MERGE implementer]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 58,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [C1/POST_MERGE implementer]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    57
+   ]
+  },
+  {
+   "seq": 59,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C1",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "cae0cbecb4c533638650aeedaf4744d4985c17886d0ed73b10066cb28ef99e00",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+     "semantic_hash": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+     "spec_id": "PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 60,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [C1/POST_MERGE verifier]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 61,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732 [C1/POST_MERGE verifier]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    60
+   ]
+  },
+  {
+   "seq": 62,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C1",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "cae0cbecb4c533638650aeedaf4744d4985c17886d0ed73b10066cb28ef99e00",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+     "semantic_hash": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+     "spec_id": "PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 63,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+    "criterion_id": "C1",
+    "semantic_hash": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+    "spec_id": "PPS-aaf94137ce7501a7fc56ecacfac587fc0c683ff8fbb5193247ac249db1fe3732",
+    "story_id": "S0",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    59,
+    62
+   ]
+  },
+  {
+   "seq": 64,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:post-merge:C1",
+    "detail": "re-proved at the merged revision",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 65,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/POST_MERGE implementer]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 66,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/POST_MERGE implementer]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    65
+   ]
+  },
+  {
+   "seq": 67,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C0",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "7e832fc3fd35281136cd30d908ee4b48be0f398eac8751c7ca63b7cfb2ce80b8",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+     "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+     "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 68,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/POST_MERGE verifier]",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 69,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/POST_MERGE verifier]",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    68
+   ]
+  },
+  {
+   "seq": 70,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C0",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "7e832fc3fd35281136cd30d908ee4b48be0f398eac8751c7ca63b7cfb2ce80b8",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+     "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+     "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58"
+    },
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 71,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+    "criterion_id": "C0",
+    "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+    "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58",
+    "story_id": "S0",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    67,
+    70
+   ]
+  },
+  {
+   "seq": 72,
+   "type": "gate/check",
+   "data": {
+    "check": "S0:post-merge:C0",
+    "detail": "re-proved at the merged revision",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 73,
+   "type": "gate/decision",
+   "data": {
+    "gate": "story",
+    "passed": true,
+    "projections": [
+     "story_state",
+     "budgets",
+     "failure_owner",
+     "retry_target"
+    ]
+   },
+   "source_seqs": [
+    20,
+    23,
+    31,
+    39,
+    47,
+    50,
+    55,
+    56,
+    64,
+    72
+   ]
+  },
+  {
+   "seq": 74,
+   "type": "story/commit",
+   "data": {
+    "revision": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 75,
+   "type": "story/dispose",
+   "data": {
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 76,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S0",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    12
+   ]
+  },
+  {
+   "seq": 77,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "wt-S0",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    11
+   ]
+  },
+  {
+   "seq": 78,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "SCRATCH",
+    "resource": "scratch-S0",
+    "status": "RELEASED",
+    "story_id": "S0",
+    "synthetic": false
+   },
+   "source_seqs": [
+    10
+   ]
+  },
+  {
+   "seq": 79,
+   "type": "story/end",
+   "data": {
+    "story_id": "S0"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 80,
+   "type": "story/begin",
+   "data": {
+    "parent": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 81,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "SCRATCH",
+    "resource": "scratch-S2",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 82,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "wt-S2",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 83,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S2",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 84,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [admission 1]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 85,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C2",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "76d1aae6cfcb258579ec4c4e512b100543cc3cc56ae1448f751997865a9a0e5f",
+     "result": {
+      "behavior_verdict": "INDETERMINATE",
+      "reason": "PRECONDITION_ABSENT"
+     },
+     "revision": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+     "semantic_hash": "90321a324fe462416dbbab8a87d6c9e7f49ed7a1bed9829aaaa6aec54d539af0",
+     "spec_id": "PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0"
+    },
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 86,
+   "type": "story/admitted",
+   "data": {
+    "admitted": true,
+    "developer_call_permitted": true,
+    "dispositions": {
+     "C2": "READY"
+    },
+    "parent": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 87,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [admission 1]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    84
+   ]
+  },
+  {
+   "seq": 88,
+   "type": "gate/check",
+   "data": {
+    "check": "S2:admission",
+    "detail": "admitted",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 89,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "DEVELOPER",
+    "criteria": [
+     "C2"
+    ],
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 90,
+   "type": "provider/result",
+   "data": {
+    "detail": "implemented 3 files",
+    "outcome": "COMPLETED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    89
+   ]
+  },
+  {
+   "seq": 91,
+   "type": "gate/check",
+   "data": {
+    "check": "S2:developer",
+    "detail": "implemented 3 files",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 92,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [C2/CANDIDATE implementer]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 93,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [C2/CANDIDATE implementer]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    92
+   ]
+  },
+  {
+   "seq": 94,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C2",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "8dabf505648c32965b040f2be546717fcec0787b4547036bcbb0d7d3aa3c3591",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "23ab676645d0086db614b7be0ef60d179851b0a4",
+     "semantic_hash": "90321a324fe462416dbbab8a87d6c9e7f49ed7a1bed9829aaaa6aec54d539af0",
+     "spec_id": "PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0"
+    },
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 95,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [C2/CANDIDATE verifier]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 96,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [C2/CANDIDATE verifier]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    95
+   ]
+  },
+  {
+   "seq": 97,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C2",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "8dabf505648c32965b040f2be546717fcec0787b4547036bcbb0d7d3aa3c3591",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "23ab676645d0086db614b7be0ef60d179851b0a4",
+     "semantic_hash": "90321a324fe462416dbbab8a87d6c9e7f49ed7a1bed9829aaaa6aec54d539af0",
+     "spec_id": "PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0"
+    },
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 98,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "23ab676645d0086db614b7be0ef60d179851b0a4",
+    "criterion_id": "C2",
+    "semantic_hash": "90321a324fe462416dbbab8a87d6c9e7f49ed7a1bed9829aaaa6aec54d539af0",
+    "spec_id": "PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0",
+    "story_id": "S2",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    94,
+    97
+   ]
+  },
+  {
+   "seq": 99,
+   "type": "gate/check",
+   "data": {
+    "check": "S2:proof:C2",
+    "detail": "verified",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 100,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S2 [tests 1]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 101,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S2 [tests 2]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 102,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S2 [tests 3]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 103,
+   "type": "tests/adequacy",
+   "data": {
+    "developer_chargeable": true,
+    "execution": {
+     "outcome": "PASSED",
+     "owner_on_failure": null,
+     "reason": "1 story-owned test(s) ran; 0 failed",
+     "selection": "STORY_TESTS_RAN",
+     "status": "EXECUTED"
+    },
+    "may_block": true,
+    "outcome": "INADEQUATE",
+    "owner": "DEVELOPER",
+    "regressions": {
+     "outcome": "FAILED",
+     "owner_on_failure": "DEVELOPER",
+     "reason": "1 story-owned test(s) ran; 1 failed",
+     "selection": "STORY_TESTS_RAN",
+     "status": "EXECUTED"
+    },
+    "relevance": "RELEVANT",
+    "story_id": "S2",
+    "vacuity": "INDETERMINATE"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 104,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S2 [tests 3]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    102
+   ]
+  },
+  {
+   "seq": 105,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S2 [tests 2]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    101
+   ]
+  },
+  {
+   "seq": 106,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S2 [tests 1]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    100
+   ]
+  },
+  {
+   "seq": 107,
+   "type": "gate/check",
+   "data": {
+    "check": "S2:quality",
+    "detail": "INADEQUATE",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 108,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "REVIEW",
+    "criteria": [
+     "C2"
+    ],
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 109,
+   "type": "provider/result",
+   "data": {
+    "detail": "reviewed",
+    "outcome": "COMPLETED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    108
+   ]
+  },
+  {
+   "seq": 110,
+   "type": "gate/check",
+   "data": {
+    "check": "S2:review",
+    "detail": "reviewed: no finding",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 111,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tool scan-S2#1",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 112,
+   "type": "tool/invoked",
+   "data": {
+    "call_id": "scan-S2#1",
+    "story_id": "S2",
+    "tool": "scan"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 113,
+   "type": "tool/result",
+   "data": {
+    "call_id": "scan-S2#1",
+    "detail": "",
+    "outcome": "COMPLETED",
+    "provenance": "NONE",
+    "signal": 0,
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    112
+   ]
+  },
+  {
+   "seq": 114,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tool scan-S2#1",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    111
+   ]
+  },
+  {
+   "seq": 115,
+   "type": "gate/check",
+   "data": {
+    "check": "S2:security",
+    "detail": "scan ran: no finding",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 116,
+   "type": "gate/check",
+   "data": {
+    "check": "S2:merge",
+    "detail": "merged at f1d960afe7c1ef3d86061b54a983ebe4cfec6e9c",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 117,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [C2/POST_MERGE implementer]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 118,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [C2/POST_MERGE implementer]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    117
+   ]
+  },
+  {
+   "seq": 119,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C2",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "f2ff2a5fd057bd5b3715028d4e48f6ed6840b5cebc3266ad4ae421372e45c2b8",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "f1d960afe7c1ef3d86061b54a983ebe4cfec6e9c",
+     "semantic_hash": "90321a324fe462416dbbab8a87d6c9e7f49ed7a1bed9829aaaa6aec54d539af0",
+     "spec_id": "PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0"
+    },
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 120,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [C2/POST_MERGE verifier]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 121,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0 [C2/POST_MERGE verifier]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    120
+   ]
+  },
+  {
+   "seq": 122,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C2",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "f2ff2a5fd057bd5b3715028d4e48f6ed6840b5cebc3266ad4ae421372e45c2b8",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "f1d960afe7c1ef3d86061b54a983ebe4cfec6e9c",
+     "semantic_hash": "90321a324fe462416dbbab8a87d6c9e7f49ed7a1bed9829aaaa6aec54d539af0",
+     "spec_id": "PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0"
+    },
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 123,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "f1d960afe7c1ef3d86061b54a983ebe4cfec6e9c",
+    "criterion_id": "C2",
+    "semantic_hash": "90321a324fe462416dbbab8a87d6c9e7f49ed7a1bed9829aaaa6aec54d539af0",
+    "spec_id": "PPS-fef688c6cf8c8ce0d39d67848548cd920334adac4447ae43a0e0d752bf71d5b0",
+    "story_id": "S2",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    119,
+    122
+   ]
+  },
+  {
+   "seq": 124,
+   "type": "gate/check",
+   "data": {
+    "check": "S2:post-merge:C2",
+    "detail": "re-proved at the merged revision",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 125,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/POST_MERGE implementer]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 126,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/POST_MERGE implementer]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    125
+   ]
+  },
+  {
+   "seq": 127,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C0",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "089c819d7d3d045f11c63c376575205c6ee1df9d74b6e061055c954efc2eeca4",
+     "result": {
+      "behavior_verdict": "REFUTED",
+      "reason": null
+     },
+     "revision": "f1d960afe7c1ef3d86061b54a983ebe4cfec6e9c",
+     "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+     "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58"
+    },
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 128,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/POST_MERGE verifier]",
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 129,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58 [C0/POST_MERGE verifier]",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    128
+   ]
+  },
+  {
+   "seq": 130,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C0",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe_id": "probe.python_callable",
+     "record_digest": "089c819d7d3d045f11c63c376575205c6ee1df9d74b6e061055c954efc2eeca4",
+     "result": {
+      "behavior_verdict": "REFUTED",
+      "reason": null
+     },
+     "revision": "f1d960afe7c1ef3d86061b54a983ebe4cfec6e9c",
+     "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+     "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58"
+    },
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 131,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "f1d960afe7c1ef3d86061b54a983ebe4cfec6e9c",
+    "criterion_id": "C0",
+    "semantic_hash": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b",
+    "spec_id": "PPS-972a15da64233e1a1774ac319da9148aebde0b15c90195b2f6991b7f04987c58",
+    "story_id": "S2",
+    "verdict": "REFUTED"
+   },
+   "source_seqs": [
+    127,
+    130
+   ]
+  },
+  {
+   "seq": 132,
+   "type": "gate/check",
+   "data": {
+    "check": "S2:post-merge:C0",
+    "detail": "POST_MERGE_REGRESSION",
+    "gate": "story",
+    "passed": false
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 133,
+   "type": "gate/decision",
+   "data": {
+    "gate": "story",
+    "passed": false,
+    "projections": [
+     "story_state",
+     "budgets",
+     "failure_owner",
+     "retry_target"
+    ]
+   },
+   "source_seqs": [
+    88,
+    91,
+    99,
+    107,
+    110,
+    115,
+    116,
+    124,
+    132
+   ]
+  },
+  {
+   "seq": 134,
+   "type": "failure/observed",
+   "data": {
+    "code": "POST_MERGE_REGRESSION",
+    "detail": "post-merge C0: POST_MERGE_REGRESSION",
+    "owner": "INTEGRATION",
+    "retryable": false,
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 135,
+   "type": "story/rollback",
+   "data": {
+    "story_id": "S2"
+   },
+   "source_seqs": [
+    134
+   ]
+  },
+  {
+   "seq": 136,
+   "type": "story/dispose",
+   "data": {
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 137,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S2",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    83
+   ]
+  },
+  {
+   "seq": 138,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "wt-S2",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    82
+   ]
+  },
+  {
+   "seq": 139,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "SCRATCH",
+    "resource": "scratch-S2",
+    "status": "RELEASED",
+    "story_id": "S2",
+    "synthetic": false
+   },
+   "source_seqs": [
+    81
+   ]
+  },
+  {
+   "seq": 140,
+   "type": "story/end",
+   "data": {
+    "story_id": "S2"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 141,
+   "type": "run/dispose-begin",
+   "data": {},
+   "source_seqs": []
+  },
+  {
+   "seq": 142,
+   "type": "run/end",
+   "data": {},
+   "source_seqs": []
+  }
+ ],
+ "journal_raw_digest": "8246421769f48ff6ec624e5a6f1850af0686a5a2dfcbd729d106381bd1851df8",
+ "subprocesses": {
+  "probe": 17,
+  "tests": 6,
+  "tool": 2,
+  "worktree": 4,
+  "scratch": 2
+ },
+ "residual_from_journal": 0,
+ "run_trace": [
+  "lease",
+  "sentinel OPEN",
+  "journal writer",
+  "RunSpec",
+  "execution",
+  "story scopes disposed",
+  "run/dispose-begin",
+  "run/end",
+  "journal writer closed",
+  "sentinel CLEAN",
+  "lease released"
+ ],
+ "outcomes": {
+  "S0": [
+   "COMMIT"
+  ],
+  "S2": [
+   "ROLLBACK"
+  ]
+ },
+ "model_ledger": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "d2f3e4a762222071b688d22ec2c2893a9995917477d23e2d4a74d3a7b236e376",
+   "request": {
+    "header_class": "DEVELOPER_IMPLEMENT",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "084c0b941f4ba56c5b6c37ce6e4580eeac8fb4399abc979daee78f7f06d9f7c7",
+     "reviewer": "a77551cdc2c7eaa9735a85503d2b55f7bccbdd526c30ddc428f82dd99b63e7d6"
+    },
+    "story_id": "S0",
+    "criteria": [
+     "C1",
+     "C0"
+    ],
+    "attempt": 1,
+    "prior_failures": [],
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+    "semantic_hashes": {
+     "C1": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+     "C0": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b"
+    },
+    "plan_hash": "2d9f66d252de7cb11c2449194ad313fa7a7ebe7cd3a1245c11ef02fca49e93b0",
+    "tool_schema": "b0a95b22b87abbdf6bfc57b55850896031dfbfdd955e3156abc946792424106d",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "COMPLETED",
+    "files": {
+     "app/calc.py": "def sub(a, b):\n    return a - b\n\n\ndef add(a, b):\n    return a + b\n",
+     "tests/test_s1.py": "import unittest\nfrom app import calc\n\n\nclass T(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(calc.add(1, 2), 3)\n"
+    },
+    "message": "S0: C1",
+    "detail": "implemented 2 files"
+   }
+  },
+  {
+   "seq": 2,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "21722db4ec4195f35f5b1e8842a0d0a43bce66b6cda88ade1632da6af65a7cca",
+   "request": {
+    "header_class": "REVIEWER_REVIEW",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "084c0b941f4ba56c5b6c37ce6e4580eeac8fb4399abc979daee78f7f06d9f7c7",
+     "reviewer": "a77551cdc2c7eaa9735a85503d2b55f7bccbdd526c30ddc428f82dd99b63e7d6"
+    },
+    "story_id": "S0",
+    "criteria": [
+     "C1",
+     "C0"
+    ],
+    "attempt": 1,
+    "prior_failures": [],
+    "parent": "591a1824a2a18455f86cc5ac8a23ef2e48ed0cce",
+    "files": [
+     "app/__init__.py",
+     "app/calc.py",
+     "tests/__init__.py",
+     "tests/test_other.py",
+     "tests/test_s1.py"
+    ],
+    "content": "8127946fc945997b1ea02a0b9c8c4390a12e5b5be76710864f739acbebfe1233",
+    "semantic_hashes": {
+     "C1": "ef2f4f54d129a1751a4aebd14916b42ea94a5df503a13fbaa8ba1ff0b2dbee83",
+     "C0": "784376d3819bb83dbeb1182813d9d69eb327869f7668fa9ec7cd7ba26a58694b"
+    },
+    "plan_hash": "2d9f66d252de7cb11c2449194ad313fa7a7ebe7cd3a1245c11ef02fca49e93b0",
+    "tool_schema": "ea5a37d14b8bcc5551b06bdffdc8b35a5d53776db59d5c0840e18a3557a8965e",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "COMPLETED",
+    "findings": [],
+    "detail": "reviewed"
+   }
+  },
+  {
+   "seq": 3,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "fe4d1cc96d117939ab4b3ffd29d421ad01457e52f515c9dbe091342f316274bb",
+   "request": {
+    "header_class": "DEVELOPER_IMPLEMENT",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "084c0b941f4ba56c5b6c37ce6e4580eeac8fb4399abc979daee78f7f06d9f7c7",
+     "reviewer": "a77551cdc2c7eaa9735a85503d2b55f7bccbdd526c30ddc428f82dd99b63e7d6"
+    },
+    "story_id": "S2",
+    "criteria": [
+     "C2"
+    ],
+    "attempt": 1,
+    "prior_failures": [],
+    "parent": "a2d4e83ca3c4ce6ba687aba9425506a176377b03",
+    "tree": "5c0957d33aeac6a137ca81914b2e38fbe54b8d45",
+    "semantic_hashes": {
+     "C2": "90321a324fe462416dbbab8a87d6c9e7f49ed7a1bed9829aaaa6aec54d539af0"
+    },
+    "plan_hash": "2d9f66d252de7cb11c2449194ad313fa7a7ebe7cd3a1245c11ef02fca49e93b0",
+    "tool_schema": "b0a95b22b87abbdf6bfc57b55850896031dfbfdd955e3156abc946792424106d",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "COMPLETED",
+    "files": {
+     "app/mul.py": "def mul(a, b):\n    return a * b\n",
+     "tests/test_s2.py": "import unittest\nfrom app import mul\n\n\nclass T(unittest.TestCase):\n    def test_mul(self):\n        self.assertEqual(mul.mul(2, 3), 6)\n",
+     "app/calc.py": "def sub(a, b):\n    return a + b\n"
+    },
+    "message": "S2: C2",
+    "detail": "implemented 3 files"
+   }
+  },
+  {
+   "seq": 4,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "da9b2879947d208c17a1fd8f4e99d88efa62492a8be5749bbd3fae50decce3fd",
+   "request": {
+    "header_class": "REVIEWER_REVIEW",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "084c0b941f4ba56c5b6c37ce6e4580eeac8fb4399abc979daee78f7f06d9f7c7",
+     "reviewer": "a77551cdc2c7eaa9735a85503d2b55f7bccbdd526c30ddc428f82dd99b63e7d6"
+    },
+    "story_id": "S2",
+    "criteria": [
+     "C2"
+    ],
+    "attempt": 1,
+    "prior_failures": [],
+    "parent": "23ab676645d0086db614b7be0ef60d179851b0a4",
+    "files": [
+     "app/__init__.py",
+     "app/calc.py",
+     "app/mul.py",
+     "tests/__init__.py",
+     "tests/test_other.py",
+     "tests/test_s1.py",
+     "tests/test_s2.py"
+    ],
+    "content": "82c27028f7f775a1f157b2b597d20e4bef316673ede4801d8a8cc8b8f005d6e8",
+    "semantic_hashes": {
+     "C2": "90321a324fe462416dbbab8a87d6c9e7f49ed7a1bed9829aaaa6aec54d539af0"
+    },
+    "plan_hash": "2d9f66d252de7cb11c2449194ad313fa7a7ebe7cd3a1245c11ef02fca49e93b0",
+    "tool_schema": "ea5a37d14b8bcc5551b06bdffdc8b35a5d53776db59d5c0840e18a3557a8965e",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "COMPLETED",
+    "findings": [],
+    "detail": "reviewed"
+   }
+  }
+ ],
+ "model_requests": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "d2f3e4a762222071b688d22ec2c2893a9995917477d23e2d4a74d3a7b236e376",
+   "matched": 1
+  },
+  {
+   "seq": 2,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "21722db4ec4195f35f5b1e8842a0d0a43bce66b6cda88ade1632da6af65a7cca",
+   "matched": 2
+  },
+  {
+   "seq": 3,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "fe4d1cc96d117939ab4b3ffd29d421ad01457e52f515c9dbe091342f316274bb",
+   "matched": 3
+  },
+  {
+   "seq": 4,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "da9b2879947d208c17a1fd8f4e99d88efa62492a8be5749bbd3fae50decce3fd",
+   "matched": 4
+  }
+ ],
+ "consumption": {
+  "expected": 4,
+  "consumed": 4,
+  "missing_unconsumed": [],
+  "extra_requests": [],
+  "duplicate_consumptions": 0,
+  "mismatches": 0,
+  "ok": true
+ },
+ "model_mismatches": [],
+ "tool_ledger": [
+  {
+   "tool": "scan",
+   "story_id": "S0",
+   "argv": [
+    "<PY>",
+    "<SCRIPT>",
+    "<REPORT>",
+    "[]"
+   ],
+   "scope_files": [
+    "app/__init__.py",
+    "app/calc.py",
+    "tests/__init__.py",
+    "tests/test_other.py",
+    "tests/test_s1.py"
+   ],
+   "scope_content": "8127946fc945997b1ea02a0b9c8c4390a12e5b5be76710864f739acbebfe1233",
+   "script_sha256": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c",
+   "input_digest": "a319bbd5309226547fef72153bdc41a9d8384a581223398ebc4e33a8570fddf3",
+   "exit_code": 0,
+   "report_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "report_bytes": 2,
+   "executed": true
+  },
+  {
+   "tool": "scan",
+   "story_id": "S2",
+   "argv": [
+    "<PY>",
+    "<SCRIPT>",
+    "<REPORT>",
+    "[]"
+   ],
+   "scope_files": [
+    "app/__init__.py",
+    "app/calc.py",
+    "app/mul.py",
+    "tests/__init__.py",
+    "tests/test_other.py",
+    "tests/test_s1.py",
+    "tests/test_s2.py"
+   ],
+   "scope_content": "82c27028f7f775a1f157b2b597d20e4bef316673ede4801d8a8cc8b8f005d6e8",
+   "script_sha256": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c",
+   "input_digest": "03746108660cd556c65e4a5d6219bac10185d2825cc970dd000c71a5c65c8fae",
+   "exit_code": 0,
+   "report_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "report_bytes": 2,
+   "executed": true
+  }
+ ],
+ "notes": [],
+ "finished": "2026-10-01T03:04:21Z",
+ "ledger_digest": "a21b7af5013b0fabe882c762ef050a070fa1a0bd2c7a57d765ccac7f5eb68f7f"
+}

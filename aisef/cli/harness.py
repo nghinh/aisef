@@ -6,6 +6,7 @@ from __future__ import annotations
 import shutil
 
 from ..harness import sandbox as _sandbox
+from ..harness import capabilities as _capabilities
 from ..harness import verify_image as _verify_image
 import sys
 from pathlib import Path
@@ -13,6 +14,14 @@ from pathlib import Path
 from ..config import Config
 from ..harness.tools import aisef_argv
 from ._common import ARTIFACT_ROOT, EXIT_NOT_READY, EXIT_OK, EXIT_USAGE, _artifact_root, _client
+
+
+def _story_tip(project: Path, story_id: str) -> str:
+    """The story branch's current commit ("" when the branch does not exist)."""
+    import subprocess
+    r = subprocess.run(["git", "rev-parse", "--verify", "--quiet", f"story/{story_id}"], cwd=project,
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return r.stdout.strip() if r.returncode == 0 else ""
 
 
 def cmd_baseline(args) -> int:
@@ -75,33 +84,38 @@ _NGOAI_KHUNG_PY = " --exclude .claude --exclude .aisef --exclude .opencode"
 #: carried neither tool, every call is a fresh container, and the first dogfood
 #: run of 1.7.2 printed `No module named pytest` sixteen times before the
 #: operator rebuilt the image by hand (LedgerLock 2026-09-15, lỗi 182 / D-028).
-_PY_IMAGE = _verify_image.RECIPES["python"].name
+_PY_IMAGE = _verify_image.RECIPES["python"].image
+#: SS-65: every preset's image and every tool it inherits come from the stack profile (harness.capabilities); the
+#: go preset used to write `golangci-lint run`, which golang:1.23-alpine never carried (measured 2026-09-17).
+_GO = _capabilities.profile_by_stack("go")
+_PY_LINT = _capabilities.profile_by_stack("python").capability(_capabilities.Role.LINT).command
+_NODE_IMAGE = _capabilities.profile_by_stack("node").image
 
 STACK_PRESETS: dict[str, dict[str, object]] = {
     "react": {
         "tools.test": "npx vitest run --reporter=verbose",
         "tools.lint": "npx eslint . --max-warnings=0" + _NGOAI_KHUNG_JS,
-        "sandbox.image": "node:22-alpine",
+        "sandbox.image": _NODE_IMAGE,
         "sandbox.tools_network": True,
         "sandbox.allow_hosts": ["registry.npmjs.org", "*.npmjs.org"],
         "app.dev_command": "npm run dev",
     },
     "python": {
         "tools.test": f"{_PY} -m pytest -v",
-        "tools.lint": "ruff check ." + _NGOAI_KHUNG_PY,
+        "tools.lint": _PY_LINT + _NGOAI_KHUNG_PY,
         "sandbox.image": _PY_IMAGE,
         "sandbox.allow_hosts": ["pypi.org", "files.pythonhosted.org"],
     },
     "go": {
         "tools.test": "go test -v ./...",
-        "tools.lint": "golangci-lint run",
-        "sandbox.image": "golang:1.23-alpine",
+        "tools.lint": _GO.capability(_capabilities.Role.LINT).command,
+        "sandbox.image": _GO.image,
         "sandbox.allow_hosts": ["proxy.golang.org", "sum.golang.org"],
     },
     "node": {
         "tools.test": "npm test",
         "tools.lint": "npx eslint . --max-warnings=0" + _NGOAI_KHUNG_JS,
-        "sandbox.image": "node:22-alpine",
+        "sandbox.image": _NODE_IMAGE,
         "sandbox.tools_network": True,
         "sandbox.allow_hosts": ["registry.npmjs.org", "*.npmjs.org"],
     },
@@ -123,7 +137,7 @@ def cmd_init(args) -> int:
             print("\n".join(thieu))
         if _verify_image.is_managed(str(cfg.get("sandbox.image", "") or "")):
             print(f"  ○ `sandbox.image` = `{cfg['sandbox.image']}` — built by the harness on the "
-                  f"first `aisef doctor` or tool run (pinned base + pinned pytest/ruff)")
+                  f"first `aisef doctor` or tool run (pinned base + the stack profile's pinned tools)")
     return EXIT_OK
 
 
@@ -426,7 +440,18 @@ def _waive_review(args) -> int:
 
     root = _artifact_root(args)
     ev = EvidenceStore(root).read(args.story)
-    dau_vao = ev.last(NOTE, GATE_INPUT)
+    # A waiver binds to the story's CURRENT build — the story branch tip — not to whatever gate scoring was
+    # recorded last (a --verify-only run at another SHA, SS-X1 / INV-P.2).
+    tip = _story_tip(Path(args.project), args.story)
+    scorings = list(ev.of(NOTE, GATE_INPUT))
+    dau_vao = next((e for e in reversed(scorings) if not tip or str(e.detail.get("candidate") or "") == tip), None)
+    if dau_vao is None and scorings and tip:
+        latest = str(scorings[-1].detail.get("candidate") or "")
+        print(f"✗ {args.story}: the story branch stands at {tip[:8]} but the last gate scoring is of "
+              f"{latest[:8] or 'no candidate'} — a waiver cannot be bound to a build that was not scored. "
+              f"Re-verify the branch tip (`aisef run --verify-only --story {args.story}`), then waive.",
+              file=sys.stderr)
+        return EXIT_USAGE
     if dau_vao is None:
         print(f"✗ {args.story}: no gate scoring recorded — nothing to override",
               file=sys.stderr)

@@ -1,0 +1,42 @@
+{
+ "record": "AISEF V2 — CYCLE-2 CORRIGENDUM 1 TO THE QP-2.7 / QP-2.8 RECORDS: THE LOWER-RUNG BINDING",
+ "kind": "append-only corrigendum; the corrected records are not rewritten",
+ "records_corrected": {
+  "closure-evidence/v2/cycle2/Q4/DIFFERENTIAL.json": "06fec168ddff676c880743365a50361bd56faf919456112df5398f788abfbf04",
+  "closure-evidence/v2/cycle2/Q5/REPRODUCTION.json": "84396d361649eafdb7b7561526b920756109989976d38faaea67776a437b85f7"
+ },
+ "what_they_say": {
+  "p7_evidence": [
+   "closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json",
+   "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+   "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json"
+  ],
+  "q5_p7_evidence": [
+   "closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json",
+   "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+   "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json"
+  ]
+ },
+ "what_they_should_say": "closure-evidence/v2/cycle2/Q0-Q3-R3/SUMMARY.json (the GREEN QP-2.6 attempt on candidate 37dc0dc) in place of closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json",
+ "facts": {
+  "r2_summary": {
+   "verdict": "FAILED",
+   "sha256": "2989e4bdb648000f6a2795789473dc911895be83e9e8e2b147e9162fe67163f5",
+   "candidate": "ac4a6c7 (FAILED on Windows Q0)"
+  },
+  "r3_summary": {
+   "verdict": "GREEN",
+   "sha256": "247251e84f0ed2fded57f85d6e69139a770d324e778e4bab4359401ae1d28ecb",
+   "candidate": "37dc0dc"
+  },
+  "q4_semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "q4_kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "q5_semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "q5_kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "kernel_tree_of_ac4a6c7": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "kernel_tree_of_37dc0dc": "37bf6457f350dd720a2214f04f3896c554ad0904"
+ },
+ "cause": "validation/qualification/q4_aggregate.py P7_EVIDENCE was set to the R2 summary when the prepared LANE-Q harness was rebased onto the R2 candidate, and was not moved to R3 when R2 failed; q5.py reads the same constant. Neither rung checks the verdict of the summary it binds.",
+ "impact": "the binding is wrong; the measurements are not affected: both records name the R3 candidate 37dc0dc as their semantic candidate and its kernel tree 37bf6457 (the same tree R2's candidate carried), and what Q4 and Q5 consume — the kernel, reference, generator and harness digests (Q4) and the one identity over kernel, corpus and harness (Q5) — does not include the lower-rung summary. QP-2.6 on that candidate is GREEN (R3).",
+ "remedy": "the final integration candidate's fresh Q4 and Q5 (closure-evidence/v2/cycle2/Q4-FINAL, Q5-FINAL) bind the R4 summary; q4_aggregate.P7_EVIDENCE names it"
+}

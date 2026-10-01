@@ -1,0 +1,9 @@
+{
+ "checker": "no_time_in_projections",
+ "package": "WP-3.3",
+ "kind": "kernel_source",
+ "rule": "NO_TIME_IN_PROJECTIONS",
+ "path": "aisef2/journal/projections/bad.py",
+ "source": "def step(state, event):\n    return {**state, \"last\": event.time}\n",
+ "expect": "NO_TIME_IN_PROJECTIONS aisef2/journal/projections/bad.py:2"
+}

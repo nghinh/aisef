@@ -1,0 +1,62 @@
+TRY004 Prefer `TypeError` exception for invalid type
+  --> ledgerlock/cli.py:92:9
+   |
+90 |     parsed = json.loads(raw)
+91 |     if not isinstance(parsed, list):
+92 |         raise ValueError("batch file must contain a JSON array of mutation dicts")
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+93 |     ops: list[tuple[str, str, object, str, int]] = []
+94 |     for element in parsed:
+   |
+
+TRY004 Prefer `TypeError` exception for invalid type
+  --> ledgerlock/cli.py:96:13
+   |
+94 |     for element in parsed:
+95 |         if not isinstance(element, dict):
+96 |             raise ValueError("each batch element must be a JSON object")
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+97 |         op = element.get("op")
+98 |         key = element.get("key")
+   |
+
+TRY004 Prefer `TypeError` exception for invalid type
+   --> ledgerlock/cli.py:102:13
+    |
+100 |         ts = element.get("ts")
+101 |         if not isinstance(op, str) or not isinstance(key, str) or not isinstance(rid, str):
+102 |             raise ValueError("each batch element must have string op/key/rid")
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+103 |         if not isinstance(ts, int):
+104 |             raise ValueError("each batch element must have integer ts")
+    |
+
+TRY004 Prefer `TypeError` exception for invalid type
+   --> ledgerlock/cli.py:104:13
+    |
+102 |             raise ValueError("each batch element must have string op/key/rid")
+103 |         if not isinstance(ts, int):
+104 |             raise ValueError("each batch element must have integer ts")
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+105 |         value: object = None
+106 |         if op != "delete":
+    |
+
+F401 [*] `os` imported but unused
+  --> tests/test_cli_exit_codes.py:13:8
+   |
+12 | import json
+13 | import os
+   |        ^^
+14 | import subprocess
+15 | import sys
+   |
+help: Remove unused import: `os`
+   |
+12 | import json
+   - import os
+13 | import subprocess
+   |
+
+Found 5 errors.
+[*] 1 fixable with the `--fix` option.

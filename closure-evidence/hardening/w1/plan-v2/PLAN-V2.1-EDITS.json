@@ -1,0 +1,63 @@
+{
+ "artifact": "W1-LEDGERLOCK-PLAN-V2.1",
+ "generated": "2026-09-21T05:09:37+0700",
+ "owner_decision": "FINAL PLAN CORRECTION, KERNEL REMAINS FROZEN (2026-09-21), section 5",
+ "base": "W1-LEDGERLOCK-PLAN-V2 (1621a2bc)",
+ "requirements_changed": false,
+ "hidden_oracle_changed": false,
+ "edits": [
+  {
+   "id": "PLAN-V2.1-01",
+   "kind": "MOVE_CHANGE_OWNER",
+   "ac": "AC-STORY-04-01-2",
+   "from": {
+    "story": "STORY-04-01",
+    "proof_mode": "CHANGE_REQUIRED",
+    "requirement": "FR-11"
+   },
+   "to": {
+    "story": "STORY-04-01",
+    "proof_mode": "PRESERVE_REQUIRED",
+    "requirement": "FR-12"
+   },
+   "introduction_owner_becomes": "STORY-01-01 (new criterion 7, CHANGE_REQUIRED / FR-12)",
+   "rationale": "Two defects in one criterion, both found by the ownership audit and both traceable to the frozen documents. Requirement: 'calling any subcommand with the wrong number of positional arguments exits 2' is a testable consequence the PRD lists under FR-12, the exit-code contract; FR-11 is the subcommand surface. Ownership: STORY-01-01's declared responsibility is 'a CLI module that registers verify/snapshot/apply/repair-tail argparse subcommands', and argparse's contract for a usage error is SystemExit(2) with the message on stderr and stdout untouched — so every correct implementation of STORY-01-01 already exhibits the behaviour. STORY-04-01 rewrites ledgerlock/cli.py and ledgerlock/__main__.py wholesale and can therefore regress it, which is what PRESERVE_REQUIRED is for. Diagnostic run 1 observed the criterion green at STORY-04-01's parent; that agrees with this reading but is not its basis, and no mode was changed because a model happened to implement something early."
+  },
+  {
+   "id": "PLAN-V2.1-02",
+   "kind": "ADD_INTRODUCTION_OWNER",
+   "ac": "AC-STORY-01-01-7",
+   "story": "STORY-01-01",
+   "proof_mode": "CHANGE_REQUIRED",
+   "requirement": "FR-12",
+   "text": "- Given the registered CLI, `python -m ledgerlock verify <ledger> <extra-positional>` in a subprocess exits `2` and writes nothing to stdout (argparse reports a usage error on stderr).",
+   "rationale": "The other half of PLAN-V2.1-01: the behaviour needs an introduction owner, and it is this story. At STORY-01-01's parent no `ledgerlock` package exists, so `python -m ledgerlock` exits 1 with a ModuleNotFoundError rather than 2 — the criterion can legitimately be red there and green at the story's candidate. STORY-01-01's `covers` gains FR-12 so the criterion's requirement stays inside the story's declared coverage."
+  }
+ ],
+ "verified_by_the_product_parser": {
+  "story_01_01_criteria": 7,
+  "story_01_01_ac7": {
+   "ac_id": "AC-STORY-01-01-7",
+   "proof_mode": "CHANGE_REQUIRED",
+   "requirement": "FR-12",
+   "raw": "7=CHANGE_REQUIRED/FR-12"
+  },
+  "story_01_01_covers": [
+   "FR-1",
+   "FR-12",
+   "FR-14"
+  ],
+  "story_04_01_ac2": {
+   "ac_id": "AC-STORY-04-01-2",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "requirement": "FR-12",
+   "raw": "2=PRESERVE_REQUIRED/FR-12"
+  },
+  "total_criteria": 77,
+  "modes": {
+   "CHANGE_REQUIRED": 66,
+   "PRESERVE_REQUIRED": 7,
+   "NEGATIVE_INVARIANT": 4
+  }
+ }
+}

@@ -1,0 +1,1212 @@
+{
+ "artifact": "W1-PLAN-V2.1-OWNERSHIP-AUDIT",
+ "generated": "2026-09-21T05:10:09+0700",
+ "owner_decision": "FINAL PLAN CORRECTION, KERNEL REMAINS FROZEN (2026-09-21), sections 1-4",
+ "method": "Each criterion is judged against the declared contracts of the plan and the frozen requirements: a behaviour entailed by an upstream story's stated responsibility is owned upstream. What a model happened to implement early is never the basis for a judgement; where diagnostic run 1 agrees, that is recorded as corroboration only.",
+ "plan": "W1-LEDGERLOCK-PLAN-V2",
+ "requirements_in_prd": [
+  "FR-1",
+  "FR-2",
+  "FR-3",
+  "FR-4",
+  "FR-5",
+  "FR-6",
+  "FR-7",
+  "FR-8",
+  "FR-9",
+  "FR-10",
+  "FR-11",
+  "FR-12",
+  "FR-13",
+  "FR-14"
+ ],
+ "stories": 16,
+ "criteria": 77,
+ "criteria_covered_by_this_audit": 77,
+ "coverage": "100%",
+ "modes": {
+  "CHANGE_REQUIRED": 66,
+  "PRESERVE_REQUIRED": 7,
+  "NEGATIVE_INVARIANT": 4
+ },
+ "actions": {
+  "KEEP_CHANGE": 76,
+  "MOVE_CHANGE_OWNER": 1,
+  "PRESERVE_DOWNSTREAM": 0,
+  "REMOVE_DUPLICATE": 0
+ },
+ "duplicate_introduction_of_one_behaviour": {},
+ "requirements_without_an_introduction_owner": [],
+ "prd_requirements_no_criterion_names": [],
+ "requirements_traceability": "100%",
+ "duplicate_requirement_rationale": {
+  "FR-1": "STORY-01-01 introduces NFC normalization itself; STORY-01-05 introduces the rejection of a key that is empty after normalization. Different behaviours of one requirement.",
+  "FR-2": "The hash chain is built in three layers, each a separate contract: STORY-01-02 the canonical encoding, STORY-01-03 the digest over it, STORY-01-05 the chaining of one line to the previous. None entails the others: a correct canonical_bytes says nothing about how a digest is taken, and a correct digest says nothing about what prev_hash a line carries.",
+  "FR-12": "Four stories, four distinct parts of the exit-code contract. STORY-01-01 introduces the usage-error exit (2) that its own argparse surface establishes (PLAN-V2.1); STORY-04-01 the success exits (0) for apply and repair-tail; STORY-04-02 the error exits (3, 4, 5); STORY-04-03 the stderr status shapes. The scope note in STORY-04-01 states the split, and each story's criteria stay inside it.",
+  "FR-13": "STORY-01-04 introduces the atomic write primitive, STORY-01-05 the durability of a single append, STORY-03-01 the crash behaviour of a multi-line batch. Three distinct guarantees.",
+  "FR-14": "STORY-01-01 introduces the stdlib-only import surface, STORY-05-02 the coverage gate and its exclusion of test sources. The prohibition itself is NEGATIVE_INVARIANT in STORY-01-01 and STORY-05-03 and claims no introduction."
+ },
+ "warnings": [
+  "FR-1: introduced across 2 stories — STORY-01-01 introduces NFC normalization itself; STORY-01-05 introduces the rejection of a key that is empty after normalization. Different behaviours of one requirement.",
+  "FR-12: introduced across 4 stories — Four stories, four distinct parts of the exit-code contract. STORY-01-01 introduces the usage-error exit (2) that its own argparse surface establishes (PLAN-V2.1); STORY-04-01 the success exits (0) for apply and repair-tail; STORY-04-02 the error exits (3, 4, 5); STORY-04-03 the stderr status shapes. The scope note in STORY-04-01 states the split, and each story's criteria stay inside it.",
+  "FR-13: introduced across 3 stories — STORY-01-04 introduces the atomic write primitive, STORY-01-05 the durability of a single append, STORY-03-01 the crash behaviour of a multi-line batch. Three distinct guarantees.",
+  "FR-14: introduced across 2 stories — STORY-01-01 introduces the stdlib-only import surface, STORY-05-02 the coverage gate and its exclusion of test sources. The prohibition itself is NEGATIVE_INVARIANT in STORY-01-01 and STORY-05-03 and claims no introduction.",
+  "FR-2: introduced across 3 stories — The hash chain is built in three layers, each a separate contract: STORY-01-02 the canonical encoding, STORY-01-03 the digest over it, STORY-01-05 the chaining of one line to the previous. None entails the others: a correct canonical_bytes says nothing about how a digest is taken, and a correct digest says nothing about what prev_hash a line carries."
+ ],
+ "errors": [],
+ "rows": [
+  {
+   "ac_id": "AC-STORY-01-01-1",
+   "story": "STORY-01-01",
+   "requirement": "FR-1",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "normalize_key returns unicodedata NFC byte-for-byte",
+   "semantic_owner_story": "STORY-01-01",
+   "upstream_dependencies": [],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-2",
+   "story": "STORY-01-01",
+   "requirement": "FR-1",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "NFC and NFD spellings of one key normalize to the same bytes",
+   "semantic_owner_story": "STORY-01-01",
+   "upstream_dependencies": [],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-3",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "the ledgerlock package is importable from a stdlib-only pyproject",
+   "semantic_owner_story": "STORY-01-01",
+   "upstream_dependencies": [],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-4",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "proof_mode": "NEGATIVE_INVARIANT",
+   "behaviour": "no forbidden import appears in the runtime package",
+   "semantic_owner_story": "STORY-01-01",
+   "upstream_dependencies": [],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "The same prohibition is declared twice on purpose, and both are NEGATIVE_INVARIANT, so neither claims introduction ownership: it must hold when the package is created and again when it ships. At STORY-01-01's parent the package does not exist, so the prohibition holds vacuously — measured in diagnostic run 1, where the nop control at the parent executed 6 tests with exactly these 2 green and the 4 CHANGE_REQUIRED ones red.",
+   "duplicate_of": "AC-STORY-05-03-1"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-5",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "proof_mode": "NEGATIVE_INVARIANT",
+   "behaviour": "no side-channel call appears in the runtime package",
+   "semantic_owner_story": "STORY-01-01",
+   "upstream_dependencies": [],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "See AC-STORY-01-01-4: one prohibition, two checkpoints, neither an introduction.",
+   "duplicate_of": "AC-STORY-05-03-2"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-6",
+   "story": "STORY-01-01",
+   "requirement": "FR-14",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "Ledger and ConflictError are importable from the package root",
+   "semantic_owner_story": "STORY-01-01",
+   "upstream_dependencies": [],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-01-7",
+   "story": "STORY-01-01",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a wrong positional count is a usage error with silent stdout",
+   "semantic_owner_story": "STORY-01-01",
+   "upstream_dependencies": [],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "PLAN-V2.1 introduction owner of the usage-error exit. The story's declared responsibility is the argparse CLI surface, and argparse exits 2 with stdout untouched on a usage error, so this story is where the behaviour first exists. At its own parent no package exists and `python -m ledgerlock` exits 1 with ModuleNotFoundError, so the criterion can legitimately be red there."
+  },
+  {
+   "ac_id": "AC-STORY-01-02-1",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "canonical_bytes encodes a line with sorted keys and tight separators",
+   "semantic_owner_story": "STORY-01-02",
+   "upstream_dependencies": [
+    "STORY-01-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-2",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "canonical_bytes is stable across two calls on equal dicts",
+   "semantic_owner_story": "STORY-01-02",
+   "upstream_dependencies": [
+    "STORY-01-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-3",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "canonical_bytes emits non-ASCII as UTF-8 literals",
+   "semantic_owner_story": "STORY-01-02",
+   "upstream_dependencies": [
+    "STORY-01-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-4",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "canonical_bytes ignores key insertion order",
+   "semantic_owner_story": "STORY-01-02",
+   "upstream_dependencies": [
+    "STORY-01-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-5",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "GENESIS is the literal seven-character string",
+   "semantic_owner_story": "STORY-01-02",
+   "upstream_dependencies": [
+    "STORY-01-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-02-6",
+   "story": "STORY-01-02",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "canonical_bytes survives a json round trip",
+   "semantic_owner_story": "STORY-01-02",
+   "upstream_dependencies": [
+    "STORY-01-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-1",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "line_hash returns 64 lowercase hex characters",
+   "semantic_owner_story": "STORY-01-03",
+   "upstream_dependencies": [
+    "STORY-01-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-2",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "line_hash separates distinct prev_hash values",
+   "semantic_owner_story": "STORY-01-03",
+   "upstream_dependencies": [
+    "STORY-01-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-3",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "line_hash empties the hash fields before hashing",
+   "semantic_owner_story": "STORY-01-03",
+   "upstream_dependencies": [
+    "STORY-01-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-4",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "line_hash is deterministic for one input pair",
+   "semantic_owner_story": "STORY-01-03",
+   "upstream_dependencies": [
+    "STORY-01-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-03-5",
+   "story": "STORY-01-03",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "line_hash accepts the non-hex GENESIS prev_hash",
+   "semantic_owner_story": "STORY-01-03",
+   "upstream_dependencies": [
+    "STORY-01-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-1",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "read_lines splits JSONL into newline-stripped byte lines",
+   "semantic_owner_story": "STORY-01-04",
+   "upstream_dependencies": [
+    "STORY-01-03"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-2",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "read_lines raises FileNotFoundError on a missing path",
+   "semantic_owner_story": "STORY-01-04",
+   "upstream_dependencies": [
+    "STORY-01-03"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-3",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "read_lines returns an empty list for an empty file",
+   "semantic_owner_story": "STORY-01-04",
+   "upstream_dependencies": [
+    "STORY-01-03"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-4",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "write_atomic replaces a file with the given lines",
+   "semantic_owner_story": "STORY-01-04",
+   "upstream_dependencies": [
+    "STORY-01-03"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-5",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "write_atomic leaves the original intact when the replace fails",
+   "semantic_owner_story": "STORY-01-04",
+   "upstream_dependencies": [
+    "STORY-01-03"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-04-6",
+   "story": "STORY-01-04",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "write_atomic writes its temp file beside the target",
+   "semantic_owner_story": "STORY-01-04",
+   "upstream_dependencies": [
+    "STORY-01-03"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-1",
+   "story": "STORY-01-05",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "append writes the first chained line with GENESIS prev_hash",
+   "semantic_owner_story": "STORY-01-05",
+   "upstream_dependencies": [
+    "STORY-01-04"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-2",
+   "story": "STORY-01-05",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "append chains the second line to the first line's hash",
+   "semantic_owner_story": "STORY-01-05",
+   "upstream_dependencies": [
+    "STORY-01-04"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-3",
+   "story": "STORY-01-05",
+   "requirement": "FR-1",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "append rejects an empty key after normalization",
+   "semantic_owner_story": "STORY-01-05",
+   "upstream_dependencies": [
+    "STORY-01-04"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-4",
+   "story": "STORY-01-05",
+   "requirement": "FR-2",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a fresh Ledger reads the chain tail from disk",
+   "semantic_owner_story": "STORY-01-05",
+   "upstream_dependencies": [
+    "STORY-01-04"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-05-5",
+   "story": "STORY-01-05",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "append durably commits the bytes before returning",
+   "semantic_owner_story": "STORY-01-05",
+   "upstream_dependencies": [
+    "STORY-01-04"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-1",
+   "story": "STORY-01-06",
+   "requirement": "FR-3",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a replayed rid returns the committed line and appends nothing",
+   "semantic_owner_story": "STORY-01-06",
+   "upstream_dependencies": [
+    "STORY-01-05"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-2",
+   "story": "STORY-01-06",
+   "requirement": "FR-4",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a different rid on a live key raises ConflictError and appends nothing",
+   "semantic_owner_story": "STORY-01-06",
+   "upstream_dependencies": [
+    "STORY-01-05"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-3",
+   "story": "STORY-01-06",
+   "requirement": "FR-5",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a different rid against a tombstone conflicts",
+   "semantic_owner_story": "STORY-01-06",
+   "upstream_dependencies": [
+    "STORY-01-05"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-4",
+   "story": "STORY-01-06",
+   "requirement": "FR-5",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "the same rid against a tombstone replays",
+   "semantic_owner_story": "STORY-01-06",
+   "upstream_dependencies": [
+    "STORY-01-05"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-01-06-5",
+   "story": "STORY-01-06",
+   "requirement": "FR-3",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "replay matching is by NFC-normalized key",
+   "semantic_owner_story": "STORY-01-06",
+   "upstream_dependencies": [
+    "STORY-01-05"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-1",
+   "story": "STORY-02-01",
+   "requirement": "FR-6",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "verify returns ok on a valid chain",
+   "semantic_owner_story": "STORY-02-01",
+   "upstream_dependencies": [
+    "STORY-01-06"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-2",
+   "story": "STORY-02-01",
+   "requirement": "FR-6",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "verify returns ok on an empty chain",
+   "semantic_owner_story": "STORY-02-01",
+   "upstream_dependencies": [
+    "STORY-01-06"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-3",
+   "story": "STORY-02-01",
+   "requirement": "FR-6",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "verify raises FileNotFoundError on a missing chain",
+   "semantic_owner_story": "STORY-02-01",
+   "upstream_dependencies": [
+    "STORY-01-06"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-4",
+   "story": "STORY-02-01",
+   "requirement": "FR-7",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "verify detects an overwritten hash field from disk alone",
+   "semantic_owner_story": "STORY-02-01",
+   "upstream_dependencies": [
+    "STORY-01-06"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-01-5",
+   "story": "STORY-02-01",
+   "requirement": "FR-7",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "verify detects a mutated value from disk alone",
+   "semantic_owner_story": "STORY-02-01",
+   "upstream_dependencies": [
+    "STORY-01-06"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-1",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "snapshot is deterministic and sorted by key",
+   "semantic_owner_story": "STORY-02-02",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-2",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a refused conflicting delete leaves the snapshot unchanged",
+   "semantic_owner_story": "STORY-02-02",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-3",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a tombstoned key is absent from the snapshot",
+   "semantic_owner_story": "STORY-02-02",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-4",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "snapshot keys are the NFC form",
+   "semantic_owner_story": "STORY-02-02",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-02-02-5",
+   "story": "STORY-02-02",
+   "requirement": "FR-9",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "two Ledger instances snapshot one chain equally",
+   "semantic_owner_story": "STORY-02-02",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-1",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "apply_batch commits N conflict-free lines as one chain",
+   "semantic_owner_story": "STORY-03-01",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-2",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "apply_batch replays a matching rid inside the batch",
+   "semantic_owner_story": "STORY-03-01",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-3",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "apply_batch refuses the whole batch on an inner conflict",
+   "semantic_owner_story": "STORY-03-01",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-4",
+   "story": "STORY-03-01",
+   "requirement": "FR-8",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "apply_batch reports the conflicting batch index",
+   "semantic_owner_story": "STORY-03-01",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-03-01-5",
+   "story": "STORY-03-01",
+   "requirement": "FR-13",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a crash inside apply_batch leaves the pre-batch bytes",
+   "semantic_owner_story": "STORY-03-01",
+   "upstream_dependencies": [
+    "STORY-02-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-1",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "repair_tail strips only the truncated final line",
+   "semantic_owner_story": "STORY-03-02",
+   "upstream_dependencies": [
+    "STORY-03-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-2",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "repair_tail is a no-op on a clean chain",
+   "semantic_owner_story": "STORY-03-02",
+   "upstream_dependencies": [
+    "STORY-03-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-3",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "repair_tail refuses when the corruption is mid-chain",
+   "semantic_owner_story": "STORY-03-02",
+   "upstream_dependencies": [
+    "STORY-03-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-03-02-4",
+   "story": "STORY-03-02",
+   "requirement": "FR-10",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "repair_tail refuses a tampered, parseable final line",
+   "semantic_owner_story": "STORY-03-02",
+   "upstream_dependencies": [
+    "STORY-03-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-1",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "snapshot without --out is a usage error",
+   "semantic_owner_story": "STORY-04-01",
+   "upstream_dependencies": [
+    "STORY-03-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-2",
+   "story": "STORY-04-01",
+   "requirement": "FR-12",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "behaviour": "a wrong positional count is a usage error with silent stdout",
+   "semantic_owner_story": "STORY-01-01",
+   "upstream_dependencies": [
+    "STORY-03-02"
+   ],
+   "another_story_claims_introduction": [
+    "AC-STORY-01-01-7"
+   ],
+   "necessarily_implied_upstream": true,
+   "action": "MOVE_CHANGE_OWNER",
+   "rationale": "Two defects in one criterion. (1) Requirement: 'calling any subcommand with the wrong number of positional arguments exits 2' is a testable consequence of FR-12, the exit-code contract; FR-11 is the subcommand surface. (2) Ownership: STORY-01-01's declared responsibility is 'a CLI module that registers verify/snapshot/apply/repair-tail argparse subcommands', and argparse's documented contract for a usage error is SystemExit(2) with the message on stderr and stdout untouched. Any correct implementation of STORY-01-01 therefore already exits 2 on a wrong positional count — the behaviour is entailed by the story's own contract, not over-implemented by chance. So the introduction owner is STORY-01-01, and because STORY-04-01 rewrites ledgerlock/cli.py and ledgerlock/__main__.py wholesale it can regress the behaviour, which is what PRESERVE_REQUIRED is for. The run-1 observation (green at the parent) agrees with this reading but is not its basis.",
+   "to_mode": "PRESERVE_REQUIRED",
+   "to_requirement": "FR-12",
+   "also_add_change_to": "STORY-01-01",
+   "downstream_disposition": "PRESERVE_DOWNSTREAM",
+   "already_applied_in_this_plan": true
+  },
+  {
+   "ac_id": "AC-STORY-04-01-3",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "--help lists the four subcommands and exits 0",
+   "semantic_owner_story": "STORY-04-01",
+   "upstream_dependencies": [
+    "STORY-03-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-4",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "verify succeeds with silent stdout and one stderr line",
+   "semantic_owner_story": "STORY-04-01",
+   "upstream_dependencies": [
+    "STORY-03-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-5",
+   "story": "STORY-04-01",
+   "requirement": "FR-11",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "snapshot --out writes the snapshot bytes",
+   "semantic_owner_story": "STORY-04-01",
+   "upstream_dependencies": [
+    "STORY-03-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-6",
+   "story": "STORY-04-01",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "apply --batch commits from the CLI",
+   "semantic_owner_story": "STORY-04-01",
+   "upstream_dependencies": [
+    "STORY-03-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-01-7",
+   "story": "STORY-04-01",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "repair-tail leaves a clean chain untouched from the CLI",
+   "semantic_owner_story": "STORY-04-01",
+   "upstream_dependencies": [
+    "STORY-03-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-1",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a missing batch file exits 3",
+   "semantic_owner_story": "STORY-04-02",
+   "upstream_dependencies": [
+    "STORY-04-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-2",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "a conflicting batch exits 4 and commits nothing",
+   "semantic_owner_story": "STORY-04-02",
+   "upstream_dependencies": [
+    "STORY-04-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-3",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "verify on a corrupted chain exits 5",
+   "semantic_owner_story": "STORY-04-02",
+   "upstream_dependencies": [
+    "STORY-04-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-02-4",
+   "story": "STORY-04-02",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "repair-tail on mid-chain corruption exits 5",
+   "semantic_owner_story": "STORY-04-02",
+   "upstream_dependencies": [
+    "STORY-04-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-1",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "behaviour": "verify succeeds with silent stdout and one stderr line",
+   "semantic_owner_story": "STORY-04-01",
+   "upstream_dependencies": [
+    "STORY-04-02"
+   ],
+   "another_story_claims_introduction": [
+    "AC-STORY-04-01-4"
+   ],
+   "necessarily_implied_upstream": true,
+   "action": "KEEP_CHANGE",
+   "rationale": "PRESERVE_REQUIRED, and correctly so: STORY-04-01 AC-4 introduces the verify stderr line, and STORY-04-03 rewrites cli.py and can regress it."
+  },
+  {
+   "ac_id": "AC-STORY-04-03-2",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "apply prints one stderr line naming the appended count",
+   "semantic_owner_story": "STORY-04-03",
+   "upstream_dependencies": [
+    "STORY-04-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-3",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "snapshot prints one stderr line naming the destination",
+   "semantic_owner_story": "STORY-04-03",
+   "upstream_dependencies": [
+    "STORY-04-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-4",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "repair-tail prints one stderr line on success",
+   "semantic_owner_story": "STORY-04-03",
+   "upstream_dependencies": [
+    "STORY-04-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-04-03-5",
+   "story": "STORY-04-03",
+   "requirement": "FR-12",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "behaviour": "every success path leaves stdout empty",
+   "semantic_owner_story": "STORY-04-01",
+   "upstream_dependencies": [
+    "STORY-04-02"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": true,
+   "action": "KEEP_CHANGE",
+   "rationale": "PRESERVE_REQUIRED over the silent-stdout property STORY-04-01 introduces across its success paths."
+  },
+  {
+   "ac_id": "AC-STORY-05-01-1",
+   "story": "STORY-05-01",
+   "requirement": "FR-2",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "behaviour": "the chain verifies and the snapshot is stable across random sequences",
+   "semantic_owner_story": "STORY-01-05",
+   "upstream_dependencies": [
+    "STORY-03-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": true,
+   "action": "KEEP_CHANGE",
+   "rationale": "PRESERVE_REQUIRED over the chain integrity STORY-01-05 introduces."
+  },
+  {
+   "ac_id": "AC-STORY-05-01-2",
+   "story": "STORY-05-01",
+   "requirement": "FR-8",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "behaviour": "a refused conflict leaves the chain at its prefix",
+   "semantic_owner_story": "STORY-03-01",
+   "upstream_dependencies": [
+    "STORY-03-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": true,
+   "action": "KEEP_CHANGE",
+   "rationale": "PRESERVE_REQUIRED over the batch atomicity STORY-03-01 introduces."
+  },
+  {
+   "ac_id": "AC-STORY-05-01-3",
+   "story": "STORY-05-01",
+   "requirement": "FR-14",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "behaviour": "unittest and pytest agree on the property module",
+   "semantic_owner_story": "REPOSITORY_CONVENTION",
+   "upstream_dependencies": [
+    "STORY-03-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": true,
+   "action": "KEEP_CHANGE",
+   "rationale": "PRESERVE_REQUIRED over runner parity. No single story introduces it: requirements §11 makes every test unittest.TestCase-based, so parity holds from the first test onward and is green at this story's parent. Recorded explicitly because the introducer is a convention, not a criterion."
+  },
+  {
+   "ac_id": "AC-STORY-05-02-1",
+   "story": "STORY-05-02",
+   "requirement": "FR-14",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "line coverage of the package is at least 85%",
+   "semantic_owner_story": "STORY-05-02",
+   "upstream_dependencies": [
+    "STORY-05-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-05-02-2",
+   "story": "STORY-05-02",
+   "requirement": "FR-14",
+   "proof_mode": "PRESERVE_REQUIRED",
+   "behaviour": "unittest and pytest agree on the whole suite",
+   "semantic_owner_story": "REPOSITORY_CONVENTION",
+   "upstream_dependencies": [
+    "STORY-05-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": true,
+   "action": "KEEP_CHANGE",
+   "rationale": "See AC-STORY-05-01-3 — the same parity property, guarded once more over the whole suite rather than one module."
+  },
+  {
+   "ac_id": "AC-STORY-05-02-3",
+   "story": "STORY-05-02",
+   "requirement": "FR-14",
+   "proof_mode": "CHANGE_REQUIRED",
+   "behaviour": "the test sources are excluded from the coverage measure",
+   "semantic_owner_story": "STORY-05-02",
+   "upstream_dependencies": [
+    "STORY-05-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "this story's own contract introduces the behaviour; no earlier story's responsibility entails it"
+  },
+  {
+   "ac_id": "AC-STORY-05-03-1",
+   "story": "STORY-05-03",
+   "requirement": "FR-14",
+   "proof_mode": "NEGATIVE_INVARIANT",
+   "behaviour": "no forbidden import appears in the runtime package",
+   "semantic_owner_story": "STORY-05-03",
+   "upstream_dependencies": [
+    "STORY-05-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "a prohibition that holds before and after this story; it claims no introduction"
+  },
+  {
+   "ac_id": "AC-STORY-05-03-2",
+   "story": "STORY-05-03",
+   "requirement": "FR-14",
+   "proof_mode": "NEGATIVE_INVARIANT",
+   "behaviour": "no side-channel call appears in the runtime package",
+   "semantic_owner_story": "STORY-05-03",
+   "upstream_dependencies": [
+    "STORY-05-01"
+   ],
+   "another_story_claims_introduction": null,
+   "necessarily_implied_upstream": false,
+   "action": "KEEP_CHANGE",
+   "rationale": "a prohibition that holds before and after this story; it claims no introduction"
+  }
+ ],
+ "pass": true
+}

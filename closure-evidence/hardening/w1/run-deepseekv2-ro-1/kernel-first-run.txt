@@ -1,0 +1,4 @@
+
+--- stderr ---
+✗ gate not approved: mockups, readiness
+  aisef review mockups

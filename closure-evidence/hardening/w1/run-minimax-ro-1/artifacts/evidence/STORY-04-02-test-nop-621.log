@@ -1,0 +1,408 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspace
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 145 items
+
+tests/test_atomic_batch.py::AC_STORY_03_01_1_ConflictFreeBatchProducesChainedLines::test_AC_STORY_03_01_1_chain_verifies_end_to_end PASSED [  0%]
+tests/test_atomic_batch.py::AC_STORY_03_01_1_ConflictFreeBatchProducesChainedLines::test_AC_STORY_03_01_1_first_line_prev_hash_is_GENESIS PASSED [  1%]
+tests/test_atomic_batch.py::AC_STORY_03_01_1_ConflictFreeBatchProducesChainedLines::test_AC_STORY_03_01_1_jsonl_gains_exactly_three_lines PASSED [  2%]
+tests/test_atomic_batch.py::AC_STORY_03_01_1_ConflictFreeBatchProducesChainedLines::test_AC_STORY_03_01_1_lines_chain_via_prev_hash PASSED [  2%]
+tests/test_atomic_batch.py::AC_STORY_03_01_2_ReplayInsideBatchDoesNotAppend::test_AC_STORY_03_01_2_chain_still_verifies PASSED [  3%]
+tests/test_atomic_batch.py::AC_STORY_03_01_2_ReplayInsideBatchDoesNotAppend::test_AC_STORY_03_01_2_jsonl_gains_exactly_one_line PASSED [  4%]
+tests/test_atomic_batch.py::AC_STORY_03_01_2_ReplayInsideBatchDoesNotAppend::test_AC_STORY_03_01_2_only_k2_is_appended PASSED [  4%]
+tests/test_atomic_batch.py::AC_STORY_03_01_2_ReplayInsideBatchDoesNotAppend::test_AC_STORY_03_01_2_returned_first_element_is_replay PASSED [  5%]
+tests/test_atomic_batch.py::AC_STORY_03_01_3_SecondElementConflictRaises::test_AC_STORY_03_01_3_conflict_raises_with_required_fields PASSED [  6%]
+tests/test_atomic_batch.py::AC_STORY_03_01_3_SecondElementConflictRaises::test_AC_STORY_03_01_3_existing_ledger_byte_identical_on_conflict PASSED [  6%]
+tests/test_atomic_batch.py::AC_STORY_03_01_3_SecondElementConflictRaises::test_AC_STORY_03_01_3_jsonl_byte_identical_on_conflict PASSED [  7%]
+tests/test_atomic_batch.py::AC_STORY_03_01_3_SecondElementConflictRaises::test_AC_STORY_03_01_3_no_file_created_when_pre_batch_empty PASSED [  8%]
+tests/test_atomic_batch.py::AC_STORY_03_01_4_FirstElementConflictRaises::test_AC_STORY_03_01_4_conflict_at_index_zero_carries_fields PASSED [  8%]
+tests/test_atomic_batch.py::AC_STORY_03_01_4_FirstElementConflictRaises::test_AC_STORY_03_01_4_jsonl_unchanged_on_conflict PASSED [  9%]
+tests/test_atomic_batch.py::AC_STORY_03_01_4_FirstElementConflictRaises::test_AC_STORY_03_01_4_no_stray_temp_files_left PASSED [ 10%]
+tests/test_atomic_batch.py::AC_STORY_03_01_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_03_01_5_jsonl_byte_identical_after_simulated_crash PASSED [ 11%]
+tests/test_atomic_batch.py::AC_STORY_03_01_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_03_01_5_no_stray_temp_files_after_simulated_crash PASSED [ 11%]
+tests/test_atomic_batch.py::AC_STORY_03_01_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_03_01_5_verify_returns_ok_after_simulated_crash PASSED [ 12%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_1_VerifyExitsZeroWithOkStderr::test_AC_STORY_04_01_1_verify_exit_zero PASSED [ 13%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_1_VerifyExitsZeroWithOkStderr::test_AC_STORY_04_01_1_verify_stderr_single_line PASSED [ 13%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_1_VerifyExitsZeroWithOkStderr::test_AC_STORY_04_01_1_verify_stdout_empty PASSED [ 14%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_2_SnapshotWritesCanonicalBytesToOut::test_AC_STORY_04_01_2_snapshot_bytes_match_canonical PASSED [ 15%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_2_SnapshotWritesCanonicalBytesToOut::test_AC_STORY_04_01_2_snapshot_ends_with_newline PASSED [ 15%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_2_SnapshotWritesCanonicalBytesToOut::test_AC_STORY_04_01_2_snapshot_exit_zero PASSED [ 16%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_2_SnapshotWritesCanonicalBytesToOut::test_AC_STORY_04_01_2_snapshot_stdout_empty PASSED [ 17%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_3_ApplyCommitsBatchAndStdoutEmpty::test_AC_STORY_04_01_3_apply_against_fresh_ledger PASSED [ 17%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_3_ApplyCommitsBatchAndStdoutEmpty::test_AC_STORY_04_01_3_apply_exit_zero PASSED [ 18%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_3_ApplyCommitsBatchAndStdoutEmpty::test_AC_STORY_04_01_3_apply_jsonl_has_exactly_batch_lines PASSED [ 19%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_3_ApplyCommitsBatchAndStdoutEmpty::test_AC_STORY_04_01_3_apply_stdout_empty PASSED [ 20%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_4_RepairTailIsByteIdenticalOnCleanJsonl::test_AC_STORY_04_01_4_repair_tail_byte_identical PASSED [ 20%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_4_RepairTailIsByteIdenticalOnCleanJsonl::test_AC_STORY_04_01_4_repair_tail_exit_zero PASSED [ 21%]
+tests/test_cli_exit_codes.py::AC_STORY_04_01_4_RepairTailIsByteIdenticalOnCleanJsonl::test_AC_STORY_04_01_4_repair_tail_stdout_empty PASSED [ 22%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_apply_with_extra_positional_exits_two_silent_stdout PASSED [ 22%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_apply_with_no_args_exits_two_silent_stdout PASSED [ 23%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_repair_tail_with_extra_positional_exits_two_silent_stdout PASSED [ 24%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_repair_tail_with_no_args_exits_two_silent_stdout PASSED [ 24%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_snapshot_with_no_args_exits_two_silent_stdout PASSED [ 25%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_verify_with_extra_positional_exits_two_silent_stdout PASSED [ 26%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_1_WrongPositionalArgCountExitsTwoAndSilentStdout::test_AC_STORY_04_02_1_verify_with_no_args_exits_two_silent_stdout PASSED [ 26%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_2_ApplyBatchMissingFileExitsThreeAndSilentStdout::test_AC_STORY_04_02_2_missing_batch_file_exits_three_silent_stdout FAILED [ 27%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_3_ApplyBatchConflictExitsFourAndLeavesJsonlIntact::test_AC_STORY_04_02_3_conflicting_apply_exits_four_silent_stdout FAILED [ 28%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_4_VerifyOnCorruptedJsonlExitsFiveAndSilentStdout::test_AC_STORY_04_02_4_verify_on_corrupted_line_17_exits_five_silent_stdout PASSED [ 28%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_5_RepairTailMidChainCorruptionExitsFiveAndSilentStdout::test_AC_STORY_04_02_5_repair_tail_on_mid_chain_corruption_exits_five_silent_stdout FAILED [ 29%]
+tests/test_cli_exit_codes.py::AC_STORY_04_02_6_SnapshotWithoutOutExitsTwo::test_AC_STORY_04_02_6_snapshot_without_out_exits_two_silent_stdout PASSED [ 30%]
+tests/test_cli_exit_codes.py::ContractAd9ExceptionMappingInMain::test_apply_with_empty_key_batch_element_exits_two FAILED [ 31%]
+tests/test_cli_exit_codes.py::ContractAd9ExceptionMappingInMain::test_snapshot_on_missing_ledger_file_exits_three FAILED [ 31%]
+tests/test_cli_exit_codes.py::ContractAd9ExceptionMappingInMain::test_snapshot_out_to_unwritable_path_exits_three FAILED [ 32%]
+tests/test_cli_exit_codes.py::ContractAd9ExceptionMappingInMain::test_verify_on_missing_ledger_file_exits_three FAILED [ 33%]
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_does_not_change_chain_length PASSED [ 33%]
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_does_not_rewrite_disk PASSED [ 34%]
+tests/test_conflict.py::AC_STORY_01_06_1_SameRidReplayReturnsOriginalLineDict::test_AC_STORY_01_06_1_replay_returns_original_line_dict PASSED [ 35%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_conflict_carries_key_field PASSED [ 35%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_conflict_keeps_chain_length PASSED [ 36%]
+tests/test_conflict.py::AC_STORY_01_06_2_DifferentRidRaisesConflictError::test_AC_STORY_01_06_2_different_rid_raises_ConflictError PASSED [ 37%]
+tests/test_conflict.py::AC_STORY_01_06_3_PutAfterDeleteWithDifferentRidRaisesConflict::test_AC_STORY_01_06_3_put_after_delete_different_rid_raises PASSED [ 37%]
+tests/test_conflict.py::AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay::test_AC_STORY_01_06_4_replay_after_delete_does_not_grow_chain PASSED [ 38%]
+tests/test_conflict.py::AC_STORY_01_06_4_PutAfterDeleteSameRidIsReplay::test_AC_STORY_01_06_4_replay_after_delete_returns_delete_line PASSED [ 39%]
+tests/test_conflict.py::AC_STORY_01_06_5_NfcKeyEquivalenceInReplay::test_AC_STORY_01_06_5_nfc_key_in_returned_dict_is_byte_exact PASSED [ 40%]
+tests/test_conflict.py::AC_STORY_01_06_5_NfcKeyEquivalenceInReplay::test_AC_STORY_01_06_5_nfd_form_replays_against_nfc_committed PASSED [ 40%]
+tests/test_format.py::AC_STORY_01_02_1_CanonicalBytesBaseline::test_AC_STORY_01_02_1_matches_documented_json_dumps PASSED [ 41%]
+tests/test_format.py::AC_STORY_01_02_2_DeterminismForEqualDicts::test_AC_STORY_01_02_2_two_equal_dicts_byte_identical PASSED [ 42%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_byte_stable_across_invocations PASSED [ 42%]
+tests/test_format.py::AC_STORY_01_02_3_NonAsciiUtf8::test_AC_STORY_01_02_3_non_ascii_is_utf8_literal PASSED [ 43%]
+tests/test_format.py::AC_STORY_01_02_4_InsertionOrderIndependence::test_AC_STORY_01_02_4_insertion_order_independent PASSED [ 44%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_distinct_from_64_char_hex PASSED [ 44%]
+tests/test_format.py::AC_STORY_01_02_5_GenesisConstant::test_AC_STORY_01_02_5_genesis_is_literal_string PASSED [ 45%]
+tests/test_format.py::AC_STORY_01_02_6_RoundTripStability::test_AC_STORY_01_02_6_roundtrip_through_json_loads PASSED [ 46%]
+tests/test_format.py::AC_STORY_01_03_1_64LowercaseHexChars::test_AC_STORY_01_03_1_returns_64_lower_hex PASSED [ 46%]
+tests/test_format.py::AC_STORY_01_03_2_PrevHashChangesDigest::test_AC_STORY_01_03_2_distinct_prev_hash_distinct_digest PASSED [ 47%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_does_not_mutate_input PASSED [ 48%]
+tests/test_format.py::AC_STORY_01_03_3_IgnoresExistingHashFields::test_AC_STORY_01_03_3_ignores_existing_hash_fields PASSED [ 48%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_matches_documented_sha256_formula PASSED [ 49%]
+tests/test_format.py::AC_STORY_01_03_4_Determinism::test_AC_STORY_01_03_4_repeatable_across_invocations PASSED [ 50%]
+tests/test_format.py::AC_STORY_01_03_5_GenesisAccepted::test_AC_STORY_01_03_5_genesis_non_hex_accepted PASSED [ 51%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_file_exists_with_exactly_one_line PASSED [ 51%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_hash_matches_line_hash_formula PASSED [ 52%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_is_bytes_safe_json PASSED [ 53%]
+tests/test_ledger.py::AC_STORY_01_05_1_FirstAppendCreatesLineWithGenesisPrevHash::test_AC_STORY_01_05_1_line_fields_match_inputs PASSED [ 53%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_first_line_hash_is_chained_at_GENESIS PASSED [ 54%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_hash_equals_line_hash_formula PASSED [ 55%]
+tests/test_ledger.py::AC_STORY_01_05_2_SecondAppendChainsFromFirstHash::test_AC_STORY_01_05_2_second_prev_hash_equals_first_hash PASSED [ 55%]
+tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_empty_key_raises_ValueError PASSED [ 56%]
+tests/test_ledger.py::AC_STORY_01_05_3_EmptyKeyRaisesValueError::test_AC_STORY_01_05_3_no_file_created_on_failure PASSED [ 57%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_empty_existing_file_chains_from_GENESIS PASSED [ 57%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_fresh_instance_chains_from_disk_tail PASSED [ 58%]
+tests/test_ledger.py::AC_STORY_01_05_4_FreshInstanceReadsTailFromDisk::test_AC_STORY_01_05_4_in_memory_state_does_not_leak PASSED [ 59%]
+tests/test_ledger.py::AC_STORY_01_05_5_OtherProcessSeesLineAfterAppendReturns::test_AC_STORY_01_05_5_other_process_finds_line PASSED [ 60%]
+tests/test_ledger.py::ACStory0105AppendFsyncIntegration::test_AC_STORY_01_05_fsync_called_on_append_mode_handle PASSED [ 60%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_1_already_nfc_is_unchanged PASSED [ 61%]
+tests/test_nfc_normalization.py::NFCNormalizationTests::test_AC_STORY_01_01_2_combining_marks_collapse PASSED [ 62%]
+tests/test_repair_tail.py::AC_STORY_03_02_1_TruncatedFinalLineIsStripped::test_AC_STORY_03_02_1_only_final_line_is_dropped PASSED [ 62%]
+tests/test_repair_tail.py::AC_STORY_03_02_1_TruncatedFinalLineIsStripped::test_AC_STORY_03_02_1_truncated_tail_with_newline_but_invalid_json PASSED [ 63%]
+tests/test_repair_tail.py::AC_STORY_03_02_1_TruncatedFinalLineIsStripped::test_AC_STORY_03_02_1_truncated_tail_without_newline_is_removed PASSED [ 64%]
+tests/test_repair_tail.py::AC_STORY_03_02_2_CleanJsonlIsByteIdenticalAfterRepair::test_AC_STORY_03_02_2_clean_chain_byte_identical_before_after PASSED [ 64%]
+tests/test_repair_tail.py::AC_STORY_03_02_2_CleanJsonlIsByteIdenticalAfterRepair::test_AC_STORY_03_02_2_clean_chain_missing_trailing_newline_is_noop PASSED [ 65%]
+tests/test_repair_tail.py::AC_STORY_03_02_2_CleanJsonlIsByteIdenticalAfterRepair::test_AC_STORY_03_02_2_clean_chain_returns_ok_true PASSED [ 66%]
+tests/test_repair_tail.py::AC_STORY_03_02_2_CleanJsonlIsByteIdenticalAfterRepair::test_AC_STORY_03_02_2_empty_file_is_noop PASSED [ 66%]
+tests/test_repair_tail.py::AC_STORY_03_02_2_CleanJsonlIsByteIdenticalAfterRepair::test_AC_STORY_03_02_2_single_line_clean_chain_byte_identical PASSED [ 67%]
+tests/test_repair_tail.py::AC_STORY_03_02_3_TruncatedTailPlusMidChainCorruptionRefuses::test_AC_STORY_03_02_3_mid_chain_corruption_blocks_repair PASSED [ 68%]
+tests/test_repair_tail.py::AC_STORY_03_02_3_TruncatedTailPlusMidChainCorruptionRefuses::test_AC_STORY_03_02_3_mid_chain_tamper_at_index_one_blocks_repair PASSED [ 68%]
+tests/test_repair_tail.py::AC_STORY_03_02_4_LastLineHashBrokenRefuses::test_AC_STORY_03_02_4_tail_hash_tamper_blocks_repair PASSED [ 69%]
+tests/test_repair_tail.py::AC_STORY_03_02_4_LastLineHashBrokenRefuses::test_AC_STORY_03_02_4_tail_prev_hash_tamper_blocks_repair PASSED [ 70%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_byte_for_byte PASSED [ 71%]
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input 
+tests/test_skeleton.py::AC_STORY_01_01_1_NfcIdentity::test_AC_STORY_01_01_1_returns_nfc_of_input PASSED [ 71%]
+tests/test_skeleton.py::AC_STORY_01_01_2_NfcNfdEquivalence::test_AC_STORY_01_01_2_nfc_and_nfd_are_byte_identical PASSED [ 72%]
+tests/test_skeleton.py::AC_STORY_01_01_3_PackageImportable::test_AC_STORY_01_01_3_subprocess_import_resolves PASSED [ 73%]
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands 
+tests/test_skeleton.py::AC_STORY_01_01_4_CliHelpSurface::test_AC_STORY_01_01_4_help_lists_subcommands PASSED [ 73%]
+tests/test_skeleton.py::AC_STORY_01_01_5_NoForbiddenImports::test_AC_STORY_01_01_5_grep_returns_no_matches PASSED [ 74%]
+tests/test_skeleton.py::AC_STORY_01_01_6_NoForbiddenCalls::test_AC_STORY_01_01_6_grep_returns_no_matches PASSED [ 75%]
+tests/test_skeleton.py::AC_STORY_01_01_7_PublicApi::test_AC_STORY_01_01_7_ledger_is_callable_class PASSED [ 75%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_1_SnapshotReturnsKeysInInsertionOrderSerializedAsNfcUtf8::test_AC_STORY_02_02_1_json_serialization_orders_keys_a_b_c PASSED [ 76%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_1_SnapshotReturnsKeysInInsertionOrderSerializedAsNfcUtf8::test_AC_STORY_02_02_1_keys_are_not_in_insertion_order_for_abc PASSED [ 77%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_1_SnapshotReturnsKeysInInsertionOrderSerializedAsNfcUtf8::test_AC_STORY_02_02_1_two_snapshot_calls_return_equal_dicts PASSED [ 77%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_2_DeleteRemovesKeyFromSnapshot::test_AC_STORY_02_02_2_delete_only_drops_targeted_key PASSED [ 78%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_2_DeleteRemovesKeyFromSnapshot::test_AC_STORY_02_02_2_snapshot_after_delete_drops_key PASSED [ 79%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_3_NfdFollowedByNfcSameRidIsIdempotentAndKeepsValue::test_AC_STORY_02_02_3_key_in_snapshot_is_byte_exact_nfc PASSED [ 80%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_3_NfdFollowedByNfcSameRidIsIdempotentAndKeepsValue::test_AC_STORY_02_02_3_nfd_put_then_nfc_replay_keeps_first_value PASSED [ 80%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_4_TwoInstancesOverSameChainReturnEqualSnapshots::test_AC_STORY_02_02_4_fresh_instance_after_delete PASSED [ 81%]
+tests/test_snapshot_determinism.py::AC_STORY_02_02_4_TwoInstancesOverSameChainReturnEqualSnapshots::test_AC_STORY_02_02_4_two_instances_over_same_chain PASSED [ 82%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_each_element_is_bytes PASSED [ 82%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_preserves_inner_newlines_as_bytes PASSED [ 83%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_strips_only_trailing_newline PASSED [ 84%]
+tests/test_store.py::AC_STORY_01_04_1_ReadLinesReturnsNBytesWithoutTrailingNewline::test_AC_STORY_01_04_1_three_lines_returns_three_bytes PASSED [ 84%]
+tests/test_store.py::AC_STORY_01_04_2_MissingFileRaisesFileNotFoundError::test_AC_STORY_01_04_2_missing_path_raises PASSED [ 85%]
+tests/test_store.py::AC_STORY_01_04_3_EmptyFileReturnsEmptyList::test_AC_STORY_01_04_3_empty_file_returns_empty_list PASSED [ 86%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_empty_list_produces_empty_file PASSED [ 86%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_single_line PASSED [ 87%]
+tests/test_store.py::AC_STORY_01_04_4_WriteAtomicProducesJoinedBytes::test_AC_STORY_01_04_4_two_lines_byte_concat PASSED [ 88%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_crash_leaves_original_intact PASSED [ 88%]
+tests/test_store.py::AC_STORY_01_04_5_CrashBeforeReplaceLeavesOriginalIntact::test_AC_STORY_01_04_5_no_stray_temp_files_after_crash PASSED [ 89%]
+tests/test_store.py::AC_STORY_01_04_6_TempFileLivesInSameDirectory::test_AC_STORY_01_04_6_tempfile_dir_is_target_parent PASSED [ 90%]
+tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_does_not_raise PASSED [ 91%]
+tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_fresh_instance_after_append_returns_ok_true PASSED [ 91%]
+tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_single_line_returns_ok_true PASSED [ 92%]
+tests/test_verify_independent.py::AC_STORY_02_01_1_NValidLinesReturnsOkTrue::test_AC_STORY_02_01_1_three_lines_returns_ok_true PASSED [ 93%]
+tests/test_verify_independent.py::AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue::test_AC_STORY_02_01_2_empty_file_does_not_raise PASSED [ 93%]
+tests/test_verify_independent.py::AC_STORY_02_01_2_ZeroByteJsonlReturnsOkTrue::test_AC_STORY_02_01_2_empty_file_returns_ok_true PASSED [ 94%]
+tests/test_verify_independent.py::AC_STORY_02_01_3_MissingPathRaisesFileNotFoundError::test_AC_STORY_02_01_3_missing_path_raises_FileNotFoundError PASSED [ 95%]
+tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_first_line_hash_overwritten_returns_index_zero PASSED [ 95%]
+tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_fresh_instance_does_not_trust_cache PASSED [ 96%]
+tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_middle_line_hash_overwritten_returns_that_index PASSED [ 97%]
+tests/test_verify_independent.py::AC_STORY_02_01_4_HashFieldTamperedReturnsBadIndex::test_AC_STORY_02_01_4_prev_hash_tamper_returns_first_affected_index PASSED [ 97%]
+tests/test_verify_independent.py::AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex::test_AC_STORY_02_01_5_fresh_instance_after_append_detects_tamper PASSED [ 98%]
+tests/test_verify_independent.py::AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex::test_AC_STORY_02_01_5_second_line_value_mutated_returns_index_one PASSED [ 99%]
+tests/test_verify_independent.py::AC_STORY_02_01_5_ValueFieldMutatedReturnsBadIndex::test_AC_STORY_02_01_5_value_mutated_returns_that_index PASSED [100%]
+
+=================================== FAILURES ===================================
+_ AC_STORY_04_02_2_ApplyBatchMissingFileExitsThreeAndSilentStdout.test_AC_STORY_04_02_2_missing_batch_file_exits_three_silent_stdout _
+
+self = <tests.test_cli_exit_codes.AC_STORY_04_02_2_ApplyBatchMissingFileExitsThreeAndSilentStdout testMethod=test_AC_STORY_04_02_2_missing_batch_file_exits_three_silent_stdout>
+
+    def test_AC_STORY_04_02_2_missing_batch_file_exits_three_silent_stdout(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            ledger_path = tmp_path / "ledger.jsonl"
+            missing_batch = tmp_path / "does-not-exist.json"
+            self.assertFalse(missing_batch.exists())
+            ledger_path.write_text("", encoding="utf-8")
+    
+            completed = _run_cli(
+                "apply", "--batch", str(missing_batch), str(ledger_path)
+            )
+    
+>           self.assertEqual(
+                completed.returncode,
+                3,
+                msg=(
+                    "AD-9 maps missing --batch file to exit code 3; "
+                    f"got returncode={completed.returncode} "
+                    f"stderr={completed.stderr!r} stdout={completed.stdout!r}"
+                ),
+            )
+E           AssertionError: 1 != 3 : AD-9 maps missing --batch file to exit code 3; got returncode=1 stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _run_module_as_main\n  File "<frozen runpy>", line 88, in _run_code\n  File "/workspace/ledgerlock/__main__.py", line 10, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 185, in main\n    return _cmd_apply(args.ledger, args.batch)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 152, in _cmd_apply\n    ops = _load_batch(batch_path)\n          ^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 89, in _load_batch\n    raw = Path(batch_path).read_text(encoding="utf-8")\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/pathlib.py", line 1027, in read_text\n    with self.open(mode=\'r\', encoding=encoding, errors=errors) as f:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/pathlib.py", line 1013, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/tmp/tmpvr6312qo/does-not-exist.json\'\n' stdout=''
+
+tests/test_cli_exit_codes.py:701: AssertionError
+_ AC_STORY_04_02_3_ApplyBatchConflictExitsFourAndLeavesJsonlIntact.test_AC_STORY_04_02_3_conflicting_apply_exits_four_silent_stdout _
+
+self = <tests.test_cli_exit_codes.AC_STORY_04_02_3_ApplyBatchConflictExitsFourAndLeavesJsonlIntact testMethod=test_AC_STORY_04_02_3_conflicting_apply_exits_four_silent_stdout>
+
+    def test_AC_STORY_04_02_3_conflicting_apply_exits_four_silent_stdout(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            ledger_path = _fresh_ledger_with_conflict_seed(tmp_path)
+            batch_path = tmp_path / "batch.json"
+            batch_path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "op": "put",
+                            "key": "k",
+                            "value": "v2",
+                            "rid": "r2",
+                            "ts": 200,
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+    
+            before_bytes = ledger_path.read_bytes()
+            self.assertTrue(
+                before_bytes,
+                msg="seed ledger must contain at least one line before apply",
+            )
+    
+            completed = _run_cli(
+                "apply", "--batch", str(batch_path), str(ledger_path)
+            )
+    
+>           self.assertEqual(
+                completed.returncode,
+                4,
+                msg=(
+                    "AD-9 maps ConflictError to exit code 4; "
+                    f"got returncode={completed.returncode} "
+                    f"stderr={completed.stderr!r} stdout={completed.stdout!r}"
+                ),
+            )
+E           AssertionError: 1 != 4 : AD-9 maps ConflictError to exit code 4; got returncode=1 stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _run_module_as_main\n  File "<frozen runpy>", line 88, in _run_code\n  File "/workspace/ledgerlock/__main__.py", line 10, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 185, in main\n    return _cmd_apply(args.ledger, args.batch)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 153, in _cmd_apply\n    Ledger(ledger_path).apply_batch(ops)\n  File "/workspace/ledgerlock/ledger.py", line 282, in apply_batch\n    raise err\nledgerlock.ConflictError: rid conflict on key \'k\': incoming=\'r2\' committed=\'r1\'\n' stdout=''
+
+tests/test_cli_exit_codes.py:759: AssertionError
+_ AC_STORY_04_02_5_RepairTailMidChainCorruptionExitsFiveAndSilentStdout.test_AC_STORY_04_02_5_repair_tail_on_mid_chain_corruption_exits_five_silent_stdout _
+
+self = <tests.test_cli_exit_codes.AC_STORY_04_02_5_RepairTailMidChainCorruptionExitsFiveAndSilentStdout testMethod=test_AC_STORY_04_02_5_repair_tail_on_mid_chain_corruption_exits_five_silent_stdout>
+
+    def test_AC_STORY_04_02_5_repair_tail_on_mid_chain_corruption_exits_five_silent_stdout(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            ledger_path = _fresh_twenty_line_ledger(tmp_path)
+    
+            raw_bytes = ledger_path.read_bytes()
+            raw_lines = raw_bytes.splitlines(keepends=False)
+            self.assertEqual(
+                len(raw_lines),
+                20,
+                msg=(
+                    "the test fixture must produce a 20-line ledger; "
+                    f"got {len(raw_lines)} lines"
+                ),
+            )
+    
+            target_index = 17
+            target_line = raw_lines[target_index]
+            target_obj = json.loads(target_line.decode("utf-8"))
+            original_hash = target_obj["hash"]
+            mutated = dict(target_obj)
+            mutated["value"] = "tampered"
+            mutated["hash"] = original_hash
+            mutated_bytes = json.dumps(mutated, separators=(",", ":")).encode("utf-8")
+    
+            raw_lines[target_index] = mutated_bytes
+            new_bytes = b"\n".join(raw_lines) + b"\n"
+            ledger_path.write_bytes(new_bytes)
+    
+            before_bytes = ledger_path.read_bytes()
+    
+            completed = _run_cli("repair-tail", str(ledger_path))
+    
+>           self.assertEqual(
+                completed.returncode,
+                5,
+                msg=(
+                    "AD-9 maps repair-tail mid-chain corruption to exit code 5; "
+                    f"got returncode={completed.returncode} "
+                    f"stderr={completed.stderr!r} stdout={completed.stdout!r}"
+                ),
+            )
+E           AssertionError: 0 != 5 : AD-9 maps repair-tail mid-chain corruption to exit code 5; got returncode=0 stderr='no-op: chain clean\n' stdout=''
+
+tests/test_cli_exit_codes.py:903: AssertionError
+_ ContractAd9ExceptionMappingInMain.test_apply_with_empty_key_batch_element_exits_two _
+
+self = <tests.test_cli_exit_codes.ContractAd9ExceptionMappingInMain testMethod=test_apply_with_empty_key_batch_element_exits_two>
+
+    def test_apply_with_empty_key_batch_element_exits_two(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            ledger_path = tmp_path / "ledger.jsonl"
+            batch_path = tmp_path / "batch.json"
+            ledger_path.write_text("", encoding="utf-8")
+            batch_path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "op": "put",
+                            "key": "",
+                            "value": 1,
+                            "rid": "r1",
+                            "ts": 100,
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+    
+            completed = _run_cli(
+                "apply", "--batch", str(batch_path), str(ledger_path)
+            )
+    
+>           self.assertEqual(
+                completed.returncode,
+                2,
+                msg=(
+                    "AD-9 maps an empty-key ValueError from the library to exit 2; "
+                    f"got returncode={completed.returncode} "
+                    f"stderr={completed.stderr!r} stdout={completed.stdout!r}"
+                ),
+            )
+E           AssertionError: 1 != 2 : AD-9 maps an empty-key ValueError from the library to exit 2; got returncode=1 stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _run_module_as_main\n  File "<frozen runpy>", line 88, in _run_code\n  File "/workspace/ledgerlock/__main__.py", line 10, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 185, in main\n    return _cmd_apply(args.ledger, args.batch)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 153, in _cmd_apply\n    Ledger(ledger_path).apply_batch(ops)\n  File "/workspace/ledgerlock/ledger.py", line 261, in apply_batch\n    raise ValueError(\nValueError: key must be a non-empty NFC-normalized string\n' stdout=''
+
+tests/test_cli_exit_codes.py:1083: AssertionError
+_ ContractAd9ExceptionMappingInMain.test_snapshot_on_missing_ledger_file_exits_three _
+
+self = <tests.test_cli_exit_codes.ContractAd9ExceptionMappingInMain testMethod=test_snapshot_on_missing_ledger_file_exits_three>
+
+    def test_snapshot_on_missing_ledger_file_exits_three(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "does-not-exist.jsonl"
+            snap_path = Path(tmp) / "snap.json"
+            self.assertFalse(missing.exists())
+    
+            completed = _run_cli(
+                "snapshot", str(missing), "--out", str(snap_path)
+            )
+    
+>           self.assertEqual(
+                completed.returncode,
+                3,
+                msg=(
+                    "AD-9 maps a missing ledger (FileNotFoundError) to exit 3; "
+                    f"got returncode={completed.returncode} "
+                    f"stderr={completed.stderr!r} stdout={completed.stdout!r}"
+                ),
+            )
+E           AssertionError: 1 != 3 : AD-9 maps a missing ledger (FileNotFoundError) to exit 3; got returncode=1 stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _run_module_as_main\n  File "<frozen runpy>", line 88, in _run_code\n  File "/workspace/ledgerlock/__main__.py", line 10, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 183, in main\n    return _cmd_snapshot(args.ledger, args.out)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 145, in _cmd_snapshot\n    state = Ledger(ledger_path).snapshot()\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/ledger.py", line 398, in snapshot\n    raw_lines = read_lines(self._path)\n                ^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/store.py", line 21, in read_lines\n    with open(p, "rb") as handle:\n         ^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/tmp/tmprnt7gigf/does-not-exist.jsonl\'\n' stdout=''
+
+tests/test_cli_exit_codes.py:1012: AssertionError
+_ ContractAd9ExceptionMappingInMain.test_snapshot_out_to_unwritable_path_exits_three _
+
+self = <tests.test_cli_exit_codes.ContractAd9ExceptionMappingInMain testMethod=test_snapshot_out_to_unwritable_path_exits_three>
+
+    def test_snapshot_out_to_unwritable_path_exits_three(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            ledger_path = tmp_path / "ledger.jsonl"
+            ledger_path.write_text("", encoding="utf-8")
+    
+            completed = _run_cli(
+                "snapshot", str(ledger_path), "--out", "/dev/null/snap.json"
+            )
+    
+>           self.assertEqual(
+                completed.returncode,
+                3,
+                msg=(
+                    "AD-9 maps a write failure on --out to exit 3; "
+                    f"got returncode={completed.returncode} "
+                    f"stderr={completed.stderr!r} stdout={completed.stdout!r}"
+                ),
+            )
+E           AssertionError: 1 != 3 : AD-9 maps a write failure on --out to exit 3; got returncode=1 stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _run_module_as_main\n  File "<frozen runpy>", line 88, in _run_code\n  File "/workspace/ledgerlock/__main__.py", line 10, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 183, in main\n    return _cmd_snapshot(args.ledger, args.out)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 146, in _cmd_snapshot\n    _write_snapshot(out_path, state)\n  File "/workspace/ledgerlock/cli.py", line 130, in _write_snapshot\n    target_dir.mkdir(parents=True, exist_ok=True)\n  File "/usr/local/lib/python3.12/pathlib.py", line 1311, in mkdir\n    os.mkdir(self, mode)\nFileExistsError: [Errno 17] File exists: \'/dev/null\'\n' stdout=''
+
+tests/test_cli_exit_codes.py:1040: AssertionError
+_ ContractAd9ExceptionMappingInMain.test_verify_on_missing_ledger_file_exits_three _
+
+self = <tests.test_cli_exit_codes.ContractAd9ExceptionMappingInMain testMethod=test_verify_on_missing_ledger_file_exits_three>
+
+    def test_verify_on_missing_ledger_file_exits_three(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "does-not-exist.jsonl"
+            self.assertFalse(missing.exists())
+    
+            completed = _run_cli("verify", str(missing))
+    
+>           self.assertEqual(
+                completed.returncode,
+                3,
+                msg=(
+                    "AD-9 maps a missing ledger (FileNotFoundError) to exit 3; "
+                    f"got returncode={completed.returncode} "
+                    f"stderr={completed.stderr!r} stdout={completed.stdout!r}"
+                ),
+            )
+E           AssertionError: 1 != 3 : AD-9 maps a missing ledger (FileNotFoundError) to exit 3; got returncode=1 stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _run_module_as_main\n  File "<frozen runpy>", line 88, in _run_code\n  File "/workspace/ledgerlock/__main__.py", line 10, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 181, in main\n    return _cmd_verify(args.ledger)\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/cli.py", line 136, in _cmd_verify\n    verdict = Ledger(ledger_path).verify()\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/ledger.py", line 435, in verify\n    raw_lines = read_lines(self._path)\n                ^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspace/ledgerlock/store.py", line 21, in read_lines\n    with open(p, "rb") as handle:\n         ^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/tmp/tmp1llvyk4u/does-not-exist.jsonl\'\n' stdout=''
+
+tests/test_cli_exit_codes.py:984: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_cli_exit_codes.py::AC_STORY_04_02_2_ApplyBatchMissingFileExitsThreeAndSilentStdout::test_AC_STORY_04_02_2_missing_batch_file_exits_three_silent_stdout
+FAILED tests/test_cli_exit_codes.py::AC_STORY_04_02_3_ApplyBatchConflictExitsFourAndLeavesJsonlIntact::test_AC_STORY_04_02_3_conflicting_apply_exits_four_silent_stdout
+FAILED tests/test_cli_exit_codes.py::AC_STORY_04_02_5_RepairTailMidChainCorruptionExitsFiveAndSilentStdout::test_AC_STORY_04_02_5_repair_tail_on_mid_chain_corruption_exits_five_silent_stdout
+FAILED tests/test_cli_exit_codes.py::ContractAd9ExceptionMappingInMain::test_apply_with_empty_key_batch_element_exits_two
+FAILED tests/test_cli_exit_codes.py::ContractAd9ExceptionMappingInMain::test_snapshot_on_missing_ledger_file_exits_three
+FAILED tests/test_cli_exit_codes.py::ContractAd9ExceptionMappingInMain::test_snapshot_out_to_unwritable_path_exits_three
+FAILED tests/test_cli_exit_codes.py::ContractAd9ExceptionMappingInMain::test_verify_on_missing_ledger_file_exits_three
+=============== 7 failed, 138 passed, 9 subtests passed in 2.18s ===============

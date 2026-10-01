@@ -1,0 +1,479 @@
+{
+ "map": "LedgerLock reference fixture — requirement -> reference behaviour -> acceptance assertions -> mutants (WP-2.0.3); closed over every section of REQUIREMENTS.md",
+ "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+ "requirements": [
+  {
+   "id": "R-1",
+   "heading": "Purpose",
+   "lines": [
+    3,
+    9
+   ],
+   "sha256": "f1af46969390765979ca43091a131dc8ae8fa45104d0743454b912d1394f8748",
+   "kind": "DESCRIPTIVE",
+   "reason": "purpose statement; the behaviours it names are R-3..R-9"
+  },
+  {
+   "id": "R-2",
+   "heading": "Non-Goals",
+   "lines": [
+    10,
+    16
+   ],
+   "sha256": "6e07aef17d190064b49f633d491b55f277e124914c8102236a8890fa7f3b9a11",
+   "kind": "DESCRIPTIVE",
+   "reason": "non-goals; the absence of network, server, UI and database is the shape of the reference, not a measured behaviour (R-12 measures the side-channel half)"
+  },
+  {
+   "id": "R-3",
+   "heading": "Storage",
+   "lines": [
+    17,
+    18
+   ],
+   "sha256": "c5cbd35556380c6875652afad65edb642312d02160eedea05543e0b36e18a83a",
+   "kind": "CONTAINER",
+   "reason": "heading of R-3.1..R-3.4"
+  },
+  {
+   "id": "R-3.1",
+   "heading": "Key normalization (Unicode NFC)",
+   "lines": [
+    19,
+    25
+   ],
+   "sha256": "082f7bc80a517c0ed2030d4f573b165be1807b4260c270c05638e02d9b6ef51d",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::normalize_key",
+    "ledgerlock/ledger.py::_plan"
+   ],
+   "behaviour": "every key is NFC before storage, lookup, hashing and serialisation; NFD and NFC spellings are one key",
+   "assertions": [
+    "A-3.1-a"
+   ],
+   "mutants": [
+    "M-3.1-1"
+   ]
+  },
+  {
+   "id": "R-3.2",
+   "heading": "JSONL hash chain",
+   "lines": [
+    26,
+    43
+   ],
+   "sha256": "1b9bb8062a3b74bb3a91d7a0689ec7ca25248587dc1d008217d253b26080e603",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::canonical_bytes",
+    "ledgerlock/ledger.py::line_hash",
+    "ledgerlock/ledger.py::encode_line",
+    "ledgerlock/ledger.py::Ledger.append"
+   ],
+   "behaviour": "one JSONL line per mutation with hash = SHA-256(prev_hash || '|' || canonical bytes with hash and prev_hash blank); the first prev_hash is the literal GENESIS; lines are appended, never rewritten",
+   "assertions": [
+    "A-3.2-a",
+    "A-3.2-b"
+   ],
+   "mutants": [
+    "M-3.2-1",
+    "M-3.2-2"
+   ],
+   "interpretation": "canonical bytes = JSON with sorted keys, no whitespace, non-ASCII kept; the constant is the literal string GENESIS"
+  },
+  {
+   "id": "R-3.3",
+   "heading": "Tamper evidence",
+   "lines": [
+    44,
+    53
+   ],
+   "sha256": "0fbf4ad694ddbd7d4de02645807f637c4b7dee479bbc3eba552d187bd5305e49",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::verify_records"
+   ],
+   "behaviour": "a full recomputation from disk detects a mutated value, a swapped op, a modified hash and a broken link, reporting the first bad index; a clean chain is ok",
+   "assertions": [
+    "A-3.3-a",
+    "A-3.3-b",
+    "A-3.3-c",
+    "A-3.3-d",
+    "A-3.3-e",
+   "A-3.3-f"
+   ],
+   "mutants": [
+    "M-3.3-1",
+    "M-3.3-2",
+    "M-3.3-3"
+   ]
+  },
+  {
+   "id": "R-3.4",
+   "heading": "Independent verify",
+   "lines": [
+    54,
+    59
+   ],
+   "sha256": "aee4d9bede00d0626ba9c445f24177d00a8c08703e90ae32de652cd0cf742e5e",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::Ledger.verify",
+    "ledgerlock/ledger.py::verify_raw"
+   ],
+   "behaviour": "verify reads the chain from disk and consults nothing the instance remembers, so a tamper after the same instance appended is detected",
+   "assertions": [
+    "A-3.4-a"
+   ],
+   "mutants": [
+    "M-3.4-1"
+   ]
+  },
+  {
+   "id": "R-4",
+   "heading": "Idempotency and Conflict Semantics",
+   "lines": [
+    60,
+    61
+   ],
+   "sha256": "088752d1132c01a898293b1c6002c2cfb9ca96b9468b842f76d4d5e928714f64",
+   "kind": "CONTAINER",
+   "reason": "heading of R-4.1..R-4.5"
+  },
+  {
+   "id": "R-4.1",
+   "heading": "Request IDs",
+   "lines": [
+    62,
+    67
+   ],
+   "sha256": "2bc80e4df25272460a161d6d4d287d5eca5432237f6873ee7c9f0302c01d81ac",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan"
+   ],
+   "behaviour": "a rid is a non-empty string; an empty rid is refused (ValueError; CLI exit 2) and nothing is written",
+   "assertions": [
+    "A-4.1-a"
+   ],
+   "mutants": [
+    "M-4.1-1"
+   ]
+  },
+  {
+   "id": "R-4.2",
+   "heading": "Idempotency",
+   "lines": [
+    68,
+    72
+   ],
+   "sha256": "c80e3017ae106a49b7829b058344ea79f7c8e01c13d4048d05736770d7670607",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan",
+    "ledgerlock/ledger.py::_by_rid"
+   ],
+   "behaviour": "a replayed rid returns the same result and appends nothing",
+   "assertions": [
+    "A-4.2-a"
+   ],
+   "mutants": [
+    "M-4.2-1"
+   ],
+   "interpretation": "a rid is replayed when any committed line carries it, whatever its op or key"
+  },
+  {
+   "id": "R-4.3",
+   "heading": "Conflict",
+   "lines": [
+    73,
+    78
+   ],
+   "sha256": "34968dc3a08936ca9892b2990a41a769d645e91e9fffe1af6bf24b1b16443ae2",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan",
+    "ledgerlock/ledger.py::_last_mutation",
+    "ledgerlock/ledger.py::Ledger.append"
+   ],
+   "behaviour": "a different rid on a key whose last committed mutation used another rid raises ConflictError (CLI exit 4) and appends nothing",
+   "assertions": [
+    "A-4.3-a"
+   ],
+   "mutants": [
+    "M-4.3-1"
+   ]
+  },
+  {
+   "id": "R-4.4",
+   "heading": "Tombstones",
+   "lines": [
+    79,
+    85
+   ],
+   "sha256": "f21f6a2745f56e333aaee15f385201ed51c74621e32fc385f8ed9308f6ba5951",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan",
+    "ledgerlock/ledger.py::snapshot_records"
+   ],
+   "behaviour": "a delete is a tombstone line; a put with a different rid conflicts against it; a put with the tombstone's rid is a no-op returning the delete's result; the key is absent from the snapshot",
+   "assertions": [
+    "A-4.4-a"
+   ],
+   "mutants": [
+    "M-4.4-1"
+   ]
+  },
+  {
+   "id": "R-4.5",
+   "heading": "Key-with-different-rid-different-op semantics",
+   "lines": [
+    86,
+    90
+   ],
+   "sha256": "81650a0029ca93a13bf92336ab95571619242cf47f58cc8c9e340cce8dc5fdcc",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::_plan"
+   ],
+   "behaviour": "put with r1 then delete with r2 conflicts; replays of the committed put do not conflict",
+   "assertions": [
+    "A-4.5-a"
+   ],
+   "mutants": [
+    "M-4.5-1"
+   ]
+  },
+  {
+   "id": "R-5",
+   "heading": "Atomic Batch Mutation",
+   "lines": [
+    91,
+    101
+   ],
+   "sha256": "f65328ddec084132544dd4832af82fdb0da86f624baf96e9071a4c6dc3037f58",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::Ledger.apply_batch",
+    "ledgerlock/ledger.py::_fsync_write",
+    "ledgerlock/cli.py::dispatch",
+    "ledgerlock/cli.py::_batch_ops"
+   ],
+   "behaviour": "a batch is planned against the chain and itself, then written as a whole through a sibling temp file, fsync and rename: all lines or none; a conflict anywhere commits nothing; a replay inside the batch appends once",
+   "assertions": [
+    "A-5-a",
+    "A-5-b",
+    "A-5-c",
+    "A-5-d"
+   ],
+   "mutants": [
+    "M-5-1",
+    "M-5-2"
+   ],
+   "interpretation": "the CLI batch file is a JSON list of {op, key, value, rid, ts}; 'under the lock' is single-process serialisation (no threading module is allowed by R-10); a crash cannot be injected from outside, so atomicity is measured by its observable postconditions (bytes unchanged on refusal, old bytes a prefix on success, no temp sibling left)"
+  },
+  {
+   "id": "R-6",
+   "heading": "Deterministic Snapshot",
+   "lines": [
+    102,
+    111
+   ],
+   "sha256": "e5a61514bb95110d7841b5cbc4761e26883af2275ad03775d37ffc771589353e",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::snapshot_records",
+    "ledgerlock/ledger.py::Ledger.snapshot",
+    "ledgerlock/cli.py::dispatch"
+   ],
+   "behaviour": "the snapshot holds the latest committed put per key unless tombstoned, keys sorted in UTF-8 byte order, byte-stable across calls; the CLI writes the same bytes",
+   "assertions": [
+    "A-6-a",
+    "A-6-b"
+   ],
+   "mutants": [
+    "M-6-1",
+    "M-6-2"
+   ]
+  },
+  {
+   "id": "R-7",
+   "heading": "Repair-tail",
+   "lines": [
+    112,
+    119
+   ],
+   "sha256": "9988bcd3f69219ab71c3a660968953733a95e5ba6727d58c2720d9b94b9fb525",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/ledger.py::Ledger.repair_tail",
+    "ledgerlock/ledger.py::scan"
+   ],
+   "behaviour": "a truncated final line is removed and the chain verifies afterwards; a clean chain is a no-op; corruption not confined to the tail is refused with the file untouched",
+   "assertions": [
+    "A-7-a",
+    "A-7-b",
+    "A-7-c"
+   ],
+   "mutants": [
+    "M-7-1",
+    "M-7-2",
+    "M-7-3"
+   ],
+   "interpretation": "truncated = the final line is unterminated and does not parse or hash; a complete last line that fails its hash is corruption, refused"
+  },
+  {
+   "id": "R-8",
+   "heading": "Durability",
+   "lines": [
+    120,
+    126
+   ],
+   "sha256": "6b3c72e04a9684c6d7bbf64c387ba751c45f170729ba10c21078c6e4f078c918",
+   "kind": "STATIC",
+   "reference": [
+    "ledgerlock/ledger.py::_append_bytes",
+    "ledgerlock/ledger.py::_fsync_write"
+   ],
+   "behaviour": "every function that opens the ledger for writing flushes and fsyncs before it returns",
+   "assertions": [
+    "A-8-a"
+   ],
+   "mutants": [
+    "M-8-1"
+   ],
+   "interpretation": "durability cannot be observed from outside the process; the assertion reads the source of the tree"
+  },
+  {
+   "id": "R-9",
+   "heading": "CLI Exit Codes (exact contract)",
+   "lines": [
+    127,
+    139
+   ],
+   "sha256": "95dcf2833569669f287aeeefc76c6665ef5f041f49af38c8b41ecf2c26daadb6",
+   "kind": "BEHAVIOUR",
+   "reference": [
+    "ledgerlock/cli.py::main",
+    "ledgerlock/cli.py::dispatch"
+   ],
+   "behaviour": "exit 0 on success, 2 on a usage error, 3 on an I/O error, 4 on a conflict, 5 on corruption (verify not ok, repair-tail refusal)",
+   "assertions": [
+    "A-9-a",
+    "A-9-b",
+    "A-9-c",
+    "A-9-d",
+    "A-9-e",
+    "A-9-f",
+    "A-9-g",
+    "A-9-h"
+   ],
+   "mutants": [
+    "M-9-1",
+    "M-9-2",
+    "M-9-3"
+   ]
+  },
+  {
+   "id": "R-10",
+   "heading": "Language / Runtime",
+   "lines": [
+    140,
+    146
+   ],
+   "sha256": "d2e76a9c009fe8482706ec196dd438e2c730dbefb363b7e02e00a43754c74e56",
+   "kind": "STATIC",
+   "reference": [
+    "ledgerlock/__init__.py",
+    "ledgerlock/__main__.py",
+    "ledgerlock/ledger.py",
+    "ledgerlock/cli.py"
+   ],
+   "behaviour": "imports only the allowed standard-library modules; ledger.py and cli.py start with `from __future__ import annotations`",
+   "assertions": [
+    "A-10-a"
+   ],
+   "mutants": [
+    "M-10-1"
+   ],
+   "interpretation": "the negative witness is a used import of a module outside the allowed set (M-10-1, two inserted lines: the import and its use)"
+  },
+  {
+   "id": "R-11",
+   "heading": "Tests and Coverage",
+   "lines": [
+    147,
+    154
+   ],
+   "sha256": "d916b45c9c635f474fa8c8d7dfa5082ea1604d18e0f0583b885ecf7b7522062b",
+   "kind": "DEVELOPER_TEST_REQUIREMENT",
+   "reason": "unit tests, 85% coverage and runner agreement are requirements on the product's own test suite; ProductProof never depends on developer tests (invariant IX) and this fixture measures product behaviour only; the mapping of test-named criteria is the DECISION-3 domain"
+  },
+  {
+   "id": "R-12",
+   "heading": "No Side Channels",
+   "lines": [
+    155,
+    160
+   ],
+   "sha256": "4a9dee25fdd7d7cc5e2ac46a95a411513f6ddbeeec8ebdd1acc5283a95141b9c",
+   "kind": "STATIC",
+   "reference": [
+    "ledgerlock/ledger.py",
+    "ledgerlock/cli.py"
+   ],
+   "behaviour": "no socket, no subprocess, no os.system in the tree; the only files touched are the ledger, the batch input and the snapshot output",
+   "assertions": [
+    "A-12-a"
+   ],
+   "mutants": [
+    "M-12-1"
+   ],
+   "interpretation": "the negative witness is an os.system call in the write path (M-12-1); the file-access half is a property of the reference's design (its opens name only those paths) and has no separate mutant"
+  },
+  {
+   "id": "R-13",
+   "heading": "Repository layout",
+   "lines": [
+    161,
+    175
+   ],
+   "sha256": "671900e55a604ec6f3c7096de6b7590cf1de1caa40121a95897b23659487bda8",
+   "kind": "STATIC",
+   "reference": [
+    "ledgerlock/__init__.py",
+    "ledgerlock/ledger.py",
+    "ledgerlock/cli.py"
+   ],
+   "behaviour": "the package has __init__.py, ledger.py (Ledger, ConflictError, append, verify, snapshot, apply_batch) and cli.py; the imported package resolves inside the tree under evaluation",
+   "assertions": [
+    "A-13-a"
+   ],
+   "mutants": [
+    "M-13-1"
+   ],
+   "interpretation": "the negative witness for the layout half is M-13-1 (ledger.py no longer defines apply_batch; the package re-exports a renamed function under that name); the in-tree resolution half cannot be violated by a product tree under python -I isolation and is witnessed by a harness calibration (the harness importing another tree is rejected by A-13-a). __main__.py is added so that `python -m ledgerlock` (R-9) runs; tests/, docs/, README and pyproject are the product repository's concern, not the reference's"
+  },
+  {
+   "id": "R-14",
+   "heading": "Acceptance",
+   "lines": [
+    176,
+    185
+   ],
+   "sha256": "bb432ea3d1c0fe928da971cb42303772a3a324377293537967aaa610509a254d",
+   "kind": "MAPPED",
+   "assertions": [
+    "A-9-a",
+    "A-6-a",
+    "A-6-b",
+    "A-5-a",
+    "A-7-a",
+    "A-10-a"
+   ],
+   "reason": "items 1-4 and 6 are measured by the assertions named; item 5 (coverage) is R-11"
+  }
+ ]
+}

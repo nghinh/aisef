@@ -638,7 +638,14 @@ def provisioned(
     # Requiring `verify.unit` on top means configuring twice for the same
     # thing, and it makes **every** story non-executable.
     if str(config.get("tools.test", "")).strip():
-        have.add("verify.unit")
+        # SS-48 / INV-N.1: provisioned means RUNNABLE — the probe, not the string, decides
+        from ..harness import verify_image
+        try:
+            checks = {tc.key: tc.ok for tc in verify_image.check_tools(project, config, build=False)}
+        except Exception:  # noqa: BLE001 — no probe possible: fall back to the declaration, stated as unmeasured
+            checks = {}
+        if checks.get("tools.test", None) is not False:
+            have.add("verify.unit")
 
     if str(config.get("review.impact_provider", "")).strip():
         have.add("code-intelligence")
@@ -716,6 +723,10 @@ def check_story(
         # makes the gate print the same error twice — measured on real e9 plan.
         out.needs.append(qua_lon)
 
+    thieu = ac_proof_defect(story)
+    if thieu is not None:
+        out.needs.append(thieu)
+
     for need in out.needs:
         cap = need.capability
         if cap == "mockup-map":
@@ -730,6 +741,27 @@ def check_story(
         if cap not in got:
             out.missing.append(need)
     return out
+
+
+def ac_proof_defect(story: Story) -> Need | None:
+    """The story's proof obligations, judged before any model call (TDD proof policy V2, owner section 8).
+
+    Two plan defects are visible from planning data alone: a criterion that declares no obligation, and a normal
+    story whose every criterion is already satisfied at its entry (no CHANGE_REQUIRED) — it contributes nothing, so
+    sending a developer at it can only produce a no-op session or a contorted test."""
+    from .obligation import story_contribution
+
+    n = len(story.acceptance_criteria)
+    if not n:
+        return None                       # "no criteria" is the machine gate's error, already reported there
+    ok, why = story_contribution(dict(getattr(story, "ac_proof", None) or {}),
+                                 [f"AC-{story.id}-{i}" for i in range(1, n + 1)],
+                                 str(getattr(story, "story_type", "NORMAL") or "NORMAL"))
+    if ok:
+        return None
+    return Need(capability="ac-proof-obligation", evidence=why, kind="story",
+                remedy="fix `ac_proof` in epics.md for this story (each criterion: CHANGE_REQUIRED, "
+                       "PRESERVE_REQUIRED or NEGATIVE_INVARIANT with its requirement) and re-run `aisef plan`")
 
 
 def screen_owners(stories) -> dict[str, str]:

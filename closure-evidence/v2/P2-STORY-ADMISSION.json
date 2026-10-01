@@ -1,0 +1,173 @@
+{
+ "record": "AISEF V2 — P2 STORY ADMISSION",
+ "work_package": "WP-2.4",
+ "rfc_sections": [
+  "13"
+ ],
+ "frozen_items": [
+  "F7"
+ ],
+ "rfc_rows": {
+  "INTRODUCE expecting UNSATISFIED_AT_PARENT, measured UNSATISFIED": {
+   "disposition": "READY",
+   "owner": null,
+   "satisfaction": "UNSATISFIED"
+  },
+  "INTRODUCE expecting UNSATISFIED_AT_PARENT, measured SATISFIED": {
+   "disposition": "PRE_SATISFIED",
+   "owner": null,
+   "satisfaction": "SATISFIED"
+  },
+  "PRESERVE expecting SATISFIED_AT_PARENT, measured SATISFIED": {
+   "disposition": "READY",
+   "owner": null,
+   "satisfaction": "SATISFIED"
+  },
+  "PRESERVE expecting SATISFIED_AT_PARENT, measured UNSATISFIED": {
+   "disposition": "PRECONDITION_BROKEN",
+   "owner": "PLAN",
+   "satisfaction": "UNSATISFIED"
+  },
+  "VERIFY, measured SATISFIED": {
+   "disposition": "READY",
+   "owner": null,
+   "satisfaction": "SATISFIED"
+  },
+  "VERIFY, measured UNSATISFIED": {
+   "disposition": "READY",
+   "owner": null,
+   "satisfaction": "UNSATISFIED"
+  },
+  "INTRODUCE, INDETERMINATE(PRECONDITION_ABSENT)": {
+   "disposition": "READY",
+   "owner": null,
+   "satisfaction": "INDETERMINATE"
+  },
+  "PRESERVE, INDETERMINATE(PRECONDITION_ABSENT)": {
+   "disposition": "PRECONDITION_BROKEN",
+   "owner": "PLAN",
+   "satisfaction": "INDETERMINATE"
+  },
+  "VERIFY, INDETERMINATE(PRECONDITION_ABSENT)": {
+   "disposition": "PRECONDITION_BROKEN",
+   "owner": "PLAN",
+   "satisfaction": "INDETERMINATE"
+  },
+  "any, probe UNRUNNABLE": {
+   "disposition": "PROBE_UNRUNNABLE",
+   "owner": "ENVIRONMENT",
+   "satisfaction": null
+  },
+  "any, probe INVALID_SPEC": {
+   "disposition": "PROBE_INVALID",
+   "owner": "INTEGRATION",
+   "satisfaction": null
+  },
+  "PRESERVE measured UNSATISFIED, introducing story committed": {
+   "disposition": "PLAN_CONTRADICTION",
+   "owner": "PLAN",
+   "satisfaction": "UNSATISFIED"
+  }
+ },
+ "bare_indeterminate": {
+  "disposition": "PROBE_INVALID",
+  "owner": "INTEGRATION",
+  "satisfaction": "INDETERMINATE"
+ },
+ "neg_cases": {
+  "NEG-1 forbidden behaviour present, INTRODUCE": {
+   "disposition": "READY",
+   "owner": null,
+   "satisfaction": "UNSATISFIED"
+  },
+  "NEG-2 forbidden behaviour absent (decidable), INTRODUCE": {
+   "disposition": "PRE_SATISFIED",
+   "owner": null,
+   "satisfaction": "SATISFIED"
+  },
+  "NEG-3 required subject absent, INTRODUCE": {
+   "disposition": "READY",
+   "owner": null,
+   "satisfaction": "INDETERMINATE"
+  },
+  "NEG-3 required subject absent, PRESERVE": {
+   "disposition": "PRECONDITION_BROKEN",
+   "owner": "PLAN",
+   "satisfaction": "INDETERMINATE"
+  },
+  "NEG-3 required subject absent, VERIFY": {
+   "disposition": "PRECONDITION_BROKEN",
+   "owner": "PLAN",
+   "satisfaction": "INDETERMINATE"
+  }
+ },
+ "real_parent": {
+  "INTRODUCE, required subject absent": [
+   "READY"
+  ],
+  "INTRODUCE, already implemented": [
+   "PRE_SATISFIED"
+  ],
+  "PRESERVE, regressed": [
+   "PRECONDITION_BROKEN"
+  ],
+  "INTRODUCE forbidden module, present": [
+   "READY"
+  ],
+  "INTRODUCE forbidden module, absent": [
+   "PRE_SATISFIED"
+  ]
+ },
+ "fault_injection": {
+  "parent checkout failure": [
+   "PROBE_UNRUNNABLE"
+  ],
+  "probe unrunnable": [
+   "PROBE_UNRUNNABLE"
+  ]
+ },
+ "plan_contradiction": {
+  "owner": "PLAN",
+  "retryability": "NOT_RETRYABLE",
+  "budget_charged": null,
+  "dispositions": [
+   "PLAN_CONTRADICTION",
+   "READY"
+  ],
+  "story_admitted": false,
+  "developer_call_permitted": false,
+  "developer_request_refused": true,
+  "provider_requests": 0
+ },
+ "binding": {
+  "bare_result_refused": true,
+  "record_for_another_parent_refused": true,
+  "PARTIAL_record_under_FULL_refused": true
+ },
+ "owner_decisions": [
+  "PLAN_CONTRADICTION (P2 owner review): owner PLAN, never retryable, developer budget 0 — an owner does not imply a retry budget is consumed (FailureCode.PLAN_CONTRADICTION in the F3 taxonomy; PLAN-OWNER-1/2)"
+ ],
+ "f7_conformance": {
+  "state": "PASS",
+  "detail": "StoryAdmissionDisposition equals the RFC (6 members)"
+ },
+ "properties": {
+  "every_rfc_row_reproduced": true,
+  "disposition_table_total": true,
+  "unadmissible_role_expectation_pairs_fail_closed": true,
+  "probe_unrunnable_is_environment": true,
+  "invalid_spec_is_probe_invalid_integration": true,
+  "preserve_unsatisfied_is_precondition_broken": true,
+  "bare_indeterminate_is_probe_invalid_never_developer": true,
+  "neg_1_2_3": true,
+  "real_probe_at_the_parent": true,
+  "abbreviated_parent_sha_refused": true,
+  "PLAN_OWNER_1_plan_contradiction_carries_PLAN": true,
+  "PLAN_OWNER_2_plan_contradiction_consumes_no_budget": true,
+  "PROBE_BIND_1_story_admission_refuses_a_bare_result": true,
+  "PROBE_BIND_2_story_admission_refuses_other_enforcement": true,
+  "no_provider_request_before_admission": true,
+  "routes_on_satisfaction_never_the_raw_verdict": true,
+  "f7_dispositions_equal_rfc": true
+ }
+}

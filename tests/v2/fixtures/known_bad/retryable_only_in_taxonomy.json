@@ -1,0 +1,9 @@
+{
+ "checker": "retryable_only_in_taxonomy",
+ "package": "WP-1.4",
+ "kind": "kernel_source",
+ "rule": "RETRYABLE_ONLY_IN_TAXONOMY",
+ "path": "aisef2/plan/bad.py",
+ "source": "def charge(failure):\n    return dict(owner='DEVELOPER', retryable=True)\n",
+ "expect": "RETRYABLE_ONLY_IN_TAXONOMY aisef2/plan/bad.py:2"
+}
