@@ -429,6 +429,42 @@ def _probe_rule(name: str, rule: str) -> Callable[[], Checker]:
     return make
 
 
+def _cohort() -> object:
+    return _load("aisef_v2_cohort_static_checks", V2 / "cohort_static_checks.py")
+
+
+def _cohort_rule(name: str, rule: str) -> Callable[[], Checker]:
+    def make() -> Checker:
+        cs = _cohort()
+        return Checker(name, "WP-2.10.1", lambda: cs.check(ROOT, (rule,)),
+                       lambda fx: cs.violations(fx["path"], fx["source"], (fx["rule"],)),
+                       ("validation/v2/cohort_static_checks.py",))
+    return make
+
+
+def _development_regression_bound() -> Checker:
+    cs = _cohort()
+    return Checker("development_regression_bound", "WP-2.10.1",
+                   lambda: cs.check(ROOT, ("DEVELOPMENT_REGRESSION_BOUND",)),
+                   lambda fx: cs.binding_problems(ROOT, fx["entries"]), ("validation/v2/cohort_static_checks.py",))
+
+
+def _no_cohort_record() -> Checker:
+    """No cohort is authorized: the census of the tree finds no preregistration. Known bad: a temporary root whose
+    one evidence file nests a preregistration."""
+    cs = _cohort()
+
+    def bad(fx):
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t)
+            for rel, text in fx["files"].items():
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                (root / rel).write_text(text, encoding="utf-8")
+            return cs.census_problems(cs.census(root, sorted(fx["files"])))
+    return Checker("no_cohort_record", "WP-2.10.1", lambda: cs.check(ROOT, ("NO_COHORT_RECORD",)), bad,
+                   ("validation/v2/cohort_static_checks.py",))
+
+
 REGISTRY: list[Callable[[], Checker]] = [
     _freeze_manifest, _v1_evidence_guard, _arch_catalog, _f_conformance, _plan_validate, _plan_docs_check,
     _state_model_prover, _v2_encoding_scanner, _packaging_check, _run_history,
@@ -453,6 +489,9 @@ REGISTRY: list[Callable[[], Checker]] = [
     _probe_rule("closed_dispatch_in_scenario_probes", "CLOSED_DISPATCH_IN_SCENARIO_PROBES"),
     _probe_rule("single_placeholder_token", "SINGLE_PLACEHOLDER_TOKEN"),
     _probe_rule("protocol_channel_discipline", "PROTOCOL_CHANNEL_DISCIPLINE"),
+    # Cycle 2, C2-P10 (WP-2.10.1): the evaluation-cohort machinery's confinement, boundary, LedgerLock binding, census
+    _cohort_rule("cohort_confined", "COHORT_CONFINED"), _cohort_rule("cohort_boundary", "COHORT_BOUNDARY"),
+    _development_regression_bound, _no_cohort_record,
 ]
 
 

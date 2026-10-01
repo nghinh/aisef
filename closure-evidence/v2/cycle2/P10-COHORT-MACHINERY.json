@@ -1,0 +1,276 @@
+{
+ "record": "AISEF V2 — CYCLE-2 C2-P10 / WP-2.10.1 EVALUATION-COHORT MACHINERY",
+ "package": "WP-2.10.1",
+ "phase": "C2-P10",
+ "authority": "owner ruling 2026-09-30: explicit authorization of the C2-P10 scope declared in the accepted manifest (WP-2.10.1, WP-2.10.2) — sealed-cohort machinery only (RFC §33 trigger); no cohort is authorized and no workload is selected",
+ "base": {
+  "commit": "9bd16fa9c578bb91a0a6c0047d2ceb6e6ab3b414",
+  "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "note": "the C2-P6 closure (QP-2.6 requalified GREEN on candidate 37dc0dc, R3)"
+ },
+ "sources": {
+  "aisef2/cohort/__init__.py": "72fd315848a97f034dbcbe0963980d88d163c9cf65a560f85de2c7f5170c4328",
+  "aisef2/cohort/preregistration.py": "498362a7cacf9dd89daa9f88dcefba70ece4046732250ccd5d3fc159eee91e4a",
+  "aisef2/cohort/lifecycle.py": "c47481125e5cacf1923c34fe05711a6dbe09ed8ff42843e536beb0165c1d4d5d",
+  "validation/v2/cohort_static_checks.py": "56deec91070b5bda05678c9f70052935c68ec0e44c7c9e2c0b7960873f6056f4",
+  "tests/v2/test_c2_p10_cohort.py": "249db69917aa91332bf601218209ba5d01111ab047e1130efadfff9f99944183",
+  "tests/v2/test_c2_p10_cohort_static.py": "6dd5188715cd9ad2ce1c8c2f34e36f6448de4bc7be62202c7f618f238c14c9b3",
+  "validation/qualification/c2_p10_cohort.py": "8b47d3edda00768415de582026369a1c91ab15e0b7a73a794e2522430195d5c3",
+  "tests/v2/fixtures/known_bad/cohort_confined.json": "277c43211bd969ef90543bf2ea31535437b48f3b8eb40af20b9bc321fc6f90f0",
+  "tests/v2/fixtures/known_bad/cohort_boundary.json": "3aad2effd4cf37dea15058dedad5d2e76e4d0ee51ed0c9dffdaada99b32f2094",
+  "tests/v2/fixtures/known_bad/development_regression_bound.json": "e99e10020c4dd8bf16e8615e2bdd2ecad4a7ff3f3e087079e428be8456bb7a75",
+  "tests/v2/fixtures/known_bad/no_cohort_record.json": "7bf3d979f8dcea412fd2bd8885ff258eadca7f40a45367a85f86092179e64b01"
+ },
+ "machinery": {
+  "states": [
+   "SEALED",
+   "EVALUATING",
+   "EXPOSED",
+   "DEVELOPMENT"
+  ],
+  "one_way": {
+   "SEALED": "EVALUATING",
+   "EVALUATING": "EXPOSED",
+   "EXPOSED": "DEVELOPMENT"
+  },
+  "terminal": "DEVELOPMENT",
+  "refusals": [
+   "PREREGISTRATION_INVALID",
+   "OPAQUE_PROFILE",
+   "DEVELOPMENT_REGRESSION",
+   "WORKLOAD_DEMOTED",
+   "WORKLOAD_OBSERVED",
+   "WORKLOAD_ALREADY_SEALED",
+   "PREREGISTRATION_REUSED",
+   "COHORT_INCONSISTENT",
+   "NOT_FORWARD",
+   "NOT_EVALUATING",
+   "PREREGISTRATION_STALE",
+   "RUN_DUPLICATE",
+   "RUNS_COMPLETE",
+   "GENERALIZATION_REFUSED"
+  ],
+  "preregistration_schema": "aisef2.cohort.preregistration/1",
+  "frozen_inputs": [
+   "kernel",
+   "workload",
+   "requirements",
+   "plan_policy",
+   "execution_profile",
+   "prompts",
+   "model_route",
+   "run_count",
+   "thresholds",
+   "oracle",
+   "metrics",
+   "plan_quality_policy"
+  ],
+  "workload_identity": [
+   "requirements_sha256",
+   "plan_baseline",
+   "plan_hash"
+  ],
+  "min_workloads_for_generalization": 2,
+  "results_read_at": "the caller's timestamp; the machine reads no clock",
+  "event_vocabulary": "none: CohortState and Refusal live in aisef2/cohort and are carried in no event (F1 unchanged); no existing aisef2 file was edited"
+ },
+ "adversarial": [
+  {
+   "id": "COH-ADV-1",
+   "case": "a DEVELOPMENT workload cannot seal (a fresh preregistration of a workload whose cohort is DEVELOPMENT)",
+   "expected": "REFUSED WORKLOAD_DEMOTED",
+   "observed": "REFUSED WORKLOAD_DEMOTED: C-1 is DEVELOPMENT: its workload never seals again",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-2",
+   "case": "DEVELOPMENT -> SEALED",
+   "expected": "REFUSED NOT_FORWARD",
+   "observed": "REFUSED NOT_FORWARD: DEVELOPMENT -> SEALED: one way, one step at a time",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-3",
+   "case": "DEVELOPMENT -> HOLDOUT (a holdout is a sealed cohort by another name)",
+   "expected": "REFUSED NOT_FORWARD",
+   "observed": "REFUSED NOT_FORWARD: DEVELOPMENT -> HOLDOUT: one way, one step at a time",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-4",
+   "case": "a frozen-input change after results_read_at demotes",
+   "expected": "EXPOSED",
+   "observed": "EXPOSED: frozen inputs changed after results were read at 20.0: execution_profile",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-5",
+   "case": "a frozen-input change during EVALUATING, results unread, invalidates the completed runs",
+   "expected": "EVALUATING",
+   "observed": "EVALUATING: invalidated ['r1', 'r2'], stale ['prompts']",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-6",
+   "case": "after it, the cohort requires a fresh preregistration",
+   "expected": "REFUSED PREREGISTRATION_STALE",
+   "observed": "REFUSED PREREGISTRATION_STALE: prompts changed: a fresh preregistration is required",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-7",
+   "case": "an OPAQUE aggregate (aggregate_min_grade OPAQUE) bars sealing",
+   "expected": "REFUSED OPAQUE_PROFILE",
+   "observed": "REFUSED OPAQUE_PROFILE: an OPAQUE aggregate_min_grade never seals (RFC §28 rule 5)",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-8",
+   "case": "LedgerLock, by its full frozen identity, under a fresh name",
+   "expected": "REFUSED DEVELOPMENT_REGRESSION",
+   "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same requirements_sha256, plan_baseline, plan_hash",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-9",
+   "case": "LedgerLock by its requirements sha256 alone",
+   "expected": "REFUSED DEVELOPMENT_REGRESSION",
+   "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same requirements_sha256",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-10",
+   "case": "LedgerLock by its plan baseline alone",
+   "expected": "REFUSED DEVELOPMENT_REGRESSION",
+   "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same plan_baseline",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-11",
+   "case": "LedgerLock by its plan hash alone",
+   "expected": "REFUSED DEVELOPMENT_REGRESSION",
+   "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same plan_hash",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-12",
+   "case": "LedgerLock constructed directly as a SEALED cohort (no path skips the bar)",
+   "expected": "REFUSED DEVELOPMENT_REGRESSION",
+   "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same requirements_sha256, plan_baseline, plan_hash",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-13",
+   "case": "a generalization from one sealed workload",
+   "expected": "REFUSED GENERALIZATION_REFUSED",
+   "observed": "REFUSED GENERALIZATION_REFUSED: 1 sealed workload(s); a generalization requires at least 2",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-14",
+   "case": "a generalization from two cohorts of one workload (same plan hash)",
+   "expected": "REFUSED GENERALIZATION_REFUSED",
+   "observed": "REFUSED GENERALIZATION_REFUSED: C-4 and C-5 are one workload (same plan_hash)",
+   "holds": true
+  },
+  {
+   "id": "COH-ADV-15",
+   "case": "a generalization resting on an EXPOSED cohort",
+   "expected": "REFUSED GENERALIZATION_REFUSED",
+   "observed": "REFUSED GENERALIZATION_REFUSED: C-2 is not a completed sealed evaluation",
+   "holds": true
+  }
+ ],
+ "positive": {
+  "lifecycle_one_way": {
+   "path": [
+    "SEALED",
+    "EVALUATING",
+    "EXPOSED",
+    "DEVELOPMENT"
+   ],
+   "non_successor_moves_refused": 17,
+   "non_successor_moves": 17
+  },
+  "repetitions_never_demote": {
+   "runs_recorded": 3,
+   "state": "EVALUATING",
+   "exposed_reason": null
+  },
+  "generalization_statement_shape": {
+   "note": "two synthetic in-memory cohorts: the statement states the sample size per workload and in total; this is a check of the machinery, not a claim",
+   "fields": [
+    "sample_size_total",
+    "workload_count",
+    "workloads"
+   ],
+   "per_workload": [
+    3,
+    2
+   ],
+   "sample_size_total": 5
+  }
+ },
+ "ledgerlock": {
+  "classification": "DEVELOPMENT_REGRESSION, permanently (RFC §30)",
+  "entry": {
+   "label": "LedgerLock",
+   "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+   "plan_baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "plan_hash": "bc71a701dd84f7227e8a474b9c9e0aec05ca3e10c0eb53168bcdba0bb8242a32",
+   "requirements_source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md",
+   "workload_record": "closure-evidence/v2/P10/WORKLOAD.json",
+   "workload_record_sha256": "d43211043dd141d388250eb756e2e6d40720093d8f091042944da4babd861463"
+  },
+  "binding_problems": [],
+  "identified_by": "requirements sha256, plan baseline, plan hash — any one component; never by a name"
+ },
+ "census": {
+  "scope": "every *.json and *.jsonl file of the tree, tracked or untracked and not ignored; any object at any depth whose schema is aisef2.cohort.preregistration/1 (every persisted preregistration or cohort carries one)",
+  "cohort_records": [],
+  "cohort_count": 0,
+  "statement": "No cohort record exists anywhere in the tree: no preregistration and no evaluation cohort. closure-evidence/cohorts/ (C-1, C-1b, C-2) is frozen V1 model-pair bench evidence that predates RFC §28, and closure-evidence/v2/P10/LEDGERLOCK-REGRESSION.json is the Cycle-1 regression record (cohort_state DEVELOPMENT, generalization_claim NONE); neither is an evaluation cohort, and neither was touched."
+ },
+ "confinement": {
+  "allowed_importers": [
+   "aisef2/cohort/",
+   "validation/v2/cohort_static_checks.py",
+   "validation/v2/profile_freeze.py",
+   "validation/qualification/c2_p10_",
+   "tests/v2/test_c2_p10_"
+  ],
+  "allowed_dependencies": [
+   "aisef2.arch.enums",
+   "aisef2.plan.obligation",
+   "aisef2.product.contract",
+   "aisef2.runtime.capability",
+   "aisef2.runtime.runspec",
+   "aisef2.cohort"
+  ],
+  "scope": "every *.py file of the tree, tracked or untracked and not ignored",
+  "violations": []
+ },
+ "tests": {
+  "module": "tests.v2.test_c2_p10_cohort",
+  "tests_run": 34,
+  "result": "OK"
+ },
+ "mutation": {
+  "record": "closure-evidence/v2/cycle2/P10-MUTATION.json",
+  "sha256": "b1ec64eee650dca2329a32faa2f26597b300ab75e9a085620d449f18bf3f72dc",
+  "targets": 39,
+  "mutants": 695,
+  "killed": 695,
+  "survivors": 0,
+  "killed_by_timeout": 0,
+  "problems": []
+ },
+ "verdict": "machinery qualified; cohort count = 0",
+ "not_done": [
+  "no cohort sealed, preregistered or recorded",
+  "no workload selected",
+  "no generalization claim",
+  "LedgerLock stays DEVELOPMENT_REGRESSION",
+  "no live provider call (WP-2.10.1 makes none)"
+ ]
+}
