@@ -1,0 +1,4409 @@
+{
+ "record": "AISEF V2 — Q2 ADEQUACY",
+ "rung": "Q2",
+ "status": "GREEN",
+ "at": "2026-10-01T00:43:50Z",
+ "subject": {
+  "seal_commit": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "head": "bfc4f37d8d04fe193c8867e76a5577366d19d989",
+  "head_is_after_the_seal": true,
+  "head_kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "kernel_tree_is_the_candidates": true,
+  "candidate_kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "v1_product_tree": "4359f347378e84fcac2d213128c7c26f282c13c0",
+  "v1_product_tree_unchanged": true,
+  "validation_v2_tree": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+  "tests_v2_tree": "a7d2fb385721891beabab3ac200b974ad81a221c",
+  "subject_trees": {
+   "validation/v2": {
+    "head": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+    "candidate": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+    "frozen": "2fd461971dd6c92637d45df3948668ec7de59ccd"
+   },
+   "tests/v2": {
+    "head": "a7d2fb385721891beabab3ac200b974ad81a221c",
+    "candidate": "a7d2fb385721891beabab3ac200b974ad81a221c",
+    "frozen": "a7d2fb385721891beabab3ac200b974ad81a221c"
+   }
+  },
+  "cycle1": {
+   "seal_commit": "b720de7c4f03061cfa07e7b9f74a74e614e52de4",
+   "semantic_candidate": "7114177834da5a7e4a0fc2c7f8fa9d067e0abaa2",
+   "kernel_tree": "4d6081940f5b9dae47439f73f0157161e028d804",
+   "records": "closure-evidence/v2/Q0-Q3"
+  },
+  "working_tree_clean_outside_qualification_output": true,
+  "rfc": {
+   "effective_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "effective_freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "lineage": [
+    "AISEF-V2-RFC-APPROVAL.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-005.json",
+    "AISEF-V2-RFC-AMENDMENT-V2-006.json"
+   ],
+   "lineage_end": "AISEF-V2-RFC-AMENDMENT-V2-006.json",
+   "broken_links": []
+  },
+  "probe": {
+   "id": "probe.python_callable",
+   "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+  },
+  "probes": {
+   "probe.python_callable": {
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "kind": "python_callable",
+    "active": false,
+    "cycle": 1
+   },
+   "probe.file_artifact": {
+    "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "kind": "file_artifact",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.python_callable_v2": {
+    "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+    "kind": "python_callable",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.cli_invocation": {
+    "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+    "kind": "cli_invocation",
+    "active": true,
+    "cycle": 2
+   },
+   "probe.process_effect": {
+    "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "kind": "process_effect",
+    "active": true,
+    "cycle": 2
+   }
+  },
+  "harness": {
+   "files": {
+    "validation/qualification/__init__.py": "40f613b3d5ffa39b5807ae0aec2878be51870891f5bd7dd76aae025e73e48f91",
+    "validation/qualification/c2_cli_calibration.py": "9c2ab78e85a8ad55d373b00c90285651fd38b413871c5bb5bc1103e78bad4864",
+    "validation/qualification/c2_cli_harness.py": "eb8c19a1831840e15bc6f1b644730a92b4cf340c913e75bb14ba06236c772293",
+    "validation/qualification/c2_effect_calibration.py": "209ea08c1c65ee4c7b0dc841d207c8518988c5ba48b5207b6451bbefc16216ca",
+    "validation/qualification/c2_effect_harness.py": "1078e3236294245aff0ebe1e9226a931a0e30d7031d7ca51d3e59c4d90273495",
+    "validation/qualification/c2_file_artifact.py": "1027f3db09055e905224ca6cfda3ef39948fd0f1ee9bf126b67178bffddcd0b5",
+    "validation/qualification/c2_integration.py": "1fbb214fc191abb2640bdd311a7b66ba47035f78ee87e37c74fbac529508f734",
+    "validation/qualification/c2_integration_r2.py": "7744d97ee2c332f4accaaebbc3ed0ce5060fef41b27f6979dc8d9def7a8c891d",
+    "validation/qualification/c2_orchestration_repair.py": "be526067bd56cdd9c3d66ff10db7f55f7959c3abf93753eef0e81e9bc5bdaafb",
+    "validation/qualification/c2_python_callable_v2.py": "798134ee826773b17147b39b163e64782177909bd6fce39432baef3a56908de8",
+    "validation/qualification/common.py": "d99345ec4e2e8a2fa747a284f4d9bac67d84b683289fddbff59644183b2d703a",
+    "validation/qualification/diag_orch9.py": "2f6d9524dacbafb90ca47990310a5b1e08116ab2bb1cdf8705b7f6c6f5c3bd23",
+    "validation/qualification/p0_reference_fixture.py": "0546e895bd890703c2e923b7872415df3f924e669f7feff9f521c4c97cb1810f",
+    "validation/qualification/p10.py": "208dc6f18a96523752ee8067740101a2c9ad18f93c1960ea2338cc65c2c2e0a0",
+    "validation/qualification/p10_contracts.py": "969a014dbe87a71b1c39088ed4a94fd555aecd8352abccb99628678746ad6e8f",
+    "validation/qualification/p5_acceptance.py": "ae98ddfe8ebc5175e88881e3794130906c624a5754ef58071c97c167dfe88fae",
+    "validation/qualification/p5_corrigendum.py": "144e157ab34cfaac01d7dbcbae05e6fbe76a9fb5a9c737362001dac9381a53f3",
+    "validation/qualification/p5_falsifiability.py": "dff3755bc28d4c10f0c5afaca666f4926fd4dbcabcc5acfb8c3d092ed1444bc4",
+    "validation/qualification/p7_finding_001_reproducer.py": "2cb9b13292ce94bfc8c8d78efba97839b73c065805e7bd9aa50a2ef29bc80363",
+    "validation/qualification/q0.py": "5dabdbf9415e1896a5f48038a5466875dd8af83de97fe3c382fe763a4baa9125",
+    "validation/qualification/q1.py": "63921b7ef48ac9297611b512c7502af94045ebc0c88eb5fbfc906dda175a302d",
+    "validation/qualification/q2.py": "5bbfe26d46c351512c9a23d8427b6c4b06d03457e06f6c6908ec93a3c989ca08",
+    "validation/qualification/q3.py": "440689d3f7fd1511fbc3859a9b6e8e82cf49311054b062fa4f0c747f86ca4458",
+    "validation/qualification/q4.py": "1fd9425c6a93ba163300af60ea152261712c63c51eabc280599eaeede34e30ff",
+    "validation/qualification/q4_aggregate.py": "b437489c7c7b6e2eb5a76c2a2a6bbcef1726039ba604ddcc9c7429bfe27c128f",
+    "validation/qualification/q5.py": "9de93fd23e60d746d28054fa9d6fda1e9ad351704f4677eebce70e87260ac9a3",
+    "validation/qualification/run.py": "baa82a3c3f7e0716855806d1ce8a78972f62792b8ad220f93c40a5860df28f90",
+    "validation/qualification/summary.py": "7ec9e8a4eb3588a65378702a65e647c532a3fc6b3f4f83464afe3e858e0362d9",
+    "validation/qualification/v1_pf_001_policy.py": "54d04d3b4ac1566fb2c445fa5b2350f1d78edc2fa2887e2b0ce6bf10cdd54650"
+   },
+   "sha256": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987",
+   "rule": "sha256 over '<posix path>\\t<lf-sha256>' lines, sorted"
+  }
+ },
+ "platform": {
+  "os": "linux",
+  "os_release": "6.17.0-1022-azure",
+  "python": "3.11.16",
+  "free_disk_gb": 92.1,
+  "implementation": "CPython",
+  "machine": "x86_64",
+  "runner_os": "Linux",
+  "ci_run": "36796758932",
+  "ci_job": "qualify",
+  "ci_attempt": "1",
+  "qualification_platform": true,
+  "range_mechanism": "posix-session-and-group",
+  "label": "linux-py3.11"
+ },
+ "product_mutation": {
+  "check_problems": [],
+  "phases": {
+   "P1": {
+    "path": "closure-evidence/v2/P1-MUTATION.json",
+    "sha256": "60bd41b03d9c66edaed6df6052029a7b03f35cd4068ccdf4ad619d8d85ab4819",
+    "targets": 19,
+    "mutants": 1151,
+    "killed": 1151,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": [],
+    "superseded": []
+   },
+   "P2": {
+    "path": "closure-evidence/v2/P2-MUTATION.json",
+    "sha256": "6b58ce0c1b45f8be1c7ba2b4cc2056e79615fdc91a5b3ede90c004c07a0656d7",
+    "targets": 47,
+    "mutants": 1305,
+    "killed": 1305,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 9,
+    "timeouts": [
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L372 condition negated",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L372 not removed",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L369 string 'STREAM_CLOSED' emptied",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L375 GtE->Lt",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L375 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_next",
+      "mutant": "L375 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_pump",
+      "mutant": "L352 string 'STREAM_CLOSED' emptied",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_watch",
+      "mutant": "L315 element 0 dropped",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable.py::_watch",
+      "mutant": "L315 element 1 dropped",
+      "timed_out": [
+       "tests/v2/p2/test_python_callable.py"
+      ]
+     }
+    ],
+    "errors": [],
+    "superseded": []
+   },
+   "P3": {
+    "path": "closure-evidence/v2/P3-MUTATION.json",
+    "sha256": "3a8d00522b154719bb0457d3adb77dc212f48ba74817b41fefbee4d506b31ce4",
+    "targets": 52,
+    "mutants": 1842,
+    "killed": 1832,
+    "survivors": [
+     {
+      "target": "tests/v2/refmodel/budgets.py::model",
+      "mutant": "L75 True->False",
+      "audit": "zip(strict=) over a four-name tuple and _walk's four-value return: the lengths are always equal, so strict never decides anything",
+      "source_sha256": "8cb4cde050c6c755edf3a83d2cd61f316d2516dc862799e155422d7aeb6d3a6b",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/qualification_counters.py::metrics",
+      "mutant": "L15 element 0 dropped",
+      "audit": "`pre` is read only through len(pre): a one-element tuple per entry counts the same",
+      "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/qualification_counters.py::metrics",
+      "mutant": "L15 element 1 dropped",
+      "audit": "`pre` is read only through len(pre): a one-element tuple per entry counts the same",
+      "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/qualification_counters.py::model",
+      "mutant": "L41 sorted() -> list()",
+      "audit": "`unplanned` is read only for truthiness and inside the refusal message",
+      "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/qualification_counters.py::model",
+      "mutant": "L44 sorted() -> list()",
+      "audit": "`misplaced` is read only for truthiness and inside the refusal message",
+      "source_sha256": "c93986b383f74a774546b9ef51b47a10199441c0315720d0b94bc6c9cdc7ee50",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L19 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L20 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L21 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L22 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     },
+     {
+      "target": "tests/v2/refmodel/story_state.py::_TABLE",
+      "mutant": "L23 False->True",
+      "audit": "the third field (whether the target state is also the outcome) is read only when the target state is not None (model: `if to is not None: ... if is_outcome`); this entry's target is None",
+      "source_sha256": "cb531eb1c893eed26d7a4255619fabe5a9c6ded17c0cde5188d4985290b2a986",
+      "source_current": true
+     }
+    ],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": [],
+    "superseded": []
+   },
+   "P4": {
+    "path": "closure-evidence/v2/P4-MUTATION.json",
+    "sha256": "0c339b531e5274d8c70f997d8f36bd292ed750ff064f13253352080bce23ce38",
+    "targets": 98,
+    "mutants": 1594,
+    "killed": 1594,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 26,
+    "timeouts": [
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L375 conditional negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L378 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L375 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L378 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L380 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L377 conditional negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L378 string 'EXITED' emptied",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L380 In->NotIn",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L377 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L380 element 0 dropped",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait",
+      "mutant": "L380 string 'TIMEOUT' emptied",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L401 conditional negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L403 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L401 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L403 IsNot->Is",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::ProcessRange.wait_empty",
+      "mutant": "L403 GtE->Lt",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::_Posix.abort",
+      "mutant": "L169 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::_Posix.abort",
+      "mutant": "L169 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::_Posix.members",
+      "mutant": "L150 And swapped",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/process_range.py::_Posix.members",
+      "mutant": "L150 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/range_anchor.py::main",
+      "mutant": "L106 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/range_anchor.py::main",
+      "mutant": "L106 Eq->NotEq",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/range_anchor.py::main",
+      "mutant": "L106 string 'EXIT' emptied",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/range_anchor.py::main",
+      "mutant": "L103 string 'EXITED ' emptied",
+      "timed_out": [
+       "tests/v2/p4/test_process_range.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/story_scope.py::StoryScope._release",
+      "mutant": "L167 condition negated",
+      "timed_out": [
+       "tests/v2/p4/test_story_scope.py"
+      ]
+     },
+     {
+      "target": "aisef2/runtime/story_scope.py::StoryScope._release",
+      "mutant": "L167 Is->IsNot",
+      "timed_out": [
+       "tests/v2/p4/test_story_scope.py"
+      ]
+     }
+    ],
+    "errors": [],
+    "superseded": []
+   },
+   "P5": {
+    "path": "closure-evidence/v2/P5-MUTATION.json",
+    "sha256": "76abd54f9be68833800f91fefb17c3d387af4cefd6f065120275bcf9b8e4364c",
+    "targets": 58,
+    "mutants": 1577,
+    "killed": 1577,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": [],
+    "superseded": []
+   },
+   "P6": {
+    "path": "closure-evidence/v2/P6-MUTATION.json",
+    "sha256": "6c4045276c2f5084d92e01f5fee48c138ad37a33420b4a5dc7956da2e9c9504c",
+    "targets": 102,
+    "mutants": 3121,
+    "killed": 3121,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": [],
+    "superseded": [
+     {
+      "target": "aisef2/orchestrate/proof.py::Party.__init__",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/proof.py::Party.run",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/proof.py::Ranged.__init__",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/proof.py::obligations_of",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/proof.py::prove",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_Held.__call__",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_Held.__init__",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_Held.release",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_attempt",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_committed",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_fail",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_freeze_plan",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::_probe",
+      "by": "C2-ORCH"
+     },
+     {
+      "target": "aisef2/orchestrate/story_runner.py::run_story",
+      "by": "C2-ORCH"
+     }
+    ]
+   },
+   "C2-P1": {
+    "path": "closure-evidence/v2/cycle2/P1-MUTATION.json",
+    "sha256": "d5643478b074273efb530d1b7a1d162e767b7c45c8e5a8d20764303f9648df38",
+    "targets": 42,
+    "mutants": 654,
+    "killed": 654,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": [],
+    "superseded": []
+   },
+   "C2-P2": {
+    "path": "closure-evidence/v2/cycle2/P2-MUTATION.json",
+    "sha256": "583e1725628185bbd6d6ba471695e27ac13445c72f0a987a26c25ecd8edf68bf",
+    "targets": 54,
+    "mutants": 1258,
+    "killed": 1258,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 2,
+    "timeouts": [
+     {
+      "target": "aisef2/probe/cli_invocation.py::_await",
+      "mutant": "L638 condition negated",
+      "timed_out": [
+       "tests/v2/test_c2_cli_protocol.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/cli_invocation.py::_await",
+      "mutant": "L638 IsNot->Is",
+      "timed_out": [
+       "tests/v2/test_c2_cli_protocol.py"
+      ]
+     }
+    ],
+    "errors": [],
+    "superseded": []
+   },
+   "C2-P3": {
+    "path": "closure-evidence/v2/cycle2/P3-MUTATION.json",
+    "sha256": "cf5ad825a6d90589fe54f0189193cef8e04084429a63966823e12d2b219021b4",
+    "targets": 75,
+    "mutants": 1465,
+    "killed": 1465,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": [],
+    "superseded": []
+   },
+   "C2-P4": {
+    "path": "closure-evidence/v2/cycle2/P4-MUTATION.json",
+    "sha256": "4ea250797a49626778ede9723dadf5eed5acd47c74d47b526d353777858873d1",
+    "targets": 18,
+    "mutants": 423,
+    "killed": 423,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 2,
+    "timeouts": [
+     {
+      "target": "aisef2/probe/python_callable_v2.py::_watch",
+      "mutant": "L359 element 0 dropped",
+      "timed_out": [
+       "tests/v2/test_python_callable_v2.py"
+      ]
+     },
+     {
+      "target": "aisef2/probe/python_callable_v2.py::_watch",
+      "mutant": "L359 element 1 dropped",
+      "timed_out": [
+       "tests/v2/test_python_callable_v2.py"
+      ]
+     }
+    ],
+    "errors": [],
+    "superseded": []
+   },
+   "C2-ORCH": {
+    "path": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json",
+    "sha256": "56940fea58adc10f80ab3ccb470cfd50cf69292ca7b2dc0b9e4591bfaf568bd6",
+    "targets": 16,
+    "mutants": 493,
+    "killed": 493,
+    "survivors": [],
+    "unaudited": [],
+    "killed_by_timeout_named": 0,
+    "timeouts": [],
+    "errors": [],
+    "superseded": []
+   }
+  },
+  "totals": {
+   "targets": 581,
+   "mutants": 14883,
+   "killed": 14873,
+   "survivors": 10,
+   "unaudited": 0,
+   "killed_by_timeout_named": 39
+  },
+  "audited_equivalents_outside_the_reference_models": [],
+  "no_audit_targets": [
+   "aisef2/product/outcome.py::contract_satisfaction"
+  ],
+  "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+  "binding": "every target carries the sha256 of the source it mutated; mutation.check re-derives each against this tree"
+ },
+ "inv_mutation_authority": {
+  "destructive_sites_problems": [],
+  "cases": [
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission",
+    "outcome": "PASS",
+    "seconds": 1.951
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number",
+    "outcome": "PASS",
+    "seconds": 1.327
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own",
+    "outcome": "PASS",
+    "seconds": 1.327
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled",
+    "outcome": "PASS",
+    "seconds": 1.327
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused",
+    "outcome": "PASS",
+    "seconds": 1.327
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed",
+    "outcome": "PASS",
+    "seconds": 1.327
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives",
+    "outcome": "PASS",
+    "seconds": 1.329
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set",
+    "outcome": "PASS",
+    "seconds": 1.486
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set",
+    "outcome": "PASS",
+    "seconds": 1.327
+   },
+   {
+    "id": "tests.v2.p4.test_mutation_safety:DependencyBoundary.test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it",
+    "outcome": "PASS",
+    "seconds": 0.019
+   },
+   {
+    "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_class_qualified_name_picks_that_class_method",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_reference_models_refusal_message_is_not_a_mutation_site",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_return_of_None_is_not_mutated_into_itself",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_mutation_targets:Locator.test_every_target_resolves",
+    "outcome": "PASS",
+    "seconds": 2.847
+   },
+   {
+    "id": "tests.v2.p5.test_invariants:MutationAuthority.test_INV_MUTATION_AUTHORITY_destructive_sites_of_the_invariant_code_are_ledgered",
+    "outcome": "PASS",
+    "seconds": 2.748
+   }
+  ]
+ },
+ "probe_capability_calibration": {
+  "probe_digests_in_use": [
+   [
+    "probe.python_callable",
+    "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"
+   ]
+  ],
+  "observation_classes_in_use": [
+   "exists",
+   "returns",
+   "raises",
+   "blocks"
+  ],
+  "fresh": [
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "exists",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/exists/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/exists/negative",
+    "qualified": true
+   },
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "returns",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/returns/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/returns/negative",
+    "qualified": true
+   },
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "raises",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/raises/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/raises/negative",
+    "qualified": true
+   },
+   {
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "blocks",
+    "positive_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/positive",
+    "negative_fixture": "tests/v2/fixtures/calibration/python_callable/blocks/negative",
+    "qualified": true
+   }
+  ],
+  "committed_record_keys": [
+   [
+    "probe.python_callable",
+    "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "blocks"
+   ],
+   [
+    "probe.python_callable",
+    "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "exists"
+   ],
+   [
+    "probe.python_callable",
+    "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "raises"
+   ],
+   [
+    "probe.python_callable",
+    "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "returns"
+   ]
+  ],
+  "in_use_all_calibrated_fresh": true,
+  "old_digest_historical_only": true,
+  "contrast_table": {
+   "SATISFIED expected, SATISFIED observed": false,
+   "SATISFIED expected, REFUTED observed": true,
+   "SATISFIED expected, INDETERMINATE observed": false,
+   "REFUTED expected, SATISFIED observed": true,
+   "REFUTED expected, REFUTED observed": false,
+   "REFUTED expected, INDETERMINATE observed": false
+  },
+  "both_polarities_required": true,
+  "problems": []
+ },
+ "fixed_verdict_probes_rejected": {
+  "counts": {
+   "PASS": 17,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 0,
+   "NOT_APPLICABLE": 0
+  },
+  "cases": [
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_a_probe_that_cannot_look_is_not_qualified",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_an_always_SATISFIED_probe_is_rejected_for_MUST_HOLD",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_an_honest_probe_is_qualified_for_its_class",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_refusing_to_run_is_not_a_demonstration",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_swapped_fixtures_qualify_nothing",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_must_ask_for_the_class_being_calibrated",
+    "outcome": "PASS",
+    "seconds": 0.002
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_spec_is_bound_to_the_probe_and_answers_no_contract",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Contrast.test_CAL_1_a_fixed_REFUTED_rule_would_have_passed_the_always_refuted_probe",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Contrast.test_an_expectation_is_satisfied_or_refuted",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Contrast.test_the_counterexample_must_produce_the_opposite_verdict",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Falsifiability.test_evidence_must_contrast_with_the_specs_expectation",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Falsifiability.test_the_evidence_is_typed",
+    "outcome": "PASS",
+    "seconds": 0.0
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Metadata.test_a_protocol_only_probe_is_calibrated",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Metadata.test_an_unregistered_probe_or_digest_is_not_qualified",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Records.test_a_record_qualifies_only_its_probe_digest_and_class",
+    "outcome": "PASS",
+    "seconds": 0.001
+   },
+   {
+    "id": "tests.v2.p2.test_calibration:Records.test_the_record_shapes_are_the_rfcs",
+    "outcome": "PASS",
+    "seconds": 0.001
+   }
+  ]
+ },
+ "spec_falsifiability": {
+  "rule": "required for every spec whose probe is a registered executable probe; a declared fixture probe identity (fixture.*) has no executable probe in the registry and can back no qualified product evidence — classified, not waived",
+  "stored_spec_inventory": [
+   {
+    "where": "tests/v2/fixtures/p1/corpus/specs/BC-LICENSE.json",
+    "spec_id": "PPS-c294f510e56e6729fdf56638e6d305c42edb2c28503e014e5a3aaa1f7a95896e",
+    "contract_id": "BC-LICENSE",
+    "probe_id": "fixture.file_artifact",
+    "probe_digest": "77a1145ebe55e2595fc5c1635c77e568f578e9763075dbca513d725ea006abf4",
+    "semantic_hash": "2379be90bb0bb10cd22bfeff3a25d419b192353e5ca28998918cfba4abea876a",
+    "classification": "DECLARED_FIXTURE_PROBE_IDENTITY"
+   },
+   {
+    "where": "tests/v2/fixtures/p1/corpus/specs/BC-NO-TELEMETRY.json",
+    "spec_id": "PPS-6c4caa4edae5f7b47e7ee2abf6328c213c035924dc0155596070fd56c7dd7b90",
+    "contract_id": "BC-NO-TELEMETRY",
+    "probe_id": "fixture.file_artifact",
+    "probe_digest": "77a1145ebe55e2595fc5c1635c77e568f578e9763075dbca513d725ea006abf4",
+    "semantic_hash": "32e0c2bb54b2cc97a5bb15b8ec1ec5469c7681bf85aa3b305ae72e5d4c77d5a4",
+    "classification": "DECLARED_FIXTURE_PROBE_IDENTITY"
+   },
+   {
+    "where": "tests/v2/fixtures/p1/corpus/specs/BC-QUIET-STDOUT.json",
+    "spec_id": "PPS-0470ce72e0357d09ee001f7be4304c3207d45b2b2218e5fd3a61c69b324ed33f",
+    "contract_id": "BC-QUIET-STDOUT",
+    "probe_id": "fixture.cli_invocation",
+    "probe_digest": "ca3f07ab47e8a702770085050798289c801784d5763ebd63e95e8344b88bf85c",
+    "semantic_hash": "15933038dabfac31998f7ed1a2104b4edf58e29cc92af46f59855a725feaea8e",
+    "classification": "DECLARED_FIXTURE_PROBE_IDENTITY"
+   },
+   {
+    "where": "tests/v2/fixtures/p1/corpus/specs/BC-VERSION.json",
+    "spec_id": "PPS-94fce8bd31e58dd3bdf9949ce3abec02bbbfec03162f026f60d4567bbc9e0a6c",
+    "contract_id": "BC-VERSION",
+    "probe_id": "fixture.cli_invocation",
+    "probe_digest": "ca3f07ab47e8a702770085050798289c801784d5763ebd63e95e8344b88bf85c",
+    "semantic_hash": "ca8924aefa83fea50506086e596639c6e5a81af31ea550f27ebfc0acbd33e28a",
+    "classification": "DECLARED_FIXTURE_PROBE_IDENTITY"
+   }
+  ],
+  "inventory_counts": {
+   "EXECUTABLE_PROBE_CURRENT_DIGEST": 0,
+   "EXECUTABLE_PROBE_HISTORICAL_DIGEST": 0,
+   "DECLARED_FIXTURE_PROBE_IDENTITY": 4
+  },
+  "evidence": [
+   {
+    "spec_id": "PPS-0723d66bce667cb3d51c628af2e4e3e979be84c1f1460bdda3d3485809420eea",
+    "semantic_hash": "a18890b9a6a9b4b11bd849e957b8777bd544731e643d0abbd2260543558db461",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "exists",
+    "candidate_expectation": "SATISFIED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/exists/negative",
+    "observed": "REFUTED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-d45122b88940327b645955fec442a4c8c88c76a393e476f1398e6b50a5408eb5",
+    "semantic_hash": "1f427cb20308a7ed17e2d6a83aa870063570cd0ac09705cdefc266074ce4453f",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "exists",
+    "candidate_expectation": "REFUTED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/exists/positive",
+    "observed": "SATISFIED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-987a6c821f928c96751645fdf7f4d82a8f4df7b9c59e2529db1be7d97a2e81f4",
+    "semantic_hash": "f7579ab5236f0ef40df3caeee668c1f980b5d0902fa1a4d7c16019d16325cbc5",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "returns",
+    "candidate_expectation": "SATISFIED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/returns/negative",
+    "observed": "REFUTED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-4e3b4d9b5642ea66f57e68c78a45afa276b2f5135cecd9fd5ef2f0f345e9c17b",
+    "semantic_hash": "31c733fbf8092a74b13aa8cfb96fe5111b27a688decf19a520d613e1e0e66e97",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "returns",
+    "candidate_expectation": "REFUTED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/returns/positive",
+    "observed": "SATISFIED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-71a77d9e7d51b9f0b7a42ca63f988e752c6be361ad2600e5014c136aedf620a2",
+    "semantic_hash": "93f6425e511d19763698646a53af01b0cc6af6d44673a9972eb8411e3af52901",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "raises",
+    "candidate_expectation": "SATISFIED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/raises/negative",
+    "observed": "REFUTED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-7d299f2bb8118518b31d60bfc4f378341fffdb7ca397677e293c32ed8366c141",
+    "semantic_hash": "67110b474d75e687646a5971fa763c8622b13ddcaf3ea6169ea26770f0d85a1a",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "raises",
+    "candidate_expectation": "REFUTED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/raises/positive",
+    "observed": "SATISFIED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-5b8129e63025b621a7298577a3da008560cd6c58143530748b6312b868f43396",
+    "semantic_hash": "0df081772683f53e8336310b704d74060fd8bc13b6d2d0c5553443d61e8e20f3",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "blocks",
+    "candidate_expectation": "SATISFIED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/blocks/negative",
+    "observed": "REFUTED",
+    "problems": []
+   },
+   {
+    "spec_id": "PPS-b6a4f9fc2c91c1b04d4f02de70d9d73cf5b6b68dc17a6bd7b5f7b65d1b3d89ca",
+    "semantic_hash": "c77109c7434b1bdb56fe510f81bb4e34e592f43558840cbcf2d365d566165273",
+    "probe_id": "probe.python_callable",
+    "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "observation_class": "blocks",
+    "candidate_expectation": "REFUTED",
+    "mechanism": "fixture_construction",
+    "counterexample_ref": "tests/v2/fixtures/calibration/python_callable/blocks/positive",
+    "observed": "SATISFIED",
+    "problems": []
+   }
+  ],
+  "product_proof_spec_fields": [
+   "id",
+   "contract_id",
+   "probe_id",
+   "probe_digest",
+   "probe_input",
+   "candidate_expectation",
+   "compiler_id",
+   "compiler_digest",
+   "semantic_hash"
+  ],
+  "plan_fact_fields": [],
+  "problems": []
+ },
+ "cycle2": {
+  "probe_capability_calibration": {
+   "probes": {
+    "probe.python_callable": {
+     "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "active": false,
+     "classes": [
+      "exists",
+      "returns",
+      "raises",
+      "blocks"
+     ]
+    },
+    "probe.file_artifact": {
+     "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "active": true,
+     "classes": [
+      "exists",
+      "content",
+      "grep_count"
+     ]
+    },
+    "probe.python_callable_v2": {
+     "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "active": true,
+     "classes": [
+      "exists",
+      "returns",
+      "raises",
+      "blocks",
+      "returns_bytes",
+      "equals",
+      "raises_attrs"
+     ]
+    },
+    "probe.cli_invocation": {
+     "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "active": true,
+     "classes": [
+      "exits",
+      "exits_streams",
+      "exits_files",
+      "blocks",
+      "equality"
+     ]
+    },
+    "probe.process_effect": {
+     "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "active": true,
+     "classes": [
+      "scenario_returns",
+      "scenario_raises",
+      "scenario_files"
+     ]
+    }
+   },
+   "fresh": [
+    {
+     "probe_id": "probe.python_callable",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "active": false,
+     "observation_class": "exists",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable/exists/positive",
+      "tests/v2/fixtures/calibration/python_callable/exists/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "active": false,
+     "observation_class": "returns",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable/returns/positive",
+      "tests/v2/fixtures/calibration/python_callable/returns/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "active": false,
+     "observation_class": "raises",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable/raises/positive",
+      "tests/v2/fixtures/calibration/python_callable/raises/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable",
+     "probe_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "active": false,
+     "observation_class": "blocks",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable/blocks/positive",
+      "tests/v2/fixtures/calibration/python_callable/blocks/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "active": true,
+     "observation_class": "exists",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/file_artifact/exists/positive",
+      "tests/v2/fixtures/calibration/file_artifact/exists/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "active": true,
+     "observation_class": "content",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/file_artifact/content/positive",
+      "tests/v2/fixtures/calibration/file_artifact/content/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "active": true,
+     "observation_class": "grep_count",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/file_artifact/grep_count/positive",
+      "tests/v2/fixtures/calibration/file_artifact/grep_count/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "active": true,
+     "observation_class": "exists",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable_v2/exists/positive",
+      "tests/v2/fixtures/calibration/python_callable_v2/exists/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "active": true,
+     "observation_class": "returns",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable_v2/returns/positive",
+      "tests/v2/fixtures/calibration/python_callable_v2/returns/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "active": true,
+     "observation_class": "raises",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable_v2/raises/positive",
+      "tests/v2/fixtures/calibration/python_callable_v2/raises/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "active": true,
+     "observation_class": "blocks",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable_v2/blocks/positive",
+      "tests/v2/fixtures/calibration/python_callable_v2/blocks/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "active": true,
+     "observation_class": "returns_bytes",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/positive",
+      "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "active": true,
+     "observation_class": "equals",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable_v2/equals/positive",
+      "tests/v2/fixtures/calibration/python_callable_v2/equals/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "active": true,
+     "observation_class": "raises_attrs",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/positive",
+      "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "active": true,
+     "observation_class": "exits",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/cli_invocation/exits/positive",
+      "tests/v2/fixtures/calibration/cli_invocation/exits/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "active": true,
+     "observation_class": "exits_streams",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/cli_invocation/exits_streams/positive",
+      "tests/v2/fixtures/calibration/cli_invocation/exits_streams/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "active": true,
+     "observation_class": "exits_files",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/cli_invocation/exits_files/positive",
+      "tests/v2/fixtures/calibration/cli_invocation/exits_files/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "active": true,
+     "observation_class": "blocks",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/cli_invocation/blocks/positive",
+      "tests/v2/fixtures/calibration/cli_invocation/blocks/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "active": true,
+     "observation_class": "equality",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/cli_invocation/equality/positive",
+      "tests/v2/fixtures/calibration/cli_invocation/equality/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "active": true,
+     "observation_class": "scenario_returns",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/process_effect/scenario_returns/positive",
+      "tests/v2/fixtures/calibration/process_effect/scenario_returns/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "active": true,
+     "observation_class": "scenario_raises",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/process_effect/scenario_raises/positive",
+      "tests/v2/fixtures/calibration/process_effect/scenario_raises/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "non_contrasting_pair_rejected": true
+    },
+    {
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "active": true,
+     "observation_class": "scenario_files",
+     "fixtures": [
+      "tests/v2/fixtures/calibration/process_effect/scenario_files/positive",
+      "tests/v2/fixtures/calibration/process_effect/scenario_files/negative"
+     ],
+     "qualified": true,
+     "calibrated_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "non_contrasting_pair_rejected": true
+    }
+   ],
+   "in_use": [
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "blocks"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "equality"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "exits"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "exits_files"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "exits_streams"
+    ],
+    [
+     "probe.file_artifact",
+     "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "content"
+    ],
+    [
+     "probe.file_artifact",
+     "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "exists"
+    ],
+    [
+     "probe.file_artifact",
+     "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "grep_count"
+    ],
+    [
+     "probe.process_effect",
+     "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "scenario_files"
+    ],
+    [
+     "probe.process_effect",
+     "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "scenario_raises"
+    ],
+    [
+     "probe.process_effect",
+     "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "scenario_returns"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "blocks"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "exists"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "raises"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "returns"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "blocks"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "equals"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "exists"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "raises"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "raises_attrs"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "returns"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "returns_bytes"
+    ]
+   ],
+   "committed_record_keys": [
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "blocks"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "equality"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "exits"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "exits_files"
+    ],
+    [
+     "probe.cli_invocation",
+     "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "exits_streams"
+    ],
+    [
+     "probe.file_artifact",
+     "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "content"
+    ],
+    [
+     "probe.file_artifact",
+     "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "exists"
+    ],
+    [
+     "probe.file_artifact",
+     "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "grep_count"
+    ],
+    [
+     "probe.process_effect",
+     "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "scenario_files"
+    ],
+    [
+     "probe.process_effect",
+     "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "scenario_raises"
+    ],
+    [
+     "probe.process_effect",
+     "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "scenario_returns"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "blocks"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "exists"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "raises"
+    ],
+    [
+     "probe.python_callable",
+     "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "returns"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "blocks"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "equals"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "exists"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "raises"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "raises_attrs"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "returns"
+    ],
+    [
+     "probe.python_callable_v2",
+     "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "returns_bytes"
+    ]
+   ],
+   "records": [
+    "closure-evidence/v2/cycle2/P1-FILE-ARTIFACT-CALIBRATION.json",
+    "closure-evidence/v2/cycle2/P2-CLI-CALIBRATION.json",
+    "closure-evidence/v2/cycle2/P3-EFFECT-CALIBRATION.json",
+    "closure-evidence/v2/cycle2/P4-PYTHON-CALLABLE-V2-CALIBRATION.json"
+   ],
+   "all_calibrated_fresh": true,
+   "problems": []
+  },
+  "calibration_cases": {
+   "counts": {
+    "PASS": 16,
+    "FAIL": 0,
+    "ERROR": 0,
+    "SKIP": 0,
+    "NOT_APPLICABLE": 0
+   },
+   "cases": [
+    {
+     "id": "tests.v2.test_c2_file_artifact:Fixtures.test_FA_3_file_artifact_is_qualified_for_every_class_over_the_directory_read_path",
+     "outcome": "PASS",
+     "seconds": 0.02
+    },
+    {
+     "id": "tests.v2.test_c2_file_artifact:Fixtures.test_FA_3_the_same_fixtures_reject_it_once_they_stop_contrasting",
+     "outcome": "PASS",
+     "seconds": 0.021
+    },
+    {
+     "id": "tests.v2.test_c2_file_artifact:Fixtures.test_FA_ADV_3_an_always_REFUTED_probe_of_the_same_shape_is_not_calibrated",
+     "outcome": "PASS",
+     "seconds": 0.003
+    },
+    {
+     "id": "tests.v2.test_c2_file_artifact:Fixtures.test_every_supported_class_has_both_fixtures_asking_for_it",
+     "outcome": "PASS",
+     "seconds": 0.002
+    },
+    {
+     "id": "tests.v2.test_c2_file_artifact:Fixtures.test_the_directory_read_path_matches_names_exactly_and_never_follows_a_link",
+     "outcome": "PASS",
+     "seconds": 0.02
+    },
+    {
+     "id": "tests.v2.test_c2_cli_calibration:Fixtures.test_CLICAL_1_every_class_is_calibrated_with_contrast_and_rejected_without_it",
+     "outcome": "PASS",
+     "seconds": 10.549
+    },
+    {
+     "id": "tests.v2.test_c2_cli_calibration:Fixtures.test_CLICAL_2_an_always_0_fixture_pair_is_rejected",
+     "outcome": "PASS",
+     "seconds": 0.697
+    },
+    {
+     "id": "tests.v2.test_python_callable_v2:Calibration.test_PCV2_1_a_positive_fixture_uses_the_workspace_stimulus",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.test_python_callable_v2:Calibration.test_PCV2_1_every_declared_class_has_both_fixtures_asking_for_it",
+     "outcome": "PASS",
+     "seconds": 0.005
+    },
+    {
+     "id": "tests.v2.test_python_callable_v2:Calibration.test_PCV2_1_the_probe_is_qualified_for_every_class_at_the_new_digest",
+     "outcome": "PASS",
+     "seconds": 2.355
+    },
+    {
+     "id": "tests.v2.test_python_callable_v2:Calibration.test_PCV2_1_the_same_fixtures_reject_it_once_they_stop_contrasting",
+     "outcome": "PASS",
+     "seconds": 4.719
+    },
+    {
+     "id": "tests.v2.test_c2_effect_calibration:Calibration.test_PECAL_1_the_three_classes_calibrated_with_contrast_over_the_small_fixtures",
+     "outcome": "PASS",
+     "seconds": 3.154
+    },
+    {
+     "id": "tests.v2.test_c2_effect_calibration:Calibration.test_PECAL_2_the_ledgerlock_trees_are_the_frozen_blobs_and_a_mutant_is_the_reference_plus_its_change",
+     "outcome": "PASS",
+     "seconds": 0.06
+    },
+    {
+     "id": "tests.v2.test_c2_effect_calibration:Calibration.test_PECAL_3_an_authored_spec_is_satisfied_on_the_reference_and_refutes_its_mutant",
+     "outcome": "PASS",
+     "seconds": 4.736
+    },
+    {
+     "id": "tests.v2.test_c2_effect_calibration:Calibration.test_PECAL_4_a_spec_that_no_mutant_refutes_is_reported_NOT_QUALIFIED",
+     "outcome": "PASS",
+     "seconds": 7.238
+    },
+    {
+     "id": "tests.v2.test_c2_effect_calibration:Calibration.test_the_authored_specs_are_closed_over_the_requirements_map",
+     "outcome": "PASS",
+     "seconds": 0.015
+    }
+   ]
+  },
+  "spec_falsifiability": {
+   "rule": "every spec that backs qualified product evidence in Cycle 2 is a spec of the owner-approved PLAN-V2.2; each is compiled under the persisted real approvals and re-executed, never read from the P5 record",
+   "specs": 59,
+   "qualified": 59,
+   "by_probe": {
+    "probe.cli_invocation": 10,
+    "probe.file_artifact": 9,
+    "probe.process_effect": 34,
+    "probe.python_callable_v2": 6
+   },
+   "approvals": {
+    "count": 59,
+    "approver": [
+     "human:owner"
+    ]
+   },
+   "rows": [
+    {
+     "spec_id": "S-10-a",
+     "semantic_hash": "0c1aa8e1b6bcbc20e1b1ca514b44de592b18f4610357c465b32f6f79bec99b04",
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-10-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-10-b",
+     "semantic_hash": "5daeb0eac00dbe0ab0bdfb6a3e163a513a7dd0a2a3ac26aefe38912ee977e93e",
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-10-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-10-c",
+     "semantic_hash": "be4bcade9818a3e343537d479fadbf9053a8cae3cbbce79326309f11f0ef8b5c",
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-10-c",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-12-a",
+     "semantic_hash": "59d9b16fb41b5e512daaf817e603e484815c577b7872f102ba3b9131bd667da8",
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-12-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-12-b",
+     "semantic_hash": "e7f83ac157533d0c6b5de11d46a1f3e40feceb33200c583c08382ccce4bf266f",
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-12-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-12-c",
+     "semantic_hash": "222515f27c24b9b5c27bb2bbe85b8a3e06f5aefefe4c4d50c661d51489bef13f",
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-12-c",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-13-a",
+     "semantic_hash": "7ab0ea2bbe8e9e3be503ad047da70604ac768f545ec86d5e0ed603c816a35ada",
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-13-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-13-b",
+     "semantic_hash": "a6cc35a216a8c5c6f86b2d647cc4a03e8444efc742f7971fdde64b8d7be1807e",
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-13-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-13-c",
+     "semantic_hash": "3d1d6512ded0e9b8bd3295aaf30d3c24cde29c74415f5ee718f5b5cb629b86bb",
+     "probe_id": "probe.file_artifact",
+     "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-13-c",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-13-d",
+     "semantic_hash": "6399812ad648f19461ef5be450b8b8d6f19602231a61df9c074a92368a40edd4",
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-13-d",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-13-e",
+     "semantic_hash": "032c67ab8ece7991690b5d730389719f371d4e55c06dfe02a29684ea59a58157",
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-13-e",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-13-f",
+     "semantic_hash": "26ebbd8446be3f92ffa681808f6d6234934c6aceea84627610caf8d53e23f890",
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-13-f",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-13-g",
+     "semantic_hash": "5370b765a9d99292dbcc98cef84c08d59fa440754e7b914fe951e75367d10dee",
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-13-g",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-13-h",
+     "semantic_hash": "249c9703dfbc33b74873bfc1f55ffb59c8c1f52bd2091ec6f925ead67440a21e",
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-13-h",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-13-i",
+     "semantic_hash": "47bc8c18046253e18c07f52c3e43d5c0599a6e52e2effabf7f8e35445c783651",
+     "probe_id": "probe.python_callable_v2",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-13-i",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.1-a",
+     "semantic_hash": "84714ebc49a5f4c6902c84953472d3472e67ff650376ba2faf34a5843a1390c8",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.1-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.1-b",
+     "semantic_hash": "c0e582d4d043cecf7c5a816bf943930b6c048371bbae460b97e277b456166e48",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.1-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.1-c",
+     "semantic_hash": "deaf2299e735b528208adccfaa4f69e2d5d3770bcbdb7eb40722473acdc65fef",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.1-c",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.2-a",
+     "semantic_hash": "747282a3d8b8dc25aa70794a1921e3930baee40aa730fe0f0eb41eb5fa2c1834",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.2-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.2-b",
+     "semantic_hash": "619730a279e212db9898909d4c581a90b57fa3ffc97666769f0e2836821f46f9",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.2-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.2-c",
+     "semantic_hash": "58f05a9dde521bd9dfc926d1fee9134514b4745210e9fe4a1e9eae55be1ca278",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.2-c",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.2-d",
+     "semantic_hash": "8d50f888076871ea1c7bbde563f02bda56d5ece6ab202c030d01bf9bbd45efd0",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.2-d",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.2-e",
+     "semantic_hash": "879e3baa597e5a481b02ec9fdb0cfbc088b2b41b1f99f31f80203e60603a41db",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.2-e",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.2-f",
+     "semantic_hash": "fbc7cf7c928de540c1d63ec85eed8ed44b2c3da72ce93a669349a16af49e7f1b",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.2-f",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.2-g",
+     "semantic_hash": "ce2c6283d2be3c7d06da5adf5abcd66450f533437075305468134d1f0be9b05b",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.2-g",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.2-h",
+     "semantic_hash": "5e6e7dd06d3ad28a311c9b73f2cb71e715ecc232f104fbe19b660ff9c93f4d37",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.2-h",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.3-a",
+     "semantic_hash": "6d829a9d7d756a0b37d2c9db6979fd656b1a5aad7620802db62ec5e3bb3b816d",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.3-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.3-b",
+     "semantic_hash": "3a0f3c5d915c0af4c11620808e4010e0fad2b8e165bf5c5278c9c7bffd6f5f55",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.3-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.3-c",
+     "semantic_hash": "d14ed7caa9908e37a2e6b2709098de4513beb09f0b24de6f5d59d935315cd885",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.3-c",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.3-d",
+     "semantic_hash": "7039c7f0c9fc9162879b61bc5692ea5431cc3b93ac1a477aadd6999b85c2061f",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-3.3-d",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-3.4-a",
+     "semantic_hash": "c0f5d5baad51699f15b5ebd2ca388cc847d67a5a42fd674fba3bf63dbb26462a",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "REFUTED",
+     "pristine": "REFUTED",
+     "witness": "M5-3.4-a",
+     "witness_verdict": "SATISFIED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-4.2-a",
+     "semantic_hash": "3e2bc49d2e6c14f2cd57f8b25788c5dc8d740375e6585858ad9b785d887e9f66",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-4.2-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-4.2-b",
+     "semantic_hash": "e4e2afc10623f8b1207440c5bb89995ab00d79225e19b069daa5b0e763e30fcf",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-4.2-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-4.3-a",
+     "semantic_hash": "01f7217c33f825d138e6fa1aeb5d5fa073e284837722f4f0fbef0d4674b8e404",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-4.3-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-4.3-b",
+     "semantic_hash": "f031277ba5fd4b1e034693336d6875aa894818054be3df6a33799c042390a611",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-4.3-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-4.4-a",
+     "semantic_hash": "93c8561b37a7c9f30c860acb4290d3edc36ab04e64af0f9c8b2bcb6d06c2e3ff",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-4.4-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-4.4-b",
+     "semantic_hash": "72e2567ef81582835eb2c2c84b9ebbd7a3bcf05d4fd97bd0f878bbea30e97a0f",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-4.4-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-4.5-a",
+     "semantic_hash": "8231017045bbfcf62b06f652cfc51cd08e92320564bc83b1df83a22972beb62b",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-4.5-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-4.5-b",
+     "semantic_hash": "3e3c2dd23d4bb79983ee33582c8b85860f22030f47cb1c093997d2b0a640099e",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-4.5-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-5-a",
+     "semantic_hash": "3b5de7d325f1a8770ff29408aa0182ef350bfbf1fad5ed88f44fbb95b58e4956",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-5-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-5-b",
+     "semantic_hash": "d7d29b8cc8f448b1f40cd01bf87affee7c551eb9b319974849851f7b2acb6c49",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-5-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-6-a",
+     "semantic_hash": "1105a5130c448327cc645d44db2b51da9b5db991bc5c0ebf31e3226d3eb5a189",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-6-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-6-b",
+     "semantic_hash": "95c6e63fe4e2d4454ca63e1dfbf366f482f4eee7a356b69a1a6c0faadef73952",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-6-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-6-c",
+     "semantic_hash": "b53197b0273faf9d3ae340965d108eab92876b43a4f0461b3e7a952b8012d1c5",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-6-c",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-6-d",
+     "semantic_hash": "6bdcb2ec9e83a401cadce5f31c3af747f19e654ac180ab4ef11678b34f5972aa",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-6-d",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-7-a",
+     "semantic_hash": "f4b22f927d61e6f7f0e5bf80fea10017e002b13fc33e31edde2f92dc76299c9e",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-7-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-7-b",
+     "semantic_hash": "2033a571eed7e0f6ff8fe1b73c530fed53e43797c282c140933df3823826b102",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-7-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-7-c",
+     "semantic_hash": "4d8e4e99153a25d062d2de8db0d4852830ccc4367581bf1067bf4a7b15c53a53",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-7-c",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-7-d",
+     "semantic_hash": "2bdb1dd656de8d39d2633029acd325bec4c3be2799da1717974055b7e8ae4ee6",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-7-d",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-7-e",
+     "semantic_hash": "b7ba1a35c20a62481b7e288bae3f5617e73a46d63e606cb1f217bc74c400943a",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-7-e",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-7-f",
+     "semantic_hash": "d6e3346e39e9b04a34c6237f19c1395f7446513c178f5e7c4ad887f5728ae90c",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-7-f",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-9-a",
+     "semantic_hash": "abebe16e33fa17cf5c29a49597aa7536cabe20dde3aa915b2a9d9cfa3cafe62a",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-9-a",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-9-b",
+     "semantic_hash": "82531d8da6bf353fb75dc8c2382affb37e24c284972ccf275349ff0382c7d328",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-9-b",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-9-c",
+     "semantic_hash": "6bee956abc61dbd7aa4f81680990472ad1627609f14995b73b4522e4bca58ec8",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-9-c",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-9-d",
+     "semantic_hash": "efce139724be8e296fd7fa98920e053e9b958a98fef52f34cb564f986a81a3f7",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-9-d",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-9-e",
+     "semantic_hash": "1a22147544f145b582d78fb2d552dfc40a6633e40b817090d4516aee686959ca",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-9-e",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-9-f",
+     "semantic_hash": "64ffbff36c8b78983ec96ae838964a8ff426ea44f52a48beb9be1c0b15dd548a",
+     "probe_id": "probe.cli_invocation",
+     "probe_digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-9-f",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-D3-05-01-1",
+     "semantic_hash": "62bd14736bfde206901c6ae17e2691e7ab732241c4cf5bbaddf96b37c676af62",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-D3-05-01-1",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    },
+    {
+     "spec_id": "S-D3-05-01-2",
+     "semantic_hash": "4350d6c0cb45caf041fe13bfa5acaa51a69bbb11ed92a6d2688e92067efb2fe4",
+     "probe_id": "probe.process_effect",
+     "probe_digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+     "expectation": "SATISFIED",
+     "pristine": "SATISFIED",
+     "witness": "M5-D3-05-01-2",
+     "witness_verdict": "REFUTED",
+     "status": "QUALIFIED",
+     "mechanism": "controlled_product_mutation",
+     "evidence_problems": [],
+     "equal_to_the_accepted_record": true
+    }
+   ],
+   "problems": []
+  }
+ },
+ "engineering_quality": {
+  "properties": {
+   "TestExecution_two_axis_semantics": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_test_execution:Shape.test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_test_execution:Classify.test_no_did_not_run_to_developer_edge_exists",
+      "outcome": "PASS",
+      "seconds": 0.0
+     }
+    ]
+   },
+   "relevance": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+      "outcome": "PASS",
+      "seconds": 0.001
+     },
+     {
+      "id": "tests.v2.p5.test_relevance:Typed.test_REL_3_coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT",
+      "outcome": "PASS",
+      "seconds": 0.001
+     },
+     {
+      "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
+      "outcome": "PASS",
+      "seconds": 0.096
+     }
+    ]
+   },
+   "vacuity": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
+      "outcome": "PASS",
+      "seconds": 0.663
+     },
+     {
+      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
+      "outcome": "PASS",
+      "seconds": 0.19
+     }
+    ]
+   },
+   "adequacy": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_adequacy:Exhaustive.test_assembly_is_total_and_follows_the_precedence",
+      "outcome": "PASS",
+      "seconds": 0.002
+     },
+     {
+      "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
+      "outcome": "PASS",
+      "seconds": 0.004
+     }
+    ]
+   },
+   "no_parent_developer_artefact": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+      "outcome": "PASS",
+      "seconds": 0.38
+     },
+     {
+      "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+      "outcome": "PASS",
+      "seconds": 0.006
+     },
+     {
+      "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_parent_developer_test_execution_is_refused_statically",
+      "outcome": "PASS",
+      "seconds": 0.181
+     },
+     {
+      "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_the_apis_are_structurally_candidate_only",
+      "outcome": "PASS",
+      "seconds": 0.185
+     },
+     {
+      "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_the_only_counterfactual_is_candidate_side_vacuity",
+      "outcome": "PASS",
+      "seconds": 0.0
+     }
+    ]
+   },
+   "INCOMPLETE_nonblocking": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_11_INDETERMINATE_vacuity_alone_is_INCOMPLETE_non_blocking_uncharged",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_12_UNMEASURABLE_relevance_alone_is_INCOMPLETE_non_blocking_uncharged",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
+      "outcome": "PASS",
+      "seconds": 0.022
+     },
+     {
+      "id": "tests.v2.test_p6_stages:Quality.test_INCOMPLETE_is_recorded_and_never_a_failure",
+      "outcome": "PASS",
+      "seconds": 0.297
+     }
+    ]
+   },
+   "UNRUNNABLE_no_AdequacyOutcome": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_3_regression_UNRUNNABLE_has_no_outcome_and_keeps_the_environment_owner",
+      "outcome": "PASS",
+      "seconds": 0.0
+     },
+     {
+      "id": "tests.v2.test_p6_stages:Quality.test_UNRUNNABLE_is_TESTS_UNRUNNABLE_with_environment_provenance_and_no_outcome",
+      "outcome": "PASS",
+      "seconds": 0.143
+     }
+    ]
+   },
+   "no_path_to_product_proof": {
+    "status": "GREEN",
+    "cases": [
+     {
+      "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
+      "outcome": "PASS",
+      "seconds": 0.125
+     },
+     {
+      "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_14_a_change_of_engineering_adequacy_leaves_the_product_proof_unchanged",
+      "outcome": "PASS",
+      "seconds": 1.021
+     }
+    ]
+   }
+  },
+  "modules": {
+   "counts": {
+    "PASS": 117,
+    "FAIL": 0,
+    "ERROR": 0,
+    "SKIP": 0,
+    "NOT_APPLICABLE": 2
+   },
+   "cases": [
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_1_a_missing_runner_is_UNRUNNABLE_ENVIRONMENT_with_no_outcome_and_no_selection",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_2_failing_assertions_are_EXECUTED_FAILED_STORY_TESTS_RAN_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_a_passing_suite_is_EXECUTED_PASSED_STORY_TESTS_RAN_with_no_owner",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_a_story_file_the_runner_could_not_collect_is_never_hidden_by_the_story_files_that_ran",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_an_error_outcome_fails_the_story_like_a_failure",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_no_did_not_run_to_developer_edge_exists",
+     "outcome": "PASS",
+     "seconds": 0.003
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_reasons_are_the_typed_facts_spelled_out",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_3_no_story_test_matched_is_DEVELOPER_by_the_typed_value_and_distinct_from_UNRUNNABLE",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_collection_cause_in_the_projects_own_tree_is_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_collection_cause_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_undeterminable_collection_cause_is_INTEGRATION_never_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_rule_5_regressions_use_the_identical_rules",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Classify.test_the_outcome_is_the_storys_tests_never_another_files",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_pytest_for_real",
+     "outcome": "NOT_APPLICABLE",
+     "seconds": 0.0,
+     "detail": "pytest is not installed here (CI runs the stdlib runner)",
+     "optional_capability_absent": "pytest adapter (optional third-party runner)"
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_the_junit_result_set_is_read_typed",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
+     "outcome": "PASS",
+     "seconds": 0.095
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_2_for_real",
+     "outcome": "PASS",
+     "seconds": 0.095
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_directory_target_is_discovered_and_a_node_id_selects_one_test",
+     "outcome": "PASS",
+     "seconds": 0.189
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_passing_suite_yields_EXECUTED_PASSED_STORY_TESTS_RAN",
+     "outcome": "PASS",
+     "seconds": 0.095
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_ended_by_a_signal_is_UNRUNNABLE",
+     "outcome": "PASS",
+     "seconds": 0.066
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_that_crashes_before_reporting_is_UNRUNNABLE",
+     "outcome": "PASS",
+     "seconds": 0.062
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_an_empty_selection_is_NO_STORY_TESTS_MATCHED_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.186
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+     "outcome": "PASS",
+     "seconds": 0.093
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_the_projects_own_tree_is_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.187
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_candidate_is_the_only_tree_execute_knows",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_harness_deadline_is_UNRUNNABLE_and_the_range_is_released",
+     "outcome": "PASS",
+     "seconds": 1.063
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_result_set_is_typed_and_carries_the_collection_detail",
+     "outcome": "PASS",
+     "seconds": 0.095
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:RealRunner.test_undeterminable_collection_cause_is_INTEGRATION",
+     "outcome": "PASS",
+     "seconds": 0.093
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_paths_are_normalised_and_ownership_is_by_whole_path_components",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_project_top_level_names_packages_and_modules_at_the_root_and_under_src",
+     "outcome": "PASS",
+     "seconds": 0.002
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_the_fields_are_the_rfcs",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_the_refusals_say_why",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_test_execution:Shape.test_typed_inputs_refuse_untyped_causes_and_absolute_paths",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
+     "outcome": "PASS",
+     "seconds": 0.096
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_2_for_real",
+     "outcome": "PASS",
+     "seconds": 0.096
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_3_for_real_the_runner_without_the_capability_declares_it",
+     "outcome": "PASS",
+     "seconds": 0.094
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_4_for_real_a_test_that_replaces_the_tracer_makes_the_measurement_PARTIAL",
+     "outcome": "PASS",
+     "seconds": 0.094
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_5_for_real_branch_evidence_is_recorded_and_the_value_is_the_lines",
+     "outcome": "PASS",
+     "seconds": 0.19
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_6_for_real_an_accessed_data_file",
+     "outcome": "PASS",
+     "seconds": 0.197
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_7_for_real_no_capability_for_the_data_file",
+     "outcome": "PASS",
+     "seconds": 0.098
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_8_for_real_the_same_tests_in_another_layout",
+     "outcome": "PASS",
+     "seconds": 0.191
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_REL_DEL_1_for_real_the_story_deletes_executable_code_and_its_test_verifies_the_deletion",
+     "outcome": "PASS",
+     "seconds": 0.095
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_product_code_run_in_a_thread_is_measured",
+     "outcome": "PASS",
+     "seconds": 0.096
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:ForReal.test_the_pytest_adapter_declares_no_measurement",
+     "outcome": "NOT_APPLICABLE",
+     "seconds": 0.0,
+     "detail": "pytest is not installed here (CI runs the stdlib runner)",
+     "optional_capability_absent": "pytest adapter (optional third-party runner)"
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Parsing.test_a_unified_diff_becomes_candidate_line_numbers",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Parsing.test_executable_lines_are_the_code_objects_own",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_2_measured_story_tests_with_zero_intersection_are_IRRELEVANT",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_3_coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_4_coverage_capability_PARTIAL_is_UNMEASURABLE",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_5_branch_evidence_is_recorded_when_present_and_never_required",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_6_a_non_line_addressable_artefact_uses_its_own_measurement",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_7_a_non_line_addressable_artefact_without_a_capability_is_UNMEASURABLE",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_8_the_same_coverage_under_another_test_layout_is_the_same_result",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_1_a_pure_executable_deletion_is_UNMEASURABLE_not_IRRELEVANT",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_2_and_3_ordinary_modifications_are_measured",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_4_a_tests_only_diff_is_measured_empty_and_is_not_a_deletion",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_a_test_that_did_not_execute_establishes_nothing",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_nothing_here_reaches_the_product_verdict",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_one_unmeasurable_artefact_never_hides_behind_the_others",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_reasons_are_the_measured_facts",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_the_developers_own_test_file_is_not_the_product_change",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_relevance:Typed.test_the_result_shape_refuses_every_contradiction",
+     "outcome": "PASS",
+     "seconds": 0.001
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_10_a_deletion_the_patch_does_not_carry_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.38
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_11_moving_the_developer_tests_does_not_change_the_result",
+     "outcome": "PASS",
+     "seconds": 0.762
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+     "outcome": "PASS",
+     "seconds": 0.381
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
+     "outcome": "PASS",
+     "seconds": 0.665
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
+     "outcome": "PASS",
+     "seconds": 0.189
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_3_a_tree_that_cannot_be_reconstructed_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.095
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_4_a_runner_unavailable_in_the_neutralised_run_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.165
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_5_a_story_test_that_no_longer_imports_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.19
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_6_intended_story_tests_that_do_not_actually_run_are_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.571
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_7_a_failure_not_attributable_to_the_neutralisation_is_INDETERMINATE",
+     "outcome": "PASS",
+     "seconds": 0.478
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS",
+     "outcome": "PASS",
+     "seconds": 0.191
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_9_a_pure_deletion_the_patch_carries_is_reconstructed_and_classified_from_execution",
+     "outcome": "PASS",
+     "seconds": 0.381
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_a_baseline_that_does_not_pass_has_no_counterfactual",
+     "outcome": "PASS",
+     "seconds": 0.098
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
+     "outcome": "PASS",
+     "seconds": 0.002
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+     "outcome": "PASS",
+     "seconds": 0.016
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_neutralisation_touches_exactly_the_story_product_artefacts",
+     "outcome": "PASS",
+     "seconds": 0.012
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_reverse_application_is_exact_or_refused",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_the_patch_is_typed_per_file",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_vacuity:Typed.test_the_result_shape_refuses_every_contradiction",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_10_regressions_FAILED_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_11_INDETERMINATE_vacuity_alone_is_INCOMPLETE_non_blocking_uncharged",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_12_UNMEASURABLE_relevance_alone_is_INCOMPLETE_non_blocking_uncharged",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_13_FAILED_with_UNMEASURABLE_is_INADEQUATE_the_hard_defect_dominates",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_14_regressions_FAILED_with_INDETERMINATE_is_INADEQUATE",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_15_opposite_TDD_chronology_with_identical_typed_inputs_is_the_identical_result",
+     "outcome": "PASS",
+     "seconds": 0.007
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_1_all_green_is_ADEQUATE",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_3_regression_UNRUNNABLE_has_no_outcome_and_keeps_the_environment_owner",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_4_the_story_tests_FAILED_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_5_NO_STORY_TESTS_MATCHED_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_6_a_developer_caused_collection_failure_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_7_an_integration_owned_collection_failure_is_never_charged_to_the_developer",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_8_VACUOUS_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_9_IRRELEVANT_is_INADEQUATE_DEVELOPER",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Exhaustive.test_ADEQ_R_the_regression_dimension_follows_the_same_typed_rules",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Exhaustive.test_assembly_is_total_and_follows_the_precedence",
+     "outcome": "PASS",
+     "seconds": 0.002
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
+     "outcome": "PASS",
+     "seconds": 0.004
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE",
+     "outcome": "PASS",
+     "seconds": 0.294
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_17_for_real_a_tests_only_diff_is_INADEQUATE_by_the_frozen_rules",
+     "outcome": "PASS",
+     "seconds": 0.287
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_1_for_real",
+     "outcome": "PASS",
+     "seconds": 0.282
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_2_for_real_the_story_runner_cannot_execute",
+     "outcome": "PASS",
+     "seconds": 0.163
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_3_for_real_the_regression_runner_cannot_execute",
+     "outcome": "PASS",
+     "seconds": 0.258
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_4_and_10_for_real",
+     "outcome": "PASS",
+     "seconds": 0.471
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner",
+     "outcome": "PASS",
+     "seconds": 0.378
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_R_for_real_regression_selection_and_collection_by_their_typed_owner",
+     "outcome": "PASS",
+     "seconds": 0.854
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
+     "outcome": "PASS",
+     "seconds": 0.113
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
+     "outcome": "PASS",
+     "seconds": 0.022
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Separation.test_no_prose_is_read_for_control_and_no_side_state_exists",
+     "outcome": "PASS",
+     "seconds": 0.006
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_EXECUTED_story_execution_carries_typed_measurements_of_tests_that_ran",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_UNRUNNABLE_regressions_carry_no_outcome",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_UNRUNNABLE_story_execution_carries_nothing_measured_and_no_outcome",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_both_EXECUTED_the_outcome_is_defined_and_is_what_the_facts_assemble_to",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_the_fields_are_the_rfcs",
+     "outcome": "PASS",
+     "seconds": 0.0
+    },
+    {
+     "id": "tests.v2.p5.test_adequacy:Shape.test_typed_executions_and_no_sensitivity",
+     "outcome": "PASS",
+     "seconds": 0.0
+    }
+   ]
+  },
+  "sensitivity": {
+   "status": "DEFERRED_BY_RFC",
+   "rfc_row": "Engineering-test **sensitivity** (mutation at story scope) | when Q2 mutation infrastructure is stable and its cost per story is measured",
+   "scope": "not measured in Q2 cycle 1; not expanded (owner §15)"
+  },
+  "optional_capabilities_absent_here": [
+   {
+    "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_pytest_for_real",
+    "capability": "pytest adapter (optional third-party runner)",
+    "reason": "pytest is not installed here (CI runs the stdlib runner)"
+   },
+   {
+    "id": "tests.v2.p5.test_relevance:ForReal.test_the_pytest_adapter_declares_no_measurement",
+    "capability": "pytest adapter (optional third-party runner)",
+    "reason": "pytest is not installed here (CI runs the stdlib runner)"
+   }
+  ],
+  "p5_records_identity_problems": []
+ },
+ "provider_calls": 0,
+ "problems": [],
+ "harness_problems": [],
+ "cases": [
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission",
+   "outcome": "PASS",
+   "seconds": 1.951
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number",
+   "outcome": "PASS",
+   "seconds": 1.327
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own",
+   "outcome": "PASS",
+   "seconds": 1.327
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled",
+   "outcome": "PASS",
+   "seconds": 1.327
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused",
+   "outcome": "PASS",
+   "seconds": 1.327
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed",
+   "outcome": "PASS",
+   "seconds": 1.327
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives",
+   "outcome": "PASS",
+   "seconds": 1.329
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set",
+   "outcome": "PASS",
+   "seconds": 1.486
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:CleanupAuthority.test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set",
+   "outcome": "PASS",
+   "seconds": 1.327
+  },
+  {
+   "id": "tests.v2.p4.test_mutation_safety:DependencyBoundary.test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it",
+   "outcome": "PASS",
+   "seconds": 0.019
+  },
+  {
+   "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_class_qualified_name_picks_that_class_method",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_reference_models_refusal_message_is_not_a_mutation_site",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_mutation_targets:Locator.test_a_return_of_None_is_not_mutated_into_itself",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_mutation_targets:Locator.test_every_target_resolves",
+   "outcome": "PASS",
+   "seconds": 2.847
+  },
+  {
+   "id": "tests.v2.p5.test_invariants:MutationAuthority.test_INV_MUTATION_AUTHORITY_destructive_sites_of_the_invariant_code_are_ledgered",
+   "outcome": "PASS",
+   "seconds": 2.748
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_a_probe_that_cannot_look_is_not_qualified",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_an_always_SATISFIED_probe_is_rejected_for_MUST_HOLD",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_an_honest_probe_is_qualified_for_its_class",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_refusing_to_run_is_not_a_demonstration",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_swapped_fixtures_qualify_nothing",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_must_ask_for_the_class_being_calibrated",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Calibrate.test_the_fixture_spec_is_bound_to_the_probe_and_answers_no_contract",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Contrast.test_CAL_1_a_fixed_REFUTED_rule_would_have_passed_the_always_refuted_probe",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Contrast.test_an_expectation_is_satisfied_or_refuted",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Contrast.test_the_counterexample_must_produce_the_opposite_verdict",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Falsifiability.test_evidence_must_contrast_with_the_specs_expectation",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Falsifiability.test_the_evidence_is_typed",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Metadata.test_a_protocol_only_probe_is_calibrated",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Metadata.test_an_unregistered_probe_or_digest_is_not_qualified",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Records.test_a_record_qualifies_only_its_probe_digest_and_class",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p2.test_calibration:Records.test_the_record_shapes_are_the_rfcs",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_1_a_missing_runner_is_UNRUNNABLE_ENVIRONMENT_with_no_outcome_and_no_selection",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_TEST_2_failing_assertions_are_EXECUTED_FAILED_STORY_TESTS_RAN_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_a_passing_suite_is_EXECUTED_PASSED_STORY_TESTS_RAN_with_no_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_a_story_file_the_runner_could_not_collect_is_never_hidden_by_the_story_files_that_ran",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_an_error_outcome_fails_the_story_like_a_failure",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_no_did_not_run_to_developer_edge_exists",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_reasons_are_the_typed_facts_spelled_out",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_3_no_story_test_matched_is_DEVELOPER_by_the_typed_value_and_distinct_from_UNRUNNABLE",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_collection_cause_in_the_projects_own_tree_is_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_collection_cause_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_4_undeterminable_collection_cause_is_INTEGRATION_never_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_rule_5_regressions_use_the_identical_rules",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_the_outcome_is_the_storys_tests_never_another_files",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_pytest_for_real",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "pytest is not installed here (CI runs the stdlib runner)",
+   "optional_capability_absent": "pytest adapter (optional third-party runner)"
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:PytestAdapter.test_the_junit_result_set_is_read_typed",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_1_for_real_the_configured_runner_is_absent",
+   "outcome": "PASS",
+   "seconds": 0.095
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_TEST_2_for_real",
+   "outcome": "PASS",
+   "seconds": 0.095
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_directory_target_is_discovered_and_a_node_id_selects_one_test",
+   "outcome": "PASS",
+   "seconds": 0.189
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_passing_suite_yields_EXECUTED_PASSED_STORY_TESTS_RAN",
+   "outcome": "PASS",
+   "seconds": 0.095
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_ended_by_a_signal_is_UNRUNNABLE",
+   "outcome": "PASS",
+   "seconds": 0.066
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_a_runner_that_crashes_before_reporting_is_UNRUNNABLE",
+   "outcome": "PASS",
+   "seconds": 0.062
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_an_empty_selection_is_NO_STORY_TESTS_MATCHED_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.186
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_a_declared_environment_dependency_is_UNRUNNABLE_ENVIRONMENT",
+   "outcome": "PASS",
+   "seconds": 0.093
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_collection_failure_on_the_projects_own_tree_is_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.187
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_candidate_is_the_only_tree_execute_knows",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_harness_deadline_is_UNRUNNABLE_and_the_range_is_released",
+   "outcome": "PASS",
+   "seconds": 1.063
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_the_result_set_is_typed_and_carries_the_collection_detail",
+   "outcome": "PASS",
+   "seconds": 0.095
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:RealRunner.test_undeterminable_collection_cause_is_INTEGRATION",
+   "outcome": "PASS",
+   "seconds": 0.093
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_paths_are_normalised_and_ownership_is_by_whole_path_components",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_project_top_level_names_packages_and_modules_at_the_root_and_under_src",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_the_fields_are_the_rfcs",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_the_refusals_say_why",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_typed_inputs_refuse_untyped_causes_and_absolute_paths",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
+   "outcome": "PASS",
+   "seconds": 0.096
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_2_for_real",
+   "outcome": "PASS",
+   "seconds": 0.096
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_3_for_real_the_runner_without_the_capability_declares_it",
+   "outcome": "PASS",
+   "seconds": 0.094
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_4_for_real_a_test_that_replaces_the_tracer_makes_the_measurement_PARTIAL",
+   "outcome": "PASS",
+   "seconds": 0.094
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_5_for_real_branch_evidence_is_recorded_and_the_value_is_the_lines",
+   "outcome": "PASS",
+   "seconds": 0.19
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_6_for_real_an_accessed_data_file",
+   "outcome": "PASS",
+   "seconds": 0.197
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_7_for_real_no_capability_for_the_data_file",
+   "outcome": "PASS",
+   "seconds": 0.098
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_8_for_real_the_same_tests_in_another_layout",
+   "outcome": "PASS",
+   "seconds": 0.191
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_DEL_1_for_real_the_story_deletes_executable_code_and_its_test_verifies_the_deletion",
+   "outcome": "PASS",
+   "seconds": 0.095
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_product_code_run_in_a_thread_is_measured",
+   "outcome": "PASS",
+   "seconds": 0.096
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_the_pytest_adapter_declares_no_measurement",
+   "outcome": "NOT_APPLICABLE",
+   "seconds": 0.0,
+   "detail": "pytest is not installed here (CI runs the stdlib runner)",
+   "optional_capability_absent": "pytest adapter (optional third-party runner)"
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Parsing.test_a_unified_diff_becomes_candidate_line_numbers",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Parsing.test_executable_lines_are_the_code_objects_own",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_2_measured_story_tests_with_zero_intersection_are_IRRELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_3_coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_4_coverage_capability_PARTIAL_is_UNMEASURABLE",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_5_branch_evidence_is_recorded_when_present_and_never_required",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_6_a_non_line_addressable_artefact_uses_its_own_measurement",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_7_a_non_line_addressable_artefact_without_a_capability_is_UNMEASURABLE",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_8_the_same_coverage_under_another_test_layout_is_the_same_result",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_1_a_pure_executable_deletion_is_UNMEASURABLE_not_IRRELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_2_and_3_ordinary_modifications_are_measured",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_DEL_4_a_tests_only_diff_is_measured_empty_and_is_not_a_deletion",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_a_test_that_did_not_execute_establishes_nothing",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_nothing_here_reaches_the_product_verdict",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_one_unmeasurable_artefact_never_hides_behind_the_others",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_reasons_are_the_measured_facts",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_the_developers_own_test_file_is_not_the_product_change",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_the_result_shape_refuses_every_contradiction",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_10_a_deletion_the_patch_does_not_carry_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.38
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_11_moving_the_developer_tests_does_not_change_the_result",
+   "outcome": "PASS",
+   "seconds": 0.762
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+   "outcome": "PASS",
+   "seconds": 0.381
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.665
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.189
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_3_a_tree_that_cannot_be_reconstructed_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.095
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_4_a_runner_unavailable_in_the_neutralised_run_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.165
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_5_a_story_test_that_no_longer_imports_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.19
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_6_intended_story_tests_that_do_not_actually_run_are_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.571
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_7_a_failure_not_attributable_to_the_neutralisation_is_INDETERMINATE",
+   "outcome": "PASS",
+   "seconds": 0.478
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_8_a_tests_only_diff_leaves_the_product_unchanged_and_is_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.191
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_9_a_pure_deletion_the_patch_carries_is_reconstructed_and_classified_from_execution",
+   "outcome": "PASS",
+   "seconds": 0.381
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_a_baseline_that_does_not_pass_has_no_counterfactual",
+   "outcome": "PASS",
+   "seconds": 0.098
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_a_symbolic_link_in_the_candidate_stays_a_link_in_the_scratch_copy",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+   "outcome": "PASS",
+   "seconds": 0.016
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_neutralisation_touches_exactly_the_story_product_artefacts",
+   "outcome": "PASS",
+   "seconds": 0.012
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_reverse_application_is_exact_or_refused",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_the_patch_is_typed_per_file",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_the_result_shape_refuses_every_contradiction",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_10_regressions_FAILED_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_11_INDETERMINATE_vacuity_alone_is_INCOMPLETE_non_blocking_uncharged",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_12_UNMEASURABLE_relevance_alone_is_INCOMPLETE_non_blocking_uncharged",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_13_FAILED_with_UNMEASURABLE_is_INADEQUATE_the_hard_defect_dominates",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_14_regressions_FAILED_with_INDETERMINATE_is_INADEQUATE",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_15_opposite_TDD_chronology_with_identical_typed_inputs_is_the_identical_result",
+   "outcome": "PASS",
+   "seconds": 0.007
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_1_all_green_is_ADEQUATE",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_3_regression_UNRUNNABLE_has_no_outcome_and_keeps_the_environment_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_4_the_story_tests_FAILED_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_5_NO_STORY_TESTS_MATCHED_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_6_a_developer_caused_collection_failure_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_7_an_integration_owned_collection_failure_is_never_charged_to_the_developer",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_8_VACUOUS_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_9_IRRELEVANT_is_INADEQUATE_DEVELOPER",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_ADEQ_R_the_regression_dimension_follows_the_same_typed_rules",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_assembly_is_total_and_follows_the_precedence",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
+   "outcome": "PASS",
+   "seconds": 0.004
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_16_for_real_a_pure_deletion_otherwise_green_is_INCOMPLETE",
+   "outcome": "PASS",
+   "seconds": 0.294
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_17_for_real_a_tests_only_diff_is_INADEQUATE_by_the_frozen_rules",
+   "outcome": "PASS",
+   "seconds": 0.287
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_1_for_real",
+   "outcome": "PASS",
+   "seconds": 0.282
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_2_for_real_the_story_runner_cannot_execute",
+   "outcome": "PASS",
+   "seconds": 0.163
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_3_for_real_the_regression_runner_cannot_execute",
+   "outcome": "PASS",
+   "seconds": 0.258
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_4_and_10_for_real",
+   "outcome": "PASS",
+   "seconds": 0.471
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_6_and_7_for_real_collection_failures_by_their_typed_owner",
+   "outcome": "PASS",
+   "seconds": 0.378
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:ForReal.test_ADEQ_R_for_real_regression_selection_and_collection_by_their_typed_owner",
+   "outcome": "PASS",
+   "seconds": 0.854
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
+   "outcome": "PASS",
+   "seconds": 0.113
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
+   "outcome": "PASS",
+   "seconds": 0.022
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_prose_is_read_for_control_and_no_side_state_exists",
+   "outcome": "PASS",
+   "seconds": 0.006
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_EXECUTED_story_execution_carries_typed_measurements_of_tests_that_ran",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_UNRUNNABLE_regressions_carry_no_outcome",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_UNRUNNABLE_story_execution_carries_nothing_measured_and_no_outcome",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_both_EXECUTED_the_outcome_is_defined_and_is_what_the_facts_assemble_to",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_the_fields_are_the_rfcs",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Shape.test_typed_executions_and_no_sensitivity",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_UNRUNNABLE_carries_no_outcome_no_selection_and_only_the_environment_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Shape.test_EXECUTED_owner_follows_outcome_and_selection",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_test_execution:Classify.test_no_did_not_run_to_developer_edge_exists",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_1_an_executed_story_test_intersecting_a_changed_executable_line_is_RELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:Typed.test_REL_3_coverage_capability_unavailable_is_UNMEASURABLE_never_IRRELEVANT",
+   "outcome": "PASS",
+   "seconds": 0.001
+  },
+  {
+   "id": "tests.v2.p5.test_relevance:ForReal.test_REL_1_for_real",
+   "outcome": "PASS",
+   "seconds": 0.096
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_1_a_story_test_that_fails_by_assertion_once_the_product_change_is_neutralised_is_NON_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.663
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_2_a_story_test_that_still_passes_is_VACUOUS",
+   "outcome": "PASS",
+   "seconds": 0.19
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_assembly_is_total_and_follows_the_precedence",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Exhaustive.test_owner_blocking_and_charge_are_read_from_the_typed_facts_only",
+   "outcome": "PASS",
+   "seconds": 0.004
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:ForReal.test_VAC_12_an_unrunnable_parent_changes_nothing_because_the_parent_is_never_executed",
+   "outcome": "PASS",
+   "seconds": 0.38
+  },
+  {
+   "id": "tests.v2.p5.test_vacuity:Typed.test_invariant_IX_is_structural",
+   "outcome": "PASS",
+   "seconds": 0.006
+  },
+  {
+   "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_parent_developer_test_execution_is_refused_statically",
+   "outcome": "PASS",
+   "seconds": 0.181
+  },
+  {
+   "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_INV_PARENT_1_the_apis_are_structurally_candidate_only",
+   "outcome": "PASS",
+   "seconds": 0.185
+  },
+  {
+   "id": "tests.v2.p5.test_invariants:NoDeveloperArtefactAtParent.test_the_only_counterfactual_is_candidate_side_vacuity",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_11_INDETERMINATE_vacuity_alone_is_INCOMPLETE_non_blocking_uncharged",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_12_UNMEASURABLE_relevance_alone_is_INCOMPLETE_non_blocking_uncharged",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_policy_object_decides_adequacy_blocking_and_INCOMPLETE_cannot_block_under_any",
+   "outcome": "PASS",
+   "seconds": 0.022
+  },
+  {
+   "id": "tests.v2.test_p6_stages:Quality.test_INCOMPLETE_is_recorded_and_never_a_failure",
+   "outcome": "PASS",
+   "seconds": 0.297
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_2_primary_UNRUNNABLE_has_no_outcome_and_the_environment_owner_the_typed_fact_carries",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Cases.test_ADEQ_3_regression_UNRUNNABLE_has_no_outcome_and_keeps_the_environment_owner",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_p6_stages:Quality.test_UNRUNNABLE_is_TESTS_UNRUNNABLE_with_environment_provenance_and_no_outcome",
+   "outcome": "PASS",
+   "seconds": 0.143
+  },
+  {
+   "id": "tests.v2.p5.test_adequacy:Separation.test_no_path_reaches_a_product_proof_a_journal_or_a_budget",
+   "outcome": "PASS",
+   "seconds": 0.125
+  },
+  {
+   "id": "tests.v2.test_p6_orchestration:Orchestration.test_ORCH_14_a_change_of_engineering_adequacy_leaves_the_product_proof_unchanged",
+   "outcome": "PASS",
+   "seconds": 1.021
+  },
+  {
+   "id": "tests.v2.test_c2_file_artifact:Fixtures.test_FA_3_file_artifact_is_qualified_for_every_class_over_the_directory_read_path",
+   "outcome": "PASS",
+   "seconds": 0.02
+  },
+  {
+   "id": "tests.v2.test_c2_file_artifact:Fixtures.test_FA_3_the_same_fixtures_reject_it_once_they_stop_contrasting",
+   "outcome": "PASS",
+   "seconds": 0.021
+  },
+  {
+   "id": "tests.v2.test_c2_file_artifact:Fixtures.test_FA_ADV_3_an_always_REFUTED_probe_of_the_same_shape_is_not_calibrated",
+   "outcome": "PASS",
+   "seconds": 0.003
+  },
+  {
+   "id": "tests.v2.test_c2_file_artifact:Fixtures.test_every_supported_class_has_both_fixtures_asking_for_it",
+   "outcome": "PASS",
+   "seconds": 0.002
+  },
+  {
+   "id": "tests.v2.test_c2_file_artifact:Fixtures.test_the_directory_read_path_matches_names_exactly_and_never_follows_a_link",
+   "outcome": "PASS",
+   "seconds": 0.02
+  },
+  {
+   "id": "tests.v2.test_c2_cli_calibration:Fixtures.test_CLICAL_1_every_class_is_calibrated_with_contrast_and_rejected_without_it",
+   "outcome": "PASS",
+   "seconds": 10.549
+  },
+  {
+   "id": "tests.v2.test_c2_cli_calibration:Fixtures.test_CLICAL_2_an_always_0_fixture_pair_is_rejected",
+   "outcome": "PASS",
+   "seconds": 0.697
+  },
+  {
+   "id": "tests.v2.test_python_callable_v2:Calibration.test_PCV2_1_a_positive_fixture_uses_the_workspace_stimulus",
+   "outcome": "PASS",
+   "seconds": 0.0
+  },
+  {
+   "id": "tests.v2.test_python_callable_v2:Calibration.test_PCV2_1_every_declared_class_has_both_fixtures_asking_for_it",
+   "outcome": "PASS",
+   "seconds": 0.005
+  },
+  {
+   "id": "tests.v2.test_python_callable_v2:Calibration.test_PCV2_1_the_probe_is_qualified_for_every_class_at_the_new_digest",
+   "outcome": "PASS",
+   "seconds": 2.355
+  },
+  {
+   "id": "tests.v2.test_python_callable_v2:Calibration.test_PCV2_1_the_same_fixtures_reject_it_once_they_stop_contrasting",
+   "outcome": "PASS",
+   "seconds": 4.719
+  },
+  {
+   "id": "tests.v2.test_c2_effect_calibration:Calibration.test_PECAL_1_the_three_classes_calibrated_with_contrast_over_the_small_fixtures",
+   "outcome": "PASS",
+   "seconds": 3.154
+  },
+  {
+   "id": "tests.v2.test_c2_effect_calibration:Calibration.test_PECAL_2_the_ledgerlock_trees_are_the_frozen_blobs_and_a_mutant_is_the_reference_plus_its_change",
+   "outcome": "PASS",
+   "seconds": 0.06
+  },
+  {
+   "id": "tests.v2.test_c2_effect_calibration:Calibration.test_PECAL_3_an_authored_spec_is_satisfied_on_the_reference_and_refutes_its_mutant",
+   "outcome": "PASS",
+   "seconds": 4.736
+  },
+  {
+   "id": "tests.v2.test_c2_effect_calibration:Calibration.test_PECAL_4_a_spec_that_no_mutant_refutes_is_reported_NOT_QUALIFIED",
+   "outcome": "PASS",
+   "seconds": 7.238
+  },
+  {
+   "id": "tests.v2.test_c2_effect_calibration:Calibration.test_the_authored_specs_are_closed_over_the_requirements_map",
+   "outcome": "PASS",
+   "seconds": 0.015
+  }
+ ],
+ "counts": {
+  "PASS": 189,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "NOT_APPLICABLE": 2
+ },
+ "seconds": 100.4,
+ "harness_digest_at_run": "b9f7d6ca9643058be3602321a5b36509381de0c8a6df4d4610715bb3b8971987"
+}

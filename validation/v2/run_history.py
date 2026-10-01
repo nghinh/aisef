@@ -51,7 +51,12 @@ HISTORIES = {"P1": "closure-evidence/v2/P1-RUN-HISTORY.json", "P2": "closure-evi
              # C2-P5 (WP-2.5.1, WP-2.5.2): opened when the integration history was closed
              "C2-P5": "closure-evidence/v2/cycle2/C2-P5-RUN-HISTORY.json",
              # C2-P6 (QP-2.6): opened by the attempts of the C2-P5 acceptance commit
-             "C2-P6": "closure-evidence/v2/cycle2/C2-P6-RUN-HISTORY.json"}
+             "C2-P6": "closure-evidence/v2/cycle2/C2-P6-RUN-HISTORY.json",
+             # opened when C2-P6 closed (owner ruling 2026-09-30 B): LANE-Q's three rungs in order, and LANE-X's C2-P10
+             "C2-P7": "closure-evidence/v2/cycle2/C2-P7-RUN-HISTORY.json",
+             "C2-P8": "closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json",
+             "C2-P9": "closure-evidence/v2/cycle2/C2-P9-RUN-HISTORY.json",
+             "C2-P10": "closure-evidence/v2/cycle2/C2-P10-RUN-HISTORY.json"}
 #: the record that closes a phase's history: a FINAL SEAL for P1-P6; for P7, the owner's acceptance of the corrected
 #: candidate's Q0-Q3 (there is no P7 seal builder — P7 qualifies, it does not seal)
 SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence/v2/P2-FINAL-SEAL.json",
@@ -69,7 +74,9 @@ SEALS = {"P1": "closure-evidence/v2/P1-FINAL-SEAL.json", "P2": "closure-evidence
          # the integration history, by its closure when C2-P5 began (not an owner acceptance)
          "C2-INTEGRATION": "closure-evidence/v2/cycle2/C2-INTEGRATION-CLOSURE.json",
          # C2-P5, by the owner's acceptance of the corrected PLAN-V2.2 (2026-09-30)
-         "C2-P5": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json"}
+         "C2-P5": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+         # C2-P6, by its closure when the requalified QP-2.6 was GREEN (owner ruling 2026-09-30 B: automatic downstream)
+         "C2-P6": "closure-evidence/v2/cycle2/C2-P6-CLOSURE.json"}
 HISTORY_REL = HISTORIES["P1"]
 RESULTS = ("PASS", "FAIL")
 GATE_EFFECTS = ("COUNTS", "DIAGNOSTIC_ONLY", "STOP", "RECORD_ONLY")
