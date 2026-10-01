@@ -89,7 +89,7 @@ def _specs_binding(digest: str) -> list[str]:
         for p in sorted((C.ROOT / base).rglob("*.json")):
             rel = p.relative_to(C.ROOT).as_posix()
             if rel in HISTORICAL_OLD_DIGEST_FILES or rel.startswith(HISTORICAL_OLD_DIGEST_PREFIXES) \
-                    or rel.startswith(C.CYCLE1_OUT_REL + "/invalidated-") or rel.startswith((C.OUT_REL + "/", C.C2_ATTEMPT1_OUT_REL + "/")):
+                    or rel.startswith(C.CYCLE1_OUT_REL + "/invalidated-") or rel.startswith((C.OUT_REL + "/", *(r + "/" for r in C.C2_PRIOR_OUT_RELS))):
                 continue   # measurements of history (the finding's records, invalidated rungs): never a stored spec
             try:
                 walk(json.loads(p.read_text(encoding="utf-8")), rel)
@@ -103,7 +103,7 @@ def _files_mentioning(digest: str) -> list[str]:
     for base in ("aisef2", "tests/v2", "validation/v2", "closure-evidence/v2", "docs"):   # not the scanner, not its records
         for p in sorted((C.ROOT / base).rglob("*")):
             if p.is_file() and p.suffix in (".py", ".json", ".md") and "__pycache__" not in p.parts \
-                    and not p.relative_to(C.ROOT).as_posix().startswith((C.OUT_REL, C.CYCLE1_OUT_REL, C.C2_ATTEMPT1_OUT_REL)):
+                    and not p.relative_to(C.ROOT).as_posix().startswith((C.OUT_REL, C.CYCLE1_OUT_REL, *C.C2_PRIOR_OUT_RELS)):
                 try:
                     if digest in p.read_text(encoding="utf-8"):
                         out.append(p.relative_to(C.ROOT).as_posix())
