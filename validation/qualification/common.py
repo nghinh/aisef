@@ -35,10 +35,10 @@ CYCLE1_OUT_REL = "closure-evidence/v2/Q0-Q3"
 #: Cycle 2 has no seal of its own, so the candidate is its own seal commit. The subject is the candidate's kernel
 #: tree AND its validation/v2 and tests/v2 trees: every rung refuses to run unless HEAD carries all three (any change
 #: to one of them is a new candidate, restarted from Q0).
-SEMANTIC_CANDIDATE = "4c64773e377e869f8236efbfa469150f7713f9ae"
+SEMANTIC_CANDIDATE = "c11615aeb1dd9e6ff992b6190f8c39a272636742"
 SEAL_COMMIT = SEMANTIC_CANDIDATE
 KERNEL_TREE = "254d8f559b879c210c4936321022f1350c4b2f89"
-SUBJECT_TREES = {"validation/v2": "6174d3df64ca7922a8cc010f1c640e854b06f3cb", "tests/v2": "fb9d8e17728a893083575638d9bad3b4faa62196"}
+SUBJECT_TREES = {"validation/v2": "7686f004167fc5e940b06bf6ff0248f068d8d116", "tests/v2": "fb9d8e17728a893083575638d9bad3b4faa62196"}
 C2_P5_ACCEPTANCE_REL = "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json"
 V1_PRODUCT_TREE = "4359f347378e84fcac2d213128c7c26f282c13c0"
 #: the earlier QP-2.6 attempts, each kept where it was written: attempt 1 (candidate 6311254, historical evidence — owner

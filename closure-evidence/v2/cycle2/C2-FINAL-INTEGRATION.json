@@ -1,0 +1,181 @@
+{
+ "record": "AISEF V2 — CYCLE-2 FINAL INTEGRATION CANDIDATE (LANE-Q + LANE-X) AND IDENTITY IMPACT ANALYSIS",
+ "authority": "owner rulings 2026-09-30 A and B (integration discipline: final integration candidate with identity impact analysis; rerun affected rungs if consumed identities change)",
+ "head": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+ "lane_x": "6353aa815cdfbea3af477a0eadfae43130be6820",
+ "qp26_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+ "trees": {
+  "aisef": {
+   "qp26_candidate": "4359f347378e84fcac2d213128c7c26f282c13c0",
+   "final": "4359f347378e84fcac2d213128c7c26f282c13c0"
+  },
+  "aisef2": {
+   "qp26_candidate": "37bf6457f350dd720a2214f04f3896c554ad0904",
+   "final": "254d8f559b879c210c4936321022f1350c4b2f89"
+  },
+  "aisef2/probe": {
+   "qp26_candidate": "1aa9301285ccc964ee31d508089ea0119f49b629",
+   "final": "1aa9301285ccc964ee31d508089ea0119f49b629"
+  },
+  "aisef2/orchestrate": {
+   "qp26_candidate": "a039b0eb5f3f09a49ab8782ad0bbec9a9ff32324",
+   "final": "a039b0eb5f3f09a49ab8782ad0bbec9a9ff32324"
+  },
+  "validation/v2": {
+   "qp26_candidate": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+   "final": "7686f004167fc5e940b06bf6ff0248f068d8d116"
+  },
+  "tests/v2": {
+   "qp26_candidate": "a7d2fb385721891beabab3ac200b974ad81a221c",
+   "final": "fb9d8e17728a893083575638d9bad3b4faa62196"
+  }
+ },
+ "changed_trees": [
+  "aisef2",
+  "tests/v2",
+  "validation/v2"
+ ],
+ "kernel_change": {
+  "since": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+  "added": [
+   "aisef2/cohort/__init__.py",
+   "aisef2/cohort/lifecycle.py",
+   "aisef2/cohort/preregistration.py"
+  ],
+  "changed_or_removed_outside_the_new_package": [],
+  "importers_outside_the_new_package": [],
+  "every_earlier_kernel_file_byte_identical": true,
+  "unreachable_from_existing_kernel_code": true
+ },
+ "identity_impact": {
+  "QP-2.6 (Q0-Q3)": {
+   "consumes": "the aisef2, validation/v2 and tests/v2 trees (common.SUBJECT_TREES, KERNEL_TREE)",
+   "changed": true,
+   "action": "RERUN in full on the final candidate (R4)"
+  },
+  "QP-2.7 (Q4)": {
+   "consumes": "the kernel digest over every aisef2 file, the reference, the generator, the harness",
+   "changed": true,
+   "action": "RERUN fresh on the final candidate"
+  },
+  "QP-2.8 (Q5)": {
+   "consumes": "one identity over the kernel digest, the corpus, the harness, F1/F9",
+   "changed": true,
+   "action": "RERUN (corpus recorded, calibrated and reproduced) on the final candidate"
+  },
+  "QP-2.9 (LedgerLock)": {
+   "consumes": "the code its run executes: story_runner and everything it imports, the probes, the compiler, the runtime; the plan, the specs and the profile",
+   "changed": false,
+   "action": "NOT RERUN: every kernel file its run could import is byte-identical to the QP-2.6 candidate's and nothing outside aisef2/cohort imports the new package, so no executed path changed; its evidence stays bound to kernel 37bf6457"
+  },
+  "C2-P10 (WP-2.10.1, WP-2.10.2)": {
+   "consumes": "the aisef2 tree it was built on",
+   "changed": false,
+   "action": "its records re-checked here"
+  }
+ },
+ "identities": {
+  "contracts": 59,
+  "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+  "semantic_change": "NONE",
+  "proposal_kernel_provenance": {
+   "differing_paths": [
+    "identities.aisef2_tree"
+   ],
+   "committed_kernel": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+   "derived_kernel": "254d8f559b879c210c4936321022f1350c4b2f89",
+   "accepted_kernel": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+   "provenance_only": true,
+   "current": true,
+   "rule": "the proposal names the kernel it was authored on; a later authorized kernel changes that field only — tolerated when it is the one differing path and the committed value is the accepted candidate's kernel"
+  },
+  "catalog": {
+   "probe.python_callable": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "probe.file_artifact": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe.python_callable_v2": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+   "probe.cli_invocation": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+   "probe.process_effect": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+  }
+ },
+ "guards": {
+  "cycle2_baseline": {
+   "command": "python -P validation/v2/cycle2_baseline.py --check",
+   "exit": 0,
+   "tail": [
+    "cycle-2 baseline guard: PASS"
+   ],
+   "seconds": 0.4
+  },
+  "checker_calibration": {
+   "command": "python -P validation/v2/checker_calibration.py --check",
+   "exit": 0,
+   "tail": [
+    "OK   profile_freeze         clean=True rejects=True always-pass-mutant-caught=True",
+    "calibrated 51/51; always-PASS mutants rejected 51/51"
+   ],
+   "seconds": 191.0
+  },
+  "f1_f11": {
+   "command": "python -P validation/v2/freeze_conformance.py --check",
+   "exit": 0,
+   "tail": [
+    "PASS     F11 ",
+    "summary {'PASS': 11, 'PENDING': 0, 'FAIL': 0} | ratchet violations 0"
+   ],
+   "seconds": 10.5
+  },
+  "v1_guard": {
+   "command": "python -P validation/v2/v1_evidence_guard.py --check",
+   "exit": 0,
+   "tail": [
+    "V1 evidence guard (DETECTIVE): PASS"
+   ],
+   "seconds": 0.2
+  },
+  "run_history": {
+   "command": "python -P validation/v2/run_history.py check",
+   "exit": 0,
+   "tail": [
+    "run history: PASS"
+   ],
+   "seconds": 2.7
+  },
+  "mutation": {
+   "command": "python -P validation/v2/mutation.py --check",
+   "exit": 0,
+   "tail": [
+    "SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::run_story: historical, taken over by C2-ORCH",
+    "mutation: PASS"
+   ],
+   "seconds": 0.1
+  },
+  "orchestration_repair_record": {
+   "command": "python -P validation/qualification/c2_orchestration_repair.py --check",
+   "exit": 0,
+   "tail": [
+    "c2 orchestration repair: PASS"
+   ],
+   "seconds": 1.1
+  },
+  "c2_p10_cohort": {
+   "command": "python -P validation/qualification/c2_p10_cohort.py --check",
+   "exit": 0,
+   "tail": [
+    "c2_p10_cohort: PASS"
+   ],
+   "seconds": 3.9
+  },
+  "c2_p10_profile": {
+   "command": "python -P validation/qualification/c2_p10_profile.py --check",
+   "exit": 0,
+   "tail": [
+    "c2_p10_profile: PASS"
+   ],
+   "seconds": 1.3
+  }
+ },
+ "problems": [],
+ "verdict": "FINAL INTEGRATION CANDIDATE VERIFIED",
+ "seconds": 211.7,
+ "at": "2026-10-01T05:33:12Z"
+}
