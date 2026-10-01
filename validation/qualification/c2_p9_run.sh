@@ -23,7 +23,8 @@ guards() {
 echo "[$(stamp)] QP-2.9: LedgerLock regression, kernel tree $KT, HEAD $(git rev-parse --short HEAD)"
 guards start || exit 1
 mkdir -p $OUT/owned
-python3 -P validation/v2/owned_run.py --out $OUT/owned/run.attempt-$ATTEMPT.json -- python3 -P validation/qualification/c2_p9.py --run --attempt $ATTEMPT
+PROFILE=${PROFILE:-qp-2.9}   # v1-aligned: the proposed 3-attempt profile of the controlled V1-vs-V2 experiment (never the default)
+python3 -P validation/v2/owned_run.py --out $OUT/owned/run.attempt-$ATTEMPT.json -- python3 -P validation/qualification/c2_p9.py --run --attempt $ATTEMPT --profile $PROFILE
 RC=$?
 echo "[$(stamp)] run rc=$RC"
 [ "$(git rev-parse HEAD:aisef2)" = "$KT" ] || { echo "STOP: the kernel tree changed during the run"; exit 3; }

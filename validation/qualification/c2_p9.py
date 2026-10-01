@@ -45,7 +45,21 @@ DEV_TIMEOUT_S = 2400.0
 REVIEW_TIMEOUT_S = 900.0
 #: P10's limits (p10.runspec_for), the accepted Cycle-1 execution profile
 LIMITS = {"DEVELOPER": 1, "PLAN": 0, "ENVIRONMENT": 1, "PROVIDER": 1, "INTEGRATION": 0, "REVIEW": 1, "SECURITY": 1}
+#: the execution profiles a run may name. `qp-2.9` is the profile attempts 1 and 2 ran. `v1-aligned` is PROPOSED for the
+#: controlled V1-vs-V2 delivery experiment only (owner ruling 'BOUNDED CORRECTIVE PATCH' §6): 3 total developer attempts
+#: (one call and two retries), which is what the comparable V1 baseline profiles gave (max_retries 2). It is a
+#: measurement-profile alignment, not a framework default: the kernel's retry semantics are untouched, and a run under
+#: it has another runspec hash — it is a new profile identity, never a continuation of attempts 1 and 2.
+PROFILES = {"qp-2.9": LIMITS, "v1-aligned": {**LIMITS, "DEVELOPER": 2}}
 PROJECT = frozenset({"ledgerlock", "tests"})
+#: V1-era control metadata in a story section of the epics (H-PROMPT-001): PLAN-V2.2 supersedes all of it
+LEGACY_BLOCK = re.compile(r"^\*\*Story metadata:\*\*.*\Z", re.M | re.S)
+LEGACY_KEYS = ("covers", "ac_proof", "story_type", "write_scope", "depends_on", "screens")
+LEGACY_LINE = re.compile(rf"^[ \t]*[-*][ \t]*(?:{'|'.join(LEGACY_KEYS)})[ \t]*:.*$\n?", re.M)
+#: a 'Scope note:' paragraph of a V1 section: story ownership and proof modes as the V1 plan had them (Story 4.1 has one)
+LEGACY_NOTE = re.compile(r"^Scope note:.*?(?:\n[ \t]*\n|\Z)", re.M | re.S)
+#: where a run's git objects are kept before its temporary directory is removed (ruling §7); outside this repository
+PRESERVE_ENV = "AISEF_QP29_PRESERVE_ROOT"
 #: what the harness changed from the attempt before (a harness defect fixed by a new harness commit, both attempts recorded)
 HARNESS_CHANGES = {2: "attempt 1's developer prompt named each obligation's clause by its id only (e.g. 'R-10: R-10/1') and its "
                       "retry prompt the failure codes only; attempt 2 gives the clause's paraphrase and the requirement's "
@@ -53,7 +67,15 @@ HARNESS_CHANGES = {2: "attempt 1's developer prompt named each obligation's clau
                       "proof concerns — never a probe, stimulus, observable or expectation. The journal is written beside "
                       "the record before the temporary directory is removed, and a secret-like token is redacted and counted "
                       "instead of aborting the record (attempt 1 left none: NO-RECORD.json). Profile, limits, plan, specs and "
-                      "kernel unchanged."}
+                      "kernel unchanged.",
+                   3: "H-PROMPT-001: attempt 2 handed the developer each V1-era epics section whole, with its 'Story metadata' "
+                      "(covers / ac_proof / story_type / write_scope / depends_on / screens) — V1 control data PLAN-V2.2 "
+                      "supersedes; STORY-01-01's attempt 1 followed that write_scope and did not create ledgerlock/ledger.py. "
+                      "The section is now prose context only, its metadata removed, stated as non-authoritative, and the "
+                      "product subjects the story's obligations name are derived from the approved contracts. The run's git "
+                      "objects (final main and every candidate) are preserved outside the temporary directory before it is "
+                      "removed, and it is not removed unless they are (attempt 2's final workspace was lost). Plan, specs and "
+                      "contracts unchanged; the profile is named in the record."}
 #: a secret-like token: `sk-` at a token start (attempt 1's pattern had no left boundary and matched inside words such as
 #: "task-…", which aborted the record of a finished run: NO-RECORD.json)
 SECRET = re.compile(r"(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,}")
@@ -121,6 +143,25 @@ def epics_section(epics: str, story: str) -> str:
     return m.group(0).strip() if m else ""
 
 
+def story_prose(epics: str, story: str) -> str:
+    """The V1 story's section as PROSE CONTEXT ONLY (H-PROMPT-001): its 'Story metadata' block, any line of V1 control
+    metadata and any 'Scope note:' paragraph are removed — covers, ac_proof, story_type, write_scope, depends_on,
+    screens and the V1 plan's ownership notes belong to the V1 plan and contradict PLAN-V2.2 wherever they differ
+    (STORY-01-01's write_scope has no ledger.py; PLAN-V2.2's obligations are over it). What the story must deliver, on
+    which subjects and after which stories comes from the current plan only."""
+    return LEGACY_LINE.sub("", LEGACY_NOTE.sub("", LEGACY_BLOCK.sub("", epics_section(epics, story)))).strip()
+
+
+def subject_text(kind: str, locator: str) -> str:
+    """A contract's product subject as the developer reads it: a path, `module:object`, or the CLI entry point."""
+    if kind == "file_artifact":
+        path = locator.removeprefix("path:")
+        return f"{path}/ (the package directory)" if "." not in path.rsplit("/", 1)[-1] else path
+    if kind == "cli_invocation":
+        return f"python -m {locator.split(':')[0]}"
+    return locator
+
+
 def sections(requirements: str) -> dict[str, str]:
     """'10' -> '§10 Language / Runtime', '3.1' -> '§3.1 Key normalization (Unicode NFC)': the numbered headings of the
     requirements, so a requirement id R-<n> names the section the developer reads."""
@@ -131,9 +172,11 @@ def sections(requirements: str) -> dict[str, str]:
 
 
 def prompts(plan, epics: str, requirements: str = "") -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
-    """The developer's task per plan story: the requirements (authoritative, in the repository), the story's epics
-    section, and the requirement clause of each obligation it must deliver or preserve. The specs' probes, stimuli and
-    expectations are not shown: the proof is independent of the developer."""
+    """The developer's task per plan story: the requirements (authoritative, in the repository), the requirement clause
+    of each obligation it must deliver or preserve and the product subjects those obligations name — all from the
+    CURRENT plan and contracts — and the story's V1-era epics section as prose context only (`story_prose`: no V1
+    control metadata, and said to yield to the clauses). The specs' probes, stimuli and expectations are not shown: the
+    proof is independent of the developer."""
     from validation.qualification import p10_contracts as aid
     graph = aid.story_graph()
     specs = {s.id: sid for sid, s in _compiled().items()}
@@ -151,16 +194,22 @@ def prompts(plan, epics: str, requirements: str = "") -> tuple[dict[str, str], d
             by_criterion[o.criterion_id] = line
         prior = [s for s in sorted(graph.get(story, ())) if not any(o.story_id == s for o in plan.obligations)]
         clauses[story] = "\n".join(dict.fromkeys(lines))
-        prior_text = "\n\n".join(epics_section(epics, s) for s in prior)
+        prior_text = "\n\n".join(story_prose(epics, s) for s in prior)
+        subjects = sorted({subject_text(aid.SPECS[specs[o.product_proof_spec_id]]["kind"], aid.SPECS[specs[o.product_proof_spec_id]]["locator"])
+                           for o in plan.obligations if o.story_id == story})
         out[story] = (
             f"You are the developer of LedgerLock story {story}. LedgerLock is a small Python library and CLI; "
             "docs/requirements.md in this repository is the authoritative specification. Implement this story in this "
             "repository (the package `ledgerlock/`, Python standard library only), working only inside this directory.\n\n"
-            f"The story:\n\n{epics_section(epics, story)}\n\n"
-            + (f"Earlier stories it builds on that no other step of this run delivers (implement what is missing):\n\n{prior_text}\n\n" if prior else "")
+            "What this story must deliver is defined by the requirement clauses listed below and by docs/requirements.md. "
+            "The story description that follows is historical context only: where it names files, modules, scopes or "
+            "layouts that differ from the clauses or the requirements, the clauses and the requirements govern.\n\n"
+            f"The story (context only):\n\n{story_prose(epics, story)}\n\n"
+            + (f"Earlier stories it builds on that no other step of this run delivers (context only; implement what is missing):\n\n{prior_text}\n\n" if prior else "")
             + "When you finish, each of the following requirement clauses is verified independently against the "
               "requirements (INTRODUCE: this story makes it true; PRESERVE: it must stay true):\n"
             + "\n".join(dict.fromkeys(lines))
+            + f"\n\nThe product subjects those clauses are verified on: {', '.join(subjects)}."
             + f"\n\nWrite this story's unit tests in {test_path(story)} (unittest; `python -m unittest {test_path(story)}` "
               "must pass from the repository root) and keep every earlier test passing. Do not edit docs/requirements.md. "
               "Do not run git commit; the harness commits your working tree.")
@@ -309,6 +358,57 @@ class RuffScanner:
                                            False, ("scanner:ruff",)) for r in rows))
 
 
+# ------------------------------------------------------------------------------ the product result outlives the run
+
+def preserve_root() -> pathlib.Path:
+    """Where preserved runs are kept: outside this repository and outside any temporary directory."""
+    return pathlib.Path(os.environ.get(PRESERVE_ENV) or (P10.LEDGERLOCK_REPO.parent / "aisef-qp-2.9-preserved"))
+
+
+def run_shas(events: list[dict], sessions: list[dict], final: str | None) -> list[str]:
+    """Every revision the run's records name: final main, each committed revision, each proved candidate, each session's
+    candidate — the objects an inspection or the independent acceptance oracle needs afterwards."""
+    shas = {final} | {s.get("candidate") for s in sessions}
+    for e in events:
+        if e["type"] == "story/commit":
+            shas.add(e["data"].get("revision"))
+        elif e["type"] in ("proof/verified", "story/begin"):
+            shas.add(e["data"].get("candidate") or e["data"].get("parent"))
+    return sorted(x for x in shas if x)
+
+
+def preserve(repo: pathlib.Path, dest: pathlib.Path, final: str, shas: list[str]) -> dict:
+    """The run repository's whole git directory copied to `dest` (every object, reachable or not: a rolled-back
+    candidate is on no branch) and each named revision pinned under refs/qp-2.9/, then checked in the copy. `dest` must
+    not exist: a preserved run is never overwritten. The answer names what is missing; the caller removes the
+    temporary directory only when nothing is (`may_remove`)."""
+    if dest.exists():
+        raise FileExistsError(f"{dest} exists — a preserved run is never overwritten")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    git_dir = subprocess.run(["git", "-C", str(repo), "rev-parse", "--absolute-git-dir"], capture_output=True, encoding="utf-8",
+                             check=True).stdout.strip()
+    shutil.copytree(git_dir, dest, symlinks=True)
+
+    def g(*a: str) -> subprocess.CompletedProcess:
+        return subprocess.run(["git", "--git-dir", str(dest), *a], capture_output=True, encoding="utf-8")
+    g("config", "core.bare", "true")
+    g("worktree", "prune")                       # the run's checkouts lived in the temporary directory
+    present, missing = [], []
+    for sha in sorted(set(shas) | {final}):
+        ok = g("cat-file", "-e", f"{sha}^{{commit}}").returncode == 0 and \
+            g("update-ref", f"refs/qp-2.9/{'final-main' if sha == final else 'revisions/' + sha}", sha).returncode == 0
+        (present if ok else missing).append(sha)
+    tree = g("rev-parse", f"{final}^{{tree}}").stdout.strip() if final in present else None
+    return {"path": str(dest), "final_main": final, "final_tree": tree, "revisions_pinned": len(present), "missing": missing,
+            "how_to_inspect": f"git --git-dir {dest} worktree add <dir> {final}  (the independent acceptance oracle runs in <dir>)"}
+
+
+def may_remove(preserved: dict | None) -> bool:
+    """The temporary directory may go only when the run's result is held elsewhere: final main and its tree present,
+    nothing named missing. Otherwise it is kept — cleanup never destroys the only inspectable product result."""
+    return bool(preserved and preserved.get("final_tree") and not preserved.get("missing"))
+
+
 # --------------------------------------------------------------------------------------------------------- the run
 
 def order(plan, graph) -> list[str]:
@@ -323,7 +423,7 @@ def order(plan, graph) -> list[str]:
     return out
 
 
-def run(out_dir: pathlib.Path) -> dict:
+def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-2.9") -> dict:
     from aisef2.arch.enums import ControlProjection, Enforcement, Owner
     from aisef2.orchestrate import story_runner as sr
     from aisef2.orchestrate.quality import TestsPolicy
@@ -362,12 +462,11 @@ def run(out_dir: pathlib.Path) -> dict:
             opaque("scanner", Enforcement.PARTIAL, tool="ruff", mode="lint as an informational scanner")]
     layers = {"workload": {"value": "LedgerLock", "layer": "c2-p9"}, "benchmark_class": {"value": P10.BENCHMARK_CLASS, "layer": "c2-p9"},
               "plan_hash": {"value": plan.plan_hash, "layer": "plan"}, "requirements_sha256": {"value": P10.REQUIREMENTS_SHA256, "layer": "workload"},
-              "limits": {"value": LIMITS, "layer": "c2-p9 (p10 profile)"}}
+              "limits": {"value": PROFILES[profile], "layer": f"c2-p9 profile {profile}"}}
     logs = out_dir / SESSIONS
     logs.mkdir(parents=True, exist_ok=True)
-    results, errors, events, state, run_id, final = {}, [], [], {}, {}, None
-    holder = tempfile.TemporaryDirectory(prefix="aisef2-c2-p9-")
-    tmp = pathlib.Path(holder.name).resolve()
+    results, errors, events, state, run_id, final, preserved = {}, [], [], {}, {}, None, None
+    tmp = pathlib.Path(tempfile.mkdtemp(prefix="aisef2-c2-p9-")).resolve()   # removed below, and only once preserved
     dev = rev = None
     try:
         repo = tmp / "repo"
@@ -382,7 +481,7 @@ def run(out_dir: pathlib.Path) -> dict:
         adapters = sr.Adapters(dev, rev, RuffScanner(), merger, ws)
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch)) for e in catalog.CATALOG}
         env = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)
-        limits = {Owner[k]: v for k, v in LIMITS.items()}
+        limits = {Owner[k]: v for k, v in PROFILES[profile].items()}
         delivered: list[str] = []
         for story in order(plan, aid.story_graph()):
             inputs = sr.StoryInputs(specs, factories, env, te.DeveloperTests(story, (test_path(story),)),
@@ -407,9 +506,23 @@ def run(out_dir: pathlib.Path) -> dict:
                   "journal_sha256": _sha(json.dumps(events, sort_keys=True, default=str).encode())}
         final = git(repo, "rev-parse", "main").stdout.strip()
     finally:
-        holder.cleanup()
+        # the product result outlives the run: whatever happened above, the repository is copied out before anything is
+        # removed, and the temporary directory stays when the copy does not hold final main
+        try:
+            repo_at = tmp / "repo"
+            head = final or subprocess.run(["git", "-C", str(repo_at), "rev-parse", "main"], capture_output=True, encoding="utf-8").stdout.strip()
+            sessions_now = (dev.sessions if dev else []) + (rev.sessions if rev else [])
+            preserved = preserve(repo_at, preserve_to, head, run_shas(events, sessions_now, head))
+        except Exception as e:  # noqa: BLE001 — a failed preservation keeps the directory; it never loses the run
+            preserved = {"path": str(preserve_to), "error": f"{type(e).__name__}: {e}"[:500], "missing": ["<not preserved>"]}
+        if may_remove(preserved):
+            shutil.rmtree(tmp, ignore_errors=True)
+            preserved["temporary_directory"] = "removed after the copy was checked"
+        else:
+            preserved["temporary_directory"] = f"KEPT at {tmp}: the copy does not hold the whole result"
     return {"started": started, "results": results, "errors": errors, "events": events, "state": state,
-            "run_identity": run_id, "final_main": final, "baseline": base, "oc": oc, "plan": plan, "specs": specs, "tasks": tasks,
+            "run_identity": run_id, "final_main": final, "preserved": preserved, "profile": profile,
+            "baseline": base, "oc": oc, "plan": plan, "specs": specs, "tasks": tasks,
             "sessions": (dev.sessions if dev else []) + (rev.sessions if rev else []), "caps": caps, "layers": layers, "kernel": kernel}
 
 
@@ -476,12 +589,14 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
         semantic_candidate=C.SEMANTIC_CANDIDATE, aisef2_tree=C.KERNEL_TREE, head_kernel_tree=C.git("rev-parse", "HEAD:aisef2"),
         repository_execution_commit=C.git("rev-parse", "HEAD"), harness={"path": "validation/qualification/c2_p9.py", "sha256": C.lf_sha(HERE / "c2_p9.py")},
         workload={"id": "LedgerLock", "benchmark_class": P10.BENCHMARK_CLASS, "repository": m["baseline"], "requirements_sha256": P10.REQUIREMENTS_SHA256,
-                  "final_main": m["final_main"], "repository_written": False},
+                  "final_main": m["final_main"], "repository_written": False, "preserved": m["preserved"]},
         plan_identity={"id": plan.id, "plan_hash": plan.plan_hash, "baseline": plan.baseline, "stories": len({o.story_id for o in plan.obligations}),
                        "obligations": len(plan.obligations), "execution_order": order(plan, aid.story_graph()), "replanned": False, "stories_split": False},
         approvals={"record": pa.APPROVALS_REL, "count": len(pa.load_approvals()), "approver": pa.OWNER},
-        execution_profile={"source": "p10.runspec_for (Cycle-1 P10 profile): OpenCode developer and reviewer on the declared route, ruff scanner, P10 limits",
-                           "runspec_hash": spec.runspec_hash, "aggregate_min_grade": spec.aggregate_min_grade.value, "limits": LIMITS,
+        execution_profile={"source": "p10.runspec_for (Cycle-1 P10 profile): OpenCode developer and reviewer on the declared route, ruff scanner, "
+                                     f"the limits of profile {m['profile']}",
+                           "profile": m["profile"], "developer_attempts_per_story": PROFILES[m["profile"]]["DEVELOPER"] + 1,
+                           "runspec_hash": spec.runspec_hash, "aggregate_min_grade": spec.aggregate_min_grade.value, "limits": PROFILES[m["profile"]],
                            "capabilities": [{"name": c.name, "grade": c.grade.value, "enforcement": c.enforcement.value} for c in spec.capabilities],
                            "model": m["oc"], "kernel_digest": m["kernel"],
                            "grade_note": "the route is a routing alias: OPAQUE, which bars sealing and nothing else here; no model identity is inferred from it"},
@@ -516,6 +631,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--run", action="store_true", required=True)
     ap.add_argument("--attempt", type=int, default=1)
+    ap.add_argument("--profile", choices=sorted(PROFILES), default="qp-2.9")
     a = ap.parse_args(argv)
     rel = attempt_dir(a.attempt)
     out_dir = ROOT / rel
@@ -524,7 +640,10 @@ def main(argv: list[str] | None = None) -> int:
     prior = [attempt_record(n) for n in range(1, a.attempt)]
     if None in prior:
         raise SystemExit(f"REFUSED: attempt {a.attempt} without a record of every earlier attempt")
-    m = run(out_dir)
+    preserve_to = preserve_root() / f"attempt-{a.attempt}.git"
+    if preserve_to.exists():    # before any model call: a run whose result could not be kept is not started
+        raise SystemExit(f"REFUSED: {preserve_to} exists — the result of attempt {a.attempt} would have nowhere to be preserved")
+    m = run(out_dir, preserve_to=preserve_to, profile=a.profile)
     rec = record(out_dir, m)
     rec["attempt"] = a.attempt
     rec["harness_change_from_prior_attempt"] = HARNESS_CHANGES.get(a.attempt)
