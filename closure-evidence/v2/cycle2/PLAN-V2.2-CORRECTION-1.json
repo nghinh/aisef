@@ -1,0 +1,1034 @@
+{
+ "record": "AISEF V2 — LEDGERLOCK PLAN-V2.2 CORRECTION 1 (owner planning decisions applied; plan only)",
+ "authority": "owner ruling 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL' (2026-10-02), decisions 1-4",
+ "status": "PLAN REGENERATED AND STATICALLY ADMITTED; not executed — no probe ran, no model was called, LedgerLock not run",
+ "identities": {
+  "aisef2_tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160",
+  "admission_engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+  "generator": {
+   "path": "validation/qualification/c2_plan_correction.py",
+   "sha256": "2a118bde56216e2d76738c13a4a063bc3e2751481f99ad860f0fd1c3dd734646"
+  },
+  "accepted_proposal": {
+   "path": "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json",
+   "sha256": "bbb7138bda9452f2ff719c2d85e435b68437ffe2e25c1e1c29b8f4fd2779827a"
+  },
+  "approvals": {
+   "path": "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json",
+   "count": 59,
+   "approver": "human:owner"
+  }
+ },
+ "old_plan": {
+  "id": "LEDGERLOCK-PLAN-V2.2-PROPOSAL",
+  "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+  "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "stories": 9,
+  "obligations": 67,
+  "obligations_by_story_and_role": {
+   "STORY-01-01": {
+    "INTRODUCE": 13
+   },
+   "STORY-01-05": {
+    "INTRODUCE": 1
+   },
+   "STORY-02-01": {
+    "INTRODUCE": 1
+   },
+   "STORY-02-02": {
+    "INTRODUCE": 1
+   },
+   "STORY-03-01": {
+    "INTRODUCE": 25
+   },
+   "STORY-04-01": {
+    "INTRODUCE": 7,
+    "PRESERVE": 2
+   },
+   "STORY-04-02": {
+    "INTRODUCE": 9
+   },
+   "STORY-05-01": {
+    "PRESERVE": 2
+   },
+   "STORY-05-03": {
+    "PRESERVE": 6
+   }
+  }
+ },
+ "new_plan": {
+  "id": "LEDGERLOCK-PLAN-V2.2-CORRECTION-1",
+  "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
+  "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "stories": 7,
+  "obligations": 67,
+  "obligations_by_story_and_role": {
+   "STORY-01-01": {
+    "INTRODUCE": 13
+   },
+   "STORY-01-05": {
+    "INTRODUCE": 1,
+    "PRESERVE": 6
+   },
+   "STORY-02-01": {
+    "INTRODUCE": 1
+   },
+   "STORY-02-02": {
+    "INTRODUCE": 1
+   },
+   "STORY-03-01": {
+    "INTRODUCE": 25
+   },
+   "STORY-04-01": {
+    "INTRODUCE": 7,
+    "PRESERVE": 3
+   },
+   "STORY-04-02": {
+    "INTRODUCE": 9,
+    "VERIFY": 1
+   }
+  }
+ },
+ "execution_order": [
+  "STORY-01-01",
+  "STORY-01-05",
+  "STORY-02-01",
+  "STORY-02-02",
+  "STORY-03-01",
+  "STORY-04-01",
+  "STORY-04-02"
+ ],
+ "moved_obligations": [
+  {
+   "criterion": "S-D3-05-01-1",
+   "spec": "S-D3-05-01-1",
+   "product_proof_spec_id": "PPS-b3407979dd38c3b08a8bbae4199e4aee2bd4a7b747bb87a6f0ac80f276279404",
+   "owner_decision": 1,
+   "from": {
+    "story": "STORY-05-01",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "to": {
+    "story": "STORY-04-02",
+    "role": "VERIFY",
+    "expected_parent": "UNCONSTRAINED"
+   },
+   "ordered_after": null,
+   "ordered_after_holds": true
+  },
+  {
+   "criterion": "S-D3-05-01-2",
+   "spec": "S-D3-05-01-2",
+   "product_proof_spec_id": "PPS-cd03ddb94c8f8a97a4c5fdb700ab6b84634082ef6746e75d309ab57996f29249",
+   "owner_decision": 2,
+   "from": {
+    "story": "STORY-05-01",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "to": {
+    "story": "STORY-04-01",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "ordered_after": "STORY-03-01",
+   "ordered_after_holds": true
+  },
+  {
+   "criterion": "AC-STORY-05-03-1:S-10-a",
+   "spec": "S-10-a",
+   "product_proof_spec_id": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+   "owner_decision": 3,
+   "from": {
+    "story": "STORY-05-03",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "to": {
+    "story": "STORY-01-05",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "ordered_after": "STORY-01-01",
+   "ordered_after_holds": true
+  },
+  {
+   "criterion": "AC-STORY-05-03-1:S-12-a",
+   "spec": "S-12-a",
+   "product_proof_spec_id": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+   "owner_decision": 3,
+   "from": {
+    "story": "STORY-05-03",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "to": {
+    "story": "STORY-01-05",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "ordered_after": "STORY-01-01",
+   "ordered_after_holds": true
+  },
+  {
+   "criterion": "AC-STORY-05-03-1:S-12-b",
+   "spec": "S-12-b",
+   "product_proof_spec_id": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+   "owner_decision": 3,
+   "from": {
+    "story": "STORY-05-03",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "to": {
+    "story": "STORY-01-05",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "ordered_after": "STORY-01-01",
+   "ordered_after_holds": true
+  },
+  {
+   "criterion": "AC-STORY-05-03-2:S-12-a",
+   "spec": "S-12-a",
+   "product_proof_spec_id": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+   "owner_decision": 3,
+   "from": {
+    "story": "STORY-05-03",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "to": {
+    "story": "STORY-01-05",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "ordered_after": "STORY-01-01",
+   "ordered_after_holds": true
+  },
+  {
+   "criterion": "AC-STORY-05-03-2:S-12-b",
+   "spec": "S-12-b",
+   "product_proof_spec_id": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+   "owner_decision": 3,
+   "from": {
+    "story": "STORY-05-03",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "to": {
+    "story": "STORY-01-05",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "ordered_after": "STORY-01-01",
+   "ordered_after_holds": true
+  },
+  {
+   "criterion": "AC-STORY-05-03-2:S-12-c",
+   "spec": "S-12-c",
+   "product_proof_spec_id": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+   "owner_decision": 3,
+   "from": {
+    "story": "STORY-05-03",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "to": {
+    "story": "STORY-01-05",
+    "role": "PRESERVE",
+    "expected_parent": "SATISFIED_AT_PARENT"
+   },
+   "ordered_after": "STORY-01-01",
+   "ordered_after_holds": true
+  }
+ ],
+ "removed_stories": {
+  "STORY-05-01": {
+   "obligations_left": 0
+  },
+  "STORY-05-03": {
+   "obligations_left": 0
+  }
+ },
+ "static_admission": {
+  "accepted_plan": {
+   "engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+   "admitted": true,
+   "result_digest": "4bc6b1c2ffe2546d993264cf86343d9cce16ec07fdc58094aff8479f3872ea25",
+   "checks": [
+    {
+     "number": 1,
+     "name": "requirement_coverage",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 2,
+     "name": "contract_spec_integrity",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 3,
+     "name": "ownership",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 4,
+     "name": "dependency_dag",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 5,
+     "name": "contradictions",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 6,
+     "name": "proof_capability",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 7,
+     "name": "traceability",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 8,
+     "name": "plan_structure",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 9,
+     "name": "probe_calibration",
+     "passed": true,
+     "problems": []
+    }
+   ]
+  },
+  "corrected_plan": {
+   "engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+   "admitted": true,
+   "result_digest": "8c9ce00f60e9a6896aa94c227262dcb6f5924bdc7b4af0e4899038283afb8be5",
+   "checks": [
+    {
+     "number": 1,
+     "name": "requirement_coverage",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 2,
+     "name": "contract_spec_integrity",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 3,
+     "name": "ownership",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 4,
+     "name": "dependency_dag",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 5,
+     "name": "contradictions",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 6,
+     "name": "proof_capability",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 7,
+     "name": "traceability",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 8,
+     "name": "plan_structure",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 9,
+     "name": "probe_calibration",
+     "passed": true,
+     "problems": []
+    }
+   ]
+  },
+  "corrected_plan_without_approvals": {
+   "engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+   "admitted": false,
+   "result_digest": "7e387d02d9c5c6b399052f07b6085eb0dbbd781d5eeb6d9846fd7eb9b8b80a58",
+   "checks": [
+    {
+     "number": 1,
+     "name": "requirement_coverage",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 2,
+     "name": "contract_spec_integrity",
+     "passed": false,
+     "problems": [
+      "contract BC-V22-S-10-a does not compile: contract BC-V22-S-10-a is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-10-b does not compile: contract BC-V22-S-10-b is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-10-c does not compile: contract BC-V22-S-10-c is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-12-a does not compile: contract BC-V22-S-12-a is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-12-b does not compile: contract BC-V22-S-12-b is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-12-c does not compile: contract BC-V22-S-12-c is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-13-a does not compile: contract BC-V22-S-13-a is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-13-b does not compile: contract BC-V22-S-13-b is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-13-c does not compile: contract BC-V22-S-13-c is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-13-d does not compile: contract BC-V22-S-13-d is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-13-e does not compile: contract BC-V22-S-13-e is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-13-f does not compile: contract BC-V22-S-13-f is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-13-g does not compile: contract BC-V22-S-13-g is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-13-h does not compile: contract BC-V22-S-13-h is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-13-i does not compile: contract BC-V22-S-13-i is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.1-a does not compile: contract BC-V22-S-3.1-a is not approved: R-3.1: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.1-b does not compile: contract BC-V22-S-3.1-b is not approved: R-3.1: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.1-c does not compile: contract BC-V22-S-3.1-c is not approved: R-3.1: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.2-a does not compile: contract BC-V22-S-3.2-a is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.2-b does not compile: contract BC-V22-S-3.2-b is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.2-c does not compile: contract BC-V22-S-3.2-c is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.2-d does not compile: contract BC-V22-S-3.2-d is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.2-e does not compile: contract BC-V22-S-3.2-e is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.2-f does not compile: contract BC-V22-S-3.2-f is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.2-g does not compile: contract BC-V22-S-3.2-g is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.2-h does not compile: contract BC-V22-S-3.2-h is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.3-a does not compile: contract BC-V22-S-3.3-a is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.3-b does not compile: contract BC-V22-S-3.3-b is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.3-c does not compile: contract BC-V22-S-3.3-c is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.3-d does not compile: contract BC-V22-S-3.3-d is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-3.4-a does not compile: contract BC-V22-S-3.4-a is not approved: R-3.4: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-4.2-a does not compile: contract BC-V22-S-4.2-a is not approved: R-4.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-4.2-b does not compile: contract BC-V22-S-4.2-b is not approved: R-4.2: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-4.3-a does not compile: contract BC-V22-S-4.3-a is not approved: R-4.3: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-4.3-b does not compile: contract BC-V22-S-4.3-b is not approved: R-4.3: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-4.4-a does not compile: contract BC-V22-S-4.4-a is not approved: R-4.4: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-4.4-b does not compile: contract BC-V22-S-4.4-b is not approved: R-4.4: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-4.5-a does not compile: contract BC-V22-S-4.5-a is not approved: R-4.5: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-4.5-b does not compile: contract BC-V22-S-4.5-b is not approved: R-4.5: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-5-a does not compile: contract BC-V22-S-5-a is not approved: R-5: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-5-b does not compile: contract BC-V22-S-5-b is not approved: R-5: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-6-a does not compile: contract BC-V22-S-6-a is not approved: R-6: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-6-b does not compile: contract BC-V22-S-6-b is not approved: R-6: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-6-c does not compile: contract BC-V22-S-6-c is not approved: R-6: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-6-d does not compile: contract BC-V22-S-6-d is not approved: R-6: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-7-a does not compile: contract BC-V22-S-7-a is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-7-b does not compile: contract BC-V22-S-7-b is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-7-c does not compile: contract BC-V22-S-7-c is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-7-d does not compile: contract BC-V22-S-7-d is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-7-e does not compile: contract BC-V22-S-7-e is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-7-f does not compile: contract BC-V22-S-7-f is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-9-a does not compile: contract BC-V22-S-9-a is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-9-b does not compile: contract BC-V22-S-9-b is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-9-c does not compile: contract BC-V22-S-9-c is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-9-d does not compile: contract BC-V22-S-9-d is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-9-e does not compile: contract BC-V22-S-9-e is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-9-f does not compile: contract BC-V22-S-9-f is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-D3-05-01-1 does not compile: contract BC-V22-S-D3-05-01-1 is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "contract BC-V22-S-D3-05-01-2 does not compile: contract BC-V22-S-D3-05-01-2 is not approved: R-5: no approval binds requirement_hash and contract_hash"
+     ]
+    },
+    {
+     "number": 3,
+     "name": "ownership",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 4,
+     "name": "dependency_dag",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 5,
+     "name": "contradictions",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 6,
+     "name": "proof_capability",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 7,
+     "name": "traceability",
+     "passed": false,
+     "problems": [
+      "criterion S-3.1-a: contract BC-V22-S-3.1-a is not approved: contract BC-V22-S-3.1-a is not approved: R-3.1: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.1-b: contract BC-V22-S-3.1-b is not approved: contract BC-V22-S-3.1-b is not approved: R-3.1: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.1-c: contract BC-V22-S-3.1-c is not approved: contract BC-V22-S-3.1-c is not approved: R-3.1: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-a: contract BC-V22-S-3.2-a is not approved: contract BC-V22-S-3.2-a is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-b: contract BC-V22-S-3.2-b is not approved: contract BC-V22-S-3.2-b is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-c: contract BC-V22-S-3.2-c is not approved: contract BC-V22-S-3.2-c is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-d: contract BC-V22-S-3.2-d is not approved: contract BC-V22-S-3.2-d is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-e: contract BC-V22-S-3.2-e is not approved: contract BC-V22-S-3.2-e is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-f: contract BC-V22-S-3.2-f is not approved: contract BC-V22-S-3.2-f is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-g: contract BC-V22-S-3.2-g is not approved: contract BC-V22-S-3.2-g is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.2-h: contract BC-V22-S-3.2-h is not approved: contract BC-V22-S-3.2-h is not approved: R-3.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.3-a: contract BC-V22-S-3.3-a is not approved: contract BC-V22-S-3.3-a is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.3-b: contract BC-V22-S-3.3-b is not approved: contract BC-V22-S-3.3-b is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.3-c: contract BC-V22-S-3.3-c is not approved: contract BC-V22-S-3.3-c is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.3-d: contract BC-V22-S-3.3-d is not approved: contract BC-V22-S-3.3-d is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "criterion S-3.4-a: contract BC-V22-S-3.4-a is not approved: contract BC-V22-S-3.4-a is not approved: R-3.4: no approval binds requirement_hash and contract_hash",
+      "criterion S-4.2-a: contract BC-V22-S-4.2-a is not approved: contract BC-V22-S-4.2-a is not approved: R-4.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-4.2-b: contract BC-V22-S-4.2-b is not approved: contract BC-V22-S-4.2-b is not approved: R-4.2: no approval binds requirement_hash and contract_hash",
+      "criterion S-4.3-a: contract BC-V22-S-4.3-a is not approved: contract BC-V22-S-4.3-a is not approved: R-4.3: no approval binds requirement_hash and contract_hash",
+      "criterion S-4.3-b: contract BC-V22-S-4.3-b is not approved: contract BC-V22-S-4.3-b is not approved: R-4.3: no approval binds requirement_hash and contract_hash",
+      "criterion S-4.4-a: contract BC-V22-S-4.4-a is not approved: contract BC-V22-S-4.4-a is not approved: R-4.4: no approval binds requirement_hash and contract_hash",
+      "criterion S-4.4-b: contract BC-V22-S-4.4-b is not approved: contract BC-V22-S-4.4-b is not approved: R-4.4: no approval binds requirement_hash and contract_hash",
+      "criterion S-4.5-a: contract BC-V22-S-4.5-a is not approved: contract BC-V22-S-4.5-a is not approved: R-4.5: no approval binds requirement_hash and contract_hash",
+      "criterion S-4.5-b: contract BC-V22-S-4.5-b is not approved: contract BC-V22-S-4.5-b is not approved: R-4.5: no approval binds requirement_hash and contract_hash",
+      "criterion S-5-a: contract BC-V22-S-5-a is not approved: contract BC-V22-S-5-a is not approved: R-5: no approval binds requirement_hash and contract_hash",
+      "criterion S-5-b: contract BC-V22-S-5-b is not approved: contract BC-V22-S-5-b is not approved: R-5: no approval binds requirement_hash and contract_hash",
+      "criterion S-6-a: contract BC-V22-S-6-a is not approved: contract BC-V22-S-6-a is not approved: R-6: no approval binds requirement_hash and contract_hash",
+      "criterion S-6-b: contract BC-V22-S-6-b is not approved: contract BC-V22-S-6-b is not approved: R-6: no approval binds requirement_hash and contract_hash",
+      "criterion S-6-c: contract BC-V22-S-6-c is not approved: contract BC-V22-S-6-c is not approved: R-6: no approval binds requirement_hash and contract_hash",
+      "criterion S-6-d: contract BC-V22-S-6-d is not approved: contract BC-V22-S-6-d is not approved: R-6: no approval binds requirement_hash and contract_hash",
+      "criterion S-7-a: contract BC-V22-S-7-a is not approved: contract BC-V22-S-7-a is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "criterion S-7-b: contract BC-V22-S-7-b is not approved: contract BC-V22-S-7-b is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "criterion S-7-c: contract BC-V22-S-7-c is not approved: contract BC-V22-S-7-c is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "criterion S-7-d: contract BC-V22-S-7-d is not approved: contract BC-V22-S-7-d is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "criterion S-7-e: contract BC-V22-S-7-e is not approved: contract BC-V22-S-7-e is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "criterion S-7-f: contract BC-V22-S-7-f is not approved: contract BC-V22-S-7-f is not approved: R-7: no approval binds requirement_hash and contract_hash",
+      "criterion S-9-a: contract BC-V22-S-9-a is not approved: contract BC-V22-S-9-a is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "criterion S-9-b: contract BC-V22-S-9-b is not approved: contract BC-V22-S-9-b is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "criterion S-9-c: contract BC-V22-S-9-c is not approved: contract BC-V22-S-9-c is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "criterion S-9-d: contract BC-V22-S-9-d is not approved: contract BC-V22-S-9-d is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "criterion S-9-e: contract BC-V22-S-9-e is not approved: contract BC-V22-S-9-e is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "criterion S-9-f: contract BC-V22-S-9-f is not approved: contract BC-V22-S-9-f is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "criterion S-10-a: contract BC-V22-S-10-a is not approved: contract BC-V22-S-10-a is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "criterion S-10-b: contract BC-V22-S-10-b is not approved: contract BC-V22-S-10-b is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "criterion S-10-c: contract BC-V22-S-10-c is not approved: contract BC-V22-S-10-c is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "criterion S-12-a: contract BC-V22-S-12-a is not approved: contract BC-V22-S-12-a is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "criterion S-12-b: contract BC-V22-S-12-b is not approved: contract BC-V22-S-12-b is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "criterion S-12-c: contract BC-V22-S-12-c is not approved: contract BC-V22-S-12-c is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "criterion S-13-a: contract BC-V22-S-13-a is not approved: contract BC-V22-S-13-a is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "criterion S-13-b: contract BC-V22-S-13-b is not approved: contract BC-V22-S-13-b is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "criterion S-13-c: contract BC-V22-S-13-c is not approved: contract BC-V22-S-13-c is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "criterion S-13-d: contract BC-V22-S-13-d is not approved: contract BC-V22-S-13-d is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "criterion S-13-e: contract BC-V22-S-13-e is not approved: contract BC-V22-S-13-e is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "criterion S-13-f: contract BC-V22-S-13-f is not approved: contract BC-V22-S-13-f is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "criterion S-13-g: contract BC-V22-S-13-g is not approved: contract BC-V22-S-13-g is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "criterion S-13-h: contract BC-V22-S-13-h is not approved: contract BC-V22-S-13-h is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "criterion S-13-i: contract BC-V22-S-13-i is not approved: contract BC-V22-S-13-i is not approved: R-13: no approval binds requirement_hash and contract_hash",
+      "criterion S-D3-05-01-1: contract BC-V22-S-D3-05-01-1 is not approved: contract BC-V22-S-D3-05-01-1 is not approved: R-3.3: no approval binds requirement_hash and contract_hash",
+      "criterion S-D3-05-01-2: contract BC-V22-S-D3-05-01-2 is not approved: contract BC-V22-S-D3-05-01-2 is not approved: R-5: no approval binds requirement_hash and contract_hash",
+      "criterion AC-STORY-04-01-2:S-9-b: contract BC-V22-S-9-b is not approved: contract BC-V22-S-9-b is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "criterion AC-STORY-04-01-2:S-9-c: contract BC-V22-S-9-c is not approved: contract BC-V22-S-9-c is not approved: R-9: no approval binds requirement_hash and contract_hash",
+      "criterion AC-STORY-05-03-1:S-10-a: contract BC-V22-S-10-a is not approved: contract BC-V22-S-10-a is not approved: R-10: no approval binds requirement_hash and contract_hash",
+      "criterion AC-STORY-05-03-1:S-12-a: contract BC-V22-S-12-a is not approved: contract BC-V22-S-12-a is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "criterion AC-STORY-05-03-1:S-12-b: contract BC-V22-S-12-b is not approved: contract BC-V22-S-12-b is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "criterion AC-STORY-05-03-2:S-12-a: contract BC-V22-S-12-a is not approved: contract BC-V22-S-12-a is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "criterion AC-STORY-05-03-2:S-12-b: contract BC-V22-S-12-b is not approved: contract BC-V22-S-12-b is not approved: R-12: no approval binds requirement_hash and contract_hash",
+      "criterion AC-STORY-05-03-2:S-12-c: contract BC-V22-S-12-c is not approved: contract BC-V22-S-12-c is not approved: R-12: no approval binds requirement_hash and contract_hash"
+     ]
+    },
+    {
+     "number": 8,
+     "name": "plan_structure",
+     "passed": true,
+     "problems": []
+    },
+    {
+     "number": 9,
+     "name": "probe_calibration",
+     "passed": true,
+     "problems": []
+    }
+   ]
+  }
+ },
+ "proofs": {
+  "product_proof_specs": {
+   "count": 59,
+   "all_equal_to_accepted": true,
+   "contract_spec_semantic_digest": "83a73da271805c470db4da55f50f542950494aa8b50a31e5b6f07e5364415745",
+   "rule": "sha256 of the JSON list of [spec, contract id, contract hash, spec id, semantic hash, probe id, probe digest] rows in proposal order (C2-ORCHESTRATION-CONFORMANCE-REPAIR (e))",
+   "semantic_hash_changes": [],
+   "spec_of_each_criterion_unchanged": true,
+   "specs": [
+    {
+     "spec_id": "S-3.1-a",
+     "spec_hash_id": "PPS-65d059abcd7bdb6aa4ae2bc1baacc5266397c4e603f2445fcb0eceeb1b7cd685",
+     "semantic_hash": "84714ebc49a5f4c6902c84953472d3472e67ff650376ba2faf34a5843a1390c8",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.1-b",
+     "spec_hash_id": "PPS-810d70f8680ef0143b3c99f951cf5a36a17ec6fb381464c8b04257c9a7e12072",
+     "semantic_hash": "c0e582d4d043cecf7c5a816bf943930b6c048371bbae460b97e277b456166e48",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.1-c",
+     "spec_hash_id": "PPS-e8786e89d9c8d608ecb8b3422f4d962581b71c405a88677cd298ed8d73d4aa04",
+     "semantic_hash": "deaf2299e735b528208adccfaa4f69e2d5d3770bcbdb7eb40722473acdc65fef",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.2-a",
+     "spec_hash_id": "PPS-6fb67922e547bc2418a84f30b9eceda641440b06d427c80b8fa75350ba67341c",
+     "semantic_hash": "747282a3d8b8dc25aa70794a1921e3930baee40aa730fe0f0eb41eb5fa2c1834",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.2-b",
+     "spec_hash_id": "PPS-163fb6867c732cc0910fc7cb0aa41dc00e333ffa863e3e20c290e89044694435",
+     "semantic_hash": "619730a279e212db9898909d4c581a90b57fa3ffc97666769f0e2836821f46f9",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.2-c",
+     "spec_hash_id": "PPS-75b12a5444f2f7af7002c3117377649819b64b3d717b9dbd47d31adb9c5d33f1",
+     "semantic_hash": "58f05a9dde521bd9dfc926d1fee9134514b4745210e9fe4a1e9eae55be1ca278",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.2-d",
+     "spec_hash_id": "PPS-2262384034b21519c6a2a3e48d3928eee26cb57eb12b9b8c74db7c7e72ffbb5e",
+     "semantic_hash": "8d50f888076871ea1c7bbde563f02bda56d5ece6ab202c030d01bf9bbd45efd0",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.2-e",
+     "spec_hash_id": "PPS-3fcd647712352b2cf0e8c569f89d039e6d4b6eee5b45801bf1c4a6965494a4cd",
+     "semantic_hash": "879e3baa597e5a481b02ec9fdb0cfbc088b2b41b1f99f31f80203e60603a41db",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.2-f",
+     "spec_hash_id": "PPS-c03399bb5a08910e909b1170b8dabf7cea87f9f1c74588cfb3d25ca3cc0c82e2",
+     "semantic_hash": "fbc7cf7c928de540c1d63ec85eed8ed44b2c3da72ce93a669349a16af49e7f1b",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.2-g",
+     "spec_hash_id": "PPS-48d94aa56e303126c572596f4f18b171bf5b3d570b60882ea3d913ddf0f29aa7",
+     "semantic_hash": "ce2c6283d2be3c7d06da5adf5abcd66450f533437075305468134d1f0be9b05b",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.2-h",
+     "spec_hash_id": "PPS-79eb2e82003c7aaad2412a035af5931ab81d49d8d050dc4df1b3efff28168bfa",
+     "semantic_hash": "5e6e7dd06d3ad28a311c9b73f2cb71e715ecc232f104fbe19b660ff9c93f4d37",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.3-a",
+     "spec_hash_id": "PPS-249d9aac810991ad250ad76be4e8ae791c1cd66ed70be4a097c6e842fb17cdce",
+     "semantic_hash": "6d829a9d7d756a0b37d2c9db6979fd656b1a5aad7620802db62ec5e3bb3b816d",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.3-b",
+     "spec_hash_id": "PPS-3a187fb9c232f40735c52deab24f1a6a4c343b487a2eed8b3a5b5eca837b797a",
+     "semantic_hash": "3a0f3c5d915c0af4c11620808e4010e0fad2b8e165bf5c5278c9c7bffd6f5f55",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.3-c",
+     "spec_hash_id": "PPS-b35f6d40ba01f56fb575a776cd8347c34cde7c8b2c5d635976e6b9789ec45e7b",
+     "semantic_hash": "d14ed7caa9908e37a2e6b2709098de4513beb09f0b24de6f5d59d935315cd885",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.3-d",
+     "spec_hash_id": "PPS-2ab21163d87a1a2939203dea178c47e710d1ee602696e75f5fa5a01a75295451",
+     "semantic_hash": "7039c7f0c9fc9162879b61bc5692ea5431cc3b93ac1a477aadd6999b85c2061f",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-3.4-a",
+     "spec_hash_id": "PPS-9a902e79dbf7c4b212f84dd24ff6c544cb0d9c7d6855c5ff6498de6054752b9b",
+     "semantic_hash": "c0f5d5baad51699f15b5ebd2ca388cc847d67a5a42fd674fba3bf63dbb26462a",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-4.2-a",
+     "spec_hash_id": "PPS-b2363ec360a30b7d13ad6affe219aea7b1eb8394d8a75ea31de74895734d7bf1",
+     "semantic_hash": "3e2bc49d2e6c14f2cd57f8b25788c5dc8d740375e6585858ad9b785d887e9f66",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-4.2-b",
+     "spec_hash_id": "PPS-1afb7c134205830634e1475eb8243f898d3f27f2d97c357ed508c99b55c98ef7",
+     "semantic_hash": "e4e2afc10623f8b1207440c5bb89995ab00d79225e19b069daa5b0e763e30fcf",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-4.3-a",
+     "spec_hash_id": "PPS-776c49de9eddd417972d7615a7f7dd7ce1e50e38a37dd0aa70d9a71711b05f92",
+     "semantic_hash": "01f7217c33f825d138e6fa1aeb5d5fa073e284837722f4f0fbef0d4674b8e404",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-4.3-b",
+     "spec_hash_id": "PPS-f5caa8ad200d3849be60bd861f139678bbbd9f53534e859607ae84e34c5c0d6a",
+     "semantic_hash": "f031277ba5fd4b1e034693336d6875aa894818054be3df6a33799c042390a611",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-4.4-a",
+     "spec_hash_id": "PPS-130df03b6e64d882a2b283367f0c58736ed84b017f59da3c296464f37edf0dff",
+     "semantic_hash": "93c8561b37a7c9f30c860acb4290d3edc36ab04e64af0f9c8b2bcb6d06c2e3ff",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-4.4-b",
+     "spec_hash_id": "PPS-696a93c595369a88fee8230a492502fd7f7330c4d2e208c8aa0ea0c2f7487662",
+     "semantic_hash": "72e2567ef81582835eb2c2c84b9ebbd7a3bcf05d4fd97bd0f878bbea30e97a0f",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-4.5-a",
+     "spec_hash_id": "PPS-b0c5328235c22b8bcd473329e501fe8d59b6245f50974950e550b2887bf4d540",
+     "semantic_hash": "8231017045bbfcf62b06f652cfc51cd08e92320564bc83b1df83a22972beb62b",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-4.5-b",
+     "spec_hash_id": "PPS-e3a1fd208c077746eb99c3513ba8e730f58b3937336d839e04457dad734ca644",
+     "semantic_hash": "3e3c2dd23d4bb79983ee33582c8b85860f22030f47cb1c093997d2b0a640099e",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-5-a",
+     "spec_hash_id": "PPS-3f801acc0c3ad4640f99b2c72a2d28feab81c2b6e3b37996709a3734232d5a89",
+     "semantic_hash": "3b5de7d325f1a8770ff29408aa0182ef350bfbf1fad5ed88f44fbb95b58e4956",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-5-b",
+     "spec_hash_id": "PPS-9f0fe5cf930f01cdcf87af1f128aa97d17215688a5408eee6a17541777896939",
+     "semantic_hash": "d7d29b8cc8f448b1f40cd01bf87affee7c551eb9b319974849851f7b2acb6c49",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-6-a",
+     "spec_hash_id": "PPS-c0136d891545f89f462cfa6ad7df93065d842b73a566c9cf7bbe3d30ce8dc682",
+     "semantic_hash": "1105a5130c448327cc645d44db2b51da9b5db991bc5c0ebf31e3226d3eb5a189",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-6-b",
+     "spec_hash_id": "PPS-7eb6897129a4419d85e86d09c314073280f9f2e42f7f9967b3b5b6acefcddafa",
+     "semantic_hash": "95c6e63fe4e2d4454ca63e1dfbf366f482f4eee7a356b69a1a6c0faadef73952",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-6-c",
+     "spec_hash_id": "PPS-d87f76a65c1d2d69c1b4a367b8ec19e9cb743645f487f629d67cbc13d44e2375",
+     "semantic_hash": "b53197b0273faf9d3ae340965d108eab92876b43a4f0461b3e7a952b8012d1c5",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-6-d",
+     "spec_hash_id": "PPS-4a7450884db9c3b82dab5604469f98058db02ce2360f7d458756a6c9a2600ba4",
+     "semantic_hash": "6bdcb2ec9e83a401cadce5f31c3af747f19e654ac180ab4ef11678b34f5972aa",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-7-a",
+     "spec_hash_id": "PPS-420e7ad407224beb963f2d769d04882579aa064a4b5c6e5767a20074c940bfe6",
+     "semantic_hash": "f4b22f927d61e6f7f0e5bf80fea10017e002b13fc33e31edde2f92dc76299c9e",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-7-b",
+     "spec_hash_id": "PPS-828ef030c2a8432c8f7bbeb19f3bea2fb383064da59f4fd3a06171c65c1380cf",
+     "semantic_hash": "2033a571eed7e0f6ff8fe1b73c530fed53e43797c282c140933df3823826b102",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-7-c",
+     "spec_hash_id": "PPS-d094dfe207adf4c1b225c4255b4e27246a884332953ce2a18aa00fa3ec865387",
+     "semantic_hash": "4d8e4e99153a25d062d2de8db0d4852830ccc4367581bf1067bf4a7b15c53a53",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-7-d",
+     "spec_hash_id": "PPS-a191c7367820fb7cd78fd9a0f523af8f348788941e3bddd2b9465af6002a7850",
+     "semantic_hash": "2bdb1dd656de8d39d2633029acd325bec4c3be2799da1717974055b7e8ae4ee6",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-7-e",
+     "spec_hash_id": "PPS-43483423030653d241413c1c094c32e846de3732498ab497a016565e33fe68a3",
+     "semantic_hash": "b7ba1a35c20a62481b7e288bae3f5617e73a46d63e606cb1f217bc74c400943a",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-7-f",
+     "spec_hash_id": "PPS-7dcfdcbb13ccefa37dd810c72bd0b8a6c121881b6839b4b3448996b0aa7cd550",
+     "semantic_hash": "d6e3346e39e9b04a34c6237f19c1395f7446513c178f5e7c4ad887f5728ae90c",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-9-a",
+     "spec_hash_id": "PPS-ebd3b11fd02a74fd3724c195f5ece4eaf6c13485e346a436dfbdbf1bcbd7aa15",
+     "semantic_hash": "abebe16e33fa17cf5c29a49597aa7536cabe20dde3aa915b2a9d9cfa3cafe62a",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-9-b",
+     "spec_hash_id": "PPS-81369279af03544a8906bb7e3438dbcad2d2cb30bcdc1d6a01c6336af2d8b31c",
+     "semantic_hash": "82531d8da6bf353fb75dc8c2382affb37e24c284972ccf275349ff0382c7d328",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-9-c",
+     "spec_hash_id": "PPS-5a6b99a28ae4d26308a06536b021253b0cb6f3a965c4ce45aaf2c56738414720",
+     "semantic_hash": "6bee956abc61dbd7aa4f81680990472ad1627609f14995b73b4522e4bca58ec8",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-9-d",
+     "spec_hash_id": "PPS-e825d561178e2874d1ca950b0af95a5a4fd2897c0406dae6850e7da204a76ee8",
+     "semantic_hash": "efce139724be8e296fd7fa98920e053e9b958a98fef52f34cb564f986a81a3f7",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-9-e",
+     "spec_hash_id": "PPS-e9e4783931d2a93ba6a911c9bfbcf769c5c3f65498fc6c9753fbf5c000525525",
+     "semantic_hash": "1a22147544f145b582d78fb2d552dfc40a6633e40b817090d4516aee686959ca",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-9-f",
+     "spec_hash_id": "PPS-b4b13254279c00c21ee6625d58a186377463dbacb9035686748c346178e05cc6",
+     "semantic_hash": "64ffbff36c8b78983ec96ae838964a8ff426ea44f52a48beb9be1c0b15dd548a",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-10-a",
+     "spec_hash_id": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+     "semantic_hash": "0c1aa8e1b6bcbc20e1b1ca514b44de592b18f4610357c465b32f6f79bec99b04",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-10-b",
+     "spec_hash_id": "PPS-64c46ebaed2d255c26a9e79c34c803fe2609161938311dfb237f066b36a67867",
+     "semantic_hash": "5daeb0eac00dbe0ab0bdfb6a3e163a513a7dd0a2a3ac26aefe38912ee977e93e",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-10-c",
+     "spec_hash_id": "PPS-8ab146580469d11dbb6c20443dd9c2070da4ecb2f7c2222f33ba127775898894",
+     "semantic_hash": "be4bcade9818a3e343537d479fadbf9053a8cae3cbbce79326309f11f0ef8b5c",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-12-a",
+     "spec_hash_id": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+     "semantic_hash": "59d9b16fb41b5e512daaf817e603e484815c577b7872f102ba3b9131bd667da8",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-12-b",
+     "spec_hash_id": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+     "semantic_hash": "e7f83ac157533d0c6b5de11d46a1f3e40feceb33200c583c08382ccce4bf266f",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-12-c",
+     "spec_hash_id": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+     "semantic_hash": "222515f27c24b9b5c27bb2bbe85b8a3e06f5aefefe4c4d50c661d51489bef13f",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-13-a",
+     "spec_hash_id": "PPS-c70151a34378bac3b90ea06dc632037dd9908f97e0b5b9a9f94fea1f158a0292",
+     "semantic_hash": "7ab0ea2bbe8e9e3be503ad047da70604ac768f545ec86d5e0ed603c816a35ada",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-13-b",
+     "spec_hash_id": "PPS-7e99202d7849d4f22d2a4da4728b0f9000ebdb5d8507e2dec7e03c38e3f7547e",
+     "semantic_hash": "a6cc35a216a8c5c6f86b2d647cc4a03e8444efc742f7971fdde64b8d7be1807e",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-13-c",
+     "spec_hash_id": "PPS-9cc8e42134b41d39f3e9b94b976290ffb97c28384525cb18e210ca8ee8e574f6",
+     "semantic_hash": "3d1d6512ded0e9b8bd3295aaf30d3c24cde29c74415f5ee718f5b5cb629b86bb",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-13-d",
+     "spec_hash_id": "PPS-b573709fccf5f6ced92b5aa4d8638c27d434141fe9ba1f1d880f1d698ab577ed",
+     "semantic_hash": "6399812ad648f19461ef5be450b8b8d6f19602231a61df9c074a92368a40edd4",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-13-e",
+     "spec_hash_id": "PPS-e2189b7dadd035417eed5d47363cb0a9f1f2d8373eb4b085a516cba572b4780f",
+     "semantic_hash": "032c67ab8ece7991690b5d730389719f371d4e55c06dfe02a29684ea59a58157",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-13-f",
+     "spec_hash_id": "PPS-85b98ccc7a5c2646588b6e4075a93541a21be2a2a246c24746359c23ca80aaa9",
+     "semantic_hash": "26ebbd8446be3f92ffa681808f6d6234934c6aceea84627610caf8d53e23f890",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-13-g",
+     "spec_hash_id": "PPS-baccecf95521389460b05a2eacb1bf62a90286fbdd336e03ba9576661646b730",
+     "semantic_hash": "5370b765a9d99292dbcc98cef84c08d59fa440754e7b914fe951e75367d10dee",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-13-h",
+     "spec_hash_id": "PPS-53ca471b36753ac39ac8744a1f9fc143612c61e387751b8e79539b655a38a5d3",
+     "semantic_hash": "249c9703dfbc33b74873bfc1f55ffb59c8c1f52bd2091ec6f925ead67440a21e",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-13-i",
+     "spec_hash_id": "PPS-0528ad5eb0576a4ec11976977458231c270b770a38142f4c40475b2968a09c12",
+     "semantic_hash": "47bc8c18046253e18c07f52c3e43d5c0599a6e52e2effabf7f8e35445c783651",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-D3-05-01-1",
+     "spec_hash_id": "PPS-b3407979dd38c3b08a8bbae4199e4aee2bd4a7b747bb87a6f0ac80f276279404",
+     "semantic_hash": "62bd14736bfde206901c6ae17e2691e7ab732241c4cf5bbaddf96b37c676af62",
+     "equal_to_accepted": true
+    },
+    {
+     "spec_id": "S-D3-05-01-2",
+     "spec_hash_id": "PPS-cd03ddb94c8f8a97a4c5fdb700ab6b84634082ef6746e75d309ab57996f29249",
+     "semantic_hash": "4350d6c0cb45caf041fe13bfa5acaa51a69bbb11ed92a6d2688e92067efb2fe4",
+     "equal_to_accepted": true
+    }
+   ]
+  },
+  "requirement_coverage": {
+   "old": {
+    "requirements": {
+     "R-10": 3,
+     "R-12": 3,
+     "R-13": 9,
+     "R-3.1": 3,
+     "R-3.2": 8,
+     "R-3.3": 5,
+     "R-3.4": 1,
+     "R-4.2": 2,
+     "R-4.3": 2,
+     "R-4.4": 2,
+     "R-4.5": 2,
+     "R-5": 3,
+     "R-6": 4,
+     "R-7": 6,
+     "R-9": 6
+    },
+    "specs": 59
+   },
+   "new": {
+    "requirements": {
+     "R-10": 3,
+     "R-12": 3,
+     "R-13": 9,
+     "R-3.1": 3,
+     "R-3.2": 8,
+     "R-3.3": 5,
+     "R-3.4": 1,
+     "R-4.2": 2,
+     "R-4.3": 2,
+     "R-4.4": 2,
+     "R-4.5": 2,
+     "R-5": 3,
+     "R-6": 4,
+     "R-7": 6,
+     "R-9": 6
+    },
+    "specs": 59
+   },
+   "unchanged": true
+  },
+  "no_orphan_obligation": {
+   "criteria_old": 67,
+   "criteria_new": 67,
+   "same_criteria": true,
+   "every_spec_in_the_committed_derivation": true,
+   "obligations_in_a_removed_story": 0
+  },
+  "introduce_uniqueness": {
+   "introduce_specs_old": 57,
+   "introduce_specs_new": 57,
+   "introducing_story_of_each_spec_unchanged": true,
+   "introduce_obligations_new": 57
+  },
+  "dependency_dag": {
+   "criterion_graph_cycle": null,
+   "story_graph_cycle": null,
+   "story_graph": {
+    "STORY-01-01": [],
+    "STORY-01-05": [
+     "STORY-01-01"
+    ],
+    "STORY-02-01": [
+     "STORY-01-01",
+     "STORY-01-05"
+    ],
+    "STORY-02-02": [
+     "STORY-01-01",
+     "STORY-01-05",
+     "STORY-02-01"
+    ],
+    "STORY-03-01": [
+     "STORY-01-01",
+     "STORY-01-05",
+     "STORY-02-01",
+     "STORY-02-02"
+    ],
+    "STORY-04-01": [
+     "STORY-01-01",
+     "STORY-01-05",
+     "STORY-02-01",
+     "STORY-02-02",
+     "STORY-03-01"
+    ],
+    "STORY-04-02": [
+     "STORY-01-01",
+     "STORY-01-05",
+     "STORY-02-01",
+     "STORY-02-02",
+     "STORY-03-01",
+     "STORY-04-01"
+    ]
+   }
+  },
+  "obligations_not_named_by_a_decision_unchanged": true,
+  "stories_new_are_stories_old_minus_the_removed": true
+ },
+ "problems": [],
+ "verdict": "PLAN CORRECTION ADMITTED STATICALLY"
+}

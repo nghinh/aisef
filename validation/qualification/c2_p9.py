@@ -50,7 +50,13 @@ LIMITS = {"DEVELOPER": 1, "PLAN": 0, "ENVIRONMENT": 1, "PROVIDER": 1, "INTEGRATI
 #: (one call and two retries), which is what the comparable V1 baseline profiles gave (max_retries 2). It is a
 #: measurement-profile alignment, not a framework default: the kernel's retry semantics are untouched, and a run under
 #: it has another runspec hash — it is a new profile identity, never a continuation of attempts 1 and 2.
-PROFILES = {"qp-2.9": LIMITS, "v1-aligned": {**LIMITS, "DEVELOPER": 2}}
+#: `delivery-experiment-1` is the ONE preregistered delivery run (owner ruling 'FINAL PLAN CORRECTION + DELIVERY RUN
+#: PREREGISTRATION', 2026-10-02): the v1-aligned limits, and — fixed in c2_delivery_experiment and checked against the
+#: committed preregistration before any model call — the corrected plan, one fixed model route and the hard ceilings.
+EXPERIMENT = "delivery-experiment-1"
+PROFILES = {"qp-2.9": LIMITS, "v1-aligned": {**LIMITS, "DEVELOPER": 2}, EXPERIMENT: {**LIMITS, "DEVELOPER": 2}}
+#: how often a running session's event stream is read against the ceilings
+POLL_S = 5.0
 PROJECT = frozenset({"ledgerlock", "tests"})
 #: V1-era control metadata in a story section of the epics (H-PROMPT-001): PLAN-V2.2 supersedes all of it
 LEGACY_BLOCK = re.compile(r"^\*\*Story metadata:\*\*.*\Z", re.M | re.S)
@@ -75,7 +81,11 @@ HARNESS_CHANGES = {2: "attempt 1's developer prompt named each obligation's clau
                       "product subjects the story's obligations name are derived from the approved contracts. The run's git "
                       "objects (final main and every candidate) are preserved outside the temporary directory before it is "
                       "removed, and it is not removed unless they are (attempt 2's final workspace was lost). Plan, specs and "
-                      "contracts unchanged; the profile is named in the record."}
+                      "contracts unchanged; the profile is named in the record. Under the profile `delivery-experiment-1` "
+                      "(preregistered, DELIVERY-EXPERIMENT-1-PREREGISTRATION.json) the plan is PLAN-V2.2 CORRECTION 1, the "
+                      "developer and the reviewer run on one fixed model route (no routing alias), a session is stopped at "
+                      "the preregistered turn cap and the run starts no session past its token ceilings, and the final "
+                      "main is put to all 59 ProductProofSpecs and to the V1 independent acceptance oracle."}
 #: a secret-like token: `sk-` at a token start (attempt 1's pattern had no left boundary and matched inside words such as
 #: "task-…", which aborted the record of a finished run: NO-RECORD.json)
 SECRET = re.compile(r"(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,}")
@@ -207,7 +217,8 @@ def prompts(plan, epics: str, requirements: str = "") -> tuple[dict[str, str], d
             f"The story (context only):\n\n{story_prose(epics, story)}\n\n"
             + (f"Earlier stories it builds on that no other step of this run delivers (context only; implement what is missing):\n\n{prior_text}\n\n" if prior else "")
             + "When you finish, each of the following requirement clauses is verified independently against the "
-              "requirements (INTRODUCE: this story makes it true; PRESERVE: it must stay true):\n"
+              "requirements (INTRODUCE: this story makes it true; PRESERVE: it must stay true"
+            + ("; VERIFY: it must be true when this story is done" if any("[VERIFY]" in x for x in lines) else "") + "):\n"
             + "\n".join(dict.fromkeys(lines))
             + f"\n\nThe product subjects those clauses are verified on: {', '.join(subjects)}."
             + f"\n\nWrite this story's unit tests in {test_path(story)} (unittest; `python -m unittest {test_path(story)}` "
@@ -234,19 +245,37 @@ def _compiled() -> dict:
 
 # --------------------------------------------------------------------------------------------- the live capabilities
 
-def opencode_session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: float) -> dict:
-    """One `opencode run --format json` session inside a V2 process range (the kernel's own OS-owned range: every
-    process it starts ends with it); the event stream goes to `log`."""
-    from aisef2.runtime.process_range import ProcessRange
-    exe = shutil.which("opencode")
-    started = time.monotonic()
-    with log.open("w", encoding="utf-8") as fh:
-        r = ProcessRange(name, [exe, "run", "--format", "json", "--dir", cwd, prompt], cwd=cwd, output=fh)
-        r.start()
-        try:
-            code = r.wait(timeout_s)
-        finally:
-            r.release()
+class Ceiling:
+    """A run's preregistered hard ceilings: finished steps (turns) per model session, and input and output tokens over
+    the whole run. A session at the turn cap is stopped; a run at a token ceiling stops the session that reached it and
+    starts no other. Counted from the client's own event stream — the same numbers the record reports."""
+
+    def __init__(self, max_turns: int, max_input_tokens: int, max_output_tokens: int) -> None:
+        self.max_turns, self.limit = max_turns, {"input": max_input_tokens, "output": max_output_tokens}
+        self.used = {"input": 0, "output": 0}
+        self.stops: list[dict] = []
+
+    def reached(self, turns: int = 0, tokens: dict | None = None) -> str | None:
+        """Why a session must stop now (or, with no arguments, must not start) — or None."""
+        tokens = tokens or {"input": 0, "output": 0}
+        for k in ("input", "output"):
+            if self.used[k] + tokens[k] >= self.limit[k]:
+                return f"max_{k}_tokens: {self.used[k] + tokens[k]} of {self.limit[k]} over the run"
+        if turns >= self.max_turns:
+            return f"max_turns: stopped at {turns} turns (cap {self.max_turns})"
+        return None
+
+    @property
+    def exhausted(self) -> bool:
+        return any(self.used[k] >= self.limit[k] for k in self.used)
+
+    def account(self) -> dict:
+        return {"max_turns_per_session": self.max_turns, "max_tokens_over_the_run": dict(self.limit), "tokens_used": dict(self.used),
+                "exhausted": self.exhausted, "stops": list(self.stops)}
+
+
+def read_session(log: pathlib.Path) -> dict:
+    """What a session's event stream says so far: its text, its error, its turns (finished steps) and its tokens."""
     text, error, turns, tokens = [], None, 0, {"input": 0, "output": 0}
     for line in log.read_text(encoding="utf-8", errors="replace").splitlines():
         if not line.startswith("{"):
@@ -266,15 +295,62 @@ def opencode_session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeou
         elif ev.get("type") == "step_finish":
             turns += 1
             tk = part.get("tokens") or {}
-            tokens["input"] += int(tk.get("input") or 0)
-            tokens["output"] += int(tk.get("output") or 0)
-    return {"exit": code, "timed_out": code is None, "error": error, "text": "".join(text), "turns": turns, "tokens": tokens,
+            cache = tk.get("cache") or {}
+            tokens["input"] += int(tk.get("input") or 0) + int(cache.get("read") or 0) + int(cache.get("write") or 0)
+            tokens["output"] += int(tk.get("output") or 0) + int(tk.get("reasoning") or 0)
+    return {"error": error, "text": "".join(text), "turns": turns, "tokens": tokens}
+
+
+def wait_within(r, log: pathlib.Path, timeout_s: float, ceiling: Ceiling | None) -> tuple[int | None, str | None]:
+    """A running session's exit status — or None with the ceiling it reached, or None with nothing: it ran out of time.
+    The event stream is read between waits; `r` is the session's process range (anything with `wait`)."""
+    deadline, code, stopped = time.monotonic() + timeout_s, None, None
+    while code is None and not stopped and time.monotonic() < deadline:
+        code = r.wait(min(POLL_S, max(0.0, deadline - time.monotonic())))
+        if code is None and ceiling:
+            seen = read_session(log)
+            stopped = ceiling.reached(seen["turns"], seen["tokens"])
+    return code, stopped
+
+
+def opencode_session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: float, *, model: str | None = None,
+                     env: dict | None = None, ceiling: Ceiling | None = None) -> dict:
+    """One `opencode run --format json` session inside a V2 process range (the kernel's own OS-owned range: every
+    process it starts ends with it); the event stream goes to `log`. With `model` the route is given to the client
+    explicitly (and the session titled, so no second model names it); with `ceiling` the stream is read while the
+    session runs and the range is released when a ceiling is reached — and no session starts at a spent ceiling."""
+    from aisef2.runtime.process_range import ProcessRange
+    exe = shutil.which("opencode")
+    started = time.monotonic()
+    code, stopped = None, ceiling.reached() if ceiling else None
+    not_started = bool(stopped)
+    if not_started:
+        log.write_text("", encoding="utf-8")
+    else:
+        argv = [exe, "run", "--format", "json", *(["--model", model, "--title", name] if model else []), "--dir", cwd, prompt]
+        with log.open("w", encoding="utf-8") as fh:
+            r = ProcessRange(name, argv, cwd=cwd, env=env, output=fh)
+            r.start()
+            try:
+                code, stopped = wait_within(r, log, timeout_s, ceiling)
+            finally:
+                r.release()
+    seen = read_session(log)
+    if ceiling:
+        for k in ceiling.used:
+            ceiling.used[k] += seen["tokens"][k]
+        if stopped:
+            ceiling.stops.append({"session": name, "reason": stopped, "started": not not_started})
+    return {"exit": code, "timed_out": code is None and not stopped, "stopped": stopped,
+            "error": stopped if not_started else seen["error"], "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],
             "seconds": round(time.monotonic() - started, 1), "log": log.name, "log_sha256": _sha(log.read_bytes())}
 
 
 class OpenCodeDeveloper:
-    def __init__(self, run, prompts: dict[str, str], logs: pathlib.Path, by_criterion: dict[str, str] | None = None) -> None:
+    def __init__(self, run, prompts: dict[str, str], logs: pathlib.Path, by_criterion: dict[str, str] | None = None,
+                 session_kw: dict | None = None) -> None:
         self.run, self.prompts, self.logs, self.sessions, self.by_criterion = run, prompts, logs, [], by_criterion or {}
+        self.session_kw = session_kw or {}      # a preregistered run's fixed model, client environment and ceilings
 
     def feedback(self, story_id: str) -> str:
         """The failures the kernel observed in this story, each with the requirement clause its proof concerns."""
@@ -295,7 +371,8 @@ class OpenCodeDeveloper:
         prompt = self.prompts[story_id] + (f"\n\nA previous attempt of this story was not accepted; the kernel observed:\n"
                                            f"{self.feedback(story_id)}\nFix the implementation." if prior else "")
         parent = git(checkout, "rev-parse", "HEAD").stdout.strip()
-        s = opencode_session(f"developer {story_id}", prompt, checkout, self.logs / f"{story_id}.developer.{attempt}.jsonl", DEV_TIMEOUT_S)
+        s = opencode_session(f"developer {story_id}", prompt, checkout, self.logs / f"{story_id}.developer.{attempt}.jsonl", DEV_TIMEOUT_S,
+                             **self.session_kw)
         s.update(story_id=story_id, attempt=attempt, role="developer", prompt_sha256=_sha(prompt.encode()))
         self.sessions.append(s)
         changed = bool(git(checkout, "status", "--porcelain").stdout.strip()) or git(checkout, "rev-parse", "HEAD").stdout.strip() != parent
@@ -306,7 +383,7 @@ class OpenCodeDeveloper:
             return Implemented(O.FAILED, None, f"the developer changed nothing (exit {s['exit']}, timed out {s['timed_out']})")
         sha = commit_all(checkout, f"{story_id}: developer attempt {attempt}")
         s["candidate"] = sha
-        return Implemented(O.COMPLETED, sha, f"opencode exit {s['exit']}, {s['turns']} turns")
+        return Implemented(O.COMPLETED, sha, f"opencode exit {s['exit']}, {s['turns']} turns" + (f", {s['stopped']}" if s["stopped"] else ""))
 
 
 class OpenCodeReviewer:
@@ -314,8 +391,8 @@ class OpenCodeReviewer:
               "and these clauses:\n{clauses}\nDo not modify any file. Answer with ONLY one JSON object: "
               '{{"findings": [{{"id": "short-id", "blocking": true or false, "summary": "one line"}}]}}')
 
-    def __init__(self, run, clauses: dict[str, str], logs: pathlib.Path) -> None:
-        self.run, self.clauses, self.logs, self.sessions = run, clauses, logs, []
+    def __init__(self, run, clauses: dict[str, str], logs: pathlib.Path, session_kw: dict | None = None) -> None:
+        self.run, self.clauses, self.logs, self.sessions, self.session_kw = run, clauses, logs, [], session_kw or {}
 
     def review(self, scope, criteria: tuple[str, ...]):
         from aisef2.journal.format2 import OperationOutcome as O
@@ -324,7 +401,7 @@ class OpenCodeReviewer:
         attempt, _ = _story_context(self.run, scope.story_id)
         prompt = self.PROMPT.format(story=scope.story_id, clauses=self.clauses[scope.story_id])
         s = opencode_session(f"reviewer {scope.story_id}", prompt, scope.root, self.logs / f"{scope.story_id}.reviewer.{attempt}.jsonl",
-                             REVIEW_TIMEOUT_S)
+                             REVIEW_TIMEOUT_S, **self.session_kw)
         s.update(story_id=scope.story_id, attempt=attempt, role="reviewer", prompt_sha256=_sha(prompt.encode()))
         self.sessions.append(s)
         if s["error"] and not s["text"]:
@@ -423,6 +500,36 @@ def order(plan, graph) -> list[str]:
     return out
 
 
+def runspec_inputs(plan, profile: str, oc: dict, fixed: dict | None = None) -> tuple[list, dict, str]:
+    """The capabilities and the settings a run's RunSpec binds, and the kernel digest. `fixed` is a preregistered
+    experiment's identity (c2_delivery_experiment.EXPERIMENT): its model route replaces the client's declared one in
+    the developer's and the reviewer's capability, and its ceilings and kernel commit are settings — so the RunSpec
+    hash binds them. The grade stays OPAQUE: no preflight fingerprint is part of the identity (RFC §23)."""
+    from aisef2.arch.enums import Enforcement
+    from aisef2.probe import catalog
+    from aisef2.runtime.capability import opaque, verified
+    from validation.qualification import q4
+    kernel = q4._over(q4._file_digests(("aisef2",)))
+    model = {"client": "opencode", "route": str(oc["declared_route"]), "version": str(oc["version"])}
+    if fixed:
+        model.update(route=fixed["route"], route_kind="FIXED_MODEL", resolved_model=fixed["resolved_model"],
+                     small_model=fixed["route"], client_binary_sha256=str(oc["binary_sha256"]))
+    caps = [verified("kernel", kernel.encode(), Enforcement.FULL, tree=C.git("rev-parse", "HEAD:aisef2")),
+            verified("python", pathlib.Path(sys.executable), Enforcement.PARTIAL, version=platform.python_version()),
+            verified("git", pathlib.Path(shutil.which("git")), Enforcement.PARTIAL),
+            *[verified(e.probe_id, e.probe_digest.encode(), Enforcement.PARTIAL) for e in catalog.CATALOG if e.active],
+            opaque("developer", Enforcement.PARTIAL, **model),
+            opaque("reviewer", Enforcement.PARTIAL, **model),
+            opaque("scanner", Enforcement.PARTIAL, tool="ruff", mode="lint as an informational scanner")]
+    layers = {"workload": {"value": "LedgerLock", "layer": "c2-p9"}, "benchmark_class": {"value": P10.BENCHMARK_CLASS, "layer": "c2-p9"},
+              "plan_hash": {"value": plan.plan_hash, "layer": "plan"}, "requirements_sha256": {"value": P10.REQUIREMENTS_SHA256, "layer": "workload"},
+              "limits": {"value": PROFILES[profile], "layer": f"c2-p9 profile {profile}"}}
+    if fixed:
+        layers.update({k: {"value": fixed[k], "layer": "preregistration"} for k in
+                       ("kernel_commit", "max_turns", "max_input_tokens", "max_output_tokens", "developer_timeout_s", "reviewer_timeout_s")})
+    return caps, layers, kernel
+
+
 def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-2.9") -> dict:
     from aisef2.arch.enums import ControlProjection, Enforcement, Owner
     from aisef2.orchestrate import story_runner as sr
@@ -432,37 +539,37 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
     from aisef2.probe.protocol import ExecutionEnv
     from aisef2.product.contract import plain
     from aisef2.quality import test_execution as te
-    from aisef2.runtime.capability import opaque, verified
     from aisef2.runtime.run_scope import RunScope
     from aisef2.runtime.runspec import resolve
     from validation.qualification import p5_acceptance as pa
     from validation.qualification import p10_contracts as aid
-    from validation.qualification import q4
     started = time.time()
     base = P10.ledgerlock_baseline()
     if not base.get("present") or not base.get("requirements_match_frozen"):
         raise SystemExit(f"the LedgerLock workload is not where the freeze says or its requirements changed: {base}")
-    plan = aid.build()["plan"]
-    if plan.plan_hash != pa.ACCEPTED["plan_hash"] or plan.baseline != base["baseline"]:
-        raise SystemExit("the plan is not the owner-approved PLAN-V2.2 at its baseline")
-    specs = {s.id: s for s in _compiled().values()}
     oc = P10.opencode_identity()
+    exp = session_kw = ceiling = None
+    if profile == EXPERIMENT:      # every identity of the preregistration is re-derived and compared before any model call
+        from validation.qualification import c2_delivery_experiment as dx
+        exp = dx.require_preregistered()
+        plan = exp["plan"]
+        ceiling = Ceiling(exp["max_turns"], exp["max_input_tokens"], exp["max_output_tokens"])
+        session_kw = {"model": exp["route"], "env": dx.client_env(), "ceiling": ceiling}
+    else:
+        plan = aid.build()["plan"]
+        if plan.plan_hash != pa.ACCEPTED["plan_hash"]:
+            raise SystemExit("the plan is not the owner-approved PLAN-V2.2")
+    if plan.baseline != base["baseline"]:
+        raise SystemExit("the plan is not at the workload's baseline")
+    specs = {s.id: s for s in _compiled().values()}
     epics = subprocess.run(["git", "-C", str(P10.LEDGERLOCK_REPO), "show", f"{P10.LEDGERLOCK_PLAN_COMMIT}:_bmad-output/epics.md"],
                            capture_output=True, encoding="utf-8", check=True).stdout
     requirements_md = subprocess.run(["git", "-C", str(P10.LEDGERLOCK_REPO), "show", f"{P10.LEDGERLOCK_PLAN_COMMIT}:docs/requirements.md"],
                                      capture_output=True, encoding="utf-8", check=True).stdout
     tasks, clauses, by_criterion = prompts(plan, epics, requirements_md)
-    kernel = q4._over(q4._file_digests(("aisef2",)))
-    caps = [verified("kernel", kernel.encode(), Enforcement.FULL, tree=C.git("rev-parse", "HEAD:aisef2")),
-            verified("python", pathlib.Path(sys.executable), Enforcement.PARTIAL, version=platform.python_version()),
-            verified("git", pathlib.Path(shutil.which("git")), Enforcement.PARTIAL),
-            *[verified(e.probe_id, e.probe_digest.encode(), Enforcement.PARTIAL) for e in catalog.CATALOG if e.active],
-            opaque("developer", Enforcement.PARTIAL, client="opencode", route=str(oc["declared_route"]), version=str(oc["version"])),
-            opaque("reviewer", Enforcement.PARTIAL, client="opencode", route=str(oc["declared_route"]), version=str(oc["version"])),
-            opaque("scanner", Enforcement.PARTIAL, tool="ruff", mode="lint as an informational scanner")]
-    layers = {"workload": {"value": "LedgerLock", "layer": "c2-p9"}, "benchmark_class": {"value": P10.BENCHMARK_CLASS, "layer": "c2-p9"},
-              "plan_hash": {"value": plan.plan_hash, "layer": "plan"}, "requirements_sha256": {"value": P10.REQUIREMENTS_SHA256, "layer": "workload"},
-              "limits": {"value": PROFILES[profile], "layer": f"c2-p9 profile {profile}"}}
+    caps, layers, kernel = runspec_inputs(plan, profile, oc, exp)
+    if exp and resolve(caps, layers, base["baseline"]).runspec_hash != exp["runspec_hash"]:
+        raise SystemExit("REFUSED: this run's RunSpec is not the preregistered one")
     logs = out_dir / SESSIONS
     logs.mkdir(parents=True, exist_ok=True)
     results, errors, events, state, run_id, final, preserved = {}, [], [], {}, {}, None, None
@@ -477,13 +584,16 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
         ws, merger = GitWorkspace(repo, tmp / "ws"), GitMerger(repo, "main", tmp / "merge")
         run_ = RunScope(tmp / "run", "c2-p9-ledgerlock", spec=lambda: resolve(caps, layers, base["baseline"]))
         run_.begin()
-        dev, rev = OpenCodeDeveloper(run_, tasks, logs, by_criterion), OpenCodeReviewer(run_, clauses, logs)
+        dev, rev = OpenCodeDeveloper(run_, tasks, logs, by_criterion, session_kw), OpenCodeReviewer(run_, clauses, logs, session_kw)
         adapters = sr.Adapters(dev, rev, RuffScanner(), merger, ws)
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch)) for e in catalog.CATALOG}
         env = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)
         limits = {Owner[k]: v for k, v in PROFILES[profile].items()}
         delivered: list[str] = []
         for story in order(plan, aid.story_graph()):
+            if ceiling and ceiling.exhausted:      # preregistered: a run at its token ceiling starts nothing more
+                results[story] = ["NOT_RUN: the run's token ceiling was reached"]
+                continue
             inputs = sr.StoryInputs(specs, factories, env, te.DeveloperTests(story, (test_path(story),)),
                                     te.DeveloperTests(story, tuple(test_path(s) for s in delivered) or (test_path(story),)),
                                     te.Dependencies(frozenset(), PROJECT), te.UNITTEST)
@@ -522,6 +632,7 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
             preserved["temporary_directory"] = f"KEPT at {tmp}: the copy does not hold the whole result"
     return {"started": started, "results": results, "errors": errors, "events": events, "state": state,
             "run_identity": run_id, "final_main": final, "preserved": preserved, "profile": profile,
+            "experiment": exp, "ceiling": ceiling.account() if ceiling else None,
             "baseline": base, "oc": oc, "plan": plan, "specs": specs, "tasks": tasks,
             "sessions": (dev.sessions if dev else []) + (rev.sessions if rev else []), "caps": caps, "layers": layers, "kernel": kernel}
 
@@ -530,9 +641,14 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
     from aisef2.runtime.runspec import resolve
     from validation.qualification import p5_acceptance as pa
     from validation.qualification import p10_contracts as aid
-    plan, events = m["plan"], m["events"]
+    plan, events, exp = m["plan"], m["events"], m.get("experiment")
+    kernel_commit, kernel_tree = (exp["kernel_commit"], exp["kernel_tree"]) if exp else (C.SEMANTIC_CANDIDATE, C.KERNEL_TREE)
     roles = {o.criterion_id: o.role.value for o in plan.obligations}
     delivery = P10.delivery_verdict_of(events, plan_admitted=True)
+    committed = {s for s, v in m["results"].items() if v[-1:] == ["COMMIT"]}
+    not_committed = sorted({o.story_id for o in plan.obligations} - committed)
+    if delivery == "PASS" and not_committed:   # the journal knows only the stories that began: one never run is not delivered
+        delivery = "FAIL"
     metrics = P10.plan_quality_metrics(events, roles)
     policy, at, policy_path = P10.preregistered_policy(out_dir)
     if policy_path is not None:
@@ -564,7 +680,6 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
             proofs[(e["data"].get("story_id"), e["data"].get("criterion_id"))] = {"candidate": e["data"].get("candidate"), "seq": e["seq"],
                                                                                    "agreement": e["data"].get("agreement"),
                                                                                    "verdict": e["data"].get("verdict")}
-    committed = {s for s, v in m["results"].items() if v[-1:] == ["COMMIT"]}
     obligations = []
     for o in plan.obligations:
         spec = m["specs"][o.product_proof_spec_id]
@@ -583,15 +698,19 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
     sessions = m["sessions"]
     spec = resolve(m["caps"], m["layers"], m["baseline"]["baseline"])
     rec = P10.Recorder().record(
-        record="AISEF V2 — CYCLE-2 QP-2.9 LEDGERLOCK REGRESSION (DEVELOPMENT / REGRESSION BENCHMARK ONLY)", rung="C2-P9 / QP-2.9",
-        authority="owner rulings 2026-09-30 A ('C2-P9 / QP-2.9 — LEDGERLOCK REGRESSION') and B (QP-2.9: execute the approved plan model)",
+        record=("AISEF V2 — DELIVERY EXPERIMENT 1: ONE PREREGISTERED LEDGERLOCK RUN (DEVELOPMENT / REGRESSION BENCHMARK ONLY)" if exp else
+                "AISEF V2 — CYCLE-2 QP-2.9 LEDGERLOCK REGRESSION (DEVELOPMENT / REGRESSION BENCHMARK ONLY)"), rung="C2-P9 / QP-2.9",
+        authority=(exp["authority"] if exp else
+                   "owner rulings 2026-09-30 A ('C2-P9 / QP-2.9 — LEDGERLOCK REGRESSION') and B (QP-2.9: execute the approved plan model)"),
+        preregistration=exp["preregistration"] if exp else None,
         written=C.now(), purpose="does the Cycle-2 framework execute more of the known workload correctly? — not: how would AISEF perform on unseen projects",
-        semantic_candidate=C.SEMANTIC_CANDIDATE, aisef2_tree=C.KERNEL_TREE, head_kernel_tree=C.git("rev-parse", "HEAD:aisef2"),
+        semantic_candidate=kernel_commit, aisef2_tree=kernel_tree, head_kernel_tree=C.git("rev-parse", "HEAD:aisef2"),
         repository_execution_commit=C.git("rev-parse", "HEAD"), harness={"path": "validation/qualification/c2_p9.py", "sha256": C.lf_sha(HERE / "c2_p9.py")},
         workload={"id": "LedgerLock", "benchmark_class": P10.BENCHMARK_CLASS, "repository": m["baseline"], "requirements_sha256": P10.REQUIREMENTS_SHA256,
                   "final_main": m["final_main"], "repository_written": False, "preserved": m["preserved"]},
         plan_identity={"id": plan.id, "plan_hash": plan.plan_hash, "baseline": plan.baseline, "stories": len({o.story_id for o in plan.obligations}),
-                       "obligations": len(plan.obligations), "execution_order": order(plan, aid.story_graph()), "replanned": False, "stories_split": False},
+                       "obligations": len(plan.obligations), "execution_order": order(plan, aid.story_graph()), "replanned": False, "stories_split": False,
+                       "correction": exp["plan_correction"] if exp else None},
         approvals={"record": pa.APPROVALS_REL, "count": len(pa.load_approvals()), "approver": pa.OWNER},
         execution_profile={"source": "p10.runspec_for (Cycle-1 P10 profile): OpenCode developer and reviewer on the declared route, ruff scanner, "
                                      f"the limits of profile {m['profile']}",
@@ -599,10 +718,15 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
                            "runspec_hash": spec.runspec_hash, "aggregate_min_grade": spec.aggregate_min_grade.value, "limits": PROFILES[m["profile"]],
                            "capabilities": [{"name": c.name, "grade": c.grade.value, "enforcement": c.enforcement.value} for c in spec.capabilities],
                            "model": m["oc"], "kernel_digest": m["kernel"],
-                           "grade_note": "the route is a routing alias: OPAQUE, which bars sealing and nothing else here; no model identity is inferred from it"},
+                           "fixed_model": {k: exp[k] for k in ("route", "resolved_model", "route_kind")} if exp else None,
+                           "ceilings": m.get("ceiling"),
+                           "grade_note": ("one fixed model route, given to the client explicitly; OPAQUE because no preflight fingerprint is part "
+                                          "of the identity (the provider preflight beside this record measured what answered)") if exp else
+                                         "the route is a routing alias: OPAQUE, which bars sealing and nothing else here; no model identity is inferred from it"},
         run_identity=m["run_identity"], cohort_state="DEVELOPMENT", benchmark_class=P10.BENCHMARK_CLASS, generalization_claim=P10.GENERALIZATION_CLAIM,
-        verdict=verdict, delivery_verdict_derivation="from the run's journal events only; no plan-quality input",
-        story_outcomes=m["results"], story_state=m["state"], story_errors=m["errors"],
+        verdict=verdict, delivery_verdict_derivation="from the run's journal events only; no plan-quality input — and FAIL, never PASS, "
+                                                     "while a story of the plan has not committed (a story that never began is in no event)",
+        story_outcomes=m["results"], story_state=m["state"], story_errors=m["errors"], stories_not_committed=not_committed,
         productproof={"obligations": obligations, "total": len(obligations),
                       "with_a_verified_proof": sum(1 for o in obligations if o["last_proof"]),
                       "satisfied_at_last_proof": sum(1 for o in obligations if o["satisfied_at_last_proof"]),
@@ -620,7 +744,7 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
                         "tokens": {k: sum(s["tokens"][k] for s in sessions) for k in ("input", "output")}},
         prohibitions=prohibitions, residual_processes={"owned_range": "see the owned-run record beside this file"},
         platform={"system": platform.system().lower(), "python": platform.python_version()},
-        stop_rules={"kernel_tree_is_the_candidates": C.git("rev-parse", "HEAD:aisef2") == C.KERNEL_TREE, "plan_retuned": False, "kernel_repaired": False,
+        stop_rules={"kernel_tree_is_the_candidates": C.git("rev-parse", "HEAD:aisef2") == kernel_tree, "plan_retuned": False, "kernel_repaired": False,
                     "historical_evidence_rewritten": False, "cohort_sealed": False, "generalization_claimed": False},
         finished=C.now(),
     )
@@ -635,6 +759,10 @@ def main(argv: list[str] | None = None) -> int:
     a = ap.parse_args(argv)
     rel = attempt_dir(a.attempt)
     out_dir = ROOT / rel
+    if a.profile == EXPERIMENT:
+        from validation.qualification import c2_delivery_experiment as dx
+        if a.attempt != dx.EXPERIMENT["attempt"]:      # ONE run: it has one attempt number, and a record there refuses a rerun
+            raise SystemExit(f"REFUSED: the delivery experiment is preregistered as attempt {dx.EXPERIMENT['attempt']} only")
     if attempt_record(a.attempt):
         raise SystemExit(f"REFUSED: {attempt_record(a.attempt)} exists — a rerun is a new attempt, never an overwrite")
     prior = [attempt_record(n) for n in range(1, a.attempt)]
@@ -666,6 +794,15 @@ def main(argv: list[str] | None = None) -> int:
                           "rule": "exact known secret values and sk- tokens are replaced and counted; nothing is discarded"}
     C.write(f"{rel}/LEDGERLOCK-REGRESSION.json", rec)
     print(f"delivery {rec['delivery_verdict']}; plan quality {rec['plan_quality_verdict']}; outcomes {rec['story_outcomes']}")
+    if a.profile == EXPERIMENT:        # the run's record is on disk first: an evaluation that fails never loses it
+        try:
+            ev = dx.evaluate(pathlib.Path(m["preserved"]["path"]), m["final_main"], out_dir)
+            print(f"final main {m['final_main']}: V2 specs satisfied {ev['v2_final_proof']['satisfied']}/{ev['v2_final_proof']['total']}; "
+                  f"V1 oracle {ev['v1_oracle']['passed']}/{ev['v1_oracle']['total']}")
+        except Exception as e:  # noqa: BLE001 — recorded beside the run's record; the preserved result can be evaluated again
+            ev = {"final_main": m["final_main"], "preserved": m["preserved"], "error": f"{type(e).__name__}: {e}"[:2000]}
+            print(f"the final evaluation did not run: {ev['error']}")
+        C.write(f"{rel}/FINAL-EVALUATION.json", ev)
     return 0
 
 
