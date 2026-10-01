@@ -1,0 +1,1168 @@
+{
+ "record": "AISEF V2 — Q5 corpus item (a real execution, its model stream recorded)",
+ "item": "bytes-returning-python-callable",
+ "covers": [
+  "probe.python_callable_v2",
+  "returns_bytes_hex",
+  "candidate proof",
+  "post-merge path"
+ ],
+ "definition": {
+  "stories": [
+   {
+    "id": "S1",
+    "obligations": [
+     [
+      "C6",
+      "INTRODUCE"
+     ]
+    ],
+    "tests": [
+     "tests/test_s1.py"
+    ],
+    "regressions": [
+     "tests/test_other.py"
+    ],
+    "tests_block": false
+   }
+  ],
+  "developer": [
+   {
+    "kind": "COMPLETED",
+    "files": {
+     "app/codec.py": "def encode(text):\n    return text.encode('utf-8')\n",
+     "tests/test_s1.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    def test_package(self):\n        import app\n        self.assertTrue(app.__name__)\n"
+    },
+    "message": "S1: C6",
+    "detail": "implemented 2 files"
+   }
+  ],
+  "reviewer": [
+   {
+    "kind": "COMPLETED",
+    "findings": [],
+    "detail": "reviewed"
+   }
+  ],
+  "pre_landed": {},
+  "scanner_findings": [],
+  "limits": {},
+  "expected_outcomes": {
+   "S1": [
+    "COMMIT"
+   ]
+  }
+ },
+ "platform": "darwin",
+ "python": "3.14.7",
+ "execution_commit": "2c3d0f972df48f77e65b504bcc4df8d4ad1dedfd",
+ "mode": "record",
+ "variant": null,
+ "errors": {
+  "replay_request_mismatch": 0,
+  "assert_consumed_failure": 0,
+  "tool_diff": 0,
+  "subprocess_diff": 0,
+  "workspace_diff": 0,
+  "probe_product_diff": 0,
+  "control_diff": 0,
+  "capability_mismatch": 0,
+  "harness_error": 0,
+  "invariant_violation": 0,
+  "exception": 0,
+  "residual_process": 0
+ },
+ "started": "2026-10-01T07:49:37Z",
+ "initial_workspace": {
+  "branch": "main",
+  "tip": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+  "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+  "files": {
+   "app/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "app/calc.py": {
+    "mode": "100644",
+    "blob": "312b477d18e86322d223001d940fc5a0b3758fc0"
+   },
+   "tests/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "tests/test_other.py": {
+    "mode": "100644",
+    "blob": "3db64f878468b50e6fa1d7573c0316e6e0e15ba6"
+   }
+  },
+  "status": "",
+  "status_note": "git status of the fixture repository's own checkout against its index (the branch moves by update-ref; the checkout stays at the base)",
+  "worktrees": 1,
+  "ws_entries": [],
+  "digest": "23b100a8c77a133cbf08aff37639c1a21e5ca35b4af7c077d41d1d4f962dd866"
+ },
+ "final_workspace": {
+  "branch": "main",
+  "tip": "00883720eb60e45d453fee7b7213466d5873f74c",
+  "tree": "bc3f6e48debc1d65bea258333fed4077e165c823",
+  "files": {
+   "app/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "app/calc.py": {
+    "mode": "100644",
+    "blob": "312b477d18e86322d223001d940fc5a0b3758fc0"
+   },
+   "app/codec.py": {
+    "mode": "100644",
+    "blob": "6fe041fe5cc2fd01704f75dc9bb317b987bf919c"
+   },
+   "tests/__init__.py": {
+    "mode": "100644",
+    "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+   },
+   "tests/test_other.py": {
+    "mode": "100644",
+    "blob": "3db64f878468b50e6fa1d7573c0316e6e0e15ba6"
+   },
+   "tests/test_s1.py": {
+    "mode": "100644",
+    "blob": "f057bdf51abf7e9a827f4e36adf806c6abc5d72d"
+   }
+  },
+  "status": "D  app/codec.py\nD  tests/test_s1.py",
+  "status_note": "git status of the fixture repository's own checkout against its index (the branch moves by update-ref; the checkout stays at the base)",
+  "worktrees": 1,
+  "ws_entries": [],
+  "digest": "62d4c4bc22336f7b62226145870f2c8c448a92a875b439fb8d2f6d2580490265"
+ },
+ "network": {
+  "guarded": true,
+  "socket_attempts": 0
+ },
+ "journal": [
+  {
+   "seq": 0,
+   "type": "run/begin",
+   "data": {
+    "journal_format": 3,
+    "run_id": "q5-bytes-returning-python-callable"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 1,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "814b696d029a2746214b0ad652f70dab221449bbd565b023b878da8f178e2ade",
+     "route": "MODEL_STREAM"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "da6c34889611bf5448aeac79fc820dfb4623bcefbaa5a7c9d1a51af757af5b8c",
+    "name": "developer"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 2,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "5faddbb6c18e9e8367ff426e1d708237d78c6b8f320a497c74aa5b9b67b5659c",
+    "name": "git"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 3,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "c731c1cbfe2553a3248911a0aae6fa0d311c21ec8dcb84a6164fe375ca929968",
+     "tree": "254d8f559b879c210c4936321022f1350c4b2f89"
+    },
+    "enforcement": "FULL",
+    "grade": "VERIFIED",
+    "identity": "bde9103727e3e738efe87b1bbe609dccb3b3e284b77331d8215b9c7649467d61",
+    "name": "kernel"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 4,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634",
+     "version": "3.14.7"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "5f34b937df4725ab238ce4b6b1e08ecf7e1cc4263b17445bd80993e0bc06aa38",
+    "name": "python"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 5,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "c7110116de216e4f0f67f38ae589070b2415dd25b5cfad3de85360d5627378f8",
+     "route": "MODEL_STREAM"
+    },
+    "enforcement": "PARTIAL",
+    "grade": "VERIFIED",
+    "identity": "c2ff0a7125c1ee8844ef0c142e377989865799cb5ed84b1ac6a090d0cd27e23c",
+    "name": "reviewer"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 6,
+   "type": "capability/resolved",
+   "data": {
+    "binding": {
+     "digest": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c"
+    },
+    "enforcement": "FULL",
+    "grade": "VERIFIED",
+    "identity": "c4869c506e599411c8a570a867d8806f534944fdebfce14f9c685c402e3f5795",
+    "name": "scanner"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 7,
+   "type": "run/spec-resolved",
+   "data": {
+    "aggregate_min_grade": "VERIFIED",
+    "capabilities": [
+     "developer",
+     "git",
+     "kernel",
+     "python",
+     "reviewer",
+     "scanner"
+    ],
+    "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "runspec_hash": "265da49305c0ca9e6107f9941909628809123e929e170044723122bc8e35183b"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 8,
+   "type": "plan/frozen",
+   "data": {
+    "plan_hash": "cd650c732ba4e70a172e59e8b6ed26172d14458f264dc821c06feb837a6cbb56",
+    "plan_id": "PLAN-bytes-returning-python-callable",
+    "roles": {
+     "C6": "INTRODUCE"
+    }
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 9,
+   "type": "story/begin",
+   "data": {
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 10,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "SCRATCH",
+    "resource": "scratch-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 11,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "wt-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 12,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 13,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [admission 1]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 14,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C6",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "probe_id": "probe.python_callable_v2",
+     "record_digest": "c17ea9b512e165e0fedb6ccd7605cb3142a80a004b13d575fbb4c9f4a745c9c2",
+     "result": {
+      "behavior_verdict": "INDETERMINATE",
+      "reason": "PRECONDITION_ABSENT"
+     },
+     "revision": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+     "semantic_hash": "096a9ddd0c7ea63536e259df581b3e837d0513c5c2b144d6e5d5de1cd0702019",
+     "spec_id": "PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 15,
+   "type": "story/admitted",
+   "data": {
+    "admitted": true,
+    "developer_call_permitted": true,
+    "dispositions": {
+     "C6": "READY"
+    },
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 16,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [admission 1]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    13
+   ]
+  },
+  {
+   "seq": 17,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:admission",
+    "detail": "admitted",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 18,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "DEVELOPER",
+    "criteria": [
+     "C6"
+    ],
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 19,
+   "type": "provider/result",
+   "data": {
+    "detail": "implemented 2 files",
+    "outcome": "COMPLETED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    18
+   ]
+  },
+  {
+   "seq": 20,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:developer",
+    "detail": "implemented 2 files",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 21,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [C6/CANDIDATE implementer]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 22,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [C6/CANDIDATE implementer]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    21
+   ]
+  },
+  {
+   "seq": 23,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C6",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "probe_id": "probe.python_callable_v2",
+     "record_digest": "94991199c8d4caddeeedfd3af12012c855164daf83a73e4770311b75bad4bee1",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "8a14b0922507a2517c68571916ac40bf44240b95",
+     "semantic_hash": "096a9ddd0c7ea63536e259df581b3e837d0513c5c2b144d6e5d5de1cd0702019",
+     "spec_id": "PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 24,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [C6/CANDIDATE verifier]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 25,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [C6/CANDIDATE verifier]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    24
+   ]
+  },
+  {
+   "seq": 26,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C6",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "probe_id": "probe.python_callable_v2",
+     "record_digest": "94991199c8d4caddeeedfd3af12012c855164daf83a73e4770311b75bad4bee1",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "8a14b0922507a2517c68571916ac40bf44240b95",
+     "semantic_hash": "096a9ddd0c7ea63536e259df581b3e837d0513c5c2b144d6e5d5de1cd0702019",
+     "spec_id": "PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 27,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "8a14b0922507a2517c68571916ac40bf44240b95",
+    "criterion_id": "C6",
+    "semantic_hash": "096a9ddd0c7ea63536e259df581b3e837d0513c5c2b144d6e5d5de1cd0702019",
+    "spec_id": "PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54",
+    "story_id": "S1",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    23,
+    26
+   ]
+  },
+  {
+   "seq": 28,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:proof:C6",
+    "detail": "verified",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 29,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 1]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 30,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 2]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 31,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 3]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 32,
+   "type": "tests/adequacy",
+   "data": {
+    "developer_chargeable": true,
+    "execution": {
+     "outcome": "PASSED",
+     "owner_on_failure": null,
+     "reason": "1 story-owned test(s) ran; 0 failed",
+     "selection": "STORY_TESTS_RAN",
+     "status": "EXECUTED"
+    },
+    "may_block": true,
+    "outcome": "INADEQUATE",
+    "owner": "DEVELOPER",
+    "regressions": {
+     "outcome": "PASSED",
+     "owner_on_failure": null,
+     "reason": "1 story-owned test(s) ran; 0 failed",
+     "selection": "STORY_TESTS_RAN",
+     "status": "EXECUTED"
+    },
+    "relevance": "IRRELEVANT",
+    "story_id": "S1",
+    "vacuity": "VACUOUS"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 33,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 3]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    31
+   ]
+  },
+  {
+   "seq": 34,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 2]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    30
+   ]
+  },
+  {
+   "seq": 35,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tests S1 [tests 1]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    29
+   ]
+  },
+  {
+   "seq": 36,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:quality",
+    "detail": "INADEQUATE",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 37,
+   "type": "provider/request",
+   "data": {
+    "budget_owner": "REVIEW",
+    "criteria": [
+     "C6"
+    ],
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 38,
+   "type": "provider/result",
+   "data": {
+    "detail": "reviewed",
+    "outcome": "COMPLETED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    37
+   ]
+  },
+  {
+   "seq": 39,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:review",
+    "detail": "reviewed: no finding",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 40,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "tool scan-S1#1",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 41,
+   "type": "tool/invoked",
+   "data": {
+    "call_id": "scan-S1#1",
+    "story_id": "S1",
+    "tool": "scan"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 42,
+   "type": "tool/result",
+   "data": {
+    "call_id": "scan-S1#1",
+    "detail": "",
+    "outcome": "COMPLETED",
+    "provenance": "NONE",
+    "signal": 0,
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    41
+   ]
+  },
+  {
+   "seq": 43,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "tool scan-S1#1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    40
+   ]
+  },
+  {
+   "seq": 44,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:security",
+    "detail": "scan ran: no finding",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 45,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:merge",
+    "detail": "merged at 00883720eb60e45d453fee7b7213466d5873f74c",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 46,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [C6/POST_MERGE implementer]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 47,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [C6/POST_MERGE implementer]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    46
+   ]
+  },
+  {
+   "seq": 48,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C6",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "probe_id": "probe.python_callable_v2",
+     "record_digest": "97a6c1eca96350b5c4f0162b31697fd544162806486df136a650b7f145692d8b",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "00883720eb60e45d453fee7b7213466d5873f74c",
+     "semantic_hash": "096a9ddd0c7ea63536e259df581b3e837d0513c5c2b144d6e5d5de1cd0702019",
+     "spec_id": "PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 49,
+   "type": "story/resource-acquired",
+   "data": {
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [C6/POST_MERGE verifier]",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 50,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "PROCESS_RANGE",
+    "resource": "probe PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54 [C6/POST_MERGE verifier]",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    49
+   ]
+  },
+  {
+   "seq": 51,
+   "type": "probe/evaluated",
+   "data": {
+    "criterion_id": "C6",
+    "record": {
+     "enforcement": "PARTIAL",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "probe_id": "probe.python_callable_v2",
+     "record_digest": "97a6c1eca96350b5c4f0162b31697fd544162806486df136a650b7f145692d8b",
+     "result": {
+      "behavior_verdict": "SATISFIED",
+      "reason": null
+     },
+     "revision": "00883720eb60e45d453fee7b7213466d5873f74c",
+     "semantic_hash": "096a9ddd0c7ea63536e259df581b3e837d0513c5c2b144d6e5d5de1cd0702019",
+     "spec_id": "PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54"
+    },
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 52,
+   "type": "proof/verified",
+   "data": {
+    "agreement": true,
+    "candidate": "00883720eb60e45d453fee7b7213466d5873f74c",
+    "criterion_id": "C6",
+    "semantic_hash": "096a9ddd0c7ea63536e259df581b3e837d0513c5c2b144d6e5d5de1cd0702019",
+    "spec_id": "PPS-4d21a4736bbbb85d4b00fca1bc3f28064eec5efbfd15a22f0a2fac15eedf9f54",
+    "story_id": "S1",
+    "verdict": "SATISFIED"
+   },
+   "source_seqs": [
+    48,
+    51
+   ]
+  },
+  {
+   "seq": 53,
+   "type": "gate/check",
+   "data": {
+    "check": "S1:post-merge:C6",
+    "detail": "re-proved at the merged revision",
+    "gate": "story",
+    "passed": true
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 54,
+   "type": "gate/decision",
+   "data": {
+    "gate": "story",
+    "passed": true,
+    "projections": [
+     "story_state",
+     "budgets",
+     "failure_owner",
+     "retry_target"
+    ]
+   },
+   "source_seqs": [
+    17,
+    20,
+    28,
+    36,
+    39,
+    44,
+    45,
+    53
+   ]
+  },
+  {
+   "seq": 55,
+   "type": "story/commit",
+   "data": {
+    "revision": "00883720eb60e45d453fee7b7213466d5873f74c",
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 56,
+   "type": "story/dispose",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 57,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "verifier-wt-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    12
+   ]
+  },
+  {
+   "seq": 58,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "WORKTREE",
+    "resource": "wt-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    11
+   ]
+  },
+  {
+   "seq": 59,
+   "type": "story/resource-released",
+   "data": {
+    "detail": "",
+    "kind": "SCRATCH",
+    "resource": "scratch-S1",
+    "status": "RELEASED",
+    "story_id": "S1",
+    "synthetic": false
+   },
+   "source_seqs": [
+    10
+   ]
+  },
+  {
+   "seq": 60,
+   "type": "story/end",
+   "data": {
+    "story_id": "S1"
+   },
+   "source_seqs": []
+  },
+  {
+   "seq": 61,
+   "type": "run/dispose-begin",
+   "data": {},
+   "source_seqs": []
+  },
+  {
+   "seq": 62,
+   "type": "run/end",
+   "data": {},
+   "source_seqs": []
+  }
+ ],
+ "journal_raw_digest": "a70ca4ed099b4cfbd74f82e3f01ba179bd0fde9bf1013f7489e11db923ea7100",
+ "subprocesses": {
+  "probe": 5,
+  "tests": 3,
+  "tool": 1,
+  "worktree": 2,
+  "scratch": 1
+ },
+ "residual_from_journal": 0,
+ "run_trace": [
+  "lease",
+  "sentinel OPEN",
+  "journal writer",
+  "RunSpec",
+  "execution",
+  "story scopes disposed",
+  "run/dispose-begin",
+  "run/end",
+  "journal writer closed",
+  "sentinel CLEAN",
+  "lease released"
+ ],
+ "outcomes": {
+  "S1": [
+   "COMMIT"
+  ]
+ },
+ "model_ledger": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "880a8e972f0d2d9a49fc75f65a0098172cc203a3bce237b919e07b4b0e965439",
+   "request": {
+    "header_class": "DEVELOPER_IMPLEMENT",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "814b696d029a2746214b0ad652f70dab221449bbd565b023b878da8f178e2ade",
+     "reviewer": "c7110116de216e4f0f67f38ae589070b2415dd25b5cfad3de85360d5627378f8"
+    },
+    "story_id": "S1",
+    "criteria": [
+     "C6"
+    ],
+    "attempt": 1,
+    "prior_failures": [],
+    "parent": "752e905ae2002f02e242ba8ce33eedbd622390a7",
+    "tree": "eb1d94a8e6d1dc5e9706245ba6b0b393d0ab88ec",
+    "semantic_hashes": {
+     "C6": "096a9ddd0c7ea63536e259df581b3e837d0513c5c2b144d6e5d5de1cd0702019"
+    },
+    "plan_hash": "cd650c732ba4e70a172e59e8b6ed26172d14458f264dc821c06feb837a6cbb56",
+    "tool_schema": "b0a95b22b87abbdf6bfc57b55850896031dfbfdd955e3156abc946792424106d",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "probe_id": "probe.python_callable_v2"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "COMPLETED",
+    "files": {
+     "app/codec.py": "def encode(text):\n    return text.encode('utf-8')\n",
+     "tests/test_s1.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    def test_package(self):\n        import app\n        self.assertTrue(app.__name__)\n"
+    },
+    "message": "S1: C6",
+    "detail": "implemented 2 files"
+   }
+  },
+  {
+   "seq": 2,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "70bade94bc2bbf21d056a6e13fb55371df57500068c25bb2422f6b08828a2982",
+   "request": {
+    "header_class": "REVIEWER_REVIEW",
+    "capability": {
+     "name": "model-stream",
+     "grade": "VERIFIED",
+     "developer": "814b696d029a2746214b0ad652f70dab221449bbd565b023b878da8f178e2ade",
+     "reviewer": "c7110116de216e4f0f67f38ae589070b2415dd25b5cfad3de85360d5627378f8"
+    },
+    "story_id": "S1",
+    "criteria": [
+     "C6"
+    ],
+    "attempt": 1,
+    "prior_failures": [],
+    "parent": "8a14b0922507a2517c68571916ac40bf44240b95",
+    "files": [
+     "app/__init__.py",
+     "app/calc.py",
+     "app/codec.py",
+     "tests/__init__.py",
+     "tests/test_other.py",
+     "tests/test_s1.py"
+    ],
+    "content": "303c708359bb7ce43e4dbf3152b73156335f3c82db44f434b22423aa8c9a4bc6",
+    "semantic_hashes": {
+     "C6": "096a9ddd0c7ea63536e259df581b3e837d0513c5c2b144d6e5d5de1cd0702019"
+    },
+    "plan_hash": "cd650c732ba4e70a172e59e8b6ed26172d14458f264dc821c06feb837a6cbb56",
+    "tool_schema": "ea5a37d14b8bcc5551b06bdffdc8b35a5d53776db59d5c0840e18a3557a8965e",
+    "execution_profile": {
+     "enforcement": "PARTIAL",
+     "timeout_s": 60,
+     "runner": "unittest",
+     "probe_digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "probe_id": "probe.python_callable_v2"
+    },
+    "route_class": "MODEL_STREAM"
+   },
+   "response": {
+    "kind": "COMPLETED",
+    "findings": [],
+    "detail": "reviewed"
+   }
+  }
+ ],
+ "model_requests": [
+  {
+   "seq": 1,
+   "header_class": "DEVELOPER_IMPLEMENT",
+   "request_hash": "880a8e972f0d2d9a49fc75f65a0098172cc203a3bce237b919e07b4b0e965439",
+   "matched": 1
+  },
+  {
+   "seq": 2,
+   "header_class": "REVIEWER_REVIEW",
+   "request_hash": "70bade94bc2bbf21d056a6e13fb55371df57500068c25bb2422f6b08828a2982",
+   "matched": 2
+  }
+ ],
+ "consumption": {
+  "expected": 2,
+  "consumed": 2,
+  "missing_unconsumed": [],
+  "extra_requests": [],
+  "duplicate_consumptions": 0,
+  "mismatches": 0,
+  "ok": true
+ },
+ "model_mismatches": [],
+ "tool_ledger": [
+  {
+   "tool": "scan",
+   "story_id": "S1",
+   "argv": [
+    "<PY>",
+    "<SCRIPT>",
+    "<REPORT>",
+    "[]"
+   ],
+   "scope_files": [
+    "app/__init__.py",
+    "app/calc.py",
+    "app/codec.py",
+    "tests/__init__.py",
+    "tests/test_other.py",
+    "tests/test_s1.py"
+   ],
+   "scope_content": "303c708359bb7ce43e4dbf3152b73156335f3c82db44f434b22423aa8c9a4bc6",
+   "script_sha256": "15e8839786bb4da70cfa4250e739b0432db7f0c4eddd2934eb546e038ce5c22c",
+   "input_digest": "8baa9c720435267967e4cd9b159b75f0d3d1a9f46320801e2fbc55ed02223859",
+   "exit_code": 0,
+   "report_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "report_bytes": 2,
+   "executed": true
+  }
+ ],
+ "notes": [],
+ "finished": "2026-10-01T07:49:39Z",
+ "ledger_digest": "970834bb7e2a158e3d00934d26cdf57849df69cbdfbd8562ab27bcd6bcd195fb"
+}
