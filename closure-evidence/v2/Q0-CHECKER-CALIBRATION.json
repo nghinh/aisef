@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 50,
+ "checker_count": 51,
  "uncovered_checker_modules": [],
- "calibrated_count": 50,
- "always_pass_mutants_rejected": 50,
+ "calibrated_count": 51,
+ "always_pass_mutants_rejected": 51,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -771,6 +771,21 @@
    "expected": "NO_COHORT_RECORD closure-evidence/v2/cycle2/COHORT-EXAMPLE.json $.cohort.preregistration: holds a preregistration",
    "observed": [
     "NO_COHORT_RECORD closure-evidence/v2/cycle2/COHORT-EXAMPLE.json $.cohort.preregistration: holds a preregistration — no cohort is authorized"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "profile_freeze",
+   "package": "WP-2.10.2",
+   "fixture": "tests/v2/fixtures/known_bad/profile_freeze.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "the measurement classifies OPAQUE ['SERVED_OTHER_MODEL']",
+   "observed": [
+    "BAD-ALIAS-AS-ATTESTED: recorded ATTESTED [], the measurement classifies OPAQUE ['SERVED_OTHER_MODEL']"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true

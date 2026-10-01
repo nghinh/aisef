@@ -465,6 +465,15 @@ def _no_cohort_record() -> Checker:
                    ("validation/v2/cohort_static_checks.py",))
 
 
+def _profile_freeze() -> Checker:
+    """WP-2.10.2: the configured development profile classifies OPAQUE, and the committed profile-freeze record
+    re-classifies from its own measurements. Known bad: a silent alias measured on the fixture provider, recorded as
+    ATTESTED."""
+    pz = _load("aisef_v2_profile_freeze", V2 / "profile_freeze.py")
+    return Checker("profile_freeze", "WP-2.10.2", lambda: pz.check(ROOT), lambda fx: pz.record_problems(fx["record"]),
+                   ("validation/v2/profile_freeze.py",))
+
+
 REGISTRY: list[Callable[[], Checker]] = [
     _freeze_manifest, _v1_evidence_guard, _arch_catalog, _f_conformance, _plan_validate, _plan_docs_check,
     _state_model_prover, _v2_encoding_scanner, _packaging_check, _run_history,
@@ -492,6 +501,8 @@ REGISTRY: list[Callable[[], Checker]] = [
     # Cycle 2, C2-P10 (WP-2.10.1): the evaluation-cohort machinery's confinement, boundary, LedgerLock binding, census
     _cohort_rule("cohort_confined", "COHORT_CONFINED"), _cohort_rule("cohort_boundary", "COHORT_BOUNDARY"),
     _development_regression_bound, _no_cohort_record,
+    # Cycle 2, C2-P10 (WP-2.10.2): model / profile freezing
+    _profile_freeze,
 ]
 
 
