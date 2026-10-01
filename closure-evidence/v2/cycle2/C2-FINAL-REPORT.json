@@ -1,0 +1,2967 @@
+{
+ "record": "AISEF V2 — CYCLE-2 P6/P7/P8/P9/P10 COMPLETE / V2 READY FOR FINAL OWNER CLOSURE REVIEW",
+ "authority": "owner rulings 2026-09-30 A and B",
+ "written": "2026-10-01T07:59:21Z",
+ "items": {
+  "01_p5_owner_acceptance": {
+   "path": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+   "sha256": "69c23b49f393276117c957f598f811a91a81e36595d60c7bf9fc0af5f414453d",
+   "verdict": "C2-P5 ACCEPTED BY THE OWNER — ACCEPTANCE BOUNDARY RECORDED",
+   "corrigendum": {
+    "path": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE-CORRIGENDUM-1.json",
+    "sha256": "71c2954dfd4396ecbaaa7f8e8887fc2de4d67a3364d70d35a792d1ee4e06223a",
+    "verdict": "CORRIGENDUM RECORDED — NO SEMANTIC CHANGE"
+   }
+  },
+  "02_owner_identity": {
+   "approver": "human:owner",
+   "established_by": [
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",
+    "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json",
+    "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json",
+    "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
+    "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
+    "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
+    "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json",
+    "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
+    "closure-evidence/v2/P1-COMPLETION-CORRECTION-V2-001.json"
+   ]
+  },
+  "03_contract_approvals": {
+   "path": "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json",
+   "sha256": "093896bbcc7b355674fca3e8001915d0ed63b02856d861c6d8f90d0542a92659",
+   "count": 59,
+   "aggregate_digest": "73e3644949a95810a43d4e91df8a91e91cef0bf434f6ce8bfc9217b862d139d5",
+   "approvers": [
+    "human:owner"
+   ]
+  },
+  "04_synthetic_not_persisted": {
+   "synthetic_identity": "human:SYNTHETIC-TEST-FIXTURE-NOT-AN-APPROVAL",
+   "persisted": false,
+   "approvers_in_the_file": [
+    "human:owner"
+   ],
+   "admission_with_the_real_approvals_only": {
+    "admitted": true,
+    "checks_passed": 9,
+    "synthetic_approval_used": false
+   }
+  },
+  "05_plan_v22_identity": {
+   "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+   "proposal_digest": "856ed25dcf10df2b7c1c3e45c125ca0642a6f8aef6b913ae84bba13cdfd1e3f9",
+   "accepted": {
+    "candidate": "3ac9b8c9f67fcf307ec34009d540e9094cea46bb",
+    "execution": "8fd083b",
+    "base": "0f779956f98f38abf4d4c33c6db4cadd819d8640",
+    "proposal_digest": "856ed25dcf10df2b7c1c3e45c125ca0642a6f8aef6b913ae84bba13cdfd1e3f9",
+    "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+    "baseline": "136a68dc",
+    "retained": 59,
+    "qualified": 59,
+    "not_qualified": 0,
+    "reference_unsatisfied": 0,
+    "without_witness": 0
+   },
+   "proposal_kernel_provenance": {
+    "differing_paths": [
+     "identities.aisef2_tree"
+    ],
+    "committed_kernel": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+    "derived_kernel": "254d8f559b879c210c4936321022f1350c4b2f89",
+    "accepted_kernel": "f4bfc7f1291cc72fa8ade79e798f5222f3429759",
+    "provenance_only": true,
+    "current": true,
+    "rule": "the proposal names the kernel it was authored on; a later authorized kernel changes that field only — tolerated when it is the one differing path and the committed value is the accepted candidate's kernel"
+   }
+  },
+  "06_or_iface_1": {
+   "binding": "IB-LEDGER",
+   "ruling": "APPROVED WITH SCOPE LIMITATION: Ledger(path) with apply_batch, snapshot, verify and operation stimuli as JSON arrays, for the exact PLAN-V2.2 BehaviorContracts of the LedgerLock Cycle-2 DEVELOPMENT_REGRESSION workload",
+   "semantics": "an OPERATIONAL CONTRACT BINDING for this qualification/regression workload; NOT a statement that the frozen prose requirements mandate this Python API shape; not framework-wide; not evidence that arbitrary conforming LedgerLock implementations must expose it; its authority is only the exact human-approved contract hashes",
+   "interface_binding_as_proposed": {
+    "binding": "a Ledger is constructed with its ledger file path, Ledger(<path>), and offers apply_batch(ops), snapshot() and verify() as methods; ops are (op, key, value, rid, ts) delivered as 5-element JSON arrays (a contract stimulus is JSON data)",
+    "source": "§5 names apply_batch(ops) and its tuple shape, §6 snapshot(), §3.4 verify from the library, §12 'the configured ledger path', §13 the class Ledger",
+    "fixed_by_requirements": false,
+    "gap": "the requirements do not say how a Ledger is bound to its path, nor that an implementation must accept arrays where they say tuples; every process_effect spec depends on this binding (the reference and PLAN-V2.1 read it the same way) — open normative gap OG-IB-LEDGER"
+   },
+   "contracts": [
+    {
+     "spec_id": "S-3.1-a",
+     "contract_id": "BC-V22-S-3.1-a",
+     "contract_hash": "5283f2ad56d21d0dbc24b4d63220729161506f88044a1b214727b0f1fbf7798a"
+    },
+    {
+     "spec_id": "S-3.1-b",
+     "contract_id": "BC-V22-S-3.1-b",
+     "contract_hash": "f6870cbe6bdd7a1fe1f7d6a1999deb8309bf7dcd21ec3fac7d7ed2c4cd581d07"
+    },
+    {
+     "spec_id": "S-3.1-c",
+     "contract_id": "BC-V22-S-3.1-c",
+     "contract_hash": "045baeac607993963fcc812c8b02771bac54014f899ce69810abeb2866476baa"
+    },
+    {
+     "spec_id": "S-3.2-a",
+     "contract_id": "BC-V22-S-3.2-a",
+     "contract_hash": "5d31e8be89a758d1baa94a64fe3546e9955b9a166cc295257a43b8d72f937f48"
+    },
+    {
+     "spec_id": "S-3.2-b",
+     "contract_id": "BC-V22-S-3.2-b",
+     "contract_hash": "44a961ee7c8bcc1eb337f4c6de5589b3edecbd84622f0071c286a4a5f7914892"
+    },
+    {
+     "spec_id": "S-3.2-c",
+     "contract_id": "BC-V22-S-3.2-c",
+     "contract_hash": "cd45f863f6e2e65cce6b4f881855d89cd7564e238d40398cb59a3403946b1275"
+    },
+    {
+     "spec_id": "S-3.2-d",
+     "contract_id": "BC-V22-S-3.2-d",
+     "contract_hash": "d5e0bab4b51180e30e83edde37d2e668e0a83e3253e6e8b822690cb9466b3466"
+    },
+    {
+     "spec_id": "S-3.2-e",
+     "contract_id": "BC-V22-S-3.2-e",
+     "contract_hash": "b163f4c1c59e61bd7888ed3cefcfa5fb1ef417e989a39c73fb24243ea070d2d5"
+    },
+    {
+     "spec_id": "S-3.2-f",
+     "contract_id": "BC-V22-S-3.2-f",
+     "contract_hash": "ec6b8915bd37d4eee5a5f20097ba8acafacfcd8fb9add876d8fd46aa921b0d7d"
+    },
+    {
+     "spec_id": "S-3.2-g",
+     "contract_id": "BC-V22-S-3.2-g",
+     "contract_hash": "b9726e9aa93672e0416002fb9ee75de845d1fab13f7a59eb357c3ff20e69ee47"
+    },
+    {
+     "spec_id": "S-3.2-h",
+     "contract_id": "BC-V22-S-3.2-h",
+     "contract_hash": "d86bc1fa22bdc2bc18d27f1b2dce74d85584b8ab20c6913397800c3b46e48780"
+    },
+    {
+     "spec_id": "S-3.3-a",
+     "contract_id": "BC-V22-S-3.3-a",
+     "contract_hash": "d02bd60c3304859b4a69d3758867c1a18ea8beb3103e5330dc31de1c5b161b5d"
+    },
+    {
+     "spec_id": "S-3.3-b",
+     "contract_id": "BC-V22-S-3.3-b",
+     "contract_hash": "898072c0919379bb8107887a04f765e83c90cf321f6656f77db2575aa6b7f8c0"
+    },
+    {
+     "spec_id": "S-3.3-c",
+     "contract_id": "BC-V22-S-3.3-c",
+     "contract_hash": "8ecabe8b3010bbf74dc9415d610b9a9f1ee3107e6947ce6d22644ee83fd9a756"
+    },
+    {
+     "spec_id": "S-3.3-d",
+     "contract_id": "BC-V22-S-3.3-d",
+     "contract_hash": "ad460741e1f46214e8e0ceb59744911d0c9d393695299a8f17a8eb53ece350b1"
+    },
+    {
+     "spec_id": "S-3.4-a",
+     "contract_id": "BC-V22-S-3.4-a",
+     "contract_hash": "0d1400398fcd566f9c403b4f67ee76f9e7735470e3ade14741e1182321bae0d0"
+    },
+    {
+     "spec_id": "S-4.2-a",
+     "contract_id": "BC-V22-S-4.2-a",
+     "contract_hash": "33eb9ffb2af9132f2bc7ed0fc8340929f35c8eec6e9b8af53688eb1ca19cdad9"
+    },
+    {
+     "spec_id": "S-4.2-b",
+     "contract_id": "BC-V22-S-4.2-b",
+     "contract_hash": "893bcc1fb56d7c085f6e6f88ad85aac4482ebeab43186d23378cb4424cea8826"
+    },
+    {
+     "spec_id": "S-4.3-a",
+     "contract_id": "BC-V22-S-4.3-a",
+     "contract_hash": "355692e9bc9c9d1e4c9d6b6339bed6d07c9bfab66fd11d3202ecef3dc3ec5051"
+    },
+    {
+     "spec_id": "S-4.3-b",
+     "contract_id": "BC-V22-S-4.3-b",
+     "contract_hash": "b787520e03590c70018c9a3d0764ccd2303f97543e0ff60a033ad0779fac5c31"
+    },
+    {
+     "spec_id": "S-4.4-a",
+     "contract_id": "BC-V22-S-4.4-a",
+     "contract_hash": "dbaab960e7112c7dc00a90789c6c99dbe0e842c1526bdeac8b55a212d308a83f"
+    },
+    {
+     "spec_id": "S-4.4-b",
+     "contract_id": "BC-V22-S-4.4-b",
+     "contract_hash": "c5715f552b5de4c31b11874ade0bb32d5604f46dfd5bccc9838e40367a84cbea"
+    },
+    {
+     "spec_id": "S-4.5-a",
+     "contract_id": "BC-V22-S-4.5-a",
+     "contract_hash": "0490cb0b735b155ab7b9f92ffd5762c9753a47956142388f60ef466409a76699"
+    },
+    {
+     "spec_id": "S-4.5-b",
+     "contract_id": "BC-V22-S-4.5-b",
+     "contract_hash": "ceb02e5dfcaa22704c6707909c6a9d935c09b9fca2e2c8da29995fad6310b9d3"
+    },
+    {
+     "spec_id": "S-5-a",
+     "contract_id": "BC-V22-S-5-a",
+     "contract_hash": "dd2ec91c8fe3c30c0d5c34ca58b56262bde538d9b3e7906952626331b00f4809"
+    },
+    {
+     "spec_id": "S-5-b",
+     "contract_id": "BC-V22-S-5-b",
+     "contract_hash": "aaf2615b650e397222ab0cae7cde5e6223d03614a46410ead06c538fc361271a"
+    },
+    {
+     "spec_id": "S-6-a",
+     "contract_id": "BC-V22-S-6-a",
+     "contract_hash": "c092996feed7333c0472a3a97aa8a00284da15a45bf99e9fe741b05360673edd"
+    },
+    {
+     "spec_id": "S-6-b",
+     "contract_id": "BC-V22-S-6-b",
+     "contract_hash": "14479819963f6fe0a91dbee8adf76174b37d73f72c85d18e43fb289b464b43f1"
+    },
+    {
+     "spec_id": "S-6-c",
+     "contract_id": "BC-V22-S-6-c",
+     "contract_hash": "e492fda9883bbf94562b9cba2a48e57f805a6173e72408bb765999b0a6bab04f"
+    },
+    {
+     "spec_id": "S-7-a",
+     "contract_id": "BC-V22-S-7-a",
+     "contract_hash": "119a643e028c49583a995ea3d74eda90234e86cba9f09dd3eaf710ea140f0922"
+    },
+    {
+     "spec_id": "S-7-b",
+     "contract_id": "BC-V22-S-7-b",
+     "contract_hash": "5eac63ed6818afd43ada5b014c96ea30b9a648bf21e15308d01eb80a6c10a3e2"
+    },
+    {
+     "spec_id": "S-7-c",
+     "contract_id": "BC-V22-S-7-c",
+     "contract_hash": "c32ef2fda0e9a3c681aa892f65249dee80692f4ca74fec3f5eaaaae5fbda70fc"
+    },
+    {
+     "spec_id": "S-D3-05-01-1",
+     "contract_id": "BC-V22-S-D3-05-01-1",
+     "contract_hash": "f3b3368d6e0af847c96f4af65f1b78ac36ccc93a5a694dca194fe7e9b946ea94"
+    },
+    {
+     "spec_id": "S-D3-05-01-2",
+     "contract_id": "BC-V22-S-D3-05-01-2",
+     "contract_hash": "050f975b4efe4176e06e13c15cfd8f2cf970fa2417e31c78734ea95f14a0aa51"
+    }
+   ],
+   "count": 34,
+   "semantic_edit_required": false
+  },
+  "07_or_iface_2": {
+   "OR-IFACE-2": {
+    "binding": "IB-ELEMENTS",
+    "ruling": "APPROVED WITH SCOPE LIMITATION: a delete's value slot is null; ts is an integer the caller supplies — the canonical test stimulus representation of the exact approved benchmark contracts",
+    "semantics": "a stimulus convention of the approved benchmark contracts; no broader requirement claim; no new framework semantics",
+    "interface_binding_as_proposed": {
+     "binding": "a delete element carries null in its value slot; ts is an integer the caller supplies",
+     "source": "§5 gives every element the shape (op, key, value, rid, ts); §3.2 gives a delete line no value",
+     "fixed_by_requirements": false,
+     "gap": "the requirements do not say what a delete's value slot holds"
+    },
+    "contracts": [
+     {
+      "spec_id": "S-3.1-a",
+      "contract_id": "BC-V22-S-3.1-a",
+      "contract_hash": "5283f2ad56d21d0dbc24b4d63220729161506f88044a1b214727b0f1fbf7798a"
+     },
+     {
+      "spec_id": "S-3.1-b",
+      "contract_id": "BC-V22-S-3.1-b",
+      "contract_hash": "f6870cbe6bdd7a1fe1f7d6a1999deb8309bf7dcd21ec3fac7d7ed2c4cd581d07"
+     },
+     {
+      "spec_id": "S-3.1-c",
+      "contract_id": "BC-V22-S-3.1-c",
+      "contract_hash": "045baeac607993963fcc812c8b02771bac54014f899ce69810abeb2866476baa"
+     },
+     {
+      "spec_id": "S-3.2-a",
+      "contract_id": "BC-V22-S-3.2-a",
+      "contract_hash": "5d31e8be89a758d1baa94a64fe3546e9955b9a166cc295257a43b8d72f937f48"
+     },
+     {
+      "spec_id": "S-3.2-b",
+      "contract_id": "BC-V22-S-3.2-b",
+      "contract_hash": "44a961ee7c8bcc1eb337f4c6de5589b3edecbd84622f0071c286a4a5f7914892"
+     },
+     {
+      "spec_id": "S-3.2-c",
+      "contract_id": "BC-V22-S-3.2-c",
+      "contract_hash": "cd45f863f6e2e65cce6b4f881855d89cd7564e238d40398cb59a3403946b1275"
+     },
+     {
+      "spec_id": "S-3.2-d",
+      "contract_id": "BC-V22-S-3.2-d",
+      "contract_hash": "d5e0bab4b51180e30e83edde37d2e668e0a83e3253e6e8b822690cb9466b3466"
+     },
+     {
+      "spec_id": "S-3.2-e",
+      "contract_id": "BC-V22-S-3.2-e",
+      "contract_hash": "b163f4c1c59e61bd7888ed3cefcfa5fb1ef417e989a39c73fb24243ea070d2d5"
+     },
+     {
+      "spec_id": "S-3.2-f",
+      "contract_id": "BC-V22-S-3.2-f",
+      "contract_hash": "ec6b8915bd37d4eee5a5f20097ba8acafacfcd8fb9add876d8fd46aa921b0d7d"
+     },
+     {
+      "spec_id": "S-3.2-g",
+      "contract_id": "BC-V22-S-3.2-g",
+      "contract_hash": "b9726e9aa93672e0416002fb9ee75de845d1fab13f7a59eb357c3ff20e69ee47"
+     },
+     {
+      "spec_id": "S-3.2-h",
+      "contract_id": "BC-V22-S-3.2-h",
+      "contract_hash": "d86bc1fa22bdc2bc18d27f1b2dce74d85584b8ab20c6913397800c3b46e48780"
+     },
+     {
+      "spec_id": "S-3.3-a",
+      "contract_id": "BC-V22-S-3.3-a",
+      "contract_hash": "d02bd60c3304859b4a69d3758867c1a18ea8beb3103e5330dc31de1c5b161b5d"
+     },
+     {
+      "spec_id": "S-3.3-b",
+      "contract_id": "BC-V22-S-3.3-b",
+      "contract_hash": "898072c0919379bb8107887a04f765e83c90cf321f6656f77db2575aa6b7f8c0"
+     },
+     {
+      "spec_id": "S-3.3-c",
+      "contract_id": "BC-V22-S-3.3-c",
+      "contract_hash": "8ecabe8b3010bbf74dc9415d610b9a9f1ee3107e6947ce6d22644ee83fd9a756"
+     },
+     {
+      "spec_id": "S-3.3-d",
+      "contract_id": "BC-V22-S-3.3-d",
+      "contract_hash": "ad460741e1f46214e8e0ceb59744911d0c9d393695299a8f17a8eb53ece350b1"
+     },
+     {
+      "spec_id": "S-3.4-a",
+      "contract_id": "BC-V22-S-3.4-a",
+      "contract_hash": "0d1400398fcd566f9c403b4f67ee76f9e7735470e3ade14741e1182321bae0d0"
+     },
+     {
+      "spec_id": "S-4.2-a",
+      "contract_id": "BC-V22-S-4.2-a",
+      "contract_hash": "33eb9ffb2af9132f2bc7ed0fc8340929f35c8eec6e9b8af53688eb1ca19cdad9"
+     },
+     {
+      "spec_id": "S-4.2-b",
+      "contract_id": "BC-V22-S-4.2-b",
+      "contract_hash": "893bcc1fb56d7c085f6e6f88ad85aac4482ebeab43186d23378cb4424cea8826"
+     },
+     {
+      "spec_id": "S-4.3-a",
+      "contract_id": "BC-V22-S-4.3-a",
+      "contract_hash": "355692e9bc9c9d1e4c9d6b6339bed6d07c9bfab66fd11d3202ecef3dc3ec5051"
+     },
+     {
+      "spec_id": "S-4.3-b",
+      "contract_id": "BC-V22-S-4.3-b",
+      "contract_hash": "b787520e03590c70018c9a3d0764ccd2303f97543e0ff60a033ad0779fac5c31"
+     },
+     {
+      "spec_id": "S-4.4-a",
+      "contract_id": "BC-V22-S-4.4-a",
+      "contract_hash": "dbaab960e7112c7dc00a90789c6c99dbe0e842c1526bdeac8b55a212d308a83f"
+     },
+     {
+      "spec_id": "S-4.4-b",
+      "contract_id": "BC-V22-S-4.4-b",
+      "contract_hash": "c5715f552b5de4c31b11874ade0bb32d5604f46dfd5bccc9838e40367a84cbea"
+     },
+     {
+      "spec_id": "S-4.5-a",
+      "contract_id": "BC-V22-S-4.5-a",
+      "contract_hash": "0490cb0b735b155ab7b9f92ffd5762c9753a47956142388f60ef466409a76699"
+     },
+     {
+      "spec_id": "S-4.5-b",
+      "contract_id": "BC-V22-S-4.5-b",
+      "contract_hash": "ceb02e5dfcaa22704c6707909c6a9d935c09b9fca2e2c8da29995fad6310b9d3"
+     },
+     {
+      "spec_id": "S-5-a",
+      "contract_id": "BC-V22-S-5-a",
+      "contract_hash": "dd2ec91c8fe3c30c0d5c34ca58b56262bde538d9b3e7906952626331b00f4809"
+     },
+     {
+      "spec_id": "S-5-b",
+      "contract_id": "BC-V22-S-5-b",
+      "contract_hash": "aaf2615b650e397222ab0cae7cde5e6223d03614a46410ead06c538fc361271a"
+     },
+     {
+      "spec_id": "S-6-a",
+      "contract_id": "BC-V22-S-6-a",
+      "contract_hash": "c092996feed7333c0472a3a97aa8a00284da15a45bf99e9fe741b05360673edd"
+     },
+     {
+      "spec_id": "S-6-b",
+      "contract_id": "BC-V22-S-6-b",
+      "contract_hash": "14479819963f6fe0a91dbee8adf76174b37d73f72c85d18e43fb289b464b43f1"
+     },
+     {
+      "spec_id": "S-6-c",
+      "contract_id": "BC-V22-S-6-c",
+      "contract_hash": "e492fda9883bbf94562b9cba2a48e57f805a6173e72408bb765999b0a6bab04f"
+     },
+     {
+      "spec_id": "S-7-a",
+      "contract_id": "BC-V22-S-7-a",
+      "contract_hash": "119a643e028c49583a995ea3d74eda90234e86cba9f09dd3eaf710ea140f0922"
+     },
+     {
+      "spec_id": "S-7-b",
+      "contract_id": "BC-V22-S-7-b",
+      "contract_hash": "5eac63ed6818afd43ada5b014c96ea30b9a648bf21e15308d01eb80a6c10a3e2"
+     },
+     {
+      "spec_id": "S-7-c",
+      "contract_id": "BC-V22-S-7-c",
+      "contract_hash": "c32ef2fda0e9a3c681aa892f65249dee80692f4ca74fec3f5eaaaae5fbda70fc"
+     },
+     {
+      "spec_id": "S-D3-05-01-1",
+      "contract_id": "BC-V22-S-D3-05-01-1",
+      "contract_hash": "f3b3368d6e0af847c96f4af65f1b78ac36ccc93a5a694dca194fe7e9b946ea94"
+     },
+     {
+      "spec_id": "S-D3-05-01-2",
+      "contract_id": "BC-V22-S-D3-05-01-2",
+      "contract_hash": "050f975b4efe4176e06e13c15cfd8f2cf970fa2417e31c78734ea95f14a0aa51"
+     }
+    ],
+    "count": 34,
+    "semantic_edit_required": false,
+    "delete_value_null_contracts": [
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-6-b",
+     "S-6-c",
+     "S-D3-05-01-1",
+     "S-D3-05-01-2"
+    ]
+   }
+  },
+  "08_or_iface_3": {
+   "binding": {
+    "binding": "IB-EMPTY",
+    "ruling": "APPROVED WITH SCOPE LIMITATION: an existing zero-byte ledger file is a fresh ledger state — the canonical initial-state interpretation of the exact approved benchmark contracts",
+    "semantics": "binds the exact approved contract set; not framework-wide; no generalization claim; the frozen requirements document is not altered",
+    "interface_binding_as_proposed": {
+     "binding": "a zero-byte file is a fresh, empty ledger (a valid chain of no lines)",
+     "source": "§14 item 1 'a fresh ledger'; §3.3 (ok when every line verifies)",
+     "fixed_by_requirements": false,
+     "gap": "a 'fresh ledger' could also be a path that does not exist yet, which §9 makes an I/O error (RISK-4); the specs on an empty ledger (S-5-a, S-6-d, S-7-d, S-9-a, S-9-c, S-9-e) read it as a zero-byte file"
+    },
+    "contracts": [
+     {
+      "spec_id": "S-6-d",
+      "contract_id": "BC-V22-S-6-d",
+      "contract_hash": "34d83cdc992858205c6ef3b6a4b4b3656d456c423b30edb9f9ce958bf823a968"
+     },
+     {
+      "spec_id": "S-7-d",
+      "contract_id": "BC-V22-S-7-d",
+      "contract_hash": "b82e216e96267a93197b528cae5f404f927ab7580569eb25e21c325129c13b93"
+     },
+     {
+      "spec_id": "S-9-a",
+      "contract_id": "BC-V22-S-9-a",
+      "contract_hash": "12d16f4df83cf829b286bbff5ab22ac21427de9473c5bbb659433700084939cb"
+     },
+     {
+      "spec_id": "S-9-c",
+      "contract_id": "BC-V22-S-9-c",
+      "contract_hash": "acfc6a041d05ea6e7154f1092de4b55a4ddd236811e1b2ceacfcbbd601467e04"
+     },
+     {
+      "spec_id": "S-9-e",
+      "contract_id": "BC-V22-S-9-e",
+      "contract_hash": "df97abc858bfd3054672956fa2dfbe7651bcc785e83028baafff289f4e446a44"
+     }
+    ],
+    "count": 5,
+    "semantic_edit_required": false,
+    "as_named_by_the_proposal": [
+     "S-5-a",
+     "S-6-d",
+     "S-7-d",
+     "S-9-a",
+     "S-9-c",
+     "S-9-e"
+    ],
+    "prose_vs_content": {
+     "named_by_the_proposal_prose": [
+      "S-5-a",
+      "S-6-d",
+      "S-7-d",
+      "S-9-a",
+      "S-9-c",
+      "S-9-e"
+     ],
+     "zero_byte_file_in_the_contract": [
+      "S-6-d",
+      "S-7-d",
+      "S-9-a",
+      "S-9-c",
+      "S-9-e"
+     ],
+     "named_but_no_zero_byte_file": [
+      "S-5-a"
+     ],
+     "zero_byte_file_but_not_named": [],
+     "no_file_start_contracts": [
+      "S-3.1-a",
+      "S-3.1-b",
+      "S-3.1-c",
+      "S-3.2-a",
+      "S-3.2-b",
+      "S-3.2-c",
+      "S-3.2-d",
+      "S-3.2-e",
+      "S-3.2-f",
+      "S-3.2-g",
+      "S-3.2-h",
+      "S-3.3-a",
+      "S-3.3-b",
+      "S-3.3-c",
+      "S-3.3-d",
+      "S-3.4-a",
+      "S-4.2-a",
+      "S-4.2-b",
+      "S-4.3-a",
+      "S-4.3-b",
+      "S-4.4-a",
+      "S-4.4-b",
+      "S-4.5-a",
+      "S-4.5-b",
+      "S-5-a",
+      "S-5-b",
+      "S-6-a",
+      "S-6-b",
+      "S-6-c",
+      "S-D3-05-01-1",
+      "S-D3-05-01-2"
+     ],
+     "reading": "the zero-byte ruling binds the contracts whose content holds a zero-byte ledger file; a process_effect contract that constructs Ledger(path) over a path with no file starts fresh under OR-IFACE-1's Ledger(path) binding, as its exact approved hash encodes; the prose inaccuracy is disclosed, no contract changes"
+    }
+   },
+   "corrigendum": {
+    "corrected_statement": [
+     "S-5-a does NOT rely on the zero-byte-existing-file interpretation (OR-IFACE-3): its stimulus holds no ledger file at all; its scenario constructs Ledger(<ws>/l.jsonl) over a path with no file, as its exact approved contract hash encodes",
+     "the OR-IFACE-3 ruling applies only where the stimulus actually contains an existing zero-byte ledger: S-6-d, S-7-d, S-9-a, S-9-c, S-9-e",
+     "no BehaviorContract changes; no ProductProofSpec changes; no semantic_hash changes; no plan_hash change; no falsifiability evidence invalidated"
+    ],
+    "measured": {
+     "S-5-a": {
+      "contract_id": "BC-V22-S-5-a",
+      "contract_hash": "dd2ec91c8fe3c30c0d5c34ca58b56262bde538d9b3e7906952626331b00f4809",
+      "zero_byte_ledger_file_in_the_stimulus": false,
+      "any_workspace_file_in_the_stimulus": false,
+      "first_step": {
+       "args": [
+        "<ws>/l.jsonl"
+       ],
+       "kwargs": {},
+       "step": "construct"
+      },
+      "bound_by_OR_IFACE_3": false
+     },
+     "or_iface_3_contracts": [
+      "S-6-d",
+      "S-7-d",
+      "S-9-a",
+      "S-9-c",
+      "S-9-e"
+     ],
+     "semantic_change": "NONE",
+     "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+     "proposal_digest": "856ed25dcf10df2b7c1c3e45c125ca0642a6f8aef6b913ae84bba13cdfd1e3f9",
+     "specs_equal_to_accepted": 59,
+     "falsifiability": {
+      "record": {
+       "path": "closure-evidence/v2/cycle2/P5-FALSIFIABILITY.json",
+       "sha256": "4b1c1a06ca31c4e4eb4dd83950ef77ff058e1f6bed4d02bba7d529defed2f668"
+      },
+      "S-5-a": {
+       "status": "QUALIFIED",
+       "pristine": "SATISFIED",
+       "mutant_verdict": "REFUTED",
+       "semantic_hash": "3b5de7d325f1a8770ff29408aa0182ef350bfbf1fad5ed88f44fbb95b58e4956"
+      }
+     }
+    }
+   }
+  },
+  "09_unsupported_clauses": [
+   {
+    "id": "R-3.2/2",
+    "clause": "hash = SHA-256(prev_hash || '|' || canonical_bytes), hash fields emptied",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "the canonical bytes encoding is not fixed: no harness can recompute a hash value independently; the product's own consistency is observed through its verify (S-3.2-a, S-3.3-*)"
+   },
+   {
+    "id": "R-3.2/4",
+    "clause": "first prev_hash is 'GENESIS' or 64 zeros, an implementation choice, documented and constant",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "a disjunctive expected value: every file shape compares one value; fixing one form would enforce a stronger property than the requirement (OD-STRONGER)"
+   },
+   {
+    "id": "R-3.3/3",
+    "clause": "ok=False and first_bad_index=<i> on the first violation",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "the verdict's representation is open (the CLI exposes the exit code only); no class reads one field of an arbitrary returned object; a fixed-shape comparison would prescribe a representation (OD-02-01-4)"
+   },
+   {
+    "id": "R-4.2/2",
+    "clause": "the second call MUST return the same result",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "the result's representation is open; the only comparator of two results needs a JSON form, which would prescribe one (OD-RETURN)"
+   },
+   {
+    "id": "R-4.3/3",
+    "clause": "or return an error result depending on CLI surface (exit 4, §9)",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "the only mutating CLI invocation is `apply --batch <file>`, whose file shape the requirements do not fix (OD-BATCH)"
+   },
+   {
+    "id": "R-4.4/3",
+    "clause": "... returning the same result as the delete",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "as R-4.2/2 (OD-RETURN)"
+   },
+   {
+    "id": "R-5/0",
+    "clause": "apply_batch runs 'under the lock'",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "the requirements define no lock and nothing observable depends on one"
+   },
+   {
+    "id": "R-5/1",
+    "clause": "apply_batch writes all lines to a sibling temp file, fsyncs it, renames it over the path",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "the mechanism is not observable by any class (no step traces the subject's own files)"
+   },
+   {
+    "id": "R-5/2",
+    "clause": "a crash at any point leaves the full batch or the pre-batch bytes, never a partial batch",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "a fault step makes the faulted call either return (call) or raise (expect_raises); the requirements fix neither, only the post-crash state, and a fault the implementation does not use (os.replace vs os.rename) never fires (OD-03-01-5)"
+   },
+   {
+    "id": "R-5/4",
+    "clause": "the CLI `apply --batch <file>` performs the same atomic operation",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "the batch-file shape is not fixed (OD-BATCH); the file-absent I/O error is measured (S-9-e)"
+   },
+   {
+    "id": "R-6/3",
+    "clause": "sorted by NFC key in UTF-8 byte order; a JSON document",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "the document's layout and representation are open: its content and key order are observable only through bytes or a representation no requirement fixes"
+   },
+   {
+    "id": "R-6/4",
+    "clause": "the CLI `snapshot --out <file>` writes this same document",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "no class compares a written file with a library value, and the file's bytes are layout-open"
+   },
+   {
+    "id": "R-7/2",
+    "clause": "no other content may be modified",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "the preserved lines were written by the product: their bytes are unknown to the harness (S-7-a measures that they remain)"
+   },
+   {
+    "id": "R-8/1",
+    "clause": "after a successful append the bytes are durably on disk (fsync) before return",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "durability is not observable from outside the process (the reference fixture treats R-8 as static)"
+   },
+   {
+    "id": "R-9/4",
+    "clause": "exit 4 on a conflict",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "as R-4.3/3 (OD-BATCH)"
+   },
+   {
+    "id": "R-12/2",
+    "clause": "no opening of files outside the ledger, batch and snapshot paths",
+    "class": "UNSUPPORTED_FOR_FULL_ENFORCEMENT",
+    "reason": "no class observes which files a subject opens"
+   }
+  ],
+  "10_requirement_ambiguities": {
+   "RISK-1": "a key with a committed put can never be deleted or changed (a same-rid delete replays, another rid conflicts): R-6's 'unless tombstoned by a later delete' is unreachable for a put key; tombstones exist only as a first mutation",
+   "RISK-2": "R-4.5 'replays of either MUST NOT conflict' holds only for the committed put (S-4.5-b); the refused delete replayed is again another rid (R-4.3)",
+   "RISK-3": "replay scope rid alone or rid+key: no spec reuses a rid across keys",
+   "RISK-4": "'verify: any other exit code is a bug' vs 2 and 3; 'fresh ledger' consistent only as an existing empty file (IB-EMPTY)",
+   "RISK-5": "'any modification detected' vs hashing canonical bytes: only semantic edits are testable (S-3.3-* edit value, op, hash, prev_hash)",
+   "RISK-6": "the GENESIS form is both 'the literal' and an implementation choice (R-3.2/4 UNSUPPORTED)",
+   "RISK-7": "§12 file confinement vs §5's sibling temp file (R-12/2 UNSUPPORTED)",
+   "RISK-8": "'under the lock' is undefined (R-5/0 UNSUPPORTED)",
+   "RISK-9": "a newline-terminated corrupt last line is neither truncated nor 'in the middle' (AC-STORY-03-02-4 UNSUPPORTED)",
+   "RISK-10": "conflicts and replays between elements of one batch: R-4.3 judges against committed mutations (S-5-a conflicts against a committed line)",
+   "RISK-11": "§10's allowed set omits __future__ (which §10 requires) and the package's own modules: S-10-a admits both",
+   "RISK-12": "§3.2's line shapes omit hash and prev_hash, which every line carries",
+   "RISK-13": "module functions vs methods; append/put/delete signatures and ts provenance open (IB-LEDGER, IB-ELEMENTS)",
+   "RISK-14": "durability, crash atomicity, file confinement and the interpreter version are outside every probe",
+   "RISK-15": "'0 — success (append …)' names a CLI append no clause specifies",
+   "RISK-16": "'no third-party imports succeed at runtime' reads as an environment property (R-14 item 6 mapped to S-10-a)"
+  },
+  "11_p5_history": {
+   "path": "closure-evidence/v2/cycle2/C2-P5-RUN-HISTORY.json",
+   "sha256": "ba70f860fc1bea8280956b224b51bef8e03979e7502ac7a2cde48c9159f9069d",
+   "attempts": 32,
+   "passed": 32,
+   "failed": [],
+   "sealed_by": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+   "closed_at": {
+    "path": "closure-evidence/v2/cycle2/C2-P5-RUN-HISTORY.json",
+    "total_attempts": 32,
+    "sha256": "ba70f860fc1bea8280956b224b51bef8e03979e7502ac7a2cde48c9159f9069d",
+    "by_commit": {
+     "ec473d1742bb41206d34a72542d7ef0d8a19aa4a": 8,
+     "5c608bf6136390097082e69efdeb396c32112fa2": 8,
+     "0f779956f98f38abf4d4c33c6db4cadd819d8640": 8,
+     "3ac9b8c9f67fcf307ec34009d540e9094cea46bb": 8
+    },
+    "failed": [],
+    "includes_the_accepted_candidate": true,
+    "rule": "closed at this count by this acceptance; the acceptance commit's own attempts open C2-P6-RUN-HISTORY.json; nothing rewritten"
+   }
+  },
+  "12_c2_p6_candidate": {
+   "qp26_gate_candidate_r3": {
+    "commit": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+    "aisef2_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+    "subject_trees": {
+     "validation/v2": "2fd461971dd6c92637d45df3948668ec7de59ccd",
+     "tests/v2": "a7d2fb385721891beabab3ac200b974ad81a221c"
+    },
+    "harness_commit": "bfc4f37d8d04fe193c8867e76a5577366d19d989",
+    "integration": {
+     "path": "closure-evidence/v2/cycle2/C2-INTEGRATION-R2.json",
+     "sha256": "cf4c2e8ef921bb01167a7d6ab49bc4e0f6cb2775d1731ebc6a672e12743757c1"
+    },
+    "orchestration_repair": {
+     "path": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+     "sha256": "065e6c539da02384777cc49ecb160f2a0d7be483fcc321794fcaec71c2c60dde"
+    },
+    "v1_pf_001_decision": {
+     "path": "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1-DECISION.json",
+     "sha256": "56c9cf91dea2c123cb53916dffc9f3603bc6e4d88e8db7ac0f17020f138f2306"
+    },
+    "c2_p5_acceptance": {
+     "path": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+     "sha256": "69c23b49f393276117c957f598f811a91a81e36595d60c7bf9fc0af5f414453d"
+    }
+   },
+   "lineage": [
+    {
+     "attempt": "1",
+     "candidate": "63112544f1146097b69c538d98e09e5a52c547c1",
+     "records": "closure-evidence/v2/cycle2/Q0-Q3",
+     "outcome": "GREEN on five platforms — VALID HISTORICAL QUALIFICATION EVIDENCE, not the gate candidate (owner ruling B, Ruling 2)"
+    },
+    {
+     "attempt": "R2",
+     "candidate": "ac4a6c75b461e409f024965391ce77e7689c0e08",
+     "harness": "9d855a5b66942db0d917b094ea190745cbebf076",
+     "records": "closure-evidence/v2/cycle2/Q0-Q3-R2",
+     "outcome": "FAILED: Windows Q0 48/51 — validation/qualification/v1_pf_001_policy.py repo_path returned the runner's absolute path (PRODUCT, C2-P6 seq 27, 34); Linux 3.11-3.14 GREEN; kept, never overwritten"
+    },
+    {
+     "attempt": "R3",
+     "candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+     "harness": "bfc4f37d8d04fe193c8867e76a5577366d19d989",
+     "records": "closure-evidence/v2/cycle2/Q0-Q3-R3",
+     "outcome": "GREEN on Linux 3.11-3.14 and Windows 3.11 — the gate"
+    }
+   ],
+   "closure": {
+    "path": "closure-evidence/v2/cycle2/C2-P6-CLOSURE.json",
+    "sha256": "62b0d94727ff36f57682e3565dfb958044bfccbf5c29fddf7a5007b914ef3041"
+   },
+   "final_candidate_r4": {
+    "commit": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+    "kernel_tree": "254d8f559b879c210c4936321022f1350c4b2f89"
+   }
+  },
+  "13_16_q0_q3": {
+   "R3_on_37dc0dc": {
+    "summary": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R3/SUMMARY.json",
+     "sha256": "247251e84f0ed2fded57f85d6e69139a770d324e778e4bab4359401ae1d28ecb"
+    },
+    "verdict": "GREEN",
+    "rungs": {
+     "Q0": "GREEN",
+     "Q1": "GREEN",
+     "Q2": "GREEN",
+     "Q3": "GREEN"
+    }
+   },
+   "R4_on_the_final_candidate": {
+    "summary": {
+     "path": "closure-evidence/v2/cycle2/Q0-Q3-R4/SUMMARY.json",
+     "sha256": "f2ca0fcd064b0396224886742483d92a15668fa0a4f94e77e7f82a6759a114d6"
+    },
+    "verdict": "GREEN",
+    "rungs": {
+     "Q0": "GREEN",
+     "Q1": "GREEN",
+     "Q2": "GREEN",
+     "Q3": "GREEN"
+    }
+   }
+  },
+  "17_mutation": {
+   "R3": {
+    "targets": 581,
+    "mutants": 14883,
+    "killed": 14873,
+    "survivors": 10,
+    "unaudited": 0,
+    "killed_by_timeout_named": 39
+   },
+   "R4": {
+    "targets": 620,
+    "mutants": 15578,
+    "killed": 15568,
+    "survivors": 10,
+    "unaudited": 0,
+    "killed_by_timeout_named": 39
+   }
+  },
+  "18_fault_families": {
+   "fault_matrix_rows": 99,
+   "fault_matrix_classes": [
+    "bytecode",
+    "bytecode_cycle2",
+    "clean_failure",
+    "cli_harness",
+    "cli_stream",
+    "cli_subject",
+    "credentials",
+    "disposal_failure",
+    "file_artifact",
+    "interruption",
+    "lease_conflict",
+    "merge_conflict",
+    "plan_contradiction",
+    "post_merge_regression",
+    "process_effect",
+    "provider",
+    "resource_acquisition",
+    "reviewer_security_environment",
+    "sandbox_environment",
+    "signal_provenance",
+    "tool",
+    "unknown_flattening",
+    "verifier_disagreement",
+    "writer_close_failure"
+   ]
+  },
+  "19_23_platforms": {
+   "R3": {
+    "linux-py3.11": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 189,
+      "fail": 0,
+      "not_applicable": 2
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 559,
+      "fail": 0,
+      "not_applicable": 1
+     },
+     "owned_after": 0,
+     "escaped": 0
+    },
+    "linux-py3.12": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 189,
+      "fail": 0,
+      "not_applicable": 2
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 559,
+      "fail": 0,
+      "not_applicable": 1
+     },
+     "owned_after": 0,
+     "escaped": 0
+    },
+    "linux-py3.13": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 189,
+      "fail": 0,
+      "not_applicable": 2
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 559,
+      "fail": 0,
+      "not_applicable": 1
+     },
+     "owned_after": 0,
+     "escaped": 0
+    },
+    "linux-py3.14": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 189,
+      "fail": 0,
+      "not_applicable": 2
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 559,
+      "fail": 0,
+      "not_applicable": 1
+     },
+     "owned_after": 0,
+     "escaped": 0
+    },
+    "windows-py3.11": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 178,
+      "fail": 0,
+      "not_applicable": 13
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 541,
+      "fail": 0,
+      "not_applicable": 19
+     },
+     "owned_after": 0,
+     "escaped": 0
+    }
+   },
+   "R4": {
+    "linux-py3.11": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 189,
+      "fail": 0,
+      "not_applicable": 2
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 559,
+      "fail": 0,
+      "not_applicable": 1
+     },
+     "owned_after": 0,
+     "escaped": 0
+    },
+    "linux-py3.12": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 189,
+      "fail": 0,
+      "not_applicable": 2
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 559,
+      "fail": 0,
+      "not_applicable": 1
+     },
+     "owned_after": 0,
+     "escaped": 0
+    },
+    "linux-py3.13": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 189,
+      "fail": 0,
+      "not_applicable": 2
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 559,
+      "fail": 0,
+      "not_applicable": 1
+     },
+     "owned_after": 0,
+     "escaped": 0
+    },
+    "linux-py3.14": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 189,
+      "fail": 0,
+      "not_applicable": 2
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 559,
+      "fail": 0,
+      "not_applicable": 1
+     },
+     "owned_after": 0,
+     "escaped": 0
+    },
+    "windows-py3.11": {
+     "Q0": {
+      "status": "GREEN",
+      "pass": 52,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q1": {
+      "status": "GREEN",
+      "pass": 396,
+      "fail": 0,
+      "not_applicable": 0
+     },
+     "Q2": {
+      "status": "GREEN",
+      "pass": 178,
+      "fail": 0,
+      "not_applicable": 13
+     },
+     "Q3": {
+      "status": "GREEN",
+      "pass": 541,
+      "fail": 0,
+      "not_applicable": 19
+     },
+     "owned_after": 0,
+     "escaped": 0
+    }
+   }
+  },
+  "24_c2_p7_subject": {
+   "qp27_on_37dc0dc": {
+    "subject": {
+     "path": "closure-evidence/v2/cycle2/Q4/SUBJECT.json",
+     "sha256": "1fb3a9795360575bb4d73904aee47efac596e6617680b7b9b12b0c92dc213d00"
+    },
+    "one_kernel_identity": "1a4309be81e5ecbd76881debdd52eca59f6640ec1e372999ec44ff4d3dcfa45e",
+    "semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+    "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+    "execution_commit": "ac608c1128c0a7b6061277cf9a12c234d86aa545"
+   },
+   "final": {
+    "subject": {
+     "path": "closure-evidence/v2/cycle2/Q4-FINAL/SUBJECT.json",
+     "sha256": "f49e06be1759468a5f23c9e290ac96dea81d644b4cfc7cf0371fc3f7d84f9c80"
+    },
+    "one_kernel_identity": "647935e1835990c274984515f8edb71fab139bafd550c74021e692603b05b905",
+    "semantic_candidate": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+    "kernel_tree": "254d8f559b879c210c4936321022f1350c4b2f89",
+    "execution_commit": "849b7e5092b2ecb690ef234939203f0dbe460d97"
+   }
+  },
+  "25_27_q4": {
+   "qp27_on_37dc0dc": {
+    "record": {
+     "path": "closure-evidence/v2/cycle2/Q4/DIFFERENTIAL.json",
+     "sha256": "06fec168ddff676c880743365a50361bd56faf919456112df5398f788abfbf04"
+    },
+    "status": "GREEN",
+    "semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+    "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+    "execution_commit": "ac608c1128c0a7b6061277cf9a12c234d86aa545",
+    "totals": {
+     "MATCHED": 100000,
+     "DIVERGENCE": 0,
+     "INVARIANT_VIOLATION": 0,
+     "EXCEPTION": 0,
+     "SILENT_SKIP": 0,
+     "requested": 100000,
+     "attempted": 100000,
+     "terminal": 100000,
+     "rows": 100000,
+     "events": 5431248,
+     "matched_with_refusal": 0,
+     "prefix_traces": 10000
+    },
+    "unexplained_divergences": 0,
+    "kernel_digest": "8e8f00ca9327599f850088181aa64fa8751d8405a5485d52faccb18fa8ef4d3d",
+    "one_kernel_identity": "1a4309be81e5ecbd76881debdd52eca59f6640ec1e372999ec44ff4d3dcfa45e",
+    "identities": {
+     "identities": [
+      "1a4309be81e5ecbd76881debdd52eca59f6640ec1e372999ec44ff4d3dcfa45e"
+     ],
+     "count": 1,
+     "equal_to_subject": true
+    },
+    "subject": {
+     "path": "closure-evidence/v2/cycle2/Q4/SUBJECT.json",
+     "sha256": "1fb3a9795360575bb4d73904aee47efac596e6617680b7b9b12b0c92dc213d00"
+    },
+    "probe_id_coverage": {
+     "preregistered": 4,
+     "reached": 4,
+     "min_samples": 73364
+    },
+    "zero_sample_categories": {},
+    "calibration": {
+     "all_detected": true,
+     "sha256": "de0f9e8e3e4893688d9e9d1740ea987243face69de6cca79eacaad3ca50a1594",
+     "path": "closure-evidence/v2/cycle2/Q4/CALIBRATION.json"
+    },
+    "lower_rung_bound": [
+     "closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json",
+     "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+     "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json"
+    ]
+   },
+   "final": {
+    "record": {
+     "path": "closure-evidence/v2/cycle2/Q4-FINAL/DIFFERENTIAL.json",
+     "sha256": "09e2e3e865e1614702851200a12d789115e5e76eae36b19164a675e798782801"
+    },
+    "status": "GREEN",
+    "semantic_candidate": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+    "kernel_tree": "254d8f559b879c210c4936321022f1350c4b2f89",
+    "execution_commit": "849b7e5092b2ecb690ef234939203f0dbe460d97",
+    "totals": {
+     "MATCHED": 100000,
+     "DIVERGENCE": 0,
+     "INVARIANT_VIOLATION": 0,
+     "EXCEPTION": 0,
+     "SILENT_SKIP": 0,
+     "requested": 100000,
+     "attempted": 100000,
+     "terminal": 100000,
+     "rows": 100000,
+     "events": 5431248,
+     "matched_with_refusal": 0,
+     "prefix_traces": 10000
+    },
+    "unexplained_divergences": 0,
+    "kernel_digest": "f763b238d9e9c007937b959238feac9d54e6af7d9c1bb707cad1686640526908",
+    "one_kernel_identity": "647935e1835990c274984515f8edb71fab139bafd550c74021e692603b05b905",
+    "identities": {
+     "identities": [
+      "647935e1835990c274984515f8edb71fab139bafd550c74021e692603b05b905"
+     ],
+     "count": 1,
+     "equal_to_subject": true
+    },
+    "subject": {
+     "path": "closure-evidence/v2/cycle2/Q4-FINAL/SUBJECT.json",
+     "sha256": "f49e06be1759468a5f23c9e290ac96dea81d644b4cfc7cf0371fc3f7d84f9c80"
+    },
+    "probe_id_coverage": {
+     "preregistered": 4,
+     "reached": 4,
+     "min_samples": 73364
+    },
+    "zero_sample_categories": {},
+    "calibration": {
+     "all_detected": true,
+     "sha256": "0732c8c25aa25ba9c8baa6a173067e2d4999fbf71f0964481d28e0f1defd75a8",
+     "path": "closure-evidence/v2/cycle2/Q4-FINAL/CALIBRATION.json"
+    },
+    "lower_rung_bound": [
+     "closure-evidence/v2/cycle2/Q0-Q3-R4/SUMMARY.json",
+     "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+     "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json"
+    ]
+   }
+  },
+  "28_30_q5": {
+   "qp28_on_37dc0dc": {
+    "record": {
+     "path": "closure-evidence/v2/cycle2/Q5/REPRODUCTION.json",
+     "sha256": "84396d361649eafdb7b7561526b920756109989976d38faaea67776a437b85f7"
+    },
+    "status": "GREEN",
+    "semantic_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+    "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+    "corpus_digest": "614c81687a213c4fef16644fde4c24fb0c16b0a69ad935337a837e5790754924",
+    "replay_digest": "aa9e5ff8a43c2ef63702a16fcd1ffd515484ede1bea4cd531dc8199939bf964b",
+    "one_identity": "7497b610455cf4ca938499dbd296375d482561e2a69c98b2e86207fe34630608",
+    "items": 12,
+    "green": 12,
+    "assert_consumed": true,
+    "model_calls": {
+     "expected": 31,
+     "consumed": 31,
+     "missing": 0,
+     "extra": 0,
+     "request_hash_mismatches": 0
+    },
+    "only_model_stream_replayed": true,
+    "replay_mechanism": "validation/qualification/q5.py ModelStream (developer and reviewer answers only; git, probes, tests, scanner, merge execute again)",
+    "re_execution": {
+     "tool_executions": 12,
+     "tool_result_replays": 0,
+     "subprocess_executions": 180,
+     "socket_attempts": 0
+    },
+    "calibration_all_rejected": true
+   },
+   "final": {
+    "record": {
+     "path": "closure-evidence/v2/cycle2/Q5-FINAL/REPRODUCTION.json",
+     "sha256": "a5875285af8782b99f4fed42309467826086c12c4a05d4b83940479640b93186"
+    },
+    "status": "GREEN",
+    "semantic_candidate": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+    "kernel_tree": "254d8f559b879c210c4936321022f1350c4b2f89",
+    "corpus_digest": "6db3eada611e6173b412b79cbf29e7daf58eccd4a7436a5ebda3dd10141c686e",
+    "replay_digest": "aa9e5ff8a43c2ef63702a16fcd1ffd515484ede1bea4cd531dc8199939bf964b",
+    "one_identity": "bb3fc1b899b71ea28c0d248f2688a2087fce589fae6a6ecc6ed5b81ddadb925d",
+    "items": 12,
+    "green": 12,
+    "assert_consumed": true,
+    "model_calls": {
+     "expected": 31,
+     "consumed": 31,
+     "missing": 0,
+     "extra": 0,
+     "request_hash_mismatches": 0
+    },
+    "only_model_stream_replayed": true,
+    "replay_mechanism": "validation/qualification/q5.py ModelStream (developer and reviewer answers only; git, probes, tests, scanner, merge execute again)",
+    "re_execution": {
+     "tool_executions": 12,
+     "tool_result_replays": 0,
+     "subprocess_executions": 180,
+     "socket_attempts": 0
+    },
+    "calibration_all_rejected": true
+   }
+  },
+  "31_ledgerlock_candidate_profile": {
+   "record": {
+    "path": "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json",
+    "sha256": "b4ad12f52a061d6a1726304416f3809eed7c065a1c962201a341a079bb8f2ff7"
+   },
+   "execution_commit": "1f992baa55c28caf8be0c059aa081806bc931b1b",
+   "kernel_tree": "37bf6457f350dd720a2214f04f3896c554ad0904",
+   "plan": {
+    "id": "LEDGERLOCK-PLAN-V2.2-PROPOSAL",
+    "plan_hash": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+    "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+    "stories": 9,
+    "obligations": 67,
+    "execution_order": [
+     "STORY-01-01",
+     "STORY-01-05",
+     "STORY-02-01",
+     "STORY-02-02",
+     "STORY-03-01",
+     "STORY-04-01",
+     "STORY-04-02",
+     "STORY-05-01",
+     "STORY-05-03"
+    ],
+    "replanned": false,
+    "stories_split": false
+   },
+   "profile": {
+    "source": "p10.runspec_for (Cycle-1 P10 profile): OpenCode developer and reviewer on the declared route, ruff scanner, P10 limits",
+    "runspec_hash": "4278bd29f717ea047cad14c77b5df88d8850932c737c99d6b1e23d7138eb4c39",
+    "aggregate_min_grade": "OPAQUE",
+    "limits": {
+     "DEVELOPER": 1,
+     "PLAN": 0,
+     "ENVIRONMENT": 1,
+     "PROVIDER": 1,
+     "INTEGRATION": 0,
+     "REVIEW": 1,
+     "SECURITY": 1
+    },
+    "grade_note": "the route is a routing alias: OPAQUE, which bars sealing and nothing else here; no model identity is inferred from it"
+   },
+   "attempts": [
+    {
+     "path": "closure-evidence/v2/cycle2/P10/NO-RECORD.json",
+     "sha256": "98677079fd68c2f21d5d259fba7041c65fde62d4f0c1896396c1482d4fbe529e"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json",
+     "sha256": "b4ad12f52a061d6a1726304416f3809eed7c065a1c962201a341a079bb8f2ff7"
+    }
+   ],
+   "story_account": {
+    "path": "closure-evidence/v2/cycle2/P10/attempt-2/STORY-ACCOUNT.json",
+    "sha256": "7a8da855af5ecad8686a93dececc5d1240fba7281e0508e56c3737aa9c03e0e6"
+   }
+  },
+  "32_delivery_verdict": {
+   "verdict": "FAIL",
+   "story_outcomes": {
+    "STORY-01-01": [
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-01-05": [
+     "RETRY",
+     "COMMIT"
+    ],
+    "STORY-02-01": [
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-02-02": [
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-03-01": [
+     "COMMIT"
+    ],
+    "STORY-04-01": [
+     "ROLLBACK"
+    ],
+    "STORY-04-02": [
+     "RETRY",
+     "COMMIT"
+    ],
+    "STORY-05-01": [
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-05-03": [
+     "ROLLBACK"
+    ]
+   },
+   "productproof": {
+    "total": 67,
+    "with_a_verified_proof": 43,
+    "satisfied_at_last_proof": 41,
+    "delivered_in_committed_stories": 35
+   },
+   "requirements": {
+    "covered_by_productproof": [
+     "R-10",
+     "R-12",
+     "R-13",
+     "R-3.1",
+     "R-3.2",
+     "R-3.3",
+     "R-3.4",
+     "R-4.2",
+     "R-4.3",
+     "R-4.4",
+     "R-4.5",
+     "R-5",
+     "R-6",
+     "R-7",
+     "R-9"
+    ],
+    "unsupported": {
+     "clauses": [
+      "R-3.2/2",
+      "R-3.2/4",
+      "R-3.3/3",
+      "R-4.2/2",
+      "R-4.3/3",
+      "R-4.4/3",
+      "R-5/0",
+      "R-5/1",
+      "R-5/2",
+      "R-5/4",
+      "R-6/3",
+      "R-6/4",
+      "R-7/2",
+      "R-8/1",
+      "R-9/4",
+      "R-12/2"
+     ],
+     "rule": "remain UNSUPPORTED_FOR_FULL_ENFORCEMENT; never counted as passes"
+    },
+    "engineering_test_only": [
+     "R-10/3",
+     "R-10/4",
+     "R-11/1",
+     "R-13/3"
+    ],
+    "classes": {
+     "DESCRIPTIVE": 4,
+     "NORMATIVE_PRODUCT_REQUIREMENT": 30,
+     "UNSUPPORTED_FOR_FULL_ENFORCEMENT": 16,
+     "ENGINEERING_TEST_REQUIREMENT": 4
+    }
+   }
+  },
+  "33_plan_quality_verdict": "NOT_CLAIMED",
+  "34_raw_plan_quality_metrics": {
+   "introduce_obligations": 57,
+   "pre_satisfied_introduce": 16,
+   "pre_satisfied_introduce_ratio": 0.2807017543859649,
+   "fully_pre_satisfied_stories": 2,
+   "fully_pre_satisfied_story_ids": [
+    "STORY-02-01",
+    "STORY-02-02"
+   ],
+   "unattributed_plan_drift": 17,
+   "attributed_plan_drift": 0,
+   "delivery_complete_stories": [
+    "STORY-01-05",
+    "STORY-03-01",
+    "STORY-04-02"
+   ],
+   "failed_stories": [
+    "STORY-01-01",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-04-01",
+    "STORY-05-01",
+    "STORY-05-03"
+   ],
+   "retries": {
+    "STORY-01-01": 1,
+    "STORY-01-05": 1,
+    "STORY-02-01": 1,
+    "STORY-02-02": 1,
+    "STORY-04-02": 1,
+    "STORY-05-01": 1
+   },
+   "provider_requests_by_budget": {
+    "DEVELOPER": 9,
+    "REVIEW": 3
+   },
+   "note": "observations of the journal; without preregistered thresholds they produce no plan-quality PASS/FAIL"
+  },
+  "35_generalization": "NONE",
+  "36_classification": "DEVELOPMENT_REGRESSION",
+  "37_cohort_lifecycle": {
+   "record": {
+    "path": "closure-evidence/v2/cycle2/P10-COHORT-MACHINERY.json",
+    "sha256": "72e21dffaa3c6fd401344b01d65b7c15a78488451b481cc0c45322044d33e561"
+   },
+   "verdict": "machinery qualified; cohort count = 0",
+   "machinery": {
+    "states": [
+     "SEALED",
+     "EVALUATING",
+     "EXPOSED",
+     "DEVELOPMENT"
+    ],
+    "one_way": {
+     "SEALED": "EVALUATING",
+     "EVALUATING": "EXPOSED",
+     "EXPOSED": "DEVELOPMENT"
+    },
+    "terminal": "DEVELOPMENT",
+    "refusals": [
+     "PREREGISTRATION_INVALID",
+     "OPAQUE_PROFILE",
+     "DEVELOPMENT_REGRESSION",
+     "WORKLOAD_DEMOTED",
+     "WORKLOAD_OBSERVED",
+     "WORKLOAD_ALREADY_SEALED",
+     "PREREGISTRATION_REUSED",
+     "COHORT_INCONSISTENT",
+     "NOT_FORWARD",
+     "NOT_EVALUATING",
+     "PREREGISTRATION_STALE",
+     "RUN_DUPLICATE",
+     "RUNS_COMPLETE",
+     "GENERALIZATION_REFUSED"
+    ],
+    "preregistration_schema": "aisef2.cohort.preregistration/1",
+    "frozen_inputs": [
+     "kernel",
+     "workload",
+     "requirements",
+     "plan_policy",
+     "execution_profile",
+     "prompts",
+     "model_route",
+     "run_count",
+     "thresholds",
+     "oracle",
+     "metrics",
+     "plan_quality_policy"
+    ],
+    "workload_identity": [
+     "requirements_sha256",
+     "plan_baseline",
+     "plan_hash"
+    ],
+    "min_workloads_for_generalization": 2,
+    "results_read_at": "the caller's timestamp; the machine reads no clock",
+    "event_vocabulary": "none: CohortState and Refusal live in aisef2/cohort and are carried in no event (F1 unchanged); no existing aisef2 file was edited"
+   },
+   "positive": {
+    "lifecycle_one_way": {
+     "path": [
+      "SEALED",
+      "EVALUATING",
+      "EXPOSED",
+      "DEVELOPMENT"
+     ],
+     "non_successor_moves_refused": 17,
+     "non_successor_moves": 17
+    },
+    "repetitions_never_demote": {
+     "runs_recorded": 3,
+     "state": "EVALUATING",
+     "exposed_reason": null
+    },
+    "generalization_statement_shape": {
+     "note": "two synthetic in-memory cohorts: the statement states the sample size per workload and in total; this is a check of the machinery, not a claim",
+     "fields": [
+      "sample_size_total",
+      "workload_count",
+      "workloads"
+     ],
+     "per_workload": [
+      3,
+      2
+     ],
+     "sample_size_total": 5
+    }
+   },
+   "tests": {
+    "module": "tests.v2.test_c2_p10_cohort",
+    "tests_run": 34,
+    "result": "OK"
+   },
+   "mutation": {
+    "record": "closure-evidence/v2/cycle2/P10-MUTATION.json",
+    "sha256": "b1ec64eee650dca2329a32faa2f26597b300ab75e9a085620d449f18bf3f72dc",
+    "targets": 39,
+    "mutants": 695,
+    "killed": 695,
+    "survivors": 0,
+    "killed_by_timeout": 0,
+    "problems": []
+   }
+  },
+  "38_cohort_adversarial": [
+   {
+    "id": "COH-ADV-1",
+    "case": "a DEVELOPMENT workload cannot seal (a fresh preregistration of a workload whose cohort is DEVELOPMENT)",
+    "expected": "REFUSED WORKLOAD_DEMOTED",
+    "observed": "REFUSED WORKLOAD_DEMOTED: C-1 is DEVELOPMENT: its workload never seals again",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-2",
+    "case": "DEVELOPMENT -> SEALED",
+    "expected": "REFUSED NOT_FORWARD",
+    "observed": "REFUSED NOT_FORWARD: DEVELOPMENT -> SEALED: one way, one step at a time",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-3",
+    "case": "DEVELOPMENT -> HOLDOUT (a holdout is a sealed cohort by another name)",
+    "expected": "REFUSED NOT_FORWARD",
+    "observed": "REFUSED NOT_FORWARD: DEVELOPMENT -> HOLDOUT: one way, one step at a time",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-4",
+    "case": "a frozen-input change after results_read_at demotes",
+    "expected": "EXPOSED",
+    "observed": "EXPOSED: frozen inputs changed after results were read at 20.0: execution_profile",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-5",
+    "case": "a frozen-input change during EVALUATING, results unread, invalidates the completed runs",
+    "expected": "EVALUATING",
+    "observed": "EVALUATING: invalidated ['r1', 'r2'], stale ['prompts']",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-6",
+    "case": "after it, the cohort requires a fresh preregistration",
+    "expected": "REFUSED PREREGISTRATION_STALE",
+    "observed": "REFUSED PREREGISTRATION_STALE: prompts changed: a fresh preregistration is required",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-7",
+    "case": "an OPAQUE aggregate (aggregate_min_grade OPAQUE) bars sealing",
+    "expected": "REFUSED OPAQUE_PROFILE",
+    "observed": "REFUSED OPAQUE_PROFILE: an OPAQUE aggregate_min_grade never seals (RFC §28 rule 5)",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-8",
+    "case": "LedgerLock, by its full frozen identity, under a fresh name",
+    "expected": "REFUSED DEVELOPMENT_REGRESSION",
+    "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same requirements_sha256, plan_baseline, plan_hash",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-9",
+    "case": "LedgerLock by its requirements sha256 alone",
+    "expected": "REFUSED DEVELOPMENT_REGRESSION",
+    "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same requirements_sha256",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-10",
+    "case": "LedgerLock by its plan baseline alone",
+    "expected": "REFUSED DEVELOPMENT_REGRESSION",
+    "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same plan_baseline",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-11",
+    "case": "LedgerLock by its plan hash alone",
+    "expected": "REFUSED DEVELOPMENT_REGRESSION",
+    "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same plan_hash",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-12",
+    "case": "LedgerLock constructed directly as a SEALED cohort (no path skips the bar)",
+    "expected": "REFUSED DEVELOPMENT_REGRESSION",
+    "observed": "REFUSED DEVELOPMENT_REGRESSION: LedgerLock is a development / regression benchmark permanently (RFC §30); same requirements_sha256, plan_baseline, plan_hash",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-13",
+    "case": "a generalization from one sealed workload",
+    "expected": "REFUSED GENERALIZATION_REFUSED",
+    "observed": "REFUSED GENERALIZATION_REFUSED: 1 sealed workload(s); a generalization requires at least 2",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-14",
+    "case": "a generalization from two cohorts of one workload (same plan hash)",
+    "expected": "REFUSED GENERALIZATION_REFUSED",
+    "observed": "REFUSED GENERALIZATION_REFUSED: C-4 and C-5 are one workload (same plan_hash)",
+    "holds": true
+   },
+   {
+    "id": "COH-ADV-15",
+    "case": "a generalization resting on an EXPOSED cohort",
+    "expected": "REFUSED GENERALIZATION_REFUSED",
+    "observed": "REFUSED GENERALIZATION_REFUSED: C-2 is not a completed sealed evaluation",
+    "holds": true
+   }
+  ],
+  "39_cohort_count": {
+   "scope": "every *.json and *.jsonl file of the tree, tracked or untracked and not ignored; any object at any depth whose schema is aisef2.cohort.preregistration/1 (every persisted preregistration or cohort carries one)",
+   "cohort_records": [],
+   "cohort_count": 0,
+   "statement": "No cohort record exists anywhere in the tree: no preregistration and no evaluation cohort. closure-evidence/cohorts/ (C-1, C-1b, C-2) is frozen V1 model-pair bench evidence that predates RFC §28, and closure-evidence/v2/P10/LEDGERLOCK-REGRESSION.json is the Cycle-1 regression record (cohort_state DEVELOPMENT, generalization_claim NONE); neither is an evaluation cohort, and neither was touched."
+  },
+  "40_profile_freeze": {
+   "record": {
+    "path": "closure-evidence/v2/cycle2/P10-PROFILE-FREEZE.json",
+    "sha256": "90526a282093d3a8ba1499c3e1d43bfab649f245350739fff4d0d345b56d89de"
+   },
+   "verdict": "attestation qualified",
+   "live_provider_calls": 0,
+   "per_run": {
+    "repeat_preflight_same_deployment": "ATTESTED",
+    "deployment_changed": "REFUSED DRIFT: fixture/fixture-model-1: fingerprint 61f2c0f9af6e is not the frozen 2914c8611b5b",
+    "alias_route": "REFUSED OPAQUE: fixture/fixture-alias: SERVED_OTHER_MODEL"
+   }
+  },
+  "41_attested_fixed_model": [
+   {
+    "id": "FIX-FIXED",
+    "source": "fixture provider, measured",
+    "route": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "provider": "fixture",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "model": "fixture-model-1"
+    },
+    "measurement": {
+     "listing": {
+      "id": "fixture-model-1",
+      "owned_by": "fixture"
+     },
+     "calls": [
+      {
+       "served_model": "fixture-model-1",
+       "deployment": "fp_fixture_1",
+       "finish_reason": "length"
+      },
+      {
+       "served_model": "fixture-model-1",
+       "deployment": "fp_fixture_1",
+       "finish_reason": "length"
+      },
+      {
+       "served_model": "fixture-model-1",
+       "deployment": "fp_fixture_1",
+       "finish_reason": "length"
+      }
+     ]
+    },
+    "grade": "ATTESTED",
+    "reasons": [],
+    "capability": {
+     "name": "model",
+     "grade": "ATTESTED",
+     "enforcement": "PARTIAL",
+     "binding": {
+      "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+      "declared_model": "fixture-model-1",
+      "deployment": "fp_fixture_1",
+      "endpoint": "fixture-provider (127.0.0.1 stub)",
+      "fingerprint": "2914c8611b5bb156f0001cdd1c7491e6c804d0447d197af1da4c61a1455fb8d7",
+      "provider": "fixture",
+      "route": "fixture/fixture-model-1"
+     },
+     "identity": "059ad8603bc30c0307be468928720ba0806a621c93e0128a86be05b4f9960bbc"
+    }
+   }
+  ],
+  "42_opaque_alias": [
+   {
+    "id": "FIX-COMBO",
+    "source": "fixture provider, measured",
+    "grade": "OPAQUE",
+    "reasons": [
+     "LISTED_AS_ALIAS",
+     "SERVED_OTHER_MODEL",
+     "UNSTABLE"
+    ],
+    "route": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "provider": "fixture",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "model": "fixture-combo"
+    }
+   },
+   {
+    "id": "FIX-ALIAS",
+    "source": "fixture provider, measured",
+    "grade": "OPAQUE",
+    "reasons": [
+     "SERVED_OTHER_MODEL"
+    ],
+    "route": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "provider": "fixture",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "model": "fixture-alias"
+    }
+   },
+   {
+    "id": "FIX-ROTATING",
+    "source": "fixture provider, measured",
+    "grade": "OPAQUE",
+    "reasons": [
+     "UNSTABLE"
+    ],
+    "route": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "provider": "fixture",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "model": "fixture-rotating"
+    }
+   },
+   {
+    "id": "FIX-UNLISTED",
+    "source": "fixture provider, measured",
+    "grade": "OPAQUE",
+    "reasons": [
+     "NOT_LISTED"
+    ],
+    "route": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "provider": "fixture",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "model": "fixture-unlisted"
+    }
+   },
+   {
+    "id": "FIX-UNMEASURED",
+    "source": "fixture route, configuration only (no preflight)",
+    "grade": "OPAQUE",
+    "reasons": [
+     "UNMEASURED"
+    ],
+    "route": {
+     "client": "aisef-preflight (validation/v2/profile_freeze.py)",
+     "provider": "fixture",
+     "endpoint": "fixture-provider (127.0.0.1 stub)",
+     "model": "fixture-model-1"
+    }
+   },
+   {
+    "id": "DEV-DESIGNER",
+    "source": "configured development profile (closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json), configuration only: no live preflight",
+    "grade": "OPAQUE",
+    "reasons": [
+     "UNMEASURED"
+    ],
+    "route": {
+     "client": "opencode",
+     "provider": "9router",
+     "endpoint": "9router",
+     "model": "mycombo"
+    }
+   },
+   {
+    "id": "DEV-DESIGNER-RECORDED",
+    "source": "the same route against the router facts recorded on 2026-09-18 (closure-evidence/hardening/w1/profiles/ROUTE-RESOLUTION-2026-09-18.json); recorded, not re-measured",
+    "grade": "OPAQUE",
+    "reasons": [
+     "LISTED_AS_ALIAS",
+     "SERVED_OTHER_MODEL"
+    ],
+    "route": {
+     "client": "opencode",
+     "provider": "9router",
+     "endpoint": "9router",
+     "model": "mycombo"
+    }
+   },
+   {
+    "id": "DEV-DEVELOPER",
+    "source": "configured development profile (closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json), configuration only: no live preflight",
+    "grade": "OPAQUE",
+    "reasons": [
+     "UNMEASURED"
+    ],
+    "route": {
+     "client": "opencode",
+     "provider": "9router",
+     "endpoint": "9router",
+     "model": "mycombo"
+    }
+   },
+   {
+    "id": "DEV-DEVELOPER-RECORDED",
+    "source": "the same route against the router facts recorded on 2026-09-18 (closure-evidence/hardening/w1/profiles/ROUTE-RESOLUTION-2026-09-18.json); recorded, not re-measured",
+    "grade": "OPAQUE",
+    "reasons": [
+     "LISTED_AS_ALIAS",
+     "SERVED_OTHER_MODEL"
+    ],
+    "route": {
+     "client": "opencode",
+     "provider": "9router",
+     "endpoint": "9router",
+     "model": "mycombo"
+    }
+   },
+   {
+    "id": "DEV-REVIEWER",
+    "source": "configured development profile (closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json), configuration only: no live preflight",
+    "grade": "OPAQUE",
+    "reasons": [
+     "UNMEASURED"
+    ],
+    "route": {
+     "client": "opencode",
+     "provider": "9router",
+     "endpoint": "9router",
+     "model": "mycombo"
+    }
+   },
+   {
+    "id": "DEV-REVIEWER-RECORDED",
+    "source": "the same route against the router facts recorded on 2026-09-18 (closure-evidence/hardening/w1/profiles/ROUTE-RESOLUTION-2026-09-18.json); recorded, not re-measured",
+    "grade": "OPAQUE",
+    "reasons": [
+     "LISTED_AS_ALIAS",
+     "SERVED_OTHER_MODEL"
+    ],
+    "route": {
+     "client": "opencode",
+     "provider": "9router",
+     "endpoint": "9router",
+     "model": "mycombo"
+    }
+   },
+   {
+    "id": "DEV-SECURITY",
+    "source": "configured development profile (closure-evidence/hardening/w1/profiles/PROFILE-W1-OC-MYCOMBO-T40.json), configuration only: no live preflight",
+    "grade": "OPAQUE",
+    "reasons": [
+     "UNMEASURED"
+    ],
+    "route": {
+     "client": "opencode",
+     "provider": "9router",
+     "endpoint": "9router",
+     "model": "mycombo"
+    }
+   },
+   {
+    "id": "DEV-SECURITY-RECORDED",
+    "source": "the same route against the router facts recorded on 2026-09-18 (closure-evidence/hardening/w1/profiles/ROUTE-RESOLUTION-2026-09-18.json); recorded, not re-measured",
+    "grade": "OPAQUE",
+    "reasons": [
+     "LISTED_AS_ALIAS",
+     "SERVED_OTHER_MODEL"
+    ],
+    "route": {
+     "client": "opencode",
+     "provider": "9router",
+     "endpoint": "9router",
+     "model": "mycombo"
+    }
+   }
+  ],
+  "43_topology": {
+   "LANE-R": "main worktree, ade198e",
+   "LANE-O": "worktree .claude/worktrees/lane-o-orchestration, branch c2/lane-o-orchestration, cacaa6b",
+   "integration_1": "6368ae5 -> ac4a6c7 (R2, failed on Windows) -> 37dc0dc (R3, GREEN; C2-P6 closed at 9bd16fa)",
+   "LANE-Q": "main worktree, branch hardening/systematic-v1: Q4 74dffbc, Q5 fbde1d9, QP-2.9 attempt 1 1f992ba, attempt 2 266e4e2",
+   "LANE-X": "worktree .claude/worktrees/lane-x-p10, branch c2/lane-x-p10, base 9bd16fa, head 6353aa8",
+   "final_integration": "worktree .claude/worktrees/c2-final-int, branch c2/final-integration: candidate c11615a, R4 53408cb; merged to the main branch at 849b7e5"
+  },
+  "44_final_integration_candidate": {
+   "commit": "c11615aeb1dd9e6ff992b6190f8c39a272636742",
+   "kernel_tree": "254d8f559b879c210c4936321022f1350c4b2f89",
+   "head_when_written": "236b440ff0b3d9811a602c9c61b3b3c769a5a819",
+   "record": {
+    "path": "closure-evidence/v2/cycle2/C2-FINAL-INTEGRATION.json",
+    "sha256": "e214beb333f4baf7957d970ed8303f9af48234b96b99bd13d81e97744bdfa85a"
+   }
+  },
+  "45_identity_impact": {
+   "changed_trees": [
+    "aisef2",
+    "tests/v2",
+    "validation/v2"
+   ],
+   "kernel_change": {
+    "since": "37dc0dcdf819387b65ee60cf614273df94aaef31",
+    "added": [
+     "aisef2/cohort/__init__.py",
+     "aisef2/cohort/lifecycle.py",
+     "aisef2/cohort/preregistration.py"
+    ],
+    "changed_or_removed_outside_the_new_package": [],
+    "importers_outside_the_new_package": [],
+    "every_earlier_kernel_file_byte_identical": true,
+    "unreachable_from_existing_kernel_code": true
+   },
+   "per_rung": {
+    "QP-2.6 (Q0-Q3)": {
+     "consumes": "the aisef2, validation/v2 and tests/v2 trees (common.SUBJECT_TREES, KERNEL_TREE)",
+     "changed": true,
+     "action": "RERUN in full on the final candidate (R4)"
+    },
+    "QP-2.7 (Q4)": {
+     "consumes": "the kernel digest over every aisef2 file, the reference, the generator, the harness",
+     "changed": true,
+     "action": "RERUN fresh on the final candidate"
+    },
+    "QP-2.8 (Q5)": {
+     "consumes": "one identity over the kernel digest, the corpus, the harness, F1/F9",
+     "changed": true,
+     "action": "RERUN (corpus recorded, calibrated and reproduced) on the final candidate"
+    },
+    "QP-2.9 (LedgerLock)": {
+     "consumes": "the code its run executes: story_runner and everything it imports, the probes, the compiler, the runtime; the plan, the specs and the profile",
+     "changed": false,
+     "action": "NOT RERUN: every kernel file its run could import is byte-identical to the QP-2.6 candidate's and nothing outside aisef2/cohort imports the new package, so no executed path changed; its evidence stays bound to kernel 37bf6457"
+    },
+    "C2-P10 (WP-2.10.1, WP-2.10.2)": {
+     "consumes": "the aisef2 tree it was built on",
+     "changed": false,
+     "action": "its records re-checked here"
+    }
+   }
+  },
+  "46_reruns": {
+   "QP-2.6": "R4 on the final candidate, GREEN",
+   "Q4": "Q4-FINAL, fresh 100k",
+   "Q5": "Q5-FINAL, corpus recorded and reproduced",
+   "QP-2.9": "not rerun (no executed path changed)",
+   "binding_corrigendum": {
+    "path": "closure-evidence/v2/cycle2/C2-P7-P8-BINDING-CORRIGENDUM-1.json",
+    "sha256": "1d529d4dad5c1f5e7faaaf9a89c0a999cef9e0779cc5310716b3f07c11808acd"
+   }
+  },
+  "47_51_guards": {
+   "cycle2_baseline": {
+    "command": "python -P validation/v2/cycle2_baseline.py --check",
+    "exit": 0,
+    "tail": [
+     "cycle-2 baseline guard: PASS"
+    ]
+   },
+   "checker_calibration": {
+    "command": "python -P validation/v2/checker_calibration.py --check",
+    "exit": 0,
+    "tail": [
+     "calibrated 51/51; always-PASS mutants rejected 51/51"
+    ]
+   },
+   "f1_f11": {
+    "command": "python -P validation/v2/freeze_conformance.py --check",
+    "exit": 0,
+    "tail": [
+     "summary {'PASS': 11, 'PENDING': 0, 'FAIL': 0} | ratchet violations 0"
+    ]
+   },
+   "v1_guard": {
+    "command": "python -P validation/v2/v1_evidence_guard.py --check",
+    "exit": 0,
+    "tail": [
+     "V1 evidence guard (DETECTIVE): PASS"
+    ]
+   },
+   "run_history": {
+    "command": "python -P validation/v2/run_history.py check",
+    "exit": 0,
+    "tail": [
+     "run history: PASS"
+    ]
+   },
+   "mutation": {
+    "command": "python -P validation/v2/mutation.py --check",
+    "exit": 0,
+    "tail": [
+     "mutation: PASS"
+    ]
+   },
+   "orchestration_repair_record": {
+    "command": "python -P validation/qualification/c2_orchestration_repair.py --check",
+    "exit": 0,
+    "tail": [
+     "c2 orchestration repair: PASS"
+    ]
+   },
+   "v1_pf_001_policy": {
+    "command": "python -P validation/qualification/v1_pf_001_policy.py --check",
+    "exit": 0,
+    "tail": [
+     "decision RECORD_ONLY []; calibration all held True: known_recurrence_before_WP_4_2=STOP, exact_known_recurrence_after_WP_4_2_in_frozen_V1=RECORD_ONLY, same_signature_in_the_aisef2_process_path=STOP, known_frame_reached_through_the_aisef2_path=STOP, unknown_windows_process_cleanup_failure=STOP, changed_v1_tree_at_the_attempt=STOP, changed_v1_tree_being_checked=STOP, missing_replacement_evidence=STOP, missing_v2_range_qualification_binding=STOP, v2_range_qualification_not_green=STOP, cycle1_evidence_changed=STOP, a_second_failing_test_without_the_signature=STOP, a_v2_test=STOP, untyped_facts=STOP, policy_without_the_amendment=STOP, another_run_and_commit_same_facts=RECORD_ONLY"
+    ]
+   },
+   "c2_p10_cohort": {
+    "command": "python -P validation/qualification/c2_p10_cohort.py --check",
+    "exit": 0,
+    "tail": [
+     "c2_p10_cohort: PASS"
+    ]
+   },
+   "c2_p10_profile": {
+    "command": "python -P validation/qualification/c2_p10_profile.py --check",
+    "exit": 0,
+    "tail": [
+     "c2_p10_profile: PASS"
+    ]
+   }
+  },
+  "51_cycle1_drift": {
+   "probe_id": "probe.python_callable",
+   "catalog_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "module_digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "active": false,
+   "active_for_kind": "probe.python_callable_v2",
+   "frozen": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+   "ok": true
+  },
+  "52_probes": {
+   "probe.python_callable": {
+    "digest": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+    "kind": "python_callable",
+    "active": false
+   },
+   "probe.file_artifact": {
+    "digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "kind": "file_artifact",
+    "active": true
+   },
+   "probe.python_callable_v2": {
+    "digest": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+    "kind": "python_callable",
+    "active": true
+   },
+   "probe.cli_invocation": {
+    "digest": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+    "kind": "cli_invocation",
+    "active": true
+   },
+   "probe.process_effect": {
+    "digest": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23",
+    "kind": "process_effect",
+    "active": true
+   }
+  },
+  "53_histories": {
+   "C2-P0": {
+    "path": "closure-evidence/v2/cycle2/C2-P0-RUN-HISTORY.json",
+    "sha256": "737df06b4f4d216adda42f3a054bf4d5b0f224768a5fe81ec12d2b7255db5d6d",
+    "attempts": 82,
+    "passed": 76,
+    "failed": [
+     {
+      "seq": 9,
+      "commit": "fb641aa",
+      "where": "local",
+      "job": "gate (full suite in the owned range)",
+      "classification": "HARNESS",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 18,
+      "commit": "05e7b9b",
+      "where": "local",
+      "job": "gate (full suite in the owned range)",
+      "classification": "HARNESS",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 21,
+      "commit": "fe9260b",
+      "where": "ci",
+      "job": "unit (windows-latest, 3.11)",
+      "classification": "HARNESS",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 49,
+      "commit": "b07dbbd",
+      "where": "ci",
+      "job": "unit (windows-latest, 3.11)",
+      "classification": "ENVIRONMENT",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 50,
+      "commit": "b07dbbd",
+      "where": "ci",
+      "job": "unit (windows-latest, 3.11)",
+      "classification": "HARNESS",
+      "known_defect": null,
+      "gate_effect": "DIAGNOSTIC_ONLY"
+     },
+     {
+      "seq": 57,
+      "commit": "002fdb7",
+      "where": "ci",
+      "job": "unit (ubuntu-latest, 3.11)",
+      "classification": "HARNESS",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     }
+    ],
+    "sealed_by": "closure-evidence/v2/cycle2/C2-P0-ACCEPTANCE.json"
+   },
+   "C2-P1": {
+    "path": "closure-evidence/v2/cycle2/C2-P1-RUN-HISTORY.json",
+    "sha256": "c46cec67677233218d4d474dac056af50eae5743060ab02432667372151915a2",
+    "attempts": 15,
+    "passed": 15,
+    "failed": [],
+    "sealed_by": "closure-evidence/v2/cycle2/C2-P1-LANE-CLOSURE.json"
+   },
+   "C2-P2": {
+    "path": "closure-evidence/v2/cycle2/C2-P2-RUN-HISTORY.json",
+    "sha256": "feb09f04e094a49e16b637fb71f087099336c8c190313a0b4fe33e05ba84de73",
+    "attempts": 36,
+    "passed": 28,
+    "failed": [
+     {
+      "seq": 8,
+      "commit": "d986ffc",
+      "where": "ci",
+      "job": "unit (windows-latest, 3.11)",
+      "classification": "PRODUCT",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 11,
+      "commit": "ac3ae16",
+      "where": "ci",
+      "job": "unit (ubuntu-latest, 3.14)",
+      "classification": "DEVELOPER",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 12,
+      "commit": "ac3ae16",
+      "where": "ci",
+      "job": "unit (ubuntu-latest, 3.12)",
+      "classification": "DEVELOPER",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 13,
+      "commit": "ac3ae16",
+      "where": "ci",
+      "job": "unit (ubuntu-latest, 3.13)",
+      "classification": "DEVELOPER",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 14,
+      "commit": "ac3ae16",
+      "where": "ci",
+      "job": "unit (windows-latest, 3.11)",
+      "classification": "PRODUCT",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 15,
+      "commit": "ac3ae16",
+      "where": "ci",
+      "job": "unit (ubuntu-latest, 3.11)",
+      "classification": "DEVELOPER",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 19,
+      "commit": "98b5a04",
+      "where": "ci",
+      "job": "unit (windows-latest, 3.11)",
+      "classification": "PRODUCT",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 26,
+      "commit": "4353c61",
+      "where": "ci",
+      "job": "unit (windows-latest, 3.11)",
+      "classification": "PRODUCT",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     }
+    ],
+    "sealed_by": "closure-evidence/v2/cycle2/C2-P2-LANE-CLOSURE.json"
+   },
+   "C2-P3": {
+    "path": "closure-evidence/v2/cycle2/C2-P3-RUN-HISTORY.json",
+    "sha256": "225d51fa062661e6f55c9010144857a50c7f33c3001dbda8622ec706e370557c",
+    "attempts": 15,
+    "passed": 15,
+    "failed": [],
+    "sealed_by": "closure-evidence/v2/cycle2/C2-P3-LANE-CLOSURE.json"
+   },
+   "C2-P4": {
+    "path": "closure-evidence/v2/cycle2/C2-P4-RUN-HISTORY.json",
+    "sha256": "ac2b0b41286dea38aa9ca0d3c670cae596d417d94be5b6dfc92241751aec777f",
+    "attempts": 15,
+    "passed": 15,
+    "failed": [],
+    "sealed_by": "closure-evidence/v2/cycle2/C2-P4-LANE-CLOSURE.json"
+   },
+   "C2-INTEGRATION": {
+    "path": "closure-evidence/v2/cycle2/C2-INTEGRATION-RUN-HISTORY.json",
+    "sha256": "47d03568de2a36d9f65bde07fddcf6dc7ab0f42dd72f873a49af9c56f659a2ed",
+    "attempts": 17,
+    "passed": 16,
+    "failed": [
+     {
+      "seq": 1,
+      "commit": "9735341",
+      "where": "local",
+      "job": "gate (full suite in the owned range)",
+      "classification": "INTEGRATION",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     }
+    ],
+    "sealed_by": "closure-evidence/v2/cycle2/C2-INTEGRATION-CLOSURE.json"
+   },
+   "C2-P5": {
+    "path": "closure-evidence/v2/cycle2/C2-P5-RUN-HISTORY.json",
+    "sha256": "ba70f860fc1bea8280956b224b51bef8e03979e7502ac7a2cde48c9159f9069d",
+    "attempts": 32,
+    "passed": 32,
+    "failed": [],
+    "sealed_by": "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json"
+   },
+   "C2-P6": {
+    "path": "closure-evidence/v2/cycle2/C2-P6-RUN-HISTORY.json",
+    "sha256": "1ecf3d689c973914969247f4589cf535ffcc2ce3029412ce9ff18c2457219d3b",
+    "attempts": 47,
+    "passed": 43,
+    "failed": [
+     {
+      "seq": 6,
+      "commit": "a76177e",
+      "where": "ci",
+      "job": "unit (windows-latest, 3.11)",
+      "classification": "PRODUCT",
+      "known_defect": "V1-PF-001",
+      "gate_effect": "STOP"
+     },
+     {
+      "seq": 27,
+      "commit": "9d855a5",
+      "where": "ci",
+      "job": "unit (windows-latest, 3.11)",
+      "classification": "PRODUCT",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 34,
+      "commit": "9d855a5",
+      "where": "ci",
+      "job": "qualification: qualify (windows-latest, 3.11)",
+      "classification": "PRODUCT",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 39,
+      "commit": "bfc4f37",
+      "where": "ci",
+      "job": "unit (ubuntu-latest, 3.13)",
+      "classification": "HARNESS",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     }
+    ],
+    "sealed_by": "closure-evidence/v2/cycle2/C2-P6-CLOSURE.json"
+   },
+   "C2-P7": {
+    "path": "closure-evidence/v2/cycle2/C2-P7-RUN-HISTORY.json",
+    "sha256": "ad626966c3f0f50d3a58dc72282aafb5c3e6ca2331144e6586e461ded8c0f823",
+    "attempts": 19,
+    "passed": 19,
+    "failed": [],
+    "sealed_by": null
+   },
+   "C2-P8": {
+    "path": "closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json",
+    "sha256": "30def470984205a61fc764d08fc24de3fefe7df6055c934fa0d5d29e83a06740",
+    "attempts": 3,
+    "passed": 3,
+    "failed": [],
+    "sealed_by": null
+   },
+   "C2-P9": {
+    "path": "closure-evidence/v2/cycle2/C2-P9-RUN-HISTORY.json",
+    "sha256": "93f3a2c9d3bba02d45f4a9775868eeb96b71e3bba9dc8b6a8f1ce692007391ad",
+    "attempts": 2,
+    "passed": 1,
+    "failed": [
+     {
+      "seq": 1,
+      "commit": "0b1f473",
+      "where": "local",
+      "job": "QP-2.9 live run (PLAN-V2.2 through story_runner; owned range)",
+      "classification": "HARNESS",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     }
+    ],
+    "sealed_by": null
+   },
+   "C2-P10": {
+    "path": "closure-evidence/v2/cycle2/C2-P10-RUN-HISTORY.json",
+    "sha256": "ea979f30678853b97655b87c546f08aecfab83475ff0fc5b317b9dbafc0c5e48",
+    "attempts": 2,
+    "passed": 0,
+    "failed": [
+     {
+      "seq": 1,
+      "commit": "8d6ab04",
+      "where": "local",
+      "job": "lane full suite (LANE-X worktree)",
+      "classification": "INTEGRATION",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     },
+     {
+      "seq": 2,
+      "commit": "6353aa8",
+      "where": "local",
+      "job": "lane full suite (LANE-X worktree)",
+      "classification": "INTEGRATION",
+      "known_defect": null,
+      "gate_effect": "COUNTS"
+     }
+    ],
+    "sealed_by": null
+   },
+   "C2-FINAL": {
+    "path": "closure-evidence/v2/cycle2/C2-FINAL-RUN-HISTORY.json",
+    "sha256": "a373b580cd97e21b53a754f0f0c46d6f13724bdc68b212596ca05807c28fec84",
+    "attempts": 27,
+    "passed": 27,
+    "failed": [],
+    "sealed_by": null
+   }
+  },
+  "54_residual_processes": 0,
+  "55_escaped_processes": 0,
+  "56_architecture_exceptions": {
+   "new_in_this_scope": [],
+   "note": "no Architecture Exception was needed or requested after V2-006; the effective RFC lineage ends at V2-006 (Q0 checks it)"
+  },
+  "57_stop_rules": {
+   "triggered_and_reported": [
+    "V1-PF-001 recurrence at a76177e (resolved by owner ruling B: RECORD_ONLY after WP-4.2)",
+    "QP-2.9 preflight: one probe per story (resolved by owner ruling B: C2-ORCHESTRATION-CONFORMANCE-REPAIR)"
+   ],
+   "owner_choices": [
+    "2026-10-01: the narrow C2-P5 kernel-provenance rule"
+   ],
+   "open": []
+  },
+  "58_working_tree": "M closure-evidence/v2/cycle2/V1-PF-001-POLICY-CALIBRATION.json\n M closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1-DECISION.json\n?? closure-evidence/v2/cycle2/C2-FINAL-REPORT.json\n?? closure-evidence/v2/cycle2/C2-FINAL-REPORT.md\n?? validation/qualification/c2_final_report.py",
+  "59_pr_6": {
+   "baseRefName": "master",
+   "headRefName": "hardening/systematic-v1",
+   "headRefOid": "2a389010ac5ee34cfca8d1a729867c03fa04bac0",
+   "isDraft": true,
+   "mergedAt": null,
+   "state": "OPEN"
+  },
+  "60_master": {
+   "origin_master": "671ef9b259c560bf07531bc5fed63b07dc28b323",
+   "expected_prefix": "671ef9b",
+   "unchanged": true
+  },
+  "61_final_statement": [
+   "Cycle-2 engineering and qualification scope is complete.",
+   "LedgerLock remains DEVELOPMENT_REGRESSION.",
+   "No cohort has been selected or sealed.",
+   "No generalization claim has been made.",
+   "PR #6 has not been merged.",
+   "Public V2 release has not been performed.",
+   "The candidate is ready for final Owner closure review."
+  ]
+ },
+ "ruling_b_additions": {
+  "v1_pf_001_policy": {
+   "ruling": {
+    "path": "closure-evidence/v2/cycle2/C2-OWNER-RULING-2026-09-30-B.json",
+    "sha256": "cbd8a7e2d2eb0ab2b68507644e46312ff39fb8fa81cd004583cdc3bf8c335e49"
+   },
+   "amendment": {
+    "path": "closure-evidence/v2/cycle2/V2-RETRY-POLICY-AMENDMENT-1.json",
+    "sha256": "3f3fd17ae5839583f07bda0683a18149b44953e1efee516f3ffc9b1e3ce5a5d5"
+   },
+   "checker": {
+    "path": "validation/v2/run_history.py",
+    "sha256": "f5ede014cc25b920cdfa5ef3fa2d8890af58505a0de0f80ce0dfd0b81453cd10"
+   },
+   "decision": {
+    "path": "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1-DECISION.json",
+    "sha256": "4c5972fe653bc585330e0848c0b196fd9c81f5c35df5c3aec8eda31bd0dc5f0c",
+    "derived_effect": "RECORD_ONLY"
+   }
+  },
+  "recurrence_preserved": {
+   "path": "closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1.json",
+   "sha256": "b3f921bfb3b56be6f6dd30aaa5f66c59182f2cf0fb79dbc769aa13d68d457d76",
+   "git_blob": {
+    "at_the_stop_commit_4513608": "d2c5dfd31c6aff9c2bc353269a35f96224df6fb6",
+    "now": "d2c5dfd31c6aff9c2bc353269a35f96224df6fb6"
+   },
+   "history_entry": {
+    "seq": 6,
+    "commit": "a76177e",
+    "where": "ci",
+    "job": "unit (windows-latest, 3.11)",
+    "classification": "PRODUCT",
+    "known_defect": "V1-PF-001",
+    "gate_effect": "STOP"
+   }
+  },
+  "calibration_cases": {
+   "path": "closure-evidence/v2/cycle2/V1-PF-001-POLICY-CALIBRATION.json",
+   "sha256": "0f4b7a2cf2fbc0d598cd2e6c51dee29bfef06e525eadbdbafddf513bbe96240c",
+   "all_held": true,
+   "cases": {
+    "known_recurrence_before_WP_4_2": "STOP",
+    "exact_known_recurrence_after_WP_4_2_in_frozen_V1": "RECORD_ONLY",
+    "same_signature_in_the_aisef2_process_path": "STOP",
+    "known_frame_reached_through_the_aisef2_path": "STOP",
+    "unknown_windows_process_cleanup_failure": "STOP",
+    "changed_v1_tree_at_the_attempt": "STOP",
+    "changed_v1_tree_being_checked": "STOP",
+    "missing_replacement_evidence": "STOP",
+    "missing_v2_range_qualification_binding": "STOP",
+    "v2_range_qualification_not_green": "STOP",
+    "cycle1_evidence_changed": "STOP",
+    "a_second_failing_test_without_the_signature": "STOP",
+    "a_v2_test": "STOP",
+    "untyped_facts": "STOP",
+    "policy_without_the_amendment": "STOP",
+    "another_run_and_commit_same_facts": "RECORD_ONLY"
+   }
+  },
+  "orchestration_reproducer": {
+   "story": "tests.v2.test_c2_orchestration_conformance.reproduce_multi_kind: C-F (file_artifact) and C-P (python_callable_v2), both INTRODUCE and READY at the parent; the harness wires exactly the story's two probes",
+   "old": {
+    "raised": "InvariantError: cycle 1 proves a story with exactly one probe factory",
+    "attempts": null,
+    "committed": false,
+    "probe_factories": [
+     "probe.file_artifact",
+     "probe.python_callable_v2"
+    ],
+    "event_types": [
+     "run/begin",
+     "capability/resolved",
+     "run/spec-resolved",
+     "plan/frozen",
+     "story/begin",
+     "story/resource-acquired",
+     "story/resource-acquired",
+     "story/resource-acquired",
+     "probe/evaluated",
+     "story/resource-acquired",
+     "probe/evaluated",
+     "story/admitted",
+     "story/resource-released",
+     "gate/check",
+     "provider/request",
+     "provider/result",
+     "gate/check",
+     "run/interrupted",
+     "story/resource-released",
+     "story/resource-released",
+     "story/resource-released",
+     "run/dispose-begin",
+     "run/end"
+    ],
+    "dispositions": {
+     "C-F": "READY",
+     "C-P": "READY"
+    },
+    "developer_requests": [
+     [
+      "C-F",
+      "C-P"
+     ]
+    ],
+    "records": [
+     {
+      "criterion_id": "C-F",
+      "probe_id": "probe.file_artifact",
+      "at": "parent",
+      "verdict": "REFUTED"
+     },
+     {
+      "criterion_id": "C-P",
+      "probe_id": "probe.python_callable_v2",
+      "at": "parent",
+      "verdict": "INDETERMINATE"
+     }
+    ],
+    "proofs": [],
+    "failures": []
+   },
+   "new": {
+    "raised": null,
+    "attempts": [
+     "COMMIT"
+    ],
+    "committed": true,
+    "probe_factories": [
+     "probe.file_artifact",
+     "probe.python_callable_v2"
+    ],
+    "event_types": [
+     "run/begin",
+     "capability/resolved",
+     "run/spec-resolved",
+     "plan/frozen",
+     "story/begin",
+     "story/resource-acquired",
+     "story/resource-acquired",
+     "story/resource-acquired",
+     "probe/evaluated",
+     "story/resource-acquired",
+     "probe/evaluated",
+     "story/admitted",
+     "story/resource-released",
+     "gate/check",
+     "provider/request",
+     "provider/result",
+     "gate/check",
+     "probe/evaluated",
+     "probe/evaluated",
+     "proof/verified",
+     "gate/check",
+     "story/resource-acquired",
+     "story/resource-released",
+     "probe/evaluated",
+     "story/resource-acquired",
+     "story/resource-released",
+     "probe/evaluated",
+     "proof/verified",
+     "gate/check",
+     "story/resource-acquired",
+     "story/resource-acquired",
+     "story/resource-acquired",
+     "tests/adequacy",
+     "story/resource-released",
+     "story/resource-released",
+     "story/resource-released",
+     "gate/check",
+     "provider/request",
+     "provider/result",
+     "gate/check",
+     "story/resource-acquired",
+     "tool/invoked",
+     "tool/result",
+     "story/resource-released",
+     "gate/check",
+     "gate/check",
+     "probe/evaluated",
+     "probe/evaluated",
+     "proof/verified",
+     "gate/check",
+     "story/resource-acquired",
+     "story/resource-released",
+     "probe/evaluated",
+     "story/resource-acquired",
+     "story/resource-released",
+     "probe/evaluated",
+     "proof/verified",
+     "gate/check",
+     "gate/decision",
+     "story/commit",
+     "story/dispose",
+     "story/resource-released",
+     "story/resource-released",
+     "story/resource-released",
+     "story/end"
+    ],
+    "dispositions": {
+     "C-F": "READY",
+     "C-P": "READY"
+    },
+    "developer_requests": [
+     [
+      "C-F",
+      "C-P"
+     ]
+    ],
+    "records": [
+     {
+      "criterion_id": "C-F",
+      "probe_id": "probe.file_artifact",
+      "at": "parent",
+      "verdict": "REFUTED"
+     },
+     {
+      "criterion_id": "C-P",
+      "probe_id": "probe.python_callable_v2",
+      "at": "parent",
+      "verdict": "INDETERMINATE"
+     },
+     {
+      "criterion_id": "C-F",
+      "probe_id": "probe.file_artifact",
+      "at": "later",
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-F",
+      "probe_id": "probe.file_artifact",
+      "at": "later",
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-P",
+      "probe_id": "probe.python_callable_v2",
+      "at": "later",
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-P",
+      "probe_id": "probe.python_callable_v2",
+      "at": "later",
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-F",
+      "probe_id": "probe.file_artifact",
+      "at": "later",
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-F",
+      "probe_id": "probe.file_artifact",
+      "at": "later",
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-P",
+      "probe_id": "probe.python_callable_v2",
+      "at": "later",
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-P",
+      "probe_id": "probe.python_callable_v2",
+      "at": "later",
+      "verdict": "SATISFIED"
+     }
+    ],
+    "proofs": [
+     {
+      "criterion_id": "C-F",
+      "agreement": true,
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-P",
+      "agreement": true,
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-F",
+      "agreement": true,
+      "verdict": "SATISFIED"
+     },
+     {
+      "criterion_id": "C-P",
+      "agreement": true,
+      "verdict": "SATISFIED"
+     }
+    ],
+    "failures": []
+   }
+  },
+  "single_probe_equivalence": {
+   "items": 7,
+   "identical": 7
+  },
+  "test_matrix": {
+   "module": "tests.v2.test_c2_orchestration_conformance",
+   "classes": [
+    "OneProofPerObligation",
+    "MixedStory",
+    "ReproofOfAnotherKind",
+    "Parties",
+    "LedgerLockStories"
+   ],
+   "exit": 0,
+   "ran": 22,
+   "passed": 22,
+   "outcomes": {
+    "LedgerLockStories.test_14a_each_spec_s_own_probe_gives_its_pristine_expectation_on_the_reference_tree": "PASS",
+    "LedgerLockStories.test_14b_admission_and_both_parties_accept_each_whole_story_through_the_path": "PASS",
+    "MixedStory.test_11_no_evaluation_is_shared_two_specs_of_one_kind_and_one_spec_under_two_obligations_each_run": "PASS",
+    "MixedStory.test_13_the_developer_request_follows_the_complete_admission_that_permits_it": "PASS",
+    "MixedStory.test_2_one_story_with_specs_of_three_probe_kinds_commits": "PASS",
+    "MixedStory.test_3_mixed_PRE_SATISFIED_and_READY_the_developer_gets_the_READY_ones_and_all_are_proved": "PASS",
+    "MixedStory.test_8_each_obligation_has_its_own_candidate_records_binding_its_spec_probe_and_candidate": "PASS",
+    "MixedStory.test_9_each_obligation_has_its_own_verified_proof_citing_its_two_records": "PASS",
+    "OneProofPerObligation.test_10_one_failing_candidate_spec_is_not_masked_by_the_others_passing": "PASS",
+    "OneProofPerObligation.test_12_a_permuted_obligation_order_gives_the_same_semantic_outcome": "PASS",
+    "OneProofPerObligation.test_1_a_story_with_specs_of_two_probe_kinds_commits_each_proved_by_its_own_probe": "PASS",
+    "OneProofPerObligation.test_4_all_PRE_SATISFIED_no_developer_request_the_candidate_is_the_parent_and_every_obligation_is_proved": "PASS",
+    "OneProofPerObligation.test_5_one_PRECONDITION_BROKEN_among_READY_blocks_the_story_before_any_developer_request": "PASS",
+    "OneProofPerObligation.test_6_one_PROBE_UNRUNNABLE_among_READY_is_the_environment_s_and_charges_its_budget": "PASS",
+    "OneProofPerObligation.test_7_one_INVALID_SPEC_among_READY_is_PROBE_INVALID_from_the_real_probe_or_from_an_unwired_one": "PASS",
+    "Parties.test_a_by_spec_party_gives_the_maker_the_spec_and_makes_a_probe_per_evaluation": "PASS",
+    "Parties.test_a_party_without_the_spec_s_probe_runs_nothing_and_makes_no_record": "PASS",
+    "Parties.test_prove_types_a_party_without_the_spec_s_probe_as_PROBE_INVALID_SPEC_and_seals_nothing": "PASS",
+    "Parties.test_the_runner_resolves_the_factory_of_the_spec_s_own_probe_identity_or_none": "PASS",
+    "ReproofOfAnotherKind.test_a_prior_spec_whose_probe_the_harness_did_not_wire_is_PROBE_INVALID_SPEC_never_a_crash": "PASS",
+    "ReproofOfAnotherKind.test_a_regression_of_the_prior_spec_of_another_kind_is_POST_MERGE_REGRESSION_and_rolled_back": "PASS",
+    "ReproofOfAnotherKind.test_the_prior_PRESERVE_spec_of_another_kind_is_re_proved_by_its_own_probe": "PASS"
+   },
+   "owned_processes": {
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "released_empty": true,
+    "escaped": 0
+   },
+   "seconds": 131.9
+  },
+  "orchestration_files_changed": {
+   "aisef2/orchestrate/proof.py": {
+    "before": "c870ec47d5c661249e1da432412ba0e874e1b8f12dd4625a7cc3839da67e1138",
+    "after": "925d831fbd5759d0151a1cec941361bbff8083eb51a19328bf0bb48050ad065f"
+   },
+   "aisef2/orchestrate/story_runner.py": {
+    "before": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
+    "after": "ec932bef042994f3ad8fd24f88cf8dd374bc403afcc4baf250c0970e3b699a59"
+   },
+   "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json": {
+    "before": null,
+    "after": "56940fea58adc10f80ab3ccb470cfd50cf69292ca7b2dc0b9e4591bfaf568bd6"
+   },
+   "tests/v2/test_c2_orchestration_conformance.py": {
+    "before": null,
+    "after": "fea1c95f6975c479f5282c38f6fd06c329217cee659a54fbb114c073a17da647"
+   },
+   "validation/qualification/c2_orchestration_repair.py": {
+    "before": null,
+    "after": "28a7ca9c57c0325c5c28262070d9344502571b2d6a79c8aee055b4b6d56d835d"
+   },
+   "validation/v2/mutation.py": {
+    "before": "dc9c3bd5cfc9779d8449b7bd8fe2901a794d50305129de594b27c55c8d8b51f3",
+    "after": "bb519e51284d8811319860b18682c3634e618fad17132cb9928835836c75180c"
+   }
+  },
+  "repair_record": {
+   "path": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+   "sha256": "3458620de44b9db4d5036a7edc0b0a47b9ed5356a040bce5e05066cec78fa1a1"
+  },
+  "contract_spec_identities": {
+   "contracts": 59,
+   "all_equal_to_accepted": true,
+   "semantic_change": "NONE",
+   "digest": "83a73da271805c470db4da55f50f542950494aa8b50a31e5b6f07e5364415745"
+  },
+  "attempt_1_6311254_retained": {
+   "summary": {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3/SUMMARY.json",
+    "sha256": "4836216af4ae94c11af36bd42e7f4812fce62801b48c6996b817039609b33c51"
+   },
+   "git_tree": {
+    "at_the_stop_commit_4513608": "5d428efa36c76d1cc63256f18a91cdac59c6c83b",
+    "now": "5d428efa36c76d1cc63256f18a91cdac59c6c83b"
+   }
+  },
+  "new_qp26": {
+   "gate_candidate": "37dc0dcdf819387b65ee60cf614273df94aaef31 (R3)",
+   "final_candidate": "c11615aeb1dd9e6ff992b6190f8c39a272636742 (R4)",
+   "R2_failed_kept": {
+    "path": "closure-evidence/v2/cycle2/Q0-Q3-R2/SUMMARY.json",
+    "sha256": "2989e4bdb648000f6a2795789473dc911895be83e9e8e2b147e9162fe67163f5"
+   }
+  }
+ },
+ "problems": [],
+ "verdict": "COMPLETE — READY FOR FINAL OWNER CLOSURE REVIEW"
+}

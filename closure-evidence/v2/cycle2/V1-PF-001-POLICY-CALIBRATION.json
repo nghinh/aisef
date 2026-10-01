@@ -3,7 +3,7 @@
  "authority": "owner ruling 2026-09-30: 'Add adversarial calibration covering at least ...'",
  "checker": {
   "path": "validation/v2/run_history.py",
-  "sha256": "23203dffbcb19c7be3c7f107fc2d79a2fe0022647154ee0ac87d34305a55333a"
+  "sha256": "f5ede014cc25b920cdfa5ef3fa2d8890af58505a0de0f80ce0dfd0b81453cd10"
  },
  "amendment": {
   "path": "closure-evidence/v2/cycle2/V2-RETRY-POLICY-AMENDMENT-1.json",
