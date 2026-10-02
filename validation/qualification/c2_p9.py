@@ -50,12 +50,13 @@ LIMITS = {"DEVELOPER": 1, "PLAN": 0, "ENVIRONMENT": 1, "PROVIDER": 1, "INTEGRATI
 #: (one call and two retries), which is what the comparable V1 baseline profiles gave (max_retries 2). It is a
 #: measurement-profile alignment, not a framework default: the kernel's retry semantics are untouched, and a run under
 #: it has another runspec hash — it is a new profile identity, never a continuation of attempts 1 and 2.
-#: `delivery-experiment-1` is the ONE preregistered delivery run (owner ruling 'FINAL PLAN CORRECTION + DELIVERY RUN
-#: PREREGISTRATION', 2026-10-02): the v1-aligned limits, and — fixed in c2_delivery_experiment and checked against the
-#: committed preregistration before any model call — the corrected plan, one fixed model route and the hard ceilings.
+#: `delivery-experiment-1` is the ONE preregistered delivery run (owner rulings 'FINAL PLAN CORRECTION + DELIVERY RUN
+#: PREREGISTRATION' and 'DELIVERY EXPERIMENT EXECUTION GUARD', 2026-10-02): the v1-aligned limits, and — fixed in
+#: c2_delivery_experiment — the corrected plan, one fixed model route, and the owner's hard spend budget. `run` refuses
+#: it unless the committed preregistration holds AND a verified ATTESTED preflight record is beside the run.
 EXPERIMENT = "delivery-experiment-1"
 PROFILES = {"qp-2.9": LIMITS, "v1-aligned": {**LIMITS, "DEVELOPER": 2}, EXPERIMENT: {**LIMITS, "DEVELOPER": 2}}
-#: how often a running session's event stream is read against the ceilings
+#: how often a running session's event stream is read against the budget
 POLL_S = 5.0
 PROJECT = frozenset({"ledgerlock", "tests"})
 #: V1-era control metadata in a story section of the epics (H-PROMPT-001): PLAN-V2.2 supersedes all of it
@@ -83,9 +84,13 @@ HARNESS_CHANGES = {2: "attempt 1's developer prompt named each obligation's clau
                       "removed, and it is not removed unless they are (attempt 2's final workspace was lost). Plan, specs and "
                       "contracts unchanged; the profile is named in the record. Under the profile `delivery-experiment-1` "
                       "(preregistered, DELIVERY-EXPERIMENT-1-PREREGISTRATION.json) the plan is PLAN-V2.2 CORRECTION 1, the "
-                      "developer and the reviewer run on one fixed model route (no routing alias), a session is stopped at "
-                      "the preregistered turn cap and the run starts no session past its token ceilings, and the final "
-                      "main is put to all 59 ProductProofSpecs and to the V1 independent acceptance oracle."}
+                      "developer and the reviewer run on one fixed model route (no routing alias) that a preflight attested "
+                      "before delivery was unlocked, the owner's hard spend budget (provider requests, turns, combined "
+                      "input tokens, output plus reasoning tokens — preflight included) is re-derived from the journal "
+                      "and the session streams and ends the experiment when reached, and the final main is put to all 59 "
+                      "ProductProofSpecs and to the V1 independent acceptance oracle. A delivery verdict is PASS only when "
+                      "every story of the plan committed in the journal, the budget was not reached and every revision "
+                      "the run names is preserved."}
 #: a secret-like token: `sk-` at a token start (attempt 1's pattern had no left boundary and matched inside words such as
 #: "task-…", which aborted the record of a finished run: NO-RECORD.json)
 SECRET = re.compile(r"(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,}")
@@ -245,38 +250,79 @@ def _compiled() -> dict:
 
 # --------------------------------------------------------------------------------------------- the live capabilities
 
-class Ceiling:
-    """A run's preregistered hard ceilings: finished steps (turns) per model session, and input and output tokens over
-    the whole run. A session at the turn cap is stopped; a run at a token ceiling stops the session that reached it and
-    starts no other. Counted from the client's own event stream — the same numbers the record reports."""
+def _event_type(e) -> str:
+    return e["type"] if isinstance(e, dict) else e.type
 
-    def __init__(self, max_turns: int, max_input_tokens: int, max_output_tokens: int) -> None:
-        self.max_turns, self.limit = max_turns, {"input": max_input_tokens, "output": max_output_tokens}
-        self.used = {"input": 0, "output": 0}
-        self.stops: list[dict] = []
 
-    def reached(self, turns: int = 0, tokens: dict | None = None) -> str | None:
-        """Why a session must stop now (or, with no arguments, must not start) — or None."""
-        tokens = tokens or {"input": 0, "output": 0}
-        for k in ("input", "output"):
-            if self.used[k] + tokens[k] >= self.limit[k]:
-                return f"max_{k}_tokens: {self.used[k] + tokens[k]} of {self.limit[k]} over the run"
-        if turns >= self.max_turns:
-            return f"max_turns: stopped at {turns} turns (cap {self.max_turns})"
+class Budget:
+    """An experiment's HARD spend ceilings, judged on the evidence: this object keeps no count of its own. What was
+    spent is re-derived, every time it is asked, from what is recorded — `base` (the preflight's accounting record,
+    made before the delivery journal existed), the journal's `provider/request` events (`requests`), and the event
+    streams of the sessions that were started (one file each under `logs`, the same files the record hashes).
+
+    A provider request is one model session the harness starts (the journal's `provider/request`) or one request of
+    the preflight; a turn is a finished step of a session; input counts prompt and cached tokens together and output
+    counts completion and reasoning tokens together, as the client reports them per finished step.
+
+    Anything that cannot be accounted for ends the experiment like a reached ceiling: a session started that the
+    journal does not record, a finished step without its tokens, a session that started and finished no step."""
+    KEYS = ("provider_requests", "turns", "input_tokens", "output_tokens")
+
+    def __init__(self, limits: dict[str, int], base: dict[str, int], logs: pathlib.Path, requests=lambda: 0) -> None:
+        if sorted(limits) != sorted(self.KEYS) or sorted(k for k in base if k in self.KEYS) != sorted(self.KEYS):
+            raise ValueError("a budget has the four ceilings, and a base that accounts for each of them")
+        self.limits, self.base, self.logs, self.requests = dict(limits), {k: int(base[k]) for k in self.KEYS}, logs, requests
+
+    def spend(self, live: pathlib.Path | None = None) -> dict:
+        """What the evidence shows spent so far. `live` is the stream of the session running now (it may have no
+        finished step yet); every other stream is a finished session's."""
+        logs = sorted(self.logs.glob("*.jsonl")) if self.logs.is_dir() else []
+        seen = {p: read_session(p) for p in logs}
+        recorded = int(self.requests())
+        unaccounted = [f"{len(logs)} sessions were started but {recorded} provider requests are recorded"] if len(logs) > recorded else []
+        for p, x in seen.items():
+            if x["steps_without_tokens"]:
+                unaccounted.append(f"{p.name}: {x['steps_without_tokens']} finished steps report no tokens")
+            if p != live and not x["turns"]:
+                unaccounted.append(f"{p.name}: a session that started finished no step — what it sent is unknown")
+        return {"provider_requests": self.base["provider_requests"] + recorded,
+                "turns": self.base["turns"] + sum(x["turns"] for x in seen.values()),
+                "input_tokens": self.base["input_tokens"] + sum(x["tokens"]["input"] for x in seen.values()),
+                "output_tokens": self.base["output_tokens"] + sum(x["tokens"]["output"] for x in seen.values()),
+                "sessions_started": len(logs), "requests_recorded": recorded, "unaccounted": unaccounted}
+
+    def reached(self, live: pathlib.Path | None = None, in_progress: bool = False) -> str | None:
+        """Why the experiment must end now — a ceiling reached or exceeded, or spend that cannot be accounted for — or
+        None. While a request is in progress (it is already recorded) the request ceiling ends the experiment only
+        when EXCEEDED: the request that reaches it may run, and nothing after it."""
+        spent = self.spend(live)
+        if spent["unaccounted"]:
+            return "unaccounted: " + "; ".join(spent["unaccounted"])
+        for k in self.KEYS:
+            if spent[k] > self.limits[k] or (spent[k] == self.limits[k] and not (in_progress and k == "provider_requests")):
+                return f"max_{k}: {spent[k]} of {self.limits[k]}"
         return None
 
-    @property
-    def exhausted(self) -> bool:
-        return any(self.used[k] >= self.limit[k] for k in self.used)
-
     def account(self) -> dict:
-        return {"max_turns_per_session": self.max_turns, "max_tokens_over_the_run": dict(self.limit), "tokens_used": dict(self.used),
-                "exhausted": self.exhausted, "stops": list(self.stops)}
+        return {"limits": dict(self.limits), "preflight": dict(self.base), "spent": self.spend(), "reached": self.reached(),
+                "derived_from": "the preflight accounting record, the journal's provider/request events and the session streams; no counter is kept",
+                "limitation": ACCOUNTING_LIMITATION}
+
+
+#: what the telemetry cannot show (recorded with every account of the budget)
+ACCOUNTING_LIMITATION = (
+    "spend is what the client reports per finished step. An HTTP request that finishes no step is not in the telemetry — a "
+    "client-internal retry, a failed request, the request in flight when a stop is issued — so its tokens cannot be counted; a "
+    "stop is issued at the first reading (every 5 s) that shows a ceiling reached, so the totals can pass a ceiling by the steps "
+    "finished since the reading before. Input is one combined number (prompt + cache read + cache write): the owner's ceiling "
+    "is combined and no separate fresh/cached limit exists. The preflight's chat probes report prompt_tokens and "
+    "completion_tokens only, counted as input and output.")
 
 
 def read_session(log: pathlib.Path) -> dict:
-    """What a session's event stream says so far: its text, its error, its turns (finished steps) and its tokens."""
-    text, error, turns, tokens = [], None, 0, {"input": 0, "output": 0}
+    """What a session's event stream says so far: its text, its error, its turns (finished steps), its tokens, and how
+    many finished steps carry no token report (spend that cannot be accounted for)."""
+    text, error, turns, tokens, blind = [], None, 0, {"input": 0, "output": 0}, 0
     for line in log.read_text(encoding="utf-8", errors="replace").splitlines():
         if not line.startswith("{"):
             continue
@@ -294,63 +340,66 @@ def read_session(log: pathlib.Path) -> dict:
                 f" (HTTP {data['statusCode']})" if data.get("statusCode") else "")
         elif ev.get("type") == "step_finish":
             turns += 1
-            tk = part.get("tokens") or {}
+            tk = part.get("tokens")
+            if not isinstance(tk, dict) or not all(isinstance(tk.get(k), int) for k in ("input", "output")):
+                blind += 1
+                continue
             cache = tk.get("cache") or {}
-            tokens["input"] += int(tk.get("input") or 0) + int(cache.get("read") or 0) + int(cache.get("write") or 0)
-            tokens["output"] += int(tk.get("output") or 0) + int(tk.get("reasoning") or 0)
-    return {"error": error, "text": "".join(text), "turns": turns, "tokens": tokens}
+            tokens["input"] += tk["input"] + int(cache.get("read") or 0) + int(cache.get("write") or 0)
+            tokens["output"] += tk["output"] + int(tk.get("reasoning") or 0)
+    return {"error": error, "text": "".join(text), "turns": turns, "tokens": tokens, "steps_without_tokens": blind}
 
 
-def wait_within(r, log: pathlib.Path, timeout_s: float, ceiling: Ceiling | None) -> tuple[int | None, str | None]:
-    """A running session's exit status — or None with the ceiling it reached, or None with nothing: it ran out of time.
-    The event stream is read between waits; `r` is the session's process range (anything with `wait`)."""
+def wait_within(r, log: pathlib.Path, timeout_s: float, budget: Budget | None, turn_cap: int | None = None) -> tuple[int | None, str | None]:
+    """A running session's exit status — or None with why it was stopped, or None with nothing: it ran out of time.
+    Between waits the budget is re-derived from the evidence, this session's stream included; `turn_cap` is a cap on
+    this one session (the preflight's smoke probe has one). `r` is the session's process range (anything with `wait`)."""
     deadline, code, stopped = time.monotonic() + timeout_s, None, None
     while code is None and not stopped and time.monotonic() < deadline:
         code = r.wait(min(POLL_S, max(0.0, deadline - time.monotonic())))
-        if code is None and ceiling:
-            seen = read_session(log)
-            stopped = ceiling.reached(seen["turns"], seen["tokens"])
+        if code is None:
+            stopped = budget.reached(log, in_progress=True) if budget else None
+            if not stopped and turn_cap is not None and read_session(log)["turns"] >= turn_cap:
+                stopped = f"session turn cap: {turn_cap} turns"
     return code, stopped
 
 
 def opencode_session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: float, *, model: str | None = None,
-                     env: dict | None = None, ceiling: Ceiling | None = None) -> dict:
+                     env: dict | None = None, budget: Budget | None = None, turn_cap: int | None = None) -> dict:
     """One `opencode run --format json` session inside a V2 process range (the kernel's own OS-owned range: every
     process it starts ends with it); the event stream goes to `log`. With `model` the route is given to the client
-    explicitly (and the session titled, so no second model names it); with `ceiling` the stream is read while the
-    session runs and the range is released when a ceiling is reached — and no session starts at a spent ceiling."""
+    explicitly (and the session titled, so no second model names it). With `budget` nothing starts when the evidence
+    shows the budget reached or spend unaccounted — or when `log` exists, which would overwrite a session's evidence —
+    and the stream is read while the session runs: the range is released when the budget is reached. A session that
+    is not started leaves no stream."""
     from aisef2.runtime.process_range import ProcessRange
     exe = shutil.which("opencode")
     started = time.monotonic()
-    code, stopped = None, ceiling.reached() if ceiling else None
+    code, stopped = None, None
+    if budget:
+        stopped = f"{log.name} exists: a session's evidence is never overwritten" if log.exists() else budget.reached(in_progress=True)
     not_started = bool(stopped)
-    if not_started:
-        log.write_text("", encoding="utf-8")
-    else:
+    if not not_started:
         argv = [exe, "run", "--format", "json", *(["--model", model, "--title", name] if model else []), "--dir", cwd, prompt]
         with log.open("w", encoding="utf-8") as fh:
             r = ProcessRange(name, argv, cwd=cwd, env=env, output=fh)
             r.start()
             try:
-                code, stopped = wait_within(r, log, timeout_s, ceiling)
+                code, stopped = wait_within(r, log, timeout_s, budget, turn_cap)
             finally:
                 r.release()
-    seen = read_session(log)
-    if ceiling:
-        for k in ceiling.used:
-            ceiling.used[k] += seen["tokens"][k]
-        if stopped:
-            ceiling.stops.append({"session": name, "reason": stopped, "started": not not_started})
-    return {"exit": code, "timed_out": code is None and not stopped, "stopped": stopped,
+    seen = read_session(log) if not not_started else {"error": None, "text": "", "turns": 0, "tokens": {"input": 0, "output": 0}}
+    return {"exit": code, "timed_out": code is None and not stopped, "stopped": stopped, "started": not not_started,
             "error": stopped if not_started else seen["error"], "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],
-            "seconds": round(time.monotonic() - started, 1), "log": log.name, "log_sha256": _sha(log.read_bytes())}
+            "seconds": round(time.monotonic() - started, 1), "log": None if not_started else log.name,
+            "log_sha256": None if not_started else _sha(log.read_bytes())}
 
 
 class OpenCodeDeveloper:
     def __init__(self, run, prompts: dict[str, str], logs: pathlib.Path, by_criterion: dict[str, str] | None = None,
                  session_kw: dict | None = None) -> None:
         self.run, self.prompts, self.logs, self.sessions, self.by_criterion = run, prompts, logs, [], by_criterion or {}
-        self.session_kw = session_kw or {}      # a preregistered run's fixed model, client environment and ceilings
+        self.session_kw = session_kw or {}      # a preregistered run's fixed model, client environment and budget
 
     def feedback(self, story_id: str) -> str:
         """The failures the kernel observed in this story, each with the requirement clause its proof concerns."""
@@ -442,15 +491,29 @@ def preserve_root() -> pathlib.Path:
     return pathlib.Path(os.environ.get(PRESERVE_ENV) or (P10.LEDGERLOCK_REPO.parent / "aisef-qp-2.9-preserved"))
 
 
+#: the keys under which the journal names a revision (story/begin and story/admitted `parent`, proof/verified
+#: `candidate`, story/commit and run/spec-resolved `revision`, probe/evaluated `record.revision`)
+REVISION_KEYS = ("revision", "candidate", "parent")
+
+
 def run_shas(events: list[dict], sessions: list[dict], final: str | None) -> list[str]:
-    """Every revision the run's records name: final main, each committed revision, each proved candidate, each session's
-    candidate — the objects an inspection or the independent acceptance oracle needs afterwards."""
+    """Every revision the run's records name: final main, each session's candidate, and every revision the journal
+    cites wherever it cites one — story parents, proved candidates, committed revisions, the revision of every probe
+    evaluation, the baseline. The objects an inspection or the independent acceptance oracle needs afterwards."""
     shas = {final} | {s.get("candidate") for s in sessions}
+
+    def walk(o) -> None:
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k in REVISION_KEYS and isinstance(v, str):
+                    shas.add(v)
+                else:
+                    walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
     for e in events:
-        if e["type"] == "story/commit":
-            shas.add(e["data"].get("revision"))
-        elif e["type"] in ("proof/verified", "story/begin"):
-            shas.add(e["data"].get("candidate") or e["data"].get("parent"))
+        walk(e["data"])
     return sorted(x for x in shas if x)
 
 
@@ -500,33 +563,48 @@ def order(plan, graph) -> list[str]:
     return out
 
 
-def runspec_inputs(plan, profile: str, oc: dict, fixed: dict | None = None) -> tuple[list, dict, str]:
+def runspec_inputs(plan, profile: str, oc: dict, fixed: dict | None = None, preflight: dict | None = None) -> tuple[list, dict, str]:
     """The capabilities and the settings a run's RunSpec binds, and the kernel digest. `fixed` is a preregistered
-    experiment's identity (c2_delivery_experiment.EXPERIMENT): its model route replaces the client's declared one in
-    the developer's and the reviewer's capability, and its ceilings and kernel commit are settings — so the RunSpec
-    hash binds them. The grade stays OPAQUE: no preflight fingerprint is part of the identity (RFC §23)."""
+    experiment (c2_delivery_experiment.fixed): its allowed model identity is the developer's and the reviewer's
+    capability, and its budget, kernel commit and preflight shape are settings — so the RunSpec hash binds them.
+
+    Without `preflight` this is the experiment's TEMPLATE: the model capability is OPAQUE, carrying the identity the
+    preflight is allowed to find. With `preflight` — the observable fields a successful preflight measured — it is the
+    RESOLVED RunSpec: the model capability is ATTESTED (the kernel's own grade, RFC §23: provider, endpoint, declared
+    model, route, client, deployment and the fingerprint of those fields), and the template's hash is one of its
+    settings. The fingerprint is a drift detector, not a claim about model weights."""
     from aisef2.arch.enums import Enforcement
     from aisef2.probe import catalog
-    from aisef2.runtime.capability import opaque, verified
+    from aisef2.runtime.capability import attested, opaque, verified
+    from aisef2.runtime.runspec import resolve
     from validation.qualification import q4
     kernel = q4._over(q4._file_digests(("aisef2",)))
-    model = {"client": "opencode", "route": str(oc["declared_route"]), "version": str(oc["version"])}
-    if fixed:
-        model.update(route=fixed["route"], route_kind="FIXED_MODEL", resolved_model=fixed["resolved_model"],
-                     small_model=fixed["route"], client_binary_sha256=str(oc["binary_sha256"]))
+    ruff = shutil.which("ruff")
+    scanner = opaque("scanner", Enforcement.PARTIAL, tool="ruff", mode="lint as an informational scanner")
+    if not fixed:
+        model = {"client": "opencode", "route": str(oc["declared_route"]), "version": str(oc["version"])}
+        models = [opaque(name, Enforcement.PARTIAL, **model) for name in ("developer", "reviewer")]
+    else:
+        if ruff:        # the binary the scanner stage executes, by its digest
+            scanner = verified("scanner", pathlib.Path(ruff), Enforcement.PARTIAL, tool="ruff", mode="lint as an informational scanner")
+        if preflight is None:
+            models = [opaque(name, Enforcement.PARTIAL, **fixed["identity"]) for name in ("developer", "reviewer")]
+        else:
+            models = [attested(name, preflight=preflight, enforcement=Enforcement.PARTIAL, **fixed["identity"]) for name in ("developer", "reviewer")]
     caps = [verified("kernel", kernel.encode(), Enforcement.FULL, tree=C.git("rev-parse", "HEAD:aisef2")),
             verified("python", pathlib.Path(sys.executable), Enforcement.PARTIAL, version=platform.python_version()),
             verified("git", pathlib.Path(shutil.which("git")), Enforcement.PARTIAL),
             *[verified(e.probe_id, e.probe_digest.encode(), Enforcement.PARTIAL) for e in catalog.CATALOG if e.active],
-            opaque("developer", Enforcement.PARTIAL, **model),
-            opaque("reviewer", Enforcement.PARTIAL, **model),
-            opaque("scanner", Enforcement.PARTIAL, tool="ruff", mode="lint as an informational scanner")]
+            *models, scanner]
     layers = {"workload": {"value": "LedgerLock", "layer": "c2-p9"}, "benchmark_class": {"value": P10.BENCHMARK_CLASS, "layer": "c2-p9"},
               "plan_hash": {"value": plan.plan_hash, "layer": "plan"}, "requirements_sha256": {"value": P10.REQUIREMENTS_SHA256, "layer": "workload"},
               "limits": {"value": PROFILES[profile], "layer": f"c2-p9 profile {profile}"}}
     if fixed:
         layers.update({k: {"value": fixed[k], "layer": "preregistration"} for k in
-                       ("kernel_commit", "max_turns", "max_input_tokens", "max_output_tokens", "developer_timeout_s", "reviewer_timeout_s")})
+                       ("experiment", "kernel_commit", "budget", "preflight_shape", "developer_timeout_s", "reviewer_timeout_s")})
+        if preflight is not None:
+            template = runspec_inputs(plan, profile, oc, fixed)
+            layers["preregistered_template_hash"] = {"value": resolve(template[0], template[1], plan.baseline).runspec_hash, "layer": "preregistration"}
     return caps, layers, kernel
 
 
@@ -544,17 +622,20 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
     from validation.qualification import p5_acceptance as pa
     from validation.qualification import p10_contracts as aid
     started = time.time()
+    exp = session_kw = budget = None
+    if profile == EXPERIMENT:
+        # THE GATE, inside the runner (the run script is not the enforcement boundary): nothing below can reach a
+        # provider unless the committed preregistration holds on this tree and this machine AND the attempt holds a
+        # verified ATTESTED preflight record bound to this preregistration, plan, kernel, route, model, client,
+        # enforcement and experiment. A refusal makes no provider call.
+        from validation.qualification import c2_delivery_experiment as dx
+        exp = dx.require_unlocked(out_dir)
     base = P10.ledgerlock_baseline()
     if not base.get("present") or not base.get("requirements_match_frozen"):
         raise SystemExit(f"the LedgerLock workload is not where the freeze says or its requirements changed: {base}")
     oc = P10.opencode_identity()
-    exp = session_kw = ceiling = None
-    if profile == EXPERIMENT:      # every identity of the preregistration is re-derived and compared before any model call
-        from validation.qualification import c2_delivery_experiment as dx
-        exp = dx.require_preregistered()
+    if exp:
         plan = exp["plan"]
-        ceiling = Ceiling(exp["max_turns"], exp["max_input_tokens"], exp["max_output_tokens"])
-        session_kw = {"model": exp["route"], "env": dx.client_env(), "ceiling": ceiling}
     else:
         plan = aid.build()["plan"]
         if plan.plan_hash != pa.ACCEPTED["plan_hash"]:
@@ -567,9 +648,9 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
     requirements_md = subprocess.run(["git", "-C", str(P10.LEDGERLOCK_REPO), "show", f"{P10.LEDGERLOCK_PLAN_COMMIT}:docs/requirements.md"],
                                      capture_output=True, encoding="utf-8", check=True).stdout
     tasks, clauses, by_criterion = prompts(plan, epics, requirements_md)
-    caps, layers, kernel = runspec_inputs(plan, profile, oc, exp)
-    if exp and resolve(caps, layers, base["baseline"]).runspec_hash != exp["runspec_hash"]:
-        raise SystemExit("REFUSED: this run's RunSpec is not the preregistered one")
+    caps, layers, kernel = runspec_inputs(plan, profile, oc, exp, exp["preflight_fields"] if exp else None)
+    if exp and resolve(caps, layers, base["baseline"]).runspec_hash != exp["resolved_runspec_hash"]:
+        raise SystemExit("REFUSED: this run's RunSpec is not the one the attestation resolved")     # the journal binds this hash
     logs = out_dir / SESSIONS
     logs.mkdir(parents=True, exist_ok=True)
     results, errors, events, state, run_id, final, preserved = {}, [], [], {}, {}, None, None
@@ -584,6 +665,10 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
         ws, merger = GitWorkspace(repo, tmp / "ws"), GitMerger(repo, "main", tmp / "merge")
         run_ = RunScope(tmp / "run", "c2-p9-ledgerlock", spec=lambda: resolve(caps, layers, base["baseline"]))
         run_.begin()
+        if exp:     # the budget reads the journal, the session streams and the preflight's accounting — it counts nothing itself
+            budget = Budget(exp["budget"], exp["preflight_accounting"], logs,
+                            lambda: sum(1 for e in run_.events if e.type == "provider/request"))
+            session_kw = {"model": exp["route"], "env": dx.client_env(), "budget": budget}
         dev, rev = OpenCodeDeveloper(run_, tasks, logs, by_criterion, session_kw), OpenCodeReviewer(run_, clauses, logs, session_kw)
         adapters = sr.Adapters(dev, rev, RuffScanner(), merger, ws)
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch)) for e in catalog.CATALOG}
@@ -591,8 +676,9 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
         limits = {Owner[k]: v for k, v in PROFILES[profile].items()}
         delivered: list[str] = []
         for story in order(plan, aid.story_graph()):
-            if ceiling and ceiling.exhausted:      # preregistered: a run at its token ceiling starts nothing more
-                results[story] = ["NOT_RUN: the run's token ceiling was reached"]
+            why = budget.reached() if budget else None
+            if why:      # a ceiling reached, or spend unaccounted: the experiment has ended — nothing more starts
+                results[story] = [f"NOT_RUN: {why}"]
                 continue
             inputs = sr.StoryInputs(specs, factories, env, te.DeveloperTests(story, (test_path(story),)),
                                     te.DeveloperTests(story, tuple(test_path(s) for s in delivered) or (test_path(story),)),
@@ -622,7 +708,8 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
             repo_at = tmp / "repo"
             head = final or subprocess.run(["git", "-C", str(repo_at), "rev-parse", "main"], capture_output=True, encoding="utf-8").stdout.strip()
             sessions_now = (dev.sessions if dev else []) + (rev.sessions if rev else [])
-            preserved = preserve(repo_at, preserve_to, head, run_shas(events, sessions_now, head))
+            cited = events or ([{"data": plain(e.data)} for e in run_.events] if "run_" in locals() else [])    # also when the run broke
+            preserved = preserve(repo_at, preserve_to, head, run_shas(cited, sessions_now, head))
         except Exception as e:  # noqa: BLE001 — a failed preservation keeps the directory; it never loses the run
             preserved = {"path": str(preserve_to), "error": f"{type(e).__name__}: {e}"[:500], "missing": ["<not preserved>"]}
         if may_remove(preserved):
@@ -632,7 +719,7 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
             preserved["temporary_directory"] = f"KEPT at {tmp}: the copy does not hold the whole result"
     return {"started": started, "results": results, "errors": errors, "events": events, "state": state,
             "run_identity": run_id, "final_main": final, "preserved": preserved, "profile": profile,
-            "experiment": exp, "ceiling": ceiling.account() if ceiling else None,
+            "experiment": exp, "budget": budget.account() if budget else None,
             "baseline": base, "oc": oc, "plan": plan, "specs": specs, "tasks": tasks,
             "sessions": (dev.sessions if dev else []) + (rev.sessions if rev else []), "caps": caps, "layers": layers, "kernel": kernel}
 
@@ -645,9 +732,19 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
     kernel_commit, kernel_tree = (exp["kernel_commit"], exp["kernel_tree"]) if exp else (C.SEMANTIC_CANDIDATE, C.KERNEL_TREE)
     roles = {o.criterion_id: o.role.value for o in plan.obligations}
     delivery = P10.delivery_verdict_of(events, plan_admitted=True)
-    committed = {s for s, v in m["results"].items() if v[-1:] == ["COMMIT"]}
+    last = {}
+    for e in events:
+        if e["type"] in ("story/commit", "story/rollback", "story/retry"):
+            last[e["data"]["story_id"]] = e["type"]
+    # a story is delivered when the harness saw it commit AND the journal's last outcome for it is its commit: a story
+    # absent from the journal is not a successful story
+    committed = {s for s, v in m["results"].items() if v[-1:] == ["COMMIT"] and last.get(s) == "story/commit"}
     not_committed = sorted({o.story_id for o in plan.obligations} - committed)
-    if delivery == "PASS" and not_committed:   # the journal knows only the stories that began: one never run is not delivered
+    budget = m.get("budget")
+    blocks_pass = ([f"{len(not_committed)} of the plan's stories did not commit"] if not_committed else []) + \
+                  ([f"the budget ended the experiment: {budget['reached']}"] if budget and budget["reached"] else []) + \
+                  (["the run's revisions are not all preserved"] if exp and not may_remove(m["preserved"]) else [])
+    if delivery == "PASS" and blocks_pass:
         delivery = "FAIL"
     metrics = P10.plan_quality_metrics(events, roles)
     policy, at, policy_path = P10.preregistered_policy(out_dir)
@@ -719,13 +816,16 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
                            "capabilities": [{"name": c.name, "grade": c.grade.value, "enforcement": c.enforcement.value} for c in spec.capabilities],
                            "model": m["oc"], "kernel_digest": m["kernel"],
                            "fixed_model": {k: exp[k] for k in ("route", "resolved_model", "route_kind")} if exp else None,
-                           "ceilings": m.get("ceiling"),
-                           "grade_note": ("one fixed model route, given to the client explicitly; OPAQUE because no preflight fingerprint is part "
-                                          "of the identity (the provider preflight beside this record measured what answered)") if exp else
+                           "attestation": exp["attestation"] if exp else None, "budget": budget,
+                           "grade_note": ("one fixed model route, given to the client explicitly, ATTESTED by the preflight beside this record "
+                                          "before delivery was unlocked; the fingerprint is a drift detector, not a claim about model weights") if exp else
                                          "the route is a routing alias: OPAQUE, which bars sealing and nothing else here; no model identity is inferred from it"},
         run_identity=m["run_identity"], cohort_state="DEVELOPMENT", benchmark_class=P10.BENCHMARK_CLASS, generalization_claim=P10.GENERALIZATION_CLAIM,
         verdict=verdict, delivery_verdict_derivation="from the run's journal events only; no plan-quality input — and FAIL, never PASS, "
-                                                     "while a story of the plan has not committed (a story that never began is in no event)",
+                                                     "while a story of the plan has not committed in the journal (a story that never began "
+                                                     "is in no event), when the budget was reached or spend was unaccounted, or when the "
+                                                     "run's revisions are not all preserved",
+        delivery_pass_blocked_by=blocks_pass,
         story_outcomes=m["results"], story_state=m["state"], story_errors=m["errors"], stories_not_committed=not_committed,
         productproof={"obligations": obligations, "total": len(obligations),
                       "with_a_verified_proof": sum(1 for o in obligations if o["last_proof"]),
@@ -796,11 +896,12 @@ def main(argv: list[str] | None = None) -> int:
     print(f"delivery {rec['delivery_verdict']}; plan quality {rec['plan_quality_verdict']}; outcomes {rec['story_outcomes']}")
     if a.profile == EXPERIMENT:        # the run's record is on disk first: an evaluation that fails never loses it
         try:
-            ev = dx.evaluate(pathlib.Path(m["preserved"]["path"]), m["final_main"], out_dir)
+            ev = dx.evaluate(pathlib.Path(m["preserved"]["path"]), m["final_main"], out_dir, rec["delivery_verdict"])
             print(f"final main {m['final_main']}: V2 specs satisfied {ev['v2_final_proof']['satisfied']}/{ev['v2_final_proof']['total']}; "
-                  f"V1 oracle {ev['v1_oracle']['passed']}/{ev['v1_oracle']['total']}")
+                  f"V1 oracle {ev['v1_oracle']['passed']}/{ev['v1_oracle']['total']}; delivery PASS confirmed: {ev['delivery_pass_confirmed']}")
         except Exception as e:  # noqa: BLE001 — recorded beside the run's record; the preserved result can be evaluated again
-            ev = {"final_main": m["final_main"], "preserved": m["preserved"], "error": f"{type(e).__name__}: {e}"[:2000]}
+            ev = {"final_main": m["final_main"], "preserved": m["preserved"], "error": f"{type(e).__name__}: {e}"[:2000],
+                  "delivery_verdict": rec["delivery_verdict"], "delivery_pass_confirmed": False}
             print(f"the final evaluation did not run: {ev['error']}")
         C.write(f"{rel}/FINAL-EVALUATION.json", ev)
     return 0

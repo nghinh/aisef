@@ -4,7 +4,9 @@
 #
 #   validation/qualification/c2_p9_run.sh
 #   ATTEMPT=3 PROFILE=delivery-experiment-1 validation/qualification/c2_p9_run.sh   # the ONE preregistered delivery run:
-#       NOT AUTHORIZED until the owner authorizes it with a hard budget (DELIVERY-EXPERIMENT-1-PREREGISTRATION.json)
+#       NOT AUTHORIZED until the owner authorizes it (DELIVERY-EXPERIMENT-1-PREREGISTRATION.json). This script only
+#       orchestrates: the runner itself (c2_p9.run) refuses unless the preregistration holds and the attempt holds a
+#       verified ATTESTED preflight record — calling it directly opens nothing.
 set -u; unsetopt nomatch
 A=${0:A:h:h:h}; cd $A                          # the checkout this script is in (attempts 1 and 2 ran in the main one)
 OUT=$A/closure-evidence/v2/cycle2/P10
@@ -29,9 +31,10 @@ echo "[$(stamp)] QP-2.9: LedgerLock regression, kernel tree $KT, HEAD $(git rev-
 guards start || exit 1
 mkdir -p $OUT/owned
 if [ "$PROFILE" = delivery-experiment-1 ]; then
-  # nothing of the preregistration may have moved, and the fixed route must answer as the preregistered model — else no run
+  # preregistration verification -> provider preflight -> ATTESTED tuple built and verified -> resolved RunSpec frozen;
+  # only then does the runner unlock delivery. The preflight is made once and its requests are in the budget.
   python3 -P $DX --check || { echo "REFUSED: the delivery experiment is not as preregistered"; exit 1; }
-  python3 -P $DX --provider-preflight --out $DIR/PROVIDER-PREFLIGHT.json || { echo "REFUSED: the fixed route did not answer as preregistered — no run"; exit 1; }
+  python3 -P $DX --attest || { echo "REFUSED: the model identity was not attested — delivery stays locked, no run"; exit 1; }
 fi
 python3 -P validation/v2/owned_run.py --out $OUT/owned/run.attempt-$ATTEMPT.json -- python3 -P validation/qualification/c2_p9.py --run --attempt $ATTEMPT --profile $PROFILE
 RC=$?
@@ -39,8 +42,7 @@ echo "[$(stamp)] run rc=$RC"
 [ "$(git rev-parse HEAD:aisef2)" = "$KT" ] || { echo "STOP: the kernel tree changed during the run"; exit 3; }
 [ "$(git rev-parse HEAD)" = "$HEAD0" ] || { echo "STOP: HEAD moved during the run"; exit 3; }
 guards end || exit 3
-if [ "$PROFILE" = delivery-experiment-1 ]; then
-  python3 -P $DX --provider-preflight --out $DIR/PROVIDER-POSTFLIGHT.json || echo "[$(stamp)] NOTE: the route no longer answers as preregistered (recorded; the run stands as it ran)"
+if [ "$PROFILE" = delivery-experiment-1 ]; then     # no request is made after the run: there is no budget outside the budget
   python3 -P $DX --check --after-run || { echo "STOP: the preregistered identities changed during the run"; exit 3; }
 fi
 exit $RC
