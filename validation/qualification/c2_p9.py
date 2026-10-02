@@ -59,12 +59,6 @@ PROFILES = {"qp-2.9": LIMITS, "v1-aligned": {**LIMITS, "DEVELOPER": 2}, EXPERIME
 #: how often a running session's event stream is read against the budget
 POLL_S = 5.0
 PROJECT = frozenset({"ledgerlock", "tests"})
-#: V1-era control metadata in a story section of the epics (H-PROMPT-001): PLAN-V2.2 supersedes all of it
-LEGACY_BLOCK = re.compile(r"^\*\*Story metadata:\*\*.*\Z", re.M | re.S)
-LEGACY_KEYS = ("covers", "ac_proof", "story_type", "write_scope", "depends_on", "screens")
-LEGACY_LINE = re.compile(rf"^[ \t]*[-*][ \t]*(?:{'|'.join(LEGACY_KEYS)})[ \t]*:.*$\n?", re.M)
-#: a 'Scope note:' paragraph of a V1 section: story ownership and proof modes as the V1 plan had them (Story 4.1 has one)
-LEGACY_NOTE = re.compile(r"^Scope note:.*?(?:\n[ \t]*\n|\Z)", re.M | re.S)
 #: where a run's git objects are kept before its temporary directory is removed (ruling §7); outside this repository
 PRESERVE_ENV = "AISEF_QP29_PRESERVE_ROOT"
 #: what the harness changed from the attempt before (a harness defect fixed by a new harness commit, both attempts recorded)
@@ -169,22 +163,6 @@ def regression_tests(repo, story: str, delivered: dict[str, bool]) -> tuple[str,
     return named or (test_path(story),)
 
 
-def epics_section(epics: str, story: str) -> str:
-    """The V1 story's own section of _bmad-output/epics.md at the plan commit (STORY-01-05 -> '### Story 1.5:')."""
-    e, n = (int(x) for x in story.split("-")[1:])
-    m = re.search(rf"^### Story {e}\.{n}:.*?(?=^### |^## |\Z)", epics, re.M | re.S)
-    return m.group(0).strip() if m else ""
-
-
-def story_prose(epics: str, story: str) -> str:
-    """The V1 story's section as PROSE CONTEXT ONLY (H-PROMPT-001): its 'Story metadata' block, any line of V1 control
-    metadata and any 'Scope note:' paragraph are removed — covers, ac_proof, story_type, write_scope, depends_on,
-    screens and the V1 plan's ownership notes belong to the V1 plan and contradict PLAN-V2.2 wherever they differ
-    (STORY-01-01's write_scope has no ledger.py; PLAN-V2.2's obligations are over it). What the story must deliver, on
-    which subjects and after which stories comes from the current plan only."""
-    return LEGACY_LINE.sub("", LEGACY_NOTE.sub("", LEGACY_BLOCK.sub("", epics_section(epics, story)))).strip()
-
-
 def subject_text(kind: str, locator: str) -> str:
     """A contract's product subject as the developer reads it: a path, `module:object`, or the CLI entry point."""
     if kind == "file_artifact":
@@ -204,12 +182,18 @@ def sections(requirements: str) -> dict[str, str]:
     return out
 
 
-def prompts(plan, epics: str, requirements: str = "") -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
-    """The developer's task per plan story: the requirements (authoritative, in the repository), the requirement clause
-    of each obligation it must deliver or preserve and the product subjects those obligations name — all from the
-    CURRENT plan and contracts — and the story's V1-era epics section as prose context only (`story_prose`: no V1
-    control metadata, and said to yield to the clauses). The specs' probes, stimuli and expectations are not shown: the
-    proof is independent of the developer."""
+def prompts(plan, requirements: str) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
+    """The developer's task per plan story, from the CURRENT authoritative sources only: the requirements (in the
+    repository), the requirement clause of each obligation the story must deliver, preserve or verify, the product
+    subjects those obligations name (the approved contracts), and the plan stories it depends on.
+
+    H-PROMPT-002 (measured on attempt 3): the V1-era epics prose these prompts carried until attempt 3 as 'context only'
+    prescribed execution shapes — `Ledger.append(("put", key, value, rid, ts))` (or `("delete", key, rid, ts)`) in
+    STORY-01-05's section — that contradict the requirements' batch tuples (§5: `(op, key, value, rid, ts)`); STORY-01-05's
+    developer implemented the four-element delete and every later candidate kept it. The prose is not mechanically
+    separable into safe and unsafe parts, so none of it is used: no legacy story text, title, example, signature or
+    tuple layout, and nothing put in its place. The specs' probes, stimuli, inputs and expectations are not shown
+    either: the proof is independent of the developer."""
     from validation.qualification import p10_contracts as aid
     graph = aid.story_graph()
     specs = {s.id: sid for sid, s in _compiled().items()}
@@ -225,20 +209,17 @@ def prompts(plan, epics: str, requirements: str = "") -> tuple[dict[str, str], d
                     f"{text.get(t['clause'], t['clause'])}")
             lines.append(line)
             by_criterion[o.criterion_id] = line
-        prior = [s for s in sorted(graph.get(story, ())) if not any(o.story_id == s for o in plan.obligations)]
+        after = [s for s in sorted(graph.get(story, ())) if any(o.story_id == s for o in plan.obligations)]
         clauses[story] = "\n".join(dict.fromkeys(lines))
-        prior_text = "\n\n".join(story_prose(epics, s) for s in prior)
         subjects = sorted({subject_text(aid.SPECS[specs[o.product_proof_spec_id]]["kind"], aid.SPECS[specs[o.product_proof_spec_id]]["locator"])
                            for o in plan.obligations if o.story_id == story})
         out[story] = (
             f"You are the developer of LedgerLock story {story}. LedgerLock is a small Python library and CLI; "
             "docs/requirements.md in this repository is the authoritative specification. Implement this story in this "
             "repository (the package `ledgerlock/`, Python standard library only), working only inside this directory.\n\n"
-            "What this story must deliver is defined by the requirement clauses listed below and by docs/requirements.md. "
-            "The story description that follows is historical context only: where it names files, modules, scopes or "
-            "layouts that differ from the clauses or the requirements, the clauses and the requirements govern.\n\n"
-            f"The story (context only):\n\n{story_prose(epics, story)}\n\n"
-            + (f"Earlier stories it builds on that no other step of this run delivers (context only; implement what is missing):\n\n{prior_text}\n\n" if prior else "")
+            "What this story must deliver is defined by the requirement clauses listed below and by docs/requirements.md, "
+            "and by nothing else.\n\n"
+            + (f"The stories of this plan it depends on: {', '.join(after)}.\n\n" if after else "")
             + "When you finish, each of the following requirement clauses is verified independently against the "
               "requirements (INTRODUCE: this story makes it true; PRESERVE: it must stay true"
             + ("; VERIFY: it must be true when this story is done" if any("[VERIFY]" in x for x in lines) else "") + "):\n"
@@ -664,11 +645,9 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
     if plan.baseline != base["baseline"]:
         raise SystemExit("the plan is not at the workload's baseline")
     specs = {s.id: s for s in _compiled().values()}
-    epics = subprocess.run(["git", "-C", str(P10.LEDGERLOCK_REPO), "show", f"{P10.LEDGERLOCK_PLAN_COMMIT}:_bmad-output/epics.md"],
-                           capture_output=True, encoding="utf-8", check=True).stdout
     requirements_md = subprocess.run(["git", "-C", str(P10.LEDGERLOCK_REPO), "show", f"{P10.LEDGERLOCK_PLAN_COMMIT}:docs/requirements.md"],
                                      capture_output=True, encoding="utf-8", check=True).stdout
-    tasks, clauses, by_criterion = prompts(plan, epics, requirements_md)
+    tasks, clauses, by_criterion = prompts(plan, requirements_md)
     caps, layers, kernel = runspec_inputs(plan, profile, oc, exp, exp["preflight_fields"] if exp else None)
     if exp and resolve(caps, layers, base["baseline"]).runspec_hash != exp["resolved_runspec_hash"]:
         raise SystemExit("REFUSED: this run's RunSpec is not the one the attestation resolved")     # the journal binds this hash

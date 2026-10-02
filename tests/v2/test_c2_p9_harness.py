@@ -1,9 +1,11 @@
 """The QP-2.9 harness corrections of the owner ruling 'AISEF V2 — BOUNDED CORRECTIVE PATCH' — deterministic, no model,
 no LedgerLock repository, nothing run:
 
-  H-PROMPT-001 (§4)  the developer prompt carries no V1-era control metadata (write_scope / ac_proof / story_type /
-                     covers / depends_on / screens); the legacy story text is prose context that yields to the current
-                     clauses; the product subjects come from the approved contracts.
+  H-PROMPT-002       the developer prompt is built from the current authoritative sources only — the requirement
+                     clauses of the story's obligations, the product subjects of the approved contracts, the plan
+                     stories it depends on. No V1-era story text: its execution examples (attempt 3: STORY-01-05's
+                     `("delete", key, rid, ts)`) contradicted the requirements and were implemented. It replaces
+                     H-PROMPT-001, which kept that text as 'context only' without its metadata.
   §7                 a run's git objects are preserved outside its temporary directory before it is removed, and it
                      is not removed unless they are.
   §6                 the proposed `v1-aligned` profile gives 3 total developer attempts; the default profile is the
@@ -17,8 +19,11 @@ no LedgerLock repository, nothing run:
 from __future__ import annotations
 
 import hashlib
+import inspect
+import json
 import os
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
@@ -29,90 +34,97 @@ if str(ROOT) not in sys.path:
 
 from aisef2.arch.enums import ObligationRole, Owner  # noqa: E402
 from aisef2.orchestrate.workspace import commit_all, git  # noqa: E402
+from aisef2.product.contract import plain  # noqa: E402
 from tests.v2 import test_p6_orchestration as e2e  # noqa: E402
 from validation.qualification import c2_p9  # noqa: E402
+from validation.qualification import c2_plan_correction as pc  # noqa: E402
 from validation.qualification import p10_contracts as aid  # noqa: E402
 
-#: Story 1.1's metadata exactly as the V1-era epics carry it at the plan commit (the block attempt 2 handed over)
-STORY_1_1_METADATA = """**Story metadata:**
-- covers: FR-1, FR-12, FR-14
-- ac_proof: 1=CHANGE_REQUIRED/FR-1, 2=CHANGE_REQUIRED/FR-1, 3=CHANGE_REQUIRED/FR-14, 4=NEGATIVE_INVARIANT/FR-14, 5=NEGATIVE_INVARIANT/FR-14, 6=CHANGE_REQUIRED/FR-14, 7=CHANGE_REQUIRED/FR-12
-- write_scope: pyproject.toml, ledgerlock/__init__.py, ledgerlock/__main__.py, ledgerlock/format.py, tests/__init__.py, tests/test_skeleton.py, tests/test_nfc_normalization.py, README.md
-- depends_on: none
-- screens: none"""
-STORIES = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (2, 1), (2, 2), (3, 1), (3, 2), (4, 1), (4, 2), (4, 3), (5, 1), (5, 2), (5, 3)]
+#: V1-era control metadata and story prose: none of it may be in a prompt (H-PROMPT-001, H-PROMPT-002)
 LEGACY_TOKENS = ("write_scope", "ac_proof", "story_type", "depends_on:", "covers:", "screens:", "Story metadata", "VERIFICATION_ONLY",
                  "ledgerlock/format.py", "tests/test_skeleton.py", "Scope note", "do not pre-empt", "PRESERVE_REQUIRED", "CHANGE_REQUIRED",
-                 "NEGATIVE_INVARIANT")
-#: Story 4.1's ownership note in the V1-era epics (prose, outside the metadata block): V1 ownership and a V1 proof mode
-SCOPE_NOTE = ("Scope note: the **error** exit codes are STORY-04-02's contract. Implement the success paths here; do not pre-empt "
-              "them. This story must not regress the usage-error exit, which is why its criterion here is PRESERVE_REQUIRED.")
+                 "NEGATIVE_INVARIANT", "### Story", "**As a**", "**I want**", "**So that**", "Acceptance criteria", "context only",
+                 "historical context")
 REQUIREMENTS = (ROOT / "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md").read_text(encoding="utf-8")
-#: sha256 of the nine generated prompts joined in story order, over the synthetic epics below (the prompt snapshot)
-SNAPSHOT = "858af6d1ff552d47c0c956516bd62436d3d6492fc96357721ebca9b6a826ee1d"
+#: the legacy execution shapes of attempt 3's seven prompts, measured on the harness of the commit it executed on
+ATTEMPT_3 = json.loads((ROOT / "tests/v2/fixtures/h_prompt_002/ATTEMPT-3-LEGACY-SHAPES.json").read_text(encoding="utf-8"))
+#: what attempt 3's STORY-01-05 prompt prescribed, and every candidate after it implemented
+FOUR_ELEMENT_DELETE = ('Ledger.append(("put", key, value, rid, ts))', '("delete", key, rid, ts)', 'delete("k", "r1", 100)')
+#: a delete with three parts after the op, in a tuple or a call: the shape §5 does not have
+DELETE_SHAPE = re.compile(r'\(\s*"delete"\s*,(?:[^,()]*,){2}[^,()]*\)|\bdelete\((?:[^,()]*,){2}[^,()]*\)')
+CODE = re.compile(r"`([^`\n]+)`")
+#: sha256 of the seven prompts of the corrected plan joined in story order (the prompt snapshot)
+SNAPSHOT = "8d277f575dde49ad91e1de3365bf5fa55dc01f36e8a5a687810c5997f3e2876f"
 
 
-def epics() -> str:
-    """A V1-shaped epics document: every story a section with prose and a 'Story metadata' block."""
-    out = ["# Epics", "", "## Epic 1: Foundation"]
-    for e, n in STORIES:
-        meta = STORY_1_1_METADATA if (e, n) == (1, 1) else (
-            f"**Story metadata:**\n- covers: FR-{e}\n- ac_proof: 1=CHANGE_REQUIRED/FR-{e}\n"
-            + ("- story_type: VERIFICATION_ONLY\n" if e == 5 else "")
-            + f"- write_scope: ledgerlock/legacy_{e}_{n}.py, tests/test_legacy_{e}_{n}.py\n- depends_on: {e}.{n - 1 or 1}\n- screens: none")
-        out += ["", f"### Story {e}.{n}: legacy title {e}.{n}", "", f"**As a** developer **I want** behaviour {e}.{n}.", "",
-                *([SCOPE_NOTE, ""] if (e, n) == (4, 1) else []),
-                "**Acceptance criteria:**", "", f"- Given the library, when story {e}.{n} is done, then `normalize_key` behaves.", "", meta]
-    return "\n".join(out) + "\n"
+def composites(value):
+    """Every list and dict inside a probe input — each step, each argument list, each observable: what a prompt must
+    never show (a leaf string may be a word the requirements also use)."""
+    if isinstance(value, (list, dict)):
+        yield value
+        for v in (value.values() if isinstance(value, dict) else value):
+            yield from composites(v)
 
 
 class Prompt(unittest.TestCase):
+    """H-PROMPT-002, on the real prompts: the corrected plan's seven stories over the frozen requirements."""
+
     @classmethod
     def setUpClass(cls):
-        cls.plan = aid.build()["plan"]
-        cls.epics = epics()
-        cls.tasks, cls.clauses, cls.by_criterion = c2_p9.prompts(cls.plan, cls.epics, REQUIREMENTS)
+        cls.plan = pc.corrected_plan()
+        cls.tasks, cls.clauses, cls.by_criterion = c2_p9.prompts(cls.plan, REQUIREMENTS)
 
-    def test_the_fixture_is_contaminated_the_way_attempt_2_was(self):
-        legacy = c2_p9.epics_section(self.epics, "STORY-01-01")
-        self.assertIn("write_scope: pyproject.toml, ledgerlock/__init__.py, ledgerlock/__main__.py, ledgerlock/format.py", legacy)
-        self.assertNotIn("ledger.py", legacy.split("write_scope:")[1].splitlines()[0])   # the obsolete scope has no ledger.py
+    def test_the_prompts_are_built_from_the_plan_and_the_requirements_only(self):
+        self.assertEqual(list(inspect.signature(c2_p9.prompts).parameters), ["plan", "requirements"])
+        self.assertEqual(sorted(self.tasks), ["STORY-01-01", "STORY-01-05", "STORY-02-01", "STORY-02-02", "STORY-03-01", "STORY-04-01",
+                                              "STORY-04-02"])
+        for name in ("story_prose", "epics_section", "LEGACY_BLOCK", "LEGACY_KEYS", "LEGACY_LINE", "LEGACY_NOTE"):
+            self.assertFalse(hasattr(c2_p9, name), name)
 
-    def test_no_prompt_carries_legacy_control_metadata(self):
-        self.assertEqual(sorted(self.tasks), sorted({o.story_id for o in self.plan.obligations}))
-        self.assertEqual(len(self.tasks), 9)
+    def test_no_legacy_metadata_or_story_text(self):
         for story, prompt in self.tasks.items():
             for token in LEGACY_TOKENS:
                 with self.subTest(story=story, token=token):
                     self.assertNotIn(token, prompt)
 
-    def test_the_prose_of_a_legacy_section_is_kept_without_its_metadata(self):
-        prose = c2_p9.story_prose(self.epics, "STORY-01-01")
-        self.assertTrue(prose.startswith("### Story 1.1: legacy title 1.1"))
-        self.assertIn("**Acceptance criteria:**", prose)
-        self.assertIn("normalize_key", prose)
-        self.assertNotIn("Story metadata", prose)
-        for story in sorted({f"STORY-{e:02d}-{n:02d}" for e, n in STORIES}):
-            self.assertEqual([k for k in c2_p9.LEGACY_KEYS if f"{k}:" in c2_p9.story_prose(self.epics, story)], [], story)
-
-    def test_a_scope_note_paragraph_is_removed_and_the_prose_around_it_kept(self):
-        legacy = c2_p9.epics_section(self.epics, "STORY-04-01")
-        self.assertIn("Scope note:", legacy)
-        prose = c2_p9.story_prose(self.epics, "STORY-04-01")
-        self.assertEqual(prose, "### Story 4.1: legacy title 4.1\n\n**As a** developer **I want** behaviour 4.1.\n\n"
-                                "**Acceptance criteria:**\n\n- Given the library, when story 4.1 is done, then `normalize_key` behaves.")
-
-    def test_a_stray_metadata_line_outside_the_block_is_removed_too(self):
-        stray = "### Story 1.1: t\n\nprose line\n- write_scope: ledgerlock/format.py\n* ac_proof: 1=CHANGE_REQUIRED/FR-1\nmore prose\n"
-        self.assertEqual(c2_p9.story_prose(stray, "STORY-01-01"), "### Story 1.1: t\n\nprose line\nmore prose")
-
-    def test_the_legacy_text_is_stated_as_context_that_yields_to_the_clauses(self):
+    def test_the_four_element_delete_of_attempt_3_does_not_return(self):
+        self.assertTrue(DELETE_SHAPE.search('`("delete", key, rid, ts)`') and DELETE_SHAPE.search('delete("k", "r1", 100)'))
+        self.assertFalse(DELETE_SHAPE.search('("delete", key, value, rid, ts)'))          # §5's five-field tuple is not that shape
         for story, prompt in self.tasks.items():
             with self.subTest(story=story):
-                self.assertIn("historical context only", prompt)
-                self.assertIn("the clauses and the requirements govern", prompt)
-                self.assertLess(prompt.index("historical context only"), prompt.index("The story (context only):"))
-                self.assertLess(prompt.index("The story (context only):"), prompt.index("each of the following requirement clauses"))
+                self.assertEqual([x for x in FOUR_ELEMENT_DELETE if x in prompt], [])
+                self.assertIsNone(DELETE_SHAPE.search(prompt))
+
+    def test_none_of_attempt_3_s_legacy_execution_shapes_returns(self):
+        self.assertEqual((ATTEMPT_3["shapes_total"], len(ATTEMPT_3["distinct_shapes_not_verbatim_in_the_requirements"])), (162, 43))
+        self.assertTrue(set(FOUR_ELEMENT_DELETE[:2]) <= set(ATTEMPT_3["distinct_shapes_not_verbatim_in_the_requirements"]))
+        for story, prompt in self.tasks.items():
+            with self.subTest(story=story):
+                self.assertEqual([x for x in ATTEMPT_3["distinct_shapes_not_verbatim_in_the_requirements"] if x in prompt], [])
+
+    def test_every_code_span_is_requirement_text_or_the_harness_s_own_instruction(self):
+        for story, prompt in self.tasks.items():
+            own = {"ledgerlock/", f"python -m unittest {c2_p9.test_path(story)}"}
+            with self.subTest(story=story):
+                self.assertEqual([c for c in CODE.findall(prompt) if c not in own and c not in REQUIREMENTS], [])
+
+    def test_no_hidden_probe_input(self):
+        specs = {s.id: s for s in c2_p9._compiled().values()}
+        for story, prompt in self.tasks.items():
+            for o in (o for o in self.plan.obligations if o.story_id == story):
+                pi = plain(specs[o.product_proof_spec_id].probe_input)
+                hidden = [json.dumps(v, ensure_ascii=False) for v in composites({k: pi.get(k) for k in ("stimulus", "observable")})]
+                with self.subTest(story=story, criterion=o.criterion_id):
+                    self.assertEqual([h for h in hidden if len(h) > 6 and h in prompt], [])
+            for word in ("stimulus", "observable", "expect_raises", "scenario", "within_s", "semantic_hash", "PPS-", "probe_input"):
+                with self.subTest(story=story, word=word):
+                    self.assertNotIn(word, prompt)
+
+    def test_the_plan_stories_it_depends_on_are_named(self):
+        self.assertNotIn("depends on", self.tasks["STORY-01-01"])
+        self.assertIn("The stories of this plan it depends on: STORY-01-01, STORY-01-05, STORY-02-01, STORY-02-02.", self.tasks["STORY-03-01"])
+        self.assertIn("The stories of this plan it depends on: STORY-01-01, STORY-01-05, STORY-02-01, STORY-02-02, STORY-03-01, STORY-04-01.",
+                      self.tasks["STORY-04-02"])
 
     def test_scope_comes_from_the_current_plan_every_obligation_s_clause_and_the_contract_subjects(self):
         specs = {s.id: sid for sid, s in c2_p9._compiled().items()}
@@ -130,18 +142,12 @@ class Prompt(unittest.TestCase):
         for subject in ("ledgerlock/ledger.py", "ledgerlock/cli.py", "ledgerlock/__init__.py", "python -m ledgerlock"):
             self.assertIn(subject, s11)                       # the files the obsolete write_scope did not have
 
-    def test_the_proof_stays_independent_no_stimulus_observable_or_expectation_is_shown(self):
-        for story, prompt in self.tasks.items():
-            for word in ("stimulus", "observable", "expect_raises", "scenario", "within_s", "semantic_hash", "PPS-"):
-                with self.subTest(story=story, word=word):
-                    self.assertNotIn(word, prompt)
-
     def test_the_prompt_snapshot(self):
         joined = "\n=====\n".join(f"{s}\n{self.tasks[s]}" for s in sorted(self.tasks))
         self.assertEqual(hashlib.sha256(joined.encode("utf-8")).hexdigest(), SNAPSHOT)
 
     def test_generation_is_deterministic(self):
-        again = c2_p9.prompts(self.plan, self.epics, REQUIREMENTS)
+        again = c2_p9.prompts(self.plan, REQUIREMENTS)
         self.assertEqual((self.tasks, self.clauses, self.by_criterion), again)
 
 

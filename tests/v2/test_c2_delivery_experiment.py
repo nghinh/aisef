@@ -129,7 +129,7 @@ class Prompts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.plan = pc.corrected_plan()
-        cls.tasks, _, cls.by_criterion = c2_p9.prompts(cls.plan, harness.epics(), harness.REQUIREMENTS)
+        cls.tasks, _, cls.by_criterion = c2_p9.prompts(cls.plan, harness.REQUIREMENTS)
 
     def test_seven_stories_have_a_task_and_the_removed_two_have_none(self):
         self.assertEqual(sorted(self.tasks), ["STORY-01-01", "STORY-01-05", "STORY-02-01", "STORY-02-02", "STORY-03-01", "STORY-04-01",
