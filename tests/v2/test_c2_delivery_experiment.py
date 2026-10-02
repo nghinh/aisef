@@ -247,10 +247,10 @@ class BudgetFromEvidence(Evidence):
         return c2_p9.wait_within(Range(), log, 600.0, budget, turn_cap), Range.waits
 
     def test_a_running_session_is_stopped_when_the_global_turn_ceiling_is_reached(self):
-        (self.logs / "S0.developer.1.jsonl").write_text(step() * 340, encoding="utf-8")     # earlier sessions of the experiment
+        (self.logs / "S0.developer.1.jsonl").write_text(step() * 690, encoding="utf-8")     # earlier sessions of the experiment
         self.events += requests(1)
-        (code, stopped), waits = self.running(self.budget(turns=350), step())
-        self.assertEqual((code, stopped, waits), (None, "max_turns: 350 of 350", 10))
+        (code, stopped), waits = self.running(self.budget(turns=dx.EXPERIMENT["budget"]["turns"]), step(), turn_cap=80)
+        self.assertEqual((code, stopped, waits), (None, "max_turns: 700 of 700", 10))       # the experiment's ceiling, before the session's cap
 
     def test_a_running_session_is_stopped_at_the_token_ceilings(self):
         (code, stopped), waits = self.running(self.budget(base={**ZERO, "input_tokens": 7000}, input_tokens=10_000), step(1000))
@@ -259,6 +259,13 @@ class BudgetFromEvidence(Evidence):
     def test_a_session_that_ends_under_the_budget_is_not_stopped(self):
         (code, stopped), waits = self.running(self.budget(), step(), exits_after=5)
         self.assertEqual((code, stopped, waits), (0, None, 5))
+
+    def test_a_session_at_its_own_turn_cap_is_stopped_and_the_experiment_goes_on(self):
+        b = self.budget(**dx.EXPERIMENT["budget"])
+        (code, stopped), waits = self.running(b, step(), turn_cap=dx.EXPERIMENT["max_turns_per_session"])
+        self.assertEqual((code, stopped, waits), (None, "session turn cap: 80 turns", 80))
+        self.assertIsNone(b.reached())                                                      # no experiment ceiling was reached by it
+        self.assertEqual(b.spend()["turns"], 80)                                            # and its turns are in the experiment's total
 
     def test_the_smoke_probe_has_its_own_turn_cap(self):
         (code, stopped), waits = self.running(self.budget(), step(), turn_cap=10)
@@ -279,7 +286,10 @@ class BudgetFromEvidence(Evidence):
         self.assertEqual((again["started"], again["stopped"]), (False, "S.developer.1.jsonl exists: a session's evidence is never overwritten"))
 
     def test_the_experiment_s_budget_is_the_owner_s(self):
-        self.assertEqual(dx.EXPERIMENT["budget"], {"provider_requests": 60, "turns": 350, "input_tokens": 30_000_000, "output_tokens": 250_000})
+        self.assertEqual(dx.EXPERIMENT["budget"], {"provider_requests": 60, "turns": 700, "input_tokens": 60_000_000, "output_tokens": 400_000})
+        self.assertEqual(dx.EXPERIMENT["max_turns_per_session"], 80)
+        shape = dx.EXPERIMENT["preflight_shape"]
+        self.assertEqual((shape["smokes"], shape["smoke_max_turns"], shape["smoke_timeout_s"]), (1, 10, 300.0))
         self.assertEqual(sorted(dx.EXPERIMENT["budget"]), sorted(c2_p9.Budget.KEYS))
         with self.assertRaises(ValueError):
             c2_p9.Budget({"turns": 1}, ZERO, self.logs)
@@ -288,8 +298,9 @@ class BudgetFromEvidence(Evidence):
 class Provider:
     """The router, faked: its model listing and its chat completions. Every call is recorded; nothing leaves the process."""
 
-    def __init__(self, owner="ds", models=("deepseek-v4-pro",) * 3, usage=True, http=200, breaks_at=None):
+    def __init__(self, owner="ds", models=("deepseek-v4-pro",) * 3, usage=True, http=200, breaks_at=None, system_fingerprints=None):
         self.owner, self.models, self.usage, self.http, self.breaks_at, self.calls = owner, models, usage, http, breaks_at, []
+        self.system_fingerprints = system_fingerprints
 
     def __call__(self, path, body=None):
         self.calls.append(path)
@@ -299,6 +310,7 @@ class Provider:
             return 200, {"data": [{"id": "ds/deepseek-v4-pro", "object": "model", "owned_by": self.owner}, {"id": "mycombo", "owned_by": "combo"}]}
         i = sum(1 for c in self.calls if c == "/chat/completions") - 1
         return self.http, {"model": self.models[i], "object": "chat.completion",
+                           **({"system_fingerprint": self.system_fingerprints[i]} if self.system_fingerprints else {}),
                            "usage": {"prompt_tokens": 2090, "completion_tokens": 12, "total_tokens": 2102} if self.usage else None}
 
 
@@ -352,8 +364,8 @@ class Preflight(Attempt):
             self.assertEqual((cap["grade"], cap["enforcement"]), ("ATTESTED", "PARTIAL"))
             self.assertEqual({k: v for k, v in cap["binding"].items() if k != "fingerprint"}, dx.allowed_identity(OC))
             self.assertRegex(cap["binding"]["fingerprint"], r"^[0-9a-f]{64}$")
-        self.assertEqual(sorted(rec["capabilities"]["developer"]["binding"]),
-                         ["client", "declared_model", "deployment", "endpoint", "fingerprint", "provider", "route"])
+        self.assertEqual(sorted(rec["capabilities"]["developer"]["binding"]), ["client", "declared_model", "endpoint", "fingerprint", "provider", "route"])
+        self.assertEqual(rec["deployment_identity"], "NOT_EXPOSED")                     # this provider exposed none: none is bound
         self.assertEqual(rec["resolved_runspec_hash"], dx.runspec(OC, rec["fingerprint_fields"]).runspec_hash)
         self.assertEqual(self.gate(), [])                                               # and it unlocks delivery
 
@@ -370,6 +382,23 @@ class Preflight(Attempt):
         self.addCleanup(other.doCleanups)
         b = other.attest(smoke_=smoke(steps=7), at=NOW + 86_400)["fingerprint_fields"]  # another day, another number of turns
         self.assertEqual(a, b)
+
+    def test_a_deployment_identity_is_bound_only_when_the_provider_exposes_one_stable_value(self):
+        rec = self.attest(Provider(system_fingerprints=("fp_44709d6fcb",) * 3))
+        self.assertEqual((rec["verdict"], rec["deployment_identity"]), ("ATTESTED", "system_fingerprint:fp_44709d6fcb"))
+        self.assertEqual(rec["capabilities"]["developer"]["binding"]["deployment"], "system_fingerprint:fp_44709d6fcb")
+        self.assertEqual(rec["resolved_runspec_hash"], dx.runspec(OC, rec["fingerprint_fields"], "system_fingerprint:fp_44709d6fcb").runspec_hash)
+        self.assertNotEqual(rec["resolved_runspec_hash"], dx.runspec(OC, rec["fingerprint_fields"]).runspec_hash)
+        self.assertEqual(rec["runspec_template_hash"], dx.runspec(OC).runspec_hash)      # the template never carries one
+        self.assertEqual(self.gate(), [])
+        self.tamper(lambda att: att.update(deployment_identity="NOT_EXPOSED"))
+        self.assertIn("the deployment identity recorded is not what the observation exposes", self.gate())
+        other = self._fresh()
+        rec = Attempt.attest(other, Provider(system_fingerprints=("fp_a", "fp_b", "fp_a")))
+        self.assertEqual((rec["verdict"], rec["deployment_identity"]), ("ATTESTED", "EXPOSED_NOT_STABLE:2_values"))
+        self.assertNotIn("deployment", rec["capabilities"]["developer"]["binding"])      # not one stable value: none is bound, none made up
+        self.assertEqual(rec["fingerprint_fields"]["response"]["system_fingerprint"], ["fp_a", "fp_b"])   # the fingerprint still binds what was seen
+        self.assertEqual(other.gate(), [])
 
     def test_another_model_answering_is_not_attested_and_the_preflight_stops_at_once(self):
         rec = self.attest(Provider(models=("MiniMax-M3",) * 3))
@@ -586,7 +615,9 @@ class RunSpecs(unittest.TestCase):
         self.assertEqual(dict(s["budget"]["value"]), dx.EXPERIMENT["budget"])
         self.assertEqual((s["plan_hash"]["value"], s["kernel_commit"]["value"], s["experiment"]["value"]),
                          (pc.corrected_plan().plan_hash, dx.EXPERIMENT["kernel_commit"], c2_p9.EXPERIMENT))
-        for key, change in (("budget", {**dx.EXPERIMENT["budget"], "turns": 351}), ("route", "9router/mycombo"), ("resolved_model", "other"),
+        self.assertEqual(s["max_turns_per_session"]["value"], 80)
+        for key, change in (("budget", {**dx.EXPERIMENT["budget"], "turns": 701}), ("max_turns_per_session", 81), ("route", "9router/mycombo"),
+                            ("resolved_model", "other"),
                             ("kernel_commit", "0" * 40), ("preflight_shape", {**dx.EXPERIMENT["preflight_shape"], "smokes": 2})):
             with self.subTest(key=key), mock.patch.dict(dx.EXPERIMENT, {key: change}):
                 self.assertNotEqual(dx.runspec(OC).runspec_hash, self.template.runspec_hash)
@@ -601,8 +632,8 @@ class Preregistration(unittest.TestCase):
 
     def test_the_record_binds_what_this_tree_holds(self):
         r = self.rec
-        self.assertEqual((r["verdict"], r["problems"]), ("PREREGISTERED — READY FOR AN OWNER DECISION; NOT AUTHORIZED", []))
-        self.assertIs(r["run_authorized"], False)
+        self.assertEqual((r["verdict"], r["problems"]), ("PREREGISTERED — THE FINAL OWNER BUDGET; ONE RUN", []))
+        self.assertTrue(r["run_authorized"].startswith("ONE RUN, by the owner's ruling"))
         self.assertEqual(r["provider_calls_made_preparing_this"], 0)
         self.assertEqual(r["plan"]["plan_hash"], self.plan.plan_hash)
         self.assertEqual(r["plan"]["correction"]["sha256"], c2_p9.C.lf_sha(ROOT / pc.OUT_REL))
@@ -618,8 +649,9 @@ class Preregistration(unittest.TestCase):
     def test_the_owner_s_budget_three_attempts_and_one_fixed_route(self):
         r = self.rec
         b = r["budget"]
-        self.assertEqual((b["max_provider_requests"], b["max_total_turns"], b["max_combined_input_tokens"], b["max_output_plus_reasoning_tokens"]),
-                         (60, 350, 30_000_000, 250_000))
+        self.assertEqual((b["max_provider_requests"], b["max_total_turns"], b["max_turns_per_session"], b["max_combined_input_tokens"],
+                          b["max_output_plus_reasoning_tokens"]), (60, 700, 80, 60_000_000, 400_000))
+        self.assertEqual(r["runspec"]["settings"]["max_turns_per_session"]["value"], 80)
         self.assertEqual(b["accounting_limitation"], c2_p9.ACCOUNTING_LIMITATION)
         self.assertEqual(dict(r["runspec"]["settings"]["budget"]["value"]), dx.EXPERIMENT["budget"])
         self.assertEqual((r["profile"]["developer_attempts_per_story"], r["profile"]["limits"]["DEVELOPER"]), (3, 2))
@@ -638,9 +670,9 @@ class Preregistration(unittest.TestCase):
                          ("OPAQUE", "ATTESTED"))
         dev = next(c for c in r["runspec"]["template_capabilities"] if c["name"] == "developer")
         self.assertEqual(dev["binding"], r["model"]["allowed_identity"])
-        self.assertEqual({k: r["model"]["allowed_identity"][k] for k in ("provider", "endpoint", "declared_model", "route", "deployment")},
+        self.assertEqual({k: v for k, v in r["model"]["allowed_identity"].items() if k != "client"},
                          {"provider": "9router", "endpoint": "https://9router.vnteki.com/v1", "declared_model": "deepseek-v4-pro",
-                          "route": "9router/ds/deepseek-v4-pro", "deployment": "owned_by:ds"})
+                          "route": "9router/ds/deepseek-v4-pro"})                      # no deployment is preregistered: it is bound only if exposed
         self.assertRegex(r["model"]["allowed_identity"]["client"], r"^opencode \S+ binary-sha256:[0-9a-f]{64} routing-config-sha256:[0-9a-f]{64}$")
         s = r["model"]["stable_declared_identity"]
         self.assertEqual((s["models_that_answered"], s["upstreams_listed"]), (["deepseek-v4-pro"], ["ds"]))
@@ -663,7 +695,7 @@ class Preregistration(unittest.TestCase):
         body["final_evaluation"]["v1_oracle"]["ORACLE_CALIBRATION_EQUIVALENCE"] = "FAIL"
         self.assertTrue(any(p.startswith("ORACLE_ENVIRONMENT_NOT_EQUIVALENT") for p in dx.problems(body)))
         body = copy.deepcopy(self.rec)
-        body["budget"]["max_total_turns"] = 351
+        body["budget"]["max_total_turns"] = 701
         self.assertIn("the budget is not the owner's", dx.problems(body))
         body = copy.deepcopy(self.rec)
         body["model"]["stable_declared_identity"]["models_that_answered"] = ["deepseek-v4-pro", "MiniMax-M3"]
@@ -715,10 +747,10 @@ class FalsePass(unittest.TestCase):
     def test_the_first_stories_committed_then_a_budget_stop(self):
         events = journal(STORIES[:3])
         self.assertEqual(c2_p9.P10.delivery_verdict_of(events, plan_admitted=True), "PASS")     # the journal alone: every story IN IT committed
-        results = {**{s: ["COMMIT"] for s in STORIES[:3]}, **{s: ["NOT_RUN: max_turns: 350 of 350"] for s in STORIES[3:]}}
-        rec = self.record(events, results, reached="max_turns: 350 of 350")
+        results = {**{s: ["COMMIT"] for s in STORIES[:3]}, **{s: ["NOT_RUN: max_turns: 700 of 700"] for s in STORIES[3:]}}
+        rec = self.record(events, results, reached="max_turns: 700 of 700")
         self.assertEqual((rec["delivery_verdict"], rec["stories_not_committed"]), ("FAIL", STORIES[3:]))
-        self.assertEqual(rec["delivery_pass_blocked_by"], ["4 of the plan's stories did not commit", "the budget ended the experiment: max_turns: 350 of 350"])
+        self.assertEqual(rec["delivery_pass_blocked_by"], ["4 of the plan's stories did not commit", "the budget ended the experiment: max_turns: 700 of 700"])
 
     def test_the_final_story_never_starts(self):
         rec = self.record(journal(STORIES[:6]), {s: ["COMMIT"] for s in STORIES[:6]})

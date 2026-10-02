@@ -590,7 +590,9 @@ def runspec_inputs(plan, profile: str, oc: dict, fixed: dict | None = None, pref
         if preflight is None:
             models = [opaque(name, Enforcement.PARTIAL, **fixed["identity"]) for name in ("developer", "reviewer")]
         else:
-            models = [attested(name, preflight=preflight, enforcement=Enforcement.PARTIAL, **fixed["identity"]) for name in ("developer", "reviewer")]
+            # the deployment is bound only when the provider exposed one (the kernel's own optional field); never made up
+            models = [attested(name, preflight=preflight, enforcement=Enforcement.PARTIAL, deployment=fixed.get("deployment"), **fixed["identity"])
+                      for name in ("developer", "reviewer")]
     caps = [verified("kernel", kernel.encode(), Enforcement.FULL, tree=C.git("rev-parse", "HEAD:aisef2")),
             verified("python", pathlib.Path(sys.executable), Enforcement.PARTIAL, version=platform.python_version()),
             verified("git", pathlib.Path(shutil.which("git")), Enforcement.PARTIAL),
@@ -601,7 +603,8 @@ def runspec_inputs(plan, profile: str, oc: dict, fixed: dict | None = None, pref
               "limits": {"value": PROFILES[profile], "layer": f"c2-p9 profile {profile}"}}
     if fixed:
         layers.update({k: {"value": fixed[k], "layer": "preregistration"} for k in
-                       ("experiment", "kernel_commit", "budget", "preflight_shape", "developer_timeout_s", "reviewer_timeout_s")})
+                       ("experiment", "kernel_commit", "budget", "max_turns_per_session", "preflight_shape", "developer_timeout_s",
+                        "reviewer_timeout_s")})
         if preflight is not None:
             template = runspec_inputs(plan, profile, oc, fixed)
             layers["preregistered_template_hash"] = {"value": resolve(template[0], template[1], plan.baseline).runspec_hash, "layer": "preregistration"}
@@ -668,7 +671,8 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
         if exp:     # the budget reads the journal, the session streams and the preflight's accounting — it counts nothing itself
             budget = Budget(exp["budget"], exp["preflight_accounting"], logs,
                             lambda: sum(1 for e in run_.events if e.type == "provider/request"))
-            session_kw = {"model": exp["route"], "env": dx.client_env(), "budget": budget}
+            # a session at its own turn cap is stopped (what it changed is still judged by the proofs); the experiment goes on
+            session_kw = {"model": exp["route"], "env": dx.client_env(), "budget": budget, "turn_cap": exp["max_turns_per_session"]}
         dev, rev = OpenCodeDeveloper(run_, tasks, logs, by_criterion, session_kw), OpenCodeReviewer(run_, clauses, logs, session_kw)
         adapters = sr.Adapters(dev, rev, RuffScanner(), merger, ws)
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch)) for e in catalog.CATALOG}
@@ -817,6 +821,8 @@ def record(out_dir: pathlib.Path, m: dict) -> dict:
                            "model": m["oc"], "kernel_digest": m["kernel"],
                            "fixed_model": {k: exp[k] for k in ("route", "resolved_model", "route_kind")} if exp else None,
                            "attestation": exp["attestation"] if exp else None, "budget": budget,
+                           "max_turns_per_session": exp["max_turns_per_session"] if exp else None,
+                           "sessions_stopped_at_the_session_cap": sum(1 for s in m["sessions"] if str(s.get("stopped") or "").startswith("session turn cap")),
                            "grade_note": ("one fixed model route, given to the client explicitly, ATTESTED by the preflight beside this record "
                                           "before delivery was unlocked; the fingerprint is a drift detector, not a claim about model weights") if exp else
                                          "the route is a routing alias: OPAQUE, which bars sealing and nothing else here; no model identity is inferred from it"},

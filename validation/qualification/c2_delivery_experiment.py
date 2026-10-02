@@ -19,7 +19,7 @@ attempt that holds a preflight, passed or failed, is never preflighted again.
 
 **The identity** is the kernel's own ATTESTED grade (RFC §23; aisef2/runtime/capability.py), nothing new: provider,
 endpoint, declared model, route, client (its version, binary digest and the digest of its routing configuration),
-deployment (the upstream the router names), and the fingerprint of the observable preflight fields. The fingerprint is
+deployment only when the provider exposes one (else NOT_EXPOSED: none is made up), and the fingerprint of the observable preflight fields. The fingerprint is
 a drift detector, not a claim about model weights. A provider that does not show one stable declared model is not
 attested: MODEL_IDENTITY_CANNOT_BE_ATTESTED, and delivery stays locked.
 
@@ -56,9 +56,9 @@ from validation.qualification import c2_plan_correction as pc  # noqa: E402
 
 C, P10 = c2_p9.C, c2_p9.P10
 OUT_REL = "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-PREREGISTRATION.json"
-AUTHORITY = ("owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL' and 'AISEF V2 — "
-             "DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' (2026-10-02); the run itself is NOT "
-             "authorized by them")
+AUTHORITY = ("owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — "
+             "DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY "
+             "EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02): exactly ONE paid run, attempt 3, no second attempt")
 W1 = "closure-evidence/hardening/w1"
 ORACLE_REL = f"{W1}/oracle/test_oracle.py"
 ORACLE_INDEPENDENCE_REL = f"{W1}/ORACLE-INDEPENDENCE.json"
@@ -77,10 +77,12 @@ EXPERIMENT = {
     # the route of the V1 baseline profile PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO (same plan base, max_retries 2)
     "provider": "9router", "endpoint": "https://9router.vnteki.com/v1",
     "route": "9router/ds/deepseek-v4-pro", "route_kind": "FIXED_MODEL", "resolved_model": "deepseek-v4-pro",
-    "deployment": "owned_by:ds",                        # the upstream the router's listing names for the route
+    "listing_owner": "ds",                              # the upstream the router's listing must name for the route (never "combo")
     "model_limit": {"context": 200000, "output": 32768},
-    # THE OWNER'S HARD SPEND BUDGET (ruling 'EXECUTION GUARD' §1): over the whole experiment, preflight included
-    "budget": {"provider_requests": 60, "turns": 350, "input_tokens": 30_000_000, "output_tokens": 250_000},
+    # THE OWNER'S FINAL HARD BUDGET ('SINGLE PAID DELIVERY EXPERIMENT / FINAL OWNER AUTHORIZATION' §B): over the whole
+    # experiment, preflight included — a bounded V1-aligned envelope (V1 on this route: 600-668 turns, 50-58M input)
+    "budget": {"provider_requests": 60, "turns": 700, "input_tokens": 60_000_000, "output_tokens": 400_000},
+    "max_turns_per_session": 80,                        # §C: a developer or reviewer session; the smoke session has its own cap
     "preflight_shape": {"listing": 1, "chat_probes": 3, "chat_probe_max_tokens": 16, "smokes": 1, "smoke_max_turns": 10,
                         "smoke_timeout_s": 300.0},
     "attestation_max_age_s": 3600,
@@ -159,7 +161,7 @@ def allowed_identity(oc: dict) -> dict:
     """The model identity the preflight is ALLOWED to find — every field of the kernel's ATTESTED binding except the
     fingerprint it measures. The client is one string: who it is, its version, its binary and its routing configuration."""
     return {"provider": EXPERIMENT["provider"], "endpoint": EXPERIMENT["endpoint"], "declared_model": EXPERIMENT["resolved_model"],
-            "route": EXPERIMENT["route"], "deployment": EXPERIMENT["deployment"],
+            "route": EXPERIMENT["route"],
             "client": f"opencode {oc.get('version')} binary-sha256:{oc.get('binary_sha256')} routing-config-sha256:{oc.get('routing_config_digest')}"}
 
 
@@ -169,12 +171,13 @@ def fixed(oc: dict) -> dict:
             "developer_timeout_s": c2_p9.DEV_TIMEOUT_S, "reviewer_timeout_s": c2_p9.REVIEW_TIMEOUT_S}
 
 
-def runspec(oc: dict, preflight: dict | None = None):
+def runspec(oc: dict, preflight: dict | None = None, deployment: str | None = None):
     """The experiment's RunSpec: the TEMPLATE (no preflight: the model is OPAQUE) or the RESOLVED one (the model
-    ATTESTED with the fingerprint of `preflight`, and the template's hash among its settings)."""
+    ATTESTED with the fingerprint of `preflight` — and the deployment, when the provider exposed one — and the
+    template's hash among its settings)."""
     from aisef2.runtime.runspec import resolve
     plan = pc.corrected_plan()
-    caps, layers, _ = c2_p9.runspec_inputs(plan, c2_p9.EXPERIMENT, oc, fixed(oc), preflight)
+    caps, layers, _ = c2_p9.runspec_inputs(plan, c2_p9.EXPERIMENT, oc, {**fixed(oc), "deployment": deployment}, preflight)
     return resolve(caps, layers, plan.baseline)
 
 
@@ -241,8 +244,8 @@ def identity_problems(obs: dict, complete: bool = True) -> list[str]:
         out.append(f"route {obs.get('route')}: not the fixed route {EXPERIMENT['route']}")
     if listing.get("http") != 200 or not listing.get("listed"):
         out.append("the router does not list the route's model")
-    elif f"owned_by:{listing.get('owned_by')}" != EXPERIMENT["deployment"]:
-        out.append(f"the router names the upstream {listing.get('owned_by')!r}, not {EXPERIMENT['deployment']} (a combo is a routing alias)")
+    elif listing.get("owned_by") != EXPERIMENT["listing_owner"]:
+        out.append(f"the router names the upstream {listing.get('owned_by')!r}, not {EXPERIMENT['listing_owner']!r} (a combo is a routing alias)")
     models = sorted({str(p.get("model")) for p in probes})
     if any(p.get("http") != 200 for p in probes):
         out.append(f"a chat probe answered HTTP {sorted({p.get('http') for p in probes if p.get('http') != 200})}")
@@ -265,6 +268,24 @@ def observation_problems(obs: dict) -> list[str]:
                 for i, s in enumerate(smokes)
                 if {k: s.get(k) for k in OK_SMOKE} != OK_SMOKE or s.get("stopped") or s.get("timed_out")]
     return out
+
+
+NOT_EXPOSED = "NOT_EXPOSED"
+
+
+def deployment_identity(obs: dict) -> str:
+    """The provider's deployment identity AS EXPOSED: the `system_fingerprint` of its responses when every probe carries
+    one and it is the same one. When no probe carries any: NOT_EXPOSED. When it is exposed but not one stable value, no
+    deployment is bound either (the values stay in the fingerprint): none is ever made up."""
+    values = [p.get("system_fingerprint") for p in obs.get("probes") or []]
+    if values and all(isinstance(v, str) and v for v in values) and len(set(values)) == 1:
+        return f"system_fingerprint:{values[0]}"
+    return NOT_EXPOSED if not any(values) else f"EXPOSED_NOT_STABLE:{len({str(v) for v in values})}_values"
+
+
+def bound_deployment(obs: dict) -> str | None:
+    d = deployment_identity(obs)
+    return d if d.startswith("system_fingerprint:") else None
 
 
 def fingerprint_fields(obs: dict) -> dict:
@@ -381,7 +402,8 @@ def attestation_record(obs: dict, accounting: dict, problems: list[str], oc: dic
     resolved RunSpec hash. With a problem the model stays OPAQUE and delivery stays locked."""
     fields = fingerprint_fields(obs)
     template = runspec(oc)
-    rec = {"record": "AISEF V2 — DELIVERY EXPERIMENT 1: MODEL IDENTITY ATTESTATION (the provider preflight; it unlocks delivery or refuses it)",
+    rec = {"deployment_identity": deployment_identity(obs),
+           "record": "AISEF V2 — DELIVERY EXPERIMENT 1: MODEL IDENTITY ATTESTATION (the provider preflight; it unlocks delivery or refuses it)",
            "experiment": {"id": EXPERIMENT["id"], "attempt": EXPERIMENT["attempt"]}, "at": at,
            "at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(at)),
            "preregistration": {"path": OUT_REL, "sha256": _sha(_canon(prereg))},
@@ -397,7 +419,7 @@ def attestation_record(obs: dict, accounting: dict, problems: list[str], oc: dic
         # the provider showed something other than the one stable expected identity — or the preflight could not finish
         rec["verdict"] = CANNOT if identity_problems(obs, complete=False) else "REFUSED"
         return rec
-    resolved = runspec(oc, fields)
+    resolved = runspec(oc, fields, bound_deployment(obs))
     models = {c.name: c for c in resolved.capabilities if c.name in ("developer", "reviewer")}
     rec.update(verdict="ATTESTED", identity_grade="ATTESTED" if all(c.grade.value == "ATTESTED" for c in models.values()) else "OPAQUE",
                aggregate_min_grade=resolved.aggregate_min_grade.value,
@@ -427,7 +449,9 @@ def gate_problems(attempt: pathlib.Path, prereg: dict, oc: dict, now: float) -> 
     if att.get("fingerprint_fields") != fingerprint_fields(obs):
         out.append("the fingerprinted fields are not what the observation shows")
     # what the record must carry, built here from the preregistered identity and the observation
-    template, resolved = runspec(oc), runspec(oc, fingerprint_fields(obs))
+    template, resolved = runspec(oc), runspec(oc, fingerprint_fields(obs), bound_deployment(obs))
+    if att.get("deployment_identity") != deployment_identity(obs):
+        out.append("the deployment identity recorded is not what the observation exposes")
     want = {c.name: c.resolved() for c in resolved.capabilities if c.name in ("developer", "reviewer")}
     for name, cap in want.items():
         got = (att.get("capabilities") or {}).get(name) or {}
@@ -471,7 +495,8 @@ def require_unlocked(attempt: pathlib.Path) -> dict:
         raise SystemExit("REFUSED: delivery is locked — " + "; ".join(found))
     att = json.loads((attempt / ATTESTATION).read_text(encoding="utf-8"))
     prereg = committed()
-    return {**fixed(oc), "plan": pc.corrected_plan(), "authority": AUTHORITY, "preflight_fields": att["fingerprint_fields"],
+    return {**fixed(oc), "deployment": bound_deployment(att["observation"]), "plan": pc.corrected_plan(), "authority": AUTHORITY,
+            "preflight_fields": att["fingerprint_fields"],
             "preflight_accounting": att["accounting"], "resolved_runspec_hash": att["resolved_runspec_hash"],
             "preregistration": {"path": OUT_REL, "sha256": C.lf_sha(ROOT / OUT_REL)}, "plan_correction": prereg["plan"]["correction"],
             "attestation": {"path": f"{c2_p9.attempt_dir(EXPERIMENT['attempt'])}/{ATTESTATION}", "sha256": _sha((attempt / ATTESTATION).read_bytes()),
@@ -637,8 +662,9 @@ def record(ready: dict, m: dict | None = None) -> dict:
     body = {
         "record": "AISEF V2 — DELIVERY EXPERIMENT 1: PREREGISTRATION AND EXECUTION GUARD OF ONE LEDGERLOCK DELIVERY RUN (prepared, not executed)",
         "authority": AUTHORITY,
-        "status": "PREPARED — NOT STARTED. The run requires a separate owner authorization.",
-        "run_authorized": False, "provider_calls_made_preparing_this": 0,
+        "status": "PREPARED — NOT STARTED. The owner authorized exactly ONE paid run of this preregistration once its deterministic "
+                  "checks pass (ruling 'SINGLE PAID DELIVERY EXPERIMENT', §G and §H); no second attempt.",
+        "run_authorized": "ONE RUN, by the owner's ruling of 2026-10-02 §H — and by nothing in this record", "provider_calls_made_preparing_this": 0,
         "kernel": {"commit": EXPERIMENT["kernel_commit"], "tree": EXPERIMENT["kernel_tree"], "head_tree": C.git("rev-parse", "HEAD:aisef2"),
                    "tree_of_the_commit": _tree_of(EXPERIMENT["kernel_commit"]),
                    "commit_is_an_ancestor_of_head": _is_ancestor(EXPERIMENT["kernel_commit"])},
@@ -668,7 +694,11 @@ def record(ready: dict, m: dict | None = None) -> dict:
                                    "refusal, owner PROVIDER, never a developer failure), later stories are NOT_RUN, and the delivery verdict is "
                                    "not PASS. The request that reaches the request ceiling may run; nothing after it — and a run that reached "
                                    "any ceiling is not a PASS even when its last story committed",
-                   "per_session_turn_cap": "none: the four ceilings above replace the earlier per-session cap (only the smoke probe has its own)",
+                   "max_turns_per_session": EXPERIMENT["max_turns_per_session"],
+                   "at_the_session_cap": "a developer or reviewer session that reaches it is stopped (its process range released) so that one "
+                                         "session cannot consume the experiment's turns; what it changed is committed as the candidate and "
+                                         "judged by the proofs, and the experiment goes on. Stopped sessions are counted in the run's record. "
+                                         "The smoke session has its own cap (preflight.shape)",
                    "session_timeouts_s": {"developer": c2_p9.DEV_TIMEOUT_S, "reviewer": c2_p9.REVIEW_TIMEOUT_S},
                    "no_later_run": "one attempt number; a record or a preflight in the attempt directory refuses another",
                    "accounting_limitation": c2_p9.ACCOUNTING_LIMITATION,
@@ -699,10 +729,14 @@ def record(ready: dict, m: dict | None = None) -> dict:
         "attestation": {"grade_before_preflight": "OPAQUE", "grade_after_a_successful_preflight": "ATTESTED",
                         "contract": "aisef2/runtime/capability.py ATTESTED (RFC §23): provider, endpoint, declared_model, route, client, "
                                     "fingerprint, and deployment when exposed — no new grade, no kernel change",
+                        "deployment_identity": "bound only when every probe's response carries one and the same system_fingerprint; otherwise the "
+                                               f"attestation records {NOT_EXPOSED} (or EXPOSED_NOT_STABLE) and binds none — never a made-up one. "
+                                               "The upstream the router's listing names (owned_by) is a required property of the route and is "
+                                               "in the fingerprint; it is not called a deployment",
                         "tuple_binds": {"provider": "provider", "endpoint/provider identity": "endpoint", "fixed route": "route",
                                         "declared model id": "declared_model",
                                         "client identity, client version, client binary digest, client configuration digest relevant to routing": "client",
-                                        "provider/deployment identity (the upstream the router's listing names)": "deployment",
+                                        "provider deployment identity, IF EXPOSED (system_fingerprint)": "deployment",
                                         "locally measured preflight fingerprint": "fingerprint"},
                         "fingerprint_binds": ["the route", "the listing row's id, object and owner", "declared limits when the listing exposes them",
                                               "the declared model id of every probe", "response object, system_fingerprint and usage field names",
@@ -745,7 +779,7 @@ def record(ready: dict, m: dict | None = None) -> dict:
                                   "the plan is the corrected plan by hash: no re-planning, no story split"],
     }
     body["problems"] = problems(body)
-    body["verdict"] = "PREREGISTERED — READY FOR AN OWNER DECISION; NOT AUTHORIZED" if not body["problems"] else "PROBLEMS"
+    body["verdict"] = "PREREGISTERED — THE FINAL OWNER BUDGET; ONE RUN" if not body["problems"] else "PROBLEMS"
     return json.loads(json.dumps(body))
 
 
@@ -766,7 +800,8 @@ def problems(body: dict) -> list[str]:
     if body["profile"]["developer_attempts_per_story"] != 3:
         out.append("not three developer attempts")
     b = body["budget"]
-    if (b["max_provider_requests"], b["max_total_turns"], b["max_combined_input_tokens"], b["max_output_plus_reasoning_tokens"]) != (60, 350, 30_000_000, 250_000):
+    if (b["max_provider_requests"], b["max_total_turns"], b["max_turns_per_session"], b["max_combined_input_tokens"],
+            b["max_output_plus_reasoning_tokens"]) != (60, 700, 80, 60_000_000, 400_000):
         out.append("the budget is not the owner's")
     r, c = body["model"]["client_resolution_measured_locally"], body["model"]["client"]
     if not (r.get("client_present") and r.get("resolves_to_the_fixed_route") and r.get("route_model_declared")):
@@ -775,7 +810,7 @@ def problems(body: dict) -> list[str]:
         out.append("the client's endpoint, routing configuration or binary is not identified")
     s = body["model"]["stable_declared_identity"]
     if not s["recorded_preflights_on_the_route"] or s["models_that_answered"] != [EXPERIMENT["resolved_model"]] \
-            or [f"owned_by:{x}" for x in s["upstreams_listed"]] != [EXPERIMENT["deployment"]]:
+            or s["upstreams_listed"] != [EXPERIMENT["listing_owner"]]:
         out.append(f"{CANNOT}: the recorded preflights do not show one stable declared identity on the route")
     g = body["runspec"]
     if g["template_grade"]["by_capability"].get("developer") != "OPAQUE" or g["resolved_grade_when_attested"]["aggregate_min_grade"] != "ATTESTED":

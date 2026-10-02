@@ -1,8 +1,8 @@
 {
  "record": "AISEF V2 — DELIVERY EXPERIMENT 1: PREREGISTRATION AND EXECUTION GUARD OF ONE LEDGERLOCK DELIVERY RUN (prepared, not executed)",
- "authority": "owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL' and 'AISEF V2 — DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' (2026-10-02); the run itself is NOT authorized by them",
- "status": "PREPARED — NOT STARTED. The run requires a separate owner authorization.",
- "run_authorized": false,
+ "authority": "owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02): exactly ONE paid run, attempt 3, no second attempt",
+ "status": "PREPARED — NOT STARTED. The owner authorized exactly ONE paid run of this preregistration once its deterministic checks pass (ruling 'SINGLE PAID DELIVERY EXPERIMENT', §G and §H); no second attempt.",
+ "run_authorized": "ONE RUN, by the owner's ruling of 2026-10-02 §H — and by nothing in this record",
  "provider_calls_made_preparing_this": 0,
  "kernel": {
   "commit": "d427299376d7af48d3dd6d86242bf5def6a43003",
@@ -17,7 +17,7 @@
   "files": [
    {
     "path": "validation/qualification/c2_p9.py",
-    "sha256": "948e2a335e655f06c4dd3033d4f38cf7df2a39506a79a000bb3c49b9e4da6dcf"
+    "sha256": "8203e6529b65f975412ba58cc2973aae2539e247b028d7894154bc0aaae70518"
    },
    {
     "path": "validation/qualification/c2_p9_run.sh",
@@ -25,7 +25,7 @@
    },
    {
     "path": "validation/qualification/c2_delivery_experiment.py",
-    "sha256": "f672c6619f7934a6db0560553bb15774e65c85a1c1326adc326125ebaf5b343c"
+    "sha256": "7599adf01317fffe17ce79d0c070e30757cb7206d52567f3374ec4c1b2292dec"
    },
    {
     "path": "validation/qualification/c2_plan_correction.py",
@@ -87,9 +87,9 @@
  },
  "budget": {
   "max_provider_requests": 60,
-  "max_total_turns": 350,
-  "max_combined_input_tokens": 30000000,
-  "max_output_plus_reasoning_tokens": 250000,
+  "max_total_turns": 700,
+  "max_combined_input_tokens": 60000000,
+  "max_output_plus_reasoning_tokens": 400000,
   "hard": "no automatic increase; no retry pool outside it; the preflight's requests, turns and tokens are in it",
   "units": {
    "provider_request": "one model session the harness starts (the journal's provider/request: developer or reviewer) or one request of the preflight (the model listing, a chat probe, the smoke session); the security stage is a local scanner and makes none",
@@ -99,7 +99,8 @@
   },
   "derived_from": "the preflight ledger, the journal's provider/request events and the session streams — re-derived at every check; no counter is kept (c2_p9.Budget)",
   "when_reached": "a ceiling reached or exceeded, or spend that cannot be accounted for, ends the experiment: the running session's process range is released, no session starts afterwards (the kernel is answered with a provider refusal, owner PROVIDER, never a developer failure), later stories are NOT_RUN, and the delivery verdict is not PASS. The request that reaches the request ceiling may run; nothing after it — and a run that reached any ceiling is not a PASS even when its last story committed",
-  "per_session_turn_cap": "none: the four ceilings above replace the earlier per-session cap (only the smoke probe has its own)",
+  "max_turns_per_session": 80,
+  "at_the_session_cap": "a developer or reviewer session that reaches it is stopped (its process range released) so that one session cannot consume the experiment's turns; what it changed is committed as the candidate and judged by the proofs, and the experiment goes on. Stopped sessions are counted in the run's record. The smoke session has its own cap (preflight.shape)",
   "session_timeouts_s": {
    "developer": 2400.0,
    "reviewer": 900.0
@@ -155,7 +156,6 @@
    "endpoint": "https://9router.vnteki.com/v1",
    "declared_model": "deepseek-v4-pro",
    "route": "9router/ds/deepseek-v4-pro",
-   "deployment": "owned_by:ds",
    "client": "opencode 1.18.31 binary-sha256:16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198 routing-config-sha256:7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5"
   },
   "client": {
@@ -228,13 +228,14 @@
   "grade_before_preflight": "OPAQUE",
   "grade_after_a_successful_preflight": "ATTESTED",
   "contract": "aisef2/runtime/capability.py ATTESTED (RFC §23): provider, endpoint, declared_model, route, client, fingerprint, and deployment when exposed — no new grade, no kernel change",
+  "deployment_identity": "bound only when every probe's response carries one and the same system_fingerprint; otherwise the attestation records NOT_EXPOSED (or EXPOSED_NOT_STABLE) and binds none — never a made-up one. The upstream the router's listing names (owned_by) is a required property of the route and is in the fingerprint; it is not called a deployment",
   "tuple_binds": {
    "provider": "provider",
    "endpoint/provider identity": "endpoint",
    "fixed route": "route",
    "declared model id": "declared_model",
    "client identity, client version, client binary digest, client configuration digest relevant to routing": "client",
-   "provider/deployment identity (the upstream the router's listing names)": "deployment",
+   "provider deployment identity, IF EXPOSED (system_fingerprint)": "deployment",
    "locally measured preflight fingerprint": "fingerprint"
   },
   "fingerprint_binds": [
@@ -261,12 +262,11 @@
     "binding": {
      "client": "opencode 1.18.31 binary-sha256:16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198 routing-config-sha256:7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5",
      "declared_model": "deepseek-v4-pro",
-     "deployment": "owned_by:ds",
      "endpoint": "https://9router.vnteki.com/v1",
      "provider": "9router",
      "route": "9router/ds/deepseek-v4-pro"
     },
-    "identity": "2d80c4736f626ba4e4b882a69ee4ddd0a621e694bdde4ef807f1cd4529721e42"
+    "identity": "1dbcca87ba6b1df4e67c4072306b525dc2761b64eee5814355cc2a6b2aa7c0b3"
    },
    {
     "name": "git",
@@ -340,12 +340,11 @@
     "binding": {
      "client": "opencode 1.18.31 binary-sha256:16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198 routing-config-sha256:7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5",
      "declared_model": "deepseek-v4-pro",
-     "deployment": "owned_by:ds",
      "endpoint": "https://9router.vnteki.com/v1",
      "provider": "9router",
      "route": "9router/ds/deepseek-v4-pro"
     },
-    "identity": "60754978a6a837116c694ad9d7fc73e9fe44e2af6bf3163ebe0597b173ccd85b"
+    "identity": "9d73773ff7b7cfed40a90ff12e115092ca8fe0b5555425866a5f195616311c36"
    },
    {
     "name": "scanner",
@@ -397,10 +396,10 @@
    "budget": {
     "layer": "preregistration",
     "value": {
-     "input_tokens": 30000000,
-     "output_tokens": 250000,
+     "input_tokens": 60000000,
+     "output_tokens": 400000,
      "provider_requests": 60,
-     "turns": 350
+     "turns": 700
     }
    },
    "developer_timeout_s": {
@@ -426,6 +425,10 @@
      "REVIEW": 1,
      "SECURITY": 1
     }
+   },
+   "max_turns_per_session": {
+    "layer": "preregistration",
+    "value": 80
    },
    "plan_hash": {
     "layer": "plan",
@@ -461,7 +464,7 @@
   },
   "resolved_derivation": "the template with the developer's and the reviewer's capability replaced by the ATTESTED tuple (the allowed identity plus the fingerprint of the observed preflight fields) and the template's hash added as the setting preregistered_template_hash — c2_delivery_experiment.runspec(oc, fields); the run's journal binds this resolved hash (run/spec-resolved), and it never changes after delivery begins"
  },
- "runspec_template_hash": "8509c91e16afabdf2d5d95a731e38e03dc77192ef898274184d0e52e540a5ea1",
+ "runspec_template_hash": "72377ff762643120e5e32fd8a033e190b14cfa9513c9866c1eb1b4a3ac8a2de2",
  "enforcement": {
   "by_capability": {
    "developer": "PARTIAL",
@@ -634,5 +637,5 @@
   "the plan is the corrected plan by hash: no re-planning, no story split"
  ],
  "problems": [],
- "verdict": "PREREGISTERED — READY FOR AN OWNER DECISION; NOT AUTHORIZED"
+ "verdict": "PREREGISTERED — THE FINAL OWNER BUDGET; ONE RUN"
 }
