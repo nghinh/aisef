@@ -3,7 +3,7 @@
  "authority": "owner ruling 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL' (2026-10-02), decisions 1-4",
  "status": "PLAN REGENERATED AND STATICALLY ADMITTED; not executed — no probe ran, no model was called, LedgerLock not run",
  "identities": {
-  "aisef2_tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160",
+  "aisef2_tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
   "admission_engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
   "generator": {
    "path": "validation/qualification/c2_plan_correction.py",

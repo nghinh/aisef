@@ -151,6 +151,16 @@ def test_path(story: str) -> str:
     return f"tests/test_{story.lower().replace('-', '_')}.py"
 
 
+def regression_tests(repo, story: str, delivered: list[str]) -> tuple[str, ...]:
+    """The regression set of `story`: the test files of the stories delivered before it — those main holds. A story that
+    committed without a developer call (nothing left to introduce: K-PRESAT-001, K-NOWORK-001) wrote no test file, and
+    naming a file nobody was asked to write fails the next developer's adequacy (TESTS_INADEQUATE, a correct story rolled
+    back: H-REGRESSION-001). With none held, the story's own tests, as for the first story."""
+    from aisef2.orchestrate.workspace import git
+    held = tuple(p for p in map(test_path, delivered) if git(repo, "cat-file", "-e", f"main:{p}").returncode == 0)
+    return held or (test_path(story),)
+
+
 def epics_section(epics: str, story: str) -> str:
     """The V1 story's own section of _bmad-output/epics.md at the plan commit (STORY-01-05 -> '### Story 1.5:')."""
     e, n = (int(x) for x in story.split("-")[1:])
@@ -685,7 +695,7 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
                 results[story] = [f"NOT_RUN: {why}"]
                 continue
             inputs = sr.StoryInputs(specs, factories, env, te.DeveloperTests(story, (test_path(story),)),
-                                    te.DeveloperTests(story, tuple(test_path(s) for s in delivered) or (test_path(story),)),
+                                    te.DeveloperTests(story, regression_tests(repo, story, delivered)),
                                     te.Dependencies(frozenset(), PROJECT), te.UNITTEST)
             try:
                 r = sr.run_story(run_, plan, story, inputs, adapters, sr.Policy(limits, TestsPolicy(True), tool_timeout_s=120))

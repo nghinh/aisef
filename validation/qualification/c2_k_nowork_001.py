@@ -16,6 +16,14 @@ temporary directory) and on this tree's kernel — in a child process whose `ais
   everything the later stories would introduce. Before: the stories left with only PRESERVE / VERIFY work are sent to
   the developer and rolled back TESTS_INADEQUATE while the product satisfies every spec. After: every story commits,
   the developer is called for the first story only, and the product is the same.
+
+H-REGRESSION-001 (found reviewing this correction; the harness, not the kernel): the runner named the test file of every
+committed story as a regression test of the next — also of a story that committed without a developer call, which wrote
+none. The same rehearsal with a developer that over-delivers PARTLY (its first delivery gets one later behaviour wrong:
+the reference with the fixture's mutant `PARTIAL`; called again, it installs the reference and tests what it fixed),
+on this tree's kernel, with the set the runner used to build and with `c2_p9.regression_tests`: before, the story that
+fixes the behaviour is rolled back TESTS_INADEQUATE for test files nobody was asked to write, and the product is left
+wrong; after, it commits and the product satisfies every spec.
 """
 
 from __future__ import annotations
@@ -40,7 +48,11 @@ BEFORE = "d427299376d7af48d3dd6d86242bf5def6a43003"         # K-PRESAT-001: the 
 BEFORE_TREE = "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160"
 CASES = "tests.v2.test_c2_k_nowork_001"
 BOUND = ("aisef2/orchestrate/story_runner.py", "tests/v2/test_c2_k_nowork_001.py", "validation/qualification/c2_k_nowork_001.py",
-         "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json")
+         "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json", "validation/qualification/c2_p9.py")
+#: the reference mutant a partly over-delivering developer's first delivery is (R-7: repair-tail on an intact chain removes
+#: its last line — S-7-d, STORY-04-01's to introduce), and the story that then has developer work
+PARTIAL, PARTIAL_STORY, PARTIAL_SPEC = "M-7-1", "STORY-04-01", "S-7-d"
+MUTANTS = "tests/v2/fixtures/workloads/ledgerlock-reference/mutants"
 ATTEMPT_2 = "closure-evidence/v2/cycle2/P10/attempt-2/JOURNAL.json"
 NOT_RULED = "VERIFY_NO_INTRODUCER_UNSATISFIED_REQUIRES_OWNER_DECISION"
 MARK = "K-NOWORK-001-RESULT "
@@ -59,9 +71,14 @@ TEST = ("import tempfile, unittest, pathlib\nfrom ledgerlock.ledger import Ledge
         "            led.apply_batch([['put', 'a', 1, 'r1', 1]])\n            led.apply_batch([['put', 'a', 1, 'r1', 2]])\n"
         "            with self.assertRaises(ConflictError):\n                led.apply_batch([['delete', 'a', None, 'r9', 3]])\n"
         "            led.verify()\n            led.snapshot()\n            self.assertEqual(len(p.read_text().splitlines()), 1)\n")
+#: what a developer asked to make repair-tail a no-op on a clean chain tests (the behaviour `PARTIAL` gets wrong)
+TEST_REPAIR = ("\n    def test_repair_tail_is_a_no_op_on_a_clean_chain(self):\n        with tempfile.TemporaryDirectory() as d:\n"
+               "            p = pathlib.Path(d) / 'l.jsonl'\n            p.write_text('')\n            led = Ledger(str(p))\n"
+               "            led.apply_batch([['put', 'a', 1, 'r1', 1]])\n            before = p.read_bytes()\n"
+               "            self.assertFalse(led.repair_tail())\n            self.assertEqual(p.read_bytes(), before)\n")
 
 
-# ------------------------------------------------------------------------------------------------ the two jobs
+# ---------------------------------------------------------------------------------------------------- the jobs
 
 def job_cases() -> dict:
     """Every regression case, by name, under the kernel this process imported."""
@@ -83,10 +100,13 @@ def job_cases() -> dict:
 
 class ReferenceDeveloper:
     """A stand-in developer (never a model): called, it installs the P5 reference implementation — written from the
-    requirements, satisfying all 59 specs — and the story's unittest file, and commits."""
+    requirements, satisfying all 59 specs — and the story's unittest file, and commits. With `first_wrong`, its first
+    delivery is the reference with that mutant's files (one later behaviour wrong); called again it installs the
+    reference and tests the behaviour it fixed."""
 
-    def __init__(self) -> None:
+    def __init__(self, first_wrong: str | None = None) -> None:
         self.calls: list[tuple[str, tuple[str, ...]]] = []
+        self.first_wrong = first_wrong
 
     def implement(self, story_id: str, criteria: tuple[str, ...], checkout: str):
         from aisef2.journal.format2 import OperationOutcome as O
@@ -99,9 +119,14 @@ class ReferenceDeveloper:
         (root / "ledgerlock").mkdir(exist_ok=True)
         for name, text in pf.reference_modules().items():
             (root / "ledgerlock" / name).write_text(text, encoding="utf-8", newline="\n")
+        first = len(self.calls) == 1
+        if self.first_wrong and first:
+            for f in sorted((ROOT / MUTANTS / self.first_wrong).glob("*.py")):
+                (root / "ledgerlock" / f.name).write_text(f.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
         (root / "tests").mkdir(exist_ok=True)
         (root / "tests" / "__init__.py").write_text("", encoding="utf-8")
-        (root / c2_p9.test_path(story_id)).write_text(TEST, encoding="utf-8", newline="\n")
+        (root / c2_p9.test_path(story_id)).write_text(TEST + (TEST_REPAIR if self.first_wrong and not first else ""),
+                                                      encoding="utf-8", newline="\n")
         return Implemented(O.COMPLETED, commit_all(checkout, f"{story_id}: the reference implementation and the story's test"), "stand-in developer")
 
 
@@ -124,8 +149,10 @@ class QuietScanner:
         return Scanned(pathlib.Path(report).exists(), ())
 
 
-def job_rehearsal() -> dict:
-    """The corrected plan and its 59 specs through the real story runner, with the stand-in developer."""
+def job_rehearsal(first_wrong: str | None = None, name_every_committed_story: bool = False) -> dict:
+    """The corrected plan and its 59 specs through the real story runner, with the stand-in developer. The regression
+    set of a story is the runner's (`c2_p9.regression_tests`) — or, with `name_every_committed_story`, the one the runner
+    built before H-REGRESSION-001."""
     from aisef2.arch.enums import ControlProjection, Enforcement, Owner
     from aisef2.orchestrate import story_runner as sr
     from aisef2.orchestrate.quality import TestsPolicy
@@ -155,16 +182,17 @@ def job_rehearsal() -> dict:
         run = RunScope(tmp / "run", "k-nowork-001-rehearsal",
                        spec=lambda: resolve([verified("kernel", b"k-nowork-001 rehearsal", Enforcement.FULL)], {}, base))
         run.begin()
-        dev = ReferenceDeveloper()
+        dev = ReferenceDeveloper(first_wrong)
         adapters = sr.Adapters(dev, NoFindingsReviewer(), QuietScanner(), GitMerger(repo, "main", tmp / "merge"), GitWorkspace(repo, tmp / "ws"))
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch)) for e in catalog.CATALOG}
         env = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)
         limits = {Owner[k]: v for k, v in c2_p9.PROFILES[c2_p9.EXPERIMENT].items()}
         results, delivered = {}, []
         for story in c2_p9.order(plan, aid.story_graph()):
+            regressions = (tuple(c2_p9.test_path(s) for s in delivered) or (c2_p9.test_path(story),)) if name_every_committed_story \
+                else c2_p9.regression_tests(repo, story, delivered)
             inputs = sr.StoryInputs(specs, factories, env, te.DeveloperTests(story, (c2_p9.test_path(story),)),
-                                    te.DeveloperTests(story, tuple(c2_p9.test_path(s) for s in delivered) or (c2_p9.test_path(story),)),
-                                    te.Dependencies(frozenset(), c2_p9.PROJECT), te.UNITTEST)
+                                    te.DeveloperTests(story, regressions), te.Dependencies(frozenset(), c2_p9.PROJECT), te.UNITTEST)
             r = sr.run_story(run, plan, story, inputs, adapters, sr.Policy(limits, TestsPolicy(True), tool_timeout_s=120))
             results[story] = [a.outcome for a in r.attempts]
             if results[story][-1:] == ["COMMIT"]:
@@ -188,7 +216,8 @@ def job_rehearsal() -> dict:
         elif e["type"] == "provider/request":
             row["developer_requests" if e["data"]["budget_owner"] == "DEVELOPER" else "review_requests"] += 1
         elif e["type"] == "tests/adequacy":
-            row["adequacy"].append({k: e["data"].get(k) for k in ("outcome", "vacuity", "relevance")})
+            row["adequacy"].append({**{k: e["data"].get(k) for k in ("outcome", "vacuity", "relevance")},
+                                    "regressions": e["data"]["regressions"].get("selection")})
         elif e["type"] == "failure/observed":
             row["failures"].append(e["data"]["code"])
     return {"plan_hash": plan.plan_hash, "stories": len(results), "obligations": len(plan.obligations), "outcomes": results,
@@ -198,7 +227,9 @@ def job_rehearsal() -> dict:
             "final_main_satisfies": {k: proof[k] for k in ("total", "satisfied", "not_satisfied")}}
 
 
-JOBS = {"cases": job_cases, "rehearsal": job_rehearsal}
+JOBS = {"cases": job_cases, "rehearsal": job_rehearsal,
+        "partial_naming_every_committed_story": lambda: job_rehearsal(PARTIAL, name_every_committed_story=True),
+        "partial": lambda: job_rehearsal(PARTIAL)}
 
 
 def in_kernel(kernel_root: pathlib.Path | None, job: str) -> dict:
@@ -249,6 +280,7 @@ def write() -> dict:
             raise SystemExit(f"{BEFORE}:aisef2 is {old['aisef2_tree']}, not {BEFORE_TREE}")
         before = {"cases": in_kernel(old_root, "cases"), "rehearsal": in_kernel(old_root, "rehearsal")}
     after = {"cases": in_kernel(None, "cases"), "rehearsal": in_kernel(None, "rehearsal")}
+    partial = {"before": in_kernel(None, "partial_naming_every_committed_story"), "after": in_kernel(None, "partial")}
     rec = {
         "record": "AISEF V2 — K-NOWORK-001: a story with no developer work was sent to the developer and falsely rolled back — "
                   "the defect reproduced and the correction measured under both kernels",
@@ -281,6 +313,17 @@ def write() -> dict:
                                "P5 reference implementation and the story's unittest file whenever it is called; a stand-in reviewer "
                                "and scanner without findings; an empty temporary repository",
                       "before": before["rehearsal"], "after": after["rehearsal"]},
+        "h_regression_001": {
+            "defect": "the runner (validation/qualification/c2_p9.py — the harness, not the kernel) named the test file of every "
+                      "committed story as a regression test of the next; a story that committed without a developer call "
+                      "(K-PRESAT-001, K-NOWORK-001) wrote none, so the next story WITH developer work failed engineering adequacy "
+                      "(regression tests not collectable) and was rolled back for a file nobody was asked to write",
+            "correction": "c2_p9.regression_tests: only the test files main holds; with none, the story's own tests (as for the "
+                          "first story). The kernel is unchanged by it",
+            "shape": f"the rehearsal above on this tree's kernel, the stand-in developer over-delivering partly: its first delivery "
+                     f"is the reference with the fixture's mutant {PARTIAL} ({PARTIAL_SPEC} wrong, {PARTIAL_STORY}'s to introduce); "
+                     "called again it installs the reference and tests the behaviour it fixed",
+            "before": partial["before"], "after": partial["after"]},
         "measured_before_the_ruling": measured_before_the_ruling(),
         "bound": _bound(),
         "provider_calls": 0, "ledgerlock_runs": 0,
@@ -316,6 +359,15 @@ def problems(rec: dict) -> list[str]:
         out.append(f"rehearsal after: the developer was called for {ra['developer_calls']}, not for the first story only")
     if any(v["adequacy"] or v["failures"] for s, v in ra["by_story"].items() if s != "STORY-01-01"):
         out.append("rehearsal after: a story without developer work ran engineering adequacy or failed")
+    hb, ha = rec["h_regression_001"]["before"], rec["h_regression_001"]["after"]
+    row = hb["by_story"][PARTIAL_STORY]
+    if hb["not_committed"] != [PARTIAL_STORY] or set(row["failures"]) != {"TESTS_INADEQUATE"} \
+            or {a["regressions"] for a in row["adequacy"]} != {"STORY_TESTS_NOT_COLLECTABLE"} \
+            or hb["final_main_satisfies"]["not_satisfied"] != [PARTIAL_SPEC]:
+        out.append(f"partial over-delivery before: {PARTIAL_STORY} was not rolled back for regression files nobody wrote: {hb['outcomes']}")
+    if ha["not_committed"] or any(v != ["COMMIT"] for v in ha["outcomes"].values()) or ha["developer_calls"] != ["STORY-01-01", PARTIAL_STORY] \
+            or ha["final_main_satisfies"] != {"total": 59, "satisfied": 59, "not_satisfied": []}:
+        out.append(f"partial over-delivery after: not every story committed at its first attempt with the product satisfying 59 of 59: {ha['outcomes']}")
     m = rec["measured_before_the_ruling"]
     if not (m["developer_requests"] and m["ended"] == ["story/rollback"] and set(m["failures"]) == {"TESTS_INADEQUATE"}):
         out.append("the real run's STORY-05-01 does not show the measured shape")

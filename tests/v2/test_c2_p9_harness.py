@@ -8,6 +8,8 @@ no LedgerLock repository, nothing run:
                      is not removed unless they are.
   §6                 the proposed `v1-aligned` profile gives 3 total developer attempts; the default profile is the
                      one attempts 1 and 2 ran.
+  H-REGRESSION-001   a story's regression set names only test files main holds: a story that committed without a
+                     developer call (K-PRESAT-001, K-NOWORK-001) wrote none, and naming it rolled the next story back.
 """
 
 from __future__ import annotations
@@ -239,6 +241,39 @@ class RetryProfile(unittest.TestCase):
         aligned = c2_p9.PROFILES["v1-aligned"]
         self.assertEqual({k: v for k, v in aligned.items() if v != c2_p9.LIMITS[k]}, {"DEVELOPER": 2})
         self.assertEqual(self.attempts("v1-aligned"), (["RETRY", "RETRY", "ROLLBACK"], 3))    # 3 total, as the V1 baseline
+
+
+class RegressionSet(unittest.TestCase):
+    """H-REGRESSION-001 (found reviewing K-NOWORK-001, measured through the real story path): the runner named the test
+    file of every committed story as a regression test of the next — also of a story that committed without a developer
+    call, which has none."""
+    setUp = e2e.Orchestration.setUp
+    story, inputs, adapters = e2e.Orchestration.story, e2e.Orchestration.inputs, e2e.Orchestration.adapters
+    events, failures, details, assertAttempts = (e2e.Orchestration.events, e2e.Orchestration.failures, e2e.Orchestration.details,
+                                                 e2e.Orchestration.assertAttempts)
+
+    def delivery(self, regressions: tuple[str, ...]):
+        """A story with developer work, correct and adequately tested, under the blocking tests policy."""
+        dev = e2e.Dev({"app/calc.py": e2e.CALC + e2e.ADD, "tests/test_s1.py": e2e.TEST_ADD})
+        plan = e2e.plan_of(self.base, e2e.obligation("C1", self.s1.id, "S1", ObligationRole.INTRODUCE))
+        return self.story(plan, "S1", dev, inputs=self.inputs("S1", regressions=regressions), tests_block=True)
+
+    def test_a_regression_file_nobody_wrote_rolls_a_correct_story_back(self):
+        r = self.delivery(("tests/test_other.py", c2_p9.test_path("STORY-02-01")))       # the set the runner used to build
+        self.assertAttempts(r, ["RETRY", "ROLLBACK"])
+        self.assertEqual({(code, owner) for code, owner, _ in self.failures("S1")}, {("TESTS_INADEQUATE", "DEVELOPER")})
+        self.assertEqual({e.data["regressions"]["selection"] for e in self.events("tests/adequacy", "S1")}, {"STORY_TESTS_NOT_COLLECTABLE"})
+
+    def test_the_set_the_runner_builds_names_only_the_files_main_holds_and_the_story_commits(self):
+        delivered = ["OTHER", "STORY-02-01"]                    # the second committed without a developer call: no file
+        self.assertEqual(c2_p9.test_path("OTHER"), "tests/test_other.py")
+        held = c2_p9.regression_tests(self.repo, "S1", delivered)
+        self.assertEqual(held, ("tests/test_other.py",))
+        self.assertAttempts(self.delivery(held), ["COMMIT"])
+
+    def test_with_no_file_held_the_set_is_the_story_s_own_tests_as_for_the_first_story(self):
+        self.assertEqual(c2_p9.regression_tests(self.repo, "S1", []), ("tests/test_s1.py",))
+        self.assertEqual(c2_p9.regression_tests(self.repo, "S1", ["STORY-02-01", "STORY-02-02"]), ("tests/test_s1.py",))
 
 
 if __name__ == "__main__":

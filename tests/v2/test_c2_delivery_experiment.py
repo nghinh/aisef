@@ -333,6 +333,9 @@ class Attempt(unittest.TestCase):
         self.attempt = pathlib.Path(tmp.name) / "attempt-3"
         self.attempt.mkdir()
         self.prereg = {"runspec_template_hash": dx.runspec(OC).runspec_hash, "note": "the fields the gate reads of a preregistration"}
+        lifted = mock.patch.object(dx, "on_hold", return_value=None)      # what is measured here is what follows the hold (class Hold)
+        lifted.start()
+        self.addCleanup(lifted.stop)
 
     def attest(self, provider=None, smoke_=None, at=NOW):
         self.provider, self.smoke = provider or Provider(), smoke_ or smoke()
@@ -588,6 +591,29 @@ class Gate(Attempt):
         self.assertIn("preregistered as attempt 3 only", str(x.exception))
 
 
+class Hold(unittest.TestCase):
+    """The owner's hold (K-NOWORK-001 ruling: the paid attempt remains UNUSED): neither the preflight nor the runner starts."""
+
+    def test_while_the_owner_s_hold_stands_nothing_starts_and_no_provider_is_reached(self):
+        self.assertTrue(dx.HOLD and dx.on_hold() == dx.HOLD)
+        explode = mock.Mock(side_effect=AssertionError("a provider was reached"))
+        with tempfile.TemporaryDirectory() as t:
+            attempt = pathlib.Path(t) / "attempt-3"
+            attempt.mkdir()
+            with mock.patch.object(dx, "default_transport", explode), mock.patch.object(c2_p9, "opencode_session", explode), \
+                    mock.patch.object(dx, "check", return_value=[]):
+                for start in (lambda: dx.attest(attempt, oc=OC, prereg={}, transport=explode, smoke=explode),
+                              lambda: dx.require_unlocked(attempt),
+                              lambda: c2_p9.run(attempt, preserve_to=attempt / "kept.git", profile=c2_p9.EXPERIMENT)):
+                    with self.assertRaises(SystemExit) as x:
+                        start()
+                    self.assertEqual(str(x.exception), f"REFUSED: delivery is locked — {dx.HOLD}")
+            self.assertEqual(sorted(p.name for p in attempt.iterdir()), [])
+        explode.assert_not_called()
+        rec = dx.committed()
+        self.assertEqual((rec["hold"], rec["run_authorized"]), (dx.HOLD, f"NO — {dx.HOLD}"))
+
+
 class RunSpecs(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -633,13 +659,13 @@ class Preregistration(unittest.TestCase):
     def test_the_record_binds_what_this_tree_holds(self):
         r = self.rec
         self.assertEqual((r["verdict"], r["problems"]), ("PREREGISTERED — THE FINAL OWNER BUDGET; ONE RUN", []))
-        self.assertTrue(r["run_authorized"].startswith("ONE RUN, by the owner's ruling"))
+        self.assertEqual((r["hold"], r["run_authorized"]), (dx.HOLD, f"NO — {dx.HOLD}"))
         self.assertEqual(r["provider_calls_made_preparing_this"], 0)
         self.assertEqual(r["plan"]["plan_hash"], self.plan.plan_hash)
         self.assertEqual(r["plan"]["correction"]["sha256"], c2_p9.C.lf_sha(ROOT / pc.OUT_REL))
         self.assertEqual(r["kernel"]["tree"], c2_p9.C.git("rev-parse", "HEAD:aisef2"))
         self.assertEqual((r["kernel"]["commit"], r["harness"]["includes"]),
-                         ("d427299376d7af48d3dd6d86242bf5def6a43003", "7630dbe5d0aa7f873e26a573ce2b9962bb0c72c2"))
+                         ("4f6dfc197acfd9146357e5781326843bc09982e5", "7630dbe5d0aa7f873e26a573ce2b9962bb0c72c2"))
         for f in r["harness"]["files"]:
             with self.subTest(file=f["path"]):
                 self.assertEqual(f["sha256"], c2_p9.C.lf_sha(ROOT / f["path"]))

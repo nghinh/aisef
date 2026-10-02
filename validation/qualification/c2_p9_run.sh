@@ -10,7 +10,7 @@
 set -u; unsetopt nomatch
 A=${0:A:h:h:h}; cd $A                          # the checkout this script is in (attempts 1 and 2 ran in the main one)
 OUT=$A/closure-evidence/v2/cycle2/P10
-KT=4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160   # the corrected kernel d427299 (K-PRESAT-001); attempts 1 and 2 ran 37bf6457… (ac4a6c7)
+KT=c2717d2ed98b76bd3d284a37c47103b5dc2bd020   # the corrected kernel 4f6dfc1 (K-NOWORK-001, on K-PRESAT-001 d427299); attempts 1 and 2 ran 37bf6457… (ac4a6c7)
 stamp() { date '+%F %T'; }
 DIRTY=$(git status --porcelain | grep -v '^?? closure-evidence/v2/cycle2/P10/\|^ M closure-evidence/v2/cycle2/P10/\|C2-P9-RUN-HISTORY.json' || true)
 [ -z "$DIRTY" ] || { echo "REFUSED: the working tree is dirty outside QP-2.9's output:"; echo "$DIRTY"; exit 1; }

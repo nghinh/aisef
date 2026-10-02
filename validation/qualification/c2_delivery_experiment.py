@@ -68,11 +68,17 @@ V1_FREEZE_REL = "closure-evidence/hardening/P19-FREEZE.json"
 V1_PREFLIGHT_REL = f"{W1}/provider_preflight.py"
 #: QP-2.9 attempt 2 and the V1 runs on the same route: what the budget is compared with (never what it is derived from)
 MEASURED_REL = "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json"
+#: Why the experiment may not start, or None. The owner's K-NOWORK-001 ruling (2026-10-02): "The paid delivery attempt
+#: remains UNUSED. Do NOT execute DELIVERY-EXPERIMENT-1." The authorization of 'SINGLE PAID DELIVERY EXPERIMENT' named the
+#: kernel d427299; this preregistration names the corrected one, which the owner has not authorized a run of. Only the
+#: owner's ruling clears this (HOLD = None, then --write): while it stands, neither the preflight nor the runner starts.
+HOLD = ("ON HOLD by the owner's ruling 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION' (2026-10-02): the paid delivery attempt "
+        "remains UNUSED; a run of this preregistration needs the owner's renewed authorization")
 EXPERIMENT = {
     "id": c2_p9.EXPERIMENT,
     "attempt": 3,                                       # the next attempt directory of closure-evidence/v2/cycle2/P10
-    "kernel_commit": "d427299376d7af48d3dd6d86242bf5def6a43003",    # K-PRESAT-001
-    "kernel_tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160",
+    "kernel_commit": "4f6dfc197acfd9146357e5781326843bc09982e5",    # K-NOWORK-001 (on K-PRESAT-001, d427299)
+    "kernel_tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
     "harness_includes": "7630dbe5d0aa7f873e26a573ce2b9962bb0c72c2",
     # the route of the V1 baseline profile PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO (same plan base, max_retries 2)
     "provider": "9router", "endpoint": "https://9router.vnteki.com/v1",
@@ -350,6 +356,8 @@ def attest(attempt: pathlib.Path, *, oc: dict | None = None, prereg: dict | None
            now=time.time) -> dict:
     """PART OF THE PAID RUN — this calls the provider. The preflight, and the attestation record it leaves in
     `attempt` whatever it finds. Written once: an attempt that already holds a preflight is refused before any request."""
+    if on_hold():
+        raise SystemExit(f"REFUSED: delivery is locked — {on_hold()}")
     pre = attempt / PREFLIGHT_DIR
     if pre.exists() or (attempt / ATTESTATION).exists():
         raise SystemExit(f"REFUSED: {attempt.name} already holds a preflight — it is made once, and its requests are in the budget")
@@ -427,6 +435,11 @@ def attestation_record(obs: dict, accounting: dict, problems: list[str], oc: dic
     return rec
 
 
+def on_hold() -> str | None:
+    """What the preflight and the runner ask before anything else."""
+    return HOLD
+
+
 def gate_problems(attempt: pathlib.Path, prereg: dict, oc: dict, now: float) -> list[str]:
     """Why delivery stays locked: everything the attestation record must be, re-derived — never taken from the record
     itself. No provider is called."""
@@ -488,6 +501,8 @@ def committed() -> dict:
 def require_unlocked(attempt: pathlib.Path) -> dict:
     """What a run of the experiment executes with — or a refusal, before any provider call: the preregistration holds
     on this tree and machine, and the attempt holds a verified attestation."""
+    if on_hold():
+        raise SystemExit(f"REFUSED: delivery is locked — {on_hold()}")
     found = check()
     oc = machine()
     found = found or gate_problems(attempt, committed(), oc, time.time())
@@ -662,9 +677,11 @@ def record(ready: dict, m: dict | None = None) -> dict:
     body = {
         "record": "AISEF V2 — DELIVERY EXPERIMENT 1: PREREGISTRATION AND EXECUTION GUARD OF ONE LEDGERLOCK DELIVERY RUN (prepared, not executed)",
         "authority": AUTHORITY,
-        "status": "PREPARED — NOT STARTED. The owner authorized exactly ONE paid run of this preregistration once its deterministic "
-                  "checks pass (ruling 'SINGLE PAID DELIVERY EXPERIMENT', §G and §H); no second attempt.",
-        "run_authorized": "ONE RUN, by the owner's ruling of 2026-10-02 §H — and by nothing in this record", "provider_calls_made_preparing_this": 0,
+        "status": "PREPARED — NOT STARTED. " + (f"{HOLD}." if HOLD else
+                                                 "The owner authorized exactly ONE paid run of this preregistration once its deterministic "
+                                                 "checks pass (ruling 'SINGLE PAID DELIVERY EXPERIMENT', §G and §H); no second attempt."),
+        "run_authorized": f"NO — {HOLD}" if HOLD else "ONE RUN, by the owner's ruling of 2026-10-02 §H — and by nothing in this record",
+        "hold": HOLD, "provider_calls_made_preparing_this": 0,
         "kernel": {"commit": EXPERIMENT["kernel_commit"], "tree": EXPERIMENT["kernel_tree"], "head_tree": C.git("rev-parse", "HEAD:aisef2"),
                    "tree_of_the_commit": _tree_of(EXPERIMENT["kernel_commit"]),
                    "commit_is_an_ancestor_of_head": _is_ancestor(EXPERIMENT["kernel_commit"])},

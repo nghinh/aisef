@@ -1,14 +1,15 @@
 {
  "record": "AISEF V2 — DELIVERY EXPERIMENT 1: PREREGISTRATION AND EXECUTION GUARD OF ONE LEDGERLOCK DELIVERY RUN (prepared, not executed)",
  "authority": "owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02): exactly ONE paid run, attempt 3, no second attempt",
- "status": "PREPARED — NOT STARTED. The owner authorized exactly ONE paid run of this preregistration once its deterministic checks pass (ruling 'SINGLE PAID DELIVERY EXPERIMENT', §G and §H); no second attempt.",
- "run_authorized": "ONE RUN, by the owner's ruling of 2026-10-02 §H — and by nothing in this record",
+ "status": "PREPARED — NOT STARTED. ON HOLD by the owner's ruling 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION' (2026-10-02): the paid delivery attempt remains UNUSED; a run of this preregistration needs the owner's renewed authorization.",
+ "run_authorized": "NO — ON HOLD by the owner's ruling 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION' (2026-10-02): the paid delivery attempt remains UNUSED; a run of this preregistration needs the owner's renewed authorization",
+ "hold": "ON HOLD by the owner's ruling 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION' (2026-10-02): the paid delivery attempt remains UNUSED; a run of this preregistration needs the owner's renewed authorization",
  "provider_calls_made_preparing_this": 0,
  "kernel": {
-  "commit": "d427299376d7af48d3dd6d86242bf5def6a43003",
-  "tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160",
-  "head_tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160",
-  "tree_of_the_commit": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160",
+  "commit": "4f6dfc197acfd9146357e5781326843bc09982e5",
+  "tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
+  "head_tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
+  "tree_of_the_commit": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
   "commit_is_an_ancestor_of_head": true
  },
  "harness": {
@@ -17,15 +18,15 @@
   "files": [
    {
     "path": "validation/qualification/c2_p9.py",
-    "sha256": "8203e6529b65f975412ba58cc2973aae2539e247b028d7894154bc0aaae70518"
+    "sha256": "73b1d3df931b2ec98fcfbdbc25e016b87f67c91ee45bbc8154fa16994f29b687"
    },
    {
     "path": "validation/qualification/c2_p9_run.sh",
-    "sha256": "a178f352e56bb858116369455e59c3125a69d1c5dc20541a47c52807b0009ca2"
+    "sha256": "690500de69c243561ddda46c2fe4ac4347937a2dfa5975b5c52c2f673e189313"
    },
    {
     "path": "validation/qualification/c2_delivery_experiment.py",
-    "sha256": "7599adf01317fffe17ce79d0c070e30757cb7206d52567f3374ec4c1b2292dec"
+    "sha256": "27a162adeaf0d88edcf1784add25478b5cf592623881716f680865443a60e04d"
    },
    {
     "path": "validation/qualification/c2_plan_correction.py",
@@ -67,7 +68,7 @@
   ],
   "correction": {
    "path": "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json",
-   "sha256": "cd388ea526f18057285635c6a4c937277e203224079056a7d9b527e53a66e940",
+   "sha256": "365ebacfc8d27a2d5f3f833a90fa4ba6d4ac6dd2a76d9e7744310579f14d8ba6",
    "check": []
   }
  },
@@ -282,10 +283,10 @@
     "grade": "VERIFIED",
     "enforcement": "FULL",
     "binding": {
-     "digest": "7520f9ec39d041e25066bd37022c735e51b025a080257c75c2367b62d731585e",
-     "tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160"
+     "digest": "1d165c76d9816cf25f02a3ade9925e60424f642d3772ea139a596dae68874657",
+     "tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020"
     },
-    "identity": "cdbcaed5ba9cda795dc6bcd792686f75d9b590f684e39bfe65007f0a9c28b845"
+    "identity": "a08f496c1b0b1c8515bbb43a883613fa65914a34d283e603f0049d034ed0ea95"
    },
    {
     "name": "probe.cli_invocation",
@@ -412,7 +413,7 @@
    },
    "kernel_commit": {
     "layer": "preregistration",
-    "value": "d427299376d7af48d3dd6d86242bf5def6a43003"
+    "value": "4f6dfc197acfd9146357e5781326843bc09982e5"
    },
    "limits": {
     "layer": "c2-p9 profile delivery-experiment-1",
@@ -464,7 +465,7 @@
   },
   "resolved_derivation": "the template with the developer's and the reviewer's capability replaced by the ATTESTED tuple (the allowed identity plus the fingerprint of the observed preflight fields) and the template's hash added as the setting preregistered_template_hash — c2_delivery_experiment.runspec(oc, fields); the run's journal binds this resolved hash (run/spec-resolved), and it never changes after delivery begins"
  },
- "runspec_template_hash": "72377ff762643120e5e32fd8a033e190b14cfa9513c9866c1eb1b4a3ac8a2de2",
+ "runspec_template_hash": "19d250574ea8fc2ef375a21ab721207da558a0145f62484407d50f623491b928",
  "enforcement": {
   "by_capability": {
    "developer": "PARTIAL",
