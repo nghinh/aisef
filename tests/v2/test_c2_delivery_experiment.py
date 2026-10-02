@@ -540,6 +540,25 @@ class Gate(Attempt):
         self.tamper(lambda att: att.update(client="opencode 9.9.9"))
         self.assertRefused("bound to another route, model or client")
 
+    def test_attempt_3_s_preregistration_runspec_and_attestation_open_nothing_for_attempt_4(self):
+        a3 = json.loads((ROOT / dx.HISTORICAL[3]["preregistration"]).read_text(encoding="utf-8"))
+        att3 = json.loads((ROOT / c2_p9.attempt_dir(3) / dx.ATTESTATION).read_text(encoding="utf-8"))
+        self.assertNotEqual(a3["runspec_template_hash"], dx.runspec(OC).runspec_hash)
+        self.tamper(lambda att: att.update(runspec_template_hash=a3["runspec_template_hash"]))
+        self.assertRefused("the RunSpec template is not the preregistered one")
+        self.setUp()
+        self.tamper(lambda att: att.update(preregistration=att3["preregistration"]))
+        self.assertRefused("bound to another preregistration")
+        self.setUp()
+        self.tamper(lambda att: att.update(experiment=att3["experiment"]))
+        self.assertRefused("not of this experiment and attempt")
+        self.setUp()
+        self.prereg = {**self.prereg, "runspec_template_hash": a3["runspec_template_hash"]}
+        self.assertRefused("the RunSpec template is not the preregistered one", "bound to another preregistration")
+        found = dx.gate_problems(ROOT / c2_p9.attempt_dir(3), dx.committed(), OC, att3["at"] + 60)    # attempt 3's own record
+        self.assertTrue(any("not of this experiment and attempt" in p for p in found), found)
+        self.assertTrue(any("bound to another preregistration" in p for p in found), found)
+
     def test_the_obsolete_authorization_s_kernel_and_runspec_open_nothing(self):
         """The identities the first authorization named (kernel d427299, RunSpec template 72377ff7…) are refused."""
         old_kernel = {"commit": "d427299376d7af48d3dd6d86242bf5def6a43003", "tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160"}
@@ -605,8 +624,11 @@ class Gate(Attempt):
 
     def test_a_run_under_the_profile_is_the_preregistered_attempt_only(self):
         with self.assertRaises(SystemExit) as x:
-            c2_p9.main(["--run", "--attempt", "4", "--profile", c2_p9.EXPERIMENT])
-        self.assertIn("preregistered as attempt 3 only", str(x.exception))
+            c2_p9.main(["--run", "--attempt", "5", "--profile", c2_p9.EXPERIMENT])
+        self.assertIn("preregistered as attempt 4 only", str(x.exception))
+        with self.assertRaises(SystemExit) as x:
+            c2_p9.main(["--run", "--attempt", "3", "--profile", c2_p9.EXPERIMENT])
+        self.assertIn("preregistered as attempt 4 only", str(x.exception))
 
 
 class Hold(unittest.TestCase):
@@ -614,12 +636,18 @@ class Hold(unittest.TestCase):
     preregistration is under one for good."""
     HELD = "ON HOLD by an owner's ruling"
 
-    def test_attempt_3_has_run_and_nothing_runs_again_under_its_preregistration(self):
-        self.assertIn(dx.EXPERIMENT["attempt"], dx.HISTORICAL)
-        self.assertTrue(dx.HOLD and dx.on_hold() == dx.HOLD)
-        with self.assertRaises(SystemExit) as x:                    # and its preregistration is never re-derived
-            dx.main(["--write"])
-        self.assertIn("attempt 3 has run", str(x.exception))
+    def test_attempt_4_is_held_and_attempt_3_s_preregistration_is_another_file_never_written(self):
+        self.assertEqual(dx.EXPERIMENT["attempt"], 4)
+        self.assertTrue(dx.HOLD and dx.on_hold() == dx.HOLD and "attempt 4 is preregistered, not authorized" in dx.HOLD)
+        self.assertNotIn(4, dx.HISTORICAL)
+        self.assertNotEqual(dx.OUT_REL, dx.HISTORICAL[3]["preregistration"])
+        rec = dx.committed()
+        self.assertEqual((rec["attempt"], rec["hold"], rec["run_authorized"]), (4, dx.HOLD, f"NO — {dx.HOLD}"))
+        with mock.patch.dict(dx.EXPERIMENT, {"attempt": 3}):       # an attempt that has run is never preregistered again
+            with self.assertRaises(SystemExit) as x:
+                dx.main(["--write"])
+            self.assertIn("attempt 3 has run", str(x.exception))
+            self.assertIn("an attempt that has run is historical: it is never preregistered again", dx.problems({**rec, "attempt": 3}))
 
     def test_while_a_hold_stands_nothing_starts_and_no_provider_is_reached(self):
         explode = mock.Mock(side_effect=AssertionError("a provider was reached"))
@@ -667,9 +695,18 @@ class RunSpecs(unittest.TestCase):
                          (pc.corrected_plan().plan_hash, dx.EXPERIMENT["kernel_commit"], c2_p9.EXPERIMENT))
         self.assertEqual(s["max_turns_per_session"]["value"], 80)
         for key, change in (("budget", {**dx.EXPERIMENT["budget"], "turns": 701}), ("max_turns_per_session", 81), ("route", "9router/mycombo"),
-                            ("resolved_model", "other"),
+                            ("resolved_model", "other"), ("attempt", 5),
                             ("kernel_commit", "0" * 40), ("preflight_shape", {**dx.EXPERIMENT["preflight_shape"], "smokes": 2})):
             with self.subTest(key=key), mock.patch.dict(dx.EXPERIMENT, {key: change}):
+                self.assertNotEqual(dx.runspec(OC).runspec_hash, self.template.runspec_hash)
+
+    def test_the_template_binds_the_prompts_and_the_feedback_code(self):
+        s, ident = self.template.settings, dx.harness_identity()
+        self.assertEqual((dict(s["harness"]["value"]), s["attempt"]["value"]), (ident, 4))
+        self.assertEqual(len(ident["prompts_sha256"]), 7)
+        for key in ("prompts_sha256", "c2_p9_sha256"):
+            other = {**ident, key: {**ident[key], "STORY-03-01": "0" * 64} if key == "prompts_sha256" else "0" * 64}
+            with self.subTest(key=key), mock.patch.object(dx, "harness_identity", return_value=other):
                 self.assertNotEqual(dx.runspec(OC).runspec_hash, self.template.runspec_hash)
         self.assertNotIn("mycombo", json.dumps([c.resolved() for c in self.template.capabilities]))
 
@@ -681,19 +718,34 @@ class Preregistration(unittest.TestCase):
         cls.plan = pc.corrected_plan()
 
     def test_the_record_binds_what_this_tree_holds(self):
-        """Attempt 3's preregistration is historical (class HistoricalAttempt3): what it binds is checked against the commit
-        its run executed on, not against this tree's sources."""
+        """Attempt 4's preregistration binds this tree: its harness files, its prompts and its feedback code by content.
+        (Attempt 3's is historical: class HistoricalAttempt3.)"""
         r = self.rec
-        self.assertEqual((r["verdict"], r["problems"]), ("PREREGISTERED — THE FINAL OWNER BUDGET; ONE RUN", []))
-        self.assertIsNone(r["hold"])
-        self.assertTrue(r["run_authorized"].startswith("ONE RUN, by the owner's ruling 'FINAL REBIND"))
+        self.assertEqual(dx.OUT_REL, "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION.json")
+        self.assertEqual((r["verdict"], r["problems"]), ("PREREGISTERED — ATTEMPT 4, THE OWNER'S BUDGET; ONE RUN", []))
+        self.assertEqual((r["attempt"], r["hold"], r["run_authorized"]), (4, dx.HOLD, f"NO — {dx.HOLD}"))
         self.assertEqual(r["provider_calls_made_preparing_this"], 0)
         self.assertEqual(r["plan"]["plan_hash"], self.plan.plan_hash)
+        self.assertEqual(r["plan"]["correction"]["sha256"], c2_p9.C.lf_sha(ROOT / pc.OUT_REL))
         self.assertEqual(r["kernel"]["tree"], c2_p9.C.git("rev-parse", "HEAD:aisef2"))
         self.assertEqual((r["kernel"]["commit"], r["harness"]["includes"]),
-                         ("4f6dfc197acfd9146357e5781326843bc09982e5", "5c7c5a6b5623b5c2b19d7f1b846ad497ab0561b2"))
+                         ("4f6dfc197acfd9146357e5781326843bc09982e5", "dd79f46e8636637f595e288081bffe555f2d35d8"))
+        for f in r["harness"]["files"]:
+            with self.subTest(file=f["path"]):
+                self.assertEqual(f["sha256"], c2_p9.C.lf_sha(ROOT / f["path"]))
         self.assertIn(f"KT={r['kernel']['tree']}", (ROOT / "validation/qualification/c2_p9_run.sh").read_text(encoding="utf-8"))
         self.assertEqual((r["workload"]["start_sha"], r["workload"]["requirements_sha256"]), (self.plan.baseline, c2_p9.P10.REQUIREMENTS_SHA256))
+        self.assertEqual(r["harness"]["run_command"], "ATTEMPT=4 PROFILE=delivery-experiment-1 validation/qualification/c2_p9_run.sh")
+        self.assertEqual(r["historical_attempts"]["3"]["problems"], [])
+
+    def test_the_prompts_and_the_feedback_code_are_bound_by_content(self):
+        ident = self.rec["developer_context"]["prompts"]
+        self.assertEqual(ident, dx.harness_identity())
+        tasks, _, _ = c2_p9.prompts(self.plan, harness.REQUIREMENTS)
+        self.assertEqual(ident["prompts_sha256"], {s: dx._sha(t.encode("utf-8")) for s, t in sorted(tasks.items())})
+        self.assertEqual(ident["c2_p9_sha256"], c2_p9.C.lf_sha(ROOT / "validation/qualification/c2_p9.py"))
+        self.assertEqual(dict(self.rec["runspec"]["settings"]["harness"]["value"]), ident)
+        self.assertEqual(self.rec["runspec"]["settings"]["attempt"]["value"], 4)
 
     def test_the_owner_s_budget_three_attempts_and_one_fixed_route(self):
         r = self.rec
@@ -713,7 +765,8 @@ class Preregistration(unittest.TestCase):
     def test_the_template_hash_is_the_preregistered_identity_and_the_old_runspec_is_gone(self):
         r = self.rec
         self.assertRegex(r["runspec_template_hash"], r"^[0-9a-f]{64}$")
-        self.assertNotIn("c7d4ed17", json.dumps(r))
+        for old in ("c7d4ed17", "8509c91e", "72377ff7", "19d250574ea8fc2e"):       # the earlier templates; 19d25057… is attempt 3's
+            self.assertNotIn(old, json.dumps(r))
         self.assertNotIn("runspec_hash", r)
         self.assertEqual((r["runspec"]["template_grade"]["by_capability"]["developer"], r["runspec"]["resolved_grade_when_attested"]["aggregate_min_grade"]),
                          ("OPAQUE", "ATTESTED"))

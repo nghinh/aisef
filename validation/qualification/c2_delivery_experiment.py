@@ -60,12 +60,13 @@ from validation.qualification import c2_p9  # noqa: E402
 from validation.qualification import c2_plan_correction as pc  # noqa: E402
 
 C, P10 = c2_p9.C, c2_p9.P10
-OUT_REL = "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-PREREGISTRATION.json"
+#: the CURRENT attempt's preregistration — attempt 4's; attempt 3's is historical evidence (HISTORICAL) and never rewritten
+OUT_REL = "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION.json"
 AUTHORITY = ("owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — "
              "DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY "
-             "EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02), the last superseded for the corrected kernel "
-             "and harness identities by 'AISEF V2 — FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT / OWNER AUTHORIZATION' (2026-10-02): "
-             "exactly ONE paid run, attempt 3, no second attempt")
+             "EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02) for the experiment's design and budget; attempt 3 "
+             "ran once under 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' and is final; this attempt-4 preregistration is prepared "
+             "under 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001' (2026-10-03) §F — no run of it is authorized")
 W1 = "closure-evidence/hardening/w1"
 ORACLE_REL = f"{W1}/oracle/test_oracle.py"
 ORACLE_INDEPENDENCE_REL = f"{W1}/ORACLE-INDEPENDENCE.json"
@@ -76,17 +77,17 @@ V1_PREFLIGHT_REL = f"{W1}/provider_preflight.py"
 #: QP-2.9 attempt 2 and the V1 runs on the same route: what the budget is compared with (never what it is derived from)
 MEASURED_REL = "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json"
 #: Why the experiment may not start, or None: while a reason stands, neither the preflight nor the runner starts, and only
-#: the owner's ruling clears it. The hold of the K-NOWORK-001 ruling stood from 6d5a062 to 5c7c5a6; the owner's ruling
-#: 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' (§6) cleared it at 06ceb23 for exactly attempt 3, which then ran
-#: once. Attempt 3 is final ('ATTEMPT-3 CLOSURE'): nothing runs again under its preregistration.
-HOLD = ("ON HOLD: attempt 3 has run and is final (owner ruling 'ATTEMPT-3 CLOSURE + MINIMAL DELIVERY HARNESS CORRECTION'); "
-        "no further run of this preregistration")
+#: the owner's ruling clears it. The K-NOWORK-001 hold stood from 6d5a062 to 5c7c5a6; 'FINAL REBIND' cleared it at 06ceb23
+#: for exactly attempt 3, which then ran once and is final. Attempt 4 is prepared and not authorized (§F of the ruling
+#: 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001': no run, no preflight, no provider call).
+HOLD = ("ON HOLD: attempt 4 is preregistered, not authorized — a run needs the owner's decision (ruling 'ATTEMPT-3 "
+        "HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001' §F)")
 EXPERIMENT = {
     "id": c2_p9.EXPERIMENT,
-    "attempt": 3,                                       # the next attempt directory of closure-evidence/v2/cycle2/P10
-    "kernel_commit": "4f6dfc197acfd9146357e5781326843bc09982e5",    # K-NOWORK-001 (on K-PRESAT-001, d427299)
+    "attempt": 4,                                       # the next attempt directory of closure-evidence/v2/cycle2/P10
+    "kernel_commit": "4f6dfc197acfd9146357e5781326843bc09982e5",    # K-NOWORK-001 (on K-PRESAT-001, d427299): unchanged since attempt 3
     "kernel_tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
-    "harness_includes": "5c7c5a6b5623b5c2b19d7f1b846ad497ab0561b2",   # H-REGRESSION-001 as the owner accepted it (on 7630dbe)
+    "harness_includes": "dd79f46e8636637f595e288081bffe555f2d35d8",   # H-RETRY-001, on H-PROMPT-002 and the historical verifier
     # the route of the V1 baseline profile PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO (same plan base, max_retries 2)
     "provider": "9router", "endpoint": "https://9router.vnteki.com/v1",
     "route": "9router/ds/deepseek-v4-pro", "route_kind": "FIXED_MODEL", "resolved_model": "deepseek-v4-pro",
@@ -182,9 +183,26 @@ def allowed_identity(oc: dict) -> dict:
             "client": f"opencode {oc.get('version')} binary-sha256:{oc.get('binary_sha256')} routing-config-sha256:{oc.get('routing_config_digest')}"}
 
 
+#: the frozen requirements, in this repository: the prompts are derived from them (byte-identical to LedgerLock's at its
+#: plan commit — P10.REQUIREMENTS_SHA256 — or nothing is preregistered)
+REQUIREMENTS_REL = "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md"
+
+
+def harness_identity() -> dict:
+    """What the developer is given, by content: the seven prompts (H-PROMPT-002) and the code that builds them and the
+    retry feedback (H-RETRY-001), c2_p9.py. The RunSpec binds it, so another prompt or feedback is another RunSpec."""
+    req = (ROOT / REQUIREMENTS_REL).read_bytes()
+    if _sha(req) != P10.REQUIREMENTS_SHA256:
+        raise SystemExit(f"{REQUIREMENTS_REL} is not the frozen requirements")
+    tasks, _, _ = c2_p9.prompts(pc.corrected_plan(), req.decode("utf-8"))
+    prompts = {s: _sha(t.encode("utf-8")) for s, t in sorted(tasks.items())}
+    return {"c2_p9_sha256": C.lf_sha(ROOT / "validation/qualification/c2_p9.py"), "prompts_sha256": prompts,
+            "prompt_set_sha256": _sha(_canon(prompts)), "prompt_rule": "H-PROMPT-002", "retry_feedback": "H-RETRY-001"}
+
+
 def fixed(oc: dict) -> dict:
     """What the RunSpec binds of the experiment (c2_p9.runspec_inputs)."""
-    return {**EXPERIMENT, "experiment": EXPERIMENT["id"], "identity": allowed_identity(oc),
+    return {**EXPERIMENT, "experiment": EXPERIMENT["id"], "identity": allowed_identity(oc), "harness": harness_identity(),
             "developer_timeout_s": c2_p9.DEV_TIMEOUT_S, "reviewer_timeout_s": c2_p9.REVIEW_TIMEOUT_S}
 
 
@@ -686,15 +704,27 @@ def record(ready: dict, m: dict | None = None) -> dict:
     ident = oracle_identity()
     mutants = ready["v1_oracle_calibration_mutants"]
     body = {
-        "record": "AISEF V2 — DELIVERY EXPERIMENT 1: PREREGISTRATION AND EXECUTION GUARD OF ONE LEDGERLOCK DELIVERY RUN (prepared, not executed)",
+        "record": f"AISEF V2 — DELIVERY EXPERIMENT 1, ATTEMPT {EXPERIMENT['attempt']}: PREREGISTRATION AND EXECUTION GUARD OF ONE "
+                  "LEDGERLOCK DELIVERY RUN (prepared, not executed)",
         "authority": AUTHORITY,
-        "status": "PREPARED — NOT STARTED. " + (f"{HOLD}." if HOLD else
-                                                 "The owner authorized exactly ONE paid run of this preregistration, on this kernel and "
-                                                 "this harness, once its deterministic checks pass (ruling 'FINAL REBIND + SINGLE PAID "
-                                                 "DELIVERY EXPERIMENT', §§2-7); no second attempt."),
-        "run_authorized": f"NO — {HOLD}" if HOLD else ("ONE RUN, by the owner's ruling 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' §7 "
-                                                         "(2026-10-02) — and by nothing in this record"),
+        "status": "PREPARED — NOT STARTED. " + (f"{HOLD}." if HOLD else "A run of this preregistration is authorized only by the owner's ruling."),
+        "run_authorized": f"NO — {HOLD}" if HOLD else "only by the owner's ruling — and by nothing in this record",
         "hold": HOLD, "provider_calls_made_preparing_this": 0,
+        "attempt": EXPERIMENT["attempt"],
+        "historical_attempts": {str(n): {"preregistration": h["preregistration"], "evidence_commit": h["evidence_commit"],
+                                         "problems": historical_problems(n), "rule": "verified against its own records; never re-derived"}
+                                for n, h in sorted(HISTORICAL.items())},
+        "developer_context": {
+            "prompts": harness_identity(),
+            "prompt_rule": "H-PROMPT-002: built from the current authoritative sources only — the requirement clause of each of the story's "
+                           "obligations (role, requirement and section, clause and text), the approved contracts' product subjects, the plan "
+                           "stories it depends on, the harness's test-file instruction. No V1-era story text, example, signature or tuple "
+                           "layout; no ProductProofSpec, probe input, stimulus, observable or expectation",
+            "retry_feedback": "H-RETRY-001: c2_p9.retry_feedback — from the journal's own records and the obligations' public facts only: "
+                              "criterion, role, requirement and clause, contract, spec, probe, subject, candidate, probe status, verdict "
+                              "against the expectation, the verifier's agreement, the typed failure and owner, the cited journal seqs; for a "
+                              "developer-owned refutation that the candidate remains refuted and the hidden proof stimulus is not disclosed. "
+                              "Never a probe input; never control (PROBE-DIAGNOSTIC-GAP-001 is open: the journal records no observation detail)"},
         "kernel": {"commit": EXPERIMENT["kernel_commit"], "tree": EXPERIMENT["kernel_tree"], "head_tree": C.git("rev-parse", "HEAD:aisef2"),
                    "tree_of_the_commit": _tree_of(EXPERIMENT["kernel_commit"]),
                    "commit_is_an_ancestor_of_head": _is_ancestor(EXPERIMENT["kernel_commit"])},
@@ -809,7 +839,7 @@ def record(ready: dict, m: dict | None = None) -> dict:
                                   "the plan is the corrected plan by hash: no re-planning, no story split"],
     }
     body["problems"] = problems(body)
-    body["verdict"] = "PREREGISTERED — THE FINAL OWNER BUDGET; ONE RUN" if not body["problems"] else "PROBLEMS"
+    body["verdict"] = f"PREREGISTERED — ATTEMPT {EXPERIMENT['attempt']}, THE OWNER'S BUDGET; ONE RUN" if not body["problems"] else "PROBLEMS"
     return json.loads(json.dumps(body))
 
 
@@ -817,7 +847,9 @@ TAKEN = "the preservation path is taken"
 
 
 def problems(body: dict) -> list[str]:
-    out = []
+    out = [f"historical attempt {n}: {p}" for n, h in (body.get("historical_attempts") or {}).items() for p in h["problems"]]
+    if body.get("attempt") in HISTORICAL or OUT_REL in [h["preregistration"] for h in HISTORICAL.values()]:
+        out.append("an attempt that has run is historical: it is never preregistered again")
     k = body["kernel"]
     if not (k["tree"] == k["head_tree"] == k["tree_of_the_commit"] and k["commit_is_an_ancestor_of_head"]):
         out.append("the kernel of this tree is not the preregistered kernel commit's")

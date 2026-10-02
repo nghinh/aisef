@@ -3,8 +3,9 @@
 # the run inside an owned process range, the kernel tree checked before and after. A rerun is a new attempt directory.
 #
 #   validation/qualification/c2_p9_run.sh
-#   ATTEMPT=3 PROFILE=delivery-experiment-1 validation/qualification/c2_p9_run.sh   # the ONE preregistered delivery run:
-#       NOT AUTHORIZED until the owner authorizes it (DELIVERY-EXPERIMENT-1-PREREGISTRATION.json). This script only
+#   ATTEMPT=4 PROFILE=delivery-experiment-1 validation/qualification/c2_p9_run.sh   # the preregistered delivery run of attempt 4:
+#       NOT AUTHORIZED until the owner authorizes it (DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION.json; attempt 3 has run
+#       and is final). This script only
 #       orchestrates: the runner itself (c2_p9.run) refuses unless the preregistration holds and the attempt holds a
 #       verified ATTESTED preflight record — calling it directly opens nothing.
 set -u; unsetopt nomatch

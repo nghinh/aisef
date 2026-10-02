@@ -1,0 +1,692 @@
+{
+ "record": "AISEF V2 — DELIVERY EXPERIMENT 1, ATTEMPT 4: PREREGISTRATION AND EXECUTION GUARD OF ONE LEDGERLOCK DELIVERY RUN (prepared, not executed)",
+ "authority": "owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02) for the experiment's design and budget; attempt 3 ran once under 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' and is final; this attempt-4 preregistration is prepared under 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001' (2026-10-03) §F — no run of it is authorized",
+ "status": "PREPARED — NOT STARTED. ON HOLD: attempt 4 is preregistered, not authorized — a run needs the owner's decision (ruling 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001' §F).",
+ "run_authorized": "NO — ON HOLD: attempt 4 is preregistered, not authorized — a run needs the owner's decision (ruling 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001' §F)",
+ "hold": "ON HOLD: attempt 4 is preregistered, not authorized — a run needs the owner's decision (ruling 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001' §F)",
+ "provider_calls_made_preparing_this": 0,
+ "attempt": 4,
+ "historical_attempts": {
+  "3": {
+   "preregistration": "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-PREREGISTRATION.json",
+   "evidence_commit": "f86e8f4fbbf20064953cc32c967fa21756c9f627",
+   "problems": [],
+   "rule": "verified against its own records; never re-derived"
+  }
+ },
+ "developer_context": {
+  "prompts": {
+   "c2_p9_sha256": "8f9846ad688d9f60be7cbb83b1f74237babb5b5fec2a416e5e2eb0de0bceb595",
+   "prompts_sha256": {
+    "STORY-01-01": "fd2472d50d2c38c7270ee3286f1b52005f959f8ef7320f8f4938628f8bdbe6bb",
+    "STORY-01-05": "3ba1f17fed80b8053559a85d72c37ad7c8cf90493831509ccea5d5b69b76cc76",
+    "STORY-02-01": "5c46e4dbab5c27a8f597170c023593331f8769ab74f1241467c3b26bf8c9b068",
+    "STORY-02-02": "122d474e208413840b1403898b1e2bd6c2e4aab207752c7dec06140898fc0760",
+    "STORY-03-01": "d98519ae408f07d111d266278e016b24a9ca5d3e23f52a6fe3153e63accaf451",
+    "STORY-04-01": "21784107b65cbdcde0325baf0c102a50e71bd113f0b318e2691ed1d390d20911",
+    "STORY-04-02": "c4be7afd38526905c83f48f23cbdd18099f4e4e51fb1649d93e6aabd805e20c6"
+   },
+   "prompt_set_sha256": "a970161573950a4023a7cb05245222baab5e72d9df62b47ec176c9a806b0d8f7",
+   "prompt_rule": "H-PROMPT-002",
+   "retry_feedback": "H-RETRY-001"
+  },
+  "prompt_rule": "H-PROMPT-002: built from the current authoritative sources only — the requirement clause of each of the story's obligations (role, requirement and section, clause and text), the approved contracts' product subjects, the plan stories it depends on, the harness's test-file instruction. No V1-era story text, example, signature or tuple layout; no ProductProofSpec, probe input, stimulus, observable or expectation",
+  "retry_feedback": "H-RETRY-001: c2_p9.retry_feedback — from the journal's own records and the obligations' public facts only: criterion, role, requirement and clause, contract, spec, probe, subject, candidate, probe status, verdict against the expectation, the verifier's agreement, the typed failure and owner, the cited journal seqs; for a developer-owned refutation that the candidate remains refuted and the hidden proof stimulus is not disclosed. Never a probe input; never control (PROBE-DIAGNOSTIC-GAP-001 is open: the journal records no observation detail)"
+ },
+ "kernel": {
+  "commit": "4f6dfc197acfd9146357e5781326843bc09982e5",
+  "tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
+  "head_tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
+  "tree_of_the_commit": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
+  "commit_is_an_ancestor_of_head": true
+ },
+ "harness": {
+  "includes": "dd79f46e8636637f595e288081bffe555f2d35d8",
+  "included": true,
+  "files": [
+   {
+    "path": "validation/qualification/c2_p9.py",
+    "sha256": "8f9846ad688d9f60be7cbb83b1f74237babb5b5fec2a416e5e2eb0de0bceb595"
+   },
+   {
+    "path": "validation/qualification/c2_p9_run.sh",
+    "sha256": "ff2dfd1b35d108e9e8bdd4eea6c5c1ef8659f90fb7fa1d096aee9055de09ec8c"
+   },
+   {
+    "path": "validation/qualification/c2_delivery_experiment.py",
+    "sha256": "67b4d12adc577e9dc629e6e49bd036b06f04a1e7b85a0f4f85f81a702cbd7822"
+   },
+   {
+    "path": "validation/qualification/c2_plan_correction.py",
+    "sha256": "2a118bde56216e2d76738c13a4a063bc3e2751481f99ad860f0fd1c3dd734646"
+   }
+  ],
+  "run_command": "ATTEMPT=4 PROFILE=delivery-experiment-1 validation/qualification/c2_p9_run.sh"
+ },
+ "workload": {
+  "id": "LedgerLock",
+  "benchmark_class": "DEVELOPMENT_REGRESSION",
+  "generalization_claim": "NONE",
+  "start_sha": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+  "repository": {
+   "repo": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2",
+   "present": true,
+   "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "baseline_is_the_plan_commit": true,
+   "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+   "requirements_match_frozen": true,
+   "epics_sha256": "4f2c920ef4853cf98254f7c2ad582a2bfdc8b90becc8bd45f44e3c262cd81376",
+   "tree": "d4560f79d0b6cc9e9b685c9cb6150ab73afb4971"
+  }
+ },
+ "plan": {
+  "id": "LEDGERLOCK-PLAN-V2.2-CORRECTION-1",
+  "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
+  "stories": 7,
+  "obligations": 67,
+  "execution_order": [
+   "STORY-01-01",
+   "STORY-01-05",
+   "STORY-02-01",
+   "STORY-02-02",
+   "STORY-03-01",
+   "STORY-04-01",
+   "STORY-04-02"
+  ],
+  "correction": {
+   "path": "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json",
+   "sha256": "365ebacfc8d27a2d5f3f833a90fa4ba6d4ac6dd2a76d9e7744310579f14d8ba6",
+   "check": []
+  }
+ },
+ "profile": {
+  "name": "delivery-experiment-1",
+  "limits": {
+   "DEVELOPER": 2,
+   "PLAN": 0,
+   "ENVIRONMENT": 1,
+   "PROVIDER": 1,
+   "INTEGRATION": 0,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "developer_attempts_per_story": 3,
+  "tests_policy": "TestsPolicy(blocking=True), as attempts 1 and 2"
+ },
+ "budget": {
+  "max_provider_requests": 60,
+  "max_total_turns": 700,
+  "max_combined_input_tokens": 60000000,
+  "max_output_plus_reasoning_tokens": 400000,
+  "hard": "no automatic increase; no retry pool outside it; the preflight's requests, turns and tokens are in it",
+  "units": {
+   "provider_request": "one model session the harness starts (the journal's provider/request: developer or reviewer) or one request of the preflight (the model listing, a chat probe, the smoke session); the security stage is a local scanner and makes none",
+   "turn": "one finished step of a session, over the whole experiment",
+   "input": "prompt + cache read + cache write tokens, one combined number",
+   "output": "completion + reasoning tokens"
+  },
+  "derived_from": "the preflight ledger, the journal's provider/request events and the session streams — re-derived at every check; no counter is kept (c2_p9.Budget)",
+  "when_reached": "a ceiling reached or exceeded, or spend that cannot be accounted for, ends the experiment: the running session's process range is released, no session starts afterwards (the kernel is answered with a provider refusal, owner PROVIDER, never a developer failure), later stories are NOT_RUN, and the delivery verdict is not PASS. The request that reaches the request ceiling may run; nothing after it — and a run that reached any ceiling is not a PASS even when its last story committed",
+  "max_turns_per_session": 80,
+  "at_the_session_cap": "a developer or reviewer session that reaches it is stopped (its process range released) so that one session cannot consume the experiment's turns; what it changed is committed as the candidate and judged by the proofs, and the experiment goes on. Stopped sessions are counted in the run's record. The smoke session has its own cap (preflight.shape)",
+  "session_timeouts_s": {
+   "developer": 2400.0,
+   "reviewer": 900.0
+  },
+  "no_later_run": "one attempt number; a record or a preflight in the attempt directory refuses another",
+  "accounting_limitation": "spend is what the client reports per finished step. An HTTP request that finishes no step is not in the telemetry — a client-internal retry, a failed request, the request in flight when a stop is issued — so its tokens cannot be counted; a stop is issued at the first reading (every 5 s) that shows a ceiling reached, so the totals can pass a ceiling by the steps finished since the reading before. Input is one combined number (prompt + cache read + cache write): the owner's ceiling is combined and no separate fresh/cached limit exists. The preflight's chat probes report prompt_tokens and completion_tokens only, counted as input and output.",
+  "for_comparison_not_derivation": {
+   "qp_2_9_attempt_2": {
+    "sessions": 12,
+    "turns": 984,
+    "tokens": {
+     "input": 96863421,
+     "output": 259248
+    }
+   },
+   "v1_runs_on_this_route": [
+    {
+     "sessions": 58,
+     "turns": 668,
+     "input_tokens_fresh": 15212434,
+     "input_tokens_cached": 43323904,
+     "output_tokens": 218000
+    },
+    {
+     "sessions": 50,
+     "turns": 604,
+     "input_tokens_fresh": 15013565,
+     "input_tokens_cached": 35259392,
+     "output_tokens": 202000
+    },
+    {
+     "sessions": 57,
+     "turns": 600,
+     "input_tokens_fresh": 14797597,
+     "input_tokens_cached": 35098496,
+     "output_tokens": 208000
+    }
+   ]
+  }
+ },
+ "model": {
+  "route": "9router/ds/deepseek-v4-pro",
+  "route_kind": "FIXED_MODEL",
+  "resolved_model": "deepseek-v4-pro",
+  "dynamic_alias": false,
+  "roles": {
+   "developer": "9router/ds/deepseek-v4-pro",
+   "reviewer": "9router/ds/deepseek-v4-pro"
+  },
+  "why_this_route": "the route of the V1 baseline profile PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO (same plan base 136a68dc, max_retries 2): the comparison the experiment exists for",
+  "allowed_identity": {
+   "provider": "9router",
+   "endpoint": "https://9router.vnteki.com/v1",
+   "declared_model": "deepseek-v4-pro",
+   "route": "9router/ds/deepseek-v4-pro",
+   "client": "opencode 1.18.31 binary-sha256:16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198 routing-config-sha256:7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5"
+  },
+  "client": {
+   "client": "opencode",
+   "binary": "/Users/nghinh/.opencode/bin/opencode",
+   "binary_sha256": "16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198",
+   "version": "1.18.31",
+   "declared_route": "9router/mycombo",
+   "endpoint": "https://9router.vnteki.com/v1",
+   "provider_config_digest_without_secrets": "e471c8f750f88e544112105b2846b5bb4af59fa48c6d1c7ec436ad2064278cee",
+   "grade": "OPAQUE",
+   "why_opaque": "declared route and client only: no request was made, so no preflight fingerprint was measured (RFC §23)",
+   "routing_config_digest": "7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5"
+  },
+  "client_configuration_overlay": {
+   "model": "9router/ds/deepseek-v4-pro",
+   "small_model": "9router/ds/deepseek-v4-pro",
+   "provider": {
+    "9router": {
+     "models": {
+      "ds/deepseek-v4-pro": {
+       "name": "ds/deepseek-v4-pro",
+       "limit": {
+        "context": 200000,
+        "output": 32768
+       }
+      }
+     }
+    }
+   }
+  },
+  "client_resolution_measured_locally": {
+   "client_present": true,
+   "model": "9router/ds/deepseek-v4-pro",
+   "small_model": "9router/ds/deepseek-v4-pro",
+   "route_model_declared": true,
+   "resolves_to_the_fixed_route": true
+  },
+  "stable_declared_identity": {
+   "recorded_preflights_on_the_route": 10,
+   "upstreams_listed": [
+    "ds"
+   ],
+   "models_that_answered": [
+    "deepseek-v4-pro"
+   ],
+   "between": [
+    "2026-09-19T14:50:11+0700",
+    "2026-09-21T05:36:04+0700"
+   ],
+   "not_measured_now": "no provider call was permitted while preparing"
+  }
+ },
+ "preflight": {
+  "shape": {
+   "listing": 1,
+   "chat_probes": 3,
+   "chat_probe_max_tokens": 16,
+   "smokes": 1,
+   "smoke_max_turns": 10,
+   "smoke_timeout_s": 300.0
+  },
+  "provider_requests_at_most": 5,
+  "order": "the model listing; then the chat probes, stopping at the first answer that is not the expected identity; then — only when the listing and every probe showed the one expected model — the smoke session(s), each bounded by 10 turns, 300 s and the budget",
+  "accounting": "preflight/LEDGER.jsonl in the attempt directory: every request is written before it is sent and after it answers; a request without a result, a probe without usage, a smoke without step telemetry is unaccounted and locks delivery",
+  "written_once": "an attempt directory that holds a preflight, passed or failed, is never preflighted again",
+  "attest_command": "python -P validation/qualification/c2_delivery_experiment.py --attest   (calls the provider: part of the paid run)"
+ },
+ "attestation": {
+  "grade_before_preflight": "OPAQUE",
+  "grade_after_a_successful_preflight": "ATTESTED",
+  "contract": "aisef2/runtime/capability.py ATTESTED (RFC §23): provider, endpoint, declared_model, route, client, fingerprint, and deployment when exposed — no new grade, no kernel change",
+  "deployment_identity": "bound only when every probe's response carries one and the same system_fingerprint; otherwise the attestation records NOT_EXPOSED (or EXPOSED_NOT_STABLE) and binds none — never a made-up one. The upstream the router's listing names (owned_by) is a required property of the route and is in the fingerprint; it is not called a deployment",
+  "tuple_binds": {
+   "provider": "provider",
+   "endpoint/provider identity": "endpoint",
+   "fixed route": "route",
+   "declared model id": "declared_model",
+   "client identity, client version, client binary digest, client configuration digest relevant to routing": "client",
+   "provider deployment identity, IF EXPOSED (system_fingerprint)": "deployment",
+   "locally measured preflight fingerprint": "fingerprint"
+  },
+  "fingerprint_binds": [
+   "the route",
+   "the listing row's id, object and owner",
+   "declared limits when the listing exposes them",
+   "the declared model id of every probe",
+   "response object, system_fingerprint and usage field names",
+   "the limits declared to the client",
+   "the smoke probe's tool-calling behaviour"
+  ],
+  "fingerprint_is": "a drift detector over observable fields — not a claim about model weights",
+  "refused_as": "MODEL_IDENTITY_CANNOT_BE_ATTESTED when the router does not list the route as one fixed upstream or the probes do not show one stable declared model equal to the expected one; delivery stays locked",
+  "record": "closure-evidence/v2/cycle2/P10/attempt-4/ATTESTATION.json",
+  "max_age_s": 3600,
+  "gate": "c2_p9.run calls require_unlocked before anything else: the preregistration re-derived, then the attestation verified against it — experiment and attempt, preregistration hash, plan, kernel, route, model, client, enforcement identity, the tuple and fingerprint rebuilt from the observation, the resolved RunSpec hash, the ledger's accounting, its age. Any difference: REFUSED, no provider call"
+ },
+ "runspec": {
+  "template_capabilities": [
+   {
+    "name": "developer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode 1.18.31 binary-sha256:16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198 routing-config-sha256:7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5",
+     "declared_model": "deepseek-v4-pro",
+     "endpoint": "https://9router.vnteki.com/v1",
+     "provider": "9router",
+     "route": "9router/ds/deepseek-v4-pro"
+    },
+    "identity": "1dbcca87ba6b1df4e67c4072306b525dc2761b64eee5814355cc2a6b2aa7c0b3"
+   },
+   {
+    "name": "git",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "5e5a622e407fb7deb74173cab9e47ff214952cc6bfcd036449cf9edbaa305537"
+    },
+    "identity": "5faddbb6c18e9e8367ff426e1d708237d78c6b8f320a497c74aa5b9b67b5659c"
+   },
+   {
+    "name": "kernel",
+    "grade": "VERIFIED",
+    "enforcement": "FULL",
+    "binding": {
+     "digest": "1d165c76d9816cf25f02a3ade9925e60424f642d3772ea139a596dae68874657",
+     "tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020"
+    },
+    "identity": "a08f496c1b0b1c8515bbb43a883613fa65914a34d283e603f0049d034ed0ea95"
+   },
+   {
+    "name": "probe.cli_invocation",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "60f848e0ffc84870bde255fd87ec83b61029c5f3f23118f0f3334e6885d83fa5"
+    },
+    "identity": "cc6b3681d7421758ae9b8b826971454abd19042f4ae49095da0b7204f9137d6a"
+   },
+   {
+    "name": "probe.file_artifact",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "09616bbfc91aa1f8a0ee961a2b3a6c9a885a7e1ed8a029a3615c2558a6b39b86"
+    },
+    "identity": "a0262f69068b69d2694fdbad7c6b959306c6bf357935e58962a1128711709c70"
+   },
+   {
+    "name": "probe.process_effect",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "072ac1d7d13a7ce030bd6a2313e80b9385875450107c6dd76d2d549b915517c8"
+    },
+    "identity": "3447913a70d21fc1e829b8fc1c758a3a6d4cd56264fda0c44435e43291fb4868"
+   },
+   {
+    "name": "probe.python_callable_v2",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "b4871a14ba406dedba9f46a9b469d538c48e135185e017adebda4c32127b2811"
+    },
+    "identity": "699d2b0512c94517617878bc41a577881b2aca3c16bb2fc6e6ea14bde9573f7b"
+   },
+   {
+    "name": "python",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634",
+     "version": "3.14.7"
+    },
+    "identity": "5f34b937df4725ab238ce4b6b1e08ecf7e1cc4263b17445bd80993e0bc06aa38"
+   },
+   {
+    "name": "reviewer",
+    "grade": "OPAQUE",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "client": "opencode 1.18.31 binary-sha256:16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198 routing-config-sha256:7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5",
+     "declared_model": "deepseek-v4-pro",
+     "endpoint": "https://9router.vnteki.com/v1",
+     "provider": "9router",
+     "route": "9router/ds/deepseek-v4-pro"
+    },
+    "identity": "9d73773ff7b7cfed40a90ff12e115092ca8fe0b5555425866a5f195616311c36"
+   },
+   {
+    "name": "scanner",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL",
+    "binding": {
+     "digest": "663a2e6dbfcb7f417e49bfb867257cb7f84a06637cd76179d50aefffc9aad92f",
+     "mode": "lint as an informational scanner",
+     "tool": "ruff"
+    },
+    "identity": "6ec865eb0aa8921eff739cc1fac664068455124e0c0ee7615e4b631863ea4ef0"
+   }
+  ],
+  "template_grade": {
+   "aggregate_min_grade": "OPAQUE",
+   "by_capability": {
+    "developer": "OPAQUE",
+    "git": "VERIFIED",
+    "kernel": "VERIFIED",
+    "probe.cli_invocation": "VERIFIED",
+    "probe.file_artifact": "VERIFIED",
+    "probe.process_effect": "VERIFIED",
+    "probe.python_callable_v2": "VERIFIED",
+    "python": "VERIFIED",
+    "reviewer": "OPAQUE",
+    "scanner": "VERIFIED"
+   }
+  },
+  "resolved_grade_when_attested": {
+   "aggregate_min_grade": "ATTESTED",
+   "by_capability": {
+    "developer": "ATTESTED",
+    "git": "VERIFIED",
+    "kernel": "VERIFIED",
+    "probe.cli_invocation": "VERIFIED",
+    "probe.file_artifact": "VERIFIED",
+    "probe.process_effect": "VERIFIED",
+    "probe.python_callable_v2": "VERIFIED",
+    "python": "VERIFIED",
+    "reviewer": "ATTESTED",
+    "scanner": "VERIFIED"
+   }
+  },
+  "settings": {
+   "attempt": {
+    "layer": "preregistration",
+    "value": 4
+   },
+   "benchmark_class": {
+    "layer": "c2-p9",
+    "value": "DEVELOPMENT_REGRESSION"
+   },
+   "budget": {
+    "layer": "preregistration",
+    "value": {
+     "input_tokens": 60000000,
+     "output_tokens": 400000,
+     "provider_requests": 60,
+     "turns": 700
+    }
+   },
+   "developer_timeout_s": {
+    "layer": "preregistration",
+    "value": 2400.0
+   },
+   "experiment": {
+    "layer": "preregistration",
+    "value": "delivery-experiment-1"
+   },
+   "harness": {
+    "layer": "preregistration",
+    "value": {
+     "c2_p9_sha256": "8f9846ad688d9f60be7cbb83b1f74237babb5b5fec2a416e5e2eb0de0bceb595",
+     "prompt_rule": "H-PROMPT-002",
+     "prompt_set_sha256": "a970161573950a4023a7cb05245222baab5e72d9df62b47ec176c9a806b0d8f7",
+     "prompts_sha256": {
+      "STORY-01-01": "fd2472d50d2c38c7270ee3286f1b52005f959f8ef7320f8f4938628f8bdbe6bb",
+      "STORY-01-05": "3ba1f17fed80b8053559a85d72c37ad7c8cf90493831509ccea5d5b69b76cc76",
+      "STORY-02-01": "5c46e4dbab5c27a8f597170c023593331f8769ab74f1241467c3b26bf8c9b068",
+      "STORY-02-02": "122d474e208413840b1403898b1e2bd6c2e4aab207752c7dec06140898fc0760",
+      "STORY-03-01": "d98519ae408f07d111d266278e016b24a9ca5d3e23f52a6fe3153e63accaf451",
+      "STORY-04-01": "21784107b65cbdcde0325baf0c102a50e71bd113f0b318e2691ed1d390d20911",
+      "STORY-04-02": "c4be7afd38526905c83f48f23cbdd18099f4e4e51fb1649d93e6aabd805e20c6"
+     },
+     "retry_feedback": "H-RETRY-001"
+    }
+   },
+   "kernel_commit": {
+    "layer": "preregistration",
+    "value": "4f6dfc197acfd9146357e5781326843bc09982e5"
+   },
+   "limits": {
+    "layer": "c2-p9 profile delivery-experiment-1",
+    "value": {
+     "DEVELOPER": 2,
+     "ENVIRONMENT": 1,
+     "INTEGRATION": 0,
+     "PLAN": 0,
+     "PROVIDER": 1,
+     "REVIEW": 1,
+     "SECURITY": 1
+    }
+   },
+   "max_turns_per_session": {
+    "layer": "preregistration",
+    "value": 80
+   },
+   "plan_hash": {
+    "layer": "plan",
+    "value": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b"
+   },
+   "preflight_shape": {
+    "layer": "preregistration",
+    "value": {
+     "chat_probe_max_tokens": 16,
+     "chat_probes": 3,
+     "listing": 1,
+     "smoke_max_turns": 10,
+     "smoke_timeout_s": 300.0,
+     "smokes": 1
+    }
+   },
+   "requirements_sha256": {
+    "layer": "workload",
+    "value": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc"
+   },
+   "reviewer_timeout_s": {
+    "layer": "preregistration",
+    "value": 900.0
+   },
+   "revision": {
+    "layer": "run",
+    "value": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5"
+   },
+   "workload": {
+    "layer": "c2-p9",
+    "value": "LedgerLock"
+   }
+  },
+  "resolved_derivation": "the template with the developer's and the reviewer's capability replaced by the ATTESTED tuple (the allowed identity plus the fingerprint of the observed preflight fields) and the template's hash added as the setting preregistered_template_hash — c2_delivery_experiment.runspec(oc, fields); the run's journal binds this resolved hash (run/spec-resolved), and it never changes after delivery begins"
+ },
+ "runspec_template_hash": "31ead94fa9ab08241b73a36cc223588e8eecfce8a3b5ae4b68d58fe57396b83f",
+ "enforcement": {
+  "by_capability": {
+   "developer": "PARTIAL",
+   "git": "PARTIAL",
+   "kernel": "FULL",
+   "probe.cli_invocation": "PARTIAL",
+   "probe.file_artifact": "PARTIAL",
+   "probe.process_effect": "PARTIAL",
+   "probe.python_callable_v2": "PARTIAL",
+   "python": "PARTIAL",
+   "reviewer": "PARTIAL",
+   "scanner": "PARTIAL"
+  },
+  "probe_execution_env": "PARTIAL",
+  "sha256": "1edbce9c6ab132a4c122a8e8a642b328220c1f2cf61e85a1ad83e4fd4be2bee7"
+ },
+ "preservation": {
+  "root": "/Users/nghinh/Downloads/projects/aisef-qp-2.9-preserved",
+  "git_dir": "/Users/nghinh/Downloads/projects/aisef-qp-2.9-preserved/attempt-4.git",
+  "free": true,
+  "rule": "the run repository's whole git directory is copied there, and final main and every revision the run names — every story parent, proved candidate, session candidate, committed revision, and every revision the journal cites anywhere — pinned under refs/qp-2.9/ before the temporary directory is removed; it is not removed unless all are held, and no delivery PASS is recorded unless they are"
+ },
+ "final_evaluation": {
+  "v2_final_proof": "all 59 ProductProofSpecs, each on its own probe, on the final main (FINAL-EVALUATION.json)",
+  "delivery_pass_confirmed": "only when the run's delivery verdict is PASS and the final main satisfies 59 of 59 specs and passes every check of the V1 oracle",
+  "v1_oracle": {
+   "path": "closure-evidence/hardening/w1/oracle/test_oracle.py",
+   "sha256": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+   "sha256_pinned": "b9ab8d3ac62faaa3d0edceced3eaf58b71a541edb361bf9ff7b401e3972b0b8c",
+   "unchanged_since_calibration": true,
+   "independence_verdict": "PASS",
+   "interpreter": {
+    "python": "3.14.7",
+    "pytest": "9.1.1",
+    "coverage": "7.16.2"
+   },
+   "v1_oracle_venv": {
+    "coverage": "7.16.1",
+    "pytest": "9.1.1"
+   },
+   "runtime_difference": "coverage 7.16.2 vs 7.16.1",
+   "interpreter_note": "the oracle venv of the V1 freeze is no longer on this machine; the oracle runs under the harness interpreter, whose versions are recorded here and whose equivalence is the calibration below",
+   "ORACLE_RUNTIME_DIFFERENCE": "coverage 7.16.2 vs 7.16.1",
+   "ORACLE_CALIBRATION_EQUIVALENCE": "PASS"
+  },
+  "readiness_measured_without_a_provider": {
+   "v2_final_proof_on_the_p5_reference_fixture": {
+    "total": 59,
+    "satisfied": 59,
+    "not_satisfied": []
+   },
+   "v1_oracle_on_its_calibration_reference": {
+    "exit": 0,
+    "total": 9,
+    "passed": 9,
+    "not_passed": [],
+    "complete": true,
+    "interpreter": {
+     "python": "3.14.7",
+     "pytest": "9.1.1",
+     "coverage": "7.16.2"
+    }
+   },
+   "v1_oracle_calibration_mutants": {
+    "total": 10,
+    "killed": 10,
+    "survived": [],
+    "mutants": {
+     "M1": {
+      "removes": "§3.3 tamper evidence: the hash is no longer recomputed on verify",
+      "target": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": [
+       "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+      ]
+     },
+     "M2": {
+      "removes": "§5 atomic batch: only the first op of a batch is committed",
+      "target": "TestAcceptance::test_14_3_apply_batch_commits_atomically",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": [
+       "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+      ]
+     },
+     "M3": {
+      "removes": "§4.3 conflict: another rid on a key no longer conflicts",
+      "target": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": [
+       "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+       "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
+       "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+       "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value"
+      ]
+     },
+     "M4": {
+      "removes": "§3.1 NFC: keys are not normalised",
+      "target": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": [
+       "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+      ]
+     },
+     "M5": {
+      "removes": "§6 snapshot order: insertion order, not byte order",
+      "target": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": [
+       "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+      ]
+     },
+     "M6": {
+      "removes": "§7 repair-tail: mid-chain corruption is 'repaired' instead of refused",
+      "target": "TestAcceptance::test_14_4_repair_tail_fixes_a_truncated_tail_and_refuses_mid_chain_corruption",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": [
+       "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+      ]
+     },
+     "M7": {
+      "removes": "§2 / §10 / §14.6: a third-party import (guarded, so only a static check sees it)",
+      "target": "TestAcceptance::test_14_6_no_third_party_imports_at_runtime",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": []
+     },
+     "M8": {
+      "removes": "§4.2 idempotency: a replayed rid appends a duplicate line",
+      "target": "TestIdempotencyAndConflict::test_replay_is_idempotent_and_a_different_rid_conflicts",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": [
+       "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover",
+       "TestIdempotencyAndConflict::test_a_tombstone_conflicts_like_a_live_value"
+      ]
+     },
+     "M9": {
+      "removes": "§6 determinism: the snapshot carries a random nonce",
+      "target": "TestAcceptance::test_14_2_snapshot_is_byte_deterministic",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": [
+       "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+      ]
+     },
+     "M10": {
+      "removes": "§5 + §4.3: a conflicting batch commits its non-conflicting prefix",
+      "target": "TestIdempotencyAndConflict::test_a_conflicting_batch_exits_4_and_commits_nothing_through_the_cli",
+      "target_outcome": "FAILED",
+      "killed": true,
+      "also_red": [
+       "TestAcceptance::test_14_5_coverage_at_least_85_percent_with_unittest_discover"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "frozen_during_the_run": [
+  "the run script refuses a dirty tree and a kernel tree other than the preregistered one, before and after",
+  "the runner itself re-derives this preregistration and verifies the attestation before any provider call",
+  "the resolved RunSpec is fixed by the attestation before delivery begins and is the one the journal binds",
+  "HEAD must be the same commit after the run as before it",
+  "the plan is the corrected plan by hash: no re-planning, no story split"
+ ],
+ "problems": [],
+ "verdict": "PREREGISTERED — ATTEMPT 4, THE OWNER'S BUDGET; ONE RUN"
+}
