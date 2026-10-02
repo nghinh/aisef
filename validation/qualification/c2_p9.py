@@ -151,14 +151,22 @@ def test_path(story: str) -> str:
     return f"tests/test_{story.lower().replace('-', '_')}.py"
 
 
-def regression_tests(repo, story: str, delivered: list[str]) -> tuple[str, ...]:
-    """The regression set of `story`: the test files of the stories delivered before it — those main holds. A story that
-    committed without a developer call (nothing left to introduce: K-PRESAT-001, K-NOWORK-001) wrote no test file, and
-    naming a file nobody was asked to write fails the next developer's adequacy (TESTS_INADEQUATE, a correct story rolled
-    back: H-REGRESSION-001). With none held, the story's own tests, as for the first story."""
+def holds(repo, path: str) -> bool:
+    """Whether main holds `path` now."""
     from aisef2.orchestrate.workspace import git
-    held = tuple(p for p in map(test_path, delivered) if git(repo, "cat-file", "-e", f"main:{p}").returncode == 0)
-    return held or (test_path(story),)
+    return git(repo, "cat-file", "-e", f"main:{path}").returncode == 0
+
+
+def regression_tests(repo, story: str, delivered: dict[str, bool]) -> tuple[str, ...]:
+    """The regression set of `story`. `delivered`: each story committed before it -> whether main held that story's test
+    file when it committed (`holds`, asked at the commit). A story that committed without a developer call (nothing left
+    to introduce: K-PRESAT-001, K-NOWORK-001) produced no test file, and naming a file nobody was asked to write fails
+    the next developer's adequacy (TESTS_INADEQUATE, a correct story rolled back: H-REGRESSION-001). ONLY such a file is
+    left out — one that was never produced and that main does not hold. A file that was produced stays named whether or
+    not main still holds it (if it is gone, that is the kernel's typed failure to state, not the harness's to hide), and
+    so does a file main holds now. With none, the story's own tests, as for the first story."""
+    named = tuple(test_path(s) for s, produced in delivered.items() if produced or holds(repo, test_path(s)))
+    return named or (test_path(story),)
 
 
 def epics_section(epics: str, story: str) -> str:
@@ -688,7 +696,7 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch)) for e in catalog.CATALOG}
         env = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)
         limits = {Owner[k]: v for k, v in PROFILES[profile].items()}
-        delivered: list[str] = []
+        delivered: dict[str, bool] = {}     # committed story -> main held its test file when it committed
         for story in order(plan, aid.story_graph()):
             why = budget.reached() if budget else None
             if why:      # a ceiling reached, or spend unaccounted: the experiment has ended — nothing more starts
@@ -701,7 +709,7 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
                 r = sr.run_story(run_, plan, story, inputs, adapters, sr.Policy(limits, TestsPolicy(True), tool_timeout_s=120))
                 results[story] = [a.outcome for a in r.attempts]
                 if results[story][-1:] == ["COMMIT"]:
-                    delivered.append(story)
+                    delivered[story] = holds(repo, test_path(story))
             except Exception as e:  # noqa: BLE001 — a typed refusal of one story is recorded; the run goes on
                 errors.append({"story": story, "error": f"{type(e).__name__}: {e}"[:2000]})
                 results[story] = [f"REFUSED: {type(e).__name__}"]

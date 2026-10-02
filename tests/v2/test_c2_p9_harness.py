@@ -8,8 +8,10 @@ no LedgerLock repository, nothing run:
                      is not removed unless they are.
   §6                 the proposed `v1-aligned` profile gives 3 total developer attempts; the default profile is the
                      one attempts 1 and 2 ran.
-  H-REGRESSION-001   a story's regression set names only test files main holds: a story that committed without a
-                     developer call (K-PRESAT-001, K-NOWORK-001) wrote none, and naming it rolled the next story back.
+  H-REGRESSION-001   a story's regression set leaves out only a test file that was never produced: a story that
+                     committed without a developer call (K-PRESAT-001, K-NOWORK-001) wrote none, and naming it rolled
+                     the next story back. Every real regression test stays; one that should exist and is gone is still
+                     named, so its typed failure is kept (the owner's adversarial cases A-D).
 """
 
 from __future__ import annotations
@@ -244,36 +246,62 @@ class RetryProfile(unittest.TestCase):
 
 
 class RegressionSet(unittest.TestCase):
-    """H-REGRESSION-001 (found reviewing K-NOWORK-001, measured through the real story path): the runner named the test
-    file of every committed story as a regression test of the next — also of a story that committed without a developer
-    call, which has none."""
+    """H-REGRESSION-001 (found reviewing K-NOWORK-001, measured through the real story path; accepted by the owner's
+    ruling 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' §1 with the adversarial cases A-D of its §3): the runner
+    named the test file of every committed story as a regression test of the next — also of a story that committed
+    without a developer call, which has none. `delivered` below is what the runner keeps: committed story -> whether
+    main held its test file when it committed."""
     setUp = e2e.Orchestration.setUp
     story, inputs, adapters = e2e.Orchestration.story, e2e.Orchestration.inputs, e2e.Orchestration.adapters
     events, failures, details, assertAttempts = (e2e.Orchestration.events, e2e.Orchestration.failures, e2e.Orchestration.details,
                                                  e2e.Orchestration.assertAttempts)
+    NO_CALL = "STORY-02-01"       # committed without a developer call: tests/test_story_02_01.py was never written
 
     def delivery(self, regressions: tuple[str, ...]):
         """A story with developer work, correct and adequately tested, under the blocking tests policy."""
         dev = e2e.Dev({"app/calc.py": e2e.CALC + e2e.ADD, "tests/test_s1.py": e2e.TEST_ADD})
-        plan = e2e.plan_of(self.base, e2e.obligation("C1", self.s1.id, "S1", ObligationRole.INTRODUCE))
+        plan = e2e.plan_of(self.merger.base(), e2e.obligation("C1", self.s1.id, "S1", ObligationRole.INTRODUCE))
         return self.story(plan, "S1", dev, inputs=self.inputs("S1", regressions=regressions), tests_block=True)
 
-    def test_a_regression_file_nobody_wrote_rolls_a_correct_story_back(self):
-        r = self.delivery(("tests/test_other.py", c2_p9.test_path("STORY-02-01")))       # the set the runner used to build
+    def assertTypedFailure(self, r) -> None:
         self.assertAttempts(r, ["RETRY", "ROLLBACK"])
         self.assertEqual({(code, owner) for code, owner, _ in self.failures("S1")}, {("TESTS_INADEQUATE", "DEVELOPER")})
         self.assertEqual({e.data["regressions"]["selection"] for e in self.events("tests/adequacy", "S1")}, {"STORY_TESTS_NOT_COLLECTABLE"})
 
-    def test_the_set_the_runner_builds_names_only_the_files_main_holds_and_the_story_commits(self):
-        delivered = ["OTHER", "STORY-02-01"]                    # the second committed without a developer call: no file
-        self.assertEqual(c2_p9.test_path("OTHER"), "tests/test_other.py")
-        held = c2_p9.regression_tests(self.repo, "S1", delivered)
-        self.assertEqual(held, ("tests/test_other.py",))
-        self.assertAttempts(self.delivery(held), ["COMMIT"])
+    def test_the_defect_a_regression_file_nobody_wrote_rolls_a_correct_story_back(self):
+        self.assertTypedFailure(self.delivery(("tests/test_other.py", c2_p9.test_path(self.NO_CALL))))   # the set the runner used to build
 
-    def test_with_no_file_held_the_set_is_the_story_s_own_tests_as_for_the_first_story(self):
-        self.assertEqual(c2_p9.regression_tests(self.repo, "S1", []), ("tests/test_s1.py",))
-        self.assertEqual(c2_p9.regression_tests(self.repo, "S1", ["STORY-02-01", "STORY-02-02"]), ("tests/test_s1.py",))
+    def test_A_a_prior_story_s_real_test_file_stays_in_the_set(self):
+        self.assertEqual(c2_p9.test_path("OTHER"), "tests/test_other.py")
+        self.assertTrue(c2_p9.holds(self.repo, "tests/test_other.py"))
+        named = c2_p9.regression_tests(self.repo, "S1", {"OTHER": True})
+        self.assertEqual(named, ("tests/test_other.py",))
+        r = self.delivery(named)
+        self.assertAttempts(r, ["COMMIT"])
+        self.assertEqual([e.data["regressions"]["selection"] for e in self.events("tests/adequacy", "S1")], ["STORY_TESTS_RAN"])   # and it ran
+
+    def test_B_a_story_that_committed_without_a_test_file_injects_no_path(self):
+        self.assertFalse(c2_p9.holds(self.repo, c2_p9.test_path(self.NO_CALL)))
+        self.assertEqual(c2_p9.regression_tests(self.repo, "S1", {self.NO_CALL: False}), ("tests/test_s1.py",))      # the story's own, as for the first
+        self.assertEqual(c2_p9.regression_tests(self.repo, "S1", {}), ("tests/test_s1.py",))
+        named = c2_p9.regression_tests(self.repo, "S1", {"OTHER": True, self.NO_CALL: False})
+        self.assertEqual(named, ("tests/test_other.py",))
+        self.assertAttempts(self.delivery(named), ["COMMIT"])
+
+    def test_C_a_mixed_sequence_keeps_every_real_test_in_order_and_fabricates_none(self):
+        e2e.land(self.repo, {"tests/test_story_03_01.py": e2e.TEST_OTHER, "tests/test_story_04_01.py": e2e.TEST_OTHER}, "two later stories' tests")
+        delivered = {"OTHER": True, self.NO_CALL: False, "STORY-02-02": False, "STORY-03-01": True,
+                     "STORY-04-01": False}       # the last: not produced by its own story, yet main holds it — a valid test stays
+        named = c2_p9.regression_tests(self.repo, "S1", delivered)
+        self.assertEqual(named, ("tests/test_other.py", "tests/test_story_03_01.py", "tests/test_story_04_01.py"))
+        self.assertAttempts(self.delivery(named), ["COMMIT"])
+
+    def test_D_a_produced_test_file_that_is_gone_is_still_named_and_its_typed_failure_is_kept(self):
+        gone = c2_p9.test_path("STORY-03-01")
+        self.assertFalse(c2_p9.holds(self.repo, gone))
+        named = c2_p9.regression_tests(self.repo, "S1", {"OTHER": True, "STORY-03-01": True})    # it was there when its story committed
+        self.assertEqual(named, ("tests/test_other.py", gone))                                      # not dropped as if harmless
+        self.assertTypedFailure(self.delivery(named))
 
 
 if __name__ == "__main__":

@@ -540,6 +540,24 @@ class Gate(Attempt):
         self.tamper(lambda att: att.update(client="opencode 9.9.9"))
         self.assertRefused("bound to another route, model or client")
 
+    def test_the_obsolete_authorization_s_kernel_and_runspec_open_nothing(self):
+        """The identities the first authorization named (kernel d427299, RunSpec template 72377ff7…) are refused."""
+        old_kernel = {"commit": "d427299376d7af48d3dd6d86242bf5def6a43003", "tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160"}
+        old_template = "72377ff762643120e5e32fd8a033e190b14cfa9513c9866c1eb1b4a3ac8a2de2"
+        self.assertNotEqual((dx.EXPERIMENT["kernel_commit"], dx.runspec(OC).runspec_hash), (old_kernel["commit"], old_template))
+        self.tamper(lambda att: att.update(kernel=old_kernel))
+        self.assertRefused("bound to another plan or kernel")
+        self.setUp()
+        self.tamper(lambda att: att.update(runspec_template_hash=old_template))
+        self.assertRefused("the RunSpec template is not the preregistered one")
+        self.setUp()
+        self.prereg = {**self.prereg, "runspec_template_hash": old_template}                # the old preregistration's
+        self.assertRefused("the RunSpec template is not the preregistered one", "bound to another preregistration")
+        body = json.loads((ROOT / dx.OUT_REL).read_text(encoding="utf-8"))                  # this tree on the old kernel
+        body["kernel"]["head_tree"] = old_kernel["tree"]
+        self.assertIn("the kernel of this tree is not the preregistered kernel commit's", dx.problems(body))
+        self.assertNotIn(old_template, json.dumps(body))
+
     def test_an_altered_fingerprint(self):
         self.tamper(lambda att: att["capabilities"]["reviewer"]["binding"].update(fingerprint="0" * 64))
         self.assertRefused("reviewer's attested tuple is not the one this preregistration and observation give: ['fingerprint']")

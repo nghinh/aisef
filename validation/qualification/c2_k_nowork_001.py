@@ -187,7 +187,7 @@ def job_rehearsal(first_wrong: str | None = None, name_every_committed_story: bo
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch)) for e in catalog.CATALOG}
         env = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)
         limits = {Owner[k]: v for k, v in c2_p9.PROFILES[c2_p9.EXPERIMENT].items()}
-        results, delivered = {}, []
+        results, delivered = {}, {}
         for story in c2_p9.order(plan, aid.story_graph()):
             regressions = (tuple(c2_p9.test_path(s) for s in delivered) or (c2_p9.test_path(story),)) if name_every_committed_story \
                 else c2_p9.regression_tests(repo, story, delivered)
@@ -196,7 +196,7 @@ def job_rehearsal(first_wrong: str | None = None, name_every_committed_story: bo
             r = sr.run_story(run, plan, story, inputs, adapters, sr.Policy(limits, TestsPolicy(True), tool_timeout_s=120))
             results[story] = [a.outcome for a in r.attempts]
             if results[story][-1:] == ["COMMIT"]:
-                delivered.append(story)
+                delivered[story] = c2_p9.holds(repo, c2_p9.test_path(story))
         state = plain(run.state(ControlProjection.STORY_STATE))
         run.shutdown()
         events = [{"type": e.type, "data": plain(e.data)} for e in run.events]
@@ -318,8 +318,10 @@ def write() -> dict:
                       "committed story as a regression test of the next; a story that committed without a developer call "
                       "(K-PRESAT-001, K-NOWORK-001) wrote none, so the next story WITH developer work failed engineering adequacy "
                       "(regression tests not collectable) and was rolled back for a file nobody was asked to write",
-            "correction": "c2_p9.regression_tests: only the test files main holds; with none, the story's own tests (as for the "
-                          "first story). The kernel is unchanged by it",
+            "correction": "c2_p9.regression_tests: only a test file that was never produced (main did not hold it when its story "
+                          "committed) and that main does not hold is left out; a produced file stays named even if it is gone "
+                          "since (the kernel's typed failure), and so does one main holds; with none, the story's own tests (as "
+                          "for the first story). The kernel is unchanged by it",
             "shape": f"the rehearsal above on this tree's kernel, the stand-in developer over-delivering partly: its first delivery "
                      f"is the reference with the fixture's mutant {PARTIAL} ({PARTIAL_SPEC} wrong, {PARTIAL_STORY}'s to introduce); "
                      "called again it installs the reference and tests the behaviour it fixed",

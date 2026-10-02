@@ -484,7 +484,7 @@
  },
  "h_regression_001": {
   "defect": "the runner (validation/qualification/c2_p9.py — the harness, not the kernel) named the test file of every committed story as a regression test of the next; a story that committed without a developer call (K-PRESAT-001, K-NOWORK-001) wrote none, so the next story WITH developer work failed engineering adequacy (regression tests not collectable) and was rolled back for a file nobody was asked to write",
-  "correction": "c2_p9.regression_tests: only the test files main holds; with none, the story's own tests (as for the first story). The kernel is unchanged by it",
+  "correction": "c2_p9.regression_tests: only a test file that was never produced (main did not hold it when its story committed) and that main does not hold is left out; a produced file stays named even if it is gone since (the kernel's typed failure), and so does one main holds; with none, the story's own tests (as for the first story). The kernel is unchanged by it",
   "shape": "the rehearsal above on this tree's kernel, the stand-in developer over-delivering partly: its first delivery is the reference with the fixture's mutant M-7-1 (S-7-d wrong, STORY-04-01's to introduce); called again it installs the reference and tests the behaviour it fixed",
   "before": {
    "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
@@ -859,9 +859,9 @@
  "bound": {
   "aisef2/orchestrate/story_runner.py": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
   "tests/v2/test_c2_k_nowork_001.py": "fb7eb72901a689a3ef57a9bc17b752d09178064789d524193e4bd4148e73b391",
-  "validation/qualification/c2_k_nowork_001.py": "081f7dcd8eca177e6bfb3981ffca14417c71b8a2d5979226c1f6c6267bec5676",
+  "validation/qualification/c2_k_nowork_001.py": "84a4f433ed72d04d3b207beeaef5a365f613d3ce44d1b750552011e4187ee247",
   "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json": "365ebacfc8d27a2d5f3f833a90fa4ba6d4ac6dd2a76d9e7744310579f14d8ba6",
-  "validation/qualification/c2_p9.py": "73b1d3df931b2ec98fcfbdbc25e016b87f67c91ee45bbc8154fa16994f29b687"
+  "validation/qualification/c2_p9.py": "da7d02a338dfab0413d1d244fa3bb116861b01acb2c29e82f6a6808041e20639"
  },
  "provider_calls": 0,
  "ledgerlock_runs": 0,
@@ -871,5 +871,5 @@
  },
  "problems": [],
  "verdict": "REPRODUCED AND CORRECTED",
- "seconds": 579.6
+ "seconds": 571.7
 }
