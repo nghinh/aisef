@@ -610,19 +610,16 @@ class Gate(Attempt):
 
 
 class Hold(unittest.TestCase):
-    """A hold (the K-NOWORK-001 ruling's stood until the owner's 'FINAL REBIND' ruling cleared it): while one stands,
-    neither the preflight nor the runner starts."""
+    """A hold: while one stands, neither the preflight nor the runner starts. Attempt 3 has run and is final: its
+    preregistration is under one for good."""
     HELD = "ON HOLD by an owner's ruling"
 
-    def test_the_hold_is_cleared_by_the_owner_s_ruling_and_the_record_says_so(self):
-        self.assertIsNone(dx.HOLD)
-        self.assertIsNone(dx.on_hold())
-        rec = dx.committed()
-        self.assertIsNone(rec["hold"])
-        self.assertTrue(rec["run_authorized"].startswith("ONE RUN, by the owner's ruling 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' §7"))
-        with mock.patch.object(dx, "HOLD", self.HELD):          # a record derived under a hold says NO, and is not the committed one
-            self.assertEqual(dx.record(rec["final_evaluation"]["readiness_measured_without_a_provider"])["run_authorized"], f"NO — {self.HELD}")
-            self.assertIn(f"{dx.OUT_REL} is not what this tree and this machine derive", dx.check())
+    def test_attempt_3_has_run_and_nothing_runs_again_under_its_preregistration(self):
+        self.assertIn(dx.EXPERIMENT["attempt"], dx.HISTORICAL)
+        self.assertTrue(dx.HOLD and dx.on_hold() == dx.HOLD)
+        with self.assertRaises(SystemExit) as x:                    # and its preregistration is never re-derived
+            dx.main(["--write"])
+        self.assertIn("attempt 3 has run", str(x.exception))
 
     def test_while_a_hold_stands_nothing_starts_and_no_provider_is_reached(self):
         explode = mock.Mock(side_effect=AssertionError("a provider was reached"))
@@ -684,19 +681,17 @@ class Preregistration(unittest.TestCase):
         cls.plan = pc.corrected_plan()
 
     def test_the_record_binds_what_this_tree_holds(self):
+        """Attempt 3's preregistration is historical (class HistoricalAttempt3): what it binds is checked against the commit
+        its run executed on, not against this tree's sources."""
         r = self.rec
         self.assertEqual((r["verdict"], r["problems"]), ("PREREGISTERED — THE FINAL OWNER BUDGET; ONE RUN", []))
         self.assertIsNone(r["hold"])
         self.assertTrue(r["run_authorized"].startswith("ONE RUN, by the owner's ruling 'FINAL REBIND"))
         self.assertEqual(r["provider_calls_made_preparing_this"], 0)
         self.assertEqual(r["plan"]["plan_hash"], self.plan.plan_hash)
-        self.assertEqual(r["plan"]["correction"]["sha256"], c2_p9.C.lf_sha(ROOT / pc.OUT_REL))
         self.assertEqual(r["kernel"]["tree"], c2_p9.C.git("rev-parse", "HEAD:aisef2"))
         self.assertEqual((r["kernel"]["commit"], r["harness"]["includes"]),
                          ("4f6dfc197acfd9146357e5781326843bc09982e5", "5c7c5a6b5623b5c2b19d7f1b846ad497ab0561b2"))
-        for f in r["harness"]["files"]:
-            with self.subTest(file=f["path"]):
-                self.assertEqual(f["sha256"], c2_p9.C.lf_sha(ROOT / f["path"]))
         self.assertIn(f"KT={r['kernel']['tree']}", (ROOT / "validation/qualification/c2_p9_run.sh").read_text(encoding="utf-8"))
         self.assertEqual((r["workload"]["start_sha"], r["workload"]["requirements_sha256"]), (self.plan.baseline, c2_p9.P10.REQUIREMENTS_SHA256))
 
@@ -771,6 +766,101 @@ KEPT = {"path": "/kept.git", "final_tree": "t" * 40, "missing": []}
 def journal(committed: list[str], rolled_back: tuple[str, ...] = ()) -> list[dict]:
     rows = [(s, t) for s in committed for t in ("gate/decision", "story/commit")] + [(s, t) for s in rolled_back for t in ("gate/decision", "story/rollback")]
     return [{"seq": n, "type": t, "data": {"story_id": s, "revision": "a" * 40}} for n, (s, t) in enumerate(rows)]
+
+
+class HistoricalAttempt3(unittest.TestCase):
+    """Attempt 3 is immutable historical evidence (owner ruling 'ATTEMPT-3 HISTORICALIZATION', §A): verified against
+    what its own records state — the evidence commit f86e8f4, the commit its run executed on, the content digests its
+    preregistration bound — never against HEAD's sources; and nothing it pins may change."""
+    RUN_AT = "06ceb231a9bafe944eb6715d85a479336626dcec"
+    C2_P9 = "validation/qualification/c2_p9.py"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.files = dx.historical_files(3)
+        cls.d, cls.h = c2_p9.attempt_dir(3), dx.HISTORICAL[3]
+
+    def doc(self, rel: str) -> dict:
+        return json.loads(self.files[rel])
+
+    def altered(self, rel: str, change) -> dict:
+        files = dict(self.files)
+        body = json.loads(files[rel])
+        change(body)
+        files[rel] = json.dumps(body, indent=1, ensure_ascii=False).encode("utf-8") + b"\n"
+        return files
+
+    def assertProblem(self, files, *needles) -> None:
+        found = dx.historical_problems(3, files)
+        for needle in needles:
+            self.assertTrue(any(needle in p for p in found), (needle, found))
+
+    def test_the_evidence_holds_as_its_own_records_state(self):
+        self.assertEqual(dx.historical_problems(3), [])
+        self.assertEqual(self.h["evidence_commit"], "f86e8f4fbbf20064953cc32c967fa21756c9f627")
+        self.assertEqual(len([r for r in self.files if r.startswith(self.d + "/")]), 20)
+
+    def test_the_bound_source_is_what_the_evidence_states(self):
+        rec, prereg, att = (self.doc(f"{self.d}/LEDGERLOCK-REGRESSION.json"), self.doc(self.h["preregistration"]),
+                            self.doc(f"{self.d}/{dx.ATTESTATION}"))
+        self.assertEqual(rec["repository_execution_commit"], self.RUN_AT)
+        bound = {f["path"]: f["sha256"] for f in prereg["harness"]["files"]}
+        self.assertEqual(bound[self.C2_P9], "da7d02a338dfab0413d1d244fa3bb116861b01acb2c29e82f6a6808041e20639")
+        self.assertEqual(rec["harness"], {"path": self.C2_P9, "sha256": bound[self.C2_P9]})
+        self.assertEqual(c2_p9.C.git("rev-parse", f"{self.RUN_AT}:{self.C2_P9}"), "b246e191091dd734e97d1ee89c28f8e305edcc76")
+        self.assertEqual(att["preregistration"]["sha256"], dx._sha(dx._canon(prereg)))
+        self.assertEqual(rec["preregistration"]["sha256"], "090627d9793a66389ccc01623a28434c3482b9d599205deee83caefc6a9dad8b")
+        self.assertEqual((att["runspec_template_hash"], att["resolved_runspec_hash"]),
+                         ("19d250574ea8fc2ef375a21ab721207da558a0145f62484407d50f623491b928",
+                          "4ce79ecfadd1cb9976aab3c87c1ea2923854b28e1c43acdabff24008ae9712ad"))
+        prompts = {s["story_id"]: s["prompt_sha256"] for s in rec["model_sessions"]["sessions"] if s["role"] == "developer" and s["attempt"] == 1}
+        self.assertEqual(sorted(prompts), ["STORY-01-01", "STORY-01-05", "STORY-03-01", "STORY-04-02"])   # the prompts it ran, by digest
+
+    def test_a_change_of_the_harness_on_head_does_not_touch_it(self):
+        prereg = self.doc(self.h["preregistration"])
+        changed = [f["path"] for f in prereg["harness"]["files"] if c2_p9.C.lf_sha(ROOT / f["path"]) != f["sha256"]]
+        self.assertIn("validation/qualification/c2_delivery_experiment.py", changed)     # this tree's harness is not the bound one
+        self.assertEqual(dx.historical_problems(3), [])
+        with mock.patch.object(dx, "historical_files", side_effect=AssertionError("read from the working tree")):
+            self.assertEqual(dx.historical_problems(3, self.files), [])
+
+    def test_a_changed_or_missing_pinned_file_fails(self):
+        files = dict(self.files)
+        files[f"{self.d}/V1-ORACLE-OUTPUT.txt"] = files[f"{self.d}/V1-ORACLE-OUTPUT.txt"] + b"PASSED\n"
+        self.assertProblem(files, "V1-ORACLE-OUTPUT.txt: differs from its evidence commit")
+        files = {**self.files, f"{self.d}/sessions/STORY-01-01.developer.1.jsonl": None}
+        self.assertProblem(files, "STORY-01-01.developer.1.jsonl: missing")
+        files = {**self.files, f"{self.d}/STORY-ACCOUNT.json": b"{}"}
+        self.assertProblem(files, "STORY-ACCOUNT.json: not in the evidence commit")
+
+    def test_a_relabelled_result_fails(self):
+        def relabel(rec):
+            rec["delivery_verdict"] = "PASS"
+            rec["story_outcomes"]["STORY-03-01"] = ["COMMIT"]
+        self.assertProblem(self.altered(f"{self.d}/LEDGERLOCK-REGRESSION.json", relabel), "LEDGERLOCK-REGRESSION.json: differs from its evidence commit")
+
+    def test_a_preregistration_bound_to_another_blob_fails(self):
+        def other(p):
+            next(f for f in p["harness"]["files"] if f["path"] == self.C2_P9)["sha256"] = "0" * 64
+        self.assertProblem(self.altered(self.h["preregistration"], other), "differs from its evidence commit",
+                           "the attestation is not bound to this preregistration", f"the preregistration bound {self.C2_P9}")
+
+    def test_another_execution_commit_fails(self):
+        def elsewhere(rec):
+            rec["repository_execution_commit"] = "7630dbe5d0aa7f873e26a573ce2b9962bb0c72c2"    # an older harness
+        self.assertProblem(self.altered(f"{self.d}/LEDGERLOCK-REGRESSION.json", elsewhere),
+                           "which is not its blob at the commit the run executed on (7630dbe5d0aa)")
+        def nowhere(rec):
+            rec["repository_execution_commit"] = "f" * 40
+        self.assertProblem(self.altered(f"{self.d}/LEDGERLOCK-REGRESSION.json", nowhere), "is not in this repository")
+
+    def test_an_altered_journal_or_attestation_fails(self):
+        def drop(events):
+            events.pop()
+        self.assertProblem(self.altered(f"{self.d}/JOURNAL.json", drop), "the journal is not the one the run's record names")
+        def respec(att):
+            att["resolved_runspec_hash"] = "0" * 64
+        self.assertProblem(self.altered(f"{self.d}/{dx.ATTESTATION}", respec), "the journal's resolved RunSpec is not the one the attestation fixed")
 
 
 class FalsePass(unittest.TestCase):

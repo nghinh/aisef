@@ -6,6 +6,11 @@ EXPERIMENT EXECUTION GUARD', 2026-10-02). PREPARED, NOT EXECUTED: the run needs 
     python -P validation/qualification/c2_delivery_experiment.py --check   # the committed record is what this tree and this machine derive
     python -P validation/qualification/c2_delivery_experiment.py --check --after-run   # the same once the run's result is preserved
     python -P validation/qualification/c2_delivery_experiment.py --attest  # PART OF THE PAID RUN: the provider preflight (calls the provider)
+    python -P validation/qualification/c2_delivery_experiment.py --check-historical   # every attempt already run, against its own records
+
+**An attempt that has run is historical** (`HISTORICAL`): its preregistration, attestation, journal and records are
+immutable evidence, verified against what they themselves state — the commit that froze them, the commit the run
+executed on, the content digests the preregistration bound — never against the sources HEAD holds, and never re-derived.
 
 **The sequence of the paid run**, each step a refusal when it fails: the preregistration is re-derived on this tree and
 machine -> the provider preflight (`attest`) -> the ATTESTED identity tuple is built from what it observed -> the tuple
@@ -71,11 +76,11 @@ V1_PREFLIGHT_REL = f"{W1}/provider_preflight.py"
 #: QP-2.9 attempt 2 and the V1 runs on the same route: what the budget is compared with (never what it is derived from)
 MEASURED_REL = "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json"
 #: Why the experiment may not start, or None: while a reason stands, neither the preflight nor the runner starts, and only
-#: the owner's ruling clears it (HOLD = None, then --write). The hold of the K-NOWORK-001 ruling ("The paid delivery
-#: attempt remains UNUSED. Do NOT execute DELIVERY-EXPERIMENT-1.") stood from 6d5a062 to 5c7c5a6; the owner's ruling
-#: 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' (§6) cleared it for exactly the kernel and the harness named below,
-#: once its §§2-5 were verified. Any other kernel, harness file, plan or preregistration is refused by the checks themselves.
-HOLD = None
+#: the owner's ruling clears it. The hold of the K-NOWORK-001 ruling stood from 6d5a062 to 5c7c5a6; the owner's ruling
+#: 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' (§6) cleared it at 06ceb23 for exactly attempt 3, which then ran
+#: once. Attempt 3 is final ('ATTEMPT-3 CLOSURE'): nothing runs again under its preregistration.
+HOLD = ("ON HOLD: attempt 3 has run and is final (owner ruling 'ATTEMPT-3 CLOSURE + MINIMAL DELIVERY HARNESS CORRECTION'); "
+        "no further run of this preregistration")
 EXPERIMENT = {
     "id": c2_p9.EXPERIMENT,
     "attempt": 3,                                       # the next attempt directory of closure-evidence/v2/cycle2/P10
@@ -110,6 +115,10 @@ SECRET_KEY = re.compile(r"key|token|secret|authorization|password", re.I)
 
 def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _lf(data: bytes) -> bytes:
+    return data.replace(b"\r\n", b"\n")
 
 
 def _canon(obj) -> bytes:
@@ -853,7 +862,10 @@ def problems(body: dict) -> list[str]:
 
 def check(after_run: bool = False) -> list[str]:
     """The committed preregistration against this tree and this machine; its readiness section is taken as measured.
-    After the run its preservation path holds the run's result, which is then no difference and no problem."""
+    After the run its preservation path holds the run's result, which is then no difference and no problem. The
+    preregistration of an attempt that has run is historical: it is checked against its own records instead."""
+    if EXPERIMENT["attempt"] in HISTORICAL:
+        return historical_problems(EXPERIMENT["attempt"])
     path = ROOT / OUT_REL
     if not path.exists():
         return [f"{OUT_REL} does not exist"]
@@ -869,11 +881,106 @@ def check(after_run: bool = False) -> list[str]:
     return list(rec["problems"]) + ([] if rec == was else [f"{OUT_REL} is not what this tree and this machine derive"])
 
 
+# ------------------------------------------------------------------------------- attempts already run: their history
+
+#: Attempts already run — immutable historical evidence (owner ruling 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 +
+#: H-RETRY-001', §A). Each is verified against what its own records state: the evidence commit that froze it (named by
+#: the owner), the commit the run executed on (its record's `repository_execution_commit`) and the content digests its
+#: preregistration bound. A later change of the harness on HEAD does not touch it; a change of anything it pins fails.
+HISTORICAL = {3: {"preregistration": "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-PREREGISTRATION.json",
+                  "owned": "closure-evidence/v2/cycle2/P10/owned/run.attempt-3.json",
+                  "evidence_commit": "f86e8f4fbbf20064953cc32c967fa21756c9f627"}}
+_HEX40 = re.compile(r"[0-9a-f]{40}")
+
+
+def _blob(commit: str, rel: str) -> bytes | None:
+    """`rel` as `commit` holds it, from git's object store — never from the working tree."""
+    r = subprocess.run(["git", "-C", str(ROOT), "show", f"{commit}:{rel}"], capture_output=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+def _tree_at(commit: str) -> str | None:
+    r = subprocess.run(["git", "-C", str(ROOT), "rev-parse", f"{commit}:aisef2"], capture_output=True, encoding="utf-8")
+    return r.stdout.strip() if r.returncode == 0 else None
+
+
+def historical_files(n: int) -> dict[str, bytes | None]:
+    """Attempt `n`'s evidence as this working tree holds it: every file its evidence commit froze (None where one is
+    gone), and every file now in its attempt directory that the commit did not freeze."""
+    h, d = HISTORICAL[n], c2_p9.attempt_dir(n)
+    frozen = subprocess.run(["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", h["evidence_commit"], "--", d, h["owned"],
+                             h["preregistration"]], capture_output=True, encoding="utf-8").stdout.split()
+    now = [p.relative_to(ROOT).as_posix() for p in (ROOT / d).rglob("*") if p.is_file()]
+    return {rel: ((ROOT / rel).read_bytes() if (ROOT / rel).is_file() else None) for rel in sorted(set(frozen) | set(now))}
+
+
+def historical_problems(n: int, files: dict[str, bytes | None] | None = None) -> list[str]:
+    """Why attempt `n`'s evidence does not hold, or []. `files`: its evidence as `historical_files` reads it (a test
+    passes an altered copy). Sources are read only from git's objects at the commits the evidence names."""
+    if n not in HISTORICAL:
+        return [f"attempt {n} has not run: it has no historical evidence"]
+    h, d = HISTORICAL[n], c2_p9.attempt_dir(n)
+    files = historical_files(n) if files is None else files
+    out = []
+    for rel, data in files.items():
+        frozen = _blob(h["evidence_commit"], rel)
+        if frozen is None:
+            out.append(f"{rel}: not in the evidence commit {h['evidence_commit'][:12]} — the historical evidence holds nothing else")
+        elif data is None:
+            out.append(f"{rel}: missing — its evidence commit {h['evidence_commit'][:12]} holds it")
+        elif _lf(data) != _lf(frozen):
+            out.append(f"{rel}: differs from its evidence commit {h['evidence_commit'][:12]}")
+    try:
+        att, rec = json.loads(files[f"{d}/{ATTESTATION}"]), json.loads(files[f"{d}/LEDGERLOCK-REGRESSION.json"])
+        prereg_bytes = files[h["preregistration"]]
+        prereg, events = json.loads(prereg_bytes), json.loads(files[f"{d}/JOURNAL.json"])
+    except (KeyError, TypeError, ValueError) as e:
+        return out + [f"attempt {n}'s attestation, record, preregistration or journal cannot be read ({type(e).__name__}: {e})"]
+    if att.get("verdict") != "ATTESTED" or att.get("experiment") != {"id": c2_p9.EXPERIMENT, "attempt": n}:
+        out.append(f"the attestation is not an ATTESTED one of attempt {n}")
+    if att.get("preregistration") != {"path": h["preregistration"], "sha256": _sha(_canon(prereg))}:
+        out.append("the attestation is not bound to this preregistration")
+    if rec.get("preregistration") != {"path": h["preregistration"], "sha256": _sha(_lf(prereg_bytes))}:
+        out.append("the run's record is not bound to this preregistration")
+    run_at = rec.get("repository_execution_commit")
+    if not (isinstance(run_at, str) and _HEX40.fullmatch(run_at) and _tree_at(run_at)):
+        return out + [f"the commit the run executed on ({run_at!r}) is not in this repository"]
+    bound = {f["path"]: f["sha256"] for f in (prereg.get("harness") or {}).get("files") or []}
+    if not bound:
+        out.append("the preregistration binds no harness file")
+    for rel, sha in bound.items():
+        blob = _blob(run_at, rel)
+        if blob is None or _sha(_lf(blob)) != sha:
+            out.append(f"the preregistration bound {rel} as {sha[:12]}…, which is not its blob at the commit the run executed on "
+                       f"({run_at[:12]})")
+    if rec.get("harness") != {"path": "validation/qualification/c2_p9.py", "sha256": bound.get("validation/qualification/c2_p9.py")}:
+        out.append("the run's record names another c2_p9.py than its preregistration bound")
+    k = prereg.get("kernel") or {}
+    trees = {_tree_at(run_at), _tree_at(str(k.get("commit"))), k.get("tree"), (att.get("kernel") or {}).get("tree"),
+             rec.get("aisef2_tree"), rec.get("head_kernel_tree")}
+    commits = {k.get("commit"), (att.get("kernel") or {}).get("commit"), rec.get("semantic_candidate")}
+    if len(trees) != 1 or None in trees or len(commits) != 1 or None in commits:
+        out.append(f"the kernel the run executed is not the one its preregistration and attestation bound: trees "
+                   f"{sorted(map(str, trees))}, commits {sorted(map(str, commits))}")
+    if att.get("runspec_template_hash") != prereg.get("runspec_template_hash"):
+        out.append("the attestation's RunSpec template is not the preregistered one")
+    resolved = [e["data"]["runspec_hash"] for e in events if e.get("type") == "run/spec-resolved"]
+    if resolved != [att.get("resolved_runspec_hash")] or (rec.get("execution_profile") or {}).get("runspec_hash") != att.get("resolved_runspec_hash"):
+        out.append("the journal's resolved RunSpec is not the one the attestation fixed")
+    ident = rec.get("run_identity") or {}
+    if _sha(json.dumps(events, sort_keys=True, default=str).encode()) != ident.get("journal_sha256") or len(events) != ident.get("journal_events"):
+        out.append("the journal is not the one the run's record names")
+    if not att.get("plan_hash") == (prereg.get("plan") or {}).get("plan_hash") == (rec.get("plan_identity") or {}).get("plan_hash"):
+        out.append("the attestation, the preregistration and the record name different plans")
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")
+    g.add_argument("--check-historical", action="store_true", help="every attempt already run, against its own records")
     g.add_argument("--attest", action="store_true", help="PART OF THE PAID RUN: the provider preflight (calls the provider)")
     ap.add_argument("--after-run", action="store_true")
     a = ap.parse_args(argv)
@@ -885,7 +992,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{rec['verdict']}: {rec['accounting']['provider_requests']} provider requests, {rec['accounting']['turns']} turns; "
               f"{'resolved RunSpec ' + rec['resolved_runspec_hash'] if rec['verdict'] == 'ATTESTED' else '; '.join(rec['problems'])}")
         return 0 if rec["verdict"] == "ATTESTED" else 1
+    if a.check_historical:
+        found = [f"attempt {n}: {p}" for n in sorted(HISTORICAL) for p in historical_problems(n)]
+        print("\n".join(found) if found else f"PASS: attempts {sorted(HISTORICAL)} hold as their own records state")
+        return 1 if found else 0
     if a.write:
+        if EXPERIMENT["attempt"] in HISTORICAL:
+            raise SystemExit(f"refused: attempt {EXPERIMENT['attempt']} has run — its preregistration is historical evidence and is "
+                             "never re-derived")
         rec = record(readiness())
         if rec["problems"]:
             raise SystemExit("refused: " + "; ".join(rec["problems"]))
