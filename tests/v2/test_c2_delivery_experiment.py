@@ -610,12 +610,23 @@ class Gate(Attempt):
 
 
 class Hold(unittest.TestCase):
-    """The owner's hold (K-NOWORK-001 ruling: the paid attempt remains UNUSED): neither the preflight nor the runner starts."""
+    """A hold (the K-NOWORK-001 ruling's stood until the owner's 'FINAL REBIND' ruling cleared it): while one stands,
+    neither the preflight nor the runner starts."""
+    HELD = "ON HOLD by an owner's ruling"
 
-    def test_while_the_owner_s_hold_stands_nothing_starts_and_no_provider_is_reached(self):
-        self.assertTrue(dx.HOLD and dx.on_hold() == dx.HOLD)
+    def test_the_hold_is_cleared_by_the_owner_s_ruling_and_the_record_says_so(self):
+        self.assertIsNone(dx.HOLD)
+        self.assertIsNone(dx.on_hold())
+        rec = dx.committed()
+        self.assertIsNone(rec["hold"])
+        self.assertTrue(rec["run_authorized"].startswith("ONE RUN, by the owner's ruling 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' §7"))
+        with mock.patch.object(dx, "HOLD", self.HELD):          # a record derived under a hold says NO, and is not the committed one
+            self.assertEqual(dx.record(rec["final_evaluation"]["readiness_measured_without_a_provider"])["run_authorized"], f"NO — {self.HELD}")
+            self.assertIn(f"{dx.OUT_REL} is not what this tree and this machine derive", dx.check())
+
+    def test_while_a_hold_stands_nothing_starts_and_no_provider_is_reached(self):
         explode = mock.Mock(side_effect=AssertionError("a provider was reached"))
-        with tempfile.TemporaryDirectory() as t:
+        with tempfile.TemporaryDirectory() as t, mock.patch.object(dx, "HOLD", self.HELD):
             attempt = pathlib.Path(t) / "attempt-3"
             attempt.mkdir()
             with mock.patch.object(dx, "default_transport", explode), mock.patch.object(c2_p9, "opencode_session", explode), \
@@ -625,11 +636,9 @@ class Hold(unittest.TestCase):
                               lambda: c2_p9.run(attempt, preserve_to=attempt / "kept.git", profile=c2_p9.EXPERIMENT)):
                     with self.assertRaises(SystemExit) as x:
                         start()
-                    self.assertEqual(str(x.exception), f"REFUSED: delivery is locked — {dx.HOLD}")
+                    self.assertEqual(str(x.exception), f"REFUSED: delivery is locked — {self.HELD}")
             self.assertEqual(sorted(p.name for p in attempt.iterdir()), [])
         explode.assert_not_called()
-        rec = dx.committed()
-        self.assertEqual((rec["hold"], rec["run_authorized"]), (dx.HOLD, f"NO — {dx.HOLD}"))
 
 
 class RunSpecs(unittest.TestCase):
@@ -677,13 +686,14 @@ class Preregistration(unittest.TestCase):
     def test_the_record_binds_what_this_tree_holds(self):
         r = self.rec
         self.assertEqual((r["verdict"], r["problems"]), ("PREREGISTERED — THE FINAL OWNER BUDGET; ONE RUN", []))
-        self.assertEqual((r["hold"], r["run_authorized"]), (dx.HOLD, f"NO — {dx.HOLD}"))
+        self.assertIsNone(r["hold"])
+        self.assertTrue(r["run_authorized"].startswith("ONE RUN, by the owner's ruling 'FINAL REBIND"))
         self.assertEqual(r["provider_calls_made_preparing_this"], 0)
         self.assertEqual(r["plan"]["plan_hash"], self.plan.plan_hash)
         self.assertEqual(r["plan"]["correction"]["sha256"], c2_p9.C.lf_sha(ROOT / pc.OUT_REL))
         self.assertEqual(r["kernel"]["tree"], c2_p9.C.git("rev-parse", "HEAD:aisef2"))
         self.assertEqual((r["kernel"]["commit"], r["harness"]["includes"]),
-                         ("4f6dfc197acfd9146357e5781326843bc09982e5", "7630dbe5d0aa7f873e26a573ce2b9962bb0c72c2"))
+                         ("4f6dfc197acfd9146357e5781326843bc09982e5", "5c7c5a6b5623b5c2b19d7f1b846ad497ab0561b2"))
         for f in r["harness"]["files"]:
             with self.subTest(file=f["path"]):
                 self.assertEqual(f["sha256"], c2_p9.C.lf_sha(ROOT / f["path"]))

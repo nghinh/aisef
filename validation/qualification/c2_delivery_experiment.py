@@ -58,7 +58,9 @@ C, P10 = c2_p9.C, c2_p9.P10
 OUT_REL = "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-PREREGISTRATION.json"
 AUTHORITY = ("owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — "
              "DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY "
-             "EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02): exactly ONE paid run, attempt 3, no second attempt")
+             "EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02), the last superseded for the corrected kernel "
+             "and harness identities by 'AISEF V2 — FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT / OWNER AUTHORIZATION' (2026-10-02): "
+             "exactly ONE paid run, attempt 3, no second attempt")
 W1 = "closure-evidence/hardening/w1"
 ORACLE_REL = f"{W1}/oracle/test_oracle.py"
 ORACLE_INDEPENDENCE_REL = f"{W1}/ORACLE-INDEPENDENCE.json"
@@ -68,18 +70,18 @@ V1_FREEZE_REL = "closure-evidence/hardening/P19-FREEZE.json"
 V1_PREFLIGHT_REL = f"{W1}/provider_preflight.py"
 #: QP-2.9 attempt 2 and the V1 runs on the same route: what the budget is compared with (never what it is derived from)
 MEASURED_REL = "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json"
-#: Why the experiment may not start, or None. The owner's K-NOWORK-001 ruling (2026-10-02): "The paid delivery attempt
-#: remains UNUSED. Do NOT execute DELIVERY-EXPERIMENT-1." The authorization of 'SINGLE PAID DELIVERY EXPERIMENT' named the
-#: kernel d427299; this preregistration names the corrected one, which the owner has not authorized a run of. Only the
-#: owner's ruling clears this (HOLD = None, then --write): while it stands, neither the preflight nor the runner starts.
-HOLD = ("ON HOLD by the owner's ruling 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION' (2026-10-02): the paid delivery attempt "
-        "remains UNUSED; a run of this preregistration needs the owner's renewed authorization")
+#: Why the experiment may not start, or None: while a reason stands, neither the preflight nor the runner starts, and only
+#: the owner's ruling clears it (HOLD = None, then --write). The hold of the K-NOWORK-001 ruling ("The paid delivery
+#: attempt remains UNUSED. Do NOT execute DELIVERY-EXPERIMENT-1.") stood from 6d5a062 to 5c7c5a6; the owner's ruling
+#: 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' (§6) cleared it for exactly the kernel and the harness named below,
+#: once its §§2-5 were verified. Any other kernel, harness file, plan or preregistration is refused by the checks themselves.
+HOLD = None
 EXPERIMENT = {
     "id": c2_p9.EXPERIMENT,
     "attempt": 3,                                       # the next attempt directory of closure-evidence/v2/cycle2/P10
     "kernel_commit": "4f6dfc197acfd9146357e5781326843bc09982e5",    # K-NOWORK-001 (on K-PRESAT-001, d427299)
     "kernel_tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
-    "harness_includes": "7630dbe5d0aa7f873e26a573ce2b9962bb0c72c2",
+    "harness_includes": "5c7c5a6b5623b5c2b19d7f1b846ad497ab0561b2",   # H-REGRESSION-001 as the owner accepted it (on 7630dbe)
     # the route of the V1 baseline profile PROFILE-W1V2.1-OC-DEEPSEEKV4PRO-T80-RO (same plan base, max_retries 2)
     "provider": "9router", "endpoint": "https://9router.vnteki.com/v1",
     "route": "9router/ds/deepseek-v4-pro", "route_kind": "FIXED_MODEL", "resolved_model": "deepseek-v4-pro",
@@ -678,9 +680,11 @@ def record(ready: dict, m: dict | None = None) -> dict:
         "record": "AISEF V2 — DELIVERY EXPERIMENT 1: PREREGISTRATION AND EXECUTION GUARD OF ONE LEDGERLOCK DELIVERY RUN (prepared, not executed)",
         "authority": AUTHORITY,
         "status": "PREPARED — NOT STARTED. " + (f"{HOLD}." if HOLD else
-                                                 "The owner authorized exactly ONE paid run of this preregistration once its deterministic "
-                                                 "checks pass (ruling 'SINGLE PAID DELIVERY EXPERIMENT', §G and §H); no second attempt."),
-        "run_authorized": f"NO — {HOLD}" if HOLD else "ONE RUN, by the owner's ruling of 2026-10-02 §H — and by nothing in this record",
+                                                 "The owner authorized exactly ONE paid run of this preregistration, on this kernel and "
+                                                 "this harness, once its deterministic checks pass (ruling 'FINAL REBIND + SINGLE PAID "
+                                                 "DELIVERY EXPERIMENT', §§2-7); no second attempt."),
+        "run_authorized": f"NO — {HOLD}" if HOLD else ("ONE RUN, by the owner's ruling 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' §7 "
+                                                         "(2026-10-02) — and by nothing in this record"),
         "hold": HOLD, "provider_calls_made_preparing_this": 0,
         "kernel": {"commit": EXPERIMENT["kernel_commit"], "tree": EXPERIMENT["kernel_tree"], "head_tree": C.git("rev-parse", "HEAD:aisef2"),
                    "tree_of_the_commit": _tree_of(EXPERIMENT["kernel_commit"]),

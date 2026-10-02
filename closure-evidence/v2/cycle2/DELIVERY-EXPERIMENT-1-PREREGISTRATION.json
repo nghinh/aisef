@@ -1,9 +1,9 @@
 {
  "record": "AISEF V2 — DELIVERY EXPERIMENT 1: PREREGISTRATION AND EXECUTION GUARD OF ONE LEDGERLOCK DELIVERY RUN (prepared, not executed)",
- "authority": "owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02): exactly ONE paid run, attempt 3, no second attempt",
- "status": "PREPARED — NOT STARTED. ON HOLD by the owner's ruling 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION' (2026-10-02): the paid delivery attempt remains UNUSED; a run of this preregistration needs the owner's renewed authorization.",
- "run_authorized": "NO — ON HOLD by the owner's ruling 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION' (2026-10-02): the paid delivery attempt remains UNUSED; a run of this preregistration needs the owner's renewed authorization",
- "hold": "ON HOLD by the owner's ruling 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION' (2026-10-02): the paid delivery attempt remains UNUSED; a run of this preregistration needs the owner's renewed authorization",
+ "authority": "owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02), the last superseded for the corrected kernel and harness identities by 'AISEF V2 — FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT / OWNER AUTHORIZATION' (2026-10-02): exactly ONE paid run, attempt 3, no second attempt",
+ "status": "PREPARED — NOT STARTED. The owner authorized exactly ONE paid run of this preregistration, on this kernel and this harness, once its deterministic checks pass (ruling 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT', §§2-7); no second attempt.",
+ "run_authorized": "ONE RUN, by the owner's ruling 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' §7 (2026-10-02) — and by nothing in this record",
+ "hold": null,
  "provider_calls_made_preparing_this": 0,
  "kernel": {
   "commit": "4f6dfc197acfd9146357e5781326843bc09982e5",
@@ -13,7 +13,7 @@
   "commit_is_an_ancestor_of_head": true
  },
  "harness": {
-  "includes": "7630dbe5d0aa7f873e26a573ce2b9962bb0c72c2",
+  "includes": "5c7c5a6b5623b5c2b19d7f1b846ad497ab0561b2",
   "included": true,
   "files": [
    {
@@ -26,7 +26,7 @@
    },
    {
     "path": "validation/qualification/c2_delivery_experiment.py",
-    "sha256": "27a162adeaf0d88edcf1784add25478b5cf592623881716f680865443a60e04d"
+    "sha256": "165c8382a5f3f7c4858bc1e0205107a489dd11d064dd567a25acd4f2444a2366"
    },
    {
     "path": "validation/qualification/c2_plan_correction.py",
