@@ -84,7 +84,18 @@ HARNESS_CHANGES = {2: "attempt 1's developer prompt named each obligation's clau
                       "and the session streams and ends the experiment when reached, and the final main is put to all 59 "
                       "ProductProofSpecs and to the V1 independent acceptance oracle. A delivery verdict is PASS only when "
                       "every story of the plan committed in the journal, the budget was not reached and every revision "
-                      "the run names is preserved."}
+                      "the run names is preserved.",
+                   4: "H-PROMPT-002: attempt 3's prompts carried the V1-era epics prose as 'context only'; STORY-01-05's "
+                      "prescribed a four-element delete (`(\"delete\", key, rid, ts)`) against the requirements' five-field "
+                      "batch tuples (§5), it was implemented and kept, and ProductProof refuted S-4.4-a and S-D3-05-01-1 "
+                      "three times each. The prompt now holds the current plan's requirement clauses, the approved "
+                      "contracts' subjects and the plan stories it depends on, and no legacy text. H-RETRY-001: a retry "
+                      "prompt named a failed proof by its code and clause only; it now states the evidence the journal "
+                      "holds — criterion, role, requirement and clause, contract, spec, probe, subject, candidate, probe "
+                      "status and verdict against the expectation, the verifier's agreement, the typed failure and owner, "
+                      "the cited journal seqs — and, for a developer-owned refutation, that the candidate remains refuted and "
+                      "the hidden proof stimulus is not disclosed (PROBE-DIAGNOSTIC-GAP-001: the journal records no "
+                      "observation detail, and none is invented). Plan, specs, contracts, kernel and budget unchanged."}
 #: a secret-like token: `sk-` at a token start (attempt 1's pattern had no left boundary and matched inside words such as
 #: "task-…", which aborted the record of a finished run: NO-RECORD.json)
 SECRET = re.compile(r"(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,}")
@@ -180,6 +191,72 @@ def sections(requirements: str) -> dict[str, str]:
     for m in re.finditer(r"^#{2,3} (\d+(?:\.\d+)?)\.? (.+)$", requirements, re.M):
         out[m.group(1)] = f"§{m.group(1)} {m.group(2).strip()}"
     return out
+
+
+def obligation_facts(plan, requirements: str) -> dict[str, dict]:
+    """criterion -> the PUBLIC facts of its obligation: the plan's story and role, the requirement and its section, the
+    clause and its text, the approved contract, its ProductProofSpec, probe, candidate expectation and product subject.
+    Never a probe input: what the developer may be told on a retry (H-RETRY-001)."""
+    from validation.qualification import p10_contracts as aid
+    compiled = _compiled()
+    key = {s.id: k for k, s in compiled.items()}
+    text = {c["id"]: c["clause"] for c in aid.CLAUSES}
+    secs = sections(requirements)
+    out = {}
+    for o in plan.obligations:
+        spec, t = compiled[key[o.product_proof_spec_id]], aid.SPECS[key[o.product_proof_spec_id]]
+        out[o.criterion_id] = {"story": o.story_id, "criterion": o.criterion_id, "role": o.role.value, "requirement": t["requirement"],
+                               "section": secs.get(t["requirement"].removeprefix("R-"), ""), "clause": t["clause"],
+                               "clause_text": text.get(t["clause"], t["clause"]), "contract": spec.contract_id, "spec": spec.id,
+                               "probe": spec.probe_id, "candidate_expectation": spec.candidate_expectation.value,
+                               "subject": subject_text(t["kind"], t["locator"])}
+    return out
+
+
+#: H-RETRY-001: what a developer-owned refutation adds, and no more — the journal records no observation detail
+#: (PROBE-DIAGNOSTIC-GAP-001), so none is told
+REFUTED = ("The candidate remains {verdict} for this approved contract and the independent verifier agrees. Inspect the "
+           "implementation against that requirement clause. The hidden proof stimulus is not disclosed.")
+
+
+def retry_feedback(events, story_id: str, facts: dict[str, dict]) -> str:
+    """H-RETRY-001: the failures the kernel observed in `story_id`, each with the harness evidence that decided it —
+    built only from journal events `(seq, type, data)` and the public facts of the obligations (`obligation_facts`).
+
+    A failed proof names its criterion, role, requirement and clause, contract, spec, probe and subject, the candidate,
+    the probe status and verdict against the expectation, whether the independent verifier agrees, the typed failure
+    and owner, and the journal seqs it rests on: the two probe records (the criterion's last two before the proof — the
+    order proof.prove journals them in), the proof and the failure. Any other failure is its code, owner and the
+    kernel's typed detail. Nothing else: no probe input, stimulus, step, exception or record detail — the journal holds
+    no observation, so none is told. It is a pure function of the journal: prompt text, never journaled, never read by
+    the kernel — owner, retryability, budget, verdict and gate decisions are the kernel's, from the same journal."""
+    events = [(int(q), str(t), d) for q, t, d in events]
+    rows = []
+    for seq, kind, data in events:
+        if kind != "failure/observed" or data.get("story_id") != story_id:
+            continue
+        code, owner, detail = data.get("code"), data.get("owner"), str(data.get("detail", ""))
+        m = re.match(r"proof of (\S+): ", detail)
+        f = facts.get(m.group(1)) if m else None
+        about = [e for e in events if f and e[2].get("story_id") == story_id and e[2].get("criterion_id") == f["criterion"]]
+        proof = next((e for e in reversed(about) if e[0] < seq and e[1] == "proof/verified"), None)
+        if proof is None:
+            rows.append(f"- {code} (owner {owner}): {detail}")
+            continue
+        recs = [e for e in about if e[0] < proof[0] and e[1] == "probe/evaluated"][-2:]
+        executed = len(recs) == 2 and all("behavior_verdict" in ((r[2].get("record") or {}).get("result") or {}) for r in recs)
+        p = proof[2]
+        line = (f"- {code} (owner {owner}) — {story_id}, criterion {f['criterion']} [{f['role']}]: {f['requirement']} "
+                f"(docs/requirements.md {f['section']}), clause {f['clause']}: {f['clause_text']}\n"
+                f"  contract {f['contract']}, ProductProofSpec {f['spec']}, probe {f['probe']}, subject {f['subject']}; candidate "
+                f"{p.get('candidate')}: probe status {'EXECUTED' if executed else 'not EXECUTED'}"
+                + (f", verdict {p.get('verdict')} (expected {f['candidate_expectation']})" if executed else "")
+                + f", the independent verifier {'agrees' if p.get('agreement') else 'disagrees'}. Evidence: journal seq "
+                f"{', '.join(str(r[0]) for r in recs)} (the probe records), {proof[0]} (the proof), {seq} (this failure).")
+        if executed and p.get("agreement") and owner == "DEVELOPER" and p.get("verdict") not in (None, f["candidate_expectation"]):
+            line += "\n  " + REFUTED.format(verdict=p["verdict"])
+        rows.append(line)
+    return "\n".join(rows)
 
 
 def prompts(plan, requirements: str) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
@@ -395,20 +472,14 @@ def opencode_session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeou
 
 
 class OpenCodeDeveloper:
-    def __init__(self, run, prompts: dict[str, str], logs: pathlib.Path, by_criterion: dict[str, str] | None = None,
+    def __init__(self, run, prompts: dict[str, str], logs: pathlib.Path, facts: dict[str, dict] | None = None,
                  session_kw: dict | None = None) -> None:
-        self.run, self.prompts, self.logs, self.sessions, self.by_criterion = run, prompts, logs, [], by_criterion or {}
+        self.run, self.prompts, self.logs, self.sessions, self.facts = run, prompts, logs, [], facts or {}
         self.session_kw = session_kw or {}      # a preregistered run's fixed model, client environment and budget
 
     def feedback(self, story_id: str) -> str:
-        """The failures the kernel observed in this story, each with the requirement clause its proof concerns."""
-        rows = []
-        for e in self.run.events:
-            if e.type == "failure/observed" and e.data.get("story_id") == story_id:
-                m = re.match(r"proof of (\S+):", str(e.data.get("detail", "")))
-                clause = self.by_criterion.get(m.group(1), "") if m else ""
-                rows.append(f"- {e.data['code']}" + (f" — {clause.lstrip('- ')}" if clause else f": {e.data.get('detail', '')}"))
-        return "\n".join(rows)
+        """H-RETRY-001: `retry_feedback` over this run's journal."""
+        return retry_feedback(((e.seq, e.type, e.data) for e in self.run.events), story_id, self.facts)
 
     def implement(self, story_id: str, criteria: tuple[str, ...], checkout: str):
         from aisef2.journal.format2 import OperationOutcome as O
@@ -602,8 +673,8 @@ def runspec_inputs(plan, profile: str, oc: dict, fixed: dict | None = None, pref
               "limits": {"value": PROFILES[profile], "layer": f"c2-p9 profile {profile}"}}
     if fixed:
         layers.update({k: {"value": fixed[k], "layer": "preregistration"} for k in
-                       ("experiment", "kernel_commit", "budget", "max_turns_per_session", "preflight_shape", "developer_timeout_s",
-                        "reviewer_timeout_s")})
+                       ("experiment", "attempt", "harness", "kernel_commit", "budget", "max_turns_per_session", "preflight_shape",
+                        "developer_timeout_s", "reviewer_timeout_s") if k in fixed})
         if preflight is not None:
             template = runspec_inputs(plan, profile, oc, fixed)
             layers["preregistered_template_hash"] = {"value": resolve(template[0], template[1], plan.baseline).runspec_hash, "layer": "preregistration"}
@@ -647,7 +718,8 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
     specs = {s.id: s for s in _compiled().values()}
     requirements_md = subprocess.run(["git", "-C", str(P10.LEDGERLOCK_REPO), "show", f"{P10.LEDGERLOCK_PLAN_COMMIT}:docs/requirements.md"],
                                      capture_output=True, encoding="utf-8", check=True).stdout
-    tasks, clauses, by_criterion = prompts(plan, requirements_md)
+    tasks, clauses, _ = prompts(plan, requirements_md)
+    facts = obligation_facts(plan, requirements_md)
     caps, layers, kernel = runspec_inputs(plan, profile, oc, exp, exp["preflight_fields"] if exp else None)
     if exp and resolve(caps, layers, base["baseline"]).runspec_hash != exp["resolved_runspec_hash"]:
         raise SystemExit("REFUSED: this run's RunSpec is not the one the attestation resolved")     # the journal binds this hash
@@ -670,7 +742,7 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
                             lambda: sum(1 for e in run_.events if e.type == "provider/request"))
             # a session at its own turn cap is stopped (what it changed is still judged by the proofs); the experiment goes on
             session_kw = {"model": exp["route"], "env": dx.client_env(), "budget": budget, "turn_cap": exp["max_turns_per_session"]}
-        dev, rev = OpenCodeDeveloper(run_, tasks, logs, by_criterion, session_kw), OpenCodeReviewer(run_, clauses, logs, session_kw)
+        dev, rev = OpenCodeDeveloper(run_, tasks, logs, facts, session_kw), OpenCodeReviewer(run_, clauses, logs, session_kw)
         adapters = sr.Adapters(dev, rev, RuffScanner(), merger, ws)
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch)) for e in catalog.CATALOG}
         env = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)

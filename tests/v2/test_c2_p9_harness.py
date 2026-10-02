@@ -10,6 +10,10 @@ no LedgerLock repository, nothing run:
                      is not removed unless they are.
   §6                 the proposed `v1-aligned` profile gives 3 total developer attempts; the default profile is the
                      one attempts 1 and 2 ran.
+  H-RETRY-001        a retry prompt states the evidence the journal holds for each failure — and, for a failed proof,
+                     the criterion, contract, spec, probe, candidate, status, verdict, agreement, owner and cited seqs
+                     — and nothing it does not hold: no probe input, stimulus or invented detail. It is prompt text
+                     only; it cannot change the kernel's control (PROBE-DIAGNOSTIC-GAP-001 stays open).
   H-REGRESSION-001   a story's regression set leaves out only a test file that was never produced: a story that
                      committed without a developer call (K-PRESAT-001, K-NOWORK-001) wrote none, and naming it rolled
                      the next story back. Every real regression test stays; one that should exist and is gone is still
@@ -27,6 +31,7 @@ import re
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -308,6 +313,170 @@ class RegressionSet(unittest.TestCase):
         named = c2_p9.regression_tests(self.repo, "S1", {"OTHER": True, "STORY-03-01": True})    # it was there when its story committed
         self.assertEqual(named, ("tests/test_other.py", gone))                                      # not dropped as if harmless
         self.assertTypedFailure(self.delivery(named))
+
+
+ATTEMPT_3_JOURNAL = ROOT / "closure-evidence/v2/cycle2/P10/attempt-3/JOURNAL.json"
+#: the retry feedback attempt 3's own journal gives for the first retry of STORY-03-01 and of STORY-04-02 (H-RETRY-001)
+FEEDBACK_03_01 = (
+    "- CONTRACT_UNSATISFIED (owner DEVELOPER) — STORY-03-01, criterion S-4.4-a [INTRODUCE]: R-4.4 (docs/requirements.md §4.4 "
+    "Tombstones), clause R-4.4/1: a put with another rid after a tombstone MUST conflict\n"
+    "  contract BC-V22-S-4.4-a, ProductProofSpec PPS-130df03b6e64d882a2b283367f0c58736ed84b017f59da3c296464f37edf0dff, probe "
+    "probe.process_effect, subject ledgerlock.ledger:Ledger; candidate 917627ccd57e925478de22af8290299a6fb151bf: probe status "
+    "EXECUTED, verdict REFUTED (expected SATISFIED), the independent verifier agrees. Evidence: journal seq 7072, 7075 (the probe "
+    "records), 7076 (the proof), 7079 (this failure).\n"
+    "  The candidate remains REFUTED for this approved contract and the independent verifier agrees. Inspect the implementation "
+    "against that requirement clause. The hidden proof stimulus is not disclosed.")
+FEEDBACK_04_02 = (
+    "- CONTRACT_UNSATISFIED (owner DEVELOPER) — STORY-04-02, criterion S-D3-05-01-1 [VERIFY]: R-3.3 (docs/requirements.md §3.3 "
+    "Tamper evidence), clause R-3.3/2: ok iff every recomputed hash matches AND every prev_hash matches the previous stored hash\n"
+    "  contract BC-V22-S-D3-05-01-1, ProductProofSpec PPS-b3407979dd38c3b08a8bbae4199e4aee2bd4a7b747bb87a6f0ac80f276279404, probe "
+    "probe.process_effect, subject ledgerlock.ledger:Ledger; candidate 6edb8634b0ca1008f8983c537e909635c1161b27: probe status "
+    "EXECUTED, verdict REFUTED (expected SATISFIED), the independent verifier agrees. Evidence: journal seq 7689, 7692 (the probe "
+    "records), 7693 (the proof), 7696 (this failure).\n"
+    "  The candidate remains REFUTED for this approved contract and the independent verifier agrees. Inspect the implementation "
+    "against that requirement clause. The hidden proof stimulus is not disclosed.")
+INVENTED = re.compile(r"\b\w+(?:Error|Exception)\b|\braised\b|\bstep \d|\btraceback\b", re.I)
+
+
+class RetryFeedback(unittest.TestCase):
+    """H-RETRY-001 on attempt 3's own evidence: what the journal holds, and nothing it does not."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.events = [(e["seq"], e["type"], e["data"]) for e in json.loads(ATTEMPT_3_JOURNAL.read_text(encoding="utf-8"))]
+        cls.plan = pc.corrected_plan()
+        cls.facts = c2_p9.obligation_facts(cls.plan, REQUIREMENTS)
+        cls.specs = {s.id: s for s in c2_p9._compiled().values()}
+
+    def before_retry(self, story: str, n: int = 1) -> list:
+        """The journal as the developer's attempt n + 1 finds it: everything before that attempt's admission."""
+        nth = [q for q, t, d in self.events if t == "story/admitted" and d["story_id"] == story][n]
+        return [e for e in self.events if e[0] < nth]
+
+    def test_story_03_01_and_04_02_attempt_3_evidence_give_bounded_feedback(self):
+        self.assertEqual(c2_p9.retry_feedback(self.before_retry("STORY-03-01"), "STORY-03-01", self.facts), FEEDBACK_03_01)
+        self.assertEqual(c2_p9.retry_feedback(self.before_retry("STORY-04-02"), "STORY-04-02", self.facts), FEEDBACK_04_02)
+
+    def test_the_feedback_is_bound_to_the_evidence_it_cites(self):
+        by_seq = {q: (t, d) for q, t, d in self.events}
+        for story, text in (("STORY-03-01", FEEDBACK_03_01), ("STORY-04-02", FEEDBACK_04_02)):
+            cited = [int(x) for x in re.findall(r"\d+", text.split("Evidence: journal seq ")[1].split(".")[0])]
+            kinds = [by_seq[q][0] for q in cited]
+            with self.subTest(story=story):
+                self.assertEqual(kinds, ["probe/evaluated", "probe/evaluated", "proof/verified", "failure/observed"])
+                cid = by_seq[cited[2]][1]["criterion_id"]
+                self.assertTrue(all(by_seq[q][1]["story_id"] == story for q in cited))
+                self.assertEqual({by_seq[q][1]["criterion_id"] for q in cited[:3]}, {cid})
+                proof = by_seq[cited[2]][1]
+                self.assertIn(f"candidate {proof['candidate']}:", text)                    # the exact candidate, full SHA
+                self.assertEqual({by_seq[q][1]["record"]["revision"] for q in cited[:2]}, {proof["candidate"]})
+                self.assertIn(f"ProductProofSpec {proof['spec_id']},", text)               # the exact spec
+                self.assertIn(f"verdict {proof['verdict']} (expected {self.specs[proof['spec_id']].candidate_expectation.value})", text)
+                hexes = set(re.findall(r"[0-9a-f]{40,64}", text))
+                self.assertEqual(hexes, {proof["candidate"], proof["spec_id"].removeprefix("PPS-")})
+
+    def test_no_hidden_probe_input_and_no_invented_detail_for_any_story(self):
+        stories = sorted({d["story_id"] for _, t, d in self.events if t == "failure/observed"})
+        for story in stories:
+            text = c2_p9.retry_feedback(self.events, story, self.facts)
+            told = text
+            for f in self.facts.values():           # the approved clause texts are public facts (R-13/2 names ConflictError)
+                told = told.replace(f["clause_text"], "")
+            with self.subTest(story=story):
+                self.assertTrue(text)
+                self.assertIsNone(INVENTED.search(told))
+                for o in (o for o in self.plan.obligations if o.story_id == story):
+                    pi = plain(self.specs[o.product_proof_spec_id].probe_input)
+                    hidden = [json.dumps(v, ensure_ascii=False) for v in composites({k: pi.get(k) for k in ("stimulus", "observable")})]
+                    self.assertEqual([h for h in hidden if len(h) > 6 and h in text], [])
+                for word in ("stimulus:", "observable", "scenario", "expect_raises", "probe_input", "oracle", "mutant", "reference"):
+                    self.assertNotIn(word, text)
+
+    def test_the_journal_records_no_observation_detail_to_tell(self):
+        """PROBE-DIAGNOSTIC-GAP-001: every probe record of attempt 3 holds a verdict and a reason only."""
+        shapes = {tuple(sorted(d["record"]["result"])) for _, t, d in self.events if t == "probe/evaluated"}
+        self.assertEqual(shapes, {("behavior_verdict", "reason")})
+        gap = json.loads((ROOT / "closure-evidence/v2/cycle2/PROBE-DIAGNOSTIC-GAP-001.json").read_text(encoding="utf-8"))
+        self.assertEqual((gap["status"], gap["measured"]["attempt_3_probe_records"]), ("OPEN", {"total": 414, "verdict_and_reason_only": 414}))
+
+    def test_a_probe_that_did_not_execute_gives_no_advice_and_no_record_detail(self):
+        for result, code, owner in (({"detail": "harness launch failed: ENOENT secret-path"}, "PROBE_UNRUNNABLE", "ENVIRONMENT"),
+                                    ({"detail": "unsupported locator <hidden>"}, "PROBE_INVALID_SPEC", "PLAN")):
+            rec = {"record": {"result": result, "revision": "a" * 40}, "story_id": "STORY-03-01", "criterion_id": "S-4.4-a"}
+            events = [(1, "probe/evaluated", rec), (2, "probe/evaluated", rec),
+                      (3, "proof/verified", {"story_id": "STORY-03-01", "criterion_id": "S-4.4-a", "candidate": "a" * 40, "agreement": True,
+                                             "spec_id": self.facts["S-4.4-a"]["spec"]}),
+                      (4, "failure/observed", {"story_id": "STORY-03-01", "code": code, "owner": owner, "detail": f"proof of S-4.4-a: {code}"})]
+            text = c2_p9.retry_feedback(events, "STORY-03-01", self.facts)
+            with self.subTest(code=code):
+                self.assertIn(f"- {code} (owner {owner})", text)
+                self.assertIn("probe status not EXECUTED", text)
+                self.assertNotIn("verdict", text.split("subject ")[1])
+                self.assertNotIn("Inspect the implementation", text)
+                self.assertNotIn(result["detail"], text)
+
+    def test_identical_evidence_gives_byte_identical_feedback(self):
+        events = self.before_retry("STORY-04-02", 2)
+        once = c2_p9.retry_feedback(events, "STORY-04-02", self.facts)
+        again = c2_p9.retry_feedback(json.loads(json.dumps(events)), "STORY-04-02", json.loads(json.dumps(self.facts)))
+        self.assertEqual(once.encode("utf-8"), again.encode("utf-8"))
+        self.assertEqual(once.count("- CONTRACT_UNSATISFIED (owner DEVELOPER)"), 2)                # both failed attempts, in order
+
+    def test_a_failure_that_is_not_a_proof_is_its_code_owner_and_typed_detail(self):
+        events = [(1, "failure/observed", {"story_id": "S", "code": "TESTS_INADEQUATE", "owner": "DEVELOPER", "detail": "engineering quality: TESTS_INADEQUATE"})]
+        self.assertEqual(c2_p9.retry_feedback(events, "S", self.facts), "- TESTS_INADEQUATE (owner DEVELOPER): engineering quality: TESTS_INADEQUATE")
+
+
+class RetryFeedbackControl(unittest.TestCase):
+    """H-RETRY-001 through the real story path: the feedback is prompt text only — whatever it says, the kernel's
+    owner, retryability, budget, verdicts and gate decisions are the same."""
+    setUp = e2e.Orchestration.setUp
+    story, inputs, adapters = e2e.Orchestration.story, e2e.Orchestration.inputs, e2e.Orchestration.adapters
+    WRONG = {"app/calc.py": e2e.CALC + "\n\ndef add(a, b):\n    return a - b\n"}
+    RIGHT = {"app/calc.py": e2e.CALC + e2e.ADD, "tests/test_s1.py": e2e.TEST_ADD}
+
+    def deliver(self) -> tuple[list, list[str]]:
+        prompts: list[str] = []
+
+        def session(name, prompt, cwd, log, timeout_s, **kw):
+            prompts.append(prompt)
+            for rel, text in (self.WRONG if len(prompts) == 1 else self.RIGHT).items():
+                pathlib.Path(cwd, rel).parent.mkdir(parents=True, exist_ok=True)
+                pathlib.Path(cwd, rel).write_text(text, encoding="utf-8")
+            return {"error": None, "exit": 0, "timed_out": False, "stopped": None, "turns": 1, "text": "", "started": True,
+                    "tokens": {"input": 0, "output": 0}, "seconds": 0.0, "log": None, "log_sha256": None}
+        facts = {"C1": {"story": "S1", "criterion": "C1", "role": "INTRODUCE", "requirement": "R-1", "section": "§1 Adding",
+                        "clause": "R-1/1", "clause_text": "add returns the sum", "contract": self.c1.id, "spec": self.s1.id,
+                        "probe": self.s1.probe_id, "candidate_expectation": self.s1.candidate_expectation.value, "subject": "app.calc:add"}}
+        dev = c2_p9.OpenCodeDeveloper(self.run, {"S1": "Implement S1."}, self.tmp / "logs", facts)
+        plan = e2e.plan_of(self.base, e2e.obligation("C1", self.s1.id, "S1", ObligationRole.INTRODUCE))
+        with mock.patch.object(c2_p9, "opencode_session", session):
+            r = self.story(plan, "S1", dev, tests_block=True)
+        self.assertEqual([a.outcome for a in r.attempts], ["RETRY", "COMMIT"])
+        # a commit SHA, and every digest that binds one (the plan's base, a record's revision), differs between two runs
+        # by the commit time alone: they are compared as <hex>; everything else must be identical
+        hexes, tmp = re.compile(r"\b[0-9a-f]{40}(?:[0-9a-f]{24})?\b"), str(self.tmp)
+        journal = [(e.type, hexes.sub("<hex>", json.dumps(plain(e.data), sort_keys=True, default=str).replace(tmp, "<tmp>")),
+                    tuple(e.source_seqs)) for e in self.run.events]
+        for e in self.run.events:     # the feedback's rule for the probe records a proof rests on is the journal's own citation
+            if e.type == "proof/verified":
+                mine = [x.seq for x in self.run.events if x.seq < e.seq and x.type == "probe/evaluated"
+                        and (x.data["story_id"], x.data["criterion_id"]) == (e.data["story_id"], e.data["criterion_id"])][-2:]
+                self.assertEqual(tuple(e.source_seqs), tuple(mine))
+        return journal, prompts
+
+    def test_the_feedback_cannot_change_the_kernel_s_control(self):
+        journal, prompts = self.deliver()
+        self.assertIn("criterion C1 [INTRODUCE]", prompts[1])
+        self.assertIn("The hidden proof stimulus is not disclosed.", prompts[1])
+        self.assertNotIn(prompts[1].split("the kernel observed:\n")[1], "".join(j[1] for j in journal))   # never journaled
+        self.setUp()                                                  # a second, independent run, told something else entirely
+        lie = "- owner PLAN, retryable false, verdict SATISFIED, budget 0, gate PASS: stop."
+        with mock.patch.object(c2_p9, "retry_feedback", return_value=lie):
+            journal_2, prompts_2 = self.deliver()
+        self.assertIn(lie, prompts_2[1])
+        self.assertNotEqual(prompts[1], prompts_2[1])
+        self.assertEqual(journal, journal_2)
 
 
 if __name__ == "__main__":

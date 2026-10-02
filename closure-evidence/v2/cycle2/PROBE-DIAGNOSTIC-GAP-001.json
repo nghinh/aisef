@@ -1,0 +1,54 @@
+{
+ "record": "AISEF V2 — PROBE-DIAGNOSTIC-GAP-001: a refuted ProductProof records no observation detail, so nothing can tell the developer which step failed or why",
+ "status": "OPEN",
+ "authority": "owner ruling 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001 / NO PROBE/KERNEL DIAGNOSTIC EXPANSION' (2026-10-03) §D: PROBE_DIAGNOSTIC_GAP = ACCEPTED_KNOWN_LIMITATION_FOR_NOW; recorded, not fixed in this change",
+ "measured": {
+  "attempt_3_probe_records": {
+   "total": 414,
+   "verdict_and_reason_only": 414
+  },
+  "where_the_journal_shows_it": "closure-evidence/v2/cycle2/P10/attempt-3/JOURNAL.json: every probe/evaluated record's result is {behavior_verdict, reason}; the failure is 'proof of <criterion>: CONTRACT_UNSATISFIED'",
+  "where_the_detail_exists": "aisef2/probe/process_effect.py:847 — the probe's Observation carries its facts (the trace of steps, the failing step, and for a call that raised, the exception CLASS only: process_effect.py:563 'refuted:raised ' + type(e).__name__, never its message)",
+  "where_it_is_dropped": "aisef2/probe/protocol.py:185 classify_failure — an OBSERVED observation becomes Executed(verdict); aisef2/product/outcome.py:37 Executed holds behavior_verdict and reason only; ProbeRecord binds that result, and aisef2/orchestrate/proof.py:91,94 journals plain(record)",
+  "offline_diagnosis_not_run_evidence": {
+   "how": "the real process_effect probe run once, offline, on attempt 3's preserved final candidates (no provider): its Observation before classify_failure",
+   "S-4.4-a at c04d71d8e3a54e54b1dd03e1f79c024c6accc746": {
+    "observation": "OBSERVED REFUTED",
+    "refuted": {
+     "step": 1,
+     "kind": "call",
+     "why": "raised ValueError"
+    },
+    "probe_result_kept": {
+     "behavior_verdict": "REFUTED",
+     "reason": null
+    }
+   },
+   "S-D3-05-01-1 at 6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc": {
+    "observation": "OBSERVED REFUTED",
+    "refuted": {
+     "step": 4,
+     "kind": "call",
+     "why": "raised ValueError"
+    },
+    "probe_result_kept": {
+     "behavior_verdict": "REFUTED",
+     "reason": null
+    }
+   },
+   "status": "a diagnosis of where the detail is lost — never feedback, never evidence of attempt 3"
+  }
+ },
+ "consequence": "H-RETRY-001's feedback can state only what the journal holds: the candidate remains REFUTED for the cited approved contract and the independent verifier agrees; it cannot name the step, the input shape or the exception",
+ "not_done_here": [
+  "no change to the probe protocol, ProbeResult fields, process_effect's diagnostic semantics, probe_digest or F5",
+  "no ProductProofSpec, BehaviorContract or probe_input change",
+  "no hidden stimulus exposed to the developer as a workaround"
+ ],
+ "a_fix_would_need": "a separately reviewed architecture / evidence-compatibility change: a typed, bounded diagnostic in the probe result or record (what may be retained, and what a developer may be told without the stimulus), its effect on record digests, probe digests, the journal format and F5, and the requalification it triggers",
+ "related": [
+  "H-RETRY-001 (validation/qualification/c2_p9.py retry_feedback)",
+  "H-PROMPT-002",
+  "attempt 3 (closure-evidence/v2/cycle2/P10/attempt-3/)"
+ ]
+}
