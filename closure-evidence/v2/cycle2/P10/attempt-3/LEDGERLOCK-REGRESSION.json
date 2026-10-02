@@ -1,0 +1,1735 @@
+{
+ "record": "AISEF V2 — DELIVERY EXPERIMENT 1: ONE PREREGISTERED LEDGERLOCK RUN (DEVELOPMENT / REGRESSION BENCHMARK ONLY)",
+ "rung": "C2-P9 / QP-2.9",
+ "authority": "owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02), the last superseded for the corrected kernel and harness identities by 'AISEF V2 — FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT / OWNER AUTHORIZATION' (2026-10-02): exactly ONE paid run, attempt 3, no second attempt",
+ "preregistration": {
+  "path": "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-PREREGISTRATION.json",
+  "sha256": "090627d9793a66389ccc01623a28434c3482b9d599205deee83caefc6a9dad8b"
+ },
+ "written": "2026-10-02T15:10:25Z",
+ "purpose": "does the Cycle-2 framework execute more of the known workload correctly? — not: how would AISEF perform on unseen projects",
+ "semantic_candidate": "4f6dfc197acfd9146357e5781326843bc09982e5",
+ "aisef2_tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
+ "head_kernel_tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
+ "repository_execution_commit": "06ceb231a9bafe944eb6715d85a479336626dcec",
+ "harness": {
+  "path": "validation/qualification/c2_p9.py",
+  "sha256": "da7d02a338dfab0413d1d244fa3bb116861b01acb2c29e82f6a6808041e20639"
+ },
+ "workload": {
+  "id": "LedgerLock",
+  "benchmark_class": "DEVELOPMENT_REGRESSION",
+  "repository": {
+   "repo": "/Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2",
+   "present": true,
+   "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "baseline_is_the_plan_commit": true,
+   "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+   "requirements_match_frozen": true,
+   "epics_sha256": "4f2c920ef4853cf98254f7c2ad582a2bfdc8b90becc8bd45f44e3c262cd81376",
+   "tree": "d4560f79d0b6cc9e9b685c9cb6150ab73afb4971"
+  },
+  "requirements_sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc",
+  "final_main": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+  "repository_written": false,
+  "preserved": {
+   "path": "/Users/nghinh/Downloads/projects/aisef-qp-2.9-preserved/attempt-3.git",
+   "final_main": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+   "final_tree": "6f2502fe9bb058cd3ed44c0ee32336fafabc2297",
+   "revisions_pinned": 12,
+   "missing": [],
+   "how_to_inspect": "git --git-dir /Users/nghinh/Downloads/projects/aisef-qp-2.9-preserved/attempt-3.git worktree add <dir> ad49a4c8e18ec645e6dda49daea38574e3142231  (the independent acceptance oracle runs in <dir>)",
+   "temporary_directory": "removed after the copy was checked"
+  }
+ },
+ "plan_identity": {
+  "id": "LEDGERLOCK-PLAN-V2.2-CORRECTION-1",
+  "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
+  "baseline": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+  "stories": 7,
+  "obligations": 67,
+  "execution_order": [
+   "STORY-01-01",
+   "STORY-01-05",
+   "STORY-02-01",
+   "STORY-02-02",
+   "STORY-03-01",
+   "STORY-04-01",
+   "STORY-04-02"
+  ],
+  "replanned": false,
+  "stories_split": false,
+  "correction": {
+   "path": "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json",
+   "sha256": "365ebacfc8d27a2d5f3f833a90fa4ba6d4ac6dd2a76d9e7744310579f14d8ba6",
+   "check": []
+  }
+ },
+ "approvals": {
+  "record": "closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json",
+  "count": 59,
+  "approver": "human:owner"
+ },
+ "execution_profile": {
+  "source": "p10.runspec_for (Cycle-1 P10 profile): OpenCode developer and reviewer on the declared route, ruff scanner, the limits of profile delivery-experiment-1",
+  "profile": "delivery-experiment-1",
+  "developer_attempts_per_story": 3,
+  "runspec_hash": "4ce79ecfadd1cb9976aab3c87c1ea2923854b28e1c43acdabff24008ae9712ad",
+  "aggregate_min_grade": "ATTESTED",
+  "limits": {
+   "DEVELOPER": 2,
+   "PLAN": 0,
+   "ENVIRONMENT": 1,
+   "PROVIDER": 1,
+   "INTEGRATION": 0,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "capabilities": [
+   {
+    "name": "developer",
+    "grade": "ATTESTED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "git",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "kernel",
+    "grade": "VERIFIED",
+    "enforcement": "FULL"
+   },
+   {
+    "name": "probe.cli_invocation",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "probe.file_artifact",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "probe.process_effect",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "probe.python_callable_v2",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "python",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "reviewer",
+    "grade": "ATTESTED",
+    "enforcement": "PARTIAL"
+   },
+   {
+    "name": "scanner",
+    "grade": "VERIFIED",
+    "enforcement": "PARTIAL"
+   }
+  ],
+  "model": {
+   "client": "opencode",
+   "binary": "/Users/nghinh/.opencode/bin/opencode",
+   "binary_sha256": "16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198",
+   "version": "1.18.31",
+   "declared_route": "9router/mycombo",
+   "endpoint": "https://9router.vnteki.com/v1",
+   "provider_config_digest_without_secrets": "e471c8f750f88e544112105b2846b5bb4af59fa48c6d1c7ec436ad2064278cee",
+   "grade": "OPAQUE",
+   "why_opaque": "declared route and client only: no request was made, so no preflight fingerprint was measured (RFC §23)"
+  },
+  "kernel_digest": "94b1aea452ebc0c5fa1bd649870370130dc985ae3fcf6b779eaa66ebe50bcbc4",
+  "fixed_model": {
+   "route": "9router/ds/deepseek-v4-pro",
+   "resolved_model": "deepseek-v4-pro",
+   "route_kind": "FIXED_MODEL"
+  },
+  "attestation": {
+   "path": "closure-evidence/v2/cycle2/P10/attempt-3/ATTESTATION.json",
+   "sha256": "89e1cc2c7c031fc5aad12cfeb231b4fc710251a4bb5520fa404b4e0b09778601",
+   "at_utc": "2026-10-02T14:02:32Z",
+   "fingerprint": "530e3f126496009bf298979d01f122a24c04310bdbbdc69a2a7fd52dee108451",
+   "runspec_template_hash": "19d250574ea8fc2ef375a21ab721207da558a0145f62484407d50f623491b928"
+  },
+  "budget": {
+   "limits": {
+    "provider_requests": 60,
+    "turns": 700,
+    "input_tokens": 60000000,
+    "output_tokens": 400000
+   },
+   "preflight": {
+    "provider_requests": 5,
+    "turns": 4,
+    "input_tokens": 141021,
+    "output_tokens": 290
+   },
+   "spent": {
+    "provider_requests": 18,
+    "turns": 295,
+    "input_tokens": 34783083,
+    "output_tokens": 383851,
+    "sessions_started": 13,
+    "requests_recorded": 13,
+    "unaccounted": []
+   },
+   "reached": null,
+   "derived_from": "the preflight accounting record, the journal's provider/request events and the session streams; no counter is kept",
+   "limitation": "spend is what the client reports per finished step. An HTTP request that finishes no step is not in the telemetry — a client-internal retry, a failed request, the request in flight when a stop is issued — so its tokens cannot be counted; a stop is issued at the first reading (every 5 s) that shows a ceiling reached, so the totals can pass a ceiling by the steps finished since the reading before. Input is one combined number (prompt + cache read + cache write): the owner's ceiling is combined and no separate fresh/cached limit exists. The preflight's chat probes report prompt_tokens and completion_tokens only, counted as input and output."
+  },
+  "max_turns_per_session": 80,
+  "sessions_stopped_at_the_session_cap": 0,
+  "grade_note": "one fixed model route, given to the client explicitly, ATTESTED by the preflight beside this record before delivery was unlocked; the fingerprint is a drift detector, not a claim about model weights"
+ },
+ "run_identity": {
+  "run_id": "c2-p9-ledgerlock",
+  "journal_events": 7959,
+  "journal_sha256": "fc99230d69943f39d43b3a4a433c8f32fc08206ba4998ae03599a795722bfb95"
+ },
+ "cohort_state": "DEVELOPMENT",
+ "benchmark_class": "DEVELOPMENT_REGRESSION",
+ "generalization_claim": "NONE",
+ "verdict": {
+  "delivery_verdict": "FAIL",
+  "plan_quality_verdict": "NOT_CLAIMED"
+ },
+ "delivery_verdict_derivation": "from the run's journal events only; no plan-quality input — and FAIL, never PASS, while a story of the plan has not committed in the journal (a story that never began is in no event), when the budget was reached or spend was unaccounted, or when the run's revisions are not all preserved",
+ "delivery_pass_blocked_by": [
+  "3 of the plan's stories did not commit"
+ ],
+ "story_outcomes": {
+  "STORY-01-01": [
+   "COMMIT"
+  ],
+  "STORY-01-05": [
+   "RETRY",
+   "COMMIT"
+  ],
+  "STORY-02-01": [
+   "COMMIT"
+  ],
+  "STORY-02-02": [
+   "COMMIT"
+  ],
+  "STORY-03-01": [
+   "RETRY",
+   "RETRY",
+   "ROLLBACK"
+  ],
+  "STORY-04-01": [
+   "ROLLBACK"
+  ],
+  "STORY-04-02": [
+   "RETRY",
+   "RETRY",
+   "ROLLBACK"
+  ]
+ },
+ "story_state": {
+  "STORY-01-01": {
+   "admitted": true,
+   "attempt": 1,
+   "outcome": "COMMIT",
+   "state": "ENDED"
+  },
+  "STORY-01-05": {
+   "admitted": true,
+   "attempt": 2,
+   "outcome": "COMMIT",
+   "state": "ENDED"
+  },
+  "STORY-02-01": {
+   "admitted": true,
+   "attempt": 1,
+   "outcome": "COMMIT",
+   "state": "ENDED"
+  },
+  "STORY-02-02": {
+   "admitted": true,
+   "attempt": 1,
+   "outcome": "COMMIT",
+   "state": "ENDED"
+  },
+  "STORY-03-01": {
+   "admitted": true,
+   "attempt": 3,
+   "outcome": "ROLLBACK",
+   "state": "ENDED"
+  },
+  "STORY-04-01": {
+   "admitted": false,
+   "attempt": 1,
+   "outcome": "ROLLBACK",
+   "state": "ENDED"
+  },
+  "STORY-04-02": {
+   "admitted": true,
+   "attempt": 3,
+   "outcome": "ROLLBACK",
+   "state": "ENDED"
+  }
+ },
+ "story_errors": [],
+ "stories_not_committed": [
+  "STORY-03-01",
+  "STORY-04-01",
+  "STORY-04-02"
+ ],
+ "productproof": {
+  "obligations": [
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.1-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-65d059abcd7bdb6aa4ae2bc1baacc5266397c4e603f2445fcb0eceeb1b7cd685",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7400,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.1-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-810d70f8680ef0143b3c99f951cf5a36a17ec6fb381464c8b04257c9a7e12072",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7408,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.1-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-e8786e89d9c8d608ecb8b3422f4d962581b71c405a88677cd298ed8d73d4aa04",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7416,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-3.2-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-6fb67922e547bc2418a84f30b9eceda641440b06d427c80b8fa75350ba67341c",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-163fb6867c732cc0910fc7cb0aa41dc00e333ffa863e3e20c290e89044694435",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7424,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-75b12a5444f2f7af7002c3117377649819b64b3d717b9dbd47d31adb9c5d33f1",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7432,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-2262384034b21519c6a2a3e48d3928eee26cb57eb12b9b8c74db7c7e72ffbb5e",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7440,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-e",
+    "role": "INTRODUCE",
+    "spec": "PPS-3fcd647712352b2cf0e8c569f89d039e6d4b6eee5b45801bf1c4a6965494a4cd",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7448,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-f",
+    "role": "INTRODUCE",
+    "spec": "PPS-c03399bb5a08910e909b1170b8dabf7cea87f9f1c74588cfb3d25ca3cc0c82e2",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7456,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-g",
+    "role": "INTRODUCE",
+    "spec": "PPS-48d94aa56e303126c572596f4f18b171bf5b3d570b60882ea3d913ddf0f29aa7",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7464,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.2-h",
+    "role": "INTRODUCE",
+    "spec": "PPS-79eb2e82003c7aaad2412a035af5931ab81d49d8d050dc4df1b3efff28168bfa",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7472,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-3.3-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-249d9aac810991ad250ad76be4e8ae791c1cd66ed70be4a097c6e842fb17cdce",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7875,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-3.3-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-3a187fb9c232f40735c52deab24f1a6a4c343b487a2eed8b3a5b5eca837b797a",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7883,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-3.3-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-b35f6d40ba01f56fb575a776cd8347c34cde7c8b2c5d635976e6b9789ec45e7b",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7891,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-3.3-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-2ab21163d87a1a2939203dea178c47e710d1ee602696e75f5fa5a01a75295451",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7899,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-3.4-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-9a902e79dbf7c4b212f84dd24ff6c544cb0d9c7d6855c5ff6498de6054752b9b",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "REFUTED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7480,
+     "agreement": true,
+     "verdict": "REFUTED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.2-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-b2363ec360a30b7d13ad6affe219aea7b1eb8394d8a75ea31de74895734d7bf1",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7488,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.2-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-1afb7c134205830634e1475eb8243f898d3f27f2d97c357ed508c99b55c98ef7",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7496,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.3-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-776c49de9eddd417972d7615a7f7dd7ce1e50e38a37dd0aa70d9a71711b05f92",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7504,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.3-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-f5caa8ad200d3849be60bd861f139678bbbd9f53534e859607ae84e34c5c0d6a",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7512,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.4-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-130df03b6e64d882a2b283367f0c58736ed84b017f59da3c296464f37edf0dff",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746",
+     "seq": 7520,
+     "agreement": true,
+     "verdict": "REFUTED"
+    },
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.4-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-696a93c595369a88fee8230a492502fd7f7330c4d2e208c8aa0ea0c2f7487662",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.5-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-b0c5328235c22b8bcd473329e501fe8d59b6245f50974950e550b2887bf4d540",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-4.5-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-e3a1fd208c077746eb99c3513ba8e730f58b3937336d839e04457dad734ca644",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-5-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-3f801acc0c3ad4640f99b2c72a2d28feab81c2b6e3b37996709a3734232d5a89",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-5-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-9f0fe5cf930f01cdcf87af1f128aa97d17215688a5408eee6a17541777896939",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-6-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-c0136d891545f89f462cfa6ad7df93065d842b73a566c9cf7bbe3d30ce8dc682",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-6-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-7eb6897129a4419d85e86d09c314073280f9f2e42f7f9967b3b5b6acefcddafa",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-6-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-d87f76a65c1d2d69c1b4a367b8ec19e9cb743645f487f629d67cbc13d44e2375",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-6-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-4a7450884db9c3b82dab5604469f98058db02ce2360f7d458756a6c9a2600ba4",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-7-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-420e7ad407224beb963f2d769d04882579aa064a4b5c6e5767a20074c940bfe6",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-7-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-828ef030c2a8432c8f7bbeb19f3bea2fb383064da59f4fd3a06171c65c1380cf",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-7-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-d094dfe207adf4c1b225c4255b4e27246a884332953ce2a18aa00fa3ec865387",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-7-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-a191c7367820fb7cd78fd9a0f523af8f348788941e3bddd2b9465af6002a7850",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-7-e",
+    "role": "INTRODUCE",
+    "spec": "PPS-43483423030653d241413c1c094c32e846de3732498ab497a016565e33fe68a3",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7907,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-7-f",
+    "role": "INTRODUCE",
+    "spec": "PPS-7dcfdcbb13ccefa37dd810c72bd0b8a6c121881b6839b4b3448996b0aa7cd550",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7915,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-9-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-ebd3b11fd02a74fd3724c195f5ece4eaf6c13485e346a436dfbdbf1bcbd7aa15",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-9-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-81369279af03544a8906bb7e3438dbcad2d2cb30bcdc1d6a01c6336af2d8b31c",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1731,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-9-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-5a6b99a28ae4d26308a06536b021253b0cb6f3a965c4ce45aaf2c56738414720",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1739,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-9-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-e825d561178e2874d1ca950b0af95a5a4fd2897c0406dae6850e7da204a76ee8",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7923,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-9-e",
+    "role": "INTRODUCE",
+    "spec": "PPS-e9e4783931d2a93ba6a911c9bfbcf769c5c3f65498fc6c9753fbf5c000525525",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7931,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-9-f",
+    "role": "INTRODUCE",
+    "spec": "PPS-b4b13254279c00c21ee6625d58a186377463dbacb9035686748c346178e05cc6",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7939,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-10-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1743,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-10-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-64c46ebaed2d255c26a9e79c34c803fe2609161938311dfb237f066b36a67867",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1747,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-10-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-8ab146580469d11dbb6c20443dd9c2070da4ecb2f7c2222f33ba127775898894",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1751,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-12-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1755,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-12-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1759,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-12-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1763,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-a",
+    "role": "INTRODUCE",
+    "spec": "PPS-c70151a34378bac3b90ea06dc632037dd9908f97e0b5b9a9f94fea1f158a0292",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1767,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-b",
+    "role": "INTRODUCE",
+    "spec": "PPS-7e99202d7849d4f22d2a4da4728b0f9000ebdb5d8507e2dec7e03c38e3f7547e",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1771,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-c",
+    "role": "INTRODUCE",
+    "spec": "PPS-9cc8e42134b41d39f3e9b94b976290ffb97c28384525cb18e210ca8ee8e574f6",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1775,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-d",
+    "role": "INTRODUCE",
+    "spec": "PPS-b573709fccf5f6ced92b5aa4d8638c27d434141fe9ba1f1d880f1d698ab577ed",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1783,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-01",
+    "criterion": "S-13-e",
+    "role": "INTRODUCE",
+    "spec": "PPS-e2189b7dadd035417eed5d47363cb0a9f1f2d8373eb4b085a516cba572b4780f",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "b01f372711b8c21e7973e420a43208988ae453be",
+     "seq": 1791,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-05",
+    "criterion": "S-13-f",
+    "role": "INTRODUCE",
+    "spec": "PPS-85b98ccc7a5c2646588b6e4075a93541a21be2a2a246c24746359c23ca80aaa9",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+     "seq": 3504,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-02-01",
+    "criterion": "S-13-g",
+    "role": "INTRODUCE",
+    "spec": "PPS-baccecf95521389460b05a2eacb1bf62a90286fbdd336e03ba9576661646b730",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+     "seq": 5168,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-02-02",
+    "criterion": "S-13-h",
+    "role": "INTRODUCE",
+    "spec": "PPS-53ca471b36753ac39ac8744a1f9fc143612c61e387751b8e79539b655a38a5d3",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+     "seq": 6831,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-03-01",
+    "criterion": "S-13-i",
+    "role": "INTRODUCE",
+    "spec": "PPS-0528ad5eb0576a4ec11976977458231c270b770a38142f4c40475b2968a09c12",
+    "probe_id": "probe.python_callable_v2",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-02",
+    "criterion": "S-D3-05-01-1",
+    "role": "VERIFY",
+    "spec": "PPS-b3407979dd38c3b08a8bbae4199e4aee2bd4a7b747bb87a6f0ac80f276279404",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc",
+     "seq": 7947,
+     "agreement": true,
+     "verdict": "REFUTED"
+    },
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "S-D3-05-01-2",
+    "role": "PRESERVE",
+    "spec": "PPS-cd03ddb94c8f8a97a4c5fdb700ab6b84634082ef6746e75d309ab57996f29249",
+    "probe_id": "probe.process_effect",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "AC-STORY-04-01-2:S-9-b",
+    "role": "PRESERVE",
+    "spec": "PPS-81369279af03544a8906bb7e3438dbcad2d2cb30bcdc1d6a01c6336af2d8b31c",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-04-01",
+    "criterion": "AC-STORY-04-01-2:S-9-c",
+    "role": "PRESERVE",
+    "spec": "PPS-5a6b99a28ae4d26308a06536b021253b0cb6f3a965c4ce45aaf2c56738414720",
+    "probe_id": "probe.cli_invocation",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": null,
+    "satisfied_at_last_proof": false,
+    "delivered": false
+   },
+   {
+    "story": "STORY-01-05",
+    "criterion": "AC-STORY-05-03-1:S-10-a",
+    "role": "PRESERVE",
+    "spec": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+     "seq": 3508,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-05",
+    "criterion": "AC-STORY-05-03-1:S-12-a",
+    "role": "PRESERVE",
+    "spec": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+     "seq": 3512,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-05",
+    "criterion": "AC-STORY-05-03-1:S-12-b",
+    "role": "PRESERVE",
+    "spec": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+     "seq": 3516,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-05",
+    "criterion": "AC-STORY-05-03-2:S-12-a",
+    "role": "PRESERVE",
+    "spec": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+     "seq": 3520,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-05",
+    "criterion": "AC-STORY-05-03-2:S-12-b",
+    "role": "PRESERVE",
+    "spec": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+     "seq": 3524,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   },
+   {
+    "story": "STORY-01-05",
+    "criterion": "AC-STORY-05-03-2:S-12-c",
+    "role": "PRESERVE",
+    "spec": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+    "probe_id": "probe.file_artifact",
+    "candidate_expectation": "SATISFIED",
+    "last_proof": {
+     "candidate": "ad49a4c8e18ec645e6dda49daea38574e3142231",
+     "seq": 3528,
+     "agreement": true,
+     "verdict": "SATISFIED"
+    },
+    "satisfied_at_last_proof": true,
+    "delivered": true
+   }
+  ],
+  "total": 67,
+  "with_a_verified_proof": 48,
+  "satisfied_at_last_proof": 46,
+  "delivered_in_committed_stories": 22,
+  "rule": "satisfied = the two parties agree and the verdict is the spec's candidate expectation; delivered = satisfied in a story whose last outcome is COMMIT"
+ },
+ "requirements": {
+  "covered_by_productproof": [
+   "R-10",
+   "R-12",
+   "R-13",
+   "R-3.1",
+   "R-3.2",
+   "R-3.3",
+   "R-3.4",
+   "R-4.2",
+   "R-4.3",
+   "R-4.4",
+   "R-4.5",
+   "R-5",
+   "R-6",
+   "R-7",
+   "R-9"
+  ],
+  "unsupported": {
+   "clauses": [
+    "R-3.2/2",
+    "R-3.2/4",
+    "R-3.3/3",
+    "R-4.2/2",
+    "R-4.3/3",
+    "R-4.4/3",
+    "R-5/0",
+    "R-5/1",
+    "R-5/2",
+    "R-5/4",
+    "R-6/3",
+    "R-6/4",
+    "R-7/2",
+    "R-8/1",
+    "R-9/4",
+    "R-12/2"
+   ],
+   "rule": "remain UNSUPPORTED_FOR_FULL_ENFORCEMENT; never counted as passes"
+  },
+  "engineering_test_only": [
+   "R-10/3",
+   "R-10/4",
+   "R-11/1",
+   "R-13/3"
+  ],
+  "classes": {
+   "DESCRIPTIVE": 4,
+   "NORMATIVE_PRODUCT_REQUIREMENT": 30,
+   "UNSUPPORTED_FOR_FULL_ENFORCEMENT": 16,
+   "ENGINEERING_TEST_REQUIREMENT": 4
+  },
+  "known_ambiguities": {
+   "RISK-1": "a key with a committed put can never be deleted or changed (a same-rid delete replays, another rid conflicts): R-6's 'unless tombstoned by a later delete' is unreachable for a put key; tombstones exist only as a first mutation",
+   "RISK-2": "R-4.5 'replays of either MUST NOT conflict' holds only for the committed put (S-4.5-b); the refused delete replayed is again another rid (R-4.3)",
+   "RISK-3": "replay scope rid alone or rid+key: no spec reuses a rid across keys",
+   "RISK-4": "'verify: any other exit code is a bug' vs 2 and 3; 'fresh ledger' consistent only as an existing empty file (IB-EMPTY)",
+   "RISK-5": "'any modification detected' vs hashing canonical bytes: only semantic edits are testable (S-3.3-* edit value, op, hash, prev_hash)",
+   "RISK-6": "the GENESIS form is both 'the literal' and an implementation choice (R-3.2/4 UNSUPPORTED)",
+   "RISK-7": "§12 file confinement vs §5's sibling temp file (R-12/2 UNSUPPORTED)",
+   "RISK-8": "'under the lock' is undefined (R-5/0 UNSUPPORTED)",
+   "RISK-9": "a newline-terminated corrupt last line is neither truncated nor 'in the middle' (AC-STORY-03-02-4 UNSUPPORTED)",
+   "RISK-10": "conflicts and replays between elements of one batch: R-4.3 judges against committed mutations (S-5-a conflicts against a committed line)",
+   "RISK-11": "§10's allowed set omits __future__ (which §10 requires) and the package's own modules: S-10-a admits both",
+   "RISK-12": "§3.2's line shapes omit hash and prev_hash, which every line carries",
+   "RISK-13": "module functions vs methods; append/put/delete signatures and ts provenance open (IB-LEDGER, IB-ELEMENTS)",
+   "RISK-14": "durability, crash atomicity, file confinement and the interpreter version are outside every probe",
+   "RISK-15": "'0 — success (append …)' names a CLI append no clause specifies",
+   "RISK-16": "'no third-party imports succeed at runtime' reads as an environment property (R-14 item 6 mapped to S-10-a)"
+  }
+ },
+ "plan_quality_metrics": {
+  "introduce_obligations": 57,
+  "pre_satisfied_introduce": 5,
+  "pre_satisfied_introduce_ratio": 0.08771929824561403,
+  "fully_pre_satisfied_stories": 2,
+  "fully_pre_satisfied_story_ids": [
+   "STORY-02-01",
+   "STORY-02-02"
+  ],
+  "unattributed_plan_drift": 8,
+  "attributed_plan_drift": 0,
+  "delivery_complete_stories": [
+   "STORY-01-01",
+   "STORY-01-05",
+   "STORY-02-01",
+   "STORY-02-02"
+  ],
+  "failed_stories": [
+   "STORY-03-01",
+   "STORY-04-01",
+   "STORY-04-02"
+  ],
+  "retries": {
+   "STORY-01-05": 1,
+   "STORY-03-01": 2,
+   "STORY-04-02": 2
+  },
+  "provider_requests_by_budget": {
+   "DEVELOPER": 9,
+   "REVIEW": 4
+  },
+  "note": "observations of the journal; without preregistered thresholds they produce no plan-quality PASS/FAIL"
+ },
+ "plan_drift": {
+  "attributed": 0,
+  "unattributed": 8
+ },
+ "plan_quality_policy": {
+  "preregistered": false,
+  "decision": "DECISION-5: DO_NOT_PREREGISTER",
+  "path": null
+ },
+ "model_sessions": {
+  "count": 13,
+  "by_role": {
+   "developer": 9,
+   "reviewer": 4
+  },
+  "sessions": [
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 22,
+    "tokens": {
+     "input": 2292021,
+     "output": 19301
+    },
+    "seconds": 243.8,
+    "log": "STORY-01-01.developer.1.jsonl",
+    "log_sha256": "a356dd23f5692fa4d8de2f2bcfc7c5be141041ff6b3ab4a4a1cc8e3b3dc03179",
+    "story_id": "STORY-01-01",
+    "attempt": 1,
+    "role": "developer",
+    "prompt_sha256": "ff7410948c6b1666e21198263788b2d133d7e168a94d658230f289705826d980",
+    "developer_committed_itself": false,
+    "candidate": "91c372f117ab36fc5e8020fb5df5e51827a81f82"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 19,
+    "tokens": {
+     "input": 2248971,
+     "output": 21136
+    },
+    "seconds": 206.8,
+    "log": "STORY-01-05.developer.1.jsonl",
+    "log_sha256": "4322d7e61ff408af2fb1d4ccc577a102ca50b675b0998179a48c23cd5978fb45",
+    "story_id": "STORY-01-05",
+    "attempt": 1,
+    "role": "developer",
+    "prompt_sha256": "9013ecd5b02db78b2513497b4bcd43c6e7c3cf5bb6312c06cc780f4b2ce5d1cd",
+    "developer_committed_itself": false,
+    "candidate": "a4bace111f76309a4a7bf7d830343836d60aa1c1"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 16,
+    "tokens": {
+     "input": 1741873,
+     "output": 17967
+    },
+    "seconds": 184.2,
+    "log": "STORY-01-05.developer.2.jsonl",
+    "log_sha256": "adf6e7a82c8f0ac76e6cd414c26c67d5345e9542667d837288278789d6842477",
+    "story_id": "STORY-01-05",
+    "attempt": 2,
+    "role": "developer",
+    "prompt_sha256": "473c514a7ea1ab056296ab3a62f6a3541b7288be6f17d628ed5b018e083935b6",
+    "developer_committed_itself": false,
+    "candidate": "1803ad39759ee50587a1a1fa763938cc89486aaa"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 21,
+    "tokens": {
+     "input": 2548500,
+     "output": 37507
+    },
+    "seconds": 356.1,
+    "log": "STORY-03-01.developer.1.jsonl",
+    "log_sha256": "5c880ae5dc9cded97597ac983ef096fa612b02f3931faa5b5f4b91778d375196",
+    "story_id": "STORY-03-01",
+    "attempt": 1,
+    "role": "developer",
+    "prompt_sha256": "83f4e0d6d4fa8e54e950c48a717eef9969b407df635000c5cefae0b52ee5d250",
+    "developer_committed_itself": false,
+    "candidate": "917627ccd57e925478de22af8290299a6fb151bf"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 41,
+    "tokens": {
+     "input": 5730108,
+     "output": 50339
+    },
+    "seconds": 501.2,
+    "log": "STORY-03-01.developer.2.jsonl",
+    "log_sha256": "a11ed2faafd9ece54891355b96633ae032a7dcd6107d28dda786e055584f353c",
+    "story_id": "STORY-03-01",
+    "attempt": 2,
+    "role": "developer",
+    "prompt_sha256": "5bb2f659f3277dec87f8ecb6597e9ccd79862addd87a0647eb15a741535a6fa6",
+    "developer_committed_itself": false,
+    "candidate": "e8a68445f72a821bd67dcd495809a284adff9200"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 43,
+    "tokens": {
+     "input": 4562731,
+     "output": 35389
+    },
+    "seconds": 376.3,
+    "log": "STORY-03-01.developer.3.jsonl",
+    "log_sha256": "0a8b0dc111d59c554d8c53ac292c4e615b7e36cfe9ee3dde7d3bdc8a39365794",
+    "story_id": "STORY-03-01",
+    "attempt": 3,
+    "role": "developer",
+    "prompt_sha256": "7b05dd4816952413d2343fd05ad3b968c7659af1875a89314857f1e77dd5c635",
+    "developer_committed_itself": false,
+    "candidate": "c04d71d8e3a54e54b1dd03e1f79c024c6accc746"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 24,
+    "tokens": {
+     "input": 3133609,
+     "output": 67966
+    },
+    "seconds": 622.4,
+    "log": "STORY-04-02.developer.1.jsonl",
+    "log_sha256": "db345a0d30e207d7fc920a27f8706f62e496c4caf72ce1d62ef51b54354aacfe",
+    "story_id": "STORY-04-02",
+    "attempt": 1,
+    "role": "developer",
+    "prompt_sha256": "72673550ab430ba855f5ecffcd2e50a289dfb499d62465cd388c3766f1fb1e0c",
+    "developer_committed_itself": false,
+    "candidate": "6edb8634b0ca1008f8983c537e909635c1161b27"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 51,
+    "tokens": {
+     "input": 6686507,
+     "output": 68058
+    },
+    "seconds": 700.4,
+    "log": "STORY-04-02.developer.2.jsonl",
+    "log_sha256": "cd0bf1586309a593000115de1f63d509692ad7725d26ade80378692d5bacd50b",
+    "story_id": "STORY-04-02",
+    "attempt": 2,
+    "role": "developer",
+    "prompt_sha256": "8c514750f2ec4d7042bebe344909ac48940086cc275e9be154a82a1658ef9411",
+    "developer_committed_itself": false,
+    "candidate": "2f8e98400f07242dc0d43161e6ecd8e31e97baf0"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 28,
+    "tokens": {
+     "input": 3865701,
+     "output": 51376
+    },
+    "seconds": 538.7,
+    "log": "STORY-04-02.developer.3.jsonl",
+    "log_sha256": "379c77d31b414ffdd999576b968e7cfa7f3ace6ab977d9dfac5b27d8c480c5b7",
+    "story_id": "STORY-04-02",
+    "attempt": 3,
+    "role": "developer",
+    "prompt_sha256": "e805ac9f72c2e9c085faca4edc153d4524b58751a3f7dd1a0a08140c13b0a6bd",
+    "developer_committed_itself": false,
+    "candidate": "6828c6c9cdad9ef6f301f52f39f4f1fc2623c5dc"
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 6,
+    "tokens": {
+     "input": 496851,
+     "output": 4827
+    },
+    "seconds": 67.7,
+    "log": "STORY-01-01.reviewer.1.jsonl",
+    "log_sha256": "50d20072d40bb9b8d7a78a87ede40fd8334a7930298667cb5e0b8c0bb932e06d",
+    "story_id": "STORY-01-01",
+    "attempt": 1,
+    "role": "reviewer",
+    "prompt_sha256": "36a079ce56df50dd60b47b0bafa14fcbfce0608799a128d51548e332541ee48b",
+    "findings": []
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 10,
+    "tokens": {
+     "input": 681864,
+     "output": 3996
+    },
+    "seconds": 64.6,
+    "log": "STORY-01-05.reviewer.2.jsonl",
+    "log_sha256": "b44a6032298c6670eb6e8d7bdfeb3420f4ce0179fb1f8f2959b9ff0302889898",
+    "story_id": "STORY-01-05",
+    "attempt": 2,
+    "role": "reviewer",
+    "prompt_sha256": "b1a0452cdab3f9e827b67bbdc5f549758076792c0e0a8735f253bb85c122a647",
+    "findings": []
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 6,
+    "tokens": {
+     "input": 396604,
+     "output": 4006
+    },
+    "seconds": 52.5,
+    "log": "STORY-02-01.reviewer.1.jsonl",
+    "log_sha256": "7dcf5d749628dfb2dbb60cd014c763df9791bc9be0d16a2c896b29375f26520d",
+    "story_id": "STORY-02-01",
+    "attempt": 1,
+    "role": "reviewer",
+    "prompt_sha256": "a7ff7563d7e27c5c23db4c5f38f8dc08704a1ffab38d41a976289bbbeed13de6",
+    "findings": [
+     {
+      "id": "verify-stub",
+      "blocking": true,
+      "summary": "ledgerlock/ledger.py verify() raises NotImplementedError instead of reading JSONL from disk and returning {'ok','first_bad_index'} (FR-6/FR-7 unimplemented)"
+     },
+     {
+      "id": "missing-verify-test",
+      "blocking": true,
+      "summary": "tests/test_verify_independent.py (story recorded scope) does not exist"
+     }
+    ]
+   },
+   {
+    "exit": 0,
+    "timed_out": false,
+    "stopped": null,
+    "started": true,
+    "error": null,
+    "turns": 4,
+    "tokens": {
+     "input": 256722,
+     "output": 1693
+    },
+    "seconds": 31.3,
+    "log": "STORY-02-02.reviewer.1.jsonl",
+    "log_sha256": "f7d5a0b866cfc75c008a6397b99294a91074355922417b0fb6b70d5bb1a161f3",
+    "story_id": "STORY-02-02",
+    "attempt": 1,
+    "role": "reviewer",
+    "prompt_sha256": "bab2ac5f5511465c0147b4f53cbf117529bbc670d3ccf4dd851390fdf3cf2bfd",
+    "findings": [
+     {
+      "id": "r13-2-layout-ok",
+      "blocking": false,
+      "summary": "ledger.py defines all six required symbols (Ledger, ConflictError, append, verify, snapshot, apply_batch); clause satisfied"
+     }
+    ]
+   }
+  ],
+  "tokens": {
+   "input": 34642062,
+   "output": 383561
+  }
+ },
+ "prohibitions": {
+  "SEALED": "REJECTED: LedgerLock is a DEVELOPMENT_REGRESSION workload in state DEVELOPMENT: it cannot become SEALED (RFC §30: permanently development; no re-labelling is available and none may be sought)",
+  "HOLDOUT": "REJECTED: LedgerLock is a DEVELOPMENT_REGRESSION workload in state DEVELOPMENT: it cannot become HOLDOUT (RFC §30: permanently development; no re-labelling is available and none may be sought)",
+  "EVALUATING": "REJECTED: LedgerLock is a DEVELOPMENT_REGRESSION workload in state DEVELOPMENT: it cannot become EVALUATING (RFC §30: permanently development; no re-labelling is available and none may be sought)",
+  "generalization_claim=POSITIVE": "REJECTED: generalization_claim is NONE: LedgerLock backs no generalization (RFC §28.6, §30)",
+  "qualification_sample_size": "REJECTED: a LedgerLock record cannot carry 'qualification_sample_size': no sample size, seal, holdout or single score exists for a development benchmark",
+  "overall_verdict": "REJECTED: delivery and plan quality are never collapsed into one score (RFC §29: the distinction is mandatory)"
+ },
+ "residual_processes": {
+  "owned_range": "see the owned-run record beside this file"
+ },
+ "platform": {
+  "system": "darwin",
+  "python": "3.14.7"
+ },
+ "stop_rules": {
+  "kernel_tree_is_the_candidates": true,
+  "plan_retuned": false,
+  "kernel_repaired": false,
+  "historical_evidence_rewritten": false,
+  "cohort_sealed": false,
+  "generalization_claimed": false
+ },
+ "finished": "2026-10-02T15:10:25Z",
+ "delivery_verdict": "FAIL",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "attempt": 3,
+ "harness_change_from_prior_attempt": "H-PROMPT-001: attempt 2 handed the developer each V1-era epics section whole, with its 'Story metadata' (covers / ac_proof / story_type / write_scope / depends_on / screens) — V1 control data PLAN-V2.2 supersedes; STORY-01-01's attempt 1 followed that write_scope and did not create ledgerlock/ledger.py. The section is now prose context only, its metadata removed, stated as non-authoritative, and the product subjects the story's obligations name are derived from the approved contracts. The run's git objects (final main and every candidate) are preserved outside the temporary directory before it is removed, and it is not removed unless they are (attempt 2's final workspace was lost). Plan, specs and contracts unchanged; the profile is named in the record. Under the profile `delivery-experiment-1` (preregistered, DELIVERY-EXPERIMENT-1-PREREGISTRATION.json) the plan is PLAN-V2.2 CORRECTION 1, the developer and the reviewer run on one fixed model route (no routing alias) that a preflight attested before delivery was unlocked, the owner's hard spend budget (provider requests, turns, combined input tokens, output plus reasoning tokens — preflight included) is re-derived from the journal and the session streams and ends the experiment when reached, and the final main is put to all 59 ProductProofSpecs and to the V1 independent acceptance oracle. A delivery verdict is PASS only when every story of the plan committed in the journal, the budget was not reached and every revision the run names is preserved.",
+ "prior_attempts": [
+  {
+   "path": "closure-evidence/v2/cycle2/P10/NO-RECORD.json",
+   "sha256": "98677079fd68c2f21d5d259fba7041c65fde62d4f0c1896396c1482d4fbe529e",
+   "delivery_verdict": "NO_RECORD"
+  },
+  {
+   "path": "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json",
+   "sha256": "b4ad12f52a061d6a1726304416f3809eed7c065a1c962201a341a079bb8f2ff7",
+   "delivery_verdict": "FAIL"
+  }
+ ],
+ "journal_file": {
+  "path": "closure-evidence/v2/cycle2/P10/attempt-3/JOURNAL.json",
+  "sha256": "fd1cba12cecbf857e9de82a69995e6fbdf9cc1cc15996ae3c9455c1c5ebf0ac3"
+ },
+ "secret_scan": {
+  "known_secret_values_checked": 5,
+  "redactions_in_files": {},
+  "redactions_in_record": 0,
+  "rule": "exact known secret values and sk- tokens are replaced and counted; nothing is discarded"
+ }
+}

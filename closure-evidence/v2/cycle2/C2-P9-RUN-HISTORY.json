@@ -57,6 +57,34 @@
    "owned_escaped": 0,
    "owned_released_empty": true,
    "owned_range_mechanism": "posix-session-and-group"
+  },
+  {
+   "seq": 3,
+   "commit": "06ceb231a9bafe944eb6715d85a479336626dcec",
+   "package": "DELIVERY-EXPERIMENT-1, QP-2.9 attempt 3: the one paid delivery run the owner authorized (ruling 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' §7) on kernel c2717d2e (4f6dfc1, K-NOWORK-001) and harness 5c7c5a6; a new attempt, not a retry",
+   "attempt": 3,
+   "retry_permitted": false,
+   "retry_of": null,
+   "v1_evidence_changed": false,
+   "v1_pf_001_signature_found": false,
+   "where": "local",
+   "job": "QP-2.9 live run, profile delivery-experiment-1 (closure-evidence/v2/cycle2/P10/attempt-3/LEDGERLOCK-REGRESSION.json)",
+   "tests_run": 67,
+   "gate_effect": "COUNTS",
+   "result": "PASS",
+   "failing_tests": [],
+   "classification": null,
+   "delivery_verdict": "FAIL",
+   "plan_quality_verdict": "NOT_CLAIMED",
+   "plan_admitted": true,
+   "stories_committed": 4,
+   "stories_total": 7,
+   "owned_processes_before": 0,
+   "owned_processes_at_exit": 0,
+   "owned_processes_after": 0,
+   "owned_escaped": 0,
+   "owned_released_empty": true,
+   "owned_range_mechanism": "posix-session-and-group"
   }
  ]
 }
