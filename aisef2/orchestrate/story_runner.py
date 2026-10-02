@@ -11,7 +11,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, Mapping
 
-from aisef2.arch.enums import ControlProjection as P, EventType as T, MeasurementPoint, Owner, SubjectAbsence
+from aisef2.arch.enums import (
+    ContractSatisfaction, ControlProjection as P, EventType as T, MeasurementPoint, Owner, SubjectAbsence,
+)
 from aisef2.control import budget
 from aisef2.control.owner import Classification, FailureCode, classify
 from aisef2.errors import InvariantError
@@ -201,8 +203,14 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
             failure, detail = blocking.decision.failure, f"admission: {blocking.decision.disposition.value}"
         else:
             continuation = continue_story(plan, admission, inputs.completed, _Sink(run))
+            # §13, §14 (K-NOWORK-001): the developer has work only where an INTRODUCE obligation is READY. With none —
+            # every INTRODUCE PRE_SATISFIED, every PRESERVE and VERIFY SATISFIED at this parent, which on an admitted
+            # story is exactly: every obligation measured SATISFIED here (§13's table) — no product behaviour is left to
+            # introduce: the developer is not called, the candidate is the parent, and every obligation is still proved
+            # there. A VERIFY that is not SATISFIED is not this case: it keeps the developer.
+            no_work = all(a.decision.satisfaction is ContractSatisfaction.SATISFIED for a in admission.obligations)
             candidate = base
-            if continuation.developer_work:
+            if not no_work:
                 request = run.append(T.PROVIDER_REQUEST, {"story_id": story_id,
                                                           "criteria": list(continuation.developer_work),
                                                           "budget_owner": Owner.DEVELOPER.value}).seq
@@ -240,9 +248,10 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                     if p.failure is not None:
                         failure, detail = p.failure, f"proof of {cid}: {p.failure.code.value}"
                         break
-            if failure is None and not continuation.already_satisfied:
-                # §14 (K-PRESAT-001): a story whose every obligation is PRE_SATISFIED made no developer call — there is no
-                # developer work for engineering adequacy to judge, so it is not run and can neither fail nor charge it
+            if failure is None and not no_work:
+                # §14 (K-PRESAT-001, K-NOWORK-001): a story with no developer work — every obligation PRE_SATISFIED, or
+                # nothing READY to introduce — made no developer call: there is no developer work for engineering
+                # adequacy to judge, so it is not run and can neither fail nor charge it
                 tests_held = _Held(scope, "tests")
                 try:
                     q = assess(run, story_id, str(verifier_wt.path), ws.diff(base, candidate), inputs.story_tests,

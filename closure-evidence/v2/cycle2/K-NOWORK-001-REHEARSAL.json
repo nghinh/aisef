@@ -1,0 +1,523 @@
+{
+ "record": "AISEF V2 — K-NOWORK-001: a story with no developer work was sent to the developer and falsely rolled back — the defect reproduced and the correction measured under both kernels",
+ "authority": "owner ruling 'AISEF V2 — K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION / OWNER RULING / NO PROVIDER CALL / NO LEDGERLOCK RUN / NO Q4-Q5' (2026-10-02)",
+ "separate_from": "K-PRESAT-001 (every obligation PRE_SATISFIED): its records and history are untouched",
+ "defect": "a story admitted with every INTRODUCE obligation PRE_SATISFIED and its remaining PRESERVE / VERIFY obligations already SATISFIED at the parent has no product behaviour left to introduce, yet a satisfied PRESERVE and any VERIFY are READY (§13), so the developer was called; the no-op or tests-only result was then judged VACUOUS / IRRELEVANT by engineering adequacy, and a correct product was rolled back",
+ "ruling": "developer work is required only where an INTRODUCE obligation is READY. When none is and every obligation is INTRODUCE + PRE_SATISFIED, PRESERVE + SATISFIED or VERIFY + SATISFIED: no developer call, no developer budget, no engineering adequacy, candidate = parent; every obligation still proved at the candidate by both parties, review and security as before, the post-merge proof, PLAN_DRIFT for each PRE_SATISFIED INTRODUCE. No new disposition",
+ "correction": {
+  "where": "aisef2/orchestrate/story_runner.py::_attempt",
+  "what": "one fact read from the admission already made — every obligation measured SATISFIED at the parent, which on an admitted story is exactly the ruling's predicate (§13's table; pinned by the regression module's Predicate case) — decides both the developer call and the adequacy stage",
+  "unchanged": "StoryAdmission and its dispositions (F7), ContractSatisfaction, routing, budgets, journal events and payloads, every contract, spec, probe and plan"
+ },
+ "not_ruled": {
+  "code": "VERIFY_NO_INTRODUCER_UNSATISFIED_REQUIRES_OWNER_DECISION",
+  "case": "no INTRODUCE obligation READY and a VERIFY obligation measured UNSATISFIED at the parent",
+  "what_the_correction_does": "nothing: the case is not the correction's — the kernel does what it did before (the READY VERIFY is the developer's work, adequacy runs); regression case E pins it",
+  "decision": "the owner's"
+ },
+ "kernel": {
+  "before": {
+   "commit": "d427299376d7af48d3dd6d86242bf5def6a43003",
+   "aisef2_tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160",
+   "files": 74,
+   "kernel_digest": "dccc6f48f5aa8e3f9727a029eebd6a9d5a4d3508ae9cc5765b794ab8b921f319",
+   "support": {
+    "tests/__init__.py": {
+     "commit": "22df5bf266174358345143e92ca0c508f2bef200",
+     "base": "22df5bf266174358345143e92ca0c508f2bef200"
+    },
+    "tests/v2": {
+     "commit": "e9f21c179d0321e758c5bce27b0af2d8b51fcb7d",
+     "base": "f17acb6f6c2d1f64d6f32c809c4f57100ef13330"
+    },
+    "validation/v2": {
+     "commit": "6640a425e6e361b8cc24776a8929e1815bd388a5",
+     "base": "60920999bdc44dc9530e7a6fe14d1341f5615a07"
+    },
+    "docs/architecture": {
+     "commit": "2e2cb173107c9aa18efdea069aeab3770296ae52",
+     "base": "2e2cb173107c9aa18efdea069aeab3770296ae52"
+    },
+    "docs/implementation/v2": {
+     "commit": "a21fd2f5943eb31bc69a7fd7ace53fd9c8fa0d44",
+     "base": "a21fd2f5943eb31bc69a7fd7ace53fd9c8fa0d44"
+    }
+   }
+  },
+  "after": {
+   "kernel_digest": "94b1aea452ebc0c5fa1bd649870370130dc985ae3fcf6b779eaa66ebe50bcbc4",
+   "rule": "q4's kernel digest over this working tree's aisef2; the files below bind it by content"
+  }
+ },
+ "cases": {
+  "module": "tests.v2.test_c2_k_nowork_001",
+  "before": {
+   "DeveloperWorkRemains.test_C_a_blocking_policy_still_blocks_that_story_on_failing_tests": "PASS",
+   "DeveloperWorkRemains.test_C_an_introduce_ready_beside_a_pre_satisfied_one_and_a_satisfied_verify_still_needs_the_developer": "PASS",
+   "DeveloperWorkRemains.test_C_introduce_ready_and_preserve_satisfied_the_developer_and_adequacy_run": "PASS",
+   "DeveloperWorkRemains.test_D_introduce_pre_satisfied_and_preserve_not_satisfied_is_precondition_broken_as_before": "PASS",
+   "DeveloperWorkRemains.test_E_a_developer_who_changes_nothing_there_fails_exactly_as_before": "PASS",
+   "DeveloperWorkRemains.test_E_no_introduce_ready_and_a_verify_unsatisfied_is_not_this_correction_s_case": "PASS",
+   "NoDeveloperWork.test_A_a_developer_that_would_only_add_tests_is_never_asked": "FAIL",
+   "NoDeveloperWork.test_A_introduce_pre_satisfied_and_preserve_satisfied_under_a_blocking_policy": "FAIL",
+   "NoDeveloperWork.test_A_the_story_s_test_file_and_the_stance_do_not_matter": "FAIL",
+   "NoDeveloperWork.test_B_introduce_pre_satisfied_and_verify_satisfied": "FAIL",
+   "NoDeveloperWork.test_preserve_and_verify_only_all_satisfied_has_no_introduce_ready_either": "FAIL",
+   "NoDeveloperWork.test_the_path_is_the_fully_pre_satisfied_story_s_path": "FAIL",
+   "Predicate.test_all_satisfied_at_the_parent_is_the_ruling_s_predicate_on_every_admissible_combination": "PASS"
+  },
+  "after": {
+   "DeveloperWorkRemains.test_C_a_blocking_policy_still_blocks_that_story_on_failing_tests": "PASS",
+   "DeveloperWorkRemains.test_C_an_introduce_ready_beside_a_pre_satisfied_one_and_a_satisfied_verify_still_needs_the_developer": "PASS",
+   "DeveloperWorkRemains.test_C_introduce_ready_and_preserve_satisfied_the_developer_and_adequacy_run": "PASS",
+   "DeveloperWorkRemains.test_D_introduce_pre_satisfied_and_preserve_not_satisfied_is_precondition_broken_as_before": "PASS",
+   "DeveloperWorkRemains.test_E_a_developer_who_changes_nothing_there_fails_exactly_as_before": "PASS",
+   "DeveloperWorkRemains.test_E_no_introduce_ready_and_a_verify_unsatisfied_is_not_this_correction_s_case": "PASS",
+   "NoDeveloperWork.test_A_a_developer_that_would_only_add_tests_is_never_asked": "PASS",
+   "NoDeveloperWork.test_A_introduce_pre_satisfied_and_preserve_satisfied_under_a_blocking_policy": "PASS",
+   "NoDeveloperWork.test_A_the_story_s_test_file_and_the_stance_do_not_matter": "PASS",
+   "NoDeveloperWork.test_B_introduce_pre_satisfied_and_verify_satisfied": "PASS",
+   "NoDeveloperWork.test_preserve_and_verify_only_all_satisfied_has_no_introduce_ready_either": "PASS",
+   "NoDeveloperWork.test_the_path_is_the_fully_pre_satisfied_story_s_path": "PASS",
+   "Predicate.test_all_satisfied_at_the_parent_is_the_ruling_s_predicate_on_every_admissible_combination": "PASS"
+  }
+ },
+ "rehearsal": {
+  "shape": "the corrected plan and its 59 ProductProofSpecs on their real probes through story_runner.run_story; the delivery experiment's retry limits; TestsPolicy(blocking); a stand-in developer that installs the P5 reference implementation and the story's unittest file whenever it is called; a stand-in reviewer and scanner without findings; an empty temporary repository",
+  "before": {
+   "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
+   "stories": 7,
+   "obligations": 67,
+   "outcomes": {
+    "STORY-01-01": [
+     "COMMIT"
+    ],
+    "STORY-01-05": [
+     "RETRY",
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-02-01": [
+     "COMMIT"
+    ],
+    "STORY-02-02": [
+     "COMMIT"
+    ],
+    "STORY-03-01": [
+     "COMMIT"
+    ],
+    "STORY-04-01": [
+     "RETRY",
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-04-02": [
+     "RETRY",
+     "RETRY",
+     "ROLLBACK"
+    ]
+   },
+   "committed": [
+    "STORY-01-01",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-03-01"
+   ],
+   "not_committed": [
+    "STORY-01-05",
+    "STORY-04-01",
+    "STORY-04-02"
+   ],
+   "developer_calls": [
+    "STORY-01-01",
+    "STORY-01-05",
+    "STORY-01-05",
+    "STORY-01-05",
+    "STORY-04-01",
+    "STORY-04-01",
+    "STORY-04-01",
+    "STORY-04-02",
+    "STORY-04-02",
+    "STORY-04-02"
+   ],
+   "by_story": {
+    "STORY-01-01": {
+     "admissions": [
+      {
+       "READY": 13
+      }
+     ],
+     "developer_requests": 1,
+     "review_requests": 1,
+     "adequacy": [
+      {
+       "outcome": "INCOMPLETE",
+       "vacuity": "INDETERMINATE",
+       "relevance": "RELEVANT"
+      }
+     ],
+     "failures": []
+    },
+    "STORY-01-05": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 1,
+       "READY": 6
+      },
+      {
+       "PRE_SATISFIED": 1,
+       "READY": 6
+      },
+      {
+       "PRE_SATISFIED": 1,
+       "READY": 6
+      }
+     ],
+     "developer_requests": 3,
+     "review_requests": 0,
+     "adequacy": [
+      {
+       "outcome": "INADEQUATE",
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT"
+      },
+      {
+       "outcome": "INADEQUATE",
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT"
+      },
+      {
+       "outcome": "INADEQUATE",
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT"
+      }
+     ],
+     "failures": [
+      "TESTS_INADEQUATE",
+      "TESTS_INADEQUATE",
+      "TESTS_INADEQUATE"
+     ]
+    },
+    "STORY-02-01": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 1
+      }
+     ],
+     "developer_requests": 0,
+     "review_requests": 1,
+     "adequacy": [],
+     "failures": []
+    },
+    "STORY-02-02": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 1
+      }
+     ],
+     "developer_requests": 0,
+     "review_requests": 1,
+     "adequacy": [],
+     "failures": []
+    },
+    "STORY-03-01": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 25
+      }
+     ],
+     "developer_requests": 0,
+     "review_requests": 1,
+     "adequacy": [],
+     "failures": []
+    },
+    "STORY-04-01": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 7,
+       "READY": 3
+      },
+      {
+       "PRE_SATISFIED": 7,
+       "READY": 3
+      },
+      {
+       "PRE_SATISFIED": 7,
+       "READY": 3
+      }
+     ],
+     "developer_requests": 3,
+     "review_requests": 0,
+     "adequacy": [
+      {
+       "outcome": "INADEQUATE",
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT"
+      },
+      {
+       "outcome": "INADEQUATE",
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT"
+      },
+      {
+       "outcome": "INADEQUATE",
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT"
+      }
+     ],
+     "failures": [
+      "TESTS_INADEQUATE",
+      "TESTS_INADEQUATE",
+      "TESTS_INADEQUATE"
+     ]
+    },
+    "STORY-04-02": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 9,
+       "READY": 1
+      },
+      {
+       "PRE_SATISFIED": 9,
+       "READY": 1
+      },
+      {
+       "PRE_SATISFIED": 9,
+       "READY": 1
+      }
+     ],
+     "developer_requests": 3,
+     "review_requests": 0,
+     "adequacy": [
+      {
+       "outcome": "INADEQUATE",
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT"
+      },
+      {
+       "outcome": "INADEQUATE",
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT"
+      },
+      {
+       "outcome": "INADEQUATE",
+       "vacuity": "VACUOUS",
+       "relevance": "IRRELEVANT"
+      }
+     ],
+     "failures": [
+      "TESTS_INADEQUATE",
+      "TESTS_INADEQUATE",
+      "TESTS_INADEQUATE"
+     ]
+    }
+   },
+   "story_state_outcomes": {
+    "STORY-01-01": "COMMIT",
+    "STORY-01-05": "ROLLBACK",
+    "STORY-02-01": "COMMIT",
+    "STORY-02-02": "COMMIT",
+    "STORY-03-01": "COMMIT",
+    "STORY-04-01": "ROLLBACK",
+    "STORY-04-02": "ROLLBACK"
+   },
+   "final_main_satisfies": {
+    "total": 59,
+    "satisfied": 59,
+    "not_satisfied": []
+   }
+  },
+  "after": {
+   "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
+   "stories": 7,
+   "obligations": 67,
+   "outcomes": {
+    "STORY-01-01": [
+     "COMMIT"
+    ],
+    "STORY-01-05": [
+     "COMMIT"
+    ],
+    "STORY-02-01": [
+     "COMMIT"
+    ],
+    "STORY-02-02": [
+     "COMMIT"
+    ],
+    "STORY-03-01": [
+     "COMMIT"
+    ],
+    "STORY-04-01": [
+     "COMMIT"
+    ],
+    "STORY-04-02": [
+     "COMMIT"
+    ]
+   },
+   "committed": [
+    "STORY-01-01",
+    "STORY-01-05",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-03-01",
+    "STORY-04-01",
+    "STORY-04-02"
+   ],
+   "not_committed": [],
+   "developer_calls": [
+    "STORY-01-01"
+   ],
+   "by_story": {
+    "STORY-01-01": {
+     "admissions": [
+      {
+       "READY": 13
+      }
+     ],
+     "developer_requests": 1,
+     "review_requests": 1,
+     "adequacy": [
+      {
+       "outcome": "INCOMPLETE",
+       "vacuity": "INDETERMINATE",
+       "relevance": "RELEVANT"
+      }
+     ],
+     "failures": []
+    },
+    "STORY-01-05": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 1,
+       "READY": 6
+      }
+     ],
+     "developer_requests": 0,
+     "review_requests": 1,
+     "adequacy": [],
+     "failures": []
+    },
+    "STORY-02-01": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 1
+      }
+     ],
+     "developer_requests": 0,
+     "review_requests": 1,
+     "adequacy": [],
+     "failures": []
+    },
+    "STORY-02-02": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 1
+      }
+     ],
+     "developer_requests": 0,
+     "review_requests": 1,
+     "adequacy": [],
+     "failures": []
+    },
+    "STORY-03-01": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 25
+      }
+     ],
+     "developer_requests": 0,
+     "review_requests": 1,
+     "adequacy": [],
+     "failures": []
+    },
+    "STORY-04-01": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 7,
+       "READY": 3
+      }
+     ],
+     "developer_requests": 0,
+     "review_requests": 1,
+     "adequacy": [],
+     "failures": []
+    },
+    "STORY-04-02": {
+     "admissions": [
+      {
+       "PRE_SATISFIED": 9,
+       "READY": 1
+      }
+     ],
+     "developer_requests": 0,
+     "review_requests": 1,
+     "adequacy": [],
+     "failures": []
+    }
+   },
+   "story_state_outcomes": {
+    "STORY-01-01": "COMMIT",
+    "STORY-01-05": "COMMIT",
+    "STORY-02-01": "COMMIT",
+    "STORY-02-02": "COMMIT",
+    "STORY-03-01": "COMMIT",
+    "STORY-04-01": "COMMIT",
+    "STORY-04-02": "COMMIT"
+   },
+   "final_main_satisfies": {
+    "total": 59,
+    "satisfied": 59,
+    "not_satisfied": []
+   }
+  }
+ },
+ "measured_before_the_ruling": {
+  "journal": "closure-evidence/v2/cycle2/P10/attempt-2/JOURNAL.json",
+  "story": "STORY-05-01",
+  "admissions": [
+   {
+    "S-D3-05-01-1": "READY",
+    "S-D3-05-01-2": "READY"
+   },
+   {
+    "S-D3-05-01-1": "READY",
+    "S-D3-05-01-2": "READY"
+   }
+  ],
+  "developer_requests": 2,
+  "adequacy": [
+   {
+    "outcome": "INADEQUATE",
+    "vacuity": "VACUOUS",
+    "relevance": "IRRELEVANT"
+   },
+   {
+    "outcome": "INADEQUATE",
+    "vacuity": "VACUOUS",
+    "relevance": "IRRELEVANT"
+   }
+  ],
+  "failures": [
+   "TESTS_INADEQUATE",
+   "TESTS_INADEQUATE"
+  ],
+  "ended": [
+   "story/rollback"
+  ]
+ },
+ "bound": {
+  "aisef2/orchestrate/story_runner.py": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+  "tests/v2/test_c2_k_nowork_001.py": "fb7eb72901a689a3ef57a9bc17b752d09178064789d524193e4bd4148e73b391",
+  "validation/qualification/c2_k_nowork_001.py": "536b4c81ca0adc7e06341a742867d7fb45a66faa8af97049676913e0007a61bc",
+  "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json": "cd388ea526f18057285635c6a4c937277e203224079056a7d9b527e53a66e940"
+ },
+ "provider_calls": 0,
+ "ledgerlock_runs": 0,
+ "platform": {
+  "python": "3.14.7",
+  "platform": "darwin"
+ },
+ "problems": [],
+ "verdict": "REPRODUCED AND CORRECTED",
+ "seconds": 323.0
+}

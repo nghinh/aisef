@@ -4,7 +4,7 @@
  "classification": "CONFORMANCE REPAIR to the frozen architecture (not an architecture expansion, not a new probe feature)",
  "subject": {
   "base": "45136086c3e4a98534f975e6db979f94165af5f3",
-  "head_when_written": "7630dbe5d0aa7f873e26a573ce2b9962bb0c72c2",
+  "head_when_written": "79c361dee3e330801418d841250602fb95134d73",
   "note": "written on head_when_written, the commit that carries the repair, and committed in the commit after it (a record cannot name the commit that contains it; the C2-P5 proposal's derived provenance in (e) reads HEAD's kernel tree); (d) binds every changed file by content",
   "old_kernel": {
    "commit": "63112544f1146097b69c538d98e09e5a52c547c1",
@@ -35,7 +35,7 @@
    }
   },
   "new_kernel": {
-   "kernel_digest": "dccc6f48f5aa8e3f9727a029eebd6a9d5a4d3508ae9cc5765b794ab8b921f319",
+   "kernel_digest": "94b1aea452ebc0c5fa1bd649870370130dc985ae3fcf6b779eaa66ebe50bcbc4",
    "rule": "q4's kernel digest over this working tree's aisef2 (its git tree exists once the repair is committed; (d) binds the two changed modules by content)"
   }
  },
@@ -51,6 +51,12 @@
   "story_runner._attempt": "the engineering-adequacy stage runs only when the story has developer work (`not continuation.already_satisfied`): a story whose every obligation is PRE_SATISFIED made no developer call, so the stage is not run and can neither fail nor charge it (RFC §14)",
   "unchanged": "the developer call was already skipped for such a story; its independent verification at the candidate, plan-drift, review, security, merge and post-merge re-proof are as before",
   "effect_on_this_record": "(b): the one Cycle-1 item that is a fully PRE_SATISFIED story differs from the old kernel by exactly that stage; (d): story_runner.py; (f): its mutation targets are re-measured in closure-evidence/v2/cycle2/K-PRESAT-001-MUTATION.json, the C2-ORCH entries for them kept as historical"
+ },
+ "k_nowork_001": {
+  "authority": "owner ruling 2026-10-02, 'AISEF V2 — K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION / OWNER RULING / NO PROVIDER CALL / NO LEDGERLOCK RUN / NO Q4-Q5'",
+  "story_runner._attempt": "one fact of the admission already made — every obligation measured SATISFIED at the parent (no INTRODUCE READY; every INTRODUCE PRE_SATISFIED, every PRESERVE and VERIFY SATISFIED) — decides both the developer call and the engineering-adequacy stage: neither runs for such a story, the candidate is the parent (RFC §13, §14)",
+  "unchanged": "StoryAdmission and its dispositions, the proofs of every obligation at the candidate by both parties, plan-drift, review, security, merge and post-merge re-proof; a VERIFY that is not SATISFIED keeps the developer",
+  "effect_on_this_record": "(b): none — the seven Cycle-1 items are as under K-PRESAT-001; (d): story_runner.py; (f): its mutation targets are re-measured in closure-evidence/v2/cycle2/K-NOWORK-001-MUTATION.json, the K-PRESAT-001 entries for them kept as historical; the red-before / green-after record is closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json"
  },
  "defect_reproducer": {
   "story": "tests.v2.test_c2_orchestration_conformance.reproduce_multi_kind: C-F (file_artifact) and C-P (python_callable_v2), both INTRODUCE and READY at the parent; the harness wires exactly the story's two probes",
@@ -1159,7 +1165,7 @@
    "released_empty": true,
    "escaped": 0
   },
-  "seconds": 122.4
+  "seconds": 124.1
  },
  "files_changed": {
   "aisef2/orchestrate/proof.py": {
@@ -1168,7 +1174,7 @@
   },
   "aisef2/orchestrate/story_runner.py": {
    "before": "4f5e3214a4694f8eb68ffb4c9aed61ca7ba295b1e70d25a11a472c4d4e55053f",
-   "after": "62fe9ad9b261a8d418edd3789097e54bd335f2bc5b4328041eecbb86650c3013"
+   "after": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5"
   },
   "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json": {
    "before": null,
@@ -1180,11 +1186,11 @@
   },
   "validation/qualification/c2_orchestration_repair.py": {
    "before": null,
-   "after": "506c4e410b32c7dc7a25d0da7c612cf9dcd2bd0b00b1aee2ef62101315a5f8bc"
+   "after": "35860c2608a48bd01c2838c612ba372deca9438998e5e79f4c0a9cc8f15d0eab"
   },
   "validation/v2/mutation.py": {
    "before": "dc9c3bd5cfc9779d8449b7bd8fe2901a794d50305129de594b27c55c8d8b51f3",
-   "after": "f32807ed3b293bc57822f9f100a7b869cd6809c1b82b305141814a7c7acae98a"
+   "after": "1b59c1190208b0a029f50a8826fc9a15684175f2befd1e852186e455f1cf18bf"
   }
  },
  "identities": {
@@ -1203,7 +1209,7 @@
     "identities.aisef2_tree": "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
    },
    "derived": {
-    "identities.aisef2_tree": "254d8f559b879c210c4936321022f1350c4b2f89"
+    "identities.aisef2_tree": "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160"
    },
    "provenance_only": true,
    "proposal_digest_unchanged": true
@@ -1711,7 +1717,8 @@
      "error": null
     }
    },
-   "owned_targets": [
+   "owned_targets": [],
+   "superseded_entries": [
     "aisef2/orchestrate/story_runner.py::StoryResult.committed",
     "aisef2/orchestrate/story_runner.py::StoryResult.revision",
     "aisef2/orchestrate/story_runner.py::_Held.__call__",
@@ -1728,6 +1735,205 @@
     "targets": 11,
     "mutants": 361,
     "killed": 361,
+    "survivors": 0,
+    "audited_survivors": 0,
+    "killed_by_timeout": 0
+   },
+   "problems": []
+  },
+  "k_nowork_001": {
+   "record": {
+    "path": "closure-evidence/v2/cycle2/K-NOWORK-001-MUTATION.json",
+    "sha256": "1a02459152f68b99f8f7b000f386f37cc4378dfcd028bf559a51a5126593c5da"
+   },
+   "authority": "owner ruling 2026-10-02, 'AISEF V2 — K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION / OWNER RULING / NO PROVIDER CALL / NO LEDGERLOCK RUN / NO Q4-Q5'",
+   "targets": {
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
+     "mutants": 3,
+     "killed": 3,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
+     "mutants": 1,
+     "killed": 1,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_Held.__call__": {
+     "mutants": 3,
+     "killed": 3,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_Held.__init__": {
+     "mutants": 6,
+     "killed": 6,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_Held.release": {
+     "mutants": 3,
+     "killed": 3,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_attempt": {
+     "mutants": 280,
+     "killed": 280,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py",
+      "tests/v2/test_p6_orchestration.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_committed": {
+     "mutants": 6,
+     "killed": 6,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_fail": {
+     "mutants": 34,
+     "killed": 34,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_freeze_plan": {
+     "mutants": 9,
+     "killed": 9,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::_probe": {
+     "mutants": 9,
+     "killed": 9,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    },
+    "aisef2/orchestrate/story_runner.py::run_story": {
+     "mutants": 11,
+     "killed": 11,
+     "survivors": [],
+     "killed_by_timeout": 0,
+     "strays_reaped": 0,
+     "kill_tests": [
+      "tests/v2/test_p6_stages.py",
+      "tests/v2/test_c2_k_nowork_001.py",
+      "tests/v2/test_c2_k_presat_001.py",
+      "tests/v2/test_c2_orchestration_conformance.py",
+      "tests/v2/test_p6_orchestration.py"
+     ],
+     "source_sha256": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+     "error": null
+    }
+   },
+   "owned_targets": [
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+    "aisef2/orchestrate/story_runner.py::_Held.__call__",
+    "aisef2/orchestrate/story_runner.py::_Held.__init__",
+    "aisef2/orchestrate/story_runner.py::_Held.release",
+    "aisef2/orchestrate/story_runner.py::_attempt",
+    "aisef2/orchestrate/story_runner.py::_committed",
+    "aisef2/orchestrate/story_runner.py::_fail",
+    "aisef2/orchestrate/story_runner.py::_freeze_plan",
+    "aisef2/orchestrate/story_runner.py::_probe",
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "superseded_entries": [],
+   "totals": {
+    "targets": 11,
+    "mutants": 365,
+    "killed": 365,
     "survivors": 0,
     "audited_survivors": 0,
     "killed_by_timeout": 0
@@ -1752,7 +1958,7 @@
     "OK   profile_freeze         clean=True rejects=True always-pass-mutant-caught=True",
     "calibrated 51/51; always-PASS mutants rejected 51/51"
    ],
-   "seconds": 189.2
+   "seconds": 190.3
   },
   "freeze_conformance": {
    "command": "python -P validation/v2/freeze_conformance.py --check",
@@ -1793,7 +1999,7 @@
    "tail": [
     "destructive authority: PASS"
    ],
-   "seconds": 1.8
+   "seconds": 1.9
   },
   "kernel_static_checks": {
    "command": "python -P validation/v2/kernel_static_checks.py --check",
@@ -1816,7 +2022,7 @@
    "command": "python -P validation/v2/mutation.py --check",
    "exit": 0,
    "tail": [
-    "SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::run_story: historical, taken over by K-PRESAT-001",
+    "SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::run_story: historical, taken over by K-NOWORK-001",
     "mutation: PASS"
    ],
    "seconds": 0.1
@@ -1836,5 +2042,5 @@
  },
  "problems": [],
  "verdict": "COMPLETE",
- "seconds": 369.0
+ "seconds": 373.1
 }

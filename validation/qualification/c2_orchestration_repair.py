@@ -27,7 +27,7 @@ each ProductProofSpec carries; a conformance repair to the frozen architecture, 
     here field by field: that one provenance field must be the only difference (the proposal digest, every hash and the
     plan are the accepted ones); the two C2-P5 checks' outputs are recorded as they are, nothing of C2-P5 is edited.
 (f) The C2-ORCH mutation record, summarised, with mutation.py's verdict on it and on P6's superseded entries, and the
-    record of the phase that took over story_runner.py's targets since (K-PRESAT-001).
+    records of the phases that took over story_runner.py's targets since (K-PRESAT-001, then K-NOWORK-001).
 
 K-PRESAT-001 (owner rulings 2026-10-01, 'BOUNDED CORRECTIVE PATCH' §3 and 'DETERMINISTIC REPAIR COMPLETION' §2): a story
 whose every obligation is PRE_SATISFIED makes no developer call and no longer runs the engineering-adequacy stage. One of
@@ -35,6 +35,12 @@ the seven Cycle-1 items (`pre-satisfied`) is such a story, so under this kernel 
 that stage — the three `tests …` process ranges, `tests/adequacy` and the `<story>:quality` gate check — and nothing else
 differs. (b) measures exactly that (`without_adequacy_stage`): the other six items are identical as before, and this one
 must differ by that stage and by nothing else, or the record states a problem.
+
+K-NOWORK-001 (owner ruling 2026-10-02, 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION'): a story with no INTRODUCE
+obligation READY and every obligation SATISFIED at its parent makes no developer call and runs no engineering-adequacy
+stage either. None of the seven Cycle-1 items is such a story but `pre-satisfied` (already K-PRESAT-001's), so (b) is as
+it was; its own red-before / green-after record is closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json, and (f) reads
+the mutation record of the phase that owns story_runner.py's targets now.
 (g) The guards, each run once.
 
 `--check` re-derives (d), (e) and (f) and compares them with the record, and requires the verdict the record states;
@@ -78,6 +84,10 @@ K_PRESAT_ITEMS = ("pre-satisfied",)
 K_PRESAT_AUTHORITY = ("owner rulings 2026-10-01, 'AISEF V2 — BOUNDED CORRECTIVE PATCH' §3 (K-PRESAT-001) and 'AISEF V2 — "
                       "DETERMINISTIC REPAIR COMPLETION' §2 (K-PRESAT-001 CONFIRMED)")
 K_PRESAT_MUTATION_REL = "closure-evidence/v2/cycle2/K-PRESAT-001-MUTATION.json"
+K_NOWORK_AUTHORITY = ("owner ruling 2026-10-02, 'AISEF V2 — K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION / OWNER RULING / NO "
+                      "PROVIDER CALL / NO LEDGERLOCK RUN / NO Q4-Q5'")
+K_NOWORK_MUTATION_REL = "closure-evidence/v2/cycle2/K-NOWORK-001-MUTATION.json"
+K_NOWORK_REHEARSAL_REL = "closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json"
 BASE = "45136086c3e4a98534f975e6db979f94165af5f3"
 OLD = "63112544f1146097b69c538d98e09e5a52c547c1"
 OLD_AISEF2_TREE = "f4bfc7f1291cc72fa8ade79e798f5222f3429759"
@@ -449,16 +459,30 @@ def identities() -> dict:
     }
 
 
+_MUTATION_KEYS = ("mutants", "killed", "survivors", "killed_by_timeout", "strays_reaped", "kill_tests", "source_sha256", "error")
+
+
+def _later_phase(mu, rel: str, phase: str, authority: str) -> dict:
+    """The record of a later phase that took over story_runner.py's targets, summarised with mutation.py's verdict on it."""
+    path = ROOT / rel
+    rec = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"targets": []}
+    rows = {t["target"]: {k: t.get(k) for k in _MUTATION_KEYS} for t in rec["targets"]}
+    return {"record": {"path": rel, "sha256": _lf(path.read_bytes()) if path.exists() else None},
+            "authority": authority, "targets": rows, "owned_targets": sorted(mu.PHASE_TARGETS[phase]),
+            "superseded_entries": mu.superseded(rec, phase),
+            "totals": {"targets": len(rows), "mutants": sum(r["mutants"] or 0 for r in rows.values()),
+                       "killed": sum(r["killed"] or 0 for r in rows.values()),
+                       "survivors": sum(len(r["survivors"] or []) for r in rows.values()),
+                       "audited_survivors": sum(1 for t, r in rows.items() for m in r["survivors"] or [] if (t, m) in mu.AUDITED),
+                       "killed_by_timeout": sum(r["killed_by_timeout"] or 0 for r in rows.values())},
+            "problems": mu.problems_of(rec, ROOT, phase) if path.exists() else [f"{rel} is missing"]}
+
+
 def mutation() -> dict:
     mu = _load("aisef_v2_mutation", "validation/v2/mutation.py")
     rec = json.loads((ROOT / MUTATION_REL).read_text(encoding="utf-8"))
     p6 = json.loads((ROOT / P6_MUTATION_REL).read_text(encoding="utf-8"))
-    rows = {t["target"]: {k: t.get(k) for k in ("mutants", "killed", "survivors", "killed_by_timeout", "strays_reaped",
-                                                 "kill_tests", "source_sha256", "error")} for t in rec["targets"]}
-    later = ROOT / K_PRESAT_MUTATION_REL
-    krec = json.loads(later.read_text(encoding="utf-8")) if later.exists() else {"targets": []}
-    krows = {t["target"]: {k: t.get(k) for k in ("mutants", "killed", "survivors", "killed_by_timeout", "strays_reaped",
-                                                  "kill_tests", "source_sha256", "error")} for t in krec["targets"]}
+    rows = {t["target"]: {k: t.get(k) for k in _MUTATION_KEYS} for t in rec["targets"]}
     return {"record": {"path": MUTATION_REL, "sha256": _lf((ROOT / MUTATION_REL).read_bytes())}, "targets": rows,
             "totals": {"targets": len(rows), "mutants": sum(r["mutants"] or 0 for r in rows.values()),
                        "killed": sum(r["killed"] or 0 for r in rows.values()),
@@ -467,14 +491,8 @@ def mutation() -> dict:
             "owned_targets": sorted(mu.C2_ORCH_TARGETS), "problems": mu.problems_of(rec, ROOT, "C2-ORCH"),
             "superseded_entries": mu.superseded(rec, "C2-ORCH"),
             "p6_superseded_entries": mu.superseded(p6, "P6"), "p6_problems": mu.problems_of(p6, ROOT, "P6"),
-            "k_presat_001": {"record": {"path": K_PRESAT_MUTATION_REL, "sha256": _lf(later.read_bytes()) if later.exists() else None},
-                             "authority": K_PRESAT_AUTHORITY, "targets": krows, "owned_targets": sorted(mu.K_PRESAT_TARGETS),
-                             "totals": {"targets": len(krows), "mutants": sum(r["mutants"] or 0 for r in krows.values()),
-                                        "killed": sum(r["killed"] or 0 for r in krows.values()),
-                                        "survivors": sum(len(r["survivors"] or []) for r in krows.values()),
-                                        "audited_survivors": sum(1 for t, r in krows.items() for m in r["survivors"] or [] if (t, m) in mu.AUDITED),
-                                        "killed_by_timeout": sum(r["killed_by_timeout"] or 0 for r in krows.values())},
-                             "problems": mu.problems_of(krec, ROOT, "K-PRESAT-001") if later.exists() else [f"{K_PRESAT_MUTATION_REL} is missing"]},
+            "k_presat_001": _later_phase(mu, K_PRESAT_MUTATION_REL, "K-PRESAT-001", K_PRESAT_AUTHORITY),
+            "k_nowork_001": _later_phase(mu, K_NOWORK_MUTATION_REL, "K-NOWORK-001", K_NOWORK_AUTHORITY),
             "every_record": mu.check(ROOT)}
 
 
@@ -516,8 +534,10 @@ def verdict_problems(rec: dict) -> list[str]:
         out.append(f"(e) {e['contracts']} contracts, semantic change {e['semantic_change']}, {e['verify_problems']}")
     f = rec["mutation"]
     k = f.get("k_presat_001") or {"problems": ["no K-PRESAT-001 mutation summary"], "totals": {}}
-    if f["problems"] or f["p6_problems"] or f["every_record"] or f["totals"]["survivors"] or k["problems"]:
-        out.append(f"(f) mutation: {f['problems'] + f['p6_problems'] + f['every_record'] + k['problems']} survivors {f['totals']['survivors']}")
+    n = f.get("k_nowork_001") or {"problems": ["no K-NOWORK-001 mutation summary"], "totals": {}}
+    if f["problems"] or f["p6_problems"] or f["every_record"] or f["totals"]["survivors"] or k["problems"] or n["problems"]:
+        out.append(f"(f) mutation: {f['problems'] + f['p6_problems'] + f['every_record'] + k['problems'] + n['problems']} "
+                   f"survivors {f['totals']['survivors']}")
     out += [f"(g) guard {k}: exit {v['exit']}" for k, v in rec["guards"].items() if v["exit"] != 0]
     return out
 
@@ -569,6 +589,17 @@ def write() -> dict:
             "effect_on_this_record": "(b): the one Cycle-1 item that is a fully PRE_SATISFIED story differs from the old kernel "
                                      "by exactly that stage; (d): story_runner.py; (f): its mutation targets are re-measured in "
                                      f"{K_PRESAT_MUTATION_REL}, the C2-ORCH entries for them kept as historical"},
+        "k_nowork_001": {
+            "authority": K_NOWORK_AUTHORITY,
+            "story_runner._attempt": "one fact of the admission already made — every obligation measured SATISFIED at the parent "
+                                     "(no INTRODUCE READY; every INTRODUCE PRE_SATISFIED, every PRESERVE and VERIFY SATISFIED) — "
+                                     "decides both the developer call and the engineering-adequacy stage: neither runs for such a "
+                                     "story, the candidate is the parent (RFC §13, §14)",
+            "unchanged": "StoryAdmission and its dispositions, the proofs of every obligation at the candidate by both parties, "
+                         "plan-drift, review, security, merge and post-merge re-proof; a VERIFY that is not SATISFIED keeps the developer",
+            "effect_on_this_record": "(b): none — the seven Cycle-1 items are as under K-PRESAT-001; (d): story_runner.py; (f): its "
+                                     f"mutation targets are re-measured in {K_NOWORK_MUTATION_REL}, the K-PRESAT-001 entries for "
+                                     f"them kept as historical; the red-before / green-after record is {K_NOWORK_REHEARSAL_REL}"},
         "defect_reproducer": reproducer,
         "single_probe_equivalence": equivalence,
         "test_matrix": matrix(),

@@ -51,7 +51,8 @@ RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence
            "C2-P4": "closure-evidence/v2/cycle2/P4-MUTATION.json",
            "C2-ORCH": "closure-evidence/v2/cycle2/C2-ORCH-MUTATION.json",
            "C2-P10": "closure-evidence/v2/cycle2/P10-MUTATION.json",
-           "K-PRESAT-001": "closure-evidence/v2/cycle2/K-PRESAT-001-MUTATION.json"}
+           "K-PRESAT-001": "closure-evidence/v2/cycle2/K-PRESAT-001-MUTATION.json",
+           "K-NOWORK-001": "closure-evidence/v2/cycle2/K-NOWORK-001-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
 TIMEOUT = 120
 
@@ -487,9 +488,18 @@ for _t in C2_ORCH_TARGETS:
 SUPERSEDED.update({t: "K-PRESAT-001" for t in K_PRESAT_TARGETS})
 for _t in K_PRESAT_TARGETS:
     del C2_ORCH_TARGETS[_t]
+# K-NOWORK-001 (owner ruling 2026-10-02, 'K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION'): the correction changed
+# story_runner.py again, so the same targets are re-measured here, the K-NOWORK regression cases added to their kill set
+# (after the stage tests); K-PRESAT-001 keeps its historical entries for them, and its record is not rewritten.
+K_NOWORK_TARGETS: dict[str, list[str]] = {
+    t: [k[0], "tests/v2/test_c2_k_nowork_001.py", *k[1:]] for t, k in K_PRESAT_TARGETS.items()}
+SUPERSEDED.update({t: "K-NOWORK-001" for t in K_NOWORK_TARGETS})
+for _t in K_NOWORK_TARGETS:
+    del K_PRESAT_TARGETS[_t]
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
                  "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS,
-                 "C2-ORCH": C2_ORCH_TARGETS, "C2-P10": C2_P10_TARGETS, "K-PRESAT-001": K_PRESAT_TARGETS}
+                 "C2-ORCH": C2_ORCH_TARGETS, "C2-P10": C2_P10_TARGETS, "K-PRESAT-001": K_PRESAT_TARGETS,
+                 "K-NOWORK-001": K_NOWORK_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
