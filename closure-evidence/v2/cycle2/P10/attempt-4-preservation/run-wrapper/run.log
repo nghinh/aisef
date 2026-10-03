@@ -1,0 +1,11 @@
+[2026-10-03 07:46:20] QP-2.9: LedgerLock regression, kernel tree c2717d2ed98b76bd3d284a37c47103b5dc2bd020, HEAD e49226b, profile delivery-experiment-1
+[2026-10-03 07:46:32] guards PASS (start)
+PASS
+ATTESTED: 5 provider requests, 3 turns; resolved RunSpec d4845bf96421951cec2982ad7242c3ddfc5f9f23fe8d4c72423e6e142dc6a07c
+delivery FAIL; plan quality NOT_CLAIMED; outcomes {'STORY-01-01': ['COMMIT'], 'STORY-01-05': ['RETRY', 'COMMIT'], 'STORY-02-01': ['COMMIT'], 'STORY-02-02': ['COMMIT'], 'STORY-03-01': ['RETRY', 'RETRY', 'ROLLBACK'], 'STORY-04-01': ['ROLLBACK'], 'STORY-04-02': ['RETRY', 'RETRY', 'ROLLBACK']}
+final main 76edbe3adc6fb2c95f539abbedb7bf65361513b0: V2 specs satisfied 51/59; V1 oracle 1/9; delivery PASS confirmed: False
+owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 4564s)
+[2026-10-03 09:03:11] run rc=0
+[2026-10-03 09:03:23] guards PASS (end)
+PASS
+run script exit=0

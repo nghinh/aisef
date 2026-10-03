@@ -1,0 +1,54 @@
+"""§1 of 'OWNER AUTHORIZATION: DELIVERY EXPERIMENT ATTEMPT 4': the deterministic integrity checks before provider access.
+Read-only. One line per check; exit 1 on any failure."""
+import json, subprocess, sys, pathlib
+sys.path.insert(0, ".")
+from validation.qualification import c2_delivery_experiment as dx, c2_p9, c2_plan_correction as pc
+ok, bad = [], []
+def check(name, cond, detail=""):
+    (ok if cond else bad).append(name); print(("OK    " if cond else "FAIL  ") + name + (f" — {detail}" if detail else ""))
+git = lambda *a: subprocess.run(["git", *a], capture_output=True, encoding="utf-8")
+OLD = "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION.json"
+HELD_AT = "f8e535cf6f678615f11a560efac3cfab46d4a257"
+old, new = json.load(open(OLD)), dx.committed()
+check("old held preregistration preserved", dx._sha(pathlib.Path(OLD).read_bytes()) == "49c6880da481abf0bf54db6d1d48ed1d80b33407dcc7b0946b78da5473aa0e6d"
+      and git("diff", "--quiet", HELD_AT, "--", OLD).returncode == 0 and OLD in dx.SUPERSEDED_BEFORE_RUN and dx.OUT_REL != OLD)
+check("new preregistration binds current HEAD", dx.check() == [] and new["problems"] == [] and new["kernel"]["tree"] == git("rev-parse", "HEAD:aisef2").stdout.strip()
+      and all(f["sha256"] == c2_p9.C.lf_sha(pathlib.Path(f["path"])) for f in new["harness"]["files"]), dx.OUT_REL)
+ident = dx.harness_identity()
+check("seven current prompt digests bind", new["developer_context"]["prompts"] == ident == dict(new["runspec"]["settings"]["harness"]["value"])
+      and len(ident["prompts_sha256"]) == 7 and ident["prompts_sha256"] == old["developer_context"]["prompts"]["prompts_sha256"], ident["prompt_set_sha256"])
+src = lambda rev, rel: git("show", f"{rev}:{rel}").stdout
+# H-PROMPT-002: the seven prompts at HEAD are the ones its commit pinned (the snapshot its own test holds at 539a497)
+import hashlib, re
+req = pathlib.Path(dx.REQUIREMENTS_REL).read_text(encoding="utf-8")
+tasks, _, _ = c2_p9.prompts(pc.corrected_plan(), req)
+snap = hashlib.sha256("\n=====\n".join(f"{s}\n{tasks[s]}" for s in sorted(tasks)).encode("utf-8")).hexdigest()
+pinned = re.search(r'^SNAPSHOT = "([0-9a-f]{64})"', src("539a4972d726e312f9f9d06a4bf0f506e538eeec", "tests/v2/test_c2_p9_harness.py"), re.M).group(1)
+check("H-PROMPT-002 binds", git("merge-base", "--is-ancestor", "539a4972d726e312f9f9d06a4bf0f506e538eeec", "HEAD").returncode == 0
+      and snap == pinned and ident["prompt_rule"] == "H-PROMPT-002", f"prompt snapshot {snap[:16]}… = the one 539a497 pinned")
+# H-RETRY-001: c2_p9.py (the feedback code) is the one its commit made, and the held and the new preregistration bind it
+check("H-RETRY-001 binds", git("merge-base", "--is-ancestor", "dd79f46e8636637f595e288081bffe555f2d35d8", "HEAD").returncode == 0
+      and git("diff", "--quiet", "dd79f46e8636637f595e288081bffe555f2d35d8", "HEAD", "--", "validation/qualification/c2_p9.py").returncode == 0
+      and ident["c2_p9_sha256"] == old["developer_context"]["prompts"]["c2_p9_sha256"] and ident["retry_feedback"] == "H-RETRY-001",
+      f"c2_p9.py {ident['c2_p9_sha256'][:16]}… unchanged since dd79f46")
+check("plan hash unchanged", new["plan"]["plan_hash"] == old["plan"]["plan_hash"] == pc.corrected_plan().plan_hash == "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b")
+check("kernel unchanged", git("diff", "--quiet", "4f6dfc197acfd9146357e5781326843bc09982e5", "HEAD", "--", "aisef2").returncode == 0
+      and git("status", "--porcelain", "--", "aisef2").stdout == "" and new["kernel"] == old["kernel"], new["kernel"]["tree"])
+rec = pc.record()
+sp = rec["proofs"]["product_proof_specs"]
+check("all 59 ProductProof semantic hashes unchanged", pc.check() == [] and sp["count"] == 59 and sp["semantic_hash_changes"] == [] and sp["all_equal_to_accepted"]
+      and sp["contract_spec_semantic_digest"] == "83a73da271805c470db4da55f50f542950494aa8b50a31e5b6f07e5364415745", sp["contract_spec_semantic_digest"][:16])
+check("attempt number = 4", dx.EXPERIMENT["attempt"] == new["attempt"] == 4 and new["harness"]["run_command"].startswith("ATTEMPT=4 ")
+      and not pathlib.Path(c2_p9.attempt_dir(4)).exists() and not (c2_p9.preserve_root() / "attempt-4.git").exists())
+check("attempt 3 remains immutable", dx.historical_problems(3) == [] and git("diff", "--quiet", "f86e8f4fbbf20064953cc32c967fa21756c9f627", "--",
+      "closure-evidence/v2/cycle2/P10/attempt-3", "closure-evidence/v2/cycle2/P10/owned/run.attempt-3.json", dx.HISTORICAL[3]["preregistration"]).returncode == 0)
+budget = (new["budget"]["max_provider_requests"], new["budget"]["max_total_turns"], new["budget"]["max_turns_per_session"],
+          new["budget"]["max_combined_input_tokens"], new["budget"]["max_output_plus_reasoning_tokens"])
+check("the budget is the amended one and nothing else of the preregistration's settings changed",
+      budget == (60, 700, 80, 60_000_000, 700_000) and new["preflight"]["shape"] == old["preflight"]["shape"]
+      and {k: v for k, v in new["runspec"]["settings"].items() if k != "budget"} == {k: v for k, v in old["runspec"]["settings"].items() if k != "budget"}
+      and new["runspec_template_hash"] != old["runspec_template_hash"], f"template {old['runspec_template_hash'][:12]} -> {new['runspec_template_hash'][:12]}")
+changed = git("diff", "--name-only", HELD_AT, "--", "aisef2", "validation", "tests").stdout.split()
+check("executable source changed only in the budget record's constants", changed == ["tests/v2/test_c2_delivery_experiment.py", "validation/qualification/c2_delivery_experiment.py"]
+      or changed == [], f"files {changed}")
+print(f"{len(ok)} OK, {len(bad)} FAIL"); sys.exit(1 if bad else 0)

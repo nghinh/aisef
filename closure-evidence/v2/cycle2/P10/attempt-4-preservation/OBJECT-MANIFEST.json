@@ -1,0 +1,306 @@
+{
+ "record": "AISEF V2 — DELIVERY-EXPERIMENT-1 attempt 4: the preserved git objects and the derived run identities, verified against the run's own records",
+ "status": "DERIVED_AFTER_THE_RUN (nothing here was written by the run; every value is checked against a record the run wrote)",
+ "preserved_git_dir": "/Users/nghinh/Downloads/projects/aisef-qp-2.9-preserved/attempt-4.git",
+ "fsck": {
+  "command": "git fsck --full --strict",
+  "exit": 0,
+  "output": ""
+ },
+ "refs": [
+  {
+   "sha": "76edbe3adc6fb2c95f539abbedb7bf65361513b0",
+   "ref": "refs/heads/main"
+  },
+  {
+   "sha": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "ref": "refs/heads/plan-v2.1"
+  },
+  {
+   "sha": "76edbe3adc6fb2c95f539abbedb7bf65361513b0",
+   "ref": "refs/qp-2.9/final-main"
+  },
+  {
+   "sha": "1271324b3fc773cf2a258d4742ccded758904e20",
+   "ref": "refs/qp-2.9/revisions/1271324b3fc773cf2a258d4742ccded758904e20"
+  },
+  {
+   "sha": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "ref": "refs/qp-2.9/revisions/136a68dcdc3f416b2a76c561a7df12d1282ad4d5"
+  },
+  {
+   "sha": "695c7f247cde2666a429edb4063fc762e1d8c0c1",
+   "ref": "refs/qp-2.9/revisions/695c7f247cde2666a429edb4063fc762e1d8c0c1"
+  },
+  {
+   "sha": "8eac518a692e1fc93c28a2d6ffdd96c0db7f3fc5",
+   "ref": "refs/qp-2.9/revisions/8eac518a692e1fc93c28a2d6ffdd96c0db7f3fc5"
+  },
+  {
+   "sha": "b0666a6eda1f8e0c745cc8c0f4a17983e651d3e8",
+   "ref": "refs/qp-2.9/revisions/b0666a6eda1f8e0c745cc8c0f4a17983e651d3e8"
+  },
+  {
+   "sha": "e8619c2dcac9cd19542c08bd0e6c8826f8c9cbf3",
+   "ref": "refs/qp-2.9/revisions/e8619c2dcac9cd19542c08bd0e6c8826f8c9cbf3"
+  },
+  {
+   "sha": "ed3d5d7c9830f33970721f7c850e51ba71786450",
+   "ref": "refs/qp-2.9/revisions/ed3d5d7c9830f33970721f7c850e51ba71786450"
+  },
+  {
+   "sha": "f9eff70f6a76f3f2c6a7921d8174032643c678c9",
+   "ref": "refs/qp-2.9/revisions/f9eff70f6a76f3f2c6a7921d8174032643c678c9"
+  },
+  {
+   "sha": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "ref": "refs/remotes/origin/HEAD"
+  },
+  {
+   "sha": "47b3eb7695189559d7d340748c4e18ce36e1393d",
+   "ref": "refs/remotes/origin/master"
+  },
+  {
+   "sha": "1621a2bce231d158c08a3b60e6c9b4f4b96ec8d0",
+   "ref": "refs/remotes/origin/plan-v2"
+  },
+  {
+   "sha": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "ref": "refs/remotes/origin/plan-v2.1"
+  },
+  {
+   "sha": "260b9f2f87d4b7fca750de090031f708e6d264e2",
+   "ref": "refs/remotes/origin/story/STORY-01-01"
+  },
+  {
+   "sha": "ba15414506091304f456c7287fcc0d8309f29481",
+   "ref": "refs/remotes/origin/story/STORY-01-02"
+  },
+  {
+   "sha": "07bc5820cd30a2d865b2bae0ef6e682d9d6c030a",
+   "ref": "refs/remotes/origin/story/STORY-01-03"
+  },
+  {
+   "sha": "bbc91c20eaf813d74ea708f1df6bf4147fe4fe00",
+   "ref": "refs/remotes/origin/story/STORY-01-04"
+  },
+  {
+   "sha": "ecb6b153a93787e4bbf9be6bf8c49ac383ad2ec1",
+   "ref": "refs/remotes/origin/story/STORY-01-05"
+  },
+  {
+   "sha": "eed6f87afc51022fc8dbdec185609922f5fbda68",
+   "ref": "refs/remotes/origin/story/STORY-01-06"
+  }
+ ],
+ "final_main": {
+  "sha": "76edbe3adc6fb2c95f539abbedb7bf65361513b0",
+  "tree": "9bbfe434ab6a7884d096195b9050704276e3b4f4",
+  "present": true
+ },
+ "journal": {
+  "path": "closure-evidence/v2/cycle2/P10/attempt-4/JOURNAL.json",
+  "events": 8036,
+  "digest_rule": "sha256 of json.dumps(events, sort_keys=True, default=str)",
+  "digest": "085ac41735d323e7b8f6c07c77ce0abc8fae2d51b106449ccfd243093069cc4b"
+ },
+ "journal_named_ids": [
+  {
+   "sha": "1271324b3fc773cf2a258d4742ccded758904e20",
+   "named_by": [
+    "probe/evaluated",
+    "proof/verified"
+   ],
+   "object_type": "commit",
+   "present": true,
+   "tree": "9bbfe434ab6a7884d096195b9050704276e3b4f4",
+   "subject": "STORY-01-05: developer attempt 2",
+   "parents": [
+    "ed3d5d7c9830f33970721f7c850e51ba71786450"
+   ]
+  },
+  {
+   "sha": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+   "named_by": [
+    "probe/evaluated",
+    "run/spec-resolved",
+    "story/admitted",
+    "story/begin"
+   ],
+   "object_type": "commit",
+   "present": true,
+   "tree": "d4560f79d0b6cc9e9b685c9cb6150ab73afb4971",
+   "subject": "W1-LEDGERLOCK-PLAN-V2.1: the usage-error exit is owned by the story whose argparse surface introduces it (STORY-01-01, FR-12), and STORY-04-01 preserves it instead of claiming to introduce it",
+   "parents": [
+    "1621a2bce231d158c08a3b60e6c9b4f4b96ec8d0"
+   ]
+  },
+  {
+   "sha": "695c7f247cde2666a429edb4063fc762e1d8c0c1",
+   "named_by": [
+    "probe/evaluated",
+    "proof/verified"
+   ],
+   "object_type": "commit",
+   "present": true,
+   "tree": "5c29b2b22c57050e7e75e200a78bf4ae1ed32d27",
+   "subject": "STORY-04-02: developer attempt 1",
+   "parents": [
+    "76edbe3adc6fb2c95f539abbedb7bf65361513b0"
+   ]
+  },
+  {
+   "sha": "76edbe3adc6fb2c95f539abbedb7bf65361513b0",
+   "named_by": [
+    "probe/evaluated",
+    "proof/verified",
+    "story/admitted",
+    "story/begin",
+    "story/commit"
+   ],
+   "object_type": "commit",
+   "present": true,
+   "tree": "9bbfe434ab6a7884d096195b9050704276e3b4f4",
+   "subject": "merge 1271324b3fc7",
+   "parents": [
+    "ed3d5d7c9830f33970721f7c850e51ba71786450",
+    "1271324b3fc773cf2a258d4742ccded758904e20"
+   ]
+  },
+  {
+   "sha": "8eac518a692e1fc93c28a2d6ffdd96c0db7f3fc5",
+   "named_by": [
+    "probe/evaluated",
+    "proof/verified"
+   ],
+   "object_type": "commit",
+   "present": true,
+   "tree": "d3bf61187145e3b7ccdcf7d2b7dd69ddf74ad66b",
+   "subject": "STORY-01-01: developer attempt 1",
+   "parents": [
+    "136a68dcdc3f416b2a76c561a7df12d1282ad4d5"
+   ]
+  },
+  {
+   "sha": "b0666a6eda1f8e0c745cc8c0f4a17983e651d3e8",
+   "named_by": [
+    "probe/evaluated",
+    "proof/verified"
+   ],
+   "object_type": "commit",
+   "present": true,
+   "tree": "1ea16c6716cc92662aff9b06c3c5b09045d06d4f",
+   "subject": "STORY-03-01: developer attempt 2",
+   "parents": [
+    "76edbe3adc6fb2c95f539abbedb7bf65361513b0"
+   ]
+  },
+  {
+   "sha": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
+   "named_by": [
+    "capability/resolved"
+   ],
+   "object_type": null,
+   "present": false,
+   "where": "the framework repository, not the workload: the kernel tree aisef2 at 4f6dfc197acfd9146357e5781326843bc09982e5",
+   "framework_repository_tree_equal": true
+  },
+  {
+   "sha": "e8619c2dcac9cd19542c08bd0e6c8826f8c9cbf3",
+   "named_by": [
+    "probe/evaluated",
+    "proof/verified"
+   ],
+   "object_type": "commit",
+   "present": true,
+   "tree": "e416439576bcfcc72152a7e89111a271f2002f22",
+   "subject": "STORY-01-05: developer attempt 1",
+   "parents": [
+    "ed3d5d7c9830f33970721f7c850e51ba71786450"
+   ]
+  },
+  {
+   "sha": "ed3d5d7c9830f33970721f7c850e51ba71786450",
+   "named_by": [
+    "probe/evaluated",
+    "proof/verified",
+    "story/admitted",
+    "story/begin",
+    "story/commit"
+   ],
+   "object_type": "commit",
+   "present": true,
+   "tree": "d3bf61187145e3b7ccdcf7d2b7dd69ddf74ad66b",
+   "subject": "merge 8eac518a692e",
+   "parents": [
+    "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+    "8eac518a692e1fc93c28a2d6ffdd96c0db7f3fc5"
+   ]
+  },
+  {
+   "sha": "f9eff70f6a76f3f2c6a7921d8174032643c678c9",
+   "named_by": [
+    "probe/evaluated",
+    "proof/verified"
+   ],
+   "object_type": "commit",
+   "present": true,
+   "tree": "f99ce66f8bfbd75c98758876f172afe940fd16cb",
+   "subject": "STORY-03-01: developer attempt 1",
+   "parents": [
+    "76edbe3adc6fb2c95f539abbedb7bf65361513b0"
+   ]
+  }
+ ],
+ "journal_named_commits_missing_from_preserved_git": [],
+ "runspec": {
+  "template": {
+   "path": "closure-evidence/v2/cycle2/P10/attempt-4-preservation/RUNSPEC-TEMPLATE.canonical.json",
+   "sha256": "bb78f7ddd081f16bc3081d55e3672114f48071af41c5404cc92f6042c153c6b5"
+  },
+  "resolved": {
+   "path": "closure-evidence/v2/cycle2/P10/attempt-4-preservation/RESOLVED-RUNSPEC.canonical.json",
+   "sha256": "d4845bf96421951cec2982ad7242c3ddfc5f9f23fe8d4c72423e6e142dc6a07c"
+  },
+  "rule": "aisef2/runtime/runspec.py runspec_hash: sha256 of canonical({capabilities, aggregate_min_grade, settings}); each file IS that canonical text, so its sha256 is the hash. Re-derived on e49226b by c2_delivery_experiment.runspec(machine(), fingerprint_fields(observation), bound_deployment(observation)) from ATTESTATION.json"
+ },
+ "run_wrapper": {
+  "dir": "closure-evidence/v2/cycle2/P10/attempt-4-preservation/run-wrapper",
+  "note": "the one-time wrapper and its log, copied from the session scratchpad (temporary); integrity.py.txt is integrity.py byte for byte (renamed so no checker or linter executes it)"
+ },
+ "accounting": {
+  "preflight": {
+   "provider_requests": 5,
+   "turns": 3,
+   "input_tokens": 107250,
+   "output_tokens": 223,
+   "unaccounted": []
+  },
+  "run_budget": {
+   "limits": {
+    "provider_requests": 60,
+    "turns": 700,
+    "input_tokens": 60000000,
+    "output_tokens": 700000
+   },
+   "preflight": {
+    "provider_requests": 5,
+    "turns": 3,
+    "input_tokens": 107250,
+    "output_tokens": 223
+   },
+   "spent": {
+    "provider_requests": 18,
+    "turns": 449,
+    "input_tokens": 48458547,
+    "output_tokens": 427741,
+    "sessions_started": 13,
+    "requests_recorded": 13,
+    "unaccounted": []
+   },
+   "reached": null,
+   "derived_from": "the preflight accounting record, the journal's provider/request events and the session streams; no counter is kept",
+   "limitation": "spend is what the client reports per finished step. An HTTP request that finishes no step is not in the telemetry — a client-internal retry, a failed request, the request in flight when a stop is issued — so its tokens cannot be counted; a stop is issued at the first reading (every 5 s) that shows a ceiling reached, so the totals can pass a ceiling by the steps finished since the reading before. Input is one combined number (prompt + cache read + cache write): the owner's ceiling is combined and no separate fresh/cached limit exists. The preflight's chat probes report prompt_tokens and completion_tokens only, counted as input and output."
+  }
+ }
+}

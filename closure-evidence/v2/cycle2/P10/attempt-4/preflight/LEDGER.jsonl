@@ -1,0 +1,10 @@
+{"event": "sent", "kind": "listing", "n": 1}
+{"event": "done", "http": 200, "n": 1}
+{"event": "sent", "kind": "chat", "n": 2}
+{"event": "done", "http": 200, "n": 2, "usage": {"completion_tokens": 16, "completion_tokens_details": {"reasoning_tokens": 16}, "prompt_tokens": 2090, "prompt_tokens_details": {"cached_tokens": 0}, "total_tokens": 2106}}
+{"event": "sent", "kind": "chat", "n": 3}
+{"event": "done", "http": 200, "n": 3, "usage": {"completion_tokens": 9, "completion_tokens_details": {"reasoning_tokens": 7}, "prompt_tokens": 2090, "prompt_tokens_details": {"cached_tokens": 0}, "total_tokens": 2099}}
+{"event": "sent", "kind": "chat", "n": 4}
+{"event": "done", "http": 200, "n": 4, "usage": {"completion_tokens": 9, "completion_tokens_details": {"reasoning_tokens": 7}, "prompt_tokens": 2090, "prompt_tokens_details": {"cached_tokens": 0}, "total_tokens": 2099}}
+{"event": "sent", "kind": "smoke", "log": "smoke.1.jsonl", "n": 5}
+{"event": "done", "exit": 0, "n": 5, "stopped": null, "timed_out": false, "turns": 3}

@@ -1,0 +1,14 @@
+PRE-EXECUTION RECORD — DELIVERY-EXPERIMENT-1, attempt 4 (written 2026-10-03 07:46:03, before any provider call)
+RUN_HEAD:                          e49226ba467491adcfbececaff4bff5b1eaffc09
+RUN_HEAD_TREE:                     9411fffa78e7f1a5cac40feb26b331840b9a4657
+KERNEL_TREE:                       c2717d2ed98b76bd3d284a37c47103b5dc2bd020
+SUPERSEDED_PREREGISTRATION_HASH:   49c6880da481abf0bf54db6d1d48ed1d80b33407dcc7b0946b78da5473aa0e6d
+FINAL_ATTEMPT4_PREREGISTRATION:    599940e238ba48d6605c2883db698765dc6f65c2a27d55c18f41a5f89708bb37
+FINAL_ATTEMPT4_RUNSPEC_TEMPLATE:   bb78f7ddd081f16bc3081d55e3672114f48071af41c5404cc92f6042c153c6b5
+BUDGET:                            60 requests / 700 turns / 80 per session / 60000000 input / 700000 output+reasoning
+INTEGRITY:                         12 OK, 0 FAIL
+ATTEMPT_4_EXISTS_BEFORE:           NO
+PRESERVE_PATH_FREE:                YES
+WORKTREE_CLEAN:                    YES
+MASTER:                            671ef9b259c560bf07531bc5fed63b07dc28b323
+MAIN_CHECKOUT:                     3ed2c41126e27d1a6b04e5442b56bbf3b6d89f11 tracked-diff 24f9b693402fee3a

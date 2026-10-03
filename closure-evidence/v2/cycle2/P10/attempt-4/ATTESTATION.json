@@ -1,0 +1,194 @@
+{
+ "deployment_identity": "system_fingerprint:a307abda487cd1b463329ccb945ce396",
+ "record": "AISEF V2 — DELIVERY EXPERIMENT 1: MODEL IDENTITY ATTESTATION (the provider preflight; it unlocks delivery or refuses it)",
+ "experiment": {
+  "id": "delivery-experiment-1",
+  "attempt": 4
+ },
+ "at": 1790988427.147091,
+ "at_utc": "2026-10-03T00:47:07Z",
+ "preregistration": {
+  "path": "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION-AMENDED.json",
+  "sha256": "d50f5b8ead85a72e0ec17e09d422640d24754e65e1a5cddb73d3343285ff58cb"
+ },
+ "runspec_template_hash": "bb78f7ddd081f16bc3081d55e3672114f48071af41c5404cc92f6042c153c6b5",
+ "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
+ "kernel": {
+  "commit": "4f6dfc197acfd9146357e5781326843bc09982e5",
+  "tree": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020"
+ },
+ "route": "9router/ds/deepseek-v4-pro",
+ "expected_resolved_model": "deepseek-v4-pro",
+ "client": "opencode 1.18.31 binary-sha256:16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198 routing-config-sha256:7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5",
+ "enforcement_identity": "1edbce9c6ab132a4c122a8e8a642b328220c1f2cf61e85a1ad83e4fd4be2bee7",
+ "observation": {
+  "route": "9router/ds/deepseek-v4-pro",
+  "listing": {
+   "http": 200,
+   "listed": true,
+   "id": "ds/deepseek-v4-pro",
+   "object": "model",
+   "owned_by": "ds",
+   "limits": {
+    "context_length": 1000000,
+    "max_completion_tokens": 384000
+   }
+  },
+  "probes": [
+   {
+    "http": 200,
+    "model": "deepseek-v4-pro",
+    "object": "chat.completion",
+    "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+    "usage": {
+     "prompt_tokens": 2090,
+     "completion_tokens": 16,
+     "total_tokens": 2106,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens_details": {
+      "reasoning_tokens": 16
+     }
+    }
+   },
+   {
+    "http": 200,
+    "model": "deepseek-v4-pro",
+    "object": "chat.completion",
+    "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+    "usage": {
+     "prompt_tokens": 2090,
+     "completion_tokens": 9,
+     "total_tokens": 2099,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens_details": {
+      "reasoning_tokens": 7
+     }
+    }
+   },
+   {
+    "http": 200,
+    "model": "deepseek-v4-pro",
+    "object": "chat.completion",
+    "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+    "usage": {
+     "prompt_tokens": 2090,
+     "completion_tokens": 9,
+     "total_tokens": 2099,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens_details": {
+      "reasoning_tokens": 7
+     }
+    }
+   }
+  ],
+  "smokes": [
+   {
+    "exit": 0,
+    "stopped": null,
+    "timed_out": false,
+    "started": true,
+    "file_written": true,
+    "shell_tool_called": true,
+    "errors": 0,
+    "turns": 3
+   }
+  ]
+ },
+ "fingerprint_fields": {
+  "route": "9router/ds/deepseek-v4-pro",
+  "listing": {
+   "id": "ds/deepseek-v4-pro",
+   "object": "model",
+   "owned_by": "ds"
+  },
+  "declared_limits_exposed": {
+   "context_length": 1000000,
+   "max_completion_tokens": 384000
+  },
+  "declared_models": [
+   "deepseek-v4-pro"
+  ],
+  "response": {
+   "object": [
+    "chat.completion"
+   ],
+   "system_fingerprint": [
+    "a307abda487cd1b463329ccb945ce396"
+   ],
+   "usage_fields": [
+    "completion_tokens",
+    "completion_tokens_details",
+    "prompt_tokens",
+    "prompt_tokens_details",
+    "total_tokens"
+   ]
+  },
+  "limits_declared_to_the_client": {
+   "context": 200000,
+   "output": 32768
+  },
+  "tool_calling": [
+   {
+    "exit": 0,
+    "file_written": true,
+    "shell_tool_called": true,
+    "errors": 0
+   }
+  ]
+ },
+ "ledger": {
+  "path": "preflight/LEDGER.jsonl",
+  "sha256": "380efa73cafc41d279a5631a66999129d49642546161a27349749a3b924acbc7"
+ },
+ "accounting": {
+  "provider_requests": 5,
+  "turns": 3,
+  "input_tokens": 107250,
+  "output_tokens": 223,
+  "unaccounted": []
+ },
+ "problems": [],
+ "identity_grade": "ATTESTED",
+ "capabilities": {
+  "developer": {
+   "name": "developer",
+   "grade": "ATTESTED",
+   "enforcement": "PARTIAL",
+   "binding": {
+    "client": "opencode 1.18.31 binary-sha256:16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198 routing-config-sha256:7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5",
+    "declared_model": "deepseek-v4-pro",
+    "deployment": "system_fingerprint:a307abda487cd1b463329ccb945ce396",
+    "endpoint": "https://9router.vnteki.com/v1",
+    "fingerprint": "530e3f126496009bf298979d01f122a24c04310bdbbdc69a2a7fd52dee108451",
+    "provider": "9router",
+    "route": "9router/ds/deepseek-v4-pro"
+   },
+   "identity": "051c8bfe0304e5775092e54b2c0c70f81363aeffd66a47d9db6ff96ee03fa93f"
+  },
+  "reviewer": {
+   "name": "reviewer",
+   "grade": "ATTESTED",
+   "enforcement": "PARTIAL",
+   "binding": {
+    "client": "opencode 1.18.31 binary-sha256:16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198 routing-config-sha256:7bbb7e98e8897ec23da7c13986a609bd5b160ce13a0d8d171afc120a8a96d8f5",
+    "declared_model": "deepseek-v4-pro",
+    "deployment": "system_fingerprint:a307abda487cd1b463329ccb945ce396",
+    "endpoint": "https://9router.vnteki.com/v1",
+    "fingerprint": "530e3f126496009bf298979d01f122a24c04310bdbbdc69a2a7fd52dee108451",
+    "provider": "9router",
+    "route": "9router/ds/deepseek-v4-pro"
+   },
+   "identity": "e1638cf50108aee563d3dbe5e18f9ad6b85deef451a3cde020092c27aac7e7b7"
+  }
+ },
+ "resolved_runspec_hash": "d4845bf96421951cec2982ad7242c3ddfc5f9f23fe8d4c72423e6e142dc6a07c",
+ "fingerprint_note": "a drift detector over the observable preflight fields — not a claim about model weights",
+ "verdict": "ATTESTED",
+ "aggregate_min_grade": "ATTESTED"
+}
