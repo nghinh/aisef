@@ -119,8 +119,8 @@ aisef mockup                       # mỗi màn hình một HTML + hợp đồng
 aisef approve mockups
 aisef approve readiness
 
-aisef run                          # hiện thực: epic tuần tự, story song song
-aisef run --verify-only --story STORY-01-07   # kiểm lại ứng viên đã đóng băng, không mở phiên developer
+aisef legacy run                   # V1 hiện thực: epic tuần tự, story song song
+aisef legacy run --verify-only --story STORY-01-07   # kiểm lại ứng viên đã đóng băng, không mở phiên developer
 aisef qa                           # bộ kiểm định
 aisef devsecops                    # CI + Dockerfile + triển khai + runbook
 aisef pre-deploy                   # cổng cuối
@@ -176,7 +176,7 @@ tắc kế hoạch (trả người kèm lời reviewer). Trước mỗi vòng �
 `aisef approve improve` trừ `--auto`.
 
 ```bash
-aisef run --verify-only --story STORY-01-07
+aisef legacy run --verify-only --story STORY-01-07
 ```
 
 Story trượt chỉ vì môi trường đo (e2e nhạy tải máy) thì không cần trả tiền
@@ -269,14 +269,12 @@ không tính là đạt.
 uv build && uvx twine check dist/*
 ```
 
-`.github/workflows/release.yml` publish bằng *trusted publishing* khi đẩy tag
-`v*` — không có token nào trong kho. Việc làm **một lần bằng tay**, bằng tài
-khoản tổ chức: tạo project `aisef` trên PyPI và khai trusted publisher
-(kho này · workflow `release.yml` · environment `pypi`). Sau đó:
-
-```bash
-git tag vX.Y.Z && git push origin vX.Y.Z
-```
+Từ 2.0 quy trình phát hành là của V2: [docs/v2/RELEASE-PROCESS.md](docs/v2/RELEASE-PROCESS.md).
+Chỉ tag đúng `vX.Y.Z` mới tới PyPI production, và chỉ sau khi ma trận test, cài
+sạch artifact staging và cổng phát hành V2 (uỷ quyền của owner) đạt trong
+`release.yml`; tag RC/dev (`v*rc*`, `v*-rc*`, `v*.dev*`) chạy `staging.yml`,
+không bao giờ publish. `aisef run` là runtime V2; V1 chạy bằng `aisef legacy run`.
+Cổng V1 ở trên giữ cho bề mặt legacy, không còn chặn hay cho phép một bản phát hành.
 
 Kho hồi quy dogfood (`tests/dogfood/`, bật bằng `AISEF_DOGFOOD=1`) dựng lại
 dự án thử `par` từ đầu vào trong kho và so với mốc đã đo — chạy trước mỗi tag.
