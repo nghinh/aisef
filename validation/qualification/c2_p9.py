@@ -449,6 +449,10 @@ def opencode_session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeou
     and the stream is read while the session runs: the range is released when the budget is reached. A session that
     is not started leaves no stream."""
     from aisef2.runtime.process_range import ProcessRange
+    unbound = [k for k, v in (("model", model), ("env", env), ("budget", budget), ("turn_cap", turn_cap)) if v is None]
+    if unbound:     # V2.0 charter §6 (B2): never the default model, an inherited environment, or unlimited spend or turns
+        raise SystemExit(f"REFUSED: a model session needs a fixed route, a built environment, a budget and a turn cap; "
+                         f"unbound: {', '.join(unbound)}")
     exe = shutil.which("opencode")
     started = time.monotonic()
     code, stopped = None, None
@@ -696,6 +700,11 @@ def run(out_dir: pathlib.Path, *, preserve_to: pathlib.Path, profile: str = "qp-
     from validation.qualification import p10_contracts as aid
     started = time.time()
     exp = session_kw = budget = None
+    if profile != EXPERIMENT:
+        # V2.0 charter §6 (B2): a profile no frozen experiment or release-smoke record authorizes never reaches a model —
+        # without one there is no fixed route, no built environment, no budget and no turn cap. Nothing has started.
+        raise SystemExit(f"REFUSED: profile {profile!r} is authorized by no frozen experiment or release-smoke record; "
+                         "a live run needs one (V2.0 release charter §6)")
     if profile == EXPERIMENT:
         # THE GATE, inside the runner (the run script is not the enforcement boundary): nothing below can reach a
         # provider unless the committed preregistration holds on this tree and this machine AND the attempt holds a

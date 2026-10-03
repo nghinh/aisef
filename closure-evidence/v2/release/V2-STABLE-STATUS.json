@@ -2,7 +2,7 @@
  "record": "AISEF V2.0 — stable release phase checkpoints (charter §22). CURRENT_SHA is the commit this status was written on; the commit carrying the file is its child (a commit cannot name itself).",
  "authority": "owner charter 'AISEF V2 — STABLE RELEASE EXECUTION ORDER / OWNER RELEASE CHARTER / SCOPE FREEZE' (2026-10-03), docs/v2/V2-STABLE-RELEASE-CHARTER.md sha256 cd8833569fed317bb1ef20cb7bc997b6f7003218be1f5347bd53df001c04b58a",
  "S0_SCOPE_FREEZE": "PASS",
- "S1_FAIL_CLOSED": "NOT_STARTED",
+ "S1_FAIL_CLOSED": "PASS",
  "S2_FIX_WINDOW": "NOT_STARTED",
  "S3_PRODUCTIZED": "NOT_STARTED",
  "S4_RC_FROZEN": "NOT_STARTED",
@@ -11,12 +11,11 @@
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
- "CURRENT_SHA": "bcbb2e63809e98dc1fd11c3ed925a3756e71285f",
+ "CURRENT_SHA": "ae478f678d117da2a369eb1e5f899c986201cfac",
  "CURRENT_KERNEL_DIGEST": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
  "CURRENT_WHEEL_DIGEST": null,
  "OPEN_V2_0_BLOCKERS": [
   "B1",
-  "B2",
   "B3",
   "B4",
   "B6",
@@ -45,6 +44,13 @@
    "phase": "S0_SCOPE_FREEZE",
    "status": "PASS",
    "what": "charter verbatim, machine-readable charter, findings register, V2.1 backlog, RELEASE-DECISIONS seq 2, release branch from faeb016 + 3ed2c41"
+  },
+  {
+   "phase": "S1_FAIL_CLOSED",
+   "status": "PASS",
+   "on": "ae478f678d117da2a369eb1e5f899c986201cfac",
+   "what": "B2 closed: c2_p9.run refuses every profile no frozen experiment/release-smoke record authorizes (qp-2.9, v1-aligned; delivery-experiment-1 by its hold); c2_p9.opencode_session refuses unless model, built env, budget and turn cap are all bound; tests/v2/test_release_fail_closed.py (no provider call); K-NOWORK-001 rehearsal re-bound to the new c2_p9.py"
   }
- ]
+ ],
+ "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO"
 }

@@ -861,7 +861,7 @@
   "tests/v2/test_c2_k_nowork_001.py": "fb7eb72901a689a3ef57a9bc17b752d09178064789d524193e4bd4148e73b391",
   "validation/qualification/c2_k_nowork_001.py": "84a4f433ed72d04d3b207beeaef5a365f613d3ce44d1b750552011e4187ee247",
   "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json": "365ebacfc8d27a2d5f3f833a90fa4ba6d4ac6dd2a76d9e7744310579f14d8ba6",
-  "validation/qualification/c2_p9.py": "8f9846ad688d9f60be7cbb83b1f74237babb5b5fec2a416e5e2eb0de0bceb595"
+  "validation/qualification/c2_p9.py": "2462745b813af58022c3d50dd45e91f1cebee0fccddaac53da4af6cf87aaae91"
  },
  "provider_calls": 0,
  "ledgerlock_runs": 0,
@@ -871,5 +871,5 @@
  },
  "problems": [],
  "verdict": "REPRODUCED AND CORRECTED",
- "seconds": 596.9
+ "seconds": 562.2
 }

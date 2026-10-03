@@ -276,9 +276,10 @@ class BudgetFromEvidence(Evidence):
         b = self.budget(output_tokens=100)
         self.events += requests(1)                                                          # the kernel journaled the next request
         with mock.patch.object(c2_p9.shutil, "which", return_value=None):                   # a start would fail on None
-            s = c2_p9.opencode_session("reviewer S", "prompt", str(self.dir), self.logs / "S.reviewer.1.jsonl", 60.0, model="p/m", budget=b)
+            s = c2_p9.opencode_session("reviewer S", "prompt", str(self.dir), self.logs / "S.reviewer.1.jsonl", 60.0, model="p/m", budget=b,
+                                       env={}, turn_cap=80)
             again = c2_p9.opencode_session("developer S", "prompt", str(self.dir), self.logs / "S.developer.1.jsonl", 60.0, model="p/m",
-                                           budget=self.budget())
+                                           budget=self.budget(), env={}, turn_cap=80)
         self.assertEqual((s["started"], s["exit"], s["turns"], s["timed_out"], s["log"]), (False, None, 0, False, None))
         self.assertEqual(s["error"], s["stopped"])                           # the adapters answer the kernel with a provider refusal
         self.assertEqual(s["stopped"], "max_output_tokens: 100 of 100")
