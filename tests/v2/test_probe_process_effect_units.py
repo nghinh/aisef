@@ -368,6 +368,14 @@ class Verdicts(unittest.TestCase):
         self.assertEqual(pe._concluded("scenario_returns", {"returns": 1}, facts),
                          Observation(K.OBSERVED, S, json.dumps(facts)))
         self.assertEqual(pe._concluded("scenario_returns", {"returns": 2}, facts).verdict, R)
+        # B1: tampering decides even when the rest of the facts would satisfy the observable; a signal the controller
+        # did not send is named whole
+        tampered = {**facts, "tampered": "an answer on the subject's channel is not the agent's"}
+        self.assertEqual(pe._concluded("scenario_returns", {"returns": 1}, tampered),
+                         Observation(K.OBSERVED, R, json.dumps(tampered)))
+        self.assertEqual(pe._concluded("scenario_returns", {"returns": 1}, {"subject_signal": 15}),
+                         Observation(K.NON_CONTROLLER_SIGNAL, detail="the subject's process ended by signal 15 after "
+                                     "DISPATCHED, and this controller's signal ledger is empty: it did not send it"))
 
 
 # --------------------------------------------------------------------------------------- placeholder and request
