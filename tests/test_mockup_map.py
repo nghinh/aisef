@@ -347,8 +347,18 @@ def _why_not_up(p, log, port: int, url: str) -> str:
         http = "answered"
     except Exception as e:  # noqa: BLE001 — a diagnostic: every failure is reported, none is raised
         http = repr(e)
+    import subprocess
+
+    def run(*argv):
+        try:
+            r = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", timeout=10)
+            return (r.stdout + r.stderr).strip()[-600:]
+        except (OSError, subprocess.SubprocessError) as e:
+            return repr(e)
     return (f"exit {p.poll()}, stderr {log.read()[-1500:]!r}, tcp {tcp}, urllib {http}, "
-            f"proxies {urllib.request.getproxies()!r}")
+            f"proxies {urllib.request.getproxies()!r}, state {run('ps', '-o', 'stat=,etime=,command=', '-p', str(p.pid))!r}, "
+            f"listening {run('lsof', '-nP', '-a', '-p', str(p.pid), '-iTCP')!r}, "
+            f"firewall {run('/usr/libexec/ApplicationFirewall/socketfilterfw', '--getglobalstate', '--getstealthmode')!r}")
 
 
 def _free_port() -> int:
