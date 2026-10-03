@@ -1,0 +1,57 @@
+{
+ "record": "AISEF V2 — STABLE RELEASE DECISIONS (append-only: a later decision is a new entry; no entry is ever edited or removed)",
+ "id": "AISEF-V2-RELEASE-DECISIONS",
+ "rule": "append-only",
+ "entries": [
+  {
+   "seq": 1,
+   "id": "AISEF_V2_STABLE_RELEASE_DECISION_AFTER_ATTEMPT4",
+   "authority": "owner ruling 'AISEF V2 — ATTEMPT-4 EVIDENCE FREEZE + RELEASE NO-GO + MEASURED REMEDIATION DESIGN' (2026-10-03) §B",
+   "approver": "human:owner",
+   "decision": {
+    "DELIVERY_NON_REGRESSION": "NOT_ESTABLISHED",
+    "STABLE_RELEASE": "NO_GO",
+    "RELEASE_GO": "NO",
+    "LEDGERLOCK_FURTHER_RELEASE_ATTEMPTS": "NOT_AUTHORIZED"
+   },
+   "ledgerlock_classification": "DEVELOPMENT_REGRESSION",
+   "grounding_facts": {
+    "route_and_identity": {
+     "fact": "valid fixed route 9router/ds/deepseek-v4-pro; identity ATTESTED (deepseek-v4-pro, owned_by ds, system_fingerprint a307abda487cd1b463329ccb945ce396 on all 3 probes); resolved RunSpec d4845bf96421951cec2982ad7242c3ddfc5f9f23fe8d4c72423e6e142dc6a07c",
+     "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/ATTESTATION.json"
+    },
+    "budget_not_exhausted": {
+     "fact": "18 / 60 provider requests, 449 / 700 turns, 48 458 547 / 60 000 000 input, 427 741 / 700 000 output+reasoning tokens; reached none; unaccounted none",
+     "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/LEDGERLOCK-REGRESSION.json execution_profile.budget"
+    },
+    "stories": {
+     "fact": "4 of 7 required stories successful (STORY-01-01, STORY-01-05, STORY-02-01, STORY-02-02 COMMIT; STORY-03-01, STORY-04-01, STORY-04-02 ROLLBACK)",
+     "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/LEDGERLOCK-REGRESSION.json story_outcomes"
+    },
+    "productproof": {
+     "fact": "51 of 59 final ProductProofSpecs satisfied on final main 76edbe3adc6fb2c95f539abbedb7bf65361513b0",
+     "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/FINAL-EVALUATION.json v2_final_proof"
+    },
+    "v1_oracle": {
+     "fact": "1 of 9 (complete oracle run)",
+     "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/FINAL-EVALUATION.json v1_oracle, closure-evidence/v2/cycle2/P10/attempt-4/V1-ORACLE-OUTPUT.txt"
+    },
+    "framework_false_rollback_or_block": {
+     "fact": "NO — the two contract rollbacks are refutations the offline replay reproduces on the preserved candidates (diagnosis, not run evidence); STORY-04-01's PRECONDITION_BROKEN follows from STORY-03-01 not committing",
+     "evidence": "closure-evidence/v2/cycle2/H-CONTEXT-AUTHORITY-001.json, closure-evidence/v2/cycle2/PROBE-DIAGNOSTIC-GAP-001.json"
+    },
+    "plan_quality": {
+     "fact": "NOT_CLAIMED",
+     "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/LEDGERLOCK-REGRESSION.json plan_quality_verdict"
+    }
+   },
+   "evidence_commit": "9b919a36b5710c650d33c8a2ca40a6c7beff6d7f",
+   "not_claimed": {
+    "v2_globally_worse_than_v1": "NOT_CLAIMED",
+    "generalization": "NOT_CLAIMED",
+    "note": "one workload, one model route, one attempt; this decision is about the current stable release only"
+   },
+   "measured_after_the_ruling_was_issued": "DEVELOPER-CONFINEMENT-GAP-001 (closure-evidence/v2/cycle2/DEVELOPER-CONFINEMENT-GAP-001.json): attempt-4 developer sessions read outside their workspace, one of them the hidden probe stimulus. No story that read hidden material committed; the decision above does not depend on it and is not changed by it."
+  }
+ ]
+}

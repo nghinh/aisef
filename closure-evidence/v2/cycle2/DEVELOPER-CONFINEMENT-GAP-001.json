@@ -1,0 +1,86 @@
+{
+ "record": "AISEF V2 — DEVELOPER-CONFINEMENT-GAP-001: the developer agent's reach is the whole host, so hidden ProductProof material and the framework's own sources are readable; in attempt 4 one developer session read the hidden probe stimulus",
+ "id": "DEVELOPER-CONFINEMENT-GAP-001",
+ "status": "OPEN",
+ "classification_proposed": "HIDDEN_PROOF_MATERIAL_REACHABLE_BY_DEVELOPER (for the owner to classify)",
+ "named_separately_because": "measured while freezing attempt 4, after the ruling was issued; it is neither a false rollback nor a false block, and it is not H-CONTEXT-AUTHORITY-001 (which is about a file inside the workspace)",
+ "measured_facts": [
+  {
+   "n": 1,
+   "fact": "A developer session read the hidden probe stimulus from the kernel's probe scratch directory.",
+   "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/sessions/STORY-04-02.developer.3.jsonl line 165 (lists the run's root: merge/, ws/scratch-STORY-04-02-*, ws/verifier-wt-STORY-04-02), 168 (finds probe-*/{harness.log, protocol.log, request.json, stderr.bin, stdout…}), 171 (cat of every probe-*/request.json: 16 974 characters holding 33 distinct hidden probe-input fragments, among them the full S-D3-05-01-1 scenario), 174 (protocol.log and stderr), 228 ('Reproduce probe-48dzjxlf exactly' — output 'step 3 RAISED ValueError'), 234 (reads <run>/repo/ledgerlock/ledger.py and the verifier worktree's)"
+  },
+  {
+   "n": 2,
+   "fact": "The scratch directory is the kernel's, beside the developer's and the verifier's worktrees.",
+   "evidence": "aisef2/orchestrate/story_runner.py:176 scope.acquire(ws.scratch(f\"scratch-{story_id}\")) and :178 ws.checkout(f\"verifier-wt-{story_id}\", base) under the same workspace root as the developer worktree wt-<story>; the probe writes request.json at aisef2/probe/process_effect.py:732"
+  },
+  {
+   "n": 3,
+   "fact": "The same session read the live kernel journal of the run.",
+   "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/sessions/STORY-04-02.developer.3.jsonl lines 150 and 153: <run>/run/journals/c2-p9-ledgerlock.jsonl (7944 lines at that moment), printing the probe/evaluated record at seq 7748 by the seq numbers its retry feedback cited"
+  },
+  {
+   "n": 4,
+   "fact": "A developer session read the framework's own sources, the LedgerLock reference implementation, a mutant and the acceptance oracle from the main checkout on the host.",
+   "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/sessions/STORY-04-02.developer.2.jsonl lines 83-190 under /Users/nghinh/Downloads/projects/ai-sdlc: aisef2/probe/process_effect.py (132, 47 255 chars), aisef2/cohort/preregistration.py (145), tests/v2/fixtures/workloads/ledgerlock-reference/reference/ledgerlock/ledger.py (154, 12 267 chars), mutants/M-3.3-2/ledger.py (157), acceptance.py (163, 24 149 chars), REQUIREMENTS-MAP.json (184), REQUIREMENTS.md (187), docs/implementation/v2/cycle2/LEDGERLOCK-PLAN-V2.2-PROPOSAL.md (190); before that the pipx-installed V1 aisef package (83-102)"
+  },
+  {
+   "n": 5,
+   "fact": "Two other sessions searched the host for the probe in the workload's source repository and its V1 virtualenv.",
+   "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/sessions/STORY-03-01.developer.3.jsonl lines 73-179 and closure-evidence/v2/cycle2/P10/attempt-4/sessions/STORY-04-02.developer.3.jsonl lines 72-135: /Users/nghinh/Downloads/projects/ledgerlock-aiseftest-run2 (git HEAD 136a68d, the workload base) and its .venv V1 aisef 1.7.3 package, ~/.cache/aisef, ~/.local; 'git show HEAD:ledgerlock/ledger.py' there failed (no such path)"
+  },
+  {
+   "n": 6,
+   "fact": "The searches used the identifiers the retry feedback gave.",
+   "evidence": "the H-RETRY-001 feedback recomputed from the journal at seq 7756 and 7892 names 'probe probe.process_effect', 'ProductProofSpec PPS-b3407979…', 'contract BC-V22-S-D3-05-01-1', 'criterion S-D3-05-01-1' and says 'The hidden proof stimulus is not disclosed.'; the searches grep for process_effect, b3407979, BC-V22, S-D3-05-01-1, ProductProofSpec (e.g. STORY-04-02.developer.2.jsonl lines 105-135, 178)"
+  },
+  {
+   "n": 7,
+   "fact": "Nothing of this reached a committed candidate.",
+   "evidence": "the three sessions changed nothing — the journal records 'the developer changed nothing' at seq 7442 (STORY-03-01), 7808 and 7944 (STORY-04-02), the sessions hold no write or edit tool call, and the candidate evaluated after each was the unchanged base 76edbe3 (seq 7566-7570, 7884-7888, 8020-8024); STORY-03-01 and STORY-04-02 rolled back (seq 7574, 8028). The developer sessions of the committed stories (STORY-01-01 attempt 1, STORY-01-05 attempts 1-2) reached outside their workspace only to run ~/.local/bin/ruff, and their tool outputs hold no hidden probe-input fragment beyond the 8-character '{\"v\": 1}'"
+  },
+  {
+   "n": 8,
+   "fact": "Attempt 3 shows none of it.",
+   "evidence": "closure-evidence/v2/cycle2/P10/attempt-3/sessions: no developer tool call names a path outside its workspace except ~/.config/ruff (2 calls); no developer call touches a scratch, probe or verifier directory; reviewers read only their own verifier worktree"
+  },
+  {
+   "n": 9,
+   "fact": "The main checkout the developer read was not changed.",
+   "evidence": "verified after the run and again before the evidence commit 9b919a3: HEAD 3ed2c41, tracked diff sha256 24f9b693…, 7 status lines, the 6 untracked files' hashes unchanged"
+  },
+  {
+   "n": 10,
+   "fact": "The workspace's git store reaches V1-era implementations and the run's own earlier candidates.",
+   "evidence": "the harness clones the whole source repository: attempt-4.git keeps refs/remotes/origin/{master, plan-v2, plan-v2.1, story/STORY-01-01..06}, 10 commits not in the baseline; STORY-03-01.developer.3.jsonl lines 139-160 git show b0666a6 (this run's rolled-back attempt 2) and 191-200 git show origin/story/STORY-01-06:ledgerlock/ledger.py and :tests/test_conflict.py"
+  },
+  {
+   "n": 11,
+   "fact": "The developer client's own surface is not part of the run's identity.",
+   "evidence": "the developer runs with the operator's global OpenCode configuration merged in (validation/qualification/c2_delivery_experiment.py:143-152 overlays only model and provider); ~/.config/opencode/plugins/rtk.ts rewrites shell commands; MCP servers and permission rules come from that global file; the client's own log records external_directory decisions as allow; none of these is in routing_config_digest, the developer capability identity or the RunSpec (c2_delivery_experiment.py:170-191). Key names only were read, never values"
+  },
+  {
+   "fact": "Hidden stimulus now persists outside any run root.",
+   "evidence": "the operator's OpenCode store ~/.local/share/opencode/opencode.db (mode 644, readable by every process of the user) holds 62 JSON-escaped copies of the S-D3-05-01-1 scenario fragment ['delete', 'd', null, 's5', 4] (counted, not printed); the evidence commit 9b919a3 holds the same session output (STORY-04-02.developer.3.jsonl line 171) in the framework repository, which already holds every spec's stimulus in validation/qualification/p10_contracts.py",
+   "n": 12
+  },
+  {
+   "fact": "Executed candidate code shares the probe's interpreter, request included.",
+   "evidence": "aisef2/probe/process_effect.py:431 reads the whole request into the module-global req of the probe child, and the subject is imported into that same interpreter (:523, :663); confinement of file reads alone cannot hide the stimulus from candidate code the probe executes — only write and egress confinement can keep it from reaching a later session",
+   "n": 13
+  }
+ ],
+ "consequence": "H-PROMPT-001 (the prompt does not disclose hidden stimuli) holds for the prompt only: the developer's bash reaches the probe's scratch files, the specs and the reference implementation. Attempt 4's verdict is unaffected (no story that read hidden material committed), but a run in which such material shapes a committed candidate would be a false-acceptance risk that the proofs cannot see. The kernel's live journal and the run's own earlier candidates are equally reachable. Because the stimulus now also sits in the operator's OpenCode store and in committed evidence, removing the kernel's scratch from reach would not be enough on its own.",
+ "not_done_here": [
+  "no confinement implemented; the context and diagnostic designs account for it: docs/implementation/v2/cycle2/H-CONTEXT-AUTHORITY-001-DESIGN.md, docs/implementation/v2/cycle2/PROBE-DIAGNOSTIC-CHANNEL-DESIGN.md",
+  "no kernel workspace-layout change",
+  "attempt-4 evidence unchanged"
+ ],
+ "related": [
+  "H-CONTEXT-AUTHORITY-001",
+  "PROBE-DIAGNOSTIC-GAP-001",
+  "H-PROMPT-001",
+  "H-RETRY-001"
+ ]
+}

@@ -1,0 +1,73 @@
+{
+ "record": "AISEF V2 — H-CONTEXT-AUTHORITY-001: a non-authoritative repository artifact became the developer's product authority against the frozen requirements",
+ "id": "H-CONTEXT-AUTHORITY-001",
+ "status": "OPEN",
+ "classification": "DEVELOPER_CONTEXT_AUTHORITY_LEAK",
+ "not": [
+  "a false rollback: the ProductProof refutations are correct (fact 7)",
+  "a framework false block"
+ ],
+ "authority": "owner ruling 'AISEF V2 — ATTEMPT-4 EVIDENCE FREEZE + RELEASE NO-GO + MEASURED REMEDIATION DESIGN' (2026-10-03) §C",
+ "measured_facts": [
+  {
+   "n": 1,
+   "fact": "The attempt-4 developer prompts contain no four-field delete execution shape.",
+   "evidence": "the 7 prompts recomputed by validation/qualification/c2_p9.py prompts(plan, requirements) at e49226b equal, digest for digest, the 7 prompts_sha256 the attempt-4 preregistration binds (DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION-AMENDED.json developer_context.prompts; prompt_set a9701615…) and the resolved RunSpec binds (P10/attempt-4-preservation/RESOLVED-RUNSPEC.canonical.json settings.harness); execution-shaped delete mentions per prompt: 0 in each of the 7 (the only 'delete' word is STORY-03-01's clause text R-4.5/1 'put k r1 then delete k r2: the second MUST conflict')"
+  },
+  {
+   "n": 2,
+   "fact": "STORY-01-01 attempt 1 nevertheless implemented the four-field delete.",
+   "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/sessions/STORY-01-01.developer.1.jsonl line 26 (write ledgerlock/ledger.py containing 'delete op needs 4 fields'); candidate 8eac518a692e… ledgerlock/ledger.py:126-128 (`if name == \"delete\": if len(items) != 4: raise ValueError(f\"delete op needs 4 fields, got {len(items)}\")`), preserved in /Users/nghinh/Downloads/projects/aisef-qp-2.9-preserved/attempt-4.git"
+  },
+  {
+   "n": 3,
+   "fact": "The developer read _bmad-output/epics.md.",
+   "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/sessions/STORY-01-01.developer.1.jsonl line 12 (read tool, filePath <worktree>/_bmad-output/epics.md), before the write at line 26; docs/requirements.md was read at line 2"
+  },
+  {
+   "n": 4,
+   "fact": "That repository artifact prescribes the four-field delete form.",
+   "evidence": "workload base 136a68d, _bmad-output/epics.md (blob 690df57f3abe2efc25099613adfe6d91a8f8ab69) line 108: 'Ledger.append((\"put\", key, value, rid, ts)) (or (\"delete\", key, rid, ts))'; the read at session line 12 returned that text"
+  },
+  {
+   "n": 5,
+   "fact": "The frozen requirements require the five-field tuple (op, key, value, rid, ts).",
+   "evidence": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md §5 lines 93-94 ('apply_batch(ops) accepts an iterable of (op, key, value, rid, ts) tuples'), blob 3c248a48755d6255733e02ff3bb74017ec969033 = the workload's docs/requirements.md at 136a68d; the approved contracts of S-4.4-a (PPS-130df03b…, semantic hash 93c8561b…) and S-D3-05-01-1 (PPS-b3407979…, 62bd1473…) exercise Ledger.apply_batch with that form (P5-CONTRACT-APPROVALS, approver human:owner)"
+  },
+  {
+   "n": 6,
+   "fact": "The incorrect implementation propagated to later candidates.",
+   "evidence": "the same check at ledgerlock/ledger.py:128 in every later candidate and merge the journal names: e8619c2, 1271324, f9eff70, b0666a6, 695c7f2 and main ed3d5d7 / 76edbe3 (git grep in attempt-4.git)"
+  },
+  {
+   "n": 7,
+   "fact": "ProductProof correctly refuted the resulting behavior.",
+   "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/JOURNAL.json probe/evaluated + proof/verified: S-4.4-a REFUTED and verified (agreement true) on f9eff70 (seq 7088-7092), b0666a6 (7327-7331) and, after a third attempt that changed nothing, the base 76edbe3 (7566-7570); S-D3-05-01-1 REFUTED and verified on 695c7f2 (7748-7752) and, after two attempts that changed nothing, the base 76edbe3 (7884-7888, 8020-8024); failures CONTRACT_UNSATISFIED owner DEVELOPER at seq 7095, 7334, 7573, 7755, 7891, 8027; offline replay on b0666a6 and 695c7f2 (diagnosis, not run evidence): the delete step raises 'ValueError: delete op needs 4 fields, got 5' while the candidate's own four-field form is accepted"
+  }
+ ],
+ "constraints": [
+  "LedgerLock's _bmad-output files are not modified",
+  "no file is deleted or hidden as a benchmark-specific repair",
+  "the plan is not changed",
+  "the correction is designed generically (non-authoritative context classes), not implemented: docs/implementation/v2/cycle2/H-CONTEXT-AUTHORITY-001-DESIGN.md"
+ ],
+ "related": [
+  "H-PROMPT-002 (removed the same legacy prose from the prompts; the repository still carries it)",
+  "DEVELOPER-CONFINEMENT-GAP-001 (the developer's reach is not limited to the workspace either)",
+  "PROBE-DIAGNOSTIC-GAP-001"
+ ],
+ "further_measured_facts_not_in_the_rulings_list": [
+  {
+   "fact": "The four-field delete is not in epics.md alone.",
+   "evidence": "workload base 136a68d: _bmad-output/EXPERIENCE.md:74-75 ('(\"delete\", key: str, rid: str, ts: int)', read by the same STORY-01-01 session at line 15, before the write at line 26), _bmad-output/prd.md:300 and _bmad-output/stories/EPIC-01/STORY-01-06.md:66 ('append((\"delete\", k, r1, t1))'), _bmad-output/mockups/apply.html:259 (Ledger.apply_batch ops as '(\"delete\", key, rid, ts)' tuples — directly against REQUIREMENTS.md §5)"
+  },
+  {
+   "fact": "The same non-authoritative prose then blocked the correction.",
+   "evidence": "closure-evidence/v2/cycle2/P10/attempt-4/sessions/STORY-04-02.developer.3.jsonl line 237 states the root cause (apply_batch rejects the five-field delete that requirements §5 prescribe); line 241 'Stop and report — scope contradiction', citing STORY-01-05/01-06's four-field append delete and the V1 write-scope guard of _bmad-output/stories/EPIC-04/STORY-04-02.md:14-25 ('Guard blocks all writes outside this list … stop and report'); the journal records 'the developer changed nothing' at seq 7944. (That session reached the root cause through the hidden probe stimulus: DEVELOPER-CONFINEMENT-GAP-001.)"
+  },
+  {
+   "fact": "The workspace's instruction file carries V1 rules of its own.",
+   "evidence": "136a68d:AGENTS.md (the same blob as CLAUDE.md) line 67 'Precedence when arbitration is needed: architecture > UX spec > visual …' and line 86 'Do not write outside the story's write_scope'; that the OpenCode client puts this file into the developer's instructions is read from the client's code, not recorded in the session streams"
+  }
+ ]
+}

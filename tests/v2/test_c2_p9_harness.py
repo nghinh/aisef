@@ -397,7 +397,9 @@ class RetryFeedback(unittest.TestCase):
         shapes = {tuple(sorted(d["record"]["result"])) for _, t, d in self.events if t == "probe/evaluated"}
         self.assertEqual(shapes, {("behavior_verdict", "reason")})
         gap = json.loads((ROOT / "closure-evidence/v2/cycle2/PROBE-DIAGNOSTIC-GAP-001.json").read_text(encoding="utf-8"))
-        self.assertEqual((gap["status"], gap["measured"]["attempt_3_probe_records"]), ("OPEN", {"total": 414, "verdict_and_reason_only": 414}))
+        self.assertEqual((gap["status"], gap["measured"]["attempt_3_probe_records"]),
+                         ("ESCALATED_MEASURED_BLOCKER", {"total": 414, "verdict_and_reason_only": 414}))   # owner ruling 2026-10-03 §E
+        self.assertEqual(gap["status_history"][0]["status"], "OPEN")
 
     def test_a_probe_that_did_not_execute_gives_no_advice_and_no_record_detail(self):
         for result, code, owner in (({"detail": "harness launch failed: ENOENT secret-path"}, "PROBE_UNRUNNABLE", "ENVIRONMENT"),

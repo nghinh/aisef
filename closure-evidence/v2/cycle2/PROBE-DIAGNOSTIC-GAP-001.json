@@ -1,6 +1,16 @@
 {
  "record": "AISEF V2 — PROBE-DIAGNOSTIC-GAP-001: a refuted ProductProof records no observation detail, so nothing can tell the developer which step failed or why",
- "status": "OPEN",
+ "status": "ESCALATED_MEASURED_BLOCKER",
+ "status_history": [
+  {
+   "status": "OPEN",
+   "authority": "owner ruling 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001 / NO PROBE/KERNEL DIAGNOSTIC EXPANSION' (2026-10-03) §D: PROBE_DIAGNOSTIC_GAP = ACCEPTED_KNOWN_LIMITATION_FOR_NOW; recorded, not fixed in this change"
+  },
+  {
+   "status": "ESCALATED_MEASURED_BLOCKER",
+   "authority": "owner ruling 'AISEF V2 — ATTEMPT-4 EVIDENCE FREEZE + RELEASE NO-GO + MEASURED REMEDIATION DESIGN' (2026-10-03) §E"
+  }
+ ],
  "authority": "owner ruling 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001 / NO PROBE/KERNEL DIAGNOSTIC EXPANSION' (2026-10-03) §D: PROBE_DIAGNOSTIC_GAP = ACCEPTED_KNOWN_LIMITATION_FOR_NOW; recorded, not fixed in this change",
  "measured": {
   "attempt_3_probe_records": {
@@ -37,18 +47,55 @@
     }
    },
    "status": "a diagnosis of where the detail is lost — never feedback, never evidence of attempt 3"
+  },
+  "attempt_4_probe_records": {
+   "total": 414,
+   "verdict_and_reason_only": 414,
+   "reason_values": {
+    "null": 406,
+    "PRECONDITION_ABSENT": 8
+   },
+   "verdicts": {
+    "SATISFIED": 354,
+    "REFUTED": 52,
+    "INDETERMINATE": 8
+   }
   }
  },
- "consequence": "H-RETRY-001's feedback can state only what the journal holds: the candidate remains REFUTED for the cited approved contract and the independent verifier agrees; it cannot name the step, the input shape or the exception",
+ "consequence": "H-RETRY-001's feedback can state only what the journal holds: the candidate remains REFUTED for the cited approved contract and the independent verifier agrees; it cannot name the step, the input shape or the exception — measured again on attempt 4: the same CONTRACT_UNSATISFIED shape, three attempts each, with no actionable detail reaching the developer",
  "not_done_here": [
   "no change to the probe protocol, ProbeResult fields, process_effect's diagnostic semantics, probe_digest or F5",
   "no ProductProofSpec, BehaviorContract or probe_input change",
-  "no hidden stimulus exposed to the developer as a workaround"
+  "no hidden stimulus exposed to the developer as a workaround",
+  "the safe diagnostic channel is designed, not implemented: docs/implementation/v2/cycle2/PROBE-DIAGNOSTIC-CHANNEL-DESIGN.md"
  ],
  "a_fix_would_need": "a separately reviewed architecture / evidence-compatibility change: a typed, bounded diagnostic in the probe result or record (what may be retained, and what a developer may be told without the stimulus), its effect on record digests, probe digests, the journal format and F5, and the requalification it triggers",
  "related": [
   "H-RETRY-001 (validation/qualification/c2_p9.py retry_feedback)",
   "H-PROMPT-002",
-  "attempt 3 (closure-evidence/v2/cycle2/P10/attempt-3/)"
- ]
+  "attempt 3 (closure-evidence/v2/cycle2/P10/attempt-3/)",
+  "attempt 4 (closure-evidence/v2/cycle2/P10/attempt-4/)",
+  "H-CONTEXT-AUTHORITY-001",
+  "DEVELOPER-CONFINEMENT-GAP-001"
+ ],
+ "escalation_grounding": {
+  "repeated_contract_unsatisfied_retries": "closure-evidence/v2/cycle2/P10/attempt-4/JOURNAL.json: STORY-03-01 S-4.4-a CONTRACT_UNSATISFIED owner DEVELOPER at seq 7095, 7334, 7573 (RETRY, RETRY, ROLLBACK); STORY-04-02 S-D3-05-01-1 at seq 7755, 7891, 8027 (RETRY, RETRY, ROLLBACK)",
+  "journal_kept_verdict_and_reason_only": "every one of the 414 attempt-4 probe/evaluated records holds {behavior_verdict, reason}; the 18 probe records of these two criteria (seq 6898-7569 for S-4.4-a, 7649-8023 for S-D3-05-01-1) are all REFUTED with reason null; nothing names the failing step, its kind or the exception",
+  "h_retry_001_could_only_repeat_contract_feedback": "the feedback, recomputed from the journal by the pure validation/qualification/c2_p9.py retry_feedback at seq 7096, 7335, 7756 and 7892, states the criterion, the clause, the contract, the spec, the probe kind, the candidate, the verdict and the verifier's agreement, then 'Inspect the implementation against that requirement clause. The hidden proof stimulus is not disclosed.' — for S-D3-05-01-1 the cited clause is R-3.3/2 (the hash-chain verify), while the step that fails is a delete call",
+  "offline_replay_shows_an_actionable_subject_failure": {
+   "label": "DIAGNOSIS, NOT ATTEMPT-4 EVIDENCE: the stimuli replayed offline (no provider) on the preserved candidates b0666a6 (STORY-03-01 attempt 2) and 695c7f2 (STORY-04-02 attempt 1); script and output kept outside the repository at /Users/nghinh/Downloads/projects/aisef-qp-2.9-preserved/attempt-4-evidence/diagnosis-not-run-evidence/",
+   "S-4.4-a": {
+    "refuted_step_kind": "call (apply_batch)",
+    "exception": "ValueError",
+    "message": "delete op needs 4 fields, got 5"
+   },
+   "S-D3-05-01-1": {
+    "refuted_step_kind": "call (apply_batch)",
+    "exception": "ValueError",
+    "message": "delete op needs 4 fields, got 5"
+   },
+   "the candidates' own four-field delete": "accepted"
+  },
+  "unavailable_to_the_developer_during_retries": "the developer was told only the contract-level feedback above. In STORY-04-02 attempt 3 the developer obtained the probe's raw files by reading the kernel's probe scratch directory — that is the exposure recorded as DEVELOPER-CONFINEMENT-GAP-001, not a diagnostic channel"
+ }
 }
