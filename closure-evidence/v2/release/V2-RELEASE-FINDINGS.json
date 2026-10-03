@@ -239,9 +239,20 @@
  "risks_not_findings": [
   {
    "id": "RISK-G7-1",
-   "what": "attempt 4 committed 4 of 7 stories and used 427,741 output+reasoning tokens; the charter's smoke ceiling is 400,000 and G7 needs every story successful",
+   "what": "G7 needs every LedgerLock story successful (§17). Attempts 3 and 4 — the same workload repository, plan and route — both ended 4/7 for one measured cause: the developer wrote a 4-field ('delete', key, rid, ts) record, contrary to requirement §5's (op, key, value, rid, ts), copied from the legacy _bmad-output/epics.md that the workload repository holds at the plan's baseline (61 files under _bmad-output/); STORY-03-01 and STORY-04-02 were refuted three times each and STORY-04-01 followed. Neither that context nor the refuting probe's missing diagnostic (PROBE-DIAGNOSTIC-GAP-001, V21-04) is changed by the release, so the one smoke is expected to fail the same way; the budget is secondary",
    "source": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 1 grounding_facts",
-   "disposition": "reported to the owner; not a blocker under §1"
+   "disposition": "not a release blocker under §1 (model/workload, not the shipped runtime); reported to the owner as a decision before S6: run as chartered, or rule a workload/context change before the preregistration",
+   "measured": {
+    "attempt_4_output_plus_reasoning": 427518,
+    "delivered_stories_01_01_01_05_02_01_02_02": 84954,
+    "failing_stories_03_01_04_02_three_attempts_each": 342564,
+    "sessions_at_the_80_turn_cap": [
+     "STORY-03-01.developer.3",
+     "STORY-04-02.developer.2"
+    ],
+    "source": "closure-evidence/v2/cycle2/P10/attempt-4/sessions/*.jsonl step_finish tokens (output + reasoning)",
+    "reading": "the 400,000 ceiling binds only when two or more stories need their third attempt; a run whose stories commit within two attempts stays near 250,000 by these per-session figures"
+   }
   }
  ],
  "reviews": [
