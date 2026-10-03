@@ -404,13 +404,18 @@ class RunParts(Temp):
         self.assertEqual(R.kernel_digest(), h.hexdigest())
 
     def test_shipped_calibrations_are_read_or_absent(self):
-        self.assertEqual(R.calibrations(self.tmp / "none.json"), ())
         row = {"probe_id": "p", "probe_digest": "d", "observation_class": "returns", "positive_fixture": "+",
                "negative_fixture": "-", "demonstrated_at": 3}
-        (self.tmp / "c.json").write_text(json.dumps({"calibrations": [row, {**row, "probe_id": "q"}]}), encoding="utf-8")
-        cals = R.calibrations(self.tmp / "c.json")
+        cals = R.calibrations([row, {**row, "probe_id": "q"}])
         self.assertEqual([(c.probe_id, c.probe_digest, c.observation_class, c.positive_fixture, c.negative_fixture, c.demonstrated_at)
                           for c in cals], [("p", "d", "returns", "+", "-", 3.0), ("q", "d", "returns", "+", "-", 3.0)])
+        self.assertEqual(R.calibrations([]), ())
+        with mock.patch.dict(sys.modules, {"aisef2.app.calibrations": None}):
+            self.assertEqual(R.calibrations(), ())
+        shipped = types.ModuleType("aisef2.app.calibrations")
+        shipped.CALIBRATIONS = (row,)
+        with mock.patch.dict(sys.modules, {"aisef2.app.calibrations": shipped}):
+            self.assertEqual([c.probe_id for c in R.calibrations()], ["p"])
 
     def test_admission_is_re_derived_and_names_every_failed_check(self):
         p = bundle.load(e2e.project_bundle("a" * 40))

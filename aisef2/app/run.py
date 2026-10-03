@@ -46,7 +46,6 @@ from aisef2.runtime.run_scope import RunScope, ShutdownRefused
 from aisef2.runtime.runspec import resolve
 
 FORMAT = "aisef-v2-run-record/1"
-CALIBRATIONS = pathlib.Path(__file__).resolve().parent / "calibrations.json"
 
 
 class RunRefused(Exception):
@@ -67,11 +66,13 @@ def kernel_digest() -> str:
     return h.hexdigest()
 
 
-def calibrations(path: pathlib.Path = CALIBRATIONS) -> tuple:
-    """The probe capability calibrations this release ships, one per probe digest and observation class in use."""
-    if not path.exists():
-        return ()
-    rows = json.loads(path.read_text(encoding="utf-8"))["calibrations"]
+def calibrations(rows=None) -> tuple:
+    """The probe capability calibrations this release ships (aisef2/app/calibrations.py), or `rows` given."""
+    if rows is None:
+        try:
+            from aisef2.app.calibrations import CALIBRATIONS as rows
+        except ImportError:     # an install without them admits no plan: check 9 names every spec
+            return ()
     return tuple(ProbeCapabilityCalibration(r["probe_id"], r["probe_digest"], r["observation_class"], r["positive_fixture"],
                                             r["negative_fixture"], float(r["demonstrated_at"])) for r in rows)
 
