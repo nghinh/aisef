@@ -747,7 +747,8 @@ def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> t
     leaked = 0
     for rel in tests:
         path = pathlib.PurePosixPath(rel)
-        cmd = [sys.executable, "-m", "unittest", "discover", "-s", str(path.parent), "-t", "tests", "-p", path.name]
+        # failfast: a mutant is killed by its first failing test; the rest of the file cannot change that verdict
+        cmd = [sys.executable, "-m", "unittest", "discover", "-f", "-s", str(path.parent), "-t", "tests", "-p", path.name]
         r = ProcessRange(f"kill tests {rel}", cmd, cwd=root, env=env).start()
         code = r.wait(TIMEOUT)
         escaped = [p.pid for p in r.escaped()]  # reported while their parents are alive — checked, never trusted
