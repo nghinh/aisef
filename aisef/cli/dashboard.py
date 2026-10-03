@@ -374,7 +374,7 @@ def tom_tat_van_hanh(groups) -> str:
 def cmd_dashboard(args) -> int:
     groups = _collect_projects(args)
     if not groups:
-        print("✗ no evidence found — run `aisef run` first", file=__import__("sys").stderr)
+        print("✗ no evidence found — run `aisef legacy run` first", file=__import__("sys").stderr)
         return EXIT_NOT_READY
 
     all_evidences = [e for _, _root, evs in groups for e in evs]

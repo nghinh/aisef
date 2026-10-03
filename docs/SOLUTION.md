@@ -368,8 +368,11 @@ aisef reject  <gate>  --note "..."   (bắt buộc ghi chú)
 aisef auto-approve all|<danh sách>   luôn ghi dấu `auto`
 
 # Bước 4 — hiện thực
-aisef run     [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
-aisef run     --verify-only --story S [--client c] [--repeat K]   kiểm lại ứng viên đã đóng băng (ADR-004 R13):
+aisef run     <đối số V2>             từ 2.0 `aisef run` là runtime V2 (đường có thẩm quyền, charter G1):
+                                      mọi đối số sau `run` chuyển nguyên cho aisef2.app.cli — xem docs/v2/USAGE.md
+# V1 chỉ còn ở bề mặt legacy đặt tên tường minh, không bao giờ là mặc định:
+aisef legacy run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
+aisef legacy run --verify-only --story S [--client c] [--repeat K]   kiểm lại ứng viên đã đóng băng (ADR-004 R13):
         không mở phiên developer; ứng viên = HEAD nhánh story; chạy lại đúng phép kiểm ✗/thiếu
         ở SHA ấy, giữ rà soát/bảo mật cùng SHA; cổng chấm đủ; đạt → merge như thường, trượt →
         failed không ăn run.max_retries. Dùng khi trượt vì môi trường đo (e2e nhạy tải máy).

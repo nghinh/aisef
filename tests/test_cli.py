@@ -574,7 +574,7 @@ class TestRunCommand(CliTestCase):
         giác. Chỉ đòi `stories` thì một story khai `screens` vẫn chạy được
         khi chưa có mockup nào — rồi trượt vì "chưa đối chiếu", sau khi đã
         tiêu tiền viết xong code."""
-        code, _, err = self.run_cli("run")
+        code, _, err = self.run_cli("legacy", "run")
         self.assertEqual(code, EXIT_NOT_READY)
         self.assertIn("readiness", err)
 
@@ -645,19 +645,19 @@ class TestRunCommand(CliTestCase):
         self.assertEqual(out.getvalue(), "")
 
     def test_rejects_unknown_client(self):
-        code, _, err = self.run_cli("run", "--client", "khong-co", "--force")
+        code, _, err = self.run_cli("legacy", "run", "--client", "khong-co", "--force")
         self.assertEqual(code, EXIT_USAGE)
         self.assertIn("khong-co", err)
 
     def test_verify_only_can_story(self):
         """R13: kiểm lại là kiểm lại **một** ứng viên — không có story thì
         không có gì để chỉ vào."""
-        code, _, err = self.run_cli("run", "--verify-only", "--force")
+        code, _, err = self.run_cli("legacy", "run", "--verify-only", "--force")
         self.assertEqual(code, EXIT_USAGE)
         self.assertIn("--story", err)
 
     def test_verify_only_khong_di_voi_no_isolate(self):
-        code, _, err = self.run_cli("run", "--verify-only", "--story", "STORY-01-01",
+        code, _, err = self.run_cli("legacy", "run", "--verify-only", "--story", "STORY-01-01",
                                     "--no-isolate", "--force")
         self.assertEqual(code, EXIT_USAGE)
         self.assertIn("--no-isolate", err)
@@ -665,15 +665,70 @@ class TestRunCommand(CliTestCase):
     def test_repeat_chi_di_voi_verify_only(self):
         """R13 `--repeat k` lặp **phép kiểm** trên một ứng viên đã đóng băng —
         không có nghĩa với lượt developer."""
-        code, _, err = self.run_cli("run", "--repeat", "3", "--force")
+        code, _, err = self.run_cli("legacy", "run", "--repeat", "3", "--force")
         self.assertEqual(code, EXIT_USAGE)
         self.assertIn("--repeat", err)
 
     def test_repeat_phai_duong(self):
-        code, _, err = self.run_cli("run", "--verify-only", "--story", "STORY-01-01",
+        code, _, err = self.run_cli("legacy", "run", "--verify-only", "--story", "STORY-01-01",
                                     "--repeat", "0", "--force")
         self.assertEqual(code, EXIT_USAGE)
         self.assertIn("--repeat", err)
+
+
+class TestRunIsV2(CliTestCase):
+    """G1 (docs/v2/V2-STABLE-RELEASE-CHARTER.md §3): `aisef run` invokes V2 — `aisef2.app.cli.run(argv)` — as the
+    authoritative path; V1 execution is reachable only through the explicitly named `aisef legacy run`."""
+
+    def v2(self, rc: int = 0):
+        """A fake `aisef2.app.cli` in sys.modules; returns (recorded argv lists, patcher)."""
+        import types
+        from unittest import mock
+
+        calls: list[list[str]] = []
+        fake = types.ModuleType("aisef2.app.cli")
+        fake.run = lambda argv: calls.append(argv) or rc
+        return calls, mock.patch.dict(sys.modules, {"aisef2.app.cli": fake})
+
+    def no_v1_run(self):
+        from unittest import mock
+
+        return mock.patch("aisef.cli.parser.cmd_run", side_effect=AssertionError("V1 run reached"))
+
+    def test_run_goes_to_v2_with_its_arguments_untouched(self):
+        calls, fake = self.v2(rc=7)
+        with fake, self.no_v1_run():
+            code = main(["run", "--client", "opencode", "--story", "S-1", "--help"])
+        self.assertEqual(code, 7)
+        self.assertEqual(calls, [["--client", "opencode", "--story", "S-1", "--help"]])
+
+    def test_a_global_project_before_run_is_forwarded_first(self):
+        calls, fake = self.v2()
+        with fake, self.no_v1_run():
+            self.assertEqual(self.run_cli("run", "--epic", "EPIC-01"), (EXIT_OK, "", ""))
+            self.assertEqual(main(["--project=/p", "run"]), EXIT_OK)
+        self.assertEqual(calls, [["--project", str(self.project), "--epic", "EPIC-01"], ["--project=/p"]])
+
+    def test_without_the_v2_runtime_run_fails_and_never_falls_back_to_v1(self):
+        from unittest import mock
+
+        with mock.patch.dict(sys.modules, {"aisef2.app.cli": None}), self.no_v1_run():
+            code, _, err = self.run_cli("run", "--epic", "EPIC-01")
+        self.assertEqual(code, EXIT_USAGE)
+        self.assertIn("aisef2.app.cli", err)
+        self.assertIn("aisef legacy run", err)
+
+    def test_v1_execution_is_only_the_named_legacy_surface(self):
+        from aisef.cli import build_parser
+        from aisef.cli.implement import cmd_run
+
+        self.assertIs(build_parser().parse_args(["legacy", "run"]).func, cmd_run)
+        self.assertFalse(hasattr(build_parser().parse_args(["run"]), "func"))
+        calls, fake = self.v2()
+        with fake:
+            code, _, err = self.run_cli("legacy", "run")       # V1: refuses before the readiness gate
+        self.assertEqual((code, calls), (EXIT_NOT_READY, []))
+        self.assertIn("readiness", err)
 
 
 class TestCtxCommand(CliTestCase):
