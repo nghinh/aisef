@@ -146,6 +146,19 @@
    "RELEASE_BLOCKER_RULE_3": "YES",
    "V2_0_DISPOSITION": "BLOCK if the S2 reproducer reproduces, else V2.1_BACKLOG",
    "source": "review KA-09"
+  },
+  {
+   "ID": "B1-BLOCKS-STOP-001",
+   "TITLE": "a subject that stops its controller (SIGSTOP to the agent's parent) gets `blocks` SATISFIED: a stopped controller counted as a live range member at W",
+   "REPRODUCER": "measured by the python_callable_v2 B1 lane on 27b3639 (a subject sends SIGSTOP to its parent and returns 1: blocks SUBJECT_DEADLINE SATISFIED); regression cases tests/v2/test_python_callable_v2.py::Forgery.test_PCV2_B1_BLOCKS_STOP_001_* and tests/v2/test_c2_cli_invocation.py::test_CLI_2b_B1_BLOCKS_STOP_001_*",
+   "AFFECTED_SHIPPED_PATH": "aisef2/probe/python_callable_v2.py, aisef2/probe/cli_invocation.py (_watch: the deadline read from the range's liveness)",
+   "AFFECTED_V2_CLAIM": "G5; candidate code must not control the verdict channel",
+   "SEVERITY": "critical (false PASS)",
+   "RELEASE_BLOCKER_RULE_1": "YES",
+   "RELEASE_BLOCKER_RULE_2": "YES",
+   "RELEASE_BLOCKER_RULE_3": "YES",
+   "V2_0_DISPOSITION": "BLOCK — fixed in 85ac8d3: the controller's own timer writes the authenticated deadline RESULT; a silent controller past the window and the watchdog is HARNESS_FAILED",
+   "source": "B1 python_callable_v2 lane, S2"
   }
  ],
  "v2_1_backlog": {
@@ -173,9 +186,10 @@
    "V21-20",
    "V21-21",
    "V21-22",
-   "V21-23"
+   "V21-23",
+   "V21-24"
   ],
-  "count": 23
+  "count": 24
  },
  "risks_not_findings": [
   {

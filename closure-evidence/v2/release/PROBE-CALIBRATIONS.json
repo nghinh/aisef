@@ -1,0 +1,213 @@
+{
+ "aisef2_tree": "9185429085f41d8e68c0d414625d990269a6a696",
+ "fixtures": {
+  "tests/v2/fixtures/calibration/cli_invocation/blocks": {
+   "negative": "6c50208c5004695ac841d0193cd3268bb6e405981e18b3230b5729bb00047873",
+   "positive": "b698aecbfcbd5bba6bab111697f274a558cfe2e8c6c45e02b53fb6f08e9f494c"
+  },
+  "tests/v2/fixtures/calibration/cli_invocation/equality": {
+   "negative": "47da4ca7fadf3af5e96bd8573d833504a770d722bb15cf533ede32137f7ee976",
+   "positive": "e491092c3e84c946412cb572b2250bcd5f30c733f270ac468d18a2621530e3ea"
+  },
+  "tests/v2/fixtures/calibration/cli_invocation/exits": {
+   "negative": "a0f599576ab705fb4263c3bc34b4a3edda564ae7c5ab956a8c601dc09fcf1ab2",
+   "positive": "c4d264397cf86fb428ea308b52106dde306830101866d2514addcffc4a1dd7b0"
+  },
+  "tests/v2/fixtures/calibration/cli_invocation/exits_files": {
+   "negative": "77b99deeae1513cf829d2931db4f2efac7a6c209f0f8d7c7ba5f416052dc1143",
+   "positive": "9034d372bc44f29a1a4e6e5e214df0ca2a3e042d95ca65c7518dc6006b754dc6"
+  },
+  "tests/v2/fixtures/calibration/cli_invocation/exits_streams": {
+   "negative": "6eca6bb143645a9dc2c159f65283705f5aa9be55ad4d73ed64295016972dc15f",
+   "positive": "400ca8c8dd9fe90ce010ed164297ec520265a75c28ef4a9a24ef5357df1f5ccf"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/content": {
+   "negative": "d0e7a2f7d6b1d66ba36386dad0b990c386ea8b10ac267464ad9056f9c40319c3",
+   "positive": "fd1dadab061ea31d7002ab6a83da6aff0145bf07786a9610314591352fc48d0c"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/exists": {
+   "negative": "0d62ed328b8564384079019d74bbc06eee0e71fc5682ce0c464820333cd45cdf",
+   "positive": "cef1db65f246911429f52434b44d5fa902c0b131580fb61662f88e06ab78ad93"
+  },
+  "tests/v2/fixtures/calibration/file_artifact/grep_count": {
+   "negative": "c8334d2c46b57740812af555ad76decf5471d5e19220730e297b2e7555f30cb9",
+   "positive": "2ffe134b7ea8607a5dc101dd084a0db1f57c664775a3a3ee2de40df8ec981710"
+  },
+  "tests/v2/fixtures/calibration/process_effect/scenario_files": {
+   "negative": "0c9e441dbd0073904444f06182dcaa868fcf18573b12cc936cbe6696194843ca",
+   "positive": "10c0ad5fb203ca559b3f36aa487713feac139233509606f1189f59ecedaf7d69"
+  },
+  "tests/v2/fixtures/calibration/process_effect/scenario_raises": {
+   "negative": "f29a4996685e00401f47fef52d9cc206af72edf291a8d4e2bba7f6153fb94877",
+   "positive": "fe427cad70330d71c5710b7ffe8a9782b625026d6acc76fa03b45104e02c9fed"
+  },
+  "tests/v2/fixtures/calibration/process_effect/scenario_returns": {
+   "negative": "2195d1d84466f15ccaa0e04dbb89b5253bfd8ffc830ff75230acb17f01e3a359",
+   "positive": "0339de512c8ee0778d655caab64ae89645355c2831967ec5563617719189812f"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/blocks": {
+   "negative": "eb4174d6443252552fee05d00dc6e9ba046c808c5ab5afd01bca8ac4293e321c",
+   "positive": "3b35358e50a97339b8314f333771474c6bc0514be718d4c4309481ccf26e705a"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/equals": {
+   "negative": "e0ee7a5794e0038f8ba88243f2c2d8b2fbb9cc53098008681e7c6cbf146c5ff3",
+   "positive": "c70a6cc7dd74a3b524330c548fdd20cb7696b58272decf8de87d3fd79da50899"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/exists": {
+   "negative": "324a67a1a151baa82d47039627012a78c457a7a04393c1039791f0202a711c75",
+   "positive": "59471cd87ecae8f7482c71e66ce0b6742048532feeb8bbe0a94c72dc5ddaf43c"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises": {
+   "negative": "57c93667269bdb59367cdf0948b9414112279a2f9e9b04bcaeeece68e1fb8f8d",
+   "positive": "cb2f7851f36446c9e1d6784bb095beaad7594e60a55b5224831304b3037869a4"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs": {
+   "negative": "b36b7d1d23229975d0880286c23751b89b0be932a3e5aa4769c6775779e87b55",
+   "positive": "ac7e68c7076403f90838a55740dc7646fc4470a2d7a37da7af81eef78a6a70cb"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns": {
+   "negative": "4c54f7e957a6ceda3262eb27b070c555a2dd72e144d45af405bb4087fee153de",
+   "positive": "68fa90a82604d4361a3258db2e3c9ad62e0c7c6c1ae86e7caa2d10c6deef2a2a"
+  },
+  "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes": {
+   "negative": "26239aadf86a2512c55428345aad33b99789e8fad3aa3ed5aca326ddb03e0c01",
+   "positive": "4db06a77eee869f406131fee5b3708e784e2a1e439f669a12a1076afff0bb7ea"
+  }
+ },
+ "generator": {
+  "path": "validation/qualification/release_calibration.py",
+  "sha256": "3818d1c988879d5af91a68784af72d623406530dae618c1a938e44073777ac9d"
+ },
+ "problems": [],
+ "record": "AISEF V2.0 \u2014 THE PROBE CAPABILITY CALIBRATIONS THE RELEASE SHIPS",
+ "rows": [
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/file_artifact/exists/negative",
+   "observation_class": "exists",
+   "positive_fixture": "tests/v2/fixtures/calibration/file_artifact/exists/positive",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/file_artifact/content/negative",
+   "observation_class": "content",
+   "positive_fixture": "tests/v2/fixtures/calibration/file_artifact/content/positive",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/file_artifact/grep_count/negative",
+   "observation_class": "grep_count",
+   "positive_fixture": "tests/v2/fixtures/calibration/file_artifact/grep_count/positive",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/exists/negative",
+   "observation_class": "exists",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/exists/positive",
+   "probe_digest": "61e877e2868702f0a6a457878c0fae1d156ad9b25734f026f408657b725f6832",
+   "probe_id": "probe.python_callable_v2"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns/negative",
+   "observation_class": "returns",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns/positive",
+   "probe_digest": "61e877e2868702f0a6a457878c0fae1d156ad9b25734f026f408657b725f6832",
+   "probe_id": "probe.python_callable_v2"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises/negative",
+   "observation_class": "raises",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises/positive",
+   "probe_digest": "61e877e2868702f0a6a457878c0fae1d156ad9b25734f026f408657b725f6832",
+   "probe_id": "probe.python_callable_v2"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/blocks/negative",
+   "observation_class": "blocks",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/blocks/positive",
+   "probe_digest": "61e877e2868702f0a6a457878c0fae1d156ad9b25734f026f408657b725f6832",
+   "probe_id": "probe.python_callable_v2"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/negative",
+   "observation_class": "returns_bytes",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/returns_bytes/positive",
+   "probe_digest": "61e877e2868702f0a6a457878c0fae1d156ad9b25734f026f408657b725f6832",
+   "probe_id": "probe.python_callable_v2"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/equals/negative",
+   "observation_class": "equals",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/equals/positive",
+   "probe_digest": "61e877e2868702f0a6a457878c0fae1d156ad9b25734f026f408657b725f6832",
+   "probe_id": "probe.python_callable_v2"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/negative",
+   "observation_class": "raises_attrs",
+   "positive_fixture": "tests/v2/fixtures/calibration/python_callable_v2/raises_attrs/positive",
+   "probe_digest": "61e877e2868702f0a6a457878c0fae1d156ad9b25734f026f408657b725f6832",
+   "probe_id": "probe.python_callable_v2"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits/negative",
+   "observation_class": "exits",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits/positive",
+   "probe_digest": "1087fa50197e5d22838ef3b7fe4222925522e68ee7aebd34c823cbd75bc26d7c",
+   "probe_id": "probe.cli_invocation"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_streams/negative",
+   "observation_class": "exits_streams",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_streams/positive",
+   "probe_digest": "1087fa50197e5d22838ef3b7fe4222925522e68ee7aebd34c823cbd75bc26d7c",
+   "probe_id": "probe.cli_invocation"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_files/negative",
+   "observation_class": "exits_files",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/exits_files/positive",
+   "probe_digest": "1087fa50197e5d22838ef3b7fe4222925522e68ee7aebd34c823cbd75bc26d7c",
+   "probe_id": "probe.cli_invocation"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/blocks/negative",
+   "observation_class": "blocks",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/blocks/positive",
+   "probe_digest": "1087fa50197e5d22838ef3b7fe4222925522e68ee7aebd34c823cbd75bc26d7c",
+   "probe_id": "probe.cli_invocation"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/cli_invocation/equality/negative",
+   "observation_class": "equality",
+   "positive_fixture": "tests/v2/fixtures/calibration/cli_invocation/equality/positive",
+   "probe_digest": "1087fa50197e5d22838ef3b7fe4222925522e68ee7aebd34c823cbd75bc26d7c",
+   "probe_id": "probe.cli_invocation"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_returns/negative",
+   "observation_class": "scenario_returns",
+   "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_returns/positive",
+   "probe_digest": "c89933821d6133496fbf52c8026e0825837a8d25704202b16bfd932a730e7cbb",
+   "probe_id": "probe.process_effect"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_raises/negative",
+   "observation_class": "scenario_raises",
+   "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_raises/positive",
+   "probe_digest": "c89933821d6133496fbf52c8026e0825837a8d25704202b16bfd932a730e7cbb",
+   "probe_id": "probe.process_effect"
+  },
+  {
+   "negative_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_files/negative",
+   "observation_class": "scenario_files",
+   "positive_fixture": "tests/v2/fixtures/calibration/process_effect/scenario_files/positive",
+   "probe_digest": "c89933821d6133496fbf52c8026e0825837a8d25704202b16bfd932a730e7cbb",
+   "probe_id": "probe.process_effect"
+  }
+ ],
+ "shipped": "aisef2/app/calibrations.py",
+ "verdict": "CALIBRATED"
+}

@@ -391,7 +391,12 @@ class Uncontainable(unittest.TestCase):
         real = {(b["catches"], b["disposition"]) for b in result["boundaries"] if b["path"] == "aisef2/runtime/story_scope.py"}
         self.assertEqual(real, {("JournalError", eb.STRUCTURAL), ("InvariantError", eb.RERAISES), ("Exception", eb.RERAISES),
                                 ("BaseException", eb.RERAISES), ("Residual", eb.RERAISES)})
-        self.assertEqual(result["counts"][eb.RERAISES], 7)   # the seven boundaries that could hold it all re-raise
+        # the boundaries that could hold it all re-raise: the kernel's seven, and the product run's (aisef2/app/run.py,
+        # V2.0 B3: the run record is written in a `finally` as any exception propagates)
+        self.assertEqual(result["counts"][eb.RERAISES], 8)
+        self.assertEqual({(b["catches"], b["disposition"]) for b in result["boundaries"] if b["path"] == "aisef2/app/run.py"},
+                         {("BaseException", eb.RERAISES), ("Exception", eb.STRUCTURAL), ("ImportError", eb.STRUCTURAL),
+                          ("(OSError, subprocess.SubprocessError)", eb.STRUCTURAL), ("ShutdownRefused", eb.STRUCTURAL)})
 
     def test_the_audit_flags_every_swallowing_pattern_and_accepts_every_re_raise(self):
         def v(src):
