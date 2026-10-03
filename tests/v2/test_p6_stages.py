@@ -274,13 +274,19 @@ class Workspace(unittest.TestCase):
         return sha
 
     def test_git_runs_without_background_maintenance_and_sha_resolves_commits_only(self):
-        self.assertEqual(ws._NO_BACKGROUND_GIT, {"GIT_CONFIG_COUNT": "2", "GIT_CONFIG_KEY_0": "maintenance.auto",
+        self.assertEqual(ws._NO_BACKGROUND_GIT, {"GIT_CONFIG_COUNT": "7", "GIT_CONFIG_KEY_0": "maintenance.auto",
                                                  "GIT_CONFIG_VALUE_0": "false", "GIT_CONFIG_KEY_1": "gc.auto",
-                                                 "GIT_CONFIG_VALUE_1": "0"})
+                                                 "GIT_CONFIG_VALUE_1": "0",
+                                                 # V2.0 release charter B4: nothing a configuration names is executed
+                                                 "GIT_CONFIG_KEY_2": "core.fsmonitor", "GIT_CONFIG_VALUE_2": "false",
+                                                 "GIT_CONFIG_KEY_3": "core.hooksPath", "GIT_CONFIG_VALUE_3": os.devnull,
+                                                 "GIT_CONFIG_KEY_4": "commit.gpgSign", "GIT_CONFIG_VALUE_4": "false",
+                                                 "GIT_CONFIG_KEY_5": "tag.gpgSign", "GIT_CONFIG_VALUE_5": "false",
+                                                 "GIT_CONFIG_KEY_6": "core.autocrlf", "GIT_CONFIG_VALUE_6": "false"})
         p = ws.git(self.repo, "config", "--get", "maintenance.auto")
         self.assertEqual((p.returncode, p.stdout.strip()), (0, "false"))
         with mock.patch.dict(os.environ, {"GIT_AUTHOR_NAME": "Envtest", "GIT_AUTHOR_EMAIL": "e@x"}):
-            self.assertTrue(ws.git(self.repo, "var", "GIT_AUTHOR_IDENT").stdout.startswith("Envtest <e@x>"))   # the parent's environment, plus the two
+            self.assertTrue(ws.git(self.repo, "var", "GIT_AUTHOR_IDENT").stdout.startswith("Envtest <e@x>"))   # the parent's environment, plus the forced settings
         c = self.ws.checkout("wt-bytes", self.base)
         pathlib.Path(c.path, "bytes.bin").write_bytes(b"not utf-8: \xff\xfe\n")
         ws.commit_all(c.path, "bytes")

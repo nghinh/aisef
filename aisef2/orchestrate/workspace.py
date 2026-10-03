@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 import pathlib
+import re
 import subprocess
 import tempfile
 from typing import Sequence
@@ -20,13 +21,54 @@ from aisef2.orchestrate.adapters import Merge, MergeOutcome, ResourceUnavailable
 from aisef2.probe.protocol import FULL_SHA
 from aisef2.runtime.story_scope import Residual
 
-_NO_BACKGROUND_GIT = {"GIT_CONFIG_COUNT": "2", "GIT_CONFIG_KEY_0": "maintenance.auto", "GIT_CONFIG_VALUE_0": "false",
-                      "GIT_CONFIG_KEY_1": "gc.auto", "GIT_CONFIG_VALUE_1": "0"}
+#: Settings every git the runner starts runs under, at command scope (above every configuration file): no background
+#: maintenance, and — V2.0 release charter B4 — nothing a configuration could make git execute: no fsmonitor, no hook
+#: (the hook path is the null device), no signing program; line endings checked out as committed on every platform.
+_FORCED = (("maintenance.auto", "false"), ("gc.auto", "0"), ("core.fsmonitor", "false"), ("core.hooksPath", os.devnull),
+           ("commit.gpgSign", "false"), ("tag.gpgSign", "false"), ("core.autocrlf", "false"))
+_NO_BACKGROUND_GIT = {"GIT_CONFIG_COUNT": str(len(_FORCED)),
+                      **{f"GIT_CONFIG_{part}_{i}": kv[j] for i, kv in enumerate(_FORCED) for j, part in enumerate(("KEY", "VALUE"))}}
+#: B4: neither the system's nor the operator's global configuration is read; and no variable of the caller's
+#: environment that would redirect git to another repository, reconfigure it, or name a program for it to run reaches it
+_ISOLATED_GIT = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_TERMINAL_PROMPT": "0", **_NO_BACKGROUND_GIT}
+_GIT_ENV_DROPPED = re.compile(r"GIT_(CONFIG.*|DIR|WORK_TREE|COMMON_DIR|INDEX_FILE|OBJECT_DIRECTORY|ALTERNATE_OBJECT_DIRECTORIES"
+                              r"|NAMESPACE|CEILING_DIRECTORIES|EXTERNAL_DIFF|DIFF_OPTS|SSH|SSH_COMMAND|EDITOR|SEQUENCE_EDITOR|PAGER"
+                              r"|ASKPASS|EXEC_PATH|TEMPLATE_DIR|PROXY_COMMAND|REPLACE_REF_BASE|NO_REPLACE_OBJECTS|ATTR_SOURCE)")
+#: B4: the repository's own configuration (local and worktree scope) may hold only these inert keys — a filter, a diff or
+#: merge driver, an include, a helper, a hook path, a worktree redirection, a submodule command: anything else is
+#: refused before git runs there (an allowlist: a key git adds later is refused until it is named here)
+INERT_KEY = re.compile(r"core\.(repositoryformatversion|filemode|bare|logallrefupdates|ignorecase|precomposeunicode|symlinks"
+                       r"|autocrlf|eol|safecrlf|checkstat|trustctime|quotepath|untrackedcache)"
+                       r"|user\.(name|email)|extensions\.(worktreeconfig|objectformat)|init\.defaultbranch"
+                       r"|branch\..+\.(remote|merge|rebase)|remote\.[^.]+\.(url|fetch)|(gc|maintenance|color|advice|status|log|i18n"
+                       r"|index|pack)\.[a-z0-9.]+|merge\.conflictstyle|pull\.(rebase|ff)|fetch\.prune|(commit|tag)\.gpgsign")
+REFUSED = 128
+
+
+def _env() -> dict:
+    return {**{k: v for k, v in os.environ.items() if not _GIT_ENV_DROPPED.fullmatch(k)}, **_ISOLATED_GIT}
+
+
+def config_problems(repo: str | os.PathLike) -> list[str]:
+    """The keys of the repository's own configuration at `repo` that are not inert (B4). Reading a configuration
+    executes nothing; includes are listed, never followed."""
+    p = subprocess.run(["git", "-C", str(repo), "config", "--list", "--show-scope", "--no-includes", "-z"],
+                       capture_output=True, env=_env())
+    if p.returncode != 0:
+        return []       # not a repository (yet): the command itself says so
+    parts = p.stdout.decode("utf-8", "replace").split("\0")
+    keys = [entry.split("\n", 1)[0] for scope, entry in zip(parts[0::2], parts[1::2], strict=False) if scope in ("local", "worktree")]
+    return sorted({k for k in keys if not INERT_KEY.fullmatch(k.lower())})
 
 
 def git(repo: str | os.PathLike, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, encoding="utf-8", errors="replace",
-                          env={**os.environ, **_NO_BACKGROUND_GIT})
+    """git in `repo` under the isolated configuration; a repository whose own configuration holds a key that is not
+    inert is refused — nothing runs, and the result says why with exit status REFUSED (B4)."""
+    bad = config_problems(repo)
+    if bad:
+        return subprocess.CompletedProcess(["git", "-C", str(repo), *args], REFUSED, "",
+                                           f"refused: the repository configuration at {repo} names {', '.join(bad)} (not inert)")
+    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, encoding="utf-8", errors="replace", env=_env())
 
 
 def _sha(repo: str | os.PathLike, rev: str) -> str:
@@ -60,6 +102,9 @@ class Checkout:
 
     def __init__(self, name: str, repo: str, path: str | pathlib.Path, revision: str) -> None:
         self.name, self.repo, self.path, self.revision = name, repo, pathlib.Path(path), revision
+        gitfile = self.path / ".git"
+        #: B4: the gitfile as git wrote it at `worktree add` — a worktree whose gitfile now points elsewhere is refused
+        self.gitfile = gitfile.read_bytes() if gitfile.is_file() else None
 
     def release(self) -> None:
         removed = git(self.repo, "worktree", "remove", "--force", str(self.path))   # the registration goes with it
@@ -96,10 +141,16 @@ class GitWorkspace:
     def move(self, checkout: Checkout, revision: str) -> None:
         if not FULL_SHA.fullmatch(revision):
             raise InvariantError(f"a checkout moves to a full SHA, not {revision!r}")
+        gitfile = checkout.path / ".git"
+        if checkout.gitfile is None or not gitfile.is_file() or gitfile.is_symlink() or gitfile.read_bytes() != checkout.gitfile:
+            raise ResourceUnavailable(f"checkout {checkout.name}: its gitfile is not the one git wrote (B4): not moved")
         p = git(checkout.path, "checkout", "--detach", "--force", revision)
         if p.returncode != 0:
             raise ResourceUnavailable(f"checkout {checkout.name} to {revision[:12]}: git checkout exited {p.returncode}")
-        git(checkout.path, "clean", "-fdq")
+        # B6: ignored files (-x) and nested repositories (-ff) go too — nothing a run left survives into the next revision
+        c = git(checkout.path, "clean", "-ffdxq")
+        if c.returncode != 0:
+            raise ResourceUnavailable(f"checkout {checkout.name} at {revision[:12]}: git clean exited {c.returncode}")
         checkout.revision = revision
 
     def diff(self, base: str, candidate: str) -> str:

@@ -291,7 +291,8 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                 except ResourceUnavailable as e:
                     failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"merged checkout: {e}"
                     checks.append(gate.check(run, story_id, "post-merge", False, detail))
-                    merger.revert(merged)
+                    if merged != candidate:     # B7: merged == candidate is a merge git made no commit for — nothing to undo
+                        merger.revert(merged)
                 else:
                     ps, cs = reprove(run, story_id, plan, specs, merged=merged, implementer=implementer,
                                      verifier=verifier, implementer_root=str(impl.path),
@@ -303,7 +304,8 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                     broken = next((p for p in ps if p.failure is not None), None)
                     if broken is not None:
                         failure, detail = broken.failure, f"post-merge {broken.criterion_id}: {broken.failure.code.value}"
-                        merger.revert(merged)
+                        if merged != candidate:     # B7: the tip is the previous story's — this story landed no commit
+                            merger.revert(merged)
                     else:
                         revision = merged
     decision_seq = gate.decision(run, checks, failure is None)

@@ -93,7 +93,7 @@ def confine(story_id: str, checkout: str) -> ReadOnlyScope:
     if not root.is_dir():
         raise InvariantError(f"a read-only scope is derived from an existing checkout, not {checkout!r}")
     for p in root.rglob("*"):
-        if ".git" in p.parts:
+        if ".git" in p.parts or p.is_symlink():     # KA-09: a link is never followed — its target is not the story's
             continue
         mode = stat.S_IMODE(p.stat().st_mode)
         os.chmod(p, mode & ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH))
@@ -103,7 +103,7 @@ def confine(story_id: str, checkout: str) -> ReadOnlyScope:
 def unconfine(scope: ReadOnlyScope) -> None:
     """Give the write bits back so the checkout can be released."""
     for p in pathlib.Path(scope.root).rglob("*"):
-        if ".git" in p.parts:
+        if ".git" in p.parts or p.is_symlink():
             continue
         os.chmod(p, stat.S_IMODE(p.stat().st_mode) | stat.S_IWUSR)
 
