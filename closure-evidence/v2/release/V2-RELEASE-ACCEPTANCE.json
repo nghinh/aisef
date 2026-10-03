@@ -1,0 +1,510 @@
+{
+ "acceptance_suite": [
+  {
+   "contract": "BC-V22-S-D3-05-01-1",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "30efddeeb6de7f197f0186dbe6db2803a47362e29137e1c5e519254946610ff3",
+   "spec": "PPS-0a4fc49cfb33782c35f559cb3f77696134cc18bf5f2953427345171db2aa16e7"
+  },
+  {
+   "contract": "BC-V22-S-7-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "d58827fc2f600b4aaafa8f21296302b4f51daec8b3184875255294f58450a059",
+   "spec": "PPS-0e947245567c1dee1d575c822efa36a876525c75d1ee03bbabaf4778e77dd50c"
+  },
+  {
+   "contract": "BC-V22-S-13-f",
+   "expectation": "SATISFIED",
+   "probe_digest": "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae",
+   "probe_id": "probe.python_callable_v2",
+   "semantic_hash": "0369b96b7e6d6d8966b97aea426464667af4cb75cf37b50fe600287e424f6490",
+   "spec": "PPS-0fefd4623ab39b9350534d2f184d94567ebb6dff022b73203238ca0ddefa2922"
+  },
+  {
+   "contract": "BC-V22-S-7-f",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "c9c9745ea526b2f409a445047f62f6bc9140fb9443f45db1ba2572c7cb962b02",
+   "spec": "PPS-1ab92a3e7c51ca828a4547e339a7146031254f87db9f72ffc641aa83b8b770f8"
+  },
+  {
+   "contract": "BC-V22-S-6-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "73b88ce19827d02054586781f80d5fc19ec17b3650017d21657511704e5f59c0",
+   "spec": "PPS-21eb7a059f2540f2b6c93b9f4d9d226e7b25b039fba131dcd23b6858c1de377d"
+  },
+  {
+   "contract": "BC-V22-S-3.2-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "449791a63343b2aaec9c79fffd6d25c28f2eae0f087519018e1a36bb5aa31373",
+   "spec": "PPS-221372fd740b0f54d7ce436ccda384abfe39ee13bdb454a96e8d392ad26afb3a"
+  },
+  {
+   "contract": "BC-V22-S-7-d",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "6415e9f26f56febfe60ba611102050665207cc83b3863db402314f5ae520dbbf",
+   "spec": "PPS-27056269f7186a68dde5e95d77b8764027322ff5197c112311b40fae034cf097"
+  },
+  {
+   "contract": "BC-V22-S-3.3-d",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "fbe00666d50b5f8f78f673bc870f38529cdcb0ffa9c7a36845fc22342570272c",
+   "spec": "PPS-2c1036786f9353092704ad6e2b8ba1d0a9ffe1023e63bc692878e2e2b265b8e1"
+  },
+  {
+   "contract": "BC-V22-S-12-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact",
+   "semantic_hash": "59d9b16fb41b5e512daaf817e603e484815c577b7872f102ba3b9131bd667da8",
+   "spec": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d"
+  },
+  {
+   "contract": "BC-V22-S-3.2-d",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "295ac54b405eaf38608241918155aa4cf9f5942996d811341247e0344b4ede49",
+   "spec": "PPS-3cb11949cd671b26d582a17b9423faaf9c4ebc831c0997c7da20d86d898d61fd"
+  },
+  {
+   "contract": "BC-V22-S-3.2-h",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "489f923feb37be0b715da4f25b5676601e29fb7f842bcd81d315dccef288afd3",
+   "spec": "PPS-4cf7a489159ac6da2d0d79cb32bcc4c6f75caa6f2cafeeb79862ea33cc109da2"
+  },
+  {
+   "contract": "BC-V22-S-4.5-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "ae47713dfcfa514b098f43ec92dab3ef9bc24f1a3978067f470367b3c29a6df5",
+   "spec": "PPS-4ff82a4585dc90919df48a672040357d333fbab166661fa4de722750e9b21e8e"
+  },
+  {
+   "contract": "BC-V22-S-5-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "44cbfbde14369d08c750f150632d029b9e5ae192c3991f91e5f61486e0f48bf2",
+   "spec": "PPS-53e20b739fb281e1ea3ffe4e6fc9ec7a8fa887dfb3f9dc694a5edccc2bb0086d"
+  },
+  {
+   "contract": "BC-V22-S-10-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact",
+   "semantic_hash": "0c1aa8e1b6bcbc20e1b1ca514b44de592b18f4610357c465b32f6f79bec99b04",
+   "spec": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9"
+  },
+  {
+   "contract": "BC-V22-S-13-h",
+   "expectation": "SATISFIED",
+   "probe_digest": "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae",
+   "probe_id": "probe.python_callable_v2",
+   "semantic_hash": "3adefbffa1056d47fbeb33664ac283b24faadaf19362ec0b9cb3660968d081ae",
+   "spec": "PPS-59f6f04aae5342f3d16bf337a1fdb2b53f03b070ed340868b9b4d3d7ea9b92ad"
+  },
+  {
+   "contract": "BC-V22-S-3.1-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "49080365192f04c61d0b800eb3c911a36bc5570db3c8e1fa022ca4d66ba2c9d5",
+   "spec": "PPS-5ad003ff650f65c31f0bc89d6a566e5580a0c08b6df2d02813d727e33bc1a3b3"
+  },
+  {
+   "contract": "BC-V22-S-3.2-g",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "77354a92aeba23096e68ac85925079489eddb014c7ac027dcd5f0ad0b64ad920",
+   "spec": "PPS-5e88e19d64fc9aa50dffea61352f7044b4f3d9ba5a71ff18c2b1c5c5f9cc502c"
+  },
+  {
+   "contract": "BC-V22-S-10-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact",
+   "semantic_hash": "5daeb0eac00dbe0ab0bdfb6a3e163a513a7dd0a2a3ac26aefe38912ee977e93e",
+   "spec": "PPS-64c46ebaed2d255c26a9e79c34c803fe2609161938311dfb237f066b36a67867"
+  },
+  {
+   "contract": "BC-V22-S-13-g",
+   "expectation": "SATISFIED",
+   "probe_digest": "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae",
+   "probe_id": "probe.python_callable_v2",
+   "semantic_hash": "34d7660a051a356064360bca1b778287c4428e11a0b8481062513e004e4500df",
+   "spec": "PPS-6567a1c40273f8fa72b618f32d33eaf649fe0042936a0fce593e8fd1c4a44d9c"
+  },
+  {
+   "contract": "BC-V22-S-13-i",
+   "expectation": "SATISFIED",
+   "probe_digest": "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae",
+   "probe_id": "probe.python_callable_v2",
+   "semantic_hash": "c24dca14a037ac18adf27042c9de7dba5d643c7eaf4ba36c8e258fd7f0071fb4",
+   "spec": "PPS-6843a9b53c313e37f60bdd8f969c6e3b167ae34282c13c82695bf64856339c57"
+  },
+  {
+   "contract": "BC-V22-S-9-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "76e7ecbe63d6573af3962fc32ffc52d0c05885c58ac122ee5978ad4586680599",
+   "spec": "PPS-6a4c2b5364c4ba048f0468d385369797b70a344babcaf2cb5f442ec3102ae673"
+  },
+  {
+   "contract": "BC-V22-S-6-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "2e0eda71c4bc78b7d4851eb39a51aba3474bbd593897cc992f663f2deb1548c7",
+   "spec": "PPS-6c72e0891d0db03594604ae71f100705e34ec6f21f42e8c9db272f9ad3b051c4"
+  },
+  {
+   "contract": "BC-V22-S-4.3-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "204b6cabca43f7fb4f284193590d4cf44b57b9ecc3509e71dc548a7b0dfce227",
+   "spec": "PPS-6fad81af3fb88f23f46277985272a49efae3b18886654f3b3ca2d0bbc80950a0"
+  },
+  {
+   "contract": "BC-V22-S-13-d",
+   "expectation": "SATISFIED",
+   "probe_digest": "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae",
+   "probe_id": "probe.python_callable_v2",
+   "semantic_hash": "b5db5d94d85fca6d1524ed59dea9d685600892e456babc5a838927263578221f",
+   "spec": "PPS-744aded9edd3854346d69c44419a98871fdcc54720601977665212c3a73f8a9d"
+  },
+  {
+   "contract": "BC-V22-S-4.2-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "543b3398304f87fc5e4c01ea690309797aa775f6234ac7b7465d2d88fc8c598e",
+   "spec": "PPS-74787e153dee89bf1989a3330595f4a41ec7bdcd841c75a2b6ed3de2fd50ecc5"
+  },
+  {
+   "contract": "BC-V22-S-4.2-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "7fe410d4b1abc4c38d58b01c9a4e7202be2b623efdb51781d38a8c14aeb73bda",
+   "spec": "PPS-77ba8cfefcaeb5b8c894ac9d828558e0e460b6c6775ccaee6383be0d6001d4f6"
+  },
+  {
+   "contract": "BC-V22-S-6-d",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "40603e970e070f400c9dbe97bf544ce9ab47ae021da02679dc08af1ab2842ecc",
+   "spec": "PPS-7c20cb281915e14c72652a9e6ea60b7158c1fff14ea7e6074eabf1fed463ec35"
+  },
+  {
+   "contract": "BC-V22-S-D3-05-01-2",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "0feb7cf522cdfb4118b1021ab9018e32b969c334f70441671303eed5c062f38c",
+   "spec": "PPS-7e6bc9074931a57b35baddb8866f9d58e3b93f316ab4c169fc5c721bd32810e7"
+  },
+  {
+   "contract": "BC-V22-S-13-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact",
+   "semantic_hash": "a6cc35a216a8c5c6f86b2d647cc4a03e8444efc742f7971fdde64b8d7be1807e",
+   "spec": "PPS-7e99202d7849d4f22d2a4da4728b0f9000ebdb5d8507e2dec7e03c38e3f7547e"
+  },
+  {
+   "contract": "BC-V22-S-9-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "d5e93051d324e8fe92d9ea9eadf2db945d1db61ad0221d34e131de6b93bb288a",
+   "spec": "PPS-82923f967807c583c9582e9b15e5c95735eff34c093733efacf1e99cc69b519b"
+  },
+  {
+   "contract": "BC-V22-S-3.3-c",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "5635830a140610dd6c21a789ae83fa48edfb661c46c6a64da1184b472d8d5c7a",
+   "spec": "PPS-82a57c52ecef2e178fd80e8636b9cd01d8aa1ad752e419590115a963b7f96a71"
+  },
+  {
+   "contract": "BC-V22-S-7-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "8c59a45296a85839e871e779c609bf116f61538df8fa69320fb3e5ad91a2ad25",
+   "spec": "PPS-835b19e7e10f8d9d14af129cb7619ea7d104101ed586d1203ec217b8f20dc393"
+  },
+  {
+   "contract": "BC-V22-S-6-c",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "42841e4f747d9eee4ce715dd8293af9c2e515a7297c9e987aa61549a4480e9b5",
+   "spec": "PPS-86ea3c3dabbb8a38f3f0f69f02883f7ed68d5929ad94d3fd04f61523e23ee2ef"
+  },
+  {
+   "contract": "BC-V22-S-10-c",
+   "expectation": "SATISFIED",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact",
+   "semantic_hash": "be4bcade9818a3e343537d479fadbf9053a8cae3cbbce79326309f11f0ef8b5c",
+   "spec": "PPS-8ab146580469d11dbb6c20443dd9c2070da4ecb2f7c2222f33ba127775898894"
+  },
+  {
+   "contract": "BC-V22-S-9-f",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "f20671db9fd3bf8dfa95509491f741a14f21c9e391e7c03ae633f31ca8778fc0",
+   "spec": "PPS-8d75389620f10e824a48138f8abf2d75d80cbdbd3cdb90535bef4df7ac71219a"
+  },
+  {
+   "contract": "BC-V22-S-3.2-e",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "ff3a1039b08024ee47b783d108c63de11fd842fa9f2cefd278caaf708cb988b9",
+   "spec": "PPS-98d742530e731fd750b4100e3515272ce6a23c9ad5578264fbb0bfc07d88eb03"
+  },
+  {
+   "contract": "BC-V22-S-13-c",
+   "expectation": "SATISFIED",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact",
+   "semantic_hash": "3d1d6512ded0e9b8bd3295aaf30d3c24cde29c74415f5ee718f5b5cb629b86bb",
+   "spec": "PPS-9cc8e42134b41d39f3e9b94b976290ffb97c28384525cb18e210ca8ee8e574f6"
+  },
+  {
+   "contract": "BC-V22-S-7-e",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "c2b21e034d2127f68ea09834e2368ba58bb36db8eb81a2ae8ea9df5054748ad7",
+   "spec": "PPS-a093d39cfc5a2062e08e7842e5c37c898bc02da8f38727539865958e528be0f5"
+  },
+  {
+   "contract": "BC-V22-S-4.5-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "be43488f831fe507a0696c174b6e1988eb1ef36823231d4a98806e14d809e56d",
+   "spec": "PPS-a4ef67e2868735b9bb57631e5e5f7d6819472665a5f31a67b1a5c1729d1e847f"
+  },
+  {
+   "contract": "BC-V22-S-9-e",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "c8c1e666e1e8baf77bbc522b58674385398882187f97a22759f2d83b2ccf42fe",
+   "spec": "PPS-b2b2334768a7a21f6ce11617d4be9ac549482b800b3fda6298a2e0337f989630"
+  },
+  {
+   "contract": "BC-V22-S-3.2-f",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "96cb4f071690a5a4447e1cb093367fa820001f29bf7626c8aa156e784e1e78b7",
+   "spec": "PPS-b407af271716358fdf6176b67382a2a49179cf3a39edb092c21bca676d3e5129"
+  },
+  {
+   "contract": "BC-V22-S-3.3-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "c62847938f6ebdb3e9951e433e06b36131878c637da061ba550e3b838dcc1672",
+   "spec": "PPS-b5eec6684bb16d2566e4ada46bd6f9c15b9101e1f47f470decb30a2d20694652"
+  },
+  {
+   "contract": "BC-V22-S-3.2-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "723423034def200b417113df2a5a401240e844b766b8f9b3e787cdf07b1244cc",
+   "spec": "PPS-b6311fbd3c60003bb26a0dfc497eb5370bd538fcfe3788ed50f038d8a4750e75"
+  },
+  {
+   "contract": "BC-V22-S-3.3-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "5990c0ff4a6a406798075f24ba3daae8d0c18d71d38307affbf01948fe9a02c4",
+   "spec": "PPS-b81e2a52685028d4e38b82399abe1849a2dfc35b0938a1a7cff2a59e913e9f31"
+  },
+  {
+   "contract": "BC-V22-S-3.4-a",
+   "expectation": "REFUTED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "db88d0eecc1b8dc44a42081a591e131c83761aef4a1ebd8c0b1a10c06aba5e47",
+   "spec": "PPS-bb7bde157098d5b82bddacbbe7a5283167e8f5f882f19333fd6ce38cc92f767e"
+  },
+  {
+   "contract": "BC-V22-S-3.1-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "1228520dbb596afe1687c1e086953fe61e7b827bef404e08e8023cef6234e82d",
+   "spec": "PPS-bdf82c8704934408cd4cb57d8d6e7c642b0fedf5f8d3b42fbf7274fa5c252f78"
+  },
+  {
+   "contract": "BC-V22-S-3.1-c",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "9797b2b8209b60a6c5006d39535a6e1d0bdaebdbef6899e7b9d65efacda344b9",
+   "spec": "PPS-c14a4598e4d4a246c4abdc1cc06e19988637900a3cc9b3f5db028588c341b933"
+  },
+  {
+   "contract": "BC-V22-S-7-c",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "145cb3b7ebd73552352985227fae5dda53963e5d11fc3b2a3a976e8e090b08fb",
+   "spec": "PPS-c692deca361564a845cb92c6d0cf34219b5a00fa4b203bc66bdbe404d4b5dbc8"
+  },
+  {
+   "contract": "BC-V22-S-13-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact",
+   "semantic_hash": "7ab0ea2bbe8e9e3be503ad047da70604ac768f545ec86d5e0ed603c816a35ada",
+   "spec": "PPS-c70151a34378bac3b90ea06dc632037dd9908f97e0b5b9a9f94fea1f158a0292"
+  },
+  {
+   "contract": "BC-V22-S-9-c",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "fc15ccef2b2e04926261e0e22570abed7c0d16e904cada4523707e3eedc23c16",
+   "spec": "PPS-c8e741a462c13c490383e56fc70e31790a5497a8009a679c48bbcb3365e77906"
+  },
+  {
+   "contract": "BC-V22-S-9-d",
+   "expectation": "SATISFIED",
+   "probe_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+   "probe_id": "probe.cli_invocation",
+   "semantic_hash": "2ff1a33c43bb2429d49d710772ef0b6164b9d444fab367cc22672cc1c0d9919b",
+   "spec": "PPS-d0e057a7ff4b495cca2a81d9f4db48fe2e556eeed99bd25f27a266f27b63ea4e"
+  },
+  {
+   "contract": "BC-V22-S-12-c",
+   "expectation": "SATISFIED",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact",
+   "semantic_hash": "222515f27c24b9b5c27bb2bbe85b8a3e06f5aefefe4c4d50c661d51489bef13f",
+   "spec": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d"
+  },
+  {
+   "contract": "BC-V22-S-13-e",
+   "expectation": "SATISFIED",
+   "probe_digest": "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae",
+   "probe_id": "probe.python_callable_v2",
+   "semantic_hash": "82af430d3f6dddc93be75925913da968a4859cb2e6d000ebbbb3d6ec561ca329",
+   "spec": "PPS-db989591efaa04eab0700c2d484067363eb502a368b44f16ab41bbb4a83b9130"
+  },
+  {
+   "contract": "BC-V22-S-3.2-c",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "81495a200f36693b41c3cce72ca95ce9bcb28bdb81b0823c2f4c20aa8f6992dd",
+   "spec": "PPS-e15441be654d820658a0a65318491a19b72e0868b62683c217bff439e36f90ff"
+  },
+  {
+   "contract": "BC-V22-S-12-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+   "probe_id": "probe.file_artifact",
+   "semantic_hash": "e7f83ac157533d0c6b5de11d46a1f3e40feceb33200c583c08382ccce4bf266f",
+   "spec": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b"
+  },
+  {
+   "contract": "BC-V22-S-4.4-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "9b1e1d8336cc84d1655388f24807d30ad43bd915a542d15bdaff214c1b2e46a1",
+   "spec": "PPS-f31c5846817d7a576d0969d6fb6aa7303e6366b1d935ad7f295cbae088fd27a3"
+  },
+  {
+   "contract": "BC-V22-S-4.4-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "1825bc1e3be352fc2cea8d8a7a921296f2c19abb0ab23308bd9e01d6c1676ea0",
+   "spec": "PPS-f7b6d4bfcbd5f3b07433a03dac8c7217ab55de7987d516437446060a6f99322b"
+  },
+  {
+   "contract": "BC-V22-S-5-b",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "a4379721bdebbebc8bf2330b7281b214b4f03da165e8be12834609dabb1d925c",
+   "spec": "PPS-fe6b175030db9fb9f5630d1e184515ab792cd11b4a004627c0be52e76d176a5c"
+  },
+  {
+   "contract": "BC-V22-S-4.3-a",
+   "expectation": "SATISFIED",
+   "probe_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+   "probe_id": "probe.process_effect",
+   "semantic_hash": "e6f0beb756468f0f6fe6659075d3a6972c2856890fa41a7d15c1473e07e7d596",
+   "spec": "PPS-ff97cad5ca88f6e6189be216cc38b5553aa8d86bc4a7bd11181094e2358faddb"
+  }
+ ],
+ "bundle_digest": "778e6b84afab76c8326a72c7b11291e3a5e195aacff7eee43d6630699bb8be0a",
+ "evaluator": {
+  "path": "validation/qualification/release_acceptance.py",
+  "sha256": "2bb7af4ebc121b1cd197849ac5703a31db160a3db12cecf161b35c663ff3080a"
+ },
+ "obligations": 67,
+ "plan_hash": "5eed537aaa4dde03653c6d779ec5d6ceb8c3869365e15b01dec00ffa7f5d3735",
+ "record": "AISEF V2.0 \u2014 RELEASE ACCEPTANCE (charter \u00a713): frozen before the release smoke; V1 is informational only",
+ "requirements_document": {
+  "path": "docs/requirements.md",
+  "sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc"
+ },
+ "stories": [
+  "STORY-01-01",
+  "STORY-01-05",
+  "STORY-02-01",
+  "STORY-02-02",
+  "STORY-03-01",
+  "STORY-04-01",
+  "STORY-04-02"
+ ],
+ "thresholds": {
+  "acceptance_suite_satisfied": "all specs",
+  "delivery_verdict": "PASS",
+  "false_acceptance": 0,
+  "framework_false_rollback_or_block": 0,
+  "preflight": "ATTESTED",
+  "productproof_delivered": "all obligations",
+  "run_verified": true,
+  "stories_committed": "all",
+  "unaccounted_spend": 0
+ },
+ "v1": "INFORMATIONAL_ONLY",
+ "workload": "LedgerLock"
+}

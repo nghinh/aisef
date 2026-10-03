@@ -1,0 +1,6319 @@
+{
+ "approvals": [
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "e36258c68051219eb917cc3c67b29d577c0db3d94aed9ff189d320255e6b9227",
+   "contract_id": "BC-V22-S-10-a",
+   "model_reviews": [],
+   "requirement_hash": "6c817ae4a601d90e6e91eefaf0e18c22ba2872e7f5b158df60cd2b795c266ae8",
+   "requirement_id": "R-10"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "a5db9327e2b952b52dfa753e203b874b119423757ddd4737b430608b593768f9",
+   "contract_id": "BC-V22-S-10-b",
+   "model_reviews": [],
+   "requirement_hash": "6c817ae4a601d90e6e91eefaf0e18c22ba2872e7f5b158df60cd2b795c266ae8",
+   "requirement_id": "R-10"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "ac4fdec1f51cd32ed941ed06a777a5aec58e4cf94c0786579ac60ff87afd0770",
+   "contract_id": "BC-V22-S-10-c",
+   "model_reviews": [],
+   "requirement_hash": "6c817ae4a601d90e6e91eefaf0e18c22ba2872e7f5b158df60cd2b795c266ae8",
+   "requirement_id": "R-10"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "f755586d9b58a9cd6c0e17bca058d80ec0d552a7782428a3270828a4451ec888",
+   "contract_id": "BC-V22-S-12-a",
+   "model_reviews": [],
+   "requirement_hash": "e7bfdb8bad608a892ac8f17ad54aa5d7209151d437e4b6358e5775b2b9664b97",
+   "requirement_id": "R-12"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "521ab1eaa1728ce90e27cf67f6bba2a4e16550fde9ecc34bbda9b52dee2713c8",
+   "contract_id": "BC-V22-S-12-b",
+   "model_reviews": [],
+   "requirement_hash": "e7bfdb8bad608a892ac8f17ad54aa5d7209151d437e4b6358e5775b2b9664b97",
+   "requirement_id": "R-12"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "07e80a71ceec44f8c183d13bfd759418031852b8459c75493b1717cc34e44831",
+   "contract_id": "BC-V22-S-12-c",
+   "model_reviews": [],
+   "requirement_hash": "e7bfdb8bad608a892ac8f17ad54aa5d7209151d437e4b6358e5775b2b9664b97",
+   "requirement_id": "R-12"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "a531eb70f78333f96b5422c771447f2e2362df775f2bd1bdaea76741a281f238",
+   "contract_id": "BC-V22-S-13-a",
+   "model_reviews": [],
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "requirement_id": "R-13"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "19041ea1858dc1afabc3f303213f12fe32a41d267a98086e171d896be387c378",
+   "contract_id": "BC-V22-S-13-b",
+   "model_reviews": [],
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "requirement_id": "R-13"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "8816d44f0607c91e21a735873dc7ae27953b6a64f51a21bb9a1da702a18c5d6e",
+   "contract_id": "BC-V22-S-13-c",
+   "model_reviews": [],
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "requirement_id": "R-13"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "c4a4c24caa62368e40d7863aa41beb2bbec2efc8c02f5bd6fe655099beb24ee0",
+   "contract_id": "BC-V22-S-13-d",
+   "model_reviews": [],
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "requirement_id": "R-13"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "b405da05d3e34c3e2253c96e38fc65acb68d588dbad8fca7b5d84ed7eddfab4c",
+   "contract_id": "BC-V22-S-13-e",
+   "model_reviews": [],
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "requirement_id": "R-13"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "6fb98de03ea0e6bc5fbd50d01cccf6ef5be73457dac73bea59466c8caa47e24e",
+   "contract_id": "BC-V22-S-13-f",
+   "model_reviews": [],
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "requirement_id": "R-13"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "ad50cc875100fdc9f55a25b826cc9f190c01048286228e2aa9936d808da1891c",
+   "contract_id": "BC-V22-S-13-g",
+   "model_reviews": [],
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "requirement_id": "R-13"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "cba9339296d628f75b0678590ca1a37aa761ecda93211a5bed84840db1b4c643",
+   "contract_id": "BC-V22-S-13-h",
+   "model_reviews": [],
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "requirement_id": "R-13"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "7156ebf0b71337aa71864f8e11119466ade76dba1040bf713c19bed2fe438dce",
+   "contract_id": "BC-V22-S-13-i",
+   "model_reviews": [],
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "requirement_id": "R-13"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "5283f2ad56d21d0dbc24b4d63220729161506f88044a1b214727b0f1fbf7798a",
+   "contract_id": "BC-V22-S-3.1-a",
+   "model_reviews": [],
+   "requirement_hash": "a4ac9bf2fbf1a7fe3f03756cc3efd166edea178a0bcee20a3a8fe9931eb22350",
+   "requirement_id": "R-3.1"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "f6870cbe6bdd7a1fe1f7d6a1999deb8309bf7dcd21ec3fac7d7ed2c4cd581d07",
+   "contract_id": "BC-V22-S-3.1-b",
+   "model_reviews": [],
+   "requirement_hash": "a4ac9bf2fbf1a7fe3f03756cc3efd166edea178a0bcee20a3a8fe9931eb22350",
+   "requirement_id": "R-3.1"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "045baeac607993963fcc812c8b02771bac54014f899ce69810abeb2866476baa",
+   "contract_id": "BC-V22-S-3.1-c",
+   "model_reviews": [],
+   "requirement_hash": "a4ac9bf2fbf1a7fe3f03756cc3efd166edea178a0bcee20a3a8fe9931eb22350",
+   "requirement_id": "R-3.1"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "5d31e8be89a758d1baa94a64fe3546e9955b9a166cc295257a43b8d72f937f48",
+   "contract_id": "BC-V22-S-3.2-a",
+   "model_reviews": [],
+   "requirement_hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd",
+   "requirement_id": "R-3.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "44a961ee7c8bcc1eb337f4c6de5589b3edecbd84622f0071c286a4a5f7914892",
+   "contract_id": "BC-V22-S-3.2-b",
+   "model_reviews": [],
+   "requirement_hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd",
+   "requirement_id": "R-3.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "cd45f863f6e2e65cce6b4f881855d89cd7564e238d40398cb59a3403946b1275",
+   "contract_id": "BC-V22-S-3.2-c",
+   "model_reviews": [],
+   "requirement_hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd",
+   "requirement_id": "R-3.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "d5e0bab4b51180e30e83edde37d2e668e0a83e3253e6e8b822690cb9466b3466",
+   "contract_id": "BC-V22-S-3.2-d",
+   "model_reviews": [],
+   "requirement_hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd",
+   "requirement_id": "R-3.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "b163f4c1c59e61bd7888ed3cefcfa5fb1ef417e989a39c73fb24243ea070d2d5",
+   "contract_id": "BC-V22-S-3.2-e",
+   "model_reviews": [],
+   "requirement_hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd",
+   "requirement_id": "R-3.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "ec6b8915bd37d4eee5a5f20097ba8acafacfcd8fb9add876d8fd46aa921b0d7d",
+   "contract_id": "BC-V22-S-3.2-f",
+   "model_reviews": [],
+   "requirement_hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd",
+   "requirement_id": "R-3.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "b9726e9aa93672e0416002fb9ee75de845d1fab13f7a59eb357c3ff20e69ee47",
+   "contract_id": "BC-V22-S-3.2-g",
+   "model_reviews": [],
+   "requirement_hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd",
+   "requirement_id": "R-3.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "d86bc1fa22bdc2bc18d27f1b2dce74d85584b8ab20c6913397800c3b46e48780",
+   "contract_id": "BC-V22-S-3.2-h",
+   "model_reviews": [],
+   "requirement_hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd",
+   "requirement_id": "R-3.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "d02bd60c3304859b4a69d3758867c1a18ea8beb3103e5330dc31de1c5b161b5d",
+   "contract_id": "BC-V22-S-3.3-a",
+   "model_reviews": [],
+   "requirement_hash": "be0d7544856cc1167e82ea62c58f3ade134ed5cff17ea5906860a414635dc828",
+   "requirement_id": "R-3.3"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "898072c0919379bb8107887a04f765e83c90cf321f6656f77db2575aa6b7f8c0",
+   "contract_id": "BC-V22-S-3.3-b",
+   "model_reviews": [],
+   "requirement_hash": "be0d7544856cc1167e82ea62c58f3ade134ed5cff17ea5906860a414635dc828",
+   "requirement_id": "R-3.3"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "8ecabe8b3010bbf74dc9415d610b9a9f1ee3107e6947ce6d22644ee83fd9a756",
+   "contract_id": "BC-V22-S-3.3-c",
+   "model_reviews": [],
+   "requirement_hash": "be0d7544856cc1167e82ea62c58f3ade134ed5cff17ea5906860a414635dc828",
+   "requirement_id": "R-3.3"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "ad460741e1f46214e8e0ceb59744911d0c9d393695299a8f17a8eb53ece350b1",
+   "contract_id": "BC-V22-S-3.3-d",
+   "model_reviews": [],
+   "requirement_hash": "be0d7544856cc1167e82ea62c58f3ade134ed5cff17ea5906860a414635dc828",
+   "requirement_id": "R-3.3"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "0d1400398fcd566f9c403b4f67ee76f9e7735470e3ade14741e1182321bae0d0",
+   "contract_id": "BC-V22-S-3.4-a",
+   "model_reviews": [],
+   "requirement_hash": "8469f6fed56497fc3ba429a96b54fa136ad816c9b3d270c4fb04e73200202990",
+   "requirement_id": "R-3.4"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "33eb9ffb2af9132f2bc7ed0fc8340929f35c8eec6e9b8af53688eb1ca19cdad9",
+   "contract_id": "BC-V22-S-4.2-a",
+   "model_reviews": [],
+   "requirement_hash": "d47de2b8b3f81c11fdc2066b0363a8e2f88f748b20553e170c36879342e47faf",
+   "requirement_id": "R-4.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "893bcc1fb56d7c085f6e6f88ad85aac4482ebeab43186d23378cb4424cea8826",
+   "contract_id": "BC-V22-S-4.2-b",
+   "model_reviews": [],
+   "requirement_hash": "d47de2b8b3f81c11fdc2066b0363a8e2f88f748b20553e170c36879342e47faf",
+   "requirement_id": "R-4.2"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "355692e9bc9c9d1e4c9d6b6339bed6d07c9bfab66fd11d3202ecef3dc3ec5051",
+   "contract_id": "BC-V22-S-4.3-a",
+   "model_reviews": [],
+   "requirement_hash": "b8755e2dcc213a9e6c2e64b020127e4008780615459cd9a8467d97a9905dbc30",
+   "requirement_id": "R-4.3"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "b787520e03590c70018c9a3d0764ccd2303f97543e0ff60a033ad0779fac5c31",
+   "contract_id": "BC-V22-S-4.3-b",
+   "model_reviews": [],
+   "requirement_hash": "b8755e2dcc213a9e6c2e64b020127e4008780615459cd9a8467d97a9905dbc30",
+   "requirement_id": "R-4.3"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "dbaab960e7112c7dc00a90789c6c99dbe0e842c1526bdeac8b55a212d308a83f",
+   "contract_id": "BC-V22-S-4.4-a",
+   "model_reviews": [],
+   "requirement_hash": "4dc976c81613e7399d903bf2ad307d444434abc695b92d194632a5f60c397834",
+   "requirement_id": "R-4.4"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "c5715f552b5de4c31b11874ade0bb32d5604f46dfd5bccc9838e40367a84cbea",
+   "contract_id": "BC-V22-S-4.4-b",
+   "model_reviews": [],
+   "requirement_hash": "4dc976c81613e7399d903bf2ad307d444434abc695b92d194632a5f60c397834",
+   "requirement_id": "R-4.4"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "0490cb0b735b155ab7b9f92ffd5762c9753a47956142388f60ef466409a76699",
+   "contract_id": "BC-V22-S-4.5-a",
+   "model_reviews": [],
+   "requirement_hash": "4564c6180cce0b410713a1c1848a703a6e9596748d81361f259c421ee4cd9f2f",
+   "requirement_id": "R-4.5"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "ceb02e5dfcaa22704c6707909c6a9d935c09b9fca2e2c8da29995fad6310b9d3",
+   "contract_id": "BC-V22-S-4.5-b",
+   "model_reviews": [],
+   "requirement_hash": "4564c6180cce0b410713a1c1848a703a6e9596748d81361f259c421ee4cd9f2f",
+   "requirement_id": "R-4.5"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "dd2ec91c8fe3c30c0d5c34ca58b56262bde538d9b3e7906952626331b00f4809",
+   "contract_id": "BC-V22-S-5-a",
+   "model_reviews": [],
+   "requirement_hash": "149b0c9e3535d8137c4a1642aaf1cd4c69141a0766de88c11c5f98f744c76b19",
+   "requirement_id": "R-5"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "aaf2615b650e397222ab0cae7cde5e6223d03614a46410ead06c538fc361271a",
+   "contract_id": "BC-V22-S-5-b",
+   "model_reviews": [],
+   "requirement_hash": "149b0c9e3535d8137c4a1642aaf1cd4c69141a0766de88c11c5f98f744c76b19",
+   "requirement_id": "R-5"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "c092996feed7333c0472a3a97aa8a00284da15a45bf99e9fe741b05360673edd",
+   "contract_id": "BC-V22-S-6-a",
+   "model_reviews": [],
+   "requirement_hash": "df0076d9f57a6bb80107ad48cf15c6ebf90cde55571b2ec00e0f3b532345e4f3",
+   "requirement_id": "R-6"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "14479819963f6fe0a91dbee8adf76174b37d73f72c85d18e43fb289b464b43f1",
+   "contract_id": "BC-V22-S-6-b",
+   "model_reviews": [],
+   "requirement_hash": "df0076d9f57a6bb80107ad48cf15c6ebf90cde55571b2ec00e0f3b532345e4f3",
+   "requirement_id": "R-6"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "e492fda9883bbf94562b9cba2a48e57f805a6173e72408bb765999b0a6bab04f",
+   "contract_id": "BC-V22-S-6-c",
+   "model_reviews": [],
+   "requirement_hash": "df0076d9f57a6bb80107ad48cf15c6ebf90cde55571b2ec00e0f3b532345e4f3",
+   "requirement_id": "R-6"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "34d83cdc992858205c6ef3b6a4b4b3656d456c423b30edb9f9ce958bf823a968",
+   "contract_id": "BC-V22-S-6-d",
+   "model_reviews": [],
+   "requirement_hash": "df0076d9f57a6bb80107ad48cf15c6ebf90cde55571b2ec00e0f3b532345e4f3",
+   "requirement_id": "R-6"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "119a643e028c49583a995ea3d74eda90234e86cba9f09dd3eaf710ea140f0922",
+   "contract_id": "BC-V22-S-7-a",
+   "model_reviews": [],
+   "requirement_hash": "2c8ba425c7eb2b8101b9a1413843adbdc92ce3187790d275b8705d1980085270",
+   "requirement_id": "R-7"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "5eac63ed6818afd43ada5b014c96ea30b9a648bf21e15308d01eb80a6c10a3e2",
+   "contract_id": "BC-V22-S-7-b",
+   "model_reviews": [],
+   "requirement_hash": "2c8ba425c7eb2b8101b9a1413843adbdc92ce3187790d275b8705d1980085270",
+   "requirement_id": "R-7"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "c32ef2fda0e9a3c681aa892f65249dee80692f4ca74fec3f5eaaaae5fbda70fc",
+   "contract_id": "BC-V22-S-7-c",
+   "model_reviews": [],
+   "requirement_hash": "2c8ba425c7eb2b8101b9a1413843adbdc92ce3187790d275b8705d1980085270",
+   "requirement_id": "R-7"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "b82e216e96267a93197b528cae5f404f927ab7580569eb25e21c325129c13b93",
+   "contract_id": "BC-V22-S-7-d",
+   "model_reviews": [],
+   "requirement_hash": "2c8ba425c7eb2b8101b9a1413843adbdc92ce3187790d275b8705d1980085270",
+   "requirement_id": "R-7"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "ce767da4da05cc1bbb35fa6d4622113f4c3838257d9654cec2d57902c2ad7ad5",
+   "contract_id": "BC-V22-S-7-e",
+   "model_reviews": [],
+   "requirement_hash": "2c8ba425c7eb2b8101b9a1413843adbdc92ce3187790d275b8705d1980085270",
+   "requirement_id": "R-7"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "ee6e495fd94913d255411abd75f30a49eaed844966f96f280e5fd36eb0dcc71a",
+   "contract_id": "BC-V22-S-7-f",
+   "model_reviews": [],
+   "requirement_hash": "2c8ba425c7eb2b8101b9a1413843adbdc92ce3187790d275b8705d1980085270",
+   "requirement_id": "R-7"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "12d16f4df83cf829b286bbff5ab22ac21427de9473c5bbb659433700084939cb",
+   "contract_id": "BC-V22-S-9-a",
+   "model_reviews": [],
+   "requirement_hash": "1c3334c2708155246ddd1237b18103419c764df2c74fd7d7163c50fb1f4fe2e5",
+   "requirement_id": "R-9"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "ca26c75c3a43788f2d9917e67188d6b3ad9d71168957b29efb60dd39bd3fb64a",
+   "contract_id": "BC-V22-S-9-b",
+   "model_reviews": [],
+   "requirement_hash": "1c3334c2708155246ddd1237b18103419c764df2c74fd7d7163c50fb1f4fe2e5",
+   "requirement_id": "R-9"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "acfc6a041d05ea6e7154f1092de4b55a4ddd236811e1b2ceacfcbbd601467e04",
+   "contract_id": "BC-V22-S-9-c",
+   "model_reviews": [],
+   "requirement_hash": "1c3334c2708155246ddd1237b18103419c764df2c74fd7d7163c50fb1f4fe2e5",
+   "requirement_id": "R-9"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "93a9c4c6ff432ba06970e76ff85a56a6d2ccbda668b849b90c607c596593ad19",
+   "contract_id": "BC-V22-S-9-d",
+   "model_reviews": [],
+   "requirement_hash": "1c3334c2708155246ddd1237b18103419c764df2c74fd7d7163c50fb1f4fe2e5",
+   "requirement_id": "R-9"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "df97abc858bfd3054672956fa2dfbe7651bcc785e83028baafff289f4e446a44",
+   "contract_id": "BC-V22-S-9-e",
+   "model_reviews": [],
+   "requirement_hash": "1c3334c2708155246ddd1237b18103419c764df2c74fd7d7163c50fb1f4fe2e5",
+   "requirement_id": "R-9"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "0c88d6dbd9b52c3716a8beb3c9b497b4c8abb20e06a1d3e9a2fd9b72ca9027c0",
+   "contract_id": "BC-V22-S-9-f",
+   "model_reviews": [],
+   "requirement_hash": "1c3334c2708155246ddd1237b18103419c764df2c74fd7d7163c50fb1f4fe2e5",
+   "requirement_id": "R-9"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "f3b3368d6e0af847c96f4af65f1b78ac36ccc93a5a694dca194fe7e9b946ea94",
+   "contract_id": "BC-V22-S-D3-05-01-1",
+   "model_reviews": [],
+   "requirement_hash": "be0d7544856cc1167e82ea62c58f3ade134ed5cff17ea5906860a414635dc828",
+   "requirement_id": "R-3.3"
+  },
+  {
+   "approved_at": 1790744603.0,
+   "approver": "human:owner",
+   "contract_hash": "050f975b4efe4176e06e13c15cfd8f2cf970fa2417e31c78734ea95f14a0aa51",
+   "contract_id": "BC-V22-S-D3-05-01-2",
+   "model_reviews": [],
+   "requirement_hash": "149b0c9e3535d8137c4a1642aaf1cd4c69141a0766de88c11c5f98f744c76b19",
+   "requirement_id": "R-5"
+  }
+ ],
+ "contracts": [
+  {
+   "contract_hash": "5283f2ad56d21d0dbc24b4d63220729161506f88044a1b214727b0f1fbf7798a",
+   "id": "BC-V22-S-3.1-a",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "equals": "é",
+       "field": "key",
+       "line": 0
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the key of the stored line is the NFC form of an NFD key",
+   "requirement_ids": [
+    "R-3.1"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "f6870cbe6bdd7a1fe1f7d6a1999deb8309bf7dcd21ec3fac7d7ed2c4cd581d07",
+   "id": "BC-V22-S-3.1-b",
+   "observable": {
+    "raises": true,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "an NFD spelling of an NFC-committed key is the same key: another rid on it raises ConflictError",
+   "requirement_ids": [
+    "R-3.1"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "exception": "ConflictError",
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "expect_raises"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "045baeac607993963fcc812c8b02771bac54014f899ce69810abeb2866476baa",
+   "id": "BC-V22-S-3.1-c",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the NFD spelling with the committed rid is a replay of the NFC-committed key: no line is appended",
+   "requirement_ids": [
+    "R-3.1"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         "v1",
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         "v2",
+         "r1",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "5d31e8be89a758d1baa94a64fe3546e9955b9a166cc295257a43b8d72f937f48",
+   "id": "BC-V22-S-3.2-a",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a chain the product wrote in two batches links (the second batch's line to the stored tail) as its own verify checks: `verify` exits 0",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "44a961ee7c8bcc1eb337f4c6de5589b3edecbd84622f0071c286a4a5f7914892",
+   "id": "BC-V22-S-3.2-b",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a second batch appends: the committed line stays, two lines",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "cd45f863f6e2e65cce6b4f881855d89cd7564e238d40398cb59a3403946b1275",
+   "id": "BC-V22-S-3.2-c",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "equals": "r1",
+       "field": "id",
+       "line": 0
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the committed record is not rewritten out of place: line 0 is still the first mutation",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "d5e0bab4b51180e30e83edde37d2e668e0a83e3253e6e8b822690cb9466b3466",
+   "id": "BC-V22-S-3.2-d",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "equals": "put",
+       "field": "op",
+       "line": 0
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the stored line's op is \"put\"",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         {
+          "v": 1
+         },
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "b163f4c1c59e61bd7888ed3cefcfa5fb1ef417e989a39c73fb24243ea070d2d5",
+   "id": "BC-V22-S-3.2-e",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "equals": {
+        "v": 1
+       },
+       "field": "value",
+       "line": 0
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the stored line's value is the JSON value put",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         {
+          "v": 1
+         },
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "ec6b8915bd37d4eee5a5f20097ba8acafacfcd8fb9add876d8fd46aa921b0d7d",
+   "id": "BC-V22-S-3.2-f",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "equals": 100,
+       "field": "ts",
+       "line": 0
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the stored line's ts is the integer given",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         {
+          "v": 1
+         },
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "b9726e9aa93672e0416002fb9ee75de845d1fab13f7a59eb357c3ff20e69ee47",
+   "id": "BC-V22-S-3.2-g",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "jsonl": {
+       "equals": "r1",
+       "field": "id",
+       "line": 0
+      }
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the stored line's id is the rid given",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         {
+          "v": 1
+         },
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "d86bc1fa22bdc2bc18d27f1b2dce74d85584b8ab20c6913397800c3b46e48780",
+   "id": "BC-V22-S-3.2-h",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "final_byte": "\n"
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "every stored line is newline-terminated: the ledger's last byte is a newline",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "d02bd60c3304859b4a69d3758867c1a18ea8beb3103e5330dc31de1c5b161b5d",
+   "id": "BC-V22-S-3.3-a",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a mutated value on a committed line is detected: `verify` exits 5",
+   "requirement_ids": [
+    "R-3.3"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "field": "value",
+      "line": 1,
+      "path": "<ws>/l.jsonl",
+      "step": "edit_jsonl",
+      "value": 20
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 5,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "898072c0919379bb8107887a04f765e83c90cf321f6656f77db2575aa6b7f8c0",
+   "id": "BC-V22-S-3.3-b",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a swapped op on a committed line is detected: `verify` exits 5",
+   "requirement_ids": [
+    "R-3.3"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "field": "op",
+      "line": 1,
+      "path": "<ws>/l.jsonl",
+      "step": "edit_jsonl",
+      "value": "delete"
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 5,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "8ecabe8b3010bbf74dc9415d610b9a9f1ee3107e6947ce6d22644ee83fd9a756",
+   "id": "BC-V22-S-3.3-c",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a modified hash is detected by recomputation: `verify` exits 5",
+   "requirement_ids": [
+    "R-3.3"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "field": "hash",
+      "line": 2,
+      "path": "<ws>/l.jsonl",
+      "step": "edit_jsonl",
+      "value": "0000000000000000000000000000000000000000000000000000000000000000"
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 5,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "ad460741e1f46214e8e0ceb59744911d0c9d393695299a8f17a8eb53ece350b1",
+   "id": "BC-V22-S-3.3-d",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a prev_hash that is not the previous line's stored hash is detected: `verify` exits 5",
+   "requirement_ids": [
+    "R-3.3"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "field": "prev_hash",
+      "line": 1,
+      "path": "<ws>/l.jsonl",
+      "step": "edit_jsonl",
+      "value": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 5,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "0d1400398fcd566f9c403b4f67ee76f9e7735470e3ade14741e1182321bae0d0",
+   "id": "BC-V22-S-3.4-a",
+   "observable": {
+    "equals_name": "before",
+    "returns_name": "after",
+    "within_s": 30
+   },
+   "polarity": "MUST_NOT_HOLD",
+   "rationale": "the verdict of the SAME instance after an on-disk change is not the verdict it gave before: verify reads the disk, not what the instance remembers",
+   "requirement_ids": [
+    "R-3.4"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [],
+      "as": "before",
+      "kwargs": {},
+      "method": "verify",
+      "step": "call"
+     },
+     {
+      "field": "value",
+      "line": 1,
+      "path": "<ws>/l.jsonl",
+      "step": "edit_jsonl",
+      "value": 20
+     },
+     {
+      "args": [],
+      "as": "after",
+      "kwargs": {},
+      "method": "verify",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "33eb9ffb2af9132f2bc7ed0fc8340929f35c8eec6e9b8af53688eb1ca19cdad9",
+   "id": "BC-V22-S-4.2-a",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a replayed rid (another value and ts) appends no line",
+   "requirement_ids": [
+    "R-4.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "anything",
+         "r1",
+         999
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "893bcc1fb56d7c085f6e6f88ad85aac4482ebeab43186d23378cb4424cea8826",
+   "id": "BC-V22-S-4.2-b",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a replayed element inside a batch appends nothing; the batch's new element appends one line",
+   "requirement_ids": [
+    "R-4.2"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v2",
+         "r1",
+         200
+        ],
+        [
+         "put",
+         "k2",
+         2,
+         "r2",
+         201
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "355692e9bc9c9d1e4c9d6b6339bed6d07c9bfab66fd11d3202ecef3dc3ec5051",
+   "id": "BC-V22-S-4.3-a",
+   "observable": {
+    "raises": true,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "another rid on a committed key raises ConflictError",
+   "requirement_ids": [
+    "R-4.3"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v2",
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "exception": "ConflictError",
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "expect_raises"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "b787520e03590c70018c9a3d0764ccd2303f97543e0ff60a033ad0779fac5c31",
+   "id": "BC-V22-S-4.3-b",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the conflicting mutation appends no line",
+   "requirement_ids": [
+    "R-4.3"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v2",
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "exception": "ConflictError",
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "expect_raises"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "dbaab960e7112c7dc00a90789c6c99dbe0e842c1526bdeac8b55a212d308a83f",
+   "id": "BC-V22-S-4.4-a",
+   "observable": {
+    "raises": true,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a put with another rid after a tombstone raises ConflictError",
+   "requirement_ids": [
+    "R-4.4"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "exception": "ConflictError",
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "expect_raises"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "c5715f552b5de4c31b11874ade0bb32d5604f46dfd5bccc9838e40367a84cbea",
+   "id": "BC-V22-S-4.4-b",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a put with the tombstone's rid is a no-op: no line",
+   "requirement_ids": [
+    "R-4.4"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         200
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "0490cb0b735b155ab7b9f92ffd5762c9753a47956142388f60ef466409a76699",
+   "id": "BC-V22-S-4.5-a",
+   "observable": {
+    "raises": true,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a delete with another rid after a put raises ConflictError",
+   "requirement_ids": [
+    "R-4.5"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "exception": "ConflictError",
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "expect_raises"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "ceb02e5dfcaa22704c6707909c6a9d935c09b9fca2e2c8da29995fad6310b9d3",
+   "id": "BC-V22-S-4.5-b",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "after the refused delete, a replay of the put does not conflict and appends nothing",
+   "requirement_ids": [
+    "R-4.5"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r2",
+         200
+        ]
+       ]
+      ],
+      "exception": "ConflictError",
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "expect_raises"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         300
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "dd2ec91c8fe3c30c0d5c34ca58b56262bde538d9b3e7906952626331b00f4809",
+   "id": "BC-V22-S-5-a",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 1
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a batch refused at its second element commits nothing, not even its acceptable first element: one line",
+   "requirement_ids": [
+    "R-5"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v1",
+         "r1",
+         100
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k2",
+         2,
+         "r2",
+         101
+        ],
+        [
+         "put",
+         "k",
+         "v2",
+         "r3",
+         102
+        ]
+       ]
+      ],
+      "exception": "ConflictError",
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "expect_raises"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "aaf2615b650e397222ab0cae7cde5e6223d03614a46410ead06c538fc361271a",
+   "id": "BC-V22-S-5-b",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 3
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "an accepted batch commits every element: three lines",
+   "requirement_ids": [
+    "R-5"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "c",
+         3,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "c092996feed7333c0472a3a97aa8a00284da15a45bf99e9fe741b05360673edd",
+   "id": "BC-V22-S-6-a",
+   "observable": {
+    "equals_name": "before",
+    "returns_name": "after",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "two snapshots of one chain are equal (byte-stable)",
+   "requirement_ids": [
+    "R-6"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ],
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [],
+      "as": "before",
+      "kwargs": {},
+      "method": "snapshot",
+      "step": "call"
+     },
+     {
+      "args": [],
+      "as": "after",
+      "kwargs": {},
+      "method": "snapshot",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "14479819963f6fe0a91dbee8adf76174b37d73f72c85d18e43fb289b464b43f1",
+   "id": "BC-V22-S-6-b",
+   "observable": {
+    "equals_name": "before",
+    "returns_name": "after",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a refused delete does not change the materialised state",
+   "requirement_ids": [
+    "R-6"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "k",
+         "v",
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [],
+      "as": "before",
+      "kwargs": {},
+      "method": "snapshot",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "delete",
+         "k",
+         null,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "exception": "ConflictError",
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "expect_raises"
+     },
+     {
+      "args": [],
+      "as": "after",
+      "kwargs": {},
+      "method": "snapshot",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "e492fda9883bbf94562b9cba2a48e57f805a6173e72408bb765999b0a6bab04f",
+   "id": "BC-V22-S-6-c",
+   "observable": {
+    "equals_name": "before",
+    "returns_name": "after",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a tombstone on a never-mutated key leaves the materialised state unchanged (the key does not appear)",
+   "requirement_ids": [
+    "R-6"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [],
+      "as": "before",
+      "kwargs": {},
+      "method": "snapshot",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "delete",
+         "k2",
+         null,
+         "r3",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [],
+      "as": "after",
+      "kwargs": {},
+      "method": "snapshot",
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "34d83cdc992858205c6ef3b6a4b4b3656d456c423b30edb9f9ce958bf823a968",
+   "id": "BC-V22-S-6-d",
+   "observable": {
+    "equality": {
+     "comparator": "bytes_equal",
+     "normalization": {},
+     "stimulus_a": {
+      "argv": [
+       "snapshot",
+       "<ws>/l.jsonl"
+      ],
+      "workspace": {
+       "l.jsonl": {
+        "bytes_hex": ""
+       }
+      }
+     },
+     "stimulus_b": {
+      "argv": [
+       "snapshot",
+       "<ws>/l.jsonl"
+      ],
+      "workspace": {
+       "l.jsonl": {
+        "bytes_hex": ""
+       }
+      }
+     }
+    },
+    "streams": [
+     "stdout"
+    ],
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "`snapshot <ledger>` produces the same bytes in two independent invocations (§14 item 2)",
+   "requirement_ids": [
+    "R-6"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "119a643e028c49583a995ea3d74eda90234e86cba9f09dd3eaf710ea140f0922",
+   "id": "BC-V22-S-7-a",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "repair-tail removes the truncated final line: two lines remain",
+   "requirement_ids": [
+    "R-7"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "append": true,
+      "bytes_hex": "7b226f70223a22707574222c226b6579223a226422",
+      "path": "<ws>/l.jsonl",
+      "step": "write"
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "repair-tail",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "5eac63ed6818afd43ada5b014c96ea30b9a648bf21e15308d01eb80a6c10a3e2",
+   "id": "BC-V22-S-7-b",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "after repair-tail the chain verifies: `verify` exits 0",
+   "requirement_ids": [
+    "R-7"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "append": true,
+      "bytes_hex": "7b226f70223a22707574222c226b6579223a226422",
+      "path": "<ws>/l.jsonl",
+      "step": "write"
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "repair-tail",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0,
+      "step": "subprocess"
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "c32ef2fda0e9a3c681aa892f65249dee80692f4ca74fec3f5eaaaae5fbda70fc",
+   "id": "BC-V22-S-7-c",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "final_byte": "\n"
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "after repair-tail the ledger ends with a newline (only complete lines remain)",
+   "requirement_ids": [
+    "R-7"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "r1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "r2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "append": true,
+      "bytes_hex": "7b226f70223a22707574222c226b6579223a226422",
+      "path": "<ws>/l.jsonl",
+      "step": "write"
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "repair-tail",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "b82e216e96267a93197b528cae5f404f927ab7580569eb25e21c325129c13b93",
+   "id": "BC-V22-S-7-d",
+   "observable": {
+    "exit_code": 0,
+    "files": {
+     "<ws>/l.jsonl": {
+      "equals_before": true
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "repair-tail on a clean chain is a no-op: exit 0, the ledger byte-identical",
+   "requirement_ids": [
+    "R-7"
+   ],
+   "stimulus": {
+    "argv": [
+     "repair-tail",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": ""
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "ce767da4da05cc1bbb35fa6d4622113f4c3838257d9654cec2d57902c2ad7ad5",
+   "id": "BC-V22-S-7-e",
+   "observable": {
+    "exit_code": 5,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "repair-tail refuses mid-chain corruption: exit 5 (§9)",
+   "requirement_ids": [
+    "R-7"
+   ],
+   "stimulus": {
+    "argv": [
+     "repair-tail",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": "7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227231222c226b6579223a2261222c226f70223a22707574222c22707265765f68617368223a2247454e45534953222c227473223a312c2276616c7565223a317d0a7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227232222c226b6579223a2262222c226f70223a22707574222c22707265765f68617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c227473223a322c2276616c7565223a327d0a7b226f70223a22707574222c226b6579223a226422"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "ee6e495fd94913d255411abd75f30a49eaed844966f96f280e5fd36eb0dcc71a",
+   "id": "BC-V22-S-7-f",
+   "observable": {
+    "exit_code": 5,
+    "files": {
+     "<ws>/l.jsonl": {
+      "equals_before": true
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the refusal modifies nothing: the ledger is byte-identical",
+   "requirement_ids": [
+    "R-7"
+   ],
+   "stimulus": {
+    "argv": [
+     "repair-tail",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": "7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227231222c226b6579223a2261222c226f70223a22707574222c22707265765f68617368223a2247454e45534953222c227473223a312c2276616c7565223a317d0a7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227232222c226b6579223a2262222c226f70223a22707574222c22707265765f68617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c227473223a322c2276616c7565223a327d0a7b226f70223a22707574222c226b6579223a226422"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "12d16f4df83cf829b286bbff5ab22ac21427de9473c5bbb659433700084939cb",
+   "id": "BC-V22-S-9-a",
+   "observable": {
+    "exit_code": 0,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "`verify` of a fresh (empty) ledger exits 0 (§14 item 1)",
+   "requirement_ids": [
+    "R-9"
+   ],
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": ""
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "ca26c75c3a43788f2d9917e67188d6b3ad9d71168957b29efb60dd39bd3fb64a",
+   "id": "BC-V22-S-9-b",
+   "observable": {
+    "exit_code": 2,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a missing required argument is a usage error: exit 2",
+   "requirement_ids": [
+    "R-9"
+   ],
+   "stimulus": {
+    "argv": [
+     "verify"
+    ]
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "acfc6a041d05ea6e7154f1092de4b55a4ddd236811e1b2ceacfcbbd601467e04",
+   "id": "BC-V22-S-9-c",
+   "observable": {
+    "exit_code": 2,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "an extra positional argument is a usage error: exit 2",
+   "requirement_ids": [
+    "R-9"
+   ],
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/l.jsonl",
+     "extra"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": ""
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "93a9c4c6ff432ba06970e76ff85a56a6d2ccbda668b849b90c607c596593ad19",
+   "id": "BC-V22-S-9-d",
+   "observable": {
+    "exit_code": 3,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a ledger file that does not exist is an I/O error: exit 3",
+   "requirement_ids": [
+    "R-9"
+   ],
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/missing.jsonl"
+    ]
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "df97abc858bfd3054672956fa2dfbe7651bcc785e83028baafff289f4e446a44",
+   "id": "BC-V22-S-9-e",
+   "observable": {
+    "exit_code": 3,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a batch file that does not exist is an I/O error: exit 3",
+   "requirement_ids": [
+    "R-9"
+   ],
+   "stimulus": {
+    "argv": [
+     "apply",
+     "--batch",
+     "<ws>/missing.json",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": ""
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "0c88d6dbd9b52c3716a8beb3c9b497b4c8abb20e06a1d3e9a2fd9b72ca9027c0",
+   "id": "BC-V22-S-9-f",
+   "observable": {
+    "exit_code": 5,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "`verify` of a corrupt chain exits 5",
+   "requirement_ids": [
+    "R-9"
+   ],
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/l.jsonl"
+    ],
+    "workspace": {
+     "l.jsonl": {
+      "bytes_hex": "7b2268617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c226964223a227231222c226b6579223a2261222c226f70223a22707574222c22707265765f68617368223a2247454e45534953222c227473223a312c2276616c7565223a317d0a"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "ledgerlock:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "e36258c68051219eb917cc3c67b29d577c0db3d94aed9ff189d320255e6b9227",
+   "id": "BC-V22-S-10-a",
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "no import statement of the package names a module outside the allowed set (§10)",
+   "requirement_ids": [
+    "R-10"
+   ],
+   "stimulus": {
+    "grep": "^\\s*(?:import|from)\\s+(?!(?:hashlib|json|os|sys|pathlib|tempfile|argparse|unittest|typing|unicodedata|uuid|__future__|ledgerlock)\\b|\\.)[A-Za-z_]",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:ledgerlock"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "a5db9327e2b952b52dfa753e203b874b119423757ddd4737b430608b593768f9",
+   "id": "BC-V22-S-10-b",
+   "observable": {
+    "matches": 1,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledger.py uses `from __future__ import annotations`",
+   "requirement_ids": [
+    "R-10"
+   ],
+   "stimulus": {
+    "grep": "^from __future__ import annotations\\b",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:ledgerlock/ledger.py"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "ac4fdec1f51cd32ed941ed06a777a5aec58e4cf94c0786579ac60ff87afd0770",
+   "id": "BC-V22-S-10-c",
+   "observable": {
+    "matches": 1,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "cli.py uses `from __future__ import annotations`",
+   "requirement_ids": [
+    "R-10"
+   ],
+   "stimulus": {
+    "grep": "^from __future__ import annotations\\b",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:ledgerlock/cli.py"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "f755586d9b58a9cd6c0e17bca058d80ec0d552a7782428a3270828a4451ec888",
+   "id": "BC-V22-S-12-a",
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "no socket in the package source",
+   "requirement_ids": [
+    "R-12"
+   ],
+   "stimulus": {
+    "grep": "^\\s*(?:import\\s+socket\\b|from\\s+socket\\b)|\\bsocket\\.\\w",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:ledgerlock"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "521ab1eaa1728ce90e27cf67f6bba2a4e16550fde9ecc34bbda9b52dee2713c8",
+   "id": "BC-V22-S-12-b",
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "no subprocess in the package source",
+   "requirement_ids": [
+    "R-12"
+   ],
+   "stimulus": {
+    "grep": "^\\s*(?:import\\s+subprocess\\b|from\\s+subprocess\\b)|\\bsubprocess\\.\\w",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:ledgerlock"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "07e80a71ceec44f8c183d13bfd759418031852b8459c75493b1717cc34e44831",
+   "id": "BC-V22-S-12-c",
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "no os.system in the package source",
+   "requirement_ids": [
+    "R-12"
+   ],
+   "stimulus": {
+    "grep": "\\bos\\.system\\s*\\(",
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:ledgerlock"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "a531eb70f78333f96b5422c771447f2e2362df775f2bd1bdaea76741a281f238",
+   "id": "BC-V22-S-13-a",
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledgerlock/__init__.py exists",
+   "requirement_ids": [
+    "R-13"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:ledgerlock/__init__.py"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  {
+   "contract_hash": "19041ea1858dc1afabc3f303213f12fe32a41d267a98086e171d896be387c378",
+   "id": "BC-V22-S-13-b",
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledgerlock/ledger.py exists",
+   "requirement_ids": [
+    "R-13"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:ledgerlock/ledger.py"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  {
+   "contract_hash": "8816d44f0607c91e21a735873dc7ae27953b6a64f51a21bb9a1da702a18c5d6e",
+   "id": "BC-V22-S-13-c",
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledgerlock/cli.py exists",
+   "requirement_ids": [
+    "R-13"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:ledgerlock/cli.py"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  {
+   "contract_hash": "c4a4c24caa62368e40d7863aa41beb2bbec2efc8c02f5bd6fe655099beb24ee0",
+   "id": "BC-V22-S-13-d",
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledger.py defines Ledger",
+   "requirement_ids": [
+    "R-13"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "python_callable",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  {
+   "contract_hash": "b405da05d3e34c3e2253c96e38fc65acb68d588dbad8fca7b5d84ed7eddfab4c",
+   "id": "BC-V22-S-13-e",
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledger.py defines ConflictError",
+   "requirement_ids": [
+    "R-13"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "python_callable",
+    "locator": "ledgerlock.ledger:ConflictError"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  {
+   "contract_hash": "6fb98de03ea0e6bc5fbd50d01cccf6ef5be73457dac73bea59466c8caa47e24e",
+   "id": "BC-V22-S-13-f",
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledger.py defines append",
+   "requirement_ids": [
+    "R-13"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "python_callable",
+    "locator": "ledgerlock.ledger:append"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  {
+   "contract_hash": "ad50cc875100fdc9f55a25b826cc9f190c01048286228e2aa9936d808da1891c",
+   "id": "BC-V22-S-13-g",
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledger.py defines verify",
+   "requirement_ids": [
+    "R-13"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "python_callable",
+    "locator": "ledgerlock.ledger:verify"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  {
+   "contract_hash": "cba9339296d628f75b0678590ca1a37aa761ecda93211a5bed84840db1b4c643",
+   "id": "BC-V22-S-13-h",
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledger.py defines snapshot",
+   "requirement_ids": [
+    "R-13"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "python_callable",
+    "locator": "ledgerlock.ledger:snapshot"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  {
+   "contract_hash": "7156ebf0b71337aa71864f8e11119466ade76dba1040bf713c19bed2fe438dce",
+   "id": "BC-V22-S-13-i",
+   "observable": {
+    "condition": "exists",
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "ledger.py defines apply_batch",
+   "requirement_ids": [
+    "R-13"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "python_callable",
+    "locator": "ledgerlock.ledger:apply_batch"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
+  },
+  {
+   "contract_hash": "f3b3368d6e0af847c96f4af65f1b78ac36ccc93a5a694dca194fe7e9b946ea94",
+   "id": "BC-V22-S-D3-05-01-1",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 5
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "after a fixed conflict-free sequence of mutations (puts, a tombstone, replays, an NFD/NFC replay) the chain the product wrote verifies (`verify` exits 0) and holds exactly the five committed lines",
+   "requirement_ids": [
+    "R-3.3"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "s1",
+         1
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "b",
+         2,
+         "s2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "s1",
+         3
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "delete",
+         "d",
+         null,
+         "s5",
+         4
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "c",
+         [
+          1,
+          2
+         ],
+         "s3",
+         5
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         "x",
+         "s4",
+         6
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "é",
+         "y",
+         "s4",
+         7
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "delete",
+         "b",
+         null,
+         "s2",
+         8
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "argv": [
+       "-m",
+       "ledgerlock",
+       "verify",
+       "<ws>/l.jsonl"
+      ],
+      "expect_exit": 0,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "050f975b4efe4176e06e13c15cfd8f2cf970fa2417e31c78734ea95f14a0aa51",
+   "id": "BC-V22-S-D3-05-01-2",
+   "observable": {
+    "files": {
+     "<ws>/l.jsonl": {
+      "line_count": 2
+     }
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "a sequence whose element conflicts leaves the ledger as the prefix committed it: two lines",
+   "requirement_ids": [
+    "R-5"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "args": [
+       "<ws>/l.jsonl"
+      ],
+      "kwargs": {},
+      "step": "construct"
+     },
+     {
+      "args": [
+       [
+        [
+         "put",
+         "a",
+         1,
+         "s1",
+         1
+        ],
+        [
+         "put",
+         "b",
+         2,
+         "s2",
+         2
+        ]
+       ]
+      ],
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "call"
+     },
+     {
+      "args": [
+       [
+        [
+         "delete",
+         "a",
+         null,
+         "s9",
+         10
+        ]
+       ]
+      ],
+      "exception": "ConflictError",
+      "kwargs": {},
+      "method": "apply_batch",
+      "step": "expect_raises"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "ledgerlock.ledger:Ledger"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  }
+ ],
+ "description": "LedgerLock is a small Python library and CLI (the package `ledgerlock/`, Python standard library only).",
+ "facts": {
+  "AC-STORY-04-01-2:S-9-b": {
+   "clause": "R-9/2",
+   "clause_text": "exit 2 on a usage error",
+   "requirement": "R-9",
+   "section": "§9 CLI Exit Codes (exact contract)",
+   "subject": "python -m ledgerlock"
+  },
+  "AC-STORY-04-01-2:S-9-c": {
+   "clause": "R-9/2",
+   "clause_text": "exit 2 on a usage error",
+   "requirement": "R-9",
+   "section": "§9 CLI Exit Codes (exact contract)",
+   "subject": "python -m ledgerlock"
+  },
+  "AC-STORY-05-03-1:S-10-a": {
+   "clause": "R-10/1",
+   "clause_text": "stdlib only; the allowed modules",
+   "requirement": "R-10",
+   "section": "§10 Language / Runtime",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "AC-STORY-05-03-1:S-12-a": {
+   "clause": "R-12/1",
+   "clause_text": "no socket, no subprocess, no os.system",
+   "requirement": "R-12",
+   "section": "§12 No Side Channels",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "AC-STORY-05-03-1:S-12-b": {
+   "clause": "R-12/1",
+   "clause_text": "no socket, no subprocess, no os.system",
+   "requirement": "R-12",
+   "section": "§12 No Side Channels",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "AC-STORY-05-03-2:S-12-a": {
+   "clause": "R-12/1",
+   "clause_text": "no socket, no subprocess, no os.system",
+   "requirement": "R-12",
+   "section": "§12 No Side Channels",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "AC-STORY-05-03-2:S-12-b": {
+   "clause": "R-12/1",
+   "clause_text": "no socket, no subprocess, no os.system",
+   "requirement": "R-12",
+   "section": "§12 No Side Channels",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "AC-STORY-05-03-2:S-12-c": {
+   "clause": "R-12/1",
+   "clause_text": "no socket, no subprocess, no os.system",
+   "requirement": "R-12",
+   "section": "§12 No Side Channels",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "S-10-a": {
+   "clause": "R-10/1",
+   "clause_text": "stdlib only; the allowed modules",
+   "requirement": "R-10",
+   "section": "§10 Language / Runtime",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "S-10-b": {
+   "clause": "R-10/2",
+   "clause_text": "use `from __future__ import annotations`",
+   "requirement": "R-10",
+   "section": "§10 Language / Runtime",
+   "subject": "ledgerlock/ledger.py"
+  },
+  "S-10-c": {
+   "clause": "R-10/2",
+   "clause_text": "use `from __future__ import annotations`",
+   "requirement": "R-10",
+   "section": "§10 Language / Runtime",
+   "subject": "ledgerlock/cli.py"
+  },
+  "S-12-a": {
+   "clause": "R-12/1",
+   "clause_text": "no socket, no subprocess, no os.system",
+   "requirement": "R-12",
+   "section": "§12 No Side Channels",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "S-12-b": {
+   "clause": "R-12/1",
+   "clause_text": "no socket, no subprocess, no os.system",
+   "requirement": "R-12",
+   "section": "§12 No Side Channels",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "S-12-c": {
+   "clause": "R-12/1",
+   "clause_text": "no socket, no subprocess, no os.system",
+   "requirement": "R-12",
+   "section": "§12 No Side Channels",
+   "subject": "ledgerlock/ (the package directory)"
+  },
+  "S-13-a": {
+   "clause": "R-13/1",
+   "clause_text": "ledgerlock/__init__.py, ledger.py, cli.py",
+   "requirement": "R-13",
+   "section": "§13 Repository layout",
+   "subject": "ledgerlock/__init__.py"
+  },
+  "S-13-b": {
+   "clause": "R-13/1",
+   "clause_text": "ledgerlock/__init__.py, ledger.py, cli.py",
+   "requirement": "R-13",
+   "section": "§13 Repository layout",
+   "subject": "ledgerlock/ledger.py"
+  },
+  "S-13-c": {
+   "clause": "R-13/1",
+   "clause_text": "ledgerlock/__init__.py, ledger.py, cli.py",
+   "requirement": "R-13",
+   "section": "§13 Repository layout",
+   "subject": "ledgerlock/cli.py"
+  },
+  "S-13-d": {
+   "clause": "R-13/2",
+   "clause_text": "ledger.py: Ledger, ConflictError, append, verify, snapshot, apply_batch",
+   "requirement": "R-13",
+   "section": "§13 Repository layout",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-13-e": {
+   "clause": "R-13/2",
+   "clause_text": "ledger.py: Ledger, ConflictError, append, verify, snapshot, apply_batch",
+   "requirement": "R-13",
+   "section": "§13 Repository layout",
+   "subject": "ledgerlock.ledger:ConflictError"
+  },
+  "S-13-f": {
+   "clause": "R-13/2",
+   "clause_text": "ledger.py: Ledger, ConflictError, append, verify, snapshot, apply_batch",
+   "requirement": "R-13",
+   "section": "§13 Repository layout",
+   "subject": "ledgerlock.ledger:append"
+  },
+  "S-13-g": {
+   "clause": "R-13/2",
+   "clause_text": "ledger.py: Ledger, ConflictError, append, verify, snapshot, apply_batch",
+   "requirement": "R-13",
+   "section": "§13 Repository layout",
+   "subject": "ledgerlock.ledger:verify"
+  },
+  "S-13-h": {
+   "clause": "R-13/2",
+   "clause_text": "ledger.py: Ledger, ConflictError, append, verify, snapshot, apply_batch",
+   "requirement": "R-13",
+   "section": "§13 Repository layout",
+   "subject": "ledgerlock.ledger:snapshot"
+  },
+  "S-13-i": {
+   "clause": "R-13/2",
+   "clause_text": "ledger.py: Ledger, ConflictError, append, verify, snapshot, apply_batch",
+   "requirement": "R-13",
+   "section": "§13 Repository layout",
+   "subject": "ledgerlock.ledger:apply_batch"
+  },
+  "S-3.1-a": {
+   "clause": "R-3.1/1",
+   "clause_text": "all keys are normalized to Unicode NFC before storage, lookup, hashing, serialization",
+   "requirement": "R-3.1",
+   "section": "§3.1 Key normalization (Unicode NFC)",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.1-b": {
+   "clause": "R-3.1/2",
+   "clause_text": "strings differing only in NFC/NFD are the same key",
+   "requirement": "R-3.1",
+   "section": "§3.1 Key normalization (Unicode NFC)",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.1-c": {
+   "clause": "R-3.1/2",
+   "clause_text": "strings differing only in NFC/NFD are the same key",
+   "requirement": "R-3.1",
+   "section": "§3.1 Key normalization (Unicode NFC)",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.2-a": {
+   "clause": "R-3.2/3",
+   "clause_text": "prev_hash of the next line = this hash",
+   "requirement": "R-3.2",
+   "section": "§3.2 JSONL hash chain",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.2-b": {
+   "clause": "R-3.2/5",
+   "clause_text": "append-only: existing records MUST NOT be rewritten in place",
+   "requirement": "R-3.2",
+   "section": "§3.2 JSONL hash chain",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.2-c": {
+   "clause": "R-3.2/5",
+   "clause_text": "append-only: existing records MUST NOT be rewritten in place",
+   "requirement": "R-3.2",
+   "section": "§3.2 JSONL hash chain",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.2-d": {
+   "clause": "R-3.2/1",
+   "clause_text": "a single JSONL file; each line {op, key <nfc>, value, ts <int>, id <rid>}",
+   "requirement": "R-3.2",
+   "section": "§3.2 JSONL hash chain",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.2-e": {
+   "clause": "R-3.2/1",
+   "clause_text": "a single JSONL file; each line {op, key <nfc>, value, ts <int>, id <rid>}",
+   "requirement": "R-3.2",
+   "section": "§3.2 JSONL hash chain",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.2-f": {
+   "clause": "R-3.2/1",
+   "clause_text": "a single JSONL file; each line {op, key <nfc>, value, ts <int>, id <rid>}",
+   "requirement": "R-3.2",
+   "section": "§3.2 JSONL hash chain",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.2-g": {
+   "clause": "R-3.2/1",
+   "clause_text": "a single JSONL file; each line {op, key <nfc>, value, ts <int>, id <rid>}",
+   "requirement": "R-3.2",
+   "section": "§3.2 JSONL hash chain",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.2-h": {
+   "clause": "R-3.2/1",
+   "clause_text": "a single JSONL file; each line {op, key <nfc>, value, ts <int>, id <rid>}",
+   "requirement": "R-3.2",
+   "section": "§3.2 JSONL hash chain",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.3-a": {
+   "clause": "R-3.3/1",
+   "clause_text": "a mutated value, swapped op or modified hash on a committed line is detected by a full verify",
+   "requirement": "R-3.3",
+   "section": "§3.3 Tamper evidence",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.3-b": {
+   "clause": "R-3.3/1",
+   "clause_text": "a mutated value, swapped op or modified hash on a committed line is detected by a full verify",
+   "requirement": "R-3.3",
+   "section": "§3.3 Tamper evidence",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.3-c": {
+   "clause": "R-3.3/1",
+   "clause_text": "a mutated value, swapped op or modified hash on a committed line is detected by a full verify",
+   "requirement": "R-3.3",
+   "section": "§3.3 Tamper evidence",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.3-d": {
+   "clause": "R-3.3/2",
+   "clause_text": "ok iff every recomputed hash matches AND every prev_hash matches the previous stored hash",
+   "requirement": "R-3.3",
+   "section": "§3.3 Tamper evidence",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-3.4-a": {
+   "clause": "R-3.4/1",
+   "clause_text": "verify reads no in-memory state set by append; recomputes from disk, CLI or library",
+   "requirement": "R-3.4",
+   "section": "§3.4 Independent verify",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-4.2-a": {
+   "clause": "R-4.2/1",
+   "clause_text": "a replayed rid MUST NOT append a new line",
+   "requirement": "R-4.2",
+   "section": "§4.2 Idempotency",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-4.2-b": {
+   "clause": "R-4.2/1",
+   "clause_text": "a replayed rid MUST NOT append a new line",
+   "requirement": "R-4.2",
+   "section": "§4.2 Idempotency",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-4.3-a": {
+   "clause": "R-4.3/1",
+   "clause_text": "another rid on a key last mutated by another rid MUST raise ConflictError",
+   "requirement": "R-4.3",
+   "section": "§4.3 Conflict",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-4.3-b": {
+   "clause": "R-4.3/2",
+   "clause_text": "... and MUST NOT append a new line",
+   "requirement": "R-4.3",
+   "section": "§4.3 Conflict",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-4.4-a": {
+   "clause": "R-4.4/1",
+   "clause_text": "a put with another rid after a tombstone MUST conflict",
+   "requirement": "R-4.4",
+   "section": "§4.4 Tombstones",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-4.4-b": {
+   "clause": "R-4.4/2",
+   "clause_text": "a put with the tombstone's rid is a no-op replay",
+   "requirement": "R-4.4",
+   "section": "§4.4 Tombstones",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-4.5-a": {
+   "clause": "R-4.5/1",
+   "clause_text": "put k r1 then delete k r2: the second MUST conflict",
+   "requirement": "R-4.5",
+   "section": "§4.5 Key-with-different-rid-different-op semantics",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-4.5-b": {
+   "clause": "R-4.5/2",
+   "clause_text": "replays of either MUST NOT conflict",
+   "requirement": "R-4.5",
+   "section": "§4.5 Key-with-different-rid-different-op semantics",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-5-a": {
+   "clause": "R-5/3",
+   "clause_text": "all or nothing without a crash: a refused batch commits nothing; an accepted one every element",
+   "requirement": "R-5",
+   "section": "§5 Atomic Batch Mutation",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-5-b": {
+   "clause": "R-5/3",
+   "clause_text": "all or nothing without a crash: a refused batch commits nothing; an accepted one every element",
+   "requirement": "R-5",
+   "section": "§5 Atomic Batch Mutation",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-6-a": {
+   "clause": "R-6/1",
+   "clause_text": "the snapshot is deterministic, byte-stable for a given chain",
+   "requirement": "R-6",
+   "section": "§6 Deterministic Snapshot",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-6-b": {
+   "clause": "R-6/2",
+   "clause_text": "the materialised state: each key's most recent committed put unless tombstoned",
+   "requirement": "R-6",
+   "section": "§6 Deterministic Snapshot",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-6-c": {
+   "clause": "R-6/2",
+   "clause_text": "the materialised state: each key's most recent committed put unless tombstoned",
+   "requirement": "R-6",
+   "section": "§6 Deterministic Snapshot",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-6-d": {
+   "clause": "R-6/1",
+   "clause_text": "the snapshot is deterministic, byte-stable for a given chain",
+   "requirement": "R-6",
+   "section": "§6 Deterministic Snapshot",
+   "subject": "python -m ledgerlock"
+  },
+  "S-7-a": {
+   "clause": "R-7/1",
+   "clause_text": "a truncated final line is removed and the chain verifies cleanly afterwards",
+   "requirement": "R-7",
+   "section": "§7 Repair-tail",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-7-b": {
+   "clause": "R-7/1",
+   "clause_text": "a truncated final line is removed and the chain verifies cleanly afterwards",
+   "requirement": "R-7",
+   "section": "§7 Repair-tail",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-7-c": {
+   "clause": "R-7/1",
+   "clause_text": "a truncated final line is removed and the chain verifies cleanly afterwards",
+   "requirement": "R-7",
+   "section": "§7 Repair-tail",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-7-d": {
+   "clause": "R-7/3",
+   "clause_text": "on a clean chain repair-tail is a no-op",
+   "requirement": "R-7",
+   "section": "§7 Repair-tail",
+   "subject": "python -m ledgerlock"
+  },
+  "S-7-e": {
+   "clause": "R-7/4",
+   "clause_text": "on mid-chain corruption repair-tail MUST refuse",
+   "requirement": "R-7",
+   "section": "§7 Repair-tail",
+   "subject": "python -m ledgerlock"
+  },
+  "S-7-f": {
+   "clause": "R-7/4",
+   "clause_text": "on mid-chain corruption repair-tail MUST refuse",
+   "requirement": "R-7",
+   "section": "§7 Repair-tail",
+   "subject": "python -m ledgerlock"
+  },
+  "S-9-a": {
+   "clause": "R-9/0",
+   "clause_text": "exit 0 on success",
+   "requirement": "R-9",
+   "section": "§9 CLI Exit Codes (exact contract)",
+   "subject": "python -m ledgerlock"
+  },
+  "S-9-b": {
+   "clause": "R-9/2",
+   "clause_text": "exit 2 on a usage error",
+   "requirement": "R-9",
+   "section": "§9 CLI Exit Codes (exact contract)",
+   "subject": "python -m ledgerlock"
+  },
+  "S-9-c": {
+   "clause": "R-9/2",
+   "clause_text": "exit 2 on a usage error",
+   "requirement": "R-9",
+   "section": "§9 CLI Exit Codes (exact contract)",
+   "subject": "python -m ledgerlock"
+  },
+  "S-9-d": {
+   "clause": "R-9/3",
+   "clause_text": "exit 3 on an I/O error",
+   "requirement": "R-9",
+   "section": "§9 CLI Exit Codes (exact contract)",
+   "subject": "python -m ledgerlock"
+  },
+  "S-9-e": {
+   "clause": "R-9/3",
+   "clause_text": "exit 3 on an I/O error",
+   "requirement": "R-9",
+   "section": "§9 CLI Exit Codes (exact contract)",
+   "subject": "python -m ledgerlock"
+  },
+  "S-9-f": {
+   "clause": "R-9/5",
+   "clause_text": "exit 5 on corruption (verify not ok, repair-tail non-tail corruption)",
+   "requirement": "R-9",
+   "section": "§9 CLI Exit Codes (exact contract)",
+   "subject": "python -m ledgerlock"
+  },
+  "S-D3-05-01-1": {
+   "clause": "R-3.3/2",
+   "clause_text": "ok iff every recomputed hash matches AND every prev_hash matches the previous stored hash",
+   "requirement": "R-3.3",
+   "section": "§3.3 Tamper evidence",
+   "subject": "ledgerlock.ledger:Ledger"
+  },
+  "S-D3-05-01-2": {
+   "clause": "R-4.3/2",
+   "clause_text": "... and MUST NOT append a new line",
+   "requirement": "R-5",
+   "section": "§5 Atomic Batch Mutation",
+   "subject": "ledgerlock.ledger:Ledger"
+  }
+ },
+ "format": "aisef-v2-project/1",
+ "name": "LedgerLock",
+ "plan": {
+  "baseline": "6a8d60c0bd3d1fa47ed4e97dd80fc0f4b645332a",
+  "id": "LEDGERLOCK-PLAN-V2.2-CORRECTION-1-REBOUND-V2.0",
+  "obligations": [
+   {
+    "criterion_id": "S-3.1-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.1-a (R-3.1/1)",
+    "product_proof_spec_id": "PPS-bdf82c8704934408cd4cb57d8d6e7c642b0fedf5f8d3b42fbf7274fa5c252f78",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.1-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.1-b (R-3.1/2)",
+    "product_proof_spec_id": "PPS-5ad003ff650f65c31f0bc89d6a566e5580a0c08b6df2d02813d727e33bc1a3b3",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.1-c",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.1-c (R-3.1/2)",
+    "product_proof_spec_id": "PPS-c14a4598e4d4a246c4abdc1cc06e19988637900a3cc9b3f5db028588c341b933",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.2-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 INTRODUCEs S-3.2-a (R-3.2/3)",
+    "product_proof_spec_id": "PPS-221372fd740b0f54d7ce436ccda384abfe39ee13bdb454a96e8d392ad26afb3a",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "S-3.2-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.2-b (R-3.2/5)",
+    "product_proof_spec_id": "PPS-b6311fbd3c60003bb26a0dfc497eb5370bd538fcfe3788ed50f038d8a4750e75",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.2-c",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.2-c (R-3.2/5)",
+    "product_proof_spec_id": "PPS-e15441be654d820658a0a65318491a19b72e0868b62683c217bff439e36f90ff",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.2-d",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.2-d (R-3.2/1)",
+    "product_proof_spec_id": "PPS-3cb11949cd671b26d582a17b9423faaf9c4ebc831c0997c7da20d86d898d61fd",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.2-e",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.2-e (R-3.2/1)",
+    "product_proof_spec_id": "PPS-98d742530e731fd750b4100e3515272ce6a23c9ad5578264fbb0bfc07d88eb03",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.2-f",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.2-f (R-3.2/1)",
+    "product_proof_spec_id": "PPS-b407af271716358fdf6176b67382a2a49179cf3a39edb092c21bca676d3e5129",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.2-g",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.2-g (R-3.2/1)",
+    "product_proof_spec_id": "PPS-5e88e19d64fc9aa50dffea61352f7044b4f3d9ba5a71ff18c2b1c5c5f9cc502c",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.2-h",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.2-h (R-3.2/1)",
+    "product_proof_spec_id": "PPS-4cf7a489159ac6da2d0d79cb32bcc4c6f75caa6f2cafeeb79862ea33cc109da2",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-3.3-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-02 INTRODUCEs S-3.3-a (R-3.3/1)",
+    "product_proof_spec_id": "PPS-b81e2a52685028d4e38b82399abe1849a2dfc35b0938a1a7cff2a59e913e9f31",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-3.3-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-02 INTRODUCEs S-3.3-b (R-3.3/1)",
+    "product_proof_spec_id": "PPS-b5eec6684bb16d2566e4ada46bd6f9c15b9101e1f47f470decb30a2d20694652",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-3.3-c",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-02 INTRODUCEs S-3.3-c (R-3.3/1)",
+    "product_proof_spec_id": "PPS-82a57c52ecef2e178fd80e8636b9cd01d8aa1ad752e419590115a963b7f96a71",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-3.3-d",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-02 INTRODUCEs S-3.3-d (R-3.3/2)",
+    "product_proof_spec_id": "PPS-2c1036786f9353092704ad6e2b8ba1d0a9ffe1023e63bc692878e2e2b265b8e1",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-3.4-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-3.4-a (R-3.4/1)",
+    "product_proof_spec_id": "PPS-bb7bde157098d5b82bddacbbe7a5283167e8f5f882f19333fd6ce38cc92f767e",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-4.2-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-4.2-a (R-4.2/1)",
+    "product_proof_spec_id": "PPS-77ba8cfefcaeb5b8c894ac9d828558e0e460b6c6775ccaee6383be0d6001d4f6",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-4.2-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-4.2-b (R-4.2/1)",
+    "product_proof_spec_id": "PPS-74787e153dee89bf1989a3330595f4a41ec7bdcd841c75a2b6ed3de2fd50ecc5",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-4.3-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-4.3-a (R-4.3/1)",
+    "product_proof_spec_id": "PPS-ff97cad5ca88f6e6189be216cc38b5553aa8d86bc4a7bd11181094e2358faddb",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-4.3-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-4.3-b (R-4.3/2)",
+    "product_proof_spec_id": "PPS-6fad81af3fb88f23f46277985272a49efae3b18886654f3b3ca2d0bbc80950a0",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-4.4-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-4.4-a (R-4.4/1)",
+    "product_proof_spec_id": "PPS-f31c5846817d7a576d0969d6fb6aa7303e6366b1d935ad7f295cbae088fd27a3",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-4.4-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-4.4-b (R-4.4/2)",
+    "product_proof_spec_id": "PPS-f7b6d4bfcbd5f3b07433a03dac8c7217ab55de7987d516437446060a6f99322b",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-4.5-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-4.5-a (R-4.5/1)",
+    "product_proof_spec_id": "PPS-a4ef67e2868735b9bb57631e5e5f7d6819472665a5f31a67b1a5c1729d1e847f",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-4.5-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-4.5-b (R-4.5/2)",
+    "product_proof_spec_id": "PPS-4ff82a4585dc90919df48a672040357d333fbab166661fa4de722750e9b21e8e",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-5-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-5-a (R-5/3)",
+    "product_proof_spec_id": "PPS-53e20b739fb281e1ea3ffe4e6fc9ec7a8fa887dfb3f9dc694a5edccc2bb0086d",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-5-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-5-b (R-5/3)",
+    "product_proof_spec_id": "PPS-fe6b175030db9fb9f5630d1e184515ab792cd11b4a004627c0be52e76d176a5c",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-6-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-6-a (R-6/1)",
+    "product_proof_spec_id": "PPS-21eb7a059f2540f2b6c93b9f4d9d226e7b25b039fba131dcd23b6858c1de377d",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-6-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-6-b (R-6/2)",
+    "product_proof_spec_id": "PPS-6c72e0891d0db03594604ae71f100705e34ec6f21f42e8c9db272f9ad3b051c4",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-6-c",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-6-c (R-6/2)",
+    "product_proof_spec_id": "PPS-86ea3c3dabbb8a38f3f0f69f02883f7ed68d5929ad94d3fd04f61523e23ee2ef",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-6-d",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 INTRODUCEs S-6-d (R-6/1)",
+    "product_proof_spec_id": "PPS-7c20cb281915e14c72652a9e6ea60b7158c1fff14ea7e6074eabf1fed463ec35",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "S-7-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 INTRODUCEs S-7-a (R-7/1)",
+    "product_proof_spec_id": "PPS-0e947245567c1dee1d575c822efa36a876525c75d1ee03bbabaf4778e77dd50c",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "S-7-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 INTRODUCEs S-7-b (R-7/1)",
+    "product_proof_spec_id": "PPS-835b19e7e10f8d9d14af129cb7619ea7d104101ed586d1203ec217b8f20dc393",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "S-7-c",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 INTRODUCEs S-7-c (R-7/1)",
+    "product_proof_spec_id": "PPS-c692deca361564a845cb92c6d0cf34219b5a00fa4b203bc66bdbe404d4b5dbc8",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "S-7-d",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 INTRODUCEs S-7-d (R-7/3)",
+    "product_proof_spec_id": "PPS-27056269f7186a68dde5e95d77b8764027322ff5197c112311b40fae034cf097",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "S-7-e",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-02 INTRODUCEs S-7-e (R-7/4)",
+    "product_proof_spec_id": "PPS-a093d39cfc5a2062e08e7842e5c37c898bc02da8f38727539865958e528be0f5",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-7-f",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-02 INTRODUCEs S-7-f (R-7/4)",
+    "product_proof_spec_id": "PPS-1ab92a3e7c51ca828a4547e339a7146031254f87db9f72ffc641aa83b8b770f8",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-9-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 INTRODUCEs S-9-a (R-9/0)",
+    "product_proof_spec_id": "PPS-6a4c2b5364c4ba048f0468d385369797b70a344babcaf2cb5f442ec3102ae673",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "S-9-b",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-9-b (R-9/2)",
+    "product_proof_spec_id": "PPS-82923f967807c583c9582e9b15e5c95735eff34c093733efacf1e99cc69b519b",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-9-c",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-9-c (R-9/2)",
+    "product_proof_spec_id": "PPS-c8e741a462c13c490383e56fc70e31790a5497a8009a679c48bbcb3365e77906",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-9-d",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-02 INTRODUCEs S-9-d (R-9/3)",
+    "product_proof_spec_id": "PPS-d0e057a7ff4b495cca2a81d9f4db48fe2e556eeed99bd25f27a266f27b63ea4e",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-9-e",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-02 INTRODUCEs S-9-e (R-9/3)",
+    "product_proof_spec_id": "PPS-b2b2334768a7a21f6ce11617d4be9ac549482b800b3fda6298a2e0337f989630",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-9-f",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-02 INTRODUCEs S-9-f (R-9/5)",
+    "product_proof_spec_id": "PPS-8d75389620f10e824a48138f8abf2d75d80cbdbd3cdb90535bef4df7ac71219a",
+    "role": "INTRODUCE",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-10-a",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-10-a (R-10/1)",
+    "product_proof_spec_id": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-10-b",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-10-b (R-10/2)",
+    "product_proof_spec_id": "PPS-64c46ebaed2d255c26a9e79c34c803fe2609161938311dfb237f066b36a67867",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-10-c",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-10-c (R-10/2)",
+    "product_proof_spec_id": "PPS-8ab146580469d11dbb6c20443dd9c2070da4ecb2f7c2222f33ba127775898894",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-12-a",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-12-a (R-12/1)",
+    "product_proof_spec_id": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-12-b",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-12-b (R-12/1)",
+    "product_proof_spec_id": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-12-c",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-12-c (R-12/1)",
+    "product_proof_spec_id": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-13-a",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-13-a (R-13/1)",
+    "product_proof_spec_id": "PPS-c70151a34378bac3b90ea06dc632037dd9908f97e0b5b9a9f94fea1f158a0292",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-13-b",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-13-b (R-13/1)",
+    "product_proof_spec_id": "PPS-7e99202d7849d4f22d2a4da4728b0f9000ebdb5d8507e2dec7e03c38e3f7547e",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-13-c",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-13-c (R-13/1)",
+    "product_proof_spec_id": "PPS-9cc8e42134b41d39f3e9b94b976290ffb97c28384525cb18e210ca8ee8e574f6",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-13-d",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-13-d (R-13/2)",
+    "product_proof_spec_id": "PPS-744aded9edd3854346d69c44419a98871fdcc54720601977665212c3a73f8a9d",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-13-e",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-01 INTRODUCEs S-13-e (R-13/2)",
+    "product_proof_spec_id": "PPS-db989591efaa04eab0700c2d484067363eb502a368b44f16ab41bbb4a83b9130",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-01"
+   },
+   {
+    "criterion_id": "S-13-f",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-05 INTRODUCEs S-13-f (R-13/2)",
+    "product_proof_spec_id": "PPS-0fefd4623ab39b9350534d2f184d94567ebb6dff022b73203238ca0ddefa2922",
+    "role": "INTRODUCE",
+    "story_id": "STORY-01-05"
+   },
+   {
+    "criterion_id": "S-13-g",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-02-01 INTRODUCEs S-13-g (R-13/2)",
+    "product_proof_spec_id": "PPS-6567a1c40273f8fa72b618f32d33eaf649fe0042936a0fce593e8fd1c4a44d9c",
+    "role": "INTRODUCE",
+    "story_id": "STORY-02-01"
+   },
+   {
+    "criterion_id": "S-13-h",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-02-02 INTRODUCEs S-13-h (R-13/2)",
+    "product_proof_spec_id": "PPS-59f6f04aae5342f3d16bf337a1fdb2b53f03b070ed340868b9b4d3d7ea9b92ad",
+    "role": "INTRODUCE",
+    "story_id": "STORY-02-02"
+   },
+   {
+    "criterion_id": "S-13-i",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-03-01 INTRODUCEs S-13-i (R-13/2)",
+    "product_proof_spec_id": "PPS-6843a9b53c313e37f60bdd8f969c6e3b167ae34282c13c82695bf64856339c57",
+    "role": "INTRODUCE",
+    "story_id": "STORY-03-01"
+   },
+   {
+    "criterion_id": "S-D3-05-01-1",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i",
+     "S-3.2-a",
+     "S-6-d",
+     "S-7-a",
+     "S-7-b",
+     "S-7-c",
+     "S-7-d",
+     "S-9-a"
+    ],
+    "expected_parent": "UNCONSTRAINED",
+    "ownership_rationale": "STORY-04-02 VERIFYs S-D3-05-01-1 (owner decision 1, 2026-10-02)",
+    "product_proof_spec_id": "PPS-0a4fc49cfb33782c35f559cb3f77696134cc18bf5f2953427345171db2aa16e7",
+    "role": "VERIFY",
+    "story_id": "STORY-04-02"
+   },
+   {
+    "criterion_id": "S-D3-05-01-2",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 PRESERVEs S-D3-05-01-2 (owner decision 2, 2026-10-02)",
+    "product_proof_spec_id": "PPS-7e6bc9074931a57b35baddb8866f9d58e3b93f316ab4c169fc5c721bd32810e7",
+    "role": "PRESERVE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "AC-STORY-04-01-2:S-9-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 PRESERVEs S-9-b for AC-STORY-04-01-2",
+    "product_proof_spec_id": "PPS-82923f967807c583c9582e9b15e5c95735eff34c093733efacf1e99cc69b519b",
+    "role": "PRESERVE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "AC-STORY-04-01-2:S-9-c",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e",
+     "S-13-f",
+     "S-13-g",
+     "S-13-h",
+     "S-3.1-a",
+     "S-3.1-b",
+     "S-3.1-c",
+     "S-3.2-b",
+     "S-3.2-c",
+     "S-3.2-d",
+     "S-3.2-e",
+     "S-3.2-f",
+     "S-3.2-g",
+     "S-3.2-h",
+     "S-3.4-a",
+     "S-4.2-a",
+     "S-4.2-b",
+     "S-4.3-a",
+     "S-4.3-b",
+     "S-4.4-a",
+     "S-4.4-b",
+     "S-4.5-a",
+     "S-4.5-b",
+     "S-5-a",
+     "S-5-b",
+     "S-6-a",
+     "S-6-b",
+     "S-6-c",
+     "S-13-i"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-04-01 PRESERVEs S-9-c for AC-STORY-04-01-2",
+    "product_proof_spec_id": "PPS-c8e741a462c13c490383e56fc70e31790a5497a8009a679c48bbcb3365e77906",
+    "role": "PRESERVE",
+    "story_id": "STORY-04-01"
+   },
+   {
+    "criterion_id": "AC-STORY-05-03-1:S-10-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-05 PRESERVEs AC-STORY-05-03-1:S-10-a (owner decision 3, 2026-10-02)",
+    "product_proof_spec_id": "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+    "role": "PRESERVE",
+    "story_id": "STORY-01-05"
+   },
+   {
+    "criterion_id": "AC-STORY-05-03-1:S-12-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-05 PRESERVEs AC-STORY-05-03-1:S-12-a (owner decision 3, 2026-10-02)",
+    "product_proof_spec_id": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+    "role": "PRESERVE",
+    "story_id": "STORY-01-05"
+   },
+   {
+    "criterion_id": "AC-STORY-05-03-1:S-12-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-05 PRESERVEs AC-STORY-05-03-1:S-12-b (owner decision 3, 2026-10-02)",
+    "product_proof_spec_id": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+    "role": "PRESERVE",
+    "story_id": "STORY-01-05"
+   },
+   {
+    "criterion_id": "AC-STORY-05-03-2:S-12-a",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-05 PRESERVEs AC-STORY-05-03-2:S-12-a (owner decision 3, 2026-10-02)",
+    "product_proof_spec_id": "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+    "role": "PRESERVE",
+    "story_id": "STORY-01-05"
+   },
+   {
+    "criterion_id": "AC-STORY-05-03-2:S-12-b",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-05 PRESERVEs AC-STORY-05-03-2:S-12-b (owner decision 3, 2026-10-02)",
+    "product_proof_spec_id": "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+    "role": "PRESERVE",
+    "story_id": "STORY-01-05"
+   },
+   {
+    "criterion_id": "AC-STORY-05-03-2:S-12-c",
+    "depends_on": [
+     "S-9-b",
+     "S-9-c",
+     "S-10-a",
+     "S-10-b",
+     "S-10-c",
+     "S-12-a",
+     "S-12-b",
+     "S-12-c",
+     "S-13-a",
+     "S-13-b",
+     "S-13-c",
+     "S-13-d",
+     "S-13-e"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "STORY-01-05 PRESERVEs AC-STORY-05-03-2:S-12-c (owner decision 3, 2026-10-02)",
+    "product_proof_spec_id": "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+    "role": "PRESERVE",
+    "story_id": "STORY-01-05"
+   }
+  ],
+  "plan_hash": "5eed537aaa4dde03653c6d779ec5d6ceb8c3869365e15b01dec00ffa7f5d3735",
+  "plan_quality_policy": {
+   "max_fully_pre_satisfied_stories": null,
+   "max_pre_satisfied_introduce_ratio": null,
+   "max_unattributed_plan_drift": null
+  }
+ },
+ "product_roots": [
+  "ledgerlock",
+  "tests"
+ ],
+ "requirements": [
+  {
+   "id": "R-10",
+   "requirement_hash": "6c817ae4a601d90e6e91eefaf0e18c22ba2872e7f5b158df60cd2b795c266ae8",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-10",
+   "text": "## 10. Language / Runtime\n\n- Python 3.11+ required (use `from __future__ import annotations`).\n- Stdlib only. Allowed: `hashlib`, `json`, `os`, `sys`, `pathlib`, `tempfile`,\n  `argparse`, `unittest`, `typing`, `unicodedata`, `uuid`.\n- No `pip install` of any runtime dependency.\n"
+  },
+  {
+   "id": "R-12",
+   "requirement_hash": "e7bfdb8bad608a892ac8f17ad54aa5d7209151d437e4b6358e5775b2b9664b97",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-12",
+   "text": "## 12. No Side Channels\n\n- No `socket`, no `subprocess`, no `os.system`.\n- No opening of files outside the configured ledger path except the explicit\n  batch input and snapshot output paths supplied by the caller.\n"
+  },
+  {
+   "id": "R-13",
+   "requirement_hash": "c353e5d0197d4f70a8e723b236618d50584ea3591a3ccbc31ed95f5da7729628",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-13",
+   "text": "## 13. Repository layout\n\n```\nledgerlock/\n  __init__.py\n  ledger.py        # core: Ledger, ConflictError, append, verify, snapshot, apply_batch\n  cli.py           # argparse CLI, exact exit codes\ntests/\n  test_*.py        # unittest.TestCase based\ndocs/\n  requirements.md  # this file\nREADME.md\npyproject.toml     # stdlib only; coverage as optional dev dep\n```\n"
+  },
+  {
+   "id": "R-3.1",
+   "requirement_hash": "a4ac9bf2fbf1a7fe3f03756cc3efd166edea178a0bcee20a3a8fe9931eb22350",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-3.1",
+   "text": "### 3.1 Key normalization (Unicode NFC)\n\nAll keys are normalized to Unicode NFC before any storage, lookup, hashing, or\nserialization step. Two strings that differ only in NFC/NFD representation MUST be\ntreated as the same key. Equivalence is checked using `unicodedata.normalize(\"NFC\", s)`.\nComparison of the normalized form MUST be byte-exact.\n"
+  },
+  {
+   "id": "R-3.2",
+   "requirement_hash": "75dfa54360ca6a59a2f38e62e405b2a68008be6010accd7bf22cbdf26812cfbd",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-3.2",
+   "text": "### 3.2 JSONL hash chain\n\nThe ledger is a single JSONL file. Each line is one of:\n\n- `{ \"op\": \"put\", \"key\": \"<nfc>\", \"value\": <json>, \"ts\": <int>, \"id\": \"<rid>\" }`\n- `{ \"op\": \"delete\", \"key\": \"<nfc>\", \"ts\": <int>, \"id\": \"<rid>\" }`\n\nEach line carries a `\"hash\"` field that is computed over the canonical bytes of\nthe line with `\"hash\"` and `\"prev_hash\"` fields set to the empty string, then:\n\n    hash = SHA-256( prev_hash || \"|\" || canonical_bytes )\n    prev_hash of the next line = this hash\n\nThe first line's `prev_hash` is the literal string `\"GENESIS\"` (64 hex chars of\nzeros OR the literal string `\"GENESIS\"` — implementation choice, but it MUST be\ndocumented and constant). The chain is append-only: existing records MUST NOT be\nrewritten in place.\n"
+  },
+  {
+   "id": "R-3.3",
+   "requirement_hash": "be0d7544856cc1167e82ea62c58f3ade134ed5cff17ea5906860a414635dc828",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-3.3",
+   "text": "### 3.3 Tamper evidence\n\nAny modification to a committed line (mutating `value`, swapping `op`, or\nmodifying `hash`) MUST be detected by an independent full verify that does not\ntrust any cached metadata. Verify returns a structured verdict:\n\n- `ok=True` if every line's recomputed hash matches its stored `hash` AND\n  every line's stored `prev_hash` matches the previous line's stored `hash`.\n- `ok=False` and `first_bad_index=<i>` on the first violation.\n"
+  },
+  {
+   "id": "R-3.4",
+   "requirement_hash": "8469f6fed56497fc3ba429a96b54fa136ad816c9b3d270c4fb04e73200202990",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-3.4",
+   "text": "### 3.4 Independent verify\n\nThe verify implementation MUST NOT read any field from in-memory state set by\n`append`. It MUST recompute the chain from disk end-to-end. This rule applies\nwhether verify is called from CLI or library.\n"
+  },
+  {
+   "id": "R-4.2",
+   "requirement_hash": "d47de2b8b3f81c11fdc2066b0363a8e2f88f748b20553e170c36879342e47faf",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-4.2",
+   "text": "### 4.2 Idempotency\n\nIf the same `rid` is replayed, the second call MUST return the same result\nand MUST NOT append a new line to the chain.\n"
+  },
+  {
+   "id": "R-4.3",
+   "requirement_hash": "b8755e2dcc213a9e6c2e64b020127e4008780615459cd9a8467d97a9905dbc30",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-4.3",
+   "text": "### 4.3 Conflict\n\nIf a different `rid` tries to mutate a key whose last committed mutation used a\ndifferent `rid`, the call MUST raise `ConflictError` (or return an error result\ndepending on CLI surface) and MUST NOT append a new line.\n"
+  },
+  {
+   "id": "R-4.4",
+   "requirement_hash": "4dc976c81613e7399d903bf2ad307d444434abc695b92d194632a5f60c397834",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-4.4",
+   "text": "### 4.4 Tombstones\n\nA `delete` produces a tombstone line. A subsequent `put` on the same key with a\ndifferent `rid` MUST conflict against the tombstone just as it would against a\nlive value. A subsequent `put` with the same `rid` as the tombstone is an\nidempotent replay and MUST be a no-op returning the same result as the delete.\n"
+  },
+  {
+   "id": "R-4.5",
+   "requirement_hash": "4564c6180cce0b410713a1c1848a703a6e9596748d81361f259c421ee4cd9f2f",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-4.5",
+   "text": "### 4.5 Key-with-different-rid-different-op semantics\n\nA `put` on key `k` with `rid=r1`, then a `delete` on key `k` with `rid=r2` —\nthe second MUST conflict. Replays of either MUST NOT conflict.\n"
+  },
+  {
+   "id": "R-5",
+   "requirement_hash": "149b0c9e3535d8137c4a1642aaf1cd4c69141a0766de88c11c5f98f744c76b19",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-5",
+   "text": "## 5. Atomic Batch Mutation\n\n`apply_batch(ops)` accepts an iterable of (op, key, value, rid, ts) tuples\nunder the lock, writes all lines to a sibling temp file, fsyncs the temp file,\nthen renames it over the JSONL path. If the process crashes at any point,\nthe JSONL on disk MUST either reflect the full batch or be byte-identical to\nits pre-batch state — never a partial batch.\n\nThe CLI equivalent is `ledgerlock apply --batch <file>` which reads the batch\nspec and performs the same atomic operation.\n"
+  },
+  {
+   "id": "R-6",
+   "requirement_hash": "df0076d9f57a6bb80107ad48cf15c6ebf90cde55571b2ec00e0f3b532345e4f3",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-6",
+   "text": "## 6. Deterministic Snapshot\n\n`snapshot()` returns a deterministic, sorted JSON document representing the\ncurrent materialized state: for each key, the most recent committed `put` value\n(if not tombstoned by a later `delete`), sorted by NFC-normalized key in\nbyte order (UTF-8 codepoint order). The snapshot MUST be byte-stable for a given\nchain content (same chain → same snapshot bytes).\n\nThe CLI `ledgerlock snapshot --out <file>` writes this same document.\n"
+  },
+  {
+   "id": "R-7",
+   "requirement_hash": "2c8ba425c7eb2b8101b9a1413843adbdc92ce3187790d275b8705d1980085270",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-7",
+   "text": "## 7. Repair-tail\n\nIf the JSONL ends in a truncated line (last byte is not `\\n` and the last line\ndoes not parse / hash), `ledgerlock repair-tail` MUST rewrite the file with the\ntruncated final line removed and verify cleanly afterwards. No other content\nmay be modified. If the chain is clean, `repair-tail` is a no-op. If the chain\nis corrupt in the middle (not at the tail), `repair-tail` MUST refuse.\n"
+  },
+  {
+   "id": "R-9",
+   "requirement_hash": "1c3334c2708155246ddd1237b18103419c764df2c74fd7d7163c50fb1f4fe2e5",
+   "source": "tests/v2/fixtures/workloads/ledgerlock-reference/REQUIREMENTS.md#R-9",
+   "text": "## 9. CLI Exit Codes (exact contract)\n\n`ledgerlock` (or `python -m ledgerlock`) MUST exit with:\n\n- `0` — success (append / verify ok / snapshot ok / repair-tail no-op or repair ok)\n- `2` — usage error (bad arguments)\n- `3` — I/O error (file not found, permission denied)\n- `4` — conflict (rid mismatch on a key)\n- `5` — corruption (verify reports `ok=False` or repair-tail finds non-tail corruption)\n\n`verify` exiting `0` means the chain is intact. `verify` exiting `5` means\ncorruption. Any other exit code is a bug.\n"
+  }
+ ],
+ "requirements_document": {
+  "path": "docs/requirements.md",
+  "sha256": "3a6a99959bbc6cf39c4d4afa9c2de222925fdcaad30aaf3fa2d04ee446597ecc"
+ },
+ "stories": {
+  "STORY-01-01": {
+   "depends_on": [],
+   "tests": [
+    "tests/test_story_01_01.py"
+   ]
+  },
+  "STORY-01-05": {
+   "depends_on": [
+    "STORY-01-01"
+   ],
+   "tests": [
+    "tests/test_story_01_05.py"
+   ]
+  },
+  "STORY-02-01": {
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-05"
+   ],
+   "tests": [
+    "tests/test_story_02_01.py"
+   ]
+  },
+  "STORY-02-02": {
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-05",
+    "STORY-02-01"
+   ],
+   "tests": [
+    "tests/test_story_02_02.py"
+   ]
+  },
+  "STORY-03-01": {
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-05",
+    "STORY-02-01",
+    "STORY-02-02"
+   ],
+   "tests": [
+    "tests/test_story_03_01.py"
+   ]
+  },
+  "STORY-04-01": {
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-05",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-03-01"
+   ],
+   "tests": [
+    "tests/test_story_04_01.py"
+   ]
+  },
+  "STORY-04-02": {
+   "depends_on": [
+    "STORY-01-01",
+    "STORY-01-05",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-03-01",
+    "STORY-04-01"
+   ],
+   "tests": [
+    "tests/test_story_04_02.py"
+   ]
+  }
+ }
+}
