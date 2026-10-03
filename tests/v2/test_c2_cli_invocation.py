@@ -362,6 +362,16 @@ class Harness(_Product):
         # IR-01: an invocation that answered at once and then stalls the closing exchange past W is the answer
         o = self.see(spec("app.cli:main", {"blocks": True}, {"argv": ["stallbye"]}, window=1), e=env(timeout=10))
         self.assertEqual((o.kind, o.verdict, facts_of(o)["exit_code"]), (K.OBSERVED, R, 0))
+        # the same stopped controller in a half of an equality: that half's observation (and no facts) is the answer
+        equality = {"equality": {"stimulus_a": {"argv": ["stopctl"]}, "stimulus_b": {"argv": ["stopctl"]}, "normalization": {},
+                                 "comparator": "bytes_equal"}, "streams": ["stdout"], "within_s": 1}
+        eq_spec = ProductProofSpec.create(   # an equality's own stimulus is empty: its halves carry theirs
+            contract_id="BC-CLI", probe_id=P.id, probe_digest=P.digest, compiler_id="test", compiler_digest="c" * 64,
+            probe_input={"subject": {"kind": "cli_invocation", "locator": "app:__main__"}, "stimulus": {},
+                         "observable": equality, "subject_absence": REQUIRES.value}, candidate_expectation=S)
+        self.assertEqual(ci.spec_class(eq_spec), "equality")
+        o = self.see(eq_spec, e=env(timeout=3))
+        self.assertEqual((o.kind, o.verdict, o.detail), (K.HARNESS_FAILED, None, silent))
 
     def test_CLI_3_a_stdout_flood_is_capped_and_exits_still_observes_the_code(self):
         self.assertEqual(ci.STREAM_CAP, 8 * 1024 * 1024)
