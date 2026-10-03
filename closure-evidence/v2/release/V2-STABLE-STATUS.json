@@ -11,13 +11,14 @@
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
- "CURRENT_SHA": "6cd8ad3c9b939239206aaedc790d477e84c5a49e",
- "CURRENT_KERNEL_DIGEST": "792c3bbf9b91fd12fe87f3a8482153416fadca3b",
+ "CURRENT_SHA": "69e65c6146e699b352cd2b509b7e6ecc4368ec99",
+ "CURRENT_KERNEL_DIGEST": "2434f962e1394fa2b5ad5db0e305c3bb2cd8fc8e",
  "CURRENT_WHEEL_DIGEST": null,
  "OPEN_V2_0_BLOCKERS": [
   "B1",
   "B3",
   "B4",
+  "B4-OLD-GIT",
   "B6",
   "B7",
   "B12",
@@ -25,7 +26,7 @@
   "B14",
   "KA-09"
  ],
- "V2_1_BACKLOG_COUNT": 30,
+ "V2_1_BACKLOG_COUNT": 34,
  "PROVIDER_CALLS": 0,
  "PAID_RELEASE_SMOKES_USED": 0,
  "sources": {
@@ -68,12 +69,19 @@
    "status": "PASS",
    "on": "6cd8ad3c9b939239206aaedc790d477e84c5a49e",
    "what": "clean-install product smoke (installed aisef run --check/run/--verify) green in CI on the real wheel; owner ruling RISK-G7-1 option 2 workload records committed (5c66e5c)"
+  },
+  {
+   "phase": "S2_FIX_WINDOW",
+   "status": "IN_PROGRESS",
+   "on": "69e65c6146e699b352cd2b509b7e6ecc4368ec99",
+   "what": "B4-OLD-GIT fixed (git >= 2.31 enforced by aisef run); Windows include fixture fixed; release acceptance frozen (69e65c6); S2 mutation 164/261"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
  "S2_DETAIL": {
-  "code": "B1 (+ B1-BLOCKS-STOP-001 completed after the pre-RC review), B3, B4, B6, B7, B12, KA-09; review blockers B16-BUDGET-AT-CEILING, B13-RC-BINDING, G1-LEGACY-IMPROVE fixed",
-  "exit": "targeted mutation V2.0-S2 to rerun for the changed modules (cli_invocation, python_callable_v2, app) and story_runner; harness re-pin lane; one full local suite"
+  "code": "B1 (+ B1-BLOCKS-STOP-001), B3, B4 (+ B4-OLD-GIT: aisef run refuses git < 2.31, 340b11c), B6, B7, B12, KA-09; review blockers B16-BUDGET-AT-CEILING, B13-RC-BINDING, G1-LEGACY-IMPROVE fixed",
+  "exit": "V2.0-S2 mutation (261 targets) running in snapshot worktrees, at most 2 workers; then the merged record, mutation.py --check, Q0 checker calibration regenerated, one full local suite",
+  "mutation_progress": "164 of 261 targets measured valid on 2026-10-04 03:00; kill tests added for the AGENT dead ops (8ffd6f0, V21-33) and run.py::check_git; failfast kill-test runs from ddbefa1"
  },
  "S3_DETAIL": {
   "done": [
@@ -100,5 +108,14 @@
   "within": "YES",
   "sensitivity_no_pre_satisfied": 535783,
   "sensitivity_one_retry_per_failed_story": 647232
+ },
+ "OPEN_V2_0_BLOCKERS_NOTE": "every listed blocker is fixed in code; each stays open until the S2 exit gates hold (V2.0-S2 mutation record complete with zero unaudited survivors, one full local suite green)",
+ "ACCEPTANCE_FROZEN": {
+  "record": "closure-evidence/v2/release/V2-RELEASE-ACCEPTANCE.json",
+  "specs": 59,
+  "obligations": 67,
+  "bundle_digest": "778e6b84afab76c8326a72c7b11291e3a5e195aacff7eee43d6630699bb8be0a",
+  "suite_sha256": "06ae626ebd5501c8c2acd32a381009c294224e8e00a8d2dca59b3b6d54e59320",
+  "commit": "69e65c6"
  }
 }
