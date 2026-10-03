@@ -118,7 +118,8 @@ class GitConfiguration(Repo):
 
     def test_an_include_is_refused_and_never_followed(self):
         included = self.tmp / "included.cfg"
-        included.write_text(f"[core]\n\tfsmonitor = {marker_command(self.marker)}\n", encoding="utf-8")
+        # written by git, which escapes the value: a hand-written Windows path is an invalid escape, and git reads no config
+        self.configure("-f", str(included), "core.fsmonitor", marker_command(self.marker))
         self.configure("include.path", str(included))
         self.assertRefused(self.repo, "include.path", self.control("status"))
         self.assertNotIn("core.fsmonitor", w.config_problems(self.repo))     # listed, not followed

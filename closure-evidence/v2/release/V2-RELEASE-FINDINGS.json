@@ -198,6 +198,19 @@
    "RELEASE_BLOCKER_RULE_3": "YES",
    "V2_0_DISPOSITION": "BLOCK — fixed in f410b2c: `aisef legacy improve`; the top-level `improve` no longer parses",
    "source": "pre-RC review ADV-05"
+  },
+  {
+   "ID": "B4-OLD-GIT",
+   "TITLE": "B4 holds only on git 2.31 or newer, and the support statement named no git version: an older git ignores the command-scope settings (GIT_CONFIG_COUNT, 2.31) and rejects `config --show-scope` (2.26) — config_problems then reads exit 129 as nothing to refuse, and git runs with the repository's own configuration in force",
+   "REPRODUCER": "measured on git 2.53: `config --list --show-scopeX` exits 129 (an unknown option, as --show-scope is before 2.26); config_problems returns [] for any non-zero exit (aisef2/orchestrate/workspace.py)",
+   "AFFECTED_SHIPPED_PATH": "aisef2/app/run.py, aisef2/app/cli.py (the product's entry), aisef2/orchestrate/workspace.py",
+   "AFFECTED_V2_CLAIM": "G5",
+   "SEVERITY": "high on an unexcluded git, none on git 2.31 or newer",
+   "RELEASE_BLOCKER_RULE_1": "YES",
+   "RELEASE_BLOCKER_RULE_2": "YES",
+   "RELEASE_BLOCKER_RULE_3": "YES",
+   "V2_0_DISPOSITION": "BLOCK — fixed by narrowing the support statement (G4) and enforcing it: `aisef run` and `aisef run --check` refuse a git older than 2.31 before their first git command (aisef2.app.run.check_git; tests/v2/test_app_units.py RunParts; mutation target run.py::check_git, 22/22 killed); docs/v2/USAGE.md and CHANGELOG state git 2.31 or newer. The kernel's own fail-closed listing is V21-34",
+   "source": "diagnosis of the Windows CI failure of tests/v2/test_release_s2_kernel.py (run 37146695306)"
   }
  ],
  "v2_1_backlog": {
@@ -235,9 +248,10 @@
    "V21-30",
    "V21-31",
    "V21-32",
-   "V21-33"
+   "V21-33",
+   "V21-34"
   ],
-  "count": 33
+  "count": 34
  },
  "risks_not_findings": [
   {
@@ -261,6 +275,11 @@
    "id": "OBS-S2-1",
    "what": "tests/v2/p4/test_interruption.py RealSignals SIGINT mid-story timed out once (child not exited within 30 s) in a local one-process run of 3089 tests under Python 3.12 while two mutation workers loaded this machine; alone it passes in 0.5 s on 3.12 and 3.14, and it passed in every CI run",
    "disposition": "not a finding: not reproduced; watched in the S2-exit full suite and the RC CI"
+  },
+  {
+   "id": "OBS-S2-2",
+   "what": "Windows CI 37146695306: test_an_include_is_refused_and_never_followed failed — its fixture wrote the included file by hand with the marker command's Windows path unquoted, an invalid config escape; git then reads no configuration (`fatal: bad config line 2`, exit 128) for the listing and for every command alike (measured locally: listing 128, status 128), so nothing configured can run",
+   "disposition": "not a finding: a fixture defect — git now writes the included file (`git config -f`), escaping the value; the old-git exposure it led to is B4-OLD-GIT"
   }
  ],
  "reviews": [

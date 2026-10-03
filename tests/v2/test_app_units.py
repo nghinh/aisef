@@ -521,6 +521,53 @@ class RunParts(Temp):
         with self.assertRaisesRegex(R.RunRefused, "is not the bundle's"):
             R.check_repository(bundle.load(doc), self.tmp / "repo")
 
+    def test_a_git_older_than_b4_needs_is_refused_with_what_was_found(self):
+        R.check_git()       # this host's git
+        real = subprocess.run
+
+        def git_says(text):
+            return lambda cmd, *a, **k: subprocess.CompletedProcess(cmd, 0, text, "") if cmd == ["git", "--version"] else real(cmd, *a, **k)
+        for text in ("git version 2.31.0\n", "git version 2.55.0.windows.5\n", "git version 3.0.1 (Apple Git-1)\n"):
+            with mock.patch.object(R.subprocess, "run", git_says(text)):
+                R.check_git()
+        for text, found in (("git version 2.30.9\n", "git version 2.30.9"), ("git version 1.99.0\n", "git version 1.99.0"),
+                            ("hub version 2.40.0\n", "hub version 2.40.0"), ("", "nothing")):
+            with mock.patch.object(R.subprocess, "run", git_says(text)), self.assertRaises(R.RunRefused) as c:
+                R.check_git()
+            self.assertEqual(str(c.exception), f"git 2.31 or newer is required (B4): found {found}")
+        with mock.patch.object(R.subprocess, "run", side_effect=FileNotFoundError("git")), self.assertRaises(R.RunRefused) as c:
+            R.check_git()
+        self.assertEqual(str(c.exception), "git 2.31 or newer is required (B4): found unavailable: FileNotFoundError")
+        if os.name == "posix":      # a git whose output is not UTF-8 is read, not a crash
+            (self.tmp / "bin").mkdir()
+            (self.tmp / "bin" / "git").write_bytes(b"#!/bin/sh\nprintf 'git version 2.40.1 \\377\\n'\n")
+            (self.tmp / "bin" / "git").chmod(0o755)
+            with mock.patch.dict(os.environ, {"PATH": f"{self.tmp / 'bin'}{os.pathsep}{os.environ['PATH']}"}):
+                R.check_git()
+
+    def test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command(self):
+        base = e2e.make_repo(self.tmp / "source")
+        (self.tmp / "p.json").write_text(json.dumps(e2e.project_bundle(base)), encoding="utf-8")
+        (self.tmp / "s.json").write_text(json.dumps(e2e.SETTINGS), encoding="utf-8")
+        real, seen = subprocess.run, []
+
+        def old_git(cmd, *a, **k):
+            seen.append(cmd[:2])
+            return subprocess.CompletedProcess(cmd, 0, "git version 2.30.2\n", "") if cmd == ["git", "--version"] else real(cmd, *a, **k)
+        with mock.patch.object(R.subprocess, "run", old_git), self.assertRaisesRegex(R.RunRefused, r"^git 2\.31 or newer"):
+            R.execute(bundle.read(self.tmp / "p.json"), settings.read(self.tmp / "s.json"), self.tmp / "source", self.tmp / "out")
+        self.assertEqual(seen, [["git", "--version"]])
+        self.assertFalse((self.tmp / "out" / "repo").exists())
+        rec = json.loads((self.tmp / "out" / "RUN.json").read_text(encoding="utf-8"))
+        self.assertEqual((rec["failure"]["stage"], rec["delivery_verdict"]), ("repository", "NOT_REACHED"))
+        seen.clear()
+        err = io.StringIO()
+        with mock.patch.object(R.subprocess, "run", old_git), contextlib.redirect_stderr(err):
+            code = cli.run(["--check", "--project", str(self.tmp / "p.json"), "--settings", str(self.tmp / "s.json"),
+                            "--repo", str(self.tmp / "source")])
+        self.assertEqual((code, seen), (2, [["git", "--version"]]))
+        self.assertIn("aisef run: refused: git 2.31 or newer is required (B4): found git version 2.30.2", err.getvalue())
+
     def test_the_probe_interpreter_is_a_private_venv_without_pip_or_host_packages(self):
         exe = R.probe_interpreter(self.tmp / "py")
         self.assertTrue(pathlib.Path(exe).is_file())

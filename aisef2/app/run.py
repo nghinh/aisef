@@ -22,6 +22,7 @@ import json
 import os
 import pathlib
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -85,6 +86,22 @@ def admit(project: Project, cals: tuple) -> dict:
     out = {"admitted": result.admitted, "engine_digest": result.engine_digest, "result_digest": result.result_digest,
            "failed": [{"check": f"{c.number}. {c.name}", "problems": list(c.problems[:5])} for c in result.checks if not c.passed]}
     return out
+
+
+#: B4 holds only on a git that takes command-scope settings (GIT_CONFIG_COUNT, 2.31) and lists scopes (2.26): an older one
+#: would run with the repository's own configuration in force
+MIN_GIT = (2, 31)
+
+
+def check_git() -> None:
+    """The git on PATH is one B4 holds on; refused before the run's first git command otherwise."""
+    try:
+        v = subprocess.run(["git", "--version"], capture_output=True, encoding="utf-8", errors="replace", timeout=60).stdout.strip()
+    except (OSError, subprocess.SubprocessError) as e:
+        v = f"unavailable: {type(e).__name__}"
+    m = re.match(r"git version (\d+)\.(\d+)", v)
+    if not m or (int(m[1]), int(m[2])) < MIN_GIT:
+        raise RunRefused(f"git {MIN_GIT[0]}.{MIN_GIT[1]} or newer is required (B4): found {v or 'nothing'}")
 
 
 def check_repository(project: Project, repo: pathlib.Path) -> None:
@@ -213,6 +230,7 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
     not_run: list[str] = []
     failure: BaseException | None = None
     try:
+        check_git()
         repo = out / "repo"
         cloned = git(out, "clone", "--quiet", "--no-hardlinks", str(source.resolve()), str(repo))
         if cloned.returncode != 0:

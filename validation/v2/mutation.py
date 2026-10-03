@@ -532,7 +532,7 @@ S2_TARGETS: dict[str, list[str]] = {
     **{f"aisef2/probe/python_callable_v2.py::HARNESS/{f}": [*_C2_P4_TESTS, *_C2_P4_BYTECODE] for f in (
         "emit", "conclude", "deadline", "answer_to", "ask", "finish", "answered", "ended", "inside", "value_of", "main")},
     **{f"aisef2/app/{m}::{f}": _APP for m, fs in (
-        ("run.py", ("kernel_digest", "calibrations", "admit", "check_repository", "probe_interpreter", "regression_tests",
+        ("run.py", ("kernel_digest", "calibrations", "admit", "check_git", "check_repository", "probe_interpreter", "regression_tests",
                     "runspec_of", "productproof", "delivery", "execute", "_close")),
         ("verify.py", ("verify",)),
         ("client.py", ("read_session", "Budget.__init__", "Budget.spend", "Budget.reached", "environment", "wait_within",

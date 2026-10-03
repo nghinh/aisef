@@ -51,6 +51,7 @@ def run(argv: list[str]) -> int:
             return 0 if v["verdict"] == "VERIFIED" else 1
         s = settings.read(a.settings)
         if a.check:
+            R.check_git()
             R.check_repository(project, a.repo)
             adm = R.admit(project, R.calibrations())
             _print({"project": project.name, "plan_hash": project.plan.plan_hash, "route": s.route, "admission": adm,

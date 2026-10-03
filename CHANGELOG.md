@@ -12,7 +12,8 @@ a hash-chained journal that `aisef run --verify` re-derives. See `docs/v2/USAGE.
   `aisef legacy improve …`; every other V1 command is unchanged.
 - Claimed: deterministic, evidence-bound orchestration and product verification; candidate code cannot control a
   verdict channel (controller/agent split with an authenticated protocol). Not claimed: generalisation, model
-  quality, superiority over V1, hostile same-user isolation. Platforms: Linux and macOS for a live run.
+  quality, superiority over V1, hostile same-user isolation. Platforms: Linux and macOS for a live run. Requires git 2.31
+  or newer (`aisef run` refuses an older one before its first git command).
 - Release mechanics: reproducible wheel/sdist (`SOURCE_DATE_EPOCH`, re-packed sdist), a frozen release candidate
   whose bytes the production job must reproduce, a non-production staging path with a clean-install smoke of the
   installed `aisef run`.

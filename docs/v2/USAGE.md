@@ -12,7 +12,7 @@ is written to a hash-chained journal that the run directory keeps, and that `ais
 pip install aisef==2.0.0
 ```
 
-Needs Python 3.11 or newer, `git`, and — for a live run — the `opencode` client on `PATH` and an OpenAI-compatible
+Needs Python 3.11 or newer, `git` 2.31 or newer, and — for a live run — the `opencode` client on `PATH` and an OpenAI-compatible
 provider endpoint whose key is in an environment variable you name. `aisef run --check` needs neither.
 
 ## What a run takes
