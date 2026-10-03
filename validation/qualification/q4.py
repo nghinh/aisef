@@ -20,6 +20,9 @@ Changed here: the subject pointer, the output directory, and the one extension t
 (§5) — every probe/evaluated record names one of the active probe identities (the generator's `probe_ids`, a stream of
 its own) and the coverage model gains the category `probe_id`, so the coverage names every active probe id. The
 differential itself (the six projections compared three ways, the terminal classes, the prefix rule) is unchanged.
+
+V2.0 release (charter S5, "Q4 fresh"): once the RC1 freeze record exists, the subject is the RC (common.candidate()) and
+the records go to closure-evidence/v2/release/Q4-RC1; nothing else changes.
 """
 
 from __future__ import annotations
@@ -43,9 +46,10 @@ if str(ROOT) not in sys.path:
 
 from validation.qualification import common as C  # noqa: E402
 
-#: the final integration candidate's fresh run; the QP-2.7 run on the QP-2.6 candidate stays in cycle2/Q4
-OUT_REL = "closure-evidence/v2/cycle2/Q4-FINAL"
-SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE   # the Cycle-2 candidate (QP-2.6)
+#: the subject and its output directory are common.candidate()'s: Cycle 2's final integration candidate (cycle2/Q4-FINAL;
+#: the QP-2.7 run on the QP-2.6 candidate stays in cycle2/Q4), or in V2.0 release mode the frozen RC1 (release/Q4-RC1)
+OUT_REL = C.Q4_OUT_REL
+SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE
 KERNEL_TREE = C.KERNEL_TREE
 #: the active probe identities (aisef2/probe/catalog.py), one named on each probe/evaluated record of a trace
 PROBE_IDS = ("probe.cli_invocation", "probe.file_artifact", "probe.process_effect", "probe.python_callable_v2")

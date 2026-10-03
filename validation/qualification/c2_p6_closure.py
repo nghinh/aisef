@@ -45,20 +45,20 @@ def ident(rel: str) -> dict:
 
 def build() -> dict:
     entries = json.loads((ROOT / HISTORY_REL).read_text(encoding="utf-8"))["entries"]
-    summary_rel = f"{C.OUT_REL}/SUMMARY.json"
+    summary_rel = f"{C.CYCLE2_OUT_REL}/SUMMARY.json"
     summary = json.loads((ROOT / summary_rel).read_text(encoding="utf-8"))
     if summary["verdict"] != "GREEN":
         raise SystemExit(f"{summary_rel} is {summary['verdict']}: nothing to close")
-    records = sorted(p.relative_to(ROOT).as_posix() for p in (ROOT / C.OUT_REL).rglob("*.json") if p.name != "SUMMARY.json")
+    records = sorted(p.relative_to(ROOT).as_posix() for p in (ROOT / C.CYCLE2_OUT_REL).rglob("*.json") if p.name != "SUMMARY.json")
     q3 = {p.stem.split("Q3-")[1]: json.loads(p.read_text(encoding="utf-8"))["v1_pf_001_family_containment"]["fault_I"]
-          for p in sorted((ROOT / C.OUT_REL / "Q3").glob("Q3-*.json"))}
+          for p in sorted((ROOT / C.CYCLE2_OUT_REL / "Q3").glob("Q3-*.json"))}
     return {
         "record": "AISEF V2 — CYCLE-2 C2-P6 CLOSURE (QP-2.6 requalified: Q0-Q3 evidence-complete and GREEN)",
         "id": "AISEF-V2-CYCLE2-C2-P6-CLOSURE",
         "authority": "owner ruling 2026-09-30 B ('QP-2.6 MUST BE REQUALIFIED ON THE NEW EXACT CANDIDATE'; if GREEN, proceed "
                      "automatically into [QP-2.7 -> QP-2.8 -> QP-2.9] || [WP-2.10.1 -> WP-2.10.2])",
         "written": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "candidate": {"commit": C.SEMANTIC_CANDIDATE, "aisef2_tree": C.KERNEL_TREE, "subject_trees": C.SUBJECT_TREES,
+        "candidate": {"commit": C.CYCLE2_SEMANTIC_CANDIDATE, "aisef2_tree": C.CYCLE2_KERNEL_TREE, "subject_trees": C.CYCLE2_SUBJECT_TREES,
                       "harness_commit": HARNESS_COMMIT, "integration": ident("closure-evidence/v2/cycle2/C2-INTEGRATION-R2.json"),
                       "orchestration_repair": ident("closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json"),
                       "v1_pf_001_decision": ident("closure-evidence/v2/cycle2/V1-PF-001-RECURRENCE-1-DECISION.json"),

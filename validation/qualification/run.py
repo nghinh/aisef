@@ -38,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
     label = plat["label"]
     if plat["free_disk_gb"] < 2.0:   # owner §25: enough free disk before a large run, or the attempt is UNRUNNABLE
         subject.append(f"only {plat['free_disk_gb']} GB free on the disk holding the tree")
-    print(f"qualification subject: seal {C.SEAL_COMMIT[:12]} candidate {C.SEMANTIC_CANDIDATE[:12]} kernel {C.KERNEL_TREE[:12]} | "
+    print(f"qualification subject ({ident['mode']}): seal {ident['seal_commit'][:12]} candidate {ident['semantic_candidate'][:12]} kernel {ident['kernel_tree'][:12]} | "
           f"HEAD {ident['head'][:12]} kernel {ident['head_kernel_tree'][:12]} | harness {ident['harness']['sha256'][:12]} | platform {label}")
     if subject:
         for p in subject:

@@ -6,21 +6,27 @@
 #
 #   validation/qualification/q4_run.sh [W]        # default 5 workers
 set -u; unsetopt nomatch
-A=/Users/nghinh/Downloads/projects/ai-sdlc; cd $A
+A=${0:A:h:h:h}; cd $A   # this script's own tree (V2.0 charter S4: the RC/release workspace, never another checkout)
 W=${1:-5}
-OUT=$A/closure-evidence/v2/cycle2/Q4-FINAL
+# the subject, its kernel tree and the output directory are validation/qualification/common.py candidate()'s: Cycle 2's
+# final integration candidate (cycle2/Q4-FINAL), or the frozen RC1 once its freeze record exists (release/Q4-RC1)
+SUBJ=($(python3 -P -c "import sys; sys.path.insert(0, '.'); from validation.qualification import common as C; print(C.Q4_OUT_REL, C.KERNEL_TREE, C.MODE)"))
+[ ${#SUBJ} -eq 3 ] || { echo "REFUSED: the qualification subject could not be read"; exit 1; }
+REL=$SUBJ[1]; KT=$SUBJ[2]; MODE=$SUBJ[3]
+OUT=$A/$REL
 SP=${AISEF_SCRATCH:-/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad}
 LOG=$SP/q4-logs; mkdir -p $LOG $OUT/chunks $OUT/owned
-KT=254d8f559b879c210c4936321022f1350c4b2f89   # the final integration candidate's kernel tree (aisef2/cohort added; C2-FINAL-INTEGRATION.json)
 stamp() { date '+%F %T'; }
-DIRTY=$(git status --porcelain | grep -v '^?? closure-evidence/v2/cycle2/Q4-FINAL/\|^ M closure-evidence/v2/cycle2/Q4-FINAL/\|^?? closure-evidence/v2/cycle2/C2-P7-RUN-HISTORY.json\|^ M closure-evidence/v2/cycle2/C2-P7-RUN-HISTORY.json' || true)
+HIST=closure-evidence/v2/cycle2/C2-P7-RUN-HISTORY.json   # Cycle 2's attempt history; in release mode nothing outside the output
+[ "$MODE" = cycle2 ] || HIST=$REL/
+DIRTY=$(git status --porcelain | grep -v "^?? $REL/\|^ M $REL/\|^?? $HIST\|^ M $HIST" || true)
 [ -z "$DIRTY" ] || { echo "REFUSED: the working tree is dirty outside Q4's output:"; echo "$DIRTY"; exit 1; }
 [ "$(git rev-parse HEAD:aisef2)" = "$KT" ] || { echo "REFUSED: HEAD's aisef2 tree is not the candidate's $KT"; exit 1; }
 [ -f $OUT/CALIBRATION.json ] && python3 -P -c "import json,sys; sys.exit(0 if json.load(open(sys.argv[1]))['all_detected'] else 1)" $OUT/CALIBRATION.json \
   || { echo "REFUSED: no calibration with every defect detected (q4_aggregate.py --calibrate first)"; exit 1; }
 ls $OUT/chunks/chunk-*.json >/dev/null 2>&1 && { echo "REFUSED: chunk records exist — a rerun is a new attempt: pass ATTEMPT=N"; [ -n "${ATTEMPT:-}" ] || exit 1; }
 ATTEMPT=${ATTEMPT:-1}
-echo "[$(stamp)] Q4: 10 x 10000 traces, $W workers, attempt $ATTEMPT, kernel tree $KT, HEAD $(git rev-parse --short HEAD)"
+echo "[$(stamp)] Q4 ($MODE): 10 x 10000 traces, $W workers, attempt $ATTEMPT, kernel tree $KT, HEAD $(git rev-parse --short HEAD), out $REL"
 # 1. the subject, frozen before the first trace (the design pilot runs here; it is not counted)
 [ -f $OUT/SUBJECT.json ] || python3 -P validation/qualification/q4.py --freeze || { echo "REFUSED: the subject could not be frozen"; exit 1; }
 # 2. F1-F11, the V1 guard and W0 before the first trace

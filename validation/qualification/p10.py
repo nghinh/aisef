@@ -630,7 +630,7 @@ def run(out_dir: pathlib.Path) -> dict:
                                          "typed by the engine, not a delivery verdict",
             "historical_runs": historical_runs(), "label": "DEVELOPMENT / REGRESSION; no generalization, no ranking of models or providers"},
         conformance=conf, p9_evidence=p9, p8_evidence={"closure-evidence/v2/Q4/DIFFERENTIAL.json": _sha((ROOT / "closure-evidence/v2/Q4/DIFFERENTIAL.json").read_bytes())},
-        p7_evidence={rel: _sha((ROOT / rel).read_bytes()) for rel in A.P7_EVIDENCE}, seals={rel: _sha((ROOT / rel).read_bytes()) for rel in A.SEALS},
+        p7_evidence={rel: _sha((ROOT / rel).read_bytes()) for rel in A.CYCLE2_P7_EVIDENCE}, seals={rel: _sha((ROOT / rel).read_bytes()) for rel in A.SEALS},
         v1_evidence={"baseline": _sha((ROOT / "closure-evidence/v2/V1-EVIDENCE-BASELINE.json").read_bytes()), "w0": _sha((ROOT / A.W0_REL).read_bytes()), "product_tree": C.git("rev-parse", "HEAD:aisef")},
         residual_processes={"from_journal": 0, "owned_range": "see the owned-run record beside this file"}, platform={"system": platform.system().lower(), "python": platform.python_version()},
         stop_rules={"kernel_tree_is_the_candidates": C.git("rev-parse", "HEAD:aisef2") == KERNEL_TREE, "plan_retuned": False, "kernel_repaired": False,

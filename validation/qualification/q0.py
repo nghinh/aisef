@@ -11,6 +11,9 @@ Cycle 2 (QP-2.6): the same rung on the Cycle-2 candidate, extended — the six p
 baseline guard as families of their own (each a discovered, calibrated checker whose known-bad probe fixture fails
 it); the catalog's probe identities (every active Cycle-2 probe, the frozen Cycle-1 probe resolvable and inactive);
 the owner's C2-P5 acceptance and its real approvals re-derived; the Cycle-1 seal lineage still asserted.
+
+V2.0 release mode (common.candidate(): the RC1 freeze record exists): the same rung on the RC; the V1 product tree is
+asserted equal to the RC's shipped aisef tree (charter G1 changed aisef/), the P5-seal equality reported NOT_APPLICABLE.
 """
 
 from __future__ import annotations
@@ -89,7 +92,7 @@ def _specs_binding(digest: str) -> list[str]:
         for p in sorted((C.ROOT / base).rglob("*.json")):
             rel = p.relative_to(C.ROOT).as_posix()
             if rel in HISTORICAL_OLD_DIGEST_FILES or rel.startswith(HISTORICAL_OLD_DIGEST_PREFIXES) \
-                    or rel.startswith(C.CYCLE1_OUT_REL + "/invalidated-") or rel.startswith((C.OUT_REL + "/", *(r + "/" for r in C.C2_PRIOR_OUT_RELS))):
+                    or rel.startswith(C.CYCLE1_OUT_REL + "/invalidated-") or rel.startswith((C.OUT_REL + "/", C.CYCLE2_OUT_REL + "/", *(r + "/" for r in C.C2_PRIOR_OUT_RELS))):
                 continue   # measurements of history (the finding's records, invalidated rungs): never a stored spec
             try:
                 walk(json.loads(p.read_text(encoding="utf-8")), rel)
@@ -103,7 +106,7 @@ def _files_mentioning(digest: str) -> list[str]:
     for base in ("aisef2", "tests/v2", "validation/v2", "closure-evidence/v2", "docs"):   # not the scanner, not its records
         for p in sorted((C.ROOT / base).rglob("*")):
             if p.is_file() and p.suffix in (".py", ".json", ".md") and "__pycache__" not in p.parts \
-                    and not p.relative_to(C.ROOT).as_posix().startswith((C.OUT_REL, C.CYCLE1_OUT_REL, *C.C2_PRIOR_OUT_RELS)):
+                    and not p.relative_to(C.ROOT).as_posix().startswith((C.OUT_REL, C.CYCLE2_OUT_REL, C.CYCLE1_OUT_REL, *C.C2_PRIOR_OUT_RELS)):
                 try:
                     if digest in p.read_text(encoding="utf-8"):
                         out.append(p.relative_to(C.ROOT).as_posix())
@@ -287,8 +290,15 @@ def run(ident: dict) -> dict:
           "external_validation_tree": C.git("rev-parse", "HEAD:closure-evidence/external-validation"),
           "external_validation_tree_at_p5_seal": C.git("rev-parse", f"{seal5['seal_commit']}:closure-evidence/external-validation")
           if "seal_commit" in seal5 else C.git("rev-parse", f"{C.SEMANTIC_CANDIDATE}:closure-evidence/external-validation")}
+    # V2.0 release: G1 changed aisef/, so the release's equivalent of "the V1 product tree is the P5 seal's" is "the V1
+    # product tree is the RC's shipped aisef tree"; the P5-seal equality is reported NOT_APPLICABLE, never dropped
+    v1_expected = v1["v1_product_tree_at_p5_seal"]
+    if ident["mode"] == "release":
+        v1_expected = v1["v1_product_tree_expected_rc_shipped"] = ident["release"]["v1_product_tree"]["rc_shipped_aisef_tree"]
+        v1["v1_product_tree_equals_the_p5_seal"] = {"outcome": C.NOT_APPLICABLE, "observed": v1["v1_product_tree"] == v1["v1_product_tree_at_p5_seal"],
+                                                    "reason": C.G1_V1_NOTE}
     if v1["guard_problems"] or v1["w0_sha256"] != v1["w0_expected"] or v1["w0_blob_at_HEAD"] != v1["w0_blob_at_the_candidate"] \
-            or v1["v1_product_tree"] != v1["v1_product_tree_at_p5_seal"] or v1["external_validation_tree"] != v1["external_validation_tree_at_p5_seal"]:
+            or v1["v1_product_tree"] != v1_expected or v1["external_validation_tree"] != v1["external_validation_tree_at_p5_seal"]:
         problems.append("the V1 identity does not hold")
 
     catalog = {"check_problems": gc.check(C.ROOT), "both_directions": C.counts(catalog_tests)}

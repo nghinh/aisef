@@ -1,5 +1,5 @@
-"""Assemble `<OUT_REL>/SUMMARY.json` (Cycle 2: closure-evidence/v2/cycle2/Q0-Q3/SUMMARY.json) from the per-platform
-rung records, and verify it.
+"""Assemble `<OUT_REL>/SUMMARY.json` (Cycle 2: closure-evidence/v2/cycle2/Q0-Q3-R4/SUMMARY.json; V2.0 release mode:
+closure-evidence/v2/release/Q0-Q3-RC1/SUMMARY.json) from the per-platform rung records, and verify it.
 
     python -P validation/qualification/summary.py            # write
     python -P validation/qualification/summary.py --check    # exit 1 if the summary is stale or a binding does not hold
@@ -24,6 +24,13 @@ from validation.qualification import common as C  # noqa: E402
 
 SUMMARY_REL = f"{C.OUT_REL}/SUMMARY.json"
 RUNGS = ("Q0", "Q1", "Q2", "Q3")
+#: what the summary is a record of, by the subject's mode (common.candidate())
+HEADER = {"cycle2": {"record": "AISEF V2 — CYCLE-2 Q0–Q3 QUALIFICATION SUMMARY (QP-2.6)", "work_package": "QP-2.6", "rfc_sections": ["27"],
+                     "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P5 ACCEPTED WITH EXPLICIT CONTRACT INTERPRETATIONS / "
+                                  "AUTHORIZE QP-2.6 AND AUTOMATIC DOWNSTREAM EXECUTION' (2026-09-30)"},
+          "release": {"record": "AISEF V2.0 — RC1 Q0–Q3 QUALIFICATION SUMMARY (charter S5)", "work_package": "V2.0 S5", "rfc_sections": ["27"],
+                      "authority": "V2.0 stable-release charter §12 (S5): Q0-Q3 on the exact RC1; no historical c11615a qualification "
+                                   "is presented as current RC evidence"}}
 
 
 def _records(out: pathlib.Path) -> dict[str, list[dict]]:
@@ -104,15 +111,14 @@ def assemble() -> dict:
     overall = C.GREEN if all(r["status"] == C.GREEN for r in rungs.values()) else (
         C.FAILED if any(r["status"] == C.FAILED for r in rungs.values()) else C.UNRUNNABLE)
     return {
-        "record": "AISEF V2 — CYCLE-2 Q0–Q3 QUALIFICATION SUMMARY (QP-2.6)", "work_package": "QP-2.6", "rfc_sections": ["27"],
-        "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P5 ACCEPTED WITH EXPLICIT CONTRACT INTERPRETATIONS / "
-                     "AUTHORIZE QP-2.6 AND AUTOMATIC DOWNSTREAM EXECUTION' (2026-09-30)",
+        **HEADER[C.MODE],
         "verdict": overall, "rung_status_model": {"GREEN": "every applicable case passed on every qualification platform",
                                                   "FAILED": "a case executed and failed", "UNRUNNABLE": "could not execute or measure; never presented as FAILED"},
         "subject": {"seal_commit": C.SEAL_COMMIT, "semantic_candidate": C.SEMANTIC_CANDIDATE, "kernel_tree": C.KERNEL_TREE,
                     "v1_product_tree": C.V1_PRODUCT_TREE, "head_at_assembly": ident["head"], "head_kernel_tree": ident["head_kernel_tree"],
                     "rfc": ident["rfc"], "probe": ident["probe"], "probes": ident["probes"], "subject_trees": C.SUBJECT_TREES,
-                    "cycle1": ident["cycle1"], "harness": ident["harness"]},
+                    "cycle1": ident["cycle1"], "harness": ident["harness"],
+                    **({"mode": C.MODE, "release": ident["release"]} if C.MODE == "release" else {})},
         "rungs": rungs,
         "q0": {"checker_calibration_count": (q0 or {}).get("calibrated"), "checkers_discovered": (q0 or {}).get("discovered"),
                "f1_f11": pick("Q0", "f1_f11", {}).get("summary") if pick("Q0", "f1_f11") else None,
