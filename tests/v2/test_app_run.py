@@ -41,7 +41,7 @@ TEST = ("import unittest\n\nfrom app import calc\n\n\nclass T(unittest.TestCase)
         "        self.assertEqual(calc.add(2, 3), 5)\n")
 #: the fake client: `opencode run --format json --model M --title T --dir D PROMPT`, or `--version`. A developer
 #: writes the story's code (unless told to change nothing); every session reports one finished step with its tokens.
-FAKE_CLIENT = r'''import json, pathlib, sys
+FAKE_CLIENT = r'''import json, os, pathlib, sys
 argv = sys.argv[1:]
 if argv == ["--version"]:
     print("0.0.0-fake")
@@ -56,6 +56,8 @@ if title.startswith("developer") and mode == "write":
 if mode == "interrupt" and title.startswith("developer"):
     raise SystemExit(3)
 text = '{"findings": []}' if title.startswith("reviewer") else "done"
+if os.environ.get("AISEF_TEST_SECRET"):     # a tool that prints the environment
+    print(json.dumps({"type": "text", "part": {"text": "env: AISEF_TEST_SECRET=" + os.environ["AISEF_TEST_SECRET"]}}))
 print(json.dumps({"type": "text", "part": {"text": text}}))
 print(json.dumps({"type": "step_finish", "part": {"tokens": {"input": 120, "output": 7, "reasoning": 3,
                                                              "cache": {"read": 10, "write": 0}}}}))
@@ -176,6 +178,18 @@ class Product(ProductBase):
         self.assertEqual((spent["provider_requests"], spent["unaccounted"]), (3 + 2, []))  # preflight 3, two sessions
         self.assertEqual(rec["preflight"]["verdict"], "ATTESTED")
         self.assertEqual(verify(self.project, self.tmp / "out")["verdict"], "VERIFIED")
+
+    def test_a_secret_the_client_receives_never_stays_in_the_session_evidence(self):
+        secret = "s3cr3t-value-0123456789"
+        self.settings = settings.load({**SETTINGS, "client_env": ["AISEF_TEST_SECRET"]})
+        with mock.patch.dict(os.environ, {"AISEF_TEST_SECRET": secret}):
+            rec = self.execute()
+        self.assertEqual(rec["delivery_verdict"], "PASS")
+        logs = sorted((self.tmp / "out" / "sessions").glob("*.jsonl"))
+        self.assertTrue(logs)
+        self.assertFalse(any(secret in p.read_text(encoding="utf-8") for p in logs))
+        self.assertEqual(sum(s["redacted"] for s in rec["sessions"]), len(logs))
+        self.assertNotIn(secret, (self.tmp / "out" / "RUN.json").read_text(encoding="utf-8"))
 
     def test_spend_exactly_at_every_ceiling_is_no_budget_stop(self):
         """Review IR-02: two sessions of one step each, the preflight's three requests — every counter ends exactly at

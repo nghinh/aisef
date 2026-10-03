@@ -112,9 +112,12 @@ def evaluate(project, run_dir: pathlib.Path, accepted: dict) -> dict:
     from aisef2.app.verify import verify
     from aisef2.journal import format3
     from aisef2.product.contract import plain
+    from validation.qualification import common as C
     problems: list[str] = []
     if accepted.get("bundle_digest") != project.digest or accepted.get("acceptance_suite") != suite(project):
         problems.append("the frozen acceptance is not this bundle's")
+    if (accepted.get("evaluator") or {}).get("sha256") != C.lf_sha(HERE / "release_acceptance.py"):
+        problems.append("this evaluator is not the frozen one")
     rec = json.loads((run_dir / "RUN.json").read_text(encoding="utf-8"))
     v = verify(project, run_dir)
     journal = format3.reconstruct((run_dir / rec["journal"]["path"]).read_text(encoding="utf-8")) if rec.get("journal") else None

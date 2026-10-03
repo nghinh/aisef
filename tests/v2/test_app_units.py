@@ -119,6 +119,9 @@ class Settings(unittest.TestCase):
         self.refused("preflight names chat_probes", preflight=2)
         self.refused(r"preflight\.chat_probes is an integer >= 2", preflight={"chat_probes": 1})
         self.refused("max_turns_per_session is an integer >= 1", max_turns_per_session=0)
+        self.refused(r"the preflight's 3 requests exceed budget.provider_requests 2",
+                     budget={**e2e.SETTINGS["budget"], "provider_requests": 2})
+        self.assertEqual(self.load(budget={**e2e.SETTINGS["budget"], "provider_requests": 3}).budget["provider_requests"], 3)
         self.assertEqual(self.load(max_turns_per_session=1).max_turns_per_session, 1)
 
     def test_read_is_load_of_the_file(self):
@@ -201,6 +204,16 @@ class Sessions(Temp):
         self.assertEqual(self.budget(requests=0).exceeded()[:13], "unaccounted: ")
         acc = b.account()
         self.assertEqual((acc["limits"], acc["preflight"], acc["reached"], acc["limitation"]), (BUDGET, BASE, None, client.LIMITATION))
+
+    def test_secret_values_are_redacted_from_a_session_stream_longest_first(self):
+        log = self.log("r.jsonl", json.dumps({"type": "text", "part": {"text": "KEY=sk-abcdef123 and sk-abcdef123456"}}), step())
+        self.assertEqual(client.redact(log, ("sk-abcdef123", "sk-abcdef123456", "")), 2)
+        text = log.read_text(encoding="utf-8")
+        self.assertNotIn("sk-abcdef", text)
+        self.assertEqual(client.read_session(log)["text"], "KEY=[REDACTED] and [REDACTED]")
+        before = log.read_bytes()
+        self.assertEqual(client.redact(log, ("absent-value",)), 0)
+        self.assertEqual(log.read_bytes(), before)
 
     def test_the_client_environment_is_built_not_inherited(self):
         with mock.patch.dict(os.environ, {"PATH": "/p", "HOME": "/h", "SECRET_X": "s", "NAMED": "n", "LANG": "C"}, clear=True):

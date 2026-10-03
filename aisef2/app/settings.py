@@ -98,9 +98,12 @@ def load(data: Mapping) -> Settings:
     pre = data["preflight"]
     if not isinstance(pre, Mapping) or sorted(pre) != ["chat_probes"]:
         raise SettingsError("preflight names chat_probes")
+    probes = _count(pre["chat_probes"], "preflight.chat_probes", 2)
+    if 1 + probes > budget["provider_requests"]:     # the preflight's requests are the budget's too (review ADV-09)
+        raise SettingsError(f"the preflight's {1 + probes} requests exceed budget.provider_requests {budget['provider_requests']}")
     return Settings(data["client"], route, p["name"], str(p["endpoint"]).rstrip("/"), str(p["api_key_env"]), tuple(env),
-                    budget, _count(data["max_turns_per_session"], "max_turns_per_session"), limits, timeouts,
-                    _count(pre["chat_probes"], "preflight.chat_probes", 2), dict(data))
+                    budget, _count(data["max_turns_per_session"], "max_turns_per_session"), limits, timeouts, probes,
+                    dict(data))
 
 
 def read(path: str | pathlib.Path) -> Settings:

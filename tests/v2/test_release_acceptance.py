@@ -50,6 +50,13 @@ class ReleaseAcceptance(e2e.ProductBase):
         self.assertFalse(out["checks"]["acceptance_suite_satisfied"])
         self.assertFalse(out["checks"]["run_verified"])      # the record's final main is not the repository's main
 
+    def test_an_evaluator_that_is_not_the_frozen_one_is_refused(self):
+        self.execute()
+        accepted = self.accepted()
+        out = A.evaluate(self.project, self.tmp / "out", {**accepted, "evaluator": {**accepted["evaluator"], "sha256": "0" * 64}})
+        self.assertIn("this evaluator is not the frozen one", out["problems"])
+        self.assertEqual(out["RELEASE_SMOKE_PASS"], "NO")
+
     def test_an_acceptance_frozen_for_another_bundle_is_refused(self):
         self.execute()
         out = A.evaluate(self.project, self.tmp / "out", {**self.accepted(), "bundle_digest": "0" * 64})

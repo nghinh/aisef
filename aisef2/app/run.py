@@ -251,7 +251,10 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         budget = client.Budget(settings.budget, pre["accounting"], logs,
                                lambda: sum(1 for e in run.events if e.type == "provider/request"))
         kw = {"model": settings.route, "env": client.environment(settings.client_env, client.overlay(settings.route)),
-              "budget": budget, "turn_cap": settings.max_turns_per_session, "exe": exe}
+              "budget": budget, "turn_cap": settings.max_turns_per_session, "exe": exe,
+              # the operator's values the client receives, and the provider key: never left in a session's evidence
+              "secrets": tuple(os.environ[n] for n in (*settings.client_env, settings.api_key_env)
+                               if len(os.environ.get(n, "")) >= 8)}
         developer = ad.Developer(run, project, logs, kw, settings.timeouts_s["developer"])
         reviewer = ad.Reviewer(run, project, logs, kw, settings.timeouts_s["reviewer"])
         adapters = sr.Adapters(developer, reviewer, scanner, merger, ws)

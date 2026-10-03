@@ -136,8 +136,25 @@ def wait_within(r, log: pathlib.Path, timeout_s: float, budget: Budget, turn_cap
     return code, stopped
 
 
+REDACTED = b"[REDACTED]"
+
+
+def redact(log: pathlib.Path, secrets) -> int:
+    """Every occurrence of a secret value in the session's stream replaced (a tool the model ran may print its
+    environment); how many. The stream stays JSON: the values are replaced inside their strings."""
+    data = log.read_bytes()
+    count = 0
+    for s in sorted({x.encode("utf-8") for x in secrets if x}, key=len, reverse=True):
+        count += data.count(s)
+        data = data.replace(s, REDACTED)
+    if count:
+        log.write_bytes(data)
+    return count
+
+
 def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: float, *, model: str | None = None,
-            env: dict | None = None, budget: Budget | None = None, turn_cap: int | None = None, exe: str | None = None) -> dict:
+            env: dict | None = None, budget: Budget | None = None, turn_cap: int | None = None, exe: str | None = None,
+            secrets: tuple[str, ...] = ()) -> dict:
     """One `opencode run --format json` session in a process range of its own; its event stream goes to `log`. Nothing
     starts when anything is unbound, when the evidence shows the budget reached or spend unaccounted, or when `log`
     exists (a session's evidence is never overwritten); the range is released when the budget or the turn cap is
@@ -162,9 +179,10 @@ def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: floa
                 code, stopped = wait_within(r, log, timeout_s, budget, turn_cap)
             finally:
                 r.release()
+        redacted = redact(log, secrets)
         seen = read_session(log)
         return {"exit": code, "timed_out": code is None and not stopped, "stopped": stopped, "started": True,
                 "error": seen["error"], "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],
-                "seconds": round(time.monotonic() - started, 1), "log": log.name}
+                "seconds": round(time.monotonic() - started, 1), "log": log.name, "redacted": redacted}
     return {"exit": None, "timed_out": False, "stopped": stopped, "started": False, "error": stopped, "text": "", "turns": 0,
             "tokens": {"input": 0, "output": 0}, "seconds": 0.0, "log": None}
