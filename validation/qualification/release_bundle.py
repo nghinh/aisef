@@ -60,16 +60,28 @@ def rebound() -> dict:
                                        "probe_digest": compiled[k].probe_digest} for k in moved}}}
 
 
-def build() -> dict:
+def build(baseline: str | None = None) -> dict:
+    """The bundle for the release smoke. Its plan is the approved one (re-bound to this release's probe identities) on
+    `baseline` — by default the release-smoke workload's commit (validation/qualification/release_workload.py: the
+    approved baseline with the superseded V1 context removed); mapped back to the approved baseline, the plan hash is
+    the approved re-bound plan's exactly."""
     from aisef2.app import bundle
     from aisef2.app import run as R
     from aisef2.orchestrate.workspace import git
+    from aisef2.plan.obligation import Plan
     from validation.qualification import c2_p9
     from validation.qualification import p5_acceptance as pa
     from validation.qualification import p10 as P10
     from validation.qualification import p10_contracts as aid
+    from validation.qualification import release_workload as W
     r = rebound()
-    plan = r["plan"]
+    approved = r["plan"]
+    baseline = W.AUTHORED_INPUT if baseline is None else baseline
+    plan = Plan.create(id=PLAN_ID, baseline=baseline, obligations=approved.obligations, plan_quality_policy=approved.plan_quality_policy)
+    back = Plan.create(id=PLAN_ID, baseline=approved.baseline, obligations=plan.obligations, plan_quality_policy=plan.plan_quality_policy)
+    workload = {"derivation": W.DERIVATION_REL, "approved_baseline": approved.baseline, "baseline": baseline,
+                "approved_rebound_plan_hash": approved.plan_hash, "mapped_back_plan_hash": back.plan_hash,
+                "only_the_baseline_moved": back.plan_hash == approved.plan_hash}
     blob = git(P10.LEDGERLOCK_REPO, "cat-file", "blob", f"{plan.baseline}:docs/requirements.md")
     if blob.returncode != 0:
         raise SystemExit(f"the LedgerLock repository does not hold the baseline's requirements: {blob.stderr.strip()[:200]}")
@@ -86,7 +98,7 @@ def build() -> dict:
     admission = R.admit(project, R.calibrations())
     record = {
         "record": "AISEF V2.0 — THE LEDGERLOCK PROJECT BUNDLE FOR THE RELEASE SMOKE (the corrected plan re-bound to this "
-                  "release's probe identities)",
+                  "release's probe identities, on the release-smoke workload's authoritative-context baseline)",
         "status": "EXPORTED; not executed — no probe ran, no model was called",
         "generator": {"path": "validation/qualification/release_bundle.py", "sha256": c2_p9.C.lf_sha(HERE / "release_bundle.py")},
         "aisef2_tree": c2_p9.C.git("rev-parse", "HEAD:aisef2"),
@@ -95,6 +107,7 @@ def build() -> dict:
                    "execution_order": project.order(), "attempt_4_order": c2_p9.order(plan, r["graph"])},
         "requirements_document": {"sha256": _sha(requirements_md.encode("utf-8")), "frozen": P10.REQUIREMENTS_SHA256},
         "rebinding": r["proof"],
+        "workload": workload,
         "admission_with_shipped_calibrations": admission,
     }
     record["problems"] = problems(record)
@@ -106,6 +119,8 @@ def problems(rec: dict) -> list[str]:
     out = []
     if not rec["rebinding"]["only_spec_ids_moved"]:
         out.append("mapped back, the re-bound plan is not the committed corrected plan: more than the probe identities moved")
+    if not rec["workload"]["only_the_baseline_moved"]:
+        out.append("mapped back to the approved baseline, the smoke's plan is not the approved re-bound plan")
     if rec["requirements_document"]["sha256"] != rec["requirements_document"]["frozen"]:
         out.append("the baseline's requirements document is not the frozen one")
     if rec["bundle"]["execution_order"] != rec["bundle"]["attempt_4_order"]:
