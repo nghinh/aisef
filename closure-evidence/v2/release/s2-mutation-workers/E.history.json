@@ -1,0 +1,13 @@
+{
+ "worker": "E",
+ "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+ "status": "stopped by the controller after 2 of its 61 requested targets, 2026-10-04 04:33 (owner answer 'Restart E now': the tests/v2/test_app_units.py fix 911881b changes its 33 app targets' kill tests; its other targets continue in chunk I on 369c8ac, the app targets and AGENT/op_invoke in chunk J on 911881b)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/E.log",
+  "sha256": "6ae6e29f1778d92458e86346dd858a5389e7fdfdd260abc232744898d70ca970"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/E.record.json",
+  "sha256": "1a4419e87c73f4ed2ec36d0df9569e704edd9edd9f39784d3f4dedae6cfd1055"
+ }
+}

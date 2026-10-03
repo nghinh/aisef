@@ -1,0 +1,186 @@
+{
+ "record": "AISEF V2 — V2.0-S2 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/probe/cli_invocation.py::AGENT/op_bye",
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "source_sha256": "1a46991ffb84395f37aced671478cecab4ec58ad7ba1d0eb9892028ee57f61c4",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "AGENT L154 returns None",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::AGENT/op_invoke",
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "source_sha256": "1a46991ffb84395f37aced671478cecab4ec58ad7ba1d0eb9892028ee57f61c4",
+   "mutants": 36,
+   "killed": 35,
+   "survivors": [
+    "AGENT L129 True->False"
+   ],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "AGENT L142 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L152 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L124 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L124 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L124 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L124 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L126 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L126 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L126 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L126 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L128 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L142 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L144 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L152 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L152 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L152 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L128 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L144 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L146 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L152 string 'raw' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L152 string 'code' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L152 string 'raised' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L123 string 'stdin' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L123 string 'out' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L123 string 'err' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L124 string 'name' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L124 string 'attr' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L128 string '__main__' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L125 string 'argv' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L135 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L129 string '__main__' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L129 True->False",
+     "killed": false
+    },
+    {
+     "mutant": "AGENT L135 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L135 string 'absent' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L135 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L136 string 'argv' emptied",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

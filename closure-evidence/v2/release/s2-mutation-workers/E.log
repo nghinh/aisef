@@ -1,0 +1,2 @@
+aisef2/probe/cli_invocation.py::AGENT/op_invoke: 35/36 killed; survivors ['AGENT L129 True->False']
+aisef2/probe/cli_invocation.py::AGENT/op_bye: 1/1 killed; survivors []
