@@ -1048,7 +1048,7 @@ def _run_verify_only_owned(
         report.error = (
             f"{story_id}: no candidate to re-verify — need a developer session "
             f"that froze a candidate on branch `{worktrees.branch_for(story_id)}` "
-            f"(run `aisef run` first)"
+            f"(run `aisef legacy run` first)"
         )
         return report
 

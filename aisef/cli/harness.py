@@ -449,7 +449,7 @@ def _waive_review(args) -> int:
         latest = str(scorings[-1].detail.get("candidate") or "")
         print(f"✗ {args.story}: the story branch stands at {tip[:8]} but the last gate scoring is of "
               f"{latest[:8] or 'no candidate'} — a waiver cannot be bound to a build that was not scored. "
-              f"Re-verify the branch tip (`aisef run --verify-only --story {args.story}`), then waive.",
+              f"Re-verify the branch tip (`aisef legacy run --verify-only --story {args.story}`), then waive.",
               file=sys.stderr)
         return EXIT_USAGE
     if dau_vao is None:
@@ -485,7 +485,7 @@ def _waive_review(args) -> int:
     if khac:
         print(f"⚠ still blocking on its own merits: {', '.join(khac)} — the waiver "
               f"covers `review` only")
-    print(f"next: aisef run --verify-only --story {args.story}")
+    print(f"next: aisef legacy run --verify-only --story {args.story}")
     return EXIT_OK
 
 

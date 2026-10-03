@@ -87,7 +87,7 @@ def apply(project: Path, requirement: str, description: str, *, today: date | No
     steps = [
         f"declare `write_scope` for {sid} in `{path.relative_to(project)}` and the index",
         "re-approve the `prd` gate (and all downstream gates) — they are now stale",
-        f"run `aisef run --epic {EPIC_ID}`",
+        f"run `aisef legacy run --epic {EPIC_ID}`",
     ]
     if (root / "baseline.md").is_file():
         steps.insert(0, "blast-radius will run automatically during implement (requires write_scope)")

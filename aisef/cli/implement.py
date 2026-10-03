@@ -124,7 +124,7 @@ def cmd_status(args) -> int:
     unmerged = [r.id for r in state.by_status(StoryStatus.VERIFIED)]
     if unmerged:
         print(f"⚠️  {len(unmerged)} stories done but not merged to main: "
-              f"{', '.join(unmerged[:5])} — run `aisef run` again to merge")
+              f"{', '.join(unmerged[:5])} — run `aisef legacy run` again to merge")
     if state.active_epics:
         print(f"Active epics: {', '.join(state.active_epics)}")
     elif state.current_epic:
@@ -138,7 +138,7 @@ def cmd_status(args) -> int:
     # `running` written by a live process and `running` left by a dead one
     # are two facts; the record carries HOST:PID, so on this host they can be
     # told apart. Read model only — nothing here touches the state file: the
-    # next `aisef run`/`improve` reconciles the journal and takes the claim
+    # next `aisef legacy run`/`improve` reconciles the journal and takes the claim
     # back (LedgerLock 2026-09-15: `running 2` for 39 minutes after the
     # orchestrator died, lỗi 179 / D-025).
     from ..control.state import claim_is_orphaned
@@ -150,7 +150,7 @@ def cmd_status(args) -> int:
               f"on this host: "
               + ", ".join(f"{r.id} ({r.claimed_by})" for r in mo_coi[:5])
               + (f", +{len(mo_coi) - 5} more" if len(mo_coi) > 5 else "")
-              + ". Nothing is lost: `aisef run` reconciles the journal and re-claims them "
+              + ". Nothing is lost: `aisef legacy run` reconciles the journal and re-claims them "
               "before starting.")
 
     print(f"\nCost: ${state.total_cost_usd:.2f}")

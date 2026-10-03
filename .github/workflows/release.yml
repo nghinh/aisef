@@ -1,64 +1,88 @@
-# Phát hành lên PyPI khi đẩy tag `v*` — dùng *trusted publishing* (OIDC),
-# không có token nào nằm trong kho hay trong secrets. Quyết định 2026-09-05:
-# tên gói `aisef` (module/lệnh vẫn `aisef`), tài khoản tổ chức; publish khi hoàn tất đợt 4.
+# Production PyPI publication — docs/v2/RELEASE-PROCESS.md; V2 charter G8, §10, §19.
 #
-# Việc phải làm một lần bằng tay (không tự động hoá được): trên PyPI, tài
-# khoản tổ chức tạo project `aisef` và thêm "trusted publisher" trỏ tới
-# kho này (`nghinh/aisef`), workflow `release.yml`, environment `pypi`. Sau đó
-# `git tag vX.Y.Z && git push origin vX.Y.Z` là đủ.
+# Publishes ONLY for a stable tag that is exactly vX.Y.Z (no rc / dev / post suffix), and ONLY after these gates
+# pass in this same run:
+#   tests    the whole tests.yml on the tagged commit: unit on ubuntu (3.11–3.14) + windows (3.11), lint, wheel;
+#   staging  staging.yml: wheel + sdist built once, sha256 recorded, exactly those files installed into clean venvs
+#            on Linux and Windows, CLI smoke from the installed package (including the V2 runtime of `aisef run`);
+#   v2-gate  validation/v2_release_gate.py: tag == pyproject version; closure-evidence/v2/release/V2-STABLE-STATUS.json
+#            says FINAL_RELEASE_READY "PASS" with no open V2.0 blocker; the owner's latest RELEASE-DECISIONS ruling
+#            on PRODUCTION_PUBLISH is "AUTHORIZED" for exactly this VERSION. It fails today, by design (§19 hold).
+# The publish job uploads the very files staging built and smoked, after re-checking their sha256.
 #
-# Đổi tên kho **là** đổi publisher: PyPI khớp theo đúng chuỗi `chủ/tên kho` lấy
-# từ token OIDC, nên sau lần đổi tên 2026-09-06 (`ai-sdlc` → `aisef`) phải khai
-# lại, không thì job `publish` bị từ chối dù mọi thứ khác xanh.
+# RC / prerelease tags (v*rc*, v*-rc*, v*.dev*) and manual runs go to staging.yml, which cannot publish.
+#
+# REPLACED for the V2 release path (charter G8 "current or explicitly replaced by this V2 release charter", §10):
+# the V1 gate this workflow used to run, `AISEF_RELEASE=1 python -m unittest tests.test_release_gate`
+# (docs/CONFORMANCE.md freshness, aisef/control/conformance.py MAX_AGE_DAYS = 14). Its code stays in
+# tests/test_release_gate.py for the legacy V1 surface (conformance.yml still runs it); it no longer blocks a V2
+# release, and the V2 gate above is what authorizes one.
+#
+# One-time, by hand (not automatable): on PyPI, project `aisef` has a trusted publisher pointing at this repository
+# (`nghinh/aisef` — renaming the repository IS changing the publisher), workflow `release.yml`, environment `pypi`.
+# Protect the `pypi` environment with the owner as required reviewer: that approval is the owner's final
+# production-publish confirmation (charter §19), on top of the RELEASE-DECISIONS entry the v2-gate reads.
 name: release
 
 on:
   push:
-    tags: ["v*"]
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  stable-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      # Defence in depth: the trigger filter above already admits only vX.Y.Z; this refuses anything else anyway.
+      - id: v
+        name: the ref is a tag of exactly vX.Y.Z
+        run: |
+          set -eu
+          if [[ "$GITHUB_REF_TYPE" != "tag" || ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::$GITHUB_REF is not a stable vX.Y.Z tag: refusing to publish"
+            exit 1
+          fi
+          echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+  tests:
+    needs: stable-tag
+    uses: ./.github/workflows/tests.yml
+
+  staging:
+    needs: stable-tag
+    uses: ./.github/workflows/staging.yml
+
+  v2-gate:
+    needs: stable-tag
     runs-on: ubuntu-latest
     steps:
-      # fetch-depth: 0 — bộ test có phép **cố ý** dựng lại một commit gốc
-      # trong lịch sử chính kho này (`git archive <task.base>`, bench A-2).
-      # Checkout mặc định là shallow (depth 1), nên commit ấy không tồn tại và
-      # phép thử **lỗi** chứ không bỏ qua. Đo được: đợt phát hành v1.7.0
-      # (run 34908370558) đỏ với 4 lỗi `git archive … exit 128`, trong khi cùng
-      # commit ấy xanh 3056/0 ở máy có lịch sử đầy đủ. Không sửa phép thử: nó
-      # đúng, môi trường thiếu.
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Kiểm phát hành (unit + bảng hợp quy còn mới)
-        run: |
-          python -m unittest discover -s tests -q
-          # `-v`, không `-q`: `-q` in "OK (skipped=1)" — người đọc log phát hành
-          # thấy xanh mà không thấy **phép nào** bị bỏ. Phép nghiệm thu dogfood
-          # bỏ qua khi thiếu `AISEF_ACCEPTANCE`; `-v` in tên nó kèm lý do.
-          AISEF_RELEASE=1 python -m unittest tests.test_release_gate -v
-      - name: Build
-        run: |
-          python -m pip install --upgrade build twine
-          python -m build
-          python -m twine check dist/*
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
+      - run: python -P validation/v2_release_gate.py "$VERSION"
+        env:
+          VERSION: ${{ needs.stable-tag.outputs.version }}
 
   publish:
-    needs: build
+    needs: [stable-tag, tests, staging, v2-gate]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
-      id-token: write   # OIDC cho trusted publishing
+      id-token: write   # OIDC for trusted publishing: no token in the repository or its secrets
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-sha256
+          path: .
+      - name: publish exactly the files staging built and smoked
+        run: cd dist && sha256sum -c ../SHA256SUMS
       - uses: pypa/gh-action-pypi-publish@release/v1

@@ -1,3 +1,4 @@
 {"checker": "packaging_check", "package": "WP-0.2", "kind": "pyproject_edit",
-"find": "exclude = [\"aisef2*\"]", "replace": "",
-"expect": "aisef2 would ship in the aisef wheel"}
+"find": "include = [\"aisef\", \"aisef.*\", \"aisef2\", \"aisef2.*\"]",
+"replace": "include = [\"aisef\", \"aisef.*\", \"aisef2\", \"aisef2.*\"]\nexclude = [\"aisef2*\"]",
+"expect": "aisef2 would NOT ship in the aisef wheel"}

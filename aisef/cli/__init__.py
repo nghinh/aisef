@@ -5,7 +5,7 @@ then exit.  No command assumes it is the main process, none runs in the
 background.  This is what allows the same command set to work in two modes
 (decision D2):
 
-* **driver-led** — a script or CI calls ``aisef run``;
+* **driver-led** — a script or CI calls ``aisef legacy run``;
 * **agent-led** — the agent itself calls ``aisef next`` / ``verify`` /
   ``complete`` via Bash, inside a Claude Desktop or OpenCode chat session.
 

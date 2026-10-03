@@ -60,7 +60,7 @@ class TestBuildParser(unittest.TestCase):
             self.parser.parse_args(["init", "--stack", "rust"])
 
     def test_run_verify_only_with_story(self):
-        args = self.parser.parse_args(["run", "--verify-only", "--story", "S-01"])
+        args = self.parser.parse_args(["legacy", "run", "--verify-only", "--story", "S-01"])
         self.assertTrue(args.verify_only)
         self.assertEqual(args.story, "S-01")
 

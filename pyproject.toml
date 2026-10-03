@@ -4,6 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aisef"             # gói, module và lệnh cùng một tên từ 0.2.0
+# The ONE place the version lives (aisef.__version__ reads the installed metadata). It becomes 2.0.0 only at the
+# V2.0-RC1 freeze (docs/v2/V2-STABLE-RELEASE-CHARTER.md §10/§11); a stable `vX.Y.Z` tag must equal it or
+# .github/workflows/release.yml refuses to publish.
 version = "1.7.6"
 description = "AISEF — AI Software Engineering Framework: input is docs/requirements.md, output is gate-verified code with SHA-bound evidence"
 readme = "README.md"
@@ -19,11 +22,11 @@ Repository = "https://github.com/nghinh/aisef"
 aisef = "aisef.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["aisef*"]
-# `aisef*` also matches `aisef2` — the V2 Cycle-1 scaffolding, which is not part of the aisef product and must not
-# ship inside its wheel. The V1 package set is unchanged by this line (proved in
-# closure-evidence/v2/P0-PACKAGING-EXCLUDE.json).
-exclude = ["aisef2*"]
+# The distribution ships exactly V1 (`aisef`) and the V2 runtime (`aisef2`, every subpackage: charter G1 makes V2
+# the authoritative `aisef run`) — never tests/, validation/ or closure-evidence/. Guarded by
+# validation/v2/packaging_check.py: `--check` on this table (a calibrated Q0 checker), `--artifacts dist` on the
+# built wheel and sdist (the wheel job of .github/workflows/tests.yml and the staging workflow).
+include = ["aisef", "aisef.*", "aisef2", "aisef2.*"]
 
 [tool.setuptools.package-data]
 # Prompt, luật, skill và script trình duyệt là *dữ liệu chạy*, không phải tài

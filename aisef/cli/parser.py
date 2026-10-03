@@ -181,7 +181,15 @@ def build_parser() -> argparse.ArgumentParser:
     mk.add_argument("--only", default="", help="only build these screen_ids")
     mk.set_defaults(func=cmd_mockup)
 
-    r2 = sub.add_parser("run", help="execute a wave: epics sequentially, stories in parallel")
+    # G1 (docs/v2/V2-STABLE-RELEASE-CHARTER.md §3): `aisef run` IS the V2 runtime. main() hands every argument after
+    # `run` to aisef2.app.cli.run before this parser runs; the entry here only lists the command and its pointer.
+    sub.add_parser("run", help="run the V2 runtime (authoritative); arguments go to aisef2.app.cli — "
+                               "see docs/v2/USAGE.md")
+
+    # V1 execution survives only behind this explicitly named legacy surface, never as the default.
+    lg = sub.add_parser("legacy", help="V1 compatibility surface (legacy, never the default): `aisef legacy run ...`")
+    legacy = lg.add_subparsers(dest="legacy_command", required=True, parser_class=_Parser)
+    r2 = legacy.add_parser("run", help="V1 (legacy): execute a wave: epics sequentially, stories in parallel")
     r2.add_argument("--client", default="claude", help="claude | opencode")
     r2.add_argument("--epic", default="", help="run only this epic")
     r2.add_argument("--sequential", action="store_true", help="disable parallel execution")
@@ -388,10 +396,28 @@ def _cho_moi_lenh_nhan_project(p: argparse.ArgumentParser) -> None:
         for sub in getattr(act, "choices", {}).values():
             sub.add_argument("--project", default=argparse.SUPPRESS,
                              help="project directory (also accepted before the command)")
+            _cho_moi_lenh_nhan_project(sub)      # nested commands too: `aisef legacy run --project X`
 
 
 def main(argv: list[str] | None = None) -> int:
     _speak_utf8()
+    argv = sys.argv[1:] if argv is None else list(argv)
+    # G1: `aisef run` → aisef2.app.cli.run(argv), the authoritative V2 path. Its arguments reach V2 untouched (V1's
+    # parser never sees them); a global `--project DIR` written before `run` is forwarded first. Lazy import: V1
+    # commands never load V2, and an install without the V2 runtime says so instead of falling back to V1.
+    i = 0
+    while i < len(argv) and (argv[i] == "--project" or argv[i].startswith("--project=")):
+        i += 1 if "=" in argv[i] else 2
+    if argv[i:i + 1] == ["run"]:
+        try:
+            from aisef2.app.cli import run as v2_run
+        except ModuleNotFoundError as e:
+            if e.name not in ("aisef2", "aisef2.app", "aisef2.app.cli"):
+                raise
+            print("✗ aisef run: the V2 runtime (aisef2.app.cli) is not installed in this environment — reinstall "
+                  "aisef; V1 execution is only `aisef legacy run`", file=sys.stderr)
+            return EXIT_USAGE
+        return v2_run(argv[:i] + argv[i + 1:])
     parser = build_parser()
     _cho_moi_lenh_nhan_project(parser)
     args = parser.parse_args(argv)

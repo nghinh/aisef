@@ -19,6 +19,19 @@ story", "nothing may be written outside the declared scope", "tests must be
 green after the last edit" — all have a correct answer, so all are code. The
 consequence: **the model is never asked to supervise itself.**
 
+## AISEF 2.0 (V2)
+
+From 2.0 the `aisef` distribution ships two packages: `aisef` (V1, the framework
+this README describes) and `aisef2`, the V2 runtime — and **`aisef run` is V2**,
+the authoritative execution path. V1 execution remains only as an explicitly
+named legacy surface, `aisef legacy run …`, never the default; every other
+command below is unchanged.
+
+- Install, once 2.0.0 is published: `pip install aisef==2.0.0`
+- Using the V2 runtime: `docs/v2/USAGE.md`
+- Releasing (tags, staging, the production hold): [docs/v2/RELEASE-PROCESS.md](docs/v2/RELEASE-PROCESS.md)
+- The ruling it all follows: [docs/v2/V2-STABLE-RELEASE-CHARTER.md](docs/v2/V2-STABLE-RELEASE-CHARTER.md)
+
 ## Install
 
 ```bash
@@ -124,8 +137,8 @@ aisef mockup                       # one HTML per screen + visual contract
 aisef approve mockups
 aisef approve readiness
 
-aisef run                          # implement: epics in sequence, stories in parallel
-aisef run --verify-only --story STORY-01-07   # re-verify a frozen candidate, no developer session
+aisef legacy run                   # V1 implement: epics in sequence, stories in parallel
+aisef legacy run --verify-only --story STORY-01-07   # re-verify a frozen candidate, no developer session
 aisef qa                           # the verification suite
 aisef devsecops                    # CI + Dockerfile + deployment + runbook
 aisef pre-deploy                   # the final gate
@@ -191,7 +204,7 @@ reached, marginal improvement ≤ 0 for `improve.flat_loops` consecutive loops,
 need `aisef approve improve` unless `--auto`.
 
 ```bash
-aisef run --verify-only --story STORY-01-07
+aisef legacy run --verify-only --story STORY-01-07
 ```
 
 When a story fails only because of the measuring environment (end-to-end tests
@@ -287,9 +300,10 @@ and raw logs of each probe stay in `.conformance/<client>/` (changeable with
 deliberately does **not** inherit `CLAUDE_*` variables from the session that
 launched it — running conformance from inside a Claude session is a real
 scenario, and a child inheriting the parent's flags measures the wrong thing.
-This repository's own release gate reads that table in code
+This repository's V1 release gate reads that table in code
 (`AISEF_RELEASE=1 python3 -m unittest tests.test_release_gate`): the `claude`
-column must show ten ✅ and the table must be no older than 14 days. Both
+column must show ten ✅ and the table must be no older than 14 days. On the 2.0
+release path the V2 release gate replaces it ([docs/v2/RELEASE-PROCESS.md](docs/v2/RELEASE-PROCESS.md)). Both
 Claude and OpenCode are first-class clients (10/10 conformance). CI:
 `.github/workflows/conformance.yml` runs weekly.
 
@@ -298,31 +312,25 @@ Claude and OpenCode are first-class clients (10/10 conformance). CI:
 Package, Python module and command all share the name **`aisef`** (since 0.2.0;
 0.1.0 installed as `aisef` but was typed `aisdlc` — that alias was removed in
 0.3.0). Release conditions are read by command, not by
-feeling:
+feeling — from 2.0 they are the V2 ones, in
+[docs/v2/RELEASE-PROCESS.md](docs/v2/RELEASE-PROCESS.md): only an exact
+`vX.Y.Z` tag reaches production PyPI, and only after the test matrix, a clean
+install of the staged artifact and the V2 release gate (the owner's recorded
+authorization) pass inside `.github/workflows/release.yml`; RC and dev tags
+(`v*rc*`, `v*-rc*`, `v*.dev*`) run `.github/workflows/staging.yml`, which never
+publishes. Publication uses *trusted publishing* — no token lives in the
+repository.
+
+The V1 gate stays for the legacy surface and no longer gates a release:
 
 ```bash
-python3 -m unittest discover -s tests -q && AISEF_RELEASE=1 AISEF_ACCEPTANCE=<acceptance project> python3 -m unittest tests.test_release_gate -q
+AISEF_RELEASE=1 AISEF_ACCEPTANCE=<acceptance project> python3 -m unittest tests.test_release_gate -q
 ```
 
 `AISEF_ACCEPTANCE` points at the dogfood project that has been accepted (v0.1.0:
 `e9`, scope EPIC-01): the gate reads `pre-deploy-report.json` (passed, has a
 declared scope, waivers carry reasons) and the `pre-deploy` approval bound to
 that exact report. Unset, it skips with a named reason — which is not a pass.
-
-```bash
-uv build && uvx twine check dist/*
-```
-
-`.github/workflows/release.yml` publishes through *trusted publishing* when a
-`v*` tag is pushed — no token lives in the repository. The **one-time manual
-step**: create the `aisef` project on PyPI and declare the trusted publisher
-(this repository · workflow `release.yml` · environment `pypi`). Renaming the
-repository means re-declaring the publisher, because PyPI matches the exact
-`owner/repo` string carried by the OIDC token. Then:
-
-```bash
-git tag vX.Y.Z && git push origin vX.Y.Z
-```
 
 The dogfood regression corpus (`tests/dogfood/`, enabled with
 `AISEF_DOGFOOD=1`) rebuilds the `par` sample project from the inputs stored in

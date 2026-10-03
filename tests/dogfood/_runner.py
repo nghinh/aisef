@@ -58,7 +58,7 @@ def clean_env() -> dict[str, str]:
 
 def run_epic(project: Path, epic: str, *, client: str = "claude") -> str:
     proc = subprocess.run(
-        [str(ROOT / "bin" / "aisef"), "run", "--epic", epic, "--client", client, "--force"],
+        [str(ROOT / "bin" / "aisef"), "legacy", "run", "--epic", epic, "--client", client, "--force"],   # the V1 corpus
         cwd=project, capture_output=True, text=True, encoding="utf-8", errors="replace", env=clean_env(), timeout=3600,
     )
     (project / "_bmad-output" / "dogfood-run.log").write_text(proc.stdout + "\n--- stderr ---\n" + proc.stderr, encoding="utf-8")

@@ -2,11 +2,16 @@
 
 Chạy với ``AISEF_RELEASE=1``. Không có biến đó thì bỏ qua, để bộ test
 thường không đỏ chỉ vì bảng chưa được chạy tuần này.
+
+V2: the release path (.github/workflows/release.yml) no longer runs the V1 gate below; the V2 stable release charter
+replaces it with validation/v2_release_gate.py (G8, §10 — docs/v2/RELEASE-PROCESS.md), tested by V2ReleaseGate.
 """
 
 from __future__ import annotations
 
+import importlib.util
 import os
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -15,6 +20,73 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from aisef.control import conformance as C  # noqa: E402
+
+_s = importlib.util.spec_from_file_location("v2_release_gate", ROOT / "validation" / "v2_release_gate.py")
+G = importlib.util.module_from_spec(_s)
+_s.loader.exec_module(G)
+
+
+class V2ReleaseGate(unittest.TestCase):
+    """Production PyPI receives a version only when V2-STABLE-STATUS says FINAL_RELEASE_READY PASS with no open
+    blocker and the owner's latest PRODUCTION_PUBLISH ruling authorizes exactly that version (charter §19, §22)."""
+
+    READY = {"FINAL_RELEASE_READY": "PASS", "OPEN_V2_0_BLOCKERS": []}
+    HELD = {"seq": 2, "approver": "human:owner", "decision": {"PRODUCTION_PUBLISH": "HELD for the owner"}}
+    OK = {"seq": 3, "approver": "human:owner", "decision": {"PRODUCTION_PUBLISH": "AUTHORIZED", "VERSION": "2.0.0"}}
+
+    def gate(self, *entries, version="2.0.0", pyproject="2.0.0", status=READY):
+        return G.problems(version, pyproject, status, {"entries": [{"seq": 1, "decision": {}}, *entries]})
+
+    def test_the_owner_authorizing_this_exact_version_passes(self):
+        self.assertEqual(self.gate(self.HELD, self.OK), [])
+
+    def test_held_unauthorized_or_revoked_publication_is_refused(self):
+        self.assertTrue(self.gate(self.HELD))
+        self.assertTrue(self.gate())
+        self.assertTrue(self.gate(self.OK, dict(self.HELD, seq=4)))           # a later hold wins
+        self.assertTrue(self.gate(dict(self.OK, approver="agent")))
+        self.assertTrue(self.gate(self.OK, version="2.0.1", pyproject="2.0.1"))
+
+    def test_rc_versions_a_tag_pyproject_mismatch_or_an_unready_status_are_refused(self):
+        self.assertTrue(self.gate(dict(self.OK, decision={**self.OK["decision"], "VERSION": "2.0.0rc1"}),
+                                  version="2.0.0rc1", pyproject="2.0.0rc1"))
+        self.assertTrue(self.gate(self.OK, pyproject="1.7.6"))
+        for status in ({"FINAL_RELEASE_READY": "NOT_STARTED", "OPEN_V2_0_BLOCKERS": []},
+                       {"FINAL_RELEASE_READY": "PASS", "OPEN_V2_0_BLOCKERS": ["B13"]}, {"FINAL_RELEASE_READY": "PASS"}, {}):
+            with self.subTest(status=status):
+                self.assertTrue(self.gate(self.OK, status=status))
+
+
+class ReleaseWorkflowsCannotPublishByAccident(unittest.TestCase):
+    """B13 / charter G8: only a stable vX.Y.Z tag reaches production PyPI, and only behind every gate; RC / dev tags
+    and manual runs reach staging.yml, which has no way to publish. Static: the YAML read as text."""
+
+    W = ROOT / ".github" / "workflows"
+
+    @staticmethod
+    def code(f: Path) -> str:
+        """The workflow without its comment lines: an explanation is not a configuration."""
+        return "\n".join(line for line in f.read_text(encoding="utf-8").splitlines() if not line.lstrip().startswith("#"))
+
+    def test_production_publish_is_stable_tags_only_and_behind_every_gate(self):
+        code = self.code(self.W / "release.yml")
+        on = code.split("\non:", 1)[1].split("\npermissions:", 1)[0]
+        self.assertEqual(re.findall(r"(?m)^\s*(\w+):", on), ["push", "tags"])
+        self.assertIn('tags: ["v[0-9]+.[0-9]+.[0-9]+"]', on)
+        self.assertIn("needs: [stable-tag, tests, staging, v2-gate]", code)
+        for gate in ("uses: ./.github/workflows/tests.yml", "uses: ./.github/workflows/staging.yml",
+                     "python -P validation/v2_release_gate.py", r"^v[0-9]+\.[0-9]+\.[0-9]+$"):
+            self.assertIn(gate, code)
+        self.assertNotIn("AISEF_RELEASE=1", code)       # the V1 freshness gate is replaced on this path
+
+    def test_no_other_workflow_can_publish(self):
+        for f in sorted(self.W.glob("*.yml")):
+            if f.name == "release.yml":
+                continue
+            code = self.code(f)
+            with self.subTest(workflow=f.name):
+                for publish in ("id-token", "pypi-publish", "twine upload"):
+                    self.assertNotIn(publish, code)
 
 
 @unittest.skipUnless(os.environ.get("AISEF_RELEASE") == "1", "chỉ khi phát hành (AISEF_RELEASE=1)")
