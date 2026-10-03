@@ -24,14 +24,24 @@ DECISIONS_REL = "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"   # append-o
 STABLE = re.compile(r"\d+\.\d+\.\d+")
 
 
-def problems(version: str, pyproject_version: str, status: dict, decisions: dict) -> list[str]:
+def problems(version: str, pyproject_version: str, status: dict, decisions: dict, rc: dict | None,
+             rc_problems: list[str]) -> list[str]:
     """Why production PyPI must not receive `version`; empty means it may.
 
     The latest RELEASE-DECISIONS entry that rules on PRODUCTION_PUBLISH decides: it must be the owner's
     (approver "human:owner") with decision.PRODUCTION_PUBLISH == "AUTHORIZED" and decision.VERSION == `version`.
     A later entry that holds or revokes publication therefore wins over an earlier authorization.
+
+    `rc` is the frozen release candidate (V2.0-RC1-FREEZE.json, charter G2) and `rc_problems` its check on this
+    commit: the published bytes are the RC's only when this commit's shipped files are the RC's (the build then uses
+    the RC's epoch, and the publish job compares the files with the frozen digests).
     """
     out = []
+    if rc is None:
+        out.append("no frozen release candidate (closure-evidence/v2/release/V2.0-RC1-FREEZE.json, charter G2)")
+    elif rc.get("rc", {}).get("version") != version:
+        out.append(f"the frozen candidate is {rc.get('rc', {}).get('version')!r}, the tag says {version!r}")
+    out += [f"release candidate: {p}" for p in rc_problems]
     if not STABLE.fullmatch(version):
         out.append(f"{version!r} is not a stable X.Y.Z version (RC and dev versions never reach production PyPI)")
     if pyproject_version != version:
@@ -63,7 +73,10 @@ def main(argv: list[str] | None = None) -> int:
         return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
 
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
-    found = problems(argv[0], pyproject, load(STATUS_REL), load(DECISIONS_REL))
+    sys.path.insert(0, str(ROOT))
+    from validation.qualification import release_rc
+    rc = load(release_rc.OUT_REL) or None
+    found = problems(argv[0], pyproject, load(STATUS_REL), load(DECISIONS_REL), rc, release_rc.check(rc) if rc else [])
     for p in found:
         print(f"FAIL  {p}")
     print(f"V2 release gate for {argv[0]}: " + ("FAIL — production publication is not authorized" if found else "PASS"))

@@ -34,11 +34,20 @@ class V2ReleaseGate(unittest.TestCase):
     HELD = {"seq": 2, "approver": "human:owner", "decision": {"PRODUCTION_PUBLISH": "HELD for the owner"}}
     OK = {"seq": 3, "approver": "human:owner", "decision": {"PRODUCTION_PUBLISH": "AUTHORIZED", "VERSION": "2.0.0"}}
 
-    def gate(self, *entries, version="2.0.0", pyproject="2.0.0", status=READY):
-        return G.problems(version, pyproject, status, {"entries": [{"seq": 1, "decision": {}}, *entries]})
+    RC = {"rc": {"version": "2.0.0"}}
+
+    def gate(self, *entries, version="2.0.0", pyproject="2.0.0", status=READY, rc=RC, rc_problems=()):
+        return G.problems(version, pyproject, status, {"entries": [{"seq": 1, "decision": {}}, *entries]}, rc, list(rc_problems))
 
     def test_the_owner_authorizing_this_exact_version_passes(self):
         self.assertEqual(self.gate(self.HELD, self.OK), [])
+
+    def test_without_the_frozen_candidate_or_with_its_shipped_files_moved_nothing_is_published(self):
+        self.assertIn("no frozen release candidate (closure-evidence/v2/release/V2.0-RC1-FREEZE.json, charter G2)",
+                      self.gate(self.OK, rc=None))
+        self.assertTrue(self.gate(self.OK, rc={"rc": {"version": "2.0.1"}}))
+        self.assertEqual(self.gate(self.OK, rc_problems=["HEAD's shipped files are not the RC's: ['aisef2']"]),
+                         ["release candidate: HEAD's shipped files are not the RC's: ['aisef2']"])
 
     def test_held_unauthorized_or_revoked_publication_is_refused(self):
         self.assertTrue(self.gate(self.HELD))
@@ -78,6 +87,9 @@ class ReleaseWorkflowsCannotPublishByAccident(unittest.TestCase):
                      "python -P validation/v2_release_gate.py", r"^v[0-9]+\.[0-9]+\.[0-9]+$"):
             self.assertIn(gate, code)
         self.assertNotIn("AISEF_RELEASE=1", code)       # the V1 freshness gate is replaced on this path
+        publish = code.split("\n  publish:", 1)[1]
+        self.assertIn("release_rc.py --verify-dist dist", publish)   # G2: the frozen RC's bytes, nothing else
+        self.assertLess(publish.index("--verify-dist"), publish.index("pypa/gh-action-pypi-publish"))
 
     def test_no_other_workflow_can_publish(self):
         for f in sorted(self.W.glob("*.yml")):

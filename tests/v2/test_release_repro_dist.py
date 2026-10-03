@@ -60,5 +60,36 @@ class ReproDist(unittest.TestCase):
             self.assertEqual(R.main(["x.tar.gz"]), 2)
 
 
+class FrozenCandidate(unittest.TestCase):
+    """validation/qualification/release_rc.py: the production publish job publishes the frozen RC's bytes only, and
+    builds take the frozen RC's epoch once there is one."""
+
+    def test_only_the_frozen_files_byte_for_byte_pass(self):
+        from validation.qualification import release_rc as rc
+        import hashlib
+        with tempfile.TemporaryDirectory() as t:
+            d = pathlib.Path(t)
+            (d / "aisef-2.0.0-py3-none-any.whl").write_bytes(b"wheel")
+            (d / "aisef-2.0.0.tar.gz").write_bytes(b"sdist")
+            frozen = {"artifacts": {"sha256": {"aisef-2.0.0-py3-none-any.whl": hashlib.sha256(b"wheel").hexdigest(),
+                                               "aisef-2.0.0.tar.gz": hashlib.sha256(b"sdist").hexdigest()}}}
+            self.assertEqual(rc.verify_dist(frozen, d), [])
+            (d / "aisef-2.0.0.tar.gz").write_bytes(b"sdist, rebuilt")
+            self.assertTrue(rc.verify_dist(frozen, d))
+            (d / "aisef-2.0.0.tar.gz").write_bytes(b"sdist")
+            (d / "extra.whl").write_bytes(b"x")
+            self.assertTrue(rc.verify_dist(frozen, d))
+
+    def test_the_epoch_is_the_frozen_candidate_s_once_frozen(self):
+        from validation.qualification import release_rc as rc
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t)
+            with mock.patch.object(rc, "ROOT", root), mock.patch.object(rc, "_git", return_value=b"1700000000\n"):
+                self.assertEqual(rc.epoch(), 1700000000)                  # before the freeze: the commit's time
+                (root / rc.OUT_REL).parent.mkdir(parents=True)
+                (root / rc.OUT_REL).write_text('{"rc": {"source_date_epoch": 1790000000}}', encoding="utf-8")
+                self.assertEqual(rc.epoch(), 1790000000)
+
+
 if __name__ == "__main__":
     unittest.main()

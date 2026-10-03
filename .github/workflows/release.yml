@@ -61,6 +61,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # the gate reads the frozen RC commit's own objects (release_rc.check)
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -85,4 +87,11 @@ jobs:
           path: .
       - name: publish exactly the files staging built and smoked
         run: cd dist && sha256sum -c ../SHA256SUMS
+      # charter G2: the files are the frozen release candidate's, byte for byte (built with the RC's epoch from
+      # the RC's shipped files, which the v2-gate job checked are this commit's)
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: the files to publish are the frozen RC's
+        run: python3 -P repo/validation/qualification/release_rc.py --verify-dist dist
       - uses: pypa/gh-action-pypi-publish@release/v1

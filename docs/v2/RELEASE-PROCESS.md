@@ -82,7 +82,20 @@ On a `vX.Y.Z` tag, in one run:
 - in `closure-evidence/v2/cycle2/RELEASE-DECISIONS.json`, the latest entry (by `seq`) whose `decision` has a
   `PRODUCTION_PUBLISH` key is the owner's and authorizes exactly this version:
   `approver: "human:owner"`, `decision.PRODUCTION_PUBLISH: "AUTHORIZED"`, `decision.VERSION: "<version>"`.
-  A later entry that holds or revokes publication wins over an earlier authorization.
+  A later entry that holds or revokes publication wins over an earlier authorization;
+- a frozen release candidate exists — `closure-evidence/v2/release/V2.0-RC1-FREEZE.json`
+  (`validation/qualification/release_rc.py`, charter G2) — for exactly this version, and the tagged commit's
+  shipped files (`aisef/`, `aisef2/`, `pyproject.toml`, `MANIFEST.in`, `README.md`) are the RC's, as read from the
+  RC commit's own git objects.
+
+### The published bytes are the frozen RC's (charter G2, §18)
+
+Builds are reproducible: `SOURCE_DATE_EPOCH` is the frozen RC's epoch once the RC is frozen
+(`release_rc.py --epoch`; before that, the commit's time), setuptools is pinned, and the sdist is re-packed
+deterministically (`repro_dist.py`). So the stable tag may sit on a later commit than the RC (the one carrying the
+status and the owner's decision) as long as its shipped files are the RC's — the gate checks that — and the
+staging build of that commit gives the RC's exact bytes. The `publish` job then refuses any file that is not the
+frozen wheel or sdist byte for byte (`release_rc.py --verify-dist dist`), before the upload step.
 
 Today it fails, by design: `FINAL_RELEASE_READY` is `NOT_STARTED`, blockers are open, and entry seq 2 rules
 `PRODUCTION_PUBLISH: "HELD for the owner's final confirmation (charter §19)"`.
@@ -112,8 +125,9 @@ The release lane does everything up to the hold and returns `FINAL_RELEASE_READY
                  "RC_SOURCE_SHA": "<sha>", "RC_WHEEL_DIGEST": "<sha256>", "RC_SDIST_DIGEST": "<sha256>"}}
    ```
 
-   (the gate reads `approver`, `PRODUCTION_PUBLISH` and `VERSION`; the RC identities are the record);
-2. confirms `V2-STABLE-STATUS.json` says `FINAL_RELEASE_READY: "PASS"` with no open blocker, on the commit to tag;
+   (the gate reads `approver`, `PRODUCTION_PUBLISH` and `VERSION`; the RC identity it checks is the frozen RC record);
+2. confirms `V2-STABLE-STATUS.json` says `FINAL_RELEASE_READY: "PASS"` with no open blocker, on the commit to tag,
+   and that `python -P validation/qualification/release_rc.py --check` passes there (its shipped files are the RC's);
 3. creates and pushes the stable tag on that commit: `git tag v2.0.0 <sha> && git push origin v2.0.0`;
 4. approves the `publish` job's deployment to the `pypi` environment once every gate is green;
 5. after publication, verifies a clean install: `pip install aisef==2.0.0`, `aisef --version`, `aisef run …`.

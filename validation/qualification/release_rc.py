@@ -5,6 +5,11 @@ kernel digest, the build epoch, and the wheel and sdist digests of its reproduci
         # -> closure-evidence/v2/release/V2.0-RC1-FREEZE.json (written once, in the harness-only commit after the RC)
     python -P validation/qualification/release_rc.py --check
         # the record is what the RC's own git objects say (works on any later commit)
+    python -P validation/qualification/release_rc.py --epoch
+        # the build epoch: the frozen RC's once frozen (so a later commit with the RC's shipped files rebuilds the
+        # RC's exact bytes), this commit's time before
+    python -P validation/qualification/release_rc.py --verify-dist DIR
+        # DIR holds exactly the frozen wheel and sdist, byte for byte (the production publish job runs it)
 
 SHA256SUMS is the file the staging build of the RC commit wrote (.github/workflows/staging.yml: SOURCE_DATE_EPOCH =
 the commit's time, the sdist re-packed by repro_dist.py); S7's rebuild must give the same digests. No source change
@@ -80,13 +85,34 @@ def check(rec: dict) -> list[str]:
     return out + rec.get("problems", [])
 
 
+def epoch() -> int:
+    if (ROOT / OUT_REL).exists():
+        return int(json.loads((ROOT / OUT_REL).read_text(encoding="utf-8"))["rc"]["source_date_epoch"])
+    return int(_git("log", "-1", "--format=%ct", "HEAD").decode())
+
+
+def verify_dist(rec: dict, dist: pathlib.Path) -> list[str]:
+    have = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(dist.iterdir()) if p.is_file()}
+    want = rec["artifacts"]["sha256"]
+    return [] if have == want else [f"the files to publish are not the frozen RC's: have {have}, frozen {want}"]
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--epoch", action="store_true")
+    ap.add_argument("--verify-dist", type=pathlib.Path)
     ap.add_argument("--freeze")
     ap.add_argument("--sums", type=pathlib.Path)
     ap.add_argument("--ci-run")
     ap.add_argument("--check", action="store_true")
     a = ap.parse_args(argv)
+    if a.epoch:
+        print(epoch())
+        return 0
+    if a.verify_dist:
+        problems = verify_dist(json.loads((ROOT / OUT_REL).read_text(encoding="utf-8")), a.verify_dist)
+        print("release candidate artifacts: " + ("PASS" if not problems else "FAIL " + "; ".join(problems)))
+        return 1 if problems else 0
     if a.freeze:
         if (ROOT / OUT_REL).exists():
             print(f"{OUT_REL} exists: a frozen candidate is never rewritten", file=sys.stderr)

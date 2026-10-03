@@ -32,7 +32,7 @@ jobs:
       - name: build the sdist, then the wheel FROM it, reproducibly
         run: |
           set -eu
-          export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          export SOURCE_DATE_EPOCH="$(python -P validation/qualification/release_rc.py --epoch)"   # the frozen RC's once frozen
           python -m build
           python -P validation/qualification/repro_dist.py dist/*.tar.gz
       - run: python -m twine check dist/*
