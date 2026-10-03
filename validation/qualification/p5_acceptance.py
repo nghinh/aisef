@@ -252,35 +252,72 @@ def ruling_bindings(cs: dict) -> dict:
 #: The owner authorized a kernel change after the acceptance (ruling 2026-09-30 B, C2-ORCHESTRATION-CONFORMANCE-REPAIR)
 #: and, asked about this field (2026-10-01), chose the narrow provenance rule below.
 PROVENANCE_PATH = "identities.aisef2_tree"
+#: The second provenance field: the authoring aid's own sha256. The V2.0 release taught its calibrations() the shipped
+#: calibrations (static admission on this tree needs a row for each re-bound probe digest); the field is tolerated only
+#: while that function is all that changed since the accepted candidate (`aid_provenance`).
+AID_PATH = "identities.authoring_aid.sha256"
+AID_REL = "validation/qualification/p10_contracts.py"
 
 
-def _paths(a, b, at: str = "") -> list[str]:
-    """The dotted paths where two JSON values differ."""
-    if isinstance(a, dict) and isinstance(b, dict):
-        return [p for k in sorted(set(a) | set(b)) for p in _paths(a.get(k), b.get(k), f"{at}.{k}" if at else k)]
-    if isinstance(a, list) and isinstance(b, list) and len(a) == len(b):
-        return [p for i, (x, y) in enumerate(zip(a, b, strict=True)) for p in _paths(x, y, f"{at}[{i}]")]
-    return [] if a == b else [at]
+def proposal_subst(recomputed: dict, committed: dict, plan) -> dict[str, str]:
+    """Rules 2 and 3 of the probe-identity re-binding (validation/qualification/rebind.py) for the proposal record: each
+    re-derived spec identity mapped to the committed one of its spec key, then the two hashes over them recomputed on
+    the mapped-back content — the plan's (`plan` is the plan `recomputed` names) and the proposal digest (the authoring
+    aid's own rule, used only when it gives back the re-derived digest)."""
+    from validation.qualification import rebind
+    compiled = lambda d: {s["spec_id"]: s for s in d["specs"] if s.get("status") == "COMPILED"}   # noqa: E731
+    subst = rebind.spec_subst(compiled(recomputed), compiled(committed))
+    if subst and plan.plan_hash == recomputed["plan"]["plan_hash"]:
+        subst[plan.plan_hash] = rebind.plan_back(plan, subst).plan_hash
+        digest = lambda d: _sha(json.dumps({"plan_hash": d["plan"]["plan_hash"], "specs": d["specs"],   # noqa: E731
+                                            "criteria": d["criteria"], "clauses": d["clauses"]},
+                                           sort_keys=True, ensure_ascii=False).encode("utf-8"))
+        if digest(recomputed) == recomputed["proposal_digest"]:
+            subst[recomputed["proposal_digest"]] = digest(rebind.back(recomputed, subst))
+    return subst
 
 
-def proposal_currency(recomputed: dict, committed: dict, accepted_kernel: str, head_kernel: str) -> dict:
+def proposal_currency(recomputed: dict, committed: dict, accepted_kernel: str, head_kernel: str,
+                      subst: dict[str, str] | None = None, aid: tuple[str, str] | None = None) -> dict:
     """Is the committed proposal what the authoring aid derives from this tree? Fail closed: current when the two are
-    equal, or when they differ ONLY in the authoring-kernel provenance and the committed value is exactly the accepted
-    candidate's kernel while the derived one is this tree's — every semantic field (specs, contracts, semantic hashes,
-    plan, compiler, admission engine, catalog, requirements, digest) still re-derives identically."""
-    diff = _paths(recomputed, committed)
+    equal once the re-derived probe identities are mapped back (`subst`, from `proposal_subst`: the probe-identity
+    re-binding), and when what then still differs is only provenance — the authoring-kernel tree, its committed value
+    exactly the accepted candidate's kernel and the derived one this tree's; with `aid` (the committed and derived
+    sha256 of the authoring aid, given only when its calibrations() is all that changed) also the aid's own sha256.
+    Every semantic field (specs, contracts, plan, compiler, admission engine, requirements, admission) still re-derives
+    identically."""
+    from validation.qualification import rebind
+    tolerated = {PROVENANCE_PATH: (accepted_kernel, head_kernel), **({AID_PATH: tuple(aid)} if aid else {})}
+    r = rebind.compare(recomputed, committed, subst or {}, tolerated)
     tree = lambda d: (d.get("identities") or {}).get("aisef2_tree")   # noqa: E731
-    provenance_only = diff == [PROVENANCE_PATH] and tree(committed) == accepted_kernel and tree(recomputed) == head_kernel
-    return {"differing_paths": diff, "committed_kernel": tree(committed), "derived_kernel": tree(recomputed),
-            "accepted_kernel": accepted_kernel, "provenance_only": provenance_only, "current": not diff or provenance_only,
-            "rule": "the proposal names the kernel it was authored on; a later authorized kernel changes that field only — "
-                    "tolerated when it is the one differing path and the committed value is the accepted candidate's kernel"}
+    return {"differing_paths": r["differing_paths"], "committed_kernel": tree(committed), "derived_kernel": tree(recomputed),
+            "accepted_kernel": accepted_kernel, "identities_rebound": r["identities_rebound"],
+            "provenance_only": r["provenance_only"], "current": r["current"],
+            "rule": "the proposal names the kernel and the authoring aid it was authored with; an authorized later change moves "
+                    "those fields only — tolerated when the committed value is the accepted candidate's and the derived one this "
+                    "tree's; the release's probe-identity re-binding (B1) is mapped back first (validation/qualification/rebind.py)"}
+
+
+def aid_provenance() -> tuple[str, str] | None:
+    """(the accepted candidate's, this tree's) sha256 of the authoring aid — None unless its calibrations() is all that
+    changed since the candidate."""
+    from validation.qualification import rebind
+    if not rebind.code_moved(AID_REL, ACCEPTED["candidate"], ("calibrations",)):
+        return None
+    return rebind.lf_sha_at(ACCEPTED["candidate"], AID_REL), _file(AID_REL)["sha256"]
 
 
 def current_proposal_currency() -> dict:
-    """`proposal_currency` of the committed proposal against the authoring aid on this tree."""
-    return proposal_currency(_aid().record(), json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8")),
-                             _git("rev-parse", f"{ACCEPTED['candidate']}:aisef2"), _git("rev-parse", "HEAD:aisef2"))
+    """`proposal_currency` of the committed proposal against the authoring aid on this tree, the probe identities
+    re-bound; `document_current`: the committed proposal document is the one the mapped-back record gives."""
+    from validation.qualification import rebind
+    aid = _aid()
+    recomputed, committed = aid.record(), json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8"))
+    subst = proposal_subst(recomputed, committed, aid.build()["plan"])
+    r = proposal_currency(recomputed, committed, _git("rev-parse", f"{ACCEPTED['candidate']}:aisef2"),
+                          _git("rev-parse", "HEAD:aisef2"), subst, aid_provenance())
+    doc = (ROOT / aid.DOC_REL).read_text(encoding="utf-8").replace("\r\n", "\n")
+    return {**r, "document_current": aid.document(rebind.back(recomputed, subst)) == doc}
 
 
 def verify(run_guards: bool) -> dict:
@@ -291,6 +328,7 @@ def verify(run_guards: bool) -> dict:
     from aisef2.product.compiler import ProbeRef, compile_spec
     from aisef2.product.contract import plain
     from validation.qualification import p5_falsifiability as pf
+    from validation.qualification import rebind
     aid = _aid()
     problems: list[str] = []
     prop = json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8"))
@@ -300,6 +338,12 @@ def verify(run_guards: bool) -> dict:
     real = load_approvals()
     cs = contracts()
     refs = {k: ProbeRef(e.probe_id, e.probe_digest) for k, e in catalog.active().items()}
+    # the plan and the proposal as the authoring aid derives them here, and the probe-identity re-binding to the
+    # accepted proposal: every identity comparison below is made with this tree's identities mapped back
+    b = aid.build()
+    plan = b["plan"]
+    recomputed = aid.record()
+    subst = proposal_subst(recomputed, prop, plan)
     specs, rows = {}, []
     for s in prop["specs"]:
         sid = s["spec_id"]
@@ -308,8 +352,8 @@ def verify(run_guards: bool) -> dict:
         specs[spec.id] = spec
         row = {"spec_id": sid, "contract_id": c.id, "contract_hash": c.contract_hash, "spec_hash_id": spec.id,
                "semantic_hash": spec.semantic_hash, "probe_id": spec.probe_id, "probe_digest": spec.probe_digest,
-               "equal_to_accepted": (c.id, c.contract_hash, spec.id, spec.semantic_hash, spec.probe_id, spec.probe_digest)
-               == (s["contract_id"], s["contract_hash"], s["spec_hash_id"], s["semantic_hash"], s["probe_id"], s["probe_digest"])}
+               "equal_to_accepted": rebind.back([c.id, c.contract_hash, spec.id, spec.semantic_hash, spec.probe_id, spec.probe_digest], subst)
+               == [s["contract_id"], s["contract_hash"], s["spec_hash_id"], s["semantic_hash"], s["probe_id"], s["probe_digest"]]}
         rows.append(row)
         if not row["equal_to_accepted"]:
             problems.append(f"{sid}: a hash differs from the accepted proposal")
@@ -319,17 +363,16 @@ def verify(run_guards: bool) -> dict:
     if set(reqs) != set(prop["requirements"]):
         problems.append("the cited requirement set differs")
     # the plan: the authoring aid's obligations; every spec id it binds is the one compiled above under the real approvals
-    b = aid.build()
-    plan = b["plan"]
-    plan_ok = plan.plan_hash == ACCEPTED["plan_hash"] == prop["plan"]["plan_hash"] and \
+    plan_ok = subst.get(plan.plan_hash, plan.plan_hash) == ACCEPTED["plan_hash"] == prop["plan"]["plan_hash"] and \
         {o.product_proof_spec_id for o in plan.obligations} <= set(specs)
     if not plan_ok:
         problems.append("the plan hash or its spec ids differ from the accepted plan")
-    recomputed = aid.record()
-    digest_ok = recomputed["proposal_digest"] == ACCEPTED["proposal_digest"] == prop["proposal_digest"]
+    digest_ok = subst.get(recomputed["proposal_digest"], recomputed["proposal_digest"]) == ACCEPTED["proposal_digest"] \
+        == prop["proposal_digest"]
     if not digest_ok:
         problems.append("the proposal digest differs")
-    currency = proposal_currency(recomputed, prop, _git("rev-parse", f"{ACCEPTED['candidate']}:aisef2"), _git("rev-parse", "HEAD:aisef2"))
+    currency = proposal_currency(recomputed, prop, _git("rev-parse", f"{ACCEPTED['candidate']}:aisef2"), _git("rev-parse", "HEAD:aisef2"),
+                                 subst, aid_provenance())
     record_current = currency["current"]
     if not record_current:
         problems.append(f"{PROPOSAL_REL} is not what the authoring aid derives from this tree")
@@ -417,6 +460,12 @@ def verify(run_guards: bool) -> dict:
                                         "never reaches this admission, which receives exactly the persisted approvals"},
         "cycle1_drift": drift,
         "proposal_kernel_provenance": currency,
+        "probe_identity_rebinding": {
+            "rule": "validation/qualification/rebind.py: the identities above are this tree's; each re-derived spec id, "
+                    "semantic hash and probe digest whose spec keeps its contract and probe id and whose probe digest moved "
+                    "from the accepted one to this tree's maps to the accepted one, and the plan hash and proposal digest "
+                    "recomputed over the mapped-back content must be the accepted ones",
+            "identities_rebound": len(subst), "map": subst},
         "approvals_file": {**_file(APPROVALS_REL), "committed_versions": committed_versions_identical(APPROVALS_REL)},
         "problems": problems,
     }
@@ -504,12 +553,14 @@ def record() -> dict:
 
 
 def check() -> list[str]:
-    """Re-derive the acceptance on this tree (the guard runs are recorded, not repeated here)."""
+    """Re-derive the acceptance on this tree (the guard runs are recorded, not repeated here), its probe identities
+    mapped back to the accepted ones (`verify`'s probe_identity_rebinding)."""
+    from validation.qualification import rebind
     doc = json.loads((ROOT / OUT_REL).read_text(encoding="utf-8"))
     v = verify(run_guards=False)
     out = list(v["problems"])
     for k in ("identities", "semantic_change", "rulings", "admission", "cycle1_drift"):
-        if json.loads(json.dumps(v[k])) != doc["verification"][k]:
+        if rebind.back(json.loads(json.dumps(v[k])), v["probe_identity_rebinding"]["map"]) != doc["verification"][k]:
             out.append(f"{OUT_REL} is stale in verification.{k}")
     h = json.loads((ROOT / HISTORY_REL).read_text(encoding="utf-8"))["entries"]
     if len(h) != doc["attempt_history"]["total_attempts"]:

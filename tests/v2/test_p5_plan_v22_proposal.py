@@ -135,11 +135,16 @@ class Coverage(unittest.TestCase):
 
 class Record(unittest.TestCase):
     def test_P5_8_committed_record_is_current(self):
-        # current up to the authoring-kernel provenance, the one field an authorized later kernel changes (owner, 2026-10-01)
+        # current up to the authoring-kernel provenance, the one field an authorized later kernel changes (owner, 2026-10-01),
+        # and up to probe identity: the release's B1 re-bound three probe digests (validation/qualification/rebind.py) —
+        # the record and the document compared with this tree's identities mapped back, every other field as committed
         from validation.qualification import p5_acceptance as PA
         found = A.check()
-        if PA.current_proposal_currency()["provenance_only"]:
+        currency = PA.current_proposal_currency()
+        if currency["current"]:
             found = [p for p in found if p != f"{A.OUT_REL} is not what the authoring aid derives from this tree"]
+        if currency["document_current"]:
+            found = [p for p in found if p != f"{A.DOC_REL} is not what the authoring aid derives from this tree"]
         self.assertEqual(found, [])
         rec = json.loads((ROOT / A.OUT_REL).read_text(encoding="utf-8"))
         self.assertEqual(rec["approvals"]["given"], [])

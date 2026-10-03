@@ -53,16 +53,20 @@ def _sha(data: bytes) -> str:
 
 
 def build() -> dict:
-    """The accepted plan, the corrected plan and what both are admitted against."""
+    """The accepted plan, the corrected plan and what both are admitted against — under this tree's probe identities;
+    `rebind` maps each of them back to the accepted one (validation/qualification/rebind.py)."""
     from aisef2.arch.enums import ObligationRole
     from aisef2.plan import static_admission as sa
     from aisef2.plan.obligation import EXPECTED_AT_PARENT, Plan
     from aisef2.probe import catalog
-    from validation.qualification import c2_p9
+    from validation.qualification import c2_p9, rebind
     from validation.qualification import p5_acceptance as pa
     from validation.qualification import p10_contracts as aid
     old = aid.build()["plan"]
-    if old.plan_hash != pa.ACCEPTED["plan_hash"]:
+    compiled = c2_p9._compiled()
+    contracts = pa.contracts()
+    subst = rebind.spec_subst(rebind.rows(compiled, contracts), rebind.accepted_rows())
+    if rebind.plan_back(old, subst).plan_hash != pa.ACCEPTED["plan_hash"]:
         raise SystemExit("the plan the correction starts from is not the accepted PLAN-V2.2")
     graph = aid.story_graph()
     introduce: dict[str, list[str]] = {}
@@ -79,11 +83,9 @@ def build() -> dict:
                                     ownership_rationale=f"{story} {role.value}s {o.criterion_id} (owner decision {n}, 2026-10-02)")
         obligations.append(o)
     new = Plan.create(id=PLAN_ID, baseline=old.baseline, obligations=tuple(obligations), plan_quality_policy=old.plan_quality_policy)
-    compiled = c2_p9._compiled()
-    contracts = pa.contracts()
     inputs = sa.AdmissionInputs(aid.requirements(), {c.id: c for c in contracts.values()}, pa.load_approvals(),
                                 {s.id: s for s in compiled.values()}, catalog.catalogue(), aid.calibrations(), catalog.registry())
-    return {"old": old, "new": new, "inputs": inputs, "compiled": compiled, "contracts": contracts, "graph": graph}
+    return {"old": old, "new": new, "inputs": inputs, "compiled": compiled, "contracts": contracts, "graph": graph, "rebind": subst}
 
 
 def corrected_plan():
@@ -112,25 +114,29 @@ def _shape(plan) -> dict:
             "obligations": len(plan.obligations), "obligations_by_story_and_role": {s: dict(sorted(v.items())) for s, v in sorted(stories.items())}}
 
 
-def record() -> dict:
+def _rows(b: dict) -> list[list]:
+    """[spec, contract id, contract hash, spec id, semantic hash, probe id, probe digest] in proposal order."""
+    from validation.qualification import rebind
+    now = rebind.rows(b["compiled"], b["contracts"])
+    return [[sid, *(now[sid][k] for k in rebind.ROW)] for sid in rebind.accepted_rows()]
+
+
+def record(b: dict | None = None) -> dict:
     from aisef2.arch.enums import ObligationRole
     from aisef2.plan import static_admission as sa
-    from validation.qualification import c2_p9
+    from validation.qualification import c2_p9, rebind
     from validation.qualification import p5_acceptance as pa
-    b = build()
+    b = b or build()
     old, new, inputs = b["old"], b["new"], b["inputs"]
     engine = sa.StaticPlanAdmissionEngine()
     admitted = {"accepted_plan": _admission(engine.admit(old, inputs)), "corrected_plan": _admission(engine.admit(new, inputs)),
                 "corrected_plan_without_approvals": _admission(engine.admit(new, dataclasses.replace(inputs, approvals=())))}
-    # the 59 specs: compiled here under the real approvals, against what the owner accepted (the committed proposal record)
+    # the 59 specs: compiled here under the real approvals, against what the owner accepted (the committed proposal
+    # record) — equal up to probe identity: this tree's identities mapped back by the re-binding
     accepted = {s["spec_id"]: s for s in json.loads((ROOT / pa.PROPOSAL_REL).read_text(encoding="utf-8"))["specs"]}
-    rows = []
-    for sid in accepted:
-        c, s = b["contracts"][sid], b["compiled"][sid]
-        rows.append([sid, c.id, c.contract_hash, s.id, s.semantic_hash, s.probe_id, s.probe_digest])
+    rows = _rows(b)
     spec_rows = [{"spec_id": r[0], "spec_hash_id": r[3], "semantic_hash": r[4],
-                  "equal_to_accepted": r[1:] == [accepted[r[0]][k] for k in ("contract_id", "contract_hash", "spec_hash_id",
-                                                                             "semantic_hash", "probe_id", "probe_digest")]} for r in rows]
+                  "equal_to_accepted": rebind.back(r[1:], b["rebind"]) == [accepted[r[0]][k] for k in rebind.ROW]} for r in rows]
     by_criterion = {p.plan_hash: {o.criterion_id: o for o in p.obligations} for p in (old, new)}
     was, now = by_criterion[old.plan_hash], by_criterion[new.plan_hash]
     name = {s.id: sid for sid, s in b["compiled"].items()}
@@ -213,11 +219,31 @@ def problems(body: dict) -> list[str]:
     return out
 
 
+def currency(b: dict, rec: dict, committed: dict) -> dict:
+    """The committed record against this tree's derivation `rec`, up to probe identity (validation/qualification/rebind.py):
+    the re-bound identities mapped back, and the hashes over them — both plans' and the contract-spec digest — recomputed
+    over the mapped-back content. Provenance tolerated: the kernel tree and this generator's sha256, each the committed
+    value as of the commit that wrote the record and the derived one this tree's — the generator's only while build,
+    record, check, currency and _rows are all that changed in it since."""
+    from validation.qualification import c2_p9, rebind
+    subst = dict(b["rebind"])
+    subst.update({p.plan_hash: rebind.plan_back(p, b["rebind"]).plan_hash for p in (b["old"], b["new"])})
+    subst[rec["proofs"]["product_proof_specs"]["contract_spec_semantic_digest"]] = \
+        _sha(json.dumps(rebind.back(_rows(b), b["rebind"]), sort_keys=True).encode())
+    written = c2_p9.C.git("log", "-1", "--format=%H", "--", OUT_REL)
+    gen = "validation/qualification/c2_plan_correction.py"
+    tolerated = {"identities.aisef2_tree": (c2_p9.C.git("rev-parse", f"{written}:aisef2"), c2_p9.C.git("rev-parse", "HEAD:aisef2"))}
+    if rebind.code_moved(gen, written, ("build", "record", "check", "currency", "_rows")):
+        tolerated["identities.generator.sha256"] = (rebind.lf_sha_at(written, gen), c2_p9.C.lf_sha(ROOT / gen))
+    return rebind.compare(rec, committed, subst, tolerated)
+
+
 def check() -> list[str]:
-    rec = record()
+    b = build()
+    rec = record(b)
     out = list(rec["problems"])
     path = ROOT / OUT_REL
-    if not path.exists() or json.loads(path.read_text(encoding="utf-8")) != rec:
+    if not path.exists() or not currency(b, rec, json.loads(path.read_text(encoding="utf-8")))["current"]:
         out.append(f"{OUT_REL} is not what this tree derives")
     return out
 
