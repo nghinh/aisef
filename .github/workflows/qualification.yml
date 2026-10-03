@@ -4,7 +4,8 @@ name: qualification
 # prints every rung record into the log (validation/qualification/common.py::emit); nothing is downloaded from it.
 on:
   push:
-    branches: [hardening/systematic-v1]
+    # V2.0 charter S5: Q0-Q3 fresh on the exact RC, on the declared platforms — the release branch qualifies too
+    branches: [hardening/systematic-v1, "release/**"]
 jobs:
   qualify:
     if: contains(github.event.head_commit.message, '[qualify]')
