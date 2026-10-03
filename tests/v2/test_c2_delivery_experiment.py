@@ -286,7 +286,7 @@ class BudgetFromEvidence(Evidence):
         self.assertEqual((again["started"], again["stopped"]), (False, "S.developer.1.jsonl exists: a session's evidence is never overwritten"))
 
     def test_the_experiment_s_budget_is_the_owner_s(self):
-        self.assertEqual(dx.EXPERIMENT["budget"], {"provider_requests": 60, "turns": 700, "input_tokens": 60_000_000, "output_tokens": 400_000})
+        self.assertEqual(dx.EXPERIMENT["budget"], {"provider_requests": 60, "turns": 700, "input_tokens": 60_000_000, "output_tokens": 700_000})
         self.assertEqual(dx.EXPERIMENT["max_turns_per_session"], 80)
         shape = dx.EXPERIMENT["preflight_shape"]
         self.assertEqual((shape["smokes"], shape["smoke_max_turns"], shape["smoke_timeout_s"]), (1, 10, 300.0))
@@ -636,13 +636,13 @@ class Hold(unittest.TestCase):
     preregistration is under one for good."""
     HELD = "ON HOLD by an owner's ruling"
 
-    def test_attempt_4_is_held_and_attempt_3_s_preregistration_is_another_file_never_written(self):
+    def test_attempt_4_is_authorized_once_and_attempt_3_s_preregistration_is_another_file_never_written(self):
         self.assertEqual(dx.EXPERIMENT["attempt"], 4)
-        self.assertTrue(dx.HOLD and dx.on_hold() == dx.HOLD and "attempt 4 is preregistered, not authorized" in dx.HOLD)
+        self.assertIsNone(dx.HOLD)                                  # the owner's one-run authorization of attempt 4
         self.assertNotIn(4, dx.HISTORICAL)
         self.assertNotEqual(dx.OUT_REL, dx.HISTORICAL[3]["preregistration"])
         rec = dx.committed()
-        self.assertEqual((rec["attempt"], rec["hold"], rec["run_authorized"]), (4, dx.HOLD, f"NO — {dx.HOLD}"))
+        self.assertEqual((rec["attempt"], rec["hold"]), (4, None))
         with mock.patch.dict(dx.EXPERIMENT, {"attempt": 3}):       # an attempt that has run is never preregistered again
             with self.assertRaises(SystemExit) as x:
                 dx.main(["--write"])
@@ -721,9 +721,14 @@ class Preregistration(unittest.TestCase):
         """Attempt 4's preregistration binds this tree: its harness files, its prompts and its feedback code by content.
         (Attempt 3's is historical: class HistoricalAttempt3.)"""
         r = self.rec
-        self.assertEqual(dx.OUT_REL, "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION.json")
+        self.assertEqual(dx.OUT_REL, "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION-AMENDED.json")
         self.assertEqual((r["verdict"], r["problems"]), ("PREREGISTERED — ATTEMPT 4, THE OWNER'S BUDGET; ONE RUN", []))
-        self.assertEqual((r["attempt"], r["hold"], r["run_authorized"]), (4, dx.HOLD, f"NO — {dx.HOLD}"))
+        self.assertEqual((r["attempt"], r["hold"], r["run_authorized"]), (4, None, "only by the owner's ruling — and by nothing in this record"))
+        self.assertIn("SUPERSEDED_BEFORE_RUN (OWNER_OUTPUT_BUDGET_AMENDMENT)", r["authority"])
+        for rel, row in dx.SUPERSEDED_BEFORE_RUN.items():          # the held preregistration that never ran, kept byte for byte
+            self.assertEqual(dx._sha((ROOT / rel).read_bytes()), row["sha256"])
+            self.assertNotEqual(rel, dx.OUT_REL)
+            self.assertNotEqual(json.loads((ROOT / rel).read_text(encoding="utf-8"))["runspec_template_hash"], r["runspec_template_hash"])
         self.assertEqual(r["provider_calls_made_preparing_this"], 0)
         self.assertEqual(r["plan"]["plan_hash"], self.plan.plan_hash)
         self.assertEqual(r["plan"]["correction"]["sha256"], c2_p9.C.lf_sha(ROOT / pc.OUT_REL))
@@ -751,7 +756,7 @@ class Preregistration(unittest.TestCase):
         r = self.rec
         b = r["budget"]
         self.assertEqual((b["max_provider_requests"], b["max_total_turns"], b["max_turns_per_session"], b["max_combined_input_tokens"],
-                          b["max_output_plus_reasoning_tokens"]), (60, 700, 80, 60_000_000, 400_000))
+                          b["max_output_plus_reasoning_tokens"]), (60, 700, 80, 60_000_000, 700_000))
         self.assertEqual(r["runspec"]["settings"]["max_turns_per_session"]["value"], 80)
         self.assertEqual(b["accounting_limitation"], c2_p9.ACCOUNTING_LIMITATION)
         self.assertEqual(dict(r["runspec"]["settings"]["budget"]["value"]), dx.EXPERIMENT["budget"])

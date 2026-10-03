@@ -60,13 +60,20 @@ from validation.qualification import c2_p9  # noqa: E402
 from validation.qualification import c2_plan_correction as pc  # noqa: E402
 
 C, P10 = c2_p9.C, c2_p9.P10
-#: the CURRENT attempt's preregistration — attempt 4's; attempt 3's is historical evidence (HISTORICAL) and never rewritten
-OUT_REL = "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION.json"
+#: the CURRENT attempt's preregistration — attempt 4's, as amended before any run; attempt 3's is historical evidence
+#: (HISTORICAL) and never rewritten
+OUT_REL = "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION-AMENDED.json"
+#: a preregistration that never ran and was replaced before any provider call: kept byte for byte, never current again
+SUPERSEDED_BEFORE_RUN = {"closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION.json": {
+    "sha256": "49c6880da481abf0bf54db6d1d48ed1d80b33407dcc7b0946b78da5473aa0e6d", "reason": "OWNER_OUTPUT_BUDGET_AMENDMENT",
+    "ruling": "'AISEF V2 — OWNER AUTHORIZATION: DELIVERY EXPERIMENT ATTEMPT 4 / ONE PAID ATTEMPT ONLY' §1"}}
 AUTHORITY = ("owner rulings 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL', 'AISEF V2 — "
              "DELIVERY EXPERIMENT EXECUTION GUARD / DETERMINISTIC ONLY / NO DELIVERY RUN YET' and 'AISEF V2 — SINGLE PAID DELIVERY "
              "EXPERIMENT / FINAL OWNER AUTHORIZATION WITH HARD COST BOUND' (2026-10-02) for the experiment's design and budget; attempt 3 "
-             "ran once under 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' and is final; this attempt-4 preregistration is prepared "
-             "under 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001' (2026-10-03) §F — no run of it is authorized")
+             "ran once under 'FINAL REBIND + SINGLE PAID DELIVERY EXPERIMENT' and is final; attempt 4 was prepared under 'ATTEMPT-3 "
+             "HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001' (2026-10-03) §F, its held preregistration 49c6880d… SUPERSEDED_BEFORE_RUN "
+             "(OWNER_OUTPUT_BUDGET_AMENDMENT), and exactly ONE run of this amended preregistration is authorized by 'AISEF V2 — OWNER "
+             "AUTHORIZATION: DELIVERY EXPERIMENT ATTEMPT 4 / ONE PAID ATTEMPT ONLY' (2026-10-03): no attempt 5")
 W1 = "closure-evidence/hardening/w1"
 ORACLE_REL = f"{W1}/oracle/test_oracle.py"
 ORACLE_INDEPENDENCE_REL = f"{W1}/ORACLE-INDEPENDENCE.json"
@@ -78,10 +85,10 @@ V1_PREFLIGHT_REL = f"{W1}/provider_preflight.py"
 MEASURED_REL = "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.json"
 #: Why the experiment may not start, or None: while a reason stands, neither the preflight nor the runner starts, and only
 #: the owner's ruling clears it. The K-NOWORK-001 hold stood from 6d5a062 to 5c7c5a6; 'FINAL REBIND' cleared it at 06ceb23
-#: for exactly attempt 3, which then ran once and is final. Attempt 4 is prepared and not authorized (§F of the ruling
-#: 'ATTEMPT-3 HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001': no run, no preflight, no provider call).
-HOLD = ("ON HOLD: attempt 4 is preregistered, not authorized — a run needs the owner's decision (ruling 'ATTEMPT-3 "
-        "HISTORICALIZATION + H-PROMPT-002 + H-RETRY-001' §F)")
+#: for exactly attempt 3, which then ran once and is final. Attempt 4 was held from f8e535c until the owner's ruling
+#: 'OWNER AUTHORIZATION: DELIVERY EXPERIMENT ATTEMPT 4 / ONE PAID ATTEMPT ONLY' authorized exactly one run of it, with
+#: the amended budget below; nothing else of the experiment changed.
+HOLD = None
 EXPERIMENT = {
     "id": c2_p9.EXPERIMENT,
     "attempt": 4,                                       # the next attempt directory of closure-evidence/v2/cycle2/P10
@@ -93,9 +100,10 @@ EXPERIMENT = {
     "route": "9router/ds/deepseek-v4-pro", "route_kind": "FIXED_MODEL", "resolved_model": "deepseek-v4-pro",
     "listing_owner": "ds",                              # the upstream the router's listing must name for the route (never "combo")
     "model_limit": {"context": 200000, "output": 32768},
-    # THE OWNER'S FINAL HARD BUDGET ('SINGLE PAID DELIVERY EXPERIMENT / FINAL OWNER AUTHORIZATION' §B): over the whole
-    # experiment, preflight included — a bounded V1-aligned envelope (V1 on this route: 600-668 turns, 50-58M input)
-    "budget": {"provider_requests": 60, "turns": 700, "input_tokens": 60_000_000, "output_tokens": 400_000},
+    # THE OWNER'S HARD BUDGET ('SINGLE PAID DELIVERY EXPERIMENT / FINAL OWNER AUTHORIZATION' §B; the output ceiling amended
+    # from 400 000 to 700 000 by 'OWNER AUTHORIZATION: DELIVERY EXPERIMENT ATTEMPT 4' §1): over the whole experiment,
+    # preflight included — a bounded V1-aligned envelope (V1 on this route: 600-668 turns, 50-58M input)
+    "budget": {"provider_requests": 60, "turns": 700, "input_tokens": 60_000_000, "output_tokens": 700_000},
     "max_turns_per_session": 80,                        # §C: a developer or reviewer session; the smoke session has its own cap
     "preflight_shape": {"listing": 1, "chat_probes": 3, "chat_probe_max_tokens": 16, "smokes": 1, "smoke_max_turns": 10,
                         "smoke_timeout_s": 300.0},
@@ -863,7 +871,7 @@ def problems(body: dict) -> list[str]:
         out.append("not three developer attempts")
     b = body["budget"]
     if (b["max_provider_requests"], b["max_total_turns"], b["max_turns_per_session"], b["max_combined_input_tokens"],
-            b["max_output_plus_reasoning_tokens"]) != (60, 700, 80, 60_000_000, 400_000):
+            b["max_output_plus_reasoning_tokens"]) != (60, 700, 80, 60_000_000, 700_000):
         out.append("the budget is not the owner's")
     r, c = body["model"]["client_resolution_measured_locally"], body["model"]["client"]
     if not (r.get("client_present") and r.get("resolves_to_the_fixed_route") and r.get("route_model_declared")):

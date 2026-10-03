@@ -1,0 +1,26 @@
+{
+ "record": "AISEF V2 — DELIVERY EXPERIMENT 1, ATTEMPT 4: a preregistration SUPERSEDED BEFORE ANY RUN",
+ "status": "SUPERSEDED_BEFORE_RUN",
+ "reason": "OWNER_OUTPUT_BUDGET_AMENDMENT",
+ "authority": "owner ruling 'AISEF V2 — OWNER AUTHORIZATION: DELIVERY EXPERIMENT ATTEMPT 4 / ONE PAID ATTEMPT ONLY' (2026-10-03) §1",
+ "superseded": {
+  "path": "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION.json",
+  "sha256": "49c6880da481abf0bf54db6d1d48ed1d80b33407dcc7b0946b78da5473aa0e6d",
+  "runspec_template_hash": "31ead94fa9ab08241b73a36cc223588e8eecfce8a3b5ae4b68d58fe57396b83f",
+  "executed": false,
+  "provider_calls": 0,
+  "kept": "byte for byte, at its path; never current again (c2_delivery_experiment.SUPERSEDED_BEFORE_RUN)"
+ },
+ "superseded_by": {
+  "path": "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION-AMENDED.json",
+  "sha256": "599940e238ba48d6605c2883db698765dc6f65c2a27d55c18f41a5f89708bb37",
+  "runspec_template_hash": "bb78f7ddd081f16bc3081d55e3672114f48071af41c5404cc92f6042c153c6b5"
+ },
+ "change": {
+  "max_output_plus_reasoning_tokens": [
+   400000,
+   700000
+  ],
+  "unchanged": "provider requests 60, turns 700, turns per session 80, combined input 60 000 000, the preflight and smoke shape, route, model identity rule, plan, specs, kernel, prompts, retry feedback, oracle, harness behaviour"
+ }
+}
