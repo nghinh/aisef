@@ -1,0 +1,93 @@
+# Staging — the non-production artifact path (docs/v2/RELEASE-PROCESS.md; V2 charter G8, §10, §18).
+#
+# Builds the wheel + sdist ONCE, records their sha256, uploads both as workflow artifacts, then installs exactly
+# those files into clean venvs on Linux and Windows and runs the CLI smoke from the installed package, never from
+# the source tree. This workflow has no publish step and no id-token permission: it cannot publish anything,
+# anywhere. release.yml calls it (workflow_call) so the files it publishes are the very files built and smoked here.
+#
+# Triggers: RC / prerelease tags and manual runs. A stable vX.Y.Z tag goes to release.yml instead.
+# TestPyPI is not wired (an owner decision: account + trusted publisher, and TestPyPI never accepts a version twice).
+name: staging
+
+on:
+  push:
+    tags: ["v*rc*", "v*-rc*", "v*.dev*"]
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install build twine
+      - run: python -m build                  # the sdist, then the wheel built FROM it
+      - run: python -m twine check dist/*
+      - name: the wheel and the sdist hold exactly aisef + aisef2
+        run: python -P validation/v2/packaging_check.py --artifacts dist
+      - name: record the sha256 of the built files
+        run: |
+          set -eu
+          (cd dist && sha256sum -- *) | tee SHA256SUMS
+          { echo '### built artifacts (sha256)'; echo '```'; cat SHA256SUMS; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-sha256
+          path: SHA256SUMS
+          if-no-files-found: error
+
+  install:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # The checkout supplies tests/installed_smoke.py and pyproject's version only; -I keeps it off sys.path.
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-sha256
+          path: .
+      - name: the downloaded files are exactly the ones built
+        run: cd dist && sha256sum -c ../SHA256SUMS
+      - name: install exactly that wheel into a clean venv
+        run: |
+          set -eu
+          tmp="$RUNNER_TEMP"; if command -v cygpath >/dev/null; then tmp=$(cygpath -u "$tmp"); fi
+          python -m venv "$tmp/venv"
+          py="$tmp/venv/bin/python"; if [ -f "$tmp/venv/Scripts/python.exe" ]; then py="$tmp/venv/Scripts/python.exe"; fi
+          "$py" -m pip install --no-index --no-deps dist/*.whl
+          echo "SMOKE_PY=$py" >> "$GITHUB_ENV"
+          echo "SMOKE_DIR=$tmp" >> "$GITHUB_ENV"
+      # --product: the V2 runtime entry `aisef run` dispatches to (aisef2.app.cli.run) must be in the artifact too.
+      - name: CLI smoke from the installed artifact
+        run: |
+          set -eu
+          want=$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version'])")
+          smoke="$GITHUB_WORKSPACE/tests/installed_smoke.py"
+          cd "$SMOKE_DIR"
+          "$SMOKE_PY" -I -c "import aisef2"
+          "$SMOKE_PY" -I "$smoke" "$want" --product

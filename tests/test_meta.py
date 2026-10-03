@@ -774,7 +774,8 @@ class TestCheckoutDuLichSuChoPhepThuCanLichSu(unittest.TestCase):
                         cau_hinh, r"fetch-depth:\s*0",
                         f"{f.name}:{ten} chạy `{self.LENH_CA_BO}` với checkout shallow — "
                         f"phép thử dựng lại commit gốc trong lịch sử kho sẽ LỖI, không bỏ qua")
-        self.assertGreaterEqual(thay, 2, "không tìm thấy job nào chạy cả bộ test — "
+        # ≥ 1: release.yml now runs tests.yml itself (workflow_call) instead of a second copy of the suite job.
+        self.assertGreaterEqual(thay, 1, "không tìm thấy job nào chạy cả bộ test — "
                                          "regex tên job hoặc lệnh đã lệch khỏi workflow")
 
     def test_commit_goc_ma_phep_thu_can_thuc_su_phan_giai_duoc(self):
