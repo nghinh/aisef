@@ -154,6 +154,15 @@ def dispatch(argv):
     if cmd == "selfterm":
         os.kill(os.getpid(), signal.SIGTERM)
         return 0
+    if cmd == "stallbye":   # IR-01: answer at once, then stall the agent's closing exchange past W
+        import __main__
+        bye = __main__.OPS["bye"]
+
+        def later(r):
+            time.sleep(3)
+            return bye(r)
+        __main__.OPS["bye"] = later
+        return 0
     if cmd == "stopctl":   # B1-BLOCKS-STOP-001: stop the controller (the agent's parent), then return at once
         os.kill(os.getppid(), signal.SIGSTOP)
         return 0
@@ -350,6 +359,9 @@ class Harness(_Product):
             with self.subTest(observable=observable):
                 o = self.see(spec("app:__main__", observable, {"argv": ["stopctl"]}, window=1), e=env(timeout=3))
                 self.assertEqual((o.kind, o.verdict, o.detail), (K.HARNESS_FAILED, None, silent))
+        # IR-01: an invocation that answered at once and then stalls the closing exchange past W is the answer
+        o = self.see(spec("app.cli:main", {"blocks": True}, {"argv": ["stallbye"]}, window=1), e=env(timeout=10))
+        self.assertEqual((o.kind, o.verdict, facts_of(o)["exit_code"]), (K.OBSERVED, R, 0))
 
     def test_CLI_3_a_stdout_flood_is_capped_and_exits_still_observes_the_code(self):
         self.assertEqual(ci.STREAM_CAP, 8 * 1024 * 1024)

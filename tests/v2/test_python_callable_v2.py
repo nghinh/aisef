@@ -147,6 +147,8 @@ PRODUCT = {
     "app/place.py": "import os\nimport tempfile\n\n\ndef cwd():\n    return os.getcwd()\n\n\n"
                     "def tmp():\n    return tempfile.gettempdir()\n",
     "app/leave.py": "from app.forge import CLAIM, claim\nimport os\nclaim(CLAIM)\nos._exit(0)\n",
+    # B1-BLOCKS-STOP-001 (IR-01): the subject answers at once, then stalls the agent's closing exchange past W
+    "app/stall.py": "import time\nimport __main__\n\n\ndef stall_close():\n    bye = __main__.OPS['bye']\n\n    def later(r):\n        time.sleep(3)\n        return bye(r)\n    __main__.OPS['bye'] = later\n" + "\n\ndef f():\n    stall_close()\n    return 1\n",
     # B1-BLOCKS-STOP-001: the subject stops its controller (the agent's parent), then returns at once
     "app/stop.py": "import os\nimport signal\n\n\ndef controller():\n    getattr(os, 'ki' + 'll')(os.getppid(), signal.SIGSTOP)\n"
                    "    return 1\n",
@@ -775,6 +777,10 @@ class Forgery(_Revisions):
             with self.subTest(observable=observable):
                 self.assertEqual(self.see(spec("app.stop:controller", observable, window=1), e=env(timeout=3)),
                                  Observation(K.HARNESS_FAILED, None, silent))
+        # IR-01: a call that answered at once and then stalls the closing exchange past W is the answer, not a deadline
+        o = self.see(spec("app.stall:f", {"blocks": True}, window=1), e=env(timeout=10))
+        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, R), o)
+        self.assertEqual(json.loads(o.detail)["returned"], 1)
         # a subject that really blocks is still the controller's deadline
         self.assertEqual(self.see(spec("app.hang:f", {"blocks": True}, window=HANG_W)),
                          Observation(K.SUBJECT_DEADLINE, S, f"the subject's {HANG_W:g}s observation window expired (blocks)"))

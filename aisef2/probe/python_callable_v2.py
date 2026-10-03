@@ -250,9 +250,16 @@ def emit(tag, body=""):
     proto.flush()
     os.fsync(proto.fileno())
 said = threading.Lock()
-def conclude(facts):
+held = [False]
+def settle():
     # one RESULT: the facts, or — when the subject's window ends first — the controller's own deadline (B1: the
-    # verdict never rests on the range merely being alive; a controller that is stopped reports nothing)
+    # verdict never rests on the range merely being alive; a controller that is stopped reports nothing). The race is
+    # settled when the observed operation ANSWERS, never after the closing exchange: a subject that stalls once it
+    # has answered cannot turn its answer into a deadline (B1-BLOCKS-STOP-001, IR-01)
+    if not held[0]:
+        held[0] = said.acquire(blocking=False)
+    return held[0]
+def conclude(facts):
     if said.acquire(blocking=False):
         emit("RESULT", json.dumps(facts))
         emit("END")
@@ -353,6 +360,8 @@ def main():
     if not got["callable"]:
         return {"subject": "present", "resolved": False, "error": "not callable"}
     got = answered({"op": "call", "args": req["args"], "kwargs": req["kwargs"], "attrs": req["attrs"]})
+    if not settle():
+        return None     # the deadline was written first: it stands
     if "returned" in got:
         return value_of(got["returned"])
     facts = {"subject": "present", "resolved": True, "raised": got["raised"]}
@@ -371,12 +380,13 @@ except Ended as e:
     facts = ended(e.args[0])
 except BaseException as e:
     facts = {"harness_failure": "the harness raised " + type(e).__name__}
-if facts is not None:
+if facts is not None and settle():
     if not ("subject_signal" in facts or "tampered" in facts or facts.get("hard_exit") or "harness_failure" in facts):
         wrong = finish()
         if wrong is not None:
             facts = {"subject": "present", "tampered": wrong}
-    conclude(facts)
+    emit("RESULT", json.dumps(facts))
+    emit("END")
 try:
     agent.stdin.close()
 except OSError:

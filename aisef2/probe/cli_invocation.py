@@ -693,9 +693,16 @@ def emit(tag, body=""):
     proto.flush()
     os.fsync(proto.fileno())
 said = threading.Lock()
-def conclude(facts):
+held = [False]
+def settle():
     # one RESULT: the facts, or — when the subject's window ends first — the controller's own deadline (B1: the
-    # verdict never rests on the range merely being alive; a controller that is stopped reports nothing)
+    # verdict never rests on the range merely being alive; a controller that is stopped reports nothing). The race is
+    # settled when the observed operation ANSWERS, never after the closing exchange: a subject that stalls once it
+    # has answered cannot turn its answer into a deadline (B1-BLOCKS-STOP-001, IR-01)
+    if not held[0]:
+        held[0] = said.acquire(blocking=False)
+    return held[0]
+def conclude(facts):
     if said.acquire(blocking=False):
         emit("RESULT", json.dumps(facts))
         emit("END")
@@ -813,6 +820,8 @@ def main():
     emit("MAIN", json.dumps({"before": before}))
     out, err = os.path.join(work, "stdout.bin"), os.path.join(work, "stderr.bin")
     r = invoke(req["argv"], req["stdin"] or os.devnull, out, err)
+    if not settle():
+        return None     # the deadline was written first: it stands
     if r is None:
         r = ended()
         if "subject_signal" not in r:
@@ -826,12 +835,13 @@ def main():
     r.update({"subject": "present", "pre": pre, "before": before, "files": {n: file_fact(n) for n in req["files"]}})
     return r
 facts = main()
-if facts is not None:
+if facts is not None and settle():
     if not ("subject_signal" in facts or "tampered" in facts or facts.get("hard_exit")):
         wrong = finish()
         if wrong is not None:
             facts = {"subject": "present", "tampered": wrong}
-    conclude(facts)
+    emit("RESULT", json.dumps(facts))
+    emit("END")
 try:
     agent.stdin.close()
 except OSError:
