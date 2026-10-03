@@ -20,7 +20,7 @@ from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # no
 from aisef2.probe import cli_invocation as ci  # noqa: E402
 from aisef2.probe import process_effect as pe  # noqa: E402
 from aisef2.probe import python_callable_v2 as pc2  # noqa: E402
-from aisef2.probe.protocol import ExecutionEnv, ObservationKind, RevisionRef  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, Observation, ObservationKind, RevisionRef  # noqa: E402
 from aisef2.product.spec import ProductProofSpec  # noqa: E402
 
 
@@ -98,6 +98,18 @@ class CallableWatch(unittest.TestCase):
                            ExecutionEnv(sys.executable, 10, Enforcement.PARTIAL), "/ws")
         self.assertEqual((o.kind, o.verdict, o.detail),
                          (ObservationKind.HARNESS_FAILED, None, "the harness process ended and its exit status was never reported"))
+
+
+class CallableConcluded(unittest.TestCase):
+    """python_callable_v2._concluded L532: an answer on the subject's channel the agent did not write refutes, whatever
+    else the facts say — a satisfying return value beside it included. (Today's controller builds tampered facts
+    fresh, without one; the precedence is the defence, pinned here.)"""
+
+    def test_tampering_refutes_even_beside_a_satisfying_value(self):
+        facts = {"subject": "present", "tampered": "an answer on the subject's channel is not the agent's",
+                 "resolved": True, "returned": 3}
+        self.assertEqual(pc2._concluded("returns", {"returns": 3, "within_s": 5}, facts),
+                         Observation(ObservationKind.OBSERVED, BehaviorVerdict.REFUTED, detail=json.dumps(facts)))
 
 
 if __name__ == "__main__":
