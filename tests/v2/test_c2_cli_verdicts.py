@@ -384,6 +384,7 @@ class Protocol(unittest.TestCase):
                          ("ab" * 32, "/py", ci.AGENT, os.path.join(work, "pycache-agent"), ws))
         self.assertEqual(req["env"], ci._child_env(ws, os.path.join(work, "tmp")))
         self.assertEqual({req["env"][k] for k in ("TMPDIR", "TEMP", "TMP")}, {os.path.join(work, "tmp")})
+        self.assertEqual(req["window"], 5.0)   # B1-BLOCKS-STOP-001: the controller's own deadline timer reads it
         bare = tempfile.mkdtemp(prefix="aisef2-cli-bare-", dir=self._d.name)
         ask2, ws2, _ = ci._prepare(bare, "/rev", "app:__main__", {}, [], "n1", "cd" * 32, "/py", 5.0)
         req2 = json.loads(pathlib.Path(ask2).read_text(encoding="utf-8"))

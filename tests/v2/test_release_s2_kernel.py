@@ -21,6 +21,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -188,7 +189,7 @@ class GitConfiguration(Repo):
         (wt.path / ".git").write_bytes((foreign.path / ".git").read_bytes())
         with self.assertRaises(ResourceUnavailable) as x:
             self.ws.move(wt, self.base)
-        self.assertIn("gitfile", str(x.exception))
+        self.assertEqual(str(x.exception), "checkout wt-S1: its gitfile is not the one git wrote (B4): not moved")
 
 
 class CheckoutMove(Repo):
@@ -204,6 +205,35 @@ class CheckoutMove(Repo):
         self.ws.move(wt, base)
         self.assertFalse((wt.path / "planted.log").exists())
         self.assertFalse(nested.exists())
+
+    def test_a_clean_that_fails_is_a_typed_refusal_and_the_checkout_keeps_its_revision(self):
+        wt = self.ws.checkout("wt-S1", self.base)
+        real = w.git
+
+        def failing_clean(repo, *args):
+            return subprocess.CompletedProcess(["git", *args], 3, "", "") if args[:1] == ("clean",) else real(repo, *args)
+        with mock.patch.object(w, "git", failing_clean), self.assertRaises(ResourceUnavailable) as x:
+            self.ws.move(wt, self.base)
+        self.assertEqual(str(x.exception), f"checkout wt-S1 at {self.base[:12]}: git clean exited 3")
+
+
+class ConfigProblems(Repo):
+    def test_a_directory_that_is_no_repository_has_no_problems(self):
+        self.assertEqual(w.config_problems(self.tmp / "ws"), [])
+
+    def test_every_key_once_in_name_order_and_undecodable_bytes_are_read_not_fatal(self):
+        self.configure("filter.zz.clean", "x")
+        self.configure("--add", "include.path", "a")
+        self.configure("--add", "include.path", "b")
+        self.configure("alias.aa", "status")
+        self.configure("url.zz.insteadOf", "y")
+        self.configure("diff.mm.textconv", "z")
+        self.configure("credential.helper", "w")
+        config = pathlib.Path(self.repo, ".git", "config")
+        config.write_bytes(config.read_bytes() + b"[user]\n\tname = \xff\xfe\n")
+        # six keys written out of name order: any order but the sorted one (1 in 720 by chance) fails
+        self.assertEqual(w.config_problems(self.repo), ["alias.aa", "credential.helper", "diff.mm.textconv", "filter.zz.clean",
+                                                        "include.path", "url.zz.insteadof"])
 
 
 class ReadOnlyScope(unittest.TestCase):
