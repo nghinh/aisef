@@ -86,6 +86,95 @@ def env_with(interpreter):
     return env(interpreter=interpreter)
 
 
+AGENT_SUBJECT = {
+    "agentsubj/__init__.py": "",
+    "agentsubj/boom.py": "raise RuntimeError('at import')\n",
+    "agentsubj/lazy.py": "def __getattr__(name):\n    raise KeyError(name)\n",
+    "agentsubj/vals.py": (
+        "import os\nBYTES = b'\\x00\\xff'\nBARR = bytearray(b'\\x01')\nVIEW = memoryview(b'ab')\nNUM = 3\nOBJ = object()\n"
+        "def add(a, b=0):\n    return a + b\n"
+        "class E(Exception):\n    def __init__(self):\n        super().__init__('e')\n        self.code = 7\n"
+        "    @property\n    def broken(self):\n        raise KeyError('broken')\n"
+        "def raise_e():\n    raise E()\n"
+        "class C:\n    def __init__(self, x):\n        self.x = x\n    def get(self):\n        return self.x\n"
+        "    @property\n    def trap(self):\n        raise KeyError('trap')\n"
+        "class Bad:\n    def __init__(self):\n        raise RuntimeError('ctor')\n"
+        "def cwd_once():\n    return os.getcwd()\n"
+        "def cwd_twice():\n    try:\n        os.getcwd()\n    except OSError:\n        pass\n    return os.getcwd()\n"),
+    "agentsubj/sticky.py": (   # a module that refuses to take its original attribute back: the fault leaks
+        "import sys, types\ndef target():\n    return 'real'\ndef call_target():\n    return target()\n"
+        "class _Sticky(types.ModuleType):\n    def __setattr__(self, name, value):\n"
+        "        if name == 'target' and getattr(value, '__name__', '') == 'target':\n            return\n"
+        "        super().__setattr__(name, value)\nsys.modules[__name__].__class__ = _Sticky\n"),
+}
+
+
+class AgentOps(unittest.TestCase):
+    """The shipped agent script (ci.AGENT) driven directly over its own pipe, op by op, each whole answer asserted. Its
+    import/resolve/value/construct/call ops are the shared agent's: this probe's controller sends only invoke and bye
+    (V21-33), so these cases are the only place they run."""
+
+    def test_every_op_answers_exactly(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = pathlib.Path(os.path.realpath(t))
+            root, work = t / "rev", t / "work"
+            work.mkdir()
+            for rel, text in AGENT_SUBJECT.items():
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                (root / rel).write_text(text, encoding="utf-8")
+            with open(work / "agent.log", "wb") as log:
+                agent = subprocess.Popen([sys.executable, "-I", "-B", "-X", "utf8=1", "-c", ci.AGENT, str(root), str(work)],
+                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=log, cwd=work)
+            try:
+                self.assertEqual(json.loads(agent.stdout.readline()), {"ready": True, "n": 0})
+                n = [0]
+
+                def ask(op, want):
+                    n[0] += 1
+                    agent.stdin.write((json.dumps({**op, "n": n[0]}) + "\n").encode("utf-8"))
+                    agent.stdin.flush()
+                    self.assertEqual(json.loads(agent.stdout.readline()), {**want, "n": n[0]}, op)
+                pkg, vals = root / "agentsubj", root / "agentsubj" / "vals.py"
+                ask({"op": "import", "name": "agentsubj.nope"}, {"raised": "ModuleNotFoundError", "missing": "agentsubj.nope"})
+                ask({"op": "import", "name": "agentsubj.boom"}, {"raised": "RuntimeError"})
+                ask({"op": "import", "name": "agentsubj"}, {"ok": True, "file": str(pkg / "__init__.py"), "path": [str(pkg)]})
+                ask({"op": "import", "name": "agentsubj.lazy"}, {"ok": True, "file": str(pkg / "lazy.py"), "path": []})
+                ask({"op": "resolve", "chain": ["x"]}, {"raised": "KeyError"})
+                ask({"op": "import", "name": "agentsubj.vals"}, {"ok": True, "file": str(vals), "path": []})
+                ask({"op": "resolve", "chain": ["missing"]}, {"absent": True})
+                for name, value in (("NUM", {"json": 3}), ("BYTES", {"bytes_hex": "00ff"}), ("BARR", {"bytes_hex": "01"}),
+                                    ("VIEW", {"memoryview_hex": "6162"}), ("OBJ", {"unserializable": "object"})):
+                    ask({"op": "resolve", "chain": [name]}, {"ok": True, "callable": False})
+                    ask({"op": "value"}, value)
+                call = {"op": "call", "args": [], "kwargs": {}}
+                ask({"op": "resolve", "chain": ["add"]}, {"ok": True, "callable": True})
+                ask({**call, "args": [1], "kwargs": {"b": 2}}, {"returned": {"json": 3}, "fired": False})
+                ask({"op": "resolve", "chain": ["raise_e"]}, {"ok": True, "callable": True})
+                ask({**call, "attrs": ["code", "nothing", "broken"]},
+                    {"raised": "E", "attrs": {"code": {"json": 7}, "nothing": {"missing": True}, "broken": {"error": "KeyError"}},
+                     "fired": False})
+                fault = ["os", "getcwd", "OSError", "F1"]
+                ask({"op": "resolve", "chain": ["cwd_once"]}, {"ok": True, "callable": True})
+                ask({**call, "patch": fault}, {"raised": "OSError", "attrs": {}, "fired": True})
+                ask(call, {"returned": {"json": str(work)}, "fired": False})            # the fault was restored
+                ask({"op": "resolve", "chain": ["cwd_twice"]}, {"ok": True, "callable": True})
+                ask({**call, "patch": fault}, {"returned": {"json": str(work)}, "fired": True})   # fires once, then the original
+                ask({"op": "resolve", "chain": ["Bad"]}, {"ok": True, "callable": True})
+                ask({"op": "construct", "args": [], "kwargs": {}}, {"raised": "RuntimeError"})
+                ask({"op": "resolve", "chain": ["C"]}, {"ok": True, "callable": True})
+                ask({"op": "construct", "args": [5], "kwargs": {}}, {"ok": True})
+                ask({**call, "method": "get"}, {"returned": {"json": 5}, "fired": False})
+                ask({**call, "method": "nope"}, {"no_method": True})
+                ask({**call, "method": "trap"}, {"resolve_raised": "KeyError"})
+                ask({"op": "import", "name": "agentsubj.sticky"}, {"ok": True, "file": str(pkg / "sticky.py"), "path": []})
+                ask({"op": "resolve", "chain": ["call_target"]}, {"ok": True, "callable": True})
+                ask({**call, "patch": ["agentsubj.sticky", "target", "OSError", "F2"]}, {"leak": "the fault F2 was not restored"})
+            finally:
+                agent.stdin.close()
+                agent.wait(30)
+                agent.stdout.close()
+
+
 class Concluded(unittest.TestCase):
     """ci._concluded as a unit: each conclusion a controller's RESULT can carry, decided with a `decide` that would say
     SATISFIED — a conclusion that fell through to the decision would show — and its (observation, facts) pair whole."""
