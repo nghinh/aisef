@@ -549,6 +549,8 @@ S2_TARGETS: dict[str, list[str]] = {
 _S2_KILLS = "tests/v2/test_s2_kills.py"
 for _t in ("aisef2/probe/cli_invocation.py::AGENT/op_invoke",):
     S2_TARGETS[_t] = [*S2_TARGETS[_t], _S2_KILLS]
+for _t in ("aisef2/probe/process_effect.py::HARNESS/ask",):   # killed only by the clock: its bounded case runs first
+    S2_TARGETS[_t] = [_S2_KILLS, *S2_TARGETS[_t]]
 SUPERSEDED.update({t: "V2.0-S2" for t in S2_TARGETS})
 for _phase in (K_NOWORK_TARGETS, P6_TARGETS, C2P2_TARGETS, C2P3_TARGETS, C2_P4_TARGETS):
     for _t in [t for t in _phase if t.split("::")[0] in (*_S2_CHANGED, "aisef2/orchestrate/story_runner.py",

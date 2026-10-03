@@ -15,7 +15,11 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
 from aisef2.probe import cli_invocation as ci  # noqa: E402
+from aisef2.probe import process_effect as pe  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, ObservationKind, RevisionRef  # noqa: E402
+from aisef2.product.spec import ProductProofSpec  # noqa: E402
 
 
 class AgentInvoke(unittest.TestCase):
@@ -49,6 +53,28 @@ class AgentInvoke(unittest.TestCase):
                 agent.stdout.close()
             self.assertEqual((work / "o.bin").read_bytes().decode("utf-8").splitlines(), [str(mod), "['x', 'y']", "True"])
             self.assertEqual((work / "e.bin").read_bytes(), b"")
+
+
+class ProcessEffectAsk(unittest.TestCase):
+    """process_effect HARNESS/ask: two of its mutants were killed only by the clock (L47 the request line's newline,
+    L51 the answer ask returns) — each leaves the harness waiting. One bounded observation, its whole outcome asserted,
+    fails them by assertion inside its own window. First in that target's kill set, before the files that would hang."""
+
+    def test_one_asked_call_is_answered_and_observed(self):
+        with tempfile.TemporaryDirectory(prefix="aisef2-s2-kills-") as t:
+            root = pathlib.Path(os.path.realpath(t))
+            (root / "subj.py").write_text("def total(*values):\n    return sum(values)\n", encoding="utf-8")
+            probe = pe.ProcessEffectProbe()
+            spec = ProductProofSpec.create(
+                contract_id="BC-EFFECT", probe_id=probe.id, probe_digest=probe.digest,
+                probe_input={"subject": {"kind": "process_effect", "locator": "subj:total"},
+                             "stimulus": {"scenario": [{"step": "call", "args": [1, 2], "kwargs": {}}]},
+                             "observable": {"returns": 3, "within_s": 5},
+                             "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+                candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+            o = probe.observe(spec, RevisionRef("89abcdef0123456789abcdef0123456789abcdef", str(root)),
+                              ExecutionEnv(sys.executable, 10, Enforcement.PARTIAL))
+            self.assertEqual((o.kind, o.verdict), (ObservationKind.OBSERVED, BehaviorVerdict.SATISFIED), o.detail)
 
 
 if __name__ == "__main__":

@@ -309,5 +309,30 @@
     "V21-30"
    ]
   }
+ ],
+ "corrections": [
+  {
+   "id": "S2-VERIFY-1",
+   "what": "Three kill counts reported from an ad-hoc scratch-copy verifier were wrong: the copy held aisef2/, tests/ and validation/ but not the V1 aisef package that tests/__init__.py imports, and the verifier never ran the unmutated baseline, so every mutant 'failed' on an import error. The campaign's own runner (validation/v2/mutation.py run_target) builds its tree from COPY, aisef included, and refuses a target whose kill tests fail unmutated: no campaign result is affected.",
+   "corrects": [
+    {
+     "where": "commit 8ffd6f0 message; docs/v2/V2.1-BACKLOG.md V21-33",
+     "claimed": "AgentOps kills all 130 mutants of tagged, plain, op_import, op_resolve, op_value, op_construct, guarded, op_call",
+     "measured": "tagged 16/16, op_import 22/22, op_resolve 16/16, op_value 2/2, op_construct 13/13, op_call 38/38, guarded 18/19 (survives: L88 string 'controlled fault ' emptied), plain 0/4 (L45 element 0/1 dropped, L46 returns None, ...)"
+    },
+    {
+     "where": "commit 340b11c message; v2_0_blockers B4-OLD-GIT V2_0_DISPOSITION",
+     "claimed": "run.py::check_git 22/22 killed",
+     "measured": "21/22 by tests/v2/test_app_units.py: L100 `except (OSError, subprocess.SubprocessError)` element 1 dropped survives (a `git --version` that times out would raise instead of being refused)"
+    },
+    {
+     "where": "commit 911881b message",
+     "claimed": "tests/v2/test_s2_kills.py alone kills 36/36 of AGENT/op_invoke's mutants",
+     "measured": "AgentInvoke alone kills 30 (L129, the campaign survivor, among them); the other 6 are killed by the existing cli files (worker E's full-kill-set run: 35/36, only L129 surviving)"
+    }
+   ],
+   "method_now": "verify2: the tree mutation.py builds (COPY), the unmutated baseline must pass, a kill counted only on a test failure, errors reported apart",
+   "disposition": "the campaign measures each of these targets with its full kill set; survivors it reports are killed in tests/v2/test_s2_kills.py and re-measured"
+  }
  ]
 }
