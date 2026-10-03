@@ -232,9 +232,10 @@
    "V21-27",
    "V21-28",
    "V21-29",
-   "V21-30"
+   "V21-30",
+   "V21-31"
   ],
-  "count": 30
+  "count": 31
  },
  "risks_not_findings": [
   {
@@ -253,6 +254,11 @@
     "source": "closure-evidence/v2/cycle2/P10/attempt-4/sessions/*.jsonl step_finish tokens (output + reasoning)",
     "reading": "the 400,000 ceiling binds only when two or more stories need their third attempt; a run whose stories commit within two attempts stays near 250,000 by these per-session figures"
    }
+  },
+  {
+   "id": "OBS-S2-1",
+   "what": "tests/v2/p4/test_interruption.py RealSignals SIGINT mid-story timed out once (child not exited within 30 s) in a local one-process run of 3089 tests under Python 3.12 while two mutation workers loaded this machine; alone it passes in 0.5 s on 3.12 and 3.14, and it passed in every CI run",
+   "disposition": "not a finding: not reproduced; watched in the S2-exit full suite and the RC CI"
   }
  ],
  "reviews": [

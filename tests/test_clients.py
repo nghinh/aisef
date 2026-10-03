@@ -681,7 +681,10 @@ class TestTranLuotDoAdapterThiHanh(unittest.TestCase):
             RunSpec(prompt="x", workdir=".", max_turns=5, timeout_seconds=60))
         self.assertFalse(res.ok)
         self.assertEqual(exit_status_of(res), "max_turns")
-        self.assertEqual(res.num_turns, 5)
+        # the adapter enforces the cap at its 0.5 s poll and the fake writes a step every 0.1 s: the kill lands within
+        # one poll of the 5th step, and num_turns is what was really written before it (macOS CI 2026-10-03: 6)
+        self.assertGreaterEqual(res.num_turns, 5)
+        self.assertLessEqual(res.num_turns, 10)
         self.assertLess(_t.monotonic() - t, 20, "phải giết sớm, không chờ hết 100 bước")
 
     def test_khong_khai_tran_thi_chay_het(self):

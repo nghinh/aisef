@@ -468,18 +468,24 @@ class TestGianhLaiCongCuaChinhMinh(unittest.TestCase):
 
         port = _free_port()
         url = f"http://127.0.0.1:{port}"
-        p = sp.Popen([_s.executable, "-m", "http.server", str(port)],
-                     stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+        # --bind: the URL is IPv4 loopback; without it http.server binds the dual-stack `::` first, which a host
+        # without usable IPv6 refuses (macOS CI 2026-10-03: never up in 10 s). Its stderr is kept to say why if not up.
+        log = tempfile.TemporaryFile()
+        p = sp.Popen([_s.executable, "-m", "http.server", "--bind", "127.0.0.1", str(port)],
+                     stdout=sp.DEVNULL, stderr=log)
         try:
             het = _t.time() + 10
             while _t.time() < het and not _responds(url, timeout=1):
                 _t.sleep(0.2)
-            self.assertTrue(_responds(url, timeout=1), "máy chủ thử chưa lên")
+            if not _responds(url, timeout=1):
+                log.seek(0)
+                self.fail(f"máy chủ thử chưa lên: exit {p.poll()}, stderr {log.read()[-1500:]!r}")
             self.assertTrue(_giai_phong_cong(str(p.pid), url))
             self.assertFalse(_responds(url, timeout=1))
         finally:
             if p.poll() is None:
                 p.kill()
+            log.close()
 
     def test_pid_khong_ton_tai_khong_lam_sap(self):
         from aisef.harness.mockup_verify import _giai_phong_cong
