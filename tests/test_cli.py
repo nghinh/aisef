@@ -723,6 +723,11 @@ class TestRunIsV2(CliTestCase):
         from aisef.cli.implement import cmd_run
 
         self.assertIs(build_parser().parse_args(["legacy", "run"]).func, cmd_run)
+        # `improve` executes V1 stories too: only as `aisef legacy improve` (G1, review ADV-05)
+        from aisef.cli.implement import cmd_improve
+        self.assertIs(build_parser().parse_args(["legacy", "improve", "--epic", "EPIC-01"]).func, cmd_improve)
+        with self.assertRaises(SystemExit):
+            build_parser().parse_args(["improve", "--epic", "EPIC-01"])
         self.assertFalse(hasattr(build_parser().parse_args(["run"]), "func"))
         calls, fake = self.v2()
         with fake:

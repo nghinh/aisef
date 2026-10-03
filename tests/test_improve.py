@@ -548,7 +548,7 @@ class TestLoiVao(ImproveTestCase):
 
         out, err = io.StringIO(), io.StringIO()
         with redirect_stdout(out), redirect_stderr(err):
-            code = main(["--project", str(self.project), "improve", "--epic", "EPIC-01"])
+            code = main(["--project", str(self.project), "legacy", "improve", "--epic", "EPIC-01"])
         self.assertEqual(code, EXIT_NOT_READY)
         self.assertIn("gate not approved", err.getvalue())
 

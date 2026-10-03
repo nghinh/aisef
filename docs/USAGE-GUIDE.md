@@ -1404,7 +1404,7 @@ aisef issues --format csv            # gap/regression table as a file
 behavior ledger:
 
 ```bash
-aisef improve --epic EPIC-01 --max-loops 3
+aisef legacy improve --epic EPIC-01 --max-loops 3
 ```
 
 Each loop: run verification → read the behavior ledger → generate **one** fix
@@ -1698,7 +1698,7 @@ aisef auto-approve all|<list>
 ```bash
 aisef run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
 aisef run --verify-only --story S [--repeat K]
-aisef improve --epic E [--max-loops N] [--auto] [--client c] [--force]
+aisef legacy improve --epic E [--max-loops N] [--auto] [--client c] [--force]
 aisef tool test|lint|sast [--story S] [--lines N]
 aisef verify [--write-scope ...] [--story S]
 aisef gate <story> --replay [--attempt n]   # or: aisef gate --replay --all

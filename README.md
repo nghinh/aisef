@@ -104,7 +104,7 @@ absorbed from the *Harness-of-Harness* line of work and measured here):
 - **Behaviour ledger.** Every acceptance criterion, requirement, verification
   kind and screen has a state: VERIFIED, GAP or REOPENED. The ledger is a
   projection of the evidence, rebuilt every time, never a second source of truth.
-- **Bounded improvement loop.** `aisef improve --epic E` reads the ledger,
+- **Bounded improvement loop.** `aisef legacy improve --epic E` reads the ledger,
   generates **one** repair story for one gap, runs it like any other story, and
   re-verifies. It stops in code: no gaps left, loop budget spent, marginal
   improvement ≤ 0 for N consecutive loops, cost cap exceeded, or the plan itself
@@ -191,7 +191,7 @@ everything downstream become `stale`), and generates a delta story
 `STORY-CH-01` with `covers=[FR-3]` — the old story stays `DONE`.
 
 ```bash
-aisef improve --epic EPIC-01 --max-loops 3      # [--auto] does not stop at the human gate
+aisef legacy improve --epic EPIC-01 --max-loops 3      # [--auto] does not stop at the human gate
 ```
 
 Evidence-driven improvement loop (ADR-004 R3): QA → behaviour ledger → **one**

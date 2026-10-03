@@ -100,7 +100,7 @@ DEFAULTS: dict[str, Any] = {
     # Evidence-based epic improvement loops (ADR-004 R3).  HoH runs T=70
     # loops with no stopping condition; here every stopping condition is code
     # and these three numbers are ceilings.  Count by epic from ``loops[]`` in
-    # the behaviour ledger — re-running ``aisef improve`` continues from the
+    # the behaviour ledger — re-running ``aisef legacy improve`` continues from the
     # last loop, not from 0.
     "improve.max_loops": 3,
     # stop when marginal improvement (delta_verified - delta_reopened between

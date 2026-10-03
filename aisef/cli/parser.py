@@ -212,8 +212,9 @@ def build_parser() -> argparse.ArgumentParser:
                     help="comma-separated manifest fields whose drift the owner accepts for this replay")
     r2.set_defaults(func=cmd_run)
 
-    im = sub.add_parser("improve", help="evidence-driven improvement loop for an epic: QA → behaviour ledger → "
-                                        "one fix story → run → QA; stops by code (ADR-004 R3)")
+    # G1: `improve` executes V1 stories (aisef.phases.run.run_epic): V1 execution only behind the named legacy surface
+    im = legacy.add_parser("improve", help="V1 (legacy): evidence-driven improvement loop for an epic: QA → behaviour "
+                                           "ledger → one fix story → run → QA; stops by code (ADR-004 R3)")
     im.add_argument("--epic", required=True, help="epic to improve, e.g. EPIC-01")
     im.add_argument("--max-loops", type=int, default=0,
                     help="max loops for the epic, including already-run loops (default: improve.max_loops)")

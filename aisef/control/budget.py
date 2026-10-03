@@ -6,7 +6,7 @@ Two costs matter to the harness:
 * the wall-clock time and turns the user is willing to wait before declaring
   the run dead.
 
-Both can blow up across concurrent runs (``aisef run`` + ``aisef improve``
+Both can blow up across concurrent runs (``aisef run`` + ``aisef legacy improve``
 + a notebook example).  Counting them after the call is too late: by then the
 charge has happened or the timeout has already aborted.  This module makes
 the reservation **before** the call and settles it **after**, with a hard

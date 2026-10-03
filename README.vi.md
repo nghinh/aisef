@@ -89,7 +89,7 @@ dòng nghiên cứu *Harness-of-Harness* và đo lại tại đây):
 - **Sổ hành vi.** Mỗi tiêu chí, yêu cầu, loại kiểm định và màn hình có một trạng
   thái: VERIFIED, GAP hay REOPENED. Sổ là **phép chiếu** từ bằng chứng, dựng lại
   mỗi lần, không phải nguồn sự thật thứ hai.
-- **Vòng cải tiến có trần.** `aisef improve --epic E` đọc sổ, sinh **một** story
+- **Vòng cải tiến có trần.** `aisef legacy improve --epic E` đọc sổ, sinh **một** story
   sửa cho một khoảng trống, chạy nó như story thường, rồi kiểm lại. Dừng bằng
   code: hết gap, hết trần vòng, cải thiện biên ≤ 0 nhiều vòng liền, vượt trần chi
   phí, hoặc chính kế hoạch bế tắc.
@@ -164,7 +164,7 @@ thành stale), sinh story delta `STORY-CH-01` với `covers=[FR-3]` — story c�
 giữ nguyên `DONE`.
 
 ```bash
-aisef improve --epic EPIC-01 --max-loops 3      # [--auto] không dừng ở cổng người
+aisef legacy improve --epic EPIC-01 --max-loops 3      # [--auto] không dừng ở cổng người
 ```
 
 Vòng cải tiến theo bằng chứng (ADR-004 R3): QA → sổ hành vi → **một** story

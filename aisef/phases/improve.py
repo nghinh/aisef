@@ -1,4 +1,4 @@
-"""Evidence-based epic improvement loop (ADR-004 R3): `aisef improve --epic E`.
+"""Evidence-based epic improvement loop (ADR-004 R3): `aisef legacy improve --epic E`.
 
 HoH proved the "measure gap -> fix -> re-measure" loop creates gain, but running
 T = 70 rounds with no stopping condition doesn't work.  Here the loop is
@@ -526,7 +526,7 @@ def _write_report(root: Path, epic_id: str, lo: Loop, decision: str, spent: floa
         lo.outcome_text.strip() or "(no stories ran)",
         "```",
         "",
-        "To continue: `aisef approve improve` then rerun `aisef improve --epic "
+        "To continue: `aisef approve improve` then rerun `aisef legacy improve --epic "
         f"{epic_id}`. History of a behavior: `aisef evidence <id>`.",
         "",
     ]

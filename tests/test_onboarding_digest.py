@@ -162,8 +162,8 @@ class TestRecordedEvidenceIsInSync(unittest.TestCase):
     def test_recorded_digest_matches_a_fresh_computation(self):
         """The record is frozen V1 evidence (validation/v2/v1_evidence_guard.py protects closure-evidence/ outside v2/),
         so it is checked against the surface it was recorded for — the V1 closure revision's — and never regenerated.
-        AISEF 2.0 moved exactly one source: README's Quick Start, where `aisef run` became `aisef legacy run` (charter
-        G1). G6.1's freshness therefore reads the V1 participant's validation as stale for the 2.0 surface — the truth."""
+        AISEF 2.0 moved exactly two sources, both for charter G1 (V1 execution only behind `aisef legacy`): README's
+        Quick Start (`aisef legacy run`) and USAGE-GUIDE's canonical workflow (`aisef legacy improve`). G6.1's freshness therefore reads the V1 participant's validation as stale for the 2.0 surface — the truth."""
         import subprocess
         import tempfile
 
@@ -179,7 +179,7 @@ class TestRecordedEvidenceIsInSync(unittest.TestCase):
         self.assertEqual(self.recorded["digest"], at_v1_close["digest"])
         fresh = compute_onboarding_digest(ROOT)
         moved = [(a["path"], a["extract"]) for a, b in zip(at_v1_close["sources"], fresh["sources"], strict=True) if a != b]
-        self.assertEqual(moved, [("README.md", "section:Quick Start")])
+        self.assertEqual(moved, [("README.md", "section:Quick Start"), ("docs/USAGE-GUIDE.md", "canonical_cli_workflow")])
         self.assertNotEqual(self.recorded["digest"], fresh["digest"])
 
     def test_sources_are_exactly_the_ones_the_contract_names(self):
