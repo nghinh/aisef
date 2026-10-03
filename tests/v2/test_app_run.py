@@ -128,8 +128,9 @@ def calibrations() -> tuple:
     return (ProbeCapabilityCalibration(e.probe_id, e.probe_digest, "returns", "fixture:positive", "fixture:negative", 1.0),)
 
 
-@unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
-class Product(unittest.TestCase):
+class ProductBase(unittest.TestCase):
+    """A one-story calc project, its settings and the fake client; no tests of its own."""
+
     def setUp(self) -> None:
         t = tempfile.TemporaryDirectory()
         self.addCleanup(t.cleanup)
@@ -157,6 +158,10 @@ class Product(unittest.TestCase):
     def journal(self, out: str = "out"):
         return format3.reconstruct((self.tmp / out / "run" / "journals" / "aisef-run.jsonl").read_text(encoding="utf-8"))
 
+
+
+@unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
+class Product(ProductBase):
     def test_a_story_is_delivered_and_the_run_verifies_from_its_journal(self):
         rec = self.execute()
         self.assertEqual(rec["delivery_verdict"], "PASS", rec)

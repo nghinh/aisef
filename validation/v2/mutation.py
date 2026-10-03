@@ -496,10 +496,55 @@ K_NOWORK_TARGETS: dict[str, list[str]] = {
 SUPERSEDED.update({t: "K-NOWORK-001" for t in K_NOWORK_TARGETS})
 for _t in K_NOWORK_TARGETS:
     del K_PRESAT_TARGETS[_t]
+# V2.0 STABLE RELEASE, S2 — the single fix window (release charter §7–§8): B1 (the verdict channel: the controller /
+# agent split of cli_invocation and process_effect), B4/B6 (workspace: the isolated git configuration, the refused
+# repository configuration, the clean of each move), B7 (story_runner: no revert of a merge that changed nothing),
+# KA-09 (adapters: confine and unconfine leave a symbolic link alone), B12/B3 (the product runtime, aisef2/app). A source
+# digest is whole-file, so every target of a changed module is re-measured here, the S2 regression cases added to its
+# kill set; the earlier phase keeps its historical entries (SUPERSEDED), as K-NOWORK-001 did. A target the change
+# removed (`_hard_exit`, the old HARNESS dispatch) is not carried over; the new controller and agent functions are added.
+_S2_KERNEL = ["tests/v2/test_release_s2_kernel.py"]
+_APP = ["tests/v2/test_app_units.py", "tests/v2/test_app_run.py"]
+_S2_CHANGED = ("aisef2/orchestrate/workspace.py", "aisef2/orchestrate/adapters.py")
+S2_TARGETS: dict[str, list[str]] = {
+    **{t: [k[0], *_S2_KERNEL, *k[1:]] for t, k in K_NOWORK_TARGETS.items()},
+    **{t: [*k, *_S2_KERNEL] for t, k in P6_TARGETS.items() if t.split("::")[0] in _S2_CHANGED},
+    **{f"aisef2/orchestrate/workspace.py::{f}": [*_ORCH_STAGES, *_S2_KERNEL] for f in ("_env", "config_problems")},
+    **{t: k for t, k in C2P2_TARGETS.items() if not t.endswith("::_hard_exit")},
+    **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_HARNESS for f in ("_concluded", "_no_result")},
+    "aisef2/probe/cli_invocation.py::_mac": [*_CLI_PURE, *_CLI_HARNESS],
+    **{f"aisef2/probe/cli_invocation.py::{s}/{f}": _CLI_HARNESS for s, fs in (
+        ("AGENT", ("flush", "redirect", "send", "tagged", "plain", "op_import", "op_resolve", "op_value", "op_construct",
+                   "guarded", "op_call", "op_invoke", "op_bye")),
+        ("HARNESS", ("emit", "answer_to", "ask", "finish", "inside", "resolve", "sha", "file_fact", "stream_fact",
+                     "invoke", "ended", "main"))) for f in fs},
+    **{t: k for t, k in C2P3_TARGETS.items()
+       if t.split("::")[1] not in ("_hard_exit", "HARNESS/HANDLERS", "HARNESS/raised_as", "HARNESS/tagged", "HARNESS/target_of")},
+    **{f"aisef2/probe/process_effect.py::HARNESS/{f}": [*_PE_REAL, *_PE_PYC] for f in (
+        "answer_to", "ask", "finish", "answered", "reported", "subject_call", "unresolved", "ended")},
+    **{f"aisef2/app/{m}::{f}": _APP for m, fs in (
+        ("run.py", ("kernel_digest", "calibrations", "admit", "check_repository", "probe_interpreter", "regression_tests",
+                    "runspec_of", "productproof", "delivery", "execute", "_close")),
+        ("verify.py", ("verify",)),
+        ("client.py", ("read_session", "Budget.__init__", "Budget.spend", "Budget.reached", "environment", "wait_within",
+                       "session")),
+        ("preflight.py", ("accounting", "run", "identity_problems", "fingerprint_fields", "deployment")),
+        ("settings.py", ("_count", "load")),
+        ("bundle.py", ("Project.order", "load")),
+        ("adapters.py", ("attempt_of", "Developer.implement", "Reviewer.review")),
+        ("cli.py", ("run",))) for f in fs},
+}
+SUPERSEDED.update({t: "V2.0-S2" for t in S2_TARGETS})
+for _phase in (K_NOWORK_TARGETS, P6_TARGETS, C2P2_TARGETS, C2P3_TARGETS):
+    for _t in [t for t in _phase if t.split("::")[0] in (*_S2_CHANGED, "aisef2/orchestrate/story_runner.py",
+                                                          "aisef2/probe/cli_invocation.py", "aisef2/probe/process_effect.py")]:
+        SUPERSEDED.setdefault(_t, "V2.0-S2")
+        del _phase[_t]
+RECORDS["V2.0-S2"] = "closure-evidence/v2/release/S2-MUTATION.json"
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
                  "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS,
                  "C2-ORCH": C2_ORCH_TARGETS, "C2-P10": C2_P10_TARGETS, "K-PRESAT-001": K_PRESAT_TARGETS,
-                 "K-NOWORK-001": K_NOWORK_TARGETS}
+                 "K-NOWORK-001": K_NOWORK_TARGETS, "V2.0-S2": S2_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
