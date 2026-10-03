@@ -4,15 +4,15 @@
  "S0_SCOPE_FREEZE": "PASS",
  "S1_FAIL_CLOSED": "PASS",
  "S2_FIX_WINDOW": "IN_PROGRESS",
- "S3_PRODUCTIZED": "IN_PROGRESS",
+ "S3_PRODUCTIZED": "PASS",
  "S4_RC_FROZEN": "NOT_STARTED",
  "S5_QUALIFIED": "NOT_STARTED",
  "S6_RELEASE_SMOKE": "NOT_STARTED",
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
- "CURRENT_SHA": "f410b2c3b9986b71bcaf04d6736d68205ead67e7",
- "CURRENT_KERNEL_DIGEST": "b95ceb4a6027bb787792d0d86b5ce64fc5a16527",
+ "CURRENT_SHA": "6cd8ad3c9b939239206aaedc790d477e84c5a49e",
+ "CURRENT_KERNEL_DIGEST": "792c3bbf9b91fd12fe87f3a8482153416fadca3b",
  "CURRENT_WHEEL_DIGEST": null,
  "OPEN_V2_0_BLOCKERS": [
   "B1",
@@ -62,6 +62,12 @@
    "status": "IN_PROGRESS",
    "on": "f410b2c3b9986b71bcaf04d6736d68205ead67e7",
    "what": "pre-RC review (2 reviewers, §20): 4 blockers fixed and regression-tested, 6 items to V2.1"
+  },
+  {
+   "phase": "S3_PRODUCTIZED",
+   "status": "PASS",
+   "on": "6cd8ad3c9b939239206aaedc790d477e84c5a49e",
+   "what": "clean-install product smoke (installed aisef run --check/run/--verify) green in CI on the real wheel; owner ruling RISK-G7-1 option 2 workload records committed (5c66e5c)"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
@@ -71,19 +77,28 @@
  },
  "S3_DETAIL": {
   "done": [
-   "aisef + aisef2 in wheel/sdist (packaging_check)",
-   "aisef run = V2, aisef legacy run = V1",
-   "release.yml/staging.yml + V2 release gate",
-   "installed smoke",
-   "docs/v2/USAGE.md",
-   "macOS in CI",
-   "shipped probe calibrations (18 rows)",
-   "LedgerLock release bundle READY",
-   "offline rehearsal pre-RC: reference/partial PASS 67/67, nothing FAIL 0/67"
+   "aisef + aisef2 in wheel/sdist (packaging_check --artifacts in the CI wheel job)",
+   "aisef run = V2 (aisef2.app.cli.run), aisef legacy run / legacy improve = V1",
+   "aisef2 imports nothing from validation/ or tests/ (no c2_p9 dependence)",
+   "clean-install fixtures: tests/installed_smoke.py --product and tests/installed_product_smoke.py (the installed aisef run --check / run / --verify, offline) — CI run 37124271140 wheel job PASS on the real wheel of c16f1d4",
+   "staging.yml runs both on the downloaded artifact",
+   "docs/v2/USAGE.md, RELEASE-PROCESS.md, CHANGELOG entry"
   ],
-  "open": [
-   "version 2.0.0 at RC1 freeze",
-   "RC digests"
+  "open_for_S4": [
+   "version 2.0.0 in the RC1 commit",
+   "RC digests from the staging build"
   ]
+ },
+ "WORKLOAD_CONTEXT_SANITIZED": "PASS",
+ "WORKLOAD_SOURCE_SHA": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
+ "WORKLOAD_RELEASE_SMOKE_SHA": "6a8d60c0bd3d1fa47ed4e97dd80fc0f4b645332a",
+ "RELEASE_SMOKE_DEPENDS_ON_MISSING_PRIVATE_DIAGNOSTIC": "NO (pre-RC: feedback_coverage 67/67; feedback rehearsal STORY-04-01 RETRY,COMMIT; official at S6 on the RC wheel)",
+ "BUDGET_ESTIMATE": {
+  "output_tokens": 292694,
+  "with_25pct_headroom": 365868,
+  "owner_ceiling": 400000,
+  "within": "YES",
+  "sensitivity_no_pre_satisfied": 535783,
+  "sensitivity_one_retry_per_failed_story": 647232
  }
 }
