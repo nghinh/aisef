@@ -543,6 +543,12 @@ S2_TARGETS: dict[str, list[str]] = {
         ("adapters.py", ("attempt_of", "Developer.implement", "Reviewer.review")),
         ("cli.py", ("run",))) for f in fs},
 }
+# Survivors of the current-snapshot campaign (owner ruling 'MUTATION WORKER HANDOFF', 2026-10-04) are killed by cases in
+# a file of their own, named only in the kill sets of the targets they were written for: re-measuring those targets
+# leaves every other result's kill-test closure byte-identical.
+_S2_KILLS = "tests/v2/test_s2_kills.py"
+for _t in ("aisef2/probe/cli_invocation.py::AGENT/op_invoke",):
+    S2_TARGETS[_t] = [*S2_TARGETS[_t], _S2_KILLS]
 SUPERSEDED.update({t: "V2.0-S2" for t in S2_TARGETS})
 for _phase in (K_NOWORK_TARGETS, P6_TARGETS, C2P2_TARGETS, C2P3_TARGETS, C2_P4_TARGETS):
     for _t in [t for t in _phase if t.split("::")[0] in (*_S2_CHANGED, "aisef2/orchestrate/story_runner.py",

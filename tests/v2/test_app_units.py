@@ -552,7 +552,8 @@ class RunParts(Temp):
         real, seen = subprocess.run, []
 
         def old_git(cmd, *a, **k):
-            seen.append(cmd[:2])
+            if isinstance(cmd, list) and cmd[:1] == ["git"]:    # git only: platform.system() runs `ver` on Windows
+                seen.append(cmd[:2])
             return subprocess.CompletedProcess(cmd, 0, "git version 2.30.2\n", "") if cmd == ["git", "--version"] else real(cmd, *a, **k)
         with mock.patch.object(R.subprocess, "run", old_git), self.assertRaisesRegex(R.RunRefused, r"^git 2\.31 or newer"):
             R.execute(bundle.read(self.tmp / "p.json"), settings.read(self.tmp / "s.json"), self.tmp / "source", self.tmp / "out")
