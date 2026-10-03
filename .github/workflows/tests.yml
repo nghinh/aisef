@@ -99,7 +99,11 @@ jobs:
           want=$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version'])")
           /tmp/venv/bin/aisef --version
           (cd /tmp && /tmp/venv/bin/python -I -c "import aisef2")
-          /tmp/venv/bin/python -I tests/installed_smoke.py "$want"
+          /tmp/venv/bin/python -I tests/installed_smoke.py "$want" --product
+      # The public path itself (owner ruling 'CONTINUE RELEASE EXECUTION' §7/§10): the installed `aisef run`
+      # --check / run / --verify on the offline calc project — fake client, loopback fake provider, no network.
+      - name: product smoke — the installed `aisef run`, end to end and offline
+        run: (cd /tmp && /tmp/venv/bin/python -I "$GITHUB_WORKSPACE/tests/installed_product_smoke.py")
       - name: a clean project can be initialised by the installed command
         run: |
           set -eu

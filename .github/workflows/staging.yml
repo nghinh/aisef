@@ -98,3 +98,11 @@ jobs:
           cd "$SMOKE_DIR"
           "$SMOKE_PY" -I -c "import aisef2"
           "$SMOKE_PY" -I "$smoke" "$want" --product
+      # The public path itself: the installed `aisef run` --check / run / --verify on the offline calc project (fake
+      # client, loopback fake provider). The fake client is a script started by its shebang: POSIX runners only.
+      - name: product smoke — the installed `aisef run`, end to end and offline
+        if: runner.os != 'Windows'
+        run: |
+          set -eu
+          cd "$SMOKE_DIR"
+          "$SMOKE_PY" -I "$GITHUB_WORKSPACE/tests/installed_product_smoke.py"
