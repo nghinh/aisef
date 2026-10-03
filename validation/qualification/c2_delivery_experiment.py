@@ -7,6 +7,7 @@ EXPERIMENT EXECUTION GUARD', 2026-10-02). PREPARED, NOT EXECUTED: the run needs 
     python -P validation/qualification/c2_delivery_experiment.py --check --after-run   # the same once the run's result is preserved
     python -P validation/qualification/c2_delivery_experiment.py --attest  # PART OF THE PAID RUN: the provider preflight (calls the provider)
     python -P validation/qualification/c2_delivery_experiment.py --check-historical   # every attempt already run, against its own records
+    python -P validation/qualification/c2_delivery_experiment.py --check-external     # this machine's copies of them, outside the repository
 
 **An attempt that has run is historical** (`HISTORICAL`): its preregistration, attestation, journal and records are
 immutable evidence, verified against what they themselves state — the commit that froze them, the commit the run
@@ -35,6 +36,7 @@ session streams; it keeps no count of its own, and what cannot be accounted for 
 from __future__ import annotations
 
 import argparse
+import calendar
 import hashlib
 import importlib.metadata
 import importlib.util
@@ -87,8 +89,11 @@ MEASURED_REL = "closure-evidence/v2/cycle2/P10/attempt-2/LEDGERLOCK-REGRESSION.j
 #: the owner's ruling clears it. The K-NOWORK-001 hold stood from 6d5a062 to 5c7c5a6; 'FINAL REBIND' cleared it at 06ceb23
 #: for exactly attempt 3, which then ran once and is final. Attempt 4 was held from f8e535c until the owner's ruling
 #: 'OWNER AUTHORIZATION: DELIVERY EXPERIMENT ATTEMPT 4 / ONE PAID ATTEMPT ONLY' authorized exactly one run of it, with
-#: the amended budget below; nothing else of the experiment changed.
-HOLD = None
+#: the amended budget below; nothing else of the experiment changed. Attempt 4 then ran once and is final (owner ruling
+#: 'CLOSE CONFIDENTIALITY / DIAGNOSTIC / EVIDENCE-INTEGRITY BLOCKERS' §0): DELIVERY-EXPERIMENT-1 runs no more; a next
+#: experiment is DELIVERY-EXPERIMENT-2 with its own preregistration, only by the owner's ruling.
+HOLD = ("ON HOLD: attempt 4 has run and is final (owner ruling 'CLOSE CONFIDENTIALITY / DIAGNOSTIC / EVIDENCE-INTEGRITY "
+        "BLOCKERS' §0); DELIVERY-EXPERIMENT-1 runs no more")
 EXPERIMENT = {
     "id": c2_p9.EXPERIMENT,
     "attempt": 4,                                       # the next attempt directory of closure-evidence/v2/cycle2/P10
@@ -927,9 +932,17 @@ def check(after_run: bool = False) -> list[str]:
 #: H-RETRY-001', §A). Each is verified against what its own records state: the evidence commit that froze it (named by
 #: the owner), the commit the run executed on (its record's `repository_execution_commit`) and the content digests its
 #: preregistration bound. A later change of the harness on HEAD does not touch it; a change of anything it pins fails.
+#: `also`: further evidence paths the commit froze; `external`: this machine's copies outside the repository (--check-external).
 HISTORICAL = {3: {"preregistration": "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-PREREGISTRATION.json",
                   "owned": "closure-evidence/v2/cycle2/P10/owned/run.attempt-3.json",
-                  "evidence_commit": "f86e8f4fbbf20064953cc32c967fa21756c9f627"}}
+                  "evidence_commit": "f86e8f4fbbf20064953cc32c967fa21756c9f627"},
+              4: {"preregistration": OUT_REL,
+                  "owned": "closure-evidence/v2/cycle2/P10/owned/run.attempt-4.json",
+                  "evidence_commit": "9b919a36b5710c650d33c8a2ca40a6c7beff6d7f",
+                  "also": ["closure-evidence/v2/cycle2/P10/attempt-4-preservation"],
+                  "external": {"manifest": "closure-evidence/v2/cycle2/P10/attempt-4-preservation/EXTERNAL-COPY-MANIFEST.sha256",
+                               "objects": "closure-evidence/v2/cycle2/P10/attempt-4-preservation/OBJECT-MANIFEST.json",
+                               "copy": "attempt-4-evidence"}}}
 _HEX40 = re.compile(r"[0-9a-f]{40}")
 
 
@@ -948,9 +961,10 @@ def historical_files(n: int) -> dict[str, bytes | None]:
     """Attempt `n`'s evidence as this working tree holds it: every file its evidence commit froze (None where one is
     gone), and every file now in its attempt directory that the commit did not freeze."""
     h, d = HISTORICAL[n], c2_p9.attempt_dir(n)
-    frozen = subprocess.run(["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", h["evidence_commit"], "--", d, h["owned"],
+    dirs = [d, *h.get("also", [])]
+    frozen = subprocess.run(["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", h["evidence_commit"], "--", *dirs, h["owned"],
                              h["preregistration"]], capture_output=True, encoding="utf-8").stdout.split()
-    now = [p.relative_to(ROOT).as_posix() for p in (ROOT / d).rglob("*") if p.is_file()]
+    now = [p.relative_to(ROOT).as_posix() for x in dirs for p in (ROOT / x).rglob("*") if p.is_file()]
     return {rel: ((ROOT / rel).read_bytes() if (ROOT / rel).is_file() else None) for rel in sorted(set(frozen) | set(now))}
 
 
@@ -1015,12 +1029,53 @@ def historical_problems(n: int, files: dict[str, bytes | None] | None = None) ->
     return out
 
 
+def external_problems(n: int, root: pathlib.Path | None = None, store: pathlib.Path | None = None) -> list[str]:
+    """Why this machine's copies of attempt `n` outside the repository do not hold, or []: the external evidence copy
+    is the one its committed manifest names, every checksum of it passes, the preserved git directory is sound and
+    holds every commit the journal names, and the developer client's own store has no session after the run ended.
+    `root`: the preservation root (default c2_p9.preserve_root()); `store`: the client's session database."""
+    ext = HISTORICAL[n].get("external")
+    if not ext:
+        return []
+    root = root or c2_p9.preserve_root()
+    copy, git_dir = root / ext["copy"], root / f"attempt-{n}.git"
+    out = []
+    committed = ROOT / ext["manifest"]
+    if not (copy / "MANIFEST.sha256").is_file() or (copy / "MANIFEST.sha256").read_bytes() != committed.read_bytes():
+        out.append(f"{copy}/MANIFEST.sha256 is not the committed {ext['manifest']}")
+    else:
+        for line in committed.read_text(encoding="utf-8").splitlines():
+            digest, rel = line.split("  ", 1)
+            f = copy / rel.removeprefix("./")
+            if not f.is_file() or _sha(f.read_bytes()) != digest:
+                out.append(f"external copy {rel}: missing or changed")
+    fsck = subprocess.run(["git", "--git-dir", str(git_dir), "fsck", "--full", "--strict"], capture_output=True, encoding="utf-8")
+    if fsck.returncode or (fsck.stdout + fsck.stderr).strip():
+        out.append(f"{git_dir}: git fsck --full --strict is not clean")
+    objects = json.loads((ROOT / ext["objects"]).read_text(encoding="utf-8"))
+    for row in objects["journal_named_ids"] + [{**objects["final_main"], "object_type": "commit"}]:
+        if row.get("object_type") == "commit" and subprocess.run(["git", "--git-dir", str(git_dir), "cat-file", "-e", row["sha"]],
+                                                                 capture_output=True).returncode:
+            out.append(f"{git_dir}: the journal's commit {row['sha'][:12]} is not preserved")
+    rec = json.loads((ROOT / c2_p9.attempt_dir(n) / "LEDGERLOCK-REGRESSION.json").read_text(encoding="utf-8"))
+    ended = calendar.timegm(time.strptime(rec["finished"], "%Y-%m-%dT%H:%M:%SZ"))
+    store = store or pathlib.Path(os.environ.get("XDG_DATA_HOME") or pathlib.Path.home() / ".local/share") / "opencode" / "opencode.db"
+    if store.is_file():
+        import sqlite3
+        with sqlite3.connect(f"file:{store}?mode=ro", uri=True) as db:
+            latest = db.execute("select max(time_created) from session").fetchone()[0]
+        if latest is not None and latest / 1000 > ended:
+            out.append(f"the client's store {store} has a session created after attempt {n} ended")
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")
     g.add_argument("--check-historical", action="store_true", help="every attempt already run, against its own records")
+    g.add_argument("--check-external", action="store_true", help="this machine's copies of the attempts outside the repository")
     g.add_argument("--attest", action="store_true", help="PART OF THE PAID RUN: the provider preflight (calls the provider)")
     ap.add_argument("--after-run", action="store_true")
     a = ap.parse_args(argv)
@@ -1035,6 +1090,10 @@ def main(argv: list[str] | None = None) -> int:
     if a.check_historical:
         found = [f"attempt {n}: {p}" for n in sorted(HISTORICAL) for p in historical_problems(n)]
         print("\n".join(found) if found else f"PASS: attempts {sorted(HISTORICAL)} hold as their own records state")
+        return 1 if found else 0
+    if a.check_external:
+        found = [f"attempt {n}: {p}" for n in sorted(HISTORICAL) for p in external_problems(n)]
+        print("\n".join(found) if found else f"PASS: this machine's copies of attempts {sorted(n for n in HISTORICAL if HISTORICAL[n].get('external'))} hold")
         return 1 if found else 0
     if a.write:
         if EXPERIMENT["attempt"] in HISTORICAL:

@@ -632,22 +632,34 @@ class Gate(Attempt):
 
 
 class Hold(unittest.TestCase):
-    """A hold: while one stands, neither the preflight nor the runner starts. Attempt 3 has run and is final: its
-    preregistration is under one for good."""
+    """A hold: while one stands, neither the preflight nor the runner starts. Attempts 3 and 4 have run and are final:
+    DELIVERY-EXPERIMENT-1 is under one for good (owner ruling 'CLOSE CONFIDENTIALITY / DIAGNOSTIC / EVIDENCE-INTEGRITY
+    BLOCKERS' §0)."""
     HELD = "ON HOLD by an owner's ruling"
 
-    def test_attempt_4_is_authorized_once_and_attempt_3_s_preregistration_is_another_file_never_written(self):
+    def test_attempt_4_has_run_and_nothing_of_the_experiment_starts_again(self):
         self.assertEqual(dx.EXPERIMENT["attempt"], 4)
-        self.assertIsNone(dx.HOLD)                                  # the owner's one-run authorization of attempt 4
-        self.assertNotIn(4, dx.HISTORICAL)
+        self.assertIn("attempt 4 has run and is final", dx.HOLD)
+        self.assertEqual(dx.on_hold(), dx.HOLD)
+        self.assertEqual(sorted(dx.HISTORICAL), [3, 4])
+        self.assertEqual(dx.HISTORICAL[4]["preregistration"], dx.OUT_REL)
         self.assertNotEqual(dx.OUT_REL, dx.HISTORICAL[3]["preregistration"])
         rec = dx.committed()
-        self.assertEqual((rec["attempt"], rec["hold"]), (4, None))
-        with mock.patch.dict(dx.EXPERIMENT, {"attempt": 3}):       # an attempt that has run is never preregistered again
+        self.assertEqual((rec["attempt"], rec["hold"]), (4, None))     # the record as it ran: the hold it had then
+        self.assertEqual(dx.check(), dx.historical_problems(4))        # checked against its own records, never re-derived
+        for n in (3, 4):                                               # an attempt that has run is never preregistered again
+            with self.subTest(attempt=n), mock.patch.dict(dx.EXPERIMENT, {"attempt": n}):
+                with self.assertRaises(SystemExit) as x:
+                    dx.main(["--write"])
+                self.assertIn(f"attempt {n} has run", str(x.exception))
+                self.assertIn("an attempt that has run is historical: it is never preregistered again", dx.problems({**rec, "attempt": n}))
+        explode = mock.Mock(side_effect=AssertionError("a provider was reached"))
+        with tempfile.TemporaryDirectory() as t, mock.patch.object(dx, "default_transport", explode), \
+                mock.patch.object(c2_p9, "opencode_session", explode):
             with self.assertRaises(SystemExit) as x:
-                dx.main(["--write"])
-            self.assertIn("attempt 3 has run", str(x.exception))
-            self.assertIn("an attempt that has run is historical: it is never preregistered again", dx.problems({**rec, "attempt": 3}))
+                dx.require_unlocked(pathlib.Path(t))
+            self.assertEqual(str(x.exception), f"REFUSED: delivery is locked — {dx.HOLD}")
+        explode.assert_not_called()
 
     def test_while_a_hold_stands_nothing_starts_and_no_provider_is_reached(self):
         explode = mock.Mock(side_effect=AssertionError("a provider was reached"))
@@ -717,9 +729,9 @@ class Preregistration(unittest.TestCase):
         cls.rec = json.loads((ROOT / dx.OUT_REL).read_text(encoding="utf-8"))
         cls.plan = pc.corrected_plan()
 
-    def test_the_record_binds_what_this_tree_holds(self):
-        """Attempt 4's preregistration binds this tree: its harness files, its prompts and its feedback code by content.
-        (Attempt 3's is historical: class HistoricalAttempt3.)"""
+    def test_the_record_binds_what_its_run_executed(self):
+        """Attempt 4's preregistration as it ran: what it binds is verified against its own records (class
+        HistoricalAttempt4), never against this tree's sources."""
         r = self.rec
         self.assertEqual(dx.OUT_REL, "closure-evidence/v2/cycle2/DELIVERY-EXPERIMENT-1-ATTEMPT-4-PREREGISTRATION-AMENDED.json")
         self.assertEqual((r["verdict"], r["problems"]), ("PREREGISTERED — ATTEMPT 4, THE OWNER'S BUDGET; ONE RUN", []))
@@ -732,23 +744,18 @@ class Preregistration(unittest.TestCase):
         self.assertEqual(r["provider_calls_made_preparing_this"], 0)
         self.assertEqual(r["plan"]["plan_hash"], self.plan.plan_hash)
         self.assertEqual(r["plan"]["correction"]["sha256"], c2_p9.C.lf_sha(ROOT / pc.OUT_REL))
-        self.assertEqual(r["kernel"]["tree"], c2_p9.C.git("rev-parse", "HEAD:aisef2"))
+        self.assertEqual(r["kernel"]["tree"], c2_p9.C.git("rev-parse", f"{HistoricalAttempt4.RUN_AT}:aisef2"))
         self.assertEqual((r["kernel"]["commit"], r["harness"]["includes"]),
                          ("4f6dfc197acfd9146357e5781326843bc09982e5", "dd79f46e8636637f595e288081bffe555f2d35d8"))
-        for f in r["harness"]["files"]:
-            with self.subTest(file=f["path"]):
-                self.assertEqual(f["sha256"], c2_p9.C.lf_sha(ROOT / f["path"]))
-        self.assertIn(f"KT={r['kernel']['tree']}", (ROOT / "validation/qualification/c2_p9_run.sh").read_text(encoding="utf-8"))
+        self.assertEqual(dx.historical_problems(4), [])                  # its harness files by content, at the commit it ran on
         self.assertEqual((r["workload"]["start_sha"], r["workload"]["requirements_sha256"]), (self.plan.baseline, c2_p9.P10.REQUIREMENTS_SHA256))
         self.assertEqual(r["harness"]["run_command"], "ATTEMPT=4 PROFILE=delivery-experiment-1 validation/qualification/c2_p9_run.sh")
         self.assertEqual(r["historical_attempts"]["3"]["problems"], [])
 
     def test_the_prompts_and_the_feedback_code_are_bound_by_content(self):
         ident = self.rec["developer_context"]["prompts"]
-        self.assertEqual(ident, dx.harness_identity())
-        tasks, _, _ = c2_p9.prompts(self.plan, harness.REQUIREMENTS)
-        self.assertEqual(ident["prompts_sha256"], {s: dx._sha(t.encode("utf-8")) for s, t in sorted(tasks.items())})
-        self.assertEqual(ident["c2_p9_sha256"], c2_p9.C.lf_sha(ROOT / "validation/qualification/c2_p9.py"))
+        self.assertEqual(ident["c2_p9_sha256"], dx._sha(dx._lf(dx._blob(HistoricalAttempt4.RUN_AT, "validation/qualification/c2_p9.py"))))
+        self.assertEqual((ident["prompt_rule"], ident["retry_feedback"], len(ident["prompts_sha256"])), ("H-PROMPT-002", "H-RETRY-001", 7))
         self.assertEqual(dict(self.rec["runspec"]["settings"]["harness"]["value"]), ident)
         self.assertEqual(self.rec["runspec"]["settings"]["attempt"]["value"], 4)
 
@@ -919,6 +926,56 @@ class HistoricalAttempt3(unittest.TestCase):
         def respec(att):
             att["resolved_runspec_hash"] = "0" * 64
         self.assertProblem(self.altered(f"{self.d}/{dx.ATTESTATION}", respec), "the journal's resolved RunSpec is not the one the attestation fixed")
+
+
+class HistoricalAttempt4(unittest.TestCase):
+    """Attempt 4 is immutable historical evidence (owner ruling 'CLOSE CONFIDENTIALITY / DIAGNOSTIC / EVIDENCE-INTEGRITY
+    BLOCKERS' §1): verified against its evidence commit 9b919a3, the commit its run executed on, e49226b, and the content
+    digests its amended preregistration bound — never against HEAD's sources; nothing it pins may change."""
+    RUN_AT = "e49226ba467491adcfbececaff4bff5b1eaffc09"
+    PRESERVED = "closure-evidence/v2/cycle2/P10/attempt-4-preservation"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.files = dx.historical_files(4)
+        cls.d, cls.h = c2_p9.attempt_dir(4), dx.HISTORICAL[4]
+
+    def test_the_evidence_holds_as_its_own_records_state(self):
+        self.assertEqual(dx.historical_problems(4), [])
+        self.assertEqual(self.h["evidence_commit"], "9b919a36b5710c650d33c8a2ca40a6c7beff6d7f")
+        self.assertEqual(len([r for r in self.files if r.startswith(self.d + "/")]), 20)
+        self.assertEqual(len([r for r in self.files if r.startswith(self.PRESERVED + "/")]), 11)
+        rec = json.loads(self.files[f"{self.d}/LEDGERLOCK-REGRESSION.json"])
+        self.assertEqual((rec["repository_execution_commit"], rec["delivery_verdict"]), (self.RUN_AT, "FAIL"))
+        self.assertEqual(dx._sha(self.files[f"{self.PRESERVED}/RESOLVED-RUNSPEC.canonical.json"]),
+                         json.loads(self.files[f"{self.d}/{dx.ATTESTATION}"])["resolved_runspec_hash"])
+
+    def test_a_change_of_the_harness_on_head_does_not_touch_it(self):
+        prereg = json.loads(self.files[self.h["preregistration"]])
+        changed = [f["path"] for f in prereg["harness"]["files"] if c2_p9.C.lf_sha(ROOT / f["path"]) != f["sha256"]]
+        self.assertIn("validation/qualification/c2_delivery_experiment.py", changed)     # this commit's own change is one
+        with mock.patch.object(dx, "historical_files", side_effect=AssertionError("read from the working tree")):
+            self.assertEqual(dx.historical_problems(4, self.files), [])
+
+    def test_a_changed_missing_or_added_file_fails_and_so_does_a_relabelled_result(self):
+        for rel, data, needle in ((f"{self.PRESERVED}/OBJECT-MANIFEST.json", b"{}", "OBJECT-MANIFEST.json: differs"),
+                                  (f"{self.d}/sessions/STORY-04-02.developer.3.jsonl", None, "STORY-04-02.developer.3.jsonl: missing"),
+                                  (f"{self.PRESERVED}/NOTE.txt", b"x", "NOTE.txt: not in the evidence commit")):
+            with self.subTest(rel=rel):
+                found = dx.historical_problems(4, {**self.files, rel: data})
+                self.assertTrue(any(needle in p for p in found), found)
+        rec = json.loads(self.files[f"{self.d}/LEDGERLOCK-REGRESSION.json"])
+        rec["delivery_verdict"] = "PASS"
+        found = dx.historical_problems(4, {**self.files, f"{self.d}/LEDGERLOCK-REGRESSION.json": json.dumps(rec).encode()})
+        self.assertTrue(any("LEDGERLOCK-REGRESSION.json: differs" in p for p in found), found)
+
+    def test_the_machine_s_external_copies_are_checked_and_an_absent_copy_fails(self):
+        with tempfile.TemporaryDirectory() as t:
+            found = dx.external_problems(4, root=pathlib.Path(t), store=pathlib.Path(t) / "none.db")
+        self.assertTrue(any("is not the committed" in p for p in found), found)
+        self.assertTrue(any("git fsck --full --strict is not clean" in p for p in found), found)
+        if (c2_p9.preserve_root() / "attempt-4-evidence").is_dir():   # this machine keeps them: they hold
+            self.assertEqual(dx.external_problems(4), [])
 
 
 class FalsePass(unittest.TestCase):
