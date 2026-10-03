@@ -1,0 +1,9 @@
+{
+ "checker": "release_inventory",
+ "package": "V2.0-S2",
+ "kind": "hand_edit",
+ "path": "closure-evidence/v2/release/AUTHORITY-INVENTORY.json",
+ "find": "\"id\": \"aisef/control/gate.py::judge_only\"",
+ "replace": "\"id\": \"aisef/control/gate.py::judge_nobody\"",
+ "expect": "UNENUMERATED authority: aisef/control/gate.py::judge_only (UNREACHABLE) is in the tree and not in the inventory"
+}
