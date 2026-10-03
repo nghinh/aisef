@@ -17,7 +17,6 @@ approvals and requirements are the ones the owner accepted). No probe runs, no m
 from __future__ import annotations
 
 import argparse
-import dataclasses
 import hashlib
 import json
 import pathlib
@@ -39,38 +38,20 @@ def _sha(data: bytes) -> str:
 
 
 def rebound() -> dict:
-    """The corrected plan under this tree's probes, and the proof it is the committed one with only spec ids moved."""
-    from aisef2.arch.enums import ObligationRole
-    from aisef2.plan.obligation import EXPECTED_AT_PARENT, Plan
-    from validation.qualification import c2_p9
+    """The corrected plan under this tree's probes, and the proof it is the committed one with only spec ids moved
+    (the probe-identity re-binding, validation/qualification/rebind.py)."""
+    from aisef2.plan.obligation import Plan
     from validation.qualification import c2_plan_correction as pc
-    from validation.qualification import p10_contracts as aid
+    from validation.qualification import rebind
     committed = json.loads((ROOT / pc.OUT_REL).read_text(encoding="utf-8"))
-    compiled = c2_p9._compiled()
-    key_of = {s.id: k for k, s in compiled.items()}
+    b = pc.build()                          # the owner's decisions applied to PLAN-V2.2 under this tree's probes
+    compiled, corrected = b["compiled"], b["new"]
     was_id = {r["spec_id"]: r["spec_hash_id"] for r in committed["proofs"]["product_proof_specs"]["specs"]}
-    accepted = aid.build()["plan"]          # PLAN-V2.2 under this tree's probes
-    graph = aid.story_graph()
-    introduce: dict[str, list[str]] = {}
-    for o in accepted.obligations:
-        if o.role is ObligationRole.INTRODUCE:
-            introduce.setdefault(o.story_id, []).append(o.criterion_id)
-    obligations = []
-    for o in accepted.obligations:          # c2_plan_correction.build, verbatim in effect
-        if o.criterion_id in pc.DECISIONS:
-            story, role, n = pc.DECISIONS[o.criterion_id]
-            role = ObligationRole[role]
-            o = dataclasses.replace(o, story_id=story, role=role, expected_parent=EXPECTED_AT_PARENT[role],
-                                    depends_on=tuple(c for s in sorted(graph[story]) for c in introduce.get(s, ())),
-                                    ownership_rationale=f"{story} {role.value}s {o.criterion_id} (owner decision {n}, 2026-10-02)")
-        obligations.append(o)
-    plan = Plan.create(id=PLAN_ID, baseline=accepted.baseline, obligations=tuple(obligations),
-                       plan_quality_policy=accepted.plan_quality_policy)
-    back = Plan.create(id=pc.PLAN_ID, baseline=plan.baseline, plan_quality_policy=plan.plan_quality_policy,
-                       obligations=tuple(dataclasses.replace(o, product_proof_spec_id=was_id[key_of[o.product_proof_spec_id]])
-                                         for o in plan.obligations))
+    plan = Plan.create(id=PLAN_ID, baseline=corrected.baseline, obligations=corrected.obligations,
+                       plan_quality_policy=corrected.plan_quality_policy)
+    back = rebind.plan_back(plan, b["rebind"], id=pc.PLAN_ID)
     moved = sorted(k for k in was_id if compiled[k].id != was_id[k])
-    return {"plan": plan, "compiled": compiled, "graph": graph,
+    return {"plan": plan, "compiled": compiled, "graph": b["graph"],
             "proof": {"committed_correction": {"path": pc.OUT_REL, "plan_hash": committed["new_plan"]["plan_hash"]},
                       "mapped_back_plan_hash": back.plan_hash,
                       "only_spec_ids_moved": back.plan_hash == committed["new_plan"]["plan_hash"],

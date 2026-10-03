@@ -641,11 +641,16 @@ class LedgerLockStories(unittest.TestCase):
     def setUpClass(cls):
         from validation.qualification import p5_acceptance as pa
         from validation.qualification import p5_falsifiability as pfz
+        from validation.qualification import rebind
         aid = pa._aid()
-        reqs, real = aid.requirements(), pa.load_approvals()
-        cls.specs = {s.id: s for s in (compile_spec(c, requirements=reqs, approvals=real, probes=REFS) for c in pa.contracts().values())}
+        reqs, real, cs = aid.requirements(), pa.load_approvals(), pa.contracts()
+        compiled = {sid: compile_spec(c, requirements=reqs, approvals=real, probes=REFS) for sid, c in cs.items()}
+        cls.specs = {s.id: s for s in compiled.values()}
         cls.plan = aid.build()["plan"]
         cls.accepted = pa.ACCEPTED["plan_hash"]
+        # the probe-identity re-binding (release B1): this tree's spec ids -> the accepted ones, for identity comparisons
+        # only; the probes below run this tree's specs
+        cls.accepted_ids = rebind.spec_subst(rebind.rows(compiled, cs), rebind.accepted_rows())
         d = tempfile.TemporaryDirectory(prefix="aisef2-c2-ledgerlock-")
         cls.addClassCleanup(d.cleanup)
         cls.tmp = pathlib.Path(d.name)
@@ -656,7 +661,8 @@ class LedgerLockStories(unittest.TestCase):
 
     def test_14a_each_spec_s_own_probe_gives_its_pristine_expectation_on_the_reference_tree(self):
         from aisef2.probe.calibration import FIXTURE_REVISION, calibration_env
-        self.assertEqual(self.plan.plan_hash, self.accepted)
+        from validation.qualification import rebind
+        self.assertEqual(rebind.plan_back(self.plan, self.accepted_ids).plan_hash, self.accepted)    # the approved plan, up to probe identity
         self.assertTrue({o.product_proof_spec_id for o in self.plan.obligations} <= set(self.specs))
         inputs = sr.StoryInputs(self.specs, PROBES, ENV, te.DeveloperTests("S", ("t",)), te.DeveloperTests("S", ("t",)),
                                 te.Dependencies(frozenset(), frozenset()), te.UNITTEST)

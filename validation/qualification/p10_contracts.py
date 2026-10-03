@@ -810,14 +810,20 @@ def author(spec_id: str, entry: dict, reqs: dict, polarity_rule: bool = True) ->
 
 
 def calibrations() -> tuple:
-    """Every Cycle-2 ProbeCapabilityCalibration the lanes recorded."""
+    """Every Cycle-2 ProbeCapabilityCalibration the lanes recorded, then the ones the release ships
+    (aisef2.app.calibrations, for this tree's probe digests; a kernel before the release has none)."""
     from aisef2.probe.calibration import ProbeCapabilityCalibration
+    try:
+        from aisef2.app.calibrations import CALIBRATIONS
+    except ImportError:
+        CALIBRATIONS = ()
     keys = ("probe_id", "probe_digest", "observation_class", "positive_fixture", "negative_fixture", "demonstrated_at")
     out = []
     for rel in CALIBRATION_RECORDS:
         c = json.loads((ROOT / rel).read_text(encoding="utf-8"))["calibrations"]
         rows = [r for v in c.values() for r in v] if isinstance(c, dict) else c
         out += [ProbeCapabilityCalibration(*(r[k] for k in keys)) for r in rows if set(keys) <= set(r) and r.get("qualified", True)]
+    out += [ProbeCapabilityCalibration(*(r[k] for k in keys)) for r in CALIBRATIONS]
     return tuple(out)
 
 

@@ -16,6 +16,7 @@ nothing run:
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import pathlib
 import re
@@ -34,6 +35,7 @@ from tests.v2 import test_c2_p9_harness as harness  # noqa: E402
 from validation.qualification import c2_delivery_experiment as dx  # noqa: E402
 from validation.qualification import c2_p9  # noqa: E402
 from validation.qualification import c2_plan_correction as pc  # noqa: E402
+from validation.qualification import rebind  # noqa: E402
 
 OLD_HASH = "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669"
 SPEC_DIGEST = "83a73da271805c470db4da55f50f542950494aa8b50a31e5b6f07e5364415745"
@@ -72,7 +74,9 @@ class PlanCorrection(unittest.TestCase):
 
     def test_the_two_standalone_stories_are_gone_and_nothing_else_changed(self):
         old, new = self.b["old"], self.b["new"]
-        self.assertEqual((old.plan_hash, len(old.obligations), len({o.story_id for o in old.obligations})), (OLD_HASH, 67, 9))
+        # the accepted plan up to probe identity: this tree's spec ids mapped back (release B1, rebind.py) give its hash
+        self.assertEqual((rebind.plan_back(old, self.b["rebind"]).plan_hash, len(old.obligations), len({o.story_id for o in old.obligations})),
+                         (OLD_HASH, 67, 9))
         self.assertEqual((len(new.obligations), len({o.story_id for o in new.obligations})), (67, 7))
         self.assertNotEqual(new.plan_hash, old.plan_hash)
         self.assertEqual({o.story_id for o in old.obligations} - {o.story_id for o in new.obligations}, {"STORY-05-01", "STORY-05-03"})
@@ -85,7 +89,12 @@ class PlanCorrection(unittest.TestCase):
     def test_the_59_specs_and_what_they_cover_are_the_accepted_ones(self):
         p = self.rec["proofs"]
         s = p["product_proof_specs"]
-        self.assertEqual((s["count"], s["all_equal_to_accepted"], s["semantic_hash_changes"], s["contract_spec_semantic_digest"]),
+        # the record states this tree's contract-spec digest; mapped back by the probe-identity re-binding (release B1,
+        # rebind.py), its rows give the accepted one exactly
+        rows = pc._rows(self.b)
+        digest = lambda r: hashlib.sha256(json.dumps(r, sort_keys=True).encode()).hexdigest()   # noqa: E731 — the record's rule
+        self.assertEqual(s["contract_spec_semantic_digest"], digest(rows))
+        self.assertEqual((s["count"], s["all_equal_to_accepted"], s["semantic_hash_changes"], digest(rebind.back(rows, self.b["rebind"]))),
                          (59, True, [], SPEC_DIGEST))
         self.assertTrue(p["requirement_coverage"]["unchanged"])
         self.assertEqual(p["requirement_coverage"]["new"]["specs"], 59)
@@ -743,7 +752,12 @@ class Preregistration(unittest.TestCase):
             self.assertNotEqual(rel, dx.OUT_REL)
             self.assertNotEqual(json.loads((ROOT / rel).read_text(encoding="utf-8"))["runspec_template_hash"], r["runspec_template_hash"])
         self.assertEqual(r["provider_calls_made_preparing_this"], 0)
-        self.assertEqual(r["plan"]["plan_hash"], self.plan.plan_hash)
+        # it binds the corrected plan as of the probe identities it was made with: this tree's, mapped back (release B1)
+        self.assertEqual(r["plan"]["plan_hash"], rebind.plan_back(self.plan, pc.build()["rebind"]).plan_hash)
+        # and the kernel it ran on, which is not this tree's: re-derived here, the preregistration is refused for it
+        here = copy.deepcopy(r)
+        here["kernel"]["head_tree"] = c2_p9.C.git("rev-parse", "HEAD:aisef2")
+        self.assertIn("the kernel of this tree is not the preregistered kernel commit's", dx.problems(here))
         self.assertEqual(r["plan"]["correction"]["sha256"], c2_p9.C.lf_sha(ROOT / pc.OUT_REL))
         self.assertEqual(r["kernel"]["tree"], c2_p9.C.git("rev-parse", f"{HistoricalAttempt4.RUN_AT}:aisef2"))
         self.assertEqual((r["kernel"]["commit"], r["harness"]["includes"]),

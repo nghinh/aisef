@@ -44,6 +44,7 @@ from tests.v2 import test_p6_orchestration as e2e  # noqa: E402
 from validation.qualification import c2_p9  # noqa: E402
 from validation.qualification import c2_plan_correction as pc  # noqa: E402
 from validation.qualification import p10_contracts as aid  # noqa: E402
+from validation.qualification import rebind  # noqa: E402
 
 #: V1-era control metadata and story prose: none of it may be in a prompt (H-PROMPT-001, H-PROMPT-002)
 LEGACY_TOKENS = ("write_scope", "ac_proof", "story_type", "depends_on:", "covers:", "screens:", "Story metadata", "VERIFICATION_ONLY",
@@ -344,9 +345,13 @@ class RetryFeedback(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.events = [(e["seq"], e["type"], e["data"]) for e in json.loads(ATTEMPT_3_JOURNAL.read_text(encoding="utf-8"))]
-        cls.plan = pc.corrected_plan()
-        cls.facts = c2_p9.obligation_facts(cls.plan, REQUIREMENTS)
-        cls.specs = {s.id: s for s in c2_p9._compiled().values()}
+        b = pc.build()
+        cls.plan = b["new"]
+        # attempt 3's journal binds the probe identities the plan was accepted with; this tree's are re-bound (release
+        # B1): the facts the feedback is told from are mapped back to the journal's (validation/qualification/rebind.py)
+        cls.facts = rebind.back(c2_p9.obligation_facts(cls.plan, REQUIREMENTS), b["rebind"])
+        compiled = c2_p9._compiled().values()
+        cls.specs = {s.id: s for s in compiled} | {b["rebind"][s.id]: s for s in compiled if s.id in b["rebind"]}
 
     def before_retry(self, story: str, n: int = 1) -> list:
         """The journal as the developer's attempt n + 1 finds it: everything before that attempt's admission."""
