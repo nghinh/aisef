@@ -439,7 +439,11 @@ class Request(_Checkout):
         self.assertEqual(os.path.basename(ws), "ws")
         self.assertEqual((captured["root"], captured["locator"], captured["interpreter"], captured["boot"]),
                          (self.root, "store.book:Book", sys.executable, pe.SUBPROCESS))
-        self.assertEqual(captured["env"], ci._child_env(ws))
+        # B6: the subject's process and every subprocess step get the evaluation's own temporary directory
+        self.assertEqual(captured["env"], ci._child_env(ws, os.path.join(captured["work"], "tmp")))
+        # B1: the key, and the subject's process: the shared agent, its own bytecode cache, the workspace as its cwd
+        self.assertEqual((len(captured["key"]), captured["agent"], captured["agent_pycache"], captured["cwd"]),
+                         (64, ci.AGENT, os.path.join(captured["work"], "pycache-agent"), ws))
         self.assertEqual(captured["steps"], [pe._resolved(x, ws) for x in scenario])
         self.assertEqual(captured["steps"][1]["args"], [ws + "/book.jsonl"])
         self.assertEqual(captured["files"], {"book.jsonl": [[0, "k"]]})
@@ -479,14 +483,21 @@ class Decision(_Checkout):
             self.see(self.S1)   # the controller stopped it: whatever the harness reported is not a measurement
 
     def test_the_process_ending_during_a_step_refutes_with_that_step(self):
-        with faked("READY", "DISPATCHED", "STEP 0", "STEP 1", returncode=3):
+        # B1: the subject's process ending during a step is reported by the controller, which outlives it
+        ended = {"subject": "present", "hard_exit": True, "exit_code": 3, "trace": [{"i": 0, "kind": "construct", "outcome": "ok"}],
+                 "refuted": {"step": 1, "why": "the process ended with exit status 3 before the scenario completed"}}
+        with faked("READY", "DISPATCHED", "STEP 0", "STEP 1", "RESULT " + json.dumps(ended), returncode=0):
             o = self.see(self.S1)
-        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, R))
-        self.assertEqual(facts_of(o), {"subject": "present", "hard_exit": True, "exit_code": 3, "trace": [],
-                                       "refuted": {"step": 1, "why": "the process ended with exit status 3 before the "
-                                                                     "scenario completed"}})
-        with faked("READY", "DISPATCHED", returncode=0):   # before the first step (the subject's import)
-            self.assertEqual(facts_of(self.see(self.S1))["refuted"]["step"], None)
+        self.assertEqual((o.kind, o.verdict, facts_of(o)), (K.OBSERVED, R, ended))
+        with faked("READY", "DISPATCHED", 'RESULT {"subject_signal": 9}', returncode=0):
+            self.assertEqual(self.see(self.S1).kind, K.NON_CONTROLLER_SIGNAL)
+        with faked("READY", "DISPATCHED", 'RESULT {"subject": "present", "tampered": "x"}', returncode=0):
+            self.assertEqual(self.see(self.S1).verdict, R)
+        # the controller's own process ending with no RESULT is the observation mechanism failing
+        for tags in (("READY", "DISPATCHED", "STEP 0", "STEP 1"), ("READY", "DISPATCHED")):
+            with faked(*tags, returncode=3):
+                self.assertEqual(self.see(self.S1), Observation(K.HARNESS_FAILED, detail="the probe's controller ended "
+                                                                                         "without a result (exit 3)"))
         with faked("READY", "DISPATCHED", "STEP 0", returncode=-9):
             o = self.see(self.S1)
             self.assertEqual(run_probe(P, self.S1, self.at, env()).result.status, ProbeExecutionStatus.EXECUTED)
@@ -544,7 +555,12 @@ class Decision(_Checkout):
         class LateResult(Vanished):   # the status is reported at the end of the window and RESULT is in the file then
             def wait(self, timeout=None):
                 return 0 if timeout else None
+        ended = {"subject": "present", "hard_exit": True, "exit_code": 0, "trace": [],
+                 "refuted": {"step": 1, "why": "the process ended with exit status 0 before the scenario completed"}}
         with mock.patch.object(pe, "ProcessRange", LateResult(("READY", "DISPATCHED", "STEP 1"), 0)), \
+                mock.patch.object(pe, "_COLLECT_S", 0.05):   # B1: the controller ended with no RESULT: the mechanism failed
+            self.assertEqual(self.see(s).kind, K.HARNESS_FAILED)
+        with mock.patch.object(pe, "ProcessRange", LateResult(("READY", "DISPATCHED", "STEP 1", "RESULT " + json.dumps(ended)), 0)), \
                 mock.patch.object(pe, "_COLLECT_S", 0.05):
             o = self.see(s)
         self.assertEqual((o.kind, o.verdict, facts_of(o)["refuted"]["step"]), (K.OBSERVED, R, 1))

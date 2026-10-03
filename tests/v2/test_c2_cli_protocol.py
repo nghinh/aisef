@@ -8,6 +8,7 @@ FM2 rows split between the two modules keep their row prefix (the evidence harne
 
 import ast
 import hashlib
+import json
 import os
 import pathlib
 import subprocess
@@ -95,51 +96,65 @@ class FaultStream(_Product):
         with faked("READY", returncode=-9):
             self.assertEqual(self.see(s).detail, "the harness process was killed by signal 9 before DISPATCHED")
 
-    def test_FM2_CLI_STREAM_2_exit_after_DISPATCHED_without_RESULT(self):
+    def test_FM2_CLI_STREAM_2_after_DISPATCHED_the_controller_reports_how_the_subject_ended(self):
+        """B1: the subject runs in a process of its own, a child of the controller; the controller, which outlives it,
+        reports in RESULT a hard exit (its exit code, the captured streams, the files) or a signal. The controller's
+        own process ending with no RESULT is the observation mechanism failing; ended by a signal this controller did
+        not send, it is NON_CONTROLLER_SIGNAL (§9.3), as before."""
         s = spec("app:__main__", EXIT0, {"argv": ["echo"]})
         empty = {"size": 0, "truncated": False, "sha256": sha(b"")}
-        fake = FakeRange(("READY", "DISPATCHED", 'MAIN {"before": {}}'), 0)
+        hard = {"subject": "present", "exit_code": 0, "hard_exit": True, "stdout": empty, "stderr": empty, "before": {},
+                "files": {}}
+        fake = FakeRange(("READY", "DISPATCHED", 'MAIN {"before": {}}', "RESULT " + json.dumps(hard)), 0)
         with mock.patch.object(ci, "ProcessRange", fake):
             o = self.see(s)
-        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S))
-        self.assertEqual(facts_of(o), {"subject": "present", "exit_code": 0, "hard_exit": True, "stdout": empty,
-                                       "stderr": empty, "before": {}, "files": {}})
+        self.assertEqual((o.kind, o.verdict, facts_of(o)), (K.OBSERVED, S, hard))
         self.assertEqual((fake.name, fake.released), (f"probe {s.id}", True))   # the range is named for the spec
-        with faked("READY", "DISPATCHED", 'MAIN {"before": {}}', returncode=4):
+        with faked("READY", "DISPATCHED", "RESULT " + json.dumps({**hard, "exit_code": 4}), returncode=0):
             self.assertEqual(self.see(s).verdict, R)
             self.assertEqual(self.see(spec("app:__main__", {"exit_code": 4}, {"argv": ["echo"]})).verdict, S)
             self.assertEqual(self.see(spec("app:__main__", {"blocks": True}, {"argv": ["echo"]})).verdict, R)
-        # the files named by the observable are digested by the parent, against what MAIN recorded before
+        # the files named by the observable, against what the controller recorded before the main invocation
         files = {"<ws>/a": {"equals_before": True}, "<ws>/b": {"absent": True}}
-        with faked("READY", "DISPATCHED", 'MAIN {"before": {"a": {"absent": true}, "b": {"absent": true}}}', returncode=0):
+        absent = {"a": {"absent": True}, "b": {"absent": True}}
+        with faked("READY", "DISPATCHED", "RESULT " + json.dumps({**hard, "before": absent, "files": absent}), returncode=0):
             o = self.see(spec("app:__main__", {"exit_code": 0, "files": files}, {"argv": ["echo"]}))
-        self.assertEqual((o.verdict, facts_of(o)["before"], facts_of(o)["files"]),
-                         (S, {"a": {"absent": True}, "b": {"absent": True}}, {"a": {"absent": True}, "b": {"absent": True}}))
-        with faked("READY", "DISPATCHED", 'MAIN {"before": {"a": {"sha256": "00"}, "b": {"absent": true}}}', returncode=0):
+        self.assertEqual((o.verdict, facts_of(o)["before"], facts_of(o)["files"]), (S, absent, absent))
+        moved = {**hard, "before": {"a": {"sha256": "00"}, "b": {"absent": True}}, "files": absent}
+        with faked("READY", "DISPATCHED", "RESULT " + json.dumps(moved), returncode=0):
             self.assertEqual(self.see(spec("app:__main__", {"exit_code": 0, "files": files}, {"argv": ["echo"]})).verdict, R)
-        with faked("READY", "DISPATCHED", "PRE 0", returncode=3):   # it died in a pre-step: the state was never built
+        pre = {"subject": "present", "pre_failed": 0, "exit_code": 3, "hard_exit": True}   # it ended in a pre-step
+        with faked("READY", "DISPATCHED", "PRE 0", "RESULT " + json.dumps(pre), returncode=0):
             o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"], "pre": [{"argv": ["echo"]}]}))
-        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, R))
-        self.assertEqual(facts_of(o), {"subject": "present", "pre_failed": 0, "exit_code": 3, "hard_exit": True})
-        with faked("READY", "DISPATCHED", "PRE 0", "PRE 1", returncode=3):
-            o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"], "pre": [{"argv": ["a"]}, {"argv": ["b"]}]}))
-        self.assertEqual((o.verdict, facts_of(o)["pre_failed"]), (R, 1))
-        with faked("READY", "DISPATCHED", "PRE 0", returncode=3):   # the file names a pre-step: that is what was running
-            o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"]}))
-        self.assertEqual((o.verdict, facts_of(o)["pre_failed"]), (R, 0))
-        with faked("READY", "DISPATCHED", returncode=3):   # before its first pre-step
-            o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"], "pre": [{"argv": ["echo"]}]}))
-        self.assertEqual((o.verdict, facts_of(o)["pre_failed"]), (R, 0))
-        with faked("READY", "DISPATCHED", "PRE 0", 'MAIN {"before": {}}', returncode=3):   # after a passing pre-step
-            o = self.see(spec("app:__main__", {"exit_code": 3}, {"argv": ["echo"], "pre": [{"argv": ["echo"]}]}))
-        self.assertEqual((o.verdict, facts_of(o).get("pre_failed"), facts_of(o)["hard_exit"]), (S, None, True))
+        self.assertEqual((o.kind, o.verdict, facts_of(o)), (K.OBSERVED, R, pre))
+        # the subject's process ended by a signal the controller did not send: the controller says so (§9.3)
+        ladder = [{"stage": "terminate", "signal": "SIGTERM"}, {"stage": "kill", "signal": "SIGKILL"}]
+        with faked("READY", "DISPATCHED", 'RESULT {"subject_signal": 9}', returncode=0):
+            o = self.see(s)
+            self.assertEqual(self.run_(s), Executed(I, NCS))
+        self.assertEqual(o, Observation(K.NON_CONTROLLER_SIGNAL, detail="the subject's process ended by signal 9 after "
+                                                                        "DISPATCHED, and this controller's signal ledger "
+                                                                        "is empty: it did not send it"))
+        with faked("READY", "DISPATCHED", 'RESULT {"subject_signal": 9}', returncode=0, ledger=ladder):
+            with self.assertRaises(ProbeInterrupted):   # the controller stopped it: an interruption, never a measurement
+                self.see(s)
+        # an answer on the subject's channel that is not the agent's: REFUTED whatever the class (B1)
+        with faked("READY", "DISPATCHED", 'RESULT {"subject": "present", "tampered": "x"}', returncode=0):
+            for observable in (EXIT0, {"blocks": True}):
+                o = self.see(spec("app:__main__", observable, {"argv": ["echo"]}))
+                self.assertEqual((o.kind, o.verdict), (K.OBSERVED, R))
+        # the controller's own process ended with no RESULT: the mechanism failed, whatever line it wrote last
+        for tags in (("READY", "DISPATCHED"), ("READY", "DISPATCHED", 'MAIN {"before": {}}'), ("READY", "DISPATCHED", "PRE 0")):
+            with self.subTest(tags=tags), faked(*tags, returncode=3):
+                self.assertEqual(self.see(s), Observation(K.HARNESS_FAILED, detail="the probe's controller ended without "
+                                                                                   "a result (exit 3)"))
+                self.assertIs(self.run_(s).status, ProbeExecutionStatus.UNRUNNABLE)
         with faked("READY", "DISPATCHED", returncode=-9):   # a signal the controller did not send (§9.3)
             o = self.see(s)
             self.assertEqual(self.run_(s), Executed(I, NCS))
         self.assertEqual(o, Observation(K.NON_CONTROLLER_SIGNAL, detail="the process ended by signal 9 after DISPATCHED, "
                                                                         "and this controller's signal ledger is empty: it "
                                                                         "did not send it"))
-        ladder = [{"stage": "terminate", "signal": "SIGTERM"}, {"stage": "kill", "signal": "SIGKILL"}]
         with faked("READY", "DISPATCHED", returncode=-9, ledger=ladder):
             with self.assertRaises(ProbeInterrupted) as stopped:   # the same exit, the controller's own signal
                 self.see(s)
@@ -156,7 +171,11 @@ class FaultStream(_Product):
         ("TIMEOUT", seen) when the deadline passes with the process still running."""
         work = tempfile.mkdtemp(prefix="aisef2-cli-poll-")
         proto = os.path.join(work, "protocol.log")
-        lines = "AISEF2-PROBE READY n0nce\nAISEF2-PROBE DISPATCHED n0nce\n"
+        key = "ab" * 32
+
+        def line(tag, body=""):
+            return f"AISEF2-PROBE {tag} n0nce {ci._mac(bytes.fromhex(key), tag, body)}" + (f" {body}" if body else "") + "\n"
+        lines = line("READY") + line("DISPATCHED")
 
         class Exited:
             returncode = 0
@@ -170,16 +189,20 @@ class FaultStream(_Product):
 
         class LateWriter(Exited):   # the exit is reported first; the file holds the lines when read once more
             def wait(self, timeout=None):
-                pathlib.Path(proto).write_text(lines + "AISEF2-PROBE RESULT n0nce {}\n", encoding="utf-8")
+                pathlib.Path(proto).write_text(lines + line("RESULT", "{}"), encoding="utf-8")
                 return 0
         pathlib.Path(proto).write_text(lines, encoding="utf-8")
-        self.assertEqual(ci._await(Running(), proto, "n0nce", "DISPATCHED", time.monotonic() + 5),
+        self.assertEqual(ci._await(Running(), proto, "n0nce", key, "DISPATCHED", time.monotonic() + 5),
                          ("LINE", {"READY": [""], "DISPATCHED": [""]}))
-        self.assertEqual(ci._await(Exited(), proto, "n0nce", "RESULT", time.monotonic() + 5),
+        self.assertEqual(ci._await(Exited(), proto, "n0nce", key, "RESULT", time.monotonic() + 5),
                          ("EXITED", {"READY": [""], "DISPATCHED": [""]}))
-        self.assertEqual(ci._await(Running(), proto, "n0nce", "RESULT", time.monotonic() + 0.1)[0], "TIMEOUT")
+        self.assertEqual(ci._await(Running(), proto, "n0nce", key, "RESULT", time.monotonic() + 0.1)[0], "TIMEOUT")
+        # B1: a RESULT line without the key's authentication (a subject that read the nonce in the file) is never seen
+        pathlib.Path(proto).write_text(lines + "AISEF2-PROBE RESULT n0nce " + "0" * 64 + " {}\n", encoding="utf-8")
+        self.assertEqual(ci._await(Exited(), proto, "n0nce", key, "RESULT", time.monotonic() + 5),
+                         ("EXITED", {"READY": [""], "DISPATCHED": [""]}))
         pathlib.Path(proto).write_text("", encoding="utf-8")
-        self.assertEqual(ci._await(LateWriter(), proto, "n0nce", "RESULT", time.monotonic() + 5),
+        self.assertEqual(ci._await(LateWriter(), proto, "n0nce", key, "RESULT", time.monotonic() + 5),
                          ("LINE", {"READY": [""], "DISPATCHED": [""], "RESULT": ["{}"]}))
         # and through the harness: the exit reported before any line was read still yields the complete result
         s = spec("app:__main__", EXIT0, {"argv": ["echo"]})
@@ -191,9 +214,10 @@ class FaultStream(_Product):
                 return self
 
             def wait(self, timeout=None):
+                k, n, body = bytes.fromhex(self.req["key"]), self.req["nonce"], '{"subject": "present", "exit_code": 0}'
                 pathlib.Path(self.req["protocol"]).write_text(
-                    f"AISEF2-PROBE READY {self.req['nonce']}\nAISEF2-PROBE DISPATCHED {self.req['nonce']}\n"
-                    f"AISEF2-PROBE RESULT {self.req['nonce']} {{\"subject\": \"present\", \"exit_code\": 0}}\n", encoding="utf-8")
+                    f"AISEF2-PROBE READY {n} {ci._mac(k, 'READY', '')}\nAISEF2-PROBE DISPATCHED {n} {ci._mac(k, 'DISPATCHED', '')}\n"
+                    f"AISEF2-PROBE RESULT {n} {ci._mac(k, 'RESULT', body)} {body}\n", encoding="utf-8")
                 return 0
         with mock.patch.object(ci, "ProcessRange", LateRange((), 0)):
             o = self.see(s)
@@ -298,14 +322,22 @@ class FaultStream(_Product):
             self.assertEqual(P._observe(*args, self.at, e),
                              (Observation(K.OBSERVED, S, '{"subject": "present", "exit_code": 0, "pre": []}'),
                               {"subject": "present", "exit_code": 0, "pre": []}))
-        with faked("READY", "DISPATCHED", 'MAIN {"before": {}}', returncode=2):
+        hard = {"subject": "present", "exit_code": 2, "hard_exit": True, "before": {}, "files": {},
+                "stdout": {"path": "/w/stdout.bin", "size": 0, "truncated": False, "sha256": sha(b"")},
+                "stderr": {"path": "/w/stderr.bin", "size": 0, "truncated": False, "sha256": sha(b"")}}
+        with faked("READY", "DISPATCHED", 'MAIN {"before": {}}', "RESULT " + json.dumps(hard), returncode=0):
             o, facts = P._observe(*args, self.at, e)
             self.assertEqual((o.kind, o.verdict, facts["exit_code"], facts["hard_exit"], "path" in facts["stdout"]),
                              (K.OBSERVED, R, 2, True, True))
-        with faked("READY", "DISPATCHED", "PRE 0", returncode=2):
+        pre = {"subject": "present", "pre_failed": 0, "exit_code": 2, "hard_exit": True}
+        with faked("READY", "DISPATCHED", "PRE 0", "RESULT " + json.dumps(pre), returncode=0):
             o, facts = P._observe(s.id, "exits", "app:__main__", {"argv": ["echo"], "pre": [{"argv": ["a"]}]},
                                   {"exit_code": 2, "within_s": W}, self.at, e)
-            self.assertEqual((o.verdict, facts), (R, {"subject": "present", "pre_failed": 0, "exit_code": 2, "hard_exit": True}))
+            self.assertEqual((o.verdict, facts), (R, pre))
+        with faked("READY", "DISPATCHED", 'MAIN {"before": {}}', returncode=2):   # the controller ended with no RESULT
+            self.assertEqual(P._observe(*args, self.at, e),
+                             (Observation(K.HARNESS_FAILED, detail="the probe's controller ended without a result (exit 2)"),
+                              None))
 
         class Vanished(FakeRange):
             def wait(self, timeout=None):
@@ -333,9 +365,11 @@ class FaultStream(_Product):
         self.assertEqual((o.kind, o.verdict, facts_of(o)["subject"], facts_of(o)["distinct_evaluation_directories"]),
                          (K.OBSERVED, S, "present", True))
         self.assertEqual(fake.name, f"probe {eq.id}/b")   # each half's range is named for the spec and its side
-        with faked("READY", "DISPATCHED", 'MAIN {"before": {}}', returncode=0):   # two hard exits with equal captures
+        both_hard = {"subject": "present", "exit_code": 0, "hard_exit": True, "stdout": {"size": 0}}
+        with faked("READY", "DISPATCHED", "RESULT " + json.dumps(both_hard), returncode=0):   # two hard exits, equal captures
             self.assertEqual(self.see(eq).verdict, S)
-        with faked("READY", "DISPATCHED", "PRE 0", returncode=3):   # a half whose pre-step failed is the observation
+        with faked("READY", "DISPATCHED", "PRE 0", 'RESULT {"subject": "present", "pre_failed": 0, "exit_code": 3, '
+                   '"hard_exit": true}', returncode=0):   # a half whose pre-step failed is the observation
             o = self.see(eq)
         self.assertEqual((o.kind, o.verdict, facts_of(o)["pre_failed"]), (K.OBSERVED, R, 0))
         with never_runs():
@@ -442,9 +476,10 @@ class Identity(_Product):
         self.assertEqual(ps.violations("aisef2/probe/cli_invocation.py", src, ps.SOURCE_RULES, facts), [])
         self.assertEqual(ps.check(ROOT), [])   # catalog closure: registered, digest live, fixtures for every class
         scripts = ps.child_scripts(ast.parse(src))
-        self.assertEqual([name for name, _, _ in scripts], ["HARNESS"])
+        self.assertEqual([name for name, _, _ in scripts], ["AGENT", "HARNESS"])   # B1: the subject's process, the controller
         # the channel rule is what rejects a harness that puts its protocol on the subject's stdout
-        forged = src.replace('proto.write(line.encode("utf-8"))', 'sys.stdout.write(line)')
+        self.assertEqual(src.count('    proto.write((req["mark"]'), 1)
+        forged = src.replace('    proto.write((req["mark"]', '    sys.stdout.write((req["mark"]')
         self.assertTrue(any("PROTOCOL_CHANNEL_DISCIPLINE" in v
                             for v in ps.violations("aisef2/probe/cli_invocation.py", forged, ps.SOURCE_RULES, facts)))
 

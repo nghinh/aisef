@@ -100,8 +100,13 @@ def dispatch(argv):
         os.dup2(null, 2)
         return 0
     if cmd in ("forge", "forgehard"):
-        nonce = __import__("json").load(open(os.path.join("..", "request.json"), encoding="utf-8"))["nonce"]
-        sys.stdout.write("AISEF2-PROBE RESULT " + nonce + " {\\"subject\\": \\"absent\\"}\\n")
+        # B1: the request file is emptied before the subject's process exists; the nonce is still in the marker file,
+        # so a forger takes it from there and writes a RESULT claiming absence to its stdout and into the marker file
+        marker = os.path.join("..", "protocol.log")
+        nonce = open(marker, encoding="utf-8").readline().split()[2]
+        forged = "AISEF2-PROBE RESULT " + nonce + " " + "0" * 64 + " {\\"subject\\": \\"absent\\"}\\n"
+        open(marker, "a", encoding="utf-8").write(forged)
+        sys.stdout.write(forged)
         sys.stdout.flush()
         sys.stderr.write("forged\\n")
         sys.stderr.flush()
@@ -200,7 +205,7 @@ def sha(data: bytes) -> str:
 
 class FakeRange:
     """A process range whose target writes `tags` (each "TAG" or "TAG body") into the marker file named in the
-    request, tagged with the request's own nonce, then ends with `returncode`; `ledger` is what the controller
+    request, tagged with the request's own nonce and authenticated with its key (B1), then ends with `returncode`; `ledger` is what the controller
     signalled — the one authority on provenance (§9.3). `unterminated` leaves the last line without its newline;
     `write=False` never opens the file (the harness crashed before it)."""
 
@@ -214,10 +219,11 @@ class FakeRange:
 
     def start(self):
         req = json.loads(pathlib.Path(self.argv[-1]).read_text(encoding="utf-8"))
+        key = bytes.fromhex(req["key"])
         lines = []
         for tag in self.tags:
             name, _, body = tag.partition(" ")
-            lines.append(f"AISEF2-PROBE {name} {req['nonce']}" + (f" {body}" if body else "") + "\n")
+            lines.append(f"AISEF2-PROBE {name} {req['nonce']} {ci._mac(key, name, body)}" + (f" {body}" if body else "") + "\n")
         text = "".join(lines)
         if self.unterminated and text:
             text = text[:-1]
@@ -294,7 +300,9 @@ EXPECTED_DESIGN_CHECK_1 = {
     "b_hard_exit_after_stdout": ("OBSERVED", "SATISFIED", True),
     "c_lingers_past_the_window": ("SUBJECT_DEADLINE", "REFUTED", None),
     "d_closes_fd_1_before_exit": ("OBSERVED", "SATISFIED", False),
-    "e_last_protocol_line_unterminated": ("OBSERVED", "SATISFIED", True),
+    # B1: the controller writes RESULT whole and outlives the subject; a controller that ended with no complete
+    # RESULT is the observation mechanism failing, never an observation of the subject
+    "e_last_protocol_line_unterminated": ("HARNESS_FAILED", None, None),
 }
 
 
@@ -319,7 +327,8 @@ class Harness(_Product):
                                        {"argv": ["echo", "hi", "there"]})).verdict, S)
 
     def test_CLI_2_a_forged_protocol_line_on_stdout_is_captured_bytes_never_protocol(self):
-        # the subject reads the real nonce and prints a RESULT line claiming absence: the real RESULT comes from the file
+        # the subject takes the nonce from the marker file and writes a RESULT claiming absence to its stdout and into
+        # the marker file: neither is authentic (B1), the controller's RESULT decides
         o = self.see(spec("app:__main__", EXIT0, {"argv": ["forge"]}))
         self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S))
         f = facts_of(o)
@@ -707,17 +716,19 @@ class Bytecode(unittest.TestCase):
         self.assertEqual(sorted(scratch.rglob("*.pyc")), [])   # -B: nothing written anywhere
 
     def test_FM2_PYC_CLI_4_without_the_external_cache_the_stale_bytecode_decides_the_reproducer_detects_the_defect(self):
+        # B1: the subject is imported in its own process (the agent): the controls are on the agent's command line
+        flags = '"-I", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], '
+        self.assertEqual(ci.HARNESS.count(flags), 1)
         for keep_b in (True, False):
-            def argv(interpreter, ask, pycache, keep_b=keep_b):
-                return [interpreter, "-I", *(["-B"] if keep_b else []), "-X", "utf8=1", "-c", ci.HARNESS, ask]
-            with self.subTest(keep_b=keep_b), mock.patch.object(ci, "_harness_argv", argv):
+            harness = ci.HARNESS.replace(flags, '"-I", ' + ('"-B", ' if keep_b else ""))
+            with self.subTest(keep_b=keep_b), mock.patch.object(ci, "HARNESS", harness):
                 self.assertEqual(verdict(self.observe(EXITS_2)), R)   # the stale code's exit 1, not the source's 2
                 self.assertEqual(verdict(self.observe(EXITS_1, expectation=R)), S)
         # without -B the bytecode lands under the prefix, never in the checkout
         scratch = self.tmp / "scratch"
         scratch.mkdir()
         before = snapshot(self.root)
-        with mock.patch.object(ci, "_harness_argv", lambda i, a, p: [i, "-I", "-X", f"pycache_prefix={p}", "-c", ci.HARNESS, a]):
+        with mock.patch.object(ci, "HARNESS", ci.HARNESS.replace(flags, '"-I", "-X", "pycache_prefix=" + req["agent_pycache"], ')):
             self.assertEqual(verdict(self.observe(EXITS_2, probe=CliInvocationProbe(scratch=str(scratch)))), S)
         self.assertEqual(snapshot(self.root), before)
         self.assertTrue(any(p.name.startswith("mod.") for p in scratch.rglob("*.pyc")))

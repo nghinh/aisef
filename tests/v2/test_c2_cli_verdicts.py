@@ -294,26 +294,40 @@ class Protocol(unittest.TestCase):
         self.addCleanup(self._d.cleanup)
         self.path = os.path.join(self._d.name, "protocol.log")
 
+    KEY = "ab" * 32
+
+    def line(self, tag: str, body: str = "", nonce: str = "n0nce", key: str = KEY) -> str:
+        """A protocol line as the controller writes it: mark, tag, nonce, the HMAC of tag and body (B1), body."""
+        return f"AISEF2-PROBE {tag} {nonce} {ci._mac(bytes.fromhex(key), tag, body)}" + (f" {body}" if body else "")
+
     def lines(self, text: str) -> dict:
         pathlib.Path(self.path).write_bytes(text.encode("utf-8"))
-        return ci._protocol(self.path, "n0nce")
+        return ci._protocol(self.path, "n0nce", self.KEY)
 
-    def test_complete_lines_with_the_mark_and_this_nonce_only(self):
-        text = ("AISEF2-PROBE READY n0nce\nnoise\nAISEF2-PROBE DISPATCHED n0nce \nAISEF2-PROBE PRE n0nce 0\n"
-                "AISEF2-PROBE READY other\nOTHER RESULT n0nce {}\nAISEF2-PROBE MAIN n0nce {\"before\": {}}\r\n"
-                'AISEF2-PROBE RESULT n0nce {"subject": "present", "exit_code": 0}\n')
+    def test_complete_authentic_lines_with_the_mark_and_this_nonce_only(self):
+        L = self.line
+        text = (L("READY") + "\nnoise\n" + L("DISPATCHED") + "\n" + L("PRE", "0") + "\n" + L("READY", nonce="other") + "\n"
+                + "OTHER RESULT n0nce {}\n" + L("MAIN", '{"before": {}}') + "\r\n"
+                + L("RESULT", '{"subject": "present", "exit_code": 0}') + "\n")
         self.assertEqual(self.lines(text), {"READY": [""], "DISPATCHED": [""], "PRE": ["0"], "MAIN": ['{"before": {}}'],
                                             "RESULT": ['{"subject": "present", "exit_code": 0}']})
-        self.assertEqual(self.lines(text + "AISEF2-PROBE END n0nce"), {**self.lines(text)})   # unterminated: not a line
+        self.assertEqual(self.lines(text + L("END")), {**self.lines(text)})   # unterminated: not a line
         self.assertEqual(self.lines(text[:-1]).get("RESULT"), None)
         self.assertEqual(self.lines(""), {})
-        self.assertEqual(ci._protocol(os.path.join(self._d.name, "absent"), "n0nce"), {})
-        self.assertEqual(self.lines("AISEF2-PROBE PRE n0nce 0\nAISEF2-PROBE PRE n0nce 1\n"), {"PRE": ["0", "1"]})
-        self.assertEqual(self.lines("AISEF2-PROBE\nAISEF2-PROBE READY\n"), {})
-        self.assertEqual(self.lines("AISEF2-PROBE READY n0nce\xff\n"), {})
+        self.assertEqual(ci._protocol(os.path.join(self._d.name, "absent"), "n0nce", self.KEY), {})
+        self.assertEqual(self.lines(L("PRE", "0") + "\n" + L("PRE", "1") + "\n"), {"PRE": ["0", "1"]})
+        self.assertEqual(self.lines("AISEF2-PROBE\nAISEF2-PROBE READY\nAISEF2-PROBE READY n0nce\n"), {})
+        # B1: a line with this nonce but no authentication, a wrong one, another key's, or a body changed after it was
+        # authenticated — what a subject that read the nonce from the file can write — is not a protocol line
+        forged = ("AISEF2-PROBE RESULT n0nce {\"subject\": \"absent\"}\n"
+                  "AISEF2-PROBE RESULT n0nce " + "0" * 64 + " {\"subject\": \"absent\"}\n"
+                  + L("RESULT", '{"subject": "absent"}', key="cd" * 32) + "\n"
+                  + L("RESULT", '{"subject": "absent"}').replace("absent", "present") + "\n")
+        self.assertEqual(self.lines(forged), {})
+        self.assertEqual(self.lines(forged + L("RESULT", "{}") + "\n"), {"RESULT": ["{}"]})
         # bytes that are not UTF-8 in the file: decoded with replacement, never an error, never a protocol line
-        pathlib.Path(self.path).write_bytes(b"\xff\xfe junk\nAISEF2-PROBE READY n0nce\nAISEF2-PROBE PRE n0nce \xff\n")
-        self.assertEqual(ci._protocol(self.path, "n0nce"), {"READY": [""], "PRE": ["�"]})
+        pathlib.Path(self.path).write_bytes(b"\xff\xfe junk\n" + L("READY").encode() + b"\n" + L("PRE", "\xe9").encode() + b"\n")
+        self.assertEqual(ci._protocol(self.path, "n0nce", self.KEY), {"READY": [""], "PRE": ["\xe9"]})
 
     def test_the_placeholder_is_substituted_at_the_head_of_an_entry_only(self):
         ws = os.path.join(self._d.name, "ws")
@@ -349,9 +363,10 @@ class Protocol(unittest.TestCase):
                 "workspace": {"in.txt": {"text": "x\ny\n", "newline": "\r\n"}, "d/raw.bin": {"bytes_hex": "00ff"},
                               "a/b/c.bin": {"bytes_hex": "01"}, "a/b/d.bin": {"bytes_hex": "02"}},
                 "pre": [{"argv": ["init", "<ws>/in.txt"]}]}
-        ask, ws, pycache = ci._prepare(work, "/rev", "app:__main__", stim, ["in.txt", "out.txt"], "n0nce")
+        ask, ws, pycache = ci._prepare(work, "/rev", "app:__main__", stim, ["in.txt", "out.txt"], "n0nce", "ab" * 32, "/py")
         self.assertEqual((ws, pycache, ask), (os.path.join(work, "ws"), os.path.join(work, "pycache"), os.path.join(work, "request.json")))
         self.assertEqual(os.listdir(pycache), [])
+        self.assertEqual((os.listdir(os.path.join(work, "pycache-agent")), os.listdir(os.path.join(work, "tmp"))), ([], []))
         self.assertEqual(pathlib.Path(ws, "in.txt").read_bytes(), b"x\r\ny\r\n")
         self.assertEqual(pathlib.Path(ws, "d", "raw.bin").read_bytes(), b"\x00\xff")
         self.assertEqual(pathlib.Path(ws, "a", "b", "c.bin").read_bytes() + pathlib.Path(ws, "a", "b", "d.bin").read_bytes(),
@@ -364,8 +379,13 @@ class Protocol(unittest.TestCase):
                          ("AISEF2-PROBE", "n0nce", "/rev", "app:__main__", work, ws))
         self.assertEqual((req["protocol"], req["cap"], req["stdin"], req["files"]),
                          (os.path.join(work, "protocol.log"), ci.STREAM_CAP, os.path.join(work, "stdin.bin"), ["in.txt", "out.txt"]))
+        # B1: the key and the subject process's own settings; B6: its temporary directory is the evaluation's
+        self.assertEqual((req["key"], req["interpreter"], req["agent"], req["agent_pycache"], req["cwd"]),
+                         ("ab" * 32, "/py", ci.AGENT, os.path.join(work, "pycache-agent"), ws))
+        self.assertEqual(req["env"], ci._child_env(ws, os.path.join(work, "tmp")))
+        self.assertEqual({req["env"][k] for k in ("TMPDIR", "TEMP", "TMP")}, {os.path.join(work, "tmp")})
         bare = tempfile.mkdtemp(prefix="aisef2-cli-bare-", dir=self._d.name)
-        ask2, ws2, _ = ci._prepare(bare, "/rev", "app:__main__", {}, [], "n1")
+        ask2, ws2, _ = ci._prepare(bare, "/rev", "app:__main__", {}, [], "n1", "cd" * 32, "/py")
         req2 = json.loads(pathlib.Path(ask2).read_text(encoding="utf-8"))
         self.assertEqual((req2["argv"], req2["pre"], req2["stdin"], req2["files"], os.listdir(ws2)), ([], [], None, [], []))
         self.assertFalse(os.path.exists(os.path.join(bare, "stdin.bin")))

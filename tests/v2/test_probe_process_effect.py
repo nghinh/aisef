@@ -201,9 +201,14 @@ class Book:
         os._exit(code)
 
     def forge(self):
-        nonce = json.load(open(os.path.join("..", "request.json"), encoding="utf-8"))["nonce"]
-        sys.stdout.write("AISEF2-PROBE RESULT " + nonce + " {\\"subject\\": \\"absent\\"}\\n")
-        sys.stdout.write("AISEF2-PROBE END " + nonce + "\\n")
+        # B1: the request file is emptied before the subject's process exists; a forger takes the nonce from the
+        # marker file and writes RESULT and END lines claiming absence to its stdout and into the marker file
+        marker = os.path.join("..", "protocol.log")
+        nonce = open(marker, encoding="utf-8").readline().split()[2]
+        forged = ("AISEF2-PROBE RESULT " + nonce + " " + "0" * 64 + " {\\"subject\\": \\"absent\\"}\\n"
+                  "AISEF2-PROBE END " + nonce + " " + "0" * 64 + "\\n")
+        open(marker, "a", encoding="utf-8").write(forged)
+        sys.stdout.write(forged)
         sys.stdout.flush()
         return "forged"
 '''
@@ -793,7 +798,10 @@ class FaultEffect(_Product):
     def test_FM2_EFFECT_9_the_process_ending_during_a_step_refutes_with_that_step(self):
         o = self.see(spec("store.book:Book", book(call("count"), call("hard", 0), call("count")), {"returns": 0}))
         self.assertEqual((o.kind, o.verdict), (K.OBSERVED, R))
-        self.assertEqual(facts_of(o), {"subject": "present", "hard_exit": True, "exit_code": 0, "trace": [],
+        # B1: the controller outlives the subject's process and reports the steps that completed before it ended
+        self.assertEqual(facts_of(o), {"subject": "present", "hard_exit": True, "exit_code": 0,
+                                       "trace": [{"i": 0, "kind": "construct", "outcome": "ok"},
+                                                 {"i": 1, "kind": "call", "outcome": "ok"}],
                                        "refuted": {"step": 2, "why": "the process ended with exit status 0 before the "
                                                                      "scenario completed"}})
 
@@ -853,7 +861,7 @@ class Identity(_Product):
         self.assertEqual((e.subject_process, e.stimulus_shape), (facts["subject_process"], facts["stimulus_shape"]))
         # each rule rejects the corresponding defect in this module's own source
         defects = {
-            "PROTOCOL_CHANNEL_DISCIPLINE": ('proto.write(line.encode("utf-8"))', 'sys.stdout.write(line)'),
+            "PROTOCOL_CHANNEL_DISCIPLINE": ('    proto.write((req["mark"]', '    sys.stdout.write((req["mark"]'),
             "SINGLE_PLACEHOLDER_TOKEN": ('value = value.replace(form, "<ws>")', 'value = value.replace(form, "<root>")'),
             "NO_CLOCK_IN_PROBE_FACTS": ("import builtins, hashlib,", "import time, builtins, hashlib,"),
             "CLOSED_DISPATCH_IN_SCENARIO_PROBES": ('    if kind != step["exception"]:\n',

@@ -62,13 +62,16 @@ is that step sequence alone). A scenario whose fault step witnesses a universall
 point) measures one declared fault at one declared call: a bounded witness, never a proof of the universal property;
 a contract that derives such a property from it declares `bounded_witness_measurement` (enforcement stays PARTIAL).
 
-**Harness.** As cli_invocation (whose watch primitives are imported, never copied): the evaluation directory
-(`_evaluation_dir`, refused inside the checkout) holds the request, the marker file, the harness log, a fresh empty
-bytecode cache and `ws/` (the subject's workspace, working directory and HOME); the child runs `-I -B -X
-pycache_prefix=<fresh> -X utf8=1` with the scrubbed environment; its protocol goes to the marker file only
-(READY, DISPATCHED before the subject's module is touched, `STEP i` before each step, RESULT, END), and the subject's
-descriptors 0/1/2 are redirected once onto the null device and binary capture files, so nothing the subject writes
-reaches the protocol. The standard text streams' newline handling is pinned (C2-P2-FINDING-001); every file the harness
+**Harness.** As cli_invocation (whose watch primitives and subject process are imported, never copied): the evaluation
+directory (`_evaluation_dir`, refused inside the checkout) holds the request, the marker file, the harness log, fresh
+empty bytecode caches, `tmp/` (the subject's temporary directory — B6) and `ws/` (the subject's workspace, working
+directory and HOME). B1 (V2.0 release charter §7): the probe's process is a controller that never imports, constructs
+or calls the subject; the subject's process (`cli_invocation.AGENT`, started before DISPATCHED) runs each construct
+and call the controller asks for and answers with what it did; the workspace, write, edit_jsonl and subprocess steps,
+every file fact, the trace and the facts are the controller's own, and the controller alone writes the protocol to the
+marker file, each line authenticated with the evaluation's key (READY, DISPATCHED before the subject's module is
+touched, `STEP i` before each step, RESULT, END). The subject's descriptors 0/1/2 are redirected onto the null device
+and binary capture files in its own process, so nothing the subject writes reaches the protocol. The standard text streams' newline handling is pinned (C2-P2-FINDING-001); every file the harness
 writes is written in binary mode. A subprocess step runs `[interpreter, -I, -B, -X pycache_prefix=<fresh>, -X utf8=1,
 -c SUBPROCESS, <checkout>, -m module, ...]` with the working directory in the workspace and the scrubbed environment:
 the interpreter is the ExecutionEnv's (never the harness process's own `sys.executable`), and SUBPROCESS only puts
@@ -76,14 +79,16 @@ the revision on the path and runs the module; the child is a member of the probe
 running is the range's residual (§17.1), stopped by the range's release — never by the probe.
 
 Parent decision table after DISPATCHED (as cli_invocation): RESULT read -> SUBJECT_ABSENT, HARNESS_FAILED (a harness
-failure the child reported) or OBSERVED with `verdict_of`; no RESULT and an exit status -> the process ended during a
-step: OBSERVED, REFUTED with the step from the last `STEP` line; a signal -> NON_CONTROLLER_SIGNAL unless the
-controller's ledger holds it (an interruption); the window's end with the process present -> SUBJECT_DEADLINE,
-REFUTED; nothing left and no status reported -> HARNESS_FAILED unless the ledger holds a stop. Every conclusion after
+failure the controller reported), NON_CONTROLLER_SIGNAL (the subject's process ended by a signal the controller did not
+send), REFUTED (an answer on the subject's channel the agent did not write), or OBSERVED with `verdict_of` — the
+subject's process ending during a step is in RESULT as an observation, REFUTED with that step and the steps completed
+before it; no RESULT and an exit status -> the controller failed: HARNESS_FAILED; a signal -> NON_CONTROLLER_SIGNAL
+unless the controller's ledger holds it (an interruption); the window's end with the process present ->
+SUBJECT_DEADLINE, REFUTED; nothing left and no status reported -> HARNESS_FAILED unless the ledger holds a stop. Every conclusion after
 DISPATCHED goes through python_callable._after_dispatch (C2-P2-FINDING-002).
 
 **Enforcement: PARTIAL.** `WEAKEST_PATH`: the subject and every subprocess step run as the harness user, with that
-user's filesystem and network; isolation, not a sandbox.
+user's filesystem and network; the subject cannot read the key nor build a fact; isolation, not a sandbox.
 """
 
 from __future__ import annotations
@@ -160,10 +165,11 @@ CLASS_TABLE = {
 }
 FAULT_WITNESS = ("a fault step measures one declared fault at one declared call: a bounded witness of a property "
                  "quantified over every crash point, never a proof of it (DECISION-1)")
-WEAKEST_PATH = ("the subject, and every subprocess step, runs as the harness user with that user's filesystem and "
-                "network access, and can read the request and the protocol file; -I interpreter isolation, a "
-                "scrubbed environment, a fresh working directory and a harness-owned bytecode cache (-X "
-                "pycache_prefix, -B) are isolation, not a sandbox")
+WEAKEST_PATH = ("the subject, in a process of its own, and every subprocess step run as the harness user with that "
+                "user's filesystem and network access; the subject can read the evaluation directory but not the key "
+                "that authenticates the protocol, and the controller alone builds the facts and writes the protocol; "
+                "-I interpreter isolation, a scrubbed environment, fresh working and temporary directories and "
+                "harness-owned bytecode caches (-X pycache_prefix, -B) are isolation, not a sandbox")
 PLACEHOLDER = ci.PLACEHOLDER
 _CONTENT = ("text", "newline", "bytes_hex")
 _FLAT = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]*")
@@ -423,41 +429,82 @@ def _observed_files(observable) -> dict:
     return out
 
 
-#: The harness script. Probe-owned; runs in `-I` mode with the checkout on sys.path; its protocol goes to the marker
-#: file named in the request and nowhere else; the subject's descriptors are redirected once, before it is touched.
+#: The harness script — the controller (B1, V2.0 release charter §7). Probe-owned; runs in `-I` mode and never imports,
+#: constructs or calls the subject, nor puts the revision on its own path: the subject's process (cli_invocation.AGENT)
+#: is started before DISPATCHED and asked for one construct or call at a time; the workspace, write, edit_jsonl and
+#: subprocess steps, every file fact, the trace and the facts are the controller's own. Its protocol goes to the marker
+#: file named in the request and nowhere else, each line authenticated with the evaluation's key, which leaves the
+#: request file before the subject's process exists.
 HARNESS = r'''
-import builtins, hashlib, importlib, json, os, subprocess, sys
+import builtins, hashlib, hmac, importlib, json, os, queue, subprocess, sys, threading
 from importlib.machinery import PathFinder
-req = json.loads(open(sys.argv[1], encoding="utf-8").read())
-nonce, root, work, ws = req["nonce"], os.path.realpath(req["root"]), req["work"], req["ws"]
+ask_path = sys.argv[1]
+req = json.loads(open(ask_path, encoding="utf-8").read())
+with open(ask_path, "w", encoding="utf-8") as f:
+    f.write("{}")
+KEY, nonce = bytes.fromhex(req["key"]), req["nonce"]
+root, work, ws = os.path.realpath(req["root"]), req["work"], req["ws"]
 name, _, attr = req["locator"].partition(":")
-sys.path[:0] = [p for p in (root, os.path.join(root, "src")) if os.path.isdir(p)]
+SEARCH = [p for p in (root, os.path.join(root, "src")) if os.path.isdir(p)]
 proto = open(req["protocol"], "wb")
 FSYNC = os.fsync
-BINARY = getattr(os, "O_BINARY", 0)
 FORMS = sorted({ws, os.path.realpath(ws)}, key=len, reverse=True)
 MISSING = object()
-for s in (sys.__stdin__, sys.__stdout__, sys.__stderr__):
-    if s is not None:
-        s.reconfigure(newline="\n")
 def emit(tag, body=""):
-    line = req["mark"] + " " + tag + " " + nonce + (" " + body if body else "") + "\n"
-    proto.write(line.encode("utf-8"))
+    mac = hmac.new(KEY, (tag + "\n" + body).encode("utf-8"), hashlib.sha256).hexdigest()
+    proto.write((req["mark"] + " " + tag + " " + nonce + " " + mac + (" " + body if body else "") + "\n").encode("utf-8"))
     proto.flush()
     FSYNC(proto.fileno())
 emit("READY")
-for fd, path, flags in ((0, os.devnull, os.O_RDONLY), (1, os.path.join(work, "stdout.bin"), os.O_WRONLY | os.O_CREAT | os.O_TRUNC),
-                        (2, os.path.join(work, "stderr.bin"), os.O_WRONLY | os.O_CREAT | os.O_TRUNC)):
-    h = os.open(path, flags | BINARY)
-    os.dup2(h, fd)
-    os.close(h)
+agent = subprocess.Popen([req["interpreter"], "-I", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], "-X", "utf8=1",
+                          "-c", req["agent"], root, work], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                         stderr=open(os.path.join(work, "agent.log"), "wb"), cwd=req["cwd"], env=req["env"])
+replies = queue.Queue()
+def pump():
+    for line in agent.stdout:
+        replies.put(line)
+    replies.put(None)
+threading.Thread(target=pump, daemon=True).start()
+sent = [0]
+def answer_to(n):
+    line = replies.get()
+    if line is None:
+        return None
+    try:
+        got = json.loads(line)
+    except ValueError:
+        got = None
+    if not isinstance(got, dict) or got.get("n") != n:
+        return {"tampered": "an answer on the subject's channel is not the agent's"}
+    return got
+def ask(op):
+    sent[0] += 1
+    op["n"] = sent[0]
+    try:
+        agent.stdin.write((json.dumps(op) + "\n").encode("utf-8"))
+        agent.stdin.flush()
+    except OSError:
+        pass
+    return answer_to(sent[0])
+def finish():
+    got = ask({"op": "bye"})
+    if got is not None and (set(got) != {"n"} or not replies.empty()):
+        return "an answer on the subject's channel is not the agent's"
+    return None
 class Leak(Exception):
     pass
+class Ended(Exception):
+    pass
+def answered(op):
+    got = ask(op)
+    if got is None or "tampered" in got:
+        raise Ended(got)
+    return got
 def inside(spec):
     places = [spec.origin] if spec.origin and spec.has_location else list(spec.submodule_search_locations or [])
     return any(os.path.realpath(p).startswith(root + os.sep) for p in places)
-def resolve(dotted):
-    parts, spec, path = dotted.split("."), None, None
+def resolve(dotted, search):
+    parts, spec, path = dotted.split("."), None, search
     for i in range(len(parts)):
         spec = PathFinder.find_spec(".".join(parts[:i + 1]), path)
         if spec is None:
@@ -476,16 +523,17 @@ def unws(value):
     if isinstance(value, dict):
         return {unws(k): unws(v) for k, v in value.items()}
     return value
-def tagged(value):
-    if isinstance(value, (bytes, bytearray)):
-        data = bytes(value)
+def reported(t):
+    if "bytes_hex" in t:
+        data = bytes.fromhex(t["bytes_hex"])
         for form in FORMS:
             data = data.replace(form.encode("utf-8"), b"<ws>")
         return {"bytes_hex": data.hex()}
-    try:
-        return {"json": unws(json.loads(json.dumps(value)))}
-    except Exception:
-        return {"unserializable": type(value).__name__}
+    if "json" in t:
+        return {"json": unws(t["json"])}
+    if "memoryview_hex" in t:
+        return {"unserializable": "memoryview"}
+    return {"unserializable": t["unserializable"]}
 def same(a, b):
     x, y = (json.dumps(v, sort_keys=True) for v in (a, b))
     return x == y
@@ -534,67 +582,68 @@ def guarded(state, call):
         setattr(owner, target, original)
         if getattr(owner, target) is not original:
             raise Leak("the fault " + step["fault"] + " was not restored after step " + str(state["i"]))
-def target_of(step, state):
-    base = state["subject"] if state["instance"] is MISSING else state["instance"]
-    return getattr(base, step["method"]) if "method" in step else base
+def subject_call(step, state, attrs):
+    op = {"op": "call", "args": step["args"], "kwargs": step["kwargs"], "attrs": attrs}
+    if "method" in step:
+        op["method"] = step["method"]
+    if state["fault"] is not None:
+        op["patch"] = list(state["fault"]["patch"]) + [state["fault"]["fault"]]
+    got = answered(op)
+    if "leak" in got:
+        raise Leak("the fault " + state["fault"]["fault"] + " was not restored after step " + str(state["i"]))
+    if got.get("fired"):
+        state["fired"].append(state["fault"]["fault"])
+    return got
 def do_workspace(step, state):
     for n, data in step["files"].items():
         with open(os.path.join(ws, n), "wb") as f:
             f.write(bytes.fromhex(data))
     return {"outcome": "ok"}
 def do_construct(step, state):
-    try:
-        state["instance"] = state["subject"](*step["args"], **step["kwargs"])
-    except BaseException as e:
-        return {"outcome": "refuted:construct raised " + type(e).__name__}
+    got = answered({"op": "construct", "args": step["args"], "kwargs": step["kwargs"]})
+    if "raised" in got:
+        return {"outcome": "refuted:construct raised " + got["raised"]}
     return {"outcome": "ok"}
-def do_call(step, state):
-    try:
-        fn = target_of(step, state)
-    except AttributeError:
+def unresolved(step, got):
+    if got.get("no_method"):
         return {"outcome": "refuted:method " + step["method"] + " missing"}
-    except BaseException as e:
-        return {"outcome": "refuted:resolving the method raised " + type(e).__name__}
-    try:
-        value = guarded(state, lambda: fn(*step["args"], **step["kwargs"]))
-    except Leak:
-        raise
-    except BaseException as e:
-        return {"outcome": "refuted:raised " + type(e).__name__}
-    state["last"] = tagged(value)
+    if "resolve_raised" in got:
+        return {"outcome": "refuted:resolving the method raised " + got["resolve_raised"]}
+    return None
+def do_call(step, state):
+    got = subject_call(step, state, [])
+    refused = unresolved(step, got)
+    if refused is not None:
+        return refused
+    if "raised" in got:
+        return {"outcome": "refuted:raised " + got["raised"]}
+    state["last"] = reported(got["returned"])
     if "as" in step:
         state["bound"][step["as"]] = state["last"]
     return {"outcome": "ok"}
-def raised_as(step, state, e):
-    kind = type(e).__name__
+def do_expect(step, state):
+    wanted = step.get("attrs", {})
+    got = subject_call(step, state, list(wanted))
+    refused = unresolved(step, got)
+    if refused is not None:
+        return refused
+    if "returned" in got:
+        return {"outcome": "refuted:returned; " + step["exception"] + " was not raised"}
+    kind = got["raised"]
     if kind != step["exception"]:
         return {"outcome": "refuted:raised " + kind + ", not " + step["exception"]}
     seen = {}
-    for a, want in step.get("attrs", {}).items():
-        try:
-            seen[a] = tagged(getattr(e, a))
-        except AttributeError:
+    for a, want in wanted.items():
+        t = got["attrs"][a]
+        if t.get("missing"):
             return {"outcome": "refuted:" + kind + " has no attribute " + a}
-        except BaseException as x:
-            return {"outcome": "refuted:reading " + kind + "." + a + " raised " + type(x).__name__}
+        if "error" in t:
+            return {"outcome": "refuted:reading " + kind + "." + a + " raised " + t["error"]}
+        seen[a] = reported(t)
         if not same(seen[a], {"json": want}):
             return {"outcome": "refuted:" + kind + "." + a + " is not the declared value"}
     state["raised"] = {"type": kind, "attrs": seen}
     return {"outcome": "raised:" + kind}
-def do_expect(step, state):
-    try:
-        fn = target_of(step, state)
-    except AttributeError:
-        return {"outcome": "refuted:method " + step["method"] + " missing"}
-    except BaseException as e:
-        return {"outcome": "refuted:resolving the method raised " + type(e).__name__}
-    try:
-        guarded(state, lambda: fn(*step["args"], **step["kwargs"]))
-    except Leak:
-        raise
-    except BaseException as e:
-        return raised_as(step, state, e)
-    return {"outcome": "refuted:returned; " + step["exception"] + " was not raised"}
 def do_write(step, state):
     try:
         with open(os.path.join(ws, step["path"]), "ab" if step.get("append") else "wb") as f:
@@ -639,7 +688,7 @@ def do_fault(step, state):
 HANDLERS = {"workspace": do_workspace, "construct": do_construct, "call": do_call, "expect_raises": do_expect,
             "write": do_write, "edit_jsonl": do_edit, "subprocess": do_subprocess, "fault": do_fault}
 def run(steps, state):
-    trace = []
+    trace = state["trace"]
     for i, step in enumerate(steps):
         if state["before"] is None and step["step"] != "workspace":
             state["before"] = {n: identity(f) for n, f in files_now().items()}
@@ -654,29 +703,46 @@ def run(steps, state):
         if entry["outcome"].startswith("refuted:"):
             return trace, {"step": i, "kind": step["step"], "why": entry["outcome"][len("refuted:"):]}
     return trace, None
+def ended(got, state):
+    if got is not None:
+        return {"subject": "present", "tampered": got["tampered"]}
+    code = agent.wait()
+    if code < 0:
+        return {"subject_signal": -code}
+    return {"subject": "present", "hard_exit": True, "exit_code": code, "trace": state["trace"] if state else [],
+            "refuted": {"step": state["i"] if state else None,
+                        "why": "the process ended with exit status " + str(code) + " before the scenario completed"}}
 def main():
+    if answer_to(0) is None:
+        return None
     emit("DISPATCHED")
-    spec = resolve(name)
+    spec = resolve(name, SEARCH)
+    if spec is None and PathFinder.find_spec(name.split(".")[0], SEARCH) is None:
+        spec = resolve(name, None)
     if spec is None or not inside(spec):
         return {"subject": "absent", "note": "" if spec is None else "resolves only outside the revision"}
-    try:
-        module = importlib.import_module(name)
-    except BaseException as e:
+    got = ask({"op": "import", "name": name})
+    if got is None or "tampered" in got:
+        return ended(got, None)
+    if "raised" in got:
         return {"subject": "present", "trace": [],
-                "refuted": {"step": None, "kind": "import", "why": "importing the subject raised " + type(e).__name__}}
-    try:
-        subject = getattr(module, attr)
-    except AttributeError:
+                "refuted": {"step": None, "kind": "import", "why": "importing the subject raised " + got["raised"]}}
+    got = ask({"op": "resolve", "chain": [attr]})
+    if got is None or "tampered" in got:
+        return ended(got, None)
+    if got.get("absent"):
         return {"subject": "absent", "note": "the module does not define " + attr}
-    except BaseException as e:
+    if "raised" in got:
         return {"subject": "present", "trace": [],
-                "refuted": {"step": None, "kind": "import", "why": "resolving the subject raised " + type(e).__name__}}
-    state = {"subject": subject, "instance": MISSING, "bound": {}, "fault": None, "raised": None, "last": None,
-             "before": None}
+                "refuted": {"step": None, "kind": "import", "why": "resolving the subject raised " + got["raised"]}}
+    state = {"instance": MISSING, "bound": {}, "fault": None, "raised": None, "last": None, "before": None, "trace": [],
+             "i": None, "fired": []}
     try:
         trace, refuted = run(req["steps"], state)
     except Leak as e:
         return {"harness_failure": str(e)}
+    except Ended as e:
+        return ended(e.args[0], state)
     if state["before"] is None:
         state["before"] = {n: identity(f) for n, f in files_now().items()}
     facts = {"subject": "present", "trace": trace, "bound": state["bound"], "raised": state["raised"],
@@ -695,8 +761,17 @@ try:
     facts = main()
 except BaseException as e:
     facts = {"harness_failure": "the harness raised " + type(e).__name__}
-emit("RESULT", json.dumps(facts))
-emit("END")
+if facts is not None:
+    if not ("subject_signal" in facts or "tampered" in facts or facts.get("hard_exit") or "harness_failure" in facts):
+        wrong = finish()
+        if wrong is not None:
+            facts = {"subject": "present", "tampered": wrong}
+    emit("RESULT", json.dumps(facts))
+    emit("END")
+try:
+    agent.stdin.close()
+except OSError:
+    pass
 '''
 
 #: The boot of a subprocess step: the revision on the path, then its module run as __main__ (probe-owned, like HARNESS).
@@ -719,16 +794,18 @@ def _harness_argv(interpreter: str, ask: str, pycache: str) -> list[str]:
     return [interpreter, "-I", "-B", "-X", f"pycache_prefix={pycache}", "-X", "utf8=1", "-c", HARNESS, ask]
 
 
-def _prepare(work: str, root: str, locator: str, steps: list, files: dict, nonce: str,
+def _prepare(work: str, root: str, locator: str, steps: list, files: dict, nonce: str, key: str,
              interpreter: str) -> tuple[str, str, str]:
-    """Lay out the evaluation directory: an empty workspace (the workspace step writes it), the fresh bytecode cache
-    and the request. Returns (request path, workspace, bytecode prefix)."""
-    ws, pycache = os.path.join(work, "ws"), os.path.join(work, "pycache")
-    os.mkdir(ws)
-    os.mkdir(pycache)   # fresh and empty: no other evaluation's bytecode, and none from the checkout
-    request = {"mark": _MARK, "nonce": nonce, "root": root, "locator": locator, "work": work, "ws": ws,
-               "protocol": os.path.join(work, "protocol.log"), "interpreter": interpreter, "env": ci._child_env(ws),
-               "boot": SUBPROCESS, "steps": [_resolved(s, ws) for s in steps], "files": files}
+    """Lay out the evaluation directory: an empty workspace (the workspace step writes it), fresh bytecode caches (the
+    controller's and the subject process's), the evaluation's own temporary directory and the request. Returns
+    (request path, workspace, bytecode prefix)."""
+    ws, pycache, agent_pycache, tmp = (os.path.join(work, n) for n in ("ws", "pycache", "pycache-agent", "tmp"))
+    for d in (ws, pycache, agent_pycache, tmp):
+        os.mkdir(d)     # fresh and empty: no other evaluation's bytecode, and none from the checkout
+    request = {"mark": _MARK, "nonce": nonce, "key": key, "root": root, "locator": locator, "work": work, "ws": ws,
+               "protocol": os.path.join(work, "protocol.log"), "interpreter": interpreter, "env": ci._child_env(ws, tmp),
+               "boot": SUBPROCESS, "steps": [_resolved(s, ws) for s in steps], "files": files, "agent": ci.AGENT,
+               "agent_pycache": agent_pycache, "cwd": ws}
     ask = os.path.join(work, "request.json")
     pathlib.Path(ask).write_text(json.dumps(request), encoding="utf-8")
     return ask, ws, pycache
@@ -787,9 +864,9 @@ class ProcessEffectProbe(HarnessProbe):
         if _inside(work, at.root):
             return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory lies inside the "
                                                                      "revision checkout: refused")
-        nonce = secrets.token_hex(16)
+        nonce, key = secrets.token_hex(16), secrets.token_hex(32)
         try:
-            ask, ws, pycache = _prepare(work, at.root, locator, steps, _observed_files(observable), nonce,
+            ask, ws, pycache = _prepare(work, at.root, locator, steps, _observed_files(observable), nonce, key,
                                         env.interpreter)
         except OSError as e:
             return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory cannot be "
@@ -808,19 +885,19 @@ class ProcessEffectProbe(HarnessProbe):
         finally:
             log.close()
         try:
-            return _watch(run, os.path.join(work, "protocol.log"), nonce, cls, observable, env)
+            return _watch(run, os.path.join(work, "protocol.log"), nonce, key, cls, observable, env)
         finally:
             run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
 
 
-def _watch(run, proto: str, nonce: str, cls: str, observable: dict, env: ExecutionEnv) -> Observation:
+def _watch(run, proto: str, nonce: str, key: str, cls: str, observable: dict, env: ExecutionEnv) -> Observation:
     """cli_invocation's watch over this probe's lines: READY and DISPATCHED under the harness watchdog, then RESULT
     under the scenario's one window; the exit is lifecycle evidence, the marker file read to its end after it (§9.4)."""
-    state, seen = ci._await(run, proto, nonce, "DISPATCHED", time.monotonic() + env.timeout_s)
+    state, seen = ci._await(run, proto, nonce, key, "DISPATCHED", time.monotonic() + env.timeout_s)
     if state != "LINE":
         return ci._harness_failure(run, state, seen, env.timeout_s)
     window = window_of(observable)
-    state, seen = ci._await(run, proto, nonce, "RESULT", time.monotonic() + window)
+    state, seen = ci._await(run, proto, nonce, key, "RESULT", time.monotonic() + window)
     if state == "TIMEOUT":
         if run.members():   # measured on the range: the scenario's process is still there at W
             at = seen["STEP"][-1] if seen.get("STEP") else "none"
@@ -831,38 +908,29 @@ def _watch(run, proto: str, nonce: str, cls: str, observable: dict, env: Executi
             return _after_dispatch(run, Observation(ObservationKind.HARNESS_FAILED,
                                                     detail="the harness process ended and its exit status was "
                                                            "never reported"))
-        seen = ci._protocol(proto, nonce)
+        seen = ci._protocol(proto, nonce, key)
     if "RESULT" in seen:
         return _after_dispatch(run, _concluded(cls, observable, json.loads(seen["RESULT"][0])))
-    return _hard_exit(run, seen)
+    return _after_dispatch(run, ci._no_result(run))
 
 
 def _concluded(cls: str, observable: dict, facts: dict) -> Observation:
-    """What the harness's RESULT says: an absent subject, a harness failure it reported, or an observation."""
+    """What the controller's RESULT says — only the controller writes it (B1): the subject's process ended by a signal
+    the controller did not send (NON_CONTROLLER_SIGNAL, §9.3); an absent subject; a harness failure it reported; an
+    answer on the subject's channel the agent did not write (REFUTED); or an observation — a hard exit of the subject's
+    process during a step is one, REFUTED with the step named."""
+    if "subject_signal" in facts:
+        return Observation(ObservationKind.NON_CONTROLLER_SIGNAL,
+                           detail=f"the subject's process ended by signal {facts['subject_signal']} after DISPATCHED, "
+                                  "and this controller's signal ledger is empty: it did not send it")
     if facts.get("subject") == "absent":   # every observable here is positive: not observed over an absent subject
         return Observation(ObservationKind.SUBJECT_ABSENT, BehaviorVerdict.REFUTED, detail=facts.get("note", ""))
     if "harness_failure" in facts:
         return Observation(ObservationKind.HARNESS_FAILED, detail="the harness failed its own scenario: "
                                                                  + str(facts["harness_failure"]))
+    if "tampered" in facts:
+        return Observation(ObservationKind.OBSERVED, BehaviorVerdict.REFUTED, detail=json.dumps(facts))
     return Observation(ObservationKind.OBSERVED, verdict_of(cls, observable, facts), detail=json.dumps(facts))
-
-
-def _hard_exit(run, seen: dict) -> Observation:
-    """After DISPATCHED the process ended with no RESULT in the marker file: by a signal the controller did not send
-    (NON_CONTROLLER_SIGNAL), or by an exit status — the process ended during a step (the last `STEP` line), so the
-    scenario did not complete: OBSERVED, REFUTED, the step named."""
-    code = run.returncode
-    if code < 0:
-        return _after_dispatch(run, Observation(ObservationKind.NON_CONTROLLER_SIGNAL,
-                                                detail=f"the process ended by signal {-code} after DISPATCHED, and "
-                                                       "this controller's signal ledger is empty: it did not "
-                                                       "send it"))
-    step = int(seen["STEP"][-1]) if seen.get("STEP") else None
-    facts = {"subject": "present", "hard_exit": True, "exit_code": code, "trace": [],
-             "refuted": {"step": step, "why": f"the process ended with exit status {code} before the scenario "
-                                              "completed"}}
-    return _after_dispatch(run, Observation(ObservationKind.OBSERVED, BehaviorVerdict.REFUTED,
-                                            detail=json.dumps(facts)))
 
 
 METADATA = ProbeMetadata(PROBE_ID, DIGEST, spec_class)

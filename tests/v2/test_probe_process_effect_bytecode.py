@@ -144,18 +144,19 @@ class Bytecode(unittest.TestCase):
         self.assertEqual(sorted(scratch.rglob("*.pyc")), [])
 
     def test_FM2_PYC_EFFECT_5_without_the_external_cache_the_stale_bytecode_decides_the_reproducer_detects_it(self):
+        # B1: the subject is imported in its own process (the shared agent): the controls are on its command line
+        flags = '"-I", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], '
+        self.assertEqual(pe.HARNESS.count(flags), 1)
         for keep_b in (True, False):
-            def argv(interpreter, ask, pycache, keep_b=keep_b):
-                return [interpreter, "-I", *(["-B"] if keep_b else []), "-X", "utf8=1", "-c", pe.HARNESS, ask]
-            with self.subTest(keep_b=keep_b), mock.patch.object(pe, "_harness_argv", argv):
+            harness = pe.HARNESS.replace(flags, '"-I", ' + ('"-B", ' if keep_b else ""))
+            with self.subTest(keep_b=keep_b), mock.patch.object(pe, "HARNESS", harness):
                 self.assertEqual(verdict(self.observe(RETURNS_2)), R)   # the stale code's 1, not the source's 2
                 self.assertEqual(verdict(self.observe(RETURNS_1, expectation=R)), S)
-        # without -B the harness's own bytecode lands under the prefix, never in the checkout
+        # without -B the subject's bytecode lands under the prefix, never in the checkout
         scratch = self.tmp / "scratch"
         scratch.mkdir()
         before = snapshot(self.root)
-        with mock.patch.object(pe, "_harness_argv", lambda i, a, p: [i, "-I", "-X", f"pycache_prefix={p}", "-c",
-                                                                     pe.HARNESS, a]):
+        with mock.patch.object(pe, "HARNESS", pe.HARNESS.replace(flags, '"-I", "-X", "pycache_prefix=" + req["agent_pycache"], ')):
             self.assertEqual(verdict(self.observe(RETURNS_2, probe=ProcessEffectProbe(scratch=str(scratch)))), S)
         self.assertEqual(snapshot(self.root), before)
         self.assertTrue(any(p.name.startswith("mod.") for p in scratch.rglob("*.pyc")))
