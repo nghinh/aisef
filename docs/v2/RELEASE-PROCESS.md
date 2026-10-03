@@ -54,7 +54,10 @@ if a gate leaves the publish job's `needs`, or if any workflow other than `relea
    checkout with the venv's interpreter, isolated:
    `python -I tests/installed_smoke.py <pyproject version> --product` — `aisef` and `aisef2` import from the
    installed artifact, `aisef --version` reports the version, V1's runtime data is packaged, and the V2 runtime
-   entry `aisef2.app.cli.run` is present.
+   entry `aisef2.app.cli.run` is present. On the POSIX runner it then runs the public path itself,
+   `python -I tests/installed_product_smoke.py`: the installed `aisef run --check`, `aisef run` and
+   `aisef run --verify` on an offline one-story project (fake client, loopback fake provider) — exit 0 each, the
+   story committed. The wheel job of `tests.yml` runs both smokes on every push.
 
 It has no publish step and no `id-token` permission. TestPyPI is not wired: the charter accepts "TestPyPI or an
 equivalent non-production artifact verification path" (G8), and this is that path. Adding TestPyPI is an owner

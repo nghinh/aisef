@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+**AISEF 2.0.0 (release candidate in preparation): `aisef run` is the V2 runtime.**
+One distribution, `aisef`, now ships the V2 kernel and product runtime (`aisef2`) next to V1. `aisef run` runs an
+owner-approved V2 project bundle on a git repository: a fixed model route attested by a preflight, one developer
+session per story attempt, and the verdict of independent product probes — never the developer's word — written to
+a hash-chained journal that `aisef run --verify` re-derives. See `docs/v2/USAGE.md`.
+
+- V1 execution moved behind the named legacy surface: `aisef legacy run …` (the 1.x `aisef run`) and
+  `aisef legacy improve …`; every other V1 command is unchanged.
+- Claimed: deterministic, evidence-bound orchestration and product verification; candidate code cannot control a
+  verdict channel (controller/agent split with an authenticated protocol). Not claimed: generalisation, model
+  quality, superiority over V1, hostile same-user isolation. Platforms: Linux and macOS for a live run.
+- Release mechanics: reproducible wheel/sdist (`SOURCE_DATE_EPOCH`, re-packed sdist), a frozen release candidate
+  whose bytes the production job must reproduce, a non-production staging path with a clean-install smoke of the
+  installed `aisef run`.
+
 ## 1.7.6 — 2026-09-16
 
 One defect, found by the clean OpenCode replay of the second LedgerLock run
