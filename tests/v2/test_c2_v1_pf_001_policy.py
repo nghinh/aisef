@@ -44,12 +44,15 @@ class Policy(unittest.TestCase):
         a = V.recorded_attempt()
         policy = rh.load_policy(V.ROOT)
         e = {**a["entry"], "seq": 1, "gate_effect": "RECORD_ONLY", "recurrence_facts": V.derived_facts(a["record"])}
-        self.assertEqual(rh.entry_problems([e], policy), [])
+        t = V.tree_at(e["commit"])      # judged on its own run's V1 tree, not HEAD's
+        self.assertEqual(rh.entry_problems([e], policy, V.ROOT, t), [])
         base = json.loads((V.ROOT / rh.POLICY_REL).read_text(encoding="utf-8"))
-        self.assertTrue(rh.entry_problems([e], base))                                   # no amendment: STOP
-        self.assertTrue(rh.entry_problems([{**e, "recurrence_facts": None}], policy))   # untyped: STOP
-        self.assertEqual(rh.entry_problems([{**e, "gate_effect": "STOP"}], policy), [])  # STOP is always admissible
-        self.assertTrue(rh.entry_problems([{**e, "result": "PASS", "classification": None, "failing_tests": []}], policy))
+        self.assertTrue(rh.entry_problems([e], base, V.ROOT, t))                                   # no amendment: STOP
+        self.assertTrue(rh.entry_problems([{**e, "recurrence_facts": None}], policy, V.ROOT, t))   # untyped: STOP
+        self.assertEqual(rh.entry_problems([{**e, "gate_effect": "STOP"}], policy, V.ROOT, t), [])  # STOP is always admissible
+        self.assertTrue(rh.entry_problems([{**e, "result": "PASS", "classification": None, "failing_tests": []}], policy,
+                                          V.ROOT, t))
+        self.assertTrue(rh.entry_problems([e], policy, V.ROOT, "0" * 40))   # another V1 tree: STOP
         self.assertFalse(rh.gate_green([e], e["commit"], e["where"], e["job"], policy))
 
 

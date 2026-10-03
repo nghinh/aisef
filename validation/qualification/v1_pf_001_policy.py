@@ -21,6 +21,7 @@ import json
 import pathlib
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 
@@ -96,12 +97,19 @@ def derived_facts(rec: dict) -> dict:
             "v2_process_range_qualification": {"path": QUALIFICATION_REL, "sha256": _sha(qual)}}
 
 
+def tree_at(commit: str) -> str | None:
+    """The V1 tree (`aisef/`) of the commit an attempt ran on: a recorded recurrence is judged on its own run's tree,
+    never on whatever HEAD holds now (the V2.0 release changes `aisef/cli` for `aisef run`, charter G1)."""
+    got = subprocess.run(["git", "rev-parse", f"{commit}:aisef"], cwd=ROOT, capture_output=True, encoding="utf-8")
+    return got.stdout.strip() if got.returncode == 0 else None
+
+
 def decide() -> dict:
     policy = rh.load_policy(ROOT)
     a = recorded_attempt()
     facts = derived_facts(a["record"])
     probe = {**a["entry"], "recurrence_facts": facts}      # evaluated, never written back into the history
-    effect, why = rh.recurrence_effect(probe, a["entries"], policy, ROOT)
+    effect, why = rh.recurrence_effect(probe, a["entries"], policy, ROOT, tree_at(a["entry"]["commit"]))
     lc = policy["known_defect_lifecycle"]["V1-PF-001"]
     return {
         "record": "AISEF V2 — V1-PF-001 RECURRENCE 1: the Cycle-2 gate effect under the corrected policy",
@@ -202,11 +210,13 @@ def calibrate() -> dict:
         rows.append({"id": c["id"], "expected": c["expect"], "observed": got, "reasons": why, "held": got == c["expect"]})
     # the policy without its amendment: fail closed
     base = json.loads((ROOT / rh.POLICY_REL).read_text(encoding="utf-8"))
-    got, why = rh.recurrence_effect({**a["entry"], "recurrence_facts": derived_facts(a["record"])}, [], base, ROOT)
+    got, why = rh.recurrence_effect({**a["entry"], "recurrence_facts": derived_facts(a["record"])}, [], base, ROOT,
+                                    tree_at(a["entry"]["commit"]))
     rows.append({"id": "policy_without_the_amendment", "expected": "STOP", "observed": got, "reasons": why, "held": got == "STOP"})
-    # run and commit identities are not inputs: the exact facts under another run id and commit give the same effect
+    # run and commit identities are not inputs: the exact facts under another run id and commit — the same V1 tree,
+    # which the facts name — give the same effect
     other = {**a["entry"], "commit": "f" * 40, "ci_run": 1, "ci_job_id": 1, "recurrence_facts": derived_facts(a["record"])}
-    got, why = rh.recurrence_effect(other, [other], policy, ROOT)
+    got, why = rh.recurrence_effect(other, [other], policy, ROOT, other["recurrence_facts"]["v1_product_tree"])
     rows.append({"id": "another_run_and_commit_same_facts", "expected": "RECORD_ONLY", "observed": got, "reasons": why,
                  "held": got == "RECORD_ONLY"})
     return {"record": "AISEF V2 — V1-PF-001 POLICY CALIBRATION (the corrected rule on known-bad cases)",

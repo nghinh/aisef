@@ -160,12 +160,27 @@ class TestRecordedEvidenceIsInSync(unittest.TestCase):
         self.recorded = json.loads((ROOT / EVIDENCE_PATH).read_text(encoding="utf-8"))
 
     def test_recorded_digest_matches_a_fresh_computation(self):
+        """The record is frozen V1 evidence (validation/v2/v1_evidence_guard.py protects closure-evidence/ outside v2/),
+        so it is checked against the surface it was recorded for — the V1 closure revision's — and never regenerated.
+        AISEF 2.0 moved exactly one source: README's Quick Start, where `aisef run` became `aisef legacy run` (charter
+        G1). G6.1's freshness therefore reads the V1 participant's validation as stale for the 2.0 surface — the truth."""
+        import subprocess
+        import tempfile
+
+        sys.path.insert(0, str(ROOT / "validation" / "v2"))
+        from v1_evidence_guard import V1_CLOSE
+
+        with tempfile.TemporaryDirectory() as t:
+            for rel in TOUCHED:
+                blob = subprocess.run(["git", "-C", str(ROOT), "show", f"{V1_CLOSE}:{rel}"], capture_output=True, check=True)
+                (Path(t) / rel).parent.mkdir(parents=True, exist_ok=True)
+                (Path(t) / rel).write_bytes(blob.stdout)
+            at_v1_close = compute_onboarding_digest(t)
+        self.assertEqual(self.recorded["digest"], at_v1_close["digest"])
         fresh = compute_onboarding_digest(ROOT)
-        self.assertEqual(
-            self.recorded["digest"],
-            fresh["digest"],
-            "onboarding surface moved — regenerate: python3 -m aisef.control.onboarding --write",
-        )
+        moved = [(a["path"], a["extract"]) for a, b in zip(at_v1_close["sources"], fresh["sources"], strict=True) if a != b]
+        self.assertEqual(moved, [("README.md", "section:Quick Start")])
+        self.assertNotEqual(self.recorded["digest"], fresh["digest"])
 
     def test_sources_are_exactly_the_ones_the_contract_names(self):
         named = [(s["path"], s["extract"]) for s in self.spec["sources"]]

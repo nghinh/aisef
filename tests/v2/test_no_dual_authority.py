@@ -44,11 +44,14 @@ def _load(name, rel):
 
 
 opa = _load("aisef_v2_old_path_audit", "validation/v2/old_path_audit.py")
-COPIED = ("aisef2", "aisef", "validation/v2", "tests/v2", "pyproject.toml", opa.INVENTORY_REL)
+#: V2.0: the release tree's inventory (validation/qualification/release_inventory.py). P6's stays sealed as the P6
+#: tree's; the release audits its own tree, with the same audit, against its own inventory.
+RELEASE_INVENTORY_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"
+COPIED = ("aisef2", "aisef", "validation/v2", "tests/v2", "pyproject.toml")
 
 
 def snapshot() -> pathlib.Path:
-    """A copy of everything the audit reads, to inject into."""
+    """A copy of everything the audit reads, to inject into — the release inventory where the audit reads one."""
     d = pathlib.Path(tempfile.mkdtemp(prefix="nda-"))
     for rel in COPIED:
         src = ROOT / rel
@@ -57,6 +60,8 @@ def snapshot() -> pathlib.Path:
         else:
             (d / rel).parent.mkdir(parents=True, exist_ok=True)
             shutil.copy(src, d / rel)
+    (d / opa.INVENTORY_REL).parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(ROOT / RELEASE_INVENTORY_REL, d / opa.INVENTORY_REL)
     return d
 
 
@@ -64,8 +69,13 @@ class Inventory(unittest.TestCase):
     """§2, §3, §17–§19 on the real tree."""
 
     def test_the_committed_inventory_matches_reality_in_both_directions(self):
-        self.assertEqual(opa.check(ROOT), [])
-        inv = json.loads((ROOT / opa.INVENTORY_REL).read_text(encoding="utf-8"))
+        self.assertEqual(opa.check(snapshot()), [])
+        inv = json.loads((ROOT / RELEASE_INVENTORY_REL).read_text(encoding="utf-8"))
+        p6 = json.loads((ROOT / opa.INVENTORY_REL).read_text(encoding="utf-8"))
+        # the release adds exactly the product runtime's two authorities to the sealed P6 inventory, and removes none
+        self.assertEqual({r["id"] for r in inv["rows"]} - {r["id"] for r in p6["rows"]},
+                         {"aisef2/app/bundle.py::load", "aisef2/app/run.py::execute"})
+        self.assertEqual({r["id"] for r in p6["rows"]} - {r["id"] for r in inv["rows"]}, set())
         self.assertEqual(inv["summary"]["UNCLASSIFIABLE"], 0)
         self.assertEqual(inv["summary"]["REMOVED"], 0)
         self.assertEqual(inv["legacy_references"], [])
