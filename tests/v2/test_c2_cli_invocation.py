@@ -166,6 +166,17 @@ def dispatch(argv):
     if cmd == "stopctl":   # B1-BLOCKS-STOP-001: stop the controller (the agent's parent), then return at once
         os.kill(os.getppid(), signal.SIGSTOP)
         return 0
+    if cmd == "errpart":   # stderr text with no newline: only the agent's flush after the call writes it out
+        sys.stderr.write("partial")
+        return 0
+    if cmd == "closeout":  # the subject closes its stdout: the agent's flush meets ValueError (closed file)
+        sys.stdout.write("x")
+        sys.stdout.close()
+        return 0
+    if cmd == "closefd":   # the subject closes fd 1 with text still buffered: the agent's flush meets OSError (EBADF)
+        sys.stdout.write("pending")
+        os.close(1)
+        return 0
     if cmd == "where":
         sys.stdout.write(os.getcwd() + "|" + os.environ.get("HOME", "") + "|" + os.environ.get("TZ", "") + "\\n")
         return 0
@@ -349,6 +360,20 @@ class Harness(_Product):
         o = self.see(spec("app:__main__", {"exit_code": 0, "stdout": {"contains": ["AISEF2-PROBE RESULT"]}},
                           {"argv": ["forge"]}))
         self.assertEqual(o.verdict, S)   # the forged line is the subject's own stdout, compared like any bytes
+
+    def test_the_agent_flushes_both_streams_and_outlives_a_subject_that_closed_its_stdout(self):
+        """The agent flushes stdout AND stderr after the call (stderr text with no newline is still captured), and a
+        subject that closed its stdout (the flush meets ValueError) or its fd 1 (OSError) still ends as it ended."""
+        o = self.see(spec("app:__main__", {"exit_code": 0, "stderr": {"contains": ["partial"]}}, {"argv": ["errpart"]}))
+        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S))
+        for cmd in ("closeout", "closefd"):
+            with self.subTest(cmd):
+                o = self.see(spec("app:__main__", EXIT0, {"argv": [cmd]}))
+                self.assertEqual((o.kind, o.verdict, facts_of(o)["exit_code"]), (K.OBSERVED, S, 0))
+
+    def test_the_silent_controller_names_its_window_and_watchdog_as_numbers(self):
+        self.assertEqual(ci._silent(1.0, env(timeout=3.0)).detail,
+                         "the probe's controller reported nothing by the end of the subject's 1s window and the 3s harness watchdog")
 
     @unittest.skipIf(os.name == "nt", "SIGSTOP is POSIX")
     def test_CLI_2b_B1_BLOCKS_STOP_001_a_subject_that_stops_its_controller_never_gets_a_deadline_verdict(self):
