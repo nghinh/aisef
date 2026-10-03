@@ -1,0 +1,3 @@
+# setuptools adds tests/test*.py to every sdist by default: 108 V1 test modules without the tests/ package, helpers
+# or fixtures they import. The sdist ships exactly aisef + aisef2 + metadata (validation/v2/packaging_check.py).
+prune tests
