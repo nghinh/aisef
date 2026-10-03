@@ -45,7 +45,7 @@
    }
   },
   "after": {
-   "kernel_digest": "94b1aea452ebc0c5fa1bd649870370130dc985ae3fcf6b779eaa66ebe50bcbc4",
+   "kernel_digest": "ed7c25a453cb528327aebe3a3526a1da6ae3699ec81318e92a7d1acb79922dd8",
    "rule": "q4's kernel digest over this working tree's aisef2; the files below bind it by content"
   }
  },
@@ -338,7 +338,7 @@
    }
   },
   "after": {
-   "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
+   "plan_hash": "74f9e0a87ff9d9e12cd16c4401ac0110a302cd169a8e97b9464060e276db76a6",
    "stories": 7,
    "obligations": 67,
    "outcomes": {
@@ -487,7 +487,7 @@
   "correction": "c2_p9.regression_tests: only a test file that was never produced (main did not hold it when its story committed) and that main does not hold is left out; a produced file stays named even if it is gone since (the kernel's typed failure), and so does one main holds; with none, the story's own tests (as for the first story). The kernel is unchanged by it",
   "shape": "the rehearsal above on this tree's kernel, the stand-in developer over-delivering partly: its first delivery is the reference with the fixture's mutant M-7-1 (S-7-d wrong, STORY-04-01's to introduce); called again it installs the reference and tests the behaviour it fixed",
   "before": {
-   "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
+   "plan_hash": "74f9e0a87ff9d9e12cd16c4401ac0110a302cd169a8e97b9464060e276db76a6",
    "stories": 7,
    "obligations": 67,
    "outcomes": {
@@ -670,7 +670,7 @@
    }
   },
   "after": {
-   "plan_hash": "8a9288f877515282e1433a83bbb3f5934b34fef25aaa0130d3251f8c726fde2b",
+   "plan_hash": "74f9e0a87ff9d9e12cd16c4401ac0110a302cd169a8e97b9464060e276db76a6",
    "stories": 7,
    "obligations": 67,
    "outcomes": {
@@ -857,7 +857,7 @@
   ]
  },
  "bound": {
-  "aisef2/orchestrate/story_runner.py": "105ce34a48422acd1de518e39b30a4bc3dcf61bb87c6af2840009c76c9b52de5",
+  "aisef2/orchestrate/story_runner.py": "30c64e6b343e993171d2bdf8d3b0cd2b16514a62622c35f398260376493a24d5",
   "tests/v2/test_c2_k_nowork_001.py": "fb7eb72901a689a3ef57a9bc17b752d09178064789d524193e4bd4148e73b391",
   "validation/qualification/c2_k_nowork_001.py": "84a4f433ed72d04d3b207beeaef5a365f613d3ce44d1b750552011e4187ee247",
   "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json": "365ebacfc8d27a2d5f3f833a90fa4ba6d4ac6dd2a76d9e7744310579f14d8ba6",
@@ -871,5 +871,5 @@
  },
  "problems": [],
  "verdict": "REPRODUCED AND CORRECTED",
- "seconds": 562.2
+ "seconds": 760.1
 }
