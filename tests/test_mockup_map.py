@@ -499,11 +499,14 @@ class TestGianhLaiCongCuaChinhMinh(unittest.TestCase):
 
         port = _free_port()
         url = f"http://127.0.0.1:{port}"
-        # --bind: the URL is IPv4 loopback; without it http.server binds the dual-stack `::` first, which a host
-        # without usable IPv6 refuses (macOS CI 2026-10-03: never up in 10 s). Its stderr is kept to say why if not up.
+        # A plain TCPServer, not `python -m http.server`: HTTPServer.server_bind() resolves socket.getfqdn(host)
+        # between bind() and listen(), and where reverse DNS hangs the socket stays bound but not listening past this
+        # test's window (macOS CI 2026-10-04: lsof showed 127.0.0.1:<port> CLOSED, the process asleep, firewall off).
+        # Its stderr is kept to say why if it is not up.
         log = tempfile.TemporaryFile()
-        p = sp.Popen([_s.executable, "-m", "http.server", "--bind", "127.0.0.1", str(port)],
-                     stdout=sp.DEVNULL, stderr=log)
+        serve = ("import http.server, socketserver, sys\n"
+                 "socketserver.TCPServer(('127.0.0.1', int(sys.argv[1])), http.server.SimpleHTTPRequestHandler).serve_forever()")
+        p = sp.Popen([_s.executable, "-c", serve, str(port)], stdout=sp.DEVNULL, stderr=log)
         try:
             het = _t.time() + 10
             while _t.time() < het and not _responds(url, timeout=1):
