@@ -91,6 +91,18 @@ class GitConfiguration(Repo):
         self.configure("core.fsmonitor", marker_command(self.marker))
         self.assertRefused(self.repo, "core.fsmonitor", self.control("status"))
 
+    def test_the_refusal_is_a_whole_result_that_names_every_key(self):
+        """What a refused call returns, exactly: the command it would have run, REFUSED, nothing on stdout, and every
+        key that is not inert, in order — a caller reads why, and nothing ran."""
+        self.configure("core.fsmonitor", marker_command(self.marker))
+        self.configure("diff.evil.textconv", marker_command(self.marker))
+        p = w.git(self.repo, "log", "-1")
+        self.assertEqual((p.args, p.returncode, p.stdout, p.stderr),
+                         (["git", "-C", str(self.repo), "log", "-1"], w.REFUSED, "",
+                          f"refused: the repository configuration at {self.repo} names core.fsmonitor, diff.evil.textconv "
+                          "(not inert)"))
+        self.assertEqual(self.ran(), 0)
+
     def test_a_clean_filter_is_refused(self):
         pathlib.Path(self.repo, ".gitattributes").write_text("*.py filter=evil\n", encoding="utf-8")
         self.configure("filter.evil.clean", marker_command(self.marker))
