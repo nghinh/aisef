@@ -3,16 +3,16 @@
  "authority": "owner charter 'AISEF V2 — STABLE RELEASE EXECUTION ORDER / OWNER RELEASE CHARTER / SCOPE FREEZE' (2026-10-03), docs/v2/V2-STABLE-RELEASE-CHARTER.md sha256 cd8833569fed317bb1ef20cb7bc997b6f7003218be1f5347bd53df001c04b58a",
  "S0_SCOPE_FREEZE": "PASS",
  "S1_FAIL_CLOSED": "PASS",
- "S2_FIX_WINDOW": "NOT_STARTED",
- "S3_PRODUCTIZED": "NOT_STARTED",
+ "S2_FIX_WINDOW": "IN_PROGRESS",
+ "S3_PRODUCTIZED": "IN_PROGRESS",
  "S4_RC_FROZEN": "NOT_STARTED",
  "S5_QUALIFIED": "NOT_STARTED",
  "S6_RELEASE_SMOKE": "NOT_STARTED",
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
- "CURRENT_SHA": "ae478f678d117da2a369eb1e5f899c986201cfac",
- "CURRENT_KERNEL_DIGEST": "c2717d2ed98b76bd3d284a37c47103b5dc2bd020",
+ "CURRENT_SHA": "2e9e7b234fac85c7d95e60fd6990848837942461",
+ "CURRENT_KERNEL_DIGEST": "b64fb5371a4546a862a11a9a83fef37a4e0fffd9",
  "CURRENT_WHEEL_DIGEST": null,
  "OPEN_V2_0_BLOCKERS": [
   "B1",
@@ -50,7 +50,34 @@
    "status": "PASS",
    "on": "ae478f678d117da2a369eb1e5f899c986201cfac",
    "what": "B2 closed: c2_p9.run refuses every profile no frozen experiment/release-smoke record authorizes (qp-2.9, v1-aligned; delivery-experiment-1 by its hold); c2_p9.opencode_session refuses unless model, built env, budget and turn cap are all bound; tests/v2/test_release_fail_closed.py (no provider call); K-NOWORK-001 rehearsal re-bound to the new c2_p9.py"
+  },
+  {
+   "phase": "S2_FIX_WINDOW",
+   "status": "IN_PROGRESS",
+   "on": "2e9e7b234fac85c7d95e60fd6990848837942461",
+   "what": "S2 code complete incl. B1-BLOCKS-STOP-001; S3 productization largely done; exit gates running"
   }
  ],
- "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO"
+ "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
+ "S2_DETAIL": {
+  "code": "B1 (ci, pe, pc2 split; B1-BLOCKS-STOP-001), B3, B4, B6, B7, B12 (aisef2/app), KA-09 fixed and regression-tested; B13 release mechanics merged",
+  "exit": "targeted mutation V2.0-S2 running (260 targets, 6,355 mutants; story_runner after its record re-pin); harness re-pin to the new probe identities in progress; one full local suite after both"
+ },
+ "S3_DETAIL": {
+  "done": [
+   "aisef + aisef2 in wheel/sdist (packaging_check)",
+   "aisef run = V2, aisef legacy run = V1",
+   "release.yml/staging.yml + V2 release gate",
+   "installed smoke",
+   "docs/v2/USAGE.md",
+   "macOS in CI",
+   "shipped probe calibrations (18 rows)",
+   "LedgerLock release bundle READY",
+   "offline rehearsal pre-RC: reference/partial PASS 67/67, nothing FAIL 0/67"
+  ],
+  "open": [
+   "version 2.0.0 at RC1 freeze",
+   "RC digests"
+  ]
+ }
 }
