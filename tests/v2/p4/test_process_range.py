@@ -424,7 +424,19 @@ class Anchor(unittest.TestCase):
             if a.poll() is None:
                 a.kill()
 
-    @unittest.skipUnless(POSIX, "waitid (POSIX)")
+    def test_without_os_waitid_the_reaper_returns_at_once(self):
+        """Where Python exposes no os.waitid (Windows; also python.org's and Homebrew's 3.12 builds on macOS, which has
+        no subreaper, so nothing is adopted to reap) the reaper returns instead of looping."""
+        import types
+        from aisef2.runtime import range_anchor as ra
+        done = threading.Event()
+        with mock.patch.dict(ra.__dict__, {"os": types.SimpleNamespace(name=os.name)}):
+            t = threading.Thread(target=lambda: (ra._reap_adopted(os.getpid(), 0.01), done.set()), daemon=True)
+            t.start()
+            t.join(5)
+        self.assertTrue(done.is_set())
+
+    @unittest.skipUnless(hasattr(os, "waitid"), "os.waitid (Linux; not in every macOS Python build)")
     def test_the_reaper_reaps_every_child_but_the_target_and_keeps_doing_it(self):
         code = (f"import json, os, subprocess, sys, threading, time\nsys.path.insert(0, {str(ROOT)!r})\n"
                 "from aisef2.runtime import range_anchor as ra\n"
