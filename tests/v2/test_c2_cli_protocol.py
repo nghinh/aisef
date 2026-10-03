@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import types
 import unittest
 from unittest import mock
 
@@ -85,6 +86,30 @@ def env_with(interpreter):
     return env(interpreter=interpreter)
 
 
+class Concluded(unittest.TestCase):
+    """ci._concluded as a unit: each conclusion a controller's RESULT can carry, decided with a `decide` that would say
+    SATISFIED — a conclusion that fell through to the decision would show — and its (observation, facts) pair whole."""
+    RUN = types.SimpleNamespace(ledger=[])   # _after_dispatch reads the controller's signal ledger only: empty here
+
+    def concluded(self, facts):
+        return ci._concluded(self.RUN, facts, lambda f: S)
+
+    def test_each_conclusion_and_the_facts_only_a_decided_one_returns(self):
+        signal = Observation(K.NON_CONTROLLER_SIGNAL, detail="the subject's process ended by signal 9 after DISPATCHED, "
+                                                             "and this controller's signal ledger is empty: it did not send it")
+        tampered = {"subject": "present", "tampered": "x"}
+        cases = {"a signal the controller did not send": ({"subject_signal": 9}, (signal, None)),
+                 # defensive: today's controller script reports no failure of its own this way (it ends without a RESULT)
+                 "the controller's own failure": ({"harness_failure": "boom"}, (Observation(K.HARNESS_FAILED, detail="boom"), None)),
+                 "an absent subject": ({"subject": "absent", "note": "n"}, (Observation(K.SUBJECT_ABSENT, R, detail="n"), None)),
+                 "an answer that is not the agent's": (tampered, (Observation(K.OBSERVED, R, detail=json.dumps(tampered)), None))}
+        for name, (facts, want) in cases.items():
+            with self.subTest(name):
+                self.assertEqual(self.concluded(facts), want)
+        facts = {"subject": "present", "exit_code": 0}
+        self.assertEqual(self.concluded(facts), (Observation(K.OBSERVED, S, detail=json.dumps(ci._public(facts))), facts))
+
+
 class FaultStream(_Product):
     def test_FM2_CLI_STREAM_1b_exit_before_READY_or_DISPATCHED_on_the_range(self):
         s = spec("app:__main__")
@@ -143,6 +168,19 @@ class FaultStream(_Product):
             for observable in (EXIT0, {"blocks": True}):
                 o = self.see(spec("app:__main__", observable, {"argv": ["echo"]}))
                 self.assertEqual((o.kind, o.verdict), (K.OBSERVED, R))
+        # the same two conclusions in a half of an equality (which unpacks each half's observation AND facts): that
+        # half's observation is the answer
+        halves = {"stimulus_a": {"argv": ["echo"]}, "stimulus_b": {"argv": ["echo"]}, "normalization": {}, "comparator": "bytes_equal"}
+        eq = ProductProofSpec.create(   # an equality's own stimulus is empty: its halves carry theirs
+            contract_id="BC-CLI", probe_id=P.id, probe_digest=P.digest, compiler_id="test", compiler_digest="c" * 64,
+            probe_input={"subject": {"kind": "cli_invocation", "locator": "app:__main__"}, "stimulus": {},
+                         "observable": {"equality": halves, "streams": ["stdout"], "within_s": W}, "subject_absence": "REQUIRES_SUBJECT"},
+            candidate_expectation=S)
+        self.assertEqual(ci.spec_class(eq), "equality")
+        with faked("READY", "DISPATCHED", 'RESULT {"subject_signal": 9}', returncode=0):
+            self.assertEqual(self.see(eq).kind, K.NON_CONTROLLER_SIGNAL)
+        with faked("READY", "DISPATCHED", 'RESULT {"subject": "present", "tampered": "x"}', returncode=0):
+            self.assertEqual((self.see(eq).kind, self.see(eq).verdict), (K.OBSERVED, R))
         # the controller's own process ended with no RESULT: the mechanism failed, whatever line it wrote last
         for tags in (("READY", "DISPATCHED"), ("READY", "DISPATCHED", 'MAIN {"before": {}}'), ("READY", "DISPATCHED", "PRE 0")):
             with self.subTest(tags=tags), faked(*tags, returncode=3):
