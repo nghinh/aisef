@@ -1,5 +1,6 @@
-"""AISEF V2 — Cycle-1 implementation of the frozen architecture (docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md).
+"""AISEF V2 — the runtime of the frozen architecture (docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md).
 
-Not part of the `aisef` product and not shipped in its wheel (pyproject excludes `aisef2*`). Nothing in `aisef/`
-imports it.
+Shipped in the `aisef` distribution from 2.0 (docs/v2/V2-STABLE-RELEASE-CHARTER.md, G1): `aisef run` is this
+runtime (`aisef2.app.cli.run`); V1 (`aisef/`) reaches it only through that command, and nothing in `aisef2/` imports
+`aisef`. Usage: docs/v2/USAGE.md.
 """

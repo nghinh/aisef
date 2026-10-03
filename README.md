@@ -28,7 +28,7 @@ named legacy surface, `aisef legacy run …`, never the default; every other
 command below is unchanged.
 
 - Install, once 2.0.0 is published: `pip install aisef==2.0.0`
-- Using the V2 runtime: `docs/v2/USAGE.md`
+- Using the V2 runtime: [docs/v2/USAGE.md](docs/v2/USAGE.md)
 - Releasing (tags, staging, the production hold): [docs/v2/RELEASE-PROCESS.md](docs/v2/RELEASE-PROCESS.md)
 - The ruling it all follows: [docs/v2/V2-STABLE-RELEASE-CHARTER.md](docs/v2/V2-STABLE-RELEASE-CHARTER.md)
 

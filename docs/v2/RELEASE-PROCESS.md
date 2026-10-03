@@ -11,7 +11,7 @@ One distribution, `aisef`, carrying exactly two packages:
 
 | package  | what it is | how it is reached |
 |----------|------------|-------------------|
-| `aisef2` | the V2 runtime, every subpackage | `aisef run …` — every argument after `run` goes to `aisef2.app.cli.run(argv)`; this is the authoritative execution path (G1). Usage: `docs/v2/USAGE.md` |
+| `aisef2` | the V2 runtime, every subpackage | `aisef run …` — every argument after `run` goes to `aisef2.app.cli.run(argv)`; this is the authoritative execution path (G1). Usage: [USAGE.md](USAGE.md) |
 | `aisef`  | V1 and the console script `aisef = aisef.cli:main` | all other commands; V1 execution only as the explicitly named legacy surface `aisef legacy run …`, never the default |
 
 Nothing else ships: no `tests/`, `validation/`, `closure-evidence/`. `pyproject.toml`

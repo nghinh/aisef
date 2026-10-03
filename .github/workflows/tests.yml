@@ -20,6 +20,10 @@ jobs:
         include:
           - os: windows-latest
             python-version: "3.11"
+          # V2.0 charter G4: `aisef run` is claimed on Linux and macOS (docs/v2/USAGE.md), so the exact RC is tested
+          # on a macOS runner too — a claimed platform is a CI-green platform
+          - os: macos-latest
+            python-version: "3.12"
     steps:
       # fetch-depth: 0 — bộ test có phép **cố ý** dựng lại một commit gốc
       # trong lịch sử chính kho này (`git archive <task.base>`, bench A-2).
