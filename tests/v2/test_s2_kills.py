@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -18,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
 from aisef2.probe import cli_invocation as ci  # noqa: E402
 from aisef2.probe import process_effect as pe  # noqa: E402
+from aisef2.probe import python_callable_v2 as pc2  # noqa: E402
 from aisef2.probe.protocol import ExecutionEnv, ObservationKind, RevisionRef  # noqa: E402
 from aisef2.product.spec import ProductProofSpec  # noqa: E402
 
@@ -75,6 +77,27 @@ class ProcessEffectAsk(unittest.TestCase):
             o = probe.observe(spec, RevisionRef("89abcdef0123456789abcdef0123456789abcdef", str(root)),
                               ExecutionEnv(sys.executable, 10, Enforcement.PARTIAL))
             self.assertEqual((o.kind, o.verdict), (ObservationKind.OBSERVED, BehaviorVerdict.SATISFIED), o.detail)
+
+
+class CallableWatch(unittest.TestCase):
+    """python_callable_v2._watch L504: after DISPATCHED the RESULT wait timed out, nothing of the range is left and its
+    exit status was never reported — the controller's own statement is HARNESS_FAILED, with that detail. Not reachable
+    end to end (a range that empties reports its status); pinned here."""
+
+    def test_a_range_gone_without_an_exit_status_is_a_harness_failure(self):
+        class Gone:
+            ledger: list = []
+
+            def members(self):
+                return []
+
+            def wait(self, timeout):
+                return None
+        with mock.patch.object(ci, "_await", side_effect=[("LINE", {"DISPATCHED": [""]}), ("TIMEOUT", {})]):
+            o = pc2._watch(Gone(), "proto", "nonce", "key", "returns", {"returns": 1, "within_s": 5},
+                           ExecutionEnv(sys.executable, 10, Enforcement.PARTIAL), "/ws")
+        self.assertEqual((o.kind, o.verdict, o.detail),
+                         (ObservationKind.HARNESS_FAILED, None, "the harness process ended and its exit status was never reported"))
 
 
 if __name__ == "__main__":
