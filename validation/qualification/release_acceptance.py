@@ -97,14 +97,20 @@ def acceptance(project, tree: pathlib.Path, sha: str, interpreter: str = sys.exe
             "not_satisfied": [r["spec"] for r in rows if r["satisfaction"] != ok], "specs": rows}
 
 
-def framework_blocks(events: list[dict], committed: set[str]) -> list[dict]:
-    """Stories that did not commit and whose last observed failure the framework owns."""
+def framework_blocks(events: list[dict], committed: set[str], depends: dict[str, list[str]] | None = None) -> list[dict]:
+    """Stories that did not commit and whose last observed failure the framework owns. One whose story depends (through
+    `depends`, transitively) on a story that did not commit is marked `upstream_not_committed`: its block follows from
+    that story's failure (e.g. PRECONDITION_BROKEN), it is not a false one."""
+    depends = depends or {}
+
+    def upstream(s: str, seen: frozenset = frozenset()) -> bool:
+        return any(d not in committed or (d not in seen and upstream(d, seen | {s})) for d in depends.get(s, ()))
     last: dict[str, dict] = {}
     for e in events:
         if e["type"] == "failure/observed" and e["data"].get("story_id"):
             last[e["data"]["story_id"]] = e["data"]
-    return [{"story": s, "code": f.get("code"), "owner": f.get("owner")} for s, f in sorted(last.items())
-            if s not in committed and f.get("owner") in FRAMEWORK_OWNERS]
+    return [{"story": s, "code": f.get("code"), "owner": f.get("owner"), **({"upstream_not_committed": True} if upstream(s) else {})}
+            for s, f in sorted(last.items()) if s not in committed and f.get("owner") in FRAMEWORK_OWNERS]
 
 
 def evaluate(project, run_dir: pathlib.Path, accepted: dict) -> dict:
@@ -130,14 +136,14 @@ def evaluate(project, run_dir: pathlib.Path, accepted: dict) -> dict:
         acc = acceptance(project, tree, sha, str(run_dir / "probe-python" / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")))
     claimed = {r["spec"] for r in pp["obligations"] if r["delivered"]}
     false_acceptance = sorted(claimed & set(acc["not_satisfied"]))
-    blocks = framework_blocks(events, committed)
+    blocks = framework_blocks(events, committed, {s: v["depends_on"] for s, v in project.stories.items()})
     pre = rec.get("preflight") or {}
     unaccounted = ((rec.get("budget") or {}).get("spent") or {}).get("unaccounted", ["no budget account"])
     checks = {"run_verified": v["verdict"] == "VERIFIED", "delivery_verdict": verdict == "PASS",
               "stories_committed": committed == set(project.order()),
               "productproof_delivered": pp["delivered"] == pp["total"] == len(project.plan.obligations),
               "acceptance_suite_satisfied": acc["satisfied"] == acc["total"] == len(project.specs),
-              "false_acceptance": not false_acceptance, "framework_false_rollback_or_block": not blocks,
+              "false_acceptance": not false_acceptance, "framework_false_rollback_or_block": not [b for b in blocks if not b.get("upstream_not_committed")],
               "preflight": pre.get("verdict") == "ATTESTED", "unaccounted_spend": not unaccounted}
     problems += [f"{k} does not hold" for k, ok in checks.items() if not ok]
     return {"run": str(run_dir), "bundle_digest": project.digest, "delivery_verdict": verdict, "delivery_blocked_by": blocked,

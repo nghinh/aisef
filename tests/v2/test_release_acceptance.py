@@ -69,6 +69,15 @@ class ReleaseAcceptance(e2e.ProductBase):
                   {"seq": 3, "type": "failure/observed", "data": {"story_id": "S3", "code": "X", "owner": "PLAN"}}]
         self.assertEqual(A.framework_blocks(events, {"S3"}), [{"story": "S1", "code": "PROBE_UNRUNNABLE", "owner": "ENVIRONMENT"}])
 
+    def test_a_block_that_follows_an_upstream_story_s_failure_is_not_a_false_one(self):
+        events = [{"seq": 1, "type": "failure/observed", "data": {"story_id": "S1", "code": "PRODUCT_REFUTED", "owner": "DEVELOPER"}},
+                  {"seq": 2, "type": "failure/observed", "data": {"story_id": "S3", "code": "PRECONDITION_BROKEN", "owner": "PLAN"}},
+                  {"seq": 3, "type": "failure/observed", "data": {"story_id": "S4", "code": "PROBE_UNRUNNABLE", "owner": "ENVIRONMENT"}}]
+        depends = {"S2": ["S1"], "S3": ["S2"], "S4": []}         # S3 -> S2 (committed) -> S1 (not committed)
+        self.assertEqual(A.framework_blocks(events, {"S2"}, depends),
+                         [{"story": "S3", "code": "PRECONDITION_BROKEN", "owner": "PLAN", "upstream_not_committed": True},
+                          {"story": "S4", "code": "PROBE_UNRUNNABLE", "owner": "ENVIRONMENT"}])
+
 
 if __name__ == "__main__":
     unittest.main()
