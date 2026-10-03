@@ -443,7 +443,9 @@ class Anchor(unittest.TestCase):
                 "later = subprocess.Popen([sys.executable, '-c', 'pass'])\n"  # adopted after a moment with no child
                 "print(json.dumps([first, status, gone(later.pid)]))\n")
         out = subprocess.run([PY, "-P", "-c", code], capture_output=True, encoding="utf-8", timeout=90)
-        self.assertEqual(json.loads(out.stdout), [True, 7, True], out.stderr)
+        # the exit status and the stream compared as text first: a child that dies says how (its stderr), never a bare
+        # JSONDecodeError (macOS CI, 2026-10-03: an empty stdout with nothing else to go on)
+        self.assertEqual((out.returncode, out.stdout.strip()), (0, json.dumps([True, 7, True])), out.stderr[-3000:])
 
     def test_the_subreaper_is_asked_for_on_linux_only_and_its_absence_is_tolerated(self):
         from aisef2.runtime import range_anchor as ra
