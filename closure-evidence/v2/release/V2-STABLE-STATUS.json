@@ -11,7 +11,7 @@
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
- "CURRENT_SHA": "69e65c6146e699b352cd2b509b7e6ecc4368ec99",
+ "CURRENT_SHA": "819fe4d79c8b26669a0c5a8a9008adc452a873e0",
  "CURRENT_KERNEL_DIGEST": "2434f962e1394fa2b5ad5db0e305c3bb2cd8fc8e",
  "CURRENT_WHEEL_DIGEST": null,
  "OPEN_V2_0_BLOCKERS": [
@@ -75,13 +75,19 @@
    "status": "IN_PROGRESS",
    "on": "69e65c6146e699b352cd2b509b7e6ecc4368ec99",
    "what": "B4-OLD-GIT fixed (git >= 2.31 enforced by aisef run); Windows include fixture fixed; release acceptance frozen (69e65c6); S2 mutation 164/261"
+  },
+  {
+   "phase": "S2_FIX_WINDOW",
+   "status": "IN_PROGRESS",
+   "on": "819fe4d79c8b26669a0c5a8a9008adc452a873e0",
+   "what": "owner ruling MUTATION WORKER HANDOFF applied: C and D stopped, E/F on 369c8ac, record tool 819fe4d"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
  "S2_DETAIL": {
   "code": "B1 (+ B1-BLOCKS-STOP-001), B3, B4 (+ B4-OLD-GIT: aisef run refuses git < 2.31, 340b11c), B6, B7, B12, KA-09; review blockers B16-BUDGET-AT-CEILING, B13-RC-BINDING, G1-LEGACY-IMPROVE fixed",
-  "exit": "V2.0-S2 mutation (261 targets) running in snapshot worktrees, at most 2 workers; then the merged record, mutation.py --check, Q0 checker calibration regenerated, one full local suite",
-  "mutation_progress": "164 of 261 targets measured valid on 2026-10-04 03:00; kill tests added for the AGENT dead ops (8ffd6f0, V21-33) and run.py::check_git; failfast kill-test runs from ddbefa1"
+  "exit": "V2.0-S2 mutation on the current snapshot 369c8ac (owner ruling MUTATION WORKER HANDOFF, 2026-10-04), at most 2 workers; then validation/qualification/s2_mutation_record.py --write (final record + summary), mutation.py --check, Q0 checker calibration regenerated, one full local suite",
+  "mutation_progress": "C and D stopped (C by the ruling, D by the owner's answer); E and F measuring on 369c8ac, H/I/G queued; 29 of 261 targets reused (B's process_effect HARNESS, proven unchanged); 117 earlier results fail the proof, C's 64 excluded by the ruling; estimated ~29 h wall-clock at the 2-worker cap"
  },
  "S3_DETAIL": {
   "done": [
