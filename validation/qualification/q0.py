@@ -41,7 +41,7 @@ FAMILIES = {
     "invariant_registry": ["invariants_doc", "no_developer_artefact_at_parent", "candidate_only_execution"],
     "except_boundary_audit": ["except_boundaries"],
     "destructive_authority_audit": ["destructive_authority", "cleanup_authority"],
-    "old_path_audit": ["old_path_audit"],
+    "old_path_audit": ["old_path_audit", "release_inventory"],
     "migration_table_check": ["migration_table"],
     "seal_identities_P4_P5_P6": ["explicit:seals"],
     "v1_evidence_guard": ["v1_evidence_guard"],

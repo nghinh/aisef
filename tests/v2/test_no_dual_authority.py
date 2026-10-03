@@ -132,6 +132,51 @@ class Inventory(unittest.TestCase):
         self.assertTrue(any(p.startswith("DISPOSITION moved: aisef/control/obligation.py::<module> is UNCLASSIFIABLE") for p in problems))
 
 
+ri = _load("aisef_v2_release_inventory", "validation/qualification/release_inventory.py")
+cc = _load("aisef_v2_checker_calibration", "validation/v2/checker_calibration.py")
+
+
+def release_snapshot(inv: dict | None = None, text: str | None = None) -> pathlib.Path:
+    """snapshot() plus, unless both are None, a release inventory at its own path (rendered rows or raw text)."""
+    d = snapshot()
+    if inv is not None or text is not None:
+        (d / RELEASE_INVENTORY_REL).parent.mkdir(parents=True, exist_ok=True)
+        (d / RELEASE_INVENTORY_REL).write_text(opa.render(inv) if text is None else text, encoding="utf-8")
+    return d
+
+
+class ReleaseInventory(unittest.TestCase):
+    """V2.0 owner ruling §6: the release tree is audited against its own content-addressed inventory; P6's stays sealed."""
+
+    def test_a_release_tree_without_its_inventory_fails_and_never_falls_back_to_the_p6_one(self):
+        d = release_snapshot()   # aisef2/app present; the P6 path holds the release rows, so a fallback would PASS
+        self.assertEqual(opa.check(d), [])
+        with mock.patch.object(cc, "ROOT", d):
+            self.assertEqual(cc._old_path_audit().clean(), [f"{RELEASE_INVENTORY_REL} is missing: generate it"])
+
+    def test_a_release_inventory_missing_a_real_v1_row_fails_unenumerated_even_when_re_pinned(self):
+        inv = json.loads((ROOT / RELEASE_INVENTORY_REL).read_text(encoding="utf-8"))
+        inv["rows"] = [r for r in inv["rows"] if r["id"] != "aisef/control/gate.py::judge_only"]
+        d = release_snapshot(inv)
+        with mock.patch.object(ri, "INVENTORY_SHA256", ri.digest(d / RELEASE_INVENTORY_REL)):
+            self.assertEqual(ri.check(d), ["UNENUMERATED authority: aisef/control/gate.py::judge_only (UNREACHABLE) "
+                                           "is in the tree and not in the inventory"])
+
+    def test_a_release_inventory_that_is_not_the_pinned_bytes_fails_the_content_address(self):
+        self.assertEqual(ri.digest(ROOT / RELEASE_INVENTORY_REL), ri.INVENTORY_SHA256)
+        # the same rows, other bytes: compare and proofs pass, the content address alone refuses it
+        inv = json.loads((ROOT / RELEASE_INVENTORY_REL).read_text(encoding="utf-8"))
+        d = release_snapshot(text=json.dumps(inv, indent=2, ensure_ascii=False) + "\n")
+        problems = ri.check(d)
+        self.assertEqual(len(problems), 1, problems)
+        self.assertTrue(problems[0].startswith("the release inventory is not the content-addressed one"), problems)
+
+    def test_the_sealed_p6_inventory_is_byte_identical_to_its_seal(self):
+        seal = json.loads((ROOT / "closure-evidence/v2/P6-FINAL-SEAL.json").read_text(encoding="utf-8"))
+        self.assertEqual(seal["p6_evidence"]["P6-AUTHORITY-INVENTORY"]["path"], opa.INVENTORY_REL)
+        self.assertEqual(ri.digest(ROOT / opa.INVENTORY_REL), seal["p6_evidence"]["P6-AUTHORITY-INVENTORY"]["sha256"])
+
+
 # --------------------------------------------------------------------------------------------- R1: poisoning
 
 class PoisonedV1(RuntimeError):

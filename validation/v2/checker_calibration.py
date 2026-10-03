@@ -29,7 +29,6 @@ from typing import Callable
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 V2 = ROOT / "validation" / "v2"
-RELEASE_INVENTORY_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"
 FIXTURES = ROOT / "tests" / "v2" / "fixtures" / "known_bad"
 OUT_REL = "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json"
 
@@ -338,12 +337,25 @@ def _old_path_audit() -> Checker:
         return opa.compare(json.loads(text), opa.inventory(ROOT))
 
     def clean():
-        # the V2.0 release tree adds authorities (aisef2/app): it is audited against its own inventory, beside the
-        # sealed P6 one (validation/qualification/release_inventory.py), by the same compare and proofs
-        if (ROOT / RELEASE_INVENTORY_REL).exists():
-            return _load("aisef_v2_release_inventory", ROOT / "validation/qualification/release_inventory.py").check(ROOT)
+        # the V2.0 release tree adds authorities (the product runtime, aisef2/app): a tree that has it is ALWAYS
+        # audited against its own content-addressed inventory (validation/qualification/release_inventory.py), so a
+        # missing release inventory fails — never a fallback to the sealed P6 one; a tree without it is the P6 tree
+        if (ROOT / "aisef2" / "app").is_dir():
+            return _release_inventory_module().check(ROOT)
         return opa.check(ROOT)
     return Checker("old_path_audit", "WP-6.3", clean, bad, ("validation/v2/old_path_audit.py",))
+
+
+def _release_inventory_module():
+    return _load("aisef_v2_release_inventory", ROOT / "validation/qualification/release_inventory.py")
+
+
+def _release_inventory() -> Checker:
+    """V2.0-S2: the release tree against its own inventory. Known bad: the release inventory weakened by hand so that a
+    real V1 old authority still in the tree is no longer admitted — Q0 must name it UNENUMERATED."""
+    # the same hand-edit audit as old_path_audit's known bad; the fixture names the release inventory
+    return Checker("release_inventory", "V2.0-S2", lambda: _release_inventory_module().check(ROOT),
+                   _old_path_audit().known_bad, ("validation/qualification/release_inventory.py",))
 
 
 def _owned_run() -> Checker:
@@ -498,7 +510,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_developer_artefact_at_parent", "NO_DEVELOPER_ARTEFACT_AT_PARENT", "WP-5.5 (invariant IX)"),
     _except_boundaries, _invariants_doc,
     _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _p5_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
-    _migration_table, _p6_evidence, _old_path_audit,
+    _migration_table, _p6_evidence, _old_path_audit, _release_inventory,
     # Cycle 2 (WP-2.0.1): the baseline guard, the probe catalog closure and the probe source rules
     _cycle2_baseline, _probe_catalog_closure,
     _probe_rule("no_clock_in_probe_facts", "NO_CLOCK_IN_PROBE_FACTS"),
