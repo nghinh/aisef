@@ -96,6 +96,17 @@ class Budget:
                 return f"max_{k}: {spent[k]} of {self.limits[k]}"
         return None
 
+    def exceeded(self) -> str | None:
+        """Spend PAST a ceiling, or spend that cannot be accounted for: the run broke its budget. Spend exactly AT a
+        ceiling is not that (review IR-02) — it only keeps more work from starting (`reached`)."""
+        spent = self.spend()
+        if spent["unaccounted"]:
+            return "unaccounted: " + "; ".join(spent["unaccounted"])
+        for k in self.KEYS:
+            if spent[k] > self.limits[k]:
+                return f"max_{k} exceeded: {spent[k]} of {self.limits[k]}"
+        return None
+
     def account(self) -> dict:
         return {"limits": dict(self.limits), "preflight": dict(self.base), "spent": self.spend(), "reached": self.reached(),
                 "limitation": LIMITATION}

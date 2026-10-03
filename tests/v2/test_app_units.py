@@ -196,6 +196,9 @@ class Sessions(Temp):
         self.assertIsNone(at.reached(in_progress=True))
         self.assertEqual(self.budget(requests=1, provider_requests=1).reached(in_progress=True), "max_provider_requests: 2 of 1")
         self.assertEqual(self.budget(requests=1, turns=1).reached(in_progress=True), "max_turns: 1 of 1")
+        self.assertIsNone(self.budget(requests=1, turns=1).exceeded())          # AT a ceiling is not past it
+        self.assertEqual(self.budget(requests=1, turns=0 + 1, input_tokens=109).exceeded(), "max_input_tokens exceeded: 110 of 109")
+        self.assertEqual(self.budget(requests=0).exceeded()[:13], "unaccounted: ")
         acc = b.account()
         self.assertEqual((acc["limits"], acc["preflight"], acc["reached"], acc["limitation"]), (BUDGET, BASE, None, client.LIMITATION))
 
@@ -522,7 +525,7 @@ class Verification(e2e.ProductBase):
         self.assertIn("the record says PASS; the journal re-derives FAIL",
                       with_record(failure={"type": "X"})["problems"])
         self.assertIn("the record says PASS; the journal re-derives FAIL",
-                      with_record(budget={**rec["budget"], "reached": "max_turns: 9 of 9"})["problems"])
+                      with_record(budget_stop="max_turns exceeded: 9 of 8")["problems"])
         self.assertEqual(with_record()["verdict"], "VERIFIED")
         self.assertEqual(with_record()["journal_events"], len(self.journal().events))
         journal = out / rec["journal"]["path"]

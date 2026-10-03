@@ -119,7 +119,7 @@ def evaluate(project, run_dir: pathlib.Path, accepted: dict) -> dict:
     v = verify(project, run_dir)
     journal = format3.reconstruct((run_dir / rec["journal"]["path"]).read_text(encoding="utf-8")) if rec.get("journal") else None
     events = [{"seq": e.seq, "type": e.type, "data": plain(e.data)} for e in journal.events] if journal else []
-    verdict, blocked, committed = R.delivery(project, events, rec.get("story_outcomes") or {}, (rec.get("budget") or {}).get("reached"),
+    verdict, blocked, committed = R.delivery(project, events, rec.get("story_outcomes") or {}, rec.get("budget_stop"),
                                              rec.get("story_errors") or [])
     pp = R.productproof(project, events, committed) if events else {"total": len(project.plan.obligations), "delivered": 0, "obligations": []}
     with tempfile.TemporaryDirectory(prefix="aisef-acceptance-") as t:

@@ -177,6 +177,34 @@ class Product(ProductBase):
         self.assertEqual(rec["preflight"]["verdict"], "ATTESTED")
         self.assertEqual(verify(self.project, self.tmp / "out")["verdict"], "VERIFIED")
 
+    def test_spend_exactly_at_every_ceiling_is_no_budget_stop(self):
+        """Review IR-02: two sessions of one step each, the preflight's three requests — every counter ends exactly at
+        its ceiling, nothing was refused or cut: the run delivered within its budget."""
+        self.settings = settings.load({**SETTINGS, "budget": {"provider_requests": 5, "turns": 2, "input_tokens": 100000,
+                                                               "output_tokens": 10000}})
+        rec = self.execute()
+        self.assertEqual((rec["delivery_verdict"], rec["budget_stop"]), ("PASS", None))
+        self.assertTrue(rec["budget"]["reached"].startswith("max_"))      # informational: no more work could start
+        self.assertEqual(verify(self.project, self.tmp / "out")["verdict"], "VERIFIED")
+
+    def test_a_session_the_budget_refuses_is_a_budget_stop(self):
+        self.settings = settings.load({**SETTINGS, "budget": {"provider_requests": 20, "turns": 1, "input_tokens": 100000,
+                                                               "output_tokens": 10000}})
+        rec = self.execute()
+        self.assertEqual(rec["delivery_verdict"], "FAIL")
+        self.assertIn("max_turns: 1 of 1", rec["budget_stop"])
+        self.assertTrue(any(b.startswith("the budget ended the run: ") for b in rec["delivery_blocked_by"]))
+        self.assertEqual(verify(self.project, self.tmp / "out")["verdict"], "VERIFIED")
+
+    def test_B3_the_record_is_written_when_closing_the_run_raises(self):
+        from aisef2.errors import InvariantError
+        with mock.patch.object(R, "_close_run", side_effect=InvariantError("a resource would not release")), \
+                self.assertRaises(InvariantError):
+            self.execute()
+        rec = json.loads((self.tmp / "out" / "RUN.json").read_text(encoding="utf-8"))
+        self.assertEqual(rec["journal"]["closed"], "closing failed in state RUNNING")
+        self.assertTrue((self.tmp / "out" / rec["journal"]["path"]).exists())
+
     def test_verification_refutes_a_record_or_a_journal_that_was_changed(self):
         self.execute()
         out = self.tmp / "out"

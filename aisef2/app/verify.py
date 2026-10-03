@@ -38,8 +38,7 @@ def verify(project: Project, out: pathlib.Path) -> dict:
                 problems.append("the journal ends in a torn line")
         except Exception as e:  # noqa: BLE001 — any refusal of the reader is the finding
             problems.append(f"the journal does not reconstruct: {type(e).__name__}: {e}"[:500])
-    budget = rec.get("budget") or {}
-    verdict, _, committed = R.delivery(project, events, rec.get("story_outcomes") or {}, budget.get("reached"),
+    verdict, _, committed = R.delivery(project, events, rec.get("story_outcomes") or {}, rec.get("budget_stop"),
                                        rec.get("story_errors") or [])
     if rec.get("failure") and verdict == "PASS":
         verdict = "FAIL"

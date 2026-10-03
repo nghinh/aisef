@@ -168,9 +168,10 @@ def productproof(project: Project, events: list[dict], committed: set[str]) -> d
             "delivered": sum(r["delivered"] for r in rows)}
 
 
-def delivery(project: Project, events: list[dict], results: dict, budget_reached: str | None, errors: list) -> tuple[str, list[str], set[str]]:
-    """From the journal: PASS only when every plan story's last outcome is its commit, the budget was not reached and
-    no story was refused; NOT_REACHED when no story reached its gate."""
+def delivery(project: Project, events: list[dict], results: dict, budget_stop: str | None, errors: list) -> tuple[str, list[str], set[str]]:
+    """From the journal: PASS only when every plan story's last outcome is its commit, the budget stopped nothing and
+    no story was refused; NOT_REACHED when no story reached its gate. `budget_stop` is an actual stop (`budget_stops`),
+    never spend that merely sits at a ceiling (review IR-02)."""
     last, decided = {}, False
     for e in events:
         if e["type"] == "gate/decision":
@@ -180,10 +181,20 @@ def delivery(project: Project, events: list[dict], results: dict, budget_reached
     committed = {s for s, v in results.items() if v[-1:] == ["COMMIT"] and last.get(s) == "story/commit"}
     missing = sorted({o.story_id for o in project.plan.obligations} - committed)
     blocked = ([f"{len(missing)} of the plan's stories did not commit: {missing}"] if missing else []) \
-        + ([f"the budget ended the run: {budget_reached}"] if budget_reached else []) \
+        + ([f"the budget ended the run: {budget_stop}"] if budget_stop else []) \
         + ([f"{len(errors)} stories were refused"] if errors else [])
     verdict = "NOT_REACHED" if not decided else ("FAIL" if blocked else "PASS")
     return verdict, blocked, committed
+
+
+def budget_stops(not_run: list[str], sessions: list[dict], budget) -> str | None:
+    """What the budget actually stopped: a story not started for it, a session it refused or ended, spend past a ceiling
+    or unaccounted. A session's own turn cap is not a run budget stop (the story is judged by its proofs)."""
+    stops = list(not_run)
+    stops += [f"{s.get('role')} {s.get('story_id')}: {s['stopped']}" for s in sessions
+              if str(s.get("stopped") or "").startswith(("max_", "unaccounted"))]
+    exceeded = budget.exceeded() if budget is not None else None
+    return "; ".join(stops + ([exceeded] if exceeded else [])) or None
 
 
 def execute(project: Project, settings: Settings, source: pathlib.Path, out: pathlib.Path, *, transport=None,
@@ -199,6 +210,7 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
     developer = reviewer = budget = None
     results: dict = {}
     errors: list = []
+    not_run: list[str] = []
     failure: BaseException | None = None
     try:
         repo = out / "repo"
@@ -252,6 +264,7 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
             why = budget.reached()
             if why:
                 results[story] = [f"NOT_RUN: {why}"]
+                not_run.append(f"{story} not run: {why}")
                 continue
             tests = tuple(project.stories[story]["tests"])
             inputs = sr.StoryInputs(project.specs, factories, env, te.DeveloperTests(story, tests),
@@ -272,29 +285,33 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         failure = e
         raise
     finally:
-        rec.update(_close(run))
-        events = [{"seq": e.seq, "type": e.type, "data": plain(e.data)} for e in run.events] if run is not None else []
-        reached = budget.reached() if budget else None
-        verdict, blocked, committed = delivery(project, events, results, reached, errors)
-        final = git(out / "repo", "rev-parse", "main").stdout.strip() if (out / "repo").exists() else None
-        rec.update(finished=clock(), story_outcomes=results, story_errors=errors, final_main=final or None,
-                   delivery_verdict="FAIL" if failure is not None and verdict == "PASS" else verdict, delivery_blocked_by=blocked,
-                   plan_quality_verdict="NOT_CLAIMED", generalization_claim="NONE",
-                   productproof=productproof(project, events, committed) if events else None,
-                   budget=budget.account() if budget else None,
-                   sessions=[{k: v for k, v in s.items() if k != "text"} for s in
-                             ((developer.sessions if developer else []) + (reviewer.sessions if reviewer else []))],
-                   failure=None if failure is None else {"type": type(failure).__name__, "detail": str(failure)[:2000],
-                                                         "stage": rec.get("stage")})
-        (out / "RUN.json").write_text(json.dumps(rec, indent=1, sort_keys=True, default=str) + "\n", encoding="utf-8")
+        closed = None
+        try:
+            closed = _close_run(run)
+        finally:    # B3: the record is written even when closing the run raises; that exception then propagates
+            rec["journal"] = _journal_info(run, closed if closed is not None or run is None else f"closing failed in state {run._state}")
+            events = [{"seq": e.seq, "type": e.type, "data": plain(e.data)} for e in run.events] if run is not None else []
+            sessions = (developer.sessions if developer else []) + (reviewer.sessions if reviewer else [])
+            stop = budget_stops(not_run, sessions, budget)
+            verdict, blocked, committed = delivery(project, events, results, stop, errors)
+            final = git(out / "repo", "rev-parse", "main").stdout.strip() if (out / "repo").exists() else None
+            rec.update(finished=clock(), story_outcomes=results, story_errors=errors, final_main=final or None,
+                       delivery_verdict="FAIL" if failure is not None and verdict == "PASS" else verdict, delivery_blocked_by=blocked,
+                       plan_quality_verdict="NOT_CLAIMED", generalization_claim="NONE",
+                       productproof=productproof(project, events, committed) if events else None,
+                       budget=budget.account() if budget else None, budget_stop=stop,
+                       sessions=[{k: v for k, v in s.items() if k != "text"} for s in sessions],
+                       failure=None if failure is None else {"type": type(failure).__name__, "detail": str(failure)[:2000],
+                                                             "stage": rec.get("stage")})
+            (out / "RUN.json").write_text(json.dumps(rec, indent=1, sort_keys=True, default=str) + "\n", encoding="utf-8")
     return rec
 
 
-def _close(run) -> dict:
+def _close_run(run) -> str | None:
     """Close the RunScope however the run ended: a normal shutdown, or — if the kernel refuses it (an open story) —
-    its interruption; the journal's location and digest either way."""
+    its interruption. How it closed."""
     if run is None:
-        return {"journal": None}
+        return None
     closed = run._state
     if run._state == "RUNNING":
         try:
@@ -303,8 +320,18 @@ def _close(run) -> dict:
         except ShutdownRefused as e:
             run.interrupt()
             closed = f"INTERRUPTED after a refused shutdown: {e}"
+    return closed
+
+
+def _journal_info(run, closed: str | None) -> dict | None:
+    """The journal's location (relative to the run directory), digest and length, as it is on disk now."""
+    if run is None:
+        return None
     path = run.journal_path
     data = path.read_bytes() if path.exists() else b""
-    return {"journal": {"path": str(path.relative_to(path.parents[2])), "sha256": _sha(data),
-                        "lines": data.count(b"\n"), "closed": closed}}
+    return {"path": str(path.relative_to(path.parents[2])), "sha256": _sha(data), "lines": data.count(b"\n"), "closed": closed}
 
+
+def _close(run) -> dict:
+    """Close the run and name its journal (used where the closing and the record are one step)."""
+    return {"journal": _journal_info(run, _close_run(run))}
