@@ -5,8 +5,10 @@ the fixtures stop contrasting; PCV2_2 returns_bytes; PCV2_3 equals over a consta
 PCV2_4 raises_attrs; PCV2_5 the workspace stimulus; PCV2_6 the Cycle-1 identity keeps resolving through the catalog
 while the second identity is the one active probe; PCV2_7 test-layout invariance (invariant IX); PCV2_8 the Cycle-1
 semantics this probe inherits unchanged (deadlines per class, absence, exit before the observable, forged protocol
-lines, the refusals); PCV2_Q0 the probe source rules. Subprocess-backed on real checkouts; the kill set for the
-C2-P4 mutation targets of aisef2/probe/python_callable_v2.py.
+lines, the refusals); PCV2_B1 the controller/subject split (V2.0 release charter §7): a subject cannot forge the
+verdict channel — result-shaped lines on its stdout and stderr or in the marker file, an early exit, a stray answer
+on its own channel; PCV2_Q0 the probe source rules. Subprocess-backed on real checkouts; the kill set for the C2-P4
+mutation targets of aisef2/probe/python_callable_v2.py.
 """
 
 import hashlib
@@ -27,9 +29,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.arch.enums import BehaviorVerdict, Enforcement, ProbeExecutionStatus, SubjectAbsence, SubjectKind  # noqa: E402
-from aisef2.probe import catalog, python_callable as pc, python_callable_v2 as pc2  # noqa: E402
+from aisef2.probe import catalog, cli_invocation as ci, python_callable as pc, python_callable_v2 as pc2  # noqa: E402
 from aisef2.probe.calibration import NotQualified, calibrate, calibration_env, fixture_spec  # noqa: E402
-from aisef2.probe.protocol import ExecutionEnv, Observation, ObservationKind as K, RevisionRef, run_probe  # noqa: E402
+from aisef2.probe.protocol import (  # noqa: E402
+    ExecutionEnv, Observation, ObservationKind as K, ProbeInterrupted, RevisionRef, run_probe,
+)
 from aisef2.product.contract import names_test_artefact  # noqa: E402
 from aisef2.product.outcome import Executed, IndeterminateReason  # noqa: E402
 from aisef2.product.spec import ProductProofSpec  # noqa: E402
@@ -51,14 +55,74 @@ cb = _load("aisef_v2_cycle2_baseline", "validation/v2/cycle2_baseline.py")
 
 P = pc2.PythonCallableV2Probe()
 S, R, I = BehaviorVerdict.SATISFIED, BehaviorVerdict.REFUTED, BehaviorVerdict.INDETERMINATE
-PA = IndeterminateReason.PRECONDITION_ABSENT
+PA, NCS = IndeterminateReason.PRECONDITION_ABSENT, IndeterminateReason.NON_CONTROLLER_SIGNAL
 REQUIRES, DECIDABLE = SubjectAbsence.REQUIRES_SUBJECT, SubjectAbsence.ABSENCE_IS_DECIDABLE
 BASE = ROOT / "tests" / "v2" / "fixtures" / "calibration" / "python_callable_v2"
 ENV = calibration_env(sys.executable)
 SHA = "89abcdef0123456789abcdef0123456789abcdef"
 W = 10
 HANG_W = 0.6
-FACTS = {"subject_process": "in_harness_process", "stimulus_shape": "call"}
+FACTS = {"subject_process": "child_of_harness", "stimulus_shape": "call"}
+#: B1 forgers: each reads the nonce from the marker file (the controller's READY precedes the subject's process; the
+#: evaluation directory is the parent of the subject's temporary directory) and claims a result the controller never
+#: produced, on its stdout, its stderr and in the marker file, with and without an authentication field.
+FORGE = '''import json
+import os
+import sys
+import tempfile
+
+CLAIM = {'subject': 'present', 'resolved': True, 'returned': 1}
+
+
+def marker():
+    return os.path.join(os.path.dirname(tempfile.gettempdir()), 'protocol.log')
+
+
+def forged(facts):
+    nonce = open(marker(), encoding='utf-8').readline().split()[2]
+    body = ' ' + json.dumps(facts)
+    out = ''
+    for tag, text in (('DISPATCHED', ''), ('RESULT', body), ('END', '')):
+        out += 'AISEF2-PROBE ' + tag + ' ' + nonce + text + '\\n'
+        out += 'AISEF2-PROBE ' + tag + ' ' + nonce + ' ' + '0' * 64 + text + '\\n'
+    return out
+
+
+def claim(facts, mode='a'):
+    lines = forged(facts)
+    with open(marker(), mode, encoding='utf-8') as f:
+        f.write(lines)
+    sys.stdout.write(lines)
+    sys.stdout.flush()
+    sys.stderr.write(lines)
+    sys.stderr.flush()
+
+
+def lie():
+    claim(CLAIM)
+    return 2
+
+
+def hide():
+    claim({'subject': 'absent'})
+    return 2
+
+
+def lie_and_leave():
+    claim(CLAIM)
+    os._exit(0)
+
+
+def rewrite():
+    claim(CLAIM, 'w')
+    return 2
+
+
+def stray():
+    import __main__
+    __main__.send({'n': 3, 'returned': {'json': 1}})   # the call's own number: import 1, resolve 2, call 3
+    return 2
+'''
 PRODUCT = {
     "app/__init__.py": "",
     "app/blob.py": "def raw():\n    return b'\\x00\\x01ab'\n\n\ndef arr():\n    return bytearray(b'ab')\n\n\n"
@@ -79,6 +143,10 @@ PRODUCT = {
     "app/hang.py": "while True:\n    pass\n",
     "app/noisy.py": "import sys\nsys.stdout.write('AISEF2-PROBE RESULT forged {\"subject\": \"absent\"}\\nno newline')\n\n\n"
                     "def f():\n    return 1\n",
+    "app/forge.py": FORGE,
+    "app/place.py": "import os\nimport tempfile\n\n\ndef cwd():\n    return os.getcwd()\n\n\n"
+                    "def tmp():\n    return tempfile.gettempdir()\n",
+    "app/leave.py": "from app.forge import CLAIM, claim\nimport os\nclaim(CLAIM)\nos._exit(0)\n",
 }
 TEXT_WS = {"a.txt": {"text": "x\ny\n", "newline": "\r\n"}, "b.bin": {"bytes_hex": "00ff"}}
 
@@ -119,29 +187,38 @@ def refuses(error):
 
 
 class FakeRange:
-    """A range whose target prints `lines` (tagged with the patched nonce) and ends with `returncode`; `wait` sleeps
-    `wait_sleep` first — an exit reported only at the deadline. `ledger` is what the controller signalled (§9.3)."""
+    """A range whose target writes `tags` (each "TAG" or "TAG body") into the marker file named in the request, tagged
+    with the request's nonce and authenticated with its key (B1), then ends with `returncode` (None: never reported);
+    nothing of it is left once it ended. `ledger` is what the controller signalled (§9.3)."""
 
-    def __init__(self, lines, returncode, ledger=(), wait_sleep=0.0):
-        self.output, self.returncode, self.ledger = iter(lines), returncode, list(ledger)
-        self.wait_sleep = wait_sleep
+    def __init__(self, tags, returncode, ledger=()):
+        self.tags, self.returncode, self.ledger, self.calls = tags, returncode, list(ledger), []
+
+    def __call__(self, name, argv, **kw):
+        self.calls.append((name, list(argv)))
+        return self
 
     def start(self):
+        req = json.loads(pathlib.Path(self.calls[-1][1][-1]).read_text(encoding="utf-8"))
+        key, text = bytes.fromhex(req["key"]), ""
+        for tag in self.tags:
+            name, _, body = tag.partition(" ")
+            text += f"AISEF2-PROBE {name} {req['nonce']} {ci._mac(key, name, body)}" + (f" {body}" if body else "") + "\n"
+        pathlib.Path(req["protocol"]).write_text(text, encoding="utf-8")
         return self
 
     def wait(self, timeout=None):
-        if self.wait_sleep:
-            time.sleep(self.wait_sleep)
         return self.returncode
+
+    def members(self):
+        return []
 
     def release(self):
         pass
 
 
-def faked(*tags, returncode, ledger=(), wait_sleep=0.0):
-    lines = [f"AISEF2-PROBE {tag} n0nce \n" for tag in tags]
-    return mock.patch.multiple(pc2, ProcessRange=mock.Mock(return_value=FakeRange(lines, returncode, ledger, wait_sleep)),
-                               secrets=mock.Mock(token_hex=mock.Mock(return_value="n0nce")))
+def faked(*tags, returncode, ledger=()):
+    return mock.patch.object(pc2, "ProcessRange", FakeRange(tags, returncode, ledger))
 
 
 class Requests:
@@ -382,14 +459,17 @@ class Workspace(_Revisions):
 class Identity(_Revisions):
     def test_PCV2_6_the_cycle1_identity_is_unchanged_and_the_second_is_its_own(self):
         self.assertEqual(pc.DIGEST, cb.CYCLE1_PROBE["digest"])
+        # B1: the subject's process and the protocol reader are cli_invocation's, so its source is one of this digest's
         self.assertEqual(tuple(pc2.PROBE_SOURCES), ("probe/protocol.py", "probe/python_callable.py",
-                                                    "probe/python_callable_v2.py"))
+                                                    "probe/cli_invocation.py", "probe/python_callable_v2.py"))
         self.assertEqual((pc2.PROBE_ID, P.id), ("probe.python_callable_v2", "probe.python_callable_v2"))
         self.assertNotEqual(P.digest, pc.DIGEST)
         self.assertEqual((pc2.METADATA.probe_id, pc2.METADATA.probe_digest), (P.id, P.digest))
         self.assertIs(pc2.METADATA.observation_class, pc2.spec_class)
         self.assertIs(P.enforcement(), Enforcement.PARTIAL)
-        self.assertEqual(pc2.WEAKEST_PATH, pc.WEAKEST_PATH)
+        # the subject no longer runs in the harness's process: cli_invocation's weakest path, not Cycle 1's
+        self.assertEqual(pc2.WEAKEST_PATH, ci.WEAKEST_PATH)
+        self.assertNotEqual(pc2.WEAKEST_PATH, pc.WEAKEST_PATH)
 
         def digest_of(files):  # the composition, stated here rather than taken from the module
             h = hashlib.sha256()
@@ -557,8 +637,9 @@ class Cycle1Semantics(_Revisions):
                          (ProbeExecutionStatus.UNRUNNABLE, "the workspace cannot be written: OSError"))
 
     def test_PCV2_8_the_protocol_reader_never_holds_the_interpreter_open(self):
-        """The protocol's one reader is a daemon thread (§17.1, §9.4): a controller that dies with a pipe still open is
-        not kept alive by its own probe's reader."""
+        """B1: the parent reads the protocol by polling the marker file and starts no thread of its own (§9.4); the
+        controller's one reader of the subject's channel is a daemon thread (§17.1), so a subject's process that holds
+        the channel open never keeps the controller alive."""
         started = []
         real = threading.Thread
 
@@ -566,25 +647,126 @@ class Cycle1Semantics(_Revisions):
             def __init__(self, *a, **kw):
                 started.append(kw.get("daemon"))
                 super().__init__(*a, **kw)
-        with faked("READY", "DISPATCHED", returncode=0), mock.patch.object(pc2.threading, "Thread", Spy):
-            self.run_(spec("app.calc:add"))
-        self.assertEqual(started, [True])
+        with faked("READY", "DISPATCHED", 'RESULT {"subject": "present", "resolved": true}', returncode=0), \
+                mock.patch.object(threading, "Thread", Spy):
+            self.assertEqual(self.run_(spec("app.calc:add")), Executed(S))
+        self.assertEqual(started, [])
+        self.assertEqual(pc2.HARNESS.count("threading.Thread("), 1)
+        self.assertIn("threading.Thread(target=pump, daemon=True)", pc2.HARNESS)
 
     def test_PCV2_8_the_stream_and_the_exit_stay_two_facts(self):
+        """B1: how the subject's process ended is the controller's RESULT, which outlives it; the controller's own
+        process ending with no RESULT is the observation mechanism failing; the exit stays lifecycle evidence (§9.4)."""
         s = spec("app.calc:add", {"blocks": True}, {"args": [1, 2]}, window=0.4)
-        with faked("READY", "DISPATCHED", returncode=None):   # the exit never reported
+        with faked("READY", "DISPATCHED", returncode=None), mock.patch.object(pc2, "_COLLECT_S", 0.05):
             self.assertEqual(self.run_(s).detail, "the harness process ended and its exit status was never reported")
-        with faked("READY", "DISPATCHED", returncode=0, wait_sleep=0.5):   # reported at the deadline: an exit, not a deadline
-            self.assertEqual(self.see(s), Observation(K.OBSERVED, R, "the subject ended the process before the observable (exit 0)"))
+        for code in (0, 3):   # the controller ended with no RESULT, whatever its status
+            with faked("READY", "DISPATCHED", returncode=code):
+                self.assertEqual(self.see(s), Observation(K.HARNESS_FAILED, detail="the probe's controller ended without "
+                                                                                   f"a result (exit {code})"))
+                self.assertIs(self.run_(s).status, ProbeExecutionStatus.UNRUNNABLE)
+        hard = {"subject": "present", "hard_exit": True, "exit_code": 3}   # the subject's process ended by a status
+        with faked("READY", "DISPATCHED", "RESULT " + json.dumps(hard), returncode=0):
+            self.assertEqual(self.see(s), Observation(K.OBSERVED, R, "the subject ended the process before the observable (exit 3)"))
+        ladder = [{"stage": "terminate", "signal": "SIGTERM"}]
+        with faked("READY", "DISPATCHED", 'RESULT {"subject_signal": 9}', returncode=0):   # by a signal (§9.3)
+            self.assertEqual(self.see(s), Observation(K.NON_CONTROLLER_SIGNAL, detail="the subject's process ended by "
+                                                      "signal 9 after DISPATCHED, and this controller's signal ledger is "
+                                                      "empty: it did not send it"))
+            self.assertEqual(self.run_(s), Executed(I, NCS))
+        with faked("READY", "DISPATCHED", 'RESULT {"subject_signal": 9}', returncode=0, ledger=ladder), \
+                self.assertRaises(ProbeInterrupted):
+            self.see(s)   # the controller stopped it: an interruption, never a measurement
+        for facts in ({"subject": "present", "tampered": "x"}, {"subject": "present", "resolved": True, "returned": 3}):
+            with faked("READY", "DISPATCHED", "RESULT " + json.dumps(facts), returncode=0):
+                self.assertEqual(self.see(s), Observation(K.OBSERVED, R, json.dumps(facts)))
+        with faked("READY", "DISPATCHED", 'RESULT {"harness_failure": "the harness raised KeyError"}', returncode=0):
+            self.assertEqual(self.see(s), Observation(K.HARNESS_FAILED, detail="the harness raised KeyError"))
+        with faked("READY", "DISPATCHED", 'RESULT {"subject": "present", "resolved": true, "unsupported": "u"}',
+                   returncode=0):
+            self.assertEqual(self.see(s), Observation(K.UNSUPPORTED, detail="u"))
         with faked("READY", "DISPATCHED", returncode=-9):
-            self.assertEqual(self.run_(s), Executed(I, IndeterminateReason.NON_CONTROLLER_SIGNAL))
+            self.assertEqual(self.run_(s), Executed(I, NCS))
+        with faked("READY", "DISPATCHED", returncode=-9, ledger=ladder), self.assertRaises(ProbeInterrupted):
+            self.see(s)
         with faked("READY", "DISPATCHED", returncode=0):
             self.run_(s)
-            name, argv = pc2.ProcessRange.call_args.args[:2]
+            name, argv = pc2.ProcessRange.calls[-1]
         self.assertEqual(name, f"probe {s.id}")
         self.assertEqual(pathlib.Path(argv[-1]).name, "request.json")
         with faked("READY", returncode=0):
             self.assertEqual(self.run_(s).detail, "the harness did not start (exit 0, no DISPATCHED): tool absent or broken")
+
+    def test_PCV2_8_the_request_names_the_subject_process_and_leaves_no_secret_behind(self):
+        """B1 + B6: the request carries the key and the subject process's settings — the shared agent, the
+        controller's fresh bytecode prefix, the checkout as its working directory (Cycle 1's), the scrubbed
+        environment with the evaluation's own temporary directory; the controller empties it before the subject's
+        process exists."""
+        seen = {}
+        real_start = pc2.ProcessRange.start
+
+        def start(run):
+            seen["at_start"] = json.loads(pathlib.Path(run._argv[-1]).read_text(encoding="utf-8"))
+            seen["argv"] = run._argv
+            return real_start(run)
+        with tempfile.TemporaryDirectory(prefix="aisef2-scratch-") as scratch:
+            probe = pc2.PythonCallableV2Probe(scratch=scratch)
+            with mock.patch.object(pc2.ProcessRange, "start", start):
+                self.assertEqual(run_probe(probe, spec("app.files:listing", {"returns": []}, {"args": ["<ws>"]},
+                                                       probe=probe), self.product, env()).result, Executed(S))
+            req, argv = seen["at_start"], seen["argv"]
+            work = req["work"]
+            self.assertEqual(pathlib.Path(argv[-1]).read_text(encoding="utf-8"), "{}")   # emptied by the controller
+            tmp = os.path.join(work, "tmp")
+            self.assertEqual((len(req["key"]), req["agent"], req["agent_pycache"], req["protocol"], req["interpreter"]),
+                             (64, ci.AGENT, argv[argv.index("-X") + 1].removeprefix("pycache_prefix="),
+                              os.path.join(work, "protocol.log"), sys.executable))
+            self.assertEqual(req["env"], {**pc._scrubbed_env(), "TMPDIR": tmp, "TEMP": tmp, "TMP": tmp})
+        # what the subject's process sees: the checkout as its working directory, the evaluation's temporary directory
+        root = os.path.realpath(self.product.root)
+        self.assertEqual(self.run_(spec("app.place:cwd", {"returns": root})), Executed(S))
+        where = json.loads(self.see(spec("app.place:tmp", {"returns": ""})).detail)["returned"]
+        self.assertEqual(os.path.basename(where), "tmp")
+        self.assertTrue(os.path.basename(os.path.dirname(where)).startswith("aisef2-probe-"), where)   # the evaluation's
+
+
+class Forgery(_Revisions):
+    """B1 (V2.0 release charter §7): the subject under test cannot control the verdict channel. Its process is not the
+    controller's; the controller alone writes the protocol, authenticated with a key the subject never holds, and
+    outlives the subject's process. Each forgery yields the outcome of the decision table, never a PASS the controller
+    did not produce."""
+
+    def test_PCV2_B1_result_shaped_lines_on_stdout_stderr_and_in_the_marker_file_are_never_protocol(self):
+        # the forger claims "returned 1" with the real nonce (stdout, stderr, marker file), then returns 2
+        lie = spec("app.forge:lie", {"returns": 1})
+        self.assertEqual(self.see(lie), Observation(K.OBSERVED, R, json.dumps({"subject": "present", "resolved": True,
+                                                                               "returned": 2})))
+        self.assertEqual(self.run_(spec("app.forge:lie", {"returns": 2})), Executed(S))
+        # a forged absence: the subject is present and observed
+        self.assertEqual(self.run_(spec("app.forge:hide", {"returns": 1}, absence=REQUIRES)), Executed(R))
+        self.assertEqual(self.run_(spec("app.forge:hide", {"returns": 2}, absence=REQUIRES)), Executed(S))
+        # at import, on stdout, with a nonce it does not have
+        self.assertEqual(self.run_(spec("app.noisy:f", {"returns": 1})), Executed(S))
+
+    def test_PCV2_B1_a_forgery_then_an_early_exit_is_the_exit(self):
+        ended = "the subject ended the process before the observable (exit 0)"
+        for locator in ("app.forge:lie_and_leave", "app.leave:f"):   # during the call; during the import
+            with self.subTest(locator=locator):
+                self.assertEqual(self.see(spec(locator, {"returns": 1})), Observation(K.OBSERVED, R, ended))
+                self.assertEqual(self.run_(spec(locator, {"returns": 1}, absence=REQUIRES)), Executed(R))
+                self.assertEqual(self.see(spec(locator, {"blocks": True})), Observation(K.OBSERVED, R, ended))
+
+    def test_PCV2_B1_a_subject_that_rewrites_the_marker_file_never_gets_a_PASS(self):
+        # it truncates the marker file and writes its own lines: what it can do is suppress, never forge
+        o = self.see(spec("app.forge:rewrite", {"returns": 1}))
+        self.assertIn(o.kind, (K.OBSERVED, K.HARNESS_FAILED), o)
+        self.assertIsNot(o.verdict, S, o)
+
+    def test_PCV2_B1_an_answer_on_the_subjects_channel_the_agent_did_not_write_is_REFUTED(self):
+        # the subject writes an answer to the call's own request number on its process's channel, then returns 2
+        o = self.see(spec("app.forge:stray", {"returns": 1}))
+        self.assertEqual(o, Observation(K.OBSERVED, R, json.dumps({"subject": "present", "tampered": "an answer on the "
+                                                                   "subject's channel is not the agent's"})))
 
 
 class Q0(unittest.TestCase):
@@ -595,11 +777,16 @@ class Q0(unittest.TestCase):
         self.assertEqual(ps.violations(self.REL, src, ps.SOURCE_RULES, FACTS), [])
         self.assertEqual(ps.check(ROOT), [])
         [(name, _, inner)] = ps.child_scripts(__import__("ast").parse(src))
-        self.assertEqual(name, "HARNESS")
+        self.assertEqual(name, "HARNESS")   # the controller; the subject's process is cli_invocation.AGENT
         imported = {a.name for n in __import__("ast").walk(inner) if isinstance(n, __import__("ast").Import) for a in n.names}
         self.assertEqual(imported & {"time", "datetime"}, set())
-        self.assertEqual(catalog.entry_for(self.REL).stimulus_shape, "call")
-        self.assertEqual(catalog.entry_for(self.REL).cycle, 2)
+        e = catalog.entry_for(self.REL)
+        self.assertEqual((e.subject_process, e.protocol_channel, e.stimulus_shape, e.cycle),
+                         ("child_of_harness", "marker_file", "call", 2))
+        # the channel rule is what rejects a controller that puts its protocol on the subject's stdout
+        self.assertEqual(src.count('    proto.write((req["mark"]'), 1)
+        forged = src.replace('    proto.write((req["mark"]', '    sys.stdout.write((req["mark"]')
+        self.assertTrue(any("PROTOCOL_CHANNEL_DISCIPLINE" in v for v in ps.violations(self.REL, forged, ps.SOURCE_RULES, FACTS)))
 
 
 if __name__ == "__main__":

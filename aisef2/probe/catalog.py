@@ -95,10 +95,11 @@ CATALOG: tuple[CatalogEntry, ...] = (
     # in_harness_process / captured_stdout are the only truthful declarations for a probe that runs no subject
     CatalogEntry(fa.PROBE_ID, fa.DIGEST, SubjectKind.FILE_ARTIFACT, fa.CLASSES, fa.METADATA, fa.FileArtifactProbe,
                  "aisef2/probe/file_artifact.py", "file_artifact", "in_harness_process", "captured_stdout", "none", 2),
-    # WP-2.4.1 (DECISION-6): the second identity supersedes as the active python_callable probe
+    # WP-2.4.1 (DECISION-6): the second identity supersedes as the active python_callable probe; B1 (V2.0 release
+    # charter §7): its subject runs in a process of its own, the protocol on the controller's marker file
     CatalogEntry(pc2.PROBE_ID, pc2.DIGEST, SubjectKind.PYTHON_CALLABLE, pc2.CLASSES, pc2.METADATA,
                  pc2.PythonCallableV2Probe, "aisef2/probe/python_callable_v2.py", "python_callable_v2",
-                 "in_harness_process", "captured_stdout", "call", 2),
+                 "child_of_harness", "marker_file", "call", 2),
     CatalogEntry(ci.PROBE_ID, ci.DIGEST, SubjectKind.CLI_INVOCATION, ci.CLASSES, ci.METADATA, ci.CliInvocationProbe,
                  "aisef2/probe/cli_invocation.py", "cli_invocation", "child_of_harness", "marker_file", "invocation", 2),
     CatalogEntry(pe.PROBE_ID, pe.DIGEST, SubjectKind.PROCESS_EFFECT, pe.CLASSES, pe.METADATA, pe.ProcessEffectProbe,
