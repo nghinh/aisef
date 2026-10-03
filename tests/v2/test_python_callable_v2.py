@@ -147,6 +147,9 @@ PRODUCT = {
     "app/place.py": "import os\nimport tempfile\n\n\ndef cwd():\n    return os.getcwd()\n\n\n"
                     "def tmp():\n    return tempfile.gettempdir()\n",
     "app/leave.py": "from app.forge import CLAIM, claim\nimport os\nclaim(CLAIM)\nos._exit(0)\n",
+    # B1-BLOCKS-STOP-001: the subject stops its controller (the agent's parent), then returns at once
+    "app/stop.py": "import os\nimport signal\n\n\ndef controller():\n    getattr(os, 'ki' + 'll')(os.getppid(), signal.SIGSTOP)\n"
+                   "    return 1\n",
 }
 TEXT_WS = {"a.txt": {"text": "x\ny\n", "newline": "\r\n"}, "b.bin": {"bytes_hex": "00ff"}}
 
@@ -761,6 +764,20 @@ class Forgery(_Revisions):
         o = self.see(spec("app.forge:rewrite", {"returns": 1}))
         self.assertIn(o.kind, (K.OBSERVED, K.HARNESS_FAILED), o)
         self.assertIsNot(o.verdict, S, o)
+
+    @unittest.skipIf(os.name == "nt", "SIGSTOP is POSIX")
+    def test_PCV2_B1_BLOCKS_STOP_001_a_subject_that_stops_its_controller_never_gets_a_deadline_verdict(self):
+        """Measured before the fix: `blocks` came back SUBJECT_DEADLINE SATISFIED although the call returned, because a
+        stopped controller still counted as a live range member at W. The deadline is now the controller's own
+        authenticated statement: a controller that is stopped says nothing, and that is no verdict."""
+        silent = "the probe's controller reported nothing by the end of the subject's 1s window and the 3s harness watchdog"
+        for observable in ({"blocks": True}, {"returns": 1}):
+            with self.subTest(observable=observable):
+                self.assertEqual(self.see(spec("app.stop:controller", observable, window=1), e=env(timeout=3)),
+                                 Observation(K.HARNESS_FAILED, None, silent))
+        # a subject that really blocks is still the controller's deadline
+        self.assertEqual(self.see(spec("app.hang:f", {"blocks": True}, window=HANG_W)),
+                         Observation(K.SUBJECT_DEADLINE, S, f"the subject's {HANG_W:g}s observation window expired (blocks)"))
 
     def test_PCV2_B1_an_answer_on_the_subjects_channel_the_agent_did_not_write_is_REFUTED(self):
         # the subject writes an answer to the call's own request number on its process's channel, then returns 2

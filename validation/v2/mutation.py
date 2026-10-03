@@ -497,9 +497,10 @@ SUPERSEDED.update({t: "K-NOWORK-001" for t in K_NOWORK_TARGETS})
 for _t in K_NOWORK_TARGETS:
     del K_PRESAT_TARGETS[_t]
 # V2.0 STABLE RELEASE, S2 — the single fix window (release charter §7–§8): B1 (the verdict channel: the controller /
-# agent split of cli_invocation and process_effect), B4/B6 (workspace: the isolated git configuration, the refused
+# agent split of cli_invocation, process_effect and python_callable_v2), B4/B6 (workspace: the isolated git configuration, the refused
 # repository configuration, the clean of each move), B7 (story_runner: no revert of a merge that changed nothing),
-# KA-09 (adapters: confine and unconfine leave a symbolic link alone), B12/B3 (the product runtime, aisef2/app). A source
+# KA-09 (adapters: confine and unconfine leave a symbolic link alone), B12/B3 (the product runtime, aisef2/app),
+# B1-BLOCKS-STOP-001 (python_callable_v2 and cli_invocation: the deadline is the controller's own statement). A source
 # digest is whole-file, so every target of a changed module is re-measured here, the S2 regression cases added to its
 # kill set; the earlier phase keeps its historical entries (SUPERSEDED), as K-NOWORK-001 did. A target the change
 # removed (`_hard_exit`, the old HARNESS dispatch) is not carried over; the new controller and agent functions are added.
@@ -511,17 +512,22 @@ S2_TARGETS: dict[str, list[str]] = {
     **{t: [*k, *_S2_KERNEL] for t, k in P6_TARGETS.items() if t.split("::")[0] in _S2_CHANGED},
     **{f"aisef2/orchestrate/workspace.py::{f}": [*_ORCH_STAGES, *_S2_KERNEL] for f in ("_env", "config_problems")},
     **{t: k for t, k in C2P2_TARGETS.items() if not t.endswith("::_hard_exit")},
-    **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_HARNESS for f in ("_concluded", "_no_result")},
+    **{f"aisef2/probe/cli_invocation.py::{f}": _CLI_HARNESS for f in ("_concluded", "_no_result", "_deadline", "_silent")},
     "aisef2/probe/cli_invocation.py::_mac": [*_CLI_PURE, *_CLI_HARNESS],
     **{f"aisef2/probe/cli_invocation.py::{s}/{f}": _CLI_HARNESS for s, fs in (
         ("AGENT", ("flush", "redirect", "send", "tagged", "plain", "op_import", "op_resolve", "op_value", "op_construct",
                    "guarded", "op_call", "op_invoke", "op_bye")),
-        ("HARNESS", ("emit", "answer_to", "ask", "finish", "inside", "resolve", "sha", "file_fact", "stream_fact",
-                     "invoke", "ended", "main"))) for f in fs},
+        ("HARNESS", ("emit", "conclude", "deadline", "answer_to", "ask", "finish", "inside", "resolve", "sha",
+                     "file_fact", "stream_fact", "invoke", "ended", "main"))) for f in fs},
     **{t: k for t, k in C2P3_TARGETS.items()
        if t.split("::")[1] not in ("_hard_exit", "HARNESS/HANDLERS", "HARNESS/raised_as", "HARNESS/tagged", "HARNESS/target_of")},
     **{f"aisef2/probe/process_effect.py::HARNESS/{f}": [*_PE_REAL, *_PE_PYC] for f in (
         "answer_to", "ask", "finish", "answered", "reported", "subject_call", "unresolved", "ended")},
+    **{t: k for t, k in C2_P4_TARGETS.items() if not t.endswith("::observe")},
+    "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe": [*_C2_P4_TESTS, *_C2_P4_BYTECODE],
+    "aisef2/probe/python_callable_v2.py::_concluded": _C2_P4_TESTS,
+    **{f"aisef2/probe/python_callable_v2.py::HARNESS/{f}": [*_C2_P4_TESTS, *_C2_P4_BYTECODE] for f in (
+        "emit", "conclude", "deadline", "answer_to", "ask", "finish", "answered", "ended", "inside", "value_of", "main")},
     **{f"aisef2/app/{m}::{f}": _APP for m, fs in (
         ("run.py", ("kernel_digest", "calibrations", "admit", "check_repository", "probe_interpreter", "regression_tests",
                     "runspec_of", "productproof", "delivery", "execute", "_close")),
@@ -535,9 +541,10 @@ S2_TARGETS: dict[str, list[str]] = {
         ("cli.py", ("run",))) for f in fs},
 }
 SUPERSEDED.update({t: "V2.0-S2" for t in S2_TARGETS})
-for _phase in (K_NOWORK_TARGETS, P6_TARGETS, C2P2_TARGETS, C2P3_TARGETS):
+for _phase in (K_NOWORK_TARGETS, P6_TARGETS, C2P2_TARGETS, C2P3_TARGETS, C2_P4_TARGETS):
     for _t in [t for t in _phase if t.split("::")[0] in (*_S2_CHANGED, "aisef2/orchestrate/story_runner.py",
-                                                          "aisef2/probe/cli_invocation.py", "aisef2/probe/process_effect.py")]:
+                                                          "aisef2/probe/cli_invocation.py", "aisef2/probe/process_effect.py",
+                                                          "aisef2/probe/python_callable_v2.py")]:
         SUPERSEDED.setdefault(_t, "V2.0-S2")
         del _phase[_t]
 RECORDS["V2.0-S2"] = "closure-evidence/v2/release/S2-MUTATION.json"

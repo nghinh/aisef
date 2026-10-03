@@ -692,6 +692,17 @@ def emit(tag, body=""):
     proto.write((req["mark"] + " " + tag + " " + nonce + " " + mac + (" " + body if body else "") + "\n").encode("utf-8"))
     proto.flush()
     os.fsync(proto.fileno())
+said = threading.Lock()
+def conclude(facts):
+    # one RESULT: the facts, or — when the subject's window ends first — the controller's own deadline (B1: the
+    # verdict never rests on the range merely being alive; a controller that is stopped reports nothing)
+    if said.acquire(blocking=False):
+        emit("RESULT", json.dumps(facts))
+        emit("END")
+def deadline():
+    timer = threading.Timer(req["window"], conclude, ({"deadline": True},))
+    timer.daemon = True
+    timer.start()
 emit("READY")
 agent = subprocess.Popen([req["interpreter"], "-I", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], "-X", "utf8=1",
                           "-c", req["agent"], root, work], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -772,6 +783,7 @@ def main():
     if answer_to(0) is None:
         return None
     emit("DISPATCHED")
+    deadline()
     spec = resolve(name, SEARCH)
     if spec is None and PathFinder.find_spec(name.split(".")[0], SEARCH) is None:
         spec = resolve(name, None)   # the revision is not on this process's path: where else the name resolves
@@ -819,8 +831,7 @@ if facts is not None:
         wrong = finish()
         if wrong is not None:
             facts = {"subject": "present", "tampered": wrong}
-    emit("RESULT", json.dumps(facts))
-    emit("END")
+    conclude(facts)
 try:
     agent.stdin.close()
 except OSError:
@@ -975,7 +986,8 @@ class CliInvocationProbe(HarnessProbe):
         nonce, key = secrets.token_hex(16), secrets.token_hex(32)
         files = [_ws_name(k) for k in dict(observable).get("files", {})]   # a frozen observable's keys are sorted
         try:
-            ask, ws, pycache = _prepare(work, at.root, locator, stim, files, nonce, key, env.interpreter)
+            ask, ws, pycache = _prepare(work, at.root, locator, stim, files, nonce, key, env.interpreter,
+                                        window_of(observable))
         except OSError as e:
             return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory cannot be "
                                                                      f"prepared: {type(e).__name__}"), None
@@ -1030,7 +1042,7 @@ def _preflight(at: RevisionRef, env: ExecutionEnv) -> Observation | None:
 
 
 def _prepare(work: str, root: str, locator: str, stim: dict, files: list[str], nonce: str, key: str,
-             interpreter: str) -> tuple[str, str, str]:
+             interpreter: str, window: float) -> tuple[str, str, str]:
     """Lay out the evaluation directory: the workspace with its byte-exact files, the stdin file, the fresh bytecode
     caches (the controller's and the subject process's), the evaluation's own temporary directory and the request.
     Returns (request path, workspace, bytecode prefix)."""
@@ -1050,7 +1062,7 @@ def _prepare(work: str, root: str, locator: str, stim: dict, files: list[str], n
                "argv": _substitute(list(stim.get("argv", [])), ws), "stdin": stdin,
                "pre": [{"argv": _substitute(list(p["argv"]), ws)} for p in stim.get("pre", [])], "files": files,
                "interpreter": interpreter, "agent": AGENT, "agent_pycache": agent_pycache, "cwd": ws,
-               "env": _child_env(ws, tmp)}
+               "env": _child_env(ws, tmp), "window": window}
     ask = os.path.join(work, "request.json")
     pathlib.Path(ask).write_text(json.dumps(_plain(request)), encoding="utf-8")
     return ask, ws, pycache
@@ -1064,12 +1076,10 @@ def _watch(run, proto: str, nonce: str, key: str, cls: str, window: float, env: 
     state, seen = _await(run, proto, nonce, key, "DISPATCHED", time.monotonic() + env.timeout_s)
     if state != "LINE":
         return _harness_failure(run, state, seen, env.timeout_s), None
-    state, seen = _await(run, proto, nonce, key, "RESULT", time.monotonic() + window)
+    state, seen = _await(run, proto, nonce, key, "RESULT", time.monotonic() + window + env.timeout_s)
     if state == "TIMEOUT":
-        if run.members():   # measured on the range: the subject's process is still there at W
-            return _after_dispatch(run, Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
-                                                    detail=f"the subject's {window:g}s observation window expired "
-                                                           f"({cls})")), None
+        if run.members():   # B1: the controller's own timer would have spoken at W; a range alive and silent is no verdict
+            return _after_dispatch(run, _silent(window, env)), None
         if run.wait(_COLLECT_S) is None:   # nothing of it is left, and the range never said how it ended
             # after DISPATCHED the controller's ledger is asked first (§9.3): on Windows its TerminateJobObject
             # takes the range's anchor down with the job, so a controller stop reports no exit status at all
@@ -1078,8 +1088,25 @@ def _watch(run, proto: str, nonce: str, key: str, cls: str, window: float, env: 
                                                            "never reported")), None
         seen = _protocol(proto, nonce, key)
     if "RESULT" in seen:
-        return _concluded(run, json.loads(seen["RESULT"][0]), decide)
+        facts = json.loads(seen["RESULT"][0])
+        if facts.get("deadline"):
+            return _after_dispatch(run, _deadline(cls, window)), None
+        return _concluded(run, facts, decide)
     return _after_dispatch(run, _no_result(run)), None
+
+
+def _deadline(cls: str, window: float, table: dict = ON_DEADLINE) -> Observation:
+    """The controller's own deadline (B1): its timer ran out with the subject still inside its observation."""
+    return Observation(ObservationKind.SUBJECT_DEADLINE, table[cls],
+                       detail=f"the subject's {window:g}s observation window expired ({cls})")
+
+
+def _silent(window: float, env: ExecutionEnv) -> Observation:
+    """B1-BLOCKS-STOP-001: by the end of the subject's window and the harness watchdog the controller said nothing,
+    while the range still holds a process — a stopped or starved controller is never read as the subject's deadline."""
+    return Observation(ObservationKind.HARNESS_FAILED,
+                       detail=f"the probe's controller reported nothing by the end of the subject's {window:g}s window "
+                              f"and the {env.timeout_s:g}s harness watchdog")
 
 
 def _concluded(run, facts: dict, decide) -> tuple[Observation, dict | None]:

@@ -249,6 +249,17 @@ def emit(tag, body=""):
     proto.write((req["mark"] + " " + tag + " " + nonce + " " + mac + (" " + body if body else "") + "\n").encode("utf-8"))
     proto.flush()
     os.fsync(proto.fileno())
+said = threading.Lock()
+def conclude(facts):
+    # one RESULT: the facts, or — when the subject's window ends first — the controller's own deadline (B1: the
+    # verdict never rests on the range merely being alive; a controller that is stopped reports nothing)
+    if said.acquire(blocking=False):
+        emit("RESULT", json.dumps(facts))
+        emit("END")
+def deadline():
+    timer = threading.Timer(req["window"], conclude, ({"deadline": True},))
+    timer.daemon = True
+    timer.start()
 emit("READY")
 agent = subprocess.Popen([req["interpreter"], "-I", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], "-c",
                           req["agent"], root, work], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -318,6 +329,7 @@ def main():
     if answer_to(0) is None:
         return None
     emit("DISPATCHED")
+    deadline()
     got = answered({"op": "import", "name": name})
     if "raised" in got:
         missing = got.get("missing")
@@ -364,8 +376,7 @@ if facts is not None:
         wrong = finish()
         if wrong is not None:
             facts = {"subject": "present", "tampered": wrong}
-    emit("RESULT", json.dumps(facts))
-    emit("END")
+    conclude(facts)
 try:
     agent.stdin.close()
 except OSError:
@@ -445,7 +456,8 @@ class PythonCallableV2Probe(HarnessProbe):
                        "kwargs": _substituted(stim.get("kwargs", {}), ws),
                        "attrs": list(dict(pi["observable"]).get("attrs", {})), "protocol": proto, "work": work,
                        "interpreter": env.interpreter, "agent": ci.AGENT, "agent_pycache": pycache,
-                       "env": {**_scrubbed_env(), "TMPDIR": tmp, "TEMP": tmp, "TMP": tmp}}
+                       "env": {**_scrubbed_env(), "TMPDIR": tmp, "TEMP": tmp, "TMP": tmp},
+                       "window": window_of(pi["observable"])}
             pathlib.Path(ask).write_text(json.dumps(_plain(request)), encoding="utf-8")
             log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
             try:
@@ -474,19 +486,20 @@ def _watch(run, proto: str, nonce: str, key: str, cls: str, observable, env: Exe
     if state != "LINE":
         return ci._harness_failure(run, state, seen, env.timeout_s)
     window = window_of(observable)
-    state, seen = ci._await(run, proto, nonce, key, "RESULT", time.monotonic() + window)
+    state, seen = ci._await(run, proto, nonce, key, "RESULT", time.monotonic() + window + env.timeout_s)
     if state == "TIMEOUT":
-        if run.members():   # measured on the range: the subject's process is still there at W
-            return _after_dispatch(run, Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
-                                                    detail=f"the subject's {window:g}s observation window expired "
-                                                           f"({cls})"))
+        if run.members():   # B1: the controller's own timer would have spoken at W; a range alive and silent is no verdict
+            return _after_dispatch(run, ci._silent(window, env))
         if run.wait(_COLLECT_S) is None:   # nothing of it is left, and the range never said how it ended
             return _after_dispatch(run, Observation(ObservationKind.HARNESS_FAILED,
                                                     detail="the harness process ended and its exit status was "
                                                            "never reported"))
         seen = ci._protocol(proto, nonce, key)
     if "RESULT" in seen:
-        return _after_dispatch(run, _concluded(cls, observable, _unsubstituted(json.loads(seen["RESULT"][0]), ws)))
+        facts = json.loads(seen["RESULT"][0])
+        if facts.get("deadline"):
+            return _after_dispatch(run, ci._deadline(cls, window, ON_DEADLINE))
+        return _after_dispatch(run, _concluded(cls, observable, _unsubstituted(facts, ws)))
     return _after_dispatch(run, ci._no_result(run))
 
 

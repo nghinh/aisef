@@ -154,6 +154,9 @@ def dispatch(argv):
     if cmd == "selfterm":
         os.kill(os.getpid(), signal.SIGTERM)
         return 0
+    if cmd == "stopctl":   # B1-BLOCKS-STOP-001: stop the controller (the agent's parent), then return at once
+        os.kill(os.getppid(), signal.SIGSTOP)
+        return 0
     if cmd == "where":
         sys.stdout.write(os.getcwd() + "|" + os.environ.get("HOME", "") + "|" + os.environ.get("TZ", "") + "\\n")
         return 0
@@ -337,6 +340,16 @@ class Harness(_Product):
         o = self.see(spec("app:__main__", {"exit_code": 0, "stdout": {"contains": ["AISEF2-PROBE RESULT"]}},
                           {"argv": ["forge"]}))
         self.assertEqual(o.verdict, S)   # the forged line is the subject's own stdout, compared like any bytes
+
+    @unittest.skipIf(os.name == "nt", "SIGSTOP is POSIX")
+    def test_CLI_2b_B1_BLOCKS_STOP_001_a_subject_that_stops_its_controller_never_gets_a_deadline_verdict(self):
+        """Before the fix a stopped controller still counted as a live range member at W, so `blocks` read SATISFIED
+        although the invocation returned. The deadline is now the controller's own authenticated statement."""
+        silent = "the probe's controller reported nothing by the end of the subject's 1s window and the 3s harness watchdog"
+        for observable in ({"blocks": True}, EXIT0):
+            with self.subTest(observable=observable):
+                o = self.see(spec("app:__main__", observable, {"argv": ["stopctl"]}, window=1), e=env(timeout=3))
+                self.assertEqual((o.kind, o.verdict, o.detail), (K.HARNESS_FAILED, None, silent))
 
     def test_CLI_3_a_stdout_flood_is_capped_and_exits_still_observes_the_code(self):
         self.assertEqual(ci.STREAM_CAP, 8 * 1024 * 1024)

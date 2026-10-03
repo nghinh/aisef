@@ -363,7 +363,7 @@ class Protocol(unittest.TestCase):
                 "workspace": {"in.txt": {"text": "x\ny\n", "newline": "\r\n"}, "d/raw.bin": {"bytes_hex": "00ff"},
                               "a/b/c.bin": {"bytes_hex": "01"}, "a/b/d.bin": {"bytes_hex": "02"}},
                 "pre": [{"argv": ["init", "<ws>/in.txt"]}]}
-        ask, ws, pycache = ci._prepare(work, "/rev", "app:__main__", stim, ["in.txt", "out.txt"], "n0nce", "ab" * 32, "/py")
+        ask, ws, pycache = ci._prepare(work, "/rev", "app:__main__", stim, ["in.txt", "out.txt"], "n0nce", "ab" * 32, "/py", 5.0)
         self.assertEqual((ws, pycache, ask), (os.path.join(work, "ws"), os.path.join(work, "pycache"), os.path.join(work, "request.json")))
         self.assertEqual(os.listdir(pycache), [])
         self.assertEqual((os.listdir(os.path.join(work, "pycache-agent")), os.listdir(os.path.join(work, "tmp"))), ([], []))
@@ -385,7 +385,7 @@ class Protocol(unittest.TestCase):
         self.assertEqual(req["env"], ci._child_env(ws, os.path.join(work, "tmp")))
         self.assertEqual({req["env"][k] for k in ("TMPDIR", "TEMP", "TMP")}, {os.path.join(work, "tmp")})
         bare = tempfile.mkdtemp(prefix="aisef2-cli-bare-", dir=self._d.name)
-        ask2, ws2, _ = ci._prepare(bare, "/rev", "app:__main__", {}, [], "n1", "cd" * 32, "/py")
+        ask2, ws2, _ = ci._prepare(bare, "/rev", "app:__main__", {}, [], "n1", "cd" * 32, "/py", 5.0)
         req2 = json.loads(pathlib.Path(ask2).read_text(encoding="utf-8"))
         self.assertEqual((req2["argv"], req2["pre"], req2["stdin"], req2["files"], os.listdir(ws2)), ([], [], None, [], []))
         self.assertFalse(os.path.exists(os.path.join(bare, "stdin.bin")))
