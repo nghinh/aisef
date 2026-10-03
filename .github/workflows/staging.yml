@@ -27,7 +27,14 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install build twine
-      - run: python -m build                  # the sdist, then the wheel built FROM it
+      # Reproducible (charter G2, §18): SOURCE_DATE_EPOCH is the commit's time, so a rebuild of the exact RC gives the
+      # frozen digests again — the wheel by setuptools itself, the sdist re-packed deterministically (repro_dist.py)
+      - name: build the sdist, then the wheel FROM it, reproducibly
+        run: |
+          set -eu
+          export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          python -m build
+          python -P validation/qualification/repro_dist.py dist/*.tar.gz
       - run: python -m twine check dist/*
       - name: the wheel and the sdist hold exactly aisef + aisef2
         run: python -P validation/v2/packaging_check.py --artifacts dist

@@ -73,7 +73,13 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install build twine
-      - run: python -m build
+      - name: build reproducibly (SOURCE_DATE_EPOCH = the commit's time; the sdist re-packed deterministically)
+        run: |
+          set -eu
+          export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          python -m build
+          python -P validation/qualification/repro_dist.py dist/*.tar.gz
+          sha256sum dist/*
       - run: twine check dist/*
       # V2 charter G1/§9: the distribution ships exactly V1 (`aisef`) and the V2 runtime (`aisef2`, every
       # subpackage) — never tests/, validation/ or closure-evidence/. `python -m build` builds this wheel FROM the

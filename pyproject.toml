@@ -1,5 +1,7 @@
 [build-system]
-requires = ["setuptools>=68"]
+# pinned exactly (V2.0 charter G2): the RC's frozen wheel/sdist digests must be rebuildable, and a newer backend
+# writes different metadata
+requires = ["setuptools==84.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
