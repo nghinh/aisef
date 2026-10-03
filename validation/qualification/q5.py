@@ -24,6 +24,9 @@ probe for its kind, re-executed at reproduction exactly like every other tool. T
 the frozen Cycle-1 python_callable probe (a Cycle-1 compatibility item on the Cycle-2 kernel). A new adversarial case:
 a file the probe observes changed on the trunk outside the model stream (the request unchanged) is a diff.
 
+V2.0 release (charter S5, "Q5 fresh/reproduction"): once the RC1 freeze record exists, the subject is the RC
+(common.candidate()), the records go to closure-evidence/v2/release/Q5-RC1 and the differential below is Q4-RC1's.
+
 Determinism is normalization after observation: the run's clock is the real clock and event times are dropped; temp
 roots become tokens. Nothing semantic is normalized (control outcomes, owners, retryability, revisions, semantic hashes,
 probe digests, request content, tool exit status, report content, file contents, test verdicts, the workspace diff).
@@ -54,10 +57,11 @@ if str(ROOT) not in sys.path:
 
 from validation.qualification import common as C  # noqa: E402
 
-#: the final integration candidate's fresh run; the QP-2.8 run on the QP-2.6 candidate stays in cycle2/Q5
-OUT_REL = "closure-evidence/v2/cycle2/Q5-FINAL"
+#: the subject and its output directory are common.candidate()'s: Cycle 2's final integration candidate (cycle2/Q5-FINAL;
+#: the QP-2.8 run on the QP-2.6 candidate stays in cycle2/Q5), or in V2.0 release mode the frozen RC1 (release/Q5-RC1)
+OUT_REL = C.Q5_OUT_REL
 CYCLE1_OUT_REL = "closure-evidence/v2/Q5"
-SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE   # the Cycle-2 candidate (QP-2.6)
+SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE
 KERNEL_TREE = C.KERNEL_TREE
 PROBE_DIGEST = "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"   # the Cycle-1 probe (P7-FINDING-001 correction), frozen
 HISTORICAL_PROBE_DIGEST = "ac434a42"
@@ -1018,7 +1022,7 @@ def aggregate(out_dir: pathlib.Path, subject: dict, ident: dict, verdicts: dict,
     dirty_outside = [ln for ln in ident["dirty"] if not ln[3:].startswith(OUT_REL)]
     if dirty_outside:
         problems.append(f"the working tree is dirty outside {OUT_REL}: {dirty_outside[:5]}")
-    p8 = "closure-evidence/v2/cycle2/Q4-FINAL/DIFFERENTIAL.json"   # the final candidate's differential below this rung
+    p8 = f"{C.Q4_OUT_REL}/DIFFERENTIAL.json"   # the same subject's differential below this rung (release mode: Q4-RC1's)
     return {
         "record": "AISEF V2 — Q5 REPRODUCTION (real execution; the model stream alone replayed)", "rung": "Q5",
         "authority": "owner's P9 / QP-9 EXECUTION AUTHORIZATION (2026-09-28)", "aggregated": C.now(),
@@ -1038,7 +1042,7 @@ def aggregate(out_dir: pathlib.Path, subject: dict, ident: dict, verdicts: dict,
         "network": {"guard": "in-process socket refusal during every item", "socket_attempts": totals["socket_attempts"]},
         "residual_processes": {"from_journal": totals["residual_process"], "owned_range": "see the owned-run record beside this file"},
         "conformance": {"start": start_rec, "end": end_rec}, "calibration": {"path": f"{OUT_REL}/CALIBRATION.json", "all_rejected": bool(calib_rec and calib_rec.get("all_rejected"))},
-        "p8_evidence": {p8: _sha((ROOT / p8).read_bytes()), "closure-evidence/v2/cycle2/Q4-FINAL/SUBJECT.json": _sha((ROOT / "closure-evidence/v2/cycle2/Q4-FINAL/SUBJECT.json").read_bytes())},
+        "p8_evidence": {p8: _sha((ROOT / p8).read_bytes()), f"{C.Q4_OUT_REL}/SUBJECT.json": _sha((ROOT / C.Q4_OUT_REL / "SUBJECT.json").read_bytes())},
         "p7_evidence": {rel: _sha((ROOT / rel).read_bytes()) for rel in A.P7_EVIDENCE}, "seals": {rel: _sha((ROOT / rel).read_bytes()) for rel in A.SEALS},
         "v1_evidence": {"baseline": _sha((ROOT / "closure-evidence/v2/V1-EVIDENCE-BASELINE.json").read_bytes()), "w0": _sha((ROOT / A.W0_REL).read_bytes()),
                         "product_tree": C.git("rev-parse", "HEAD:aisef")},

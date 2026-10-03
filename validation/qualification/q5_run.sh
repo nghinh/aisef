@@ -5,13 +5,19 @@
 #
 #   validation/qualification/q5_run.sh
 set -u; unsetopt nomatch
-A=/Users/nghinh/Downloads/projects/ai-sdlc; cd $A
-OUT=$A/closure-evidence/v2/cycle2/Q5-FINAL
+A=${0:A:h:h:h}; cd $A   # this script's own tree (V2.0 charter S4: the RC/release workspace, never another checkout)
+# the subject, its kernel tree and the output directory are validation/qualification/common.py candidate()'s: Cycle 2's
+# final integration candidate (cycle2/Q5-FINAL), or the frozen RC1 once its freeze record exists (release/Q5-RC1)
+SUBJ=($(python3 -P -c "import sys; sys.path.insert(0, '.'); from validation.qualification import common as C; print(C.Q5_OUT_REL, C.KERNEL_TREE, C.MODE)"))
+[ ${#SUBJ} -eq 3 ] || { echo "REFUSED: the qualification subject could not be read"; exit 1; }
+REL=$SUBJ[1]; KT=$SUBJ[2]; MODE=$SUBJ[3]
+OUT=$A/$REL
 SP=${AISEF_SCRATCH:-/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad}
 LOG=$SP/q5-logs; mkdir -p $LOG $OUT/owned
-KT=254d8f559b879c210c4936321022f1350c4b2f89   # the final integration candidate's kernel tree (aisef2/cohort added; C2-FINAL-INTEGRATION.json)
 stamp() { date '+%F %T'; }
-DIRTY=$(git status --porcelain | grep -v '^?? closure-evidence/v2/cycle2/Q5-FINAL/\|^ M closure-evidence/v2/cycle2/Q5-FINAL/\|^?? closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json\|^ M closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json' || true)
+HIST=closure-evidence/v2/cycle2/C2-P8-RUN-HISTORY.json   # Cycle 2's attempt history; in release mode nothing outside the output
+[ "$MODE" = cycle2 ] || HIST=$REL/
+DIRTY=$(git status --porcelain | grep -v "^?? $REL/\|^ M $REL/\|^?? $HIST\|^ M $HIST" || true)
 [ -z "$DIRTY" ] || { echo "REFUSED: the working tree is dirty outside Q5's output:"; echo "$DIRTY"; exit 1; }
 [ "$(git rev-parse HEAD:aisef2)" = "$KT" ] || { echo "REFUSED: HEAD's aisef2 tree is not the candidate's $KT"; exit 1; }
 [ -f $OUT/CORPUS.json ] || { echo "REFUSED: no frozen corpus (q5.py --record first, committed)"; exit 1; }
@@ -19,7 +25,7 @@ DIRTY=$(git status --porcelain | grep -v '^?? closure-evidence/v2/cycle2/Q5-FINA
   || { echo "REFUSED: no calibration with every defect rejected (q5.py --calibrate first)"; exit 1; }
 ATTEMPT=${ATTEMPT:-1}
 [ -d $OUT/reproduction ] && { echo "REFUSED: reproduction records exist — a rerun is a new attempt: move them under attempt-N/ and pass ATTEMPT=N"; exit 1; }
-echo "[$(stamp)] Q5: reproduction attempt $ATTEMPT, kernel tree $KT, HEAD $(git rev-parse --short HEAD)"
+echo "[$(stamp)] Q5 ($MODE): reproduction attempt $ATTEMPT, kernel tree $KT, HEAD $(git rev-parse --short HEAD), out $REL"
 [ -f $OUT/SUBJECT.json ] || python3 -P validation/qualification/q5.py --freeze || { echo "REFUSED: the subject could not be frozen"; exit 1; }
 python3 -P validation/qualification/q5.py --conformance start || { echo "REFUSED: conformance at start"; exit 1; }
 python3 -P validation/v2/owned_run.py --out $OUT/owned/reproduction.attempt-$ATTEMPT.json -- \

@@ -104,7 +104,7 @@ def run() -> dict:
         "record": "AISEF V2 — QP-2.9 PREFLIGHT: can the current authoritative path prove the owner-approved LedgerLock PLAN-V2.2?",
         "authority": "owner ruling 2026-09-30 (QP-2.9 authorized after QP-2.8; global stop rules)",
         "subject": {"head": C.git("rev-parse", "HEAD"), "aisef2_tree": C.git("rev-parse", "HEAD:aisef2"),
-                    "semantic_candidate": C.SEMANTIC_CANDIDATE, "kernel_tree": C.KERNEL_TREE},
+                    "semantic_candidate": C.CYCLE2_SEMANTIC_CANDIDATE, "kernel_tree": C.CYCLE2_KERNEL_TREE},
         "benchmark_class": "DEVELOPMENT_REGRESSION", "generalization": "NONE", "plan_quality_policy": "DO_NOT_PREREGISTER (DECISION-5)",
         **m,
         "model_calls": 0, "subjects_executed": 0,

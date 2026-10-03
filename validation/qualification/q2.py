@@ -24,12 +24,17 @@ import tempfile
 import time
 
 from . import common as C
+from . import release_calibration
 
 FIXTURES_REL = "tests/v2/fixtures/calibration"
 #: the Cycle-2 calibration records, one per lane; with P2-CALIBRATION.json (Cycle 1) they are every committed record
 CYCLE2_CALIBRATION_RECORDS = ("closure-evidence/v2/cycle2/P1-FILE-ARTIFACT-CALIBRATION.json", "closure-evidence/v2/cycle2/P2-CLI-CALIBRATION.json",
                               "closure-evidence/v2/cycle2/P3-EFFECT-CALIBRATION.json",
                               "closure-evidence/v2/cycle2/P4-PYTHON-CALLABLE-V2-CALIBRATION.json")
+#: V2.0 release (charter S5): B1 changed three probes, so the Cycle-2 lane records above are bound to digests the RC no
+#: longer carries (history, as release_calibration.py says); in release mode the committed calibrations of the active
+#: probes are the ones the RC ships, recorded by validation/qualification/release_calibration.py
+RELEASE_CALIBRATION_RECORDS = (release_calibration.RECORD_REL,)
 CYCLE2_CALIBRATION_CASES = [("tests.v2.test_c2_file_artifact", ("Fixtures",)), ("tests.v2.test_c2_cli_calibration", ("Fixtures",)),
                             ("tests.v2.test_python_callable_v2", ("Calibration",)), ("tests.v2.test_c2_effect_calibration", None)]
 WORKERS = 3
@@ -130,10 +135,15 @@ def _calibration() -> dict:
             and not contrast["REFUTED expected, REFUTED observed"], "problems": problems}
 
 
+def _calibration_records() -> tuple[str, ...]:
+    return RELEASE_CALIBRATION_RECORDS if C.MODE == "release" else CYCLE2_CALIBRATION_RECORDS
+
+
 def _committed_calibration_keys() -> set:
     keys = set()
-    for rel in ("closure-evidence/v2/P2-CALIBRATION.json", *CYCLE2_CALIBRATION_RECORDS):
-        c = json.loads((C.ROOT / rel).read_text(encoding="utf-8"))["calibrations"]
+    for rel in ("closure-evidence/v2/P2-CALIBRATION.json", *_calibration_records()):
+        doc = json.loads((C.ROOT / rel).read_text(encoding="utf-8"))
+        c = doc["calibrations"] if "calibrations" in doc else doc["rows"]   # the release record's rows (release_calibration.py)
         rows = [r for v in c.values() for r in v] if isinstance(c, dict) else c
         keys |= {(r["probe_id"], r["probe_digest"], r["observation_class"]) for r in rows if "probe_id" in r and r.get("qualified", True)}
     return keys
@@ -182,7 +192,7 @@ def _calibration_cycle2() -> dict:
     return {"probes": {e.probe_id: {"digest": e.probe_digest, "active": e.active,
                                     "classes": list(importlib.import_module(e.factory.__module__).CLASSES)} for e in catalog.CATALOG},
             "fresh": fresh, "in_use": sorted(in_use), "committed_record_keys": sorted(committed),
-            "records": list(CYCLE2_CALIBRATION_RECORDS), "all_calibrated_fresh": in_use == fresh_keys, "problems": problems}
+            "records": list(_calibration_records()), "all_calibrated_fresh": in_use == fresh_keys, "problems": problems}
 
 
 def _falsifiability_cycle2() -> dict:
@@ -193,9 +203,14 @@ def _falsifiability_cycle2() -> dict:
     from aisef2.product.compiler import ProbeRef, compile_spec
     from validation.qualification import p5_acceptance as pa
     from validation.qualification import p5_falsifiability as pf
+    from validation.qualification import rebind
     reqs, real, contracts = pa._aid().requirements(), pa.load_approvals(), pa.contracts()
     refs = {k: ProbeRef(e.probe_id, e.probe_digest) for k, e in catalog.active().items()}
     specs = {sid: compile_spec(c, requirements=reqs, approvals=real, probes=refs) for sid, c in contracts.items()}
+    # V2.0 release: B1 moved the probe digests the accepted specs were compiled under, so the release's equivalent of
+    # "equal to the accepted record" is equal UP TO PROBE IDENTITY (validation/qualification/rebind.py, fail closed);
+    # Cycle 2 compares literally
+    subst = rebind.spec_subst(rebind.rows(specs, contracts), rebind.accepted_rows()) if C.MODE == "release" else {}
     witness_of = {m["spec"]: m for m in pf.corpus()["mutants"]}
     committed = {r["spec_id"]: r for r in json.loads((C.ROOT / pf.OUT_REL).read_text(encoding="utf-8"))["specs"]}
     corpus_problems = pf.corpus_problems()
@@ -217,7 +232,9 @@ def _falsifiability_cycle2() -> dict:
         row = {"spec_id": sid, "semantic_hash": spec.semantic_hash, "probe_id": spec.probe_id, "probe_digest": spec.probe_digest,
                "expectation": expectation, "pristine": pristine, "witness": witness_of[sid]["id"], "witness_verdict": witness,
                "status": status, "mechanism": pf.MECHANISM, "evidence_problems": ev["falsifiability_problems"] if ev else None,
-               "equal_to_the_accepted_record": committed.get(sid, {}).get("semantic_hash") == spec.semantic_hash}
+               "equal_to_the_accepted_record": committed.get(sid, {}).get("semantic_hash") == subst.get(spec.semantic_hash, spec.semantic_hash)}
+        if C.MODE == "release":
+            row["accepted_semantic_hash_up_to_probe_identity"] = subst.get(spec.semantic_hash)
         rows.append(row)
         if status != "QUALIFIED" or (ev and ev["falsifiability_problems"]) or not row["equal_to_the_accepted_record"]:
             problems.append(f"{sid}: {status} (pristine {pristine}, witness {witness}) {ev and ev['falsifiability_problems']}")
