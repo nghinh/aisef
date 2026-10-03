@@ -1,0 +1,233 @@
+{
+ "record": "AISEF V2.0 — the owner's stable release charter, machine-readable (charter §5). The verbatim text is authoritative; this record restates it for checking and never overrides it.",
+ "authority": "owner charter 'AISEF V2 — STABLE RELEASE EXECUTION ORDER / OWNER RELEASE CHARTER / SCOPE FREEZE' (2026-10-03), docs/v2/V2-STABLE-RELEASE-CHARTER.md sha256 cd8833569fed317bb1ef20cb7bc997b6f7003218be1f5347bd53df001c04b58a",
+ "charter_text": {
+  "path": "docs/v2/V2-STABLE-RELEASE-CHARTER.md",
+  "sha256": "cd8833569fed317bb1ef20cb7bc997b6f7003218be1f5347bd53df001c04b58a",
+  "verbatim": true
+ },
+ "package": "aisef",
+ "version": "2.0.0",
+ "public_cli": "aisef",
+ "authoritative_runtime": "V2",
+ "claims": [
+  "AISEF 2.0 provides deterministic, evidence-bound orchestration and product verification for AI-assisted software delivery."
+ ],
+ "non_claims": [
+  "generalization across arbitrary workloads",
+  "superiority over V1",
+  "sealed-cohort performance",
+  "hostile multi-tenant isolation",
+  "FULL isolation against a malicious same-user host process",
+  "protection against a machine owner intentionally attacking the framework",
+  "benchmark leadership"
+ ],
+ "threat_model": {
+  "operator": "trusted",
+  "generated_developer_code": "may be faulty or opportunistic",
+  "candidate_code": [
+   "MUST NOT control authoritative proof/verdict channels",
+   "MUST NOT corrupt release evidence"
+  ],
+  "same_user_os_hostile_isolation": "NOT a V2.0 claim",
+  "not_required": "all six isolation properties FULL on every OS"
+ },
+ "release_blocker_rule": {
+  "all_of": [
+   "a deterministic reproducer",
+   "affects the public V2 stable runtime, the shipped artifact, or an explicit V2.0 release claim",
+   "impact is one of the listed impacts"
+  ],
+  "impacts": [
+   "false PASS",
+   "false rollback / false block",
+   "evidence corruption",
+   "authoritative-verdict corruption",
+   "release artifact corruption",
+   "credential/security exposure in the shipped execution path",
+   "P0/P1 correctness failure"
+  ],
+  "otherwise": "record it in V2.1-BACKLOG and continue the V2.0 release",
+  "finding_fields": [
+   "ID",
+   "REPRODUCER",
+   "AFFECTED_SHIPPED_PATH",
+   "AFFECTED_V2_CLAIM",
+   "SEVERITY",
+   "RELEASE_BLOCKER_RULE_1",
+   "RELEASE_BLOCKER_RULE_2",
+   "RELEASE_BLOCKER_RULE_3",
+   "V2_0_DISPOSITION"
+  ]
+ },
+ "go_criteria": {
+  "G1": {
+   "name": "PRODUCT VEHICLE",
+   "all_of": [
+    "package is aisef",
+    "version is 2.0.0",
+    "the aisef public CLI invokes V2 as the authoritative execution path",
+    "V2 code is included in wheel/sdist",
+    "no hidden/default V1 execution authority remains behind `aisef run`"
+   ],
+   "allowed": "legacy V1 compatibility only as an explicitly named legacy surface, never as the default authority"
+  },
+  "G2": {
+   "name": "EXACT RELEASE CANDIDATE",
+   "record": [
+    "full source SHA",
+    "kernel tree digest",
+    "wheel digest",
+    "sdist digest",
+    "RunSpec identity where applicable"
+   ],
+   "rule": "no source change after RC freeze may retain the same RC qualification"
+  },
+  "G3": {
+   "name": "CORRECTNESS",
+   "on_exact_rc": [
+    "full test suite: 0 failed",
+    "lint/static gates green",
+    "all release-blocking regression tests green",
+    "Q0-Q5 GREEN on the exact RC",
+    "zero unaudited mutation survivors in changed release-critical code"
+   ]
+  },
+  "G4": {
+   "name": "CI",
+   "rule": "exact RC CI green on every platform explicitly claimed; never claim a platform that is not green; a platform problem may narrow the support statement before RC freeze"
+  },
+  "G5": {
+   "name": "AUTHORITATIVE EVIDENCE",
+   "all_of": [
+    "candidate code cannot manufacture or directly control the authoritative ProbeResult / verdict channel",
+    "raw authoritative run evidence required for release qualification is preserved",
+    "evidence identity binds the exact candidate/spec/probe/run identities required by current RFC semantics"
+   ]
+  },
+  "G6": {
+   "name": "PUBLIC DELIVERY PATH",
+   "rule": "the canonical public workflow runs from a clean installed artifact (pip install aisef==2.0.0; aisef ...)",
+   "must_not_depend_on": [
+    "validation/qualification/c2_p9.py",
+    "forensic checkouts",
+    "developer local paths",
+    "qualification-only scripts"
+   ]
+  },
+  "G7": {
+   "name": "FINAL LIVE RELEASE SMOKE",
+   "count": 1,
+   "judged_against": "ABSOLUTE V2 acceptance, not V2 > V1",
+   "all_of": [
+    "every planned story reaches a legitimate successful terminal state",
+    "100% mandatory release acceptance checks",
+    "100% mandatory V2 ProductProof for that workload",
+    "false acceptance = 0",
+    "framework-caused false rollback/block = 0",
+    "no identity stop",
+    "no budget stop",
+    "final artifact/workspace evidence preserved"
+   ],
+   "v1": "informational only; not a release gate"
+  },
+  "G8": {
+   "name": "RELEASE MECHANICS",
+   "all_of": [
+    "a TestPyPI or equivalent non-production artifact verification path exists",
+    "a clean environment installs exactly the built artifact",
+    "CLI smoke passes",
+    "package data is present",
+    "the release workflow cannot publish an RC merely because a generic v* tag exists",
+    "release conformance/freshness gates are current or explicitly replaced by this charter"
+   ]
+  },
+  "G9": {
+   "name": "GOVERNANCE",
+   "all_of": [
+    "the charter committed verbatim",
+    "a new append-only RELEASE-DECISIONS entry superseding the historical NO_GO for this V2.0 release process",
+    "historical NO_GO records never rewritten"
+   ]
+  }
+ },
+ "deferred_to_v2_1": [
+  "sealed evaluation cohorts",
+  "generalized performance claims",
+  "proof that V2 outperforms V1",
+  "FULL hostile-developer isolation across all OSes",
+  "full same-user process secrecy",
+  "reconstructing every historical Owner ruling verbatim",
+  "broad branch-history archaeology not required for the release tree",
+  "witness-digest redesign where equal digest is legitimate content addressing and no integrity violation is reproduced",
+  "research-only benchmark improvements",
+  "additional architecture studies"
+ ],
+ "backlog": "docs/v2/V2.1-BACKLOG.md",
+ "phases": [
+  "S0_SCOPE_FREEZE",
+  "S1_FAIL_CLOSED",
+  "S2_FIX_WINDOW",
+  "S3_PRODUCTIZED",
+  "S4_RC_FROZEN",
+  "S5_QUALIFIED",
+  "S6_RELEASE_SMOKE",
+  "S7_TESTPYPI",
+  "FINAL_RELEASE_READY"
+ ],
+ "fix_window_blockers": [
+  "B1",
+  "B3",
+  "B4",
+  "B6",
+  "B7",
+  "B15",
+  "B12"
+ ],
+ "release_smoke": {
+  "workload": "LedgerLock",
+  "classification": "DEVELOPMENT_REGRESSION / PUBLIC RELEASE SMOKE",
+  "not": [
+   "HOLDOUT",
+   "SEALED",
+   "GENERALIZATION EVIDENCE"
+  ],
+  "authorized_paid_runs": 1,
+  "id": "V2.0 RELEASE SMOKE #1",
+  "hiddenness_claim": "NONE",
+  "hard_ceilings": {
+   "MAX_PROVIDER_REQUESTS": 60,
+   "MAX_TOTAL_TURNS": 700,
+   "MAX_COMBINED_INPUT_TOKENS": 60000000,
+   "MAX_OUTPUT_PLUS_REASONING_TOKENS": 400000,
+   "MAX_TURNS_PER_SESSION": 80
+  },
+  "envelope": "offline-rehearsal estimate + 25% headroom, never above the hard ceilings; no automatic expansion",
+  "on_fail": "RELEASE_GO = NO, STOP, no further paid attempt, no fix-to-green; root cause to the owner"
+ },
+ "production_hold": "no production PyPI publish and no final v2.0.0 tag before the owner's final confirmation",
+ "review_discipline": {
+  "before_rc_freeze": [
+   "one implementation reviewer",
+   "one adversarial/release reviewer"
+  ],
+  "at_rc_qualification": "at most two independent reviewers against this charter",
+  "may_only_identify": [
+   "violation of this charter",
+   "deterministic release blocker under §1",
+   "evidence inconsistency"
+  ]
+ },
+ "prohibited_before_final_owner_confirmation": [
+  "second paid release smoke",
+  "V2 architecture redesign",
+  "sealed cohort",
+  "new generalization benchmark",
+  "V1 superiority experiment",
+  "broad new mutation campaign unrelated to changed code",
+  "post-RC silent kernel patch",
+  "production PyPI publish",
+  "final stable production tag"
+ ],
+ "status": "closure-evidence/v2/release/V2-STABLE-STATUS.json"
+}

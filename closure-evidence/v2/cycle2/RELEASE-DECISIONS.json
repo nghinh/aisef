@@ -52,6 +52,36 @@
     "note": "one workload, one model route, one attempt; this decision is about the current stable release only"
    },
    "measured_after_the_ruling_was_issued": "DEVELOPER-CONFINEMENT-GAP-001 (closure-evidence/v2/cycle2/DEVELOPER-CONFINEMENT-GAP-001.json): attempt-4 developer sessions read outside their workspace, one of them the hidden probe stimulus. No story that read hidden material committed; the decision above does not depend on it and is not changed by it."
+  },
+  {
+   "seq": 2,
+   "id": "AISEF_V2_0_STABLE_RELEASE_PROCESS_CHARTER",
+   "authority": "owner charter 'AISEF V2 — STABLE RELEASE EXECUTION ORDER / OWNER RELEASE CHARTER / SCOPE FREEZE' (2026-10-03), docs/v2/V2-STABLE-RELEASE-CHARTER.md sha256 cd8833569fed317bb1ef20cb7bc997b6f7003218be1f5347bd53df001c04b58a",
+   "approver": "human:owner",
+   "supersedes": {
+    "seq": 1,
+    "scope": "for the purposes of the V2.0 release process only; entry seq 1 and every historical verdict stay immutable"
+   },
+   "decision": {
+    "V2_0_RELEASE_PROCESS": "AUTHORIZED_UNDER_CHARTER",
+    "TARGET": {
+     "distribution": "aisef",
+     "version": "2.0.0",
+     "public_cli": "aisef",
+     "authoritative_runtime": "V2"
+    },
+    "RELEASE_GO": "NO — until G1-G9 hold and the owner confirms production publication",
+    "STABLE_RELEASE": "PENDING_CHARTER_GATES",
+    "DELIVERY_NON_REGRESSION": "NOT_A_GATE (V1 comparison informational only, charter §13)",
+    "LEDGERLOCK_FURTHER_RELEASE_ATTEMPTS": "EXACTLY ONE: V2.0 RELEASE SMOKE #1 (charter §14), as DEVELOPMENT_REGRESSION / PUBLIC RELEASE SMOKE — not holdout, not sealed, not generalization evidence",
+    "PAID_RUNS_AUTHORIZED": 1,
+    "PRODUCTION_PUBLISH": "HELD for the owner's final confirmation (charter §19)"
+   },
+   "charter": {
+    "text": "docs/v2/V2-STABLE-RELEASE-CHARTER.md",
+    "sha256": "cd8833569fed317bb1ef20cb7bc997b6f7003218be1f5347bd53df001c04b58a",
+    "machine_readable": "closure-evidence/v2/release/V2-STABLE-RELEASE-CHARTER.json"
+   }
   }
  ]
 }
