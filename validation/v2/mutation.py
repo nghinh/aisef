@@ -54,7 +54,10 @@ RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence
            "K-PRESAT-001": "closure-evidence/v2/cycle2/K-PRESAT-001-MUTATION.json",
            "K-NOWORK-001": "closure-evidence/v2/cycle2/K-NOWORK-001-MUTATION.json"}
 OUT_REL = RECORDS["P1"]
-TIMEOUT = 120
+#: per kill-test file. V2.0 S2: the B1 split runs a controller and an agent per evaluation, and the heaviest kill file
+#: (tests/v2/test_python_callable_v2.py) takes 96 s on an idle machine — 120 s would let two workers' load time out
+#: the unmutated baseline. A kill by timeout is still named in the record.
+TIMEOUT = 300
 
 #: target "path::function" -> the test files that must kill its mutants (semantic tests only; see module doc).
 _CONTRACT_TESTS = ["tests/v2/p1/test_contract.py"]
