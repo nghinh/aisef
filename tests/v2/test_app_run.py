@@ -21,7 +21,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.app import adapters as ad  # noqa: E402
-from aisef2.app import bundle, cli, preflight, settings  # noqa: E402
+from aisef2.app import bundle, cli, client, preflight, settings  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
 from aisef2.app.verify import verify  # noqa: E402
 from aisef2.arch.enums import ObligationRole, Owner, Polarity, SubjectAbsence, SubjectKind  # noqa: E402
@@ -107,7 +107,8 @@ def project_bundle(baseline: str) -> dict:
 
 
 SETTINGS = {"format": settings.FORMAT, "client": "opencode", "route": ROUTE,
-            "provider": {"name": "fakeprov", "endpoint": "https://provider.invalid/v1", "api_key_env": "AISEF_TEST_NO_KEY"},
+            "provider": {"name": "fakeprov", "endpoint": "https://provider.invalid/v1", "api_key_env": "AISEF_TEST_NO_KEY",
+                         "served_model": "model-1", "listed_owner": "fake", "model_limit": {"context": 100000, "output": 8000}},
             "client_env": [], "budget": {"provider_requests": 20, "turns": 50, "input_tokens": 100000, "output_tokens": 10000},
             "max_turns_per_session": 10, "limits": {o.value: 1 for o in Owner},
             "timeouts_s": {"developer": 60, "reviewer": 60, "tool": 120, "probe": 60}, "preflight": {"chat_probes": 2}}
@@ -123,6 +124,14 @@ def provider(served: str = "model-1", fingerprint: str = "fp-1"):
         return 200, {"model": served, "system_fingerprint": fingerprint, "usage": {"prompt_tokens": 9, "completion_tokens": 1}}
     transport.calls = calls
     return transport
+
+
+def client_config(root: pathlib.Path, endpoint: str = "https://provider.invalid/v1", key: str = "{env:AISEF_TEST_NO_KEY}") -> dict:
+    """An isolated client configuration (XDG_CONFIG_HOME): the operator's own is never read by a test."""
+    (root / "xdg" / "opencode").mkdir(parents=True, exist_ok=True)
+    (root / "xdg" / "opencode" / "opencode.json").write_text(json.dumps(
+        {"provider": {"fakeprov": {"options": {"baseURL": endpoint, "apiKey": key}}}}), encoding="utf-8")
+    return {"XDG_CONFIG_HOME": str(root / "xdg")}
 
 
 def calibrations() -> tuple:
@@ -148,6 +157,9 @@ class ProductBase(unittest.TestCase):
         self.scanner = mock.patch.object(ad, "scanner", lambda: ad.NoScanner())
         self.scanner.start()
         self.addCleanup(self.scanner.stop)
+        xdg = mock.patch.dict(os.environ, client_config(self.tmp))
+        xdg.start()
+        self.addCleanup(xdg.stop)
 
     def mode(self, m: str) -> None:
         (self.client.parent / "mode").write_text(m)
@@ -190,6 +202,20 @@ class Product(ProductBase):
         self.assertFalse(any(secret in p.read_text(encoding="utf-8") for p in logs))
         self.assertEqual(sum(s["redacted"] for s in rec["sessions"]), len(logs))
         self.assertNotIn(secret, (self.tmp / "out" / "RUN.json").read_text(encoding="utf-8"))
+
+    def test_a_client_configured_for_another_endpoint_is_refused_before_any_request(self):
+        client_config(self.tmp, endpoint="https://elsewhere.invalid/v1")
+        transport = provider()
+        with self.assertRaisesRegex(R.RunRefused, "sends provider fakeprov to https://elsewhere.invalid/v1, not to the attested"):
+            self.execute(transport=transport)
+        self.assertEqual(transport.calls, [])
+
+    def test_the_client_overlay_fixes_the_route_and_declares_its_model(self):
+        rec = self.execute()
+        self.assertEqual(rec["delivery_verdict"], "PASS")
+        overlay = json.loads(client.environment((), client.overlay(ROUTE, self.settings.model_limit))["OPENCODE_CONFIG_CONTENT"])
+        self.assertEqual(overlay, {"model": ROUTE, "small_model": ROUTE, "provider": {"fakeprov": {"models": {
+            "model-1": {"name": "model-1", "limit": {"context": 100000, "output": 8000}}}}}})
 
     def test_spend_exactly_at_every_ceiling_is_no_budget_stop(self):
         """Review IR-02: two sessions of one step each, the preflight's three requests — every counter ends exactly at
@@ -311,6 +337,9 @@ class Command(unittest.TestCase):
         baseline = make_repo(self.tmp / "source")
         (self.tmp / "project.json").write_text(json.dumps(project_bundle(baseline)), encoding="utf-8")
         (self.tmp / "settings.json").write_text(json.dumps(SETTINGS), encoding="utf-8")
+        xdg = mock.patch.dict(os.environ, client_config(self.tmp))
+        xdg.start()
+        self.addCleanup(xdg.stop)
 
     def cli(self, *argv: str) -> tuple[int, str, str]:
         out, err = io.StringIO(), io.StringIO()
@@ -343,7 +372,7 @@ class Command(unittest.TestCase):
             code, _, err = self.cli("--project", str(self.tmp / "project.json"), "--settings", str(self.tmp / "settings.json"),
                                     "--repo", str(self.tmp / "source"), "--out", str(self.tmp / "out"))
         self.assertEqual(code, 2)
-        self.assertIn("AISEF_TEST_NO_KEY is not set", err)
+        self.assertIn("no provider key", err)
         self.assertEqual(json.loads((self.tmp / "out" / "RUN.json").read_text(encoding="utf-8"))["failure"]["stage"], "preflight")
 
 

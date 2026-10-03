@@ -14,18 +14,18 @@ import urllib.request
 
 NOT_EXPOSED = "NOT_EXPOSED"
 PROBE_PROMPT = "Reply with the single word: ok"
+PROBE_MAX_TOKENS = 16      # the attempt-4 preflight's (a reasoning model spends its first tokens reasoning)
 
 
 class IdentityStop(Exception):
     """The route cannot be attested: no session may start."""
 
 
-def http_transport(endpoint: str, key_env: str, timeout_s: float = 60.0):
-    """(path, body | None) -> (status, json): GET when `body` is None, else POST; the key read from `key_env` here and
-    sent as a bearer token, never recorded."""
-    key = os.environ.get(key_env)
+def http_transport(endpoint: str, key: str, timeout_s: float = 60.0):
+    """(path, body | None) -> (status, json): GET when `body` is None, else POST; `key` sent as a bearer token, never
+    recorded."""
     if not key:
-        raise IdentityStop(f"the provider key variable {key_env} is not set")
+        raise IdentityStop("no provider key: the key variable is not set, or the client's configuration holds none")
 
     def call(path: str, body: dict | None = None) -> tuple[int, dict]:
         req = urllib.request.Request(endpoint + path, data=None if body is None else json.dumps(body).encode("utf-8"),
@@ -59,12 +59,16 @@ def accounting(ledger: pathlib.Path) -> dict:
             "unaccounted": sorted(sent - set(done))}
 
 
-def run(route: str, chat_probes: int, transport, directory: pathlib.Path) -> dict:
-    """Measure the route; the observation and the verdict ATTESTED or OPAQUE (with every problem named)."""
+def run(route: str, chat_probes: int, transport, directory: pathlib.Path, served_model: str | None = None,
+        listed_owner: str | None = None) -> dict:
+    """Measure the route; the observation and the verdict ATTESTED or OPAQUE (with every problem named). The listing
+    must list the route's model (owned by `listed_owner`, when given: never a router's alias of another), and every
+    completion must be served by `served_model` (the route's model when not given)."""
     directory.mkdir(parents=True, exist_ok=False)
     ledger = directory / "LEDGER.jsonl"
     model = route.split("/", 1)[1]
-    obs: dict = {"route": route, "declared_model": model, "listing": None, "probes": []}
+    obs: dict = {"route": route, "declared_model": model, "expected_served_model": served_model or model,
+                 "expected_listed_owner": listed_owner, "listing": None, "probes": []}
     n = 1
     _append(ledger, {"n": n, "event": "sent", "kind": "listing"})
     code, body = transport("/models")
@@ -75,7 +79,7 @@ def run(route: str, chat_probes: int, transport, directory: pathlib.Path) -> dic
         n += 1
         _append(ledger, {"n": n, "event": "sent", "kind": "chat"})
         code, body = transport("/chat/completions", {"model": model, "messages": [{"role": "user", "content": PROBE_PROMPT}],
-                                                     "max_tokens": 1, "temperature": 0})
+                                                     "max_tokens": PROBE_MAX_TOKENS, "temperature": 0})
         usage = body.get("usage") or {}
         _append(ledger, {"n": n, "event": "done", "http": code, "input_tokens": usage.get("prompt_tokens") or 0,
                          "output_tokens": usage.get("completion_tokens") or 0})
@@ -92,11 +96,14 @@ def identity_problems(obs: dict) -> list[str]:
     out = []
     if obs["listing"]["http"] != 200 or not obs["listing"]["listed"]:
         out.append(f"the provider does not list the declared model {obs['declared_model']}")
+    elif obs.get("expected_listed_owner") and obs["listing"]["owned_by"] != obs["expected_listed_owner"]:
+        out.append(f"the listing names {obs['listing']['owned_by']!r} as the model's owner, not {obs['expected_listed_owner']!r}")
+    served = obs.get("expected_served_model") or obs["declared_model"]
     for i, p in enumerate(obs["probes"]):
         if p["http"] != 200:
             out.append(f"probe {i}: HTTP {p['http']}")
-        elif p["served_model"] != obs["declared_model"]:
-            out.append(f"probe {i}: served by {p['served_model']!r}, not the declared model (an alias or a re-route)")
+        elif p["served_model"] != served:
+            out.append(f"probe {i}: served by {p['served_model']!r}, not {served!r} (an alias or a re-route)")
     fingerprints = {p["system_fingerprint"] for p in obs["probes"]}
     if len(fingerprints) > 1:
         out.append(f"the deployment changed between probes ({len(fingerprints)} fingerprints)")

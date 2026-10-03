@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import pathlib
 import sys
 import tempfile
@@ -35,6 +36,7 @@ if str(ROOT) not in sys.path:
 OUT_REL = "closure-evidence/v2/release/OFFLINE-REHEARSAL.json"
 SCENARIOS = ("reference", "partial", "nothing")
 ROUTE = "rehearsal/fake-model"
+ENDPOINT = "https://rehearsal.invalid/v1"
 #: the charter's hard ceilings (§15): the rehearsal runs under them so a structural overrun shows here first
 CEILINGS = {"provider_requests": 60, "turns": 700, "input_tokens": 60_000_000, "output_tokens": 400_000}
 CLIENT = r'''import json, pathlib, sys
@@ -72,7 +74,8 @@ def settings_doc() -> dict:
     from aisef2.arch.enums import Owner
     from validation.qualification import c2_p9
     return {"format": settings.FORMAT, "client": "opencode", "route": ROUTE,
-            "provider": {"name": "rehearsal", "endpoint": "https://rehearsal.invalid/v1", "api_key_env": "AISEF_REHEARSAL_NO_KEY"},
+            "provider": {"name": "rehearsal", "endpoint": ENDPOINT, "api_key_env": None, "served_model": "fake-model",
+                         "listed_owner": "rehearsal", "model_limit": {"context": 200000, "output": 32768}},
             "client_env": [], "budget": dict(CEILINGS), "max_turns_per_session": 80,
             "limits": {o.value: c2_p9.PROFILES[c2_p9.EXPERIMENT][o.value] for o in Owner},
             "timeouts_s": {"developer": 600, "reviewer": 600, "tool": 120, "probe": 60}, "preflight": {"chat_probes": 2}}
@@ -148,8 +151,21 @@ def rehearse(names=SCENARIOS, cals=None) -> dict:
     project = bundle.load(rb.build()["bundle"])
     results = {}
     with tempfile.TemporaryDirectory(prefix="aisef-rehearsal-") as t:
-        for name in names:
-            results[name] = scenario(name, project, pathlib.Path(t) / name, cals)
+        # the client's own configuration, isolated: the operator's is never read by a rehearsal
+        cfg = pathlib.Path(t) / "xdg" / "opencode"
+        cfg.mkdir(parents=True)
+        (cfg / "opencode.json").write_text(json.dumps({"provider": {"rehearsal": {"options": {
+            "baseURL": ENDPOINT, "apiKey": "rehearsal-not-a-key"}}}}), encoding="utf-8")
+        before = os.environ.get("XDG_CONFIG_HOME")
+        os.environ["XDG_CONFIG_HOME"] = str(cfg.parent)
+        try:
+            for name in names:
+                results[name] = scenario(name, project, pathlib.Path(t) / name, cals)
+        finally:
+            if before is None:
+                os.environ.pop("XDG_CONFIG_HOME", None)
+            else:
+                os.environ["XDG_CONFIG_HOME"] = before
     return {"record": "AISEF V2.0 — OFFLINE REHEARSAL OF THE RELEASE SMOKE (fake client, fake provider; no model, no network)",
             "bundle_digest": project.digest, "plan_hash": project.plan.plan_hash, "execution_order": project.order(),
             "ceilings": CEILINGS, "results": results, "problems": problems_of(results, project.order())}

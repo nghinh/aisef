@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import re
 import shutil
 import time
 
@@ -120,9 +121,31 @@ def environment(names: tuple[str, ...], overlay: dict) -> dict:
     return {**{k: os.environ[k] for k in keep if k in os.environ}, "OPENCODE_CONFIG_CONTENT": json.dumps(overlay, sort_keys=True)}
 
 
-def overlay(route: str) -> dict:
-    """The client configuration overlay: the model and the small model are the one fixed route."""
-    return {"model": route, "small_model": route}
+def overlay(route: str, model_limit: dict | None = None) -> dict:
+    """The client configuration overlay: the model and the small model are the one fixed route, and the route's model
+    is declared to its provider with its limits (as the attempt-4 harness did: a provider's configuration need not
+    list the model)."""
+    provider, model = route.split("/", 1)
+    return {"model": route, "small_model": route,
+            "provider": {provider: {"models": {model: {"name": model, **({"limit": dict(model_limit)} if model_limit else {})}}}}}
+
+
+def configured_provider(name: str, environ=None) -> tuple[str | None, str]:
+    """(endpoint, key) of provider `name` in the client's own configuration (XDG_CONFIG_HOME or ~/.config,
+    opencode/opencode.json): the endpoint the client's sessions go to, and its key — a literal or `{env:VAR}`. The key
+    is never printed or recorded. (None, "") when the configuration does not define the provider."""
+    environ = os.environ if environ is None else environ
+    base = pathlib.Path(environ.get("XDG_CONFIG_HOME") or pathlib.Path(environ.get("HOME", "~")).expanduser() / ".config")
+    try:
+        opts = (json.loads((base / "opencode" / "opencode.json").read_text(encoding="utf-8")).get("provider") or {})[name]["options"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None, ""
+    key = str(opts.get("apiKey") or "")
+    m = re.fullmatch(r"\{env:([A-Za-z0-9_]+)\}", key)
+    if m:
+        key = environ.get(m.group(1), "")
+    endpoint = str(opts.get("baseURL") or opts.get("baseUrl") or "").rstrip("/")
+    return endpoint or None, key
 
 
 def wait_within(r, log: pathlib.Path, timeout_s: float, budget: Budget, turn_cap: int) -> tuple[int | None, str | None]:

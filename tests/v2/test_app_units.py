@@ -91,6 +91,15 @@ class Settings(unittest.TestCase):
                 self.refused("one fixed route", route=route)
         self.refused("provider is", provider={**e2e.SETTINGS["provider"], "name": "other"})
         self.refused("provider is", provider={"name": "fakeprov", "endpoint": "https://x"})
+        prov = e2e.SETTINGS["provider"]
+        self.assertIsNone(self.load(provider={**prov, "api_key_env": None, "listed_owner": None}).api_key_env)
+        for bad, why in ((("api_key_env", ""), "api_key_env names a variable"), (("served_model", ""), "served_model is"),
+                         (("listed_owner", 3), "listed_owner is"), (("model_limit", {"context": 1}), "model_limit is"),
+                         (("model_limit", {"context": 0, "output": 1}), r"model_limit\.context is an integer >= 1")):
+            with self.subTest(field=bad[0], value=bad[1]):
+                self.refused(why, provider={**prov, bad[0]: bad[1]})
+        s = self.load()
+        self.assertEqual((s.served_model, s.listed_owner, s.model_limit), ("model-1", "fake", {"context": 100000, "output": 8000}))
         self.refused("provider is", provider="fakeprov")
         for endpoint in ("http://provider/v1", "ftp://x", "http://127.0.0.2.evil/v1"):
             with self.subTest(endpoint=endpoint):
@@ -215,11 +224,37 @@ class Sessions(Temp):
         self.assertEqual(client.redact(log, ("absent-value",)), 0)
         self.assertEqual(log.read_bytes(), before)
 
+    def test_the_client_s_own_configuration_names_the_endpoint_and_the_key(self):
+        cfg = self.tmp / "opencode"
+        cfg.mkdir()
+
+        def write(options):
+            (cfg / "opencode.json").write_text(json.dumps({"provider": {"p": {"options": options}}}), encoding="utf-8")
+        env = {"XDG_CONFIG_HOME": str(self.tmp), "MYKEY": "from-env-123"}
+        write({"baseURL": "https://e/v1/", "apiKey": "literal-key-123"})
+        self.assertEqual(client.configured_provider("p", env), ("https://e/v1", "literal-key-123"))
+        write({"baseUrl": "https://e/v1", "apiKey": "{env:MYKEY}"})
+        self.assertEqual(client.configured_provider("p", env), ("https://e/v1", "from-env-123"))
+        self.assertEqual(client.configured_provider("p", {"XDG_CONFIG_HOME": str(self.tmp)}), ("https://e/v1", ""))
+        self.assertEqual(client.configured_provider("other", env), (None, ""))
+        self.assertEqual(client.configured_provider("p", {"XDG_CONFIG_HOME": str(self.tmp / "none")}), (None, ""))
+        (self.tmp / "home" / ".config" / "opencode").mkdir(parents=True)
+        (self.tmp / "home" / ".config" / "opencode" / "opencode.json").write_text(
+            json.dumps({"provider": {"p": {"options": {"baseURL": "https://h/v1", "apiKey": "k"}}}}), encoding="utf-8")
+        self.assertEqual(client.configured_provider("p", {"HOME": str(self.tmp / "home")}), ("https://h/v1", "k"))
+
+    def test_the_overlay_fixes_both_models_and_declares_the_route_s_model(self):
+        self.assertEqual(client.overlay("9router/ds/deepseek-v4-pro", {"context": 200000, "output": 32768}),
+                         {"model": "9router/ds/deepseek-v4-pro", "small_model": "9router/ds/deepseek-v4-pro",
+                          "provider": {"9router": {"models": {"ds/deepseek-v4-pro": {"name": "ds/deepseek-v4-pro",
+                                                                                     "limit": {"context": 200000, "output": 32768}}}}}})
+        self.assertEqual(client.overlay("p/m")["provider"], {"p": {"models": {"m": {"name": "m"}}}})
+
     def test_the_client_environment_is_built_not_inherited(self):
         with mock.patch.dict(os.environ, {"PATH": "/p", "HOME": "/h", "SECRET_X": "s", "NAMED": "n", "LANG": "C"}, clear=True):
             env = client.environment(("NAMED", "ABSENT"), client.overlay("a/b"))
         self.assertEqual(env, {"PATH": "/p", "HOME": "/h", "NAMED": "n", "LANG": "C",
-                               "OPENCODE_CONFIG_CONTENT": json.dumps({"model": "a/b", "small_model": "a/b"}, sort_keys=True)})
+                               "OPENCODE_CONFIG_CONTENT": json.dumps(client.overlay("a/b"), sort_keys=True)})
 
     def test_an_unbound_or_unaccountable_session_never_starts(self):
         b = self.budget(requests=0)
@@ -296,7 +331,7 @@ class Preflight(Temp):
         self.assertEqual(preflight.identity_problems(obs(listing=(200, False))), ["the provider does not list the declared model model-1"])
         self.assertEqual(preflight.identity_problems(obs(probes=((502, None, "fp"),))), ["probe 0: HTTP 502"])
         self.assertEqual(preflight.identity_problems(obs(probes=((200, "model-1", "fp"), (200, "m2", "fp")))),
-                         ["probe 1: served by 'm2', not the declared model (an alias or a re-route)"])
+                         ["probe 1: served by 'm2', not 'model-1' (an alias or a re-route)"])
         self.assertEqual(preflight.identity_problems(obs(probes=((200, "model-1", "a"), (200, "model-1", "b")))),
                          ["the deployment changed between probes (2 fingerprints)"])
         self.assertIsNone(preflight.deployment(obs(probes=((200, "model-1", preflight.NOT_EXPOSED),))))
@@ -310,9 +345,38 @@ class Preflight(Temp):
         rec = preflight.run(e2e.ROUTE, 2, unlisted, self.tmp / "p3")
         self.assertEqual((rec["verdict"], rec["observation"]["listing"]["listed"]), ("OPAQUE", False))
 
-    def test_the_key_is_read_from_its_variable_and_never_defaulted(self):
-        with mock.patch.dict(os.environ, {}, clear=True), self.assertRaisesRegex(preflight.IdentityStop, "K is not set"):
-            preflight.http_transport("https://x", "K")
+    def test_a_transport_without_a_key_is_refused(self):
+        with self.assertRaisesRegex(preflight.IdentityStop, "no provider key"):
+            preflight.http_transport("https://x", "")
+
+    def test_a_router_serving_the_route_under_its_upstream_name_is_attested_only_as_declared(self):
+        """The attempt-4 route: 9router lists `ds/deepseek-v4-pro` owned by `ds`, and every completion reports serving
+        `deepseek-v4-pro`. Attested only with that served model and that owner declared; the router's own alias
+        owner (`combo`) is refused."""
+        def router(owner="ds", served="deepseek-v4-pro"):
+            def t(path, body=None):
+                if body is None:
+                    return 200, {"data": [{"id": "ds/deepseek-v4-pro", "owned_by": owner}]}
+                return 200, {"model": served, "system_fingerprint": "fp", "usage": {"prompt_tokens": 1, "completion_tokens": 9}}
+            return t
+        route = "9router/ds/deepseek-v4-pro"
+        ok = preflight.run(route, 2, router(), self.tmp / "a", "deepseek-v4-pro", "ds")
+        self.assertEqual((ok["verdict"], ok["problems"]), ("ATTESTED", []))
+        undeclared = preflight.run(route, 2, router(), self.tmp / "b")
+        self.assertEqual(undeclared["verdict"], "OPAQUE")
+        self.assertIn("probe 0: served by 'deepseek-v4-pro', not 'ds/deepseek-v4-pro' (an alias or a re-route)", undeclared["problems"])
+        alias = preflight.run(route, 2, router(owner="combo"), self.tmp / "c", "deepseek-v4-pro", "ds")
+        self.assertEqual(alias["problems"], ["the listing names 'combo' as the model's owner, not 'ds'"])
+        self.assertEqual(preflight.run(route, 2, router(owner="combo"), self.tmp / "d", "deepseek-v4-pro", None)["verdict"], "ATTESTED")
+
+    def test_probe_requests_carry_enough_tokens_for_a_reasoning_model(self):
+        bodies = []
+        def t(path, body=None):
+            bodies.append(body)
+            return e2e.provider()(path, body)
+        preflight.run(e2e.ROUTE, 2, t, self.tmp / "p")
+        self.assertEqual([b["max_tokens"] for b in bodies if b], [preflight.PROBE_MAX_TOKENS] * 2)
+        self.assertEqual(preflight.PROBE_MAX_TOKENS, 16)
 
 
 # --------------------------------------------------------------------------------------------- the bundle

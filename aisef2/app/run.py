@@ -230,8 +230,15 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         exe = client_exe or shutil.which("opencode", path=client.environment(settings.client_env, {}).get("PATH"))
         if not exe:
             raise RunRefused("the client (opencode) is not on the PATH the run gives it")
-        transport = transport or preflight.http_transport(settings.endpoint, settings.api_key_env)
-        pre = preflight.run(settings.route, settings.chat_probes, transport, out / "preflight")
+        # the client's own configuration decides where its sessions go: it must be the endpoint the preflight attests
+        configured, config_key = client.configured_provider(settings.provider)
+        if configured != settings.endpoint:
+            raise RunRefused(f"the client's configuration sends provider {settings.provider} to {configured}, not to the "
+                             f"attested endpoint {settings.endpoint}")
+        key = os.environ.get(settings.api_key_env, "") if settings.api_key_env else config_key
+        transport = transport or preflight.http_transport(settings.endpoint, key)
+        pre = preflight.run(settings.route, settings.chat_probes, transport, out / "preflight", settings.served_model,
+                            settings.listed_owner)
         rec["preflight"] = pre
         if pre["verdict"] != "ATTESTED":
             raise preflight.IdentityStop("the route is not attested: " + "; ".join(pre["problems"]))
@@ -250,11 +257,11 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         logs = out / "sessions"
         budget = client.Budget(settings.budget, pre["accounting"], logs,
                                lambda: sum(1 for e in run.events if e.type == "provider/request"))
-        kw = {"model": settings.route, "env": client.environment(settings.client_env, client.overlay(settings.route)),
+        kw = {"model": settings.route,
+              "env": client.environment(settings.client_env, client.overlay(settings.route, settings.model_limit)),
               "budget": budget, "turn_cap": settings.max_turns_per_session, "exe": exe,
               # the operator's values the client receives, and the provider key: never left in a session's evidence
-              "secrets": tuple(os.environ[n] for n in (*settings.client_env, settings.api_key_env)
-                               if len(os.environ.get(n, "")) >= 8)}
+              "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8)}
         developer = ad.Developer(run, project, logs, kw, settings.timeouts_s["developer"])
         reviewer = ad.Reviewer(run, project, logs, kw, settings.timeouts_s["reviewer"])
         adapters = sr.Adapters(developer, reviewer, scanner, merger, ws)

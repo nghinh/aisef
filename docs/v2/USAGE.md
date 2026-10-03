@@ -41,7 +41,8 @@ bundles; it does not author them.
   "format": "aisef-v2-run/1",
   "client": "opencode",
   "route": "myprovider/my-model",
-  "provider": {"name": "myprovider", "endpoint": "https://api.example.com/v1", "api_key_env": "MYPROVIDER_API_KEY"},
+  "provider": {"name": "myprovider", "endpoint": "https://api.example.com/v1", "api_key_env": "MYPROVIDER_API_KEY",
+               "served_model": "my-model", "listed_owner": null, "model_limit": {"context": 200000, "output": 32768}},
   "client_env": ["MYPROVIDER_API_KEY"],
   "budget": {"provider_requests": 60, "turns": 700, "input_tokens": 60000000, "output_tokens": 400000},
   "max_turns_per_session": 80,
@@ -51,10 +52,17 @@ bundles; it does not author them.
 }
 ```
 
-`route` is `<provider>/<model>` and is the only model the client may use (main and small model alike).
+`route` is `<provider>/<model>` and is the only model the client may use (main and small model alike); the client
+is told the route's model and its `model_limit`. `served_model` is the model name the provider reports serving the
+route (a router may report its upstream name: route `9router/ds/deepseek-v4-pro` is served as `deepseek-v4-pro`),
+and `listed_owner`, when not null, the owner its model listing must name — never a router's alias of another
+model. The client's own configuration (`opencode.json` under `XDG_CONFIG_HOME` or `~/.config/opencode/`) must send
+the provider to `endpoint`, or the run is refused before any request; `api_key_env: null` takes the key from that
+configuration (a literal or `{env:VAR}`).
 `client_env` names the operator variables the client receives; its whole environment is otherwise built (PATH, HOME,
 locale, XDG and temporary directories), never inherited. `limits` are the retries each failure owner may consume.
-The key is read from `api_key_env` at run time and is never written anywhere.
+The key is read at run time and never written anywhere; every value the client receives is redacted from the
+session logs.
 
 ## Commands
 
