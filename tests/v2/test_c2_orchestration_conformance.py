@@ -716,9 +716,10 @@ class Record(unittest.TestCase):
     def test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story(self):
         """Agreement is identity for six of the seven Cycle-1 items; the seventh is a fully PRE_SATISFIED story, which
         under K-PRESAT-001 runs no engineering-adequacy stage: it must differ from the old kernel by that stage and by
-        nothing else."""
+        nothing else. On the V2.0 release tree the record is cycle 2's (historical): it binds this tree up to the
+        release's named changes, each while its own gate holds (c2_orchestration_repair.release_differences)."""
         from validation.qualification import c2_orchestration_repair as rp
-        self.assertEqual(rp.check(), [])
+        self.assertEqual(rp.release_differences(), [])
         rec = json.loads((ROOT / rp.OUT_REL).read_text(encoding="utf-8"))
         eq = rec["single_probe_equivalence"]
         staged = eq["identical_but_the_adequacy_stage_of_a_fully_pre_satisfied_story"]
@@ -735,6 +736,36 @@ class Record(unittest.TestCase):
         old, new = rec["defect_reproducer"]["old"], rec["defect_reproducer"]["new"]
         self.assertEqual(old["raised"], "InvariantError: cycle 1 proves a story with exactly one probe factory")
         self.assertEqual((new["raised"], new["attempts"]), (None, ["COMMIT"]))
+
+    def test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds(self):
+        from unittest import mock
+        from validation.qualification import c2_orchestration_repair as rp
+        from validation.qualification import p5_acceptance as pa
+        rec = json.loads((ROOT / rp.OUT_REL).read_text(encoding="utf-8"))["identities"]
+        mu = rp._load("aisef_v2_mutation", "validation/v2/mutation.py")
+        released = ["(d) aisef2/probe/catalog.py changed since the base and is not in the record",
+                    "(d) aisef2/orchestrate/story_runner.py changed since the record",
+                    "(e) the identities differ from the record", "(f) the mutation summary differs from the record"]
+        stray = {"a file the release did not name": "(d) aisef2/orchestrate/proof.py changed since the record",
+                 "a verdict problem of the record": "(c) the test matrix: exit 1"}
+
+        def left(found, now=rec, acceptance=(), mutation=()):
+            with mock.patch.object(rp, "identities", return_value=now), mock.patch.object(rp, "check", return_value=found), \
+                    mock.patch.object(pa, "check", return_value=list(acceptance)), mock.patch.object(mu, "check", return_value=list(mutation)):
+                return rp.release_differences()
+        self.assertEqual(left(released), [])
+        for name, x in stray.items():
+            with self.subTest(name):
+                self.assertEqual(left(released + [x]), [x])
+        with self.subTest("the C2-P5 acceptance not current up to probe identity"):
+            self.assertEqual(len(left(released, acceptance=["x"])), 1)
+        with self.subTest("a mutation record that does not hold"):
+            self.assertEqual(left(released, mutation=["x"]), ["(f) the mutation summary differs from the record"])
+        with self.subTest("an identity a probe change does not move"):
+            self.assertEqual(len(left(released, now={**rec, "cycle1_drift_ok": not rec["cycle1_drift_ok"]})), 1)
+        with self.subTest("a probe source the release did not change"):
+            src = {**rec["probe_sources_vs_6311254"], "aisef2/probe/protocol.py": {"6311254": "a", "now": "b"}}
+            self.assertEqual(len(left(released, now={**rec, "probe_sources_vs_6311254": src})), 1)
 
 
 if __name__ == "__main__":

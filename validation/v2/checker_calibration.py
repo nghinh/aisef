@@ -29,6 +29,7 @@ from typing import Callable
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 V2 = ROOT / "validation" / "v2"
+RELEASE_INVENTORY_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"
 FIXTURES = ROOT / "tests" / "v2" / "fixtures" / "known_bad"
 OUT_REL = "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json"
 
@@ -335,7 +336,14 @@ def _old_path_audit() -> Checker:
     def bad(fx):
         text = _edit((ROOT / fx["path"]).read_text(encoding="utf-8"), fx)
         return opa.compare(json.loads(text), opa.inventory(ROOT))
-    return Checker("old_path_audit", "WP-6.3", lambda: opa.check(ROOT), bad, ("validation/v2/old_path_audit.py",))
+
+    def clean():
+        # the V2.0 release tree adds authorities (aisef2/app): it is audited against its own inventory, beside the
+        # sealed P6 one (validation/qualification/release_inventory.py), by the same compare and proofs
+        if (ROOT / RELEASE_INVENTORY_REL).exists():
+            return _load("aisef_v2_release_inventory", ROOT / "validation/qualification/release_inventory.py").check(ROOT)
+        return opa.check(ROOT)
+    return Checker("old_path_audit", "WP-6.3", clean, bad, ("validation/v2/old_path_audit.py",))
 
 
 def _owned_run() -> Checker:

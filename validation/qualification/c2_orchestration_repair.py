@@ -616,7 +616,7 @@ def write() -> dict:
     return rec
 
 
-def check() -> list[str]:
+def check(now: dict | None = None) -> list[str]:
     p = ROOT / OUT_REL
     if not p.exists():
         return [f"{OUT_REL} is missing"]
@@ -625,16 +625,57 @@ def check() -> list[str]:
     out += verdict_problems(rec)
     for rel, row in rec["files_changed"].items():
         f = ROOT / rel
-        now = _lf(f.read_bytes()) if f.exists() else None
-        if now != row["after"]:
+        now_bytes = _lf(f.read_bytes()) if f.exists() else None
+        if now_bytes != row["after"]:
             out.append(f"(d) {rel} changed since the record")
     committed = {x for x in repair_paths() if x and x != OUT_REL}
     out += [f"(d) {x} changed since the base and is not in the record" for x in sorted(committed - set(rec["files_changed"]))]
-    now = identities()
+    now = identities() if now is None else now
     if {k: now.get(k) for k in SEMANTIC_IDENTITIES} != {k: rec["identities"].get(k) for k in SEMANTIC_IDENTITIES}:
         out.append("(e) the identities differ from the record")
     if mutation() != rec["mutation"]:
         out.append("(f) the mutation summary differs from the record")
+    return out
+
+
+def release_differences() -> list[str]:
+    """On the V2.0 release tree this cycle-2 record is HISTORICAL — cycle 2's measurement, byte-identical. The release
+    (docs/v2/V2-STABLE-RELEASE-CHARTER.md, S2 fix window) changed files it binds or that changed since its base, each
+    for a named blocker (`changed`). Returns `check`'s findings that are NOT such a change whose own gate holds ([] =
+    every way this tree differs from the record is the release's, gated): a file in `changed`; this generator only where
+    `check` and this function differ from its recorded commit (rebind.code_moved); identities that differ only in the
+    ones a probe change moves (`probe_moved`), the probe sources only in `changed` files, the C2-P5 acceptance current up
+    to probe identity (p5_acceptance.check, the re-binding rule); the mutation summary while every mutation record holds
+    (validation/v2/mutation.py check)."""
+    from validation.qualification import p5_acceptance as pa
+    from validation.qualification import rebind
+    changed = {"aisef2/orchestrate/story_runner.py": "B7", "aisef2/orchestrate/adapters.py": "B4",
+               "aisef2/orchestrate/workspace.py": "B4, B6, B7", "aisef2/probe/catalog.py": "B1",
+               "aisef2/probe/cli_invocation.py": "B1, B1-BLOCKS-STOP-001", "aisef2/probe/process_effect.py": "B1, B1-BLOCKS-STOP-001",
+               "aisef2/probe/python_callable_v2.py": "B1, B1-BLOCKS-STOP-001", "validation/v2/mutation.py": "S2 mutation phase",
+               "tests/v2/test_c2_orchestration_conformance.py": "probe-identity re-binding; this rule"}
+    probe_moved = ("all_equal_to_accepted", "contract_spec_semantic_digest", "plan_hash", "plan_ok", "catalog",
+                   "catalog_matches_the_brief", "probe_sources_vs_6311254", "probe_sources_identical_to_6311254")
+    me = "validation/qualification/c2_orchestration_repair.py"
+    rec = json.loads((ROOT / OUT_REL).read_text(encoding="utf-8"))
+    now = identities()
+    moved = sorted(k for k in SEMANTIC_IDENTITIES if now.get(k) != rec["identities"].get(k))
+    sources = sorted(rel for rel, x in now["probe_sources_vs_6311254"].items()
+                     if x != rec["identities"]["probe_sources_vs_6311254"].get(rel))
+    out = []
+    for x in check(now):
+        parts = x.split(" ", 2)
+        if parts[0] == "(d)" and parts[2] in ("changed since the record", "changed since the base and is not in the record") and (
+                parts[1] in changed or parts[1] == me and rebind.code_moved(me, "4f6dfc1", ("check", "release_differences"))):
+            continue
+        if x == "(e) the identities differ from the record":
+            stray = [k for k in moved if k not in probe_moved] + [r for r in sources if r not in changed]
+            if not stray and not pa.check():
+                continue
+            x += f": beyond the release's probe change {stray}, or the C2-P5 acceptance is not current up to probe identity"
+        if x == "(f) the mutation summary differs from the record" and not _load("aisef_v2_mutation", "validation/v2/mutation.py").check():
+            continue
+        out.append(x)
     return out
 
 
