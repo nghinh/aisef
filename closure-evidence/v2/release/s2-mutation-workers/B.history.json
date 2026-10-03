@@ -1,0 +1,13 @@
+{
+ "worker": "B",
+ "snapshot": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+ "status": "stopped after 95 of its 125 requested targets by handoff.sh, 2026-10-04 00:37 (results through line 95 were the ones its snapshot still matched)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/B.log",
+  "sha256": "f1e4a81e0e57be7de3d0cdcff4c26f98d8f10fea8c8d8b845c0024088aff1f1d"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/B.record.json",
+  "sha256": "95a28a66589224d45aab7dfa04ce4f66bbcf11417ebec705b74da5ee49c167ba"
+ }
+}

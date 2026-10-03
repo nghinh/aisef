@@ -1,0 +1,13 @@
+{
+ "worker": "C",
+ "snapshot": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+ "status": "stopped by the controller after 64 of its 117 requested targets, 2026-10-04 03:39 (owner ruling MUTATION WORKER HANDOFF §1); its results are not merged (§4)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/C.log",
+  "sha256": "f607553215685b5baa16d6c5822a6b1bd2d29fae5285dc203638ce9d0390d7e5"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/C.record.json",
+  "sha256": "ee34efc23858bbc4a507b070bc5d64c4c8001c0a4473b6f54918a12f787e1c4f"
+ }
+}

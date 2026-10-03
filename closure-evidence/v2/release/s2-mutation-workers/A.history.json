@@ -1,0 +1,13 @@
+{
+ "worker": "A",
+ "snapshot": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+ "status": "ended after 51 of its 124 requested targets (log last written 2026-10-03 17:05)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/A.log",
+  "sha256": "f14e12c6c87164884f78802799817851fe52582fbf255fe2f16b28a1e6094e78"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/A.record.json",
+  "sha256": "9877d3c7a1040494e4e66ff778b71e62c1cf3f32e69c00775efef7d2495e32cd"
+ }
+}

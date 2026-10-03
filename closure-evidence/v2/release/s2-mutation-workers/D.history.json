@@ -1,0 +1,10 @@
+{
+ "worker": "D",
+ "snapshot": "8bec241d3f4b79ab0e5f61d82b9e2aa90700ac76",
+ "status": "stopped by the controller before finishing its first target, 2026-10-04 03:51 (owner answer: stop D now — tests/v2/test_release_s2_kernel.py, in its kill sets, changed after its snapshot)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/D.log",
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ },
+ "record": null
+}
