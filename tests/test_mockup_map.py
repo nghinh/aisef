@@ -330,6 +330,27 @@ class TestAppServer(unittest.TestCase):
         self.assertIn("exited early", why)
 
 
+def _why_not_up(p, log, port: int, url: str) -> str:
+    """What a host says when the throwaway server is not reachable: the server's state and stderr (it logs every
+    request it receives), a raw TCP connect, the urllib error and the proxies urllib would use."""
+    import socket
+    import urllib.request
+
+    log.seek(0)
+    try:
+        with socket.create_connection(("127.0.0.1", port), timeout=2):
+            tcp = "connected"
+    except OSError as e:
+        tcp = repr(e)
+    try:
+        urllib.request.urlopen(url, timeout=2).close()
+        http = "answered"
+    except Exception as e:  # noqa: BLE001 — a diagnostic: every failure is reported, none is raised
+        http = repr(e)
+    return (f"exit {p.poll()}, stderr {log.read()[-1500:]!r}, tcp {tcp}, urllib {http}, "
+            f"proxies {urllib.request.getproxies()!r}")
+
+
 def _free_port() -> int:
     import socket
 
@@ -478,8 +499,7 @@ class TestGianhLaiCongCuaChinhMinh(unittest.TestCase):
             while _t.time() < het and not _responds(url, timeout=1):
                 _t.sleep(0.2)
             if not _responds(url, timeout=1):
-                log.seek(0)
-                self.fail(f"máy chủ thử chưa lên: exit {p.poll()}, stderr {log.read()[-1500:]!r}")
+                self.fail(f"máy chủ thử chưa lên: {_why_not_up(p, log, port, url)}")
             self.assertTrue(_giai_phong_cong(str(p.pid), url))
             self.assertFalse(_responds(url, timeout=1))
         finally:
