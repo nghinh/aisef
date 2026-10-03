@@ -339,7 +339,8 @@ def _journal_info(run, closed: str | None) -> dict | None:
         return None
     path = run.journal_path
     data = path.read_bytes() if path.exists() else b""
-    return {"path": str(path.relative_to(path.parents[2])), "sha256": _sha(data), "lines": data.count(b"\n"), "closed": closed}
+    return {"path": path.relative_to(path.parents[2]).as_posix(), "sha256": _sha(data), "lines": data.count(b"\n"),
+            "closed": closed}
 
 
 def _close(run) -> dict:

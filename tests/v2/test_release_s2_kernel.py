@@ -73,7 +73,9 @@ class Repo(unittest.TestCase):
         return self.ran()
 
     def assertRefused(self, where, key: str, ran: int) -> None:
-        self.assertIn(key, w.config_problems(where))
+        listing = subprocess.run(["git", "-C", str(where), "config", "--list", "--show-scope", "--no-includes", "-z"],
+                                 capture_output=True, env=w._env())     # what config_problems read, shown if it misses the key
+        self.assertIn(key, w.config_problems(where), (listing.returncode, listing.stdout[-1500:], listing.stderr[-800:]))
         p = w.git(where, "status", "--porcelain")
         self.assertEqual(p.returncode, w.REFUSED)
         self.assertIn(key, p.stderr)
@@ -186,7 +188,10 @@ class GitConfiguration(Repo):
         other, other_base = e2e.make_repo(self.tmp / "other-root")
         wt = self.ws.checkout("wt-S1", self.base)
         foreign = self.ws.__class__(other, self.tmp / "ws").checkout("wt-other", other_base)
-        (wt.path / ".git").write_bytes((foreign.path / ".git").read_bytes())
+        # rewritten in place: Git for Windows marks .git hidden, and Windows refuses to re-create (CREATE_ALWAYS) a hidden file
+        with open(wt.path / ".git", "r+b") as f:
+            f.write((foreign.path / ".git").read_bytes())
+            f.truncate()
         with self.assertRaises(ResourceUnavailable) as x:
             self.ws.move(wt, self.base)
         self.assertEqual(str(x.exception), "checkout wt-S1: its gitfile is not the one git wrote (B4): not moved")
@@ -244,6 +249,7 @@ class ReadOnlyScope(unittest.TestCase):
             checkout.mkdir()
             outside.write_text("not the story's", encoding="utf-8")
             outside.chmod(0o644)
+            mode = stat.S_IMODE(outside.stat().st_mode)     # 0o644 on POSIX; Windows keeps only the read-only bit (0o666)
             (checkout / "a.py").write_text("A = 1\n", encoding="utf-8")
             try:
                 os.symlink(outside, checkout / "link")
@@ -251,11 +257,11 @@ class ReadOnlyScope(unittest.TestCase):
             except (OSError, NotImplementedError) as e:      # Windows without the symlink privilege
                 self.skipTest(f"no symlinks here: {e}")
             scope = adapters.confine("S1", str(checkout))
-            self.assertEqual(stat.S_IMODE(outside.stat().st_mode), 0o644)
+            self.assertEqual(stat.S_IMODE(outside.stat().st_mode), mode)
             self.assertFalse(os.access(checkout / "a.py", os.W_OK))
             adapters.unconfine(scope)
             self.assertTrue(os.access(checkout / "a.py", os.W_OK))
-            self.assertEqual(stat.S_IMODE(outside.stat().st_mode), 0o644)
+            self.assertEqual(stat.S_IMODE(outside.stat().st_mode), mode)
 
 
 #: `sub` answers correctly until the flag exists — what a post-merge proof that disagrees with the candidate proofs

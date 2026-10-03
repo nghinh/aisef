@@ -748,7 +748,7 @@ class Preregistration(unittest.TestCase):
         self.assertEqual((r["attempt"], r["hold"], r["run_authorized"]), (4, None, "only by the owner's ruling — and by nothing in this record"))
         self.assertIn("SUPERSEDED_BEFORE_RUN (OWNER_OUTPUT_BUDGET_AMENDMENT)", r["authority"])
         for rel, row in dx.SUPERSEDED_BEFORE_RUN.items():          # the held preregistration that never ran, kept byte for byte
-            self.assertEqual(dx._sha((ROOT / rel).read_bytes()), row["sha256"])
+            self.assertEqual(dx._sha((ROOT / rel).read_bytes().replace(b"\r\n", b"\n")), row["sha256"])   # LF: a CRLF checkout
             self.assertNotEqual(rel, dx.OUT_REL)
             self.assertNotEqual(json.loads((ROOT / rel).read_text(encoding="utf-8"))["runspec_template_hash"], r["runspec_template_hash"])
         self.assertEqual(r["provider_calls_made_preparing_this"], 0)
