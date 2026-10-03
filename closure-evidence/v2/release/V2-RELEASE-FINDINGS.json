@@ -157,8 +157,47 @@
    "RELEASE_BLOCKER_RULE_1": "YES",
    "RELEASE_BLOCKER_RULE_2": "YES",
    "RELEASE_BLOCKER_RULE_3": "YES",
-   "V2_0_DISPOSITION": "BLOCK — fixed in 85ac8d3: the controller's own timer writes the authenticated deadline RESULT; a silent controller past the window and the watchdog is HARNESS_FAILED",
+   "V2_0_DISPOSITION": "BLOCK — fixed in 85ac8d3 (the controller's own timer writes the deadline RESULT) and completed in ec8e759 after the pre-RC implementation review measured the timer still armed through the closing exchange (IR-01): the race is settled when the observed operation answers",
    "source": "B1 python_callable_v2 lane, S2"
+  },
+  {
+   "ID": "B16-BUDGET-AT-CEILING",
+   "TITLE": "a run that delivered every story, with spend landing exactly on a ceiling, was recorded FAIL 'the budget ended the run' (Budget.reached asked after the last story); verify and the release acceptance re-derived the same false FAIL",
+   "REPRODUCER": "measured by both pre-RC reviewers (IR-02, ADV-01: turns=2 with two one-step sessions → FAIL); regression tests/v2/test_app_run.py::Product.test_spend_exactly_at_every_ceiling_is_no_budget_stop",
+   "AFFECTED_SHIPPED_PATH": "aisef2/app/run.py, client.py, verify.py; validation/qualification/release_acceptance.py",
+   "AFFECTED_V2_CLAIM": "G7 (the release smoke's verdict), §17",
+   "SEVERITY": "high (false block of the one paid smoke)",
+   "RELEASE_BLOCKER_RULE_1": "YES",
+   "RELEASE_BLOCKER_RULE_2": "YES",
+   "RELEASE_BLOCKER_RULE_3": "YES",
+   "V2_0_DISPOSITION": "BLOCK — fixed in 5a8203b: RUN.json budget_stop is what the budget actually stopped (a story not started, a session refused or ended, spend past a ceiling, unaccounted spend)",
+   "source": "pre-RC review IR-02 / ADV-01"
+  },
+  {
+   "ID": "B13-RC-BINDING",
+   "TITLE": "the production path neither rebuilt the RC's bytes (the tag sits on a later commit; the epoch was that commit's) nor compared any frozen RC identity",
+   "REPRODUCER": "measured by the adversarial reviewer (ADV-02): same files, later epoch → different wheel and sdist digests; the gate passed with RC identities matching nothing built",
+   "AFFECTED_SHIPPED_PATH": ".github/workflows/release.yml, staging.yml, tests.yml; validation/v2_release_gate.py; validation/qualification/release_rc.py, repro_dist.py",
+   "AFFECTED_V2_CLAIM": "G2, §11, §18",
+   "SEVERITY": "high (charter violation)",
+   "RELEASE_BLOCKER_RULE_1": "YES",
+   "RELEASE_BLOCKER_RULE_2": "YES",
+   "RELEASE_BLOCKER_RULE_3": "YES",
+   "V2_0_DISPOSITION": "BLOCK — fixed in 46c8c57: builds take the frozen RC's epoch, the gate requires the RC record and the tagged commit's shipped files to be the RC's, the publish job verifies the files against the frozen digests",
+   "source": "pre-RC review ADV-02"
+  },
+  {
+   "ID": "G1-LEGACY-IMPROVE",
+   "TITLE": "`aisef improve` executed V1 stories (run_epic) under a top-level name, outside the named legacy surface",
+   "REPRODUCER": "measured by the adversarial reviewer (ADV-05): top-level improve -> cmd_improve -> aisef.phases.improve -> run_epic",
+   "AFFECTED_SHIPPED_PATH": "aisef/cli/parser.py",
+   "AFFECTED_V2_CLAIM": "G1",
+   "SEVERITY": "medium (charter violation)",
+   "RELEASE_BLOCKER_RULE_1": "YES",
+   "RELEASE_BLOCKER_RULE_2": "YES",
+   "RELEASE_BLOCKER_RULE_3": "YES",
+   "V2_0_DISPOSITION": "BLOCK — fixed in f410b2c: `aisef legacy improve`; the top-level `improve` no longer parses",
+   "source": "pre-RC review ADV-05"
   }
  ],
  "v2_1_backlog": {
@@ -187,9 +226,15 @@
    "V21-21",
    "V21-22",
    "V21-23",
-   "V21-24"
+   "V21-24",
+   "V21-25",
+   "V21-26",
+   "V21-27",
+   "V21-28",
+   "V21-29",
+   "V21-30"
   ],
-  "count": 24
+  "count": 30
  },
  "risks_not_findings": [
   {
@@ -197,6 +242,34 @@
    "what": "attempt 4 committed 4 of 7 stories and used 427,741 output+reasoning tokens; the charter's smoke ceiling is 400,000 and G7 needs every story successful",
    "source": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 1 grounding_facts",
    "disposition": "reported to the owner; not a blocker under §1"
+  }
+ ],
+ "reviews": [
+  {
+   "when": "pre-RC (charter §20: one implementation + one adversarial/release reviewer)",
+   "workflow_run": "wf_aec09ce7-c6f",
+   "blockers_fixed": {
+    "IR-01": "B1-BLOCKS-STOP-001 (ec8e759)",
+    "IR-02/ADV-01": "B16-BUDGET-AT-CEILING (5a8203b)",
+    "ADV-02": "B13-RC-BINDING (46c8c57)",
+    "ADV-05": "G1-LEGACY-IMPROVE (f410b2c)"
+   },
+   "evidence_inconsistencies": {
+    "IR-03/ADV-04": "V2_1_BACKLOG_COUNT now derived from this register at every status write",
+    "ADV-03": "K-NOWORK-001 record re-pin (harness re-pin lane)"
+   },
+   "hardening_applied": {
+    "IR-B6": "RUN.json written when closing raises (5a8203b)",
+    "ADV-09": "session-log secret redaction, preflight within budget, frozen evaluator enforced (a6f3aa2)"
+   },
+   "to_v2_1": [
+    "V21-25",
+    "V21-26",
+    "V21-27",
+    "V21-28",
+    "V21-29",
+    "V21-30"
+   ]
   }
  ]
 }

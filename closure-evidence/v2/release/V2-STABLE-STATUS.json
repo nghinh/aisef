@@ -11,8 +11,8 @@
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
- "CURRENT_SHA": "2e9e7b234fac85c7d95e60fd6990848837942461",
- "CURRENT_KERNEL_DIGEST": "b64fb5371a4546a862a11a9a83fef37a4e0fffd9",
+ "CURRENT_SHA": "f410b2c3b9986b71bcaf04d6736d68205ead67e7",
+ "CURRENT_KERNEL_DIGEST": "b95ceb4a6027bb787792d0d86b5ce64fc5a16527",
  "CURRENT_WHEEL_DIGEST": null,
  "OPEN_V2_0_BLOCKERS": [
   "B1",
@@ -25,7 +25,7 @@
   "B14",
   "KA-09"
  ],
- "V2_1_BACKLOG_COUNT": 23,
+ "V2_1_BACKLOG_COUNT": 30,
  "PROVIDER_CALLS": 0,
  "PAID_RELEASE_SMOKES_USED": 0,
  "sources": {
@@ -56,12 +56,18 @@
    "status": "IN_PROGRESS",
    "on": "2e9e7b234fac85c7d95e60fd6990848837942461",
    "what": "S2 code complete incl. B1-BLOCKS-STOP-001; S3 productization largely done; exit gates running"
+  },
+  {
+   "phase": "S2_FIX_WINDOW",
+   "status": "IN_PROGRESS",
+   "on": "f410b2c3b9986b71bcaf04d6736d68205ead67e7",
+   "what": "pre-RC review (2 reviewers, §20): 4 blockers fixed and regression-tested, 6 items to V2.1"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
  "S2_DETAIL": {
-  "code": "B1 (ci, pe, pc2 split; B1-BLOCKS-STOP-001), B3, B4, B6, B7, B12 (aisef2/app), KA-09 fixed and regression-tested; B13 release mechanics merged",
-  "exit": "targeted mutation V2.0-S2 running (260 targets, 6,355 mutants; story_runner after its record re-pin); harness re-pin to the new probe identities in progress; one full local suite after both"
+  "code": "B1 (+ B1-BLOCKS-STOP-001 completed after the pre-RC review), B3, B4, B6, B7, B12, KA-09; review blockers B16-BUDGET-AT-CEILING, B13-RC-BINDING, G1-LEGACY-IMPROVE fixed",
+  "exit": "targeted mutation V2.0-S2 to rerun for the changed modules (cli_invocation, python_callable_v2, app) and story_runner; harness re-pin lane; one full local suite"
  },
  "S3_DETAIL": {
   "done": [
