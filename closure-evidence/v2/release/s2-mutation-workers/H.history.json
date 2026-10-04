@@ -1,0 +1,13 @@
+{
+ "worker": "H",
+ "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+ "status": "complete: all 35 requested orchestrate targets measured on 369c8ac (started 2026-10-04 04:34 by queue.sh; finished 13:40)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/H.log",
+  "sha256": "90a82ece07c52c957e094dc97b69e0ea3c32d7f3a8bf439ff844cfaf2eecdcaf"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/H.record.json",
+  "sha256": "33b19efc331e1686acda1ef225c9cefa8c855afb19e72d9f0db6f2f7d31c35ec"
+ }
+}

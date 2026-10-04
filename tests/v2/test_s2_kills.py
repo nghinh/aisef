@@ -17,6 +17,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
+from aisef2.orchestrate import workspace as w  # noqa: E402
 from aisef2.probe import cli_invocation as ci  # noqa: E402
 from aisef2.probe import process_effect as pe  # noqa: E402
 from aisef2.probe import python_callable_v2 as pc2  # noqa: E402
@@ -120,6 +121,15 @@ class CallableHarnessArgv(unittest.TestCase):
     def test_the_harness_command_line_names_the_fresh_cache_prefix(self):
         self.assertEqual(pc2._harness_argv("/py", "/w/ask.json", "/w/pyc"),
                          ["/py", "-I", "-B", "-X", "pycache_prefix=/w/pyc", "-c", pc2.HARNESS, "/w/ask.json"])
+
+
+class WorkspaceConfigListing(unittest.TestCase):
+    """workspace.config_problems L58: where git cannot list a configuration at all (here, a directory that does not
+    exist), the answer is the empty list of keys — a list, as everywhere else, never None."""
+
+    def test_no_listing_is_an_empty_list_of_keys(self):
+        with tempfile.TemporaryDirectory() as t:
+            self.assertEqual(w.config_problems(pathlib.Path(t) / "absent"), [])
 
 
 if __name__ == "__main__":

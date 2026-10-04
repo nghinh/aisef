@@ -1,0 +1,481 @@
+aisef2/orchestrate/story_runner.py::StoryResult.committed: 3/3 killed; survivors []
+aisef2/orchestrate/story_runner.py::StoryResult.revision: 1/1 killed; survivors []
+aisef2/orchestrate/story_runner.py::_Held.__init__: 6/6 killed; survivors []
+aisef2/orchestrate/story_runner.py::_Held.__call__: 3/3 killed; survivors []
+aisef2/orchestrate/story_runner.py::_Held.release: 3/3 killed; survivors []
+aisef2/orchestrate/story_runner.py::_committed: 6/6 killed; survivors []
+aisef2/orchestrate/story_runner.py::_freeze_plan: 9/9 killed; survivors []
+aisef2/orchestrate/story_runner.py::_fail: 34/34 killed; survivors []
+aisef2/orchestrate/story_runner.py::_probe: 9/9 killed; survivors []
+aisef2/orchestrate/story_runner.py::run_story: 11/11 killed; survivors []
+aisef2/orchestrate/story_runner.py::_attempt: 284/284 killed; survivors []
+aisef2/orchestrate/adapters.py::Implemented.__post_init__: 27/27 killed; survivors []
+aisef2/orchestrate/adapters.py::Finding.blocks: 2/2 killed; survivors []
+aisef2/orchestrate/adapters.py::ReadOnlyScope.read: 1/1 killed; survivors []
+aisef2/orchestrate/adapters.py::ReadOnlyScope.files: 8/8 killed; survivors []
+aisef2/orchestrate/adapters.py::confine: 9/9 killed; survivors []
+aisef2/orchestrate/adapters.py::unconfine: 5/5 killed; survivors []
+aisef2/orchestrate/adapters.py::Merge.__post_init__: 6/6 killed; survivors []
+aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT: 11/11 killed; survivors []
+aisef2/orchestrate/workspace.py::git: 22/22 killed; survivors []
+aisef2/orchestrate/workspace.py::_sha: 13/13 killed; survivors []
+aisef2/orchestrate/workspace.py::Scratch.__init__: 6/6 killed; survivors []
+aisef2/orchestrate/workspace.py::Scratch.release: 3/3 killed; survivors []
+aisef2/orchestrate/workspace.py::Checkout.__init__: 10/10 killed; survivors []
+aisef2/orchestrate/workspace.py::Checkout.release: 8/8 killed; survivors []
+aisef2/orchestrate/workspace.py::GitWorkspace.scratch: 4/4 killed; survivors []
+aisef2/orchestrate/workspace.py::GitWorkspace.checkout: 16/16 killed; survivors []
+aisef2/orchestrate/workspace.py::GitWorkspace.move: 26/26 killed; survivors []
+aisef2/orchestrate/workspace.py::GitWorkspace.diff: 9/9 killed; survivors []
+aisef2/orchestrate/workspace.py::GitMerger.base: 1/1 killed; survivors []
+aisef2/orchestrate/workspace.py::GitMerger.merge: 46/46 killed; survivors []
+aisef2/orchestrate/workspace.py::GitMerger.revert: 15/15 killed; survivors []
+aisef2/orchestrate/workspace.py::commit_all: 19/19 killed; survivors []
+aisef2/orchestrate/workspace.py::_env: 6/6 killed; survivors []
+aisef2/orchestrate/workspace.py::config_problems: 33/34 killed; survivors ['L58 returns None']
+SUPERSEDED  P6 aisef2/orchestrate/adapters.py::Finding.blocks: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/adapters.py::Implemented.__post_init__: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/adapters.py::Merge.__post_init__: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/adapters.py::ReadOnlyScope.files: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/adapters.py::ReadOnlyScope.read: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/adapters.py::confine: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/adapters.py::unconfine: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/proof.py::Party.__init__: historical, taken over by C2-ORCH
+SUPERSEDED  P6 aisef2/orchestrate/proof.py::Party.run: historical, taken over by C2-ORCH
+SUPERSEDED  P6 aisef2/orchestrate/proof.py::Ranged.__init__: historical, taken over by C2-ORCH
+SUPERSEDED  P6 aisef2/orchestrate/proof.py::obligations_of: historical, taken over by C2-ORCH
+SUPERSEDED  P6 aisef2/orchestrate/proof.py::prove: historical, taken over by C2-ORCH
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::StoryResult.committed: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::StoryResult.revision: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::_Held.__call__: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::_Held.__init__: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::_Held.release: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::_attempt: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::_committed: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::_fail: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::_freeze_plan: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::_probe: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/story_runner.py::run_story: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::Checkout.__init__: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::Checkout.release: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::GitMerger.base: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::GitMerger.merge: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::GitMerger.revert: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::GitWorkspace.checkout: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::GitWorkspace.diff: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::GitWorkspace.move: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::GitWorkspace.scratch: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::Scratch.__init__: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::Scratch.release: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::_sha: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::commit_all: historical, taken over by V2.0-S2
+SUPERSEDED  P6 aisef2/orchestrate/workspace.py::git: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::CLASSES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::CLASS_TABLE: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::COMPARATORS: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::CliInvocationProbe._observe: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::CliInvocationProbe.observe: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::FILE_SHAPES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::ON_DEADLINE: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::PROBE_SOURCES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::QUANTIFIERS: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::STREAM_SHAPES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_argv_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_await: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_bytes_of: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_child_env: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_content_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_disposed: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_equal: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_equality_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_equality_verdict: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_file_fact: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_file_matches: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_file_shape_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_half_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_hard_exit: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_harness_argv: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_harness_failure: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_is_int: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_name_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_normalization_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_normalize: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_preflight: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_prepare: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_probe_digest: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_protocol: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_public: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_sha_file: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_stimulus_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_stream_bytes: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_stream_fact: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_stream_matches: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_stream_shape_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_streams_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_substitute: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_watch: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_ws_key_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::_ws_name: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::observation_class: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::spec_class: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P2 aisef2/probe/cli_invocation.py::verdict_of: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::CLASSES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::CLASS_TABLE: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::FAULTED: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::FAULTS: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::FILE_SHAPES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/HANDLERS: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/count_lines: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/do_call: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/do_construct: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/do_edit: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/do_expect: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/do_fault: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/do_subprocess: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/do_workspace: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/do_write: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/emit: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/file_fact: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/files_now: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/guarded: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/identity: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/inside: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/main: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/raised_as: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/resolve: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/row_of: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/run: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/same: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/tagged: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/target_of: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::HARNESS/unws: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::ON_DEADLINE: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::PROBE_SOURCES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::ProcessEffectProbe.__init__: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::ProcessEffectProbe.observe: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::STEPS: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_CONTENT: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_FILE_HOLDS: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_FILE_SHAPE_OK: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_HOLDS: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_SHAPES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_concluded: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_content_of: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_edit_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_expect_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_fault_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_file_shape_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_files_hold: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_flat_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_hard_exit: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_harness_argv: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_ident_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_identity: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_invocation_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_jsonl_holds: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_observed_files: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_prepare: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_probe_digest: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_raises_hold: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_resolved: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_returns_hold: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_same: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_scenario_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_step_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_subprocess_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_substitute: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_watch: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_workspace_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_write_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::_ws_path_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::observation_class: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::spec_class: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P3 aisef2/probe/process_effect.py::verdict_of: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::CLASSES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::ON_DEADLINE: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::PROBE_SOURCES: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::_file_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::_harness_argv: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::_is_hex: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::_probe_digest: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::_substituted: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::_unsubstituted: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::_watch: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::_workspace_ok: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::_write_workspace: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::observation_class: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::observe: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::spec_class: historical, taken over by V2.0-S2
+SUPERSEDED  C2-P4 aisef2/probe/python_callable_v2.py::verdict_of: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::StoryResult.committed: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::StoryResult.revision: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::_Held.__call__: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::_Held.__init__: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::_Held.release: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::_attempt: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::_committed: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::_fail: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::_freeze_plan: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::_probe: historical, taken over by V2.0-S2
+SUPERSEDED  C2-ORCH aisef2/orchestrate/story_runner.py::run_story: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::StoryResult.committed: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::StoryResult.revision: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::_Held.__call__: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::_Held.__init__: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::_Held.release: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::_attempt: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::_committed: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::_fail: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::_freeze_plan: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::_probe: historical, taken over by V2.0-S2
+SUPERSEDED  K-PRESAT-001 aisef2/orchestrate/story_runner.py::run_story: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::StoryResult.committed: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::StoryResult.revision: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::_Held.__call__: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::_Held.__init__: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::_Held.release: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::_attempt: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::_committed: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::_fail: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::_freeze_plan: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::_probe: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::run_story: historical, taken over by V2.0-S2
+FAIL  aisef2/probe/cli_invocation.py::_is_int has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_content_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_bytes_of has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_name_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_ws_key_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_argv_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_stimulus_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_stream_shape_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_file_shape_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::observation_class has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::spec_class has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_sha_file has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_stream_fact has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_file_fact has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_stream_bytes has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_stream_matches has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_file_matches has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::verdict_of has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_ws_name has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_substitute has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_public has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_child_env has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_protocol has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_prepare has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::CLASSES has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::ON_DEADLINE has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::STREAM_SHAPES has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::FILE_SHAPES has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_normalization_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_equality_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_streams_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_normalize has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_equal has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_half_ok has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_equality_verdict has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::CLASS_TABLE has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::QUANTIFIERS has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::COMPARATORS has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::PROBE_SOURCES has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_probe_digest has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_await has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__ has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::CliInvocationProbe.observe has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::CliInvocationProbe._observe has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_preflight has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_watch has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_harness_failure has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_disposed has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_harness_argv has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_concluded has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_no_result has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_deadline has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_silent has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::_mac has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/flush has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/redirect has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/send has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/tagged has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/plain has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/op_import has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/op_resolve has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/op_value has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/op_construct has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/guarded has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/op_call has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/op_invoke has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::AGENT/op_bye has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/emit has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/conclude has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/deadline has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/answer_to has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/ask has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/finish has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/inside has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/resolve has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/sha has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/file_fact has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/stream_fact has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/invoke has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/ended has no mutation result
+FAIL  aisef2/probe/cli_invocation.py::HARNESS/main has no mutation result
+FAIL  aisef2/probe/process_effect.py::CLASSES has no mutation result
+FAIL  aisef2/probe/process_effect.py::ON_DEADLINE has no mutation result
+FAIL  aisef2/probe/process_effect.py::STEPS has no mutation result
+FAIL  aisef2/probe/process_effect.py::FAULTS has no mutation result
+FAIL  aisef2/probe/process_effect.py::FAULTED has no mutation result
+FAIL  aisef2/probe/process_effect.py::FILE_SHAPES has no mutation result
+FAIL  aisef2/probe/process_effect.py::CLASS_TABLE has no mutation result
+FAIL  aisef2/probe/process_effect.py::_CONTENT has no mutation result
+FAIL  aisef2/probe/process_effect.py::_flat_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_ws_path_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_ident_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_content_of has no mutation result
+FAIL  aisef2/probe/process_effect.py::_invocation_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_workspace_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_expect_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_write_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_edit_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_subprocess_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_fault_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_SHAPES has no mutation result
+FAIL  aisef2/probe/process_effect.py::_step_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_scenario_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::_FILE_SHAPE_OK has no mutation result
+FAIL  aisef2/probe/process_effect.py::_file_shape_ok has no mutation result
+FAIL  aisef2/probe/process_effect.py::observation_class has no mutation result
+FAIL  aisef2/probe/process_effect.py::spec_class has no mutation result
+FAIL  aisef2/probe/process_effect.py::_same has no mutation result
+FAIL  aisef2/probe/process_effect.py::_returns_hold has no mutation result
+FAIL  aisef2/probe/process_effect.py::_raises_hold has no mutation result
+FAIL  aisef2/probe/process_effect.py::_identity has no mutation result
+FAIL  aisef2/probe/process_effect.py::_jsonl_holds has no mutation result
+FAIL  aisef2/probe/process_effect.py::_FILE_HOLDS has no mutation result
+FAIL  aisef2/probe/process_effect.py::_files_hold has no mutation result
+FAIL  aisef2/probe/process_effect.py::_HOLDS has no mutation result
+FAIL  aisef2/probe/process_effect.py::verdict_of has no mutation result
+FAIL  aisef2/probe/process_effect.py::_substitute has no mutation result
+FAIL  aisef2/probe/process_effect.py::_resolved has no mutation result
+FAIL  aisef2/probe/process_effect.py::_observed_files has no mutation result
+FAIL  aisef2/probe/process_effect.py::_concluded has no mutation result
+FAIL  aisef2/probe/process_effect.py::PROBE_SOURCES has no mutation result
+FAIL  aisef2/probe/process_effect.py::_probe_digest has no mutation result
+FAIL  aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement has no mutation result
+FAIL  aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions has no mutation result
+FAIL  aisef2/probe/process_effect.py::_harness_argv has no mutation result
+FAIL  aisef2/probe/process_effect.py::_prepare has no mutation result
+FAIL  aisef2/probe/process_effect.py::ProcessEffectProbe.__init__ has no mutation result
+FAIL  aisef2/probe/process_effect.py::ProcessEffectProbe.observe has no mutation result
+FAIL  aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in has no mutation result
+FAIL  aisef2/probe/process_effect.py::_watch has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/emit has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/inside has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/resolve has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/unws has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/same has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/row_of has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/count_lines has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/file_fact has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/files_now has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/identity has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/guarded has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/do_workspace has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/do_construct has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/do_call has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/do_expect has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/do_write has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/do_edit has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/do_subprocess has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/do_fault has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/run has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/main has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/answer_to has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/ask has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/finish has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/answered has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/reported has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/subject_call has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/unresolved has no mutation result
+FAIL  aisef2/probe/process_effect.py::HARNESS/ended has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::PROBE_SOURCES has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::CLASSES has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::ON_DEADLINE has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_probe_digest has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_is_hex has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_file_ok has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_workspace_ok has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::observation_class has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::spec_class has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::verdict_of has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_substituted has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_unsubstituted has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_write_workspace has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_watch has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_harness_argv has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__ has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::_concluded has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/emit has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/conclude has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/deadline has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/answer_to has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/ask has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/finish has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/answered has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/ended has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/inside has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/value_of has no mutation result
+FAIL  aisef2/probe/python_callable_v2.py::HARNESS/main has no mutation result
+FAIL  aisef2/app/run.py::kernel_digest has no mutation result
+FAIL  aisef2/app/run.py::calibrations has no mutation result
+FAIL  aisef2/app/run.py::admit has no mutation result
+FAIL  aisef2/app/run.py::check_git has no mutation result
+FAIL  aisef2/app/run.py::check_repository has no mutation result
+FAIL  aisef2/app/run.py::probe_interpreter has no mutation result
+FAIL  aisef2/app/run.py::regression_tests has no mutation result
+FAIL  aisef2/app/run.py::runspec_of has no mutation result
+FAIL  aisef2/app/run.py::productproof has no mutation result
+FAIL  aisef2/app/run.py::delivery has no mutation result
+FAIL  aisef2/app/run.py::execute has no mutation result
+FAIL  aisef2/app/run.py::_close has no mutation result
+FAIL  aisef2/app/verify.py::verify has no mutation result
+FAIL  aisef2/app/client.py::read_session has no mutation result
+FAIL  aisef2/app/client.py::Budget.__init__ has no mutation result
+FAIL  aisef2/app/client.py::Budget.spend has no mutation result
+FAIL  aisef2/app/client.py::Budget.reached has no mutation result
+FAIL  aisef2/app/client.py::environment has no mutation result
+FAIL  aisef2/app/client.py::wait_within has no mutation result
+FAIL  aisef2/app/client.py::session has no mutation result
+FAIL  aisef2/app/preflight.py::accounting has no mutation result
+FAIL  aisef2/app/preflight.py::run has no mutation result
+FAIL  aisef2/app/preflight.py::identity_problems has no mutation result
+FAIL  aisef2/app/preflight.py::fingerprint_fields has no mutation result
+FAIL  aisef2/app/preflight.py::deployment has no mutation result
+FAIL  aisef2/app/settings.py::_count has no mutation result
+FAIL  aisef2/app/settings.py::load has no mutation result
+FAIL  aisef2/app/bundle.py::Project.order has no mutation result
+FAIL  aisef2/app/bundle.py::load has no mutation result
+FAIL  aisef2/app/adapters.py::attempt_of has no mutation result
+FAIL  aisef2/app/adapters.py::Developer.implement has no mutation result
+FAIL  aisef2/app/adapters.py::Reviewer.review has no mutation result
+FAIL  aisef2/app/cli.py::run has no mutation result
+FAIL  aisef2/orchestrate/workspace.py::config_problems: unaudited survivor 'L58 returns None'
+mutation: FAIL
