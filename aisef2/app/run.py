@@ -245,7 +245,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         rec["stage"] = "probe interpreter"
         python = probe_interpreter(out / "probe-python")
         rec["stage"] = "preflight"
-        exe = client_exe or shutil.which("opencode", path=client.environment(settings.client_env, {}).get("PATH"))
+        # exactly the PATH the run gives the client: none given, nothing found (never the os.defpath fallback)
+        exe = client_exe or shutil.which("opencode", path=client.environment(settings.client_env, {}).get("PATH", ""))
         if not exe:
             raise RunRefused("the client (opencode) is not on the PATH the run gives it")
         # the client's own configuration decides where its sessions go: it must be the endpoint the preflight attests

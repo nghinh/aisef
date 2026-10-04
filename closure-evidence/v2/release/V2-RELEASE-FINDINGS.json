@@ -292,6 +292,11 @@
    "extends": "OBS-S2-3",
    "what": "A second baseline failure of the same kill files: worker I (369c8ac), cli_invocation.py::AGENT/op_call (2026-10-04 ~16:05; the failed baseline ended ~95 s after the previous target, so a test failed early, not the 300 s runner timeout). Not reproduced: test_c2_cli_protocol.py + test_c2_cli_invocation.py 15/15 runs each on a faithful 369c8ac tree under the same load (OBS-S2-3's 3 plus 12 more), and the timing-tightest case (Harness.test_CLI_2b…, a 3 s harness watchdog) 20/20. Two of about 50 campaign baselines of these files failed; the runner discarded the kill tests' output, so the failing test is unknown. Consequence for the evidence: a spurious failure while measuring a mutant would count as a kill, so a survivor could be masked at about that rate; the mutants of these files' targets are otherwise killed by assertion.",
    "disposition": "not a finding (not reproduced). validation/v2/mutation.py now keeps the failing kill-test file, exit status and output tail of a failing baseline in the result ('baseline'); both errored targets (_preflight, AGENT/op_call) are re-measured in round K with it"
+  },
+  {
+   "id": "OBS-S2-5",
+   "what": "aisef2/app/run.py execute: the client lookup `shutil.which('opencode', path=client.environment(...).get('PATH'))` carried an equivalent mutant (S2 mutation, worker J: 'PATH' emptied survives): the client environment copies the operator's PATH verbatim, and shutil.which with path=None reads the same os.environ PATH, so no test can tell them apart; audits are not accepted for kernel targets (validation/qualification/q2.py).",
+   "disposition": "not a finding: the lookup now reads `.get('PATH', '')` — exactly the PATH the run gives the client; none given, nothing found (never os.defpath's fallback, which the client would not search either). The mutant is then killed (tests/v2/test_s2_kills.py AppExecute: the client found on the run's PATH). A second candidate, the `(out / 'repo').exists()` guard of final_main, was measured NOT equivalent (test_app_units' old-git test kills it: a refused run runs no git at all) and is unchanged."
   }
  ],
  "reviews": [

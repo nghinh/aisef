@@ -4,6 +4,7 @@ every other result's kill-test closure stays byte-identical (validation/qualific
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import pathlib
@@ -301,7 +302,6 @@ class AppRunSpec(unittest.TestCase):
     enforcement and tool, and every resolved setting with its value and the layer it came from."""
 
     def test_the_runspec_names_every_capability_and_every_setting_with_its_layer(self):
-        import hashlib
         from aisef2.app import adapters as ad
         from aisef2.app import preflight, settings
         from aisef2.probe import catalog
@@ -363,6 +363,232 @@ class AppDelivery(unittest.TestCase):
         six = types.SimpleNamespace(plan=types.SimpleNamespace(obligations=[types.SimpleNamespace(story_id=s) for s in stories]))
         self.assertEqual(R.delivery(six, [ev(1, "gate/decision")], {}, None, []),
                          ("FAIL", ["6 of the plan's stories did not commit: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']"], set()))
+
+
+class _Stop(BaseException):
+    """Not an Exception: stops a run the way an interruption does."""
+
+
+@unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
+class AppExecute(unittest.TestCase):
+    """aisef2.app.run.execute: the run record, whole (RUN.json's keys, values and bytes; the run's directories; what each
+    story is given), every refusal with its message and stage, a refused story that does not stop the run, a story not
+    run for the budget, and a failure after a delivered story."""
+
+    def setUp(self):
+        from tests.v2 import test_app_run as e2e
+        self.e2e = e2e
+        self.base = e2e.ProductBase("setUp")   # its fixture: the one-story calc project, the fake client and provider
+        self.base.setUp()
+        self.addCleanup(self.base.doCleanups)
+        self.tmp, self.p, self.st = self.base.tmp, self.base.project, self.base.settings
+
+    def run_(self, out, **kw):
+        kw.setdefault("transport", self.e2e.provider())
+        kw.setdefault("client_exe", str(self.base.client))
+        kw.setdefault("cals", self.e2e.calibrations())
+        return R.execute(self.p, self.st, self.tmp / "source", out, **kw)
+
+    def record(self, out):
+        return json.loads((out / "RUN.json").read_text(encoding="utf-8"))
+
+    def test_the_record_of_a_delivered_run_is_whole(self):
+        from aisef2.app import adapters as ad
+        from aisef2.orchestrate import story_runner as sr
+        from aisef2.orchestrate.quality import TestsPolicy
+        self.e2e.client_config(self.tmp, key="config-literal-key-0001")      # the client's own key: not the one used
+        seen = {}
+        real_rt, real_dev, real_story = R.regression_tests, ad.Developer, sr.run_story
+
+        def rt(repo, project, story, delivered):
+            seen["delivered"] = delivered
+            return real_rt(repo, project, story, delivered)
+
+        def dev(run, project, logs, kw, timeout):
+            seen["secrets"] = kw["secrets"]
+            return real_dev(run, project, logs, kw, timeout)
+
+        def story(run, plan, sid, inputs, adapters, policy):
+            seen["policy"] = policy
+            return real_story(run, plan, sid, inputs, adapters, policy)
+        roots, real_ws, real_merger = [], R.GitWorkspace, R.GitMerger
+
+        def workspace(repo, root):
+            roots.append(("workspace", pathlib.Path(root)))
+            return real_ws(repo, root)
+
+        def merger(repo, branch, root):
+            roots.append(("merger", pathlib.Path(root)))
+            return real_merger(repo, branch, root)
+        out = self.tmp / "deep" / "out"     # its parent does not exist yet
+        with mock.patch.dict(os.environ, {"AISEF_TEST_NO_KEY": "env-provider-key-0001"}), \
+                mock.patch.object(R, "regression_tests", rt), mock.patch.object(R.ad, "Developer", dev), \
+                mock.patch.object(R.sr, "run_story", story), mock.patch.object(R, "GitWorkspace", workspace), \
+                mock.patch.object(R, "GitMerger", merger):
+            rec = self.run_(out, clock=lambda: 7.0)
+        self.assertEqual(roots, [("workspace", out / "work" / "ws"), ("merger", out / "work" / "merge")])
+        self.assertEqual((out / "RUN.json").read_text(encoding="utf-8"), json.dumps(rec, indent=1, sort_keys=True, default=str) + "\n")
+        self.assertEqual(sorted(rec), sorted([
+            "format", "bundle_digest", "project", "plan_hash", "settings", "started", "stage", "kernel_digest", "platform",
+            "admission", "preflight", "runspec_hash", "aggregate_min_grade", "scanner", "journal", "finished", "story_outcomes",
+            "story_errors", "final_main", "delivery_verdict", "delivery_blocked_by", "plan_quality_verdict",
+            "generalization_claim", "productproof", "budget", "budget_stop", "sessions", "failure"]))
+        main = subprocess.run(["git", "-C", str(out / "repo"), "rev-parse", "main"], capture_output=True, text=True,
+                              encoding="utf-8", check=True).stdout.strip()
+        import platform as pf
+        self.assertEqual({k: rec[k] for k in ("format", "bundle_digest", "project", "plan_hash", "settings", "started",
+                                              "finished", "stage", "kernel_digest", "platform", "story_outcomes",
+                                              "story_errors", "final_main", "delivery_verdict", "delivery_blocked_by",
+                                              "plan_quality_verdict", "generalization_claim", "budget_stop", "failure")},
+                         {"format": R.FORMAT, "bundle_digest": self.p.digest, "project": self.p.name,
+                          "plan_hash": self.p.plan.plan_hash, "settings": self.st.content, "started": 7.0, "finished": 7.0,
+                          "stage": "finished", "kernel_digest": R.kernel_digest(),
+                          "platform": {"system": pf.system().lower(), "python": pf.python_version()},
+                          "story_outcomes": {"S1": ["COMMIT"]}, "story_errors": [], "final_main": main,
+                          "delivery_verdict": "PASS", "delivery_blocked_by": [], "plan_quality_verdict": "NOT_CLAIMED",
+                          "generalization_claim": "NONE", "budget_stop": None, "failure": None})
+        self.assertEqual(rec["journal"]["closed"], "SHUTDOWN")
+        self.assertTrue(rec["sessions"] and all("text" not in s for s in rec["sessions"]))
+        self.assertTrue(all(d.is_dir() for d in (out / "work" / "ws", out / "work" / "merge", out / "probe-python")))
+        self.assertEqual(seen["delivered"], {"S1": True})
+        self.assertEqual(seen["secrets"], ("env-provider-key-0001",))
+        self.assertEqual(seen["policy"], sr.Policy(self.st.limits, TestsPolicy(True), tool_timeout_s=self.st.timeouts_s["tool"]))
+
+    def refusal(self, out, exc=R.RunRefused, **kw):
+        with self.assertRaises(exc) as c:
+            self.run_(out, **kw)
+        failure = self.record(out)["failure"]
+        self.assertEqual(failure, {"type": exc.__name__, "detail": str(c.exception), "stage": failure["stage"]})
+        return str(c.exception), failure["stage"]
+
+    def test_every_refusal_names_itself_and_the_stage_it_stopped(self):
+        from aisef2.app import preflight
+        with self.assertRaises(R.RunRefused) as c:
+            R.execute(self.p, self.st, self.tmp / "absent", self.tmp / "o1", transport=self.e2e.provider(),
+                      client_exe=str(self.base.client), cals=self.e2e.calibrations())
+        self.assertTrue(str(c.exception).startswith("the project repository could not be cloned: "), str(c.exception))
+        self.assertEqual(self.record(self.tmp / "o1")["failure"]["stage"], "repository")
+        real_git = R.git
+
+        def no_checkout(repo, *args):
+            return subprocess.CompletedProcess(args, 1, "", "") if args[:1] == ("checkout",) else real_git(repo, *args)
+        with mock.patch.object(R, "git", no_checkout):
+            self.assertEqual(self.refusal(self.tmp / "o2"), ("the baseline could not be checked out as main", "repository"))
+        msg, stage = self.refusal(self.tmp / "o3", cals=())
+        self.assertEqual(stage, "admission")
+        with mock.patch.object(R, "probe_interpreter", side_effect=R.RunRefused("no interpreter")):
+            self.assertEqual(self.refusal(self.tmp / "o4"), ("no interpreter", "probe interpreter"))
+        import shutil
+        (self.tmp / "gitonly").mkdir()
+        (self.tmp / "gitonly" / "git").symlink_to(shutil.which("git"))     # git, and no client, on the run's PATH
+        with mock.patch.dict(os.environ, {"PATH": str(self.tmp / "gitonly")}):
+            self.assertEqual(self.refusal(self.tmp / "o5", client_exe=None),
+                             ("the client (opencode) is not on the PATH the run gives it", "preflight"))
+        with mock.patch.dict(os.environ, {"PATH": f"{self.base.client.parent}{os.pathsep}{os.environ.get('PATH', '')}"}), \
+                mock.patch.object(R.client, "configured_provider", side_effect=_Stop("found")):
+            with self.assertRaises(_Stop):    # found on the PATH the run gives the client: the run went on to its config
+                self.run_(self.tmp / "o6", client_exe=None)
+        bad = self.e2e.provider(served="other-model")
+        msg, stage = self.refusal(self.tmp / "o7", exc=preflight.IdentityStop, transport=bad)
+        problems = self.record(self.tmp / "o7")["preflight"]["problems"]
+        self.assertEqual((msg, stage, len(problems)), ("the route is not attested: " + "; ".join(problems), "preflight", 2))
+        real_pre = preflight.run
+
+        def unaccounted(*a, **k):
+            pre = real_pre(*a, **k)
+            return {**pre, "accounting": {**pre["accounting"], "unaccounted": ["r1"]}}
+        with mock.patch.object(R.preflight, "run", unaccounted):
+            self.assertEqual(self.refusal(self.tmp / "o8", exc=preflight.IdentityStop),
+                             ("preflight requests unaccounted: ['r1']", "preflight"))
+
+    def test_a_refused_story_does_not_stop_a_running_run(self):
+        with mock.patch.object(bundle.Project, "order", lambda self: ["S1", "S1"]), \
+                mock.patch.object(R.sr, "run_story", side_effect=RuntimeError("boom")):
+            rec = self.run_(self.tmp / "o")
+        self.assertEqual((rec["story_errors"], rec["story_outcomes"]),
+                         ([{"story": "S1", "error": "RuntimeError: boom"}] * 2, {"S1": ["REFUSED: RuntimeError"]}))
+
+    def test_a_story_not_run_for_the_budget_is_named(self):
+        with mock.patch.object(R.client.Budget, "reached", return_value="max_provider_requests: 9 of 9"):
+            rec = self.run_(self.tmp / "o")
+        self.assertEqual(rec["story_outcomes"], {"S1": ["NOT_RUN: max_provider_requests: 9 of 9"]})
+        self.assertTrue(rec["budget_stop"].startswith("S1 not run: max_provider_requests: 9 of 9"), rec["budget_stop"])
+
+    def test_a_failure_after_a_delivered_story_fails_the_run(self):
+        from aisef2.orchestrate import story_runner as sr
+        real, calls = sr.run_story, []
+
+        def once(*a, **k):
+            calls.append(1)
+            if len(calls) > 1:
+                raise _Stop("stopped after S1")
+            return real(*a, **k)
+        out = self.tmp / "o"
+        with mock.patch.object(bundle.Project, "order", lambda self: ["S1", "S1"]), mock.patch.object(R.sr, "run_story", once), \
+                self.assertRaises(_Stop):
+            self.run_(out)
+        rec = self.record(out)
+        self.assertEqual((rec["story_outcomes"], rec["delivery_verdict"], rec["failure"]["type"]), ({"S1": ["COMMIT"]}, "FAIL", "_Stop"))
+
+
+@unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
+class AppVerify(unittest.TestCase):
+    """aisef2.app.verify.verify L40-L52: refused stories re-derive FAIL; a record without a final main, or a run
+    directory without its repository, is not compared with one; a journal that does not reconstruct is named with its
+    error; and the answer is whole."""
+
+    def setUp(self):
+        from tests.v2 import test_app_run as e2e
+        self.base = e2e.ProductBase("setUp")
+        self.base.setUp()
+        self.addCleanup(self.base.doCleanups)
+        self.base.execute()
+        self.out = self.base.tmp / "out"
+        self.rec = json.loads((self.out / "RUN.json").read_text(encoding="utf-8"))
+
+    def verify(self, **changes):
+        from aisef2.app.verify import verify
+        (self.out / "RUN.json").write_text(json.dumps({**self.rec, **changes}), encoding="utf-8")
+        return verify(self.base.project, self.out)
+
+    def test_the_answer_is_whole_and_every_branch_is_its_own(self):
+        from aisef2.journal import format3
+        n = len(self.base.journal().events)
+        self.assertEqual(self.verify(), {"verdict": "VERIFIED", "problems": [], "delivery_verdict": "PASS", "journal_events": n})
+        refused = self.verify(story_errors=[{"story": "S1", "error": "RuntimeError: x"}], delivery_verdict="FAIL")
+        self.assertEqual((refused["verdict"], refused["delivery_verdict"]), ("VERIFIED", "FAIL"))
+        self.assertEqual(self.verify(final_main=None)["verdict"], "VERIFIED")
+        (self.out / "repo").rename(self.out / "repo-aside")
+        try:
+            self.assertEqual(self.verify()["verdict"], "VERIFIED")    # no repository: nothing to compare
+        finally:
+            (self.out / "repo-aside").rename(self.out / "repo")
+        journal = self.out / self.rec["journal"]["path"]
+        bad = b'{"not": "a journal line"}\n'
+        journal.write_bytes(bad)
+        try:
+            format3.reconstruct(bad.decode("utf-8"))
+        except Exception as e:  # noqa: BLE001
+            why = f"the journal does not reconstruct: {type(e).__name__}: {e}"[:500]
+        else:
+            self.fail("the planted journal reconstructs")
+        v = self.verify(journal={**self.rec["journal"], "sha256": hashlib.sha256(bad).hexdigest(), "lines": 1})
+        self.assertIn(why, v["problems"])
+
+
+class ClientReadSession(unittest.TestCase):
+    """aisef2.app.client.read_session L38/L39/L56: a client's event log is read whatever it holds — bytes that are not
+    UTF-8, lines that are JSON but not an event object, a finished step whose token report lacks a count."""
+
+    def test_a_log_with_foreign_bytes_non_object_lines_and_a_partial_token_report(self):
+        from aisef2.app import client
+        with tempfile.TemporaryDirectory() as t:
+            log = pathlib.Path(t) / "s.jsonl"
+            log.write_bytes(b"\xff\xfe not text\n" + b"[1]\n" + b'{"type": "text", "part": {"text": "hi"}}\n'
+                            + b'{"type": "step_finish", "part": {"tokens": {"input": 3}}}\n'
+                            + b'{"type": "step_finish", "part": {"tokens": {"input": 2, "output": 1}}}\n')
+            self.assertEqual(client.read_session(log), {"error": None, "text": "hi", "turns": 2,
+                                                         "tokens": {"input": 2, "output": 1}, "steps_without_tokens": 1})
 
 
 if __name__ == "__main__":

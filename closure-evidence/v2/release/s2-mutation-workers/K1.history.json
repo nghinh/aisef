@@ -1,0 +1,13 @@
+{
+ "worker": "K1",
+ "snapshot": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+ "status": "complete: provisional round K, 12 targets measured on e0b7021 (started 2026-10-04 16:53 by the controller in the slot G left; finished ~19:08). Targets whose kill set includes tests/v2/test_s2_kills.py are re-measured after its last edit",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K1.log",
+  "sha256": "e3d87dadccf92c95f941fd0061d6daf7da00953ab8d601f446f3eba5f0af25a8"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K1.record.json",
+  "sha256": "a6aaa144351e6cebbf9ffe0f4dcf88cd3a07fe6f69e1fe775fca6fd2fea9125e"
+ }
+}
