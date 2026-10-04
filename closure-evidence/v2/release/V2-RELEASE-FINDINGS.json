@@ -280,6 +280,11 @@
    "id": "OBS-S2-2",
    "what": "Windows CI 37146695306: test_an_include_is_refused_and_never_followed failed — its fixture wrote the included file by hand with the marker command's Windows path unquoted, an invalid config escape; git then reads no configuration (`fatal: bad config line 2`, exit 128) for the listing and for every command alike (measured locally: listing 128, status 128), so nothing configured can run",
    "disposition": "not a finding: a fixture defect — git now writes the included file (`git config -f`), escaping the value; the old-git exposure it led to is B4-OLD-GIT"
+  },
+  {
+   "id": "OBS-S2-3",
+   "what": "S2 mutation worker G (snapshot 369c8ac), target cli_invocation.py::_preflight: the unmutated kill tests (tests/v2/test_c2_cli_protocol.py, tests/v2/test_c2_cli_invocation.py) failed once (2026-10-04 ~14:52), so the runner refused the target ('kill tests fail on the unmutated tree (leaked 0)'). Seven other G targets with the same kill set passed that baseline; three faithful runs of both files on 369c8ac (the tree mutation.py builds), under the same load (workers G and I running), all passed (62 s / 66 s each). The runner keeps no test output, so the failing test is not known; a timing failure under load (cf. OBS-S2-1) is the remaining candidate.",
+   "disposition": "not a finding: not reproduced. The errored result is kept in worker G's history and excluded by the qualifier ('the run errored'); _preflight is re-measured in the final round K"
   }
  ],
  "reviews": [
