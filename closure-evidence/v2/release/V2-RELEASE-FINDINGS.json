@@ -297,6 +297,11 @@
    "id": "OBS-S2-5",
    "what": "aisef2/app/run.py execute: the client lookup `shutil.which('opencode', path=client.environment(...).get('PATH'))` carried an equivalent mutant (S2 mutation, worker J: 'PATH' emptied survives): the client environment copies the operator's PATH verbatim, and shutil.which with path=None reads the same os.environ PATH, so no test can tell them apart; audits are not accepted for kernel targets (validation/qualification/q2.py).",
    "disposition": "not a finding: the lookup now reads `.get('PATH', '')` — exactly the PATH the run gives the client; none given, nothing found (never os.defpath's fallback, which the client would not search either). The mutant is then killed (tests/v2/test_s2_kills.py AppExecute: the client found on the run's PATH). A second candidate, the `(out / 'repo').exists()` guard of final_main, was measured NOT equivalent (test_app_units' old-git test kills it: a refused run runs no git at all) and is unchanged."
+  },
+  {
+   "id": "OBS-S2-6",
+   "what": "aisef2/app/settings.py load: `sorted(pre) != ['chat_probes']` carried an equivalent mutant (S2 mutation, worker J2: 'L117 sorted() -> list()' survives): for a mapping, the sorted and the listed keys equal a one-element list together or not at all; audits are not accepted for kernel targets.",
+   "disposition": "not a finding: written `set(pre) != {'chat_probes'}` — the same test of exactly that one key; its mutants are killed (the existing settings tests and tests/v2/test_s2_kills.py AppSettingsLoad)"
   }
  ],
  "reviews": [

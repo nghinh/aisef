@@ -114,7 +114,7 @@ def load(data: Mapping) -> Settings:
             raise SettingsError(f"timeouts_s.{k} is a positive number of seconds")
         timeouts[k] = float(v)
     pre = data["preflight"]
-    if not isinstance(pre, Mapping) or sorted(pre) != ["chat_probes"]:
+    if not isinstance(pre, Mapping) or set(pre) != {"chat_probes"}:
         raise SettingsError("preflight names chat_probes")
     probes = _count(pre["chat_probes"], "preflight.chat_probes", 2)
     if 1 + probes > budget["provider_requests"]:     # the preflight's requests are the budget's too (review ADV-09)

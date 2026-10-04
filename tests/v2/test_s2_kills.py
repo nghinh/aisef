@@ -662,5 +662,26 @@ class ClientWaitWithin(unittest.TestCase):
             self.assertEqual(client.wait_within(self.Process([None, 0]), log, 30, budget, 9), (0, None))
 
 
+class AppSettingsLoad(unittest.TestCase):
+    """aisef2.app.settings.load L76/L84/L94: the refusals name the keys in order and the provider's shape; model_limit's
+    two keys are accepted in any order."""
+
+    def test_refusals_name_themselves_and_key_order_does_not_matter(self):
+        from aisef2.app import settings
+        from tests.v2 import test_app_run as e2e
+        data = {k: v for k, v in e2e.SETTINGS.items() if k != "preflight"}
+        data["extra"] = 1
+        with self.assertRaises(settings.SettingsError) as c:
+            settings.load(data)
+        self.assertEqual(str(c.exception), f"run settings hold exactly {sorted(settings.KEYS)}; these hold {sorted(data)} — "
+                                           "nothing is defaulted")
+        with self.assertRaises(settings.SettingsError) as c:
+            settings.load({**e2e.SETTINGS, "provider": {**e2e.SETTINGS["provider"], "name": "other"}})
+        self.assertEqual(str(c.exception), "provider is {api_key_env, endpoint, listed_owner, model_limit, name, served_model}, "
+                                           "its name the route's provider")
+        reversed_limit = {**e2e.SETTINGS["provider"], "model_limit": {"output": 8000, "context": 100000}}
+        self.assertEqual(settings.load({**e2e.SETTINGS, "provider": reversed_limit}).model_limit, {"context": 100000, "output": 8000})
+
+
 if __name__ == "__main__":
     unittest.main()
