@@ -1,0 +1,3756 @@
+{
+ "record": "AISEF V2 — V2.0-S2 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/bundle.py::Project.order",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "976c61619d781547f73198fb3c518d9c5df93f92b89112c10402d9772d8eb283",
+   "mutants": 10,
+   "killed": 9,
+   "survivors": [
+    "L64 sorted() -> list()"
+   ],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L74 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L64 sorted() -> list()",
+     "killed": false
+    },
+    {
+     "mutant": "L67 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L70 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L70 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L68 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L71 string \"the plan's story graph has a cycle\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L68 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L69 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L69 string 'depends_on' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle.py::load",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "976c61619d781547f73198fb3c518d9c5df93f92b89112c10402d9772d8eb283",
+   "mutants": 73,
+   "killed": 73,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L102 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L104 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L122 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L127 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L131 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L135 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L141 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L102 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L104 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L121 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L131 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L134 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L135 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L102 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L102 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L104 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L104 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L109 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L111 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L111 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L111 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L127 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L130 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L133 string 'requirements_document' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L135 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L135 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L113 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L113 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L126 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L126 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'depends_on' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'tests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L132 string \"stories are exactly the plan's stories\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L134 string 'product_roots' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L136 string \"product_roots are top-level names of the project's own source tree\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L102 string 'format' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'not a project bundle of format ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string 'a bundle holds exactly ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string '; it holds ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L108 string 'id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L110 string 'plan' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L123 string 'the plan names ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L123 string \" spec(s) no approved contract compiles to under this release's probes: \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L129 string 'facts are the public fields ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L129 string ' (strings) of every plan criterion, and no other' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L137 string 'name' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L137 string 'description' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L137 string 'path' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L137 string 'sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L105 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'requirements' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L108 string 'contracts' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string \"the bundle's kernel objects do not load: \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L127 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'depends_on' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'tests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L135 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'approvals' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'contract ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string ' does not compile: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string 'facts' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'stories' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L135 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L135 string '/' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/cli.py::run",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "d6f74f12123fea22c65ab12d5e92c12a74a6169084accc6555a4d292953dfff5",
+   "mutants": 63,
+   "killed": 63,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L44 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L66 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L42 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L48 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L53 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L66 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L51 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L59 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L61 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 element 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L63 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L66 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L42 string 'out' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L42 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L42 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L42 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L43 string '--' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L43 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L51 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L59 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L65 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L66 string 'PASS' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L42 string 'settings' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L42 string 'repo' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L45 string 'this mode needs ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L51 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L57 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L57 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L57 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L57 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L57 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string 'record' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L66 string 'delivery_verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L42 string 'out' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L51 string 'VERIFIED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'project' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'plan_hash' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'route' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'admission' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L58 string 'ready' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L62 string 'aisef run: refused: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L64 element 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L51 string 'verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L58 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'project' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'delivery_verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'delivery_blocked_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'story_outcomes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L64 string 'final_main' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string 'journal' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string 'plan_quality_verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string 'RUN.json' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L45 string ' ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/client.py::Budget.reached",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "6e66b7c66fccdd0583a58d08e66c6d758ab81c4b9a59fefbad324ce549e3572b",
+   "mutants": 20,
+   "killed": 20,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L93 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L89 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L94 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L96 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L93 string 'unaccounted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L96 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L97 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L94 string 'unaccounted: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L96 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L96 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L96 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L96 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L97 string 'max_' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L97 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L97 string ' of ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L94 string '; ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L94 string 'unaccounted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L96 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L96 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L96 string 'provider_requests' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/client.py::environment",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "6e66b7c66fccdd0583a58d08e66c6d758ab81c4b9a59fefbad324ce549e3572b",
+   "mutants": 37,
+   "killed": 37,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L121 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 7 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 8 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 9 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 10 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 11 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 12 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 13 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 14 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 15 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L121 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'PATH' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'HOME' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'USERPROFILE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'SYSTEMROOT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'SystemRoot' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'WINDIR' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'LANG' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'LC_ALL' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'TMPDIR' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'TEMP' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'TMP' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L120 string 'XDG_CONFIG_HOME' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L120 string 'XDG_DATA_HOME' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L120 string 'XDG_STATE_HOME' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L120 string 'XDG_CACHE_HOME' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L121 string 'OPENCODE_CONFIG_CONTENT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L121 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L121 True->False",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/client.py::session",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "6e66b7c66fccdd0583a58d08e66c6d758ab81c4b9a59fefbad324ce549e3572b",
+   "mutants": 114,
+   "killed": 114,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L186 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L192 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L210 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L190 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L192 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L194 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L207 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 7 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 8 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 dict entry 9 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L193 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L194 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 7 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 8 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 9 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 10 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 7 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 8 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 9 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 dict entry 10 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L210 string 'exit' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 string 'timed_out' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 string 'stopped' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 string 'started' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 string 'error' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 string 'text' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 string 'turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L211 string 'tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L211 string 'seconds' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L211 string 'log' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L210 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L210 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L211 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L190 string \" exists: a session's evidence is never overwritten\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string 'run' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string '--format' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string 'json' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string '--model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string '--title' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string '--dir' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L207 string 'exit' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L207 string 'timed_out' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L207 string 'stopped' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L207 string 'started' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L208 string 'error' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L208 string 'text' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L208 string 'turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L208 string 'tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L209 string 'seconds' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L209 string 'log' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L209 string 'redacted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L207 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L211 string 'input' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L211 string 'output' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L185 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L187 string 'a model session needs a fixed route, a built environment, a budget and a turn cap; unbound: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L190 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L193 string 'opencode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L195 string 'the client (opencode) is not on the PATH the run gives it' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L197 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L197 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string 'w' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L202 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L202 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L207 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L207 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L208 string 'error' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L208 string 'text' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L208 string 'turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L208 string 'tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L185 string 'model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L185 string 'env' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L185 string 'budget' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L185 string 'turn_cap' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L193 string 'PATH' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L188 string ', ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/client.py::wait_within",
+   "kill_tests": [
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "6e66b7c66fccdd0583a58d08e66c6d758ab81c4b9a59fefbad324ce549e3572b",
+   "mutants": 23,
+   "killed": 23,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 1,
+   "results": [
+    {
+     "mutant": "L159 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L153 And swapped",
+     "killed": true,
+     "timed_out": [
+      "tests/v2/test_s2_kills.py"
+     ]
+    },
+    {
+     "mutant": "L155 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L159 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L159 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L153 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L157 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L157 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L157 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L157 GtE->Lt",
+     "killed": true
+    },
+    {
+     "mutant": "L156 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L158 string 'session turn cap: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L158 string ' turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L157 string 'turns' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/preflight.py::accounting",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "01f1a937fb56c74908da2dd1ca8576526fc4f49ccc877d25aa5b611de8f82dca",
+   "mutants": 26,
+   "killed": 26,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L56 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L53 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L56 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'provider_requests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 string 'turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'input_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L58 string 'output_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string 'unaccounted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string 'n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L54 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string 'n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string 'sent' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string 'done' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L54 string 'event' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string 'event' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L58 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'input_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L58 string 'output_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L53 string 'utf-8' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/preflight.py::identity_problems",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "01f1a937fb56c74908da2dd1ca8576526fc4f49ccc877d25aa5b611de8f82dca",
+   "mutants": 49,
+   "killed": 49,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L97 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L108 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L110 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L97 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L99 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L101 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L102 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L102 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L108 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L97 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L97 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L99 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L103 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L105 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L99 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L101 string 'expected_served_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L101 string 'declared_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L102 string 'probes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'system_fingerprint' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L97 string 'http' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L97 string 'listed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L98 string 'the provider does not list the declared model ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L99 string 'expected_listed_owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'http' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'probes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'the deployment changed between probes (' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string ' fingerprints)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L97 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L97 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L99 string 'owned_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L99 string 'expected_listed_owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L100 string 'the listing names ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L100 string \" as the model's owner, not \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L104 string 'probe ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L104 string ': HTTP ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string 'served_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L98 string 'declared_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L99 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string 'probe ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string ': served by ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string ', not ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string ' (an alias or a re-route)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L100 string 'owned_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L100 string 'expected_listed_owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L104 string 'http' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L100 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L106 string 'served_model' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::admit",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "9e0c939eb98c1e80cbcc869fafc0b2118a5d20c88e46b90b8a6b3a5a74c1a81d",
+   "mutants": 15,
+   "killed": 15,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L88 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L86 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L86 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L86 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L86 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'engine_digest' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'result_digest' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string 'failed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L87 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L87 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string 'check' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string 'problems' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L87 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string '. ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::check_repository",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "9e0c939eb98c1e80cbcc869fafc0b2118a5d20c88e46b90b8a6b3a5a74c1a81d",
+   "mutants": 16,
+   "killed": 16,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L109 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L112 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L109 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L112 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L111 string 'cat-file' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L111 string 'blob' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L112 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L111 string ':' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'cat-file' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string '-e' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L110 string \" does not hold the plan's baseline \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L113 string 'the requirements document ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L113 string \" at the baseline is not the bundle's\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string '^{commit}' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string 'utf-8' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::delivery",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "9e0c939eb98c1e80cbcc869fafc0b2118a5d20c88e46b90b8a6b3a5a74c1a81d",
+   "mutants": 46,
+   "killed": 46,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L204 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L192 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L192 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L192 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L192 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L194 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L196 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L199 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L203 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L204 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L204 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L204 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L192 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L194 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L196 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L202 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L203 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L203 string 'NOT_REACHED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L203 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L194 string 'gate/decision' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L195 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L196 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L198 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L198 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L198 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L200 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L201 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L203 string 'FAIL' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L203 string 'PASS' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L194 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string 'story/commit' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string 'story/rollback' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L196 string 'story/retry' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L197 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L198 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L198 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L197 string 'story_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string 'story/commit' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L202 string ' stories were refused' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L197 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L198 string 'COMMIT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L200 string \" of the plan's stories did not commit: \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L201 string 'the budget ended the run: ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "9e0c939eb98c1e80cbcc869fafc0b2118a5d20c88e46b90b8a6b3a5a74c1a81d",
+   "mutants": 205,
+   "killed": 205,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L220 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L336 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L223 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L223 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L223 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L223 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L223 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L223 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L223 dict entry 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L223 dict entry 7 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L223 dict entry 8 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L236 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L239 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L243 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L250 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L254 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L262 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L264 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string 'format' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string 'bundle_digest' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string 'project' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L223 string 'plan_hash' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L224 string 'settings' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L224 string 'started' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L224 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L224 string 'kernel_digest' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string 'platform' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L224 string 'repository' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L225 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L236 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L239 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L241 string 'admission' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L243 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L245 string 'probe interpreter' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L247 string 'preflight' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L249 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L250 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L253 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L253 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L254 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L257 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L258 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L262 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L269 string 'run' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L275 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L275 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L275 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L275 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L279 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L279 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L279 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L279 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L279 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L279 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L294 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L312 string 'finished' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L222 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string 'system' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L225 string 'python' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L234 string 'repo' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L235 string 'clone' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L235 string '--quiet' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L235 string '--no-hardlinks' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L241 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L242 string 'admission' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L242 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L245 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L247 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L261 string 'preflight' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L262 string 'ATTESTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L264 string 'unaccounted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L269 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L270 string 'aisef-run' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L272 string 'work' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L276 string 'sessions' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L279 string 'model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L280 string 'env' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L281 string 'budget' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L281 string 'turn_cap' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L281 string 'exe' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L283 string 'secrets' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L283 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L289 Enforcement.PARTIAL->FULL",
+     "killed": true
+    },
+    {
+     "mutant": "L289 Enforcement.PARTIAL->UNAVAILABLE",
+     "killed": true
+    },
+    {
+     "mutant": "L298 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L305 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L312 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L322 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L325 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L325 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L325 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L326 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L221 string ' exists: a run directory is never reused or overwritten' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L240 string 'the baseline could not be checked out as main' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L242 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L243 string 'admitted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L246 string 'probe-python' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L249 string 'opencode' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L251 string 'the client (opencode) is not on the PATH the run gives it' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L259 string 'preflight' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L262 string 'verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L264 string 'accounting' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L270 string 'run' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L273 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L275 string 'main' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L277 string 'accounting' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L284 string 'developer' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L285 string 'reviewer' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L289 string 'probe' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L290 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L305 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L310 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L321 string 'journal' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L321 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L322 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L323 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L323 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L237 string 'the project repository could not be cloned: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L239 string 'checkout' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L239 string '-q' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L239 string '-B' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L239 string 'main' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L243 string 'admission' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L244 string 'the plan is not admitted (RFC §12): ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L255 string \"the client's configuration sends provider \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L255 string ' to ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L255 string ', not to the attested endpoint ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L263 string 'the route is not attested: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L265 string 'preflight requests unaccounted: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L273 string 'ws' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L274 string 'merge' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L275 string 'ws' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L275 string 'merge' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L290 string 'tool' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L298 string 'tests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L310 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L321 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L322 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L322 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L322 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L327 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L328 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L329 string 'NOT_CLAIMED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L329 string 'NONE' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L330 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L331 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L333 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L335 string '\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L335 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L249 string 'PATH' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L283 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L283 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L283 GtE->Lt",
+     "killed": true
+    },
+    {
+     "mutant": "L295 string 'NOT_RUN: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L296 string ' not run: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L305 string 'COMMIT' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L308 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L308 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L310 string 'RUNNING' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L321 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L321 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L321 string 'closing failed in state ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L322 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L322 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L322 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L328 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L328 string 'FAIL' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L333 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L333 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L333 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L333 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L335 string 'RUN.json' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L244 string 'failed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L263 string '; ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L263 string 'problems' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L265 string 'unaccounted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L278 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L306 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L308 string 'story' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L308 string 'error' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L309 string 'REFUSED: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L326 string 'repo' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L328 IsNot->Is",
+     "killed": true
+    },
+    {
+     "mutant": "L328 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L333 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L333 string 'detail' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L334 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L335 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L244 string 'admission' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L265 string 'accounting' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L278 string 'provider/request' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L326 string 'rev-parse' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L326 string 'main' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L328 string 'PASS' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L332 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L332 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L332 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L334 string 'stage' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L308 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L326 string 'repo' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L332 string 'text' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L306 string 'cat-file' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L306 string '-e' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L306 string 'main:' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::probe_interpreter",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "9e0c939eb98c1e80cbcc869fafc0b2118a5d20c88e46b90b8a6b3a5a74c1a81d",
+   "mutants": 21,
+   "killed": 21,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L121 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L123 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L121 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L119 element 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L120 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string '-I' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string '-m' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'venv' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string '--without-pip' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L119 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L120 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L120 string 'Scripts/python.exe' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L120 string 'bin/python' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L120 string 'nt' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L122 string 'the probe interpreter was not created at ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/settings.py::_count",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "aee4495ffcfac7057b12319263b674fa28fc7cff09c71b67abdf5fe7698d6425",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L67 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L69 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L67 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L67 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L67 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L68 string ' is an integer >= ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L68 string ', not ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "967117c99028e2da9eca138be579082791cac5e3236a923a2a036600eda67038",
+   "mutants": 87,
+   "killed": 87,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L22 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L24 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L28 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L43 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L45 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L47 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L49 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L52 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L22 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L23 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L24 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L28 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L32 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L41 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L41 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L41 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L45 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L47 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L49 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L50 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L52 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L52 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L52 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L52 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L23 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L23 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L26 string 'journal' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L32 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L37 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L41 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L42 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L43 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L44 string 'FAIL' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L47 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L50 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'problems' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'delivery_verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L53 string 'journal_events' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L52 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L22 string 'format' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L23 string 'verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L23 string 'problems' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L23 string 'REFUTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L24 string 'bundle_digest' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L25 string 'the run is not of this project bundle' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L29 string 'the run has no journal (it ended before the run began)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L32 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L32 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L41 string 'budget_stop' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L43 string 'failure' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L43 string 'PASS' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L45 string 'delivery_verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L48 string \"the record's ProductProof account is not the one the journal re-derives\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L49 string 'final_main' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'REFUTED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L52 string 'VERIFIED' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L21 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string 'the journal is not the one RUN.json names (digest or length)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L36 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L36 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L36 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L41 string 'story_outcomes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L42 string 'story_errors' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'the record says ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string '; the journal re-derives ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L47 string 'productproof' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L50 string 'final_main' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L51 string \"the run's repository main is not the record's final main\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L21 string 'RUN.json' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L23 string 'RUN.json is not a run record of format ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L32 string 'sha256' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L32 string 'lines' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L35 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L36 string 'seq' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L36 string 'type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L36 string 'data' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L38 string 'the journal ends in a torn line' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L49 string 'repo' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L31 string 'path' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string 'delivery_verdict' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L40 string 'the journal does not reconstruct: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L40 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L50 string 'rev-parse' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L50 string 'main' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L50 string 'repo' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/workspace.py::config_problems",
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "a3bb637d401557b8f1578c1e49b6b8a495d47e5dcc678736b07eaf6cd5737d21",
+   "mutants": 34,
+   "killed": 34,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L57 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L61 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L57 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L58 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L61 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L55 element 7 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string '\\x00' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string 'git' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string '-C' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string 'config' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string '--list' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string '--show-scope' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string '--no-includes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L55 string '-z' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L56 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L60 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 In->NotIn",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string 'replace' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L60 string '\\n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L60 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L60 False->True",
+     "killed": true
+    },
+    {
+     "mutant": "L60 string 'local' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L60 string 'worktree' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::AGENT/plain",
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_c2_cli_invocation.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "1a46991ffb84395f37aced671478cecab4ec58ad7ba1d0eb9892028ee57f61c4",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "AGENT L44 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L45 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L45 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L46 returns None",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::AGENT/send",
+   "kill_tests": [
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "source_sha256": "1a46991ffb84395f37aced671478cecab4ec58ad7ba1d0eb9892028ee57f61c4",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 1,
+   "results": [
+    {
+     "mutant": "AGENT L27 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L27 string '\\n' emptied",
+     "killed": true,
+     "timed_out": [
+      "tests/v2/test_s2_kills.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::HARNESS/ask",
+   "kill_tests": [
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "source_sha256": "a47eed87bf5b908acb33e1d205e31580f68973ea5be33b151db095f4a75872fa",
+   "mutants": 4,
+   "killed": 4,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "HARNESS L51 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "HARNESS L45 string 'n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "HARNESS L47 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "HARNESS L47 string '\\n' emptied",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

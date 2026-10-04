@@ -1,0 +1,13 @@
+{
+ "worker": "K5",
+ "snapshot": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+ "status": "complete: final round K half 1, all 20 requested targets measured on c6c3a55 (started 2026-10-04 21:53 by handoff-K56.sh; finished 2026-10-05 02:19). Not passing as measured: client.wait_within (L153 'And swapped' killed only by the clock), bundle.Project.order (L64 'sorted() -> list()' survived: hash-order luck), AGENT/send (L27 newline emptied killed only by the clock) — killed by tests/v2/test_s2_kills_k.py and re-measured by K7; the other 17 clean",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K5.log",
+  "sha256": "8b37a194d02fbcb9c3419269025857c9fff11b1ab2cc394b877e242ade10aac5"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K5.record.json",
+  "sha256": "ae86c8ca5de561b6d81e68bb11e84ec72fb6da0bec291b83137c85fc854ac62f"
+ }
+}
