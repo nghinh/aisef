@@ -295,5 +295,40 @@ class AppRepositoryAndInterpreter(unittest.TestCase):
             self.assertEqual(exe, str(where / "Scripts/python.exe"))
 
 
+class AppRunSpec(unittest.TestCase):
+    """aisef2.app.run.runspec_of L149-L165: the run's specification, whole — every capability with its grade,
+    enforcement and tool, and every resolved setting with its value and the layer it came from."""
+
+    def test_the_runspec_names_every_capability_and_every_setting_with_its_layer(self):
+        import hashlib
+        from aisef2.app import adapters as ad
+        from aisef2.app import preflight, settings
+        from aisef2.probe import catalog
+        from aisef2.product.contract import plain
+        from tests.v2 import test_app_run as e2e
+        with tempfile.TemporaryDirectory() as t:
+            p, st = bundle.load(e2e.project_bundle("a" * 40)), settings.load(e2e.SETTINGS)
+            pre = preflight.run(e2e.ROUTE, 2, e2e.provider(), pathlib.Path(t) / "pre")
+            for scanner, tool, grade in ((ad.NoScanner(), "none", "OPAQUE"), (ad.RuffScanner(sys.executable), "ruff", "VERIFIED")):
+                spec = R.runspec_of(p, st, pre, "client-x", sys.executable, scanner)
+                caps = {c.name: (c.grade.value, c.enforcement.value) for c in spec.capabilities}
+                probes = {e.probe_id: ("VERIFIED", "PARTIAL") for e in catalog.CATALOG if e.active}
+                self.assertEqual(caps, {"kernel": ("VERIFIED", "FULL"), "python": ("VERIFIED", "PARTIAL"),
+                                        "git": ("VERIFIED", "PARTIAL"), "developer": ("ATTESTED", "PARTIAL"),
+                                        "reviewer": ("ATTESTED", "PARTIAL"), "scanner": (grade, "PARTIAL"), **probes})
+                self.assertEqual(dict({c.name: c for c in spec.capabilities}["scanner"].tuple_).get("tool"), tool)
+                self.assertEqual(plain(spec.settings), {
+                    "revision": {"value": "a" * 40, "layer": "run"},
+                    "workload": {"value": p.name, "layer": "bundle"}, "bundle_digest": {"value": p.digest, "layer": "bundle"},
+                    "plan_hash": {"value": p.plan.plan_hash, "layer": "plan"},
+                    "requirements_sha256": {"value": p.requirements_sha256, "layer": "bundle"},
+                    "settings_sha256": {"value": hashlib.sha256(json.dumps(st.content, sort_keys=True).encode()).hexdigest(),
+                                        "layer": "settings"},
+                    "limits": {"value": {k.value: v for k, v in st.limits.items()}, "layer": "settings"},
+                    "budget": {"value": plain(st.budget), "layer": "settings"},
+                    "max_turns_per_session": {"value": st.max_turns_per_session, "layer": "settings"},
+                    "timeouts_s": {"value": plain(st.timeouts_s), "layer": "settings"}})
+
+
 if __name__ == "__main__":
     unittest.main()
