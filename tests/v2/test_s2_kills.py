@@ -132,5 +132,36 @@ class WorkspaceConfigListing(unittest.TestCase):
             self.assertEqual(w.config_problems(pathlib.Path(t) / "absent"), [])
 
 
+class AgentPlain(unittest.TestCase):
+    """cli_invocation AGENT/plain L45-L46: an invoke result json cannot carry comes back as its repr — a set (TypeError)
+    and a circular list (ValueError) alike — never an agent failure, never None."""
+
+    def test_unserializable_results_come_back_as_their_repr(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = pathlib.Path(os.path.realpath(t))
+            root, work = t / "rev", t / "work"
+            (root / "plainsubj").mkdir(parents=True)
+            work.mkdir()
+            (root / "plainsubj" / "__init__.py").write_text("", encoding="utf-8")
+            (root / "plainsubj" / "cli.py").write_text("def as_set(argv):\n    return {1}\n"
+                                                       "def circular(argv):\n    x = []\n    x.append(x)\n    return x\n",
+                                                       encoding="utf-8")
+            with open(work / "agent.log", "wb") as log:
+                agent = subprocess.Popen([sys.executable, "-I", "-B", "-X", "utf8=1", "-c", ci.AGENT, str(root), str(work)],
+                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=log, cwd=work)
+            try:
+                self.assertEqual(json.loads(agent.stdout.readline()), {"ready": True, "n": 0})
+                for n, (attr, raw) in enumerate((("as_set", "{1}"), ("circular", "[[...]]")), 1):
+                    req = {"op": "invoke", "n": n, "stdin": os.devnull, "out": str(work / f"o{n}.bin"),
+                           "err": str(work / f"e{n}.bin"), "name": "plainsubj.cli", "attr": attr, "argv": []}
+                    agent.stdin.write((json.dumps(req) + "\n").encode("utf-8"))
+                    agent.stdin.flush()
+                    self.assertEqual(json.loads(agent.stdout.readline()), {"raw": raw, "code": 1, "raised": None, "n": n})
+            finally:
+                agent.stdin.close()
+                agent.wait(30)
+                agent.stdout.close()
+
+
 if __name__ == "__main__":
     unittest.main()
