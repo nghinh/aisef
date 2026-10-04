@@ -1,0 +1,13 @@
+{
+ "worker": "F",
+ "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+ "status": "complete: all 30 requested targets measured on 369c8ac (started 2026-10-04 03:52 by handoff-F.sh when D exited; finished 09:25)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/F.log",
+  "sha256": "cb78021a87b4a2f9d27d3bef1ffa976f7fff222a13a77e056e7de7158802d9ad"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/F.record.json",
+  "sha256": "5ce830af772f9193a036ced6de86f5d5744baf3502c182c9a0dcd74f62094981"
+ }
+}
