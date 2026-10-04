@@ -1,0 +1,190 @@
+{
+ "record": "AISEF V2 — V2.0-S2 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/run.py::_close",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "9e0c939eb98c1e80cbcc869fafc0b2118a5d20c88e46b90b8a6b3a5a74c1a81d",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L367 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L367 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L367 string 'journal' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::calibrations",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "9e0c939eb98c1e80cbcc869fafc0b2118a5d20c88e46b90b8a6b3a5a74c1a81d",
+   "mutants": 11,
+   "killed": 11,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L72 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L77 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L72 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L77 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L76 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L77 string 'probe_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L77 string 'probe_digest' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L77 string 'observation_class' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L77 string 'positive_fixture' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L78 string 'negative_fixture' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L78 string 'demonstrated_at' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::kernel_digest",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "9e0c939eb98c1e80cbcc869fafc0b2118a5d20c88e46b90b8a6b3a5a74c1a81d",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L67 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L65 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L65 string '*.py' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/run.py::regression_tests",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "9e0c939eb98c1e80cbcc869fafc0b2118a5d20c88e46b90b8a6b3a5a74c1a81d",
+   "mutants": 14,
+   "killed": 14,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L132 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L130 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L131 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L130 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L132 tuple() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L131 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L131 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L131 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L132 string 'tests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'cat-file' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string '-e' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L131 string 'tests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L130 string 'main:' emptied",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

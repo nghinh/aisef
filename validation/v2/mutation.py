@@ -557,7 +557,7 @@ for _t in ("aisef2/probe/cli_invocation.py::AGENT/op_invoke", "aisef2/probe/pyth
            "aisef2/app/client.py::Budget.spend", "aisef2/app/client.py::Budget.reached", "aisef2/app/client.py::environment"):
     S2_TARGETS[_t] = [*S2_TARGETS[_t], _S2_KILLS]
 for _t in ("aisef2/probe/process_effect.py::HARNESS/ask",    # killed only by the clock: its bounded case runs first
-           "aisef2/probe/cli_invocation.py::AGENT/send"):
+           "aisef2/probe/cli_invocation.py::AGENT/send", "aisef2/app/client.py::wait_within"):
     S2_TARGETS[_t] = [_S2_KILLS, *S2_TARGETS[_t]]
 SUPERSEDED.update({t: "V2.0-S2" for t in S2_TARGETS})
 for _phase in (K_NOWORK_TARGETS, P6_TARGETS, C2P2_TARGETS, C2P3_TARGETS, C2_P4_TARGETS):

@@ -638,5 +638,29 @@ class ClientEnvironment(unittest.TestCase):
                                "OPENCODE_CONFIG_CONTENT": "{\"a\": 1, \"model\": \"m\"}"})
 
 
+class ClientWaitWithin(unittest.TestCase):
+    """aisef2.app.client.wait_within L153/L156: the wait ends once the process has an exit status (a further wait is a
+    failure here, not a clock kill), and a request already in progress at the request ceiling may finish."""
+
+    class Process:
+        def __init__(self, codes):
+            self.codes = list(codes)
+
+        def wait(self, timeout):
+            if not self.codes:
+                raise AssertionError("waited again after the process reported its exit status")
+            return self.codes.pop(0)
+
+    def test_the_wait_ends_at_the_exit_status_and_a_request_in_progress_may_finish_at_the_ceiling(self):
+        from aisef2.app import client
+        limits = {"provider_requests": 1, "turns": 10, "input_tokens": 100, "output_tokens": 100}
+        with tempfile.TemporaryDirectory() as t:
+            t = pathlib.Path(t)
+            budget = client.Budget(limits, dict.fromkeys(limits, 0), t / "logs", lambda: 1)   # the one request, recorded
+            log = t / "s.jsonl"
+            log.write_text("", encoding="utf-8")
+            self.assertEqual(client.wait_within(self.Process([None, 0]), log, 30, budget, 9), (0, None))
+
+
 if __name__ == "__main__":
     unittest.main()

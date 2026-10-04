@@ -1,0 +1,13 @@
+{
+ "worker": "K2",
+ "snapshot": "6d9cc6422a467d7ee2abb14e74032679504049aa",
+ "status": "complete: the 4 run.py targets staled by run.py's change and without test_s2_kills.py in their kill set, measured on 6d9cc64 (started 19:31 by the controller in the slot K1 left; finished ~19:40), all killed",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K2.log",
+  "sha256": "9caa32f8ba714ebb935d0c8d2cc9e283482218fc664e2a8b0be9b84cc28d4727"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K2.record.json",
+  "sha256": "0d47b815e0b1f3dc5dca041f4f9ed3ff5a7f9b9aad108d120594c2f510b87546"
+ }
+}
