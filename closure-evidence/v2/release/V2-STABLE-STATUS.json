@@ -3,7 +3,7 @@
  "authority": "owner charter 'AISEF V2 — STABLE RELEASE EXECUTION ORDER / OWNER RELEASE CHARTER / SCOPE FREEZE' (2026-10-03), docs/v2/V2-STABLE-RELEASE-CHARTER.md sha256 cd8833569fed317bb1ef20cb7bc997b6f7003218be1f5347bd53df001c04b58a",
  "S0_SCOPE_FREEZE": "PASS",
  "S1_FAIL_CLOSED": "PASS",
- "S2_FIX_WINDOW": "IN_PROGRESS",
+ "S2_FIX_WINDOW": "PASS",
  "S3_PRODUCTIZED": "PASS",
  "S4_RC_FROZEN": "NOT_STARTED",
  "S5_QUALIFIED": "NOT_STARTED",
@@ -11,21 +11,10 @@
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
- "CURRENT_SHA": "819fe4d79c8b26669a0c5a8a9008adc452a873e0",
- "CURRENT_KERNEL_DIGEST": "2434f962e1394fa2b5ad5db0e305c3bb2cd8fc8e",
+ "CURRENT_SHA": "1ba5bde6f7fb783a729e276b09629a773a138209",
+ "CURRENT_KERNEL_DIGEST": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
  "CURRENT_WHEEL_DIGEST": null,
- "OPEN_V2_0_BLOCKERS": [
-  "B1",
-  "B3",
-  "B4",
-  "B4-OLD-GIT",
-  "B6",
-  "B7",
-  "B12",
-  "B13",
-  "B14",
-  "KA-09"
- ],
+ "OPEN_V2_0_BLOCKERS": [],
  "V2_1_BACKLOG_COUNT": 34,
  "PROVIDER_CALLS": 0,
  "PAID_RELEASE_SMOKES_USED": 0,
@@ -81,13 +70,91 @@
    "status": "IN_PROGRESS",
    "on": "819fe4d79c8b26669a0c5a8a9008adc452a873e0",
    "what": "owner ruling MUTATION WORKER HANDOFF applied: C and D stopped, E/F on 369c8ac, record tool 819fe4d"
+  },
+  {
+   "phase": "S2_FIX_WINDOW",
+   "status": "PASS",
+   "on": "1ba5bde6f7fb783a729e276b09629a773a138209",
+   "what": "S2 mutation final PASS (261/261 exactly once, 6437/6437 killed, 0 unaudited, 0 by the clock); full local suite 5440 with one owner-waived machine-state failure; CI 37229943538 green on Linux/macOS/Windows; candidate frozen"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
  "S2_DETAIL": {
   "code": "B1 (+ B1-BLOCKS-STOP-001), B3, B4 (+ B4-OLD-GIT: aisef run refuses git < 2.31, 340b11c), B6, B7, B12, KA-09; review blockers B16-BUDGET-AT-CEILING, B13-RC-BINDING, G1-LEGACY-IMPROVE fixed",
   "exit": "V2.0-S2 mutation on the current snapshot 369c8ac (owner ruling MUTATION WORKER HANDOFF, 2026-10-04), at most 2 workers; then validation/qualification/s2_mutation_record.py --write (final record + summary), mutation.py --check, Q0 checker calibration regenerated, one full local suite",
-  "mutation_progress": "C and D stopped (C by the ruling, D by the owner's answer); E and F measuring on 369c8ac, H/I/G queued; 29 of 261 targets reused (B's process_effect HARNESS, proven unchanged); 117 earlier results fail the proof, C's 64 excluded by the ruling; estimated ~29 h wall-clock at the 2-worker cap"
+  "FROZEN_CANDIDATE": "1ba5bde6f7fb783a729e276b09629a773a138209",
+  "candidate_tree": "1ba5bde's tree outside closure-evidence/ is FINAL_HEAD 25e38f4b336fb49648b0ce7844fc269981efd586's (git diff --quiet)",
+  "kernel_tree": "aisef2 at 1ba5bde: c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
+  "mutation": {
+   "FINAL_HEAD": "25e38f4b336fb49648b0ce7844fc269981efd586",
+   "TOTAL_TARGETS": 261,
+   "ACCOUNTED_EXACTLY_ONCE": true,
+   "measured_at_final_head": 3,
+   "reused_after_mechanical_proof": 258,
+   "stale_excluded": 245,
+   "CURRENT_SNAPSHOT_TARGETS": 3,
+   "MUTANTS": 6437,
+   "KILLED": 6437,
+   "KILLED_BY_TIMEOUT": 0,
+   "AUDITED_SURVIVORS": 0,
+   "UNAUDITED_SURVIVORS": 0,
+   "STALE_RESULTS_EXCLUDED": 245,
+   "RERUN_TARGETS": 138,
+   "S2_MUTATION_VERDICT": "PASS",
+   "record": {
+    "path": "closure-evidence/v2/release/S2-MUTATION.json",
+    "sha256": "e8b67eec84196120162e1bd34ac3519720226cb9bbc304df7ac2edbbfa26b0e4"
+   },
+   "summary": {
+    "path": "closure-evidence/v2/release/S2-MUTATION-SUMMARY.json",
+    "sha256": "9ada2e1e654ee267cd259ccf695fd624cd4e4e4ec31e9209868fecfb9d4155ba"
+   },
+   "checks": "s2_mutation_record.py --check PASS; validation/v2/mutation.py --check PASS",
+   "qualifier": {
+    "path": "validation/qualification/s2_mutation_record.py",
+    "file_sha256": "d9c75f7143aecb7a4e87a7eb53940e604ab00ea690574fc2152b473d2a71ffeb",
+    "criteria_sha256": "dee08768f72aaacf31d2dcd0f9fde9e354d088f6b8d1ee7c8031aef664afacc0",
+    "criteria_sha256_frozen_at_819fe4d": "dee08768f72aaacf31d2dcd0f9fde9e354d088f6b8d1ee7c8031aef664afacc0",
+    "criteria_unchanged": true
+   }
+  },
+  "q0_checker_calibration": {
+   "path": "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json",
+   "sha256": "be035016c42be0b78aac4f94c002505c93ae0aef1f7bf5fff513441120a55759",
+   "result": "calibrated 52/52; always-PASS mutants rejected 52/52"
+  },
+  "full_local_suite": {
+   "commit": "1ba5bde6f7fb783a729e276b09629a773a138209",
+   "command": "python3 -P validation/v2/owned_run.py -- python3 -m unittest discover -s tests (in a detached worktree of 1ba5bde, no mutation running)",
+   "result": "Ran 5440 tests in 2438 s; FAILED (failures=1, skipped=80); owned processes before=0 at_exit=0 after=0 escaped=0 released_empty=True",
+   "the_one_failure": "HistoricalAttempt4.test_the_machine_s_external_copies_are_checked_and_an_absent_copy_fails — machine state (S2-REAL-CLIENT-RUN), WAIVED by the owner (S2-REAL-CLIENT-RUN/R1)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-final-suite/suite-1ba5bde.txt",
+    "sha256": "093b53b3f9e051c13607436a4ff0e81598479aefa26f9a10615577baa8a0fdc2"
+   },
+   "owned_run": {
+    "path": "closure-evidence/v2/release/s2-final-suite/owned-1ba5bde.json",
+    "sha256": "45fa6b67db10cedae9d3c174a3fb44c2b5afce6122049b97b692ab5abe3c8acd"
+   },
+   "closure_evidence_after": "the suite's worktree had no change (git status empty)"
+  },
+  "ci": {
+   "run": 37229943538,
+   "workflow": "tests",
+   "commit": "1ba5bde6f7fb783a729e276b09629a773a138209",
+   "jobs": {
+    "unit (ubuntu-latest, 3.11)": "success, Ran 5440 OK (skipped=90)",
+    "unit (ubuntu-latest, 3.12)": "success, Ran 5440 OK (skipped=90)",
+    "unit (ubuntu-latest, 3.13)": "success, Ran 5440 OK (skipped=90)",
+    "unit (ubuntu-latest, 3.14)": "success, Ran 5440 OK (skipped=90)",
+    "unit (macos-latest, 3.12)": "success, Ran 5440 OK (skipped=92)",
+    "unit (windows-latest, 3.11)": "success, Ran 5437 OK (skipped=173)",
+    "lint": "success",
+    "wheel": "success"
+   }
+  },
+  "findings_this_window": "OBS-S2-10, OBS-S2-11, OBS-S2-12, S2-REAL-CLIENT-RUN (+ /R1)",
+  "not_started": "S4 (owner: do not begin S4 until S2's final candidate and evidence are frozen); no provider call, no Q4/Q5, no paid smoke"
  },
  "S3_DETAIL": {
   "done": [
@@ -115,7 +182,7 @@
   "sensitivity_no_pre_satisfied": 535783,
   "sensitivity_one_retry_per_failed_story": 647232
  },
- "OPEN_V2_0_BLOCKERS_NOTE": "every listed blocker is fixed in code; each stays open until the S2 exit gates hold (V2.0-S2 mutation record complete with zero unaudited survivors, one full local suite green)",
+ "OPEN_V2_0_BLOCKERS_NOTE": "the listed blockers (B1, B3, B4, B4-OLD-GIT, B6, B7, B12, B13, B14, KA-09) were fixed in code and stayed open until the S2 exit gates held; they hold for the frozen S2 candidate 1ba5bde (mutation record PASS, zero unaudited survivors, full local suite green but one owner-waived machine-state failure, CI green on Linux/macOS/Windows). S2-REAL-CLIENT-RUN is not a 2.0 blocker (owner, S2-REAL-CLIENT-RUN/R1)",
  "ACCEPTANCE_FROZEN": {
   "record": "closure-evidence/v2/release/V2-RELEASE-ACCEPTANCE.json",
   "specs": 59,

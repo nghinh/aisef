@@ -225,6 +225,24 @@
    "RELEASE_BLOCKER_RULE_3": "PENDING_OWNER",
    "V2_0_DISPOSITION": "OPEN — owner decision required: the operator's store (leave or remove the 14 test sessions — the controller does not delete operator data), the failing machine check, and whether the isolation fix (XDG_DATA_HOME/STATE/CACHE and a PATH without the real client in the app tests) lands before S2 is frozen (it changes kill-test closures of the app targets, so their results must be re-measured) or after",
    "source": "diagnosis of the one failure of the S2 final candidate's full local suite (1ba5bde)"
+  },
+  {
+   "ID": "S2-REAL-CLIENT-RUN/R1",
+   "RECLASSIFIES": "S2-REAL-CLIENT-RUN",
+   "OWNER_RULING": {
+    "date": "2026-10-05",
+    "approver": "human:owner",
+    "asked": "the S2 gate 'full local suite green' and the isolation fix's timing, after S2-REAL-CLIENT-RUN",
+    "answers": {
+     "suite gate": "Record a waiver (Recommended)",
+     "isolation": "V2.1 + env guard now (Recommended)"
+    }
+   },
+   "RELEASE_BLOCKER_RULE_1": "YES",
+   "RELEASE_BLOCKER_RULE_2": "NO (test isolation; the shipped runtime never resolves the client this way unmutated)",
+   "RELEASE_BLOCKER_RULE_3": "NO (no provider reached, nothing disclosed)",
+   "V2_0_DISPOSITION": "NOT A V2.0 BLOCKER (owner). (1) Waiver: the S2 gate 'full local suite green' holds for 1ba5bde with exactly one failure waived — tests/v2/test_c2_delivery_experiment.py HistoricalAttempt4.test_the_machine_s_external_copies_are_checked_and_an_absent_copy_fails, failing only because of the 14 test sessions this incident left in the operator's store; the store is left untouched. (2) V2.1_BACKLOG as V21-36: the app tests isolate the client's data/state/cache directories and PATH as they isolate its configuration (tests/v2/test_app_run.py ProductBase, client_config, the client cases); its line in docs/v2/V2.1-BACKLOG.md lands with the next change to the tree (S4 preparation), so the frozen S2 candidate keeps the tree its suite and CI measured. (3) Env guard now: every later mutation worker starts through the controller's launcher with PATH stripped of each directory holding an `opencode` executable and XDG_DATA_HOME/XDG_STATE_HOME/XDG_CACHE_HOME in the worker's scratch; measured 2026-10-05: shutil.which('opencode') is None under it (directly and through aisef2.app.client.environment), git and python3 resolve, and the escape mutant run.py::execute 'L249 Or swapped' replayed under it against tests/v2/test_app_run.py is killed (failures=2, errors=11) while the operator's store stays at 1970 sessions, latest unchanged",
+   "source": "owner answers 2026-10-05 to the controller's question after the S2 final candidate's full local suite"
   }
  ],
  "v2_1_backlog": {
