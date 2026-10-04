@@ -895,5 +895,19 @@ class AppPreflightRun(unittest.TestCase):
             self.assertEqual((d / "PREFLIGHT.json").read_text(encoding="utf-8"), json.dumps(rec, indent=1, sort_keys=True) + "\n")
 
 
+class AppPreflightFingerprint(unittest.TestCase):
+    """aisef2.app.preflight.fingerprint_fields L116/L117: the served models and fingerprints the attestation binds are
+    sorted, so the fingerprint is the same in every process (string hashing is randomized per process)."""
+
+    def test_the_bound_fields_are_sorted(self):
+        from aisef2.app import preflight
+        names = ["m-f", "m-b", "m-e", "m-a", "m-d", "m-c"]
+        obs = {"declared_model": "m", "listing": {"id": "m", "owned_by": "o"},
+               "probes": [{"served_model": n, "system_fingerprint": "fp-" + n} for n in names]}
+        self.assertEqual(preflight.fingerprint_fields(obs), {"declared_model": "m", "listed_id": "m", "owned_by": "o",
+                                                             "served_models": sorted(names),
+                                                             "system_fingerprint": sorted("fp-" + n for n in names)})
+
+
 if __name__ == "__main__":
     unittest.main()
