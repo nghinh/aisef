@@ -552,7 +552,7 @@ for _t in ("aisef2/probe/cli_invocation.py::AGENT/op_invoke", "aisef2/probe/pyth
            "aisef2/orchestrate/workspace.py::config_problems", "aisef2/probe/cli_invocation.py::AGENT/plain",
            "aisef2/probe/cli_invocation.py::AGENT/guarded", "aisef2/app/run.py::admit", "aisef2/app/run.py::check_git",
            "aisef2/app/run.py::check_repository", "aisef2/app/run.py::probe_interpreter", "aisef2/app/run.py::runspec_of",
-           "aisef2/app/run.py::productproof"):
+           "aisef2/app/run.py::productproof", "aisef2/app/run.py::delivery"):
     S2_TARGETS[_t] = [*S2_TARGETS[_t], _S2_KILLS]
 for _t in ("aisef2/probe/process_effect.py::HARNESS/ask",    # killed only by the clock: its bounded case runs first
            "aisef2/probe/cli_invocation.py::AGENT/send"):

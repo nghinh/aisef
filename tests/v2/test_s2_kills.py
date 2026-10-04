@@ -11,6 +11,7 @@ import select
 import subprocess
 import sys
 import tempfile
+import types
 import unittest
 from unittest import mock
 
@@ -345,6 +346,23 @@ class AppProductProof(unittest.TestCase):
             "story": "S1", "criterion": "C-ADD", "role": "INTRODUCE", "spec": spec.id, "probe_id": spec.probe_id,
             "expected": expected, "last_proof": {"candidate": "c1", "seq": 9, "agreement": True, "verdict": expected},
             "satisfied_at_last_proof": True, "delivered": True}])
+
+
+class AppDelivery(unittest.TestCase):
+    """aisef2.app.run.delivery L196/L199: a story's last lifecycle event in the journal decides — a retry after its
+    commit leaves it uncommitted whatever the results say — and the stories that did not commit are named in order."""
+
+    def test_the_journal_s_last_event_decides_and_the_missing_are_named_in_order(self):
+        from tests.v2 import test_app_run as e2e
+        p = bundle.load(e2e.project_bundle("a" * 40))
+        ev = lambda seq, t, **d: {"seq": seq, "type": t, "data": d}  # noqa: E731
+        events = [ev(1, "gate/decision"), ev(2, "story/commit", story_id="S1"), ev(3, "story/retry", story_id="S1")]
+        self.assertEqual(R.delivery(p, events, {"S1": ["COMMIT"]}, None, []),
+                         ("FAIL", ["1 of the plan's stories did not commit: ['S1']"], set()))
+        stories = ["S6", "S2", "S5", "S1", "S4", "S3"]
+        six = types.SimpleNamespace(plan=types.SimpleNamespace(obligations=[types.SimpleNamespace(story_id=s) for s in stories]))
+        self.assertEqual(R.delivery(six, [ev(1, "gate/decision")], {}, None, []),
+                         ("FAIL", ["6 of the plan's stories did not commit: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']"], set()))
 
 
 if __name__ == "__main__":
