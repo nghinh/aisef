@@ -68,7 +68,7 @@ def run(route: str, chat_probes: int, transport, directory: pathlib.Path, served
     ledger = directory / "LEDGER.jsonl"
     model = route.split("/", 1)[1]
     obs: dict = {"route": route, "declared_model": model, "expected_served_model": served_model or model,
-                 "expected_listed_owner": listed_owner, "listing": None, "probes": []}
+                 "expected_listed_owner": listed_owner, "probes": []}     # the listing is added once it is measured
     n = 1
     _append(ledger, {"n": n, "event": "sent", "kind": "listing"})
     code, body = transport("/models")

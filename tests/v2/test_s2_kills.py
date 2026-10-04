@@ -865,5 +865,35 @@ class AppAdapters(unittest.TestCase):
         self.assertIs(type(r.findings), tuple)
 
 
+class AppPreflightRun(unittest.TestCase):
+    """aisef2.app.preflight.run L67-L91: what the preflight sends, what its ledger says, what it observed, and the
+    record it writes — whole."""
+
+    def test_the_preflight_s_requests_ledger_observation_and_record(self):
+        from aisef2.app import preflight
+        from tests.v2 import test_app_run as e2e
+        sent, provider = [], e2e.provider()
+
+        def transport(path, body=None):
+            sent.append((path, body))
+            return provider(path, body)
+        with tempfile.TemporaryDirectory() as t:
+            d = pathlib.Path(t) / "deep" / "pre"        # its parent does not exist yet
+            rec = preflight.run(e2e.ROUTE, 2, transport, d, "model-1", "fake")
+            chat = {"model": "model-1", "messages": [{"role": "user", "content": preflight.PROBE_PROMPT}],
+                    "max_tokens": preflight.PROBE_MAX_TOKENS, "temperature": 0}
+            self.assertEqual(sent, [("/models", None), ("/chat/completions", chat), ("/chat/completions", chat)])
+            self.assertEqual([json.loads(x) for x in (d / "LEDGER.jsonl").read_text(encoding="utf-8").splitlines()], [
+                {"n": 1, "event": "sent", "kind": "listing"}, {"n": 1, "event": "done", "http": 200},
+                {"n": 2, "event": "sent", "kind": "chat"}, {"n": 2, "event": "done", "http": 200, "input_tokens": 9, "output_tokens": 1},
+                {"n": 3, "event": "sent", "kind": "chat"}, {"n": 3, "event": "done", "http": 200, "input_tokens": 9, "output_tokens": 1}])
+            probe = {"http": 200, "served_model": "model-1", "system_fingerprint": "fp-1"}
+            self.assertEqual(rec["observation"], {"route": e2e.ROUTE, "declared_model": "model-1", "expected_served_model": "model-1",
+                                                  "expected_listed_owner": "fake",
+                                                  "listing": {"http": 200, "listed": True, "id": "model-1", "owned_by": "fake"},
+                                                  "probes": [probe, probe]})
+            self.assertEqual((d / "PREFLIGHT.json").read_text(encoding="utf-8"), json.dumps(rec, indent=1, sort_keys=True) + "\n")
+
+
 if __name__ == "__main__":
     unittest.main()

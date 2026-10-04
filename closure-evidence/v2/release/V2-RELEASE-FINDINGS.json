@@ -312,6 +312,11 @@
    "id": "OBS-S2-8",
    "what": "aisef2/app/adapters.py Reviewer.review: `except (ValueError, KeyError, TypeError)` around `json.loads(m.group(0))['findings']` carried an equivalent mutant (S2 mutation, worker J2: TypeError dropped survives): a {...} match loads as an object or raises ValueError, and indexing an object raises KeyError only.",
    "disposition": "not a finding: the unreachable TypeError removed from the clause; dropping either remaining element is killed by the existing review tests (invalid JSON, no findings key)"
+  },
+  {
+   "id": "OBS-S2-9",
+   "what": "aisef2/app/preflight.py run: the observation's initial `\"listing\": None` placeholder carried an equivalent mutant (S2 mutation, worker J: 'L70 dict entry 4 dropped' survives): the entry is always overwritten before anything reads it, and the record is written with sorted keys.",
+   "disposition": "not a finding: the placeholder removed (the listing is added once measured); every read of obs['listing'] follows that assignment"
   }
  ],
  "reviews": [
