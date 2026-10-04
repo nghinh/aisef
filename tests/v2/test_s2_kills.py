@@ -664,7 +664,7 @@ class ClientWaitWithin(unittest.TestCase):
 
 class AppSettingsLoad(unittest.TestCase):
     """aisef2.app.settings.load L76/L84/L94: the refusals name the keys in order and the provider's shape; model_limit's
-    two keys are accepted in any order."""
+    two keys are accepted in any order. settings._count L68: a count refusal names the value."""
 
     def test_refusals_name_themselves_and_key_order_does_not_matter(self):
         from aisef2.app import settings
@@ -682,6 +682,12 @@ class AppSettingsLoad(unittest.TestCase):
         reversed_limit = {**e2e.SETTINGS["provider"], "model_limit": {"output": 8000, "context": 100000}}
         self.assertEqual(settings.load({**e2e.SETTINGS, "provider": reversed_limit}).model_limit, {"context": 100000, "output": 8000})
 
+
+    def test_a_count_refusal_names_the_value(self):     # settings._count L68
+        from aisef2.app import settings
+        with self.assertRaises(settings.SettingsError) as c:
+            settings._count(0, "chat_probes")
+        self.assertEqual(str(c.exception), "chat_probes is an integer >= 1, not 0")
 
 class AppBundleLoad(unittest.TestCase):
     """aisef2.app.bundle.load L105-L129: every refusal names itself (the keys in order, a kernel object that does not
