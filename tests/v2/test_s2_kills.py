@@ -720,5 +720,76 @@ class AppBundleLoad(unittest.TestCase):
                                            f"release's probes: {named[:3]}")
 
 
+FAKE_OPENCODE = """
+import json, pathlib, sys, time
+here = pathlib.Path(sys.argv[0]).parent
+(here / "argv.json").write_text(json.dumps(sys.argv[1:]))
+mode = (here / "mode").read_text()
+print(json.dumps({"type": "text", "part": {"text": "hello"}}), flush=True)
+print(json.dumps({"type": "step_finish", "part": {"tokens": {"input": 5, "output": 2}}}), flush=True)
+if mode != "exit":
+    time.sleep(60)
+"""
+
+
+@unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
+class ClientSession(unittest.TestCase):
+    """aisef2.app.client.session L188-L211: the refusal of an unbound session names what is unbound; the client found on
+    the PATH the session is given runs exactly `opencode run --format json --model M --title N --dir D PROMPT`; the
+    log's parents are made; and the answer is whole — exited, timed out, stopped at the turn cap, or never started."""
+
+    LIMITS = {"provider_requests": 9, "turns": 99, "input_tokens": 10 ** 6, "output_tokens": 10 ** 6}
+
+    def setUp(self):
+        from aisef2.app import client
+        self.client = client
+        t = tempfile.TemporaryDirectory()
+        self.addCleanup(t.cleanup)
+        self.tmp = pathlib.Path(os.path.realpath(t.name))
+        self.bin = self.tmp / "bin"
+        self.bin.mkdir()
+        (self.bin / "opencode").write_text(f"#!{sys.executable}\n" + FAKE_OPENCODE, encoding="utf-8")
+        (self.bin / "opencode").chmod(0o755)
+        self.logs = self.tmp / "deep" / "logs"     # its parent does not exist yet
+        self.kw = {"model": "fakeprov/m", "env": {"PATH": f"{self.bin}{os.pathsep}/usr/bin:/bin"}, "turn_cap": 5,
+                   "budget": client.Budget(self.LIMITS, dict.fromkeys(self.LIMITS, 0), self.logs, lambda: 1)}
+
+    def mode(self, m):
+        (self.bin / "mode").write_text(m, encoding="utf-8")
+
+    def test_an_unbound_session_is_refused_naming_what_is_unbound(self):
+        with self.assertRaises(self.client.SessionRefused) as c:
+            self.client.session("n", "p", str(self.tmp), self.logs / "u.jsonl", 5, **{**self.kw, "model": None, "env": None})
+        self.assertEqual(str(c.exception), "a model session needs a fixed route, a built environment, a budget and a turn cap; "
+                                           "unbound: model, env")
+
+    def test_a_session_runs_the_client_s_command_line_and_answers_whole(self):
+        self.mode("exit")
+        s = self.client.session("S1-dev", "the prompt", str(self.tmp), self.logs / "s.jsonl", 30, **self.kw)
+        self.assertEqual(json.loads((self.bin / "argv.json").read_text()),
+                         ["run", "--format", "json", "--model", "fakeprov/m", "--title", "S1-dev", "--dir", str(self.tmp), "the prompt"])
+        self.assertIsInstance(s.pop("seconds"), float)
+        self.assertEqual(s, {"exit": 0, "timed_out": False, "stopped": None, "started": True, "error": None, "text": "hello",
+                             "turns": 1, "tokens": {"input": 5, "output": 2}, "log": "s.jsonl", "redacted": 0})
+
+    def test_a_hung_session_times_out_and_a_capped_one_is_stopped(self):
+        self.mode("hang")
+        self.logs.mkdir(parents=True)        # a log whose directory already exists
+        s = self.client.session("n", "p", str(self.tmp), self.logs / "h.jsonl", 1, **{**self.kw, "turn_cap": 99})
+        self.assertEqual((s["exit"], s["timed_out"], s["stopped"], s["started"]), (None, True, None, True))
+        capped = self.tmp / "capped"      # its own logs and budget: one session, one recorded request
+        budget = self.client.Budget(self.LIMITS, dict.fromkeys(self.LIMITS, 0), capped, lambda: 1)
+        s = self.client.session("n", "p", str(self.tmp), capped / "c.jsonl", 30, **{**self.kw, "turn_cap": 1, "budget": budget})
+        self.assertEqual((s["exit"], s["timed_out"], s["stopped"]), (None, False, "session turn cap: 1 turns"))
+
+    def test_a_session_that_never_starts_answers_whole(self):
+        self.logs.mkdir(parents=True)
+        (self.logs / "x.jsonl").write_text("", encoding="utf-8")
+        why = "x.jsonl exists: a session's evidence is never overwritten"
+        self.assertEqual(self.client.session("n", "p", str(self.tmp), self.logs / "x.jsonl", 5, **self.kw),
+                         {"exit": None, "timed_out": False, "stopped": why, "started": False, "error": why, "text": "",
+                          "turns": 0, "tokens": {"input": 0, "output": 0}, "seconds": 0.0, "log": None})
+
+
 if __name__ == "__main__":
     unittest.main()
