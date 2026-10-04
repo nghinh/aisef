@@ -915,5 +915,48 @@ class AppPreflightFingerprint(unittest.TestCase):
                                                              "system_fingerprint": sorted("fp-" + n for n in names)})
 
 
+class AppCommand(unittest.TestCase):
+    """aisef2.app.cli.run L51/L57/L61/L64-L66: each mode prints exactly its document and exits by its verdict (verify:
+    VERIFIED 0, else 1; check: the admission; run: PASS 0, else 1); a session refused before the run began exits 2."""
+
+    def cli(self, *argv: str) -> tuple[int, dict | None, str]:
+        import contextlib
+        import io
+        from aisef2.app import cli
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = cli.run(list(argv))
+        return code, json.loads(out.getvalue()) if out.getvalue() else None, err.getvalue()
+
+    def test_each_mode_prints_its_document_and_exits_by_its_verdict(self):
+        from aisef2.app import cli, settings
+        from aisef2.app.client import SessionRefused
+        project = types.SimpleNamespace(name="p", plan=types.SimpleNamespace(plan_hash="h" * 64))
+        bundles = mock.patch.object(bundle, "read", lambda path: project)
+        runs = mock.patch.object(settings, "read", lambda path: types.SimpleNamespace(route="r/m"))
+        with bundles, runs:
+            for verdict, code in (("VERIFIED", 0), ("REFUTED", 1)):
+                with self.subTest(verify=verdict), mock.patch.object(cli, "verify", lambda pr, out, v=verdict: {"verdict": v, "n": 1}):
+                    self.assertEqual(self.cli("--verify", "--project", "b", "--out", "o"), (code, {"verdict": verdict, "n": 1}, ""))
+            admission = {"admitted": True, "why": []}
+            with mock.patch.object(R, "check_git", lambda: None), mock.patch.object(R, "check_repository", lambda pr, repo: None), \
+                    mock.patch.object(R, "calibrations", lambda: ()), mock.patch.object(R, "admit", lambda pr, cal: admission):
+                self.assertEqual(self.cli("--check", "--project", "b", "--settings", "s", "--repo", "r"),
+                                 (0, {"project": "p", "plan_hash": "h" * 64, "route": "r/m", "admission": admission, "ready": True}, ""))
+            keys = ("project", "delivery_verdict", "delivery_blocked_by", "story_outcomes", "final_main", "journal",
+                    "plan_quality_verdict")
+            for verdict, code in (("PASS", 0), ("FAIL", 1)):
+                rec = {k: f"{k}-value" for k in keys} | {"delivery_verdict": verdict, "other": 1}
+                with self.subTest(run=verdict), mock.patch.object(R, "execute", lambda pr, s, repo, out, r=rec: r):
+                    self.assertEqual(self.cli("--project", "b", "--settings", "s", "--repo", "r", "--out", "o"),
+                                     (code, {k: rec[k] for k in keys} | {"record": str(pathlib.Path("o") / "RUN.json")}, ""))
+
+            def refused(pr, s, repo, out):
+                raise SessionRefused("the session is not bound")
+            with mock.patch.object(R, "execute", refused):
+                self.assertEqual(self.cli("--project", "b", "--settings", "s", "--repo", "r", "--out", "o"),
+                                 (2, None, "aisef run: refused: the session is not bound\n"))
+
+
 if __name__ == "__main__":
     unittest.main()

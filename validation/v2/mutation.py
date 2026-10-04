@@ -556,7 +556,7 @@ for _t in ("aisef2/probe/cli_invocation.py::AGENT/op_invoke", "aisef2/probe/pyth
            "aisef2/app/verify.py::verify", "aisef2/app/client.py::read_session", "aisef2/app/client.py::Budget.__init__",
            "aisef2/app/client.py::Budget.spend", "aisef2/app/client.py::Budget.reached", "aisef2/app/client.py::environment",
            "aisef2/app/settings.py::load", "aisef2/app/settings.py::_count",
-               "aisef2/app/bundle.py::load", "aisef2/app/client.py::session",
+           "aisef2/app/bundle.py::load", "aisef2/app/client.py::session", "aisef2/app/cli.py::run",
            "aisef2/app/preflight.py::accounting", "aisef2/app/adapters.py::Developer.implement",
            "aisef2/app/adapters.py::Reviewer.review", "aisef2/app/preflight.py::run",
            "aisef2/app/preflight.py::fingerprint_fields"):
