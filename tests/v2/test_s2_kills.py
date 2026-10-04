@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import select
 import subprocess
 import sys
 import tempfile
@@ -213,6 +214,85 @@ class AppRun(unittest.TestCase):
                 self.assertRaises(R.RunRefused) as c:
             R.check_git()
         self.assertEqual(str(c.exception), "git 2.31 or newer is required (B4): found unavailable: TimeoutExpired")
+
+
+@unittest.skipUnless(os.name == "posix", "select on a pipe is POSIX")
+class AgentSend(unittest.TestCase):
+    """cli_invocation AGENT/send L27: every answer is one newline-terminated line — without the newline a reader waiting
+    for a line waits for ever (that mutant was killed only by the clock). Read with a bound, asserted, first in the
+    target's kill set."""
+
+    def test_the_ready_answer_is_one_whole_line(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = pathlib.Path(os.path.realpath(t))
+            with open(t / "agent.log", "wb") as log:
+                agent = subprocess.Popen([sys.executable, "-I", "-B", "-X", "utf8=1", "-c", ci.AGENT, str(t), str(t)],
+                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=log, cwd=t)
+            try:
+                ready, _, _ = select.select([agent.stdout], [], [], 30)
+                self.assertTrue(ready, "the agent sent nothing in 30 s")
+                self.assertEqual(os.read(agent.stdout.fileno(), 4096), b'{"ready": true, "n": 0}\n')
+            finally:
+                agent.stdin.close()
+                agent.wait(30)
+                agent.stdout.close()
+
+
+class AppRepositoryAndInterpreter(unittest.TestCase):
+    """aisef2.app.run: check_repository L109/L113 (the baseline must be a commit; the refusal names the document) and
+    probe_interpreter L119/L120 (B6: the venv is made isolated (-I), its failure raises with what it said captured, and
+    the Windows layout is Scripts/python.exe)."""
+
+    def test_a_baseline_that_is_not_a_commit_is_refused_and_a_wrong_document_is_named(self):
+        from tests.v2 import test_app_run as e2e
+        with tempfile.TemporaryDirectory() as t:
+            repo = pathlib.Path(t) / "repo"
+            base = e2e.make_repo(repo)
+            tree = subprocess.run(["git", "-C", str(repo), "rev-parse", f"{base}^{{tree}}"], capture_output=True, text=True,
+                                  encoding="utf-8", check=True).stdout.strip()
+            with self.assertRaises(R.RunRefused) as c:
+                R.check_repository(bundle.load(e2e.project_bundle(tree)), repo)
+            self.assertEqual(str(c.exception), f"{repo} does not hold the plan's baseline {tree}")
+            doc = e2e.project_bundle(base)
+            doc["requirements_document"]["path"] = "docs/absent.md"
+            with self.assertRaises(R.RunRefused) as c:
+                R.check_repository(bundle.load(doc), repo)
+            self.assertEqual(str(c.exception), "the requirements document docs/absent.md at the baseline is not the bundle's")
+
+    def test_the_probe_venv_is_made_isolated_from_the_hosts_python_path(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = pathlib.Path(t)
+            (t / "host" / "venv").mkdir(parents=True)
+            marker = t / "host-venv-ran"
+            (t / "host" / "venv" / "__init__.py").write_text("", encoding="utf-8")
+            (t / "host" / "venv" / "__main__.py").write_text(f"open({str(marker)!r}, 'w').close()\n", encoding="utf-8")
+            with mock.patch.dict(os.environ, {"PYTHONPATH": str(t / "host")}):
+                exe = R.probe_interpreter(t / "py")
+            self.assertFalse(marker.exists(), "the host's PYTHONPATH reached the venv creation")
+            self.assertTrue(pathlib.Path(exe).is_file())
+
+    @unittest.skipUnless(os.name == "posix", "a script interpreter by its shebang")
+    def test_a_failing_venv_creation_raises_with_its_output_captured(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = pathlib.Path(t)
+            bad = t / "badpython"
+            bad.write_text("#!/bin/sh\necho boom >&2\nexit 3\n", encoding="utf-8")
+            bad.chmod(0o755)
+            with self.assertRaises(subprocess.CalledProcessError) as c:
+                R.probe_interpreter(t / "py", python=str(bad))
+            self.assertEqual((c.exception.returncode, c.exception.stderr), (3, b"boom\n"))
+
+    def test_the_windows_layout_is_scripts_python_exe(self):
+        with tempfile.TemporaryDirectory() as t:
+            where = pathlib.Path(t) / "py"
+
+            def made(argv, **kw):
+                (where / "Scripts").mkdir(parents=True)
+                (where / "Scripts" / "python.exe").write_bytes(b"")
+                return subprocess.CompletedProcess(argv, 0, b"", b"")
+            with mock.patch.object(R.subprocess, "run", side_effect=made), mock.patch.object(R.os, "name", "nt"):
+                exe = R.probe_interpreter(where)
+            self.assertEqual(exe, str(where / "Scripts/python.exe"))
 
 
 if __name__ == "__main__":
