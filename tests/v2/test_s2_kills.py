@@ -330,5 +330,22 @@ class AppRunSpec(unittest.TestCase):
                     "timeouts_s": {"value": plain(st.timeouts_s), "layer": "settings"}})
 
 
+class AppProductProof(unittest.TestCase):
+    """aisef2.app.run.productproof L173-L182: an obligation's row, whole — its last proof (candidate, seq, agreement,
+    verdict) and the probe its spec binds."""
+
+    def test_an_obligation_row_is_whole(self):
+        from tests.v2 import test_app_run as e2e
+        p = bundle.load(e2e.project_bundle("a" * 40))
+        spec = next(iter(p.specs.values()))
+        expected = spec.candidate_expectation.value
+        events = [{"seq": 9, "type": "proof/verified", "data": {"story_id": "S1", "criterion_id": "C-ADD", "candidate": "c1",
+                                                                "agreement": True, "verdict": expected}}]
+        self.assertEqual(R.productproof(p, events, {"S1"})["obligations"], [{
+            "story": "S1", "criterion": "C-ADD", "role": "INTRODUCE", "spec": spec.id, "probe_id": spec.probe_id,
+            "expected": expected, "last_proof": {"candidate": "c1", "seq": 9, "agreement": True, "verdict": expected},
+            "satisfied_at_last_proof": True, "delivered": True}])
+
+
 if __name__ == "__main__":
     unittest.main()
