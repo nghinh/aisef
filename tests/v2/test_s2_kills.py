@@ -163,5 +163,36 @@ class AgentPlain(unittest.TestCase):
                 agent.stdout.close()
 
 
+class AgentGuarded(unittest.TestCase):
+    """cli_invocation AGENT/guarded L88: a controlled fault raises with the message 'controlled fault <id>', which the
+    caller sees through the exception's attributes."""
+
+    def test_the_controlled_fault_names_itself_in_its_message(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = pathlib.Path(os.path.realpath(t))
+            root, work = t / "rev", t / "work"
+            root.mkdir()
+            work.mkdir()
+            (root / "guardsubj.py").write_text("import os\ndef cwd():\n    return os.getcwd()\n", encoding="utf-8")
+            with open(work / "agent.log", "wb") as log:
+                agent = subprocess.Popen([sys.executable, "-I", "-B", "-X", "utf8=1", "-c", ci.AGENT, str(root), str(work)],
+                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=log, cwd=work)
+            try:
+                self.assertEqual(json.loads(agent.stdout.readline()), {"ready": True, "n": 0})
+                ops = ({"op": "import", "name": "guardsubj"}, {"op": "resolve", "chain": ["cwd"]},
+                       {"op": "call", "args": [], "kwargs": {}, "patch": ["os", "getcwd", "OSError", "F1"], "attrs": ["args"]})
+                answers = []
+                for n, op in enumerate(ops, 1):
+                    agent.stdin.write((json.dumps({**op, "n": n}) + "\n").encode("utf-8"))
+                    agent.stdin.flush()
+                    answers.append(json.loads(agent.stdout.readline()))
+                self.assertEqual(answers[2], {"raised": "OSError", "attrs": {"args": {"json": ["controlled fault F1"]}},
+                                              "fired": True, "n": 3})
+            finally:
+                agent.stdin.close()
+                agent.wait(30)
+                agent.stdout.close()
+
+
 if __name__ == "__main__":
     unittest.main()
