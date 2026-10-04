@@ -591,5 +591,37 @@ class ClientReadSession(unittest.TestCase):
                                                          "tokens": {"input": 2, "output": 1}, "steps_without_tokens": 1})
 
 
+class ClientBudget(unittest.TestCase):
+    """aisef2.app.client.Budget L70/L74/L94: the refusal of an incomplete budget names itself; the sessions are read in
+    name order whatever order the directory lists them; every unaccounted reason is named, '; '-joined."""
+
+    LIMITS = {"provider_requests": 10, "turns": 10, "input_tokens": 100, "output_tokens": 100}
+
+    def test_an_incomplete_budget_is_refused_by_name(self):
+        from aisef2.app import client
+        with self.assertRaises(ValueError) as c:
+            client.Budget({"turns": 1}, {}, pathlib.Path("."))
+        self.assertEqual(str(c.exception), "a budget has the four ceilings, and a base that accounts for each of them")
+
+    def test_unaccounted_spend_is_named_in_session_order(self):
+        from aisef2.app import client
+        with tempfile.TemporaryDirectory() as t:
+            t = pathlib.Path(t)
+            for name in ("a.jsonl", "b.jsonl"):     # one finished step each, with no token report
+                (t / name).write_text('{"type": "step_finish", "part": {}}\n', encoding="utf-8")
+
+            class Listed:                            # the directory, its logs listed in reverse name order
+                def is_dir(self):
+                    return True
+
+                def glob(self, pattern):
+                    return [t / "b.jsonl", t / "a.jsonl"]
+            b = client.Budget(self.LIMITS, dict.fromkeys(self.LIMITS, 0), Listed())
+            reasons = ["2 sessions were started but 0 provider requests are recorded",
+                       "a.jsonl: 1 finished steps report no tokens", "b.jsonl: 1 finished steps report no tokens"]
+            self.assertEqual(b.spend()["unaccounted"], reasons)
+            self.assertEqual(b.reached(), "unaccounted: " + "; ".join(reasons))
+
+
 if __name__ == "__main__":
     unittest.main()
