@@ -1,0 +1,13 @@
+{
+ "worker": "K6",
+ "snapshot": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+ "status": "complete: final round K half 2, all 18 requested targets measured on c6c3a55 (started 2026-10-04 21:53 by handoff-K56.sh; finished 2026-10-05 01:52): 925/925 mutants killed, no survivor, no error, no kill by the clock",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K6.log",
+  "sha256": "4ace01ceadb7910bb8d9131953718e8a586b34f7251ab376abb040448211951c"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K6.record.json",
+  "sha256": "25cb1568115990e625bc5cef9a603a2442a3766b6ff3685646f1ab545da9a941"
+ }
+}
