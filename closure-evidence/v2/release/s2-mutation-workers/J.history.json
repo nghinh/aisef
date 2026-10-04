@@ -1,0 +1,13 @@
+{
+ "worker": "J",
+ "snapshot": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+ "status": "complete: all 33 requested targets (the 33 app targets + AGENT/op_invoke) measured on 911881b (started 2026-10-04 16:41 by handoff-J.sh; finished 21:52). Its survivors are killed in tests/v2/test_s2_kills.py (e0b7021 .. ba88eaa); every target whose kill set or file changed since is re-measured in final round K (K5/K6 at c6c3a55)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/J.log",
+  "sha256": "94c7ca6fc4d4c591c81ac5d86b06f69f2ca49db5dc50243ad8f33e48875a0d05"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/J.record.json",
+  "sha256": "15f719a1108913cf8c9442466cb7779b5b0fa8cddc987b4829a65ed5e5010f0a"
+ }
+}
