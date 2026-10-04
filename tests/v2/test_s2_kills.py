@@ -112,5 +112,15 @@ class CallableConcluded(unittest.TestCase):
                          Observation(ObservationKind.OBSERVED, BehaviorVerdict.REFUTED, detail=json.dumps(facts)))
 
 
+class CallableHarnessArgv(unittest.TestCase):
+    """python_callable_v2._harness_argv L401: the harness runs under the fresh bytecode-cache prefix, so it never reads
+    bytecode a subject could have planted in a shared cache (P7-FINDING-001). Without the key, `-X <path>` is an option
+    Python accepts silently and ignores."""
+
+    def test_the_harness_command_line_names_the_fresh_cache_prefix(self):
+        self.assertEqual(pc2._harness_argv("/py", "/w/ask.json", "/w/pyc"),
+                         ["/py", "-I", "-B", "-X", "pycache_prefix=/w/pyc", "-c", pc2.HARNESS, "/w/ask.json"])
+
+
 if __name__ == "__main__":
     unittest.main()
