@@ -2,10 +2,10 @@
  "record": "AISEF V2 — Q0 CHECKER CALIBRATION",
  "work_package": "WP-0.5",
  "rule": "each checker must pass the clean repository, fail its committed known-bad fixture for the named reason, and calibration must reject an always-PASS mutant of it",
- "checker_count": 51,
+ "checker_count": 52,
  "uncovered_checker_modules": [],
- "calibrated_count": 51,
- "always_pass_mutants_rejected": 51,
+ "calibrated_count": 52,
+ "always_pass_mutants_rejected": 52,
  "checkers": [
   {
    "checker": "freeze_manifest",
@@ -138,10 +138,13 @@
    "clean_problems": [],
    "rejects_known_bad": true,
    "rejects_for_the_expected_reason": true,
-   "expected": "aisef2 would ship in the aisef wheel",
+   "expected": "aisef2 would NOT ship in the aisef wheel",
    "observed": [
-    "aisef2 would ship in the aisef wheel",
-    "aisef2.arch would ship in the aisef wheel"
+    "aisef2 would NOT ship in the aisef wheel",
+    "aisef2.app would NOT ship in the aisef wheel",
+    "aisef2.arch would NOT ship in the aisef wheel",
+    "aisef2.cohort would NOT ship in the aisef wheel",
+    "aisef2.control would NOT ship in the aisef wheel"
    ],
    "calibrated": true,
    "always_pass_mutant_rejected_by_calibration": true
@@ -600,6 +603,24 @@
    "rejects_known_bad": true,
    "rejects_for_the_expected_reason": true,
    "expected": "STALE inventory row: aisef/control/gate.py::judge_nobody",
+   "observed": [
+    "UNENUMERATED authority: aisef/control/gate.py::judge_only (UNREACHABLE) is in the tree and not in the inventory",
+    "UNENUMERATED authority: aisef2/app/bundle.py::load (ACTIVE_V2_AUTHORITY) is in the tree and not in the inventory",
+    "UNENUMERATED authority: aisef2/app/run.py::execute (ACTIVE_V2_AUTHORITY) is in the tree and not in the inventory",
+    "STALE inventory row: aisef/control/gate.py::judge_nobody no longer resolves to an authority in the tree"
+   ],
+   "calibrated": true,
+   "always_pass_mutant_rejected_by_calibration": true
+  },
+  {
+   "checker": "release_inventory",
+   "package": "V2.0-S2",
+   "fixture": "tests/v2/fixtures/known_bad/release_inventory.json",
+   "clean_passes": true,
+   "clean_problems": [],
+   "rejects_known_bad": true,
+   "rejects_for_the_expected_reason": true,
+   "expected": "UNENUMERATED authority: aisef/control/gate.py::judge_only (UNREACHABLE) is in the tree and not in the inventory",
    "observed": [
     "UNENUMERATED authority: aisef/control/gate.py::judge_only (UNREACHABLE) is in the tree and not in the inventory",
     "STALE inventory row: aisef/control/gate.py::judge_nobody no longer resolves to an authority in the tree"

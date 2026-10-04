@@ -1,0 +1,4667 @@
+{
+ "record": "AISEF V2.0 — S2 MUTATION, FINAL (owner rulings 'MUTATION WORKER HANDOFF' and its follow-ups, 2026-10-04)",
+ "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+ "FINAL_HEAD": "25e38f4b336fb49648b0ce7844fc269981efd586",
+ "TOTAL_TARGETS": 261,
+ "ACCOUNTED_EXACTLY_ONCE": true,
+ "measured_at_final_head": 3,
+ "reused_after_mechanical_proof": 258,
+ "stale_excluded": 245,
+ "CURRENT_SNAPSHOT_TARGETS": 3,
+ "MUTANTS": 6437,
+ "KILLED": 6437,
+ "KILLED_BY_TIMEOUT": 0,
+ "AUDITED_SURVIVORS": 0,
+ "UNAUDITED_SURVIVORS": 0,
+ "STALE_RESULTS_EXCLUDED": 245,
+ "STALE_RESULTS_EXCLUDED_BY_REASON": {
+  "worker excluded by the ruling (C)": 64,
+  "proof failed": 181,
+  "superseded or duplicate": 0
+ },
+ "RERUN_TARGETS": 138,
+ "MISSING_TARGETS": [],
+ "NOT_PASSING": {},
+ "problems": [],
+ "qualifier": {
+  "path": "validation/qualification/s2_mutation_record.py",
+  "file_sha256": "d9c75f7143aecb7a4e87a7eb53940e604ab00ea690574fc2152b473d2a71ffeb",
+  "criteria_sha256": "dee08768f72aaacf31d2dcd0f9fde9e354d088f6b8d1ee7c8031aef664afacc0",
+  "criteria_sha256_frozen_at_819fe4d": "dee08768f72aaacf31d2dcd0f9fde9e354d088f6b8d1ee7c8031aef664afacc0",
+  "criteria_unchanged": true
+ },
+ "S2_MUTATION_VERDICT": "PASS",
+ "workers": [
+  {
+   "worker": "A",
+   "snapshot": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "status": "ended after 51 of its 124 requested targets (log last written 2026-10-03 17:05)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/A.log",
+    "sha256": "f14e12c6c87164884f78802799817851fe52582fbf255fe2f16b28a1e6094e78"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/A.record.json",
+    "sha256": "9877d3c7a1040494e4e66ff778b71e62c1cf3f32e69c00775efef7d2495e32cd"
+   },
+   "results": 51
+  },
+  {
+   "worker": "B",
+   "snapshot": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "status": "stopped after 95 of its 125 requested targets by handoff.sh, 2026-10-04 00:37 (results through line 95 were the ones its snapshot still matched)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/B.log",
+    "sha256": "f1e4a81e0e57be7de3d0cdcff4c26f98d8f10fea8c8d8b845c0024088aff1f1d"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/B.record.json",
+    "sha256": "95a28a66589224d45aab7dfa04ce4f66bbcf11417ebec705b74da5ee49c167ba"
+   },
+   "results": 95
+  },
+  {
+   "worker": "C",
+   "snapshot": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "status": "stopped by the controller after 64 of its 117 requested targets, 2026-10-04 03:39 (owner ruling MUTATION WORKER HANDOFF §1); its results are not merged (§4)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/C.log",
+    "sha256": "f607553215685b5baa16d6c5822a6b1bd2d29fae5285dc203638ce9d0390d7e5"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/C.record.json",
+    "sha256": "ee34efc23858bbc4a507b070bc5d64c4c8001c0a4473b6f54918a12f787e1c4f"
+   },
+   "results": 64
+  },
+  {
+   "worker": "D",
+   "snapshot": "8bec241d3f4b79ab0e5f61d82b9e2aa90700ac76",
+   "status": "stopped by the controller before finishing its first target, 2026-10-04 03:51 (owner answer: stop D now — tests/v2/test_release_s2_kernel.py, in its kill sets, changed after its snapshot)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/D.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "record": null,
+   "results": 0
+  },
+  {
+   "worker": "E",
+   "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "status": "stopped by the controller after 2 of its 61 requested targets, 2026-10-04 04:33 (owner answer 'Restart E now': the tests/v2/test_app_units.py fix 911881b changes its 33 app targets' kill tests; its other targets continue in chunk I on 369c8ac, the app targets and AGENT/op_invoke in chunk J on 911881b)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/E.log",
+    "sha256": "6ae6e29f1778d92458e86346dd858a5389e7fdfdd260abc232744898d70ca970"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/E.record.json",
+    "sha256": "1a4419e87c73f4ed2ec36d0df9569e704edd9edd9f39784d3f4dedae6cfd1055"
+   },
+   "results": 2
+  },
+  {
+   "worker": "F",
+   "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "status": "complete: all 30 requested targets measured on 369c8ac (started 2026-10-04 03:52 by handoff-F.sh when D exited; finished 09:25)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/F.log",
+    "sha256": "cb78021a87b4a2f9d27d3bef1ffa976f7fff222a13a77e056e7de7158802d9ad"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/F.record.json",
+    "sha256": "5ce830af772f9193a036ced6de86f5d5744baf3502c182c9a0dcd74f62094981"
+   },
+   "results": 30
+  },
+  {
+   "worker": "G",
+   "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "status": "complete: all 57 requested cli_invocation targets measured on 369c8ac (started 2026-10-04 13:40 by queue.sh; finished ~16:50); _preflight errored (OBS-S2-3)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/G.log",
+    "sha256": "49da75210dda94f3a3e4298957e0826ac93e7f00bd2632eb6907d7fd87394f0e"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/G.record.json",
+    "sha256": "6cdb493e840b7a8582a38dfd26804e87938b5619df10f8ed9fe92a4a61223a36"
+   },
+   "results": 57
+  },
+  {
+   "worker": "H",
+   "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "status": "complete: all 35 requested orchestrate targets measured on 369c8ac (started 2026-10-04 04:34 by queue.sh; finished 13:40)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/H.log",
+    "sha256": "90a82ece07c52c957e094dc97b69e0ea3c32d7f3a8bf439ff844cfaf2eecdcaf"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/H.record.json",
+    "sha256": "33b19efc331e1686acda1ef225c9cefa8c855afb19e72d9f0db6f2f7d31c35ec"
+   },
+   "results": 35
+  },
+  {
+   "worker": "I",
+   "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "status": "complete: all 75 requested targets measured on 369c8ac (E's remaining cli_invocation targets + 49 process_effect; started 2026-10-04 09:25 by queue.sh; finished 16:41)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/I.log",
+    "sha256": "442e24a704e148f156a4d52a9ebf493461bdff3d08b8a195bb0551e838633a2d"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/I.record.json",
+    "sha256": "096666f9c6575dff4f490ff6fd980009cfd788c093600ef5c4dba8b2d5be5925"
+   },
+   "results": 75
+  },
+  {
+   "worker": "J",
+   "snapshot": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "status": "complete: all 33 requested targets (the 33 app targets + AGENT/op_invoke) measured on 911881b (started 2026-10-04 16:41 by handoff-J.sh; finished 21:52). Its survivors are killed in tests/v2/test_s2_kills.py (e0b7021 .. ba88eaa); every target whose kill set or file changed since is re-measured in final round K (K5/K6 at c6c3a55)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/J.log",
+    "sha256": "94c7ca6fc4d4c591c81ac5d86b06f69f2ca49db5dc50243ad8f33e48875a0d05"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/J.record.json",
+    "sha256": "15f719a1108913cf8c9442466cb7779b5b0fa8cddc987b4829a65ed5e5010f0a"
+   },
+   "results": 33
+  },
+  {
+   "worker": "J2",
+   "snapshot": "c4732b4d774f170f1525b42f6344f5477689abb3",
+   "status": "complete: J's tail, all 7 requested targets (settings.load .. cli.run) measured on c4732b4 (started 2026-10-04 19:43 by the controller in the slot K2 left; finished 20:49). Survivors killed in test_s2_kills.py (settings.load, bundle.load, Developer.implement, Reviewer.review 79ba6db/earlier; cli.run ba88eaa); all 7 targets re-measured in final round K (K3/K4)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/J2.log",
+    "sha256": "ce7eb874cfa5c97722713faba66da85c8ae43ad42cdd216a70aa3158ea3aa9b1"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/J2.record.json",
+    "sha256": "c80711ff2b4e71ec649a16347d3ee3e56ca5830f876373fc3349e255e319c49a"
+   },
+   "results": 7
+  },
+  {
+   "worker": "K1",
+   "snapshot": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "status": "complete: provisional round K, 12 targets measured on e0b7021 (started 2026-10-04 16:53 by the controller in the slot G left; finished ~19:08). Targets whose kill set includes tests/v2/test_s2_kills.py are re-measured after its last edit",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K1.log",
+    "sha256": "e3d87dadccf92c95f941fd0061d6daf7da00953ab8d601f446f3eba5f0af25a8"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K1.record.json",
+    "sha256": "a6aaa144351e6cebbf9ffe0f4dcf88cd3a07fe6f69e1fe775fca6fd2fea9125e"
+   },
+   "results": 12
+  },
+  {
+   "worker": "K2",
+   "snapshot": "6d9cc6422a467d7ee2abb14e74032679504049aa",
+   "status": "complete: the 4 run.py targets staled by run.py's change and without test_s2_kills.py in their kill set, measured on 6d9cc64 (started 19:31 by the controller in the slot K1 left; finished ~19:40), all killed",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K2.log",
+    "sha256": "9caa32f8ba714ebb935d0c8d2cc9e283482218fc664e2a8b0be9b84cc28d4727"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K2.record.json",
+    "sha256": "0d47b815e0b1f3dc5dca041f4f9ed3ff5a7f9b9aad108d120594c2f510b87546"
+   },
+   "results": 4
+  },
+  {
+   "worker": "K3",
+   "snapshot": "ba88eaaaa7198de0debd27ea5ba1e5bb402e4f20",
+   "status": "stopped by the controller 2026-10-04 21:51 during its first target (run.py::execute), no result: final round K at ba88eaa was staled by the Windows fix to tests/v2/test_s2_kills.py (ClientEnvironment, CI 37207425787); its half and K4's (never started) are re-measured by K5/K6 at the fix's commit",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K3.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "record": null,
+   "results": 0
+  },
+  {
+   "worker": "K5",
+   "snapshot": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "status": "complete: final round K half 1, all 20 requested targets measured on c6c3a55 (started 2026-10-04 21:53 by handoff-K56.sh; finished 2026-10-05 02:19). Not passing as measured: client.wait_within (L153 'And swapped' killed only by the clock), bundle.Project.order (L64 'sorted() -> list()' survived: hash-order luck), AGENT/send (L27 newline emptied killed only by the clock) — killed by tests/v2/test_s2_kills_k.py and re-measured by K7; the other 17 clean",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K5.log",
+    "sha256": "8b37a194d02fbcb9c3419269025857c9fff11b1ab2cc394b877e242ade10aac5"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K5.record.json",
+    "sha256": "ae86c8ca5de561b6d81e68bb11e84ec72fb6da0bec291b83137c85fc854ac62f"
+   },
+   "results": 20
+  },
+  {
+   "worker": "K6",
+   "snapshot": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "status": "complete: final round K half 2, all 18 requested targets measured on c6c3a55 (started 2026-10-04 21:53 by handoff-K56.sh; finished 2026-10-05 01:52): 925/925 mutants killed, no survivor, no error, no kill by the clock",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K6.log",
+    "sha256": "4ace01ceadb7910bb8d9131953718e8a586b34f7251ab376abb040448211951c"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K6.record.json",
+    "sha256": "25cb1568115990e625bc5cef9a603a2442a3766b6ff3685646f1ab545da9a941"
+   },
+   "results": 18
+  },
+  {
+   "worker": "K7",
+   "snapshot": "fc24d30fc31451b27a65aa410bf944003c05e64d",
+   "status": "complete: round K's three findings re-measured on fc24d30 (started 2026-10-05 02:20 by the controller; finished 02:28): AGENT/send 2/2, client.wait_within 23/23, bundle.Project.order 10/10 killed — no survivor, no error, no kill by the clock",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K7.log",
+    "sha256": "6bc960190e811960cdd25b581a2ea8c791329ff713fefe8967c2d38c020a1092"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K7.record.json",
+    "sha256": "afd92851d84b68b8aec099bc42fe494ae1f26d51e4b2f162dffabe665415f585"
+   },
+   "results": 3
+  }
+ ],
+ "classes": {
+  "measured_at_final_head": [
+   "aisef2/app/bundle.py::Project.order",
+   "aisef2/app/client.py::wait_within",
+   "aisef2/probe/cli_invocation.py::AGENT/send"
+  ],
+  "reused_after_mechanical_proof": [
+   "aisef2/app/adapters.py::Developer.implement",
+   "aisef2/app/adapters.py::Reviewer.review",
+   "aisef2/app/adapters.py::attempt_of",
+   "aisef2/app/bundle.py::load",
+   "aisef2/app/cli.py::run",
+   "aisef2/app/client.py::Budget.__init__",
+   "aisef2/app/client.py::Budget.reached",
+   "aisef2/app/client.py::Budget.spend",
+   "aisef2/app/client.py::environment",
+   "aisef2/app/client.py::read_session",
+   "aisef2/app/client.py::session",
+   "aisef2/app/preflight.py::accounting",
+   "aisef2/app/preflight.py::deployment",
+   "aisef2/app/preflight.py::fingerprint_fields",
+   "aisef2/app/preflight.py::identity_problems",
+   "aisef2/app/preflight.py::run",
+   "aisef2/app/run.py::_close",
+   "aisef2/app/run.py::admit",
+   "aisef2/app/run.py::calibrations",
+   "aisef2/app/run.py::check_git",
+   "aisef2/app/run.py::check_repository",
+   "aisef2/app/run.py::delivery",
+   "aisef2/app/run.py::execute",
+   "aisef2/app/run.py::kernel_digest",
+   "aisef2/app/run.py::probe_interpreter",
+   "aisef2/app/run.py::productproof",
+   "aisef2/app/run.py::regression_tests",
+   "aisef2/app/run.py::runspec_of",
+   "aisef2/app/settings.py::_count",
+   "aisef2/app/settings.py::load",
+   "aisef2/app/verify.py::verify",
+   "aisef2/orchestrate/adapters.py::Finding.blocks",
+   "aisef2/orchestrate/adapters.py::Implemented.__post_init__",
+   "aisef2/orchestrate/adapters.py::Merge.__post_init__",
+   "aisef2/orchestrate/adapters.py::ReadOnlyScope.files",
+   "aisef2/orchestrate/adapters.py::ReadOnlyScope.read",
+   "aisef2/orchestrate/adapters.py::confine",
+   "aisef2/orchestrate/adapters.py::unconfine",
+   "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+   "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+   "aisef2/orchestrate/story_runner.py::_Held.__call__",
+   "aisef2/orchestrate/story_runner.py::_Held.__init__",
+   "aisef2/orchestrate/story_runner.py::_Held.release",
+   "aisef2/orchestrate/story_runner.py::_attempt",
+   "aisef2/orchestrate/story_runner.py::_committed",
+   "aisef2/orchestrate/story_runner.py::_fail",
+   "aisef2/orchestrate/story_runner.py::_freeze_plan",
+   "aisef2/orchestrate/story_runner.py::_probe",
+   "aisef2/orchestrate/story_runner.py::run_story",
+   "aisef2/orchestrate/workspace.py::Checkout.__init__",
+   "aisef2/orchestrate/workspace.py::Checkout.release",
+   "aisef2/orchestrate/workspace.py::GitMerger.base",
+   "aisef2/orchestrate/workspace.py::GitMerger.merge",
+   "aisef2/orchestrate/workspace.py::GitMerger.revert",
+   "aisef2/orchestrate/workspace.py::GitWorkspace.checkout",
+   "aisef2/orchestrate/workspace.py::GitWorkspace.diff",
+   "aisef2/orchestrate/workspace.py::GitWorkspace.move",
+   "aisef2/orchestrate/workspace.py::GitWorkspace.scratch",
+   "aisef2/orchestrate/workspace.py::Scratch.__init__",
+   "aisef2/orchestrate/workspace.py::Scratch.release",
+   "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT",
+   "aisef2/orchestrate/workspace.py::_env",
+   "aisef2/orchestrate/workspace.py::_sha",
+   "aisef2/orchestrate/workspace.py::commit_all",
+   "aisef2/orchestrate/workspace.py::config_problems",
+   "aisef2/orchestrate/workspace.py::git",
+   "aisef2/probe/cli_invocation.py::AGENT/flush",
+   "aisef2/probe/cli_invocation.py::AGENT/guarded",
+   "aisef2/probe/cli_invocation.py::AGENT/op_bye",
+   "aisef2/probe/cli_invocation.py::AGENT/op_call",
+   "aisef2/probe/cli_invocation.py::AGENT/op_construct",
+   "aisef2/probe/cli_invocation.py::AGENT/op_import",
+   "aisef2/probe/cli_invocation.py::AGENT/op_invoke",
+   "aisef2/probe/cli_invocation.py::AGENT/op_resolve",
+   "aisef2/probe/cli_invocation.py::AGENT/op_value",
+   "aisef2/probe/cli_invocation.py::AGENT/plain",
+   "aisef2/probe/cli_invocation.py::AGENT/redirect",
+   "aisef2/probe/cli_invocation.py::AGENT/tagged",
+   "aisef2/probe/cli_invocation.py::CLASSES",
+   "aisef2/probe/cli_invocation.py::CLASS_TABLE",
+   "aisef2/probe/cli_invocation.py::COMPARATORS",
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__",
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe",
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality",
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in",
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement",
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions",
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe",
+   "aisef2/probe/cli_invocation.py::FILE_SHAPES",
+   "aisef2/probe/cli_invocation.py::HARNESS/answer_to",
+   "aisef2/probe/cli_invocation.py::HARNESS/ask",
+   "aisef2/probe/cli_invocation.py::HARNESS/conclude",
+   "aisef2/probe/cli_invocation.py::HARNESS/deadline",
+   "aisef2/probe/cli_invocation.py::HARNESS/emit",
+   "aisef2/probe/cli_invocation.py::HARNESS/ended",
+   "aisef2/probe/cli_invocation.py::HARNESS/file_fact",
+   "aisef2/probe/cli_invocation.py::HARNESS/finish",
+   "aisef2/probe/cli_invocation.py::HARNESS/inside",
+   "aisef2/probe/cli_invocation.py::HARNESS/invoke",
+   "aisef2/probe/cli_invocation.py::HARNESS/main",
+   "aisef2/probe/cli_invocation.py::HARNESS/resolve",
+   "aisef2/probe/cli_invocation.py::HARNESS/sha",
+   "aisef2/probe/cli_invocation.py::HARNESS/stream_fact",
+   "aisef2/probe/cli_invocation.py::ON_DEADLINE",
+   "aisef2/probe/cli_invocation.py::PROBE_SOURCES",
+   "aisef2/probe/cli_invocation.py::QUANTIFIERS",
+   "aisef2/probe/cli_invocation.py::STREAM_SHAPES",
+   "aisef2/probe/cli_invocation.py::_argv_ok",
+   "aisef2/probe/cli_invocation.py::_await",
+   "aisef2/probe/cli_invocation.py::_bytes_of",
+   "aisef2/probe/cli_invocation.py::_child_env",
+   "aisef2/probe/cli_invocation.py::_concluded",
+   "aisef2/probe/cli_invocation.py::_content_ok",
+   "aisef2/probe/cli_invocation.py::_deadline",
+   "aisef2/probe/cli_invocation.py::_disposed",
+   "aisef2/probe/cli_invocation.py::_equal",
+   "aisef2/probe/cli_invocation.py::_equality_ok",
+   "aisef2/probe/cli_invocation.py::_equality_verdict",
+   "aisef2/probe/cli_invocation.py::_file_fact",
+   "aisef2/probe/cli_invocation.py::_file_matches",
+   "aisef2/probe/cli_invocation.py::_file_shape_ok",
+   "aisef2/probe/cli_invocation.py::_half_ok",
+   "aisef2/probe/cli_invocation.py::_harness_argv",
+   "aisef2/probe/cli_invocation.py::_harness_failure",
+   "aisef2/probe/cli_invocation.py::_is_int",
+   "aisef2/probe/cli_invocation.py::_mac",
+   "aisef2/probe/cli_invocation.py::_name_ok",
+   "aisef2/probe/cli_invocation.py::_no_result",
+   "aisef2/probe/cli_invocation.py::_normalization_ok",
+   "aisef2/probe/cli_invocation.py::_normalize",
+   "aisef2/probe/cli_invocation.py::_preflight",
+   "aisef2/probe/cli_invocation.py::_prepare",
+   "aisef2/probe/cli_invocation.py::_probe_digest",
+   "aisef2/probe/cli_invocation.py::_protocol",
+   "aisef2/probe/cli_invocation.py::_public",
+   "aisef2/probe/cli_invocation.py::_sha_file",
+   "aisef2/probe/cli_invocation.py::_silent",
+   "aisef2/probe/cli_invocation.py::_stimulus_ok",
+   "aisef2/probe/cli_invocation.py::_stream_bytes",
+   "aisef2/probe/cli_invocation.py::_stream_fact",
+   "aisef2/probe/cli_invocation.py::_stream_matches",
+   "aisef2/probe/cli_invocation.py::_stream_shape_ok",
+   "aisef2/probe/cli_invocation.py::_streams_ok",
+   "aisef2/probe/cli_invocation.py::_substitute",
+   "aisef2/probe/cli_invocation.py::_watch",
+   "aisef2/probe/cli_invocation.py::_ws_key_ok",
+   "aisef2/probe/cli_invocation.py::_ws_name",
+   "aisef2/probe/cli_invocation.py::observation_class",
+   "aisef2/probe/cli_invocation.py::spec_class",
+   "aisef2/probe/cli_invocation.py::verdict_of",
+   "aisef2/probe/process_effect.py::CLASSES",
+   "aisef2/probe/process_effect.py::CLASS_TABLE",
+   "aisef2/probe/process_effect.py::FAULTED",
+   "aisef2/probe/process_effect.py::FAULTS",
+   "aisef2/probe/process_effect.py::FILE_SHAPES",
+   "aisef2/probe/process_effect.py::HARNESS/answer_to",
+   "aisef2/probe/process_effect.py::HARNESS/answered",
+   "aisef2/probe/process_effect.py::HARNESS/ask",
+   "aisef2/probe/process_effect.py::HARNESS/count_lines",
+   "aisef2/probe/process_effect.py::HARNESS/do_call",
+   "aisef2/probe/process_effect.py::HARNESS/do_construct",
+   "aisef2/probe/process_effect.py::HARNESS/do_edit",
+   "aisef2/probe/process_effect.py::HARNESS/do_expect",
+   "aisef2/probe/process_effect.py::HARNESS/do_fault",
+   "aisef2/probe/process_effect.py::HARNESS/do_subprocess",
+   "aisef2/probe/process_effect.py::HARNESS/do_workspace",
+   "aisef2/probe/process_effect.py::HARNESS/do_write",
+   "aisef2/probe/process_effect.py::HARNESS/emit",
+   "aisef2/probe/process_effect.py::HARNESS/ended",
+   "aisef2/probe/process_effect.py::HARNESS/file_fact",
+   "aisef2/probe/process_effect.py::HARNESS/files_now",
+   "aisef2/probe/process_effect.py::HARNESS/finish",
+   "aisef2/probe/process_effect.py::HARNESS/guarded",
+   "aisef2/probe/process_effect.py::HARNESS/identity",
+   "aisef2/probe/process_effect.py::HARNESS/inside",
+   "aisef2/probe/process_effect.py::HARNESS/main",
+   "aisef2/probe/process_effect.py::HARNESS/reported",
+   "aisef2/probe/process_effect.py::HARNESS/resolve",
+   "aisef2/probe/process_effect.py::HARNESS/row_of",
+   "aisef2/probe/process_effect.py::HARNESS/run",
+   "aisef2/probe/process_effect.py::HARNESS/same",
+   "aisef2/probe/process_effect.py::HARNESS/subject_call",
+   "aisef2/probe/process_effect.py::HARNESS/unresolved",
+   "aisef2/probe/process_effect.py::HARNESS/unws",
+   "aisef2/probe/process_effect.py::ON_DEADLINE",
+   "aisef2/probe/process_effect.py::PROBE_SOURCES",
+   "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__",
+   "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in",
+   "aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement",
+   "aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions",
+   "aisef2/probe/process_effect.py::ProcessEffectProbe.observe",
+   "aisef2/probe/process_effect.py::STEPS",
+   "aisef2/probe/process_effect.py::_CONTENT",
+   "aisef2/probe/process_effect.py::_FILE_HOLDS",
+   "aisef2/probe/process_effect.py::_FILE_SHAPE_OK",
+   "aisef2/probe/process_effect.py::_HOLDS",
+   "aisef2/probe/process_effect.py::_SHAPES",
+   "aisef2/probe/process_effect.py::_concluded",
+   "aisef2/probe/process_effect.py::_content_of",
+   "aisef2/probe/process_effect.py::_edit_ok",
+   "aisef2/probe/process_effect.py::_expect_ok",
+   "aisef2/probe/process_effect.py::_fault_ok",
+   "aisef2/probe/process_effect.py::_file_shape_ok",
+   "aisef2/probe/process_effect.py::_files_hold",
+   "aisef2/probe/process_effect.py::_flat_ok",
+   "aisef2/probe/process_effect.py::_harness_argv",
+   "aisef2/probe/process_effect.py::_ident_ok",
+   "aisef2/probe/process_effect.py::_identity",
+   "aisef2/probe/process_effect.py::_invocation_ok",
+   "aisef2/probe/process_effect.py::_jsonl_holds",
+   "aisef2/probe/process_effect.py::_observed_files",
+   "aisef2/probe/process_effect.py::_prepare",
+   "aisef2/probe/process_effect.py::_probe_digest",
+   "aisef2/probe/process_effect.py::_raises_hold",
+   "aisef2/probe/process_effect.py::_resolved",
+   "aisef2/probe/process_effect.py::_returns_hold",
+   "aisef2/probe/process_effect.py::_same",
+   "aisef2/probe/process_effect.py::_scenario_ok",
+   "aisef2/probe/process_effect.py::_step_ok",
+   "aisef2/probe/process_effect.py::_subprocess_ok",
+   "aisef2/probe/process_effect.py::_substitute",
+   "aisef2/probe/process_effect.py::_watch",
+   "aisef2/probe/process_effect.py::_workspace_ok",
+   "aisef2/probe/process_effect.py::_write_ok",
+   "aisef2/probe/process_effect.py::_ws_path_ok",
+   "aisef2/probe/process_effect.py::observation_class",
+   "aisef2/probe/process_effect.py::spec_class",
+   "aisef2/probe/process_effect.py::verdict_of",
+   "aisef2/probe/python_callable_v2.py::CLASSES",
+   "aisef2/probe/python_callable_v2.py::HARNESS/answer_to",
+   "aisef2/probe/python_callable_v2.py::HARNESS/answered",
+   "aisef2/probe/python_callable_v2.py::HARNESS/ask",
+   "aisef2/probe/python_callable_v2.py::HARNESS/conclude",
+   "aisef2/probe/python_callable_v2.py::HARNESS/deadline",
+   "aisef2/probe/python_callable_v2.py::HARNESS/emit",
+   "aisef2/probe/python_callable_v2.py::HARNESS/ended",
+   "aisef2/probe/python_callable_v2.py::HARNESS/finish",
+   "aisef2/probe/python_callable_v2.py::HARNESS/inside",
+   "aisef2/probe/python_callable_v2.py::HARNESS/main",
+   "aisef2/probe/python_callable_v2.py::HARNESS/value_of",
+   "aisef2/probe/python_callable_v2.py::ON_DEADLINE",
+   "aisef2/probe/python_callable_v2.py::PROBE_SOURCES",
+   "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__",
+   "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement",
+   "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe",
+   "aisef2/probe/python_callable_v2.py::_concluded",
+   "aisef2/probe/python_callable_v2.py::_file_ok",
+   "aisef2/probe/python_callable_v2.py::_harness_argv",
+   "aisef2/probe/python_callable_v2.py::_is_hex",
+   "aisef2/probe/python_callable_v2.py::_probe_digest",
+   "aisef2/probe/python_callable_v2.py::_substituted",
+   "aisef2/probe/python_callable_v2.py::_unsubstituted",
+   "aisef2/probe/python_callable_v2.py::_watch",
+   "aisef2/probe/python_callable_v2.py::_workspace_ok",
+   "aisef2/probe/python_callable_v2.py::_write_workspace",
+   "aisef2/probe/python_callable_v2.py::observation_class",
+   "aisef2/probe/python_callable_v2.py::spec_class",
+   "aisef2/probe/python_callable_v2.py::verdict_of"
+  ]
+ },
+ "provenance": {
+  "aisef2/app/adapters.py::Developer.implement": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/adapters.py::Reviewer.review": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/adapters.py::attempt_of": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/bundle.py::Project.order": {
+   "worker": "K7",
+   "measured_on": "fc24d30fc31451b27a65aa410bf944003c05e64d",
+   "class": "measured_at_final_head"
+  },
+  "aisef2/app/bundle.py::load": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/cli.py::run": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/client.py::Budget.__init__": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/client.py::Budget.reached": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/client.py::Budget.spend": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/client.py::environment": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/client.py::read_session": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/client.py::session": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/client.py::wait_within": {
+   "worker": "K7",
+   "measured_on": "fc24d30fc31451b27a65aa410bf944003c05e64d",
+   "class": "measured_at_final_head"
+  },
+  "aisef2/app/preflight.py::accounting": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/preflight.py::deployment": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/preflight.py::fingerprint_fields": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/preflight.py::identity_problems": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/preflight.py::run": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/run.py::_close": {
+   "worker": "K2",
+   "measured_on": "6d9cc6422a467d7ee2abb14e74032679504049aa",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/app/run.py::admit": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/run.py::calibrations": {
+   "worker": "K2",
+   "measured_on": "6d9cc6422a467d7ee2abb14e74032679504049aa",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/app/run.py::check_git": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/run.py::check_repository": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/run.py::delivery": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/run.py::execute": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/run.py::kernel_digest": {
+   "worker": "K2",
+   "measured_on": "6d9cc6422a467d7ee2abb14e74032679504049aa",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/app/run.py::probe_interpreter": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/run.py::productproof": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/run.py::regression_tests": {
+   "worker": "K2",
+   "measured_on": "6d9cc6422a467d7ee2abb14e74032679504049aa",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/app/run.py::runspec_of": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/settings.py::_count": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/settings.py::load": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/app/verify.py::verify": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/adapters.py::Finding.blocks": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/adapters.py::Implemented.__post_init__": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/adapters.py::Merge.__post_init__": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/adapters.py::ReadOnlyScope.files": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/adapters.py::ReadOnlyScope.read": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/adapters.py::confine": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/adapters.py::unconfine": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__call__": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__init__": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.release": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::_attempt": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::_committed": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::_fail": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::_freeze_plan": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::_probe": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/story_runner.py::run_story": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::Checkout.__init__": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::Checkout.release": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.base": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.merge": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.revert": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.checkout": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.diff": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.move": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.scratch": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::Scratch.__init__": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::Scratch.release": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::_env": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::_sha": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::commit_all": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::config_problems": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/orchestrate/workspace.py::git": {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/flush": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/guarded": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_bye": {
+   "worker": "E",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_call": {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_construct": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_import": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_invoke": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_resolve": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_value": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/plain": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/redirect": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/send": {
+   "worker": "K7",
+   "measured_on": "fc24d30fc31451b27a65aa410bf944003c05e64d",
+   "class": "measured_at_final_head"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/tagged": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::CLASSES": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::CLASS_TABLE": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::COMPARATORS": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::FILE_SHAPES": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/answer_to": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/ask": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/conclude": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/deadline": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/emit": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/ended": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/file_fact": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/finish": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/inside": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/invoke": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/main": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/resolve": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/sha": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/stream_fact": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::ON_DEADLINE": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::PROBE_SOURCES": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::QUANTIFIERS": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::STREAM_SHAPES": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_argv_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_await": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_bytes_of": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_child_env": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_concluded": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_content_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_deadline": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_disposed": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_equal": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_equality_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_equality_verdict": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_file_fact": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_file_matches": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_file_shape_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_half_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_harness_argv": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_harness_failure": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_is_int": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_mac": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_name_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_no_result": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_normalization_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_normalize": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_preflight": {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_prepare": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_probe_digest": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_protocol": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_public": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_sha_file": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_silent": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_stimulus_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_stream_bytes": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_stream_fact": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_stream_matches": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_stream_shape_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_streams_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_substitute": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_watch": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/cli_invocation.py::_ws_key_ok": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::_ws_name": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::observation_class": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::spec_class": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/cli_invocation.py::verdict_of": {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/process_effect.py::CLASSES": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::CLASS_TABLE": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::FAULTED": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::FAULTS": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::FILE_SHAPES": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/answer_to": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/answered": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/ask": {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/count_lines": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_call": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_construct": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_edit": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_expect": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_fault": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_subprocess": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_workspace": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_write": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/emit": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/ended": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/file_fact": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/files_now": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/finish": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/guarded": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/identity": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/inside": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/main": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/reported": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/resolve": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/row_of": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/run": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/same": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/subject_call": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/unresolved": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::HARNESS/unws": {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef/config.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::ON_DEADLINE": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::PROBE_SOURCES": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.observe": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::STEPS": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_CONTENT": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_FILE_HOLDS": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_FILE_SHAPE_OK": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_HOLDS": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_SHAPES": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_concluded": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_content_of": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_edit_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_expect_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_fault_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_file_shape_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_files_hold": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_flat_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_harness_argv": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_ident_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_identity": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_invocation_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_jsonl_holds": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_observed_files": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_prepare": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_probe_digest": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_raises_hold": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_resolved": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_returns_hold": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_same": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_scenario_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_step_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_subprocess_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_substitute": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_watch": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_workspace_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_write_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::_ws_path_ok": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::observation_class": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::spec_class": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/process_effect.py::verdict_of": {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle.py",
+    "aisef2/app/preflight.py",
+    "aisef2/app/run.py",
+    "aisef2/app/settings.py"
+   ]
+  },
+  "aisef2/probe/python_callable_v2.py::CLASSES": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/answer_to": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/answered": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/ask": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/conclude": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/deadline": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/emit": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/ended": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/finish": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/inside": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/main": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/value_of": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::ON_DEADLINE": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::PROBE_SOURCES": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_concluded": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_file_ok": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_harness_argv": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_is_hex": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_probe_digest": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_substituted": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_unsubstituted": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_watch": {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_workspace_ok": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::_write_workspace": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::observation_class": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::spec_class": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  },
+  "aisef2/probe/python_callable_v2.py::verdict_of": {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "class": "reused_after_mechanical_proof"
+  }
+ },
+ "stale_excluded_results": [
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/adapters.py::Finding.blocks",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/adapters.py::Implemented.__post_init__",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/adapters.py::Merge.__post_init__",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/adapters.py::ReadOnlyScope.files",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/adapters.py::ReadOnlyScope.read",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/adapters.py::confine",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/adapters.py::unconfine",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::CLASSES",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::CLASS_TABLE",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::COMPARATORS",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_c2_cli_protocol.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::FILE_SHAPES",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::ON_DEADLINE",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::PROBE_SOURCES",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_c2_cli_protocol.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::QUANTIFIERS",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::STREAM_SHAPES",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_argv_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_await",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_c2_cli_protocol.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_bytes_of",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_child_env",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_content_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_equal",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_equality_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_equality_verdict",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_file_fact",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_file_matches",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_file_shape_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_half_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_is_int",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_name_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_normalization_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_normalize",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_prepare",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_probe_digest",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_c2_cli_protocol.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_protocol",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_public",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_sha_file",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_stimulus_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_stream_bytes",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_stream_fact",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_stream_matches",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_stream_shape_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_streams_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_substitute",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_ws_key_ok",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::_ws_name",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::observation_class",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::spec_class",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "A",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/cli_invocation.py::verdict_of",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_c2_cli_verdicts.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::Checkout.__init__",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::Checkout.release",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::GitMerger.base",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::GitMerger.merge",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::GitMerger.revert",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::GitWorkspace.checkout",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::GitWorkspace.diff",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::GitWorkspace.move",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::GitWorkspace.scratch",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::Scratch.__init__",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::Scratch.release",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::_env",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::_sha",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::commit_all",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::config_problems",
+   "why": [
+    "its kill set is not the current one",
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/orchestrate/workspace.py::git",
+   "why": [
+    "kill tests changed: tests/v2/test_release_s2_kernel.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::CLASSES",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::CLASS_TABLE",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::FAULTED",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::FAULTS",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::FILE_SHAPES",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::HARNESS/ask",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::ON_DEADLINE",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::PROBE_SOURCES",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::ProcessEffectProbe.observe",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::STEPS",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_CONTENT",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_FILE_HOLDS",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_FILE_SHAPE_OK",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_HOLDS",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_SHAPES",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_concluded",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_content_of",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_edit_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_expect_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_fault_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_file_shape_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_files_hold",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_flat_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_harness_argv",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_ident_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_identity",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_invocation_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_jsonl_holds",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_observed_files",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_prepare",
+   "why": [
+    "the run errored: kill tests fail on the unmutated tree (leaked 0)"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_probe_digest",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_raises_hold",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_resolved",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_returns_hold",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_same",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_scenario_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_step_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_subprocess_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_substitute",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_watch",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_workspace_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_write_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::_ws_path_ok",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::observation_class",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::spec_class",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "B",
+   "measured_on": "29860a54a1bc71b34eb0193f40c0d59d962d02fc",
+   "target": "aisef2/probe/process_effect.py::verdict_of",
+   "why": [
+    "kill tests changed: tests/test_cli.py, tests/v2/test_c2_cli_invocation.py, tests/v2/test_probe_process_effect_units.py"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/flush",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/op_import",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/plain",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/redirect",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/send",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/tagged",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::CLASSES",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::CLASS_TABLE",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::COMPARATORS",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::FILE_SHAPES",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::ON_DEADLINE",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::PROBE_SOURCES",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::QUANTIFIERS",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::STREAM_SHAPES",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_argv_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_await",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_bytes_of",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_child_env",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_concluded",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_content_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_deadline",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_disposed",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_equal",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_equality_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_equality_verdict",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_file_fact",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_file_matches",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_file_shape_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_half_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_harness_argv",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_harness_failure",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_is_int",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_mac",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_name_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_no_result",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_normalization_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_normalize",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_preflight",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_prepare",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_probe_digest",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_protocol",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_public",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_sha_file",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_silent",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_stimulus_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_stream_bytes",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_stream_fact",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_stream_matches",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_stream_shape_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_streams_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_substitute",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_watch",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_ws_key_ok",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::_ws_name",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::observation_class",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::spec_class",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "C",
+   "measured_on": "1e56f8b2f4219e40236df7cfc202b30400f9e3c5",
+   "target": "aisef2/probe/cli_invocation.py::verdict_of",
+   "why": [
+    "owner ruling MUTATION WORKER HANDOFF §4: C's stale-snapshot results are not merged into the final verdict"
+   ]
+  },
+  {
+   "worker": "E",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/op_invoke",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/probe/python_callable_v2.py::_concluded",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/probe/python_callable_v2.py::_harness_argv",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "F",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/probe/python_callable_v2.py::_watch",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/send",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "G",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/probe/cli_invocation.py::_preflight",
+   "why": [
+    "the run errored: kill tests fail on the unmutated tree (leaked 0)"
+   ]
+  },
+  {
+   "worker": "H",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/orchestrate/workspace.py::config_problems",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/guarded",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/op_call",
+   "why": [
+    "the run errored: kill tests fail on the unmutated tree (leaked 0)"
+   ]
+  },
+  {
+   "worker": "I",
+   "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/plain",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/adapters.py::Developer.implement",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/adapters.py::Reviewer.review",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/adapters.py::attempt_of",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/bundle.py::Project.order",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/bundle.py::load",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/cli.py::run",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/client.py::Budget.__init__",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/client.py::Budget.reached",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/client.py::Budget.spend",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/client.py::environment",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/client.py::read_session",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/client.py::session",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/client.py::wait_within",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/preflight.py::accounting",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/preflight.py::deployment",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/preflight.py::fingerprint_fields",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/preflight.py::identity_problems",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/preflight.py::run",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::_close",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::admit",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::calibrations",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::check_git",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::check_repository",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::delivery",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::execute",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::kernel_digest",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::probe_interpreter",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::productproof",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::regression_tests",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/run.py::runspec_of",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/settings.py::_count",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/settings.py::load",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J",
+   "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
+   "target": "aisef2/app/verify.py::verify",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J2",
+   "measured_on": "c4732b4d774f170f1525b42f6344f5477689abb3",
+   "target": "aisef2/app/adapters.py::Developer.implement",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J2",
+   "measured_on": "c4732b4d774f170f1525b42f6344f5477689abb3",
+   "target": "aisef2/app/adapters.py::Reviewer.review",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J2",
+   "measured_on": "c4732b4d774f170f1525b42f6344f5477689abb3",
+   "target": "aisef2/app/adapters.py::attempt_of",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "J2",
+   "measured_on": "c4732b4d774f170f1525b42f6344f5477689abb3",
+   "target": "aisef2/app/bundle.py::Project.order",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J2",
+   "measured_on": "c4732b4d774f170f1525b42f6344f5477689abb3",
+   "target": "aisef2/app/bundle.py::load",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J2",
+   "measured_on": "c4732b4d774f170f1525b42f6344f5477689abb3",
+   "target": "aisef2/app/cli.py::run",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "J2",
+   "measured_on": "c4732b4d774f170f1525b42f6344f5477689abb3",
+   "target": "aisef2/app/settings.py::load",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/app/run.py::admit",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/app/run.py::check_git",
+   "why": [
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/orchestrate/workspace.py::config_problems",
+   "why": [
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/guarded",
+   "why": [
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/op_invoke",
+   "why": [
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/plain",
+   "why": [
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/probe/process_effect.py::HARNESS/ask",
+   "why": [
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/probe/python_callable_v2.py::_concluded",
+   "why": [
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/probe/python_callable_v2.py::_harness_argv",
+   "why": [
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K1",
+   "measured_on": "e0b702132a2f7f1edb17eb271ba3cd8a90bc376c",
+   "target": "aisef2/probe/python_callable_v2.py::_watch",
+   "why": [
+    "kill tests changed: tests/v2/test_s2_kills.py"
+   ]
+  },
+  {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "target": "aisef2/app/bundle.py::Project.order",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "target": "aisef2/app/client.py::wait_within",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "target": "aisef2/probe/cli_invocation.py::AGENT/send",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  }
+ ]
+}
