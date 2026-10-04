@@ -1,0 +1,10 @@
+{
+ "worker": "K3",
+ "snapshot": "ba88eaaaa7198de0debd27ea5ba1e5bb402e4f20",
+ "status": "stopped by the controller 2026-10-04 21:51 during its first target (run.py::execute), no result: final round K at ba88eaa was staled by the Windows fix to tests/v2/test_s2_kills.py (ClientEnvironment, CI 37207425787); its half and K4's (never started) are re-measured by K5/K6 at the fix's commit",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K3.log",
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ },
+ "record": null
+}
