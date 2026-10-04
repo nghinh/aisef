@@ -84,7 +84,7 @@ class Reviewer:
         m = re.search(r"\{.*\}", s["text"], re.S)
         try:
             found = json.loads(m.group(0))["findings"] if m else []
-        except (ValueError, KeyError, TypeError):
+        except (ValueError, KeyError):  # a {...} match loads as an object or not at all: no TypeError is possible
             found = []
         found = [f for f in found if isinstance(f, dict)] if isinstance(found, list) else []
         s["findings"] = found

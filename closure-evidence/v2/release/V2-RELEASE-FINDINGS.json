@@ -307,6 +307,11 @@
    "id": "OBS-S2-7",
    "what": "aisef2/app/bundle.py load: `ContractApproval(**{**a, 'model_reviews': tuple(a['model_reviews'])})` carried two equivalent mutants (S2 mutation, worker J2: the override dropped, its tuple() -> list()): ContractApproval's own __post_init__ already makes model_reviews a tuple. The override also accepted a string, splitting 'abc' into ('a', 'b', 'c') review references.",
    "disposition": "not a finding: the override removed (`ContractApproval(**a)`); a non-list model_reviews is now refused as a bundle error (ContractError is a ValueError), pinned by tests/v2/test_s2_kills.py AppBundleLoad"
+  },
+  {
+   "id": "OBS-S2-8",
+   "what": "aisef2/app/adapters.py Reviewer.review: `except (ValueError, KeyError, TypeError)` around `json.loads(m.group(0))['findings']` carried an equivalent mutant (S2 mutation, worker J2: TypeError dropped survives): a {...} match loads as an object or raises ValueError, and indexing an object raises KeyError only.",
+   "disposition": "not a finding: the unreachable TypeError removed from the clause; dropping either remaining element is killed by the existing review tests (invalid JSON, no findings key)"
   }
  ],
  "reviews": [

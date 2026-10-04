@@ -791,5 +791,79 @@ class ClientSession(unittest.TestCase):
                           "turns": 0, "tokens": {"input": 0, "output": 0}, "seconds": 0.0, "log": None})
 
 
+class AppPreflightAccounting(unittest.TestCase):
+    """aisef2.app.preflight.accounting L59: requests sent and never answered are named in order."""
+
+    def test_unanswered_requests_in_order(self):
+        from aisef2.app import preflight
+        with tempfile.TemporaryDirectory() as t:
+            ledger = pathlib.Path(t) / "ledger.jsonl"
+            ledger.write_text("".join(json.dumps({"event": "sent", "n": n}) + "\n" for n in (1, 8)), encoding="utf-8")
+            self.assertEqual(preflight.accounting(ledger)["unaccounted"], [1, 8])    # {1, 8} iterates as [8, 1]
+
+
+class AppAdapters(unittest.TestCase):
+    """aisef2.app.adapters Developer.implement / Reviewer.review: the sessions they start (name, log, role), the
+    developer's retry prompt, commit message and details, and the review's findings, whole."""
+
+    def setUp(self):
+        from tests.v2 import test_app_run as e2e
+        t = tempfile.TemporaryDirectory()
+        self.addCleanup(t.cleanup)
+        self.tmp = pathlib.Path(os.path.realpath(t.name))
+        e2e.make_repo(self.tmp / "repo")
+        self.project = bundle.load(e2e.project_bundle("a" * 40))
+        from aisef2.arch.enums import ControlProjection
+        self.events = []
+        self.run = types.SimpleNamespace(events=self.events, state=lambda proj: {"S1": {"attempt": 2}}
+                                         if proj is ControlProjection.STORY_STATE else None)
+        self.calls = []
+
+    def session(self, *, text="", write=None, stopped=None):
+        from aisef2.app import client
+
+        def fake(name, prompt, cwd, log, timeout_s, **kw):
+            self.calls.append((name, prompt, log))
+            if write:
+                (pathlib.Path(cwd) / write).write_text("x = 1\n")
+            return {"exit": 0, "timed_out": False, "stopped": stopped, "started": True, "error": None, "text": text,
+                    "turns": 1, "tokens": {"input": 1, "output": 1}, "seconds": 0.0, "log": log.name}
+        return mock.patch.object(client, "session", fake)
+
+    def head_subject(self):
+        return subprocess.run(["git", "-C", str(self.tmp / "repo"), "log", "-1", "--format=%s"], capture_output=True,
+                              text=True, encoding="utf-8", check=True).stdout.strip()
+
+    def test_the_developer_s_sessions_commits_and_details(self):
+        from aisef2.app import adapters as ad
+        from aisef2.journal.format2 import OperationOutcome as O
+        dev = ad.Developer(self.run, self.project, self.tmp / "logs", {}, 5)
+        with self.session():
+            r = dev.implement("S1", ("C-ADD",), str(self.tmp / "repo"))
+        self.assertEqual((r.outcome, r.detail), (O.FAILED, "the developer changed nothing (exit 0, timed out False)"))
+        self.assertEqual(self.calls[-1][0::2], ("developer S1", self.tmp / "logs" / "S1.developer.2.jsonl"))
+        self.assertEqual(dev.sessions[-1]["role"], "developer")
+        with self.session(write="app/one.py"):
+            r = dev.implement("S1", ("C-ADD",), str(self.tmp / "repo"))
+        self.assertEqual((r.outcome, r.detail, self.head_subject()), (O.COMPLETED, "opencode exit 0, 1 turns", "S1: developer attempt 2"))
+        with self.session(write="app/two.py", stopped="session turn cap: 1 turns"):
+            r = dev.implement("S1", ("C-ADD",), str(self.tmp / "repo"))
+        self.assertEqual(r.detail, "opencode exit 0, 1 turns, session turn cap: 1 turns")
+        self.events.append(types.SimpleNamespace(seq=7, type="failure/observed", data={"story_id": "S1", "code": "X", "owner": "DEVELOPER"}))
+        with self.session(write="app/three.py"):
+            dev.implement("S1", ("C-ADD",), str(self.tmp / "repo"))
+        self.assertTrue(self.calls[-1][1].endswith("\nFix the implementation."), self.calls[-1][1][-80:])
+
+    def test_the_reviewer_s_session_and_findings(self):
+        from aisef2.app import adapters as ad
+        rev = ad.Reviewer(self.run, self.project, self.tmp / "logs", {}, 5)
+        scope = types.SimpleNamespace(story_id="S1", root=str(self.tmp / "repo"))
+        with self.session(text='{"findings": [{"id": "F1", "blocking": true}]}'):
+            r = rev.review(scope, ("C-ADD",))
+        self.assertEqual(self.calls[-1][0::2], ("reviewer S1", self.tmp / "logs" / "S1.reviewer.2.jsonl"))
+        self.assertEqual((rev.sessions[-1]["role"], rev.sessions[-1]["findings"]), ("reviewer", [{"id": "F1", "blocking": True}]))
+        self.assertIs(type(r.findings), tuple)
+
+
 if __name__ == "__main__":
     unittest.main()
