@@ -631,10 +631,11 @@ class ClientEnvironment(unittest.TestCase):
         from aisef2.app import client
         kept = ("PATH", "HOME", "USERPROFILE", "SYSTEMROOT", "SystemRoot", "WINDIR", "LANG", "LC_ALL", "TMPDIR", "TEMP", "TMP",
                 "XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_STATE_HOME", "XDG_CACHE_HOME")
-        host = {**{k: f"v-{k}" for k in kept}, "AISEF_NAMED": "named", "AISEF_NOT_NAMED": "dropped"}
+        # one value per name ignoring case: on Windows SYSTEMROOT and SystemRoot are one variable
+        host = {**{k: f"v-{k.upper()}" for k in kept}, "AISEF_NAMED": "named", "AISEF_NOT_NAMED": "dropped"}
         with mock.patch.dict(os.environ, host, clear=True):
             env = client.environment(("AISEF_NAMED",), {"model": "m", "a": 1})
-        self.assertEqual(env, {**{k: f"v-{k}" for k in kept}, "AISEF_NAMED": "named",
+        self.assertEqual(env, {**{k: f"v-{k.upper()}" for k in kept}, "AISEF_NAMED": "named",
                                "OPENCODE_CONFIG_CONTENT": "{\"a\": 1, \"model\": \"m\"}"})
 
 
