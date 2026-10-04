@@ -211,6 +211,20 @@
    "RELEASE_BLOCKER_RULE_3": "YES",
    "V2_0_DISPOSITION": "BLOCK — fixed by narrowing the support statement (G4) and enforcing it: `aisef run` and `aisef run --check` refuse a git older than 2.31 before their first git command (aisef2.app.run.check_git; tests/v2/test_app_units.py RunParts; mutation target run.py::check_git, 22/22 killed); docs/v2/USAGE.md and CHANGELOG state git 2.31 or newer. The kernel's own fail-closed listing is V21-34",
    "source": "diagnosis of the Windows CI failure of tests/v2/test_release_s2_kernel.py (run 37146695306)"
+  },
+  {
+   "ID": "S2-REAL-CLIENT-RUN",
+   "TITLE": "Under two mutants the S2 mutation campaign ran the operator's REAL OpenCode client: the app tests hand the product their fake client through client_exe and isolate XDG_CONFIG_HOME only, so `client_exe or shutil.which(\"opencode\", ...)` mutated to `and` (run.py L249 'Or swapped', target execute; client.py L193 'Or swapped', target session) resolved ~/.opencode/bin/opencode on PATH, which then used the operator's real data directory",
+   "REPRODUCER": "measured read-only 2026-10-05 03:30 (+07): ~/.local/share/opencode/opencode.db holds 14 sessions created 2026-10-04 17:53-23:13 local (titles 'developer S1', 'S1-dev', 'n'; directories under the tests' temporary out/work/ws), provider fakeprov, models model-1/m, 0 tokens, cost 0 — the windows in which workers J (execute ~17:53, session ~19:45-20:24), K3 (execute, 21:12-21:15) and K5 (execute and session, 22:09-23:13) and the controller's own scratch verification runs (verify2.py, execute, ~18:54-18:59) ran those targets' mutants; ~/.local/share/opencode/log/opencode.log over the same window: 14 runs, 60 LLM request attempts, every one to fakeprov/model-1 (endpoint https://provider.invalid/v1, a reserved name that never resolves, or no base URL), every one AI_APICallError 'Cannot connect to API'; no other host named; 2 runs read the operator's ~/.config/opencode configuration and made no request; 12 snapshot directories written under ~/.local/share/opencode/snapshot. The unmutated code never does this: the full local suite of 1ba5bde (02:52-03:33) created no session",
+   "CONSEQUENCE": "(1) the standing rule 'never execute opencode' was broken by the campaign's kill tests (not by the controller); (2) no provider request reached any provider (PROVIDER_CALLS stays 0); (3) the operator's client store now has sessions after attempt 4 ended, so tests/v2/test_c2_delivery_experiment.py HistoricalAttempt4.test_the_machine_s_external_copies_are_checked_and_an_absent_copy_fails (c2_delivery_experiment.external_problems(4)) fails on this machine — the one failure of the full local suite of 1ba5bde (5440 tests, failures=1); CI machines keep no such store",
+   "AFFECTED_SHIPPED_PATH": "none: tests/v2/test_app_run.py ProductBase and the client cases isolate the client's configuration but not its data directory or PATH (test isolation, not product behaviour)",
+   "AFFECTED_V2_CLAIM": "INV-MUTATION-AUTHORITY (mutation output must not expand authority); the S2 exit gate 'full local suite green'",
+   "SEVERITY": "operator-machine side effect, no provider contact, no secret disclosed by the record",
+   "RELEASE_BLOCKER_RULE_1": "PENDING_OWNER",
+   "RELEASE_BLOCKER_RULE_2": "PENDING_OWNER",
+   "RELEASE_BLOCKER_RULE_3": "PENDING_OWNER",
+   "V2_0_DISPOSITION": "OPEN — owner decision required: the operator's store (leave or remove the 14 test sessions — the controller does not delete operator data), the failing machine check, and whether the isolation fix (XDG_DATA_HOME/STATE/CACHE and a PATH without the real client in the app tests) lands before S2 is frozen (it changes kill-test closures of the app targets, so their results must be re-measured) or after",
+   "source": "diagnosis of the one failure of the S2 final candidate's full local suite (1ba5bde)"
   }
  ],
  "v2_1_backlog": {
