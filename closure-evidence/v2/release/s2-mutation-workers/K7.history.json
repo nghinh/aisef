@@ -1,0 +1,13 @@
+{
+ "worker": "K7",
+ "snapshot": "fc24d30fc31451b27a65aa410bf944003c05e64d",
+ "status": "complete: round K's three findings re-measured on fc24d30 (started 2026-10-05 02:20 by the controller; finished 02:28): AGENT/send 2/2, client.wait_within 23/23, bundle.Project.order 10/10 killed — no survivor, no error, no kill by the clock",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K7.log",
+  "sha256": "6bc960190e811960cdd25b581a2ea8c791329ff713fefe8967c2d38c020a1092"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K7.record.json",
+  "sha256": "afd92851d84b68b8aec099bc42fe494ae1f26d51e4b2f162dffabe665415f585"
+ }
+}

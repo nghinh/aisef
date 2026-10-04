@@ -1,0 +1,196 @@
+{
+ "record": "AISEF V2 — V2.0-S2 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/bundle.py::Project.order",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills_k.py"
+   ],
+   "source_sha256": "976c61619d781547f73198fb3c518d9c5df93f92b89112c10402d9772d8eb283",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L74 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L64 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L67 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L70 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L70 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L68 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L71 string \"the plan's story graph has a cycle\" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L68 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L69 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L69 string 'depends_on' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/client.py::wait_within",
+   "kill_tests": [
+    "tests/v2/test_s2_kills_k.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "6e66b7c66fccdd0583a58d08e66c6d758ab81c4b9a59fefbad324ce549e3572b",
+   "mutants": 23,
+   "killed": 23,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L159 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L152 element 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L153 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L155 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L159 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L159 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L153 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L153 Lt->GtE",
+     "killed": true
+    },
+    {
+     "mutant": "L155 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L157 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L157 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L157 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L157 GtE->Lt",
+     "killed": true
+    },
+    {
+     "mutant": "L156 True->False",
+     "killed": true
+    },
+    {
+     "mutant": "L158 string 'session turn cap: ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L158 string ' turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L157 string 'turns' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::AGENT/send",
+   "kill_tests": [
+    "tests/v2/test_s2_kills_k.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "source_sha256": "1a46991ffb84395f37aced671478cecab4ec58ad7ba1d0eb9892028ee57f61c4",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "AGENT L27 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "AGENT L27 string '\\n' emptied",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

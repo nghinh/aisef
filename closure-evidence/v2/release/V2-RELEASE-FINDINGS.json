@@ -317,6 +317,21 @@
    "id": "OBS-S2-9",
    "what": "aisef2/app/preflight.py run: the observation's initial `\"listing\": None` placeholder carried an equivalent mutant (S2 mutation, worker J: 'L70 dict entry 4 dropped' survives): the entry is always overwritten before anything reads it, and the record is written with sorted keys.",
    "disposition": "not a finding: the placeholder removed (the listing is added once measured); every read of obs['listing'] follows that assignment"
+  },
+  {
+   "id": "OBS-S2-10",
+   "what": "tests/v2/test_s2_kills.py ClientEnvironment (written for client.environment's survivors) put distinct values in SYSTEMROOT and SystemRoot; on Windows os.environ is case-insensitive, so the two are one variable and the case failed there (CI 37207425787, windows-latest 3.11; every other job only the three mutation-bound checks).",
+   "disposition": "not a finding: a test defect, the product is right; fixed 5025e56 (one value per name ignoring case; all 37 client.environment mutants still killed). The fix staled final round K at ba88eaa: the controller stopped handoff-K.sh before K4 started and K3 in its first target (no result; its log kept, K3.history.json); round K re-ran as K5/K6 at c6c3a55. CI on c6c3a55 (37210881575): all six unit jobs only the three mutation-bound checks."
+  },
+  {
+   "id": "OBS-S2-11",
+   "what": "Two kill cases first in their targets' kill sets stopped being first inside their file: unittest runs a module's classes in name order, and cases added later to tests/v2/test_s2_kills.py (AgentGuarded, AgentInvoke, AgentPlain before AgentSend; the session cases before ClientWaitWithin) reach the mutants first and wait until the runner's 300 s timeout — K5 measured AGENT/send L27 (newline emptied) and client.wait_within L153 ('And swapped') as killed only by the clock.",
+   "disposition": "not a finding: tests/v2/test_s2_kills_k.py imports AgentSend and ClientWaitWithin and runs first in exactly those two kill sets (fc24d30); both mutants are killed at once by assertion; K7 re-measured the two targets."
+  },
+  {
+   "id": "OBS-S2-12",
+   "what": "bundle.Project.order L64 'sorted() -> list()' survived in K5 although J and J2 had killed it: without sorted() the stories run in a set's iteration order, which string hashing randomizes per process, so the existing cases killed it only when that order happened not to be name order. Two kills written earlier in the campaign have the same shape with fixed names — preflight.fingerprint_fields L116/L117 (AppPreflightFingerprint, six names) and client.Budget.spend L74 (ClientBudget) — and miss their mutant only when the hash order of their names equals name order (about 1 run in 720 for six names); round K (K6) measured both killed.",
+   "disposition": "not a finding: tests/v2/test_s2_kills_k.py AppProjectOrder picks story names whose set order differs from name order in the running process, then asserts name order (deterministic; 6 runs under 6 hash seeds, killed by assertion each time); K7 re-measured Project.order. The two fixed-name kills are left as measured: making them deterministic means editing tests/v2/test_s2_kills.py, which would stale every round-K result."
   }
  ],
  "reviews": [
