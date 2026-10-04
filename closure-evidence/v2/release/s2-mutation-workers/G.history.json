@@ -1,0 +1,13 @@
+{
+ "worker": "G",
+ "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+ "status": "complete: all 57 requested cli_invocation targets measured on 369c8ac (started 2026-10-04 13:40 by queue.sh; finished ~16:50); _preflight errored (OBS-S2-3)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/G.log",
+  "sha256": "49da75210dda94f3a3e4298957e0826ac93e7f00bd2632eb6907d7fd87394f0e"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/G.record.json",
+  "sha256": "6cdb493e840b7a8582a38dfd26804e87938b5619df10f8ed9fe92a4a61223a36"
+ }
+}

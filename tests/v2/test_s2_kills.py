@@ -16,6 +16,8 @@ from unittest import mock
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+from aisef2.app import bundle  # noqa: E402
+from aisef2.app import run as R  # noqa: E402
 from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
 from aisef2.orchestrate import workspace as w  # noqa: E402
 from aisef2.probe import cli_invocation as ci  # noqa: E402
@@ -192,6 +194,25 @@ class AgentGuarded(unittest.TestCase):
                 agent.stdin.close()
                 agent.wait(30)
                 agent.stdout.close()
+
+
+class AppRun(unittest.TestCase):
+    """aisef2.app.run: admit L87 (each failed admission check names its problems, which the refusal shows) and
+    check_git L100 (a `git --version` that times out is refused, never raised)."""
+
+    def test_a_failed_admission_check_carries_its_problems(self):
+        from tests.v2 import test_app_run as e2e
+        failed = R.admit(bundle.load(e2e.project_bundle("a" * 40)), ())["failed"]
+        self.assertEqual([sorted(f) for f in failed], [["check", "problems"]])
+        self.assertEqual(failed[0]["check"], "9. probe_calibration")
+        self.assertTrue(failed[0]["problems"] and all("no ProbeCapabilityCalibration" in x for x in failed[0]["problems"]),
+                        failed[0]["problems"])
+
+    def test_a_git_that_hangs_is_refused(self):
+        with mock.patch.object(R.subprocess, "run", side_effect=subprocess.TimeoutExpired(["git", "--version"], 60)), \
+                self.assertRaises(R.RunRefused) as c:
+            R.check_git()
+        self.assertEqual(str(c.exception), "git 2.31 or newer is required (B4): found unavailable: TimeoutExpired")
 
 
 if __name__ == "__main__":
