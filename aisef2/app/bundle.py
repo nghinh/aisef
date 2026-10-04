@@ -106,7 +106,7 @@ def load(data: Mapping) -> Project:
     try:
         requirements = {r["id"]: Requirement(**r) for r in data["requirements"]}
         contracts = {c["id"]: BehaviorContract.from_json(c) for c in data["contracts"]}
-        approvals = tuple(ContractApproval(**{**a, "model_reviews": tuple(a["model_reviews"])}) for a in data["approvals"])
+        approvals = tuple(ContractApproval(**a) for a in data["approvals"])     # model_reviews: the approval's own tuple
         plan = _plan(data["plan"])
     except (KeyError, TypeError, ValueError) as e:
         raise BundleError(f"the bundle's kernel objects do not load: {type(e).__name__}: {e}") from e

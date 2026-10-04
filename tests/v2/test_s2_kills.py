@@ -683,5 +683,42 @@ class AppSettingsLoad(unittest.TestCase):
         self.assertEqual(settings.load({**e2e.SETTINGS, "provider": reversed_limit}).model_limit, {"context": 100000, "output": 8000})
 
 
+class AppBundleLoad(unittest.TestCase):
+    """aisef2.app.bundle.load L105-L129: every refusal names itself (the keys in order, a kernel object that does not
+    load, a contract that does not compile, the facts' shape, the unknown specs in order); a KeyError while loading is a
+    refusal; the approvals and their reviews load immutable."""
+
+    def test_refusals_name_themselves_and_the_approvals_load_immutable(self):
+        from tests.v2 import test_app_run as e2e
+        doc = e2e.project_bundle("a" * 40)
+
+        def refused(d):
+            with self.assertRaises(bundle.BundleError) as c:
+                bundle.load(d)
+            return str(c.exception)
+        keys = {k: v for k, v in doc.items() if k != "facts"}
+        keys["extra"] = 1
+        self.assertEqual(refused(keys), f"a bundle holds exactly {sorted(bundle.KEYS)}; it holds {sorted(keys)}")
+        self.assertEqual(refused({**doc, "requirements": [{"no_id": 1}]}), "the bundle's kernel objects do not load: KeyError: 'id'")
+        self.assertTrue(refused({**doc, "approvals": []}).startswith(f"contract {doc['contracts'][0]['id']} does not compile: "))
+        self.assertEqual(refused({**doc, "facts": {}}),
+                         f"facts are the public fields {list(bundle.FACT_FIELDS)} (strings) of every plan criterion, and no other")
+        reviews = [{**a, "model_reviews": "not-a-list"} for a in doc["approvals"]]
+        self.assertEqual(refused({**doc, "approvals": reviews}),
+                         "the bundle's kernel objects do not load: ContractError: model_reviews must be a tuple of journal references")
+        p = bundle.load(doc)
+        self.assertIs(type(p.approvals), tuple)
+        self.assertTrue(p.approvals and all(type(a.model_reviews) is tuple for a in p.approvals))
+
+    def test_the_unknown_specs_are_named_in_order(self):
+        doc = json.loads((ROOT / "closure-evidence/v2/release/LEDGERLOCK-PROJECT.json").read_text(encoding="utf-8"))
+        named = sorted({o.product_proof_spec_id for o in bundle._plan(doc["plan"]).obligations})
+        self.assertGreater(len(named), 3)
+        with self.assertRaises(bundle.BundleError) as c:
+            bundle.load({**doc, "contracts": []})
+        self.assertEqual(str(c.exception), f"the plan names {len(named)} spec(s) no approved contract compiles to under this "
+                                           f"release's probes: {named[:3]}")
+
+
 if __name__ == "__main__":
     unittest.main()

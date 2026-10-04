@@ -302,6 +302,11 @@
    "id": "OBS-S2-6",
    "what": "aisef2/app/settings.py load: `sorted(pre) != ['chat_probes']` carried an equivalent mutant (S2 mutation, worker J2: 'L117 sorted() -> list()' survives): for a mapping, the sorted and the listed keys equal a one-element list together or not at all; audits are not accepted for kernel targets.",
    "disposition": "not a finding: written `set(pre) != {'chat_probes'}` — the same test of exactly that one key; its mutants are killed (the existing settings tests and tests/v2/test_s2_kills.py AppSettingsLoad)"
+  },
+  {
+   "id": "OBS-S2-7",
+   "what": "aisef2/app/bundle.py load: `ContractApproval(**{**a, 'model_reviews': tuple(a['model_reviews'])})` carried two equivalent mutants (S2 mutation, worker J2: the override dropped, its tuple() -> list()): ContractApproval's own __post_init__ already makes model_reviews a tuple. The override also accepted a string, splitting 'abc' into ('a', 'b', 'c') review references.",
+   "disposition": "not a finding: the override removed (`ContractApproval(**a)`); a non-list model_reviews is now refused as a bundle error (ContractError is a ValueError), pinned by tests/v2/test_s2_kills.py AppBundleLoad"
   }
  ],
  "reviews": [
