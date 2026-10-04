@@ -1,0 +1,13 @@
+{
+ "worker": "I",
+ "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+ "status": "complete: all 75 requested targets measured on 369c8ac (E's remaining cli_invocation targets + 49 process_effect; started 2026-10-04 09:25 by queue.sh; finished 16:41)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/I.log",
+  "sha256": "442e24a704e148f156a4d52a9ebf493461bdff3d08b8a195bb0551e838633a2d"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/I.record.json",
+  "sha256": "096666f9c6575dff4f490ff6fd980009cfd788c093600ef5c4dba8b2d5be5925"
+ }
+}

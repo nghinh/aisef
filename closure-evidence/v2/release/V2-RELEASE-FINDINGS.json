@@ -285,6 +285,12 @@
    "id": "OBS-S2-3",
    "what": "S2 mutation worker G (snapshot 369c8ac), target cli_invocation.py::_preflight: the unmutated kill tests (tests/v2/test_c2_cli_protocol.py, tests/v2/test_c2_cli_invocation.py) failed once (2026-10-04 ~14:52), so the runner refused the target ('kill tests fail on the unmutated tree (leaked 0)'). Seven other G targets with the same kill set passed that baseline; three faithful runs of both files on 369c8ac (the tree mutation.py builds), under the same load (workers G and I running), all passed (62 s / 66 s each). The runner keeps no test output, so the failing test is not known; a timing failure under load (cf. OBS-S2-1) is the remaining candidate.",
    "disposition": "not a finding: not reproduced. The errored result is kept in worker G's history and excluded by the qualifier ('the run errored'); _preflight is re-measured in the final round K"
+  },
+  {
+   "id": "OBS-S2-4",
+   "extends": "OBS-S2-3",
+   "what": "A second baseline failure of the same kill files: worker I (369c8ac), cli_invocation.py::AGENT/op_call (2026-10-04 ~16:05; the failed baseline ended ~95 s after the previous target, so a test failed early, not the 300 s runner timeout). Not reproduced: test_c2_cli_protocol.py + test_c2_cli_invocation.py 15/15 runs each on a faithful 369c8ac tree under the same load (OBS-S2-3's 3 plus 12 more), and the timing-tightest case (Harness.test_CLI_2b…, a 3 s harness watchdog) 20/20. Two of about 50 campaign baselines of these files failed; the runner discarded the kill tests' output, so the failing test is unknown. Consequence for the evidence: a spurious failure while measuring a mutant would count as a kill, so a survivor could be masked at about that rate; the mutants of these files' targets are otherwise killed by assertion.",
+   "disposition": "not a finding (not reproduced). validation/v2/mutation.py now keeps the failing kill-test file, exit status and output tail of a failing baseline in the result ('baseline'); both errored targets (_preflight, AGENT/op_call) are re-measured in round K with it"
   }
  ],
  "reviews": [

@@ -760,7 +760,9 @@ def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> t
         path = pathlib.PurePosixPath(rel)
         # failfast: a mutant is killed by its first failing test; the rest of the file cannot change that verdict
         cmd = [sys.executable, "-m", "unittest", "discover", "-f", "-s", str(path.parent), "-t", "tests", "-p", path.name]
-        r = ProcessRange(f"kill tests {rel}", cmd, cwd=root, env=env).start()
+        log = root.parent / "kill-test.log"   # beside the work tree: its tail explains a failing run (OBS-S2-3)
+        with open(log, "wb") as out:
+            r = ProcessRange(f"kill tests {rel}", cmd, cwd=root, env=env, output=out).start()
         code = r.wait(TIMEOUT)
         escaped = [p.pid for p in r.escaped()]  # reported while their parents are alive — checked, never trusted
         try:
@@ -777,6 +779,7 @@ def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> t
             _TIMED_OUT.append(rel)  # a kill by timeout is a kill, and the record says so (load can cause one)
             return False, leaked
         if code != 0:
+            _FAILED.append(f"{rel} exit {code}: " + log.read_text(encoding="utf-8", errors="replace")[-2000:])
             return False, leaked
     return True, leaked
 
@@ -785,6 +788,8 @@ def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> t
 _TIMED_OUT: list[str] = []
 #: every signal the runner sent for the current mutant, each with the authority's proof (drained into its result)
 _CLEANUP: list[dict] = []
+#: the failing kill-test run's file, exit status and output tail (read when the unmutated tree fails)
+_FAILED: list[str] = []
 
 
 def _reap_strays(work: pathlib.Path, boundary: ca.Boundary) -> int:
@@ -818,13 +823,15 @@ def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
         path = work / rel
         original = path.read_text(encoding="utf-8")
         boundary = ca.establish(work)  # P4-FINDING-011: the runner's own ownership boundary, before any worker
+        _FAILED.clear()
+        _TIMED_OUT.clear()
         try:
             clean, leaked = _run_tests(work, tests, boundary)
         except ca.Unproven as e:
             return {"target": target, "error": f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN}: {e}", "mutants": []}
         if not clean or leaked:
             return {"target": target, "error": f"kill tests fail on the unmutated tree (leaked {leaked})",
-                    "mutants": []}
+                    "mutants": [], "baseline": {"timed_out": list(_TIMED_OUT), "failed": list(_FAILED)}}
         results = []
         for desc, src in mutants(original, func, _enum_members(original, work)):
             path.write_text(src, encoding="utf-8")
