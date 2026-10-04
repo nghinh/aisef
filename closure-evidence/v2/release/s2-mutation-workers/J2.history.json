@@ -1,0 +1,13 @@
+{
+ "worker": "J2",
+ "snapshot": "c4732b4d774f170f1525b42f6344f5477689abb3",
+ "status": "complete: J's tail, all 7 requested targets (settings.load .. cli.run) measured on c4732b4 (started 2026-10-04 19:43 by the controller in the slot K2 left; finished 20:49). Survivors killed in test_s2_kills.py (settings.load, bundle.load, Developer.implement, Reviewer.review 79ba6db/earlier; cli.run ba88eaa); all 7 targets re-measured in final round K (K3/K4)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/J2.log",
+  "sha256": "ce7eb874cfa5c97722713faba66da85c8ae43ad42cdd216a70aa3158ea3aa9b1"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/J2.record.json",
+  "sha256": "c80711ff2b4e71ec649a16347d3ee3e56ca5830f876373fc3349e255e319c49a"
+ }
+}
