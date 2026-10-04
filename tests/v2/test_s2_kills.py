@@ -623,5 +623,20 @@ class ClientBudget(unittest.TestCase):
             self.assertEqual(b.reached(), "unaccounted: " + "; ".join(reasons))
 
 
+class ClientEnvironment(unittest.TestCase):
+    """aisef2.app.client.environment L119-L120: the client's environment is exactly the operator's PATH, home, system
+    root, locale, temporary and XDG directories, the variables the settings name, and the overlay — nothing else."""
+
+    def test_exactly_the_kept_variables_the_named_ones_and_the_overlay(self):
+        from aisef2.app import client
+        kept = ("PATH", "HOME", "USERPROFILE", "SYSTEMROOT", "SystemRoot", "WINDIR", "LANG", "LC_ALL", "TMPDIR", "TEMP", "TMP",
+                "XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_STATE_HOME", "XDG_CACHE_HOME")
+        host = {**{k: f"v-{k}" for k in kept}, "AISEF_NAMED": "named", "AISEF_NOT_NAMED": "dropped"}
+        with mock.patch.dict(os.environ, host, clear=True):
+            env = client.environment(("AISEF_NAMED",), {"model": "m", "a": 1})
+        self.assertEqual(env, {**{k: f"v-{k}" for k in kept}, "AISEF_NAMED": "named",
+                               "OPENCODE_CONFIG_CONTENT": "{\"a\": 1, \"model\": \"m\"}"})
+
+
 if __name__ == "__main__":
     unittest.main()

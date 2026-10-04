@@ -554,7 +554,7 @@ for _t in ("aisef2/probe/cli_invocation.py::AGENT/op_invoke", "aisef2/probe/pyth
            "aisef2/app/run.py::check_repository", "aisef2/app/run.py::probe_interpreter", "aisef2/app/run.py::runspec_of",
            "aisef2/app/run.py::productproof", "aisef2/app/run.py::delivery", "aisef2/app/run.py::execute",
            "aisef2/app/verify.py::verify", "aisef2/app/client.py::read_session", "aisef2/app/client.py::Budget.__init__",
-           "aisef2/app/client.py::Budget.spend", "aisef2/app/client.py::Budget.reached"):
+           "aisef2/app/client.py::Budget.spend", "aisef2/app/client.py::Budget.reached", "aisef2/app/client.py::environment"):
     S2_TARGETS[_t] = [*S2_TARGETS[_t], _S2_KILLS]
 for _t in ("aisef2/probe/process_effect.py::HARNESS/ask",    # killed only by the clock: its bounded case runs first
            "aisef2/probe/cli_invocation.py::AGENT/send"):
