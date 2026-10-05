@@ -1,0 +1,8 @@
+qualification subject (release): seal 529591e4f2ae candidate 529591e4f2ae kernel c6ddf5b9c0b4 | HEAD 27616a4a1bb9 kernel c6ddf5b9c0b4 | harness 1a5d3812fcd8 | platform darwin-py3.14
+Q0: GREEN in 228.0s — {'PASS': 58, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'NOT_APPLICABLE': 0} problems 0
+Q1: GREEN in 465.7s — {'PASS': 401, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'NOT_APPLICABLE': 0} problems 0
+Q2: GREEN in 158.8s — {'PASS': 191, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'NOT_APPLICABLE': 0} problems 0
+Q3: FAILED in 393.5s — {'PASS': 565, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'NOT_APPLICABLE': 1} problems 1
+    FM2-CLI-STREAM-2 (cli_stream): UNRUNNABLE: tests.v2.test_c2_cli_protocol:FaultStream.test_FM2_CLI_STREAM_2_exit_after_DISPATCHED_without_RESULT: ERROR — case not found in the run
+owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 1248s)
+exit 1

@@ -1,0 +1,13 @@
+diff --git a/validation/qualification/q3.py b/validation/qualification/q3.py
+index 0a0d2e5..56e2631 100644
+--- a/validation/qualification/q3.py
++++ b/validation/qualification/q3.py
+@@ -489,7 +489,7 @@ CYCLE2_FAMILY = [
+     _row("FM2-CLI-STREAM-1", "cli_stream", "exit before READY", [CLII + "FaultStream.test_FM2_CLI_STREAM_1_exit_before_READY",
+                                                                  CLIP + "FaultStream.test_FM2_CLI_STREAM_1b_exit_before_READY_or_DISPATCHED_on_the_range"],
+          journal="harness failure: probe/evaluated UNRUNNABLE", **_UNRUN),
+-    _row("FM2-CLI-STREAM-2", "cli_stream", "exit after DISPATCHED without RESULT", [CLIP + "FaultStream.test_FM2_CLI_STREAM_2_exit_after_DISPATCHED_without_RESULT",
++    _row("FM2-CLI-STREAM-2", "cli_stream", "exit after DISPATCHED without RESULT", [CLIP + "FaultStream.test_FM2_CLI_STREAM_2_after_DISPATCHED_the_controller_reports_how_the_subject_ended",
+                                                                                     CLII + "FaultStream.test_FM2_CLI_STREAM_2b_a_real_hard_exit_after_DISPATCHED"],
+          execution="EXECUTED", journal="the subject's hard exit is the observation, decided by its class"),
+     _row("FM2-CLI-STREAM-3", "cli_stream", "RESULT then late bytes on stdout", [CLII + "FaultStream.test_FM2_CLI_STREAM_3_RESULT_then_late_bytes_on_stdout"],

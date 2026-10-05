@@ -251,6 +251,28 @@
    "MEASURED": "S5 hermetic full suite on exactly 529591e (closure-evidence/v2/release/S5-RC1-EXACT-RC.json): 5444 tests, 0 failed; the attempt-4 test PASSES there, exercised (the preserved copy checked in full; the client store absent)",
    "V2_0_DISPOSITION": "CLOSED for release purposes: the earlier failure was confirmed machine contamination (the operator's real store, written by S2's escaped mutants on 2026-10-04); no waiver is used for S5. The operator's store is left untouched; V21-36 (test isolation) stays in the V2.1 backlog",
    "source": "S5, 2026-10-05"
+  },
+  {
+   "ID": "S5-Q3-STALE-CASE",
+   "TITLE": "Q3's fault-matrix row FM2-CLI-STREAM-2 (validation/qualification/q3.py:492) names tests.v2.test_c2_cli_protocol:FaultStream.test_FM2_CLI_STREAM_2_exit_after_DISPATCHED_without_RESULT, which S2's B1 change (098dd7a, 2026-10-03: the subject in a process of its own, the controller reporting its exit in RESULT) renamed to test_FM2_CLI_STREAM_2_after_DISPATCHED_the_controller_reports_how_the_subject_ended; Q3 on the exact RC is therefore UNRUNNABLE for that row (case not found), i.e. FAILED, on every platform",
+   "REPRODUCER": "S5 hermetic release-mode dry run of Q0-Q3 on darwin at 27616a4 (subject: seal and candidate 529591e, kernel c6ddf5b9): Q0 GREEN 58, Q1 GREEN 401, Q2 GREEN 191, Q3 FAILED 565 PASS + 1 N/A, problem 'FM2-CLI-STREAM-2 (cli_stream): UNRUNNABLE: ... ERROR — case not found in the run'. Of q3.py's 99 rows and 165 case ids, exactly this one does not load (unittest's _FailedTest).",
+   "AFFECTED_SHIPPED_PATH": "none: validation/qualification/q3.py (the qualification harness; not shipped, not a subject tree)",
+   "AFFECTED_V2_CLAIM": "charter S5 / G3 'Q0-Q5 GREEN on the exact RC' (Q3 cannot be GREEN with the row as frozen)",
+   "SEVERITY": "fails closed (UNRUNNABLE, never a false PASS); blocks S5",
+   "RELEASE_BLOCKER_RULE_1": "YES",
+   "RELEASE_BLOCKER_RULE_2": "NO (no runtime, artifact or product-claim effect)",
+   "RELEASE_BLOCKER_RULE_3": "NO (no §1 impact: the gate fails closed)",
+   "PROPOSED_REMEDY": "a harness-only re-pin commit after the RC (charter §11: 'mechanically necessary qualification re-pin ... in a SEPARATE, harness-only commit ... MUST NOT change product or kernel semantics'): the row's first case id -> the renamed test (one line; the row's second case and expectations unchanged; its fault label still reads the pre-B1 wording). Verified by a second hermetic dry run with only that line changed (scratch worktree, uncommitted): Q0 58, Q1 401, Q2 191, Q3 565 + 1 N/A — all GREEN, problems 0, owned 0/0/0. The RC's shipped files and kernel are unchanged by it (release_rc --check would stay PASS); the harness digest bound into the Q records changes (1a5d3812 -> ca2ce49b).",
+   "V2_0_DISPOSITION": "OWNER DECISION: the S5 ruling forbids source changes without owner review; no [qualify] attempt was spent",
+   "evidence": {
+    "run1_as_frozen": "closure-evidence/v2/release/s5-rc1/q0-q3-dryrun-darwin/run1-as-frozen/run.txt",
+    "run1_sha256": "2c1885b5cf1b686858d64df5ae869826f3f622a1a7a79caf234ec9b4d8bfcbde",
+    "run2_with_the_proposed_repin": "closure-evidence/v2/release/s5-rc1/q0-q3-dryrun-darwin/run2-proposed-q3-repin/run.txt",
+    "run2_sha256": "c9561de701192822bae07c9494d1636d588395269eaa4ddcc43fc89e72916502",
+    "patch": "closure-evidence/v2/release/s5-rc1/q0-q3-dryrun-darwin/run2-proposed-q3-repin/proposed-q3-repin.patch",
+    "patch_sha256": "3371d8ab898f90481511fb588b8b2602459df779a85aa793be08e513dec05415"
+   },
+   "source": "S5, 2026-10-05"
   }
  ],
  "v2_1_backlog": {
