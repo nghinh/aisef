@@ -1,0 +1,286 @@
+﻿2026-10-05T13:31:29.8111812Z Current runner version: '2.337.0'
+2026-10-05T13:31:29.8140532Z ##[group]Runner Image Provisioner
+2026-10-05T13:31:29.8141438Z Hosted Compute Agent
+2026-10-05T13:31:29.8142065Z Version: 20260901.588
+2026-10-05T13:31:29.8142808Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-05T13:31:29.8143692Z Build Date: 2026-09-01T19:56:44Z
+2026-10-05T13:31:29.8144484Z Worker ID: {4f9094db-a9fa-4d7e-b955-a4fbd7106a95}
+2026-10-05T13:31:29.8145305Z Azure Region: westus
+2026-10-05T13:31:29.8145914Z ##[endgroup]
+2026-10-05T13:31:29.8147468Z ##[group]Operating System
+2026-10-05T13:31:29.8148191Z Microsoft Windows Server 2025
+2026-10-05T13:31:29.8148909Z 10.0.26100
+2026-10-05T13:31:29.8149519Z Datacenter
+2026-10-05T13:31:29.8150090Z ##[endgroup]
+2026-10-05T13:31:29.8150738Z ##[group]Runner Image
+2026-10-05T13:31:29.8151388Z Image: windows-2025-vs2026
+2026-10-05T13:31:29.8152054Z Version: 20260925.250.1
+2026-10-05T13:31:29.8153780Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260925.250/images/windows/Windows2025-VS2026-Readme.md
+2026-10-05T13:31:29.8155809Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260925.250
+2026-10-05T13:31:29.8156914Z ##[endgroup]
+2026-10-05T13:31:29.8158058Z ##[group]GITHUB_TOKEN Permissions
+2026-10-05T13:31:29.8160462Z Contents: read
+2026-10-05T13:31:29.8161093Z Metadata: read
+2026-10-05T13:31:29.8161670Z ##[endgroup]
+2026-10-05T13:31:29.8163807Z Secret source: Actions
+2026-10-05T13:31:29.8164848Z Cache mode: write
+2026-10-05T13:31:29.8165596Z Prepare workflow directory
+2026-10-05T13:31:29.8664877Z Prepare all required actions
+2026-10-05T13:31:29.8724192Z Getting action download info
+2026-10-05T13:31:30.2232275Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-05T13:31:30.3618742Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-05T13:31:30.5344795Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+2026-10-05T13:31:31.1528274Z Complete job name: install (windows-latest)
+2026-10-05T13:31:31.3096668Z ##[group]Run actions/checkout@v4
+2026-10-05T13:31:31.3097914Z with:
+2026-10-05T13:31:31.3098448Z   repository: nghinh/aisef
+2026-10-05T13:31:31.3106021Z   token: ***
+2026-10-05T13:31:31.3106564Z   ssh-strict: true
+2026-10-05T13:31:31.3107107Z   ssh-user: git
+2026-10-05T13:31:31.3107666Z   persist-credentials: true
+2026-10-05T13:31:31.3108299Z   clean: true
+2026-10-05T13:31:31.3108855Z   sparse-checkout-cone-mode: true
+2026-10-05T13:31:31.3109559Z   fetch-depth: 1
+2026-10-05T13:31:31.3110110Z   fetch-tags: false
+2026-10-05T13:31:31.3110675Z   show-progress: true
+2026-10-05T13:31:31.3111260Z   lfs: false
+2026-10-05T13:31:31.3111761Z   submodules: false
+2026-10-05T13:31:31.3112324Z   set-safe-directory: true
+2026-10-05T13:31:31.3113005Z   allow-unsafe-pr-checkout: false
+2026-10-05T13:31:31.3113953Z ##[endgroup]
+2026-10-05T13:31:31.4593248Z Syncing repository: nghinh/aisef
+2026-10-05T13:31:31.4595599Z ##[group]Getting Git version info
+2026-10-05T13:31:31.4596489Z Working directory is 'D:\a\aisef\aisef'
+2026-10-05T13:31:31.5630998Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-10-05T13:31:31.9063085Z git version 2.55.0.windows.5
+2026-10-05T13:31:31.9123447Z ##[endgroup]
+2026-10-05T13:31:31.9148200Z Temporarily overriding HOME='D:\a\_temp\d9aec60a-ff0d-447e-9a19-501266175c96' before making global git config changes
+2026-10-05T13:31:31.9153081Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-05T13:31:31.9159900Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\aisef\aisef
+2026-10-05T13:31:31.9904879Z Deleting the contents of 'D:\a\aisef\aisef'
+2026-10-05T13:31:31.9912709Z ##[group]Initializing the repository
+2026-10-05T13:31:31.9921018Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\aisef\aisef
+2026-10-05T13:31:32.0809560Z Initialized empty Git repository in D:/a/aisef/aisef/.git/
+2026-10-05T13:31:32.0867227Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/nghinh/aisef
+2026-10-05T13:31:32.1511455Z ##[endgroup]
+2026-10-05T13:31:32.1513530Z ##[group]Disabling automatic garbage collection
+2026-10-05T13:31:32.1521008Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+2026-10-05T13:31:32.1836205Z ##[endgroup]
+2026-10-05T13:31:32.1837276Z ##[group]Setting up auth
+2026-10-05T13:31:32.1850528Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-10-05T13:31:32.2184452Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-10-05T13:31:33.8130942Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-05T13:31:33.8460166Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-10-05T13:31:34.4998394Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-05T13:31:34.5450616Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-10-05T13:31:35.2361515Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-10-05T13:31:35.2783415Z ##[endgroup]
+2026-10-05T13:31:35.2784616Z ##[group]Fetching the repository
+2026-10-05T13:31:35.2805644Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +7f5a6a0a83f022832d8e4f18aec9c1057bfa0df1:refs/remotes/origin/release/v2.0.0
+2026-10-05T13:31:40.9209974Z From https://github.com/nghinh/aisef
+2026-10-05T13:31:40.9216676Z  * [new ref]         7f5a6a0a83f022832d8e4f18aec9c1057bfa0df1 -> origin/release/v2.0.0
+2026-10-05T13:31:40.9259566Z ##[endgroup]
+2026-10-05T13:31:40.9261320Z ##[group]Determining the checkout info
+2026-10-05T13:31:40.9264768Z ##[endgroup]
+2026-10-05T13:31:40.9284225Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+2026-10-05T13:31:40.9760135Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+2026-10-05T13:31:41.0098491Z ##[group]Checking out the ref
+2026-10-05T13:31:41.0108488Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B release/v2.0.0 refs/remotes/origin/release/v2.0.0
+2026-10-05T13:31:42.0661979Z Updating files:  44% (1985/4469)
+2026-10-05T13:31:42.0943713Z Updating files:  45% (2012/4469)
+2026-10-05T13:31:42.1062516Z Updating files:  46% (2056/4469)
+2026-10-05T13:31:42.1358293Z Updating files:  47% (2101/4469)
+2026-10-05T13:31:42.1631855Z Updating files:  48% (2146/4469)
+2026-10-05T13:31:42.1835207Z Updating files:  49% (2190/4469)
+2026-10-05T13:31:42.1983643Z Updating files:  50% (2235/4469)
+2026-10-05T13:31:42.2153042Z Updating files:  51% (2280/4469)
+2026-10-05T13:31:42.2424636Z Updating files:  52% (2324/4469)
+2026-10-05T13:31:42.2775559Z Updating files:  53% (2369/4469)
+2026-10-05T13:31:42.2892140Z Updating files:  54% (2414/4469)
+2026-10-05T13:31:42.3007567Z Updating files:  55% (2458/4469)
+2026-10-05T13:31:42.3144416Z Updating files:  56% (2503/4469)
+2026-10-05T13:31:42.3323876Z Updating files:  57% (2548/4469)
+2026-10-05T13:31:42.3472566Z Updating files:  58% (2593/4469)
+2026-10-05T13:31:42.5357730Z Updating files:  59% (2637/4469)
+2026-10-05T13:31:42.5605824Z Updating files:  60% (2682/4469)
+2026-10-05T13:31:42.6213660Z Updating files:  61% (2727/4469)
+2026-10-05T13:31:42.6393560Z Updating files:  62% (2771/4469)
+2026-10-05T13:31:42.6627706Z Updating files:  63% (2816/4469)
+2026-10-05T13:31:42.7133764Z Updating files:  64% (2861/4469)
+2026-10-05T13:31:42.7614863Z Updating files:  65% (2905/4469)
+2026-10-05T13:31:42.7951306Z Updating files:  66% (2950/4469)
+2026-10-05T13:31:42.8253225Z Updating files:  67% (2995/4469)
+2026-10-05T13:31:42.8875921Z Updating files:  68% (3039/4469)
+2026-10-05T13:31:42.9257617Z Updating files:  69% (3084/4469)
+2026-10-05T13:31:42.9391792Z Updating files:  70% (3129/4469)
+2026-10-05T13:31:42.9587641Z Updating files:  71% (3173/4469)
+2026-10-05T13:31:43.0063022Z Updating files:  72% (3218/4469)
+2026-10-05T13:31:43.0164231Z Updating files:  73% (3263/4469)
+2026-10-05T13:31:43.0298433Z Updating files:  74% (3308/4469)
+2026-10-05T13:31:43.0484110Z Updating files:  75% (3352/4469)
+2026-10-05T13:31:43.0629492Z Updating files:  76% (3397/4469)
+2026-10-05T13:31:43.0696146Z Updating files:  77% (3442/4469)
+2026-10-05T13:31:43.0746097Z Updating files:  77% (3465/4469)
+2026-10-05T13:31:43.0866896Z Updating files:  78% (3486/4469)
+2026-10-05T13:31:43.1017407Z Updating files:  79% (3531/4469)
+2026-10-05T13:31:43.1208704Z Updating files:  80% (3576/4469)
+2026-10-05T13:31:43.1366488Z Updating files:  81% (3620/4469)
+2026-10-05T13:31:43.1514124Z Updating files:  82% (3665/4469)
+2026-10-05T13:31:43.1629958Z Updating files:  83% (3710/4469)
+2026-10-05T13:31:43.1742031Z Updating files:  84% (3754/4469)
+2026-10-05T13:31:43.1858528Z Updating files:  85% (3799/4469)
+2026-10-05T13:31:43.1981312Z Updating files:  86% (3844/4469)
+2026-10-05T13:31:43.2101932Z Updating files:  87% (3889/4469)
+2026-10-05T13:31:43.2295457Z Updating files:  88% (3933/4469)
+2026-10-05T13:31:43.2433702Z Updating files:  89% (3978/4469)
+2026-10-05T13:31:43.2607467Z Updating files:  90% (4023/4469)
+2026-10-05T13:31:43.2763497Z Updating files:  91% (4067/4469)
+2026-10-05T13:31:43.2894669Z Updating files:  92% (4112/4469)
+2026-10-05T13:31:43.2990839Z Updating files:  93% (4157/4469)
+2026-10-05T13:31:43.3139987Z Updating files:  94% (4201/4469)
+2026-10-05T13:31:43.3286203Z Updating files:  95% (4246/4469)
+2026-10-05T13:31:43.3452281Z Updating files:  96% (4291/4469)
+2026-10-05T13:31:43.3600720Z Updating files:  97% (4335/4469)
+2026-10-05T13:31:43.3754821Z Updating files:  98% (4380/4469)
+2026-10-05T13:31:43.3897540Z Updating files:  99% (4425/4469)
+2026-10-05T13:31:43.3898013Z Updating files: 100% (4469/4469)
+2026-10-05T13:31:43.3898429Z Updating files: 100% (4469/4469), done.
+2026-10-05T13:31:43.4107504Z Switched to a new branch 'release/v2.0.0'
+2026-10-05T13:31:43.4170286Z branch 'release/v2.0.0' set up to track 'origin/release/v2.0.0'.
+2026-10-05T13:31:43.4324591Z ##[endgroup]
+2026-10-05T13:31:43.4789700Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+2026-10-05T13:31:43.5082980Z 7f5a6a0a83f022832d8e4f18aec9c1057bfa0df1
+2026-10-05T13:31:43.5608142Z ##[group]Run actions/setup-python@v5
+2026-10-05T13:31:43.5608504Z with:
+2026-10-05T13:31:43.5608706Z   python-version: 3.11
+2026-10-05T13:31:43.5608975Z   check-latest: false
+2026-10-05T13:31:43.5612171Z   token: ***
+2026-10-05T13:31:43.5612406Z   update-environment: true
+2026-10-05T13:31:43.5612661Z   allow-prereleases: false
+2026-10-05T13:31:43.5612905Z   freethreaded: false
+2026-10-05T13:31:43.5613121Z ##[endgroup]
+2026-10-05T13:31:43.7395062Z ##[group]Installed versions
+2026-10-05T13:31:43.7621434Z (node:3008) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-05T13:31:43.7622555Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-05T13:31:43.7623231Z Successfully set up CPython (3.11.9)
+2026-10-05T13:31:43.7624541Z ##[endgroup]
+2026-10-05T13:31:43.7970722Z ##[group]Run actions/download-artifact@v4
+2026-10-05T13:31:43.7971115Z with:
+2026-10-05T13:31:43.7971324Z   name: dist
+2026-10-05T13:31:43.7971539Z   path: dist/
+2026-10-05T13:31:43.7971767Z   merge-multiple: false
+2026-10-05T13:31:43.7972026Z   repository: nghinh/aisef
+2026-10-05T13:31:43.7972525Z   run-id: 37317404055
+2026-10-05T13:31:43.7972747Z env:
+2026-10-05T13:31:43.7973046Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:43.7973618Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2026-10-05T13:31:43.7974151Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:43.7974619Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:43.7975088Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:43.7975459Z ##[endgroup]
+2026-10-05T13:31:43.9903490Z Downloading single artifact
+2026-10-05T13:31:44.0141291Z (node:8472) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-05T13:31:44.0142991Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-05T13:31:44.2972253Z Preparing to download the following artifacts:
+2026-10-05T13:31:44.2983304Z - dist (ID: 11348306953, Size: 1769629, Expected Digest: sha256:e5aa6bcc87f269509d72c19a28c60e98612fe47b675782076915ebda8ccf94cd)
+2026-10-05T13:31:44.5401041Z Redirecting to blob download url: https://productionresultssa4.blob.core.windows.net/actions-results/80318b2a-88ab-854f-b6e9-d6a120b95354/workflow-job-run-0864dbec-a4c3-55e2-9728-c5fab98cf7b3/artifacts/bcae0416621b3db43d8cba1e4454a792c7af9e4b7287e51056efc5a215d95839.zip
+2026-10-05T13:31:44.5403374Z Starting download of artifact to: D:\a\aisef\aisef\dist
+2026-10-05T13:31:44.8923775Z (node:8472) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-05T13:31:45.3398879Z SHA256 digest of downloaded artifact is e5aa6bcc87f269509d72c19a28c60e98612fe47b675782076915ebda8ccf94cd
+2026-10-05T13:31:45.3400083Z Artifact download completed successfully.
+2026-10-05T13:31:45.3400421Z Total of 1 artifact(s) downloaded
+2026-10-05T13:31:45.3409691Z Download artifact has finished successfully
+2026-10-05T13:31:45.3765967Z ##[group]Run actions/download-artifact@v4
+2026-10-05T13:31:45.3766351Z with:
+2026-10-05T13:31:45.3766571Z   name: dist-sha256
+2026-10-05T13:31:45.3766809Z   path: .
+2026-10-05T13:31:45.3767026Z   merge-multiple: false
+2026-10-05T13:31:45.3767281Z   repository: nghinh/aisef
+2026-10-05T13:31:45.3767539Z   run-id: 37317404055
+2026-10-05T13:31:45.3767763Z env:
+2026-10-05T13:31:45.3768067Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:45.3768601Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2026-10-05T13:31:45.3769132Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:45.3769607Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:45.3770089Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:45.3770465Z ##[endgroup]
+2026-10-05T13:31:45.5711164Z Downloading single artifact
+2026-10-05T13:31:45.5943415Z (node:8652) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-05T13:31:45.5944478Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-05T13:31:45.8886063Z Preparing to download the following artifacts:
+2026-10-05T13:31:45.8887270Z - dist-sha256 (ID: 11348167651, Size: 264, Expected Digest: sha256:ecbbe9aa6375f9a07675f3fccca405886965f4ee3ac630eb6bb0abfd986c9615)
+2026-10-05T13:31:46.1826172Z Redirecting to blob download url: https://productionresultssa4.blob.core.windows.net/actions-results/80318b2a-88ab-854f-b6e9-d6a120b95354/workflow-job-run-0864dbec-a4c3-55e2-9728-c5fab98cf7b3/artifacts/030ac884951a628a67088ac4ebdcc46452544c33186a71fffe72c620cffb2105.zip
+2026-10-05T13:31:46.1828380Z Starting download of artifact to: D:\a\aisef\aisef
+2026-10-05T13:31:46.4606242Z (node:8652) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-05T13:31:46.4670225Z SHA256 digest of downloaded artifact is ecbbe9aa6375f9a07675f3fccca405886965f4ee3ac630eb6bb0abfd986c9615
+2026-10-05T13:31:46.4671392Z Artifact download completed successfully.
+2026-10-05T13:31:46.4671912Z Total of 1 artifact(s) downloaded
+2026-10-05T13:31:46.4679597Z Download artifact has finished successfully
+2026-10-05T13:31:46.5009843Z ##[group]Run cd dist && sha256sum -c ../SHA256SUMS
+2026-10-05T13:31:46.5010378Z [36;1mcd dist && sha256sum -c ../SHA256SUMS[0m
+2026-10-05T13:31:46.5077902Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-10-05T13:31:46.5078388Z env:
+2026-10-05T13:31:46.5078713Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:46.5079273Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2026-10-05T13:31:46.5079819Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:46.5080628Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:46.5081130Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:46.5081520Z ##[endgroup]
+2026-10-05T13:31:46.7122753Z aisef-2.0.0-py3-none-any.whl: OK
+2026-10-05T13:31:46.7184002Z aisef-2.0.0.tar.gz: OK
+2026-10-05T13:31:46.7435226Z ##[group]Run set -eu
+2026-10-05T13:31:46.7435602Z [36;1mset -eu[0m
+2026-10-05T13:31:46.7436064Z [36;1mtmp="$RUNNER_TEMP"; if command -v cygpath >/dev/null; then tmp=$(cygpath -u "$tmp"); fi[0m
+2026-10-05T13:31:46.7436610Z [36;1mpython -m venv "$tmp/venv"[0m
+2026-10-05T13:31:46.7437222Z [36;1mpy="$tmp/venv/bin/python"; if [ -f "$tmp/venv/Scripts/python.exe" ]; then py="$tmp/venv/Scripts/python.exe"; fi[0m
+2026-10-05T13:31:46.7438311Z [36;1m"$py" -m pip install --no-index --no-deps dist/*.whl[0m
+2026-10-05T13:31:46.7438741Z [36;1mecho "SMOKE_PY=$py" >> "$GITHUB_ENV"[0m
+2026-10-05T13:31:46.7439130Z [36;1mecho "SMOKE_DIR=$tmp" >> "$GITHUB_ENV"[0m
+2026-10-05T13:31:46.7456521Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-10-05T13:31:46.7457011Z env:
+2026-10-05T13:31:46.7457337Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:46.7458401Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2026-10-05T13:31:46.7459073Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:46.7459574Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:46.7460081Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:46.7460475Z ##[endgroup]
+2026-10-05T13:31:54.8987757Z Processing d:\a\aisef\aisef\dist\aisef-2.0.0-py3-none-any.whl
+2026-10-05T13:31:54.9269237Z Installing collected packages: aisef
+2026-10-05T13:31:55.5768607Z Successfully installed aisef-2.0.0
+2026-10-05T13:31:55.6644666Z ##[group]Run set -eu
+2026-10-05T13:31:55.6645169Z [36;1mset -eu[0m
+2026-10-05T13:31:55.6646165Z [36;1mwant=$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version'])")[0m
+2026-10-05T13:31:55.6647369Z [36;1msmoke="$GITHUB_WORKSPACE/tests/installed_smoke.py"[0m
+2026-10-05T13:31:55.6647914Z [36;1mcd "$SMOKE_DIR"[0m
+2026-10-05T13:31:55.6648313Z [36;1m"$SMOKE_PY" -I -c "import aisef2"[0m
+2026-10-05T13:31:55.6648816Z [36;1m"$SMOKE_PY" -I "$smoke" "$want" --product[0m
+2026-10-05T13:31:55.6671726Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-10-05T13:31:55.6672371Z env:
+2026-10-05T13:31:55.6672805Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:55.6673552Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2026-10-05T13:31:55.6674341Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:55.6675026Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:55.6676673Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2026-10-05T13:31:55.6677288Z   SMOKE_PY: /d/a/_temp/venv/Scripts/python.exe
+2026-10-05T13:31:55.6677755Z   SMOKE_DIR: /d/a/_temp
+2026-10-05T13:31:55.6678107Z ##[endgroup]
+2026-10-05T13:31:56.3889208Z installed smoke: PASS (aisef 2.0.0)
+2026-10-05T13:31:56.4380728Z Post job cleanup.
+2026-10-05T13:31:56.5920497Z (node:1292) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-05T13:31:56.5921789Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-05T13:31:56.6254257Z Post job cleanup.
+2026-10-05T13:31:56.8448233Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-10-05T13:31:56.8779464Z git version 2.55.0.windows.5
+2026-10-05T13:31:56.8861781Z Temporarily overriding HOME='D:\a\_temp\c72e1f97-c461-4a81-ba24-6d65ef46099c' before making global git config changes
+2026-10-05T13:31:56.8862716Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-05T13:31:56.8872850Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\aisef\aisef
+2026-10-05T13:31:56.9206883Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-10-05T13:31:56.9538897Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-10-05T13:31:57.6789408Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-05T13:31:57.7062613Z http.https://github.com/.extraheader
+2026-10-05T13:31:57.7115837Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+2026-10-05T13:31:57.7447002Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-10-05T13:31:58.2894645Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-05T13:31:58.3212880Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-10-05T13:31:58.9117561Z Cleaning up orphan processes
+2026-10-05T13:31:58.9729293Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

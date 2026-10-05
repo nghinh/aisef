@@ -1,0 +1,1340 @@
+﻿2026-10-05T13:31:04.6809563Z Current runner version: '2.337.0'
+2026-10-05T13:31:04.6846973Z ##[group]Runner Image Provisioner
+2026-10-05T13:31:04.6848731Z Hosted Compute Agent
+2026-10-05T13:31:04.6849962Z Version: 20260901.588
+2026-10-05T13:31:04.6851016Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-05T13:31:04.6852344Z Build Date: 2026-09-01T19:56:44Z
+2026-10-05T13:31:04.6853452Z Worker ID: {a1d12e6e-7e48-4e96-aa26-3e19a0dc887f}
+2026-10-05T13:31:04.6854815Z Azure Region: eastus
+2026-10-05T13:31:04.6855789Z ##[endgroup]
+2026-10-05T13:31:04.6858154Z ##[group]Operating System
+2026-10-05T13:31:04.6859157Z Ubuntu
+2026-10-05T13:31:04.6860220Z 24.04.5
+2026-10-05T13:31:04.6861755Z LTS
+2026-10-05T13:31:04.6862583Z ##[endgroup]
+2026-10-05T13:31:04.6863424Z ##[group]Runner Image
+2026-10-05T13:31:04.6865403Z Image: ubuntu-24.04
+2026-10-05T13:31:04.6866340Z Version: 20260927.320.1
+2026-10-05T13:31:04.6868574Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-05T13:31:04.6871618Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+2026-10-05T13:31:04.6873299Z ##[endgroup]
+2026-10-05T13:31:04.6875417Z ##[group]GITHUB_TOKEN Permissions
+2026-10-05T13:31:04.6878774Z Contents: read
+2026-10-05T13:31:04.6880091Z Metadata: read
+2026-10-05T13:31:04.6880974Z ##[endgroup]
+2026-10-05T13:31:04.6884431Z Secret source: Actions
+2026-10-05T13:31:04.6885990Z Cache mode: write
+2026-10-05T13:31:04.6887553Z Prepare workflow directory
+2026-10-05T13:31:04.7385178Z Prepare all required actions
+2026-10-05T13:31:04.7462194Z Getting action download info
+2026-10-05T13:31:04.9661478Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-05T13:31:05.0983967Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-05T13:31:05.2163097Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-05T13:31:05.4911118Z Complete job name: build
+2026-10-05T13:31:05.5701945Z ##[group]Run actions/checkout@v4
+2026-10-05T13:31:05.5702855Z with:
+2026-10-05T13:31:05.5703291Z   repository: nghinh/aisef
+2026-10-05T13:31:05.5707120Z   token: ***
+2026-10-05T13:31:05.5707545Z   ssh-strict: true
+2026-10-05T13:31:05.5707977Z   ssh-user: git
+2026-10-05T13:31:05.5708424Z   persist-credentials: true
+2026-10-05T13:31:05.5708898Z   clean: true
+2026-10-05T13:31:05.5709572Z   sparse-checkout-cone-mode: true
+2026-10-05T13:31:05.5710084Z   fetch-depth: 1
+2026-10-05T13:31:05.5710511Z   fetch-tags: false
+2026-10-05T13:31:05.5710939Z   show-progress: true
+2026-10-05T13:31:05.5711376Z   lfs: false
+2026-10-05T13:31:05.5711782Z   submodules: false
+2026-10-05T13:31:05.5712215Z   set-safe-directory: true
+2026-10-05T13:31:05.5712707Z   allow-unsafe-pr-checkout: false
+2026-10-05T13:31:05.5713421Z ##[endgroup]
+2026-10-05T13:31:05.6808782Z Syncing repository: nghinh/aisef
+2026-10-05T13:31:05.6811540Z ##[group]Getting Git version info
+2026-10-05T13:31:05.6812706Z Working directory is '/home/runner/work/aisef/aisef'
+2026-10-05T13:31:05.6814168Z [command]/usr/bin/git version
+2026-10-05T13:31:05.6913982Z git version 2.55.0
+2026-10-05T13:31:05.6939980Z ##[endgroup]
+2026-10-05T13:31:05.6957495Z Temporarily overriding HOME='/home/runner/work/_temp/6fe2006f-2c54-4921-b12e-ac245e10149c' before making global git config changes
+2026-10-05T13:31:05.6960319Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-05T13:31:05.6965499Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+2026-10-05T13:31:05.7029049Z Deleting the contents of '/home/runner/work/aisef/aisef'
+2026-10-05T13:31:05.7034926Z ##[group]Initializing the repository
+2026-10-05T13:31:05.7050992Z [command]/usr/bin/git init /home/runner/work/aisef/aisef
+2026-10-05T13:31:05.7193538Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-05T13:31:05.7201384Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-05T13:31:05.7203730Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-05T13:31:05.7205160Z hint: call:
+2026-10-05T13:31:05.7205994Z hint:
+2026-10-05T13:31:05.7207047Z hint: 	git config --global init.defaultBranch <name>
+2026-10-05T13:31:05.7208272Z hint:
+2026-10-05T13:31:05.7209666Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-05T13:31:05.7211495Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-05T13:31:05.7212966Z hint:
+2026-10-05T13:31:05.7214331Z hint: 	git branch -m <name>
+2026-10-05T13:31:05.7215431Z hint:
+2026-10-05T13:31:05.7216639Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-05T13:31:05.7218654Z Initialized empty Git repository in /home/runner/work/aisef/aisef/.git/
+2026-10-05T13:31:05.7227551Z [command]/usr/bin/git remote add origin https://github.com/nghinh/aisef
+2026-10-05T13:31:05.7314382Z ##[endgroup]
+2026-10-05T13:31:05.7316000Z ##[group]Disabling automatic garbage collection
+2026-10-05T13:31:05.7317871Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-05T13:31:05.7352301Z ##[endgroup]
+2026-10-05T13:31:05.7353070Z ##[group]Setting up auth
+2026-10-05T13:31:05.7390820Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-05T13:31:05.7406082Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-05T13:31:05.7823892Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-05T13:31:05.7868136Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-05T13:31:05.8119657Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-05T13:31:05.8162904Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-05T13:31:05.8466028Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-05T13:31:05.8512386Z ##[endgroup]
+2026-10-05T13:31:05.8513255Z ##[group]Fetching the repository
+2026-10-05T13:31:05.8524926Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +7f5a6a0a83f022832d8e4f18aec9c1057bfa0df1:refs/remotes/origin/release/v2.0.0
+2026-10-05T13:31:08.7682559Z From https://github.com/nghinh/aisef
+2026-10-05T13:31:08.7683955Z  * [new ref]         7f5a6a0a83f022832d8e4f18aec9c1057bfa0df1 -> origin/release/v2.0.0
+2026-10-05T13:31:08.7687034Z ##[endgroup]
+2026-10-05T13:31:08.7687943Z ##[group]Determining the checkout info
+2026-10-05T13:31:08.7689521Z ##[endgroup]
+2026-10-05T13:31:08.7695611Z [command]/usr/bin/git sparse-checkout disable
+2026-10-05T13:31:08.7765321Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-05T13:31:08.7805711Z ##[group]Checking out the ref
+2026-10-05T13:31:08.7821680Z [command]/usr/bin/git checkout --progress --force -B release/v2.0.0 refs/remotes/origin/release/v2.0.0
+2026-10-05T13:31:09.4503453Z Switched to a new branch 'release/v2.0.0'
+2026-10-05T13:31:09.4530597Z branch 'release/v2.0.0' set up to track 'origin/release/v2.0.0'.
+2026-10-05T13:31:09.4618953Z ##[endgroup]
+2026-10-05T13:31:09.4675506Z [command]/usr/bin/git log -1 --format=%H
+2026-10-05T13:31:09.4735510Z 7f5a6a0a83f022832d8e4f18aec9c1057bfa0df1
+2026-10-05T13:31:09.5156123Z ##[group]Run actions/setup-python@v5
+2026-10-05T13:31:09.5156554Z with:
+2026-10-05T13:31:09.5156846Z   python-version: 3.12
+2026-10-05T13:31:09.5157166Z   check-latest: false
+2026-10-05T13:31:09.5160314Z   token: ***
+2026-10-05T13:31:09.5160615Z   update-environment: true
+2026-10-05T13:31:09.5160945Z   allow-prereleases: false
+2026-10-05T13:31:09.5161500Z   freethreaded: false
+2026-10-05T13:31:09.5161794Z ##[endgroup]
+2026-10-05T13:31:09.6589158Z ##[group]Installed versions
+2026-10-05T13:31:09.6710967Z (node:2077) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-05T13:31:09.6712231Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-05T13:31:09.6712999Z Successfully set up CPython (3.12.14)
+2026-10-05T13:31:09.6713990Z ##[endgroup]
+2026-10-05T13:31:09.6918249Z ##[group]Run python -m pip install build twine
+2026-10-05T13:31:09.6919187Z [36;1mpython -m pip install build twine[0m
+2026-10-05T13:31:09.7224973Z shell: /usr/bin/bash -e {0}
+2026-10-05T13:31:09.7225420Z env:
+2026-10-05T13:31:09.7225784Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:09.7226333Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-05T13:31:09.7226838Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:09.7227321Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:09.7227755Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:09.7228183Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-05T13:31:09.7228562Z ##[endgroup]
+2026-10-05T13:31:10.7697267Z Collecting build
+2026-10-05T13:31:10.8181736Z   Downloading build-1.6.1-py3-none-any.whl.metadata (5.6 kB)
+2026-10-05T13:31:10.8382161Z Collecting twine
+2026-10-05T13:31:10.8421274Z   Downloading twine-7.0.0-py3-none-any.whl.metadata (3.5 kB)
+2026-10-05T13:31:10.8589888Z Collecting packaging>=24.0 (from build)
+2026-10-05T13:31:10.8626751Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-05T13:31:10.8768566Z Collecting pyproject_hooks (from build)
+2026-10-05T13:31:10.8805021Z   Downloading pyproject_hooks-1.3.3-py3-none-any.whl.metadata (1.3 kB)
+2026-10-05T13:31:10.9090007Z Collecting readme-renderer>=35.0 (from twine)
+2026-10-05T13:31:10.9129052Z   Downloading readme_renderer-46.0-py3-none-any.whl.metadata (3.0 kB)
+2026-10-05T13:31:10.9498701Z Collecting requests>=2.20 (from twine)
+2026-10-05T13:31:10.9536178Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+2026-10-05T13:31:10.9672559Z Collecting requests-toolbelt!=0.9.0,>=0.8.0 (from twine)
+2026-10-05T13:31:10.9710719Z   Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl.metadata (14 kB)
+2026-10-05T13:31:10.9935343Z Collecting urllib3>=1.26.0 (from twine)
+2026-10-05T13:31:10.9972917Z   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+2026-10-05T13:31:11.1422586Z Collecting keyring>=21.2.0 (from twine)
+2026-10-05T13:31:11.1465399Z   Downloading keyring-25.7.0-py3-none-any.whl.metadata (21 kB)
+2026-10-05T13:31:11.1652768Z Collecting rfc3986>=1.4.0 (from twine)
+2026-10-05T13:31:11.1686183Z   Downloading rfc3986-2.0.0-py2.py3-none-any.whl.metadata (6.6 kB)
+2026-10-05T13:31:11.2007372Z Collecting rich>=14.3.3 (from twine)
+2026-10-05T13:31:11.2042260Z   Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+2026-10-05T13:31:11.4070823Z Collecting id (from twine)
+2026-10-05T13:31:11.4116462Z   Downloading id-1.6.1-py3-none-any.whl.metadata (5.1 kB)
+2026-10-05T13:31:11.4251641Z Collecting SecretStorage>=3.2 (from keyring>=21.2.0->twine)
+2026-10-05T13:31:11.4285680Z   Downloading secretstorage-3.5.0-py3-none-any.whl.metadata (4.0 kB)
+2026-10-05T13:31:11.4406222Z Collecting jeepney>=0.4.2 (from keyring>=21.2.0->twine)
+2026-10-05T13:31:11.4448130Z   Downloading jeepney-0.9.0-py3-none-any.whl.metadata (1.2 kB)
+2026-10-05T13:31:11.4574590Z Collecting jaraco.classes (from keyring>=21.2.0->twine)
+2026-10-05T13:31:11.4609683Z   Downloading jaraco.classes-3.4.0-py3-none-any.whl.metadata (2.6 kB)
+2026-10-05T13:31:11.4831650Z Collecting jaraco.functools (from keyring>=21.2.0->twine)
+2026-10-05T13:31:11.4881964Z   Downloading jaraco_functools-4.6.0-py3-none-any.whl.metadata (2.9 kB)
+2026-10-05T13:31:11.6280678Z Collecting jaraco.context (from keyring>=21.2.0->twine)
+2026-10-05T13:31:11.6322498Z   Downloading jaraco_context-6.1.2-py3-none-any.whl.metadata (4.2 kB)
+2026-10-05T13:31:11.6707370Z Collecting nh3>=0.2.14 (from readme-renderer>=35.0->twine)
+2026-10-05T13:31:11.6751877Z   Downloading nh3-0.3.7-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.0 kB)
+2026-10-05T13:31:11.6892382Z Collecting docutils>=0.21.2 (from readme-renderer>=35.0->twine)
+2026-10-05T13:31:11.6930370Z   Downloading docutils-0.23-py3-none-any.whl.metadata (15 kB)
+2026-10-05T13:31:11.7318650Z Collecting Pygments>=2.5.1 (from readme-renderer>=35.0->twine)
+2026-10-05T13:31:11.7374227Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-05T13:31:11.8558439Z Collecting charset_normalizer<4,>=2 (from requests>=2.20->twine)
+2026-10-05T13:31:11.8600287Z   Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+2026-10-05T13:31:11.8785381Z Collecting idna<4,>=2.5 (from requests>=2.20->twine)
+2026-10-05T13:31:11.8828712Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+2026-10-05T13:31:11.9035023Z Collecting certifi>=2023.5.7 (from requests>=2.20->twine)
+2026-10-05T13:31:11.9070366Z   Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+2026-10-05T13:31:11.9320098Z Collecting markdown-it-py>=2.2.0 (from rich>=14.3.3->twine)
+2026-10-05T13:31:11.9354659Z   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+2026-10-05T13:31:11.9504174Z Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=14.3.3->twine)
+2026-10-05T13:31:11.9538445Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+2026-10-05T13:31:12.1318154Z Collecting cryptography>=2.0 (from SecretStorage>=3.2->keyring>=21.2.0->twine)
+2026-10-05T13:31:12.1356415Z   Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.4 kB)
+2026-10-05T13:31:12.2317520Z Collecting cffi>=2.0.0 (from cryptography>=2.0->SecretStorage>=3.2->keyring>=21.2.0->twine)
+2026-10-05T13:31:12.2354402Z   Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+2026-10-05T13:31:12.4121939Z Collecting pycparser (from cffi>=2.0.0->cryptography>=2.0->SecretStorage>=3.2->keyring>=21.2.0->twine)
+2026-10-05T13:31:12.4157789Z   Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+2026-10-05T13:31:12.4344494Z Collecting more-itertools (from jaraco.classes->keyring>=21.2.0->twine)
+2026-10-05T13:31:12.4381746Z   Downloading more_itertools-11.1.0-py3-none-any.whl.metadata (41 kB)
+2026-10-05T13:31:12.4482662Z Downloading build-1.6.1-py3-none-any.whl (31 kB)
+2026-10-05T13:31:12.4534464Z Downloading twine-7.0.0-py3-none-any.whl (43 kB)
+2026-10-05T13:31:12.4595641Z Downloading keyring-25.7.0-py3-none-any.whl (39 kB)
+2026-10-05T13:31:12.4650592Z Downloading jeepney-0.9.0-py3-none-any.whl (49 kB)
+2026-10-05T13:31:12.4704678Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-05T13:31:12.4771917Z Downloading readme_renderer-46.0-py3-none-any.whl (14 kB)
+2026-10-05T13:31:12.4824630Z Downloading docutils-0.23-py3-none-any.whl (634 kB)
+2026-10-05T13:31:12.4937435Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 634.7/634.7 kB 66.1 MB/s  0:00:00
+2026-10-05T13:31:12.4975378Z Downloading nh3-0.3.7-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (832 kB)
+2026-10-05T13:31:12.5157531Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 832.2/832.2 kB 36.6 MB/s  0:00:00
+2026-10-05T13:31:12.5195684Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-10-05T13:31:12.5315109Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 109.6 MB/s  0:00:00
+2026-10-05T13:31:12.5350419Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+2026-10-05T13:31:12.5405908Z Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (257 kB)
+2026-10-05T13:31:12.5474611Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+2026-10-05T13:31:12.5528862Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+2026-10-05T13:31:12.5586996Z Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+2026-10-05T13:31:12.5642360Z Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+2026-10-05T13:31:12.5702490Z Downloading rfc3986-2.0.0-py2.py3-none-any.whl (31 kB)
+2026-10-05T13:31:12.5762986Z Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+2026-10-05T13:31:12.5835240Z Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+2026-10-05T13:31:12.7069686Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+2026-10-05T13:31:12.7122319Z Downloading secretstorage-3.5.0-py3-none-any.whl (15 kB)
+2026-10-05T13:31:12.7175011Z Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl (4.8 MB)
+2026-10-05T13:31:12.7562097Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.8/4.8 MB 126.3 MB/s  0:00:00
+2026-10-05T13:31:12.7600675Z Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+2026-10-05T13:31:12.7657422Z Downloading id-1.6.1-py3-none-any.whl (14 kB)
+2026-10-05T13:31:12.7713500Z Downloading jaraco.classes-3.4.0-py3-none-any.whl (6.8 kB)
+2026-10-05T13:31:12.7764592Z Downloading jaraco_context-6.1.2-py3-none-any.whl (7.9 kB)
+2026-10-05T13:31:12.8203753Z Downloading jaraco_functools-4.6.0-py3-none-any.whl (11 kB)
+2026-10-05T13:31:12.8257550Z Downloading more_itertools-11.1.0-py3-none-any.whl (72 kB)
+2026-10-05T13:31:12.8308174Z Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+2026-10-05T13:31:12.8359717Z Downloading pyproject_hooks-1.3.3-py3-none-any.whl (10 kB)
+2026-10-05T13:31:12.9836121Z Installing collected packages: urllib3, rfc3986, pyproject_hooks, Pygments, pycparser, packaging, nh3, more-itertools, mdurl, jeepney, jaraco.context, idna, docutils, charset_normalizer, certifi, requests, readme-renderer, markdown-it-py, jaraco.functools, jaraco.classes, id, cffi, build, rich, requests-toolbelt, cryptography, SecretStorage, keyring, twine
+2026-10-05T13:31:15.5687990Z 
+2026-10-05T13:31:15.5716551Z Successfully installed Pygments-2.21.0 SecretStorage-3.5.0 build-1.6.1 certifi-2026.7.22 cffi-2.1.1 charset_normalizer-3.5.2 cryptography-50.0.2 docutils-0.23 id-1.6.1 idna-3.20 jaraco.classes-3.4.0 jaraco.context-6.1.2 jaraco.functools-4.6.0 jeepney-0.9.0 keyring-25.7.0 markdown-it-py-4.2.0 mdurl-0.1.2 more-itertools-11.1.0 nh3-0.3.7 packaging-26.3 pycparser-3.0 pyproject_hooks-1.3.3 readme-renderer-46.0 requests-2.34.2 requests-toolbelt-1.0.0 rfc3986-2.0.0 rich-15.0.0 twine-7.0.0 urllib3-2.8.0
+2026-10-05T13:31:15.6842395Z ##[group]Run set -eu
+2026-10-05T13:31:15.6842690Z [36;1mset -eu[0m
+2026-10-05T13:31:15.6843227Z [36;1mexport SOURCE_DATE_EPOCH="$(python -P validation/qualification/release_rc.py --epoch)"   # the frozen RC's once frozen[0m
+2026-10-05T13:31:15.6843796Z [36;1mpython -m build[0m
+2026-10-05T13:31:15.6844144Z [36;1mpython -P validation/qualification/repro_dist.py dist/*.tar.gz[0m
+2026-10-05T13:31:15.6920441Z shell: /usr/bin/bash -e {0}
+2026-10-05T13:31:15.6920714Z env:
+2026-10-05T13:31:15.6921008Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:15.6921455Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-05T13:31:15.6921925Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:15.6922317Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:15.6922696Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:15.6923127Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-05T13:31:15.6923464Z ##[endgroup]
+2026-10-05T13:31:15.9180707Z * Creating isolated environment: venv+pip...
+2026-10-05T13:31:15.9291138Z * Installing packages in isolated environment:
+2026-10-05T13:31:15.9292058Z   - setuptools==84.0.0
+2026-10-05T13:31:16.8663268Z * Getting build dependencies for sdist...
+2026-10-05T13:31:17.4604164Z running egg_info
+2026-10-05T13:31:17.4621919Z creating aisef.egg-info
+2026-10-05T13:31:17.4623258Z writing aisef.egg-info/PKG-INFO
+2026-10-05T13:31:17.4628555Z writing dependency_links to aisef.egg-info/dependency_links.txt
+2026-10-05T13:31:17.4631929Z writing entry points to aisef.egg-info/entry_points.txt
+2026-10-05T13:31:17.4634394Z writing top-level names to aisef.egg-info/top_level.txt
+2026-10-05T13:31:17.4635965Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+2026-10-05T13:31:17.4739695Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+2026-10-05T13:31:17.4741752Z reading manifest template 'MANIFEST.in'
+2026-10-05T13:31:17.4766395Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+2026-10-05T13:31:17.5149988Z * Installed build dependency versions:
+2026-10-05T13:31:17.5150549Z   - setuptools==84.0.0
+2026-10-05T13:31:17.5150925Z * Building sdist...
+2026-10-05T13:31:17.6989583Z running sdist
+2026-10-05T13:31:17.6990096Z running egg_info
+2026-10-05T13:31:17.7016704Z writing aisef.egg-info/PKG-INFO
+2026-10-05T13:31:17.7182151Z writing dependency_links to aisef.egg-info/dependency_links.txt
+2026-10-05T13:31:17.7185715Z writing entry points to aisef.egg-info/entry_points.txt
+2026-10-05T13:31:17.7188415Z writing top-level names to aisef.egg-info/top_level.txt
+2026-10-05T13:31:17.7298012Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+2026-10-05T13:31:17.7322703Z reading manifest template 'MANIFEST.in'
+2026-10-05T13:31:17.7353166Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+2026-10-05T13:31:17.7416549Z running check
+2026-10-05T13:31:17.7448573Z creating aisef-2.0.0
+2026-10-05T13:31:17.7453698Z creating aisef-2.0.0/aisef
+2026-10-05T13:31:17.7455055Z creating aisef-2.0.0/aisef.egg-info
+2026-10-05T13:31:17.7459681Z creating aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7460089Z creating aisef-2.0.0/aisef/clients
+2026-10-05T13:31:17.7460529Z creating aisef-2.0.0/aisef/codebase
+2026-10-05T13:31:17.7461317Z creating aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7462660Z creating aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7464068Z creating aisef-2.0.0/aisef/harness/assets
+2026-10-05T13:31:17.7465317Z creating aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7466527Z creating aisef-2.0.0/aisef/kit/prompts
+2026-10-05T13:31:17.7467792Z creating aisef-2.0.0/aisef/kit/rules
+2026-10-05T13:31:17.7469111Z creating aisef-2.0.0/aisef/kit/skills/aisef-mockup-html
+2026-10-05T13:31:17.7471420Z creating aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7472657Z creating aisef-2.0.0/aisef2
+2026-10-05T13:31:17.7474111Z creating aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7475438Z creating aisef-2.0.0/aisef2/arch
+2026-10-05T13:31:17.7477016Z creating aisef-2.0.0/aisef2/cohort
+2026-10-05T13:31:17.7477942Z creating aisef-2.0.0/aisef2/control
+2026-10-05T13:31:17.7479386Z creating aisef-2.0.0/aisef2/invariants
+2026-10-05T13:31:17.7480775Z creating aisef-2.0.0/aisef2/journal
+2026-10-05T13:31:17.7482097Z creating aisef-2.0.0/aisef2/journal/projections
+2026-10-05T13:31:17.7483444Z creating aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7484673Z creating aisef-2.0.0/aisef2/plan
+2026-10-05T13:31:17.7485946Z creating aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7487173Z creating aisef-2.0.0/aisef2/product
+2026-10-05T13:31:17.7488518Z creating aisef-2.0.0/aisef2/quality
+2026-10-05T13:31:17.7489941Z creating aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7490875Z copying files to aisef-2.0.0...
+2026-10-05T13:31:17.7491688Z copying MANIFEST.in -> aisef-2.0.0
+2026-10-05T13:31:17.7493753Z copying README.md -> aisef-2.0.0
+2026-10-05T13:31:17.7495561Z copying pyproject.toml -> aisef-2.0.0
+2026-10-05T13:31:17.7496939Z copying aisef/__init__.py -> aisef-2.0.0/aisef
+2026-10-05T13:31:17.7498527Z copying aisef/__main__.py -> aisef-2.0.0/aisef
+2026-10-05T13:31:17.7500273Z copying aisef/_compat.py -> aisef-2.0.0/aisef
+2026-10-05T13:31:17.7501864Z copying aisef/config.py -> aisef-2.0.0/aisef
+2026-10-05T13:31:17.7503701Z copying aisef/memory.py -> aisef-2.0.0/aisef
+2026-10-05T13:31:17.7505500Z copying aisef/memory_bench.py -> aisef-2.0.0/aisef
+2026-10-05T13:31:17.7507073Z copying aisef.egg-info/PKG-INFO -> aisef-2.0.0/aisef.egg-info
+2026-10-05T13:31:17.7508687Z copying aisef.egg-info/SOURCES.txt -> aisef-2.0.0/aisef.egg-info
+2026-10-05T13:31:17.7510501Z copying aisef.egg-info/dependency_links.txt -> aisef-2.0.0/aisef.egg-info
+2026-10-05T13:31:17.7511865Z copying aisef.egg-info/entry_points.txt -> aisef-2.0.0/aisef.egg-info
+2026-10-05T13:31:17.7513217Z copying aisef.egg-info/top_level.txt -> aisef-2.0.0/aisef.egg-info
+2026-10-05T13:31:17.7514519Z copying aisef/cli/__init__.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7515973Z copying aisef/cli/__main__.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7520686Z copying aisef/cli/_common.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7521244Z copying aisef/cli/closure.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7521765Z copying aisef/cli/dashboard.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7522315Z copying aisef/cli/doctor.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7523778Z copying aisef/cli/harness.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7525691Z copying aisef/cli/implement.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7527362Z copying aisef/cli/memory.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7528809Z copying aisef/cli/parser.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7531056Z copying aisef/cli/plan.py -> aisef-2.0.0/aisef/cli
+2026-10-05T13:31:17.7532487Z copying aisef/clients/__init__.py -> aisef-2.0.0/aisef/clients
+2026-10-05T13:31:17.7533681Z copying aisef/clients/base.py -> aisef-2.0.0/aisef/clients
+2026-10-05T13:31:17.7535511Z copying aisef/clients/claude_code.py -> aisef-2.0.0/aisef/clients
+2026-10-05T13:31:17.7536859Z copying aisef/clients/compile.py -> aisef-2.0.0/aisef/clients
+2026-10-05T13:31:17.7538322Z copying aisef/clients/opencode.py -> aisef-2.0.0/aisef/clients
+2026-10-05T13:31:17.7539986Z copying aisef/clients/stream.py -> aisef-2.0.0/aisef/clients
+2026-10-05T13:31:17.7541723Z copying aisef/clients/synthetic.py -> aisef-2.0.0/aisef/clients
+2026-10-05T13:31:17.7543107Z copying aisef/codebase/__init__.py -> aisef-2.0.0/aisef/codebase
+2026-10-05T13:31:17.7544457Z copying aisef/codebase/baseline.py -> aisef-2.0.0/aisef/codebase
+2026-10-05T13:31:17.7545865Z copying aisef/codebase/basic.py -> aisef-2.0.0/aisef/codebase
+2026-10-05T13:31:17.7547232Z copying aisef/codebase/detect.py -> aisef-2.0.0/aisef/codebase
+2026-10-05T13:31:17.7548633Z copying aisef/codebase/graphify.py -> aisef-2.0.0/aisef/codebase
+2026-10-05T13:31:17.7550233Z copying aisef/codebase/provider.py -> aisef-2.0.0/aisef/codebase
+2026-10-05T13:31:17.7551638Z copying aisef/control/__init__.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7553188Z copying aisef/control/acceptance.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7554328Z copying aisef/control/approvals.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7555803Z copying aisef/control/attribution.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7557273Z copying aisef/control/bmad_status.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7558692Z copying aisef/control/budget.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7560891Z copying aisef/control/change.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7562404Z copying aisef/control/closure.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7565011Z copying aisef/control/cohort.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7566783Z copying aisef/control/complexity.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7568514Z copying aisef/control/conformance.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7570395Z copying aisef/control/defects.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7572102Z copying aisef/control/design_contract.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7573700Z copying aisef/control/experience.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7575572Z copying aisef/control/findings.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7577182Z copying aisef/control/gate.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7579810Z copying aisef/control/identity.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7581365Z copying aisef/control/impact.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7583690Z copying aisef/control/invariants.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7584936Z copying aisef/control/journal.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7586475Z copying aisef/control/ledger.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7588398Z copying aisef/control/machine_gate.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7590201Z copying aisef/control/normalize.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7592105Z copying aisef/control/obligation.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7593548Z copying aisef/control/onboarding.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7594906Z copying aisef/control/outcome.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7596369Z copying aisef/control/planes.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7597836Z copying aisef/control/preflight.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7599840Z copying aisef/control/proof.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7601448Z copying aisef/control/qualification.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7602961Z copying aisef/control/replay.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7604496Z copying aisef/control/replay_manifest.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7606007Z copying aisef/control/reviewer_qual.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7607946Z copying aisef/control/scheduler.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7609529Z copying aisef/control/security.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7611160Z copying aisef/control/state.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7612849Z copying aisef/control/tdd.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7614455Z copying aisef/control/worktree.py -> aisef-2.0.0/aisef/control
+2026-10-05T13:31:17.7616296Z copying aisef/harness/__init__.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7617336Z copying aisef/harness/aria.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7618888Z copying aisef/harness/browser.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7620542Z copying aisef/harness/capabilities.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7622050Z copying aisef/harness/context.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7623577Z copying aisef/harness/guardrails.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7625518Z copying aisef/harness/mockup_map.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7627125Z copying aisef/harness/mockup_verify.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7628474Z copying aisef/harness/observe.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7630378Z copying aisef/harness/ownership.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7631812Z copying aisef/harness/process_owner.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7633292Z copying aisef/harness/prompts.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7634695Z copying aisef/harness/routing.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7636229Z copying aisef/harness/runlog.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7637622Z copying aisef/harness/sandbox.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7639549Z copying aisef/harness/server_identity.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7640993Z copying aisef/harness/testlog.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7642523Z copying aisef/harness/tools.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7644344Z copying aisef/harness/verify_image.py -> aisef-2.0.0/aisef/harness
+2026-10-05T13:31:17.7645853Z copying aisef/harness/assets/render.mjs -> aisef-2.0.0/aisef/harness/assets
+2026-10-05T13:31:17.7647216Z copying aisef/kit/__init__.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7648424Z copying aisef/kit/catalog.json -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7650015Z copying aisef/kit/catalog.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7651494Z copying aisef/kit/constitution.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7652909Z copying aisef/kit/detect_stack.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7654258Z copying aisef/kit/docs.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7655771Z copying aisef/kit/fetch.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7657251Z copying aisef/kit/install.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7658760Z copying aisef/kit/registry.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7660712Z copying aisef/kit/router.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7662121Z copying aisef/kit/security_filter.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7663573Z copying aisef/kit/skill_scan.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7665007Z copying aisef/kit/skills.py -> aisef-2.0.0/aisef/kit
+2026-10-05T13:31:17.7666570Z copying aisef/kit/prompts/devsecops.md -> aisef-2.0.0/aisef/kit/prompts
+2026-10-05T13:31:17.7667977Z copying aisef/kit/prompts/mockup-screen.md -> aisef-2.0.0/aisef/kit/prompts
+2026-10-05T13:31:17.7669509Z copying aisef/kit/prompts/story-implement.md -> aisef-2.0.0/aisef/kit/prompts
+2026-10-05T13:31:17.7671148Z copying aisef/kit/prompts/story-review.md -> aisef-2.0.0/aisef/kit/prompts
+2026-10-05T13:31:17.7672654Z copying aisef/kit/prompts/story-security-review.md -> aisef-2.0.0/aisef/kit/prompts
+2026-10-05T13:31:17.7674027Z copying aisef/kit/rules/must_never.md -> aisef-2.0.0/aisef/kit/rules
+2026-10-05T13:31:17.7675410Z copying aisef/kit/rules/principles.md -> aisef-2.0.0/aisef/kit/rules
+2026-10-05T13:31:17.7677129Z copying aisef/kit/skills/aisef-mockup-html/SKILL.md -> aisef-2.0.0/aisef/kit/skills/aisef-mockup-html
+2026-10-05T13:31:17.7678337Z copying aisef/phases/__init__.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7679736Z copying aisef/phases/deploy.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7681666Z copying aisef/phases/implement.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7684402Z copying aisef/phases/improve.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7686268Z copying aisef/phases/mockup.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7688032Z copying aisef/phases/plan.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7689626Z copying aisef/phases/qa.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7691644Z copying aisef/phases/report.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7693051Z copying aisef/phases/run.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7696019Z copying aisef/phases/story_split.py -> aisef-2.0.0/aisef/phases
+2026-10-05T13:31:17.7697070Z copying aisef2/__init__.py -> aisef-2.0.0/aisef2
+2026-10-05T13:31:17.7697844Z copying aisef2/errors.py -> aisef-2.0.0/aisef2
+2026-10-05T13:31:17.7698679Z copying aisef2/app/__init__.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7700015Z copying aisef2/app/adapters.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7701322Z copying aisef2/app/bundle.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7702511Z copying aisef2/app/calibrations.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7703614Z copying aisef2/app/cli.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7704673Z copying aisef2/app/client.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7705906Z copying aisef2/app/feedback.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7706992Z copying aisef2/app/preflight.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7708116Z copying aisef2/app/run.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7709551Z copying aisef2/app/settings.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7710924Z copying aisef2/app/verify.py -> aisef-2.0.0/aisef2/app
+2026-10-05T13:31:17.7712922Z copying aisef2/arch/__init__.py -> aisef-2.0.0/aisef2/arch
+2026-10-05T13:31:17.7714296Z copying aisef2/arch/enums.py -> aisef-2.0.0/aisef2/arch
+2026-10-05T13:31:17.7715982Z copying aisef2/cohort/__init__.py -> aisef-2.0.0/aisef2/cohort
+2026-10-05T13:31:17.7720208Z copying aisef2/cohort/lifecycle.py -> aisef-2.0.0/aisef2/cohort
+2026-10-05T13:31:17.7740220Z copying aisef2/cohort/preregistration.py -> aisef-2.0.0/aisef2/cohort
+2026-10-05T13:31:17.7750504Z copying aisef2/control/__init__.py -> aisef-2.0.0/aisef2/control
+2026-10-05T13:31:17.7751221Z copying aisef2/control/budget.py -> aisef-2.0.0/aisef2/control
+2026-10-05T13:31:17.7751712Z copying aisef2/control/owner.py -> aisef-2.0.0/aisef2/control
+2026-10-05T13:31:17.7752670Z copying aisef2/control/routing.py -> aisef-2.0.0/aisef2/control
+2026-10-05T13:31:17.7753336Z copying aisef2/invariants/__init__.py -> aisef-2.0.0/aisef2/invariants
+2026-10-05T13:31:17.7754060Z copying aisef2/invariants/evidence.py -> aisef-2.0.0/aisef2/invariants
+2026-10-05T13:31:17.7754790Z copying aisef2/invariants/registry.py -> aisef-2.0.0/aisef2/invariants
+2026-10-05T13:31:17.7755487Z copying aisef2/journal/__init__.py -> aisef-2.0.0/aisef2/journal
+2026-10-05T13:31:17.7756117Z copying aisef2/journal/compat.py -> aisef-2.0.0/aisef2/journal
+2026-10-05T13:31:17.7756746Z copying aisef2/journal/event.py -> aisef-2.0.0/aisef2/journal
+2026-10-05T13:31:17.7757355Z copying aisef2/journal/fold.py -> aisef-2.0.0/aisef2/journal
+2026-10-05T13:31:17.7758004Z copying aisef2/journal/format2.py -> aisef-2.0.0/aisef2/journal
+2026-10-05T13:31:17.7758622Z copying aisef2/journal/format3.py -> aisef-2.0.0/aisef2/journal
+2026-10-05T13:31:17.7759380Z copying aisef2/journal/writer.py -> aisef-2.0.0/aisef2/journal
+2026-10-05T13:31:17.7760179Z copying aisef2/journal/projections/__init__.py -> aisef-2.0.0/aisef2/journal/projections
+2026-10-05T13:31:17.7760957Z copying aisef2/journal/projections/budgets.py -> aisef-2.0.0/aisef2/journal/projections
+2026-10-05T13:31:17.7761985Z copying aisef2/journal/projections/failure_owner.py -> aisef-2.0.0/aisef2/journal/projections
+2026-10-05T13:31:17.7763060Z copying aisef2/journal/projections/qualification_counters.py -> aisef-2.0.0/aisef2/journal/projections
+2026-10-05T13:31:17.7763972Z copying aisef2/journal/projections/retry_target.py -> aisef-2.0.0/aisef2/journal/projections
+2026-10-05T13:31:17.7764863Z copying aisef2/journal/projections/story_state.py -> aisef-2.0.0/aisef2/journal/projections
+2026-10-05T13:31:17.7765870Z copying aisef2/journal/projections/terminal_state.py -> aisef-2.0.0/aisef2/journal/projections
+2026-10-05T13:31:17.7766623Z copying aisef2/orchestrate/__init__.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7767406Z copying aisef2/orchestrate/adapters.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7768003Z copying aisef2/orchestrate/gate.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7768750Z copying aisef2/orchestrate/merge.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7769944Z copying aisef2/orchestrate/proof.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7770686Z copying aisef2/orchestrate/quality.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7771278Z copying aisef2/orchestrate/review.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7772004Z copying aisef2/orchestrate/seam.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7772633Z copying aisef2/orchestrate/security.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7773414Z copying aisef2/orchestrate/story_runner.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7774058Z copying aisef2/orchestrate/workspace.py -> aisef-2.0.0/aisef2/orchestrate
+2026-10-05T13:31:17.7774592Z copying aisef2/plan/__init__.py -> aisef-2.0.0/aisef2/plan
+2026-10-05T13:31:17.7775177Z copying aisef2/plan/drift.py -> aisef-2.0.0/aisef2/plan
+2026-10-05T13:31:17.7775735Z copying aisef2/plan/obligation.py -> aisef-2.0.0/aisef2/plan
+2026-10-05T13:31:17.7776294Z copying aisef2/plan/static_admission.py -> aisef-2.0.0/aisef2/plan
+2026-10-05T13:31:17.7777016Z copying aisef2/plan/story_admission.py -> aisef-2.0.0/aisef2/plan
+2026-10-05T13:31:17.7777510Z copying aisef2/probe/__init__.py -> aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7778049Z copying aisef2/probe/calibration.py -> aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7778675Z copying aisef2/probe/catalog.py -> aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7779376Z copying aisef2/probe/cli_invocation.py -> aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7780088Z copying aisef2/probe/file_artifact.py -> aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7780739Z copying aisef2/probe/process_effect.py -> aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7781438Z copying aisef2/probe/protocol.py -> aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7782101Z copying aisef2/probe/python_callable.py -> aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7782670Z copying aisef2/probe/python_callable_v2.py -> aisef-2.0.0/aisef2/probe
+2026-10-05T13:31:17.7783328Z copying aisef2/product/__init__.py -> aisef-2.0.0/aisef2/product
+2026-10-05T13:31:17.7784559Z copying aisef2/product/approval.py -> aisef-2.0.0/aisef2/product
+2026-10-05T13:31:17.7785970Z copying aisef2/product/compiler.py -> aisef-2.0.0/aisef2/product
+2026-10-05T13:31:17.7787395Z copying aisef2/product/contract.py -> aisef-2.0.0/aisef2/product
+2026-10-05T13:31:17.7788887Z copying aisef2/product/outcome.py -> aisef-2.0.0/aisef2/product
+2026-10-05T13:31:17.7790508Z copying aisef2/product/spec.py -> aisef-2.0.0/aisef2/product
+2026-10-05T13:31:17.7791976Z copying aisef2/quality/__init__.py -> aisef-2.0.0/aisef2/quality
+2026-10-05T13:31:17.7793380Z copying aisef2/quality/adequacy.py -> aisef-2.0.0/aisef2/quality
+2026-10-05T13:31:17.7795438Z copying aisef2/quality/relevance.py -> aisef-2.0.0/aisef2/quality
+2026-10-05T13:31:17.7796853Z copying aisef2/quality/test_execution.py -> aisef-2.0.0/aisef2/quality
+2026-10-05T13:31:17.7798355Z copying aisef2/quality/vacuity.py -> aisef-2.0.0/aisef2/quality
+2026-10-05T13:31:17.7800044Z copying aisef2/runtime/__init__.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7801565Z copying aisef2/runtime/capability.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7803211Z copying aisef2/runtime/process_range.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7804875Z copying aisef2/runtime/range_anchor.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7806693Z copying aisef2/runtime/repair.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7808121Z copying aisef2/runtime/run_scope.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7838654Z copying aisef2/runtime/runspec.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7840785Z copying aisef2/runtime/sentinel.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7841579Z copying aisef2/runtime/story_scope.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7842296Z copying aisef2/runtime/tool.py -> aisef-2.0.0/aisef2/runtime
+2026-10-05T13:31:17.7842876Z Writing aisef-2.0.0/setup.cfg
+2026-10-05T13:31:17.7843272Z Creating tar archive
+2026-10-05T13:31:18.0959127Z removing 'aisef-2.0.0' (and everything under it)
+2026-10-05T13:31:18.2461142Z * Building wheel from sdist
+2026-10-05T13:31:18.2664844Z * Creating isolated environment: venv+pip...
+2026-10-05T13:31:18.2686229Z * Installing packages in isolated environment:
+2026-10-05T13:31:18.2686803Z   - setuptools==84.0.0
+2026-10-05T13:31:19.3502466Z * Getting build dependencies for wheel...
+2026-10-05T13:31:19.8181289Z running egg_info
+2026-10-05T13:31:19.8196163Z writing aisef.egg-info/PKG-INFO
+2026-10-05T13:31:19.8218538Z writing dependency_links to aisef.egg-info/dependency_links.txt
+2026-10-05T13:31:19.8258936Z writing entry points to aisef.egg-info/entry_points.txt
+2026-10-05T13:31:19.8300201Z writing top-level names to aisef.egg-info/top_level.txt
+2026-10-05T13:31:19.8384375Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+2026-10-05T13:31:19.8409831Z reading manifest template 'MANIFEST.in'
+2026-10-05T13:31:19.8414018Z no previously-included directories found matching 'tests'
+2026-10-05T13:31:19.8441481Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+2026-10-05T13:31:19.9534105Z * Installed build dependency versions:
+2026-10-05T13:31:19.9534678Z   - setuptools==84.0.0
+2026-10-05T13:31:19.9535050Z * Building wheel...
+2026-10-05T13:31:20.1114474Z running bdist_wheel
+2026-10-05T13:31:20.1173703Z running build
+2026-10-05T13:31:20.1174058Z running build_py
+2026-10-05T13:31:20.1188829Z creating build/lib/aisef2
+2026-10-05T13:31:20.1191984Z copying aisef2/errors.py -> build/lib/aisef2
+2026-10-05T13:31:20.1194396Z copying aisef2/__init__.py -> build/lib/aisef2
+2026-10-05T13:31:20.1198075Z creating build/lib/aisef
+2026-10-05T13:31:20.1199478Z copying aisef/__main__.py -> build/lib/aisef
+2026-10-05T13:31:20.1202096Z copying aisef/config.py -> build/lib/aisef
+2026-10-05T13:31:20.1204633Z copying aisef/memory.py -> build/lib/aisef
+2026-10-05T13:31:20.1207183Z copying aisef/__init__.py -> build/lib/aisef
+2026-10-05T13:31:20.1209607Z copying aisef/_compat.py -> build/lib/aisef
+2026-10-05T13:31:20.1211932Z copying aisef/memory_bench.py -> build/lib/aisef
+2026-10-05T13:31:20.1215104Z creating build/lib/aisef2/control
+2026-10-05T13:31:20.1216428Z copying aisef2/control/budget.py -> build/lib/aisef2/control
+2026-10-05T13:31:20.1218843Z copying aisef2/control/routing.py -> build/lib/aisef2/control
+2026-10-05T13:31:20.1221314Z copying aisef2/control/owner.py -> build/lib/aisef2/control
+2026-10-05T13:31:20.1223771Z copying aisef2/control/__init__.py -> build/lib/aisef2/control
+2026-10-05T13:31:20.1226922Z creating build/lib/aisef2/journal
+2026-10-05T13:31:20.1228207Z copying aisef2/journal/format2.py -> build/lib/aisef2/journal
+2026-10-05T13:31:20.1231091Z copying aisef2/journal/writer.py -> build/lib/aisef2/journal
+2026-10-05T13:31:20.1233197Z copying aisef2/journal/compat.py -> build/lib/aisef2/journal
+2026-10-05T13:31:20.1235422Z copying aisef2/journal/fold.py -> build/lib/aisef2/journal
+2026-10-05T13:31:20.1237705Z copying aisef2/journal/format3.py -> build/lib/aisef2/journal
+2026-10-05T13:31:20.1240352Z copying aisef2/journal/__init__.py -> build/lib/aisef2/journal
+2026-10-05T13:31:20.1242287Z copying aisef2/journal/event.py -> build/lib/aisef2/journal
+2026-10-05T13:31:20.1245996Z creating build/lib/aisef2/probe
+2026-10-05T13:31:20.1247290Z copying aisef2/probe/process_effect.py -> build/lib/aisef2/probe
+2026-10-05T13:31:20.1250511Z copying aisef2/probe/calibration.py -> build/lib/aisef2/probe
+2026-10-05T13:31:20.1252724Z copying aisef2/probe/file_artifact.py -> build/lib/aisef2/probe
+2026-10-05T13:31:20.1255307Z copying aisef2/probe/protocol.py -> build/lib/aisef2/probe
+2026-10-05T13:31:20.1257685Z copying aisef2/probe/cli_invocation.py -> build/lib/aisef2/probe
+2026-10-05T13:31:20.1260647Z copying aisef2/probe/python_callable_v2.py -> build/lib/aisef2/probe
+2026-10-05T13:31:20.1263167Z copying aisef2/probe/__init__.py -> build/lib/aisef2/probe
+2026-10-05T13:31:20.1264910Z copying aisef2/probe/python_callable.py -> build/lib/aisef2/probe
+2026-10-05T13:31:20.1267468Z copying aisef2/probe/catalog.py -> build/lib/aisef2/probe
+2026-10-05T13:31:20.1270912Z creating build/lib/aisef2/arch
+2026-10-05T13:31:20.1271840Z copying aisef2/arch/__init__.py -> build/lib/aisef2/arch
+2026-10-05T13:31:20.1274268Z copying aisef2/arch/enums.py -> build/lib/aisef2/arch
+2026-10-05T13:31:20.1277268Z creating build/lib/aisef2/invariants
+2026-10-05T13:31:20.1278565Z copying aisef2/invariants/registry.py -> build/lib/aisef2/invariants
+2026-10-05T13:31:20.1281457Z copying aisef2/invariants/evidence.py -> build/lib/aisef2/invariants
+2026-10-05T13:31:20.1283266Z copying aisef2/invariants/__init__.py -> build/lib/aisef2/invariants
+2026-10-05T13:31:20.1286817Z creating build/lib/aisef2/app
+2026-10-05T13:31:20.1287961Z copying aisef2/app/preflight.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1290827Z copying aisef2/app/bundle.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1292974Z copying aisef2/app/cli.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1294995Z copying aisef2/app/adapters.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1297516Z copying aisef2/app/feedback.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1317627Z copying aisef2/app/calibrations.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1318576Z copying aisef2/app/run.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1319505Z copying aisef2/app/verify.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1320067Z copying aisef2/app/client.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1320625Z copying aisef2/app/__init__.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1321232Z copying aisef2/app/settings.py -> build/lib/aisef2/app
+2026-10-05T13:31:20.1321739Z creating build/lib/aisef2/plan
+2026-10-05T13:31:20.1322261Z copying aisef2/plan/story_admission.py -> build/lib/aisef2/plan
+2026-10-05T13:31:20.1323221Z copying aisef2/plan/static_admission.py -> build/lib/aisef2/plan
+2026-10-05T13:31:20.1323889Z copying aisef2/plan/obligation.py -> build/lib/aisef2/plan
+2026-10-05T13:31:20.1324483Z copying aisef2/plan/drift.py -> build/lib/aisef2/plan
+2026-10-05T13:31:20.1324977Z copying aisef2/plan/__init__.py -> build/lib/aisef2/plan
+2026-10-05T13:31:20.1325348Z creating build/lib/aisef2/product
+2026-10-05T13:31:20.1325709Z copying aisef2/product/compiler.py -> build/lib/aisef2/product
+2026-10-05T13:31:20.1326114Z copying aisef2/product/spec.py -> build/lib/aisef2/product
+2026-10-05T13:31:20.1326539Z copying aisef2/product/outcome.py -> build/lib/aisef2/product
+2026-10-05T13:31:20.1329017Z copying aisef2/product/approval.py -> build/lib/aisef2/product
+2026-10-05T13:31:20.1331132Z copying aisef2/product/contract.py -> build/lib/aisef2/product
+2026-10-05T13:31:20.1333125Z copying aisef2/product/__init__.py -> build/lib/aisef2/product
+2026-10-05T13:31:20.1336132Z creating build/lib/aisef2/cohort
+2026-10-05T13:31:20.1337555Z copying aisef2/cohort/preregistration.py -> build/lib/aisef2/cohort
+2026-10-05T13:31:20.1340006Z copying aisef2/cohort/lifecycle.py -> build/lib/aisef2/cohort
+2026-10-05T13:31:20.1342452Z copying aisef2/cohort/__init__.py -> build/lib/aisef2/cohort
+2026-10-05T13:31:20.1345838Z creating build/lib/aisef2/runtime
+2026-10-05T13:31:20.1347063Z copying aisef2/runtime/capability.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1349651Z copying aisef2/runtime/repair.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1351815Z copying aisef2/runtime/sentinel.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1353945Z copying aisef2/runtime/runspec.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1356070Z copying aisef2/runtime/range_anchor.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1358221Z copying aisef2/runtime/process_range.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1360907Z copying aisef2/runtime/run_scope.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1363198Z copying aisef2/runtime/tool.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1365622Z copying aisef2/runtime/__init__.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1367244Z copying aisef2/runtime/story_scope.py -> build/lib/aisef2/runtime
+2026-10-05T13:31:20.1371126Z creating build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1372597Z copying aisef2/orchestrate/quality.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1374584Z copying aisef2/orchestrate/adapters.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1376503Z copying aisef2/orchestrate/workspace.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1379006Z copying aisef2/orchestrate/proof.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1381587Z copying aisef2/orchestrate/review.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1383489Z copying aisef2/orchestrate/gate.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1385819Z copying aisef2/orchestrate/security.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1387545Z copying aisef2/orchestrate/merge.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1389960Z copying aisef2/orchestrate/story_runner.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1392282Z copying aisef2/orchestrate/seam.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1394232Z copying aisef2/orchestrate/__init__.py -> build/lib/aisef2/orchestrate
+2026-10-05T13:31:20.1397540Z creating build/lib/aisef2/quality
+2026-10-05T13:31:20.1398761Z copying aisef2/quality/test_execution.py -> build/lib/aisef2/quality
+2026-10-05T13:31:20.1401744Z copying aisef2/quality/vacuity.py -> build/lib/aisef2/quality
+2026-10-05T13:31:20.1403895Z copying aisef2/quality/__init__.py -> build/lib/aisef2/quality
+2026-10-05T13:31:20.1406075Z copying aisef2/quality/relevance.py -> build/lib/aisef2/quality
+2026-10-05T13:31:20.1408283Z copying aisef2/quality/adequacy.py -> build/lib/aisef2/quality
+2026-10-05T13:31:20.1412004Z creating build/lib/aisef2/journal/projections
+2026-10-05T13:31:20.1413368Z copying aisef2/journal/projections/retry_target.py -> build/lib/aisef2/journal/projections
+2026-10-05T13:31:20.1415622Z copying aisef2/journal/projections/qualification_counters.py -> build/lib/aisef2/journal/projections
+2026-10-05T13:31:20.1417547Z copying aisef2/journal/projections/budgets.py -> build/lib/aisef2/journal/projections
+2026-10-05T13:31:20.1419879Z copying aisef2/journal/projections/failure_owner.py -> build/lib/aisef2/journal/projections
+2026-10-05T13:31:20.1421964Z copying aisef2/journal/projections/story_state.py -> build/lib/aisef2/journal/projections
+2026-10-05T13:31:20.1423961Z copying aisef2/journal/projections/__init__.py -> build/lib/aisef2/journal/projections
+2026-10-05T13:31:20.1425961Z copying aisef2/journal/projections/terminal_state.py -> build/lib/aisef2/journal/projections
+2026-10-05T13:31:20.1431350Z creating build/lib/aisef/control
+2026-10-05T13:31:20.1432562Z copying aisef/control/preflight.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1435397Z copying aisef/control/invariants.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1437432Z copying aisef/control/closure.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1440684Z copying aisef/control/design_contract.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1442567Z copying aisef/control/acceptance.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1444909Z copying aisef/control/conformance.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1447054Z copying aisef/control/outcome.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1449515Z copying aisef/control/replay.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1451983Z copying aisef/control/budget.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1454283Z copying aisef/control/approvals.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1456674Z copying aisef/control/worktree.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1459163Z copying aisef/control/findings.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1461767Z copying aisef/control/impact.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1463886Z copying aisef/control/proof.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1466183Z copying aisef/control/journal.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1468479Z copying aisef/control/identity.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1470789Z copying aisef/control/tdd.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1473202Z copying aisef/control/gate.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1475999Z copying aisef/control/machine_gate.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1478446Z copying aisef/control/defects.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1480756Z copying aisef/control/security.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1482875Z copying aisef/control/normalize.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1485460Z copying aisef/control/complexity.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1487873Z copying aisef/control/cohort.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1489847Z copying aisef/control/onboarding.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1492272Z copying aisef/control/state.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1494612Z copying aisef/control/qualification.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1496771Z copying aisef/control/experience.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1498930Z copying aisef/control/replay_manifest.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1501333Z copying aisef/control/planes.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1503447Z copying aisef/control/obligation.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1505513Z copying aisef/control/scheduler.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1507562Z copying aisef/control/ledger.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1510297Z copying aisef/control/__init__.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1511940Z copying aisef/control/change.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1514364Z copying aisef/control/reviewer_qual.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1516926Z copying aisef/control/attribution.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1519026Z copying aisef/control/bmad_status.py -> build/lib/aisef/control
+2026-10-05T13:31:20.1522877Z creating build/lib/aisef/phases
+2026-10-05T13:31:20.1524113Z copying aisef/phases/deploy.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1526847Z copying aisef/phases/implement.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1530687Z copying aisef/phases/story_split.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1532789Z copying aisef/phases/improve.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1535369Z copying aisef/phases/run.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1537991Z copying aisef/phases/report.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1540419Z copying aisef/phases/mockup.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1542744Z copying aisef/phases/plan.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1545194Z copying aisef/phases/__init__.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1547044Z copying aisef/phases/qa.py -> build/lib/aisef/phases
+2026-10-05T13:31:20.1551088Z creating build/lib/aisef/cli
+2026-10-05T13:31:20.1552278Z copying aisef/cli/closure.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1554787Z copying aisef/cli/parser.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1557252Z copying aisef/cli/__main__.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1559185Z copying aisef/cli/implement.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1561865Z copying aisef/cli/dashboard.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1566513Z copying aisef/cli/_common.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1567124Z copying aisef/cli/doctor.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1567566Z copying aisef/cli/harness.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1569571Z copying aisef/cli/memory.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1571690Z copying aisef/cli/plan.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1573748Z copying aisef/cli/__init__.py -> build/lib/aisef/cli
+2026-10-05T13:31:20.1577472Z creating build/lib/aisef/kit
+2026-10-05T13:31:20.1578579Z copying aisef/kit/registry.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1581437Z copying aisef/kit/install.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1583654Z copying aisef/kit/skills.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1586168Z copying aisef/kit/router.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1587886Z copying aisef/kit/fetch.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1590527Z copying aisef/kit/security_filter.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1592723Z copying aisef/kit/constitution.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1594879Z copying aisef/kit/skill_scan.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1596887Z copying aisef/kit/docs.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1599153Z copying aisef/kit/__init__.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1601014Z copying aisef/kit/detect_stack.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1603336Z copying aisef/kit/catalog.py -> build/lib/aisef/kit
+2026-10-05T13:31:20.1607452Z creating build/lib/aisef/harness
+2026-10-05T13:31:20.1608665Z copying aisef/harness/testlog.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1611602Z copying aisef/harness/process_owner.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1613674Z copying aisef/harness/browser.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1616058Z copying aisef/harness/tools.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1618525Z copying aisef/harness/capabilities.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1621083Z copying aisef/harness/ownership.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1637355Z copying aisef/harness/prompts.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1640247Z copying aisef/harness/runlog.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1640941Z copying aisef/harness/mockup_map.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1641614Z copying aisef/harness/verify_image.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1642608Z copying aisef/harness/observe.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1643245Z copying aisef/harness/routing.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1643863Z copying aisef/harness/sandbox.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1644530Z copying aisef/harness/server_identity.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1645272Z copying aisef/harness/mockup_verify.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1645955Z copying aisef/harness/context.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1646580Z copying aisef/harness/aria.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1647186Z copying aisef/harness/__init__.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1647827Z copying aisef/harness/guardrails.py -> build/lib/aisef/harness
+2026-10-05T13:31:20.1651155Z creating build/lib/aisef/clients
+2026-10-05T13:31:20.1652374Z copying aisef/clients/stream.py -> build/lib/aisef/clients
+2026-10-05T13:31:20.1654638Z copying aisef/clients/opencode.py -> build/lib/aisef/clients
+2026-10-05T13:31:20.1656926Z copying aisef/clients/compile.py -> build/lib/aisef/clients
+2026-10-05T13:31:20.1658875Z copying aisef/clients/__init__.py -> build/lib/aisef/clients
+2026-10-05T13:31:20.1660916Z copying aisef/clients/base.py -> build/lib/aisef/clients
+2026-10-05T13:31:20.1663051Z copying aisef/clients/claude_code.py -> build/lib/aisef/clients
+2026-10-05T13:31:20.1664984Z copying aisef/clients/synthetic.py -> build/lib/aisef/clients
+2026-10-05T13:31:20.1667839Z creating build/lib/aisef/codebase
+2026-10-05T13:31:20.1669061Z copying aisef/codebase/basic.py -> build/lib/aisef/codebase
+2026-10-05T13:31:20.1671499Z copying aisef/codebase/detect.py -> build/lib/aisef/codebase
+2026-10-05T13:31:20.1673387Z copying aisef/codebase/provider.py -> build/lib/aisef/codebase
+2026-10-05T13:31:20.1675251Z copying aisef/codebase/baseline.py -> build/lib/aisef/codebase
+2026-10-05T13:31:20.1677187Z copying aisef/codebase/graphify.py -> build/lib/aisef/codebase
+2026-10-05T13:31:20.1679050Z copying aisef/codebase/__init__.py -> build/lib/aisef/codebase
+2026-10-05T13:31:20.1683816Z running egg_info
+2026-10-05T13:31:20.1699622Z writing aisef.egg-info/PKG-INFO
+2026-10-05T13:31:20.1829094Z writing dependency_links to aisef.egg-info/dependency_links.txt
+2026-10-05T13:31:20.1899139Z writing entry points to aisef.egg-info/entry_points.txt
+2026-10-05T13:31:20.2322562Z writing top-level names to aisef.egg-info/top_level.txt
+2026-10-05T13:31:20.2436163Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+2026-10-05T13:31:20.2464696Z reading manifest template 'MANIFEST.in'
+2026-10-05T13:31:20.2468422Z no previously-included directories found matching 'tests'
+2026-10-05T13:31:20.2496014Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+2026-10-05T13:31:20.2536017Z creating build/lib/aisef/kit/prompts
+2026-10-05T13:31:20.2537495Z copying aisef/kit/prompts/devsecops.md -> build/lib/aisef/kit/prompts
+2026-10-05T13:31:20.2540653Z copying aisef/kit/prompts/story-implement.md -> build/lib/aisef/kit/prompts
+2026-10-05T13:31:20.2543003Z copying aisef/kit/prompts/mockup-screen.md -> build/lib/aisef/kit/prompts
+2026-10-05T13:31:20.2545511Z copying aisef/kit/prompts/story-review.md -> build/lib/aisef/kit/prompts
+2026-10-05T13:31:20.2547955Z copying aisef/kit/prompts/story-security-review.md -> build/lib/aisef/kit/prompts
+2026-10-05T13:31:20.2550043Z creating build/lib/aisef/kit/rules
+2026-10-05T13:31:20.2551560Z copying aisef/kit/rules/principles.md -> build/lib/aisef/kit/rules
+2026-10-05T13:31:20.2554250Z copying aisef/kit/rules/must_never.md -> build/lib/aisef/kit/rules
+2026-10-05T13:31:20.2556507Z creating build/lib/aisef/kit/skills/aisef-mockup-html
+2026-10-05T13:31:20.2558982Z copying aisef/kit/skills/aisef-mockup-html/SKILL.md -> build/lib/aisef/kit/skills/aisef-mockup-html
+2026-10-05T13:31:20.2561269Z copying aisef/kit/catalog.json -> build/lib/aisef/kit
+2026-10-05T13:31:20.2563754Z creating build/lib/aisef/harness/assets
+2026-10-05T13:31:20.2565109Z copying aisef/harness/assets/render.mjs -> build/lib/aisef/harness/assets
+2026-10-05T13:31:20.2619645Z installing to build/bdist.linux-x86_64/wheel
+2026-10-05T13:31:20.2620172Z running install
+2026-10-05T13:31:20.2686686Z running install_lib
+2026-10-05T13:31:20.2700252Z creating build/bdist.linux-x86_64/wheel
+2026-10-05T13:31:20.2703237Z creating build/bdist.linux-x86_64/wheel/aisef2
+2026-10-05T13:31:20.2705670Z creating build/bdist.linux-x86_64/wheel/aisef2/control
+2026-10-05T13:31:20.2707320Z copying build/lib/aisef2/control/budget.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+2026-10-05T13:31:20.2709424Z copying build/lib/aisef2/control/routing.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+2026-10-05T13:31:20.2711322Z copying build/lib/aisef2/control/owner.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+2026-10-05T13:31:20.2713240Z copying build/lib/aisef2/control/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+2026-10-05T13:31:20.2715836Z creating build/bdist.linux-x86_64/wheel/aisef2/journal
+2026-10-05T13:31:20.2717394Z copying build/lib/aisef2/journal/format2.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+2026-10-05T13:31:20.2719629Z copying build/lib/aisef2/journal/writer.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+2026-10-05T13:31:20.2721496Z copying build/lib/aisef2/journal/compat.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+2026-10-05T13:31:20.2723172Z copying build/lib/aisef2/journal/fold.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+2026-10-05T13:31:20.2724900Z copying build/lib/aisef2/journal/format3.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+2026-10-05T13:31:20.2726796Z copying build/lib/aisef2/journal/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+2026-10-05T13:31:20.2728420Z copying build/lib/aisef2/journal/event.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+2026-10-05T13:31:20.2731431Z creating build/bdist.linux-x86_64/wheel/aisef2/journal/projections
+2026-10-05T13:31:20.2733080Z copying build/lib/aisef2/journal/projections/retry_target.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+2026-10-05T13:31:20.2734946Z copying build/lib/aisef2/journal/projections/qualification_counters.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+2026-10-05T13:31:20.2736565Z copying build/lib/aisef2/journal/projections/budgets.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+2026-10-05T13:31:20.2738539Z copying build/lib/aisef2/journal/projections/failure_owner.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+2026-10-05T13:31:20.2740111Z copying build/lib/aisef2/journal/projections/story_state.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+2026-10-05T13:31:20.2741877Z copying build/lib/aisef2/journal/projections/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+2026-10-05T13:31:20.2743643Z copying build/lib/aisef2/journal/projections/terminal_state.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+2026-10-05T13:31:20.2745768Z creating build/bdist.linux-x86_64/wheel/aisef2/probe
+2026-10-05T13:31:20.2747486Z copying build/lib/aisef2/probe/process_effect.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+2026-10-05T13:31:20.2749922Z copying build/lib/aisef2/probe/calibration.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+2026-10-05T13:31:20.2751733Z copying build/lib/aisef2/probe/file_artifact.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+2026-10-05T13:31:20.2753618Z copying build/lib/aisef2/probe/protocol.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+2026-10-05T13:31:20.2755394Z copying build/lib/aisef2/probe/cli_invocation.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+2026-10-05T13:31:20.2757697Z copying build/lib/aisef2/probe/python_callable_v2.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+2026-10-05T13:31:20.2759704Z copying build/lib/aisef2/probe/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+2026-10-05T13:31:20.2761240Z copying build/lib/aisef2/probe/python_callable.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+2026-10-05T13:31:20.2763165Z copying build/lib/aisef2/probe/catalog.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+2026-10-05T13:31:20.2765748Z creating build/bdist.linux-x86_64/wheel/aisef2/arch
+2026-10-05T13:31:20.2767215Z copying build/lib/aisef2/arch/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/arch
+2026-10-05T13:31:20.2769010Z copying build/lib/aisef2/arch/enums.py -> build/bdist.linux-x86_64/wheel/./aisef2/arch
+2026-10-05T13:31:20.2771888Z creating build/bdist.linux-x86_64/wheel/aisef2/invariants
+2026-10-05T13:31:20.2773431Z copying build/lib/aisef2/invariants/registry.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+2026-10-05T13:31:20.2775485Z copying build/lib/aisef2/invariants/evidence.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+2026-10-05T13:31:20.2777206Z copying build/lib/aisef2/invariants/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+2026-10-05T13:31:20.2779832Z creating build/bdist.linux-x86_64/wheel/aisef2/app
+2026-10-05T13:31:20.2781341Z copying build/lib/aisef2/app/preflight.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2783105Z copying build/lib/aisef2/app/bundle.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2784795Z copying build/lib/aisef2/app/cli.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2786427Z copying build/lib/aisef2/app/adapters.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2788087Z copying build/lib/aisef2/app/feedback.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2789926Z copying build/lib/aisef2/app/calibrations.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2791725Z copying build/lib/aisef2/app/run.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2793569Z copying build/lib/aisef2/app/verify.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2795182Z copying build/lib/aisef2/app/client.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2796953Z copying build/lib/aisef2/app/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2798538Z copying build/lib/aisef2/app/settings.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+2026-10-05T13:31:20.2801553Z creating build/bdist.linux-x86_64/wheel/aisef2/plan
+2026-10-05T13:31:20.2803332Z copying build/lib/aisef2/plan/story_admission.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+2026-10-05T13:31:20.2805071Z copying build/lib/aisef2/plan/static_admission.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+2026-10-05T13:31:20.2806904Z copying build/lib/aisef2/plan/obligation.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+2026-10-05T13:31:20.2808494Z copying build/lib/aisef2/plan/drift.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+2026-10-05T13:31:20.2810393Z copying build/lib/aisef2/plan/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+2026-10-05T13:31:20.2812597Z creating build/bdist.linux-x86_64/wheel/aisef2/product
+2026-10-05T13:31:20.2814187Z copying build/lib/aisef2/product/compiler.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+2026-10-05T13:31:20.2815969Z copying build/lib/aisef2/product/spec.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+2026-10-05T13:31:20.2817607Z copying build/lib/aisef2/product/outcome.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+2026-10-05T13:31:20.2819488Z copying build/lib/aisef2/product/approval.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+2026-10-05T13:31:20.2821251Z copying build/lib/aisef2/product/contract.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+2026-10-05T13:31:20.2823036Z copying build/lib/aisef2/product/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+2026-10-05T13:31:20.2825351Z creating build/bdist.linux-x86_64/wheel/aisef2/cohort
+2026-10-05T13:31:20.2827026Z copying build/lib/aisef2/cohort/preregistration.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+2026-10-05T13:31:20.2828909Z copying build/lib/aisef2/cohort/lifecycle.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+2026-10-05T13:31:20.2830843Z copying build/lib/aisef2/cohort/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+2026-10-05T13:31:20.2832489Z copying build/lib/aisef2/errors.py -> build/bdist.linux-x86_64/wheel/./aisef2
+2026-10-05T13:31:20.2835132Z creating build/bdist.linux-x86_64/wheel/aisef2/runtime
+2026-10-05T13:31:20.2836707Z copying build/lib/aisef2/runtime/capability.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2838442Z copying build/lib/aisef2/runtime/repair.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2840385Z copying build/lib/aisef2/runtime/sentinel.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2842123Z copying build/lib/aisef2/runtime/runspec.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2843835Z copying build/lib/aisef2/runtime/range_anchor.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2845484Z copying build/lib/aisef2/runtime/process_range.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2847301Z copying build/lib/aisef2/runtime/run_scope.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2848980Z copying build/lib/aisef2/runtime/tool.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2850918Z copying build/lib/aisef2/runtime/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2852350Z copying build/lib/aisef2/runtime/story_scope.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+2026-10-05T13:31:20.2854143Z copying build/lib/aisef2/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2
+2026-10-05T13:31:20.2856739Z creating build/bdist.linux-x86_64/wheel/aisef2/orchestrate
+2026-10-05T13:31:20.2858312Z copying build/lib/aisef2/orchestrate/quality.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2860206Z copying build/lib/aisef2/orchestrate/adapters.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2861942Z copying build/lib/aisef2/orchestrate/workspace.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2863868Z copying build/lib/aisef2/orchestrate/proof.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2865650Z copying build/lib/aisef2/orchestrate/review.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2867078Z copying build/lib/aisef2/orchestrate/gate.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2868725Z copying build/lib/aisef2/orchestrate/security.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2870483Z copying build/lib/aisef2/orchestrate/merge.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2872180Z copying build/lib/aisef2/orchestrate/story_runner.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2873943Z copying build/lib/aisef2/orchestrate/seam.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2875570Z copying build/lib/aisef2/orchestrate/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+2026-10-05T13:31:20.2877924Z creating build/bdist.linux-x86_64/wheel/aisef2/quality
+2026-10-05T13:31:20.2879690Z copying build/lib/aisef2/quality/test_execution.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+2026-10-05T13:31:20.2881683Z copying build/lib/aisef2/quality/vacuity.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+2026-10-05T13:31:20.2883453Z copying build/lib/aisef2/quality/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+2026-10-05T13:31:20.2885104Z copying build/lib/aisef2/quality/relevance.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+2026-10-05T13:31:20.2886913Z copying build/lib/aisef2/quality/adequacy.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+2026-10-05T13:31:20.2889722Z creating build/bdist.linux-x86_64/wheel/aisef
+2026-10-05T13:31:20.2892336Z creating build/bdist.linux-x86_64/wheel/aisef/control
+2026-10-05T13:31:20.2893949Z copying build/lib/aisef/control/preflight.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2896059Z copying build/lib/aisef/control/invariants.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2897748Z copying build/lib/aisef/control/closure.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2900821Z copying build/lib/aisef/control/design_contract.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2902354Z copying build/lib/aisef/control/acceptance.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2904072Z copying build/lib/aisef/control/conformance.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2905753Z copying build/lib/aisef/control/outcome.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2907520Z copying build/lib/aisef/control/replay.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2909516Z copying build/lib/aisef/control/budget.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2911375Z copying build/lib/aisef/control/approvals.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2913105Z copying build/lib/aisef/control/worktree.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2914967Z copying build/lib/aisef/control/findings.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2916754Z copying build/lib/aisef/control/impact.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2918531Z copying build/lib/aisef/control/proof.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2920516Z copying build/lib/aisef/control/journal.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2922278Z copying build/lib/aisef/control/identity.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2924084Z copying build/lib/aisef/control/tdd.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2925791Z copying build/lib/aisef/control/gate.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2928441Z copying build/lib/aisef/control/machine_gate.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2930782Z copying build/lib/aisef/control/defects.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2932346Z copying build/lib/aisef/control/security.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2934089Z copying build/lib/aisef/control/normalize.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2936131Z copying build/lib/aisef/control/complexity.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2937906Z copying build/lib/aisef/control/cohort.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2939859Z copying build/lib/aisef/control/onboarding.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2941663Z copying build/lib/aisef/control/state.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2943565Z copying build/lib/aisef/control/qualification.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2945342Z copying build/lib/aisef/control/experience.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2947106Z copying build/lib/aisef/control/replay_manifest.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2948787Z copying build/lib/aisef/control/planes.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2950710Z copying build/lib/aisef/control/obligation.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2952397Z copying build/lib/aisef/control/scheduler.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2954125Z copying build/lib/aisef/control/ledger.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2956113Z copying build/lib/aisef/control/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2957538Z copying build/lib/aisef/control/change.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2959630Z copying build/lib/aisef/control/reviewer_qual.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2961766Z copying build/lib/aisef/control/attribution.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2963638Z copying build/lib/aisef/control/bmad_status.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+2026-10-05T13:31:20.2965281Z copying build/lib/aisef/__main__.py -> build/bdist.linux-x86_64/wheel/./aisef
+2026-10-05T13:31:20.2967915Z creating build/bdist.linux-x86_64/wheel/aisef/phases
+2026-10-05T13:31:20.2969663Z copying build/lib/aisef/phases/deploy.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2971670Z copying build/lib/aisef/phases/implement.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2975221Z copying build/lib/aisef/phases/story_split.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2976741Z copying build/lib/aisef/phases/improve.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2978732Z copying build/lib/aisef/phases/run.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2981012Z copying build/lib/aisef/phases/report.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2982803Z copying build/lib/aisef/phases/mockup.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2984523Z copying build/lib/aisef/phases/plan.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2986623Z copying build/lib/aisef/phases/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2988195Z copying build/lib/aisef/phases/qa.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+2026-10-05T13:31:20.2990354Z copying build/lib/aisef/config.py -> build/bdist.linux-x86_64/wheel/./aisef
+2026-10-05T13:31:20.2992187Z copying build/lib/aisef/memory.py -> build/bdist.linux-x86_64/wheel/./aisef
+2026-10-05T13:31:20.2994975Z creating build/bdist.linux-x86_64/wheel/aisef/cli
+2026-10-05T13:31:20.2996441Z copying build/lib/aisef/cli/closure.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.2998390Z copying build/lib/aisef/cli/parser.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3000280Z copying build/lib/aisef/cli/__main__.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3001952Z copying build/lib/aisef/cli/implement.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3003943Z copying build/lib/aisef/cli/dashboard.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3005662Z copying build/lib/aisef/cli/_common.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3007371Z copying build/lib/aisef/cli/doctor.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3009158Z copying build/lib/aisef/cli/harness.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3011297Z copying build/lib/aisef/cli/memory.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3012889Z copying build/lib/aisef/cli/plan.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3014700Z copying build/lib/aisef/cli/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+2026-10-05T13:31:20.3017330Z creating build/bdist.linux-x86_64/wheel/aisef/kit
+2026-10-05T13:31:20.3018788Z copying build/lib/aisef/kit/registry.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3021024Z copying build/lib/aisef/kit/install.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3022752Z copying build/lib/aisef/kit/skills.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3024361Z copying build/lib/aisef/kit/router.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3026049Z copying build/lib/aisef/kit/fetch.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3028552Z creating build/bdist.linux-x86_64/wheel/aisef/kit/rules
+2026-10-05T13:31:20.3030350Z copying build/lib/aisef/kit/rules/principles.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/rules
+2026-10-05T13:31:20.3032380Z copying build/lib/aisef/kit/rules/must_never.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/rules
+2026-10-05T13:31:20.3033822Z copying build/lib/aisef/kit/security_filter.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3035729Z copying build/lib/aisef/kit/constitution.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3037253Z copying build/lib/aisef/kit/skill_scan.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3039743Z creating build/bdist.linux-x86_64/wheel/aisef/kit/prompts
+2026-10-05T13:31:20.3041437Z copying build/lib/aisef/kit/prompts/devsecops.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+2026-10-05T13:31:20.3043095Z copying build/lib/aisef/kit/prompts/story-implement.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+2026-10-05T13:31:20.3044924Z copying build/lib/aisef/kit/prompts/mockup-screen.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+2026-10-05T13:31:20.3046553Z copying build/lib/aisef/kit/prompts/story-review.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+2026-10-05T13:31:20.3048432Z copying build/lib/aisef/kit/prompts/story-security-review.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+2026-10-05T13:31:20.3050652Z creating build/bdist.linux-x86_64/wheel/aisef/kit/skills
+2026-10-05T13:31:20.3052630Z creating build/bdist.linux-x86_64/wheel/aisef/kit/skills/aisef-mockup-html
+2026-10-05T13:31:20.3054203Z copying build/lib/aisef/kit/skills/aisef-mockup-html/SKILL.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/skills/aisef-mockup-html
+2026-10-05T13:31:20.3055858Z copying build/lib/aisef/kit/docs.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3057660Z copying build/lib/aisef/kit/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3059005Z copying build/lib/aisef/kit/detect_stack.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3061018Z copying build/lib/aisef/kit/catalog.json -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3062957Z copying build/lib/aisef/kit/catalog.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+2026-10-05T13:31:20.3064297Z copying build/lib/aisef/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef
+2026-10-05T13:31:20.3066792Z creating build/bdist.linux-x86_64/wheel/aisef/harness
+2026-10-05T13:31:20.3068812Z copying build/lib/aisef/harness/testlog.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3070810Z copying build/lib/aisef/harness/process_owner.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3072520Z copying build/lib/aisef/harness/browser.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3074307Z copying build/lib/aisef/harness/tools.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3076272Z copying build/lib/aisef/harness/capabilities.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3078086Z copying build/lib/aisef/harness/ownership.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3079917Z copying build/lib/aisef/harness/prompts.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3081647Z copying build/lib/aisef/harness/runlog.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3084177Z creating build/bdist.linux-x86_64/wheel/aisef/harness/assets
+2026-10-05T13:31:20.3085724Z copying build/lib/aisef/harness/assets/render.mjs -> build/bdist.linux-x86_64/wheel/./aisef/harness/assets
+2026-10-05T13:31:20.3087468Z copying build/lib/aisef/harness/mockup_map.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3089196Z copying build/lib/aisef/harness/verify_image.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3091173Z copying build/lib/aisef/harness/observe.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3093074Z copying build/lib/aisef/harness/routing.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3094821Z copying build/lib/aisef/harness/sandbox.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3096682Z copying build/lib/aisef/harness/server_identity.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3101141Z copying build/lib/aisef/harness/mockup_verify.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3102948Z copying build/lib/aisef/harness/context.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3103934Z copying build/lib/aisef/harness/aria.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3104890Z copying build/lib/aisef/harness/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3105875Z copying build/lib/aisef/harness/guardrails.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+2026-10-05T13:31:20.3108729Z creating build/bdist.linux-x86_64/wheel/aisef/clients
+2026-10-05T13:31:20.3110438Z copying build/lib/aisef/clients/stream.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+2026-10-05T13:31:20.3112395Z copying build/lib/aisef/clients/opencode.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+2026-10-05T13:31:20.3114149Z copying build/lib/aisef/clients/compile.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+2026-10-05T13:31:20.3122456Z copying build/lib/aisef/clients/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+2026-10-05T13:31:20.3123483Z copying build/lib/aisef/clients/base.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+2026-10-05T13:31:20.3124507Z copying build/lib/aisef/clients/claude_code.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+2026-10-05T13:31:20.3125520Z copying build/lib/aisef/clients/synthetic.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+2026-10-05T13:31:20.3126449Z copying build/lib/aisef/_compat.py -> build/bdist.linux-x86_64/wheel/./aisef
+2026-10-05T13:31:20.3127302Z copying build/lib/aisef/memory_bench.py -> build/bdist.linux-x86_64/wheel/./aisef
+2026-10-05T13:31:20.3128124Z creating build/bdist.linux-x86_64/wheel/aisef/codebase
+2026-10-05T13:31:20.3129117Z copying build/lib/aisef/codebase/basic.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+2026-10-05T13:31:20.3130951Z copying build/lib/aisef/codebase/detect.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+2026-10-05T13:31:20.3132699Z copying build/lib/aisef/codebase/provider.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+2026-10-05T13:31:20.3134303Z copying build/lib/aisef/codebase/baseline.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+2026-10-05T13:31:20.3136110Z copying build/lib/aisef/codebase/graphify.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+2026-10-05T13:31:20.3137778Z copying build/lib/aisef/codebase/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+2026-10-05T13:31:20.3139736Z running install_egg_info
+2026-10-05T13:31:20.3154640Z Copying aisef.egg-info to build/bdist.linux-x86_64/wheel/./aisef-2.0.0-py3.12.egg-info
+2026-10-05T13:31:20.3165193Z running install_scripts
+2026-10-05T13:31:20.3175826Z creating build/bdist.linux-x86_64/wheel/aisef-2.0.0.dist-info/WHEEL
+2026-10-05T13:31:20.3181563Z creating '/home/runner/work/aisef/aisef/dist/.tmp-lmznwkfv/aisef-2.0.0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+2026-10-05T13:31:20.3185289Z adding 'aisef/__init__.py'
+2026-10-05T13:31:20.3187736Z adding 'aisef/__main__.py'
+2026-10-05T13:31:20.3191076Z adding 'aisef/_compat.py'
+2026-10-05T13:31:20.3200954Z adding 'aisef/config.py'
+2026-10-05T13:31:20.3210608Z adding 'aisef/memory.py'
+2026-10-05T13:31:20.3214298Z adding 'aisef/memory_bench.py'
+2026-10-05T13:31:20.3217486Z adding 'aisef/cli/__init__.py'
+2026-10-05T13:31:20.3219347Z adding 'aisef/cli/__main__.py'
+2026-10-05T13:31:20.3222133Z adding 'aisef/cli/_common.py'
+2026-10-05T13:31:20.3224796Z adding 'aisef/cli/closure.py'
+2026-10-05T13:31:20.3230412Z adding 'aisef/cli/dashboard.py'
+2026-10-05T13:31:20.3237586Z adding 'aisef/cli/doctor.py'
+2026-10-05T13:31:20.3246343Z adding 'aisef/cli/harness.py'
+2026-10-05T13:31:20.3259796Z adding 'aisef/cli/implement.py'
+2026-10-05T13:31:20.3262367Z adding 'aisef/cli/memory.py'
+2026-10-05T13:31:20.3271310Z adding 'aisef/cli/parser.py'
+2026-10-05T13:31:20.3277088Z adding 'aisef/cli/plan.py'
+2026-10-05T13:31:20.3279116Z adding 'aisef/clients/__init__.py'
+2026-10-05T13:31:20.3289858Z adding 'aisef/clients/base.py'
+2026-10-05T13:31:20.3294410Z adding 'aisef/clients/claude_code.py'
+2026-10-05T13:31:20.3300177Z adding 'aisef/clients/compile.py'
+2026-10-05T13:31:20.3306561Z adding 'aisef/clients/opencode.py'
+2026-10-05T13:31:20.3313511Z adding 'aisef/clients/stream.py'
+2026-10-05T13:31:20.3318522Z adding 'aisef/clients/synthetic.py'
+2026-10-05T13:31:20.3320967Z adding 'aisef/codebase/__init__.py'
+2026-10-05T13:31:20.3325034Z adding 'aisef/codebase/baseline.py'
+2026-10-05T13:31:20.3327817Z adding 'aisef/codebase/basic.py'
+2026-10-05T13:31:20.3330609Z adding 'aisef/codebase/detect.py'
+2026-10-05T13:31:20.3333155Z adding 'aisef/codebase/graphify.py'
+2026-10-05T13:31:20.3335653Z adding 'aisef/codebase/provider.py'
+2026-10-05T13:31:20.3337779Z adding 'aisef/control/__init__.py'
+2026-10-05T13:31:20.3341346Z adding 'aisef/control/acceptance.py'
+2026-10-05T13:31:20.3347808Z adding 'aisef/control/approvals.py'
+2026-10-05T13:31:20.3354100Z adding 'aisef/control/attribution.py'
+2026-10-05T13:31:20.3357311Z adding 'aisef/control/bmad_status.py'
+2026-10-05T13:31:20.3362593Z adding 'aisef/control/budget.py'
+2026-10-05T13:31:20.3365963Z adding 'aisef/control/change.py'
+2026-10-05T13:31:20.3405308Z adding 'aisef/control/closure.py'
+2026-10-05T13:31:20.3412391Z adding 'aisef/control/cohort.py'
+2026-10-05T13:31:20.3421919Z adding 'aisef/control/complexity.py'
+2026-10-05T13:31:20.3426180Z adding 'aisef/control/conformance.py'
+2026-10-05T13:31:20.3430068Z adding 'aisef/control/defects.py'
+2026-10-05T13:31:20.3433755Z adding 'aisef/control/design_contract.py'
+2026-10-05T13:31:20.3439878Z adding 'aisef/control/experience.py'
+2026-10-05T13:31:20.3446603Z adding 'aisef/control/findings.py'
+2026-10-05T13:31:20.3480745Z adding 'aisef/control/gate.py'
+2026-10-05T13:31:20.3485909Z adding 'aisef/control/identity.py'
+2026-10-05T13:31:20.3491552Z adding 'aisef/control/impact.py'
+2026-10-05T13:31:20.3495887Z adding 'aisef/control/invariants.py'
+2026-10-05T13:31:20.3501466Z adding 'aisef/control/journal.py'
+2026-10-05T13:31:20.3516522Z adding 'aisef/control/ledger.py'
+2026-10-05T13:31:20.3528445Z adding 'aisef/control/machine_gate.py'
+2026-10-05T13:31:20.3547014Z adding 'aisef/control/normalize.py'
+2026-10-05T13:31:20.3552081Z adding 'aisef/control/obligation.py'
+2026-10-05T13:31:20.3556485Z adding 'aisef/control/onboarding.py'
+2026-10-05T13:31:20.3560371Z adding 'aisef/control/outcome.py'
+2026-10-05T13:31:20.3565212Z adding 'aisef/control/planes.py'
+2026-10-05T13:31:20.3580760Z adding 'aisef/control/preflight.py'
+2026-10-05T13:31:20.3586234Z adding 'aisef/control/proof.py'
+2026-10-05T13:31:20.3592813Z adding 'aisef/control/qualification.py'
+2026-10-05T13:31:20.3597014Z adding 'aisef/control/replay.py'
+2026-10-05T13:31:20.3601475Z adding 'aisef/control/replay_manifest.py'
+2026-10-05T13:31:20.3615651Z adding 'aisef/control/reviewer_qual.py'
+2026-10-05T13:31:20.3619800Z adding 'aisef/control/scheduler.py'
+2026-10-05T13:31:20.3623248Z adding 'aisef/control/security.py'
+2026-10-05T13:31:20.3630736Z adding 'aisef/control/state.py'
+2026-10-05T13:31:20.3634336Z adding 'aisef/control/tdd.py'
+2026-10-05T13:31:20.3643412Z adding 'aisef/control/worktree.py'
+2026-10-05T13:31:20.3646053Z adding 'aisef/harness/__init__.py'
+2026-10-05T13:31:20.3650472Z adding 'aisef/harness/aria.py'
+2026-10-05T13:31:20.3653713Z adding 'aisef/harness/browser.py'
+2026-10-05T13:31:20.3659687Z adding 'aisef/harness/capabilities.py'
+2026-10-05T13:31:20.3665435Z adding 'aisef/harness/context.py'
+2026-10-05T13:31:20.3688728Z adding 'aisef/harness/guardrails.py'
+2026-10-05T13:31:20.3692752Z adding 'aisef/harness/mockup_map.py'
+2026-10-05T13:31:20.3699433Z adding 'aisef/harness/mockup_verify.py'
+2026-10-05T13:31:20.3706853Z adding 'aisef/harness/observe.py'
+2026-10-05T13:31:20.3710255Z adding 'aisef/harness/ownership.py'
+2026-10-05T13:31:20.3714571Z adding 'aisef/harness/process_owner.py'
+2026-10-05T13:31:20.3717350Z adding 'aisef/harness/prompts.py'
+2026-10-05T13:31:20.3720905Z adding 'aisef/harness/routing.py'
+2026-10-05T13:31:20.3723198Z adding 'aisef/harness/runlog.py'
+2026-10-05T13:31:20.3731460Z adding 'aisef/harness/sandbox.py'
+2026-10-05T13:31:20.3735873Z adding 'aisef/harness/server_identity.py'
+2026-10-05T13:31:20.3743826Z adding 'aisef/harness/testlog.py'
+2026-10-05T13:31:20.3755395Z adding 'aisef/harness/tools.py'
+2026-10-05T13:31:20.3761489Z adding 'aisef/harness/verify_image.py'
+2026-10-05T13:31:20.3766048Z adding 'aisef/harness/assets/render.mjs'
+2026-10-05T13:31:20.3768550Z adding 'aisef/kit/__init__.py'
+2026-10-05T13:31:20.3771450Z adding 'aisef/kit/catalog.json'
+2026-10-05T13:31:20.3774292Z adding 'aisef/kit/catalog.py'
+2026-10-05T13:31:20.3777558Z adding 'aisef/kit/constitution.py'
+2026-10-05T13:31:20.3781183Z adding 'aisef/kit/detect_stack.py'
+2026-10-05T13:31:20.3784199Z adding 'aisef/kit/docs.py'
+2026-10-05T13:31:20.3787586Z adding 'aisef/kit/fetch.py'
+2026-10-05T13:31:20.3791643Z adding 'aisef/kit/install.py'
+2026-10-05T13:31:20.3798520Z adding 'aisef/kit/registry.py'
+2026-10-05T13:31:20.3802986Z adding 'aisef/kit/router.py'
+2026-10-05T13:31:20.3807084Z adding 'aisef/kit/security_filter.py'
+2026-10-05T13:31:20.3811658Z adding 'aisef/kit/skill_scan.py'
+2026-10-05T13:31:20.3815250Z adding 'aisef/kit/skills.py'
+2026-10-05T13:31:20.3817192Z adding 'aisef/kit/prompts/devsecops.md'
+2026-10-05T13:31:20.3819858Z adding 'aisef/kit/prompts/mockup-screen.md'
+2026-10-05T13:31:20.3823704Z adding 'aisef/kit/prompts/story-implement.md'
+2026-10-05T13:31:20.3827778Z adding 'aisef/kit/prompts/story-review.md'
+2026-10-05T13:31:20.3831545Z adding 'aisef/kit/prompts/story-security-review.md'
+2026-10-05T13:31:20.3834302Z adding 'aisef/kit/rules/must_never.md'
+2026-10-05T13:31:20.3836556Z adding 'aisef/kit/rules/principles.md'
+2026-10-05T13:31:20.3840828Z adding 'aisef/kit/skills/aisef-mockup-html/SKILL.md'
+2026-10-05T13:31:20.3843367Z adding 'aisef/phases/__init__.py'
+2026-10-05T13:31:20.3851459Z adding 'aisef/phases/deploy.py'
+2026-10-05T13:31:20.3939934Z adding 'aisef/phases/implement.py'
+2026-10-05T13:31:20.3957603Z adding 'aisef/phases/improve.py'
+2026-10-05T13:31:20.3964230Z adding 'aisef/phases/mockup.py'
+2026-10-05T13:31:20.3976905Z adding 'aisef/phases/plan.py'
+2026-10-05T13:31:20.3993429Z adding 'aisef/phases/qa.py'
+2026-10-05T13:31:20.4000534Z adding 'aisef/phases/report.py'
+2026-10-05T13:31:20.4019473Z adding 'aisef/phases/run.py'
+2026-10-05T13:31:20.4025715Z adding 'aisef/phases/story_split.py'
+2026-10-05T13:31:20.4029601Z adding 'aisef2/__init__.py'
+2026-10-05T13:31:20.4043523Z adding 'aisef2/errors.py'
+2026-10-05T13:31:20.4043965Z adding 'aisef2/app/__init__.py'
+2026-10-05T13:31:20.4044256Z adding 'aisef2/app/adapters.py'
+2026-10-05T13:31:20.4044519Z adding 'aisef2/app/bundle.py'
+2026-10-05T13:31:20.4044785Z adding 'aisef2/app/calibrations.py'
+2026-10-05T13:31:20.4045744Z adding 'aisef2/app/cli.py'
+2026-10-05T13:31:20.4051428Z adding 'aisef2/app/client.py'
+2026-10-05T13:31:20.4055078Z adding 'aisef2/app/feedback.py'
+2026-10-05T13:31:20.4058882Z adding 'aisef2/app/preflight.py'
+2026-10-05T13:31:20.4067274Z adding 'aisef2/app/run.py'
+2026-10-05T13:31:20.4071156Z adding 'aisef2/app/settings.py'
+2026-10-05T13:31:20.4073697Z adding 'aisef2/app/verify.py'
+2026-10-05T13:31:20.4075977Z adding 'aisef2/arch/__init__.py'
+2026-10-05T13:31:20.4079808Z adding 'aisef2/arch/enums.py'
+2026-10-05T13:31:20.4082451Z adding 'aisef2/cohort/__init__.py'
+2026-10-05T13:31:20.4086643Z adding 'aisef2/cohort/lifecycle.py'
+2026-10-05T13:31:20.4091311Z adding 'aisef2/cohort/preregistration.py'
+2026-10-05T13:31:20.4093360Z adding 'aisef2/control/__init__.py'
+2026-10-05T13:31:20.4096347Z adding 'aisef2/control/budget.py'
+2026-10-05T13:31:20.4100911Z adding 'aisef2/control/owner.py'
+2026-10-05T13:31:20.4104527Z adding 'aisef2/control/routing.py'
+2026-10-05T13:31:20.4107009Z adding 'aisef2/invariants/__init__.py'
+2026-10-05T13:31:20.4109789Z adding 'aisef2/invariants/evidence.py'
+2026-10-05T13:31:20.4117482Z adding 'aisef2/invariants/registry.py'
+2026-10-05T13:31:20.4120160Z adding 'aisef2/journal/__init__.py'
+2026-10-05T13:31:20.4124044Z adding 'aisef2/journal/compat.py'
+2026-10-05T13:31:20.4128308Z adding 'aisef2/journal/event.py'
+2026-10-05T13:31:20.4132130Z adding 'aisef2/journal/fold.py'
+2026-10-05T13:31:20.4139695Z adding 'aisef2/journal/format2.py'
+2026-10-05T13:31:20.4147852Z adding 'aisef2/journal/format3.py'
+2026-10-05T13:31:20.4151593Z adding 'aisef2/journal/writer.py'
+2026-10-05T13:31:20.4154566Z adding 'aisef2/journal/projections/__init__.py'
+2026-10-05T13:31:20.4157655Z adding 'aisef2/journal/projections/budgets.py'
+2026-10-05T13:31:20.4160494Z adding 'aisef2/journal/projections/failure_owner.py'
+2026-10-05T13:31:20.4163371Z adding 'aisef2/journal/projections/qualification_counters.py'
+2026-10-05T13:31:20.4165444Z adding 'aisef2/journal/projections/retry_target.py'
+2026-10-05T13:31:20.4168223Z adding 'aisef2/journal/projections/story_state.py'
+2026-10-05T13:31:20.4171216Z adding 'aisef2/journal/projections/terminal_state.py'
+2026-10-05T13:31:20.4173919Z adding 'aisef2/orchestrate/__init__.py'
+2026-10-05T13:31:20.4177131Z adding 'aisef2/orchestrate/adapters.py'
+2026-10-05T13:31:20.4179451Z adding 'aisef2/orchestrate/gate.py'
+2026-10-05T13:31:20.4182338Z adding 'aisef2/orchestrate/merge.py'
+2026-10-05T13:31:20.4185838Z adding 'aisef2/orchestrate/proof.py'
+2026-10-05T13:31:20.4188720Z adding 'aisef2/orchestrate/quality.py'
+2026-10-05T13:31:20.4191522Z adding 'aisef2/orchestrate/review.py'
+2026-10-05T13:31:20.4194246Z adding 'aisef2/orchestrate/seam.py'
+2026-10-05T13:31:20.4196771Z adding 'aisef2/orchestrate/security.py'
+2026-10-05T13:31:20.4203250Z adding 'aisef2/orchestrate/story_runner.py'
+2026-10-05T13:31:20.4208429Z adding 'aisef2/orchestrate/workspace.py'
+2026-10-05T13:31:20.4211053Z adding 'aisef2/plan/__init__.py'
+2026-10-05T13:31:20.4214607Z adding 'aisef2/plan/drift.py'
+2026-10-05T13:31:20.4217698Z adding 'aisef2/plan/obligation.py'
+2026-10-05T13:31:20.4223779Z adding 'aisef2/plan/static_admission.py'
+2026-10-05T13:31:20.4227889Z adding 'aisef2/plan/story_admission.py'
+2026-10-05T13:31:20.4230321Z adding 'aisef2/probe/__init__.py'
+2026-10-05T13:31:20.4234118Z adding 'aisef2/probe/calibration.py'
+2026-10-05T13:31:20.4238150Z adding 'aisef2/probe/catalog.py'
+2026-10-05T13:31:20.4262293Z adding 'aisef2/probe/cli_invocation.py'
+2026-10-05T13:31:20.4272713Z adding 'aisef2/probe/file_artifact.py'
+2026-10-05T13:31:20.4291824Z adding 'aisef2/probe/process_effect.py'
+2026-10-05T13:31:20.4298842Z adding 'aisef2/probe/protocol.py'
+2026-10-05T13:31:20.4308329Z adding 'aisef2/probe/python_callable.py'
+2026-10-05T13:31:20.4336297Z adding 'aisef2/probe/python_callable_v2.py'
+2026-10-05T13:31:20.4336873Z adding 'aisef2/product/__init__.py'
+2026-10-05T13:31:20.4337349Z adding 'aisef2/product/approval.py'
+2026-10-05T13:31:20.4337795Z adding 'aisef2/product/compiler.py'
+2026-10-05T13:31:20.4338221Z adding 'aisef2/product/contract.py'
+2026-10-05T13:31:20.4338678Z adding 'aisef2/product/outcome.py'
+2026-10-05T13:31:20.4340184Z adding 'aisef2/product/spec.py'
+2026-10-05T13:31:20.4340619Z adding 'aisef2/quality/__init__.py'
+2026-10-05T13:31:20.4345142Z adding 'aisef2/quality/adequacy.py'
+2026-10-05T13:31:20.4350544Z adding 'aisef2/quality/relevance.py'
+2026-10-05T13:31:20.4360218Z adding 'aisef2/quality/test_execution.py'
+2026-10-05T13:31:20.4366347Z adding 'aisef2/quality/vacuity.py'
+2026-10-05T13:31:20.4368740Z adding 'aisef2/runtime/__init__.py'
+2026-10-05T13:31:20.4372099Z adding 'aisef2/runtime/capability.py'
+2026-10-05T13:31:20.4379407Z adding 'aisef2/runtime/process_range.py'
+2026-10-05T13:31:20.4383082Z adding 'aisef2/runtime/range_anchor.py'
+2026-10-05T13:31:20.4386600Z adding 'aisef2/runtime/repair.py'
+2026-10-05T13:31:20.4391710Z adding 'aisef2/runtime/run_scope.py'
+2026-10-05T13:31:20.4394851Z adding 'aisef2/runtime/runspec.py'
+2026-10-05T13:31:20.4398120Z adding 'aisef2/runtime/sentinel.py'
+2026-10-05T13:31:20.4402480Z adding 'aisef2/runtime/story_scope.py'
+2026-10-05T13:31:20.4405679Z adding 'aisef2/runtime/tool.py'
+2026-10-05T13:31:20.4417871Z adding 'aisef-2.0.0.dist-info/METADATA'
+2026-10-05T13:31:20.4419591Z adding 'aisef-2.0.0.dist-info/WHEEL'
+2026-10-05T13:31:20.4421100Z adding 'aisef-2.0.0.dist-info/entry_points.txt'
+2026-10-05T13:31:20.4422294Z adding 'aisef-2.0.0.dist-info/top_level.txt'
+2026-10-05T13:31:20.4432287Z adding 'aisef-2.0.0.dist-info/RECORD'
+2026-10-05T13:31:20.4439053Z removing build/bdist.linux-x86_64/wheel
+2026-10-05T13:31:20.5179737Z Successfully built aisef-2.0.0.tar.gz and aisef-2.0.0-py3-none-any.whl
+2026-10-05T13:31:20.9251837Z a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d  aisef-2.0.0.tar.gz
+2026-10-05T13:31:20.9356933Z ##[group]Run python -m twine check dist/*
+2026-10-05T13:31:20.9357290Z [36;1mpython -m twine check dist/*[0m
+2026-10-05T13:31:20.9427970Z shell: /usr/bin/bash -e {0}
+2026-10-05T13:31:20.9428239Z env:
+2026-10-05T13:31:20.9428531Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:20.9428968Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-05T13:31:20.9429585Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:20.9429967Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:20.9430350Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:20.9430727Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-05T13:31:20.9431059Z ##[endgroup]
+2026-10-05T13:31:21.5252662Z Checking dist/aisef-2.0.0-py3-none-any.whl: [32mPASSED[0m
+2026-10-05T13:31:21.5502265Z Checking dist/aisef-2.0.0.tar.gz: [32mPASSED[0m
+2026-10-05T13:31:21.6031534Z ##[group]Run python -P validation/v2/packaging_check.py --artifacts dist
+2026-10-05T13:31:21.6032097Z [36;1mpython -P validation/v2/packaging_check.py --artifacts dist[0m
+2026-10-05T13:31:21.6103400Z shell: /usr/bin/bash -e {0}
+2026-10-05T13:31:21.6103687Z env:
+2026-10-05T13:31:21.6103979Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.6104417Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-05T13:31:21.6104828Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.6105198Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.6105564Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.6105950Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-05T13:31:21.6106273Z ##[endgroup]
+2026-10-05T13:31:21.7200745Z packaging: PASS (exactly aisef + aisef2)
+2026-10-05T13:31:21.7311387Z ##[group]Run set -eu
+2026-10-05T13:31:21.7311721Z [36;1mset -eu[0m
+2026-10-05T13:31:21.7311988Z [36;1m(cd dist && sha256sum -- *) | tee SHA256SUMS[0m
+2026-10-05T13:31:21.7312517Z [36;1m{ echo '### built artifacts (sha256)'; echo '```'; cat SHA256SUMS; echo '```'; } >> "$GITHUB_STEP_SUMMARY"[0m
+2026-10-05T13:31:21.7383796Z shell: /usr/bin/bash -e {0}
+2026-10-05T13:31:21.7384071Z env:
+2026-10-05T13:31:21.7384357Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.7384792Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-05T13:31:21.7385220Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.7385603Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.7385980Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.7386369Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-05T13:31:21.7386696Z ##[endgroup]
+2026-10-05T13:31:21.7948190Z 5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b  aisef-2.0.0-py3-none-any.whl
+2026-10-05T13:31:21.7956443Z a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d  aisef-2.0.0.tar.gz
+2026-10-05T13:31:21.8529833Z ##[group]Run actions/upload-artifact@v4
+2026-10-05T13:31:21.8530133Z with:
+2026-10-05T13:31:21.8530326Z   name: dist
+2026-10-05T13:31:21.8530523Z   path: dist/
+2026-10-05T13:31:21.8530731Z   if-no-files-found: error
+2026-10-05T13:31:21.8530971Z   compression-level: 6
+2026-10-05T13:31:21.8531199Z   overwrite: false
+2026-10-05T13:31:21.8531420Z   include-hidden-files: false
+2026-10-05T13:31:21.8531655Z env:
+2026-10-05T13:31:21.8531914Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.8532334Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-05T13:31:21.8532735Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.8533128Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.8533509Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:21.8533908Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-05T13:31:21.8534262Z ##[endgroup]
+2026-10-05T13:31:22.0280171Z (node:2185) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-05T13:31:22.0281004Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-05T13:31:22.0333565Z With the provided path, there will be 2 files uploaded
+2026-10-05T13:31:22.0338287Z Artifact name is valid!
+2026-10-05T13:31:22.0339461Z Root directory input is valid!
+2026-10-05T13:31:22.2447037Z Beginning upload of artifact content to blob storage
+2026-10-05T13:31:22.3294713Z (node:2185) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-05T13:31:22.4000074Z Uploaded bytes 1769629
+2026-10-05T13:31:22.4149946Z Finished uploading artifact content to blob storage!
+2026-10-05T13:31:22.4151281Z SHA256 digest of uploaded artifact zip is e5aa6bcc87f269509d72c19a28c60e98612fe47b675782076915ebda8ccf94cd
+2026-10-05T13:31:22.4153277Z Finalizing artifact upload
+2026-10-05T13:31:22.6323069Z Artifact dist.zip successfully finalized. Artifact ID 11348306953
+2026-10-05T13:31:22.6324056Z Artifact dist has been successfully uploaded! Final size is 1769629 bytes. Artifact ID is 11348306953
+2026-10-05T13:31:22.6332048Z Artifact download URL: https://github.com/nghinh/aisef/actions/runs/37317404055/artifacts/11348306953
+2026-10-05T13:31:22.6510173Z ##[group]Run actions/upload-artifact@v4
+2026-10-05T13:31:22.6510504Z with:
+2026-10-05T13:31:22.6510765Z   name: dist-sha256
+2026-10-05T13:31:22.6511013Z   path: SHA256SUMS
+2026-10-05T13:31:22.6511256Z   if-no-files-found: error
+2026-10-05T13:31:22.6511507Z   compression-level: 6
+2026-10-05T13:31:22.6511743Z   overwrite: false
+2026-10-05T13:31:22.6511977Z   include-hidden-files: false
+2026-10-05T13:31:22.6512246Z env:
+2026-10-05T13:31:22.6512511Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:22.6512953Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-05T13:31:22.6513372Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:22.6513755Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:22.6514126Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-05T13:31:22.6514520Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-05T13:31:22.6514886Z ##[endgroup]
+2026-10-05T13:31:22.8243426Z (node:2197) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-05T13:31:22.8281575Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-05T13:31:22.8298918Z With the provided path, there will be 1 file uploaded
+2026-10-05T13:31:22.8325861Z Artifact name is valid!
+2026-10-05T13:31:22.8327046Z Root directory input is valid!
+2026-10-05T13:31:23.0523702Z Beginning upload of artifact content to blob storage
+2026-10-05T13:31:23.0706501Z (node:2197) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-05T13:31:23.1006937Z Uploaded bytes 264
+2026-10-05T13:31:23.1194650Z Finished uploading artifact content to blob storage!
+2026-10-05T13:31:23.1196189Z SHA256 digest of uploaded artifact zip is ecbbe9aa6375f9a07675f3fccca405886965f4ee3ac630eb6bb0abfd986c9615
+2026-10-05T13:31:23.1197393Z Finalizing artifact upload
+2026-10-05T13:31:23.3350457Z Artifact dist-sha256.zip successfully finalized. Artifact ID 11348167651
+2026-10-05T13:31:23.3351340Z Artifact dist-sha256 has been successfully uploaded! Final size is 264 bytes. Artifact ID is 11348167651
+2026-10-05T13:31:23.3354484Z Artifact download URL: https://github.com/nghinh/aisef/actions/runs/37317404055/artifacts/11348167651
+2026-10-05T13:31:23.3532789Z Post job cleanup.
+2026-10-05T13:31:23.4819012Z (node:2209) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-05T13:31:23.4819950Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-05T13:31:23.5024794Z Post job cleanup.
+2026-10-05T13:31:23.5977825Z [command]/usr/bin/git version
+2026-10-05T13:31:23.6025175Z git version 2.55.0
+2026-10-05T13:31:23.6073026Z Temporarily overriding HOME='/home/runner/work/_temp/783affb0-9b4b-4b58-9138-cd393c7afccd' before making global git config changes
+2026-10-05T13:31:23.6074366Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-05T13:31:23.6078366Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+2026-10-05T13:31:23.6127978Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-05T13:31:23.6172154Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-05T13:31:23.6462938Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-05T13:31:23.6504481Z http.https://github.com/.extraheader
+2026-10-05T13:31:23.6530135Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-05T13:31:23.6588559Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-05T13:31:23.6946257Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-05T13:31:23.6993307Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-05T13:31:23.7430618Z Cleaning up orphan processes
+2026-10-05T13:31:23.7759691Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
