@@ -1,0 +1,13 @@
+{
+ "worker": "K9",
+ "snapshot": "190b882b591a01b07b2fac2cdd651fe0369f4254",
+ "status": "complete: OBS-S2-12's two targets re-measured on 190b882 under the real-client guard, the committed record set aside in the worker's scratch worktree (started 2026-10-05 09:23 by the controller): fingerprint_fields 22/22, Budget.spend 44/44 killed, tests/v2/test_s2_kills_deterministic.py first in both kill sets; no survivor, no error, no kill by the clock. (K8, the same two targets on fbebf81 at 09:10, merged its results into the committed record mutation.py run found in its tree, so its record is not its own measurement: kept unchanged in the scratchpad, not imported.)",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K9.log",
+  "sha256": "6bdf14fe282088b3686a7465130a2a2d689e88c31265c47ba5511c72efb6abfb"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/K9.record.json",
+  "sha256": "f912c5ea6e07a3071f65d1d6f28ace8b7f8c9ff1f41f57d6f7aa6329553d96f3"
+ }
+}

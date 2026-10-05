@@ -1,22 +1,22 @@
 {
  "record": "AISEF V2.0 — S2 MUTATION, FINAL (owner rulings 'MUTATION WORKER HANDOFF' and its follow-ups, 2026-10-04)",
  "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
- "FINAL_HEAD": "25e38f4b336fb49648b0ce7844fc269981efd586",
+ "FINAL_HEAD": "190b882b591a01b07b2fac2cdd651fe0369f4254",
  "TOTAL_TARGETS": 261,
  "ACCOUNTED_EXACTLY_ONCE": true,
- "measured_at_final_head": 3,
- "reused_after_mechanical_proof": 258,
- "stale_excluded": 245,
- "CURRENT_SNAPSHOT_TARGETS": 3,
+ "measured_at_final_head": 2,
+ "reused_after_mechanical_proof": 259,
+ "stale_excluded": 247,
+ "CURRENT_SNAPSHOT_TARGETS": 2,
  "MUTANTS": 6437,
  "KILLED": 6437,
  "KILLED_BY_TIMEOUT": 0,
  "AUDITED_SURVIVORS": 0,
  "UNAUDITED_SURVIVORS": 0,
- "STALE_RESULTS_EXCLUDED": 245,
+ "STALE_RESULTS_EXCLUDED": 247,
  "STALE_RESULTS_EXCLUDED_BY_REASON": {
   "worker excluded by the ruling (C)": 64,
-  "proof failed": 181,
+  "proof failed": 183,
   "superseded or duplicate": 0
  },
  "RERUN_TARGETS": 138,
@@ -263,29 +263,42 @@
     "sha256": "afd92851d84b68b8aec099bc42fe494ae1f26d51e4b2f162dffabe665415f585"
    },
    "results": 3
+  },
+  {
+   "worker": "K9",
+   "snapshot": "190b882b591a01b07b2fac2cdd651fe0369f4254",
+   "status": "complete: OBS-S2-12's two targets re-measured on 190b882 under the real-client guard, the committed record set aside in the worker's scratch worktree (started 2026-10-05 09:23 by the controller): fingerprint_fields 22/22, Budget.spend 44/44 killed, tests/v2/test_s2_kills_deterministic.py first in both kill sets; no survivor, no error, no kill by the clock. (K8, the same two targets on fbebf81 at 09:10, merged its results into the committed record mutation.py run found in its tree, so its record is not its own measurement: kept unchanged in the scratchpad, not imported.)",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K9.log",
+    "sha256": "6bdf14fe282088b3686a7465130a2a2d689e88c31265c47ba5511c72efb6abfb"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/K9.record.json",
+    "sha256": "f912c5ea6e07a3071f65d1d6f28ace8b7f8c9ff1f41f57d6f7aa6329553d96f3"
+   },
+   "results": 2
   }
  ],
  "classes": {
   "measured_at_final_head": [
-   "aisef2/app/bundle.py::Project.order",
-   "aisef2/app/client.py::wait_within",
-   "aisef2/probe/cli_invocation.py::AGENT/send"
+   "aisef2/app/client.py::Budget.spend",
+   "aisef2/app/preflight.py::fingerprint_fields"
   ],
   "reused_after_mechanical_proof": [
    "aisef2/app/adapters.py::Developer.implement",
    "aisef2/app/adapters.py::Reviewer.review",
    "aisef2/app/adapters.py::attempt_of",
+   "aisef2/app/bundle.py::Project.order",
    "aisef2/app/bundle.py::load",
    "aisef2/app/cli.py::run",
    "aisef2/app/client.py::Budget.__init__",
    "aisef2/app/client.py::Budget.reached",
-   "aisef2/app/client.py::Budget.spend",
    "aisef2/app/client.py::environment",
    "aisef2/app/client.py::read_session",
    "aisef2/app/client.py::session",
+   "aisef2/app/client.py::wait_within",
    "aisef2/app/preflight.py::accounting",
    "aisef2/app/preflight.py::deployment",
-   "aisef2/app/preflight.py::fingerprint_fields",
    "aisef2/app/preflight.py::identity_problems",
    "aisef2/app/preflight.py::run",
    "aisef2/app/run.py::_close",
@@ -349,6 +362,7 @@
    "aisef2/probe/cli_invocation.py::AGENT/op_value",
    "aisef2/probe/cli_invocation.py::AGENT/plain",
    "aisef2/probe/cli_invocation.py::AGENT/redirect",
+   "aisef2/probe/cli_invocation.py::AGENT/send",
    "aisef2/probe/cli_invocation.py::AGENT/tagged",
    "aisef2/probe/cli_invocation.py::CLASSES",
    "aisef2/probe/cli_invocation.py::CLASS_TABLE",
@@ -551,7 +565,7 @@
   "aisef2/app/bundle.py::Project.order": {
    "worker": "K7",
    "measured_on": "fc24d30fc31451b27a65aa410bf944003c05e64d",
-   "class": "measured_at_final_head"
+   "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/bundle.py::load": {
    "worker": "K5",
@@ -574,9 +588,9 @@
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/client.py::Budget.spend": {
-   "worker": "K6",
-   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "worker": "K9",
+   "measured_on": "190b882b591a01b07b2fac2cdd651fe0369f4254",
+   "class": "measured_at_final_head"
   },
   "aisef2/app/client.py::environment": {
    "worker": "K5",
@@ -596,7 +610,7 @@
   "aisef2/app/client.py::wait_within": {
    "worker": "K7",
    "measured_on": "fc24d30fc31451b27a65aa410bf944003c05e64d",
-   "class": "measured_at_final_head"
+   "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/preflight.py::accounting": {
    "worker": "K5",
@@ -609,9 +623,9 @@
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/preflight.py::fingerprint_fields": {
-   "worker": "K6",
-   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "worker": "K9",
+   "measured_on": "190b882b591a01b07b2fac2cdd651fe0369f4254",
+   "class": "measured_at_final_head"
   },
   "aisef2/app/preflight.py::identity_problems": {
    "worker": "K5",
@@ -1011,7 +1025,7 @@
   "aisef2/probe/cli_invocation.py::AGENT/send": {
    "worker": "K7",
    "measured_on": "fc24d30fc31451b27a65aa410bf944003c05e64d",
-   "class": "measured_at_final_head"
+   "class": "reused_after_mechanical_proof"
   },
   "aisef2/probe/cli_invocation.py::AGENT/tagged": {
    "worker": "I",
@@ -4659,6 +4673,22 @@
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
    "target": "aisef2/probe/cli_invocation.py::AGENT/send",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "target": "aisef2/app/client.py::Budget.spend",
+   "why": [
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "target": "aisef2/app/preflight.py::fingerprint_fields",
    "why": [
     "its kill set is not the current one"
    ]

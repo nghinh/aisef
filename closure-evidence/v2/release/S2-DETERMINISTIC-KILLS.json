@@ -1,0 +1,837 @@
+{
+ "record": "AISEF V2.0 — S2 deterministic kills for OBS-S2-12's targets (owner, 2026-10-05)",
+ "tool": "validation/qualification/s2_deterministic_kills.py",
+ "kill_file": {
+  "path": "tests/v2/test_s2_kills_deterministic.py",
+  "sha256": "3501a46004d7cdde7e748ef78d6e6cad556b4be2924410459d65abf9d43df2aa"
+ },
+ "seeds": [
+  "0",
+  "1",
+  "2",
+  "4242",
+  "2147483647",
+  "random"
+ ],
+ "guard": "PATH without an opencode executable; XDG_DATA_HOME/XDG_STATE_HOME/XDG_CACHE_HOME in a scratch directory",
+ "baseline_passes_under_every_seed": true,
+ "targets": [
+  {
+   "target": "aisef2/app/preflight.py::fingerprint_fields",
+   "source_sha256": "01f1a937fb56c74908da2dd1ca8576526fc4f49ccc877d25aa5b611de8f82dca",
+   "kill_set": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 22,
+   "killed_by_this_file_alone": 22,
+   "results": [
+    {
+     "mutant": "L115 returns None",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 dict entry 0 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 dict entry 1 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 dict entry 2 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 dict entry 3 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 dict entry 4 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 string 'declared_model' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 string 'listed_id' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 string 'owned_by' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L116 string 'served_models' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L117 string 'system_fingerprint' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L116 sorted() -> list()",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L117 sorted() -> list()",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 string 'declared_model' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 string 'id' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 string 'owned_by' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 string 'listing' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L115 string 'listing' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L116 string 'served_model' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L117 string 'system_fingerprint' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L116 string 'probes' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L117 string 'probes' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_the_bound_fields_in_name_order_whatever_the_set_order (tests.v2.test_s2_kills_deterministic.FingerprintFields.test_the_bound_fields_in_name_order_whatever_the_set_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/client.py::Budget.spend",
+   "source_sha256": "6e66b7c66fccdd0583a58d08e66c6d758ab81c4b9a59fefbad324ce549e3572b",
+   "kill_set": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 44,
+   "killed_by_this_file_alone": 44,
+   "results": [
+    {
+     "mutant": "L83 returns None",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L74 conditional negated",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L77 conditional negated",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L78 element 0 dropped",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L78 element 1 dropped",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L79 condition negated",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L81 condition negated",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L83 dict entry 0 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L83 dict entry 1 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L83 dict entry 2 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L83 dict entry 3 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L83 dict entry 4 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L83 dict entry 5 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L83 dict entry 6 dropped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L74 sorted() -> list()",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L77 Gt->LtE",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L81 And swapped",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L83 string 'provider_requests' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L84 string 'turns' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L85 string 'input_tokens' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L86 string 'output_tokens' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L87 string 'sessions_started' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L87 string 'requests_recorded' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L87 string 'unaccounted' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L79 string 'steps_without_tokens' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L81 NotEq->Eq",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L81 not removed",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L74 string '*.jsonl' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L77 string ' sessions were started but ' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L77 string ' provider requests are recorded' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L83 string 'provider_requests' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L84 string 'turns' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L85 string 'input_tokens' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L86 string 'output_tokens' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)",
+       "test_no_directory_no_sessions (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_no_directory_no_sessions)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L80 string ': ' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L80 string ' finished steps report no tokens' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L81 string 'turns' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L82 string ': a session that started finished no step — what it sent is unknown' emptied",
+     "verdict": {
+      "kind": "assertion",
+      "failed": [
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L84 string 'turns' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L85 string 'input' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L86 string 'output' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L80 string 'steps_without_tokens' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L85 string 'tokens' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    },
+    {
+     "mutant": "L86 string 'tokens' emptied",
+     "verdict": {
+      "kind": "error",
+      "failed": [
+       "test_as_many_requests_as_sessions_and_a_live_session_without_a_step (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step)",
+       "test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order (tests.v2.test_s2_kills_deterministic.BudgetSpend.test_more_sessions_than_requests_and_each_unaccounted_session_named_in_name_order)"
+      ]
+     },
+     "same_under_every_seed": true,
+     "killed_under_every_seed": true
+    }
+   ]
+  }
+ ],
+ "verdict": "PASS"
+}

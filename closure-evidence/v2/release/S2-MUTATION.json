@@ -1229,6 +1229,7 @@
   {
    "target": "aisef2/app/client.py::Budget.spend",
    "kill_tests": [
+    "tests/v2/test_s2_kills_deterministic.py",
     "tests/v2/test_app_units.py",
     "tests/v2/test_app_run.py",
     "tests/v2/test_s2_kills.py"
@@ -2673,6 +2674,7 @@
   {
    "target": "aisef2/app/preflight.py::fingerprint_fields",
    "kill_tests": [
+    "tests/v2/test_s2_kills_deterministic.py",
     "tests/v2/test_app_units.py",
     "tests/v2/test_app_run.py",
     "tests/v2/test_s2_kills.py"

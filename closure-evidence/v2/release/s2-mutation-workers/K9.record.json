@@ -1,0 +1,304 @@
+{
+ "record": "AISEF V2 — V2.0-S2 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/client.py::Budget.spend",
+   "kill_tests": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "6e66b7c66fccdd0583a58d08e66c6d758ab81c4b9a59fefbad324ce549e3572b",
+   "mutants": 44,
+   "killed": 44,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L83 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L74 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L77 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L78 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L78 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L79 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L81 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L83 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L83 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L83 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L83 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L83 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L83 dict entry 5 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L83 dict entry 6 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L74 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L77 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L81 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L83 string 'provider_requests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L84 string 'turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L85 string 'input_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'output_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string 'sessions_started' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string 'requests_recorded' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L87 string 'unaccounted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L79 string 'steps_without_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L81 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L81 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L74 string '*.jsonl' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L77 string ' sessions were started but ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L77 string ' provider requests are recorded' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L83 string 'provider_requests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L84 string 'turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L85 string 'input_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'output_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L80 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L80 string ' finished steps report no tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L81 string 'turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L82 string ': a session that started finished no step — what it sent is unknown' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L84 string 'turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L85 string 'input' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'output' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L80 string 'steps_without_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L85 string 'tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L86 string 'tokens' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/preflight.py::fingerprint_fields",
+   "kill_tests": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "01f1a937fb56c74908da2dd1ca8576526fc4f49ccc877d25aa5b611de8f82dca",
+   "mutants": 22,
+   "killed": 22,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L115 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L115 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'declared_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'listed_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'owned_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string 'served_models' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L117 string 'system_fingerprint' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L117 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'declared_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'owned_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string 'served_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L117 string 'system_fingerprint' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string 'probes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L117 string 'probes' emptied",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}
