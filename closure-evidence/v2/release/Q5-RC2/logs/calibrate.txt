@@ -1,0 +1,3 @@
+calibration: {'control_round_trip': None, '1_same_call_count_changed_request': True, '2_changed_tool_behaviour': True, '3_missing_replay_item': True, '4_extra_model_call': True, '5_changed_final_workspace_file': True, '6_changed_tool_exit_status': True, '7_unconsumed_replay_item': True, '10_changed_probe_fixture': True, '9_reordered_request': True, '9_duplicate_consumption': True, '16_normalization': True} all True
+owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 22s)
+exit 0
