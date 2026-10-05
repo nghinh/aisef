@@ -2,56 +2,188 @@
 
 # AISEF — AI Software Engineering Framework
 
-[Bộ nhớ dài hạn có phạm vi](docs/MEMORY.md) qua `aisef memory`, **mặc định TẮT và đã đóng băng** từ 12/09/2026 — vẫn chạy, vẫn được vá lỗi và vá bảo mật, nhưng không đầu tư thêm tính năng cho tới khi có người ngoài cần ([phụ lục ADR-007](docs/ADR-007-scoped-advisory-memory.md)). Bộ nhớ chỉ là ngữ cảnh tư vấn, không phải bằng chứng cho cổng; giữ phiên mới. Xem [nghiên cứu/kế hoạch](docs/MEMORY-RESEARCH-PLAN.md), [báo cáo kiểm thử](docs/MEMORY-VALIDATION.md) và [ADR-007](docs/ADR-007-scoped-advisory-memory.md).
-
-Khung phát triển phần mềm bằng agent. Tên đầy đủ là **AI Software Engineering
-Framework**, viết tắt **AISEF**; gói trên PyPI, module Python và lệnh đều là
-`aisef`. Đầu vào của mỗi dự án là **một file**
-`docs/requirements.md`; đầu ra là một ứng dụng chạy được, kèm bằng chứng
-cho từng bước.
+AISEF làm phần mềm bằng coding agent và không tin lời agent. Gói trên PyPI, module Python và lệnh đều tên là
+`aisef`.
 
 Nguyên tắc nền, xuyên suốt mọi quyết định trong kho này:
 
 > **Cần phán đoán thì giao cho model. Cần đảm bảo thì viết code.**
 
-Viết PRD, thiết kế kiến trúc, dựng mockup, viết code — đều cần phán đoán,
-đều giao cho model. Còn "mọi yêu cầu phải có story phủ", "không được ghi
-ra ngoài phạm vi", "test phải xanh sau lần sửa cuối" — đều có đáp án đúng,
-nên đều là code. Hệ quả: **không bao giờ giao cho model việc giám sát
-chính nó.**
-
-## Cài
+**AISEF 2.0** biến nguyên tắc đó thành runtime. `aisef run` thực thi một kế hoạch đã được chủ dự án phê duyệt trên một
+repository git: với mỗi story, một phiên developer sửa code, và kernel V2 quyết định — dựa trên các probe độc lập kiểm
+tra sản phẩm, không bao giờ dựa trên lời của developer hay test do chính developer viết — story được giao, chạy lại
+hay rollback. Mọi quyết định được ghi vào một journal chuỗi băm, và `aisef run --verify` dựng lại toàn bộ lần chạy từ
+journal đó.
 
 ```bash
-pip install aisef
+pip install aisef==2.0.0
 ```
 
-Hoặc chạy từ bản sao kho nguồn:
+- [Hướng dẫn dùng AISEF 2.0](docs/v2/USAGE.vi.md) · [English](docs/v2/USAGE.md)
+- [Thay đổi trong 2.0](CHANGELOG.md) · [Giới hạn đã biết](#giới-hạn-đã-biết-của-20)
+- [RFC kiến trúc](docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md) · [Quy trình phát hành](docs/v2/RELEASE-PROCESS.md)
+- [Framework 1.x (bề mặt legacy và công cụ lập kế hoạch)](#framework-v1-bề-mặt-legacy-và-công-cụ-lập-kế-hoạch)
+
+## AISEF 2.0 làm gì
+
+`aisef run` là đường thực thi có thẩm quyền. Một lần chạy, theo thứ tự:
+
+1. **Đầu vào được niêm phong trước khi chạy bất cứ thứ gì.** Project bundle (yêu cầu, behaviour contract, phê duyệt
+   của con người gắn chúng với nhau, kế hoạch) được nạp và mọi hash được kiểm lại; file yêu cầu phải đúng là file mà
+   kế hoạch đã được duyệt theo; repository được clone tại baseline của kế hoạch và không bao giờ bị ghi.
+2. **Kế hoạch được kiểm duyệt tĩnh.** Chín phép kiểm chạy trước khi gọi bất kỳ model nào; kế hoạch không qua bị từ chối
+   kèm lý do.
+3. **Route model được chứng thực.** Preflight liệt kê các model của provider và gửi vài probe một token; route chỉ được
+   chấp nhận nếu mọi câu trả lời đều do đúng model đã khai phục vụ, dưới cùng một fingerprint triển khai. Mọi trường hợp
+   khác là *identity stop*: không phiên nào được mở.
+4. **Story chạy theo thứ tự phụ thuộc.** Với mỗi story, phiên developer (OpenCode, trên đúng route đã chứng thực) sửa
+   code trong một workspace bị giới hạn. Sau đó kernel chứng minh candidate:
+   - **ProductProof** — các probe do harness sở hữu (gọi hàm Python, gọi CLI, hiệu ứng tiến trình, file artifact) kiểm
+     từng behaviour contract trên candidate. Mã candidate chỉ chạy trong tiến trình agent của probe; kết luận do một
+     controller không bao giờ import mã đó đưa ra, qua một kênh đã xác thực, nên mã đang bị kiểm không thể tự chế ra
+     kết quả đạt.
+   - **Độ đầy đủ của test kỹ thuật** — test của developer phải chạy được, không rỗng và có liên quan; chúng là bằng
+     chứng về chất lượng kỹ thuật, không bao giờ là bằng chứng sản phẩm đúng.
+   - **Bảo toàn** — sau khi merge, mọi hành vi các story trước đã chứng minh được chứng minh lại; một hồi quy làm story
+     bị rollback.
+5. **Lỗi có chủ.** Mọi lỗi được định kiểu (PLAN, DEVELOPER, ENVIRONMENT, PROVIDER, INTEGRATION, REVIEW, SECURITY) và
+   chỉ tiêu vào ngân sách chạy lại của chủ nó; một lần chạy lại cho developer biết, bằng sự thật công khai, criterion
+   nào đã hỏng — không bao giờ lộ stimulus ẩn của phép chứng minh.
+6. **Chi tiêu được đối soát, không ước lượng.** Request, lượt và token được tính lại từ bằng chứng trước và trong mọi
+   phiên; chạm trần, hoặc chi tiêu không đối soát được, sẽ kết thúc lần chạy.
+7. **Mọi thứ được giữ lại.** Thư mục chạy chứa journal thô, mọi candidate và lần merge trong bản clone, mọi luồng phiên
+   và ledger preflight. `aisef run --verify` dựng lại kết luận chỉ từ journal.
+
+Đứng sau là chín bất biến của kernel, được bật trong mọi lần chạy test — trong đó có *Requirement Authority* (chỉ
+contract đã duyệt mới định nghĩa sự thật sản phẩm), *Independent Evidence* (tác nhân viết code không bao giờ định nghĩa
+bằng chứng chứng nhận nó), *Typed Ownership*, *Immutable Provenance* và *No Prose As Control State* (không đầu ra nào
+của model trở thành mã điều khiển). Xem [RFC kiến trúc](docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md) §4.
+
+## Bắt đầu nhanh
+
+Cần Python 3.11+, `git` 2.31+ và — cho một lần chạy thật — client [OpenCode](https://opencode.ai) trên `PATH` cùng một
+endpoint provider tương thích OpenAI. `aisef run` được hỗ trợ trên **Linux và macOS**.
 
 ```bash
-git clone <repo> aisef && cd aisef && pip install -e .
-python3 -m unittest discover -s tests -q   # vài phút, không mở container (tests/__init__.py)
-AISEF_TEST_DOCKER=1 python3 -m unittest tests.test_sandbox tests.test_tools -q   # thêm test Docker thật
+aisef run --check  --project bundle.json --settings run.json --repo ./myproject   # đầu vào + kiểm duyệt, không gửi request nào tới provider
+aisef run          --project bundle.json --settings run.json --repo ./myproject --out ./runs/r1
+aisef run --verify --project bundle.json --out ./runs/r1                          # dựng lại một lần chạy đã xong
 ```
 
-Kho skill tham chiếu **không cần clone tay**: `aisef setup` tự lấy về
-`~/.cache/aisef/references` đúng commit mà `aisef/kit/catalog.json`
-ghim (khoảng 91 MB theo `du -sh` ngày 15/09/2026, một lần cho mọi dự án). Máy ngoại tuyến hoặc CI trỏ
-sang chỗ khác bằng `AISEF_REFERENCES=/duong/dan`, hoặc dùng
-`aisef setup --no-fetch` để chỉ xài những gì đã có trên đĩa.
+- **`bundle.json`** (`aisef-v2-project/1`) — dự án: file yêu cầu, behaviour contract, phê duyệt của con người gắn mỗi
+  contract với các yêu cầu của nó, kế hoạch (commit baseline và nghĩa vụ chứng minh của từng story), các sự thật công
+  khai developer được biết, và với mỗi story các phụ thuộc và đường dẫn test.
+- **`run.json`** (`aisef-v2-run/1`) — đúng một route model, danh tính provider, các trần ngân sách, giới hạn chạy lại
+  theo chủ lỗi, timeout và giới hạn lượt. Không có giá trị mặc định.
+- **Mã thoát** — `0` đã giao (PASS; `--check` sẵn sàng; `--verify` VERIFIED) · `1` chưa giao (FAIL hoặc NOT_REACHED;
+  `--verify` REFUTED) · `2` bị từ chối trước khi chạy (một đầu vào không thoả, kế hoạch chưa được kiểm duyệt, identity
+  stop).
 
-Không có phụ thuộc Python nào ngoài thư viện chuẩn. Tuỳ chọn:
-`docker` (cách ly khi chạy test), `playwright` (trích hợp đồng thị giác
-từ mockup) — thiếu thì framework **nói thẳng là thiếu** chứ không giả vờ
-vẫn kiểm được.
+Định dạng từng trường, thư mục chạy và mọi lý do từ chối: [docs/v2/USAGE.vi.md](docs/v2/USAGE.vi.md).
 
-## Hướng dẫn dùng từng bước
+## 2.0 đã được kiểm định thế nào
 
-Người mới bắt đầu đọc `docs/HUONG-DAN-SU-DUNG.md`: chuẩn bị máy, cài, viết
-`docs/requirements.md`, cấu hình lệnh test, đi hết tám cổng, đọc kết cục cổng,
-xử lý sự cố, bảng lệnh và bảng khoá cấu hình đầy đủ.
+Bản ứng viên RC2 (`1565bcc`) được đóng băng cùng digest wheel và sdist, rồi kiểm định đúng như bản phát hành:
 
-## Điểm khác biệt: harness
+| phép kiểm | kết quả |
+|---|---|
+| toàn bộ bộ test, môi trường kín, trên đúng bản ứng viên | 5.454 test, 0 lỗi |
+| CI | Linux (Python 3.11–3.14), macOS, Windows, lint, wheel — đều xanh |
+| mutation testing phần mã quan trọng đã đổi | 261 target, 6.463 / 6.463 mutant bị diệt, 0 sống sót |
+| các bậc kiểm định Q0–Q3 (toàn vẹn tĩnh, tuân thủ ngữ nghĩa, độ đầy đủ, tiêm lỗi) | GREEN trên Linux và Windows |
+| Q4 — các projection điều khiển của kernel so với một mô hình tham chiếu độc lập, 100.000 lần chạy sinh ra | 100.000 / 100.000 khớp |
+| Q5 — chạy lại thật một tập 12 lần chạy đã ghi, phát lại luồng model | 12 / 12 tái hiện, không lệch |
+| build tái lập được | ba lần build lại độc lập trùng từng byte với wheel và sdist đã đóng băng |
+| cài sạch | wheel đã cài: version, CLI, `aisef run --check / run / --verify` offline — PASS |
+| smoke phát hành thật (7 story, 67 nghĩa vụ chứng minh, route model thật) | 6/7 story được giao; sản phẩm cuối thoả **toàn bộ 59 spec nghiệm thu**; 0 lần chấp nhận sai; một story đúng bị rollback do criterion của kế hoạch báo sai — xem dưới |
+
+Bằng chứng nằm trong [`closure-evidence/v2/release/`](closure-evidence/v2/release/), bắt đầu từ
+[`V2.0-FINAL-RELEASE-REPORT.md`](closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md).
+
+## 2.0 khẳng định gì, và không khẳng định gì
+
+**Khẳng định:** điều phối và kiểm chứng sản phẩm tất định, gắn với bằng chứng; mã candidate không thể điều khiển kênh
+kết luận; bằng chứng thô của lần chạy được giữ lại và kiểm lại được.
+
+**Mô hình đe doạ:** người vận hành đáng tin; mã sinh ra có thể sai hoặc "lách".
+
+**Không khẳng định:** tổng quát hoá cho mọi loại workload; chất lượng model; vượt trội so với V1; cô lập đa người thuê
+có tính thù địch; cô lập hoàn toàn trước tiến trình độc hại của cùng người dùng hệ điều hành; bảo vệ trước chủ máy.
+`plan_quality_verdict` luôn là `NOT_CLAIMED` trong 2.0.
+
+### Giới hạn đã biết của 2.0
+
+- **AISEF 2.0 chạy bundle; nó không soạn bundle.** Project bundle V2 (contract, phê duyệt, kế hoạch) được chuẩn bị và
+  phê duyệt bên ngoài `aisef run`; không có chuyển đổi tự động từ dự án 1.x.
+- **Criterion đọc mã Python bằng mẫu theo dòng có thể bác bỏ mã đúng.** Trong smoke phát hành 2.0, một story đúng bị
+  rollback vì criterion "stdlib only" coi một dòng docstring bắt đầu bằng `from …` là một câu lệnh import
+  (S6-SMOKE-2-FALSE-ROLLBACK-S10A). Kernel dừng an toàn — không có mã sai nào vào sản phẩm đã giao — nhưng story đó
+  không được giao. Criterion nhận biết cú pháp được lên kế hoạch cho 2.1 (V21-37).
+- **Hồi quy phát hiện sau merge không quay về ai.** Nó thuộc INTEGRATION và không được chạy lại, nên developer không
+  được biết criterion bị hỏng và không có lượt chạy lại (V21-38, kế hoạch 2.1).
+- **Nền tảng.** Một lần `aisef run` thật được khẳng định trên Linux và macOS; trên Windows gói cài được và bộ test của
+  kernel chạy được, nhưng chạy thật không thuộc phạm vi khẳng định của 2.0.
+- **Probe** chạy với thư viện chuẩn và chính mã nguồn của candidate (không có phụ thuộc bên thứ ba của dự án). Review
+  của model và scanner (`ruff`, nếu đã cài) chỉ mang tính tham khảo, không bao giờ chặn.
+
+Toàn bộ backlog 2.1, mỗi mục có cách tái hiện: [docs/v2/V2.1-BACKLOG.md](docs/v2/V2.1-BACKLOG.md).
+
+## Chuyển từ AISEF 1.x
+
+- `aisef run` giờ là V2. Phần thực thi của V1 là `aisef legacy run …` (cùng tuỳ chọn như `aisef run` của 1.x), và vòng
+  cải tiến là `aisef legacy improve …`. Mọi lệnh 1.x khác — `doctor`, `setup`, `plan`, `mockup`, `approve`, `qa`,
+  `report`, … — giữ nguyên.
+- Dự án V1 không phải bundle V2: V2 chạy các behaviour contract đã duyệt và một kế hoạch đã qua kiểm duyệt, không chạy
+  file story của V1.
+- V2 không ghi gì vào repository của dự án; kết quả của nó là thư mục chạy và nhánh `main` của bản clone.
+
+## Cài từ mã nguồn
+
+```bash
+git clone https://github.com/nghinh/aisef && cd aisef && pip install -e .
+python3 -m unittest discover -s tests -q   # toàn bộ bộ test; không mở container (tests/__init__.py)
+```
+
+Không có phụ thuộc Python nào ngoài thư viện chuẩn.
+
+## Cấu trúc
+
+```
+aisef2/                 kernel và runtime V2
+  app/                  thứ `aisef run` thực thi: bundle, settings, preflight, client, run, verify, CLI
+  product/              thẩm quyền yêu cầu, behaviour contract, ProductProof spec
+  probe/                probe do harness sở hữu (gọi hàm Python, gọi CLI, hiệu ứng tiến trình, file artifact)
+  plan/                 nghĩa vụ của kế hoạch, kiểm duyệt tĩnh và theo story, plan drift
+  runtime/              phạm vi lần chạy và story, sentinel kết thúc, run spec
+  orchestrate/          story runner: một đường điều phối có thẩm quyền duy nhất
+  control/              chủ sở hữu lỗi, khả năng chạy lại, định tuyến
+  journal/              journal chỉ-ghi-thêm, chuỗi băm, và các projection của nó
+  quality/              độ đầy đủ của test kỹ thuật
+  invariants/           chín bất biến, bật ở mọi tầng test
+aisef/                  framework 1.x: chuỗi lập kế hoạch, cổng, guard, thực thi legacy
+docs/v2/                cách dùng, phát hành và backlog 2.1
+closure-evidence/v2/    mọi bản ghi kiểm định của 2.0
+```
+
+---
+
+## Framework V1 (bề mặt legacy và công cụ lập kế hoạch)
+
+Toàn bộ phần dưới mô tả framework 1.x mà 2.0 vẫn ship. Chuỗi lập kế hoạch (`plan`, `mockup`, `approve`, `gates`, …)
+và các công cụ giữ nguyên; phần thực thi chỉ chạy sau bề mặt legacy có tên rõ ràng, `aisef legacy run` /
+`aisef legacy improve`, không bao giờ là mặc định. [Bộ nhớ dài hạn có phạm vi](docs/MEMORY.md) (`aisef memory`)
+**mặc định TẮT và đã đóng băng** từ 12/09/2026 — chỉ là ngữ cảnh tư vấn, không phải bằng chứng cho cổng.
+
+Đầu vào của mỗi dự án 1.x là **một file**, `docs/requirements.md`; đầu ra là một ứng dụng chạy được, kèm bằng chứng
+cho từng bước. Hướng dẫn từng bước: [`docs/HUONG-DAN-SU-DUNG.md`](docs/HUONG-DAN-SU-DUNG.md).
+
+Kho skill tham chiếu **không cần clone tay**: `aisef setup` tự lấy về `~/.cache/aisef/references` đúng commit mà
+`aisef/kit/catalog.json` ghim (khoảng 91 MB, một lần cho mọi dự án). Máy ngoại tuyến hoặc CI trỏ sang chỗ khác bằng
+`AISEF_REFERENCES=/duong/dan`, hoặc dùng `aisef setup --no-fetch`. Tuỳ chọn: `docker` (cách ly khi chạy test),
+`playwright` (trích hợp đồng thị giác từ mockup) — thiếu thì framework **nói thẳng là thiếu** chứ không giả vờ vẫn
+kiểm được.
+
+### Điểm khác biệt: harness
 
 Phần lớn công cụ agent là một prompt cộng một vòng lặp. AISEF là một **harness**:
 lớp giàn giáo lúc chạy quanh model, quyết định model **thấy** gì, được **chạm**
@@ -74,7 +206,7 @@ hơn được ghi lại, không phải mặc định là ổn. Và nhóm 6 gắn
 commit, nên "test đã xanh" luôn có nghĩa "xanh trên **bản này**", không phải
 "xanh ở đâu đó lúc nào đó".
 
-## Harness của harness: framework tự cải tiến framework
+### Harness của harness: framework tự cải tiến framework
 
 Một story qua cổng chưa phải phần khó. Phần khó là chuyện xảy ra **sau khi** epic
 được tuyên bố xong: story sau lặng lẽ làm hỏng story trước, một tiêu chí có test
@@ -101,7 +233,7 @@ dòng nghiên cứu *Harness-of-Harness* và đo lại tại đây):
   tính/mutant, môi trường), nên "cổng có chấm đúng không" là câu hỏi trả lời
   được bằng một lệnh.
 
-## Sáu bước
+### Sáu bước
 
 ```bash
 cd /duong/dan/du-an-cua-ban
@@ -133,7 +265,7 @@ Chạy nhanh không cần người duyệt: `aisef plan --auto-approve all`. Ph�
 tự động **luôn** được ghi dấu `auto` để về sau truy được tài liệu nào chưa
 từng có người thật xem.
 
-## Brownfield (dự án đã có mã)
+### Brownfield (dự án đã có mã)
 
 ```bash
 aisef baseline                     # phân tích mã hiện tại → _bmad-output/baseline.md
@@ -146,7 +278,7 @@ artifact có sẵn, thêm ngữ cảnh brownfield vào prompt, đổi intent th�
 `"update"`, và slot `blast_radius` trong prompt story hiện impact analysis
 từ đồ thị mã trước khi implement.
 
-## Sau khi có code
+### Sau khi có code
 
 ```bash
 aisef doc vitest --topic coverage --story STORY-01-02
@@ -185,7 +317,7 @@ lấy ứng viên ở HEAD nhánh story, chạy lại đúng phép kiểm ✗/th
 giữ rà soát và bảo mật đã có ở cùng SHA, chấm đủ cổng; đạt thì merge như lượt
 thường, trượt thì `failed` và không ăn vào `run.max_retries`.
 
-## Cổng
+### Cổng
 
 Tám cổng, mỗi cổng hai lớp. **Cổng máy** chạy trước — nó bắt được thứ máy
 bắt tốt hơn người (chu trình phụ thuộc, yêu cầu không kiểm chứng được,
@@ -196,7 +328,7 @@ người duyệt có thể là người khác, lúc khác, trên máy khác. B�
 duyệt gắn với **băm nội dung** artifact — sửa tài liệu sau khi duyệt thì
 phê duyệt hết hiệu lực, và sửa tầng trên làm mọi tầng dưới thành `stale`.
 
-## Guard
+### Guard
 
 Mười guard, mỗi guard là một lệnh trả mã thoát, nối vào ba mốc vòng đời:
 
@@ -220,13 +352,13 @@ mốc chặn tương đương `Stop`, nên `completion` **không** được nố
 cáo biên dịch liệt nó vào hậu kiểm, và cổng story hỏi lại đúng câu ấy từ bằng
 chứng: trượt story chứ không giữ được phiên lại.
 
-## Lỗi thật đã gặp
+### Lỗi thật đã gặp
 
 189 lỗi tìm bằng đo trên agent thật, xếp theo mười một lớp nguyên nhân kèm phép hồi quy (179–185 do lần dogfood đầu tiên trên gói 1.7.2 công khai tìm ra, đã sửa ở 1.7.3; 186 do lần chạy thứ hai trên 1.7.3, đã sửa ở 1.7.4; 187 do replay sạch lần chạy ấy trên 1.7.4 với client OpenCode gốc, đã sửa ở 1.7.5; 188 do cùng replay ấy tiếp trên 1.7.5, đã sửa ở 1.7.6; 189 do cùng replay ấy tiếp trên 1.7.6, **còn mở** — đã tái tạo tất định, chưa sửa ở bản phát hành nào): `docs/FAILURE-TAXONOMY.md`. Lỗi mới thì thêm một dòng vào đó cùng commit với test. Thay đổi theo phiên bản, kèm việc phải làm khi nâng cấp: `CHANGELOG.md`.
 
 Khung áp chuẩn ấy lên chính nó. `docs/PROJECT-CLOSURE-GATE.md` là hợp đồng do chủ dự án duyệt để tuyên bố dự án kỹ thuật hoàn tất, và `aisef closure` chấm 27 tiêu chí của nó từ bằng chứng trên đĩa, không gọi model. Trên 1.7.6 đạt 24/27; ba tiêu chí còn mở là xác nhận ngoài bởi một người ngoài dự án — thứ không việc nội bộ nào thay được. (1.7.2 đọc 23/27: lần dogfood đầu tiên tìm ra ba lỗi P1 — D-026, D-028, D-029 — đã sửa ở 1.7.3; lần chạy thứ hai trên 1.7.3 tìm ra D-032, đã sửa ở 1.7.4; replay sạch lần chạy ấy trên 1.7.4 tìm ra D-033, đã sửa ở 1.7.5; cùng replay ấy tiếp trên 1.7.5 tìm ra D-034, đã sửa ở 1.7.6.) Một bản phát hành được nhận diện bằng sản phẩm nó chứa — digest nội dung trên cây của tag và digest wheel/sdist trên PyPI — chứ không bằng commit đang là HEAD, nên ghi bằng chứng về một bản phát hành không làm mất hiệu lực chính bản ấy (D-022, sửa ở 1.7.2).
 
-## Hợp quy client
+### Hợp quy client
 
 Hook và plugin là tạo tác **biên dịch ra** — đúng cú pháp không có nghĩa là
 client chạy chúng. Lỗi 31 là ví dụ mới nhất: bản cài từ wheel biên dịch ra hook
@@ -251,7 +383,7 @@ phát hành của chính kho này đọc bảng đó bằng code
 hai trong V1 — có cột, không chặn. CI: `.github/workflows/conformance.yml`
 chạy tuần.
 
-## Phát hành
+### Phát hành
 
 Gói, module Python và lệnh cùng tên **`aisef`** (từ 0.2.0; bí danh `aisdlc` đã bị gỡ trong 0.3.0).
 Điều kiện đọc bằng lệnh, không bằng cảm giác:
@@ -279,7 +411,7 @@ Cổng V1 ở trên giữ cho bề mặt legacy, không còn chặn hay cho phé
 Kho hồi quy dogfood (`tests/dogfood/`, bật bằng `AISEF_DOGFOOD=1`) dựng lại
 dự án thử `par` từ đầu vào trong kho và so với mốc đã đo — chạy trước mỗi tag.
 
-### Benchmark đã đo được gì
+#### Benchmark đã đo được gì
 
 Bốn đợt đo, bốn kết quả null hoặc không kết luận được — báo ra vì null cũng là kết quả:
 
@@ -310,7 +442,7 @@ Nên định vị trung thực với bằng chứng hiện có: AISEF **không**
 được nhiều hơn. Thứ nó làm được, đo được, là **không cho gọi việc chưa xong là
 xong**, và để lại bằng chứng nói rõ vì sao.
 
-### Giới hạn đã biết
+#### Giới hạn đã biết của 1.x
 
 Khai ở đây vì mọi claim phải có bằng chứng; thứ chưa chứng minh gọi là chưa
 chứng minh (quyết định chủ đầu tư 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
@@ -348,7 +480,7 @@ chứng minh (quyết định chủ đầu tư 2026-09-06, `docs/RELEASE-PLAN-v0
 - **`coverage`**: harness đọc số từ runner (`--coverage`/`--cov`); dự án chưa
   bật thì mục cổng là ○ chưa cấu hình, không phải đạt.
 
-## Khi cổng chặn
+### Khi cổng chặn
 
 Cổng chặn là framework đang làm việc, không phải framework hỏng. Ba ca hay
 gặp và cách xử đúng:
@@ -359,11 +491,11 @@ gặp và cách xử đúng:
 | `story đụng vào yêu cầu đang bị câu hỏi mở chặn` | epic gán một FR mà PRD ghi là chưa quyết được | trả lời câu hỏi, hoặc bỏ FR đó khỏi story |
 | `merge đụng …` | hai story cùng sửa một file | `write_scope` khai sai — sửa ở story, **không** gỡ conflict cho xong |
 
-`--force` có ở `approve` và `run` cho trường hợp cố ý bỏ qua. Dùng nó là
+`--force` có ở `approve` và `legacy run` cho trường hợp cố ý bỏ qua. Dùng nó là
 một quyết định, và nó được ghi lại: bản ghi phê duyệt giữ ghi chú, báo cáo
 nghiệm thu hiện đúng trạng thái từng cổng.
 
-## Chạy song song
+### Chạy song song
 
 Epic chạy tuần tự. Trong một epic, hai story chỉ được cùng đợt khi **hết
 phụ thuộc** *và* **phạm vi ghi rời nhau** — thiếu điều kiện thứ hai thì hai
@@ -371,7 +503,7 @@ story cùng sửa một file và người thua là người merge sau. Mỗi sto
 trong worktree git riêng; merge tuần tự cuối đợt. Conflict lúc merge không
 được tự gỡ: nó là **bằng chứng `write_scope` khai sai**.
 
-## Cấu trúc
+### Cấu trúc gói 1.x
 
 ```
 aisef/
@@ -389,7 +521,7 @@ docs/
   SPIKE-REPORT.md          kết quả 7 spike kiểm chứng khả thi
 ```
 
-## Bằng chứng, không tự khai
+### Bằng chứng, không tự khai
 
 Mọi cổng đọc `_bmad-output/evidence/{story}.jsonl` — lần chạy test, lần
 sửa file, lần gọi model kèm chi phí và độ trễ, lần đối chiếu mockup. Câu

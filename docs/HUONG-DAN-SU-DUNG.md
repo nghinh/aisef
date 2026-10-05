@@ -1,5 +1,12 @@
 # Hướng dẫn sử dụng AISEF
 
+> **AISEF 2.0 — đọc phần này trước.** Từ 2.0, `aisef run` là **runtime V2**: nó thực thi một project bundle đã
+> được chủ dự án phê duyệt dưới kernel V2 và quyết định từng story dựa trên các probe độc lập kiểm tra sản phẩm. Cách
+> dùng: **[docs/v2/USAGE.vi.md](v2/USAGE.vi.md)**. Hướng dẫn này nói về **framework 1.x** mà 2.0 vẫn ship — chuỗi lập
+> kế hoạch (`setup`, `plan`, `mockup`, `approve`, cổng, guard, `qa`, `report`, …) và phần thực thi legacy, giờ chỉ chạy
+> bằng **`aisef legacy run`** (cùng tuỳ chọn như `aisef run` của 1.x) và **`aisef legacy improve`**. Mọi lệnh khác bên
+> dưới giữ nguyên. Cài 2.0 bằng `pip install aisef==2.0.0`.
+
 [Bộ nhớ dài hạn — **ĐÓNG BĂNG**, mặc định TẮT](MEMORY.md): từ phụ lục ADR-007 ngày 2026-09-12, `aisef memory` không còn là "thử nghiệm, sắp có" mà là **đóng băng**: code còn đó và vẫn được sửa lỗi/lỗ bảo mật, nhưng **không thêm năng lực mới**. Rã băng cần một yêu cầu từ bên ngoài, **hoặc** một phép đo có đối chứng cho thấy một lỗi lặp lại mà bộ nhớ hẳn đã ngăn được. Bộ nhớ **không** phải bằng chứng cho cổng. Tham khảo: [nghiên cứu/kế hoạch](MEMORY-RESEARCH-PLAN.md), [báo cáo kiểm thử](MEMORY-VALIDATION.md), [ADR-007](ADR-007-scoped-advisory-memory.md).
 
 **AISEF** là viết tắt của **AI Software Engineering Framework**. Gói cài, module
@@ -29,7 +36,7 @@ Quy ước đọc:
 8. [Bước lập kế hoạch: `aisef plan`](#8-bước-lập-kế-hoạch-aisef-plan)
 9. [Bước mockup (dự án có giao diện)](#9-bước-mockup-dự-án-có-giao-diện)
 10. [Đọc cổng story: sáu kết cục](#10-đọc-cổng-story-sáu-kết-cục)
-11. [Bước hiện thực: `aisef run`](#11-bước-hiện-thực-aisef-run)
+11. [Bước hiện thực: `aisef legacy run`](#11-bước-hiện-thực-aisef-legacy-run)
 12. [Kiểm định, đóng gói, nghiệm thu](#12-kiểm-định-đóng-gói-nghiệm-thu)
 13. [Vòng cải tiến và thay đổi sau phát hành](#13-vòng-cải-tiến-và-thay-đổi-sau-phát-hành)
 14. [Chi phí thật và cách giảm](#14-chi-phí-thật-và-cách-giảm)
@@ -82,7 +89,7 @@ Bốn thứ, chỉ **hai** là bắt buộc.
 | Thứ | Bắt buộc? | Kiểm bằng | Thiếu thì sao |
 |---|---|---|---|
 | Python ≥ 3.11 | **có** | `python3 --version` | không cài được gói |
-| `git` | **có** | `git --version` | không chạy được `aisef run` (mỗi story cần một worktree riêng) |
+| `git` | **có** | `git --version` | không chạy được `aisef legacy run` (mỗi story cần một worktree riêng) |
 | Một client agent: `claude` (khuyến nghị) hoặc `opencode` | **có, để chạy agent** | `claude --version` | các lệnh gọi agent dừng với mã 2 và câu "chưa cài claude trên máy này" |
 | Docker | không | `docker info` | test chạy thẳng trên máy; framework ghi rõ là **suy biến** kèm tên bảo đảm thiếu |
 | Playwright + Chromium | không, trừ khi dự án có giao diện | `npx playwright --version` | không trích được hợp đồng thị giác từ mockup |
@@ -114,7 +121,7 @@ Kiểm tra cài được:
 aisef --help
 ```
 
-Bạn phải thấy danh sách lệnh con (`setup`, `doctor`, `plan`, `run`, …). Gói,
+Bạn phải thấy danh sách lệnh con (`setup`, `doctor`, `plan`, `run` — runtime V2 —, `legacy`, …). Gói,
 module Python và lệnh đều tên `aisef`. `aisef --version` in số bản; muốn biết cả
 môi trường thì dùng `aisef doctor`.
 
@@ -777,10 +784,10 @@ một lưới an toàn thì bạn đang tin sai chỗ — hãy khai đủ `tools
 
 ---
 
-## 11. Bước hiện thực: `aisef run`
+## 11. Bước hiện thực: `aisef legacy run`
 
 ```bash
-aisef run
+aisef legacy run
 ```
 
 Chuyện xảy ra với **mỗi** story:
@@ -798,9 +805,9 @@ Chuyện xảy ra với **mỗi** story:
 Các dạng chạy:
 
 ```bash
-aisef run --epic EPIC-01        # chỉ một epic
-aisef run --sequential          # tắt chạy song song (dễ đọc log hơn)
-aisef run --force               # chạy dù cổng stories chưa duyệt (chỉ để thử)
+aisef legacy run --epic EPIC-01        # chỉ một epic
+aisef legacy run --sequential          # tắt chạy song song (dễ đọc log hơn)
+aisef legacy run --force               # chạy dù cổng stories chưa duyệt (chỉ để thử)
 ```
 
 Xem tiến độ và chi phí bất cứ lúc nào (lệnh này **không** tốn tiền):
@@ -861,7 +868,7 @@ Rồi phân loại:
   tiền cho một phiên viết code mới, chỉ kiểm lại đúng bản đã có:
 
   ```bash
-  aisef run --verify-only --story STORY-01-03 --repeat 3
+  aisef legacy run --verify-only --story STORY-01-03 --repeat 3
   ```
 
   `--repeat 3` chạy mỗi phép kiểm ba lần; nếu kết quả đổi giữa các lần thì cổng
@@ -919,8 +926,8 @@ Rồi phân loại:
   1.7.4 phiên developer bị mở lại ấy không viết gì, bị tính là no-op, hai lần thì
   story chết với `sessions kept producing nothing to grade` — D-032, lần chạy
   LedgerLock thứ hai tìm ra.) Nếu người rà soát vẫn không ra verdict, story kết thúc
-  `REVIEW_UNRUNNABLE` kèm lỗi cuối; `aisef run --verify-only --story <mã>` chạy lại
-  giai đoạn rà soát sau đó trên đúng ứng viên ấy, và `aisef run` thường sẽ tiếp
+  `REVIEW_UNRUNNABLE` kèm lỗi cuối; `aisef legacy run --verify-only --story <mã>` chạy lại
+  giai đoạn rà soát sau đó trên đúng ứng viên ấy, và `aisef legacy run` thường sẽ tiếp
   tục story ấy từ giai đoạn rà soát. Verdict `block` có cấu trúc vẫn là verdict và
   vẫn trả story về developer.
 
@@ -1070,7 +1077,7 @@ aisef issues --format csv            # bảng gap/hồi quy ra tệp
 **Vòng cải tiến** đóng dần các khoảng trống (GAP) mà sổ hành vi ghi lại:
 
 ```bash
-aisef improve --epic EPIC-01 --max-loops 3
+aisef legacy improve --epic EPIC-01 --max-loops 3
 ```
 
 Mỗi vòng: chạy kiểm định → đọc sổ hành vi → sinh **một** story sửa cho **một**
@@ -1267,10 +1274,10 @@ Thông báo trong bảng này là **nguyên văn tiếng Anh** như CLI in ra.
 | `⚠️ this project already has files … and there is no _bmad-output/baseline.md` | dự án đã có code mà chưa dựng baseline | `aisef baseline` **trước** khi `aisef plan` ([§4](#4-tạo-dự-án-và-viết-đầu-vào)) |
 | Guard chặn `npm test` / lệnh test của bạn | `tool-bypass`: chạy thẳng thì không có gì được ghi | dùng `aisef tool test`; chạy hẹp thì gọi trực tiếp runner, đừng qua script npm ([§7](#7-aisef-compile-và-aisef-doctor)) |
 | `⚠️ not recorded as evidence: no story id` | `aisef tool …` chạy ngoài một phiên story | thêm `--story <mã>` nếu bạn muốn nó thành bằng chứng |
-| `deadlock due to plan: criteria … are already satisfied at the branch point` | một story trước đã làm xong hành vi ấy | **sửa hoặc bỏ tiêu chí**, đừng thử lại ([§11](#11-bước-hiện-thực-aisef-run)) |
-| Mục cổng ⚠ `no baseline regression` — `BASELINE_UNAVAILABLE: …` | có bản ghi mốc nhưng không bản nào chụp ở cha tích hợp cho hợp đồng hiện tại của story (1.7.5) | chạy lại story từ gốc — `aisef run` bỏ nhánh khi tiêu chí đổi; không thêm hay khôi phục test để qua cổng |
+| `deadlock due to plan: criteria … are already satisfied at the branch point` | một story trước đã làm xong hành vi ấy | **sửa hoặc bỏ tiêu chí**, đừng thử lại ([§11](#11-bước-hiện-thực-aisef-legacy-run)) |
+| Mục cổng ⚠ `no baseline regression` — `BASELINE_UNAVAILABLE: …` | có bản ghi mốc nhưng không bản nào chụp ở cha tích hợp cho hợp đồng hiện tại của story (1.7.5) | chạy lại story từ gốc — `aisef legacy run` bỏ nhánh khi tiêu chí đổi; không thêm hay khôi phục test để qua cổng |
 | Story `failed`, lý do `the story worktree still has changes outside write_scope before attempt …` | worktree của story có thay đổi ngoài phạm vi không do lượt nào của story để lại (1.7.6) — harness không xoá thứ nó không tạo | commit hoặc xoá các tệp được nêu trong worktree rồi chạy lại; thứ chính lượt trước để lại ngoài phạm vi thì được khôi phục tự động, bạn không phải làm gì |
-| `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | phép kiểm tất định xanh; phiên rà soát không ra verdict sau ba lần trên cùng ứng viên (1.7.4) | không có gì phải sửa trong code — ứng viên được giữ. Xem client rà soát (`run.max_turns`, hết giờ, nhà cung cấp), rồi `aisef run --verify-only --story <mã>` chạy lại giai đoạn rà soát trên ứng viên ấy |
+| `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | phép kiểm tất định xanh; phiên rà soát không ra verdict sau ba lần trên cùng ứng viên (1.7.4) | không có gì phải sửa trong code — ứng viên được giữ. Xem client rà soát (`run.max_turns`, hết giờ, nhà cung cấp), rồi `aisef legacy run --verify-only --story <mã>` chạy lại giai đoạn rà soát trên ứng viên ấy |
 | `sessions kept producing nothing to grade` | phiên đã **quyết định** không viết gì, hai lần liền | đọc `aisef evidence <story>`, sửa kế hoạch — mở lại phiên sẽ ra đúng kết quả ấy |
 | `the command matched no tests` | lệnh chạy được nhưng bộ chọn không khớp test nào | chưa story nào viết loại test ấy, hoặc bộ chọn sai — sửa `verify.<loại>` |
 | `Cost: $0.00` trong `aisef status` | nhà cung cấp không báo giá phiên nào | dùng `aisef cost`: nó đổi sang token và cho công thức ([§14](#14-chi-phí-thật-và-cách-giảm)) |
@@ -1323,12 +1330,20 @@ aisef reject <cổng> --note "..."
 aisef auto-approve all|<danh sách>
 ```
 
-**Hiện thực**
+**Runtime V2** ([v2/USAGE.vi.md](v2/USAGE.vi.md))
 
 ```bash
-aisef run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
-aisef run --verify-only --story S [--repeat K]
-aisef improve --epic E [--max-loops N] [--auto] [--client c] [--force]
+aisef run --check  --project bundle.json --settings run.json --repo REPO
+aisef run          --project bundle.json --settings run.json --repo REPO --out THU_MUC_CHAY
+aisef run --verify --project bundle.json --out THU_MUC_CHAY
+```
+
+**Hiện thực (V1, legacy)**
+
+```bash
+aisef legacy run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
+aisef legacy run --verify-only --story S [--repeat K]
+aisef legacy improve --epic E [--max-loops N] [--auto] [--client c] [--force]
 aisef tool test|lint|sast [--story S] [--lines N]
 aisef verify [--write-scope ...] [--story S]
 aisef gate <story> [--attempt n] | --all | --replay
@@ -1462,7 +1477,7 @@ của *vị từ* — `bảo toàn` cần được khoanh theo **hành vi** — 
 | `sandbox.provider` | `"docker"` | nơi chạy lệnh: `docker` hoặc `local` |
 | `sandbox.use_docker` | `true` | dùng container cho tool |
 | `sandbox.allow_degraded` | `true` | cho phép chạy khi thiếu bảo đảm, có ghi rõ |
-| `sandbox.image` | `""` | ảnh container. Preset python đặt ảnh do khung **tự dựng** và ghim (`aisef-verify-python:<digest>`: `python:3.12-slim` ghim theo digest + pytest, pytest-cov, ruff ghim theo phiên bản) vì `python:3.12-slim` trơn không có pytest; `aisef doctor` dựng ảnh và dò từng công cụ đã khai ngay trong ảnh, `aisef run` từ chối mở phiên khi ảnh đã khai thiếu công cụ đã khai (1.7.3) |
+| `sandbox.image` | `""` | ảnh container. Preset python đặt ảnh do khung **tự dựng** và ghim (`aisef-verify-python:<digest>`: `python:3.12-slim` ghim theo digest + pytest, pytest-cov, ruff ghim theo phiên bản) vì `python:3.12-slim` trơn không có pytest; `aisef doctor` dựng ảnh và dò từng công cụ đã khai ngay trong ảnh, `aisef legacy run` từ chối mở phiên khi ảnh đã khai thiếu công cụ đã khai (1.7.3) |
 | `sandbox.allow_hosts` | `[]` | host mà tool được phép kết nối tới (`egress` đọc danh sách này; `localhost` luôn được miễn) |
 | `sandbox.tools_network` | `false` | cho tool ra mạng hay không |
 | `sandbox.pre_deploy_degraded_waiver` | `""` | lý do chấp nhận kiểm định chạy ngoài Docker ở cổng cuối |

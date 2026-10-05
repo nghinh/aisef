@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AISEF — Ship AI-written code with engineering proof</title>
-  <meta name="description" content="Engineering harness for coding agents. Planning, guardrails, isolated execution, independent review, SHA-bound evidence, and deterministic gates. Zero dependencies. Python ≥ 3.11.">
+  <meta name="description" content="AISEF 2.0: deterministic, evidence-bound orchestration and product verification for coding agents. Harness-owned probes decide delivery; every decision lands in a hash-chained journal you can re-verify. Zero dependencies. Python ≥ 3.11.">
   <link rel="icon" type="image/png" sizes="32x32" href="icon/aisef-favicon-32.png">
   <link rel="apple-touch-icon" href="icon/aisef-icon-light.png">
   <meta property="og:title" content="AISEF — Ship AI-written code with engineering proof">
-  <meta property="og:description" content="Engineering harness for coding agents. SHA-bound evidence. Deterministic gates. Zero dependencies.">
+  <meta property="og:description" content="Harness-owned probes decide delivery. Hash-chained journal. Re-verifiable runs. Zero dependencies.">
   <meta property="og:image" content="icon/aisef-icon-light.png">
   <meta name="theme-color" content="#0C0A09">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -670,16 +670,16 @@ section { padding: 100px 0; }
   <div class="wrap hero-content">
     <div class="hero-badge">
       <span class="dot"></span>
-      v1.7.2 · Open Source · Zero Dependencies
+      v2.0.0 · Open Source · Zero Dependencies
     </div>
     <h1>AI writes code.<br>The harness <span class="accent">proves it works.</span></h1>
     <p class="hero-sub">
-      AISEF wraps coding agents with planning, guardrails, isolated execution,
-      independent review, SHA-bound evidence and deterministic gates.
-      Your agent delivers. The framework verifies.
+      AISEF 2.0 runs an owner-approved plan on your repository. A coding agent writes each story;
+      harness-owned probes of the product &mdash; never the agent's word &mdash; decide whether it is
+      delivered, retried or rolled back. Every decision lands in a hash-chained journal you can re-verify.
     </p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="https://github.com/nghinh/aisef#quick-start" target="_blank" rel="noopener">Get started</a>
+      <a class="btn btn-primary" href="https://github.com/nghinh/aisef#get-started" target="_blank" rel="noopener">Get started</a>
       <a class="btn btn-ghost" href="https://github.com/nghinh/aisef" target="_blank" rel="noopener">View on GitHub</a>
     </div>
     <div class="hero-pip">
@@ -688,7 +688,7 @@ section { padding: 100px 0; }
     <span class="hero-meta">
       Python ≥ 3.11 · MIT License ·
       <a href="https://pypi.org/project/aisef/" target="_blank" rel="noopener">PyPI</a> ·
-      <a href="https://github.com/nghinh/aisef/blob/master/docs/USAGE-GUIDE.md" target="_blank" rel="noopener">Docs</a>
+      <a href="https://github.com/nghinh/aisef/blob/master/docs/v2/USAGE.md" target="_blank" rel="noopener">Docs</a>
     </span>
   </div>
 </section>
@@ -739,11 +739,11 @@ section { padding: 100px 0; }
     <div class="eyebrow">Trust chain</div>
     <h2>From requirements to verified software</h2>
     <p class="pipeline-sub">
-      One input file drives every phase. The candidate is frozen at a commit SHA.
+      One approved project bundle drives the run. The candidate is frozen at a commit SHA.
       Everything after the freeze is deterministic code, not model judgment.
     </p>
     <div class="pipeline-visual">
-      <svg viewBox="0 0 960 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AISEF trust chain pipeline: requirements flow through planning, agent execution, SHA freeze, testing, review, gate verification, and merge">
+      <svg viewBox="0 0 960 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AISEF trust chain: an approved bundle is admitted, the agent writes a candidate frozen at a SHA, then harness-owned probes, preservation and a hash-chained journal decide delivery">
         <!-- Phase labels -->
         <text x="190" y="16" font-size="10" fill="#A8A29E" text-anchor="middle" letter-spacing="0.08em" font-weight="500">MODEL GENERATES</text>
         <text x="740" y="16" font-size="10" fill="var(--verify,#16A34A)" text-anchor="middle" letter-spacing="0.08em" font-weight="500">HARNESS VERIFIES</text>
@@ -774,11 +774,11 @@ section { padding: 100px 0; }
 
         <!-- Nodes — model side (neutral) -->
         <rect x="10" y="54" width="90" height="52" rx="8" fill="var(--card,#fff)" stroke="var(--rule,#D6D3D1)" stroke-width="1"/>
-        <text x="55" y="76" font-size="10" fill="var(--ink,#1C1917)" text-anchor="middle" font-weight="500">docs/</text>
-        <text x="55" y="92" font-size="9" fill="#A8A29E" text-anchor="middle">requirements</text>
+        <text x="55" y="76" font-size="10" fill="var(--ink,#1C1917)" text-anchor="middle" font-weight="500">bundle</text>
+        <text x="55" y="92" font-size="9" fill="#A8A29E" text-anchor="middle">approved</text>
 
         <rect x="140" y="54" width="90" height="52" rx="8" fill="var(--card,#fff)" stroke="var(--rule,#D6D3D1)" stroke-width="1"/>
-        <text x="185" y="84" font-size="11" fill="var(--ink,#1C1917)" text-anchor="middle" font-weight="500">Plan</text>
+        <text x="185" y="84" font-size="11" fill="var(--ink,#1C1917)" text-anchor="middle" font-weight="500">Admit</text>
 
         <rect x="270" y="54" width="90" height="52" rx="8" fill="var(--card,#fff)" stroke="var(--rule,#D6D3D1)" stroke-width="1"/>
         <text x="315" y="84" font-size="11" fill="var(--ink,#1C1917)" text-anchor="middle" font-weight="500">Agent</text>
@@ -791,16 +791,16 @@ section { padding: 100px 0; }
 
         <!-- Nodes — harness side (green) -->
         <rect x="556" y="54" width="88" height="52" rx="8" fill="var(--verify-soft,rgba(22,163,74,0.10))" stroke="var(--verify,#16A34A)" stroke-width="1"/>
-        <text x="600" y="76" font-size="11" fill="var(--verify,#16A34A)" text-anchor="middle" font-weight="500">Test</text>
-        <text x="600" y="92" font-size="9" fill="var(--verify,#16A34A)" text-anchor="middle" opacity="0.7">✓ 48 checks</text>
+        <text x="600" y="76" font-size="11" fill="var(--verify,#16A34A)" text-anchor="middle" font-weight="500">Probe</text>
+        <text x="600" y="92" font-size="9" fill="var(--verify,#16A34A)" text-anchor="middle" opacity="0.7">✓ ProductProof</text>
 
         <rect x="680" y="54" width="88" height="52" rx="8" fill="var(--verify-soft,rgba(22,163,74,0.10))" stroke="var(--verify,#16A34A)" stroke-width="1"/>
-        <text x="724" y="76" font-size="11" fill="var(--verify,#16A34A)" text-anchor="middle" font-weight="500">Review</text>
-        <text x="724" y="92" font-size="9" fill="var(--verify,#16A34A)" text-anchor="middle" opacity="0.7">✓ independent</text>
+        <text x="724" y="76" font-size="11" fill="var(--verify,#16A34A)" text-anchor="middle" font-weight="500">Preserve</text>
+        <text x="724" y="92" font-size="9" fill="var(--verify,#16A34A)" text-anchor="middle" opacity="0.7">✓ re-proved</text>
 
         <rect x="804" y="54" width="88" height="52" rx="8" fill="var(--verify-soft,rgba(22,163,74,0.10))" stroke="var(--verify,#16A34A)" stroke-width="1"/>
-        <text x="848" y="76" font-size="11" fill="var(--verify,#16A34A)" text-anchor="middle" font-weight="500">Gate</text>
-        <text x="848" y="92" font-size="9" fill="var(--verify,#16A34A)" text-anchor="middle" opacity="0.7">✓ deterministic</text>
+        <text x="848" y="76" font-size="11" fill="var(--verify,#16A34A)" text-anchor="middle" font-weight="500">Journal</text>
+        <text x="848" y="92" font-size="9" fill="var(--verify,#16A34A)" text-anchor="middle" opacity="0.7">✓ hash-chained</text>
 
         <!-- Final node — merge -->
         <rect x="920" y="58" width="36" height="44" rx="8" fill="var(--verify,#16A34A)"/>
@@ -810,7 +810,7 @@ section { padding: 100px 0; }
     <dl class="pipeline-labels">
       <div>
         <dt>Left of the line</dt>
-        <dd>The model uses judgment: planning, coding, problem-solving.</dd>
+        <dd>The model uses judgment: writing the code, problem-solving.</dd>
       </div>
       <div>
         <dt>Frozen SHA</dt>
@@ -818,7 +818,7 @@ section { padding: 100px 0; }
       </div>
       <div>
         <dt>Right of the line</dt>
-        <dd>Deterministic code: tests, review, gates, evidence. No model opinion.</dd>
+        <dd>Deterministic code: harness-owned probes, preservation, the journal. No model opinion.</dd>
       </div>
     </dl>
   </div>
@@ -828,65 +828,72 @@ section { padding: 100px 0; }
 <section class="diff section-rule" id="capabilities">
   <div class="wrap">
     <div class="eyebrow">Core differentiators</div>
-    <h2>What the harness guarantees</h2>
+    <h2>What the 2.0 kernel guarantees</h2>
     <p class="diff-sub">
       Each mechanism exists because a real agent run exposed the gap it fills.
     </p>
     <ul class="diff-list">
       <li class="diff-item">
-        <span class="diff-label">SHA-bound evidence</span>
+        <span class="diff-label">Independent evidence</span>
         <div class="diff-desc">
-          <h3>Every check is tied to the exact commit it ran on</h3>
-          <p>Evidence from a different SHA is classified as stale — a distinct state from failure and from success. No retroactive claims.</p>
+          <h3>Harness-owned probes decide, not the developer&rsquo;s tests</h3>
+          <p>ProductProof checks every approved behaviour contract against the candidate with probes the harness owns: a Python callable, a CLI invocation, a process effect, a file artifact. The developer&rsquo;s tests are evidence of engineering quality, never of product correctness.</p>
         </div>
       </li>
       <li class="diff-item">
-        <span class="diff-label">Reviewer ≠ developer</span>
+        <span class="diff-label">Sealed verdict channel</span>
         <div class="diff-desc">
-          <h3>The review session is a separate agent, forbidden to edit code</h3>
-          <p>Structural guarantee, not a prompt instruction. The model never supervises its own output. It is a separation guarantee, not a safety net &mdash; the measured miss rate below says the machine checks are what hold.</p>
+          <h3>The code under test cannot manufacture a pass</h3>
+          <p>Candidate code runs only inside the probe&rsquo;s agent process. The verdict comes from a controller that never imports it, over an authenticated channel.</p>
         </div>
       </li>
       <li class="diff-item">
-        <span class="diff-label">Qualified gates</span>
+        <span class="diff-label">Static admission</span>
         <div class="diff-desc">
-          <h3>16 story-level checks, each with positive, negative and environment controls</h3>
-          <p>48 total controls. "Is the gate itself scoring correctly?" is answered by a command, not by hope. Since 1.6.0 the reviewer's own judgement is scored the same way — 6 judgement classes &times; the same 3 controls, 18 more cells.</p>
+          <h3>Nine checks before any model is called</h3>
+          <p>Every hash in the project bundle is re-checked, every contract must carry the human approval that binds it to its requirements, and the plan must admit. A plan that does not admit is refused with its reasons.</p>
         </div>
       </li>
       <li class="diff-item">
-        <span class="diff-label">Write-scope lock</span>
+        <span class="diff-label">Route attestation</span>
         <div class="diff-desc">
-          <h3>Each story declares which files it may touch</h3>
-          <p>The guard rejects any diff that changes files outside scope. Blast-radius analysis on brownfield codebases. An agent that "fixes" module A doesn't silently break modules B, C, D.</p>
+          <h3>The model you declared is the model that answers</h3>
+          <p>The preflight lists the provider&rsquo;s models and sends one-token probes; the route is accepted only if every answer was served by the declared model under one deployment fingerprint. Anything else is an identity stop: no session starts.</p>
         </div>
       </li>
       <li class="diff-item">
-        <span class="diff-label">Nop detection</span>
+        <span class="diff-label">Preservation</span>
         <div class="diff-desc">
-          <h3>A test already green before the story wrote code proves nothing</h3>
-          <p>The gate compares test results against the parent commit. No credit for pre-existing passes. Red-before-green is checked.</p>
+          <h3>What earlier stories proved is proved again after every merge</h3>
+          <p>Every behaviour an earlier story proved is re-proved on the merged result. A regression rolls the story back instead of reaching the delivered <code>main</code>.</p>
         </div>
       </li>
       <li class="diff-item">
-        <span class="diff-label">Six outcomes</span>
+        <span class="diff-label">Typed ownership</span>
         <div class="diff-desc">
-          <h3>PASSED · FAILED · UNRUNNABLE · UNCONFIGURED · WAIVED · N/A</h3>
-          <p>Unconfigured ≠ passed. Unrunnable ≠ failed. Three invariants that prevent silent elision of missing checks.</p>
+          <h3>Every failure has an owner and a retry budget</h3>
+          <p>PLAN, DEVELOPER, ENVIRONMENT, PROVIDER, INTEGRATION, REVIEW, SECURITY &mdash; a failure consumes only its owner&rsquo;s retry limit. A retry tells the developer which criterion failed, in public facts, never the proof&rsquo;s hidden stimulus.</p>
         </div>
       </li>
       <li class="diff-item">
-        <span class="diff-label">Behaviour ledger</span>
+        <span class="diff-label">Spend from evidence</span>
         <div class="diff-desc">
-          <h3>Every requirement, acceptance criterion and screen has a tracked state</h3>
-          <p>VERIFIED, GAP, or REOPENED. The ledger is rebuilt from evidence — never a second source of truth. Regression is automatic.</p>
+          <h3>Budget is accounted, not estimated</h3>
+          <p>Requests, turns and tokens are re-derived from the preflight ledger, the journal and the session streams before and during every session. A ceiling reached, or spend that cannot be accounted for, ends the run.</p>
         </div>
       </li>
       <li class="diff-item">
-        <span class="diff-label">Crash recovery</span>
+        <span class="diff-label">Re-verifiable runs</span>
         <div class="diff-desc">
-          <h3>Reconcile-on-start with three recovery scenarios</h3>
-          <p>Roll-forward for merged work, undo for in-progress, stale cleanup for abandoned state. Every <code>aisef run</code> starts with reconciliation.</p>
+          <h3>A hash-chained journal is the only source of a verdict</h3>
+          <p>The run directory keeps the raw journal, every candidate and merge, every session stream. <code>aisef run --verify</code> re-derives the whole run from the journal alone.</p>
+        </div>
+      </li>
+      <li class="diff-item">
+        <span class="diff-label">1.x still ships</span>
+        <div class="diff-desc">
+          <h3>Write-scope lock, nop detection, qualified gates, behaviour ledger, crash recovery</h3>
+          <p>The 1.x planning pipeline and its gates and guards are unchanged in 2.0. Its execution runs only behind the named legacy surface, <code>aisef legacy run</code>, never by default.</p>
         </div>
       </li>
     </ul>
@@ -897,28 +904,30 @@ section { padding: 100px 0; }
 <section class="evidence" id="evidence">
   <div class="wrap">
     <div class="eyebrow">Measured, not claimed</div>
-    <h2>Real numbers from real agent runs</h2>
+    <h2>Real numbers from the 2.0 release qualification</h2>
     <p class="evidence-sub">
-      Every number comes from the actual codebase. Where something hasn't
-      been measured, the framework says so — it never defaults to "probably fine".
+      Release candidate RC2 was frozen with its wheel and sdist digests and qualified as shipped.
+      Where something hasn't been measured, the framework says so &mdash; it never defaults to "probably fine".
     </p>
     <div class="evidence-terminal">
-      <div><span class="cmd">AISEF v1.7.2 &mdash; one command behind every row</span></div>
+      <div><span class="cmd">AISEF 2.0.0 &mdash; one record behind every row</span></div>
       <br>
-      <div><span class="label">  Tests</span> <span class="val">3,122</span> <span class="ok">✓ 0 failing</span></div>
-      <div><span class="label">  Guards</span> <span class="val">10</span> <span class="ok">✓ 3 lifecycle moments</span></div>
-      <div><span class="label">  Gate checks</span> <span class="val">48</span> <span class="ok">✓ 16 × 3 controls</span></div>
-      <div><span class="label">  Reviewer cells</span> <span class="val">18</span> <span class="ok">✓ 6 judgement classes × 3</span></div>
-      <div><span class="label">  Config keys</span> <span class="val">70</span> <span class="ok">✓ every key has a default</span></div>
-      <div><span class="label">  Conformance</span> <span class="val">10/10</span> <span class="ok">✓ Claude + OpenCode</span></div>
+      <div><span class="label">  Tests</span> <span class="val">5,454</span> <span class="ok">✓ 0 failing, hermetic</span></div>
+      <div><span class="label">  CI</span> <span class="val">green</span> <span class="ok">✓ Linux 3.11–3.14 · macOS · Windows</span></div>
+      <div><span class="label">  Mutants</span> <span class="val">6,463</span> <span class="ok">✓ all killed, 0 survivors</span></div>
+      <div><span class="label">  Differential</span> <span class="val">100,000</span> <span class="ok">✓ traces matched the model</span></div>
+      <div><span class="label">  Reproduction</span> <span class="val">12/12</span> <span class="ok">✓ recorded corpus, no drift</span></div>
+      <div><span class="label">  Rebuilds</span> <span class="val">3</span> <span class="ok">✓ byte-identical wheel + sdist</span></div>
+      <div><span class="label">  Release smoke</span> <span class="val">59/59</span> <span class="ok">✓ acceptance specs, 0 false accepts</span></div>
       <div><span class="label">  Dependencies</span> <span class="val">0</span> <span class="ok">✓ stdlib only</span></div>
-      <div><span class="label">  Version</span> <span class="val">1.7.2</span> <span class="ok">✓ stable</span></div>
+      <div><span class="label">  Version</span> <span class="val">2.0.0</span> <span class="ok">✓ stable</span></div>
     </div>
     <p class="evidence-note">
-      Conformance probes (C1–C10) test destructive guards, injection defense, worktree
-      isolation, reviewer role separation, credential stripping, and more. Both Claude Code
-      and OpenCode passed all 10 probes in the 2026-09-08 run. Run <code style="color:#A1A1AA">aisef dashboard</code>
-      yourself, or read <code style="color:#A1A1AA">docs/CONFORMANCE.md</code>, to check the table and its age.
+      The live release smoke ran 7 stories and 67 proof obligations on a real model route: 6 stories were delivered,
+      and one correct story was rolled back because a plan criterion read a docstring line as an import &mdash; the
+      kernel failed closed, and the limitation is published below. Every row is a record in
+      <code style="color:#A1A1AA">closure-evidence/v2/release/</code>, starting from
+      <code style="color:#A1A1AA">V2.0-FINAL-RELEASE-REPORT.md</code>.
     </p>
   </div>
 </section>
@@ -936,11 +945,14 @@ section { padding: 100px 0; }
       <div class="benchmark-col proven">
         <h3><span style="color:var(--verify)">●</span> Measured and verified</h3>
         <ul>
+          <li><strong>2.0:</strong> on a real model route, 7 stories and 67 proof obligations: the delivered product satisfied all 59 acceptance specs and no incorrect story was accepted. one story committed on its third attempt after two retries; one correct story was rolled back by a plan criterion&rsquo;s false positive</li>
+          <li><strong>2.0:</strong> the kernel against its reference model on 100,000 generated traces, a 12-item recorded corpus reproduced with no drift, 6,463 of 6,463 mutants of the release-critical code killed</li>
+          <li><strong>1.x</strong> (the measurements below are of the 1.x execution path, which 2.0 keeps as <code>aisef legacy run</code>):</li>
           <li>On simple bug-fix tasks, correctness was saturated for both harnessed and bare agents. On the hard tasks with a non-frontier model, the corpus cannot currently detect a difference at all: across 339 recorded attempts, 12 of 340 cross-arm pairs (3.5%) came out differently, and 25 of the 30 tasks never separated the two arms even once. C-1b's published +0.06 does not survive re-reading — all three of its failing attempts were sessions the CLI cut, and under the attempt definition its own protocol pre-registered, all three tasks read 1.00/1.00 in both arms. So no correctness claim is supportable, in either direction</li>
           <li>The harness is not free, and the price is measured rather than asserted: the harnessed arm spent 44% more turns in C-1, 27% more in C-1b, and 1.51&times; the tokens in C-2 &mdash; for the same outcome each time. <code>aisef cost</code> attributes spend to outcomes and reports that only 4–22% of it bought an attempt the gate passed</li>
           <li>Conformance probes pass 10/10 on two different clients (Claude Code, OpenCode)</li>
           <li>And the result that does <em>not</em> flatter the harness: cohort C-2, pre-registered before any data, came back <strong>inconclusive</strong> &mdash; 11 of 12 tasks saturated at the ceiling with the unharnessed arm at 36/36, so the experiment had no power to resolve the comparison at that model and task difficulty. Three cohorts, three different signs (&minus;0.06, +0.06, &minus;0.028); quoting one without the others would be selection, not evidence</li>
-          <li>3,122 unit tests cover all public modules; 411 benchmark attempts across 30 challenge tasks (the majority on real agents, the rest on a simulator that says so)</li>
+          <li>411 benchmark attempts across 30 challenge tasks (the majority on real agents, the rest on a simulator that says so)</li>
           <li>The review layer is measured too, and the numbers are not flattering: false block 10.5% (6 of 57 blocks, stated as a floor rather than an estimate), miss 34–39% (27 of 70 passes), and of 20 consecutive reviews of an identical tree, 11 reversed the verdict. Recomputable from evidence on disk, with no model call</li>
           <li>The framework's own project-closure gate (<code style="color:#A1A1AA">aisef closure</code>, 27 criteria in 6 gates, read from evidence on disk with no model call) passes 24 of 27 on 1.7.6; the three open criteria are external validation. The first dogfood run of the public 1.7.2 package found three P1 defects (D-026, D-028, D-029), fixed in 1.7.3; the second run, on 1.7.3, found one (D-032), fixed in 1.7.4; the clean OpenCode replay of that run, on 1.7.4, found one (D-033), fixed in 1.7.5; the same replay continued on 1.7.5 found one (D-034), fixed in 1.7.6. A defect in that gate itself &mdash; release identity conflated with the repository HEAD, so recording evidence <em>about</em> a release invalidated it &mdash; was measured on 1.7.1, fixed in 1.7.2 and pinned by a permanent fixed-point test</li>
           <li>Crash recovery: three interrupted-run paths (journal reconcile, run loop, improve loop) plus a real SIGKILL mid-write — at most the one half-written line is lost</li>
@@ -949,10 +961,14 @@ section { padding: 100px 0; }
       <div class="benchmark-col unproven">
         <h3><span style="color:var(--amber)">●</span> Not yet proven</h3>
         <ul>
+          <li><strong>2.0:</strong> generalisation across arbitrary workloads &mdash; the live qualification is one 7-story workload on one model route. Model quality and superiority over V1 are not claimed</li>
+          <li><strong>2.0:</strong> plan criteria that read Python source with line patterns can refute correct code (V21-37), and a regression found after the merge is not routed back to the developer (V21-38). Both are planned for 2.1</li>
+          <li><strong>2.0:</strong> a live <code>aisef run</code> on Windows (the package installs and the kernel&rsquo;s suite runs there), hostile multi-tenant isolation, and isolation against a malicious process of the same OS user</li>
+          <li><strong>2.0:</strong> bundle authoring &mdash; 2.0 runs an approved project bundle; it does not write one, and there is no automatic conversion from a 1.x project</li>
           <li>That the harness helps an agent solve more — every cohort so far (v0.3.0, C-1, C-1b, C-2) returned a null or an inconclusive result. The measured value is elsewhere: refusing to call unfinished work done, and leaving evidence why</li>
           <li>No external user has independently adopted the framework — all evidence is internal. The G6 handoff bundle for the public 1.7.2 release is ready and frozen; independent external-human validation is awaited, and until a genuine participant's report is in, this line stands</li>
-          <li>Distributed execution (multi-machine) is designed but untested in production</li>
-          <li>Local sandbox provider does not isolate credentials — Docker is required for credential-sensitive projects</li>
+          <li>1.x: distributed execution (multi-machine) is designed but untested in production</li>
+          <li>1.x: the local sandbox provider does not isolate credentials — Docker is required for credential-sensitive projects</li>
           <li>Performance at scale (50+ stories, large codebases) is untested</li>
         </ul>
       </div>
@@ -964,39 +980,35 @@ section { padding: 100px 0; }
 <section class="arch section-rule" id="architecture">
   <div class="wrap">
     <div class="eyebrow">Architecture</div>
-    <h2>The control plane</h2>
+    <h2>Four planes, nine invariants</h2>
     <p class="arch-sub">
-      Six harness groups. Everything in the framework belongs to exactly one.
-      This is also the acceptance yardstick for the framework itself.
+      2.0 separates what 1.x conflated: who defines product truth, what proves it, who owns a story,
+      and what records the run. Nine kernel invariants are armed in every test run.
     </p>
     <div class="arch-grid">
-      <div class="arch-card full">
-        <div class="arch-label">CLIENTS</div>
-        <div class="arch-title">Claude Code &nbsp;&middot;&nbsp; OpenCode &nbsp;&middot;&nbsp; <span style="color:var(--muted);font-weight:400">any client with hook support</span><span class="arch-badge">10/10 conformance</span></div>
+      <div class="arch-card">
+        <div class="arch-label">&#9312; REQUIREMENT PLANE</div>
+        <div class="arch-detail">Human authority &middot; requirements document sealed by hash<br>Prose, never read by control</div>
       </div>
       <div class="arch-card">
-        <div class="arch-label">&#9312; INSTRUCTIONS &amp; RULES</div>
-        <div class="arch-detail">CLAUDE.md &middot; AGENTS.md &middot; skill catalog &middot; 4 agent roles</div>
+        <div class="arch-label">&#9313; PRODUCT PLANE</div>
+        <div class="arch-detail">Approved BehaviorContract &rarr; ProductProofSpec<br>Evaluated by harness-owned probes &middot; survives every re-plan</div>
       </div>
       <div class="arch-card">
-        <div class="arch-label">&#9313; TOOLS</div>
-        <div class="arch-detail">3 evidence-producing tools &middot; prose on when / how / when not</div>
+        <div class="arch-label">&#9314; PLANNING PLANE</div>
+        <div class="arch-detail">PlanObligation: INTRODUCE / PRESERVE / VERIFY<br>Static admission &middot; revising a plan never invalidates product evidence</div>
+      </div>
+      <div class="arch-card">
+        <div class="arch-label">&#9315; RECORD PLANE</div>
+        <div class="arch-detail">Append-only, hash-chained journal &middot; the sole authority for run state<br>Every read model a pure fold &middot; <code>aisef run --verify</code></div>
       </div>
       <div class="arch-card full accent">
-        <div class="arch-label">&#9316; GUARDRAILS &amp; HOOKS</div>
-        <div class="arch-detail">10 guards &middot; 3 lifecycle moments &middot; pre-execution + post-execution + post-review &middot; framework-side enforcement</div>
-      </div>
-      <div class="arch-card">
-        <div class="arch-label">&#9315; ORCHESTRATION</div>
-        <div class="arch-detail">Reviewer &ne; developer &middot; story state machine<br>Wave scheduling &middot; handoff packets &middot; crash recovery</div>
-      </div>
-      <div class="arch-card">
-        <div class="arch-label">&#9314; SANDBOXES &amp; EXECUTION</div>
-        <div class="arch-detail">4 permission levels &middot; Docker provider (S1&ndash;S5)<br>Worktree isolation &middot; write-scope enforcement</div>
+        <div class="arch-label">NINE INVARIANTS</div>
+        <div class="arch-detail">Requirement Authority &middot; Independent Evidence &middot; Typed Ownership &middot; Immutable Provenance &middot; No Prose As Control State &middot; and four more &mdash; armed in every test tier</div>
       </div>
       <div class="arch-card full">
-        <div class="arch-label">&#9317; OBSERVABILITY</div>
-        <div class="arch-detail">Structured events with provenance &middot; cost &amp; latency per session &middot; SHA-bound evidence store<br>Behaviour ledger (VERIFIED / GAP / REOPENED) &middot; benchmark corpus &middot; conformance probes C1&ndash;C10</div>
+        <div class="arch-label">1.x HARNESS (still shipped)</div>
+        <div class="arch-detail">Instructions &amp; rules &middot; tools &middot; sandboxes &middot; orchestration &middot; 10 guards &middot; observability<br>Claude Code &middot; OpenCode &middot; conformance C1&ndash;C10 &middot; behind <code>aisef legacy run</code></div>
       </div>
     </div>
   </div>
@@ -1006,42 +1018,38 @@ section { padding: 100px 0; }
 <section class="cli-section">
   <div class="wrap">
     <div class="eyebrow">Developer experience</div>
-    <h2>Five commands from init to ship</h2>
+    <h2>Three modes: check, run, verify</h2>
     <p class="cli-sub">
-      One input file. One CLI. Full traceability from requirements to merge.
+      One approved bundle. One run directory. Every verdict re-derivable from the journal.
     </p>
     <div class="cli-steps">
       <div class="cli-step">
-        <div class="cli-step-label">Install &amp; init</div>
+        <div class="cli-step-label">Install</div>
         <div><span class="prompt">$ </span><span class="cmd">pip install aisef</span></div>
-        <div><span class="prompt">$ </span><span class="cmd">aisef init</span></div>
-        <div><span class="dim">  ✓ Stack detected</span></div>
-        <div><span class="dim">  ✓ Skills installed</span></div>
-        <div><span class="dim">  ✓ Rules compiled</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">aisef --version</span></div>
+        <div><span class="dim">  aisef 2.0.0</span></div>
       </div>
       <div class="cli-step">
-        <div class="cli-step-label">Plan</div>
-        <div><span class="prompt">$ </span><span class="cmd">aisef plan</span></div>
-        <div><span class="dim">  PRD → Architecture → Epics → Stories</span></div>
-        <div><span class="dim">  3 stories in 2 waves</span></div>
-        <div><span class="dim">  Write scopes declared</span></div>
-        <div><span class="ok">  ✓ Ready for review</span></div>
+        <div class="cli-step-label">Check</div>
+        <div><span class="prompt">$ </span><span class="cmd">aisef run --check <span class="flag">--project bundle.json --settings run.json --repo ./app</span></span></div>
+        <div><span class="dim">  inputs sealed, plan admitted</span></div>
+        <div><span class="dim">  no provider request made</span></div>
+        <div><span class="ok">  "ready": true</span></div>
       </div>
       <div class="cli-step">
-        <div class="cli-step-label">Execute</div>
-        <div><span class="prompt">$ </span><span class="cmd">aisef run</span></div>
-        <div><span class="ok">  ◉ STORY-01  Tokenizer      ✓ done</span></div>
-        <div><span class="ok">  ◉ STORY-02  Parser         ✓ done</span></div>
-        <div><span class="ok">  ◉ STORY-03  Edge cases     ✓ done</span></div>
-        <div><span class="dim">  3/3 stories verified</span></div>
+        <div class="cli-step-label">Run</div>
+        <div><span class="prompt">$ </span><span class="cmd">aisef run <span class="flag">--project bundle.json --settings run.json --repo ./app --out runs/r1</span></span></div>
+        <div><span class="dim">  route attested &middot; stories in dependency order</span></div>
+        <div><span class="ok">  "STORY-01-01": ["COMMIT"]</span></div>
+        <div><span class="ok">  "STORY-01-02": ["RETRY", "COMMIT"]</span></div>
+        <div><span class="ok">  "delivery_verdict": "PASS"</span></div>
       </div>
       <div class="cli-step">
-        <div class="cli-step-label">Ship</div>
-        <div><span class="prompt">$ </span><span class="cmd">aisef pre-deploy <span class="flag">--epic EPIC-01</span></span></div>
-        <div><span class="ok">  ✓ All stories verified</span></div>
-        <div><span class="ok">  ✓ No stray commits</span></div>
-        <div><span class="ok">  ✓ Evidence ledger consistent</span></div>
-        <div><span class="ok">  ✓ Ready to ship</span></div>
+        <div class="cli-step-label">Verify</div>
+        <div><span class="prompt">$ </span><span class="cmd">aisef run --verify <span class="flag">--project bundle.json --out runs/r1</span></span></div>
+        <div><span class="dim">  journal chain re-checked</span></div>
+        <div><span class="dim">  verdict re-derived from the journal</span></div>
+        <div><span class="ok">  "verdict": "VERIFIED"</span></div>
       </div>
     </div>
   </div>
@@ -1053,17 +1061,17 @@ section { padding: 100px 0; }
     <h2>Start shipping with evidence</h2>
     <p>
       Open source. Zero dependencies. Installs in one command.
-      Works on new and existing codebases.
+      The 1.x planning pipeline still ships, with its execution behind <code>aisef legacy run</code>.
     </p>
     <div class="cta-buttons">
-      <a class="btn btn-primary" href="https://github.com/nghinh/aisef#quick-start" target="_blank" rel="noopener">Get started</a>
+      <a class="btn btn-primary" href="https://github.com/nghinh/aisef#get-started" target="_blank" rel="noopener">Get started</a>
       <a class="btn btn-ghost" href="https://github.com/nghinh/aisef" target="_blank" rel="noopener">View on GitHub</a>
     </div>
     <div class="cta-links">
       <a href="https://pypi.org/project/aisef/" target="_blank" rel="noopener">PyPI</a>
-      <a href="https://github.com/nghinh/aisef/blob/master/docs/USAGE-GUIDE.md" target="_blank" rel="noopener">Documentation</a>
+      <a href="https://github.com/nghinh/aisef/blob/master/docs/v2/USAGE.md" target="_blank" rel="noopener">Documentation</a>
       <a href="https://github.com/nghinh/aisef/blob/master/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
-      <a href="https://github.com/nghinh/aisef/blob/master/docs/CONFORMANCE.md" target="_blank" rel="noopener">Conformance</a>
+      <a href="https://github.com/nghinh/aisef/blob/master/closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md" target="_blank" rel="noopener">Release evidence</a>
     </div>
   </div>
 </section>
@@ -1071,7 +1079,7 @@ section { padding: 100px 0; }
 <!-- ════════════ Footer ════════════ -->
 <footer class="footer">
   <div class="wrap">
-    AISEF — AI Software Engineering Framework · v1.7.2 · MIT License
+    AISEF — AI Software Engineering Framework · v2.0.0 · MIT License
   </div>
 </footer>
 

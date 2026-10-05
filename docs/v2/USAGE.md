@@ -1,3 +1,5 @@
+*English · [Tiếng Việt](USAGE.vi.md)*
+
 # AISEF 2.0 — using the V2 runtime (`aisef run`)
 
 AISEF 2.0 provides deterministic, evidence-bound orchestration and product verification for AI-assisted software
@@ -114,6 +116,17 @@ and never blocks; the scanner (`ruff`, when installed) is informational.
 
 Platforms: `aisef run` is supported on Linux and macOS. On Windows the package installs and the kernel's test suite
 runs, but a live `aisef run` is not part of the 2.0 claim.
+
+## Known limitations
+
+- **Plan criteria that read Python source with line patterns can refute correct code.** In the 2.0 release smoke a
+  correct story was rolled back because a "stdlib only" criterion matched a docstring line beginning with `from …`
+  as an import (S6-SMOKE-2-FALSE-ROLLBACK-S10A). The kernel failed closed — no incorrect code reached the delivered
+  product — but the story did not land. Syntax-aware criteria are planned for 2.1 (V21-37).
+- **A regression found after the merge goes back to nobody.** It is owned by INTEGRATION and not retryable, so the
+  developer neither learns the failing criterion nor gets a retry (V21-38, planned for 2.1).
+
+The whole 2.1 backlog, with a reproducer for every item: [V2.1-BACKLOG.md](V2.1-BACKLOG.md).
 
 ## Coming from AISEF 1.x
 

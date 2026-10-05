@@ -2,35 +2,139 @@
 
 # AISEF — AI Software Engineering Framework
 
-[Scoped long-term memory](docs/MEMORY.md) is available via `aisef memory`, **OFF by default and frozen** since 2026-09-12 — it keeps working and keeps getting security fixes, but no further capability is being built into it until someone outside asks ([ADR-007 addendum](docs/ADR-007-scoped-advisory-memory.md)). Memory is advisory context, never gate evidence; fresh sessions remain unchanged. See [research and plan](docs/MEMORY-RESEARCH-PLAN.md), [validation report](docs/MEMORY-VALIDATION.md) and [ADR-007](docs/ADR-007-scoped-advisory-memory.md).
-
-A framework for building software with coding agents. The package on PyPI, the
-Python module and the command are all called `aisef`. Each project's input is
-**one file**, `docs/requirements.md`; the output is a working application plus
-evidence for every step that produced it.
+AISEF builds software with coding agents and refuses to take their word for it. The package on PyPI, the Python
+module and the command are all called `aisef`.
 
 The principle behind every decision in this repository:
 
 > **If it needs judgement, give it to the model. If it needs a guarantee, write code.**
 
-Writing a PRD, designing the architecture, building mockups, writing code — all
-need judgement, all go to the model. "Every requirement must be covered by a
-story", "nothing may be written outside the declared scope", "tests must be
-green after the last edit" — all have a correct answer, so all are code. The
-consequence: **the model is never asked to supervise itself.**
+**AISEF 2.0** makes that principle the runtime. `aisef run` executes an owner-approved plan on a git repository:
+for each story a developer session changes the code, and the V2 kernel decides — from independent probes of the
+product, never from the developer's word or the developer's own tests — whether the story is delivered, retried or
+rolled back. Every decision is written to a hash-chained journal, and `aisef run --verify` re-derives the whole run
+from it.
 
-## AISEF 2.0 (V2)
+```bash
+pip install aisef==2.0.0
+```
 
-From 2.0 the `aisef` distribution ships two packages: `aisef` (V1, the framework
-this README describes) and `aisef2`, the V2 runtime — and **`aisef run` is V2**,
-the authoritative execution path. V1 execution remains only as an explicitly
-named legacy surface, `aisef legacy run …`, never the default; every other
-command below is unchanged.
+- [Using AISEF 2.0](docs/v2/USAGE.md) · [Hướng dẫn tiếng Việt](docs/v2/USAGE.vi.md)
+- [What changed in 2.0](CHANGELOG.md) · [Known limitations](#known-limitations-of-20)
+- [Architecture RFC](docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md) · [Release process](docs/v2/RELEASE-PROCESS.md)
+- [The 1.x framework (legacy surface and planning tools)](#the-v1-framework-legacy-surface-and-planning-tools)
 
-- Install, once 2.0.0 is published: `pip install aisef==2.0.0`
-- Using the V2 runtime: [docs/v2/USAGE.md](docs/v2/USAGE.md)
-- Releasing (tags, staging, the production hold): [docs/v2/RELEASE-PROCESS.md](docs/v2/RELEASE-PROCESS.md)
-- The ruling it all follows: [docs/v2/V2-STABLE-RELEASE-CHARTER.md](docs/v2/V2-STABLE-RELEASE-CHARTER.md)
+## What AISEF 2.0 does
+
+`aisef run` is the authoritative execution path. One run, in order:
+
+1. **Inputs are sealed before anything runs.** The project bundle (requirements, behaviour contracts, the human
+   approvals that bind them, the plan) is loaded and every hash re-checked; the requirements document must be the
+   one the plan was approved against; the repository is cloned at the plan's baseline and never written.
+2. **The plan is admitted statically.** Nine admission checks run before any model is called; a plan that does not
+   admit is refused with its reasons.
+3. **The model route is attested.** The preflight lists the provider's models and sends a few one-token probes; the
+   route is accepted only if every answer was served by the declared model under one deployment fingerprint.
+   Anything else is an *identity stop*: no session starts.
+4. **Stories run in dependency order.** For each story the developer session (OpenCode, on the one attested route)
+   changes the code inside a confined workspace. Then the kernel proves the candidate:
+   - **ProductProof** — harness-owned probes (a Python callable, a CLI invocation, a process effect, a file artifact)
+     check each behaviour contract against the candidate. Candidate code runs only in the probe's agent process; the
+     verdict comes from a controller that never imports it, over an authenticated channel, so the code under test
+     cannot manufacture a passing result.
+   - **Engineering test adequacy** — the developer's tests must run, must not be vacuous, and must be relevant; they
+     are evidence of engineering quality, never of product correctness.
+   - **Preservation** — after the merge, every behaviour earlier stories proved is proved again; a regression rolls
+     the story back.
+5. **Failures have owners.** Every failure is typed (PLAN, DEVELOPER, ENVIRONMENT, PROVIDER, INTEGRATION, REVIEW,
+   SECURITY) and consumes only its owner's retry budget; a retry tells the developer, in public facts, which
+   criterion failed — never the proof's hidden stimulus.
+6. **Spend is accounted, not estimated.** Requests, turns and tokens are re-derived from the evidence before and
+   during every session; a ceiling reached, or spend that cannot be accounted for, ends the run.
+7. **Everything is kept.** The run directory holds the raw journal, every candidate and merge in the clone, every
+   session stream and the preflight ledger. `aisef run --verify` re-derives the verdict from the journal alone.
+
+Behind it are nine kernel invariants, armed in every test run — among them *Requirement Authority* (only approved
+contracts define product truth), *Independent Evidence* (the actor that writes the code never defines the evidence
+that certifies it), *Typed Ownership*, *Immutable Provenance* and *No Prose As Control State* (no model output ever
+becomes a control code). See the [architecture RFC](docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md) §4.
+
+## Get started
+
+Needs Python 3.11+, `git` 2.31+ and — for a live run — the [OpenCode](https://opencode.ai) client on `PATH` and an
+OpenAI-compatible provider endpoint. `aisef run` is supported on **Linux and macOS**.
+
+```bash
+aisef run --check  --project bundle.json --settings run.json --repo ./myproject   # inputs + admission, no provider request
+aisef run          --project bundle.json --settings run.json --repo ./myproject --out ./runs/r1
+aisef run --verify --project bundle.json --out ./runs/r1                          # re-derive a finished run
+```
+
+- **`bundle.json`** (`aisef-v2-project/1`) — the project: requirements document, behaviour contracts, the human
+  approvals binding each contract to its requirements, the plan (baseline commit and proof obligations per story),
+  the public facts a developer may be told, and per story its dependencies and test paths.
+- **`run.json`** (`aisef-v2-run/1`) — the one model route, the provider identity, the budget ceilings, the per-owner
+  retry limits, timeouts and the turn cap. Nothing is defaulted.
+- **Exit status** — `0` delivered (PASS; `--check` ready; `--verify` VERIFIED) · `1` not delivered (FAIL or
+  NOT_REACHED; `--verify` REFUTED) · `2` refused before the run began (an input that does not hold, an unadmitted
+  plan, an identity stop).
+
+Field-by-field formats, the run directory and every refusal: [docs/v2/USAGE.md](docs/v2/USAGE.md).
+
+## How 2.0 was qualified
+
+Release candidate RC2 (`1565bcc`) was frozen with its wheel and sdist digests and qualified as shipped:
+
+| check | result |
+|---|---|
+| full test suite, hermetic, on the exact candidate | 5,454 tests, 0 failed |
+| CI | Linux (Python 3.11–3.14), macOS, Windows, lint, wheel — all green |
+| mutation testing of the changed release-critical code | 261 targets, 6,463 / 6,463 mutants killed, 0 survivors |
+| qualification rungs Q0–Q3 (static integrity, semantic conformance, adequacy, fault injection) | GREEN on Linux and Windows |
+| Q4 — the kernel's control-critical projections against an independent reference model, 100,000 generated runs | 100,000 / 100,000 matched |
+| Q5 — real re-execution of a recorded 12-run corpus, model stream replayed | 12 / 12 reproduced, no drift |
+| reproducible build | three independent rebuilds byte-identical to the frozen wheel and sdist |
+| clean install | installed wheel: version, CLI, `aisef run --check / run / --verify` offline — PASS |
+| live release smoke (7 stories, 67 proof obligations, real model route) | 6 of 7 stories delivered; the final product satisfied **all 59 acceptance specs**; 0 false acceptances; one correct story rolled back by a plan criterion's false positive — see below |
+
+The evidence is in [`closure-evidence/v2/release/`](closure-evidence/v2/release/), starting from
+[`V2.0-FINAL-RELEASE-REPORT.md`](closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md).
+
+## What 2.0 claims, and what it does not
+
+**Claimed:** deterministic, evidence-bound orchestration and product verification; candidate code cannot control
+a verdict channel; raw run evidence is preserved and re-verifiable.
+
+**Threat model:** a trusted operator; generated code may be faulty or opportunistic.
+
+**Not claimed:** generalisation across arbitrary workloads; model quality; superiority over V1; hostile
+multi-tenant isolation; full isolation against a malicious process of the same OS user; protection against the
+machine's owner. `plan_quality_verdict` is always `NOT_CLAIMED` in 2.0.
+
+### Known limitations of 2.0
+
+- **AISEF 2.0 runs bundles; it does not author them.** A V2 project bundle (contracts, approvals, plan) is prepared
+  and approved outside `aisef run`; there is no automatic conversion from a 1.x project.
+- **Plan criteria that read Python source with line patterns can refute correct code.** In the 2.0 release smoke a
+  correct story was rolled back because a "stdlib only" criterion matched a docstring line beginning with
+  `from …` as an import (S6-SMOKE-2-FALSE-ROLLBACK-S10A). The kernel failed closed — no incorrect code reached the
+  delivered product — but the story did not land. Syntax-aware criteria are planned for 2.1 (V21-37).
+- **A regression found after the merge goes back to nobody.** It is owned by INTEGRATION and not retryable, so the
+  developer neither learns the failing criterion nor gets a retry (V21-38, planned for 2.1).
+- **Platforms.** A live `aisef run` is claimed on Linux and macOS; on Windows the package installs and the kernel's
+  test suite runs, but a live run is not part of the 2.0 claim.
+- **Probes** run with the standard library and the candidate's own source (no third-party project dependencies).
+  The model review and the scanner (`ruff`, when installed) are informational and never block.
+
+The full 2.1 backlog, with a reproducer for every item: [docs/v2/V2.1-BACKLOG.md](docs/v2/V2.1-BACKLOG.md).
+
+## Coming from AISEF 1.x
+
+- `aisef run` is now V2. V1's execution is `aisef legacy run …` (same options as 1.x `aisef run`), and the
+  improvement loop is `aisef legacy improve …`. Every other 1.x command — `doctor`, `setup`, `plan`, `mockup`,
+  `approve`, `qa`, `report`, … — is unchanged.
+- V1 projects are not V2 bundles: V2 runs approved behaviour contracts and an admitted plan, not V1 story files.
+- V2 writes nothing into the project repository; its results are the run directory and the clone's `main`.
 
 ## Install
 
@@ -57,15 +161,39 @@ No Python dependencies beyond the standard library. Optional: `docker`
 from mockups). When either is missing the framework **says so plainly** instead
 of pretending it still verified anything.
 
-## Step-by-step guide
+## Layout
 
-New users should read [`docs/USAGE-GUIDE.md`](docs/USAGE-GUIDE.md) (English) or
-[`docs/HUONG-DAN-SU-DUNG.md`](docs/HUONG-DAN-SU-DUNG.md) (Vietnamese):
-preparing the machine, installing, writing `docs/requirements.md`, configuring
-the test command, passing all eight gates, reading gate outcomes,
-troubleshooting, plus full command and configuration tables.
+```
+aisef2/                 the V2 kernel and runtime
+  app/                  what `aisef run` executes: bundle, settings, preflight, client, run, verify, CLI
+  product/              requirement authority, behaviour contracts, ProductProof specs
+  probe/                harness-owned probes (python callable, CLI invocation, process effect, file artifact)
+  plan/                 plan obligations, static and per-story admission, plan drift
+  runtime/              run and story scopes, the termination sentinel, the run spec
+  orchestrate/          the story runner: one authoritative orchestration path
+  control/              failure ownership, retryability, routing
+  journal/              the append-only, hash-chained journal and its projections
+  quality/              engineering test adequacy
+  invariants/           the nine invariants, armed in every test tier
+aisef/                  the 1.x framework: planning pipeline, gates, guards, legacy execution
+docs/v2/                using, releasing and the 2.1 backlog
+closure-evidence/v2/    every qualification record of 2.0
+```
 
-## What makes it different: the harness
+---
+
+## The V1 framework (legacy surface and planning tools)
+
+Everything below describes the 1.x framework that 2.0 still ships. Its planning pipeline (`plan`, `mockup`,
+`approve`, `gates`, …) and tools are unchanged; its execution runs only behind the named legacy surface,
+`aisef legacy run` / `aisef legacy improve`, never by default. [Scoped long-term memory](docs/MEMORY.md)
+(`aisef memory`) is **off by default and frozen** since 2026-09-12 — advisory context, never gate evidence.
+
+Each 1.x project's input is **one file**, `docs/requirements.md`; the output is a working application plus
+evidence for every step that produced it. Step-by-step guide: [`docs/USAGE-GUIDE.md`](docs/USAGE-GUIDE.md)
+(English) or [`docs/HUONG-DAN-SU-DUNG.md`](docs/HUONG-DAN-SU-DUNG.md) (Vietnamese).
+
+### What makes it different: the harness
 
 Most agent tooling is a prompt plus a loop. AISEF is a **harness**: the run-time
 scaffolding around the model that decides what the model sees, what it may
@@ -88,7 +216,7 @@ pre-execution guards is recorded as offering weaker assurance instead of being
 assumed fine. And group 6 binds every result to a commit, so "the tests passed"
 always means "they passed on *this* code", never "they passed at some point".
 
-## Harness of harness: the framework improves the framework
+### Harness of harness: the framework improves the framework
 
 A single story passing its gate is not the interesting part. The hard problem is
 what happens **after** an epic is declared done: a later story quietly breaks an
@@ -119,7 +247,7 @@ absorbed from the *Harness-of-Harness* line of work and measured here):
   negative/mutant, environment), so "is the gate itself scoring correctly" is a
   question answered by a command.
 
-## Six steps
+### Six steps
 
 ```bash
 cd /path/to/your/project
@@ -159,7 +287,7 @@ dependencies **at the project root**: the baseline run, the nop control and the
 clean verification tree all resolve `node_modules` / `.venv` from there, and
 without them they can only report that there is nothing to run.
 
-## Brownfield (existing codebase)
+### Brownfield (existing codebase)
 
 ```bash
 aisef baseline                     # analyse existing code → _bmad-output/baseline.md
@@ -172,7 +300,7 @@ existing artifacts are kept, prompts include brownfield context and
 `intent: "update"`, and the `blast_radius` slot in story prompts shows
 impact analysis from the codebase graph before implementation.
 
-## Once there is code
+### Once there is code
 
 ```bash
 aisef doc vitest --topic coverage --story STORY-01-02
@@ -215,7 +343,7 @@ were ✗ or missing at that SHA, keeps the review and security verdicts from the
 same SHA, and scores the full gate. Passing merges as usual; failing marks
 `failed` and does not consume `run.max_retries`.
 
-## Gates
+### Gates
 
 Eight gates, each with two layers. The **machine gate** runs first — it catches
 what machines catch better than people (dependency cycles, requirements that
@@ -228,7 +356,7 @@ approval record is bound to the artifact's **content hash** — editing a docume
 after approval voids it, and re-approving an upper layer marks every layer below
 `stale`.
 
-## Guards
+### Guards
 
 Ten guards, each a command returning an exit code, wired into three lifecycle
 moments:
@@ -254,7 +382,7 @@ is not wired there — the compile report lists it as post-hoc, and the story
 gate re-asks the same question from evidence, which fails the story instead
 of stopping the session.
 
-## Real bugs already hit
+### Real bugs already hit
 
 189 bugs found by measurement on real agents, grouped into eleven cause
 classes with a regression check each (179–185 came from the first dogfood run
@@ -279,7 +407,7 @@ fixed in 1.7.5; the same replay continued on 1.7.5 found D-034, fixed in 1.7.6.)
 the tag's tree and the wheel/sdist digests on PyPI — not by which commit is HEAD,
 so recording evidence about a release does not invalidate it (D-022, fixed in 1.7.2).
 
-## Client conformance
+### Client conformance
 
 Hooks and plugins are **compiled artifacts** — being syntactically valid does not
 mean the client runs them. Bug 31 is the most recent example: a wheel install
@@ -307,7 +435,7 @@ release path the V2 release gate replaces it ([docs/v2/RELEASE-PROCESS.md](docs/
 Claude and OpenCode are first-class clients (10/10 conformance). CI:
 `.github/workflows/conformance.yml` runs weekly.
 
-## Releasing
+### Releasing
 
 Package, Python module and command all share the name **`aisef`** (since 0.2.0;
 0.1.0 installed as `aisef` but was typed `aisdlc` — that alias was removed in
@@ -337,7 +465,7 @@ The dogfood regression corpus (`tests/dogfood/`, enabled with
 the repository and compares against the measured baseline — run it before every
 tag.
 
-### What the benchmarks measured
+#### What the benchmarks measured
 
 Four cohorts, four null or inconclusive results, reported because a null is a result:
 
@@ -369,7 +497,7 @@ So the honest positioning, on the evidence available today: AISEF does not make
 an agent solve more. What it does, measurably, is refuse to call unfinished work
 done, and leave evidence that says why.
 
-### Known limitations
+#### Known limitations of 1.x
 
 Declared here because every claim needs evidence; what has not been proven is
 called unproven (owner decision 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
@@ -417,7 +545,7 @@ called unproven (owner decision 2026-09-06, `docs/RELEASE-PLAN-v0.1.0.md` §0):
   (`--coverage`/`--cov`); a project that has not enabled it gets ○ "not
   configured", which is not a pass.
 
-## When a gate blocks
+### When a gate blocks
 
 A blocking gate is the framework working, not the framework broken. Three common
 cases and the correct response:
@@ -428,11 +556,11 @@ cases and the correct response:
 | `story touches a requirement blocked by an open question` | an epic assigned an FR the PRD records as undecided | answer the question, or drop that FR from the story |
 | `merge conflict in …` | two stories edited the same file | the `write_scope` was declared wrong — fix it in the story, do **not** just resolve the conflict |
 
-`--force` exists on `approve` and `run` for deliberate overrides. Using it is a
+`--force` exists on `approve` and `legacy run` for deliberate overrides. Using it is a
 decision, and it is recorded: the approval keeps the note, and the acceptance
 report shows each gate's true state.
 
-## Running in parallel
+### Running in parallel
 
 Epics run sequentially. Inside an epic two stories share a wave only when they
 have **no dependencies left** *and* **disjoint write scopes** — without the
@@ -441,7 +569,7 @@ story runs in its own git worktree; merges happen one at a time at the end of th
 wave. A merge conflict must not be resolved silently: it is **evidence that a
 `write_scope` was declared wrong**.
 
-## Layout
+### Layout of the 1.x package
 
 ```
 aisef/
@@ -461,7 +589,7 @@ docs/
   DANH-GIA-360-VA-LO-TRINH.md  360° assessment and roadmap (Vietnamese)
 ```
 
-## Evidence, not self-report
+### Evidence, not self-report
 
 Every gate reads `_bmad-output/evidence/{story}.jsonl` — each test run, each file
 edit, each model call with its cost and latency, each mockup comparison. An

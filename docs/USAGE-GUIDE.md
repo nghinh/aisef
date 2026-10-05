@@ -1,5 +1,12 @@
 # AISEF Usage Guide
 
+> **AISEF 2.0 — read this first.** From 2.0, `aisef run` is the **V2 runtime**: it executes an owner-approved
+> project bundle under the V2 kernel and decides every story from independent product probes. How to use it:
+> **[docs/v2/USAGE.md](v2/USAGE.md)**. This guide covers the **1.x framework** that 2.0 still ships — the planning
+> pipeline (`setup`, `plan`, `mockup`, `approve`, gates, guards, `qa`, `report`, …) and the legacy execution, which
+> now runs only as **`aisef legacy run`** (same options as 1.x `aisef run`) and **`aisef legacy improve`**. Every
+> other command below is unchanged. Install 2.0 with `pip install aisef==2.0.0`.
+
 Optional [long-term memory guide](MEMORY.md): `aisef memory` is **frozen** and OFF by default — the code stays and keeps its bug and security fixes, no new capability is added. Includes configuration, CLI, provenance, security and retrieval-only benchmark limitations; memory is never gate evidence. Cross-references: [research/plan](MEMORY-RESEARCH-PLAN.md), [validation report](MEMORY-VALIDATION.md), [ADR-007](ADR-007-scoped-advisory-memory.md).
 
 **AISEF** stands for **AI Software Engineering Framework**. The installable
@@ -29,7 +36,7 @@ Reading conventions:
 8. [Planning step: `aisef plan`](#8-planning-step-aisef-plan)
 9. [Mockup step (UI projects)](#9-mockup-step-ui-projects)
 10. [Reading story gates: six outcomes](#10-reading-story-gates-six-outcomes)
-11. [Implementation step: `aisef run`](#11-implementation-step-aisef-run)
+11. [Implementation step: `aisef legacy run`](#11-implementation-step-aisef-legacy-run)
 12. [Brownfield projects (existing codebases)](#12-brownfield-projects-existing-codebases)
 13. [Verification, packaging, and acceptance](#13-verification-packaging-and-acceptance)
 14. [Improvement loops and post-release changes](#14-improvement-loops-and-post-release-changes)
@@ -83,7 +90,7 @@ Four things, only **two** are required.
 | Item | Required? | Check with | What if missing |
 |---|---|---|---|
 | Python ≥ 3.11 | **yes** | `python3 --version` | can't install the package |
-| `git` | **yes** | `git --version` | can't run `aisef run` (each story needs its own worktree) |
+| `git` | **yes** | `git --version` | can't run `aisef legacy run` (each story needs its own worktree) |
 | An agent client: `claude` or `opencode` | **yes, to run agents** | `claude --version` | agent commands exit with code 2 and the message "claude is not installed on this machine" |
 | Docker | no | `docker info` | tests run directly on the host; the framework records this as **degraded** with the name of each missing guarantee |
 | Playwright + Chromium | no, unless the project has a UI | `npx playwright --version` | can't extract a visual contract from mockups |
@@ -135,14 +142,16 @@ Verify the installation:
 aisef --help
 ```
 
-You should see a list of **33** subcommands (`setup`, `doctor`, `plan`, `run`, …
+You should see a list of **34** subcommands (`setup`, `doctor`, `plan`, `run` — the V2 runtime —, `legacy`, …
 all of them in [§17](#17-reference-all-commands)).
 The package, Python module, and CLI command are all named `aisef`.
 `aisef --version` prints the version; to inspect the whole environment, use
 `aisef doctor`.
 
-This guide describes **1.7.2** (released 2026-09-15; 1.0.0 was 2026-09-08, and
-1.2.x, 1.3.0, 1.3.1, 1.4.0, 1.5.0, 1.6.0, 1.7.1 came between). 1.7.2 changes
+This guide describes the 1.x framework as **2.0.0** ships it: every V1 command behaves as in 1.7.6, except that V1
+execution moved behind `aisef legacy` (`aisef legacy run`, `aisef legacy improve`) — `aisef run` is now the V2
+runtime ([v2/USAGE.md](v2/USAGE.md)). History: 1.7.2 was released 2026-09-15 (1.0.0 was 2026-09-08, and
+1.2.x, 1.3.0, 1.3.1, 1.4.0, 1.5.0, 1.6.0, 1.7.1 came between); it changed
 nothing in the CLI or the workflow described here: it corrects the framework's
 own project-closure gate, which identified a release by the repository's HEAD
 commit instead of by the product it ships (`CHANGELOG.md`, D-022). 1.7.0 was
@@ -201,14 +210,14 @@ harness **builds** (`aisef-verify-python:<recipe digest>` — `python:3.12-slim`
 pinned by digest plus pytest, pytest-cov and ruff pinned by version), because
 the bare `python:3.12-slim` it named before carries no test runner. `aisef
 doctor` builds it on first use and probes every declared tool inside it;
-`aisef run` refuses to start a session when a declared image lacks a declared
+`aisef legacy run` refuses to start a session when a declared image lacks a declared
 tool. A project that declares its own `sandbox.image` is probed the same way.
 
 For contributors who want to modify the framework:
 
 ```bash
 git clone <repo> aisef && cd aisef && pip install -e .
-python3 -m unittest discover -s tests -q     # 3122 tests, OK (skipped=19) — measured 2026-09-15 on 1.7.2
+python3 -m unittest discover -s tests -q     # 5454 tests, OK (skipped=80) — measured 2026-10-05 on 2.0.0
 ```
 
 (A checkout run from a git *worktree* skips about 60 more, because `.gitignore`
@@ -345,7 +354,7 @@ fresh checkout: an uncommitted skill directory simply does not exist where the
 agent session runs. The same applies to the files `aisef compile` writes
 (`.claude/settings.json`, `.opencode/plugin/`) — uncommitted, the session runs
 with no guard at all, and the story then fails `guard ran` after you have paid
-for it. Since 1.5.0 `aisef run` says so before the first session starts, but
+for it. Since 1.5.0 `aisef legacy run` says so before the first session starts, but
 committing is still yours to do:
 
 ```bash
@@ -737,7 +746,7 @@ What to look for at each gate:
   "error cases of command X" against the same file: any competent implementation
   of the first covers both, and the second then has no legal move, because its
   tests are green before its own code exists. Merging that pair here costs
-  nothing; discovering it during `aisef run` costs two sessions per story.
+  nothing; discovering it during `aisef legacy run` costs two sessions per story.
 
 Fast run without stopping at any gate (use only for experimentation):
 
@@ -888,10 +897,10 @@ not cover the case.
 
 ---
 
-## 11. Implementation step: `aisef run`
+## 11. Implementation step: `aisef legacy run`
 
 ```bash
-aisef run
+aisef legacy run
 ```
 
 What happens for **each** story:
@@ -936,9 +945,9 @@ Four things about that loop that only show up once you run it:
   developer session wrote nothing, counted as a no-op, and after two the story
   died with `sessions kept producing nothing to grade` — D-032, found by the
   second LedgerLock run.) If the reviewer still produces no verdict the story
-  ends `REVIEW_UNRUNNABLE`, naming the last failure; `aisef run --verify-only
+  ends `REVIEW_UNRUNNABLE`, naming the last failure; `aisef legacy run --verify-only
   --story <id>` re-runs the review stage later on the same candidate, and a plain
-  `aisef run` resumes such a story at the review stage. A structured `block` is a
+  `aisef legacy run` resumes such a story at the review stage. A structured `block` is a
   verdict and still returns the story to the developer.
 - **A story's baseline is immutable within its epoch (1.7.5).** `no baseline
   regression` compares the candidate with the test suite as it stood at the
@@ -996,9 +1005,9 @@ after two.
 Run variations:
 
 ```bash
-aisef run --epic EPIC-01        # only one epic
-aisef run --sequential          # disable parallel runs (easier to read logs)
-aisef run --force               # run even if the stories gate isn't approved (for testing only)
+aisef legacy run --epic EPIC-01        # only one epic
+aisef legacy run --sequential          # disable parallel runs (easier to read logs)
+aisef legacy run --force               # run even if the stories gate isn't approved (for testing only)
 ```
 
 Check progress and cost at any time (this command is **free**):
@@ -1035,7 +1044,7 @@ If a story shows `running` long after nothing is happening, look for the line
 `⚠️  N stories ORPHANED — claimed by a process that no longer exists on this
 host` (1.7.3): the orchestrator died mid-wave and the claim names a dead PID.
 Nothing is lost — worktrees, candidates and journals are intact — and `status`
-changes nothing on disk; the next `aisef run` reconciles the journal and
+changes nothing on disk; the next `aisef legacy run` reconciles the journal and
 re-claims those stories before starting.
 
 Note `Cost: $0.00`. That is not a free run — it is the provider reporting no price.
@@ -1125,7 +1134,7 @@ Then classify:
   no need to pay for a new coding session — just re-verify the existing code:
 
   ```bash
-  aisef run --verify-only --story STORY-01-03 --repeat 3
+  aisef legacy run --verify-only --story STORY-01-03 --repeat 3
   ```
 
   `--repeat 3` runs each check three times; if results differ across runs, the
@@ -1315,7 +1324,7 @@ aisef approve prd --note "delta scope looks right"
 # ... approve each gate
 
 # 10. Run implementation — stories include blast radius analysis
-aisef run
+aisef legacy run
 
 # 11. After stories merge, update the graph incrementally
 aisef baseline --incremental
@@ -1641,9 +1650,9 @@ money and left the project worse, which is the number to look for first.
 | Gate item ✗ `TDD`, while the nop control passed | you are before 1.6.0 | upgrade: a passing nop control now satisfies `TDD`, and the gate says which evidence proved it |
 | `aisef guard tool-bypass: … is the project's test command run directly` | the agent ran your declared command instead of `aisef tool test`; nothing was recorded | this is the guard working. Use `aisef tool test`. To narrow a run for debugging, change the command's own identity (`pytest tests/x.py -k foo`); with `npm`/`yarn`/`pnpm`/`bun` the script name *is* the identity, so call the underlying runner |
 | Story `failed`, reason `deadlock due to plan` | the story's criteria are already satisfied at its branch point — usually an earlier story shipped the behaviour | fix or drop the criteria named in the message, then re-run. Amending them drops the stale branch automatically |
-| Gate item ⚠ `no baseline regression` — `BASELINE_UNAVAILABLE: …` | baseline records exist but none was captured at the integrated parent for the story's current contract (1.7.5) | re-run the story from its base — `aisef run` discards the branch when the criteria changed; do not add or restore tests to satisfy the gate |
+| Gate item ⚠ `no baseline regression` — `BASELINE_UNAVAILABLE: …` | baseline records exist but none was captured at the integrated parent for the story's current contract (1.7.5) | re-run the story from its base — `aisef legacy run` discards the branch when the criteria changed; do not add or restore tests to satisfy the gate |
 | Story `failed`, reason `the story worktree still has changes outside write_scope before attempt …` | the story worktree holds out-of-scope changes no attempt of this story is on record for (1.7.6) — the harness does not delete what it did not make | commit or remove the named paths in the worktree, then re-run; what a failed attempt itself left outside the scope is restored automatically and needs nothing from you |
-| Story `failed`, reason `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | deterministic checks passed; the review session produced no verdict in three executions on the same candidate (1.7.4) | nothing to fix in the code — the candidate is kept. Look at the reviewer client (`run.max_turns`, timeouts, provider), then `aisef run --verify-only --story <id>` re-runs the review stage on that candidate |
+| Story `failed`, reason `REVIEW_UNRUNNABLE: the reviewer did not produce a verdict …` | deterministic checks passed; the review session produced no verdict in three executions on the same candidate (1.7.4) | nothing to fix in the code — the candidate is kept. Look at the reviewer client (`run.max_turns`, timeouts, provider), then `aisef legacy run --verify-only --story <id>` re-runs the review stage on that candidate |
 | Story `failed`, reason `sessions kept producing nothing to grade` | the session ran clean and wrote nothing — a decision, not a fault | do not re-run it; read the last graded verdict. Two consecutive no-op sessions stop the story on purpose |
 | Attempts ending at `max_turns` | `run.max_turns` (default 40) reached | the session is still graded if it committed work. Check `aisef status --attempts`; if the agent was reading `_bmad-output/` to work out gate rules, raising the cap does not help |
 | `Cost: $0.00` on a real run | the provider reported no price, not a free run | use `aisef cost` ([§15.2](#152-aisef-cost--what-the-spend-bought)); it switches to input tokens and hands you the price formula |
@@ -1693,11 +1702,19 @@ aisef reject <gate> --note "..."
 aisef auto-approve all|<list>
 ```
 
-**Implementation**
+**V2 runtime** ([v2/USAGE.md](v2/USAGE.md))
 
 ```bash
-aisef run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
-aisef run --verify-only --story S [--repeat K]
+aisef run --check  --project bundle.json --settings run.json --repo REPO
+aisef run          --project bundle.json --settings run.json --repo REPO --out RUN_DIR
+aisef run --verify --project bundle.json --out RUN_DIR
+```
+
+**Implementation (V1, legacy)**
+
+```bash
+aisef legacy run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
+aisef legacy run --verify-only --story S [--repeat K]
 aisef legacy improve --epic E [--max-loops N] [--auto] [--client c] [--force]
 aisef tool test|lint|sast [--story S] [--lines N]
 aisef verify [--write-scope ...] [--story S]
@@ -1803,7 +1820,7 @@ Values shown are the defaults.
 | `run.max_turns` | `40` | maximum turns in one agent session. Enforced on OpenCode since 1.4.0 by the adapter counting turns itself; since 1.7.3 the stop kills the whole process tree |
 | `run.timeout_seconds` | `1800` | maximum time for one session |
 | `run.max_retries` | `2` | quality retries for one story |
-| `run.infra_retries` | `-1` | separate budget for sessions lost to the client (provider 502, rate limit, unparsable tool call). They score nothing, so they are not quality attempts. `-1` keeps the old coupling to `max_retries + 1`; raise it only with a measured client failure rate — see [§11](#11-implementation-step-aisef-run) |
+| `run.infra_retries` | `-1` | separate budget for sessions lost to the client (provider 502, rate limit, unparsable tool call). They score nothing, so they are not quality attempts. `-1` keeps the old coupling to `max_retries + 1`; raise it only with a measured client failure rate — see [§11](#11-implementation-step-aisef-legacy-run) |
 | `run.cost_cap_usd` · `run.turn_cap` · `run.wall_clock_cap_seconds` | `0.0` · `0` · `0.0` | in-flight budget caps checked before every paid call; `0` disables. Warns at 80 % of a declared cap, once per dimension. The cost cap does nothing on a provider that reports no price |
 | `run.qualify_preflight` | `false` | opt-in: run the unified qualification policy before the first attempt |
 | `cost.warn_multiple` | `3.0` | warn when one story costs more than this multiple of the median |
