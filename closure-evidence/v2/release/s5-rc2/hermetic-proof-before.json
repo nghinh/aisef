@@ -1,0 +1,27 @@
+{
+ "env_names": [
+  "HOME",
+  "LANG",
+  "LOGNAME",
+  "PATH",
+  "TMPDIR",
+  "USER",
+  "XDG_CACHE_HOME",
+  "XDG_CONFIG_HOME",
+  "XDG_DATA_HOME",
+  "XDG_STATE_HOME",
+  "__CF_USER_TEXT_ENCODING"
+ ],
+ "secret_like_names": [],
+ "which_opencode": null,
+ "hermetic_roots_entries": {
+  "HOME": [],
+  "XDG_CONFIG_HOME": [],
+  "XDG_DATA_HOME": [],
+  "XDG_STATE_HOME": [],
+  "XDG_CACHE_HOME": []
+ },
+ "store_the_attempt4_check_reads": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s6/suite-rc2-1565bcc/xdg/data/opencode/opencode.db",
+ "store_exists": false,
+ "opencode_state_paths_existing": []
+}
