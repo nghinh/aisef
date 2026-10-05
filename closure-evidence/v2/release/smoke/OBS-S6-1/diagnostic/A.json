@@ -1,0 +1,32 @@
+{
+ "request": "A",
+ "url": "https://9router.vnteki.com/v1/chat/completions",
+ "method": "POST",
+ "body": "{\"model\": \"ds/deepseek-v4-pro\", \"messages\": [{\"role\": \"user\", \"content\": \"Reply with the single word: ok\"}], \"max_tokens\": 16, \"temperature\": 0}",
+ "body_sha256": "b702e126f09f8f806c4d8681a64afc8c63b75f93d0f0be6fb6bf93055326f4ac",
+ "headers_sent": [
+  "Authorization: <REDACTED>",
+  "Content-Type: application/json",
+  "User-Agent: Python-urllib/3.14"
+ ],
+ "timeout_s": 60.0,
+ "transport_result": "RESPONSE",
+ "transport_error": null,
+ "http_status": 200,
+ "content_type": "text/event-stream",
+ "response_headers": {
+  "content-type": "text/event-stream",
+  "transfer-encoding": "chunked",
+  "server": "cloudflare",
+  "cf-ray": "a45bbf004fb85f82-SIN",
+  "cf-cache-status": "DYNAMIC"
+ },
+ "elapsed_s": 2.0,
+ "body_bytes": 573,
+ "body_shape": "JSON",
+ "shipped_parse": "JSONDecodeError",
+ "shipped_transport_would_return": 0,
+ "first_bytes": "{\"id\":\"83e2362b-7c33-40c8-a7f8-e3dfa7ac5c9c\",\"object\":\"chat.completion\",\"created\":1791196175,\"model\":\"deepseek-v4-pro\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"ok\",\"reasoning_content\":\"We need answer single word ok.\"},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":90,\"completion_tokens\":9,\"total_tokens\":99,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":7},\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":90},\"system_fingerprint\":\"a307abda487cd1b463329ccb945ce396\"}data: [DONE]\n\n",
+ "first_bytes_limit": 768,
+ "redacted": false
+}

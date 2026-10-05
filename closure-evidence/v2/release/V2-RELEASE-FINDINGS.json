@@ -337,6 +337,42 @@
     }
    },
    "source": "S6, 2026-10-05"
+  },
+  {
+   "ID": "S6-SMOKE-1-PREFLIGHT-OPAQUE/R1",
+   "RECLASSIFIES": "S6-SMOKE-1-PREFLIGHT-OPAQUE",
+   "OWNER_RULING": "owner ruling 2026-10-05 'Owner ruling for S6-SMOKE-1-PREFLIGHT-OPAQUE': (1) exactly two diagnostic provider requests — A the shipped RC1 probe, B byte-identical plus \"stream\": false — no OpenCode, session, journal or workload, no retry; (2) record transport result/error class, HTTP status, content type, elapsed time, bounded redacted first bytes, never the key; (3) RC1 529591e permanently REJECTED; (4) the calls only distinguish A/B/C and fix the minimal RC2 change; (5) the observability defect is independently confirmed and RC2 must correct it; (6) if A: RC2 sends \"stream\": false and preserves transport error class, HTTP status, content type and parse/error class; (7) minimal change; (8) rerun every invalidated qualification stage (the frozen rules decide the mutation rerun set), S4 freeze, S5 exact-RC; (9) the charter amended narrowly: one additional paid smoke, only for the fully requalified RC2; (10) not before every RC2 gate PASS and its SHA/digests frozen and preregistered; (11) if it fails, stop: no third paid smoke",
+   "MEASURED": [
+    "request A (exactly the RC1 probe; its bytes, request line and headers proven equal to the shipped transport's on loopback): RESPONSE, HTTP 200, Content-Type text/event-stream, 2.0 s, 573 bytes — a complete chat.completion JSON object (model deepseek-v4-pro) followed by 'data: [DONE]'; the shipped parse raises JSONDecodeError, so the shipped transport returns HTTP 0",
+    "request B (A + \"stream\": false): RESPONSE, HTTP 200, Content-Type application/json, 1.325 s — JSON, model deepseek-v4-pro, system_fingerprint a307abda487cd1b463329ccb945ce396: the shipped transport returns 200 and the probe would attest",
+    "spend: 2 requests; output tokens 9 (A) + 14 (B)"
+   ],
+   "ROOT_CAUSE": "A CONFIRMED: without \"stream\": false the router answers the probe as an event stream (text/event-stream, JSON + 'data: [DONE]'); the RC1 transport parses it as JSON, fails, and records HTTP 0. B (another non-JSON page) and C (a dropped connection) are not what happened. Independently (owner §5): the RC1 preflight collapses distinct transport and non-JSON conditions into an opaque HTTP 0",
+   "RC2_FIX": "aisef2/app/preflight.py only: the chat probe sends \"stream\": false; a failed request keeps its HTTP status (0 only when no HTTP answer came) and records the transport/parse error class and the content type, in the ledger, the observation and the identity problem",
+   "V2_0_DISPOSITION": "BLOCK until RC2: RC1 529591e REJECTED (owner); fixed in RC2, closed by RC2's qualification",
+   "evidence": {
+    "diagnostic": {
+     "path": "closure-evidence/v2/release/smoke/OBS-S6-1/diagnostic/DIAGNOSTIC.json",
+     "sha256": "0e1ba946e6bed2f29aef6ff0d7c08f137db26157e9aa684b0393bc6093de2243"
+    },
+    "ledger": {
+     "path": "closure-evidence/v2/release/smoke/OBS-S6-1/diagnostic/LEDGER.jsonl",
+     "sha256": "88539e357c2438cf203221a58b27775c55677b152ad00195188e7c4eb218e7a9"
+    },
+    "tool": {
+     "path": "closure-evidence/v2/release/smoke/OBS-S6-1/diagnostic/diag.py",
+     "sha256": "0a1d01823f4da8766f83bb609be3701b7e7c2c4ae3e9cc36df9db18b92910830"
+    },
+    "same_bytes_proof": {
+     "path": "closure-evidence/v2/release/smoke/OBS-S6-1/diagnostic/same_bytes.py",
+     "sha256": "d20b4771c850ac8f078df741d7c8fe6c4a8e5a09a86e68d4c0b14a12834f5aef"
+    },
+    "selftest": {
+     "path": "closure-evidence/v2/release/smoke/OBS-S6-1/diagnostic/diag_selftest.py",
+     "sha256": "bc30eee4753126b47f0ec49f92fff67180fc77334115aa75a91483a1a0c80b92"
+    }
+   },
+   "source": "S6, 2026-10-05"
   }
  ],
  "v2_1_backlog": {

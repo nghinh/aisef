@@ -1,0 +1,49 @@
+{
+ "request": "B",
+ "url": "https://9router.vnteki.com/v1/chat/completions",
+ "method": "POST",
+ "body": "{\"model\": \"ds/deepseek-v4-pro\", \"messages\": [{\"role\": \"user\", \"content\": \"Reply with the single word: ok\"}], \"max_tokens\": 16, \"temperature\": 0, \"stream\": false}",
+ "body_sha256": "b80a10e29983a72f9667042bd4f94e20c8af0f2df27b97ee74a7c4a4dff1df35",
+ "headers_sent": [
+  "Authorization: <REDACTED>",
+  "Content-Type: application/json",
+  "User-Agent: Python-urllib/3.14"
+ ],
+ "timeout_s": 60.0,
+ "transport_result": "RESPONSE",
+ "transport_error": null,
+ "http_status": 200,
+ "content_type": "application/json",
+ "response_headers": {
+  "content-type": "application/json",
+  "transfer-encoding": "chunked",
+  "server": "cloudflare",
+  "cf-ray": "a45bbf092c83332a-HKG",
+  "cf-cache-status": "DYNAMIC"
+ },
+ "elapsed_s": 1.325,
+ "body_bytes": 454,
+ "body_shape": "JSON",
+ "shipped_parse": "JSON",
+ "shipped_transport_would_return": 200,
+ "first_bytes": "{\"id\":\"d4437ac6-98df-40ac-9df2-d23fae8bf8b0\",\"object\":\"chat.completion\",\"created\":1791196176,\"model\":\"deepseek-v4-pro\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"ok\"},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":2090,\"completion_tokens\":14,\"total_tokens\":2104,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":12}},\"system_fingerprint\":\"a307abda487cd1b463329ccb945ce396\"}",
+ "first_bytes_limit": 768,
+ "redacted": false,
+ "json_facts": {
+  "model": "deepseek-v4-pro",
+  "object": "chat.completion",
+  "system_fingerprint": "a307abda487cd1b463329ccb945ce396",
+  "usage": {
+   "prompt_tokens": 2090,
+   "completion_tokens": 14,
+   "total_tokens": 2104,
+   "prompt_tokens_details": {
+    "cached_tokens": 0
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 12
+   }
+  },
+  "finish_reason": "stop"
+ }
+}

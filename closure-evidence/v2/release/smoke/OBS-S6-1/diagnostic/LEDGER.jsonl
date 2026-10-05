@@ -1,0 +1,4 @@
+{"at": "2026-10-05T17:29:34+0700", "event": "sent", "request": "A"}
+{"elapsed_s": 2.0, "event": "done", "http_status": 200, "request": "A", "transport_result": "RESPONSE"}
+{"at": "2026-10-05T17:29:36+0700", "event": "sent", "request": "B"}
+{"elapsed_s": 1.325, "event": "done", "http_status": 200, "request": "B", "transport_result": "RESPONSE"}

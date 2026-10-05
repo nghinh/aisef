@@ -3,13 +3,13 @@
  "authority": "owner charter 'AISEF V2 — STABLE RELEASE EXECUTION ORDER / OWNER RELEASE CHARTER / SCOPE FREEZE' (2026-10-03), docs/v2/V2-STABLE-RELEASE-CHARTER.md sha256 cd8833569fed317bb1ef20cb7bc997b6f7003218be1f5347bd53df001c04b58a",
  "S0_SCOPE_FREEZE": "PASS",
  "S1_FAIL_CLOSED": "PASS",
- "S2_FIX_WINDOW": "PASS",
+ "S2_FIX_WINDOW": "RUNNING",
  "S3_PRODUCTIZED": "PASS",
- "S4_RC_FROZEN": "PASS",
- "S5_QUALIFIED": "PASS",
- "S6_RELEASE_SMOKE": "FAIL",
- "S7_TESTPYPI": "BLOCKED",
- "FINAL_RELEASE_READY": "BLOCKED",
+ "S4_RC_FROZEN": "NOT_STARTED",
+ "S5_QUALIFIED": "NOT_STARTED",
+ "S6_RELEASE_SMOKE": "NOT_STARTED",
+ "S7_TESTPYPI": "NOT_STARTED",
+ "FINAL_RELEASE_READY": "NOT_STARTED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
  "CURRENT_SHA": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
  "CURRENT_KERNEL_DIGEST": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
@@ -18,7 +18,7 @@
   "S6-SMOKE-1-PREFLIGHT-OPAQUE"
  ],
  "V2_1_BACKLOG_COUNT": 36,
- "PROVIDER_CALLS": 4,
+ "PROVIDER_CALLS": 6,
  "PAID_RELEASE_SMOKES_USED": 1,
  "sources": {
   "release_branch_base": {
@@ -120,6 +120,12 @@
    "status": "FAIL",
    "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
    "what": "the one paid smoke: rehearsal clean, preregistered, started; the preflight stopped it (route listed, 3 chat probes HTTP 0, OPAQUE): no session, RELEASE_SMOKE_PASS NO, RELEASE_GO NO; stopped for the owner (S6-SMOKE-1-PREFLIGHT-OPAQUE)"
+  },
+  {
+   "phase": "S2_FIX_WINDOW",
+   "status": "RUNNING",
+   "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+   "what": "owner: RC1 REJECTED; two diagnostic requests confirm root cause A (no stream:false -> event stream -> JSONDecodeError -> HTTP 0); RC2 = the minimal preflight fix, then S2 (the frozen rules' rerun set), S4, S5, smoke #2 (S6-SMOKE-1-PREFLIGHT-OPAQUE/R1)"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
@@ -438,5 +444,20 @@
    "tags": 0,
    "testpypi_or_pypi_uploads": 0
   }
+ },
+ "RC1_REJECTED": {
+  "rc": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+  "by": "owner ruling 2026-10-05 (permanent)",
+  "why": "S6-SMOKE-1-PREFLIGHT-OPAQUE",
+  "its_phases": {
+   "S2_FIX_WINDOW": "PASS",
+   "S4_RC_FROZEN": "PASS",
+   "S5_QUALIFIED": "PASS",
+   "S6_RELEASE_SMOKE": "FAIL"
+  }
+ },
+ "CHARTER_AMENDMENT": {
+  "by": "owner ruling 2026-10-05",
+  "what": "one additional paid release smoke (#2), only for the fully requalified RC2, after every RC2 gate PASS and its SHA/digests frozen and preregistered; if it fails: stop, no third paid smoke; never a retry of RC1"
  }
 }
