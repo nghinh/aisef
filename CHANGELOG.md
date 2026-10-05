@@ -17,6 +17,13 @@ a hash-chained journal that `aisef run --verify` re-derives. See `docs/v2/USAGE.
 - The provider preflight asks for one JSON answer (`"stream": false`) — without it the release route answered as an
   event stream and RC1's preflight refused the route — and a failed preflight request keeps its HTTP status, error
   class and content type in the ledger, the observation and the refusal.
+- Known limitation (S6-SMOKE-2-FALSE-ROLLBACK-S10A): in the release smoke of the candidate, one correct story was rolled
+  back. A plan criterion ("stdlib only") detected Python imports with a line pattern that also matched a docstring
+  line beginning with `from …`; `aisef run` enforced the criterion as written and failed closed (no incorrect code
+  reached main; the final product satisfied the whole release acceptance suite), but the story did not land, and a
+  regression found after the merge gives the developer neither the failing criterion nor a retry. Criteria that
+  read Python source with line patterns can refute correct code this way; V2.1 makes them syntax-aware (V21-37) and
+  routes post-merge regressions back to the developer when the retry policy permits (V21-38).
 - Release mechanics: reproducible wheel/sdist (`SOURCE_DATE_EPOCH`, re-packed sdist), a frozen release candidate
   whose bytes the production job must reproduce, a non-production staging path with a clean-install smoke of the
   installed `aisef run`.
