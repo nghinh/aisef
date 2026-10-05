@@ -1,5 +1,7 @@
-"""V2.0 release charter S6/§13-§17: V2.0-RELEASE-SMOKE-1 — rehearsed offline on the exact RC wheel, preregistered
-once, run exactly once.
+"""V2.0 release charter S6/§13-§17: V2.0-RELEASE-SMOKE-2 — rehearsed offline on the exact RC wheel, preregistered
+once, run exactly once. Smoke #1 (closure-evidence/v2/release/smoke/) ran on V2.0-RC1 and failed at the preflight
+(S6-SMOKE-1-PREFLIGHT-OPAQUE); the owner rejected RC1 and amended the charter narrowly (2026-10-05): one additional
+paid smoke, only for the fully requalified RC2 — this one. If it fails, there is no third.
 
     python -P validation/qualification/release_smoke.py --rehearse W                  # -> smoke/REHEARSAL.json
     python -P validation/qualification/release_smoke.py --preregister W --out DIR     # -> smoke/PREREGISTRATION.json + SETTINGS.json
@@ -12,7 +14,7 @@ venv's `aisef run` on the release bundle, the LedgerLock repository at the plan'
 settings, into a run directory that does not exist and lies outside any repository. The rehearsal is the same command
 with a fake client on PATH and a loopback fake provider. Nothing here retries, repairs, or changes a prompt, the plan,
 the budget or the route (§16); `--run` writes smoke/STARTED.json before anything is spent and refuses whenever it
-exists — there is no second smoke.
+exists — there is no third (owner amendment 2026-10-05).
 
 Budget envelope (§15): the flow the rehearsal exercises — a developer session and a review per attempt, at most
 DEVELOPER + 1 attempts per story (the retry policy), the preflight's listing and chat probes — gives the structural
@@ -42,7 +44,9 @@ ROOT = HERE.parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-SMOKE_REL = "closure-evidence/v2/release/smoke"
+SMOKE_REL = "closure-evidence/v2/release/smoke-2"
+#: the candidate the owner rejected (2026-10-05): never smoked again
+REJECTED_RC = "529591e4f2aeaa1ec621d624ef223e77ec9ff603"
 REHEARSAL_REL = f"{SMOKE_REL}/REHEARSAL.json"
 PREREG_REL = f"{SMOKE_REL}/PREREGISTRATION.json"
 SETTINGS_REL = f"{SMOKE_REL}/SETTINGS.json"
@@ -354,7 +358,7 @@ def rehearse(wheel: pathlib.Path, names=SCENARIOS) -> dict:
             results = {n: rehearse_one(aisef, project, n, t / n, endpoint, accepted) for n in names}
     finally:
         server.shutdown()
-    return {"record": "AISEF V2.0 — OFFLINE REHEARSAL OF RELEASE SMOKE #1 on the RC wheel (fake client, loopback fake "
+    return {"record": "AISEF V2.0 — OFFLINE REHEARSAL OF RELEASE SMOKE #2 on the RC wheel (fake client, loopback fake "
                       "provider; no model, no network)",
             "wheel": {"name": wheel.name, "sha256": _sha_file(wheel)}, "bundle_digest": project.digest,
             "envelope": envelope(len(project.order())), "results": results, **criteria(project, results),
@@ -415,6 +419,8 @@ def preregister(wheel: pathlib.Path, side: pathlib.Path) -> dict:
     side = side.expanduser().resolve()
     rehearsal = _load(REHEARSAL_REL)
     problems = rc.check(frozen)
+    if frozen["rc"]["sha"] == REJECTED_RC:
+        problems.append("the frozen candidate is the rejected V2.0-RC1")
     if frozen["artifacts"]["sha256"].get(wheel.name) != _sha_file(wheel):
         problems.append(f"{wheel.name} is not the frozen RC's wheel")
     if rehearsal is None or rehearsal["problems"] or rehearsal["wheel"]["sha256"] != _sha_file(wheel):
@@ -428,7 +434,7 @@ def preregister(wheel: pathlib.Path, side: pathlib.Path) -> dict:
     if who["endpoint"] != PROVIDER["endpoint"] or not who["key_present"] or not who["binary_sha256"]:
         problems.append(f"the client is absent, or its configuration does not send {PROVIDER['name']} to {PROVIDER['endpoint']} with a key")
     rec = {
-        "record": "AISEF V2.0 — RELEASE SMOKE #1 PREREGISTRATION (charter §15): bound before any provider call",
+        "record": "AISEF V2.0 — RELEASE SMOKE #2 PREREGISTRATION (charter §15, owner amendment 2026-10-05): bound before any provider call",
         "rc": {"sha": frozen["rc"]["sha"], "version": frozen["rc"]["version"], "kernel_digest": frozen["kernel"]["digest"],
                "wheel": {"name": wheel.name, "sha256": _sha_file(wheel)}},
         "plan": {"bundle": rb.BUNDLE_REL, "bundle_digest": project.digest, "plan_hash": project.plan.plan_hash,
@@ -442,7 +448,7 @@ def preregister(wheel: pathlib.Path, side: pathlib.Path) -> dict:
         "stop_rules": ["the preflight does not attest the route: identity stop, no session",
                        "a budget ceiling reached, or spend that cannot be accounted for: the run ends",
                        "a session at its turn cap ends; its story is judged by its proofs",
-                       "no attempt beyond the retry policy; no second smoke; no repair, prompt, plan, budget or route change (§16)"],
+                       "no attempt beyond the retry policy; no third smoke; no repair, prompt, plan, budget or route change (§16)"],
         "settings": {"path": SETTINGS_REL, "sha256": hashlib.sha256(_canon(settings)).hexdigest()},
         "repository": {"path": str(W.RELEASE_REPO), "baseline": project.plan.baseline,
                        "derivation": {"path": W.DERIVATION_REL, "sha256": C.lf_sha(ROOT / W.DERIVATION_REL)},
@@ -497,7 +503,7 @@ def run(wheel: pathlib.Path) -> int:
     if pre is None or pre["verdict"] != "PREREGISTERED":
         raise SystemExit("no preregistration: the smoke does not run")
     if (ROOT / STARTED_REL).exists():
-        raise SystemExit(f"{STARTED_REL} exists: the one release smoke has started; there is no second (§16)")
+        raise SystemExit(f"{STARTED_REL} exists: release smoke #2 has started; there is no third (owner amendment 2026-10-05)")
     problems = check(pre, wheel)
     if problems:
         raise SystemExit("the preregistration does not hold: " + "; ".join(problems))
@@ -506,7 +512,7 @@ def run(wheel: pathlib.Path) -> int:
     shutil.copyfile(ROOT / rb.BUNDLE_REL, side / "inputs" / "project.json")
     shutil.copyfile(ROOT / SETTINGS_REL, side / "inputs" / "settings.json")
     shutil.copyfile(wheel, side / "inputs" / wheel.name)
-    _write(STARTED_REL, {"record": "AISEF V2.0 — RELEASE SMOKE #1 STARTED (written before any provider call; never a second)",
+    _write(STARTED_REL, {"record": "AISEF V2.0 — RELEASE SMOKE #2 STARTED (written before any provider call; never a third)",
                          "started_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "preregistration_sha256": _sha_file(ROOT / PREREG_REL),
                          "wheel_sha256": _sha_file(wheel), "side_directory": str(side)})
     aisef = install(side / "inputs" / wheel.name, side / "venv")
@@ -519,7 +525,7 @@ def run(wheel: pathlib.Path) -> int:
     v = subprocess.run([str(aisef), "run", "--verify", "--project", str(side / "inputs" / "project.json"), "--out",
                         str(side / "run")], capture_output=True, text=True, encoding="utf-8", cwd=side)
     run_json = side / "run" / "RUN.json"
-    _write(RESULT_REL, {"record": "AISEF V2.0 — RELEASE SMOKE #1 RESULT (the run as it ended; evaluated by --evaluate)",
+    _write(RESULT_REL, {"record": "AISEF V2.0 — RELEASE SMOKE #2 RESULT (the run as it ended; evaluated by --evaluate)",
                         "argv": argv, "exit": code, "seconds": round(t1 - t0, 1), "verify_exit": v.returncode,
                         "verify_stdout_tail": v.stdout[-2000:],
                         "run_json_sha256": _sha_file(run_json) if run_json.exists() else None, "side_directory": str(side)})

@@ -2,7 +2,7 @@
 
 ## 2.0.0 — 2026-10-05
 
-**AISEF 2.0.0 (candidate V2.0-RC1): `aisef run` is the V2 runtime.**
+**AISEF 2.0.0 (candidate V2.0-RC2): `aisef run` is the V2 runtime.**
 One distribution, `aisef`, now ships the V2 kernel and product runtime (`aisef2`) next to V1. `aisef run` runs an
 owner-approved V2 project bundle on a git repository: a fixed model route attested by a preflight, one developer
 session per story attempt, and the verdict of independent product probes — never the developer's word — written to
@@ -14,6 +14,9 @@ a hash-chained journal that `aisef run --verify` re-derives. See `docs/v2/USAGE.
   verdict channel (controller/agent split with an authenticated protocol). Not claimed: generalisation, model
   quality, superiority over V1, hostile same-user isolation. Platforms: Linux and macOS for a live run. Requires git 2.31
   or newer (`aisef run` refuses an older one before its first git command).
+- The provider preflight asks for one JSON answer (`"stream": false`) — without it the release route answered as an
+  event stream and RC1's preflight refused the route — and a failed preflight request keeps its HTTP status, error
+  class and content type in the ledger, the observation and the refusal.
 - Release mechanics: reproducible wheel/sdist (`SOURCE_DATE_EPOCH`, re-packed sdist), a frozen release candidate
   whose bytes the production job must reproduce, a non-production staging path with a clean-install smoke of the
   installed `aisef run`.

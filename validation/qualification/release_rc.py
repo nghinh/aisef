@@ -2,7 +2,7 @@
 kernel digest, the build epoch, and the wheel and sdist digests of its reproducible build.
 
     python -P validation/qualification/release_rc.py --freeze RC_SHA --sums SHA256SUMS --ci-run RUN_ID
-        # -> closure-evidence/v2/release/V2.0-RC1-FREEZE.json (written once, in the harness-only commit after the RC)
+        # -> closure-evidence/v2/release/V2.0-RC2-FREEZE.json (written once, in the harness-only commit after the RC)
     python -P validation/qualification/release_rc.py --check
         # the record is what the RC's own git objects say (works on any later commit)
     python -P validation/qualification/release_rc.py --epoch
@@ -32,7 +32,10 @@ ROOT = HERE.parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-OUT_REL = "closure-evidence/v2/release/V2.0-RC1-FREEZE.json"
+#: the candidate this harness freezes and qualifies: V2.0-RC1 (529591e) was REJECTED by the owner on 2026-10-05
+#: (S6-SMOKE-1-PREFLIGHT-OPAQUE); its records under closure-evidence/v2/release/ are history
+RC = "RC2"
+OUT_REL = f"closure-evidence/v2/release/V2.0-{RC}-FREEZE.json"
 VERSION = "2.0.0"
 SHIPPED = ("aisef", "aisef2", "pyproject.toml", "MANIFEST.in", "README.md")
 _SUM = re.compile(r"([0-9a-f]{64})\s+\*?(\S+)")
@@ -63,7 +66,7 @@ def freeze(sha: str, sums_text: str, ci_run: str) -> dict:
     problems = [] if version == VERSION else [f"the candidate's version is {version}, not {VERSION}"]
     if set(artifacts) != want:
         problems.append(f"SHA256SUMS names {sorted(artifacts)}, not exactly {sorted(want)}")
-    return {"record": "AISEF V2.0 — RELEASE CANDIDATE 1, FROZEN (charter G2, S4)",
+    return {"record": f"AISEF V2.0 — RELEASE CANDIDATE {RC[2:]}, FROZEN (charter G2, S4)",
             "rc": {"sha": full, "version": version, "source_date_epoch": int(_git("log", "-1", "--format=%ct", full).decode()),
                    "shipped_trees": {rel: _git("rev-parse", f"{full}:{rel}").decode().strip() for rel in SHIPPED}},
             "kernel": {"tree": _git("rev-parse", f"{full}:aisef2").decode().strip(), "digest": kernel_digest_at(full)},

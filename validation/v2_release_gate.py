@@ -32,13 +32,14 @@ def problems(version: str, pyproject_version: str, status: dict, decisions: dict
     (approver "human:owner") with decision.PRODUCTION_PUBLISH == "AUTHORIZED" and decision.VERSION == `version`.
     A later entry that holds or revokes publication therefore wins over an earlier authorization.
 
-    `rc` is the frozen release candidate (V2.0-RC1-FREEZE.json, charter G2) and `rc_problems` its check on this
+    `rc` is the frozen release candidate (release_rc.OUT_REL, charter G2) and `rc_problems` its check on this
     commit: the published bytes are the RC's only when this commit's shipped files are the RC's (the build then uses
     the RC's epoch, and the publish job compares the files with the frozen digests).
     """
+    from validation.qualification import release_rc
     out = []
     if rc is None:
-        out.append("no frozen release candidate (closure-evidence/v2/release/V2.0-RC1-FREEZE.json, charter G2)")
+        out.append(f"no frozen release candidate ({release_rc.OUT_REL}, charter G2)")
     elif rc.get("rc", {}).get("version") != version:
         out.append(f"the frozen candidate is {rc.get('rc', {}).get('version')!r}, the tag says {version!r}")
     out += [f"release candidate: {p}" for p in rc_problems]

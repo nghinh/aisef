@@ -43,7 +43,7 @@ class V2ReleaseGate(unittest.TestCase):
         self.assertEqual(self.gate(self.HELD, self.OK), [])
 
     def test_without_the_frozen_candidate_or_with_its_shipped_files_moved_nothing_is_published(self):
-        self.assertIn("no frozen release candidate (closure-evidence/v2/release/V2.0-RC1-FREEZE.json, charter G2)",
+        self.assertIn("no frozen release candidate (closure-evidence/v2/release/V2.0-RC2-FREEZE.json, charter G2)",
                       self.gate(self.OK, rc=None))
         self.assertTrue(self.gate(self.OK, rc={"rc": {"version": "2.0.1"}}))
         self.assertEqual(self.gate(self.OK, rc_problems=["HEAD's shipped files are not the RC's: ['aisef2']"]),

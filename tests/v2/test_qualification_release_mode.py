@@ -1,9 +1,9 @@
-"""V2.0 release charter S4/S5: the qualification subject is DATA. `common.candidate()` reads the RC1 freeze record when it
+"""V2.0 release charter S4/S5: the qualification subject is DATA. `common.candidate()` reads the RC2 freeze record when it
 exists (release mode: the RC, its kernel tree, its subject trees, its shipped aisef tree, release output directories) and
 is the Cycle-2 subject exactly otherwise; Cycle-2 history keeps meaning c11615a in either mode.
 
 Every freeze record here is written to a temporary directory and `common.RC_FREEZE` is pointed at it: the repository's
-closure-evidence/v2/release/V2.0-RC1-FREEZE.json is never written."""
+closure-evidence/v2/release/V2.0-RC2-FREEZE.json is never written."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from validation.qualification import release_rc  # noqa: E402
 C2_CANDIDATE, C2_KERNEL = "c11615aeb1dd9e6ff992b6190f8c39a272636742", "254d8f559b879c210c4936321022f1350c4b2f89"
 C2_TREES = {"validation/v2": "7686f004167fc5e940b06bf6ff0248f068d8d116", "tests/v2": "fb9d8e17728a893083575638d9bad3b4faa62196"}
 C2_OUTS = ("closure-evidence/v2/cycle2/Q0-Q3-R4", "closure-evidence/v2/cycle2/Q4-FINAL", "closure-evidence/v2/cycle2/Q5-FINAL")
-RELEASE_OUTS = ("closure-evidence/v2/release/Q0-Q3-RC1", "closure-evidence/v2/release/Q4-RC1", "closure-evidence/v2/release/Q5-RC1")
+RELEASE_OUTS = ("closure-evidence/v2/release/Q0-Q3-RC2", "closure-evidence/v2/release/Q4-RC2", "closure-evidence/v2/release/Q5-RC2")
 SUBJECT_NAMES = {"MODE", "SEMANTIC_CANDIDATE", "SEAL_COMMIT", "KERNEL_TREE", "SUBJECT_TREES", "V1_PRODUCT_TREE", "OUT_REL",
                  "Q4_OUT_REL", "Q5_OUT_REL"}
 
@@ -115,7 +115,7 @@ class Subject(unittest.TestCase):
         self.assertFalse(ident["kernel_tree_is_the_candidates"])
         self.assertTrue(any(p.startswith("HEAD's aisef2 tree") and C2_KERNEL in p for p in problems), problems)
         self.assertIn("the semantic candidate does not carry the frozen kernel tree", problems)
-        self.assertIn("the RC1 freeze record: the kernel identity is not the RC commit's", problems)
+        self.assertIn("the RC2 freeze record: the kernel identity is not the RC commit's", problems)
 
     def test_release_q2_reads_the_calibrations_the_rc_ships(self):
         import importlib

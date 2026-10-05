@@ -46,7 +46,8 @@ C2_P5_ACCEPTANCE_REL = "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json"
 CYCLE2_V1_PRODUCT_TREE = "4359f347378e84fcac2d213128c7c26f282c13c0"
 #: the earlier QP-2.6 attempts, each kept where it was written: attempt 1 (candidate 6311254, historical evidence — owner
 #: ruling 2026-09-30 B) and R2 (candidate ac4a6c7, FAILED on Windows: the v1_pf_001_policy repo_path defect)
-C2_PRIOR_OUT_RELS = ("closure-evidence/v2/cycle2/Q0-Q3", "closure-evidence/v2/cycle2/Q0-Q3-R2", "closure-evidence/v2/cycle2/Q0-Q3-R3")
+C2_PRIOR_OUT_RELS = ("closure-evidence/v2/cycle2/Q0-Q3", "closure-evidence/v2/cycle2/Q0-Q3-R2", "closure-evidence/v2/cycle2/Q0-Q3-R3",
+                     "closure-evidence/v2/release/Q0-Q3-RC1")   # the rejected V2.0-RC1's rungs: history
 #: QP-2.6 requalification (owner ruling 2026-09-30 B: the orchestration conformance repair changed a qualification-consumed
 #: kernel path; the full QP-2.6 reruns on the new exact candidate, recorded beside attempt 1, never over it)
 #: R4: the final integration candidate (LANE-Q + LANE-X; C2-FINAL-INTEGRATION.json): the kernel and both subject trees changed
@@ -58,8 +59,9 @@ CYCLE2_Q4_OUT_REL, CYCLE2_Q5_OUT_REL = "closure-evidence/v2/cycle2/Q4-FINAL", "c
 #: closure-evidence/v2/release/ ("no historical c11615a qualification may be presented as current RC evidence");
 #: without the record, the Cycle-2 subject above, exactly
 RC_FREEZE = ROOT / release_rc.OUT_REL
-RELEASE_OUT_REL, RELEASE_Q4_OUT_REL, RELEASE_Q5_OUT_REL = ("closure-evidence/v2/release/Q0-Q3-RC1", "closure-evidence/v2/release/Q4-RC1",
-                                                           "closure-evidence/v2/release/Q5-RC1")
+RELEASE_OUT_REL, RELEASE_Q4_OUT_REL, RELEASE_Q5_OUT_REL = (f"closure-evidence/v2/release/Q0-Q3-{release_rc.RC}",
+                                                           f"closure-evidence/v2/release/Q4-{release_rc.RC}",
+                                                           f"closure-evidence/v2/release/Q5-{release_rc.RC}")
 G1_V1_NOTE = ("the release changed aisef/ for charter G1 ('legacy improve'): the V1 product tree the subject freezes is the RC's "
               "shipped aisef tree, not Cycle 2's")
 #: the platforms the qualification claims (§20); any other platform's record is kept as a non-gate observation
@@ -174,7 +176,7 @@ def subject_problems(ident: dict) -> list[str]:
     if ident["candidate_kernel_tree"] != ident["kernel_tree"]:
         out.append("the semantic candidate does not carry the frozen kernel tree")
     if ident["release"]:
-        out += [f"the RC1 freeze record: {p}" for p in ident["release"]["rc_check_problems"]]
+        out += [f"the {release_rc.RC} freeze record: {p}" for p in ident["release"]["rc_check_problems"]]
     if not ident["head_is_after_the_seal"]:
         out.append("HEAD does not descend from the seal commit")
     for rel, t in ident["subject_trees"].items():

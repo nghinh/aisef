@@ -22,22 +22,26 @@ class IdentityStop(Exception):
 
 
 def http_transport(endpoint: str, key: str, timeout_s: float = 60.0):
-    """(path, body | None) -> (status, json): GET when `body` is None, else POST; `key` sent as a bearer token, never
-    recorded."""
+    """(path, body | None) -> (status, json): GET when `body` is None, else POST with "stream": false (one JSON answer
+    is read: without it the router answers as an event stream, S6-SMOKE-1-PREFLIGHT-OPAQUE); `key` sent as a bearer
+    token, never recorded. A failed request keeps its HTTP status (0 only when no HTTP answer came) and says why in
+    `transport_error` (the error or parse class) and `content_type`."""
     if not key:
         raise IdentityStop("no provider key: the key variable is not set, or the client's configuration holds none")
 
     def call(path: str, body: dict | None = None) -> tuple[int, dict]:
-        req = urllib.request.Request(endpoint + path, data=None if body is None else json.dumps(body).encode("utf-8"),
+        req = urllib.request.Request(endpoint + path, data=None if body is None else json.dumps({**body, "stream": False}).encode("utf-8"),
                                      method="GET" if body is None else "POST",
                                      headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+        status, ctype = 0, None
         try:
             with urllib.request.urlopen(req, timeout=timeout_s) as r:
-                return r.status, json.loads(r.read().decode("utf-8") or "{}")
+                status, ctype = r.status, r.headers.get("Content-Type")
+                return status, json.loads(r.read().decode("utf-8") or "{}")
         except urllib.error.HTTPError as e:
-            return e.code, {}
+            return e.code, {"transport_error": "HTTPError", "content_type": e.headers.get("Content-Type") if e.headers else None}
         except (urllib.error.URLError, OSError, ValueError) as e:
-            return 0, {"transport_error": type(e).__name__}
+            return status, {"transport_error": type(e).__name__, "content_type": ctype}
     return call
 
 
@@ -64,6 +68,8 @@ def run(route: str, chat_probes: int, transport, directory: pathlib.Path, served
     """Measure the route; the observation and the verdict ATTESTED or OPAQUE (with every problem named). The listing
     must list the route's model (owned by `listed_owner`, when given: never a router's alias of another), and every
     completion must be served by `served_model` (the route's model when not given)."""
+    def failure(body: dict) -> dict:     # what a failed request's answer says about why (nothing for one that parsed)
+        return {k: body.get(k) for k in ("transport_error", "content_type")} if body.get("transport_error") else {}
     directory.mkdir(parents=True, exist_ok=False)
     ledger = directory / "LEDGER.jsonl"
     model = route.split("/", 1)[1]
@@ -72,19 +78,21 @@ def run(route: str, chat_probes: int, transport, directory: pathlib.Path, served
     n = 1
     _append(ledger, {"n": n, "event": "sent", "kind": "listing"})
     code, body = transport("/models")
-    _append(ledger, {"n": n, "event": "done", "http": code})
+    failed = failure(body)
+    _append(ledger, {"n": n, "event": "done", "http": code, **failed})
     row = next((x for x in (body.get("data") or []) if isinstance(x, dict) and x.get("id") == model), None)
-    obs["listing"] = {"http": code, "listed": row is not None, "id": (row or {}).get("id"), "owned_by": (row or {}).get("owned_by")}
+    obs["listing"] = {"http": code, "listed": row is not None, "id": (row or {}).get("id"), "owned_by": (row or {}).get("owned_by"),
+                      **failed}
     for _ in range(chat_probes):
         n += 1
         _append(ledger, {"n": n, "event": "sent", "kind": "chat"})
         code, body = transport("/chat/completions", {"model": model, "messages": [{"role": "user", "content": PROBE_PROMPT}],
                                                      "max_tokens": PROBE_MAX_TOKENS, "temperature": 0})
-        usage = body.get("usage") or {}
+        usage, failed = body.get("usage") or {}, failure(body)
         _append(ledger, {"n": n, "event": "done", "http": code, "input_tokens": usage.get("prompt_tokens") or 0,
-                         "output_tokens": usage.get("completion_tokens") or 0})
+                         "output_tokens": usage.get("completion_tokens") or 0, **failed})
         obs["probes"].append({"http": code, "served_model": body.get("model"),
-                              "system_fingerprint": body.get("system_fingerprint") or NOT_EXPOSED})
+                              "system_fingerprint": body.get("system_fingerprint") or NOT_EXPOSED, **failed})
     problems = identity_problems(obs)
     rec = {"observation": obs, "problems": problems, "verdict": "OPAQUE" if problems else "ATTESTED",
            "accounting": accounting(ledger)}
@@ -93,15 +101,17 @@ def run(route: str, chat_probes: int, transport, directory: pathlib.Path, served
 
 
 def identity_problems(obs: dict) -> list[str]:
+    def why(r: dict) -> str:
+        return f" ({r.get('content_type')}: {r['transport_error']})" if r.get("transport_error") else ""
     out = []
     if obs["listing"]["http"] != 200 or not obs["listing"]["listed"]:
-        out.append(f"the provider does not list the declared model {obs['declared_model']}")
+        out.append(f"the provider does not list the declared model {obs['declared_model']}{why(obs['listing'])}")
     elif obs.get("expected_listed_owner") and obs["listing"]["owned_by"] != obs["expected_listed_owner"]:
         out.append(f"the listing names {obs['listing']['owned_by']!r} as the model's owner, not {obs['expected_listed_owner']!r}")
     served = obs.get("expected_served_model") or obs["declared_model"]
     for i, p in enumerate(obs["probes"]):
-        if p["http"] != 200:
-            out.append(f"probe {i}: HTTP {p['http']}")
+        if p["http"] != 200 or p.get("transport_error"):
+            out.append(f"probe {i}: HTTP {p['http']}{why(p)}")
         elif p["served_model"] != served:
             out.append(f"probe {i}: served by {p['served_model']!r}, not {served!r} (an alias or a re-route)")
     fingerprints = {p["system_fingerprint"] for p in obs["probes"]}

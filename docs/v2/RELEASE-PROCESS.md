@@ -87,7 +87,7 @@ On a `vX.Y.Z` tag, in one run:
   `PRODUCTION_PUBLISH` key is the owner's and authorizes exactly this version:
   `approver: "human:owner"`, `decision.PRODUCTION_PUBLISH: "AUTHORIZED"`, `decision.VERSION: "<version>"`.
   A later entry that holds or revokes publication wins over an earlier authorization;
-- a frozen release candidate exists — `closure-evidence/v2/release/V2.0-RC1-FREEZE.json`
+- a frozen release candidate exists — `closure-evidence/v2/release/V2.0-RC2-FREEZE.json` (RC1 was rejected)
   (`validation/qualification/release_rc.py`, charter G2) — for exactly this version, and the tagged commit's
   shipped files (`aisef/`, `aisef2/`, `pyproject.toml`, `MANIFEST.in`, `README.md`) are the RC's, as read from the
   RC commit's own git objects.

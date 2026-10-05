@@ -28,8 +28,8 @@ RUNGS = ("Q0", "Q1", "Q2", "Q3")
 HEADER = {"cycle2": {"record": "AISEF V2 — CYCLE-2 Q0–Q3 QUALIFICATION SUMMARY (QP-2.6)", "work_package": "QP-2.6", "rfc_sections": ["27"],
                      "authority": "owner ruling 'AISEF V2 — CYCLE-2 OWNER RULING / C2-P5 ACCEPTED WITH EXPLICIT CONTRACT INTERPRETATIONS / "
                                   "AUTHORIZE QP-2.6 AND AUTOMATIC DOWNSTREAM EXECUTION' (2026-09-30)"},
-          "release": {"record": "AISEF V2.0 — RC1 Q0–Q3 QUALIFICATION SUMMARY (charter S5)", "work_package": "V2.0 S5", "rfc_sections": ["27"],
-                      "authority": "V2.0 stable-release charter §12 (S5): Q0-Q3 on the exact RC1; no historical c11615a qualification "
+          "release": {"record": f"AISEF V2.0 — {C.release_rc.RC} Q0–Q3 QUALIFICATION SUMMARY (charter S5)", "work_package": "V2.0 S5", "rfc_sections": ["27"],
+                      "authority": f"V2.0 stable-release charter §12 (S5): Q0-Q3 on the exact {C.release_rc.RC}; no historical c11615a qualification "
                                    "is presented as current RC evidence"}}
 
 

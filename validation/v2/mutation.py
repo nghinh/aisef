@@ -573,6 +573,11 @@ S2_TARGETS["aisef2/app/bundle.py::Project.order"] = [*S2_TARGETS["aisef2/app/bun
 _S2_KILLS_DET = "tests/v2/test_s2_kills_deterministic.py"
 for _t in ("aisef2/app/preflight.py::fingerprint_fields", "aisef2/app/client.py::Budget.spend"):
     S2_TARGETS[_t] = [_S2_KILLS_DET, *S2_TARGETS[_t]]
+# RC2 (S6-SMOKE-1-PREFLIGHT-OPAQUE, owner 2026-10-05): the preflight's failure provenance, killed in a file of its own,
+# first in exactly the kill sets of the two targets whose code the fix changed.
+_S2_KILLS_RC2 = "tests/v2/test_s2_kills_rc2.py"
+for _t in ("aisef2/app/preflight.py::run", "aisef2/app/preflight.py::identity_problems"):
+    S2_TARGETS[_t] = [_S2_KILLS_RC2, *S2_TARGETS[_t]]
 SUPERSEDED.update({t: "V2.0-S2" for t in S2_TARGETS})
 for _phase in (K_NOWORK_TARGETS, P6_TARGETS, C2P2_TARGETS, C2P3_TARGETS, C2_P4_TARGETS):
     for _t in [t for t in _phase if t.split("::")[0] in (*_S2_CHANGED, "aisef2/orchestrate/story_runner.py",
