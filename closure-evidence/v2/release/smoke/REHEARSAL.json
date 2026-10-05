@@ -1,0 +1,358 @@
+{
+ "budget_estimate": {
+  "estimate": {
+   "tokens": 292694,
+   "with_25pct_headroom": 365868,
+   "within_owner_ceiling": true
+  },
+  "failed_in_the_paid_attempts": [
+   "STORY-03-01",
+   "STORY-04-01",
+   "STORY-04-02"
+  ],
+  "method": "Owner ruling \u00a79: the output + reasoning tokens the corrected-context smoke needs to succeed, + 25 %, against the owner's ceiling. Structure \u2014 the sessions the kernel's rules give a successful run (the rehearsal's flow): per story one review; developer attempts as the same model took them on this plan where the story committed in every paid attempt (none where the kernel skipped the developer: K-NOWORK), else one (those stories failed for the superseded context the release workload removes). Price \u2014 each session at the most it ever cost for that story, role and attempt; unmeasured, at the most any story's session of that role and attempt cost. Sensitivities: no story pre-satisfied; one retry for each story that failed historically.",
+  "owner_ceiling": 400000,
+  "pre_satisfied_in_every_paid_attempt": [
+   "STORY-02-01",
+   "STORY-02-02"
+  ],
+  "preflight": {
+   "output_tokens_at_most": 48,
+   "requests": 4
+  },
+  "sensitivity": {
+   "both": {
+    "tokens": 653717,
+    "with_25pct_headroom": 817147,
+    "within_owner_ceiling": false
+   },
+   "no_story_pre_satisfied": {
+    "tokens": 428626,
+    "with_25pct_headroom": 535783,
+    "within_owner_ceiling": false
+   },
+   "one_retry_per_historically_failed_story": {
+    "tokens": 517785,
+    "with_25pct_headroom": 647232,
+    "within_owner_ceiling": false
+   }
+  },
+  "sessions": [
+   {
+    "developer": [
+     51083
+    ],
+    "developer_attempts": 1,
+    "review": 4827,
+    "story": "STORY-01-01"
+   },
+   {
+    "developer": [
+     21136,
+     17967
+    ],
+    "developer_attempts": 2,
+    "review": 3996,
+    "story": "STORY-01-05"
+   },
+   {
+    "developer": [],
+    "developer_attempts": 0,
+    "review": 4006,
+    "story": "STORY-02-01"
+   },
+   {
+    "developer": [],
+    "developer_attempts": 0,
+    "review": 1711,
+    "story": "STORY-02-02"
+   },
+   {
+    "developer": [
+     37507
+    ],
+    "developer_attempts": 1,
+    "review": 4827,
+    "story": "STORY-03-01"
+   },
+   {
+    "developer": [
+     67966
+    ],
+    "developer_attempts": 1,
+    "review": 4827,
+    "story": "STORY-04-01"
+   },
+   {
+    "developer": [
+     67966
+    ],
+    "developer_attempts": 1,
+    "review": 4827,
+    "story": "STORY-04-02"
+   }
+  ],
+  "sources": {
+   "3": "closure-evidence/v2/cycle2/P10/attempt-3",
+   "4": "closure-evidence/v2/cycle2/P10/attempt-4"
+  }
+ },
+ "bundle_digest": "778e6b84afab76c8326a72c7b11291e3a5e195aacff7eee43d6630699bb8be0a",
+ "criteria": {
+  "BUDGET_ESTIMATE_WITHIN_OWNER_CEILING": "YES",
+  "RELEASE_SMOKE_DEPENDS_ON_MISSING_PRIVATE_DIAGNOSTIC": "NO",
+  "WORKLOAD_CONTEXT_SANITIZED": "PASS"
+ },
+ "diagnostic": {
+  "feedback_coverage": {
+   "missing": {},
+   "obligations": 67,
+   "told_in_public_facts": 67
+  },
+  "feedback_scenario_problems": []
+ },
+ "envelope": {
+  "budget": {
+   "input_tokens": 60000000,
+   "output_tokens": 400000,
+   "provider_requests": 58,
+   "turns": 700
+  },
+  "ceilings": {
+   "input_tokens": 60000000,
+   "output_tokens": 400000,
+   "provider_requests": 60,
+   "turns": 700
+  },
+  "estimate": {
+   "provider_requests": 46,
+   "turns": 3360
+  },
+  "headroom": 1.25,
+  "rule": "min(ceil(structural estimate * 1.25), ceiling); tokens: the ceiling (no offline estimate)"
+ },
+ "problems": [],
+ "record": "AISEF V2.0 \u2014 OFFLINE REHEARSAL OF RELEASE SMOKE #1 on the RC wheel (fake client, loopback fake provider; no model, no network)",
+ "results": {
+  "feedback": {
+   "acceptance_problems": [],
+   "budget_stop": null,
+   "delivery_verdict": "PASS",
+   "developer_calls": [
+    "STORY-01-01",
+    "STORY-04-01",
+    "STORY-04-01"
+   ],
+   "exit": 0,
+   "false_acceptance": [],
+   "provider_requests": 14,
+   "release_smoke_pass": "YES",
+   "retry_prompts": [
+    "STORY-04-01"
+   ],
+   "retry_prompts_naming_the_refuted_criterion": [
+    "STORY-04-01"
+   ],
+   "sessions": 10,
+   "stderr_tail": "",
+   "story_outcomes": {
+    "STORY-01-01": [
+     "COMMIT"
+    ],
+    "STORY-01-05": [
+     "COMMIT"
+    ],
+    "STORY-02-01": [
+     "COMMIT"
+    ],
+    "STORY-02-02": [
+     "COMMIT"
+    ],
+    "STORY-03-01": [
+     "COMMIT"
+    ],
+    "STORY-04-01": [
+     "RETRY",
+     "COMMIT"
+    ],
+    "STORY-04-02": [
+     "COMMIT"
+    ]
+   },
+   "unaccounted": [],
+   "verify_exit": 0,
+   "visible_outside_the_context_policy": []
+  },
+  "nothing": {
+   "acceptance_problems": [
+    "delivery_verdict does not hold",
+    "stories_committed does not hold",
+    "productproof_delivered does not hold",
+    "acceptance_suite_satisfied does not hold"
+   ],
+   "budget_stop": null,
+   "delivery_verdict": "FAIL",
+   "developer_calls": [
+    "STORY-01-01",
+    "STORY-01-01",
+    "STORY-01-01",
+    "STORY-02-01",
+    "STORY-02-01",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-02-02",
+    "STORY-02-02",
+    "STORY-03-01",
+    "STORY-03-01",
+    "STORY-03-01"
+   ],
+   "exit": 1,
+   "false_acceptance": [],
+   "provider_requests": 16,
+   "release_smoke_pass": "NO",
+   "retry_prompts": [
+    "STORY-01-01",
+    "STORY-01-01",
+    "STORY-02-01",
+    "STORY-02-01",
+    "STORY-02-02",
+    "STORY-02-02",
+    "STORY-03-01",
+    "STORY-03-01"
+   ],
+   "retry_prompts_naming_the_refuted_criterion": [],
+   "sessions": 12,
+   "stderr_tail": "",
+   "story_outcomes": {
+    "STORY-01-01": [
+     "RETRY",
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-01-05": [
+     "ROLLBACK"
+    ],
+    "STORY-02-01": [
+     "RETRY",
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-02-02": [
+     "RETRY",
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-03-01": [
+     "RETRY",
+     "RETRY",
+     "ROLLBACK"
+    ],
+    "STORY-04-01": [
+     "ROLLBACK"
+    ],
+    "STORY-04-02": [
+     "ROLLBACK"
+    ]
+   },
+   "unaccounted": [],
+   "verify_exit": 0,
+   "visible_outside_the_context_policy": []
+  },
+  "partial": {
+   "acceptance_problems": [],
+   "budget_stop": null,
+   "delivery_verdict": "PASS",
+   "developer_calls": [
+    "STORY-01-01",
+    "STORY-04-01"
+   ],
+   "exit": 0,
+   "false_acceptance": [],
+   "provider_requests": 13,
+   "release_smoke_pass": "YES",
+   "retry_prompts": [],
+   "retry_prompts_naming_the_refuted_criterion": [],
+   "sessions": 9,
+   "stderr_tail": "",
+   "story_outcomes": {
+    "STORY-01-01": [
+     "COMMIT"
+    ],
+    "STORY-01-05": [
+     "COMMIT"
+    ],
+    "STORY-02-01": [
+     "COMMIT"
+    ],
+    "STORY-02-02": [
+     "COMMIT"
+    ],
+    "STORY-03-01": [
+     "COMMIT"
+    ],
+    "STORY-04-01": [
+     "COMMIT"
+    ],
+    "STORY-04-02": [
+     "COMMIT"
+    ]
+   },
+   "unaccounted": [],
+   "verify_exit": 0,
+   "visible_outside_the_context_policy": []
+  },
+  "reference": {
+   "acceptance_problems": [],
+   "budget_stop": null,
+   "delivery_verdict": "PASS",
+   "developer_calls": [
+    "STORY-01-01"
+   ],
+   "exit": 0,
+   "false_acceptance": [],
+   "provider_requests": 12,
+   "release_smoke_pass": "YES",
+   "retry_prompts": [],
+   "retry_prompts_naming_the_refuted_criterion": [],
+   "sessions": 8,
+   "stderr_tail": "",
+   "story_outcomes": {
+    "STORY-01-01": [
+     "COMMIT"
+    ],
+    "STORY-01-05": [
+     "COMMIT"
+    ],
+    "STORY-02-01": [
+     "COMMIT"
+    ],
+    "STORY-02-02": [
+     "COMMIT"
+    ],
+    "STORY-03-01": [
+     "COMMIT"
+    ],
+    "STORY-04-01": [
+     "COMMIT"
+    ],
+    "STORY-04-02": [
+     "COMMIT"
+    ]
+   },
+   "unaccounted": [],
+   "verify_exit": 0,
+   "visible_outside_the_context_policy": []
+  }
+ },
+ "wheel": {
+  "name": "aisef-2.0.0-py3-none-any.whl",
+  "sha256": "a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7"
+ },
+ "workload": {
+  "baseline": "6a8d60c0bd3d1fa47ed4e97dd80fc0f4b645332a",
+  "derivation": "closure-evidence/v2/release/V2-RELEASE-WORKLOAD-DERIVATION.json",
+  "repository": "/Users/nghinh/Downloads/projects/ledgerlock-v2-release-smoke",
+  "repository_problems": [],
+  "sha256": "5c078826f0f6ef6cfd803ab2811b5e26db58b3964a4429ccf255e39991d6946e"
+ }
+}
