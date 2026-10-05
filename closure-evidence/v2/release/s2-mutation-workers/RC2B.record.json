@@ -1,0 +1,530 @@
+{
+ "record": "AISEF V2 — V2.0-S2 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/preflight.py::accounting",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "d567efe2d54b80ed0cd38d3827114569aeec09c8718873bfaa926685a04628a8",
+   "mutants": 26,
+   "killed": 26,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L60 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L57 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L60 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L60 string 'provider_requests' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L60 string 'turns' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'input_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L62 string 'output_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L63 string 'unaccounted' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L63 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L58 string 'n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L58 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string 'n' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L58 string 'sent' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string 'done' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L58 string 'event' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L59 string 'event' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L61 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L62 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L61 string 'input_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L62 string 'output_tokens' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L57 string 'utf-8' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/preflight.py::deployment",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "d567efe2d54b80ed0cd38d3827114569aeec09c8718873bfaa926685a04628a8",
+   "mutants": 7,
+   "killed": 7,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L132 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L132 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L132 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L131 string 'system_fingerprint' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L132 Eq->NotEq",
+     "killed": true
+    },
+    {
+     "mutant": "L132 NotIn->In",
+     "killed": true
+    },
+    {
+     "mutant": "L131 string 'probes' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/preflight.py::fingerprint_fields",
+   "kill_tests": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "d567efe2d54b80ed0cd38d3827114569aeec09c8718873bfaa926685a04628a8",
+   "mutants": 22,
+   "killed": 22,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L125 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L125 dict entry 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L125 dict entry 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L125 dict entry 2 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L125 dict entry 3 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L125 dict entry 4 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'declared_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'listed_id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'owned_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string 'served_models' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string 'system_fingerprint' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L127 sorted() -> list()",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'declared_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'id' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'owned_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L125 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string 'served_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string 'system_fingerprint' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L126 string 'probes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L127 string 'probes' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/preflight.py::identity_problems",
+   "kill_tests": [
+    "tests/v2/test_s2_kills_rc2.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "d567efe2d54b80ed0cd38d3827114569aeec09c8718873bfaa926685a04628a8",
+   "mutants": 60,
+   "killed": 60,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L107 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L118 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L120 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L105 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L107 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L109 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L111 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L112 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L112 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L113 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L118 Gt->LtE",
+     "killed": true
+    },
+    {
+     "mutant": "L105 conditional negated",
+     "killed": true
+    },
+    {
+     "mutant": "L107 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L107 not removed",
+     "killed": true
+    },
+    {
+     "mutant": "L109 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L113 Or swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L115 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L109 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L111 string 'expected_served_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L111 string 'declared_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L112 string 'probes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L113 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L115 NotEq->Eq",
+     "killed": true
+    },
+    {
+     "mutant": "L117 string 'system_fingerprint' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string 'transport_error' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string ' (' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string ': ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string ')' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'http' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'listed' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L108 string 'the provider does not list the declared model ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'expected_listed_owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L113 string 'transport_error' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L117 string 'probes' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string 'the deployment changed between probes (' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L119 string ' fingerprints)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L107 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'owned_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'expected_listed_owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L110 string 'the listing names ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L110 string \" as the model's owner, not \" emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L113 string 'http' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L114 string 'probe ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L114 string ': HTTP ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L115 string 'served_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string 'content_type' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L105 string 'transport_error' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L108 string 'declared_model' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L109 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string 'probe ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string ': served by ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string ', not ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string ' (an alias or a re-route)' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L108 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L110 string 'owned_by' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L110 string 'expected_listed_owner' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L114 string 'http' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L110 string 'listing' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L116 string 'served_model' emptied",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

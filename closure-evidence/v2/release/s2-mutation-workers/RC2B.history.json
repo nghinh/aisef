@@ -1,0 +1,13 @@
+{
+ "worker": "RC2B",
+ "snapshot": "3f3270cffc6edae987ce76d273482abbda252998",
+ "status": "complete: RC2 (S6-SMOKE-1-PREFLIGHT-OPAQUE) — aisef2/app/preflight.py::identity_problems, accounting, fingerprint_fields and deployment re-measured on 3f3270c under the real-client guard, the committed record set aside in the worker's scratch worktree (started 2026-10-05 19:19 by the controller); tests/v2/test_s2_kills_rc2.py first in identity_problems' kill set",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/RC2B.log",
+  "sha256": "c63f26e5cea3ce2e3da69275ed635577295fafdd53b38bb81114da84229d9fb1"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/RC2B.record.json",
+  "sha256": "8158e88f9a698859203ef108baa8e1cdaeef3d8cf9217e0a043ab56e4390506c"
+ }
+}

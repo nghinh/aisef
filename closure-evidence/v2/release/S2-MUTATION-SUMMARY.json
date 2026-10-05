@@ -1,22 +1,22 @@
 {
  "record": "AISEF V2.0 — S2 MUTATION, FINAL (owner rulings 'MUTATION WORKER HANDOFF' and its follow-ups, 2026-10-04)",
  "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
- "FINAL_HEAD": "190b882b591a01b07b2fac2cdd651fe0369f4254",
+ "FINAL_HEAD": "3f3270cffc6edae987ce76d273482abbda252998",
  "TOTAL_TARGETS": 261,
  "ACCOUNTED_EXACTLY_ONCE": true,
- "measured_at_final_head": 2,
- "reused_after_mechanical_proof": 259,
- "stale_excluded": 247,
- "CURRENT_SNAPSHOT_TARGETS": 2,
- "MUTANTS": 6437,
- "KILLED": 6437,
+ "measured_at_final_head": 5,
+ "reused_after_mechanical_proof": 256,
+ "stale_excluded": 252,
+ "CURRENT_SNAPSHOT_TARGETS": 5,
+ "MUTANTS": 6463,
+ "KILLED": 6463,
  "KILLED_BY_TIMEOUT": 0,
  "AUDITED_SURVIVORS": 0,
  "UNAUDITED_SURVIVORS": 0,
- "STALE_RESULTS_EXCLUDED": 247,
+ "STALE_RESULTS_EXCLUDED": 252,
  "STALE_RESULTS_EXCLUDED_BY_REASON": {
   "worker excluded by the ruling (C)": 64,
-  "proof failed": 183,
+  "proof failed": 188,
   "superseded or duplicate": 0
  },
  "RERUN_TARGETS": 138,
@@ -277,12 +277,43 @@
     "sha256": "f912c5ea6e07a3071f65d1d6f28ace8b7f8c9ff1f41f57d6f7aa6329553d96f3"
    },
    "results": 2
+  },
+  {
+   "worker": "RC2A",
+   "snapshot": "3f3270cffc6edae987ce76d273482abbda252998",
+   "status": "complete: RC2 (S6-SMOKE-1-PREFLIGHT-OPAQUE) — aisef2/app/preflight.py::run re-measured on 3f3270c under the real-client guard, the committed record set aside in the worker's scratch worktree (started 2026-10-05 19:19 by the controller); tests/v2/test_s2_kills_rc2.py first in its kill set",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/RC2A.log",
+    "sha256": "3fee1f276d58816e97fe7e3ffccf4dd172258df5aef7ee5899fa194ec4d893e9"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/RC2A.record.json",
+    "sha256": "69de148f6fee3c2b69b635f4e0cf0443d7a69e3370f82299381e3e3b988efd4e"
+   },
+   "results": 1
+  },
+  {
+   "worker": "RC2B",
+   "snapshot": "3f3270cffc6edae987ce76d273482abbda252998",
+   "status": "complete: RC2 (S6-SMOKE-1-PREFLIGHT-OPAQUE) — aisef2/app/preflight.py::identity_problems, accounting, fingerprint_fields and deployment re-measured on 3f3270c under the real-client guard, the committed record set aside in the worker's scratch worktree (started 2026-10-05 19:19 by the controller); tests/v2/test_s2_kills_rc2.py first in identity_problems' kill set",
+   "log": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/RC2B.log",
+    "sha256": "c63f26e5cea3ce2e3da69275ed635577295fafdd53b38bb81114da84229d9fb1"
+   },
+   "record": {
+    "path": "closure-evidence/v2/release/s2-mutation-workers/RC2B.record.json",
+    "sha256": "8158e88f9a698859203ef108baa8e1cdaeef3d8cf9217e0a043ab56e4390506c"
+   },
+   "results": 4
   }
  ],
  "classes": {
   "measured_at_final_head": [
-   "aisef2/app/client.py::Budget.spend",
-   "aisef2/app/preflight.py::fingerprint_fields"
+   "aisef2/app/preflight.py::accounting",
+   "aisef2/app/preflight.py::deployment",
+   "aisef2/app/preflight.py::fingerprint_fields",
+   "aisef2/app/preflight.py::identity_problems",
+   "aisef2/app/preflight.py::run"
   ],
   "reused_after_mechanical_proof": [
    "aisef2/app/adapters.py::Developer.implement",
@@ -293,14 +324,11 @@
    "aisef2/app/cli.py::run",
    "aisef2/app/client.py::Budget.__init__",
    "aisef2/app/client.py::Budget.reached",
+   "aisef2/app/client.py::Budget.spend",
    "aisef2/app/client.py::environment",
    "aisef2/app/client.py::read_session",
    "aisef2/app/client.py::session",
    "aisef2/app/client.py::wait_within",
-   "aisef2/app/preflight.py::accounting",
-   "aisef2/app/preflight.py::deployment",
-   "aisef2/app/preflight.py::identity_problems",
-   "aisef2/app/preflight.py::run",
    "aisef2/app/run.py::_close",
    "aisef2/app/run.py::admit",
    "aisef2/app/run.py::calibrations",
@@ -550,92 +578,131 @@
   "aisef2/app/adapters.py::Developer.implement": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/adapters.py::Reviewer.review": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/adapters.py::attempt_of": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/bundle.py::Project.order": {
    "worker": "K7",
    "measured_on": "fc24d30fc31451b27a65aa410bf944003c05e64d",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/bundle.py::load": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/cli.py::run": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/client.py::Budget.__init__": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/client.py::Budget.reached": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/client.py::Budget.spend": {
    "worker": "K9",
    "measured_on": "190b882b591a01b07b2fac2cdd651fe0369f4254",
-   "class": "measured_at_final_head"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/client.py::environment": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/client.py::read_session": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/client.py::session": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/client.py::wait_within": {
    "worker": "K7",
    "measured_on": "fc24d30fc31451b27a65aa410bf944003c05e64d",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/preflight.py::accounting": {
-   "worker": "K5",
-   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "worker": "RC2B",
+   "measured_on": "3f3270cffc6edae987ce76d273482abbda252998",
+   "class": "measured_at_final_head"
   },
   "aisef2/app/preflight.py::deployment": {
-   "worker": "K6",
-   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "worker": "RC2B",
+   "measured_on": "3f3270cffc6edae987ce76d273482abbda252998",
+   "class": "measured_at_final_head"
   },
   "aisef2/app/preflight.py::fingerprint_fields": {
-   "worker": "K9",
-   "measured_on": "190b882b591a01b07b2fac2cdd651fe0369f4254",
+   "worker": "RC2B",
+   "measured_on": "3f3270cffc6edae987ce76d273482abbda252998",
    "class": "measured_at_final_head"
   },
   "aisef2/app/preflight.py::identity_problems": {
-   "worker": "K5",
-   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "worker": "RC2B",
+   "measured_on": "3f3270cffc6edae987ce76d273482abbda252998",
+   "class": "measured_at_final_head"
   },
   "aisef2/app/preflight.py::run": {
-   "worker": "K6",
-   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "worker": "RC2A",
+   "measured_on": "3f3270cffc6edae987ce76d273482abbda252998",
+   "class": "measured_at_final_head"
   },
   "aisef2/app/run.py::_close": {
    "worker": "K2",
@@ -651,7 +718,10 @@
   "aisef2/app/run.py::admit": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/run.py::calibrations": {
    "worker": "K2",
@@ -667,22 +737,34 @@
   "aisef2/app/run.py::check_git": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/run.py::check_repository": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/run.py::delivery": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/run.py::execute": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/run.py::kernel_digest": {
    "worker": "K2",
@@ -698,12 +780,18 @@
   "aisef2/app/run.py::probe_interpreter": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/run.py::productproof": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/run.py::regression_tests": {
    "worker": "K2",
@@ -719,22 +807,34 @@
   "aisef2/app/run.py::runspec_of": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/settings.py::_count": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/settings.py::load": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/app/verify.py::verify": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/orchestrate/adapters.py::Finding.blocks": {
    "worker": "H",
@@ -774,57 +874,101 @@
   "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::_Held.__call__": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::_Held.__init__": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::_Held.release": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::_attempt": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::_committed": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::_fail": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::_freeze_plan": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::_probe": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/story_runner.py::run_story": {
    "worker": "H",
    "measured_on": "369c8ac147e2de24361bfd2315721295cd252ab2",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "validation/qualification/common.py",
+    "validation/qualification/release_rc.py"
+   ]
   },
   "aisef2/orchestrate/workspace.py::Checkout.__init__": {
    "worker": "H",
@@ -904,7 +1048,10 @@
   "aisef2/orchestrate/workspace.py::config_problems": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/orchestrate/workspace.py::git": {
    "worker": "H",
@@ -926,7 +1073,10 @@
   "aisef2/probe/cli_invocation.py::AGENT/guarded": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/probe/cli_invocation.py::AGENT/op_bye": {
    "worker": "E",
@@ -979,7 +1129,10 @@
   "aisef2/probe/cli_invocation.py::AGENT/op_invoke": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/probe/cli_invocation.py::AGENT/op_resolve": {
    "worker": "I",
@@ -1008,7 +1161,10 @@
   "aisef2/probe/cli_invocation.py::AGENT/plain": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/probe/cli_invocation.py::AGENT/redirect": {
    "worker": "G",
@@ -1025,7 +1181,10 @@
   "aisef2/probe/cli_invocation.py::AGENT/send": {
    "worker": "K7",
    "measured_on": "fc24d30fc31451b27a65aa410bf944003c05e64d",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/probe/cli_invocation.py::AGENT/tagged": {
    "worker": "I",
@@ -1706,7 +1865,10 @@
   "aisef2/probe/process_effect.py::HARNESS/ask": {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/probe/process_effect.py::HARNESS/count_lines": {
    "worker": "B",
@@ -2584,7 +2746,10 @@
   "aisef2/probe/python_callable_v2.py::_concluded": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/probe/python_callable_v2.py::_file_ok": {
    "worker": "F",
@@ -2594,7 +2759,10 @@
   "aisef2/probe/python_callable_v2.py::_harness_argv": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/probe/python_callable_v2.py::_is_hex": {
    "worker": "F",
@@ -2619,7 +2787,10 @@
   "aisef2/probe/python_callable_v2.py::_watch": {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
-   "class": "reused_after_mechanical_proof"
+   "class": "reused_after_mechanical_proof",
+   "other_code_changed": [
+    "aisef2/app/preflight.py"
+   ]
   },
   "aisef2/probe/python_callable_v2.py::_workspace_ok": {
    "worker": "F",
@@ -4368,7 +4539,8 @@
    "measured_on": "911881b80f2d69f27ee98a9f8e7d1886976ea584",
    "target": "aisef2/app/preflight.py::identity_problems",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
    ]
   },
   {
@@ -4672,6 +4844,23 @@
   {
    "worker": "K5",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "target": "aisef2/app/preflight.py::accounting",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "target": "aisef2/app/preflight.py::identity_problems",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "K5",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
    "target": "aisef2/probe/cli_invocation.py::AGENT/send",
    "why": [
     "its kill set is not the current one"
@@ -4688,9 +4877,35 @@
   {
    "worker": "K6",
    "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "target": "aisef2/app/preflight.py::deployment",
+   "why": [
+    "the target file changed since it was measured"
+   ]
+  },
+  {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
    "target": "aisef2/app/preflight.py::fingerprint_fields",
    "why": [
+    "the target file changed since it was measured",
     "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "K6",
+   "measured_on": "c6c3a5538bd5453c61cad6116b62e1f18b51800a",
+   "target": "aisef2/app/preflight.py::run",
+   "why": [
+    "the target file changed since it was measured",
+    "its kill set is not the current one"
+   ]
+  },
+  {
+   "worker": "K9",
+   "measured_on": "190b882b591a01b07b2fac2cdd651fe0369f4254",
+   "target": "aisef2/app/preflight.py::fingerprint_fields",
+   "why": [
+    "the target file changed since it was measured"
    ]
   }
  ]

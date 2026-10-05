@@ -1,0 +1,67 @@
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/c2-corrective/closure-evidence/v2/release/s2-mutation-workers/RC2A.history.json
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/c2-corrective/closure-evidence/v2/release/s2-mutation-workers/RC2B.history.json
+== s2 --write
+{
+ "record": "AISEF V2.0 — S2 MUTATION, FINAL (owner rulings 'MUTATION WORKER HANDOFF' and its follow-ups, 2026-10-04)",
+ "snapshot": "369c8ac147e2de24361bfd2315721295cd252ab2",
+ "FINAL_HEAD": "3f3270cffc6edae987ce76d273482abbda252998",
+ "TOTAL_TARGETS": 261,
+ "ACCOUNTED_EXACTLY_ONCE": true,
+ "measured_at_final_head": 5,
+ "reused_after_mechanical_proof": 256,
+ "stale_excluded": 252,
+ "CURRENT_SNAPSHOT_TARGETS": 5,
+ "MUTANTS": 6463,
+ "KILLED": 6463,
+ "KILLED_BY_TIMEOUT": 0,
+ "AUDITED_SURVIVORS": 0,
+ "UNAUDITED_SURVIVORS": 0,
+ "STALE_RESULTS_EXCLUDED": 252,
+ "STALE_RESULTS_EXCLUDED_BY_REASON": {
+  "worker excluded by the ruling (C)": 64,
+  "proof failed": 188,
+  "superseded or duplicate": 0
+ },
+ "RERUN_TARGETS": 138,
+ "MISSING_TARGETS": [],
+ "NOT_PASSING": {},
+ "problems": [],
+ "qualifier": {
+  "path": "validation/qualification/s2_mutation_record.py",
+  "file_sha256": "d9c75f7143aecb7a4e87a7eb53940e604ab00ea690574fc2152b473d2a71ffeb",
+  "criteria_sha256": "dee08768f72aaacf31d2dcd0f9fde9e354d088f6b8d1ee7c8031aef664afacc0",
+  "criteria_sha256_frozen_at_819fe4d": "dee08768f72aaacf31d2dcd0f9fde9e354d088f6b8d1ee7c8031aef664afacc0",
+  "criteria_unchanged": true
+ },
+ "S2_MUTATION_VERDICT": "PASS"
+}
+
+== s2 --check
+s2 mutation record: PASS
+== mutation --check
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::_probe: historical, taken over by V2.0-S2
+SUPERSEDED  K-NOWORK-001 aisef2/orchestrate/story_runner.py::run_story: historical, taken over by V2.0-S2
+mutation: PASS
+== deterministic --write
+aisef2/app/preflight.py::fingerprint_fields: 22/22 killed by tests/v2/test_s2_kills_deterministic.py alone under seeds 0, 1, 2, 4242, 2147483647, random
+aisef2/app/client.py::Budget.spend: 44/44 killed by tests/v2/test_s2_kills_deterministic.py alone under seeds 0, 1, 2, 4242, 2147483647, random
+s2 deterministic kills: PASS
+== deterministic --check
+aisef2/app/preflight.py::fingerprint_fields: 22/22 killed by tests/v2/test_s2_kills_deterministic.py alone under seeds 0, 1, 2, 4242, 2147483647, random
+aisef2/app/client.py::Budget.spend: 44/44 killed by tests/v2/test_s2_kills_deterministic.py alone under seeds 0, 1, 2, 4242, 2147483647, random
+s2 deterministic kills: PASS
+== checker calibration --check
+OK   no_cohort_record       clean=True rejects=True always-pass-mutant-caught=True
+OK   profile_freeze         clean=True rejects=True always-pass-mutant-caught=True
+calibrated 52/52; always-PASS mutants rejected 52/52
+== c2 orchestration repair (release differences)
+[]
+ M closure-evidence/v2/release/S2-DETERMINISTIC-KILLS.json
+ M closure-evidence/v2/release/S2-MUTATION-SUMMARY.json
+ M closure-evidence/v2/release/S2-MUTATION.json
+?? closure-evidence/v2/release/s2-mutation-workers/RC2A.history.json
+?? closure-evidence/v2/release/s2-mutation-workers/RC2A.log
+?? closure-evidence/v2/release/s2-mutation-workers/RC2A.record.json
+?? closure-evidence/v2/release/s2-mutation-workers/RC2B.history.json
+?? closure-evidence/v2/release/s2-mutation-workers/RC2B.log
+?? closure-evidence/v2/release/s2-mutation-workers/RC2B.record.json

@@ -1,0 +1,13 @@
+{
+ "worker": "RC2A",
+ "snapshot": "3f3270cffc6edae987ce76d273482abbda252998",
+ "status": "complete: RC2 (S6-SMOKE-1-PREFLIGHT-OPAQUE) — aisef2/app/preflight.py::run re-measured on 3f3270c under the real-client guard, the committed record set aside in the worker's scratch worktree (started 2026-10-05 19:19 by the controller); tests/v2/test_s2_kills_rc2.py first in its kill set",
+ "log": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/RC2A.log",
+  "sha256": "3fee1f276d58816e97fe7e3ffccf4dd172258df5aef7ee5899fa194ec4d893e9"
+ },
+ "record": {
+  "path": "closure-evidence/v2/release/s2-mutation-workers/RC2A.record.json",
+  "sha256": "69de148f6fee3c2b69b635f4e0cf0443d7a69e3370f82299381e3e3b988efd4e"
+ }
+}

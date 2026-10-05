@@ -18,7 +18,7 @@
  "targets": [
   {
    "target": "aisef2/app/preflight.py::fingerprint_fields",
-   "source_sha256": "01f1a937fb56c74908da2dd1ca8576526fc4f49ccc877d25aa5b611de8f82dca",
+   "source_sha256": "d567efe2d54b80ed0cd38d3827114569aeec09c8718873bfaa926685a04628a8",
    "kill_set": [
     "tests/v2/test_s2_kills_deterministic.py",
     "tests/v2/test_app_units.py",
@@ -29,7 +29,7 @@
    "killed_by_this_file_alone": 22,
    "results": [
     {
-     "mutant": "L115 returns None",
+     "mutant": "L125 returns None",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -40,7 +40,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 dict entry 0 dropped",
+     "mutant": "L125 dict entry 0 dropped",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -51,7 +51,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 dict entry 1 dropped",
+     "mutant": "L125 dict entry 1 dropped",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -62,7 +62,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 dict entry 2 dropped",
+     "mutant": "L125 dict entry 2 dropped",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -73,7 +73,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 dict entry 3 dropped",
+     "mutant": "L125 dict entry 3 dropped",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -84,7 +84,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 dict entry 4 dropped",
+     "mutant": "L125 dict entry 4 dropped",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -95,7 +95,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 string 'declared_model' emptied",
+     "mutant": "L125 string 'declared_model' emptied",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -106,7 +106,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 string 'listed_id' emptied",
+     "mutant": "L125 string 'listed_id' emptied",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -117,7 +117,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 string 'owned_by' emptied",
+     "mutant": "L125 string 'owned_by' emptied",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -128,7 +128,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L116 string 'served_models' emptied",
+     "mutant": "L126 string 'served_models' emptied",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -139,7 +139,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L117 string 'system_fingerprint' emptied",
+     "mutant": "L127 string 'system_fingerprint' emptied",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -150,7 +150,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L116 sorted() -> list()",
+     "mutant": "L126 sorted() -> list()",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -161,7 +161,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L117 sorted() -> list()",
+     "mutant": "L127 sorted() -> list()",
      "verdict": {
       "kind": "assertion",
       "failed": [
@@ -172,7 +172,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 string 'declared_model' emptied",
+     "mutant": "L125 string 'declared_model' emptied",
      "verdict": {
       "kind": "error",
       "failed": [
@@ -183,7 +183,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 string 'id' emptied",
+     "mutant": "L125 string 'id' emptied",
      "verdict": {
       "kind": "error",
       "failed": [
@@ -194,7 +194,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 string 'owned_by' emptied",
+     "mutant": "L125 string 'owned_by' emptied",
      "verdict": {
       "kind": "error",
       "failed": [
@@ -205,7 +205,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 string 'listing' emptied",
+     "mutant": "L125 string 'listing' emptied",
      "verdict": {
       "kind": "error",
       "failed": [
@@ -216,7 +216,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L115 string 'listing' emptied",
+     "mutant": "L125 string 'listing' emptied",
      "verdict": {
       "kind": "error",
       "failed": [
@@ -227,7 +227,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L116 string 'served_model' emptied",
+     "mutant": "L126 string 'served_model' emptied",
      "verdict": {
       "kind": "error",
       "failed": [
@@ -238,7 +238,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L117 string 'system_fingerprint' emptied",
+     "mutant": "L127 string 'system_fingerprint' emptied",
      "verdict": {
       "kind": "error",
       "failed": [
@@ -249,7 +249,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L116 string 'probes' emptied",
+     "mutant": "L126 string 'probes' emptied",
      "verdict": {
       "kind": "error",
       "failed": [
@@ -260,7 +260,7 @@
      "killed_under_every_seed": true
     },
     {
-     "mutant": "L117 string 'probes' emptied",
+     "mutant": "L127 string 'probes' emptied",
      "verdict": {
       "kind": "error",
       "failed": [
