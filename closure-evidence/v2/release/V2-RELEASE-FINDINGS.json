@@ -422,6 +422,75 @@
     }
    },
    "source": "S6, 2026-10-05"
+  },
+  {
+   "ID": "S6-SMOKE-2-FALSE-ROLLBACK-S10A/R1",
+   "RECLASSIFIES": "S6-SMOKE-2-FALSE-ROLLBACK-S10A",
+   "OWNER_RULING": [
+    "Owner ruling: Option A — accept RC2 with a narrowly scoped waiver for S6-SMOKE-2-FALSE-ROLLBACK-S10A.",
+    "RC2 1565bcc remains the release candidate. Do not modify the RC, workload, frozen acceptance, kernel, tests, or plan.",
+    "1. STORY-02-01 was a correct story: its own acceptance criterion passed before and after merge; its tests passed; its review passed; it introduced no forbidden import.",
+    "2. The rollback was triggered by frozen workload criterion S-10-a, whose line regex falsely interpreted docstring text beginning with `from disk...` as a Python import.",
+    "3. The shipped RC2 kernel executed the frozen criterion exactly as specified and failed closed. No incorrect code reached final main.",
+    "4. Therefore this incident is classified as a workload-spec false positive, not a demonstrated kernel/runtime correctness defect.",
+    "5. Owner grants a single-case waiver of charter §17's `framework false rollback = 0` outcome requirement for this specific recorded incident only.",
+    "6. This waiver does not permit: any additional false rollback; weakening future qualification; changing or hiding the smoke evidence; editing the release workload after the fact; another paid smoke.",
+    "7. Preserve S6-SMOKE-2-FALSE-ROLLBACK-S10A permanently in the V2.0 release findings and release notes/known limitations at the appropriate technical level.",
+    "8. Add two V2.1 follow-ups: replace regex-based Python import detection in generated/approved criteria with AST-aware or otherwise syntactically correct detection; improve post-merge regression attribution/feedback so a developer can receive the failing criterion and retry when policy permits.",
+    "9. Do not rerun the paid smoke. Smoke #2 is the final authorized paid smoke.",
+    "10. Re-evaluate S6 using this owner ruling. If there are no other S6 blockers, mark S6 accepted-with-waiver and proceed to S7 / final release readiness.",
+    "11. S7 and final release checks must use the existing frozen RC2 evidence only. No code or qualification input may change.",
+    "12. If all remaining non-waived release gates pass, set RELEASE_GO = YES for RC2 and proceed with the normal release sequence. Stop only if a new independent blocker appears or before any irreversible publication step that still requires explicit owner approval."
+   ],
+   "OWNER_RULING_DATE": "2026-10-06",
+   "CLASSIFICATION": "workload-spec false positive, not a demonstrated kernel/runtime correctness defect (ruling 3-4)",
+   "WAIVER": {
+    "what": "charter §17 'framework false rollback = 0', for this one recorded incident only (STORY-02-01, smoke #2, POST_MERGE_REGRESSION on AC-STORY-05-03-1:S-10-a at d90a7f6)",
+    "does_not_permit": [
+     "any additional false rollback",
+     "weakening future qualification",
+     "changing or hiding the smoke evidence",
+     "editing the release workload after the fact",
+     "another paid smoke"
+    ]
+   },
+   "S6_REEVALUATION": {
+    "failing_checks": [
+     "delivery_verdict",
+     "framework_false_rollback_or_block",
+     "productproof_delivered",
+     "stories_committed"
+    ],
+    "each_traced_to_the_waived_incident": {
+     "stories_committed": "6 of 7: the one missing story is STORY-02-01 (story_outcomes ROLLBACK)",
+     "delivery_verdict": "FAIL, blocked only by: 1 of the plan's stories did not commit: ['STORY-02-01']",
+     "productproof_delivered": "66 of 67: the one obligation not delivered is STORY-02-01 S-13-g (INTRODUCE; its last proof SATISFIED at the merged revision d90a7f6, seq 385) — not delivered because the story rolled back; its spec PPS-6567a1c4 is in the frozen acceptance suite and satisfied on the final main",
+     "framework_false_rollback_or_block": "exactly one: [{\"code\": \"POST_MERGE_REGRESSION\", \"owner\": \"INTEGRATION\", \"story\": \"STORY-02-01\"}]"
+    },
+    "passing_checks": [
+     "acceptance_suite_satisfied",
+     "false_acceptance",
+     "preflight",
+     "run_verified",
+     "unaccounted_spend"
+    ],
+    "facts": {
+     "acceptance": "59/59",
+     "false_acceptance": 0,
+     "preflight": "ATTESTED",
+     "run_verified": "VERIFIED (1834 events)",
+     "budget_stop": null,
+     "unaccounted_spend": 0
+    },
+    "other_s6_blockers": "none: every failing check is a consequence of the one waived rollback; no independent failure"
+   },
+   "RELEASE_NOTES": "CHANGELOG.md 2.0.0 'Known limitation (S6-SMOKE-2-FALSE-ROLLBACK-S10A)' (0d46f2b, docs only)",
+   "V2_1_FOLLOW_UPS": [
+    "V21-37 (AST-aware or otherwise syntactically correct import detection in generated/approved criteria)",
+    "V21-38 (post-merge regression attribution and feedback; retry when the policy permits)"
+   ],
+   "V2_0_DISPOSITION": "WAIVED by the owner (single case); the finding stays in this register permanently; S6 ACCEPTED_WITH_WAIVER",
+   "source": "S6, 2026-10-06"
   }
  ],
  "v2_1_backlog": {
@@ -462,9 +531,11 @@
    "V21-33",
    "V21-34",
    "V21-35",
-   "V21-36"
+   "V21-36",
+   "V21-37",
+   "V21-38"
   ],
-  "count": 36
+  "count": 38
  },
  "risks_not_findings": [
   {

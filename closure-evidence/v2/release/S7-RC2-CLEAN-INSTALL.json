@@ -1,0 +1,46 @@
+{
+ "record": "AISEF V2.0 — S7 CLEAN INSTALL of the frozen RC2 artifacts (charter §18)",
+ "rc": "1565bccff66cda866820d5307a26de462e79e9a0",
+ "artifacts": {
+  "wheel": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+  "sdist": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+  "frozen_record": {
+   "path": "closure-evidence/v2/release/V2.0-RC2-FREEZE.json",
+   "sha256": "05338b7861a0f2a90ae7dca41409d1c5e953d45304c57d4ce22a1e6f63e59e21"
+  }
+ },
+ "TESTPYPI": "NOT WIRED (owner decision, docs/v2/RELEASE-PROCESS.md: account, trusted publisher, one upload per version); charter G8's equivalent non-production path is staging.yml: the RC2 staging build 37312767560 and the rebuild 37317404055 on the freeze commit, each installing exactly the built wheel into clean venvs on ubuntu and windows",
+ "checks": {
+  "digests_are_the_frozen_values": "staging 37312767560 (the freeze source), staging rebuild 37317404055, and an offline local rebuild — all equal to V2.0-RC2-FREEZE.json (release_rc --verify-dist PASS)",
+  "install_succeeds": "clean venv, pip install --no-index --no-deps of exactly the frozen wheel: PASS (here; staging ubuntu + windows)",
+  "aisef_version": "aisef 2.0.0",
+  "cli_starts": "aisef --help: exit 0",
+  "canonical_public_workflow": "installed product smoke: aisef run --check, run, --verify from the installed artifact, offline: PASS (here; staging ubuntu)",
+  "package_data": "installed smoke: aisef kit prompts/rules/skills, harness assets, kit/catalog.json packaged; aisef2 runtime entry present: PASS",
+  "no_dependency_on_the_checkout": "every command from a directory outside any repository, -I; aisef and aisef2 imported from the venv",
+  "no_dependency_on_qualification_files": "validation and tests not importable from the install; packaging_check --artifacts: exactly aisef + aisef2",
+  "no_accidental_v1_default_authority": "aisef run = 'Run a project's admitted plan under the AISEF V2 kernel'; V1 execution only behind `aisef legacy {run,improve}`",
+  "pip_check": "No broken requirements found",
+  "real_opencode_store_unchanged": true
+ },
+ "environment": "env -i; fresh HOME and XDG_*; PATH without the real client; offline (PIP_NO_INDEX)",
+ "logs": {
+  "s7": {
+   "path": "closure-evidence/v2/release/s7-rc2/s7.txt",
+   "sha256": "db4b75f5d6d3f15b93dd66c17a92fac482b6370ba1e0f605c5a1f95da38484e5"
+  },
+  "packaging_check": {
+   "path": "closure-evidence/v2/release/s7-rc2/packaging_check.txt",
+   "sha256": "60ae6070f9662cc463d011d009c2710aa9e435187f6e055a4c0430e3ce3665b3"
+  },
+  "env": {
+   "path": "closure-evidence/v2/release/s7-rc2/env.sh",
+   "sha256": "37e3c053f759a2ffd51f963d13c1e22f3bf7d13897d3f966c4d81b8d78dd3ee1"
+  },
+  "runner": {
+   "path": "closure-evidence/v2/release/s7-rc2/s7_cleanroom.sh",
+   "sha256": "f53ba859391ca2d17cd4de3fb6323ffdf7785b5c49a88d39bc871f4ee7d86cca"
+  }
+ },
+ "verdict": "PASS"
+}

@@ -1,0 +1,116 @@
+== frozen wheel digest
+5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b  /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s7/dist/aisef-2.0.0-py3-none-any.whl
+rc=0
+== venv
+rc=0
+== install exactly the frozen wheel, offline
+Processing /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s7/dist/aisef-2.0.0-py3-none-any.whl
+Installing collected packages: aisef
+Successfully installed aisef-2.0.0
+rc=0
+== pip check
+No broken requirements found.
+rc=0
+== aisef --version
+aisef 2.0.0
+rc=0
+== aisef --help (the CLI starts)
+usage: aisef [-h] [-V] [--project PROJECT]
+             {memory,setup,doctor,init,gates,status,change,baseline,doc,skill,review,approve,reject,compile,gate,guard,plan,mockup,run,legacy,verify,tool,qa,devsecops,pre-deploy,evidence,ctx,issues,report,cost,auto-approve,dashboard,closure,replay} ...
+
+AISEF — orchestrate the AI-assisted software development lifecycle
+
+positional arguments:
+  {memory,setup,doctor,init,gates,status,change,baseline,doc,skill,review,approve,reject,compile,gate,guard,plan,mockup,run,legacy,verify,tool,qa,devsecops,pre-deploy,evidence,ctx,issues,report,cost,auto-approve,dashboard,closure,replay}
+    memory              experimental scoped advisory memory (default off)
+    setup               detect stack and install skills into the project
+    doctor              check environment and prerequisites
+    init                write default .ai/config.json
+    gates               show gate status table
+    status              show story progress and cost
+    change              post-release change: record FR, stale PRD downward,
+                        generate delta stories
+    baseline            build baseline for brownfield projects: analyze
+                        existing codebase
+    doc                 look up library documentation on demand (context7,
+                        cached)
+    skill               skill registry: build, inspect, test routing
+    review              view artifact for a gate
+    approve             approve a gate
+    reject              reject a gate with a note
+    compile             generate client configuration (hooks, plugins)
+    gate                re-score story gates on recorded evidence (ADR-005 V4)
+                        — current rules, prior reviewer notes, no model calls
+    guard               run guard on a hook event (reads stdin)
+    plan                run BMAD phase chain up to the first unapproved gate
+    mockup              generate screen mockups + visual design contracts
+    run                 run the V2 runtime (authoritative); arguments go to
+                        aisef2.app.cli — see docs/v2/USAGE.md
+    legacy              V1 compatibility surface (legacy, never the default):
+                        `aisef legacy run ...`
+    verify              re-run guards on the working tree (post-check)
+    tool                run a harness tool and record evidence
+    qa                  run the test suite (unit, sit, e2e, security, ...)
+    devsecops           generate CI + Dockerfile + deployment + runbook
+    pre-deploy          score pre-deployment gate
+    evidence            look up history for a story or behaviour in the ledger
+    ctx                 code map around a story's write scope — full,
+                        untruncated (ADR-005 V7; the `repo_map` prompt slot is
+                        the capped version)
+    issues              export gap/regression table from behaviour ledger
+                        (ADR-004 R12) — for tracking, does not touch gates
+    report              generate acceptance report from evidence
+    cost                attribute spend to outcomes: net VERIFIED behaviour
+                        per dollar (per input token when the provider prices
+                        nothing), split by attempt outcome (ADR-009 O4)
+    auto-approve        auto-approve gates (records auto flag)
+    dashboard           generate conformance HTML dashboard from evidence
+    closure             score the project closure gate (read-only, no model
+                        calls)
+    replay              re-score story gates on recorded evidence
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  --project PROJECT     project directory (default: current directory)
+rc=0
+== aisef run --help (V2 runtime)
+usage: aisef run [-h] [--check | --verify] --project PROJECT
+                 [--settings SETTINGS] [--repo REPO] [--out OUT]
+
+Run a project's admitted plan under the AISEF V2 kernel.
+
+options:
+  -h, --help           show this help message and exit
+  --check              check the inputs and the plan's admission; no provider
+                       request
+  --verify             verify a finished run directory against its journal
+  --project PROJECT    the project bundle (aisef-v2-project/1)
+  --settings SETTINGS  the run settings (aisef-v2-run/1)
+  --repo REPO          the project's git repository (cloned; never written)
+  --out OUT            the run directory (must not exist)
+rc=0
+== aisef legacy --help (V1 only behind the named legacy surface)
+usage: aisef legacy [-h] [--project PROJECT] {run,improve} ...
+
+positional arguments:
+  {run,improve}
+    run              V1 (legacy): execute a wave: epics sequentially, stories
+                     in parallel
+    improve          V1 (legacy): evidence-driven improvement loop for an
+                     epic: QA → behaviour ledger → one fix story → run → QA;
+                     stops by code (ADR-004 R3)
+
+options:
+  -h, --help         show this help message and exit
+  --project PROJECT  project directory (also accepted before the command)
+rc=0
+== no qualification harness in the install
+{'validation': False, 'tests': False, 'aisef': True, 'aisef2': True}
+rc=0
+== installed smoke (RC2's tests/installed_smoke.py, -I)
+installed smoke: PASS (aisef 2.0.0)
+rc=0
+== installed product smoke: aisef run --check / run / --verify, offline (RC2's tests/installed_product_smoke.py, -I)
+installed product smoke: PASS (`aisef run` --check, run, --verify from the installed artifact)
+rc=0

@@ -7,17 +7,15 @@
  "S3_PRODUCTIZED": "PASS",
  "S4_RC_FROZEN": "PASS",
  "S5_QUALIFIED": "PASS",
- "S6_RELEASE_SMOKE": "FAIL",
- "S7_TESTPYPI": "BLOCKED",
- "FINAL_RELEASE_READY": "BLOCKED",
+ "S6_RELEASE_SMOKE": "ACCEPTED_WITH_WAIVER",
+ "S7_TESTPYPI": "PASS",
+ "FINAL_RELEASE_READY": "PASS",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
  "CURRENT_SHA": "1565bccff66cda866820d5307a26de462e79e9a0",
  "CURRENT_KERNEL_DIGEST": "12ef35b0b25fadc318ea18cb09419693ac65fa0a",
  "CURRENT_WHEEL_DIGEST": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
- "OPEN_V2_0_BLOCKERS": [
-  "S6-SMOKE-2-FALSE-ROLLBACK-S10A"
- ],
- "V2_1_BACKLOG_COUNT": 36,
+ "OPEN_V2_0_BLOCKERS": [],
+ "V2_1_BACKLOG_COUNT": 38,
  "PROVIDER_CALLS": 25,
  "PAID_RELEASE_SMOKES_USED": 2,
  "sources": {
@@ -156,6 +154,24 @@
    "status": "FAIL",
    "on": "1565bccff66cda866820d5307a26de462e79e9a0",
    "what": "smoke #2 on RC2: preflight ATTESTED; 6/7 stories committed, STORY-02-01 falsely rolled back by the plan's S-10-a grep matching a docstring line; acceptance 59/59, ProductProof 66/67, false acceptance 0; RELEASE_SMOKE_PASS NO, RELEASE_GO NO; stopped for the owner (S6-SMOKE-2-FALSE-ROLLBACK-S10A)"
+  },
+  {
+   "phase": "S6_RELEASE_SMOKE",
+   "status": "ACCEPTED_WITH_WAIVER",
+   "on": "1565bccff66cda866820d5307a26de462e79e9a0",
+   "what": "owner ruling 2026-10-06 (Option A): S6-SMOKE-2-FALSE-ROLLBACK-S10A waived for this one incident; re-evaluation: every failing check traces to the one waived rollback, no other S6 blocker"
+  },
+  {
+   "phase": "S7_TESTPYPI",
+   "status": "PASS",
+   "on": "1565bccff66cda866820d5307a26de462e79e9a0",
+   "what": "TestPyPI not wired; staging path + clean-room install of the frozen wheel: version 2.0.0, CLI, aisef run check/run/verify offline, package data, no checkout/harness dependency, V1 only behind legacy"
+  },
+  {
+   "phase": "FINAL_RELEASE_READY",
+   "status": "PASS",
+   "on": "1565bccff66cda866820d5307a26de462e79e9a0",
+   "what": "RELEASE_GO YES for RC2; held for the owner's production confirmation (charter §19)"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
@@ -189,7 +205,7 @@
   "sensitivity_no_pre_satisfied": 535783,
   "sensitivity_one_retry_per_failed_story": 647232
  },
- "OPEN_V2_0_BLOCKERS_NOTE": "the listed blockers (B1, B3, B4, B4-OLD-GIT, B6, B7, B12, B13, B14, KA-09) were fixed in code and stayed open until the S2 exit gates held; they hold for the frozen S2 candidate 1ba5bde (mutation record PASS, zero unaudited survivors, full local suite green but one owner-waived machine-state failure, CI green on Linux/macOS/Windows). S2-REAL-CLIENT-RUN is not a 2.0 blocker (owner, S2-REAL-CLIENT-RUN/R1)",
+ "OPEN_V2_0_BLOCKERS_NOTE": "none open for RC2 1565bcc: S6-SMOKE-2-FALSE-ROLLBACK-S10A WAIVED by the owner (2026-10-06, single case; V2-RELEASE-FINDINGS row /R1); every other release blocker closed",
  "ACCEPTANCE_FROZEN": {
   "record": "closure-evidence/v2/release/V2-RELEASE-ACCEPTANCE.json",
   "specs": 59,
@@ -591,7 +607,7 @@
   }
  },
  "S6_DETAIL": {
-  "RELEASE_GO": "NO",
+  "RELEASE_GO": "YES (owner ruling 2026-10-06, Option A)",
   "RELEASE_SMOKE_PASS": "NO",
   "smoke": "#2 (owner amendment 2026-10-05; no third)",
   "rc": "1565bccff66cda866820d5307a26de462e79e9a0",
@@ -628,6 +644,29 @@
   "RAW_JOURNAL_VERIFIED": "YES (aisef run --verify: VERIFIED, 1834 events)",
   "preflight": "ATTESTED",
   "blocker": "S6-SMOKE-2-FALSE-ROLLBACK-S10A",
-  "owner_decision_required": true
+  "owner_decision_required": true,
+  "waiver": {
+   "finding": "S6-SMOKE-2-FALSE-ROLLBACK-S10A/R1",
+   "scope": "charter §17 'framework false rollback = 0', this one incident only",
+   "reevaluation": "none: every failing check is a consequence of the one waived rollback; no independent failure"
+  }
+ },
+ "RELEASE_GO": "YES",
+ "S7_DETAIL": {
+  "record": {
+   "path": "closure-evidence/v2/release/S7-RC2-CLEAN-INSTALL.json",
+   "sha256": "f7b128d226e03cc0fe806f8a27f0bcf66d640c067df8f0fa15f7f47bcdf87349"
+  },
+  "TESTPYPI": "not wired; staging (charter G8 equivalent)",
+  "CLEAN_INSTALL": "PASS",
+  "PUBLIC_CLI_SMOKE": "PASS"
+ },
+ "FINAL_DETAIL": {
+  "FINAL_RELEASE_READY": "YES",
+  "RELEASE_GO": "YES",
+  "rc": "1565bccff66cda866820d5307a26de462e79e9a0",
+  "version": "2.0.0",
+  "next_action": "OWNER_CONFIRM_PRODUCTION_TAG_AND_PYPI (charter §19; docs/v2/RELEASE-PROCESS.md 'How the owner confirms'): the owner's RELEASE-DECISIONS entry (PRODUCTION_PUBLISH AUTHORIZED, VERSION 2.0.0), the v2.0.0 tag, the pypi environment approval",
+  "held": "no tag, no TestPyPI or PyPI upload, no GitHub Release by the controller"
  }
 }
