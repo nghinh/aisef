@@ -569,6 +569,10 @@ _S2_KILLS_K = "tests/v2/test_s2_kills_k.py"
 for _t in ("aisef2/app/client.py::wait_within", "aisef2/probe/cli_invocation.py::AGENT/send"):
     S2_TARGETS[_t] = [_S2_KILLS_K, *S2_TARGETS[_t]]
 S2_TARGETS["aisef2/app/bundle.py::Project.order"] = [*S2_TARGETS["aisef2/app/bundle.py::Project.order"], _S2_KILLS_K]
+# OBS-S2-12: kills that hold whatever the string-hash seed, first in exactly these two kill sets (owner, 2026-10-05).
+_S2_KILLS_DET = "tests/v2/test_s2_kills_deterministic.py"
+for _t in ("aisef2/app/preflight.py::fingerprint_fields", "aisef2/app/client.py::Budget.spend"):
+    S2_TARGETS[_t] = [_S2_KILLS_DET, *S2_TARGETS[_t]]
 SUPERSEDED.update({t: "V2.0-S2" for t in S2_TARGETS})
 for _phase in (K_NOWORK_TARGETS, P6_TARGETS, C2P2_TARGETS, C2P3_TARGETS, C2_P4_TARGETS):
     for _t in [t for t in _phase if t.split("::")[0] in (*_S2_CHANGED, "aisef2/orchestrate/story_runner.py",
