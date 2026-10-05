@@ -1,0 +1,7 @@
+The smoke #2 wheel is the frozen RC2 wheel rebuilt offline on the controller's machine, nothing downloaded:
+- source: git archive of 1565bccff66cda866820d5307a26de462e79e9a0 (the RC2 commit)
+- backend: setuptools 84.0.0 (pyproject's exact pin), from the local pip wheel cache, unpacked onto PYTHONPATH
+- build: SOURCE_DATE_EPOCH=1791204847 (the frozen epoch) python3 -P build_dist.py (sdist, then the wheel from the unpacked sdist), env -i
+- sdist re-packed by validation/qualification/repro_dist.py
+- result: wheel 5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b, sdist a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d
+  = V2.0-RC2-FREEZE.json's (release_rc.py --verify-dist PASS): a third rebuild of the exact RC, byte for byte
