@@ -612,6 +612,17 @@
      "measured": "deterministic by construction (a fixed fake listing order); the deterministic file covers Budget.spend's 44 mutants anyway"
     }
    ]
+  },
+  {
+   "id": "S6-LINT-1",
+   "what": "The S6 diagnostic helper committed in b7380c5 (smoke/OBS-S6-1/diagnostic/same_bytes.py) imported json without using it: ruff F401, so the lint job of tests run 37297299871 on that evidence-only commit failed. The unused import is removed and nothing else; the helper ran (and proved A's bytes equal to the shipped transport's) with the original file.",
+   "corrects": [
+    {
+     "where": "V2-RELEASE-FINDINGS v2_0_blockers S6-SMOKE-1-PREFLIGHT-OPAQUE/R1 evidence.same_bytes_proof",
+     "claimed": "sha256 d20b4771c850ac8f078df741d7c8fe6c4a8e5a09a86e68d4c0b14a12834f5aef",
+     "measured": "sha256 0a111575028404ad6d862f4ac1ce179f991a8ff48a3d70161d9b7280d193a452 after the one-line lint fix (the import line only)"
+    }
+   ]
   }
  ]
 }

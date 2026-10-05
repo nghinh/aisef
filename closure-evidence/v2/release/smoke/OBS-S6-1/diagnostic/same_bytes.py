@@ -1,5 +1,5 @@
 """A's request vs the RC1 shipped transport's, captured raw on loopback (request line, headers, body)."""
-import json, pathlib, socket, subprocess, sys, threading
+import pathlib, socket, subprocess, sys, threading
 sys.path.insert(0, ".")
 from aisef2.app import preflight
 cap = []
