@@ -273,6 +273,13 @@
     "patch_sha256": "3371d8ab898f90481511fb588b8b2602459df779a85aa793be08e513dec05415"
    },
    "source": "S5, 2026-10-05"
+  },
+  {
+   "ID": "S5-Q3-STALE-CASE/R1",
+   "RECLASSIFIES": "S5-Q3-STALE-CASE",
+   "OWNER_RULING": "2026-10-05: 'Approve the one-line re-pin (Recommended)'",
+   "V2_0_DISPOSITION": "RESOLVED by the harness-only re-pin commit 29dbd0a (validation/qualification/q3.py: one case id); the RC unchanged (release_rc --check PASS)",
+   "source": "S5"
   }
  ],
  "v2_1_backlog": {
@@ -428,6 +435,16 @@
    "reclassifies": "OBS-S4-2",
    "what": "owner ruling 2026-10-05 ('Proceed to S5 on the exact frozen RC 529591e')",
    "disposition": "accepted as an infrastructure observation only; the diagnostic Windows rerun does not alter the frozen S4 gate result"
+  },
+  {
+   "id": "OBS-S5-1",
+   "what": "qualification.yml starts a Q0-Q3 attempt for any push whose commit message contains the token in brackets; the controller's evidence commit e9d5269 quoted it in prose ('No [qualify] attempt was spent'), which started attempt 1 (run 37281473872) unintentionally.",
+   "disposition": "recorded as attempt 1, not cancelled (closure-evidence/v2/release/Q0-Q3-RC1/attempts/); every later commit message is checked for the token before it is pushed"
+  },
+  {
+   "id": "OBS-S5-2",
+   "what": "Q0 attempts 1 and 2 (runs 37281473872, 37281662775) FAILED on all five platforms with one problem — 'the old probe digest is named outside historical evidence' — naming the controller's darwin dry-run rung records committed in e9d5269 under closure-evidence/v2/release/s5-rc1/q0-q3-dryrun-darwin/*/records/ (Q0 and Q3 records list the digests they measured). Q0's scan exempts the scanner's own record areas (common.OUT_REL and the earlier rung output directories), not s5-rc1/. 58 checks PASS in every job; Q1-Q3 did not run.",
+   "disposition": "not a finding (an evidence-placement error by the controller; no source, RC or product effect): the dry-run rung records moved by git into closure-evidence/v2/release/Q0-Q3-RC1/darwin-dry-runs/ (the scanner's own record area; summary.py reads only the rung directories and PLATFORMS/, so they stay non-gate observations, as C2's darwin dry-run records were); after the move no file outside the historical set names the old digest. Both failed attempts kept (attempts/ATTEMPTS.json, records decoded byte-for-byte)."
   }
  ],
  "reviews": [

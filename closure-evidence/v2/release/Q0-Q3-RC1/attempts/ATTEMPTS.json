@@ -1,0 +1,38 @@
+{
+ "record": "AISEF V2.0 — S5 Q0-Q3 qualification attempts on RC1 (qualification.yml; each run a recorded attempt, never a rerun-to-green)",
+ "attempts": [
+  {
+   "attempt": 1,
+   "run": 37281473872,
+   "commit": "e9d5269",
+   "trigger": "ACCIDENTAL — the literal token in an evidence commit's message ('No [qualify] attempt was spent')",
+   "harness": "as frozen (1a5d3812: Q3 row FM2-CLI-STREAM-2 stale)",
+   "result": "every job FAILED at Q0 (58 PASS, 1 problem) — Q1-Q3 not run",
+   "cause": "the old probe digest named in the controller's darwin dry-run rung records committed outside the scanner's record area (OBS-S5-2)",
+   "records": {
+    "Q0-linux-py3.11.json": "ecd5869caecdc8e3858c366399d38381503ddc67aba8b2f8bd67d1ad7bf902e8",
+    "Q0-linux-py3.12.json": "19c96b336bfd2cf844a5949c363a71e44554dbf3416db777fb5319b15baff914",
+    "Q0-linux-py3.13.json": "09d76a6bfa93414682c7c1fadc61b0fc4e54bc0a95572241599daf983486bbb4",
+    "Q0-linux-py3.14.json": "d26c3cc7ef33e8dee17d63f571eec0b764601347d0b95221c8b4aeba857c94ae",
+    "Q0-windows-py3.11.json": "589e2c2d9372c6113f0c32fc049ba01d133cecabc669f8ad7c536007eaccde97"
+   }
+  },
+  {
+   "attempt": 2,
+   "run": 37281662775,
+   "commit": "29dbd0a",
+   "trigger": "intended (the owner-approved Q3 re-pin)",
+   "harness": "ca2ce49b (re-pinned)",
+   "result": "every job FAILED at Q0 (58 PASS, 1 problem) — Q1-Q3 not run",
+   "cause": "the same as attempt 1 (OBS-S5-2)",
+   "records": {
+    "Q0-linux-py3.11.json": "118c935a55ae68abbc9c8a8db14f064407beed574f75b73b01084b9c70ceebf3",
+    "Q0-linux-py3.12.json": "f4bdfccb235a3c4680276006bc9a21913a1211c74114846afc12661b2fa533c2",
+    "Q0-linux-py3.13.json": "ef1f47c87081dc33e4e2fb0f85e41422bd4ddc52adaaceb35baa40f50b26f048",
+    "Q0-linux-py3.14.json": "5904eccd9c820f980fac3a6159aba44cf8449d6e779d5f326f65b8ebf51026d2",
+    "Q0-windows-py3.11.json": "42126105f2f647b0b529a9b62211e1d4ad18fd06882c9ba2ee21ce58ce8755d1"
+   }
+  }
+ ],
+ "decoded_by": "the controller's log reader: every record re-rendered to the sha256 its job printed (common.emit/decode); nothing downloaded"
+}

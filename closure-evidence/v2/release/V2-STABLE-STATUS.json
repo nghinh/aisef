@@ -6,7 +6,7 @@
  "S2_FIX_WINDOW": "PASS",
  "S3_PRODUCTIZED": "PASS",
  "S4_RC_FROZEN": "PASS",
- "S5_QUALIFIED": "BLOCKED",
+ "S5_QUALIFIED": "RUNNING",
  "S6_RELEASE_SMOKE": "NOT_STARTED",
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
@@ -14,9 +14,7 @@
  "CURRENT_SHA": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
  "CURRENT_KERNEL_DIGEST": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
  "CURRENT_WHEEL_DIGEST": "a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7",
- "OPEN_V2_0_BLOCKERS": [
-  "S5-Q3-STALE-CASE"
- ],
+ "OPEN_V2_0_BLOCKERS": [],
  "V2_1_BACKLOG_COUNT": 36,
  "PROVIDER_CALLS": 0,
  "PAID_RELEASE_SMOKES_USED": 0,
@@ -102,6 +100,12 @@
    "status": "BLOCKED",
    "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
    "what": "Q0-Q3 dry run on the exact RC: Q3 FAILED on a stale fault-matrix case id (S5-Q3-STALE-CASE); a one-line harness-only re-pin makes Q0-Q3 GREEN in a second dry run; owner review required before any change or [qualify] attempt"
+  },
+  {
+   "phase": "S5_QUALIFIED",
+   "status": "RUNNING",
+   "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+   "what": "owner approved the Q3 re-pin (29dbd0a) and authorized Q4/Q5; Q0-Q3 attempts 1-2 FAILED at Q0 on dry-run records placed outside the scanner's area (OBS-S5-2), moved; S5-Q3-STALE-CASE resolved by the re-pin"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
@@ -348,16 +352,22 @@
   },
   "hermetic_full_suite": "5444 tests, 0 failed (no waiver)",
   "remaining": [
-   "Q0-Q3 fresh on the exact RC (release mode; Linux 3.11-3.14 and Windows 3.11)",
-   "Q4 fresh and Q5 fresh/reproduction — need the owner's authorization ('not yet')"
+   "Q0-Q3 attempt 3 (after the evidence move)",
+   "Q4 fresh",
+   "Q5 fresh/reproduction"
   ],
-  "blocked_on": [
-   "S5-Q3-STALE-CASE: Q3 cannot be GREEN on the exact RC without a one-line harness-only re-pin of validation/qualification/q3.py (verified GREEN in a dry run) — owner review required by the S5 ruling",
-   "Q4 fresh and Q5 fresh/reproduction: the owner's 'not yet'"
-  ],
+  "blocked_on": [],
   "q0_q3_dry_runs_darwin": {
    "as_frozen": "Q0 GREEN, Q1 GREEN, Q2 GREEN, Q3 FAILED (FM2-CLI-STREAM-2 case not found)",
    "with_the_proposed_repin": "Q0-Q3 GREEN (non-gate; the gate platforms are Linux and Windows via [qualify])"
+  },
+  "owner_answers_2026_10_05": {
+   "Q3 re-pin": "Approve the one-line re-pin (Recommended) — applied 29dbd0a",
+   "Q4/Q5": "Authorize Q4 and Q5 (Recommended)"
+  },
+  "q0_q3_attempts": {
+   "1": "run 37281473872 at e9d5269 (accidental): Q0 FAILED (OBS-S5-2)",
+   "2": "run 37281662775 at 29dbd0a: Q0 FAILED (OBS-S5-2)"
   }
  }
 }
