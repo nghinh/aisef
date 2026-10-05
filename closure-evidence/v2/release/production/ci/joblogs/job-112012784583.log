@@ -1,0 +1,301 @@
+staging / install (windows-latest)	UNKNOWN STEP	﻿2026-10-05T22:41:16.1399098Z Current runner version: '2.337.0'
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1437315Z ##[group]Runner Image Provisioner
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1438581Z Hosted Compute Agent
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1439409Z Version: 20260901.588
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1440295Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1441448Z Build Date: 2026-09-01T19:56:44Z
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1442445Z Worker ID: {90cee95e-d4d9-47e3-b065-5a627ceeebee}
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1443606Z Azure Region: northcentralus
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1444589Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1446372Z ##[group]Operating System
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1447336Z Microsoft Windows Server 2025
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1448347Z 10.0.26100
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1449123Z Datacenter
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1449917Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1450771Z ##[group]Runner Image
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1451669Z Image: windows-2025-vs2026
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1452924Z Version: 20260925.250.1
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1455365Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260925.250/images/windows/Windows2025-VS2026-Readme.md
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1458202Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260925.250
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1459859Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1461541Z ##[group]GITHUB_TOKEN Permissions
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1463941Z Contents: read
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1464790Z Metadata: read
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1465572Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1468658Z Secret source: Actions
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1469943Z Cache mode: write
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1471027Z Prepare workflow directory
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.1964842Z Prepare all required actions
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.2034340Z Getting action download info
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.5434106Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.6593451Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:16.7957154Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.3673126Z Uses: nghinh/aisef/.github/workflows/staging.yml@refs/tags/v2.0.0 (ca2631374602da45dae75b7f6907ff4729d0b2f7)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.3677799Z Complete job name: staging / install (windows-latest)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5487732Z ##[group]Run actions/checkout@v4
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5488855Z with:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5489266Z   repository: nghinh/aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5493245Z   token: ***
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5493636Z   ssh-strict: true
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5494033Z   ssh-user: git
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5494426Z   persist-credentials: true
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5494876Z   clean: true
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5495277Z   sparse-checkout-cone-mode: true
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5495768Z   fetch-depth: 1
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5496161Z   fetch-tags: false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5496570Z   show-progress: true
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5496971Z   lfs: false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5497337Z   submodules: false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5497777Z   set-safe-directory: true
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5498231Z   allow-unsafe-pr-checkout: false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.5498916Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.7088460Z Syncing repository: nghinh/aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.7090933Z ##[group]Getting Git version info
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.7091933Z Working directory is 'D:\a\aisef\aisef'
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.7899177Z [command]"C:\Program Files\Git\bin\git.exe" version
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.9278251Z git version 2.55.0.windows.5
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.9337465Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.9361610Z Temporarily overriding HOME='D:\a\_temp\ce10108f-8930-440b-9e26-60ec6c49823c' before making global git config changes
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.9364269Z Adding repository directory to the temporary git global config as a safe directory
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.9377359Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\aisef\aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.9721593Z Deleting the contents of 'D:\a\aisef\aisef'
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.9728355Z ##[group]Initializing the repository
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:17.9740911Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\aisef\aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:18.0216810Z Initialized empty Git repository in D:/a/aisef/aisef/.git/
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:18.0271674Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/nghinh/aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:18.0784574Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:18.0786607Z ##[group]Disabling automatic garbage collection
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:18.0793608Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:18.1124300Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:18.1126335Z ##[group]Setting up auth
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:18.1141694Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:18.1501602Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:19.2369770Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:19.2703469Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:19.8690295Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:19.9087077Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:20.4677962Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:20.5060750Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:20.5061809Z ##[group]Fetching the repository
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:20.5079271Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ca2631374602da45dae75b7f6907ff4729d0b2f7:refs/tags/v2.0.0
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:24.1208527Z From https://github.com/nghinh/aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:24.1212176Z  * [new ref]         ca2631374602da45dae75b7f6907ff4729d0b2f7 -> v2.0.0
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:24.1250642Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:24.1251046Z ##[group]Determining the checkout info
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:24.1253718Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:24.1268074Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:24.1624824Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:24.1932157Z ##[group]Checking out the ref
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:24.1941711Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force refs/tags/v2.0.0
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.2518734Z Updating files:  46% (2161/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.2699851Z Updating files:  47% (2191/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.2839988Z Updating files:  48% (2238/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.3012471Z Updating files:  49% (2284/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.3255998Z Updating files:  50% (2331/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.3545618Z Updating files:  51% (2378/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.3651415Z Updating files:  52% (2424/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.3756286Z Updating files:  53% (2471/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.3892790Z Updating files:  54% (2517/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.4140976Z Updating files:  55% (2564/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.5228323Z Updating files:  56% (2611/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.6130763Z Updating files:  57% (2657/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.6334259Z Updating files:  58% (2704/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.6885690Z Updating files:  59% (2750/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.7069403Z Updating files:  60% (2797/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.7671910Z Updating files:  61% (2844/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.8149393Z Updating files:  62% (2890/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.8446714Z Updating files:  63% (2937/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.8711289Z Updating files:  64% (2984/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.9131546Z Updating files:  65% (3030/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.9734081Z Updating files:  66% (3077/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:25.9874103Z Updating files:  67% (3123/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.0072079Z Updating files:  68% (3170/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.0358845Z Updating files:  69% (3217/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.0804332Z Updating files:  70% (3263/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.1127138Z Updating files:  71% (3310/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.1235246Z Updating files:  72% (3356/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.1357533Z Updating files:  73% (3403/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.1475816Z Updating files:  74% (3450/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.1650000Z Updating files:  75% (3496/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.1777225Z Updating files:  76% (3543/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.1902871Z Updating files:  77% (3589/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.2083637Z Updating files:  78% (3636/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.2281547Z Updating files:  79% (3683/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.2456945Z Updating files:  80% (3729/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.2464263Z Updating files:  81% (3776/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.2625838Z Updating files:  81% (3777/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.2780034Z Updating files:  82% (3823/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.2929044Z Updating files:  83% (3869/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.3035895Z Updating files:  84% (3916/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.3142314Z Updating files:  85% (3962/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.3257223Z Updating files:  86% (4009/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.3370243Z Updating files:  87% (4056/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.3502787Z Updating files:  88% (4102/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.3649380Z Updating files:  89% (4149/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.3781932Z Updating files:  90% (4195/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.3924671Z Updating files:  91% (4242/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.4045005Z Updating files:  92% (4289/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.4121781Z Updating files:  93% (4335/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.4287597Z Updating files:  94% (4382/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.4422849Z Updating files:  95% (4428/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.4575481Z Updating files:  96% (4475/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.4719911Z Updating files:  97% (4522/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.4893724Z Updating files:  98% (4568/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5038106Z Updating files:  99% (4615/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5038729Z Updating files: 100% (4661/4661)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5039667Z Updating files: 100% (4661/4661), done.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5198651Z Note: switching to 'refs/tags/v2.0.0'.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5199022Z 
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5199387Z You are in 'detached HEAD' state. You can look around, make experimental
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5200118Z changes and commit them, and you can discard any commits you make in this
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5200833Z state without impacting any branches by switching back to a branch.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5201267Z 
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5201545Z If you want to create a new branch to retain commits you create, you may
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5202242Z do so (now or later) by using -c with the switch command. Example:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5202704Z 
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5202857Z   git switch -c <new-branch-name>
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5203102Z 
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5203253Z Or undo this operation with:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5203475Z 
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5203648Z   git switch -
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5203824Z 
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5204171Z Turn off this advice by setting config variable advice.detachedHead to false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5204644Z 
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5206607Z HEAD is now at ca26313 RELEASE-DECISIONS seq 3: the owner's production-publish authorization for AISEF 2.0.0 (charter §19) — approver human:owner, decision {PRODUCTION_PUBLISH: AUTHORIZED, VERSION: 2.0.0}, on the frozen and qualified RC2 1565bcc. Decision record only.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5404918Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.5746615Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6017333Z ca2631374602da45dae75b7f6907ff4729d0b2f7
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6492992Z ##[group]Run actions/setup-python@v5
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6493546Z with:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6493751Z   python-version: 3.11
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6493997Z   check-latest: false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6496482Z   token: ***
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6496698Z   update-environment: true
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6496937Z   allow-prereleases: false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6497169Z   freethreaded: false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.6497382Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8121903Z ##[group]Installed versions
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8245056Z (node:3988) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8246198Z (Use `node --trace-deprecation ...` to show where the warning was created)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8246946Z Successfully set up CPython (3.11.9)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8247679Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8566579Z ##[group]Run actions/download-artifact@v4
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8566942Z with:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8567131Z   name: dist
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8567344Z   path: dist/
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8567541Z   merge-multiple: false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8567766Z   repository: nghinh/aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8567989Z   run-id: 37383985011
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8568183Z env:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8568445Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8568921Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8569370Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8569784Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8570184Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:26.8570508Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.0385971Z Downloading single artifact
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.0620327Z (node:9328) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.0621955Z (Use `node --trace-deprecation ...` to show where the warning was created)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.2082513Z Preparing to download the following artifacts:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.2083501Z - dist (ID: 11375269225, Size: 1769629, Expected Digest: sha256:754a6b9b5e24717fc0e3a9480879b3971f4037959c1f41718799a6af8d563f5b)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.3768905Z Redirecting to blob download url: https://productionresultssa10.blob.core.windows.net/actions-results/8cfdcc66-49d7-8529-951a-b4bed871d5c2/workflow-job-run-d9a7ba16-9a95-5771-8c04-32ae705306d9/artifacts/bcae0416621b3db43d8cba1e4454a792c7af9e4b7287e51056efc5a215d95839.zip
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.3770846Z Starting download of artifact to: D:\a\aisef\aisef\dist
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.5485226Z (node:9328) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.6865391Z SHA256 digest of downloaded artifact is 754a6b9b5e24717fc0e3a9480879b3971f4037959c1f41718799a6af8d563f5b
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.6866041Z Artifact download completed successfully.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.6866348Z Total of 1 artifact(s) downloaded
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.6873855Z Download artifact has finished successfully
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7200771Z ##[group]Run actions/download-artifact@v4
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7201128Z with:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7201334Z   name: dist-sha256
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7201547Z   path: .
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7201758Z   merge-multiple: false
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7201993Z   repository: nghinh/aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7202222Z   run-id: 37383985011
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7202425Z env:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7202689Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7203156Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7203597Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7203992Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7204389Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.7204917Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.9027862Z Downloading single artifact
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.9246003Z (node:8080) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:27.9247104Z (Use `node --trace-deprecation ...` to show where the warning was created)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.0472854Z Preparing to download the following artifacts:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.0473595Z - dist-sha256 (ID: 11375224188, Size: 264, Expected Digest: sha256:776f9af0c8849aa94473d1b45d07d48099ae56fa34cacdd408ac0a6b76c4ce72)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.2322179Z Redirecting to blob download url: https://productionresultssa10.blob.core.windows.net/actions-results/8cfdcc66-49d7-8529-951a-b4bed871d5c2/workflow-job-run-d9a7ba16-9a95-5771-8c04-32ae705306d9/artifacts/030ac884951a628a67088ac4ebdcc46452544c33186a71fffe72c620cffb2105.zip
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.2324164Z Starting download of artifact to: D:\a\aisef\aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.3575558Z (node:8080) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.3633172Z SHA256 digest of downloaded artifact is 776f9af0c8849aa94473d1b45d07d48099ae56fa34cacdd408ac0a6b76c4ce72
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.3634109Z Artifact download completed successfully.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.3634596Z Total of 1 artifact(s) downloaded
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.3642487Z Download artifact has finished successfully
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.3990011Z ##[group]Run cd dist && sha256sum -c ../SHA256SUMS
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.3990490Z ^[[36;1mcd dist && sha256sum -c ../SHA256SUMS^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4007718Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4008130Z env:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4009053Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4009534Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4010033Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4010445Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4010859Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4011190Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4706253Z aisef-2.0.0-py3-none-any.whl: OK
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4737009Z aisef-2.0.0.tar.gz: OK
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4946726Z ##[group]Run set -eu
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4947079Z ^[[36;1mset -eu^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4947532Z ^[[36;1mtmp="$RUNNER_TEMP"; if command -v cygpath >/dev/null; then tmp=$(cygpath -u "$tmp"); fi^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4948001Z ^[[36;1mpython -m venv "$tmp/venv"^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4948522Z ^[[36;1mpy="$tmp/venv/bin/python"; if [ -f "$tmp/venv/Scripts/python.exe" ]; then py="$tmp/venv/Scripts/python.exe"; fi^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4949080Z ^[[36;1m"$py" -m pip install --no-index --no-deps dist/*.whl^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4949450Z ^[[36;1mecho "SMOKE_PY=$py" >> "$GITHUB_ENV"^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4949761Z ^[[36;1mecho "SMOKE_DIR=$tmp" >> "$GITHUB_ENV"^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4965455Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4965875Z env:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4966163Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4966654Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4967096Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4967505Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4967906Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:28.4968218Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:37.5661991Z Processing d:\a\aisef\aisef\dist\aisef-2.0.0-py3-none-any.whl
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:37.5963243Z Installing collected packages: aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.2563898Z Successfully installed aisef-2.0.0
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3425030Z ##[group]Run set -eu
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3425417Z ^[[36;1mset -eu^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3426250Z ^[[36;1mwant=$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version'])")^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3426961Z ^[[36;1msmoke="$GITHUB_WORKSPACE/tests/installed_smoke.py"^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3427304Z ^[[36;1mcd "$SMOKE_DIR"^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3427639Z ^[[36;1m"$SMOKE_PY" -I -c "import aisef2"^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3428027Z ^[[36;1m"$SMOKE_PY" -I "$smoke" "$want" --product^[[0m
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3441073Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3441463Z env:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3441751Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3442198Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3442700Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3443103Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3443509Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3443865Z   SMOKE_PY: /d/a/_temp/venv/Scripts/python.exe
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3444155Z   SMOKE_DIR: /d/a/_temp
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.3444378Z ##[endgroup]
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:38.9955838Z installed smoke: PASS (aisef 2.0.0)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.0407830Z Post job cleanup.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.1919900Z (node:8436) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.1921118Z (Use `node --trace-deprecation ...` to show where the warning was created)
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.2257017Z Post job cleanup.
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.4153695Z [command]"C:\Program Files\Git\bin\git.exe" version
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.4441542Z git version 2.55.0.windows.5
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.4503263Z Temporarily overriding HOME='D:\a\_temp\40d25ed5-d842-4402-9d7f-81be468e2b81' before making global git config changes
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.4504429Z Adding repository directory to the temporary git global config as a safe directory
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.4514559Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\aisef\aisef
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.4823878Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:39.5126623Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:40.0643674Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:40.0903921Z http.https://github.com/.extraheader
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:40.0947415Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:40.1256512Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:40.6519751Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:40.6820873Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:41.2379963Z Cleaning up orphan processes
+staging / install (windows-latest)	UNKNOWN STEP	2026-10-05T22:41:41.2469721Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

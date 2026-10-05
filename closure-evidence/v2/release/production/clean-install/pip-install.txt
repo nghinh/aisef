@@ -1,0 +1,7 @@
+Collecting aisef==2.0.0
+  Downloading aisef-2.0.0-py3-none-any.whl.metadata (27 kB)
+Downloading aisef-2.0.0-py3-none-any.whl (957 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 957.2/957.2 kB 8.0 MB/s  0:00:00
+Installing collected packages: aisef
+Successfully installed aisef-2.0.0
+exit 0

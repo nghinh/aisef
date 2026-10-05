@@ -1,0 +1,2 @@
+Requirement already satisfied: pip in /private/tmp/aisef-2.0.0-final-verify/lib/python3.14/site-packages (26.2.1)
+exit 0

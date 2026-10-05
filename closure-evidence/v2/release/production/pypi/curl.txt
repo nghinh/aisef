@@ -1,0 +1,2 @@
+json exit 0
+sdist exit 0 https://files.pythonhosted.org/packages/14/67/a29946884b1c2757c10fd607b5e3928451e195e42223fc7f13b2bbe17f63/aisef-2.0.0.tar.gz

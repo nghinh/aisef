@@ -1,0 +1,282 @@
+{
+ "record": "AISEF 2.0.0 production release: tag, publication to PyPI and post-publication verification (owner ruling 'FINAL RELEASE EXECUTION — AISEF 2.0.0', phases 1-6).",
+ "authority": {
+  "decision": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 3 AISEF_V2_0_PRODUCTION_PUBLISH (approver human:owner; PRODUCTION_PUBLISH AUTHORIZED, VERSION 2.0.0)",
+  "ruling": "owner FINAL RELEASE EXECUTION — AISEF 2.0.0 (2026-10-06): tag, production publication and post-publication verification autonomously; stop only on a genuine inconsistency, failed gate, artifact mismatch or publication failure"
+ },
+ "STATUS": "AISEF 2.0.0 RELEASED",
+ "PRODUCTION_PUBLISH": "COMPLETE",
+ "RELEASE_VERIFICATION": "PASS",
+ "recorded_at": "2026-10-05T23:55:26Z",
+ "version": "2.0.0",
+ "rc": {
+  "name": "V2.0-RC2",
+  "sha": "1565bccff66cda866820d5307a26de462e79e9a0",
+  "kernel_tree": "12ef35b0b25fadc318ea18cb09419693ac65fa0a",
+  "kernel_digest": "d1972a2ab89a6831c28af79ed9fda6ef207cecefe96db479dbe5f19ffb8b6a93",
+  "source_date_epoch": 1791204847,
+  "freeze_record": {
+   "path": "closure-evidence/v2/release/V2.0-RC2-FREEZE.json",
+   "sha256": "05338b7861a0f2a90ae7dca41409d1c5e953d45304c57d4ce22a1e6f63e59e21"
+  }
+ },
+ "phase_1_pre_tag": {
+  "verdict": "PASS",
+  "on": "ca2631374602da45dae75b7f6907ff4729d0b2f7",
+  "checks": {
+   "release_rc.py --check": "release candidate: PASS (HEAD's shipped files and kernel are RC2's)",
+   "v2_release_gate.py 2.0.0": "V2 release gate for 2.0.0: PASS"
+  },
+  "re_run_after_publication": {
+   "release_rc": {
+    "path": "closure-evidence/v2/release/production/recheck/recheck-release_rc.txt",
+    "sha256": "3145d7417de51c5ec523c02d283b03d81fcd911736c035d67362774bbe2c62a3"
+   },
+   "gate": {
+    "path": "closure-evidence/v2/release/production/recheck/recheck-gate.txt",
+    "sha256": "ef2b12f0bdf48625bf7721b162e26d04865cb39799aaaa660165220327ca1a18"
+   }
+  }
+ },
+ "phase_2_tag": {
+  "verdict": "PASS",
+  "tag": "v2.0.0",
+  "kind": "lightweight",
+  "commit": "ca2631374602da45dae75b7f6907ff4729d0b2f7",
+  "commit_is": "ca26313 RELEASE-DECISIONS seq 3 — RC2 1565bcc's tree outside closure-evidence/ (release_rc --check PASS)",
+  "origin": "git ls-remote: ca2631374602da45dae75b7f6907ff4729d0b2f7 refs/tags/v2.0.0",
+  "replaced_or_force_pushed": false
+ },
+ "phase_3_workflow": {
+  "verdict": "PASS",
+  "workflow": "release",
+  "run_id": 37383985011,
+  "url": "https://github.com/nghinh/aisef/actions/runs/37383985011",
+  "event": "push",
+  "head_branch": "v2.0.0",
+  "head_sha": "ca2631374602da45dae75b7f6907ff4729d0b2f7",
+  "attempt": 1,
+  "conclusion": "success",
+  "created_at": "2026-10-05T22:40:42Z",
+  "updated_at": "2026-10-05T23:49:47Z",
+  "jobs": {
+   "stable-tag": {
+    "id": 112012624181,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:46Z",
+    "completed": "2026-10-05T22:40:49Z"
+   },
+   "v2-gate": {
+    "id": 112012661957,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:52Z",
+    "completed": "2026-10-05T22:40:58Z",
+    "result": "V2 release gate for 2.0.0: PASS"
+   },
+   "staging / build": {
+    "id": 112012662124,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:53Z",
+    "completed": "2026-10-05T22:41:12Z",
+    "result": "built the frozen bytes: wheel 5e840f7b…, sdist a7a1a5fb… (SHA256SUMS)"
+   },
+   "tests / lint": {
+    "id": 112012662210,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:52Z",
+    "completed": "2026-10-05T22:41:03Z",
+    "result": "All checks passed!"
+   },
+   "tests / wheel": {
+    "id": 112012662226,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:53Z",
+    "completed": "2026-10-05T22:41:24Z"
+   },
+   "tests / unit (ubuntu-latest, 3.11)": {
+    "id": 112012662282,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:53Z",
+    "completed": "2026-10-05T23:11:54Z",
+    "result": "Ran 5454 tests in 1846.457s; OK (skipped=90)"
+   },
+   "tests / unit (ubuntu-latest, 3.12)": {
+    "id": 112012662286,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:53Z",
+    "completed": "2026-10-05T23:13:08Z",
+    "result": "Ran 5454 tests in 1922.326s; OK (skipped=90)"
+   },
+   "tests / unit (ubuntu-latest, 3.14)": {
+    "id": 112012662294,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:55Z",
+    "completed": "2026-10-05T23:16:33Z",
+    "result": "Ran 5454 tests in 2124.296s; OK (skipped=90)"
+   },
+   "tests / unit (windows-latest, 3.11)": {
+    "id": 112012662296,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:54Z",
+    "completed": "2026-10-05T23:49:19Z",
+    "result": "Ran 5451 tests in 4077.064s; OK (skipped=173)"
+   },
+   "tests / unit (ubuntu-latest, 3.13)": {
+    "id": 112012662303,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:52Z",
+    "completed": "2026-10-05T23:05:11Z",
+    "result": "Ran 5454 tests in 1447.814s; OK (skipped=90)"
+   },
+   "tests / unit (macos-latest, 3.12)": {
+    "id": 112012662340,
+    "conclusion": "success",
+    "started": "2026-10-05T22:40:59Z",
+    "completed": "2026-10-05T23:26:50Z",
+    "result": "Ran 5454 tests in 2731.386s; OK (skipped=92)"
+   },
+   "staging / install (ubuntu-latest)": {
+    "id": 112012784553,
+    "conclusion": "success",
+    "started": "2026-10-05T22:41:16Z",
+    "completed": "2026-10-05T22:41:40Z",
+    "result": "sha256sum -c OK (both files); installed smokes passed (job success)"
+   },
+   "staging / install (windows-latest)": {
+    "id": 112012784583,
+    "conclusion": "success",
+    "started": "2026-10-05T22:41:15Z",
+    "completed": "2026-10-05T22:41:43Z",
+    "result": "sha256sum -c OK (both files); installed smokes passed (job success)"
+   },
+   "publish": {
+    "id": 112034668583,
+    "conclusion": "success",
+    "started": "2026-10-05T23:49:23Z",
+    "completed": "2026-10-05T23:49:47Z",
+    "result": "sha256sum -c ../SHA256SUMS OK (both); release_rc.py --verify-dist dist: release candidate artifacts: PASS; twine check PASSED (both); uploaded both files by trusted publishing; attestations' subjects are the frozen digests"
+   }
+  },
+  "jobs_success": "14/14",
+  "retries": "none (attempt 1; no infrastructure re-run)",
+  "approval": "the pypi environment has no protection rule, so the publish job ran without a manual approval step; there was no deployment to approve (OBS-PUB-1). The controls that held: the owner's seq 3 decision, the v2-gate job, sha256sum -c against staging's SHA256SUMS and release_rc --verify-dist against the frozen digests — all PASS before the upload",
+  "run_record": {
+   "path": "closure-evidence/v2/release/production/ci/release-run-37383985011.json",
+   "sha256": "0fbe888eb7da81f6f131e263a35137fb29f6185247d31f7ba3f863ffa34d18be"
+  },
+  "job_logs": "closure-evidence/v2/release/production/ci/joblogs/ (all 14 jobs)"
+ },
+ "pypi": {
+  "project": "https://pypi.org/project/aisef/2.0.0/",
+  "files": {
+   "aisef-2.0.0-py3-none-any.whl": {
+    "sha256": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+    "upload_time": "2026-10-05T23:49:43.303777Z",
+    "yanked": false
+   },
+   "aisef-2.0.0.tar.gz": {
+    "sha256": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+    "upload_time": "2026-10-05T23:49:44.855207Z",
+    "yanked": false
+   }
+  },
+  "files_on_pypi_for_2.0.0": 2,
+  "json": {
+   "path": "closure-evidence/v2/release/production/pypi/pypi-2.0.0.json",
+   "sha256": "3758d3b33a9423a363697249990a3fb0cbf577c577fb2fb10ddcc060c9379d86"
+  }
+ },
+ "phase_4_clean_install": {
+  "verdict": "PASS",
+  "venv": "/tmp/aisef-2.0.0-final-verify (fresh; python 3.14.7, macOS)",
+  "cwd": "/tmp/aisef-2.0.0-final-verify/work (outside any repository)",
+  "install": "python -m pip install --upgrade pip; pip install --no-cache-dir aisef==2.0.0 → Successfully installed aisef-2.0.0; the venv holds exactly aisef==2.0.0 and pip",
+  "env": "CLI checks under env -i (PATH without an opencode executable, fresh HOME, no provider key); no provider or model call",
+  "aisef --version": "aisef 2.0.0 (exit 0)",
+  "aisef run --help": "the V2 runtime: --check | --verify, --project, --settings, --repo, --out (exit 0)",
+  "aisef legacy --help": "V1 only behind legacy: run, improve (exit 0)",
+  "aisef --help": "34 subcommands; run = 'run the V2 runtime (authoritative)'; legacy = 'V1 compatibility surface (legacy, never the default)' (exit 0)",
+  "aisef doctor": "ran its local checks (python, git, client binaries on PATH, docker, playwright, project files); exit 2 = EXIT_NOT_READY because the scratch directory is not a 1.x project (docs/requirements.md missing) — doctor's behaviour since v1.1.0, not a release defect (OBS-PUB-2)",
+  "package": {
+   "imports_from": [
+    "/private/tmp/aisef-2.0.0-final-verify/lib/python3.14/site-packages/aisef/__init__.py",
+    "/private/tmp/aisef-2.0.0-final-verify/lib/python3.14/site-packages/aisef2/__init__.py"
+   ],
+   "repo_local_import": false,
+   "tests_or_validation_importable": false,
+   "tests_or_validation_shipped": [],
+   "package_data": [
+    "aisef/harness/assets/render.mjs",
+    "aisef/kit/catalog.json",
+    "aisef/kit/prompts/devsecops.md",
+    "aisef/kit/prompts/mockup-screen.md",
+    "aisef/kit/prompts/story-implement.md",
+    "aisef/kit/prompts/story-review.md",
+    "aisef/kit/prompts/story-security-review.md",
+    "aisef/kit/rules/must_never.md",
+    "aisef/kit/rules/principles.md",
+    "aisef/kit/skills/aisef-mockup-html/SKILL.md"
+   ],
+   "installed_files": 406
+  },
+  "evidence": {
+   "aisef_doctor.txt": "805d241c2c786d2f1d7771fe250bd1c09f690c5f21468522ccc6b3a16ab60744",
+   "aisef_help.txt": "aff12567b6216729ed0f959c676a73023644d0af0e2b364445e57a9238492777",
+   "aisef_legacy_help.txt": "4fb822d42e5467da120e4b82db40200f786bce273d989818ecd179404fd570fb",
+   "aisef_run_help.txt": "c18a64735610dc23005ba8cebc84fa607e2057b0023f636097131d575ced7260",
+   "aisef_version.txt": "7e7c7205a54478b9fbafa9735b39867e8d9632c84f986cb8afd45a61c144e204",
+   "finished": "5fcb3ce7ab555f62cf8a17ad1e3d78ecc433b6002a51486098bd89f9594b4257",
+   "package.json": "1f03898e75d3e54a8ba5ea75ce1cedfe3730ca7a51595b056612b54da626c02c",
+   "pip-install.txt": "255aab4c6eb0c1f16ec43c9d0f3413ea1f9b0536e266dfdaff131a2d9984109c",
+   "pip-list.txt": "216be8cfccb1e446af2ccff7d1f0f788e7c25cdce4363ee4ef1256cfef00e3ef",
+   "pip-upgrade.txt": "6d8ad553b4736b93bb54efbe98d4d2b4a821d64b65897df0073d237a95946ea2",
+   "started": "04c9a7017c9b705c7f4243a72dd6494f64dd323a61b077eb7360d086fa7edfd1",
+   "venv.txt": "28d3b9e880a77975493dc7e359144c0295a4f694cfe0af4f928c22307bc5c320"
+  }
+ },
+ "phase_5_artifacts": {
+  "verdict": "PASS",
+  "dir": "/tmp/aisef-2.0.0-pypi-artifacts",
+  "how": "pip download --no-cache-dir --no-deps aisef==2.0.0 (the wheel); the sdist by its URL from https://pypi.org/pypi/aisef/2.0.0/json; full SHA-256 of both against the frozen RC2 digests, and PyPI's own reported digests",
+  "comparison": {
+   "aisef-2.0.0-py3-none-any.whl": {
+    "downloaded": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+    "pypi_reported": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+    "frozen": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+    "match": true
+   },
+   "aisef-2.0.0.tar.gz": {
+    "downloaded": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+    "pypi_reported": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+    "frozen": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+    "match": true
+   }
+  },
+  "evidence": {
+   "compare.json": "5110d14a65cea17a61eda0639964eb508627f42f466161c4f3bf534a02cb236d",
+   "curl.txt": "6dd3081ed8254f874a805303dec7d39069b8756f1579f05db09ce1d28f278e7b",
+   "finished": "7b1fadb2037bf33b365b35674d33aa37f6a47846372b3342aaee2ec0f2f19ad4",
+   "ls.txt": "17f115614b34fd2b73b2b2c4e432c70b4ac670cc58b829feb065736d37fdab73",
+   "pip-download.txt": "9058f8d8ccf77162ab8cda3bc1751b6bc1f72ebcdc5d7ae4d90873df524947a9",
+   "pypi-2.0.0.json": "3758d3b33a9423a363697249990a3fb0cbf577c577fb2fb10ddcc060c9379d86",
+   "sha256.txt": "16722ad81b8e42cdd065140193c9b90bcc6f64710a7a8788b7d67d881901d793",
+   "started": "c1b302096cf31f6909921e401de32ab0062a6654e41265e49170a9a188f4109b"
+  }
+ },
+ "scripts": {
+  "phase4.sh": "3bb18d00c6d966fc93596c655258d430a27a2e3c4d858e17356670604785c9b2",
+  "phase5.sh": "43ea46fb2fb61e88ee54f33b5e687162adad2056c5ca025d023847b3535acdec"
+ },
+ "observations": [
+  "OBS-PUB-1",
+  "OBS-PUB-2"
+ ],
+ "external_actions": {
+  "tags_pushed": 1,
+  "pypi_uploads": 2,
+  "provider_calls": 0,
+  "paid_smokes": 0,
+  "other_versions_published": 0
+ },
+ "unchanged": "no source, kernel, test, plan, workload or qualification-input change; the tagged commit is not modified (this record is a child commit on release/v2.0.0)"
+}

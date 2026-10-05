@@ -1,0 +1,33 @@
+{
+ "version": "2.0.0",
+ "aisef_file": "/private/tmp/aisef-2.0.0-final-verify/lib/python3.14/site-packages/aisef/__init__.py",
+ "aisef2_file": "/private/tmp/aisef-2.0.0-final-verify/lib/python3.14/site-packages/aisef2/__init__.py",
+ "repo_local_import": false,
+ "top_level_entries": [
+  "..",
+  "aisef",
+  "aisef-2.0.0.dist-info",
+  "aisef2"
+ ],
+ "tests_importable": false,
+ "validation_importable": false,
+ "shipped_tests_or_validation": [],
+ "package_data_non_py": [
+  "aisef/harness/assets/render.mjs",
+  "aisef/kit/catalog.json",
+  "aisef/kit/prompts/devsecops.md",
+  "aisef/kit/prompts/mockup-screen.md",
+  "aisef/kit/prompts/story-implement.md",
+  "aisef/kit/prompts/story-review.md",
+  "aisef/kit/prompts/story-security-review.md",
+  "aisef/kit/rules/must_never.md",
+  "aisef/kit/rules/principles.md",
+  "aisef/kit/skills/aisef-mockup-html/SKILL.md"
+ ],
+ "file_count": 406,
+ "sys_path0": [
+  "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python314.zip",
+  "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14",
+  "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/lib-dynload"
+ ]
+}

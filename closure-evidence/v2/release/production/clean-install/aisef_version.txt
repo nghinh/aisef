@@ -1,0 +1,3 @@
+$ aisef --version  (cwd /tmp/aisef-2.0.0-final-verify/work)
+aisef 2.0.0
+exit 0

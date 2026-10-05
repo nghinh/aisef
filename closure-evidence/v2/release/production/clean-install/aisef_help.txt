@@ -1,0 +1,60 @@
+$ aisef --help  (cwd /tmp/aisef-2.0.0-final-verify/work)
+usage: aisef [-h] [-V] [--project PROJECT]
+             {memory,setup,doctor,init,gates,status,change,baseline,doc,skill,review,approve,reject,compile,gate,guard,plan,mockup,run,legacy,verify,tool,qa,devsecops,pre-deploy,evidence,ctx,issues,report,cost,auto-approve,dashboard,closure,replay} ...
+
+AISEF — orchestrate the AI-assisted software development lifecycle
+
+positional arguments:
+  {memory,setup,doctor,init,gates,status,change,baseline,doc,skill,review,approve,reject,compile,gate,guard,plan,mockup,run,legacy,verify,tool,qa,devsecops,pre-deploy,evidence,ctx,issues,report,cost,auto-approve,dashboard,closure,replay}
+    memory              experimental scoped advisory memory (default off)
+    setup               detect stack and install skills into the project
+    doctor              check environment and prerequisites
+    init                write default .ai/config.json
+    gates               show gate status table
+    status              show story progress and cost
+    change              post-release change: record FR, stale PRD downward,
+                        generate delta stories
+    baseline            build baseline for brownfield projects: analyze
+                        existing codebase
+    doc                 look up library documentation on demand (context7,
+                        cached)
+    skill               skill registry: build, inspect, test routing
+    review              view artifact for a gate
+    approve             approve a gate
+    reject              reject a gate with a note
+    compile             generate client configuration (hooks, plugins)
+    gate                re-score story gates on recorded evidence (ADR-005 V4)
+                        — current rules, prior reviewer notes, no model calls
+    guard               run guard on a hook event (reads stdin)
+    plan                run BMAD phase chain up to the first unapproved gate
+    mockup              generate screen mockups + visual design contracts
+    run                 run the V2 runtime (authoritative); arguments go to
+                        aisef2.app.cli — see docs/v2/USAGE.md
+    legacy              V1 compatibility surface (legacy, never the default):
+                        `aisef legacy run ...`
+    verify              re-run guards on the working tree (post-check)
+    tool                run a harness tool and record evidence
+    qa                  run the test suite (unit, sit, e2e, security, ...)
+    devsecops           generate CI + Dockerfile + deployment + runbook
+    pre-deploy          score pre-deployment gate
+    evidence            look up history for a story or behaviour in the ledger
+    ctx                 code map around a story's write scope — full,
+                        untruncated (ADR-005 V7; the `repo_map` prompt slot is
+                        the capped version)
+    issues              export gap/regression table from behaviour ledger
+                        (ADR-004 R12) — for tracking, does not touch gates
+    report              generate acceptance report from evidence
+    cost                attribute spend to outcomes: net VERIFIED behaviour
+                        per dollar (per input token when the provider prices
+                        nothing), split by attempt outcome (ADR-009 O4)
+    auto-approve        auto-approve gates (records auto flag)
+    dashboard           generate conformance HTML dashboard from evidence
+    closure             score the project closure gate (read-only, no model
+                        calls)
+    replay              re-score story gates on recorded evidence
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  --project PROJECT     project directory (default: current directory)
+exit 0

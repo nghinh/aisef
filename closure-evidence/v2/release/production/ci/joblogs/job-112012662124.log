@@ -1,0 +1,1357 @@
+staging / build	UNKNOWN STEP	﻿2026-10-05T22:40:54.3840739Z Current runner version: '2.337.0'
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3857337Z ##[group]Runner Image Provisioner
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3857928Z Hosted Compute Agent
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3858337Z Version: 20260901.588
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3858738Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3859227Z Build Date: 2026-09-01T19:56:44Z
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3859641Z Worker ID: {d762add1-6366-451f-96b7-0a329f9fddd6}
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3860119Z Azure Region: westus3
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3860481Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3861391Z ##[group]Operating System
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3861802Z Ubuntu
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3862124Z 24.04.5
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3862427Z LTS
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3862818Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3863184Z ##[group]Runner Image
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3863581Z Image: ubuntu-24.04
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3863927Z Version: 20260927.320.1
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3864738Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3865628Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3866226Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3866875Z ##[group]GITHUB_TOKEN Permissions
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3868298Z Contents: read
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3868652Z Metadata: read
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3869190Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3870505Z Secret source: Actions
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3871204Z Cache mode: write
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.3871806Z Prepare workflow directory
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.4070031Z Prepare all required actions
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.4100844Z Getting action download info
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.7717397Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.8480365Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+staging / build	UNKNOWN STEP	2026-10-05T22:40:54.9397895Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1455268Z Uses: nghinh/aisef/.github/workflows/staging.yml@refs/tags/v2.0.0 (ca2631374602da45dae75b7f6907ff4729d0b2f7)
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1457903Z Complete job name: staging / build
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1931661Z ##[group]Run actions/checkout@v4
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1932139Z with:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1932415Z   repository: nghinh/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1934914Z   token: ***
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1935188Z   ssh-strict: true
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1935467Z   ssh-user: git
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1935748Z   persist-credentials: true
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1936065Z   clean: true
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1936352Z   sparse-checkout-cone-mode: true
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1936697Z   fetch-depth: 1
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1936978Z   fetch-tags: false
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1937262Z   show-progress: true
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1937548Z   lfs: false
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1937806Z   submodules: false
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1938096Z   set-safe-directory: true
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1938421Z   allow-unsafe-pr-checkout: false
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.1938828Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2616307Z Syncing repository: nghinh/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2618236Z ##[group]Getting Git version info
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2619056Z Working directory is '/home/runner/work/aisef/aisef'
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2620074Z [command]/usr/bin/git version
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2670412Z git version 2.55.0
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2684040Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2694832Z Temporarily overriding HOME='/home/runner/work/_temp/5350338c-b403-488f-bd11-533db5f579ed' before making global git config changes
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2695993Z Adding repository directory to the temporary git global config as a safe directory
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2698271Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2742999Z Deleting the contents of '/home/runner/work/aisef/aisef'
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2749982Z ##[group]Initializing the repository
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2757440Z [command]/usr/bin/git init /home/runner/work/aisef/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2865580Z hint: Using 'master' as the name for the initial branch. This default branch name
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2866993Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2868406Z hint: to use in all of your new repositories, which will suppress this warning,
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2869345Z hint: call:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2869785Z hint:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2870307Z hint: 	git config --global init.defaultBranch <name>
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2871053Z hint:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2871629Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2872624Z hint: 'development'. The just-created branch can be renamed via this command:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2873404Z hint:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2873807Z hint: 	git branch -m <name>
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2874907Z hint:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2875560Z hint: Disable this message with "git config set advice.defaultBranchName false"
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2876672Z Initialized empty Git repository in /home/runner/work/aisef/aisef/.git/
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2878440Z [command]/usr/bin/git remote add origin https://github.com/nghinh/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2916007Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2916780Z ##[group]Disabling automatic garbage collection
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2918537Z [command]/usr/bin/git config --local gc.auto 0
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2958068Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2958937Z ##[group]Setting up auth
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2959820Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.2976086Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.3289195Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.3318381Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.3490781Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.3518557Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.3700003Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.3732943Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.3733523Z ##[group]Fetching the repository
+staging / build	UNKNOWN STEP	2026-10-05T22:40:55.3739283Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ca2631374602da45dae75b7f6907ff4729d0b2f7:refs/tags/v2.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.2749105Z From https://github.com/nghinh/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.2750784Z  * [new ref]         ca2631374602da45dae75b7f6907ff4729d0b2f7 -> v2.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.2753731Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.2758280Z ##[group]Determining the checkout info
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.2759710Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.2761847Z [command]/usr/bin/git sparse-checkout disable
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.2805266Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.2832178Z ##[group]Checking out the ref
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.2833963Z [command]/usr/bin/git checkout --progress --force refs/tags/v2.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7704217Z Note: switching to 'refs/tags/v2.0.0'.
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7704614Z 
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7704853Z You are in 'detached HEAD' state. You can look around, make experimental
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7705307Z changes and commit them, and you can discard any commits you make in this
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7705757Z state without impacting any branches by switching back to a branch.
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7706174Z 
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7706402Z If you want to create a new branch to retain commits you create, you may
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7706810Z do so (now or later) by using -c with the switch command. Example:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7707433Z 
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7707551Z   git switch -c <new-branch-name>
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7707717Z 
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7707861Z Or undo this operation with:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7708017Z 
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7708114Z   git switch -
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7708274Z 
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7708479Z Turn off this advice by setting config variable advice.detachedHead to false
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7708796Z 
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7709941Z HEAD is now at ca26313 RELEASE-DECISIONS seq 3: the owner's production-publish authorization for AISEF 2.0.0 (charter §19) — approver human:owner, decision {PRODUCTION_PUBLISH: AUTHORIZED, VERSION: 2.0.0}, on the frozen and qualified RC2 1565bcc. Decision record only.
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7767239Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7806863Z [command]/usr/bin/git log -1 --format=%H
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.7829364Z ca2631374602da45dae75b7f6907ff4729d0b2f7
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8082071Z ##[group]Run actions/setup-python@v5
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8082270Z with:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8082443Z   python-version: 3.12
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8082608Z   check-latest: false
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8083929Z   token: ***
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8084076Z   update-environment: true
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8084242Z   allow-prereleases: false
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8084426Z   freethreaded: false
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8084577Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8896314Z ##[group]Installed versions
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8960764Z (node:2195) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8961634Z (Use `node --trace-deprecation ...` to show where the warning was created)
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8962058Z Successfully set up CPython (3.12.14)
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.8962527Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9081350Z ##[group]Run python -m pip install build twine
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9081657Z ^[[36;1mpython -m pip install build twine^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9340361Z shell: /usr/bin/bash -e {0}
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9340591Z env:
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9340801Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9341288Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9341558Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9341799Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9342040Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9342281Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+staging / build	UNKNOWN STEP	2026-10-05T22:40:59.9342494Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.6549444Z Collecting build
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.7117115Z   Downloading build-1.6.1-py3-none-any.whl.metadata (5.6 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.7328326Z Collecting twine
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.7425603Z   Downloading twine-7.0.0-py3-none-any.whl.metadata (3.5 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.7607593Z Collecting packaging>=24.0 (from build)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.7704540Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.7845917Z Collecting pyproject_hooks (from build)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.7941449Z   Downloading pyproject_hooks-1.3.3-py3-none-any.whl.metadata (1.3 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.8208020Z Collecting readme-renderer>=35.0 (from twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.8303432Z   Downloading readme_renderer-46.0-py3-none-any.whl.metadata (3.0 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.8681105Z Collecting requests>=2.20 (from twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.8776713Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.9090598Z Collecting requests-toolbelt!=0.9.0,>=0.8.0 (from twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.9185727Z   Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl.metadata (14 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.9602431Z Collecting urllib3>=1.26.0 (from twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:00.9702200Z   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.0180000Z Collecting keyring>=21.2.0 (from twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.0280234Z   Downloading keyring-25.7.0-py3-none-any.whl.metadata (21 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.0780079Z Collecting rfc3986>=1.4.0 (from twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.0885995Z   Downloading rfc3986-2.0.0-py2.py3-none-any.whl.metadata (6.6 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.1297040Z Collecting rich>=14.3.3 (from twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.1393408Z   Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.1759767Z Collecting id (from twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.1856362Z   Downloading id-1.6.1-py3-none-any.whl.metadata (5.1 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.2008971Z Collecting SecretStorage>=3.2 (from keyring>=21.2.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.2108608Z   Downloading secretstorage-3.5.0-py3-none-any.whl.metadata (4.0 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.2254090Z Collecting jeepney>=0.4.2 (from keyring>=21.2.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.2397613Z   Downloading jeepney-0.9.0-py3-none-any.whl.metadata (1.2 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.2546741Z Collecting jaraco.classes (from keyring>=21.2.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.2642681Z   Downloading jaraco.classes-3.4.0-py3-none-any.whl.metadata (2.6 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.2811874Z Collecting jaraco.functools (from keyring>=21.2.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.2907560Z   Downloading jaraco_functools-4.6.0-py3-none-any.whl.metadata (2.9 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.3059869Z Collecting jaraco.context (from keyring>=21.2.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.3155976Z   Downloading jaraco_context-6.1.2-py3-none-any.whl.metadata (4.2 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.3503537Z Collecting nh3>=0.2.14 (from readme-renderer>=35.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.3599986Z   Downloading nh3-0.3.7-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.0 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.3808986Z Collecting docutils>=0.21.2 (from readme-renderer>=35.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.3904310Z   Downloading docutils-0.23-py3-none-any.whl.metadata (15 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.4091732Z Collecting Pygments>=2.5.1 (from readme-renderer>=35.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.4188729Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.5012237Z Collecting charset_normalizer<4,>=2 (from requests>=2.20->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.5107849Z   Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.5311436Z Collecting idna<4,>=2.5 (from requests>=2.20->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.5407592Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.5595558Z Collecting certifi>=2023.5.7 (from requests>=2.20->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.5691380Z   Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.5875646Z Collecting markdown-it-py>=2.2.0 (from rich>=14.3.3->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.5972788Z   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.6137132Z Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=14.3.3->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.6237379Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.7289409Z Collecting cryptography>=2.0 (from SecretStorage>=3.2->keyring>=21.2.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.7387955Z   Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.4 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.7966701Z Collecting cffi>=2.0.0 (from cryptography>=2.0->SecretStorage>=3.2->keyring>=21.2.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.8063760Z   Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.8209907Z Collecting pycparser (from cffi>=2.0.0->cryptography>=2.0->SecretStorage>=3.2->keyring>=21.2.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.8304536Z   Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.8491256Z Collecting more-itertools (from jaraco.classes->keyring>=21.2.0->twine)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.8586662Z   Downloading more_itertools-11.1.0-py3-none-any.whl.metadata (41 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.8732559Z Downloading build-1.6.1-py3-none-any.whl (31 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.8848594Z Downloading twine-7.0.0-py3-none-any.whl (43 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.8973263Z Downloading keyring-25.7.0-py3-none-any.whl (39 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.9089513Z Downloading jeepney-0.9.0-py3-none-any.whl (49 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.9214083Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.9414276Z Downloading readme_renderer-46.0-py3-none-any.whl (14 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.9526155Z Downloading docutils-0.23-py3-none-any.whl (634 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.9745738Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 634.7/634.7 kB 34.7 MB/s  0:00:00
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.9842322Z Downloading nh3-0.3.7-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (832 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:01.9971484Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 832.2/832.2 kB 52.6 MB/s  0:00:00
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.0066832Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.0191467Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 88.7 MB/s  0:00:00
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.0285842Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.0399196Z Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (257 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.0511259Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.0626627Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.0741454Z Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.0907607Z Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.1018478Z Downloading rfc3986-2.0.0-py2.py3-none-any.whl (31 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.1128943Z Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.1245547Z Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.1356355Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.1466243Z Downloading secretstorage-3.5.0-py3-none-any.whl (15 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.1576313Z Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl (4.8 MB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.1956341Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.8/4.8 MB 123.4 MB/s  0:00:00
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.2053667Z Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.2166600Z Downloading id-1.6.1-py3-none-any.whl (14 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.2283665Z Downloading jaraco.classes-3.4.0-py3-none-any.whl (6.8 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.2395434Z Downloading jaraco_context-6.1.2-py3-none-any.whl (7.9 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.2506685Z Downloading jaraco_functools-4.6.0-py3-none-any.whl (11 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.2615885Z Downloading more_itertools-11.1.0-py3-none-any.whl (72 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.2726566Z Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.2840298Z Downloading pyproject_hooks-1.3.3-py3-none-any.whl (10 kB)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:02.3769350Z Installing collected packages: urllib3, rfc3986, pyproject_hooks, Pygments, pycparser, packaging, nh3, more-itertools, mdurl, jeepney, jaraco.context, idna, docutils, charset_normalizer, certifi, requests, readme-renderer, markdown-it-py, jaraco.functools, jaraco.classes, id, cffi, build, rich, requests-toolbelt, cryptography, SecretStorage, keyring, twine
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.7701625Z 
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.7719078Z Successfully installed Pygments-2.21.0 SecretStorage-3.5.0 build-1.6.1 certifi-2026.7.22 cffi-2.1.1 charset_normalizer-3.5.2 cryptography-50.0.2 docutils-0.23 id-1.6.1 idna-3.20 jaraco.classes-3.4.0 jaraco.context-6.1.2 jaraco.functools-4.6.0 jeepney-0.9.0 keyring-25.7.0 markdown-it-py-4.2.0 mdurl-0.1.2 more-itertools-11.1.0 nh3-0.3.7 packaging-26.3 pycparser-3.0 pyproject_hooks-1.3.3 readme-renderer-46.0 requests-2.34.2 requests-toolbelt-1.0.0 rfc3986-2.0.0 rich-15.0.0 twine-7.0.0 urllib3-2.8.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8318576Z ##[group]Run set -eu
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8318758Z ^[[36;1mset -eu^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8319053Z ^[[36;1mexport SOURCE_DATE_EPOCH="$(python -P validation/qualification/release_rc.py --epoch)"   # the frozen RC's once frozen^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8319378Z ^[[36;1mpython -m build^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8319570Z ^[[36;1mpython -P validation/qualification/repro_dist.py dist/*.tar.gz^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8373469Z shell: /usr/bin/bash -e {0}
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8373619Z env:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8373778Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8374027Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8374265Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8374481Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8374698Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8374938Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.8375127Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:41:03.9850386Z * Creating isolated environment: venv+pip...
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.0063699Z * Installing packages in isolated environment:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.0064006Z   - setuptools==84.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.5579162Z * Getting build dependencies for sdist...
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8586632Z running egg_info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8594882Z creating aisef.egg-info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8596175Z writing aisef.egg-info/PKG-INFO
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8599209Z writing dependency_links to aisef.egg-info/dependency_links.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8601286Z writing entry points to aisef.egg-info/entry_points.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8602782Z writing top-level names to aisef.egg-info/top_level.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8603476Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8662488Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8663446Z reading manifest template 'MANIFEST.in'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8677792Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8865676Z * Installed build dependency versions:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8866038Z   - setuptools==84.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.8866251Z * Building sdist...
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.9888333Z running sdist
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.9888594Z running egg_info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.9903257Z writing aisef.egg-info/PKG-INFO
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.9907196Z writing dependency_links to aisef.egg-info/dependency_links.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.9909313Z writing entry points to aisef.egg-info/entry_points.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.9911233Z writing top-level names to aisef.egg-info/top_level.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.9970854Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:04.9984709Z reading manifest template 'MANIFEST.in'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0002433Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0005184Z running check
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0022961Z creating aisef-2.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0025828Z creating aisef-2.0.0/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0026565Z creating aisef-2.0.0/aisef.egg-info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0027226Z creating aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0027812Z creating aisef-2.0.0/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0028469Z creating aisef-2.0.0/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0029028Z creating aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0029612Z creating aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0030360Z creating aisef-2.0.0/aisef/harness/assets
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0030897Z creating aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0031673Z creating aisef-2.0.0/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0032250Z creating aisef-2.0.0/aisef/kit/rules
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0032896Z creating aisef-2.0.0/aisef/kit/skills/aisef-mockup-html
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0033920Z creating aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0034453Z creating aisef-2.0.0/aisef2
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0035028Z creating aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0035598Z creating aisef-2.0.0/aisef2/arch
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0036466Z creating aisef-2.0.0/aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0036759Z creating aisef-2.0.0/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0037334Z creating aisef-2.0.0/aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0037870Z creating aisef-2.0.0/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0038445Z creating aisef-2.0.0/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0038973Z creating aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0039510Z creating aisef-2.0.0/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0040055Z creating aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0040606Z creating aisef-2.0.0/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0041319Z creating aisef-2.0.0/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0041935Z creating aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0042423Z copying files to aisef-2.0.0...
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0042835Z copying MANIFEST.in -> aisef-2.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0044029Z copying README.md -> aisef-2.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0045035Z copying pyproject.toml -> aisef-2.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0045673Z copying aisef/__init__.py -> aisef-2.0.0/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0046442Z copying aisef/__main__.py -> aisef-2.0.0/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0047087Z copying aisef/_compat.py -> aisef-2.0.0/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0047854Z copying aisef/config.py -> aisef-2.0.0/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0048744Z copying aisef/memory.py -> aisef-2.0.0/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0049611Z copying aisef/memory_bench.py -> aisef-2.0.0/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0050493Z copying aisef.egg-info/PKG-INFO -> aisef-2.0.0/aisef.egg-info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0051360Z copying aisef.egg-info/SOURCES.txt -> aisef-2.0.0/aisef.egg-info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0052117Z copying aisef.egg-info/dependency_links.txt -> aisef-2.0.0/aisef.egg-info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0052777Z copying aisef.egg-info/entry_points.txt -> aisef-2.0.0/aisef.egg-info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0053496Z copying aisef.egg-info/top_level.txt -> aisef-2.0.0/aisef.egg-info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0054115Z copying aisef/cli/__init__.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0054891Z copying aisef/cli/__main__.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0055587Z copying aisef/cli/_common.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0056320Z copying aisef/cli/closure.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0056986Z copying aisef/cli/dashboard.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0057796Z copying aisef/cli/doctor.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0058585Z copying aisef/cli/harness.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0059389Z copying aisef/cli/implement.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0060215Z copying aisef/cli/memory.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0060849Z copying aisef/cli/parser.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0061849Z copying aisef/cli/plan.py -> aisef-2.0.0/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0062642Z copying aisef/clients/__init__.py -> aisef-2.0.0/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0063197Z copying aisef/clients/base.py -> aisef-2.0.0/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0064080Z copying aisef/clients/claude_code.py -> aisef-2.0.0/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0064796Z copying aisef/clients/compile.py -> aisef-2.0.0/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0065565Z copying aisef/clients/opencode.py -> aisef-2.0.0/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0066283Z copying aisef/clients/stream.py -> aisef-2.0.0/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0067080Z copying aisef/clients/synthetic.py -> aisef-2.0.0/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0067859Z copying aisef/codebase/__init__.py -> aisef-2.0.0/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0068492Z copying aisef/codebase/baseline.py -> aisef-2.0.0/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0069239Z copying aisef/codebase/basic.py -> aisef-2.0.0/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0069881Z copying aisef/codebase/detect.py -> aisef-2.0.0/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0070672Z copying aisef/codebase/graphify.py -> aisef-2.0.0/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0071391Z copying aisef/codebase/provider.py -> aisef-2.0.0/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0072355Z copying aisef/control/__init__.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0073439Z copying aisef/control/acceptance.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0074242Z copying aisef/control/approvals.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0075500Z copying aisef/control/attribution.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0076369Z copying aisef/control/bmad_status.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0077162Z copying aisef/control/budget.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0078137Z copying aisef/control/change.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0079033Z copying aisef/control/closure.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0080542Z copying aisef/control/cohort.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0081515Z copying aisef/control/complexity.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0082501Z copying aisef/control/conformance.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0083361Z copying aisef/control/defects.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0084219Z copying aisef/control/design_contract.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0085015Z copying aisef/control/experience.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0085954Z copying aisef/control/findings.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0086806Z copying aisef/control/gate.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0111571Z copying aisef/control/identity.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0111944Z copying aisef/control/impact.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0112299Z copying aisef/control/invariants.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0112661Z copying aisef/control/journal.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0112986Z copying aisef/control/ledger.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0113327Z copying aisef/control/machine_gate.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0113631Z copying aisef/control/normalize.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0113937Z copying aisef/control/obligation.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0114278Z copying aisef/control/onboarding.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0114611Z copying aisef/control/outcome.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0114941Z copying aisef/control/planes.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0115280Z copying aisef/control/preflight.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0115623Z copying aisef/control/proof.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0115966Z copying aisef/control/qualification.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0116327Z copying aisef/control/replay.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0116671Z copying aisef/control/replay_manifest.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0117049Z copying aisef/control/reviewer_qual.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0117396Z copying aisef/control/scheduler.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0117749Z copying aisef/control/security.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0118076Z copying aisef/control/state.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0118387Z copying aisef/control/tdd.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0118702Z copying aisef/control/worktree.py -> aisef-2.0.0/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0119032Z copying aisef/harness/__init__.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0119353Z copying aisef/harness/aria.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0119672Z copying aisef/harness/browser.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0120016Z copying aisef/harness/capabilities.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0120364Z copying aisef/harness/context.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0120703Z copying aisef/harness/guardrails.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0121142Z copying aisef/harness/mockup_map.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0121667Z copying aisef/harness/mockup_verify.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0121906Z copying aisef/harness/observe.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0122243Z copying aisef/harness/ownership.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0122591Z copying aisef/harness/process_owner.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0122938Z copying aisef/harness/prompts.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0123341Z copying aisef/harness/routing.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0123669Z copying aisef/harness/runlog.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0124000Z copying aisef/harness/sandbox.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0124261Z copying aisef/harness/server_identity.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0124573Z copying aisef/harness/testlog.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0124892Z copying aisef/harness/tools.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0125229Z copying aisef/harness/verify_image.py -> aisef-2.0.0/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0125529Z copying aisef/harness/assets/render.mjs -> aisef-2.0.0/aisef/harness/assets
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0125857Z copying aisef/kit/__init__.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0126155Z copying aisef/kit/catalog.json -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0126446Z copying aisef/kit/catalog.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0126684Z copying aisef/kit/constitution.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0126987Z copying aisef/kit/detect_stack.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0127280Z copying aisef/kit/docs.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0127554Z copying aisef/kit/fetch.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0127791Z copying aisef/kit/install.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0128086Z copying aisef/kit/registry.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0128374Z copying aisef/kit/router.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0128699Z copying aisef/kit/security_filter.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0128967Z copying aisef/kit/skill_scan.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0129267Z copying aisef/kit/skills.py -> aisef-2.0.0/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0130216Z copying aisef/kit/prompts/devsecops.md -> aisef-2.0.0/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0131240Z copying aisef/kit/prompts/mockup-screen.md -> aisef-2.0.0/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0132416Z copying aisef/kit/prompts/story-implement.md -> aisef-2.0.0/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0133710Z copying aisef/kit/prompts/story-review.md -> aisef-2.0.0/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0134840Z copying aisef/kit/prompts/story-security-review.md -> aisef-2.0.0/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0135730Z copying aisef/kit/rules/must_never.md -> aisef-2.0.0/aisef/kit/rules
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0136559Z copying aisef/kit/rules/principles.md -> aisef-2.0.0/aisef/kit/rules
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0137443Z copying aisef/kit/skills/aisef-mockup-html/SKILL.md -> aisef-2.0.0/aisef/kit/skills/aisef-mockup-html
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0138202Z copying aisef/phases/__init__.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0139103Z copying aisef/phases/deploy.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0140026Z copying aisef/phases/implement.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0142111Z copying aisef/phases/improve.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0143084Z copying aisef/phases/mockup.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0144034Z copying aisef/phases/plan.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0144970Z copying aisef/phases/qa.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0145965Z copying aisef/phases/report.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0146835Z copying aisef/phases/run.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0147890Z copying aisef/phases/story_split.py -> aisef-2.0.0/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0148737Z copying aisef2/__init__.py -> aisef-2.0.0/aisef2
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0149678Z copying aisef2/errors.py -> aisef-2.0.0/aisef2
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0150406Z copying aisef2/app/__init__.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0151272Z copying aisef2/app/adapters.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0152200Z copying aisef2/app/bundle.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0153039Z copying aisef2/app/calibrations.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0153831Z copying aisef2/app/cli.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0154620Z copying aisef2/app/client.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0155466Z copying aisef2/app/feedback.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0156270Z copying aisef2/app/preflight.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0157058Z copying aisef2/app/run.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0157955Z copying aisef2/app/settings.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0158788Z copying aisef2/app/verify.py -> aisef-2.0.0/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0159597Z copying aisef2/arch/__init__.py -> aisef-2.0.0/aisef2/arch
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0160354Z copying aisef2/arch/enums.py -> aisef-2.0.0/aisef2/arch
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0161216Z copying aisef2/cohort/__init__.py -> aisef-2.0.0/aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0162076Z copying aisef2/cohort/lifecycle.py -> aisef-2.0.0/aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0162977Z copying aisef2/cohort/preregistration.py -> aisef-2.0.0/aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0163831Z copying aisef2/control/__init__.py -> aisef-2.0.0/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0164602Z copying aisef2/control/budget.py -> aisef-2.0.0/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0165375Z copying aisef2/control/owner.py -> aisef-2.0.0/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0166217Z copying aisef2/control/routing.py -> aisef-2.0.0/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0167052Z copying aisef2/invariants/__init__.py -> aisef-2.0.0/aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0167847Z copying aisef2/invariants/evidence.py -> aisef-2.0.0/aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0168600Z copying aisef2/invariants/registry.py -> aisef-2.0.0/aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0169469Z copying aisef2/journal/__init__.py -> aisef-2.0.0/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0170242Z copying aisef2/journal/compat.py -> aisef-2.0.0/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0171122Z copying aisef2/journal/event.py -> aisef-2.0.0/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0171955Z copying aisef2/journal/fold.py -> aisef-2.0.0/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0172780Z copying aisef2/journal/format2.py -> aisef-2.0.0/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0173649Z copying aisef2/journal/format3.py -> aisef-2.0.0/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0174567Z copying aisef2/journal/writer.py -> aisef-2.0.0/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0175467Z copying aisef2/journal/projections/__init__.py -> aisef-2.0.0/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0176331Z copying aisef2/journal/projections/budgets.py -> aisef-2.0.0/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0177169Z copying aisef2/journal/projections/failure_owner.py -> aisef-2.0.0/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0177990Z copying aisef2/journal/projections/qualification_counters.py -> aisef-2.0.0/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0178736Z copying aisef2/journal/projections/retry_target.py -> aisef-2.0.0/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0179510Z copying aisef2/journal/projections/story_state.py -> aisef-2.0.0/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0180283Z copying aisef2/journal/projections/terminal_state.py -> aisef-2.0.0/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0181105Z copying aisef2/orchestrate/__init__.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0181897Z copying aisef2/orchestrate/adapters.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0182666Z copying aisef2/orchestrate/gate.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0183443Z copying aisef2/orchestrate/merge.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0184302Z copying aisef2/orchestrate/proof.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0184989Z copying aisef2/orchestrate/quality.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0185764Z copying aisef2/orchestrate/review.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0186527Z copying aisef2/orchestrate/seam.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0187307Z copying aisef2/orchestrate/security.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0191549Z copying aisef2/orchestrate/story_runner.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0191974Z copying aisef2/orchestrate/workspace.py -> aisef-2.0.0/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0192304Z copying aisef2/plan/__init__.py -> aisef-2.0.0/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0192611Z copying aisef2/plan/drift.py -> aisef-2.0.0/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0192924Z copying aisef2/plan/obligation.py -> aisef-2.0.0/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0193269Z copying aisef2/plan/static_admission.py -> aisef-2.0.0/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0193626Z copying aisef2/plan/story_admission.py -> aisef-2.0.0/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0193958Z copying aisef2/probe/__init__.py -> aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0194291Z copying aisef2/probe/calibration.py -> aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0194628Z copying aisef2/probe/catalog.py -> aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0195332Z copying aisef2/probe/cli_invocation.py -> aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0196376Z copying aisef2/probe/file_artifact.py -> aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0197162Z copying aisef2/probe/process_effect.py -> aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0198042Z copying aisef2/probe/protocol.py -> aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0198850Z copying aisef2/probe/python_callable.py -> aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0199658Z copying aisef2/probe/python_callable_v2.py -> aisef-2.0.0/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0200490Z copying aisef2/product/__init__.py -> aisef-2.0.0/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0201203Z copying aisef2/product/approval.py -> aisef-2.0.0/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0202055Z copying aisef2/product/compiler.py -> aisef-2.0.0/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0202684Z copying aisef2/product/contract.py -> aisef-2.0.0/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0203470Z copying aisef2/product/outcome.py -> aisef-2.0.0/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0204107Z copying aisef2/product/spec.py -> aisef-2.0.0/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0204840Z copying aisef2/quality/__init__.py -> aisef-2.0.0/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0205449Z copying aisef2/quality/adequacy.py -> aisef-2.0.0/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0206238Z copying aisef2/quality/relevance.py -> aisef-2.0.0/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0206997Z copying aisef2/quality/test_execution.py -> aisef-2.0.0/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0207798Z copying aisef2/quality/vacuity.py -> aisef-2.0.0/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0208572Z copying aisef2/runtime/__init__.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0209133Z copying aisef2/runtime/capability.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0209877Z copying aisef2/runtime/process_range.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0210611Z copying aisef2/runtime/range_anchor.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0211476Z copying aisef2/runtime/repair.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0212151Z copying aisef2/runtime/run_scope.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0227781Z copying aisef2/runtime/runspec.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0228149Z copying aisef2/runtime/sentinel.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0228534Z copying aisef2/runtime/story_scope.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0228885Z copying aisef2/runtime/tool.py -> aisef-2.0.0/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0229179Z Writing aisef-2.0.0/setup.cfg
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.0229341Z Creating tar archive
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.1999003Z removing 'aisef-2.0.0' (and everything under it)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.2863827Z * Building wheel from sdist
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.2977132Z * Creating isolated environment: venv+pip...
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.2989894Z * Installing packages in isolated environment:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.2990187Z   - setuptools==84.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.7130456Z * Getting build dependencies for wheel...
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.9875225Z running egg_info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.9882761Z writing aisef.egg-info/PKG-INFO
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.9886521Z writing dependency_links to aisef.egg-info/dependency_links.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.9888795Z writing entry points to aisef.egg-info/entry_points.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.9890493Z writing top-level names to aisef.egg-info/top_level.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.9946183Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.9960793Z reading manifest template 'MANIFEST.in'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.9963307Z no previously-included directories found matching 'tests'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:05.9978990Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.0164894Z * Installed build dependency versions:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.0165123Z   - setuptools==84.0.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.0165263Z * Building wheel...
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1110912Z running bdist_wheel
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1140689Z running build
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1140884Z running build_py
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1149509Z creating build/lib/aisef2
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1151240Z copying aisef2/errors.py -> build/lib/aisef2
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1152997Z copying aisef2/__init__.py -> build/lib/aisef2
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1154970Z creating build/lib/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1155804Z copying aisef/__main__.py -> build/lib/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1157086Z copying aisef/config.py -> build/lib/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1158382Z copying aisef/memory.py -> build/lib/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1159678Z copying aisef/__init__.py -> build/lib/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1160703Z copying aisef/_compat.py -> build/lib/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1161993Z copying aisef/memory_bench.py -> build/lib/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1163797Z creating build/lib/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1164565Z copying aisef2/control/budget.py -> build/lib/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1165681Z copying aisef2/control/routing.py -> build/lib/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1166810Z copying aisef2/control/owner.py -> build/lib/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1167904Z copying aisef2/control/__init__.py -> build/lib/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1169632Z creating build/lib/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1170381Z copying aisef2/journal/format2.py -> build/lib/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1171802Z copying aisef2/journal/writer.py -> build/lib/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1172897Z copying aisef2/journal/compat.py -> build/lib/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1173855Z copying aisef2/journal/fold.py -> build/lib/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1174858Z copying aisef2/journal/format3.py -> build/lib/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1176042Z copying aisef2/journal/__init__.py -> build/lib/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1177011Z copying aisef2/journal/event.py -> build/lib/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1179026Z creating build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1179814Z copying aisef2/probe/process_effect.py -> build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1181401Z copying aisef2/probe/calibration.py -> build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1182481Z copying aisef2/probe/file_artifact.py -> build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1183628Z copying aisef2/probe/protocol.py -> build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1184725Z copying aisef2/probe/cli_invocation.py -> build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1186075Z copying aisef2/probe/python_callable_v2.py -> build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1187243Z copying aisef2/probe/__init__.py -> build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1188141Z copying aisef2/probe/python_callable.py -> build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1189233Z copying aisef2/probe/catalog.py -> build/lib/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1191122Z creating build/lib/aisef2/arch
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1191763Z copying aisef2/arch/__init__.py -> build/lib/aisef2/arch
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1192897Z copying aisef2/arch/enums.py -> build/lib/aisef2/arch
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1194467Z creating build/lib/aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1195205Z copying aisef2/invariants/registry.py -> build/lib/aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1196442Z copying aisef2/invariants/evidence.py -> build/lib/aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1197492Z copying aisef2/invariants/__init__.py -> build/lib/aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1199349Z creating build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1200076Z copying aisef2/app/preflight.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1201337Z copying aisef2/app/bundle.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1202397Z copying aisef2/app/cli.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1203438Z copying aisef2/app/adapters.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1204438Z copying aisef2/app/feedback.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1205440Z copying aisef2/app/calibrations.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1206407Z copying aisef2/app/run.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1207574Z copying aisef2/app/verify.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1208532Z copying aisef2/app/client.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1209582Z copying aisef2/app/__init__.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1210547Z copying aisef2/app/settings.py -> build/lib/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1212330Z creating build/lib/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1213101Z copying aisef2/plan/story_admission.py -> build/lib/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1214262Z copying aisef2/plan/static_admission.py -> build/lib/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1215385Z copying aisef2/plan/obligation.py -> build/lib/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1216425Z copying aisef2/plan/drift.py -> build/lib/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1217478Z copying aisef2/plan/__init__.py -> build/lib/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1219055Z creating build/lib/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1219793Z copying aisef2/product/compiler.py -> build/lib/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1220845Z copying aisef2/product/spec.py -> build/lib/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1221988Z copying aisef2/product/outcome.py -> build/lib/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1223004Z copying aisef2/product/approval.py -> build/lib/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1224089Z copying aisef2/product/contract.py -> build/lib/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1225098Z copying aisef2/product/__init__.py -> build/lib/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1226598Z creating build/lib/aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1227366Z copying aisef2/cohort/preregistration.py -> build/lib/aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1228503Z copying aisef2/cohort/lifecycle.py -> build/lib/aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1229567Z copying aisef2/cohort/__init__.py -> build/lib/aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1231564Z creating build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1232337Z copying aisef2/runtime/capability.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1233536Z copying aisef2/runtime/repair.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1234556Z copying aisef2/runtime/sentinel.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1235584Z copying aisef2/runtime/runspec.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1236580Z copying aisef2/runtime/range_anchor.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1237576Z copying aisef2/runtime/process_range.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1238677Z copying aisef2/runtime/run_scope.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1239738Z copying aisef2/runtime/tool.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1240735Z copying aisef2/runtime/__init__.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1241762Z copying aisef2/runtime/story_scope.py -> build/lib/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1243778Z creating build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1244681Z copying aisef2/orchestrate/quality.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1245657Z copying aisef2/orchestrate/adapters.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1246703Z copying aisef2/orchestrate/workspace.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1247774Z copying aisef2/orchestrate/proof.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1248764Z copying aisef2/orchestrate/review.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1249737Z copying aisef2/orchestrate/gate.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1250774Z copying aisef2/orchestrate/security.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1251878Z copying aisef2/orchestrate/merge.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1252891Z copying aisef2/orchestrate/story_runner.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1253991Z copying aisef2/orchestrate/seam.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1254971Z copying aisef2/orchestrate/__init__.py -> build/lib/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1256673Z creating build/lib/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1257426Z copying aisef2/quality/test_execution.py -> build/lib/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1258650Z copying aisef2/quality/vacuity.py -> build/lib/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1259722Z copying aisef2/quality/__init__.py -> build/lib/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1260704Z copying aisef2/quality/relevance.py -> build/lib/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1261892Z copying aisef2/quality/adequacy.py -> build/lib/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1263785Z creating build/lib/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1264645Z copying aisef2/journal/projections/retry_target.py -> build/lib/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1265775Z copying aisef2/journal/projections/qualification_counters.py -> build/lib/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1266743Z copying aisef2/journal/projections/budgets.py -> build/lib/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1267825Z copying aisef2/journal/projections/failure_owner.py -> build/lib/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1268858Z copying aisef2/journal/projections/story_state.py -> build/lib/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1269836Z copying aisef2/journal/projections/__init__.py -> build/lib/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1270844Z copying aisef2/journal/projections/terminal_state.py -> build/lib/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1274368Z creating build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1275098Z copying aisef/control/preflight.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1276536Z copying aisef/control/invariants.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1277814Z copying aisef/control/closure.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1279456Z copying aisef/control/design_contract.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1280485Z copying aisef/control/acceptance.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1281723Z copying aisef/control/conformance.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1282812Z copying aisef/control/outcome.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1283833Z copying aisef/control/replay.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1284877Z copying aisef/control/budget.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1285923Z copying aisef/control/approvals.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1287024Z copying aisef/control/worktree.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1288320Z copying aisef/control/findings.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1289443Z copying aisef/control/impact.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1290519Z copying aisef/control/proof.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1291884Z copying aisef/control/journal.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1292978Z copying aisef/control/identity.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1294021Z copying aisef/control/tdd.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1295142Z copying aisef/control/gate.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1296713Z copying aisef/control/machine_gate.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1297791Z copying aisef/control/defects.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1298853Z copying aisef/control/security.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1299879Z copying aisef/control/normalize.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1301453Z copying aisef/control/complexity.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1302486Z copying aisef/control/cohort.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1303607Z copying aisef/control/onboarding.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1304623Z copying aisef/control/state.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1305827Z copying aisef/control/qualification.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1306946Z copying aisef/control/experience.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1308084Z copying aisef/control/replay_manifest.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1309113Z copying aisef/control/planes.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1310142Z copying aisef/control/obligation.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1311246Z copying aisef/control/scheduler.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1312364Z copying aisef/control/ledger.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1313562Z copying aisef/control/__init__.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1314417Z copying aisef/control/change.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1315449Z copying aisef/control/reviewer_qual.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1316900Z copying aisef/control/attribution.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1317895Z copying aisef/control/bmad_status.py -> build/lib/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1320030Z creating build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1320650Z copying aisef/phases/deploy.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1322334Z copying aisef/phases/implement.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1324389Z copying aisef/phases/story_split.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1325367Z copying aisef/phases/improve.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1326842Z copying aisef/phases/run.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1328237Z copying aisef/phases/report.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1329285Z copying aisef/phases/mockup.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1330444Z copying aisef/phases/plan.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1331706Z copying aisef/phases/__init__.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1332708Z copying aisef/phases/qa.py -> build/lib/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1334748Z creating build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1335471Z copying aisef/cli/closure.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1336790Z copying aisef/cli/parser.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1338124Z copying aisef/cli/__main__.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1339126Z copying aisef/cli/implement.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1340462Z copying aisef/cli/dashboard.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1341785Z copying aisef/cli/_common.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1342825Z copying aisef/cli/doctor.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1344105Z copying aisef/cli/harness.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1345298Z copying aisef/cli/memory.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1346259Z copying aisef/cli/plan.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1347539Z copying aisef/cli/__init__.py -> build/lib/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1349628Z creating build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1350214Z copying aisef/kit/registry.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1351652Z copying aisef/kit/install.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1352825Z copying aisef/kit/skills.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1353903Z copying aisef/kit/router.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1354835Z copying aisef/kit/fetch.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1355892Z copying aisef/kit/security_filter.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1356913Z copying aisef/kit/constitution.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1357966Z copying aisef/kit/skill_scan.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1358970Z copying aisef/kit/docs.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1359929Z copying aisef/kit/__init__.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1360887Z copying aisef/kit/detect_stack.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1362036Z copying aisef/kit/catalog.py -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1364416Z creating build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1365019Z copying aisef/harness/testlog.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1366567Z copying aisef/harness/process_owner.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1367632Z copying aisef/harness/browser.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1368717Z copying aisef/harness/tools.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1369985Z copying aisef/harness/capabilities.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1371165Z copying aisef/harness/ownership.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1372203Z copying aisef/harness/prompts.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1373200Z copying aisef/harness/runlog.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1374155Z copying aisef/harness/mockup_map.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1375140Z copying aisef/harness/verify_image.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1376261Z copying aisef/harness/observe.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1377346Z copying aisef/harness/routing.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1378335Z copying aisef/harness/sandbox.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1379585Z copying aisef/harness/server_identity.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1380519Z copying aisef/harness/mockup_verify.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1381766Z copying aisef/harness/context.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1382826Z copying aisef/harness/aria.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1383912Z copying aisef/harness/__init__.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1384777Z copying aisef/harness/guardrails.py -> build/lib/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1386897Z creating build/lib/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1387508Z copying aisef/clients/stream.py -> build/lib/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1388977Z copying aisef/clients/opencode.py -> build/lib/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1390054Z copying aisef/clients/compile.py -> build/lib/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1391242Z copying aisef/clients/__init__.py -> build/lib/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1392216Z copying aisef/clients/base.py -> build/lib/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1393470Z copying aisef/clients/claude_code.py -> build/lib/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1394547Z copying aisef/clients/synthetic.py -> build/lib/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1396472Z creating build/lib/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1397052Z copying aisef/codebase/basic.py -> build/lib/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1398300Z copying aisef/codebase/detect.py -> build/lib/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1399435Z copying aisef/codebase/provider.py -> build/lib/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1400339Z copying aisef/codebase/baseline.py -> build/lib/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1401743Z copying aisef/codebase/graphify.py -> build/lib/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1402813Z copying aisef/codebase/__init__.py -> build/lib/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1405604Z running egg_info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1413195Z writing aisef.egg-info/PKG-INFO
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1418700Z writing dependency_links to aisef.egg-info/dependency_links.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1422533Z writing entry points to aisef.egg-info/entry_points.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1425607Z writing top-level names to aisef.egg-info/top_level.txt
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1465750Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1479825Z reading manifest template 'MANIFEST.in'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1482245Z no previously-included directories found matching 'tests'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1497761Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1514934Z creating build/lib/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1515957Z copying aisef/kit/prompts/devsecops.md -> build/lib/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1517654Z copying aisef/kit/prompts/story-implement.md -> build/lib/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1518852Z copying aisef/kit/prompts/mockup-screen.md -> build/lib/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1520024Z copying aisef/kit/prompts/story-review.md -> build/lib/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1521309Z copying aisef/kit/prompts/story-security-review.md -> build/lib/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1522426Z creating build/lib/aisef/kit/rules
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1523264Z copying aisef/kit/rules/principles.md -> build/lib/aisef/kit/rules
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1524533Z copying aisef/kit/rules/must_never.md -> build/lib/aisef/kit/rules
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1525544Z creating build/lib/aisef/kit/skills/aisef-mockup-html
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1526757Z copying aisef/kit/skills/aisef-mockup-html/SKILL.md -> build/lib/aisef/kit/skills/aisef-mockup-html
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1527861Z copying aisef/kit/catalog.json -> build/lib/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1528915Z creating build/lib/aisef/harness/assets
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1529675Z copying aisef/harness/assets/render.mjs -> build/lib/aisef/harness/assets
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1560328Z installing to build/bdist.linux-x86_64/wheel
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1560791Z running install
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1596850Z running install_lib
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1604297Z creating build/bdist.linux-x86_64/wheel
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1605766Z creating build/bdist.linux-x86_64/wheel/aisef2
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1606654Z creating build/bdist.linux-x86_64/wheel/aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1607465Z copying build/lib/aisef2/control/budget.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1608481Z copying build/lib/aisef2/control/routing.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1609469Z copying build/lib/aisef2/control/owner.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1610337Z copying build/lib/aisef2/control/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1611665Z creating build/bdist.linux-x86_64/wheel/aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1612362Z copying build/lib/aisef2/journal/format2.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1613418Z copying build/lib/aisef2/journal/writer.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1614224Z copying build/lib/aisef2/journal/compat.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1614910Z copying build/lib/aisef2/journal/fold.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1615724Z copying build/lib/aisef2/journal/format3.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1616563Z copying build/lib/aisef2/journal/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1617242Z copying build/lib/aisef2/journal/event.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1618563Z creating build/bdist.linux-x86_64/wheel/aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1619301Z copying build/lib/aisef2/journal/projections/retry_target.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1620226Z copying build/lib/aisef2/journal/projections/qualification_counters.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1621018Z copying build/lib/aisef2/journal/projections/budgets.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1622020Z copying build/lib/aisef2/journal/projections/failure_owner.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1622708Z copying build/lib/aisef2/journal/projections/story_state.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1623390Z copying build/lib/aisef2/journal/projections/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1624153Z copying build/lib/aisef2/journal/projections/terminal_state.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1625099Z creating build/bdist.linux-x86_64/wheel/aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1625846Z copying build/lib/aisef2/probe/process_effect.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1626985Z copying build/lib/aisef2/probe/calibration.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1627762Z copying build/lib/aisef2/probe/file_artifact.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1628598Z copying build/lib/aisef2/probe/protocol.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1629420Z copying build/lib/aisef2/probe/cli_invocation.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1630461Z copying build/lib/aisef2/probe/python_callable_v2.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1631419Z copying build/lib/aisef2/probe/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1632120Z copying build/lib/aisef2/probe/python_callable.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1632988Z copying build/lib/aisef2/probe/catalog.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1634122Z creating build/bdist.linux-x86_64/wheel/aisef2/arch
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1634832Z copying build/lib/aisef2/arch/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/arch
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1635705Z copying build/lib/aisef2/arch/enums.py -> build/bdist.linux-x86_64/wheel/./aisef2/arch
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1636838Z creating build/bdist.linux-x86_64/wheel/aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1637498Z copying build/lib/aisef2/invariants/registry.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1638470Z copying build/lib/aisef2/invariants/evidence.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1639203Z copying build/lib/aisef2/invariants/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1640198Z creating build/bdist.linux-x86_64/wheel/aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1640902Z copying build/lib/aisef2/app/preflight.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1641898Z copying build/lib/aisef2/app/bundle.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1642670Z copying build/lib/aisef2/app/cli.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1643402Z copying build/lib/aisef2/app/adapters.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1644134Z copying build/lib/aisef2/app/feedback.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1644950Z copying build/lib/aisef2/app/calibrations.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1645703Z copying build/lib/aisef2/app/run.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1646551Z copying build/lib/aisef2/app/verify.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1647234Z copying build/lib/aisef2/app/client.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1648023Z copying build/lib/aisef2/app/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1648689Z copying build/lib/aisef2/app/settings.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1649839Z creating build/bdist.linux-x86_64/wheel/aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1650672Z copying build/lib/aisef2/plan/story_admission.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1651630Z copying build/lib/aisef2/plan/static_admission.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1652461Z copying build/lib/aisef2/plan/obligation.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1653186Z copying build/lib/aisef2/plan/drift.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1653952Z copying build/lib/aisef2/plan/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1654876Z creating build/bdist.linux-x86_64/wheel/aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1655586Z copying build/lib/aisef2/product/compiler.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1656422Z copying build/lib/aisef2/product/spec.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1657129Z copying build/lib/aisef2/product/outcome.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1657916Z copying build/lib/aisef2/product/approval.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1658732Z copying build/lib/aisef2/product/contract.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1659490Z copying build/lib/aisef2/product/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1660414Z creating build/bdist.linux-x86_64/wheel/aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1661222Z copying build/lib/aisef2/cohort/preregistration.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1662157Z copying build/lib/aisef2/cohort/lifecycle.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1662920Z copying build/lib/aisef2/cohort/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1663612Z copying build/lib/aisef2/errors.py -> build/bdist.linux-x86_64/wheel/./aisef2
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1664719Z creating build/bdist.linux-x86_64/wheel/aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1665369Z copying build/lib/aisef2/runtime/capability.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1666224Z copying build/lib/aisef2/runtime/repair.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1666959Z copying build/lib/aisef2/runtime/sentinel.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1667689Z copying build/lib/aisef2/runtime/runspec.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1668443Z copying build/lib/aisef2/runtime/range_anchor.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1669219Z copying build/lib/aisef2/runtime/process_range.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1670038Z copying build/lib/aisef2/runtime/run_scope.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1670825Z copying build/lib/aisef2/runtime/tool.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1671758Z copying build/lib/aisef2/runtime/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1672375Z copying build/lib/aisef2/runtime/story_scope.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1673153Z copying build/lib/aisef2/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1674241Z creating build/bdist.linux-x86_64/wheel/aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1674930Z copying build/lib/aisef2/orchestrate/quality.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1675798Z copying build/lib/aisef2/orchestrate/adapters.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1676531Z copying build/lib/aisef2/orchestrate/workspace.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1677326Z copying build/lib/aisef2/orchestrate/proof.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1678223Z copying build/lib/aisef2/orchestrate/review.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1678765Z copying build/lib/aisef2/orchestrate/gate.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1679551Z copying build/lib/aisef2/orchestrate/security.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1680212Z copying build/lib/aisef2/orchestrate/merge.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1681059Z copying build/lib/aisef2/orchestrate/story_runner.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1681950Z copying build/lib/aisef2/orchestrate/seam.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1682640Z copying build/lib/aisef2/orchestrate/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1683632Z creating build/bdist.linux-x86_64/wheel/aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1684404Z copying build/lib/aisef2/quality/test_execution.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1685391Z copying build/lib/aisef2/quality/vacuity.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1686228Z copying build/lib/aisef2/quality/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1686964Z copying build/lib/aisef2/quality/relevance.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1687762Z copying build/lib/aisef2/quality/adequacy.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1688948Z creating build/bdist.linux-x86_64/wheel/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1689922Z creating build/bdist.linux-x86_64/wheel/aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1690566Z copying build/lib/aisef/control/preflight.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1691888Z copying build/lib/aisef/control/invariants.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1692656Z copying build/lib/aisef/control/closure.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1693954Z copying build/lib/aisef/control/design_contract.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1694592Z copying build/lib/aisef/control/acceptance.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1695393Z copying build/lib/aisef/control/conformance.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1696106Z copying build/lib/aisef/control/outcome.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1696869Z copying build/lib/aisef/control/replay.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1697616Z copying build/lib/aisef/control/budget.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1698474Z copying build/lib/aisef/control/approvals.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1699283Z copying build/lib/aisef/control/worktree.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1700108Z copying build/lib/aisef/control/findings.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1701010Z copying build/lib/aisef/control/impact.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1701830Z copying build/lib/aisef/control/proof.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1702650Z copying build/lib/aisef/control/journal.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1703455Z copying build/lib/aisef/control/identity.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1704165Z copying build/lib/aisef/control/tdd.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1704894Z copying build/lib/aisef/control/gate.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1705987Z copying build/lib/aisef/control/machine_gate.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1707005Z copying build/lib/aisef/control/defects.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1707601Z copying build/lib/aisef/control/security.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1708393Z copying build/lib/aisef/control/normalize.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1709338Z copying build/lib/aisef/control/complexity.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1710141Z copying build/lib/aisef/control/cohort.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1711024Z copying build/lib/aisef/control/onboarding.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1711841Z copying build/lib/aisef/control/state.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1712754Z copying build/lib/aisef/control/qualification.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1713561Z copying build/lib/aisef/control/experience.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1714393Z copying build/lib/aisef/control/replay_manifest.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1715134Z copying build/lib/aisef/control/planes.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1715909Z copying build/lib/aisef/control/obligation.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1716632Z copying build/lib/aisef/control/scheduler.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1717405Z copying build/lib/aisef/control/ledger.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1718304Z copying build/lib/aisef/control/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1718905Z copying build/lib/aisef/control/change.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1719731Z copying build/lib/aisef/control/reviewer_qual.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1720662Z copying build/lib/aisef/control/attribution.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1721589Z copying build/lib/aisef/control/bmad_status.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1722336Z copying build/lib/aisef/__main__.py -> build/bdist.linux-x86_64/wheel/./aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1723516Z creating build/bdist.linux-x86_64/wheel/aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1724179Z copying build/lib/aisef/phases/deploy.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1725207Z copying build/lib/aisef/phases/implement.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1726905Z copying build/lib/aisef/phases/story_split.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1727572Z copying build/lib/aisef/phases/improve.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1728513Z copying build/lib/aisef/phases/run.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1729455Z copying build/lib/aisef/phases/report.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1730244Z copying build/lib/aisef/phases/mockup.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1731112Z copying build/lib/aisef/phases/plan.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1732093Z copying build/lib/aisef/phases/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1732766Z copying build/lib/aisef/phases/qa.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1733732Z copying build/lib/aisef/config.py -> build/bdist.linux-x86_64/wheel/./aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1734575Z copying build/lib/aisef/memory.py -> build/bdist.linux-x86_64/wheel/./aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1735836Z creating build/bdist.linux-x86_64/wheel/aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1736460Z copying build/lib/aisef/cli/closure.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1737458Z copying build/lib/aisef/cli/parser.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1738200Z copying build/lib/aisef/cli/__main__.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1738885Z copying build/lib/aisef/cli/implement.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1739854Z copying build/lib/aisef/cli/dashboard.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1740650Z copying build/lib/aisef/cli/_common.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1741474Z copying build/lib/aisef/cli/doctor.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1742347Z copying build/lib/aisef/cli/harness.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1743172Z copying build/lib/aisef/cli/memory.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1743856Z copying build/lib/aisef/cli/plan.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1744680Z copying build/lib/aisef/cli/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1745833Z creating build/bdist.linux-x86_64/wheel/aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1746499Z copying build/lib/aisef/kit/registry.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1747458Z copying build/lib/aisef/kit/install.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1748257Z copying build/lib/aisef/kit/skills.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1748927Z copying build/lib/aisef/kit/router.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1749734Z copying build/lib/aisef/kit/fetch.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1750718Z creating build/bdist.linux-x86_64/wheel/aisef/kit/rules
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1751545Z copying build/lib/aisef/kit/rules/principles.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/rules
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1752412Z copying build/lib/aisef/kit/rules/must_never.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/rules
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1753197Z copying build/lib/aisef/kit/security_filter.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1753976Z copying build/lib/aisef/kit/constitution.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1754692Z copying build/lib/aisef/kit/skill_scan.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1755824Z creating build/bdist.linux-x86_64/wheel/aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1756547Z copying build/lib/aisef/kit/prompts/devsecops.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1757442Z copying build/lib/aisef/kit/prompts/story-implement.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1758176Z copying build/lib/aisef/kit/prompts/mockup-screen.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1758928Z copying build/lib/aisef/kit/prompts/story-review.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1759687Z copying build/lib/aisef/kit/prompts/story-security-review.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1760610Z creating build/bdist.linux-x86_64/wheel/aisef/kit/skills
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1761623Z creating build/bdist.linux-x86_64/wheel/aisef/kit/skills/aisef-mockup-html
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1762367Z copying build/lib/aisef/kit/skills/aisef-mockup-html/SKILL.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/skills/aisef-mockup-html
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1763160Z copying build/lib/aisef/kit/docs.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1763891Z copying build/lib/aisef/kit/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1764538Z copying build/lib/aisef/kit/detect_stack.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1765318Z copying build/lib/aisef/kit/catalog.json -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1766157Z copying build/lib/aisef/kit/catalog.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1766888Z copying build/lib/aisef/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1768016Z creating build/bdist.linux-x86_64/wheel/aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1768626Z copying build/lib/aisef/harness/testlog.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1769647Z copying build/lib/aisef/harness/process_owner.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1770443Z copying build/lib/aisef/harness/browser.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1771261Z copying build/lib/aisef/harness/tools.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1772190Z copying build/lib/aisef/harness/capabilities.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1772996Z copying build/lib/aisef/harness/ownership.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1773726Z copying build/lib/aisef/harness/prompts.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1774411Z copying build/lib/aisef/harness/runlog.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1775426Z creating build/bdist.linux-x86_64/wheel/aisef/harness/assets
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1776158Z copying build/lib/aisef/harness/assets/render.mjs -> build/bdist.linux-x86_64/wheel/./aisef/harness/assets
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1777053Z copying build/lib/aisef/harness/mockup_map.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1777830Z copying build/lib/aisef/harness/verify_image.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1778614Z copying build/lib/aisef/harness/observe.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1779458Z copying build/lib/aisef/harness/routing.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1780265Z copying build/lib/aisef/harness/sandbox.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1781207Z copying build/lib/aisef/harness/server_identity.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1782094Z copying build/lib/aisef/harness/mockup_verify.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1782889Z copying build/lib/aisef/harness/context.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1783666Z copying build/lib/aisef/harness/aria.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1784398Z copying build/lib/aisef/harness/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1785039Z copying build/lib/aisef/harness/guardrails.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1786427Z creating build/bdist.linux-x86_64/wheel/aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1787061Z copying build/lib/aisef/clients/stream.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1788031Z copying build/lib/aisef/clients/opencode.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1788846Z copying build/lib/aisef/clients/compile.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1789644Z copying build/lib/aisef/clients/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1790212Z copying build/lib/aisef/clients/base.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1791182Z copying build/lib/aisef/clients/claude_code.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1792008Z copying build/lib/aisef/clients/synthetic.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1792810Z copying build/lib/aisef/_compat.py -> build/bdist.linux-x86_64/wheel/./aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1793584Z copying build/lib/aisef/memory_bench.py -> build/bdist.linux-x86_64/wheel/./aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1794747Z creating build/bdist.linux-x86_64/wheel/aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1795516Z copying build/lib/aisef/codebase/basic.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1796288Z copying build/lib/aisef/codebase/detect.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1797024Z copying build/lib/aisef/codebase/provider.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1797782Z copying build/lib/aisef/codebase/baseline.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1798516Z copying build/lib/aisef/codebase/graphify.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1799283Z copying build/lib/aisef/codebase/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1799952Z running install_egg_info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1806979Z Copying aisef.egg-info to build/bdist.linux-x86_64/wheel/./aisef-2.0.0-py3.12.egg-info
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1814740Z running install_scripts
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1820775Z creating build/bdist.linux-x86_64/wheel/aisef-2.0.0.dist-info/WHEEL
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1824213Z creating '/home/runner/work/aisef/aisef/dist/.tmp-p5g2lyb0/aisef-2.0.0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1826485Z adding 'aisef/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1827957Z adding 'aisef/__main__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1830708Z adding 'aisef/_compat.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1836835Z adding 'aisef/config.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1842578Z adding 'aisef/memory.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1844737Z adding 'aisef/memory_bench.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1846595Z adding 'aisef/cli/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1847402Z adding 'aisef/cli/__main__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1848973Z adding 'aisef/cli/_common.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1850490Z adding 'aisef/cli/closure.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1853892Z adding 'aisef/cli/dashboard.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1858094Z adding 'aisef/cli/doctor.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1863395Z adding 'aisef/cli/harness.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1871206Z adding 'aisef/cli/implement.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1872668Z adding 'aisef/cli/memory.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1877731Z adding 'aisef/cli/parser.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1881102Z adding 'aisef/cli/plan.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1882257Z adding 'aisef/clients/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1888334Z adding 'aisef/clients/base.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1891014Z adding 'aisef/clients/claude_code.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1894361Z adding 'aisef/clients/compile.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1898096Z adding 'aisef/clients/opencode.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1902240Z adding 'aisef/clients/stream.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1905155Z adding 'aisef/clients/synthetic.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1906318Z adding 'aisef/codebase/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1908652Z adding 'aisef/codebase/baseline.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1910221Z adding 'aisef/codebase/basic.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1911823Z adding 'aisef/codebase/detect.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1913258Z adding 'aisef/codebase/graphify.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1914572Z adding 'aisef/codebase/provider.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1915709Z adding 'aisef/control/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1917625Z adding 'aisef/control/acceptance.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1921531Z adding 'aisef/control/approvals.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1925057Z adding 'aisef/control/attribution.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1926820Z adding 'aisef/control/bmad_status.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1929758Z adding 'aisef/control/budget.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1931773Z adding 'aisef/control/change.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1954581Z adding 'aisef/control/closure.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1958708Z adding 'aisef/control/cohort.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1964234Z adding 'aisef/control/complexity.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1966865Z adding 'aisef/control/conformance.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1969035Z adding 'aisef/control/defects.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1971280Z adding 'aisef/control/design_contract.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1974296Z adding 'aisef/control/experience.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1977946Z adding 'aisef/control/findings.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1996672Z adding 'aisef/control/gate.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.1999642Z adding 'aisef/control/identity.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2002966Z adding 'aisef/control/impact.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2005146Z adding 'aisef/control/invariants.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2008090Z adding 'aisef/control/journal.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2016602Z adding 'aisef/control/ledger.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2023289Z adding 'aisef/control/machine_gate.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2033789Z adding 'aisef/control/normalize.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2036415Z adding 'aisef/control/obligation.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2038835Z adding 'aisef/control/onboarding.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2040694Z adding 'aisef/control/outcome.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2043389Z adding 'aisef/control/planes.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2052256Z adding 'aisef/control/preflight.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2055255Z adding 'aisef/control/proof.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2058751Z adding 'aisef/control/qualification.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2061072Z adding 'aisef/control/replay.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2063393Z adding 'aisef/control/replay_manifest.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2071524Z adding 'aisef/control/reviewer_qual.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2073649Z adding 'aisef/control/scheduler.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2075434Z adding 'aisef/control/security.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2079663Z adding 'aisef/control/state.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2081706Z adding 'aisef/control/tdd.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2086883Z adding 'aisef/control/worktree.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2088094Z adding 'aisef/harness/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2090372Z adding 'aisef/harness/aria.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2092263Z adding 'aisef/harness/browser.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2095582Z adding 'aisef/harness/capabilities.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2098756Z adding 'aisef/harness/context.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2112511Z adding 'aisef/harness/guardrails.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2114590Z adding 'aisef/harness/mockup_map.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2118293Z adding 'aisef/harness/mockup_verify.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2122582Z adding 'aisef/harness/observe.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2124280Z adding 'aisef/harness/ownership.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2126545Z adding 'aisef/harness/process_owner.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2127920Z adding 'aisef/harness/prompts.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2129643Z adding 'aisef/harness/routing.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2130707Z adding 'aisef/harness/runlog.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2135401Z adding 'aisef/harness/sandbox.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2137788Z adding 'aisef/harness/server_identity.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2142346Z adding 'aisef/harness/testlog.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2148843Z adding 'aisef/harness/tools.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2152207Z adding 'aisef/harness/verify_image.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2154684Z adding 'aisef/harness/assets/render.mjs'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2155730Z adding 'aisef/kit/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2157042Z adding 'aisef/kit/catalog.json'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2158393Z adding 'aisef/kit/catalog.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2159977Z adding 'aisef/kit/constitution.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2161811Z adding 'aisef/kit/detect_stack.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2163201Z adding 'aisef/kit/docs.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2164841Z adding 'aisef/kit/fetch.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2166883Z adding 'aisef/kit/install.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2170757Z adding 'aisef/kit/registry.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2173272Z adding 'aisef/kit/router.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2175266Z adding 'aisef/kit/security_filter.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2177545Z adding 'aisef/kit/skill_scan.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2178903Z adding 'aisef/kit/skills.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2180377Z adding 'aisef/kit/prompts/devsecops.md'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2181338Z adding 'aisef/kit/prompts/mockup-screen.md'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2183466Z adding 'aisef/kit/prompts/story-implement.md'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2185763Z adding 'aisef/kit/prompts/story-review.md'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2187587Z adding 'aisef/kit/prompts/story-security-review.md'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2188931Z adding 'aisef/kit/rules/must_never.md'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2190402Z adding 'aisef/kit/rules/principles.md'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2192719Z adding 'aisef/kit/skills/aisef-mockup-html/SKILL.md'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2193780Z adding 'aisef/phases/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2198517Z adding 'aisef/phases/deploy.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2248231Z adding 'aisef/phases/implement.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2258663Z adding 'aisef/phases/improve.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2262597Z adding 'aisef/phases/mockup.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2269816Z adding 'aisef/phases/plan.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2279153Z adding 'aisef/phases/qa.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2283340Z adding 'aisef/phases/report.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2294276Z adding 'aisef/phases/run.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2297888Z adding 'aisef/phases/story_split.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2299810Z adding 'aisef2/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2308380Z adding 'aisef2/errors.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2308612Z adding 'aisef2/app/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2308833Z adding 'aisef2/app/adapters.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2309052Z adding 'aisef2/app/bundle.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2309211Z adding 'aisef2/app/calibrations.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2309371Z adding 'aisef2/app/cli.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2311097Z adding 'aisef2/app/client.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2313017Z adding 'aisef2/app/feedback.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2315033Z adding 'aisef2/app/preflight.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2319606Z adding 'aisef2/app/run.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2321610Z adding 'aisef2/app/settings.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2323079Z adding 'aisef2/app/verify.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2324042Z adding 'aisef2/arch/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2325937Z adding 'aisef2/arch/enums.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2327029Z adding 'aisef2/cohort/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2329214Z adding 'aisef2/cohort/lifecycle.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2331569Z adding 'aisef2/cohort/preregistration.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2332610Z adding 'aisef2/control/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2333919Z adding 'aisef2/control/budget.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2336222Z adding 'aisef2/control/owner.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2338034Z adding 'aisef2/control/routing.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2339060Z adding 'aisef2/invariants/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2340338Z adding 'aisef2/invariants/evidence.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2344628Z adding 'aisef2/invariants/registry.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2345769Z adding 'aisef2/journal/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2347191Z adding 'aisef2/journal/compat.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2350226Z adding 'aisef2/journal/event.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2352378Z adding 'aisef2/journal/fold.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2356394Z adding 'aisef2/journal/format2.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2360825Z adding 'aisef2/journal/format3.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2362649Z adding 'aisef2/journal/writer.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2364057Z adding 'aisef2/journal/projections/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2365511Z adding 'aisef2/journal/projections/budgets.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2366632Z adding 'aisef2/journal/projections/failure_owner.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2367896Z adding 'aisef2/journal/projections/qualification_counters.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2368771Z adding 'aisef2/journal/projections/retry_target.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2370006Z adding 'aisef2/journal/projections/story_state.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2371263Z adding 'aisef2/journal/projections/terminal_state.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2372512Z adding 'aisef2/orchestrate/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2374055Z adding 'aisef2/orchestrate/adapters.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2374862Z adding 'aisef2/orchestrate/gate.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2376162Z adding 'aisef2/orchestrate/merge.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2377911Z adding 'aisef2/orchestrate/proof.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2379205Z adding 'aisef2/orchestrate/quality.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2380279Z adding 'aisef2/orchestrate/review.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2381514Z adding 'aisef2/orchestrate/seam.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2382824Z adding 'aisef2/orchestrate/security.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2386317Z adding 'aisef2/orchestrate/story_runner.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2389090Z adding 'aisef2/orchestrate/workspace.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2390040Z adding 'aisef2/plan/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2392184Z adding 'aisef2/plan/drift.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2393709Z adding 'aisef2/plan/obligation.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2396921Z adding 'aisef2/plan/static_admission.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2399017Z adding 'aisef2/plan/story_admission.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2399900Z adding 'aisef2/probe/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2402019Z adding 'aisef2/probe/calibration.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2404128Z adding 'aisef2/probe/catalog.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2418059Z adding 'aisef2/probe/cli_invocation.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2424162Z adding 'aisef2/probe/file_artifact.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2435258Z adding 'aisef2/probe/process_effect.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2439213Z adding 'aisef2/probe/protocol.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2444897Z adding 'aisef2/probe/python_callable.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2450814Z adding 'aisef2/probe/python_callable_v2.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2452175Z adding 'aisef2/product/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2453589Z adding 'aisef2/product/approval.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2454959Z adding 'aisef2/product/compiler.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2456903Z adding 'aisef2/product/contract.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2458466Z adding 'aisef2/product/outcome.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2459751Z adding 'aisef2/product/spec.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2460799Z adding 'aisef2/quality/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2463436Z adding 'aisef2/quality/adequacy.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2466277Z adding 'aisef2/quality/relevance.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2471727Z adding 'aisef2/quality/test_execution.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2475062Z adding 'aisef2/quality/vacuity.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2476099Z adding 'aisef2/runtime/__init__.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2477630Z adding 'aisef2/runtime/capability.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2481697Z adding 'aisef2/runtime/process_range.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2483409Z adding 'aisef2/runtime/range_anchor.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2485199Z adding 'aisef2/runtime/repair.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2487780Z adding 'aisef2/runtime/run_scope.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2489363Z adding 'aisef2/runtime/runspec.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2491126Z adding 'aisef2/runtime/sentinel.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2493198Z adding 'aisef2/runtime/story_scope.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2494767Z adding 'aisef2/runtime/tool.py'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2501790Z adding 'aisef-2.0.0.dist-info/METADATA'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2502417Z adding 'aisef-2.0.0.dist-info/WHEEL'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2502981Z adding 'aisef-2.0.0.dist-info/entry_points.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2503479Z adding 'aisef-2.0.0.dist-info/top_level.txt'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2508638Z adding 'aisef-2.0.0.dist-info/RECORD'
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2512050Z removing build/bdist.linux-x86_64/wheel
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.2908046Z Successfully built aisef-2.0.0.tar.gz and aisef-2.0.0-py3-none-any.whl
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5334035Z a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d  aisef-2.0.0.tar.gz
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5398584Z ##[group]Run python -m twine check dist/*
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5398792Z ^[[36;1mpython -m twine check dist/*^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5450530Z shell: /usr/bin/bash -e {0}
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5450677Z env:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5450834Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5451226Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5451468Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5451685Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5451906Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5452127Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.5452327Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7149395Z Checking dist/aisef-2.0.0-py3-none-any.whl: ^[[32mPASSED^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7303458Z Checking dist/aisef-2.0.0.tar.gz: ^[[32mPASSED^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7540907Z ##[group]Run python -P validation/v2/packaging_check.py --artifacts dist
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7541384Z ^[[36;1mpython -P validation/v2/packaging_check.py --artifacts dist^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7593934Z shell: /usr/bin/bash -e {0}
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7594081Z env:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7594237Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7594479Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7594717Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7594932Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7595149Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7595370Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.7595687Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8098510Z packaging: PASS (exactly aisef + aisef2)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8159051Z ##[group]Run set -eu
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8159216Z ^[[36;1mset -eu^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8159360Z ^[[36;1m(cd dist && sha256sum -- *) | tee SHA256SUMS^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8159643Z ^[[36;1m{ echo '### built artifacts (sha256)'; echo '```'; cat SHA256SUMS; echo '```'; } >> "$GITHUB_STEP_SUMMARY"^[[0m
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8206987Z shell: /usr/bin/bash -e {0}
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8207126Z env:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8207284Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8207527Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8207765Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8207975Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8208186Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8208416Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8208602Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8290691Z 5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b  aisef-2.0.0-py3-none-any.whl
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8294796Z a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d  aisef-2.0.0.tar.gz
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8348490Z ##[group]Run actions/upload-artifact@v4
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8348651Z with:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8348764Z   name: dist
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8348877Z   path: dist/
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8348999Z   if-no-files-found: error
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8349141Z   compression-level: 6
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8349267Z   overwrite: false
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8349394Z   include-hidden-files: false
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8349530Z env:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8349680Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8349924Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8350166Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8350380Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8350590Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8350807Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.8351217Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.9361384Z (node:2298) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.9361975Z (Use `node --trace-deprecation ...` to show where the warning was created)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.9395920Z With the provided path, there will be 2 files uploaded
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.9399969Z Artifact name is valid!
+staging / build	UNKNOWN STEP	2026-10-05T22:41:06.9400232Z Root directory input is valid!
+staging / build	UNKNOWN STEP	2026-10-05T22:41:07.2729794Z Beginning upload of artifact content to blob storage
+staging / build	UNKNOWN STEP	2026-10-05T22:41:07.3234163Z (node:2298) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+staging / build	UNKNOWN STEP	2026-10-05T22:41:07.8946960Z Uploaded bytes 1769629
+staging / build	UNKNOWN STEP	2026-10-05T22:41:07.9601971Z Finished uploading artifact content to blob storage!
+staging / build	UNKNOWN STEP	2026-10-05T22:41:07.9602583Z SHA256 digest of uploaded artifact zip is 754a6b9b5e24717fc0e3a9480879b3971f4037959c1f41718799a6af8d563f5b
+staging / build	UNKNOWN STEP	2026-10-05T22:41:07.9604052Z Finalizing artifact upload
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2360705Z Artifact dist.zip successfully finalized. Artifact ID 11375269225
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2361250Z Artifact dist has been successfully uploaded! Final size is 1769629 bytes. Artifact ID is 11375269225
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2365122Z Artifact download URL: https://github.com/nghinh/aisef/actions/runs/37383985011/artifacts/11375269225
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2493008Z ##[group]Run actions/upload-artifact@v4
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2493176Z with:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2493296Z   name: dist-sha256
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2493537Z   path: SHA256SUMS
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2493664Z   if-no-files-found: error
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2493806Z   compression-level: 6
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2493939Z   overwrite: false
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2494066Z   include-hidden-files: false
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2494207Z env:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2494358Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2494605Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2494842Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2495058Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2495274Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2495493Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.2495697Z ##[endgroup]
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.3535945Z (node:2311) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.3536383Z (Use `node --trace-deprecation ...` to show where the warning was created)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.3565383Z With the provided path, there will be 1 file uploaded
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.3574518Z Artifact name is valid!
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.3574716Z Root directory input is valid!
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.7158038Z Beginning upload of artifact content to blob storage
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.7270116Z (node:2311) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+staging / build	UNKNOWN STEP	2026-10-05T22:41:08.9603922Z Uploaded bytes 264
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.0215116Z Finished uploading artifact content to blob storage!
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.0215918Z SHA256 digest of uploaded artifact zip is 776f9af0c8849aa94473d1b45d07d48099ae56fa34cacdd408ac0a6b76c4ce72
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.0217140Z Finalizing artifact upload
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.2857881Z Artifact dist-sha256.zip successfully finalized. Artifact ID 11375224188
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.2858580Z Artifact dist-sha256 has been successfully uploaded! Final size is 264 bytes. Artifact ID is 11375224188
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.2862842Z Artifact download URL: https://github.com/nghinh/aisef/actions/runs/37383985011/artifacts/11375224188
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.2998120Z Post job cleanup.
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.3766417Z (node:2323) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.3766906Z (Use `node --trace-deprecation ...` to show where the warning was created)
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.3899995Z Post job cleanup.
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4475955Z [command]/usr/bin/git version
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4506783Z git version 2.55.0
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4530241Z Temporarily overriding HOME='/home/runner/work/_temp/6da362aa-f085-490a-a096-673da1263fe9' before making global git config changes
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4531065Z Adding repository directory to the temporary git global config as a safe directory
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4533861Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4563124Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4589717Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4813138Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4850235Z http.https://github.com/.extraheader
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4860936Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.4903058Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.5135482Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.5214207Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.5734571Z Cleaning up orphan processes
+staging / build	UNKNOWN STEP	2026-10-05T22:41:09.5924903Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
