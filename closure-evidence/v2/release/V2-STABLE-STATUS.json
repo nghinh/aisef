@@ -5,7 +5,7 @@
  "S1_FAIL_CLOSED": "PASS",
  "S2_FIX_WINDOW": "PASS",
  "S3_PRODUCTIZED": "PASS",
- "S4_RC_FROZEN": "NOT_STARTED",
+ "S4_RC_FROZEN": "PASS",
  "S5_QUALIFIED": "NOT_STARTED",
  "S6_RELEASE_SMOKE": "NOT_STARTED",
  "S7_TESTPYPI": "NOT_STARTED",
@@ -13,7 +13,7 @@
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
  "CURRENT_SHA": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
  "CURRENT_KERNEL_DIGEST": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
- "CURRENT_WHEEL_DIGEST": null,
+ "CURRENT_WHEEL_DIGEST": "a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7",
  "OPEN_V2_0_BLOCKERS": [],
  "V2_1_BACKLOG_COUNT": 36,
  "PROVIDER_CALLS": 0,
@@ -82,6 +82,12 @@
    "status": "PASS",
    "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
    "what": "OBS-S2-12 closed deterministically (dedicated kill file, 66/66 under 6 hash seeds); S2 re-frozen at 529591e (version 2.0.0, staging on release/** folded in by the owner): record PASS 261/261, 6437/6437, 0 by the clock, 0 unaudited; full local suite 5444 with the one owner-waived machine-state failure; CI 37256508108 8/8 green"
+  },
+  {
+   "phase": "S4_RC_FROZEN",
+   "status": "PASS",
+   "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+   "what": "V2.0-RC1 = 529591e frozen (V2.0-RC1-FREEZE.json in 66067c0): version 2.0.0, kernel tree c6ddf5b9 / digest b93d4c08, wheel a04c4eb9, sdist 7cf8d07e from staging run 37256508105 of exactly the RC; rebuilt byte-identical at the frozen epoch (run 37263474517); RC CI 8/8"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
@@ -197,7 +203,11 @@
   "open_for_S4": [
    "version 2.0.0 in the RC1 commit",
    "RC digests from the staging build"
-  ]
+  ],
+  "open_for_S4_resolved": {
+   "version 2.0.0 in the RC1 commit": "pyproject.toml 2.0.0 in 529591e (folded in by the owner's answer, 2026-10-05)",
+   "RC digests from the staging build": "staging run 37256508105 of exactly 529591e; frozen in V2.0-RC1-FREEZE.json"
+  }
  },
  "WORKLOAD_CONTEXT_SANITIZED": "PASS",
  "WORKLOAD_SOURCE_SHA": "136a68dcdc3f416b2a76c561a7df12d1282ad4d5",
@@ -219,5 +229,91 @@
   "bundle_digest": "778e6b84afab76c8326a72c7b11291e3a5e195aacff7eee43d6630699bb8be0a",
   "suite_sha256": "06ae626ebd5501c8c2acd32a381009c294224e8e00a8d2dca59b3b6d54e59320",
   "commit": "69e65c6"
+ },
+ "S4_DETAIL": {
+  "RC": "V2.0-RC1",
+  "RC_SOURCE_SHA": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+  "RC_VERSION": "2.0.0",
+  "RC_KERNEL_TREE": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
+  "RC_KERNEL_DIGEST": "b93d4c08ae2e392de9c6e6083a39625c936c8935481a4dfa1a44dff2824e77fd",
+  "RC_WHEEL_DIGEST": "a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7",
+  "RC_SDIST_DIGEST": "7cf8d07ef29577ad56e7d3a852c5da14436126d842a1dccbad79eca4e16e234d",
+  "source_date_epoch": 1791168192,
+  "shipped_trees": {
+   "MANIFEST.in": "e20357e77d9d8f0d413ddb8355498d6a410f9e91",
+   "README.md": "108df12187cacc139ad63985e49dc0f4a006d446",
+   "aisef": "49871d69e661f325c8c2b12748e7a1adada89c08",
+   "aisef2": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
+   "pyproject.toml": "c1eafb3c53437d079e71a2a1ee06d09bbec2756f"
+  },
+  "freeze_record": {
+   "path": "closure-evidence/v2/release/V2.0-RC1-FREEZE.json",
+   "sha256": "ffec0092a88e93f7ee645861c90e6b58d5d51bddbf4f41d364ccde851a7d0c6e",
+   "commit": "66067c0c8420427ccec5f65d92e54a39864c3020",
+   "verdict": "FROZEN",
+   "problems": [],
+   "written_by": "python3 -P validation/qualification/release_rc.py --freeze 529591e --sums <staging SHA256SUMS> --ci-run 37256508105 (once; dry-run FROZEN [] first)"
+  },
+  "staging_build_of_the_RC": {
+   "run": 37256508105,
+   "event": "push",
+   "headSha": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+   "jobs": {
+    "build": "success",
+    "install (ubuntu-latest)": "success",
+    "install (windows-latest)": "success"
+   },
+   "sha256sums": {
+    "aisef-2.0.0-py3-none-any.whl": "a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7",
+    "aisef-2.0.0.tar.gz": "7cf8d07ef29577ad56e7d3a852c5da14436126d842a1dccbad79eca4e16e234d"
+   },
+   "installs_reverified_sums": true
+  },
+  "staging_rebuild_at_the_frozen_epoch": {
+   "run": 37263474517,
+   "headSha": "66067c0c8420427ccec5f65d92e54a39864c3020",
+   "jobs": "build, install ubuntu, install windows: success",
+   "result": "byte-identical to the frozen digests (both files) — a rehearsal of S7's rebuild"
+  },
+  "ci_of_the_RC": {
+   "run": 37256508108,
+   "commit": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+   "result": "8/8 success: ubuntu 3.11-3.14 and macos 3.12 Ran 5444 OK, windows 3.11 Ran 5441 OK, lint, wheel"
+  },
+  "release_mode_cross_checks": {
+   "local": "with the record on disk, before F1: the 26 test modules importing the qualification code + tests/test_release_gate.py + the checker calibration tests: 439 tests, the one owner-waived failure (HistoricalAttempt4, same cause), owned 0/0/0",
+   "ci_of_the_freeze_commit": {
+    "run": 37263474461,
+    "commit": "66067c0c8420427ccec5f65d92e54a39864c3020",
+    "attempts": [
+     {
+      "attempt": 1,
+      "result": "ubuntu 3.11-3.14 and macos 3.12 Ran 5444 OK, lint, wheel success; windows 3.11: runner lost communication, no test verdict (ENVIRONMENT; OBS-S4-2)"
+     },
+     {
+      "attempt": 2,
+      "of": "the windows job only",
+      "gate_effect": "DIAGNOSTIC_ONLY (V2-RETRY-POLICY: no approved CI retry count)",
+      "result": "windows 3.11 Ran 5441 OK (skipped=173), owned 0/0/0"
+     }
+    ]
+   }
+  },
+  "checks_on_the_freeze_commit": "release_rc.py --check PASS; s2_mutation_record.py --check PASS; mutation.py --check PASS; s2_deterministic_kills.py --check PASS; v2_release_gate.py 2.0.0 FAIL by design (production publication not authorized)",
+  "after_the_RC": "only closure-evidence/ changed (7d9492c S2 evidence, 66067c0 freeze record, this status commit)",
+  "acceptance": {
+   "record": "closure-evidence/v2/release/V2-RELEASE-ACCEPTANCE.json",
+   "specs": 59,
+   "obligations": 67,
+   "bundle_digest": "778e6b84afab76c8326a72c7b11291e3a5e195aacff7eee43d6630699bb8be0a",
+   "suite_sha256": "06ae626ebd5501c8c2acd32a381009c294224e8e00a8d2dca59b3b6d54e59320",
+   "commit": "69e65c6",
+   "unchanged_since": "69e65c6 (git diff --quiet)",
+   "check": "release_acceptance.py --check PASS"
+  },
+  "packaging": "validation/v2/packaging_check.py --check PASS (exactly aisef + aisef2)",
+  "tags": "none pushed (no v2* tag on origin); no GitHub Release; no PyPI or TestPyPI upload",
+  "reviewers": "none (charter §20; OBS-S4-1 records one read-only research workflow used before S4)",
+  "not_started": "S5 (needs fresh Q4/Q5, not authorized in this lane), S6 paid smoke, S7, FINAL_RELEASE_READY"
  }
 }

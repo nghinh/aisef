@@ -381,6 +381,11 @@
    "id": "OBS-S4-1",
    "what": "Charter §20 ('Do NOT create another swarm of research agents'): before S4 the controller ran one read-only workflow of 6 agents (5 readers + 1 synthesis, 2026-10-05 ~08:45-09:00, run wf_19884141-613) to map what S4 requires from the charter, docs/v2/RELEASE-PROCESS.md, validation/qualification/release_rc.py, the CI workflows and the status file. They changed nothing and gave no review verdict; their output was a plan the controller then checked against the files itself (pyproject version rule, staging trigger, release_rc.freeze/check). It is still a research swarm the charter forbids.",
    "disposition": "process deviation, recorded: no further agents for S2's closure or S4 (no implementation or adversarial reviewer was used: §20's two pre-freeze reviewers were spent in the pre-RC review); every S4 step is done and checked by the controller against the files."
+  },
+  {
+   "id": "OBS-S4-2",
+   "what": "CI on the freeze commit 66067c0 (tests run 37263474461, attempt 1): 'unit (windows-latest, 3.11)' (job 111615315191, 04:25:50-05:12:50Z) ended with GitHub's annotation 'The hosted runner lost communication with the server'; its test step never concluded and its log is not available (the jobs/111615315191/logs API answers 404), so it gave no test verdict. Every other job of the run passed (ubuntu 3.11-3.14 and macos 3.12: 5444 OK; lint; wheel). Note: `gh run view --job 111615315191 --log` now serves attempt 2's log (it starts at 05:15:37Z, after attempt 1 ended) — it is not attempt 1's.",
+   "disposition": "not a finding: classified ENVIRONMENT, as the same runner loss was at C2-P0-RUN-HISTORY seq 49; V2-RETRY-POLICY approves no CI retry count (phase-gate:ci null), so the re-run of that one job (attempt 2, job 111625731732: Ran 5441 tests, OK (skipped=173), owned processes 0/0/0) is DIAGNOSTIC ONLY and does not erase attempt 1. No gate rests on it: the RC gate is CI on the RC itself (run 37256508108 on 529591e, 8/8 green); run 37263474461 is the controller's release-mode cross-check of the freeze commit."
   }
  ],
  "reviews": [
