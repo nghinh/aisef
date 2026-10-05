@@ -373,6 +373,55 @@
     }
    },
    "source": "S6, 2026-10-05"
+  },
+  {
+   "ID": "S6-SMOKE-1-PREFLIGHT-OPAQUE/R2",
+   "RECLASSIFIES": "S6-SMOKE-1-PREFLIGHT-OPAQUE/R1",
+   "MEASURED": "smoke #2 on RC2: the preflight ATTESTED on the real route (listing 200; 3 chat probes 200, served deepseek-v4-pro, one fingerprint) — smoke-2/run-1/preflight/",
+   "V2_0_DISPOSITION": "CLOSED: fixed in RC2 1565bcc and confirmed live",
+   "source": "S6, 2026-10-05"
+  },
+  {
+   "ID": "S6-SMOKE-2-FALSE-ROLLBACK-S10A",
+   "TITLE": "V2.0 RELEASE SMOKE #2 on RC2: 6 of 7 stories committed; STORY-02-01 was rolled back (POST_MERGE_REGRESSION, owner INTEGRATION) because the plan's ProductProofSpec for AC-STORY-05-03-1:S-10-a ('stdlib only; the allowed modules', probe.file_artifact grep_count) counted a docstring line beginning with 'from disk …' as an import of a module 'disk'. The story added no import. RELEASE_SMOKE_PASS = NO: delivery FAIL, ProductProof 66/67, framework false rollback 1",
+   "REPRODUCER": "offline and deterministic (smoke-2/S6-SMOKE-2-ANALYSIS/smoke2_reproducer.py, output beside it): the RC2 kernel's own aisef2.probe.file_artifact.grep_facts with the spec's pattern over ledgerlock/*.py of the preserved candidates — parent 8398d43: 0 matches; STORY-02-01 candidate 8f140e1 and merged d90a7f6: 1 match, ledgerlock/ledger.py:261 '    from disk without trusting any cached in-memory state (docs/requirements.md' (a docstring line of the new module-level verify() wrapper); the import statements of all three revisions identical and all allowed; the same merged file with only that line's first word changed: 0 matches",
+   "MEASURED": [
+    "the run: preflight ATTESTED (3 chat probes HTTP 200, deepseek-v4-pro, one fingerprint a307abda…) — S6-SMOKE-1's fix holds on the real route; 15 sessions, 19 provider requests, 270 turns, input 18,812,251, output 313,380 (within every ceiling, no budget stop, spend fully accounted); aisef run --verify VERIFIED (1834 journal events); 3832 s",
+    "stories: STORY-01-01, 01-05, 02-02, 03-01, 04-01 (pre-satisfied, no developer session), 04-02 COMMIT; STORY-02-01 ROLLBACK; STORY-04-02 retried twice for its own criterion S-9-d (CONTRACT_UNSATISFIED, owner DEVELOPER, one attempt at the 80-turn cap) and committed on attempt 3 — legitimate, within the retry policy",
+    "STORY-02-01's own criterion S-13-g: SATISFIED at the candidate and re-proved at the merged revision; its 18 tests and 45 regression tests passed; the review found nothing; the only refutation is the PRESERVE obligation S-10-a (owned by STORY-01-05), checked post-merge",
+    "the final main 0f8923e satisfies the frozen release acceptance suite 59/59; false acceptance 0; ProductProof 66/67 (S-13-g's obligation not delivered: its story rolled back)"
+   ],
+   "ROOT_CAUSE": "a false refutation by the release workload's plan, not the shipped kernel: PPS-54a03b90 (BC-V22-S-10-a in closure-evidence/v2/release/LEDGERLOCK-PROJECT.json) decides 'stdlib only' with the line pattern ^\\s*(?:import|from)\\s+(?!(?:allowed)\\b|\\.)[A-Za-z_], which cannot tell an import statement from prose in a docstring or comment. The kernel enforced the spec exactly as compiled (a REFUTED preserved obligation after the merge rolls the story back); the rollback was false because the spec was",
+   "AFFECTED_SHIPPED_PATH": "none in the wheel: the ProductProofSpec belongs to the release workload's bundle; probe.file_artifact's grep_count does what it documents (lines matching R)",
+   "AFFECTED_V2_CLAIM": "charter §17 RELEASE_SMOKE_PASS (all planned stories in legitimate successful terminal states; mandatory ProductProof 100%; framework false rollback/block = 0)",
+   "SEVERITY": "fails closed (no false acceptance; the rolled-back code never reached main); a false rollback of a correct story; blocks the release: §17 'If release smoke FAILS: RELEASE_GO = NO, STOP'; the owner's ruling: no third paid smoke",
+   "RELEASE_BLOCKER_RULE_1": "YES (deterministic offline reproducer)",
+   "RELEASE_BLOCKER_RULE_2": "YES (an explicit V2.0 release claim: the release smoke); not the shipped runtime",
+   "RELEASE_BLOCKER_RULE_3": "YES (false rollback)",
+   "V2_0_DISPOSITION": "BLOCK: RELEASE_GO = NO; stopped for the owner (no third paid smoke; no fix-to-green)",
+   "evidence": {
+    "result": {
+     "path": "closure-evidence/v2/release/smoke-2/RESULT.json",
+     "sha256": "e0375c6e0968cf2dc6d1b10fb5a333ffa36ee326015548c63fe198794a70a317"
+    },
+    "run_json": {
+     "path": "closure-evidence/v2/release/smoke-2/run-1/RUN.json",
+     "sha256": "67f7f62fa2a3af8babb19f9b6e009f292f7b7a4a2ece0d34015a2ec2ceb01616"
+    },
+    "journal": {
+     "path": "closure-evidence/v2/release/smoke-2/run-1/aisef-run.jsonl",
+     "sha256": "03fde541d5b5c8d4bd2f409bae7750ef28affdf24693810927cc71a386cbb81b"
+    },
+    "reproducer": {
+     "path": "closure-evidence/v2/release/smoke-2/S6-SMOKE-2-ANALYSIS/smoke2_reproducer.py",
+     "sha256": "60d93edbd64bc25498471eb2e3c1cd6c3d16f75de3e6a52621f3ab80ad952bf8"
+    },
+    "reproduction": {
+     "path": "closure-evidence/v2/release/smoke-2/S6-SMOKE-2-ANALYSIS/smoke2_reproducer.out.json",
+     "sha256": "45a133c946bcb1861a5931bf00201660c08e03ec2e436686c4859bdbb22d79ca"
+    }
+   },
+   "source": "S6, 2026-10-05"
   }
  ],
  "v2_1_backlog": {

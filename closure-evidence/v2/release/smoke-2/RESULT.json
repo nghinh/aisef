@@ -1,0 +1,72 @@
+{
+ "RELEASE_SMOKE_PASS": "NO",
+ "argv": [
+  "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-2/venv/bin/aisef",
+  "run",
+  "--project",
+  "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-2/inputs/project.json",
+  "--settings",
+  "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-2/inputs/settings.json",
+  "--repo",
+  "/Users/nghinh/Downloads/projects/ledgerlock-v2-release-smoke",
+  "--out",
+  "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-2/run"
+ ],
+ "evaluation": {
+  "RELEASE_SMOKE_PASS": "NO",
+  "acceptance": {
+   "not_satisfied": [],
+   "revision": "0f8923ec7dcfaf83dd464d0832c3b1883580a9f3",
+   "satisfied": 59,
+   "total": 59
+  },
+  "bundle_digest": "778e6b84afab76c8326a72c7b11291e3a5e195aacff7eee43d6630699bb8be0a",
+  "checks": {
+   "acceptance_suite_satisfied": true,
+   "delivery_verdict": false,
+   "false_acceptance": true,
+   "framework_false_rollback_or_block": false,
+   "preflight": true,
+   "productproof_delivered": false,
+   "run_verified": true,
+   "stories_committed": false,
+   "unaccounted_spend": true
+  },
+  "delivery_blocked_by": [
+   "1 of the plan's stories did not commit: ['STORY-02-01']"
+  ],
+  "delivery_verdict": "FAIL",
+  "false_acceptance": [],
+  "framework_false_rollback_or_block": [
+   {
+    "code": "POST_MERGE_REGRESSION",
+    "owner": "INTEGRATION",
+    "story": "STORY-02-01"
+   }
+  ],
+  "problems": [
+   "delivery_verdict does not hold",
+   "stories_committed does not hold",
+   "productproof_delivered does not hold",
+   "framework_false_rollback_or_block does not hold"
+  ],
+  "productproof": {
+   "delivered": 66,
+   "total": 67
+  },
+  "run": "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-2/run",
+  "verification": {
+   "delivery_verdict": "FAIL",
+   "journal_events": 1834,
+   "problems": [],
+   "verdict": "VERIFIED"
+  }
+ },
+ "exit": 1,
+ "record": "AISEF V2.0 \u2014 RELEASE SMOKE #2 RESULT (the run as it ended; evaluated by --evaluate)",
+ "run_json_sha256": "67f7f62fa2a3af8babb19f9b6e009f292f7b7a4a2ece0d34015a2ec2ceb01616",
+ "seconds": 3832.0,
+ "side_directory": "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-2",
+ "verify_exit": 0,
+ "verify_stdout_tail": "{\n \"delivery_verdict\": \"FAIL\",\n \"journal_events\": 1834,\n \"problems\": [],\n \"verdict\": \"VERIFIED\"\n}\n"
+}

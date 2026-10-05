@@ -1,0 +1,64 @@
+{
+ "pattern": "^\\s*(?:import|from)\\s+(?!(?:hashlib|json|os|sys|pathlib|tempfile|argparse|unittest|typing|unicodedata|uuid|__future__|ledgerlock)\\b|\\.)[A-Za-z_]",
+ "parent 8398d43 (STORY-01-05 merged)": {
+  "matches": 0,
+  "matching_lines": {},
+  "top_level_import_statements": [
+   "from .cli import main",
+   "from .ledger import ConflictError, Ledger",
+   "from __future__ import annotations",
+   "from pathlib import Path",
+   "from typing import Any, Iterable",
+   "import argparse",
+   "import hashlib",
+   "import json",
+   "import os",
+   "import sys",
+   "import tempfile",
+   "import unicodedata"
+  ]
+ },
+ "STORY-02-01 candidate 8f140e1": {
+  "matches": 1,
+  "matching_lines": {
+   "ledgerlock/ledger.py:261": "    from disk without trusting any cached in-memory state (docs/requirements.md"
+  },
+  "top_level_import_statements": [
+   "from .cli import main",
+   "from .ledger import ConflictError, Ledger",
+   "from __future__ import annotations",
+   "from pathlib import Path",
+   "from typing import Any, Iterable",
+   "import argparse",
+   "import hashlib",
+   "import json",
+   "import os",
+   "import sys",
+   "import tempfile",
+   "import unicodedata"
+  ]
+ },
+ "merged d90a7f6": {
+  "matches": 1,
+  "matching_lines": {
+   "ledgerlock/ledger.py:261": "    from disk without trusting any cached in-memory state (docs/requirements.md"
+  },
+  "top_level_import_statements": [
+   "from .cli import main",
+   "from .ledger import ConflictError, Ledger",
+   "from __future__ import annotations",
+   "from pathlib import Path",
+   "from typing import Any, Iterable",
+   "import argparse",
+   "import hashlib",
+   "import json",
+   "import os",
+   "import sys",
+   "import tempfile",
+   "import unicodedata"
+  ]
+ },
+ "merged d90a7f6 with the docstring line reworded": {
+  "matches": 0
+ }
+}

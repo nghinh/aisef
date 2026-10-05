@@ -1,0 +1,41 @@
+{
+ "delivery_blocked_by": [
+  "1 of the plan's stories did not commit: ['STORY-02-01']"
+ ],
+ "delivery_verdict": "FAIL",
+ "final_main": "0f8923ec7dcfaf83dd464d0832c3b1883580a9f3",
+ "journal": {
+  "closed": "SHUTDOWN",
+  "lines": 1834,
+  "path": "run/journals/aisef-run.jsonl",
+  "sha256": "03fde541d5b5c8d4bd2f409bae7750ef28affdf24693810927cc71a386cbb81b"
+ },
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "project": "LedgerLock",
+ "record": "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-2/run/RUN.json",
+ "story_outcomes": {
+  "STORY-01-01": [
+   "COMMIT"
+  ],
+  "STORY-01-05": [
+   "COMMIT"
+  ],
+  "STORY-02-01": [
+   "ROLLBACK"
+  ],
+  "STORY-02-02": [
+   "COMMIT"
+  ],
+  "STORY-03-01": [
+   "COMMIT"
+  ],
+  "STORY-04-01": [
+   "COMMIT"
+  ],
+  "STORY-04-02": [
+   "RETRY",
+   "RETRY",
+   "COMMIT"
+  ]
+ }
+}
