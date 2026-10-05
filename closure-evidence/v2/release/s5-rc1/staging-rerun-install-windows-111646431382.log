@@ -1,0 +1,276 @@
+install (windows-latest)	Set up job	﻿2026-10-05T06:43:23.2543407Z Current runner version: '2.337.0'
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2601408Z ##[group]Runner Image Provisioner
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2602213Z Hosted Compute Agent
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2602857Z Version: 20260901.588
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2603489Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2604190Z Build Date: 2026-09-01T19:56:44Z
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2604933Z Worker ID: {9ef1e45d-bcf2-45d0-afad-31e4eead2bfa}
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2605606Z Azure Region: westus2
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2606136Z ##[endgroup]
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2607515Z ##[group]Operating System
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2608187Z Microsoft Windows Server 2025
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2608824Z 10.0.26100
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2609324Z Datacenter
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2609808Z ##[endgroup]
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2610394Z ##[group]Runner Image
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2611047Z Image: windows-2025-vs2026
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2611680Z Version: 20260925.250.1
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2613228Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260925.250/images/windows/Windows2025-VS2026-Readme.md
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2615220Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260925.250
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2616235Z ##[endgroup]
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2617309Z ##[group]GITHUB_TOKEN Permissions
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2619107Z Contents: read
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2619766Z Metadata: read
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2620292Z ##[endgroup]
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2622343Z Secret source: Actions
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2623326Z Cache mode: write
+install (windows-latest)	Set up job	2026-10-05T06:43:23.2623996Z Prepare workflow directory
+install (windows-latest)	Set up job	2026-10-05T06:43:23.3188448Z Prepare all required actions
+install (windows-latest)	Set up job	2026-10-05T06:43:23.3254274Z Getting action download info
+install (windows-latest)	Set up job	2026-10-05T06:43:23.6524340Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+install (windows-latest)	Set up job	2026-10-05T06:43:23.7898925Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+install (windows-latest)	Set up job	2026-10-05T06:43:23.9681488Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+install (windows-latest)	Set up job	2026-10-05T06:43:24.5063213Z Complete job name: install (windows-latest)
+install (windows-latest)	Run actions/checkout@v4	﻿2026-10-05T06:43:24.6589444Z ##[group]Run actions/checkout@v4
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6590528Z with:
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6590977Z   repository: nghinh/aisef
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6595022Z   token: ***
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6595460Z   ssh-strict: true
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6595895Z   ssh-user: git
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6596337Z   persist-credentials: true
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6596823Z   clean: true
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6597264Z   sparse-checkout-cone-mode: true
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6598572Z   fetch-depth: 1
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6599194Z   fetch-tags: false
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6599669Z   show-progress: true
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6600125Z   lfs: false
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6600548Z   submodules: false
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6601000Z   set-safe-directory: true
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6601504Z   allow-unsafe-pr-checkout: false
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.6602342Z ##[endgroup]
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.8043666Z Syncing repository: nghinh/aisef
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.8045546Z ##[group]Getting Git version info
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.8046497Z Working directory is 'D:\a\aisef\aisef'
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:24.9005340Z [command]"C:\Program Files\Git\bin\git.exe" version
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.2901956Z git version 2.55.0.windows.5
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.2945947Z ##[endgroup]
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.2964750Z Temporarily overriding HOME='D:\a\_temp\934c591e-ac21-4e7c-9104-dd83e063d48a' before making global git config changes
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.2966943Z Adding repository directory to the temporary git global config as a safe directory
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.2974968Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\aisef\aisef
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.3682085Z Deleting the contents of 'D:\a\aisef\aisef'
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.3688588Z ##[group]Initializing the repository
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.3697520Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\aisef\aisef
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.4645497Z Initialized empty Git repository in D:/a/aisef/aisef/.git/
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.4690024Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/nghinh/aisef
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.5314527Z ##[endgroup]
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.5317716Z ##[group]Disabling automatic garbage collection
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.5326882Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.5669199Z ##[endgroup]
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.5671480Z ##[group]Setting up auth
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.5681671Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.5991332Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:27.2941479Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:27.3234569Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:27.8617686Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:27.8922315Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:28.4377714Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:28.4681043Z ##[endgroup]
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:28.4681911Z ##[group]Fetching the repository
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:28.4701364Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +529591e4f2aeaa1ec621d624ef223e77ec9ff603:refs/remotes/origin/release/v2.0.0
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:31.4946199Z From https://github.com/nghinh/aisef
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:31.4947085Z  * [new ref]         529591e4f2aeaa1ec621d624ef223e77ec9ff603 -> origin/release/v2.0.0
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:31.4986370Z ##[endgroup]
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:31.4986817Z ##[group]Determining the checkout info
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:31.4989604Z ##[endgroup]
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:31.5004945Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:31.5567874Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:31.5891618Z ##[group]Checking out the ref
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:31.5900735Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B release/v2.0.0 refs/remotes/origin/release/v2.0.0
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.6511193Z Updating files:  53% (2241/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.6650182Z Updating files:  54% (2263/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.6913329Z Updating files:  55% (2305/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.7140831Z Updating files:  56% (2347/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.7385990Z Updating files:  57% (2389/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.7495963Z Updating files:  58% (2431/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.7598189Z Updating files:  59% (2473/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.7723344Z Updating files:  60% (2514/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.7878164Z Updating files:  61% (2556/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.8265379Z Updating files:  62% (2598/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.9681196Z Updating files:  63% (2640/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:32.9896962Z Updating files:  64% (2682/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.0440552Z Updating files:  65% (2724/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.0604686Z Updating files:  66% (2766/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.0737258Z Updating files:  67% (2808/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.1289506Z Updating files:  68% (2850/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.1628594Z Updating files:  69% (2892/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.1927868Z Updating files:  70% (2933/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.2152135Z Updating files:  71% (2975/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.2450740Z Updating files:  72% (3017/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.3021471Z Updating files:  73% (3059/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.3462222Z Updating files:  74% (3101/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.3579252Z Updating files:  75% (3143/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.3762085Z Updating files:  76% (3185/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.3900710Z Updating files:  77% (3227/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.4051620Z Updating files:  78% (3269/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.4197983Z Updating files:  79% (3311/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.4352758Z Updating files:  80% (3352/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.4492686Z Updating files:  81% (3394/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.4604994Z Updating files:  82% (3436/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.4708767Z Updating files:  83% (3478/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.4818245Z Updating files:  84% (3520/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.4925718Z Updating files:  85% (3562/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.5065086Z Updating files:  86% (3604/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.5216288Z Updating files:  87% (3646/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.5364102Z Updating files:  88% (3688/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.5499769Z Updating files:  89% (3730/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.5640071Z Updating files:  90% (3771/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.5774837Z Updating files:  91% (3813/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.5859185Z Updating files:  92% (3855/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.5992620Z Updating files:  93% (3897/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.6130687Z Updating files:  94% (3939/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.6266540Z Updating files:  95% (3981/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.6462994Z Updating files:  96% (4023/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.6685177Z Updating files:  97% (4065/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.6884972Z Updating files:  98% (4107/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.7012843Z Updating files:  99% (4149/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.7013569Z Updating files: 100% (4190/4190)
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.7014039Z Updating files: 100% (4190/4190), done.
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.7337955Z Switched to a new branch 'release/v2.0.0'
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.7503546Z branch 'release/v2.0.0' set up to track 'origin/release/v2.0.0'.
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.7631090Z ##[endgroup]
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.8081173Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+install (windows-latest)	Run actions/checkout@v4	2026-10-05T06:43:33.8356026Z 529591e4f2aeaa1ec621d624ef223e77ec9ff603
+install (windows-latest)	Run actions/setup-python@v5	﻿2026-10-05T06:43:33.8876862Z ##[group]Run actions/setup-python@v5
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:33.8877227Z with:
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:33.8877425Z   python-version: 3.11
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:33.8877664Z   check-latest: false
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:33.8880375Z   token: ***
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:33.8880585Z   update-environment: true
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:33.8880821Z   allow-prereleases: false
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:33.8881039Z   freethreaded: false
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:33.8881238Z ##[endgroup]
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:34.0478171Z ##[group]Installed versions
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:34.0712564Z (node:6948) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:34.0713341Z (Use `node --trace-deprecation ...` to show where the warning was created)
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:34.0714849Z Successfully set up CPython (3.11.9)
+install (windows-latest)	Run actions/setup-python@v5	2026-10-05T06:43:34.0715818Z ##[endgroup]
+install (windows-latest)	Run actions/download-artifact@v4	﻿2026-10-05T06:43:34.1019044Z ##[group]Run actions/download-artifact@v4
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1019444Z with:
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1019639Z   name: dist
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1019824Z   path: dist/
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1020021Z   merge-multiple: false
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1020243Z   repository: nghinh/aisef
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1020460Z   run-id: 37256508105
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1020654Z env:
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1020914Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1021384Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1021845Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1022251Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1022645Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.1022950Z ##[endgroup]
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.2806276Z Downloading single artifact
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.3038904Z (node:6768) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.3041013Z (Use `node --trace-deprecation ...` to show where the warning was created)
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.5735482Z Preparing to download the following artifacts:
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.5736239Z - dist (ID: 11329183235, Size: 1768877, Expected Digest: sha256:999ddcf3db8c273d715da7a503b49413e8a6576a6af509213186944458b868a1)
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.7989759Z Redirecting to blob download url: https://productionresultssa5.blob.core.windows.net/actions-results/960eb754-0d03-88cc-b0a2-19676864662d/workflow-job-run-fc890578-0067-57e5-9979-b794613233e0/artifacts/bcae0416621b3db43d8cba1e4454a792c7af9e4b7287e51056efc5a215d95839.zip
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:34.7992095Z Starting download of artifact to: D:\a\aisef\aisef\dist
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.1219790Z (node:6768) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5286612Z SHA256 digest of downloaded artifact is 999ddcf3db8c273d715da7a503b49413e8a6576a6af509213186944458b868a1
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5287351Z Artifact download completed successfully.
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5287713Z Total of 1 artifact(s) downloaded
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5295114Z Download artifact has finished successfully
+install (windows-latest)	Run actions/download-artifact@v4	﻿2026-10-05T06:43:35.5613737Z ##[group]Run actions/download-artifact@v4
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5614116Z with:
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5614304Z   name: dist-sha256
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5614499Z   path: .
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5614683Z   merge-multiple: false
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5614908Z   repository: nghinh/aisef
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5615133Z   run-id: 37256508105
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5615321Z env:
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5615587Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5616049Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5616542Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5616955Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5617351Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.5617887Z ##[endgroup]
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.7413572Z Downloading single artifact
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.7639624Z (node:7644) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:35.7641238Z (Use `node --trace-deprecation ...` to show where the warning was created)
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:36.0141998Z Preparing to download the following artifacts:
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:36.0143042Z - dist-sha256 (ID: 11328973657, Size: 266, Expected Digest: sha256:0a6721028d2b7a73ac010e314e4e5ab49cc480d923f4f46cc135779aca570de3)
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:36.2555953Z Redirecting to blob download url: https://productionresultssa5.blob.core.windows.net/actions-results/960eb754-0d03-88cc-b0a2-19676864662d/workflow-job-run-fc890578-0067-57e5-9979-b794613233e0/artifacts/030ac884951a628a67088ac4ebdcc46452544c33186a71fffe72c620cffb2105.zip
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:36.2557651Z Starting download of artifact to: D:\a\aisef\aisef
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:36.5420735Z (node:7644) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:36.5480014Z SHA256 digest of downloaded artifact is 0a6721028d2b7a73ac010e314e4e5ab49cc480d923f4f46cc135779aca570de3
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:36.5480925Z Artifact download completed successfully.
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:36.5481236Z Total of 1 artifact(s) downloaded
+install (windows-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:36.5488859Z Download artifact has finished successfully
+install (windows-latest)	the downloaded files are exactly the ones built	﻿2026-10-05T06:43:36.5785106Z ##[group]Run cd dist && sha256sum -c ../SHA256SUMS
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.5785617Z ^[[36;1mcd dist && sha256sum -c ../SHA256SUMS^[[0m
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.5861036Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.5861470Z env:
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.5861754Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.5862242Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.5862714Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.5863131Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.5863557Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.5863881Z ##[endgroup]
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.8119022Z aisef-2.0.0-py3-none-any.whl: OK
+install (windows-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:36.8153291Z aisef-2.0.0.tar.gz: OK
+install (windows-latest)	install exactly that wheel into a clean venv	﻿2026-10-05T06:43:36.8383668Z ##[group]Run set -eu
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8384050Z ^[[36;1mset -eu^[[0m
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8384479Z ^[[36;1mtmp="$RUNNER_TEMP"; if command -v cygpath >/dev/null; then tmp=$(cygpath -u "$tmp"); fi^[[0m
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8384965Z ^[[36;1mpython -m venv "$tmp/venv"^[[0m
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8385500Z ^[[36;1mpy="$tmp/venv/bin/python"; if [ -f "$tmp/venv/Scripts/python.exe" ]; then py="$tmp/venv/Scripts/python.exe"; fi^[[0m
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8386095Z ^[[36;1m"$py" -m pip install --no-index --no-deps dist/*.whl^[[0m
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8386462Z ^[[36;1mecho "SMOKE_PY=$py" >> "$GITHUB_ENV"^[[0m
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8386790Z ^[[36;1mecho "SMOKE_DIR=$tmp" >> "$GITHUB_ENV"^[[0m
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8403680Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8404115Z env:
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8404398Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8404884Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8405401Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8405838Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8406258Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:36.8406598Z ##[endgroup]
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:45.0269020Z Processing d:\a\aisef\aisef\dist\aisef-2.0.0-py3-none-any.whl
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:45.0544349Z Installing collected packages: aisef
+install (windows-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:45.7142824Z Successfully installed aisef-2.0.0
+install (windows-latest)	CLI smoke from the installed artifact	﻿2026-10-05T06:43:45.7921290Z ##[group]Run set -eu
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7921656Z ^[[36;1mset -eu^[[0m
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7922300Z ^[[36;1mwant=$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version'])")^[[0m
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7923054Z ^[[36;1msmoke="$GITHUB_WORKSPACE/tests/installed_smoke.py"^[[0m
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7923401Z ^[[36;1mcd "$SMOKE_DIR"^[[0m
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7923663Z ^[[36;1m"$SMOKE_PY" -I -c "import aisef2"^[[0m
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7924006Z ^[[36;1m"$SMOKE_PY" -I "$smoke" "$want" --product^[[0m
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7945298Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7946036Z env:
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7946515Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7947363Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7948185Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7949203Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7949951Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7950616Z   SMOKE_PY: /d/a/_temp/venv/Scripts/python.exe
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7951845Z   SMOKE_DIR: /d/a/_temp
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:45.7952380Z ##[endgroup]
+install (windows-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:46.4975514Z installed smoke: PASS (aisef 2.0.0)
+install (windows-latest)	Post Run actions/setup-python@v5	﻿2026-10-05T06:43:46.5417030Z Post job cleanup.
+install (windows-latest)	Post Run actions/setup-python@v5	2026-10-05T06:43:46.6906937Z (node:6212) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+install (windows-latest)	Post Run actions/setup-python@v5	2026-10-05T06:43:46.6907718Z (Use `node --trace-deprecation ...` to show where the warning was created)
+install (windows-latest)	Post Run actions/checkout@v4	﻿2026-10-05T06:43:46.7214244Z Post job cleanup.
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:46.9440759Z [command]"C:\Program Files\Git\bin\git.exe" version
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:46.9721250Z git version 2.55.0.windows.5
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:46.9787202Z Temporarily overriding HOME='D:\a\_temp\21cb686a-e02f-4424-863c-14f6c9054581' before making global git config changes
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:46.9788321Z Adding repository directory to the temporary git global config as a safe directory
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:46.9799460Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\aisef\aisef
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:47.0099880Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:47.0398303Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:47.5819117Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:47.6077202Z http.https://github.com/.extraheader
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:47.6121073Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:47.6422091Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:48.1734859Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+install (windows-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:48.2032739Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+install (windows-latest)	Complete job	﻿2026-10-05T06:43:48.7754010Z Cleaning up orphan processes
+install (windows-latest)	Complete job	2026-10-05T06:43:48.7809237Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

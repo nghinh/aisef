@@ -1,0 +1,1340 @@
+build	Set up job	﻿2026-10-05T06:43:01.7651260Z Current runner version: '2.337.0'
+build	Set up job	2026-10-05T06:43:01.7676196Z ##[group]Runner Image Provisioner
+build	Set up job	2026-10-05T06:43:01.7677196Z Hosted Compute Agent
+build	Set up job	2026-10-05T06:43:01.7677855Z Version: 20260901.588
+build	Set up job	2026-10-05T06:43:01.7678492Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+build	Set up job	2026-10-05T06:43:01.7679382Z Build Date: 2026-09-01T19:56:44Z
+build	Set up job	2026-10-05T06:43:01.7680105Z Worker ID: {5d0745d0-b990-4de2-9a2e-b734b43a9d19}
+build	Set up job	2026-10-05T06:43:01.7680874Z Azure Region: eastus
+build	Set up job	2026-10-05T06:43:01.7681565Z ##[endgroup]
+build	Set up job	2026-10-05T06:43:01.7683170Z ##[group]Operating System
+build	Set up job	2026-10-05T06:43:01.7684088Z Ubuntu
+build	Set up job	2026-10-05T06:43:01.7684636Z 24.04.5
+build	Set up job	2026-10-05T06:43:01.7685229Z LTS
+build	Set up job	2026-10-05T06:43:01.7685822Z ##[endgroup]
+build	Set up job	2026-10-05T06:43:01.7686387Z ##[group]Runner Image
+build	Set up job	2026-10-05T06:43:01.7687063Z Image: ubuntu-24.04
+build	Set up job	2026-10-05T06:43:01.7687694Z Version: 20260927.320.1
+build	Set up job	2026-10-05T06:43:01.7689142Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+build	Set up job	2026-10-05T06:43:01.7690973Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+build	Set up job	2026-10-05T06:43:01.7692024Z ##[endgroup]
+build	Set up job	2026-10-05T06:43:01.7693140Z ##[group]GITHUB_TOKEN Permissions
+build	Set up job	2026-10-05T06:43:01.7695842Z Contents: read
+build	Set up job	2026-10-05T06:43:01.7696499Z Metadata: read
+build	Set up job	2026-10-05T06:43:01.7697196Z ##[endgroup]
+build	Set up job	2026-10-05T06:43:01.7699371Z Secret source: Actions
+build	Set up job	2026-10-05T06:43:01.7700458Z Cache mode: write
+build	Set up job	2026-10-05T06:43:01.7701444Z Prepare workflow directory
+build	Set up job	2026-10-05T06:43:01.8024592Z Prepare all required actions
+build	Set up job	2026-10-05T06:43:01.8071917Z Getting action download info
+build	Set up job	2026-10-05T06:43:02.0518285Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+build	Set up job	2026-10-05T06:43:02.1594122Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+build	Set up job	2026-10-05T06:43:02.2395625Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+build	Set up job	2026-10-05T06:43:02.4616551Z Complete job name: build
+build	Run actions/checkout@v4	﻿2026-10-05T06:43:02.5406873Z ##[group]Run actions/checkout@v4
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5407842Z with:
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5408315Z   repository: nghinh/aisef
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5412456Z   token: ***
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5412908Z   ssh-strict: true
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5413567Z   ssh-user: git
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5414046Z   persist-credentials: true
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5414581Z   clean: true
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5415052Z   sparse-checkout-cone-mode: true
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5415610Z   fetch-depth: 1
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5416068Z   fetch-tags: false
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5416552Z   show-progress: true
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5417019Z   lfs: false
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5417465Z   submodules: false
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5417944Z   set-safe-directory: true
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5418475Z   allow-unsafe-pr-checkout: false
+build	Run actions/checkout@v4	2026-10-05T06:43:02.5419287Z ##[endgroup]
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6391074Z Syncing repository: nghinh/aisef
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6393739Z ##[group]Getting Git version info
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6394550Z Working directory is '/home/runner/work/aisef/aisef'
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6400427Z [command]/usr/bin/git version
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6513302Z git version 2.55.0
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6547219Z ##[endgroup]
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6560047Z Temporarily overriding HOME='/home/runner/work/_temp/ea9bdeac-3b5b-4f58-887d-e09671e6d0cf' before making global git config changes
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6562656Z Adding repository directory to the temporary git global config as a safe directory
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6565817Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6619100Z Deleting the contents of '/home/runner/work/aisef/aisef'
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6628813Z ##[group]Initializing the repository
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6629986Z [command]/usr/bin/git init /home/runner/work/aisef/aisef
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6743590Z hint: Using 'master' as the name for the initial branch. This default branch name
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6745267Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6746676Z hint: to use in all of your new repositories, which will suppress this warning,
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6747548Z hint: call:
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6748234Z hint:
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6748822Z hint: 	git config --global init.defaultBranch <name>
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6749545Z hint:
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6750217Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6751304Z hint: 'development'. The just-created branch can be renamed via this command:
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6752173Z hint:
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6752651Z hint: 	git branch -m <name>
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6753202Z hint:
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6754237Z hint: Disable this message with "git config set advice.defaultBranchName false"
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6759717Z Initialized empty Git repository in /home/runner/work/aisef/aisef/.git/
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6770855Z [command]/usr/bin/git remote add origin https://github.com/nghinh/aisef
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6820691Z ##[endgroup]
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6821561Z ##[group]Disabling automatic garbage collection
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6825302Z [command]/usr/bin/git config --local gc.auto 0
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6857523Z ##[endgroup]
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6858440Z ##[group]Setting up auth
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6865652Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build	Run actions/checkout@v4	2026-10-05T06:43:02.6897589Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build	Run actions/checkout@v4	2026-10-05T06:43:02.7281007Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build	Run actions/checkout@v4	2026-10-05T06:43:02.7326794Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build	Run actions/checkout@v4	2026-10-05T06:43:02.7569290Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build	Run actions/checkout@v4	2026-10-05T06:43:02.7608123Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build	Run actions/checkout@v4	2026-10-05T06:43:02.7857283Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+build	Run actions/checkout@v4	2026-10-05T06:43:02.7905445Z ##[endgroup]
+build	Run actions/checkout@v4	2026-10-05T06:43:02.7906667Z ##[group]Fetching the repository
+build	Run actions/checkout@v4	2026-10-05T06:43:02.7920389Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +529591e4f2aeaa1ec621d624ef223e77ec9ff603:refs/remotes/origin/release/v2.0.0
+build	Run actions/checkout@v4	2026-10-05T06:43:04.8292725Z From https://github.com/nghinh/aisef
+build	Run actions/checkout@v4	2026-10-05T06:43:04.8294988Z  * [new ref]         529591e4f2aeaa1ec621d624ef223e77ec9ff603 -> origin/release/v2.0.0
+build	Run actions/checkout@v4	2026-10-05T06:43:04.8298565Z ##[endgroup]
+build	Run actions/checkout@v4	2026-10-05T06:43:04.8299509Z ##[group]Determining the checkout info
+build	Run actions/checkout@v4	2026-10-05T06:43:04.8300572Z ##[endgroup]
+build	Run actions/checkout@v4	2026-10-05T06:43:04.8307066Z [command]/usr/bin/git sparse-checkout disable
+build	Run actions/checkout@v4	2026-10-05T06:43:04.8360548Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+build	Run actions/checkout@v4	2026-10-05T06:43:04.8395188Z ##[group]Checking out the ref
+build	Run actions/checkout@v4	2026-10-05T06:43:04.8399262Z [command]/usr/bin/git checkout --progress --force -B release/v2.0.0 refs/remotes/origin/release/v2.0.0
+build	Run actions/checkout@v4	2026-10-05T06:43:05.4591803Z Switched to a new branch 'release/v2.0.0'
+build	Run actions/checkout@v4	2026-10-05T06:43:05.4599039Z branch 'release/v2.0.0' set up to track 'origin/release/v2.0.0'.
+build	Run actions/checkout@v4	2026-10-05T06:43:05.4709879Z ##[endgroup]
+build	Run actions/checkout@v4	2026-10-05T06:43:05.4713929Z [command]/usr/bin/git log -1 --format=%H
+build	Run actions/checkout@v4	2026-10-05T06:43:05.4741577Z 529591e4f2aeaa1ec621d624ef223e77ec9ff603
+build	Run actions/setup-python@v5	﻿2026-10-05T06:43:05.5086010Z ##[group]Run actions/setup-python@v5
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.5086496Z with:
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.5086790Z   python-version: 3.12
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.5087122Z   check-latest: false
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.5090172Z   token: ***
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.5090489Z   update-environment: true
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.5090856Z   allow-prereleases: false
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.5091406Z   freethreaded: false
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.5091716Z ##[endgroup]
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.6398218Z ##[group]Installed versions
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.6494976Z (node:2299) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.6496700Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.6497813Z Successfully set up CPython (3.12.14)
+build	Run actions/setup-python@v5	2026-10-05T06:43:05.6498920Z ##[endgroup]
+build	Run python -m pip install build twine	﻿2026-10-05T06:43:05.6660249Z ##[group]Run python -m pip install build twine
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6660889Z ^[[36;1mpython -m pip install build twine^[[0m
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6983642Z shell: /usr/bin/bash -e {0}
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6984295Z env:
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6984826Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6985668Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6986475Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6987228Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6987945Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6988679Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+build	Run python -m pip install build twine	2026-10-05T06:43:05.6989292Z ##[endgroup]
+build	Run python -m pip install build twine	2026-10-05T06:43:06.5638966Z Collecting build
+build	Run python -m pip install build twine	2026-10-05T06:43:06.6115185Z   Downloading build-1.6.1-py3-none-any.whl.metadata (5.6 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.6316957Z Collecting twine
+build	Run python -m pip install build twine	2026-10-05T06:43:06.6354963Z   Downloading twine-7.0.0-py3-none-any.whl.metadata (3.5 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.6501377Z Collecting packaging>=24.0 (from build)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.6540641Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.6645737Z Collecting pyproject_hooks (from build)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.6679966Z   Downloading pyproject_hooks-1.3.3-py3-none-any.whl.metadata (1.3 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.6817380Z Collecting readme-renderer>=35.0 (from twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.6851670Z   Downloading readme_renderer-46.0-py3-none-any.whl.metadata (3.0 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.7072526Z Collecting requests>=2.20 (from twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.7107414Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.7225969Z Collecting requests-toolbelt!=0.9.0,>=0.8.0 (from twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.7258158Z   Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl.metadata (14 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.7471358Z Collecting urllib3>=1.26.0 (from twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.7506722Z   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.7769098Z Collecting keyring>=21.2.0 (from twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.7804278Z   Downloading keyring-25.7.0-py3-none-any.whl.metadata (21 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.7967055Z Collecting rfc3986>=1.4.0 (from twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.8003210Z   Downloading rfc3986-2.0.0-py2.py3-none-any.whl.metadata (6.6 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.8272253Z Collecting rich>=14.3.3 (from twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.8309952Z   Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.8550437Z Collecting id (from twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.8585037Z   Downloading id-1.6.1-py3-none-any.whl.metadata (5.1 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.8709139Z Collecting SecretStorage>=3.2 (from keyring>=21.2.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.8743984Z   Downloading secretstorage-3.5.0-py3-none-any.whl.metadata (4.0 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.8852844Z Collecting jeepney>=0.4.2 (from keyring>=21.2.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.8885958Z   Downloading jeepney-0.9.0-py3-none-any.whl.metadata (1.2 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.9001638Z Collecting jaraco.classes (from keyring>=21.2.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.9035746Z   Downloading jaraco.classes-3.4.0-py3-none-any.whl.metadata (2.6 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.9193404Z Collecting jaraco.functools (from keyring>=21.2.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.9226868Z   Downloading jaraco_functools-4.6.0-py3-none-any.whl.metadata (2.9 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.9356744Z Collecting jaraco.context (from keyring>=21.2.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.9390362Z   Downloading jaraco_context-6.1.2-py3-none-any.whl.metadata (4.2 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.9795250Z Collecting nh3>=0.2.14 (from readme-renderer>=35.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.9831405Z   Downloading nh3-0.3.7-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.0 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:06.9975242Z Collecting docutils>=0.21.2 (from readme-renderer>=35.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.0008034Z   Downloading docutils-0.23-py3-none-any.whl.metadata (15 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.0191086Z Collecting Pygments>=2.5.1 (from readme-renderer>=35.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.0223601Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.1416947Z Collecting charset_normalizer<4,>=2 (from requests>=2.20->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.1453170Z   Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.1616848Z Collecting idna<4,>=2.5 (from requests>=2.20->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.1652140Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.1860379Z Collecting certifi>=2023.5.7 (from requests>=2.20->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.1893009Z   Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.2073240Z Collecting markdown-it-py>=2.2.0 (from rich>=14.3.3->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.2107990Z   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.2251723Z Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=14.3.3->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.2286579Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.4034618Z Collecting cryptography>=2.0 (from SecretStorage>=3.2->keyring>=21.2.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.4070862Z   Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.4 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5044217Z Collecting cffi>=2.0.0 (from cryptography>=2.0->SecretStorage>=3.2->keyring>=21.2.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5082347Z   Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5227869Z Collecting pycparser (from cffi>=2.0.0->cryptography>=2.0->SecretStorage>=3.2->keyring>=21.2.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5259451Z   Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5447644Z Collecting more-itertools (from jaraco.classes->keyring>=21.2.0->twine)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5480591Z   Downloading more_itertools-11.1.0-py3-none-any.whl.metadata (41 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5580504Z Downloading build-1.6.1-py3-none-any.whl (31 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5633467Z Downloading twine-7.0.0-py3-none-any.whl (43 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5692430Z Downloading keyring-25.7.0-py3-none-any.whl (39 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5746954Z Downloading jeepney-0.9.0-py3-none-any.whl (49 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5803770Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5871624Z Downloading readme_renderer-46.0-py3-none-any.whl (14 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.5928445Z Downloading docutils-0.23-py3-none-any.whl (634 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6018773Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 634.7/634.7 kB 76.4 MB/s  0:00:00
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6055545Z Downloading nh3-0.3.7-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (832 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6139763Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 832.2/832.2 kB 91.3 MB/s  0:00:00
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6173813Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6241690Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 211.2 MB/s  0:00:00
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6274160Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6329722Z Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (257 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6386884Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6439649Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6494139Z Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6547659Z Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6608727Z Downloading rfc3986-2.0.0-py2.py3-none-any.whl (31 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6666438Z Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6723618Z Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6778731Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.6830664Z Downloading secretstorage-3.5.0-py3-none-any.whl (15 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.7416624Z Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl (4.8 MB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.7595312Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.8/4.8 MB 296.5 MB/s  0:00:00
+build	Run python -m pip install build twine	2026-10-05T06:43:07.7632547Z Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.7689142Z Downloading id-1.6.1-py3-none-any.whl (14 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.7740294Z Downloading jaraco.classes-3.4.0-py3-none-any.whl (6.8 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.7791315Z Downloading jaraco_context-6.1.2-py3-none-any.whl (7.9 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.7842923Z Downloading jaraco_functools-4.6.0-py3-none-any.whl (11 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.7897634Z Downloading more_itertools-11.1.0-py3-none-any.whl (72 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.7953601Z Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.8007625Z Downloading pyproject_hooks-1.3.3-py3-none-any.whl (10 kB)
+build	Run python -m pip install build twine	2026-10-05T06:43:07.9462875Z Installing collected packages: urllib3, rfc3986, pyproject_hooks, Pygments, pycparser, packaging, nh3, more-itertools, mdurl, jeepney, jaraco.context, idna, docutils, charset_normalizer, certifi, requests, readme-renderer, markdown-it-py, jaraco.functools, jaraco.classes, id, cffi, build, rich, requests-toolbelt, cryptography, SecretStorage, keyring, twine
+build	Run python -m pip install build twine	2026-10-05T06:43:10.1089513Z 
+build	Run python -m pip install build twine	2026-10-05T06:43:10.1119800Z Successfully installed Pygments-2.21.0 SecretStorage-3.5.0 build-1.6.1 certifi-2026.7.22 cffi-2.1.1 charset_normalizer-3.5.2 cryptography-50.0.2 docutils-0.23 id-1.6.1 idna-3.20 jaraco.classes-3.4.0 jaraco.context-6.1.2 jaraco.functools-4.6.0 jeepney-0.9.0 keyring-25.7.0 markdown-it-py-4.2.0 mdurl-0.1.2 more-itertools-11.1.0 nh3-0.3.7 packaging-26.3 pycparser-3.0 pyproject_hooks-1.3.3 readme-renderer-46.0 requests-2.34.2 requests-toolbelt-1.0.0 rfc3986-2.0.0 rich-15.0.0 twine-7.0.0 urllib3-2.8.0
+build	build the sdist, then the wheel FROM it, reproducibly	﻿2026-10-05T06:43:10.1852714Z ##[group]Run set -eu
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1853032Z ^[[36;1mset -eu^[[0m
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1853903Z ^[[36;1mexport SOURCE_DATE_EPOCH="$(python -P validation/qualification/release_rc.py --epoch)"   # the frozen RC's once frozen^[[0m
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1854584Z ^[[36;1mpython -m build^[[0m
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1854974Z ^[[36;1mpython -P validation/qualification/repro_dist.py dist/*.tar.gz^[[0m
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1921151Z shell: /usr/bin/bash -e {0}
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1921468Z env:
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1921805Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1922382Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1922965Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1923665Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1924181Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1924693Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.1925149Z ##[endgroup]
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.3933719Z * Creating isolated environment: venv+pip...
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.4156985Z * Installing packages in isolated environment:
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:10.4157994Z   - setuptools==84.0.0
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.2705768Z * Getting build dependencies for sdist...
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7541584Z running egg_info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7558719Z creating aisef.egg-info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7559815Z writing aisef.egg-info/PKG-INFO
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7565028Z writing dependency_links to aisef.egg-info/dependency_links.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7568275Z writing entry points to aisef.egg-info/entry_points.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7570989Z writing top-level names to aisef.egg-info/top_level.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7572362Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7687129Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7689696Z reading manifest template 'MANIFEST.in'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7713450Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7948026Z * Installed build dependency versions:
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7948619Z   - setuptools==84.0.0
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.7949043Z * Building sdist...
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9650658Z running sdist
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9651684Z running egg_info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9681303Z writing aisef.egg-info/PKG-INFO
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9687166Z writing dependency_links to aisef.egg-info/dependency_links.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9689733Z writing entry points to aisef.egg-info/entry_points.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9692209Z writing top-level names to aisef.egg-info/top_level.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9806270Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9830508Z reading manifest template 'MANIFEST.in'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9860927Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9864317Z running check
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9893338Z creating aisef-2.0.0
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9898986Z creating aisef-2.0.0/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9900925Z creating aisef-2.0.0/aisef.egg-info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9902764Z creating aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9905241Z creating aisef-2.0.0/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9906755Z creating aisef-2.0.0/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9908859Z creating aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9910828Z creating aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9912581Z creating aisef-2.0.0/aisef/harness/assets
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9914792Z creating aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9916773Z creating aisef-2.0.0/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9918334Z creating aisef-2.0.0/aisef/kit/rules
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9920612Z creating aisef-2.0.0/aisef/kit/skills/aisef-mockup-html
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9923555Z creating aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9924880Z creating aisef-2.0.0/aisef2
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9927002Z creating aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9928945Z creating aisef-2.0.0/aisef2/arch
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9930559Z creating aisef-2.0.0/aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9932329Z creating aisef-2.0.0/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9934690Z creating aisef-2.0.0/aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9936086Z creating aisef-2.0.0/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9938262Z creating aisef-2.0.0/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9939632Z creating aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9941601Z creating aisef-2.0.0/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9943633Z creating aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9945381Z creating aisef-2.0.0/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9947487Z creating aisef-2.0.0/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9949028Z creating aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9950220Z copying files to aisef-2.0.0...
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9951161Z copying MANIFEST.in -> aisef-2.0.0
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9953648Z copying README.md -> aisef-2.0.0
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9956233Z copying pyproject.toml -> aisef-2.0.0
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9957866Z copying aisef/__init__.py -> aisef-2.0.0/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9959926Z copying aisef/__main__.py -> aisef-2.0.0/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9961599Z copying aisef/_compat.py -> aisef-2.0.0/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9963634Z copying aisef/config.py -> aisef-2.0.0/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9966177Z copying aisef/memory.py -> aisef-2.0.0/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9968599Z copying aisef/memory_bench.py -> aisef-2.0.0/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9970214Z copying aisef.egg-info/PKG-INFO -> aisef-2.0.0/aisef.egg-info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9972699Z copying aisef.egg-info/SOURCES.txt -> aisef-2.0.0/aisef.egg-info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9976806Z copying aisef.egg-info/dependency_links.txt -> aisef-2.0.0/aisef.egg-info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9978943Z copying aisef.egg-info/entry_points.txt -> aisef-2.0.0/aisef.egg-info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9980715Z copying aisef.egg-info/top_level.txt -> aisef-2.0.0/aisef.egg-info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9982175Z copying aisef/cli/__init__.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9983150Z copying aisef/cli/__main__.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9984101Z copying aisef/cli/_common.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9984826Z copying aisef/cli/closure.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9987056Z copying aisef/cli/dashboard.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9988756Z copying aisef/cli/doctor.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9990466Z copying aisef/cli/harness.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9992225Z copying aisef/cli/implement.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9994382Z copying aisef/cli/memory.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9996066Z copying aisef/cli/parser.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9997830Z copying aisef/cli/plan.py -> aisef-2.0.0/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:11.9999601Z copying aisef/clients/__init__.py -> aisef-2.0.0/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0001004Z copying aisef/clients/base.py -> aisef-2.0.0/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0002811Z copying aisef/clients/claude_code.py -> aisef-2.0.0/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0004754Z copying aisef/clients/compile.py -> aisef-2.0.0/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0006493Z copying aisef/clients/opencode.py -> aisef-2.0.0/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0008224Z copying aisef/clients/stream.py -> aisef-2.0.0/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0009907Z copying aisef/clients/synthetic.py -> aisef-2.0.0/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0011556Z copying aisef/codebase/__init__.py -> aisef-2.0.0/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0013133Z copying aisef/codebase/baseline.py -> aisef-2.0.0/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0014935Z copying aisef/codebase/basic.py -> aisef-2.0.0/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0016571Z copying aisef/codebase/detect.py -> aisef-2.0.0/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0018177Z copying aisef/codebase/graphify.py -> aisef-2.0.0/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0019821Z copying aisef/codebase/provider.py -> aisef-2.0.0/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0021416Z copying aisef/control/__init__.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0022948Z copying aisef/control/acceptance.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0024727Z copying aisef/control/approvals.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0026492Z copying aisef/control/attribution.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0028165Z copying aisef/control/bmad_status.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0029710Z copying aisef/control/budget.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0031226Z copying aisef/control/change.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0032935Z copying aisef/control/closure.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0035480Z copying aisef/control/cohort.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0037215Z copying aisef/control/complexity.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0038918Z copying aisef/control/conformance.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0040562Z copying aisef/control/defects.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0042451Z copying aisef/control/design_contract.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0044288Z copying aisef/control/experience.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0045965Z copying aisef/control/findings.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0047592Z copying aisef/control/gate.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0049556Z copying aisef/control/identity.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0051205Z copying aisef/control/impact.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0052891Z copying aisef/control/invariants.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0055377Z copying aisef/control/journal.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0056966Z copying aisef/control/ledger.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0059062Z copying aisef/control/machine_gate.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0060902Z copying aisef/control/normalize.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0063153Z copying aisef/control/obligation.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0064889Z copying aisef/control/onboarding.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0066867Z copying aisef/control/outcome.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0068669Z copying aisef/control/planes.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0070552Z copying aisef/control/preflight.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0072644Z copying aisef/control/proof.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0074742Z copying aisef/control/qualification.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0076648Z copying aisef/control/replay.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0078550Z copying aisef/control/replay_manifest.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0080434Z copying aisef/control/reviewer_qual.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0082608Z copying aisef/control/scheduler.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0084616Z copying aisef/control/security.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0086503Z copying aisef/control/state.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0088567Z copying aisef/control/tdd.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0090451Z copying aisef/control/worktree.py -> aisef-2.0.0/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0092508Z copying aisef/harness/__init__.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0094368Z copying aisef/harness/aria.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0096210Z copying aisef/harness/browser.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0098043Z copying aisef/harness/capabilities.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0099970Z copying aisef/harness/context.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0101872Z copying aisef/harness/guardrails.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0104352Z copying aisef/harness/mockup_map.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0106247Z copying aisef/harness/mockup_verify.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0108178Z copying aisef/harness/observe.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0110050Z copying aisef/harness/ownership.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0111890Z copying aisef/harness/process_owner.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0113731Z copying aisef/harness/prompts.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0115958Z copying aisef/harness/routing.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0117883Z copying aisef/harness/runlog.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0119331Z copying aisef/harness/sandbox.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0121448Z copying aisef/harness/server_identity.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0122981Z copying aisef/harness/testlog.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0125265Z copying aisef/harness/tools.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0127157Z copying aisef/harness/verify_image.py -> aisef-2.0.0/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0128910Z copying aisef/harness/assets/render.mjs -> aisef-2.0.0/aisef/harness/assets
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0130444Z copying aisef/kit/__init__.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0132322Z copying aisef/kit/catalog.json -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0133868Z copying aisef/kit/catalog.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0135818Z copying aisef/kit/constitution.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0137293Z copying aisef/kit/detect_stack.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0139083Z copying aisef/kit/docs.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0140564Z copying aisef/kit/fetch.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0142453Z copying aisef/kit/install.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0144678Z copying aisef/kit/registry.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0146468Z copying aisef/kit/router.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0148223Z copying aisef/kit/security_filter.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0149871Z copying aisef/kit/skill_scan.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0151637Z copying aisef/kit/skills.py -> aisef-2.0.0/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0153483Z copying aisef/kit/prompts/devsecops.md -> aisef-2.0.0/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0155273Z copying aisef/kit/prompts/mockup-screen.md -> aisef-2.0.0/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0156908Z copying aisef/kit/prompts/story-implement.md -> aisef-2.0.0/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0158500Z copying aisef/kit/prompts/story-review.md -> aisef-2.0.0/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0160177Z copying aisef/kit/prompts/story-security-review.md -> aisef-2.0.0/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0161718Z copying aisef/kit/rules/must_never.md -> aisef-2.0.0/aisef/kit/rules
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0163461Z copying aisef/kit/rules/principles.md -> aisef-2.0.0/aisef/kit/rules
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0165595Z copying aisef/kit/skills/aisef-mockup-html/SKILL.md -> aisef-2.0.0/aisef/kit/skills/aisef-mockup-html
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0166838Z copying aisef/phases/__init__.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0168727Z copying aisef/phases/deploy.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0170560Z copying aisef/phases/implement.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0173345Z copying aisef/phases/improve.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0175543Z copying aisef/phases/mockup.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0177315Z copying aisef/phases/plan.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0179147Z copying aisef/phases/qa.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0181045Z copying aisef/phases/report.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0183240Z copying aisef/phases/run.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0185539Z copying aisef/phases/story_split.py -> aisef-2.0.0/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0187029Z copying aisef2/__init__.py -> aisef-2.0.0/aisef2
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0188795Z copying aisef2/errors.py -> aisef-2.0.0/aisef2
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0190359Z copying aisef2/app/__init__.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0192121Z copying aisef2/app/adapters.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0193782Z copying aisef2/app/bundle.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0195675Z copying aisef2/app/calibrations.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0197295Z copying aisef2/app/cli.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0199019Z copying aisef2/app/client.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0200753Z copying aisef2/app/feedback.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0202252Z copying aisef2/app/preflight.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0203866Z copying aisef2/app/run.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0205935Z copying aisef2/app/settings.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0207543Z copying aisef2/app/verify.py -> aisef-2.0.0/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0209286Z copying aisef2/arch/__init__.py -> aisef-2.0.0/aisef2/arch
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0210930Z copying aisef2/arch/enums.py -> aisef-2.0.0/aisef2/arch
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0213130Z copying aisef2/cohort/__init__.py -> aisef-2.0.0/aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0214753Z copying aisef2/cohort/lifecycle.py -> aisef-2.0.0/aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0216460Z copying aisef2/cohort/preregistration.py -> aisef-2.0.0/aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0218037Z copying aisef2/control/__init__.py -> aisef-2.0.0/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0219836Z copying aisef2/control/budget.py -> aisef-2.0.0/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0221378Z copying aisef2/control/owner.py -> aisef-2.0.0/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0223147Z copying aisef2/control/routing.py -> aisef-2.0.0/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0225332Z copying aisef2/invariants/__init__.py -> aisef-2.0.0/aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0226786Z copying aisef2/invariants/evidence.py -> aisef-2.0.0/aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0228360Z copying aisef2/invariants/registry.py -> aisef-2.0.0/aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0230296Z copying aisef2/journal/__init__.py -> aisef-2.0.0/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0231750Z copying aisef2/journal/compat.py -> aisef-2.0.0/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0233479Z copying aisef2/journal/event.py -> aisef-2.0.0/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0235412Z copying aisef2/journal/fold.py -> aisef-2.0.0/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0236925Z copying aisef2/journal/format2.py -> aisef-2.0.0/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0238884Z copying aisef2/journal/format3.py -> aisef-2.0.0/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0240674Z copying aisef2/journal/writer.py -> aisef-2.0.0/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0242349Z copying aisef2/journal/projections/__init__.py -> aisef-2.0.0/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0244002Z copying aisef2/journal/projections/budgets.py -> aisef-2.0.0/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0245870Z copying aisef2/journal/projections/failure_owner.py -> aisef-2.0.0/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0247733Z copying aisef2/journal/projections/qualification_counters.py -> aisef-2.0.0/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0249330Z copying aisef2/journal/projections/retry_target.py -> aisef-2.0.0/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0251150Z copying aisef2/journal/projections/story_state.py -> aisef-2.0.0/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0252761Z copying aisef2/journal/projections/terminal_state.py -> aisef-2.0.0/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0254487Z copying aisef2/orchestrate/__init__.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0256103Z copying aisef2/orchestrate/adapters.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0257705Z copying aisef2/orchestrate/gate.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0259264Z copying aisef2/orchestrate/merge.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0260842Z copying aisef2/orchestrate/proof.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0262484Z copying aisef2/orchestrate/quality.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0264534Z copying aisef2/orchestrate/review.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0266085Z copying aisef2/orchestrate/seam.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0267715Z copying aisef2/orchestrate/security.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0269588Z copying aisef2/orchestrate/story_runner.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0271581Z copying aisef2/orchestrate/workspace.py -> aisef-2.0.0/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0273097Z copying aisef2/plan/__init__.py -> aisef-2.0.0/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0275039Z copying aisef2/plan/drift.py -> aisef-2.0.0/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0276780Z copying aisef2/plan/obligation.py -> aisef-2.0.0/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0278489Z copying aisef2/plan/static_admission.py -> aisef-2.0.0/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0280298Z copying aisef2/plan/story_admission.py -> aisef-2.0.0/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0281800Z copying aisef2/probe/__init__.py -> aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0283432Z copying aisef2/probe/calibration.py -> aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0285294Z copying aisef2/probe/catalog.py -> aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0286991Z copying aisef2/probe/cli_invocation.py -> aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0289047Z copying aisef2/probe/file_artifact.py -> aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0290864Z copying aisef2/probe/process_effect.py -> aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0292768Z copying aisef2/probe/protocol.py -> aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0295013Z copying aisef2/probe/python_callable.py -> aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0296789Z copying aisef2/probe/python_callable_v2.py -> aisef-2.0.0/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0298707Z copying aisef2/product/__init__.py -> aisef-2.0.0/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0300168Z copying aisef2/product/approval.py -> aisef-2.0.0/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0301976Z copying aisef2/product/compiler.py -> aisef-2.0.0/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0303655Z copying aisef2/product/contract.py -> aisef-2.0.0/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0305823Z copying aisef2/product/outcome.py -> aisef-2.0.0/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0307441Z copying aisef2/product/spec.py -> aisef-2.0.0/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0309236Z copying aisef2/quality/__init__.py -> aisef-2.0.0/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0310701Z copying aisef2/quality/adequacy.py -> aisef-2.0.0/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0312872Z copying aisef2/quality/relevance.py -> aisef-2.0.0/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0314999Z copying aisef2/quality/test_execution.py -> aisef-2.0.0/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0316761Z copying aisef2/quality/vacuity.py -> aisef-2.0.0/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0318511Z copying aisef2/runtime/__init__.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0319868Z copying aisef2/runtime/capability.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0321483Z copying aisef2/runtime/process_range.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0323884Z copying aisef2/runtime/range_anchor.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0325741Z copying aisef2/runtime/repair.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0327242Z copying aisef2/runtime/run_scope.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0329121Z copying aisef2/runtime/runspec.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0330624Z copying aisef2/runtime/sentinel.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0332778Z copying aisef2/runtime/story_scope.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0334442Z copying aisef2/runtime/tool.py -> aisef-2.0.0/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0340385Z Writing aisef-2.0.0/setup.cfg
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.0358472Z Creating tar archive
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.3179242Z removing 'aisef-2.0.0' (and everything under it)
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.4591319Z * Building wheel from sdist
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.4791056Z * Creating isolated environment: venv+pip...
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.4811801Z * Installing packages in isolated environment:
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:12.4812421Z   - setuptools==84.0.0
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.1890236Z * Getting build dependencies for wheel...
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6149950Z running egg_info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6167082Z writing aisef.egg-info/PKG-INFO
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6172510Z writing dependency_links to aisef.egg-info/dependency_links.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6176499Z writing entry points to aisef.egg-info/entry_points.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6179070Z writing top-level names to aisef.egg-info/top_level.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6284872Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6312381Z reading manifest template 'MANIFEST.in'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6317098Z no previously-included directories found matching 'tests'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6345822Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6667096Z * Installed build dependency versions:
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6667693Z   - setuptools==84.0.0
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.6668040Z * Building wheel...
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8263247Z running bdist_wheel
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8328344Z running build
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8328696Z running build_py
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8345187Z creating build/lib/aisef2
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8348405Z copying aisef2/errors.py -> build/lib/aisef2
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8350525Z copying aisef2/__init__.py -> build/lib/aisef2
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8353909Z creating build/lib/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8355769Z copying aisef/__main__.py -> build/lib/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8357995Z copying aisef/config.py -> build/lib/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8360519Z copying aisef/memory.py -> build/lib/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8363381Z copying aisef/__init__.py -> build/lib/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8365448Z copying aisef/_compat.py -> build/lib/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8367686Z copying aisef/memory_bench.py -> build/lib/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8370690Z creating build/lib/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8372658Z copying aisef2/control/budget.py -> build/lib/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8375313Z copying aisef2/control/routing.py -> build/lib/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8377917Z copying aisef2/control/owner.py -> build/lib/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8380502Z copying aisef2/control/__init__.py -> build/lib/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8384176Z creating build/lib/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8385734Z copying aisef2/journal/format2.py -> build/lib/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8388647Z copying aisef2/journal/writer.py -> build/lib/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8391049Z copying aisef2/journal/compat.py -> build/lib/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8393709Z copying aisef2/journal/fold.py -> build/lib/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8396380Z copying aisef2/journal/format3.py -> build/lib/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8399039Z copying aisef2/journal/__init__.py -> build/lib/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8401453Z copying aisef2/journal/event.py -> build/lib/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8405372Z creating build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8406845Z copying aisef2/probe/process_effect.py -> build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8409959Z copying aisef2/probe/calibration.py -> build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8412350Z copying aisef2/probe/file_artifact.py -> build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8415275Z copying aisef2/probe/protocol.py -> build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8417976Z copying aisef2/probe/cli_invocation.py -> build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8420853Z copying aisef2/probe/python_callable_v2.py -> build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8423764Z copying aisef2/probe/__init__.py -> build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8425593Z copying aisef2/probe/python_callable.py -> build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8428381Z copying aisef2/probe/catalog.py -> build/lib/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8431532Z creating build/lib/aisef2/arch
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8433204Z copying aisef2/arch/__init__.py -> build/lib/aisef2/arch
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8435878Z copying aisef2/arch/enums.py -> build/lib/aisef2/arch
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8439155Z creating build/lib/aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8440704Z copying aisef2/invariants/registry.py -> build/lib/aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8443824Z copying aisef2/invariants/evidence.py -> build/lib/aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8446601Z copying aisef2/invariants/__init__.py -> build/lib/aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8450253Z creating build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8451605Z copying aisef2/app/preflight.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8454475Z copying aisef2/app/bundle.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8456918Z copying aisef2/app/cli.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8459457Z copying aisef2/app/adapters.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8461904Z copying aisef2/app/feedback.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8464647Z copying aisef2/app/calibrations.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8467012Z copying aisef2/app/run.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8469674Z copying aisef2/app/verify.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8472052Z copying aisef2/app/client.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8474902Z copying aisef2/app/__init__.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8477344Z copying aisef2/app/settings.py -> build/lib/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8480672Z creating build/lib/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8482149Z copying aisef2/plan/story_admission.py -> build/lib/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8485178Z copying aisef2/plan/static_admission.py -> build/lib/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8487702Z copying aisef2/plan/obligation.py -> build/lib/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8490148Z copying aisef2/plan/drift.py -> build/lib/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8492612Z copying aisef2/plan/__init__.py -> build/lib/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8496080Z creating build/lib/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8497509Z copying aisef2/product/compiler.py -> build/lib/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8500131Z copying aisef2/product/spec.py -> build/lib/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8502562Z copying aisef2/product/outcome.py -> build/lib/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8505365Z copying aisef2/product/approval.py -> build/lib/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8507590Z copying aisef2/product/contract.py -> build/lib/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8510211Z copying aisef2/product/__init__.py -> build/lib/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8513410Z creating build/lib/aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8515179Z copying aisef2/cohort/preregistration.py -> build/lib/aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8517883Z copying aisef2/cohort/lifecycle.py -> build/lib/aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8520419Z copying aisef2/cohort/__init__.py -> build/lib/aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8524146Z creating build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8525717Z copying aisef2/runtime/capability.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8528379Z copying aisef2/runtime/repair.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8530837Z copying aisef2/runtime/sentinel.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8533666Z copying aisef2/runtime/runspec.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8535726Z copying aisef2/runtime/range_anchor.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8538436Z copying aisef2/runtime/process_range.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8541071Z copying aisef2/runtime/run_scope.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8543613Z copying aisef2/runtime/tool.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8546306Z copying aisef2/runtime/__init__.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8548669Z copying aisef2/runtime/story_scope.py -> build/lib/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8552299Z creating build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8554039Z copying aisef2/orchestrate/quality.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8556495Z copying aisef2/orchestrate/adapters.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8558915Z copying aisef2/orchestrate/workspace.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8561514Z copying aisef2/orchestrate/proof.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8563935Z copying aisef2/orchestrate/review.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8566542Z copying aisef2/orchestrate/gate.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8568978Z copying aisef2/orchestrate/security.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8570947Z copying aisef2/orchestrate/merge.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8573857Z copying aisef2/orchestrate/story_runner.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8576007Z copying aisef2/orchestrate/seam.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8578632Z copying aisef2/orchestrate/__init__.py -> build/lib/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8581964Z creating build/lib/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8583846Z copying aisef2/quality/test_execution.py -> build/lib/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8586587Z copying aisef2/quality/vacuity.py -> build/lib/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8589239Z copying aisef2/quality/__init__.py -> build/lib/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8591561Z copying aisef2/quality/relevance.py -> build/lib/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8594211Z copying aisef2/quality/adequacy.py -> build/lib/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8597864Z creating build/lib/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8599470Z copying aisef2/journal/projections/retry_target.py -> build/lib/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8601942Z copying aisef2/journal/projections/qualification_counters.py -> build/lib/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8604311Z copying aisef2/journal/projections/budgets.py -> build/lib/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8606982Z copying aisef2/journal/projections/failure_owner.py -> build/lib/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8609038Z copying aisef2/journal/projections/story_state.py -> build/lib/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8611256Z copying aisef2/journal/projections/__init__.py -> build/lib/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8613803Z copying aisef2/journal/projections/terminal_state.py -> build/lib/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8619086Z creating build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8620522Z copying aisef/control/preflight.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8623674Z copying aisef/control/invariants.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8626371Z copying aisef/control/closure.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8629555Z copying aisef/control/design_contract.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8631961Z copying aisef/control/acceptance.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8634673Z copying aisef/control/conformance.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8637187Z copying aisef/control/outcome.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8639648Z copying aisef/control/replay.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8642249Z copying aisef/control/budget.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8645088Z copying aisef/control/approvals.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8647666Z copying aisef/control/worktree.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8650670Z copying aisef/control/findings.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8653663Z copying aisef/control/impact.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8655640Z copying aisef/control/proof.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8658388Z copying aisef/control/journal.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8660912Z copying aisef/control/identity.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8663755Z copying aisef/control/tdd.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8666406Z copying aisef/control/gate.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8669544Z copying aisef/control/machine_gate.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8672159Z copying aisef/control/defects.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8675330Z copying aisef/control/security.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8677700Z copying aisef/control/normalize.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8680161Z copying aisef/control/complexity.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8682407Z copying aisef/control/cohort.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8684972Z copying aisef/control/onboarding.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8687127Z copying aisef/control/state.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8689364Z copying aisef/control/qualification.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8691544Z copying aisef/control/experience.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8693655Z copying aisef/control/replay_manifest.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8696208Z copying aisef/control/planes.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8698487Z copying aisef/control/obligation.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8700739Z copying aisef/control/scheduler.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8702989Z copying aisef/control/ledger.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8705654Z copying aisef/control/__init__.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8707673Z copying aisef/control/change.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8709886Z copying aisef/control/reviewer_qual.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8712348Z copying aisef/control/attribution.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8714839Z copying aisef/control/bmad_status.py -> build/lib/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8718215Z creating build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8720103Z copying aisef/phases/deploy.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8722750Z copying aisef/phases/implement.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8726685Z copying aisef/phases/story_split.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8729153Z copying aisef/phases/improve.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8731873Z copying aisef/phases/run.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8734868Z copying aisef/phases/report.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8737433Z copying aisef/phases/mockup.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8739988Z copying aisef/phases/plan.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8742681Z copying aisef/phases/__init__.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8745243Z copying aisef/phases/qa.py -> build/lib/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8749107Z creating build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8750500Z copying aisef/cli/closure.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8753186Z copying aisef/cli/parser.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8756166Z copying aisef/cli/__main__.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8758574Z copying aisef/cli/implement.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8761266Z copying aisef/cli/dashboard.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8763707Z copying aisef/cli/_common.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8766526Z copying aisef/cli/doctor.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8769032Z copying aisef/cli/harness.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8771250Z copying aisef/cli/memory.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8773214Z copying aisef/cli/plan.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8775783Z copying aisef/cli/__init__.py -> build/lib/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8779026Z creating build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8780557Z copying aisef/kit/registry.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8782785Z copying aisef/kit/install.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8785229Z copying aisef/kit/skills.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8787224Z copying aisef/kit/router.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8789275Z copying aisef/kit/fetch.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8791391Z copying aisef/kit/security_filter.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8793475Z copying aisef/kit/constitution.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8795924Z copying aisef/kit/skill_scan.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8797927Z copying aisef/kit/docs.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8799928Z copying aisef/kit/__init__.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8801793Z copying aisef/kit/detect_stack.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8803884Z copying aisef/kit/catalog.py -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8807623Z creating build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8809007Z copying aisef/harness/testlog.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8811432Z copying aisef/harness/process_owner.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8813509Z copying aisef/harness/browser.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8815875Z copying aisef/harness/tools.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8818022Z copying aisef/harness/capabilities.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8820075Z copying aisef/harness/ownership.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8822010Z copying aisef/harness/prompts.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8824173Z copying aisef/harness/runlog.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8826210Z copying aisef/harness/mockup_map.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8828282Z copying aisef/harness/verify_image.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8830359Z copying aisef/harness/observe.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8832454Z copying aisef/harness/routing.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8835021Z copying aisef/harness/sandbox.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8837219Z copying aisef/harness/server_identity.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8839335Z copying aisef/harness/mockup_verify.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8841403Z copying aisef/harness/context.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8843546Z copying aisef/harness/aria.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8845839Z copying aisef/harness/__init__.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8847670Z copying aisef/harness/guardrails.py -> build/lib/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8850870Z creating build/lib/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8852262Z copying aisef/clients/stream.py -> build/lib/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8854945Z copying aisef/clients/opencode.py -> build/lib/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8857043Z copying aisef/clients/compile.py -> build/lib/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8859143Z copying aisef/clients/__init__.py -> build/lib/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8860950Z copying aisef/clients/base.py -> build/lib/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8863143Z copying aisef/clients/claude_code.py -> build/lib/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8865491Z copying aisef/clients/synthetic.py -> build/lib/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8868469Z creating build/lib/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8869835Z copying aisef/codebase/basic.py -> build/lib/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8872153Z copying aisef/codebase/detect.py -> build/lib/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8874680Z copying aisef/codebase/provider.py -> build/lib/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8876689Z copying aisef/codebase/baseline.py -> build/lib/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8878789Z copying aisef/codebase/graphify.py -> build/lib/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8880793Z copying aisef/codebase/__init__.py -> build/lib/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8885640Z running egg_info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8901582Z writing aisef.egg-info/PKG-INFO
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8909309Z writing dependency_links to aisef.egg-info/dependency_links.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8913499Z writing entry points to aisef.egg-info/entry_points.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8917214Z writing top-level names to aisef.egg-info/top_level.txt
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.8991816Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9017529Z reading manifest template 'MANIFEST.in'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9021632Z no previously-included directories found matching 'tests'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9048791Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9081880Z creating build/lib/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9083783Z copying aisef/kit/prompts/devsecops.md -> build/lib/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9086560Z copying aisef/kit/prompts/story-implement.md -> build/lib/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9088466Z copying aisef/kit/prompts/mockup-screen.md -> build/lib/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9090676Z copying aisef/kit/prompts/story-review.md -> build/lib/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9092896Z copying aisef/kit/prompts/story-security-review.md -> build/lib/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9095291Z creating build/lib/aisef/kit/rules
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9096833Z copying aisef/kit/rules/principles.md -> build/lib/aisef/kit/rules
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9099085Z copying aisef/kit/rules/must_never.md -> build/lib/aisef/kit/rules
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9101124Z creating build/lib/aisef/kit/skills/aisef-mockup-html
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9103449Z copying aisef/kit/skills/aisef-mockup-html/SKILL.md -> build/lib/aisef/kit/skills/aisef-mockup-html
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9105843Z copying aisef/kit/catalog.json -> build/lib/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9107885Z creating build/lib/aisef/harness/assets
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9109359Z copying aisef/harness/assets/render.mjs -> build/lib/aisef/harness/assets
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9168654Z installing to build/bdist.linux-x86_64/wheel
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9169255Z running install
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9239060Z running install_lib
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9253575Z creating build/bdist.linux-x86_64/wheel
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9256691Z creating build/bdist.linux-x86_64/wheel/aisef2
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9258755Z creating build/bdist.linux-x86_64/wheel/aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9260476Z copying build/lib/aisef2/control/budget.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9262288Z copying build/lib/aisef2/control/routing.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9264145Z copying build/lib/aisef2/control/owner.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9266046Z copying build/lib/aisef2/control/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9268141Z creating build/bdist.linux-x86_64/wheel/aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9269761Z copying build/lib/aisef2/journal/format2.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9271590Z copying build/lib/aisef2/journal/writer.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9273442Z copying build/lib/aisef2/journal/compat.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9275243Z copying build/lib/aisef2/journal/fold.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9277041Z copying build/lib/aisef2/journal/format3.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9278864Z copying build/lib/aisef2/journal/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9280621Z copying build/lib/aisef2/journal/event.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9283110Z creating build/bdist.linux-x86_64/wheel/aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9285152Z copying build/lib/aisef2/journal/projections/retry_target.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9286964Z copying build/lib/aisef2/journal/projections/qualification_counters.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9288541Z copying build/lib/aisef2/journal/projections/budgets.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9290307Z copying build/lib/aisef2/journal/projections/failure_owner.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9291970Z copying build/lib/aisef2/journal/projections/story_state.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9293744Z copying build/lib/aisef2/journal/projections/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9295662Z copying build/lib/aisef2/journal/projections/terminal_state.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9297790Z creating build/bdist.linux-x86_64/wheel/aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9299388Z copying build/lib/aisef2/probe/process_effect.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9301574Z copying build/lib/aisef2/probe/calibration.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9303179Z copying build/lib/aisef2/probe/file_artifact.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9305906Z copying build/lib/aisef2/probe/protocol.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9307681Z copying build/lib/aisef2/probe/cli_invocation.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9309967Z copying build/lib/aisef2/probe/python_callable_v2.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9311619Z copying build/lib/aisef2/probe/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9313421Z copying build/lib/aisef2/probe/python_callable.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9315261Z copying build/lib/aisef2/probe/catalog.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9317464Z creating build/bdist.linux-x86_64/wheel/aisef2/arch
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9318990Z copying build/lib/aisef2/arch/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/arch
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9320698Z copying build/lib/aisef2/arch/enums.py -> build/bdist.linux-x86_64/wheel/./aisef2/arch
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9322964Z creating build/bdist.linux-x86_64/wheel/aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9324999Z copying build/lib/aisef2/invariants/registry.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9326787Z copying build/lib/aisef2/invariants/evidence.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9328397Z copying build/lib/aisef2/invariants/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9330531Z creating build/bdist.linux-x86_64/wheel/aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9332078Z copying build/lib/aisef2/app/preflight.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9333938Z copying build/lib/aisef2/app/bundle.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9335671Z copying build/lib/aisef2/app/cli.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9337389Z copying build/lib/aisef2/app/adapters.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9339070Z copying build/lib/aisef2/app/feedback.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9340777Z copying build/lib/aisef2/app/calibrations.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9342366Z copying build/lib/aisef2/app/run.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9344584Z copying build/lib/aisef2/app/verify.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9346146Z copying build/lib/aisef2/app/client.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9347853Z copying build/lib/aisef2/app/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9349491Z copying build/lib/aisef2/app/settings.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9351758Z creating build/bdist.linux-x86_64/wheel/aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9353863Z copying build/lib/aisef2/plan/story_admission.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9355646Z copying build/lib/aisef2/plan/static_admission.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9357316Z copying build/lib/aisef2/plan/obligation.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9358957Z copying build/lib/aisef2/plan/drift.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9360615Z copying build/lib/aisef2/plan/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9362796Z creating build/bdist.linux-x86_64/wheel/aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9364625Z copying build/lib/aisef2/product/compiler.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9366318Z copying build/lib/aisef2/product/spec.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9367978Z copying build/lib/aisef2/product/outcome.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9369662Z copying build/lib/aisef2/product/approval.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9371321Z copying build/lib/aisef2/product/contract.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9373019Z copying build/lib/aisef2/product/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9375413Z creating build/bdist.linux-x86_64/wheel/aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9377054Z copying build/lib/aisef2/cohort/preregistration.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9378726Z copying build/lib/aisef2/cohort/lifecycle.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9380403Z copying build/lib/aisef2/cohort/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9381980Z copying build/lib/aisef2/errors.py -> build/bdist.linux-x86_64/wheel/./aisef2
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9384433Z creating build/bdist.linux-x86_64/wheel/aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9386071Z copying build/lib/aisef2/runtime/capability.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9387733Z copying build/lib/aisef2/runtime/repair.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9389411Z copying build/lib/aisef2/runtime/sentinel.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9391064Z copying build/lib/aisef2/runtime/runspec.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9392741Z copying build/lib/aisef2/runtime/range_anchor.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9394962Z copying build/lib/aisef2/runtime/process_range.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9396639Z copying build/lib/aisef2/runtime/run_scope.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9398376Z copying build/lib/aisef2/runtime/tool.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9400077Z copying build/lib/aisef2/runtime/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9401599Z copying build/lib/aisef2/runtime/story_scope.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9403460Z copying build/lib/aisef2/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9405844Z creating build/bdist.linux-x86_64/wheel/aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9407455Z copying build/lib/aisef2/orchestrate/quality.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9409163Z copying build/lib/aisef2/orchestrate/adapters.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9410831Z copying build/lib/aisef2/orchestrate/workspace.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9412534Z copying build/lib/aisef2/orchestrate/proof.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9414770Z copying build/lib/aisef2/orchestrate/review.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9416379Z copying build/lib/aisef2/orchestrate/gate.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9418023Z copying build/lib/aisef2/orchestrate/security.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9419617Z copying build/lib/aisef2/orchestrate/merge.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9421286Z copying build/lib/aisef2/orchestrate/story_runner.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9423051Z copying build/lib/aisef2/orchestrate/seam.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9425056Z copying build/lib/aisef2/orchestrate/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9427167Z creating build/bdist.linux-x86_64/wheel/aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9428789Z copying build/lib/aisef2/quality/test_execution.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9430604Z copying build/lib/aisef2/quality/vacuity.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9432390Z copying build/lib/aisef2/quality/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9434159Z copying build/lib/aisef2/quality/relevance.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9435991Z copying build/lib/aisef2/quality/adequacy.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9438296Z creating build/bdist.linux-x86_64/wheel/aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9440476Z creating build/bdist.linux-x86_64/wheel/aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9442060Z copying build/lib/aisef/control/preflight.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9444028Z copying build/lib/aisef/control/invariants.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9445773Z copying build/lib/aisef/control/closure.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9448290Z copying build/lib/aisef/control/design_contract.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9449797Z copying build/lib/aisef/control/acceptance.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9451460Z copying build/lib/aisef/control/conformance.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9453163Z copying build/lib/aisef/control/outcome.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9455303Z copying build/lib/aisef/control/replay.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9456819Z copying build/lib/aisef/control/budget.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9458517Z copying build/lib/aisef/control/approvals.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9460186Z copying build/lib/aisef/control/worktree.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9461885Z copying build/lib/aisef/control/findings.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9463735Z copying build/lib/aisef/control/impact.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9465909Z copying build/lib/aisef/control/proof.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9467560Z copying build/lib/aisef/control/journal.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9469306Z copying build/lib/aisef/control/identity.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9470985Z copying build/lib/aisef/control/tdd.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9472696Z copying build/lib/aisef/control/gate.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9475410Z copying build/lib/aisef/control/machine_gate.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9477125Z copying build/lib/aisef/control/defects.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9478856Z copying build/lib/aisef/control/security.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9480530Z copying build/lib/aisef/control/normalize.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9482949Z copying build/lib/aisef/control/complexity.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9484799Z copying build/lib/aisef/control/cohort.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9486595Z copying build/lib/aisef/control/onboarding.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9488270Z copying build/lib/aisef/control/state.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9490379Z copying build/lib/aisef/control/qualification.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9492008Z copying build/lib/aisef/control/experience.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9493903Z copying build/lib/aisef/control/replay_manifest.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9495593Z copying build/lib/aisef/control/planes.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9497371Z copying build/lib/aisef/control/obligation.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9499077Z copying build/lib/aisef/control/scheduler.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9500731Z copying build/lib/aisef/control/ledger.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9502666Z copying build/lib/aisef/control/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9504443Z copying build/lib/aisef/control/change.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9506243Z copying build/lib/aisef/control/reviewer_qual.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9508299Z copying build/lib/aisef/control/attribution.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9510059Z copying build/lib/aisef/control/bmad_status.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9511738Z copying build/lib/aisef/__main__.py -> build/bdist.linux-x86_64/wheel/./aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9514206Z creating build/bdist.linux-x86_64/wheel/aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9516102Z copying build/lib/aisef/phases/deploy.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9517851Z copying build/lib/aisef/phases/implement.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9520838Z copying build/lib/aisef/phases/story_split.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9522415Z copying build/lib/aisef/phases/improve.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9524802Z copying build/lib/aisef/phases/run.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9526767Z copying build/lib/aisef/phases/report.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9528427Z copying build/lib/aisef/phases/mockup.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9530165Z copying build/lib/aisef/phases/plan.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9532141Z copying build/lib/aisef/phases/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9533831Z copying build/lib/aisef/phases/qa.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9535980Z copying build/lib/aisef/config.py -> build/bdist.linux-x86_64/wheel/./aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9537557Z copying build/lib/aisef/memory.py -> build/bdist.linux-x86_64/wheel/./aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9539942Z creating build/bdist.linux-x86_64/wheel/aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9541383Z copying build/lib/aisef/cli/closure.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9543058Z copying build/lib/aisef/cli/parser.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9545486Z copying build/lib/aisef/cli/__main__.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9547012Z copying build/lib/aisef/cli/implement.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9549096Z copying build/lib/aisef/cli/dashboard.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9550686Z copying build/lib/aisef/cli/_common.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9552336Z copying build/lib/aisef/cli/doctor.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9554554Z copying build/lib/aisef/cli/harness.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9556255Z copying build/lib/aisef/cli/memory.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9557907Z copying build/lib/aisef/cli/plan.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9559625Z copying build/lib/aisef/cli/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9561873Z creating build/bdist.linux-x86_64/wheel/aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9563575Z copying build/lib/aisef/kit/registry.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9565708Z copying build/lib/aisef/kit/install.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9567281Z copying build/lib/aisef/kit/skills.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9568910Z copying build/lib/aisef/kit/router.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9570672Z copying build/lib/aisef/kit/fetch.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9572935Z creating build/bdist.linux-x86_64/wheel/aisef/kit/rules
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9575070Z copying build/lib/aisef/kit/rules/principles.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/rules
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9576590Z copying build/lib/aisef/kit/rules/must_never.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/rules
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9578223Z copying build/lib/aisef/kit/security_filter.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9579930Z copying build/lib/aisef/kit/constitution.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9581556Z copying build/lib/aisef/kit/skill_scan.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9583870Z creating build/bdist.linux-x86_64/wheel/aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9585632Z copying build/lib/aisef/kit/prompts/devsecops.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9587346Z copying build/lib/aisef/kit/prompts/story-implement.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9589011Z copying build/lib/aisef/kit/prompts/mockup-screen.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9590634Z copying build/lib/aisef/kit/prompts/story-review.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9592371Z copying build/lib/aisef/kit/prompts/story-security-review.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9594698Z creating build/bdist.linux-x86_64/wheel/aisef/kit/skills
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9596869Z creating build/bdist.linux-x86_64/wheel/aisef/kit/skills/aisef-mockup-html
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9598588Z copying build/lib/aisef/kit/skills/aisef-mockup-html/SKILL.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/skills/aisef-mockup-html
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9600033Z copying build/lib/aisef/kit/docs.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9601725Z copying build/lib/aisef/kit/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9603448Z copying build/lib/aisef/kit/detect_stack.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9605347Z copying build/lib/aisef/kit/catalog.json -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9606901Z copying build/lib/aisef/kit/catalog.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9608624Z copying build/lib/aisef/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9610890Z creating build/bdist.linux-x86_64/wheel/aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9612476Z copying build/lib/aisef/harness/testlog.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9614849Z copying build/lib/aisef/harness/process_owner.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9616389Z copying build/lib/aisef/harness/browser.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9618129Z copying build/lib/aisef/harness/tools.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9619998Z copying build/lib/aisef/harness/capabilities.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9621714Z copying build/lib/aisef/harness/ownership.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9623536Z copying build/lib/aisef/harness/prompts.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9625296Z copying build/lib/aisef/harness/runlog.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9627429Z creating build/bdist.linux-x86_64/wheel/aisef/harness/assets
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9629022Z copying build/lib/aisef/harness/assets/render.mjs -> build/bdist.linux-x86_64/wheel/./aisef/harness/assets
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9630771Z copying build/lib/aisef/harness/mockup_map.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9632452Z copying build/lib/aisef/harness/verify_image.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9634489Z copying build/lib/aisef/harness/observe.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9636332Z copying build/lib/aisef/harness/routing.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9637982Z copying build/lib/aisef/harness/sandbox.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9639831Z copying build/lib/aisef/harness/server_identity.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9641519Z copying build/lib/aisef/harness/mockup_verify.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9643219Z copying build/lib/aisef/harness/context.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9645107Z copying build/lib/aisef/harness/aria.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9646845Z copying build/lib/aisef/harness/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9648366Z copying build/lib/aisef/harness/guardrails.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9650892Z creating build/bdist.linux-x86_64/wheel/aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9652457Z copying build/lib/aisef/clients/stream.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9654736Z copying build/lib/aisef/clients/opencode.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9656562Z copying build/lib/aisef/clients/compile.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9658277Z copying build/lib/aisef/clients/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9659796Z copying build/lib/aisef/clients/base.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9661662Z copying build/lib/aisef/clients/claude_code.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9663501Z copying build/lib/aisef/clients/synthetic.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9665485Z copying build/lib/aisef/_compat.py -> build/bdist.linux-x86_64/wheel/./aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9667069Z copying build/lib/aisef/memory_bench.py -> build/bdist.linux-x86_64/wheel/./aisef
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9669379Z creating build/bdist.linux-x86_64/wheel/aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9670975Z copying build/lib/aisef/codebase/basic.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9672730Z copying build/lib/aisef/codebase/detect.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9674941Z copying build/lib/aisef/codebase/provider.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9676477Z copying build/lib/aisef/codebase/baseline.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9678230Z copying build/lib/aisef/codebase/graphify.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9679878Z copying build/lib/aisef/codebase/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9681237Z running install_egg_info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9696279Z Copying aisef.egg-info to build/bdist.linux-x86_64/wheel/./aisef-2.0.0-py3.12.egg-info
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9707487Z running install_scripts
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9717686Z creating build/bdist.linux-x86_64/wheel/aisef-2.0.0.dist-info/WHEEL
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9722929Z creating '/home/runner/work/aisef/aisef/dist/.tmp-90vjuvmo/aisef-2.0.0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9726602Z adding 'aisef/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9729015Z adding 'aisef/__main__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9732140Z adding 'aisef/_compat.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9741455Z adding 'aisef/config.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9750452Z adding 'aisef/memory.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9754266Z adding 'aisef/memory_bench.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9757459Z adding 'aisef/cli/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9759377Z adding 'aisef/cli/__main__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9762169Z adding 'aisef/cli/_common.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9765387Z adding 'aisef/cli/closure.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9770692Z adding 'aisef/cli/dashboard.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9777987Z adding 'aisef/cli/doctor.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9786257Z adding 'aisef/cli/harness.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9798524Z adding 'aisef/cli/implement.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9801055Z adding 'aisef/cli/memory.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9809422Z adding 'aisef/cli/parser.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9815090Z adding 'aisef/cli/plan.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9817248Z adding 'aisef/clients/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9827021Z adding 'aisef/clients/base.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9831331Z adding 'aisef/clients/claude_code.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9836998Z adding 'aisef/clients/compile.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9842990Z adding 'aisef/clients/opencode.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9849790Z adding 'aisef/clients/stream.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9855098Z adding 'aisef/clients/synthetic.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9857215Z adding 'aisef/codebase/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9861152Z adding 'aisef/codebase/baseline.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9864111Z adding 'aisef/codebase/basic.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9866995Z adding 'aisef/codebase/detect.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9869668Z adding 'aisef/codebase/graphify.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9872247Z adding 'aisef/codebase/provider.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9874898Z adding 'aisef/control/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9878287Z adding 'aisef/control/acceptance.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9884778Z adding 'aisef/control/approvals.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9890553Z adding 'aisef/control/attribution.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9893758Z adding 'aisef/control/bmad_status.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9898918Z adding 'aisef/control/budget.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9902339Z adding 'aisef/control/change.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9937560Z adding 'aisef/control/closure.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9943998Z adding 'aisef/control/cohort.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9952418Z adding 'aisef/control/complexity.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9957051Z adding 'aisef/control/conformance.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9960762Z adding 'aisef/control/defects.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9964689Z adding 'aisef/control/design_contract.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9969699Z adding 'aisef/control/experience.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:13.9975772Z adding 'aisef/control/findings.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0004510Z adding 'aisef/control/gate.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0009164Z adding 'aisef/control/identity.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0014650Z adding 'aisef/control/impact.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0018750Z adding 'aisef/control/invariants.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0032029Z adding 'aisef/control/journal.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0040947Z adding 'aisef/control/ledger.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0055927Z adding 'aisef/control/machine_gate.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0076904Z adding 'aisef/control/normalize.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0082205Z adding 'aisef/control/obligation.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0087871Z adding 'aisef/control/onboarding.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0092129Z adding 'aisef/control/outcome.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0098143Z adding 'aisef/control/planes.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0116461Z adding 'aisef/control/preflight.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0123081Z adding 'aisef/control/proof.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0131183Z adding 'aisef/control/qualification.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0136672Z adding 'aisef/control/replay.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0141896Z adding 'aisef/control/replay_manifest.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0158727Z adding 'aisef/control/reviewer_qual.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0163477Z adding 'aisef/control/scheduler.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0167960Z adding 'aisef/control/security.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0177269Z adding 'aisef/control/state.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0181610Z adding 'aisef/control/tdd.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0192716Z adding 'aisef/control/worktree.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0196147Z adding 'aisef/harness/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0201409Z adding 'aisef/harness/aria.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0205618Z adding 'aisef/harness/browser.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0212861Z adding 'aisef/harness/capabilities.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0220110Z adding 'aisef/harness/context.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0247611Z adding 'aisef/harness/guardrails.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0252176Z adding 'aisef/harness/mockup_map.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0260281Z adding 'aisef/harness/mockup_verify.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0269657Z adding 'aisef/harness/observe.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0273794Z adding 'aisef/harness/ownership.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0279332Z adding 'aisef/harness/process_owner.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0282683Z adding 'aisef/harness/prompts.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0286983Z adding 'aisef/harness/routing.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0289787Z adding 'aisef/harness/runlog.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0299972Z adding 'aisef/harness/sandbox.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0305898Z adding 'aisef/harness/server_identity.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0315760Z adding 'aisef/harness/testlog.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0329667Z adding 'aisef/harness/tools.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0337022Z adding 'aisef/harness/verify_image.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0342140Z adding 'aisef/harness/assets/render.mjs'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0344914Z adding 'aisef/kit/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0347828Z adding 'aisef/kit/catalog.json'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0350869Z adding 'aisef/kit/catalog.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0354951Z adding 'aisef/kit/constitution.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0358773Z adding 'aisef/kit/detect_stack.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0361980Z adding 'aisef/kit/docs.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0366023Z adding 'aisef/kit/fetch.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0370556Z adding 'aisef/kit/install.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0379307Z adding 'aisef/kit/registry.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0384822Z adding 'aisef/kit/router.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0389346Z adding 'aisef/kit/security_filter.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0395115Z adding 'aisef/kit/skill_scan.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0398662Z adding 'aisef/kit/skills.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0402213Z adding 'aisef/kit/prompts/devsecops.md'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0405104Z adding 'aisef/kit/prompts/mockup-screen.md'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0409893Z adding 'aisef/kit/prompts/story-implement.md'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0415389Z adding 'aisef/kit/prompts/story-review.md'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0419979Z adding 'aisef/kit/prompts/story-security-review.md'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0423706Z adding 'aisef/kit/rules/must_never.md'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0427219Z adding 'aisef/kit/rules/principles.md'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0432723Z adding 'aisef/kit/skills/aisef-mockup-html/SKILL.md'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0435396Z adding 'aisef/phases/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0445525Z adding 'aisef/phases/deploy.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0530154Z adding 'aisef/phases/implement.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0545544Z adding 'aisef/phases/improve.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0551775Z adding 'aisef/phases/mockup.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0563065Z adding 'aisef/phases/plan.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0577653Z adding 'aisef/phases/qa.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0593573Z adding 'aisef/phases/report.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0601244Z adding 'aisef/phases/run.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0607389Z adding 'aisef/phases/story_split.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0611049Z adding 'aisef2/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0613131Z adding 'aisef2/errors.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0616757Z adding 'aisef2/app/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0620370Z adding 'aisef2/app/adapters.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0624608Z adding 'aisef2/app/bundle.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0627459Z adding 'aisef2/app/calibrations.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0630369Z adding 'aisef2/app/cli.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0635733Z adding 'aisef2/app/client.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0639192Z adding 'aisef2/app/feedback.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0642899Z adding 'aisef2/app/preflight.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0650797Z adding 'aisef2/app/run.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0654759Z adding 'aisef2/app/settings.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0657587Z adding 'aisef2/app/verify.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0659993Z adding 'aisef2/arch/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0663645Z adding 'aisef2/arch/enums.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0666556Z adding 'aisef2/cohort/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0670723Z adding 'aisef2/cohort/lifecycle.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0675353Z adding 'aisef2/cohort/preregistration.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0677859Z adding 'aisef2/control/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0680812Z adding 'aisef2/control/budget.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0685411Z adding 'aisef2/control/owner.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0689042Z adding 'aisef2/control/routing.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0691602Z adding 'aisef2/invariants/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0694686Z adding 'aisef2/invariants/evidence.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0701827Z adding 'aisef2/invariants/registry.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0704630Z adding 'aisef2/journal/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0707643Z adding 'aisef2/journal/compat.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0713064Z adding 'aisef2/journal/event.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0717243Z adding 'aisef2/journal/fold.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0724595Z adding 'aisef2/journal/format2.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0732127Z adding 'aisef2/journal/format3.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0735750Z adding 'aisef2/journal/writer.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0738665Z adding 'aisef2/journal/projections/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0741738Z adding 'aisef2/journal/projections/budgets.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0744633Z adding 'aisef2/journal/projections/failure_owner.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0747623Z adding 'aisef2/journal/projections/qualification_counters.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0749946Z adding 'aisef2/journal/projections/retry_target.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0752651Z adding 'aisef2/journal/projections/story_state.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0756014Z adding 'aisef2/journal/projections/terminal_state.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0758767Z adding 'aisef2/orchestrate/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0762080Z adding 'aisef2/orchestrate/adapters.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0764846Z adding 'aisef2/orchestrate/gate.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0767725Z adding 'aisef2/orchestrate/merge.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0771383Z adding 'aisef2/orchestrate/proof.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0774678Z adding 'aisef2/orchestrate/quality.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0778103Z adding 'aisef2/orchestrate/review.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0780493Z adding 'aisef2/orchestrate/seam.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0782827Z adding 'aisef2/orchestrate/security.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0790417Z adding 'aisef2/orchestrate/story_runner.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0796827Z adding 'aisef2/orchestrate/workspace.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0798305Z adding 'aisef2/plan/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0802318Z adding 'aisef2/plan/drift.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0806010Z adding 'aisef2/plan/obligation.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0812697Z adding 'aisef2/plan/static_admission.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0817460Z adding 'aisef2/plan/story_admission.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0819453Z adding 'aisef2/probe/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0823515Z adding 'aisef2/probe/calibration.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0828380Z adding 'aisef2/probe/catalog.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0849771Z adding 'aisef2/probe/cli_invocation.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0860226Z adding 'aisef2/probe/file_artifact.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0878361Z adding 'aisef2/probe/process_effect.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0884918Z adding 'aisef2/probe/protocol.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0894050Z adding 'aisef2/probe/python_callable.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0903914Z adding 'aisef2/probe/python_callable_v2.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0906287Z adding 'aisef2/product/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0909119Z adding 'aisef2/product/approval.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0916175Z adding 'aisef2/product/compiler.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0916768Z adding 'aisef2/product/contract.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0918680Z adding 'aisef2/product/outcome.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0921352Z adding 'aisef2/product/spec.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0923829Z adding 'aisef2/quality/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0928281Z adding 'aisef2/quality/adequacy.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0934287Z adding 'aisef2/quality/relevance.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0943632Z adding 'aisef2/quality/test_execution.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0949585Z adding 'aisef2/quality/vacuity.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0952159Z adding 'aisef2/runtime/__init__.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0955647Z adding 'aisef2/runtime/capability.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0963694Z adding 'aisef2/runtime/process_range.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0967228Z adding 'aisef2/runtime/range_anchor.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0971281Z adding 'aisef2/runtime/repair.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0977522Z adding 'aisef2/runtime/run_scope.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0980386Z adding 'aisef2/runtime/runspec.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0984259Z adding 'aisef2/runtime/sentinel.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0989255Z adding 'aisef2/runtime/story_scope.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.0992537Z adding 'aisef2/runtime/tool.py'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.1005190Z adding 'aisef-2.0.0.dist-info/METADATA'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.1006752Z adding 'aisef-2.0.0.dist-info/WHEEL'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.1008461Z adding 'aisef-2.0.0.dist-info/entry_points.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.1009945Z adding 'aisef-2.0.0.dist-info/top_level.txt'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.1021952Z adding 'aisef-2.0.0.dist-info/RECORD'
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.1030467Z removing build/bdist.linux-x86_64/wheel
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.1628427Z Successfully built aisef-2.0.0.tar.gz and aisef-2.0.0-py3-none-any.whl
+build	build the sdist, then the wheel FROM it, reproducibly	2026-10-05T06:43:14.5268326Z 7cf8d07ef29577ad56e7d3a852c5da14436126d842a1dccbad79eca4e16e234d  aisef-2.0.0.tar.gz
+build	Run python -m twine check dist/*	﻿2026-10-05T06:43:14.5369375Z ##[group]Run python -m twine check dist/*
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5369762Z ^[[36;1mpython -m twine check dist/*^[[0m
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5433700Z shell: /usr/bin/bash -e {0}
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5433994Z env:
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5434306Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5434829Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5435349Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5435807Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5436271Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5436738Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.5437127Z ##[endgroup]
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.8348681Z Checking dist/aisef-2.0.0-py3-none-any.whl: ^[[32mPASSED^[[0m
+build	Run python -m twine check dist/*	2026-10-05T06:43:14.8601776Z Checking dist/aisef-2.0.0.tar.gz: ^[[32mPASSED^[[0m
+build	the wheel and the sdist hold exactly aisef + aisef2	﻿2026-10-05T06:43:14.8958242Z ##[group]Run python -P validation/v2/packaging_check.py --artifacts dist
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.8958806Z ^[[36;1mpython -P validation/v2/packaging_check.py --artifacts dist^[[0m
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9022819Z shell: /usr/bin/bash -e {0}
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9023087Z env:
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9023512Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9024011Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9024501Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9024932Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9025384Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9025848Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9026218Z ##[endgroup]
+build	the wheel and the sdist hold exactly aisef + aisef2	2026-10-05T06:43:14.9821844Z packaging: PASS (exactly aisef + aisef2)
+build	record the sha256 of the built files	﻿2026-10-05T06:43:14.9912813Z ##[group]Run set -eu
+build	record the sha256 of the built files	2026-10-05T06:43:14.9913138Z ^[[36;1mset -eu^[[0m
+build	record the sha256 of the built files	2026-10-05T06:43:14.9913691Z ^[[36;1m(cd dist && sha256sum -- *) | tee SHA256SUMS^[[0m
+build	record the sha256 of the built files	2026-10-05T06:43:14.9914309Z ^[[36;1m{ echo '### built artifacts (sha256)'; echo '```'; cat SHA256SUMS; echo '```'; } >> "$GITHUB_STEP_SUMMARY"^[[0m
+build	record the sha256 of the built files	2026-10-05T06:43:14.9995743Z shell: /usr/bin/bash -e {0}
+build	record the sha256 of the built files	2026-10-05T06:43:14.9996275Z env:
+build	record the sha256 of the built files	2026-10-05T06:43:14.9996747Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+build	record the sha256 of the built files	2026-10-05T06:43:14.9997550Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+build	record the sha256 of the built files	2026-10-05T06:43:14.9998349Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	record the sha256 of the built files	2026-10-05T06:43:14.9999059Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	record the sha256 of the built files	2026-10-05T06:43:14.9999774Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	record the sha256 of the built files	2026-10-05T06:43:15.0000491Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+build	record the sha256 of the built files	2026-10-05T06:43:15.0001083Z ##[endgroup]
+build	record the sha256 of the built files	2026-10-05T06:43:15.0144455Z a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7  aisef-2.0.0-py3-none-any.whl
+build	record the sha256 of the built files	2026-10-05T06:43:15.0151622Z 7cf8d07ef29577ad56e7d3a852c5da14436126d842a1dccbad79eca4e16e234d  aisef-2.0.0.tar.gz
+build	Run actions/upload-artifact@v4	﻿2026-10-05T06:43:15.0235302Z ##[group]Run actions/upload-artifact@v4
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0235600Z with:
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0235782Z   name: dist
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0235966Z   path: dist/
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0236163Z   if-no-files-found: error
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0236396Z   compression-level: 6
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0236614Z   overwrite: false
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0236821Z   include-hidden-files: false
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0237045Z env:
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0237295Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0237739Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0238164Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0238542Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0238920Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0239309Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.0239635Z ##[endgroup]
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.1883642Z (node:2405) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.1884498Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.1959412Z With the provided path, there will be 2 files uploaded
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.1960575Z Artifact name is valid!
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.1961244Z Root directory input is valid!
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.4000971Z Beginning upload of artifact content to blob storage
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.4877773Z (node:2405) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.6697590Z Uploaded bytes 1768877
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.6880481Z Finished uploading artifact content to blob storage!
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.6881864Z SHA256 digest of uploaded artifact zip is 999ddcf3db8c273d715da7a503b49413e8a6576a6af509213186944458b868a1
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.6884004Z Finalizing artifact upload
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9137174Z Artifact dist.zip successfully finalized. Artifact ID 11329183235
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9139515Z Artifact dist has been successfully uploaded! Final size is 1768877 bytes. Artifact ID is 11329183235
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9147504Z Artifact download URL: https://github.com/nghinh/aisef/actions/runs/37256508105/artifacts/11329183235
+build	Run actions/upload-artifact@v4	﻿2026-10-05T06:43:15.9292469Z ##[group]Run actions/upload-artifact@v4
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9292794Z with:
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9293002Z   name: dist-sha256
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9293224Z   path: SHA256SUMS
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9293767Z   if-no-files-found: error
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9294023Z   compression-level: 6
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9294258Z   overwrite: false
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9294484Z   include-hidden-files: false
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9294749Z env:
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9295022Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9295495Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9295939Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9296336Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9296732Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9297135Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:15.9297476Z ##[endgroup]
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.0941973Z (node:2418) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.0942943Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.0990588Z With the provided path, there will be 1 file uploaded
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.1010334Z Artifact name is valid!
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.1025256Z Root directory input is valid!
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.3086053Z Beginning upload of artifact content to blob storage
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.3273061Z (node:2418) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.3703303Z Uploaded bytes 266
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.4018050Z Finished uploading artifact content to blob storage!
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.4019170Z SHA256 digest of uploaded artifact zip is 0a6721028d2b7a73ac010e314e4e5ab49cc480d923f4f46cc135779aca570de3
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.4020881Z Finalizing artifact upload
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.6264189Z Artifact dist-sha256.zip successfully finalized. Artifact ID 11328973657
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.6265499Z Artifact dist-sha256 has been successfully uploaded! Final size is 266 bytes. Artifact ID is 11328973657
+build	Run actions/upload-artifact@v4	2026-10-05T06:43:16.6271601Z Artifact download URL: https://github.com/nghinh/aisef/actions/runs/37256508105/artifacts/11328973657
+build	Post Run actions/setup-python@v5	﻿2026-10-05T06:43:16.6443871Z Post job cleanup.
+build	Post Run actions/setup-python@v5	2026-10-05T06:43:16.7650244Z (node:2430) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build	Post Run actions/setup-python@v5	2026-10-05T06:43:16.7651503Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build	Post Run actions/checkout@v4	﻿2026-10-05T06:43:16.7861393Z Post job cleanup.
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.8803756Z [command]/usr/bin/git version
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.8847746Z git version 2.55.0
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.8886645Z Temporarily overriding HOME='/home/runner/work/_temp/1f38df4d-6672-45cb-a455-4944675a92e0' before making global git config changes
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.8888069Z Adding repository directory to the temporary git global config as a safe directory
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.8891391Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.8932098Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.8968265Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.9234658Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.9264223Z http.https://github.com/.extraheader
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.9283932Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.9315980Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.9572258Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build	Post Run actions/checkout@v4	2026-10-05T06:43:16.9611697Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build	Complete job	﻿2026-10-05T06:43:17.0016325Z Cleaning up orphan processes
+build	Complete job	2026-10-05T06:43:17.0318568Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

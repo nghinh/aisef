@@ -1,0 +1,7 @@
+HEAD 529591e4f2aeaa1ec621d624ef223e77ec9ff603
+status [0 lines]
+version = "2.0.0"
+aisef2 tree c6ddf5b9c0b436bcc3c882d9b303dd59b367141c
+kernel digest b93d4c08ae2e392de9c6e6083a39625c936c8935481a4dfa1a44dff2824e77fd
+shipped trees == freeze record: True | kernel == record: True
+ls: closure-evidence/v2/release/V2.0-RC1-FREEZE.json: No such file or directory

@@ -1,0 +1,5 @@
+python3 -> /opt/homebrew/bin/python3
+git -> /opt/homebrew/bin/git git version 2.53.0
+3.14.7 macOS-26.5.2-arm64-arm-64bit-Mach-O
+ProductName:		macOS ProductVersion:		26.5.2 BuildVersion:		25F84 
+lrwxr-xr-x@ 1 nghinh  admin  40 Sep  8 22:21 /opt/homebrew/bin/python3 -> ../Cellar/python@3.14/3.14.7/bin/python3

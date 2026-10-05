@@ -1,0 +1,261 @@
+install (ubuntu-latest)	Set up job	﻿2026-10-05T06:43:22.6645848Z Current runner version: '2.337.0'
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6673523Z ##[group]Runner Image Provisioner
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6674534Z Hosted Compute Agent
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6675415Z Version: 20260901.588
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6676106Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6676844Z Build Date: 2026-09-01T19:56:44Z
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6677554Z Worker ID: {0978b884-2ce6-463c-8ca3-280f741064b0}
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6678303Z Azure Region: eastus
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6678899Z ##[endgroup]
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6680895Z ##[group]Operating System
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6681643Z Ubuntu
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6682144Z 24.04.5
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6682721Z LTS
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6683276Z ##[endgroup]
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6683849Z ##[group]Runner Image
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6684520Z Image: ubuntu-24.04
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6685321Z Version: 20260927.320.1
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6686936Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6689125Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6690212Z ##[endgroup]
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6691378Z ##[group]GITHUB_TOKEN Permissions
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6693720Z Contents: read
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6694368Z Metadata: read
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6695624Z ##[endgroup]
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6698261Z Secret source: Actions
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6699305Z Cache mode: write
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.6700276Z Prepare workflow directory
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.7111192Z Prepare all required actions
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.7160683Z Getting action download info
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:22.9677285Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:23.0906921Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:23.1722948Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+install (ubuntu-latest)	Set up job	2026-10-05T06:43:23.4753421Z Complete job name: install (ubuntu-latest)
+install (ubuntu-latest)	Run actions/checkout@v4	﻿2026-10-05T06:43:23.5540953Z ##[group]Run actions/checkout@v4
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5541861Z with:
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5542307Z   repository: nghinh/aisef
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5546688Z   token: ***
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5547138Z   ssh-strict: true
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5547603Z   ssh-user: git
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5548047Z   persist-credentials: true
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5548521Z   clean: true
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5548959Z   sparse-checkout-cone-mode: true
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5549510Z   fetch-depth: 1
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5549956Z   fetch-tags: false
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5550382Z   show-progress: true
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5550823Z   lfs: false
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5551222Z   submodules: false
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5551655Z   set-safe-directory: true
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5552145Z   allow-unsafe-pr-checkout: false
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.5552943Z ##[endgroup]
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6564980Z Syncing repository: nghinh/aisef
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6567561Z ##[group]Getting Git version info
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6568720Z Working directory is '/home/runner/work/aisef/aisef'
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6570395Z [command]/usr/bin/git version
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6698202Z git version 2.55.0
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6723429Z ##[endgroup]
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6752095Z Temporarily overriding HOME='/home/runner/work/_temp/26b99cc5-d9df-4614-b942-c00907473d8f' before making global git config changes
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6755139Z Adding repository directory to the temporary git global config as a safe directory
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6759398Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6821998Z Deleting the contents of '/home/runner/work/aisef/aisef'
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6828081Z ##[group]Initializing the repository
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6833050Z [command]/usr/bin/git init /home/runner/work/aisef/aisef
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6983021Z hint: Using 'master' as the name for the initial branch. This default branch name
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6996810Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.6999833Z hint: to use in all of your new repositories, which will suppress this warning,
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7001312Z hint: call:
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7002192Z hint:
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7003438Z hint: 	git config --global init.defaultBranch <name>
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7005049Z hint:
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7006288Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7011054Z hint: 'development'. The just-created branch can be renamed via this command:
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7012502Z hint:
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7013329Z hint: 	git branch -m <name>
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7014247Z hint:
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7015772Z hint: Disable this message with "git config set advice.defaultBranchName false"
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7017966Z Initialized empty Git repository in /home/runner/work/aisef/aisef/.git/
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7021337Z [command]/usr/bin/git remote add origin https://github.com/nghinh/aisef
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7067331Z ##[endgroup]
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7068864Z ##[group]Disabling automatic garbage collection
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7072426Z [command]/usr/bin/git config --local gc.auto 0
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7109995Z ##[endgroup]
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7112259Z ##[group]Setting up auth
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7118677Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7156506Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7590858Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7638923Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7924958Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.7963342Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.8191232Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.8232148Z ##[endgroup]
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.8233050Z ##[group]Fetching the repository
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:23.8242859Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +529591e4f2aeaa1ec621d624ef223e77ec9ff603:refs/remotes/origin/release/v2.0.0
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.8648384Z From https://github.com/nghinh/aisef
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.8650653Z  * [new ref]         529591e4f2aeaa1ec621d624ef223e77ec9ff603 -> origin/release/v2.0.0
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.8656346Z ##[endgroup]
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.8657981Z ##[group]Determining the checkout info
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.8659975Z ##[endgroup]
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.8666478Z [command]/usr/bin/git sparse-checkout disable
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.8729612Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.8775815Z ##[group]Checking out the ref
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:25.8779641Z [command]/usr/bin/git checkout --progress --force -B release/v2.0.0 refs/remotes/origin/release/v2.0.0
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:26.5021686Z Switched to a new branch 'release/v2.0.0'
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:26.5025544Z branch 'release/v2.0.0' set up to track 'origin/release/v2.0.0'.
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:26.5090254Z ##[endgroup]
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:26.5139040Z [command]/usr/bin/git log -1 --format=%H
+install (ubuntu-latest)	Run actions/checkout@v4	2026-10-05T06:43:26.5166637Z 529591e4f2aeaa1ec621d624ef223e77ec9ff603
+install (ubuntu-latest)	Run actions/setup-python@v5	﻿2026-10-05T06:43:26.5583632Z ##[group]Run actions/setup-python@v5
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.5584680Z with:
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.5585674Z   python-version: 3.11
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.5586487Z   check-latest: false
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.5596230Z   token: ***
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.5597001Z   update-environment: true
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.5598099Z   allow-prereleases: false
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.5598936Z   freethreaded: false
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.5599703Z ##[endgroup]
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.6946241Z ##[group]Installed versions
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.7058352Z (node:2279) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.7060869Z (Use `node --trace-deprecation ...` to show where the warning was created)
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.7062223Z Successfully set up CPython (3.11.16)
+install (ubuntu-latest)	Run actions/setup-python@v5	2026-10-05T06:43:26.7063537Z ##[endgroup]
+install (ubuntu-latest)	Run actions/download-artifact@v4	﻿2026-10-05T06:43:26.7330064Z ##[group]Run actions/download-artifact@v4
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7331855Z with:
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7333078Z   name: dist
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7334065Z   path: dist/
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7335381Z   merge-multiple: false
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7336587Z   repository: nghinh/aisef
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7337438Z   run-id: 37256508105
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7338505Z env:
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7339687Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7341241Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7343455Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7355751Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7357854Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7359981Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.7361763Z ##[endgroup]
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.8975081Z Downloading single artifact
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.9132511Z (node:2289) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.9134978Z (Use `node --trace-deprecation ...` to show where the warning was created)
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.9979897Z Preparing to download the following artifacts:
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:26.9983673Z - dist (ID: 11329183235, Size: 1768877, Expected Digest: sha256:999ddcf3db8c273d715da7a503b49413e8a6576a6af509213186944458b868a1)
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.1277464Z Redirecting to blob download url: https://productionresultssa5.blob.core.windows.net/actions-results/960eb754-0d03-88cc-b0a2-19676864662d/workflow-job-run-fc890578-0067-57e5-9979-b794613233e0/artifacts/bcae0416621b3db43d8cba1e4454a792c7af9e4b7287e51056efc5a215d95839.zip
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.1279515Z Starting download of artifact to: /home/runner/work/aisef/aisef/dist
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2089695Z (node:2289) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2629753Z SHA256 digest of downloaded artifact is 999ddcf3db8c273d715da7a503b49413e8a6576a6af509213186944458b868a1
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2630587Z Artifact download completed successfully.
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2630967Z Total of 1 artifact(s) downloaded
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2636965Z Download artifact has finished successfully
+install (ubuntu-latest)	Run actions/download-artifact@v4	﻿2026-10-05T06:43:27.2866748Z ##[group]Run actions/download-artifact@v4
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2867165Z with:
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2867411Z   name: dist-sha256
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2867694Z   path: .
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2867940Z   merge-multiple: false
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2868243Z   repository: nghinh/aisef
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2868537Z   run-id: 37256508105
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2868803Z env:
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2869120Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2869633Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2870134Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2870601Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2871065Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2871556Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.2871947Z ##[endgroup]
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.4398444Z Downloading single artifact
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.4547888Z (node:2302) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.4550062Z (Use `node --trace-deprecation ...` to show where the warning was created)
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.5655395Z Preparing to download the following artifacts:
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.5657350Z - dist-sha256 (ID: 11328973657, Size: 266, Expected Digest: sha256:0a6721028d2b7a73ac010e314e4e5ab49cc480d923f4f46cc135779aca570de3)
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.7198580Z Redirecting to blob download url: https://productionresultssa5.blob.core.windows.net/actions-results/960eb754-0d03-88cc-b0a2-19676864662d/workflow-job-run-fc890578-0067-57e5-9979-b794613233e0/artifacts/030ac884951a628a67088ac4ebdcc46452544c33186a71fffe72c620cffb2105.zip
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.7200275Z Starting download of artifact to: /home/runner/work/aisef/aisef
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.7671882Z (node:2302) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.7735576Z SHA256 digest of downloaded artifact is 0a6721028d2b7a73ac010e314e4e5ab49cc480d923f4f46cc135779aca570de3
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.7737026Z Artifact download completed successfully.
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.7737919Z Total of 1 artifact(s) downloaded
+install (ubuntu-latest)	Run actions/download-artifact@v4	2026-10-05T06:43:27.7742525Z Download artifact has finished successfully
+install (ubuntu-latest)	the downloaded files are exactly the ones built	﻿2026-10-05T06:43:27.7890817Z ##[group]Run cd dist && sha256sum -c ../SHA256SUMS
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.7891372Z ^[[36;1mcd dist && sha256sum -c ../SHA256SUMS^[[0m
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8226604Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8227104Z env:
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8227484Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8228059Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8228649Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8229162Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8229702Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8230224Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8230672Z ##[endgroup]
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8369197Z aisef-2.0.0-py3-none-any.whl: OK
+install (ubuntu-latest)	the downloaded files are exactly the ones built	2026-10-05T06:43:27.8375315Z aisef-2.0.0.tar.gz: OK
+install (ubuntu-latest)	install exactly that wheel into a clean venv	﻿2026-10-05T06:43:27.8417403Z ##[group]Run set -eu
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8417763Z ^[[36;1mset -eu^[[0m
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8418264Z ^[[36;1mtmp="$RUNNER_TEMP"; if command -v cygpath >/dev/null; then tmp=$(cygpath -u "$tmp"); fi^[[0m
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8418823Z ^[[36;1mpython -m venv "$tmp/venv"^[[0m
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8419438Z ^[[36;1mpy="$tmp/venv/bin/python"; if [ -f "$tmp/venv/Scripts/python.exe" ]; then py="$tmp/venv/Scripts/python.exe"; fi^[[0m
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8420136Z ^[[36;1m"$py" -m pip install --no-index --no-deps dist/*.whl^[[0m
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8420578Z ^[[36;1mecho "SMOKE_PY=$py" >> "$GITHUB_ENV"^[[0m
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8420965Z ^[[36;1mecho "SMOKE_DIR=$tmp" >> "$GITHUB_ENV"^[[0m
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8482201Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8482632Z env:
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8482972Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8483532Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8484090Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8484601Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8485348Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8485834Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:27.8486237Z ##[endgroup]
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:33.1636494Z Processing ./dist/aisef-2.0.0-py3-none-any.whl
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:33.1754140Z Installing collected packages: aisef
+install (ubuntu-latest)	install exactly that wheel into a clean venv	2026-10-05T06:43:33.6475022Z Successfully installed aisef-2.0.0
+install (ubuntu-latest)	CLI smoke from the installed artifact	﻿2026-10-05T06:43:33.6998032Z ##[group]Run set -eu
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.6998344Z ^[[36;1mset -eu^[[0m
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.6999168Z ^[[36;1mwant=$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version'])")^[[0m
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.6999912Z ^[[36;1msmoke="$GITHUB_WORKSPACE/tests/installed_smoke.py"^[[0m
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7000268Z ^[[36;1mcd "$SMOKE_DIR"^[[0m
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7000537Z ^[[36;1m"$SMOKE_PY" -I -c "import aisef2"^[[0m
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7000879Z ^[[36;1m"$SMOKE_PY" -I "$smoke" "$want" --product^[[0m
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7066263Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7066619Z env:
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7066889Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7067339Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7067794Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7068210Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7068647Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7069058Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7069438Z   SMOKE_PY: /home/runner/work/_temp/venv/bin/python
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7088268Z   SMOKE_DIR: /home/runner/work/_temp
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:33.7088622Z ##[endgroup]
+install (ubuntu-latest)	CLI smoke from the installed artifact	2026-10-05T06:43:35.0999799Z installed smoke: PASS (aisef 2.0.0)
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	﻿2026-10-05T06:43:35.1216886Z ##[group]Run set -eu
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1217212Z ^[[36;1mset -eu^[[0m
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1217433Z ^[[36;1mcd "$SMOKE_DIR"^[[0m
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1217790Z ^[[36;1m"$SMOKE_PY" -I "$GITHUB_WORKSPACE/tests/installed_product_smoke.py"^[[0m
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1282188Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1282546Z env:
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1282830Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1283273Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1283710Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1284118Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1284509Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1285166Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1285558Z   SMOKE_PY: /home/runner/work/_temp/venv/bin/python
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1285880Z   SMOKE_DIR: /home/runner/work/_temp
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:35.1286200Z ##[endgroup]
+install (ubuntu-latest)	product smoke — the installed `aisef run`, end to end and offline	2026-10-05T06:43:39.1451930Z installed product smoke: PASS (`aisef run` --check, run, --verify from the installed artifact)
+install (ubuntu-latest)	Post Run actions/setup-python@v5	﻿2026-10-05T06:43:39.1823269Z Post job cleanup.
+install (ubuntu-latest)	Post Run actions/setup-python@v5	2026-10-05T06:43:39.3088354Z (node:2558) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+install (ubuntu-latest)	Post Run actions/setup-python@v5	2026-10-05T06:43:39.3089884Z (Use `node --trace-deprecation ...` to show where the warning was created)
+install (ubuntu-latest)	Post Run actions/checkout@v4	﻿2026-10-05T06:43:39.3353298Z Post job cleanup.
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4332626Z [command]/usr/bin/git version
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4390952Z git version 2.55.0
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4434570Z Temporarily overriding HOME='/home/runner/work/_temp/1bff2f45-e95b-44ad-b622-4aa6730fb6b5' before making global git config changes
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4438314Z Adding repository directory to the temporary git global config as a safe directory
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4440552Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4486151Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4531422Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4839040Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4866762Z http.https://github.com/.extraheader
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4879412Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.4923724Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.5224342Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+install (ubuntu-latest)	Post Run actions/checkout@v4	2026-10-05T06:43:39.5265323Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+install (ubuntu-latest)	Complete job	﻿2026-10-05T06:43:39.5691349Z Cleaning up orphan processes
+install (ubuntu-latest)	Complete job	2026-10-05T06:43:39.6221229Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

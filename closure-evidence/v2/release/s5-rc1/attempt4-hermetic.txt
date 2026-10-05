@@ -1,0 +1,7 @@
+----------------------------------------------------------------------
+Ran 1 test in 0.327s
+
+OK
+preserve_root /Users/nghinh/Downloads/projects/aisef-qp-2.9-preserved | attempt-4-evidence present: True
+external copy checked: manifest + every checksum + git fsck + journal commits; problems: []
+client store read by the check: /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5/xdg/data/opencode/opencode.db exists: False

@@ -1,0 +1,264 @@
+{
+ "record": "AISEF V2.0 — S5 on the exact RC1: hermetic full suite and exact-RC checks (owner ruling 2026-10-05 'Proceed to S5 on the exact frozen RC 529591e')",
+ "rc": {
+  "sha": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+  "version": "2.0.0",
+  "kernel_tree": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
+  "kernel_digest": "b93d4c08ae2e392de9c6e6083a39625c936c8935481a4dfa1a44dff2824e77fd"
+ },
+ "hermetic_environment": {
+  "how": "env -i with only PATH (every directory holding an opencode executable removed, as in S2), HOME and XDG_CONFIG/DATA/STATE/CACHE_HOME in fresh empty directories, TMPDIR (the system's), LANG, USER, LOGNAME; macOS adds __CF_USER_TEXT_ENCODING to every process",
+  "spec": {
+   "path": "closure-evidence/v2/release/s5-rc1/env.sh",
+   "sha256": "249147ab818b6722f713948ff248ed95b9134b2e89490d30955e71d8889893a0"
+  },
+  "script": {
+   "path": "closure-evidence/v2/release/s5-rc1/run-suite.sh",
+   "sha256": "cade5cd2317e63953c6e393d0f4230d004ba75c609f60d081d24e51ccb5fb233"
+  },
+  "zero_state_before": {
+   "which_opencode": null,
+   "secret_like_variables": [],
+   "hermetic_roots_entries": {
+    "HOME": [],
+    "XDG_CONFIG_HOME": [],
+    "XDG_DATA_HOME": [],
+    "XDG_STATE_HOME": [],
+    "XDG_CACHE_HOME": []
+   },
+   "client_store_the_attempt4_check_reads": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5/xdg/data/opencode/opencode.db",
+   "store_exists": false,
+   "opencode_state_paths_existing": [],
+   "record": {
+    "path": "closure-evidence/v2/release/s5-rc1/hermetic-proof-before.json",
+    "sha256": "5aaea33a4d2f97063421baeec68789cefc09379cc99805322a91c5ae05b30b95"
+   }
+  },
+  "after": {
+   "path": "closure-evidence/v2/release/s5-rc1/hermetic-proof-after.json",
+   "sha256": "5aaea33a4d2f97063421baeec68789cefc09379cc99805322a91c5ae05b30b95"
+  },
+  "tools": {
+   "path": "closure-evidence/v2/release/s5-rc1/provenance-tools.txt",
+   "sha256": "b9e8397651d677c5c18887a37269833de7225e59fa818bab9be1387ada6af3bb"
+  }
+ },
+ "full_suite": {
+  "worktree": "a fresh detached worktree at 529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+  "command": "python3 -P validation/v2/owned_run.py -- python3 -m unittest discover -s tests",
+  "started": "2026-10-05T06:42:29Z",
+  "finished": "2026-10-05T07:18:04Z",
+  "result": "Ran 5444 tests in 2133 s; OK (skipped=80); FAILED 0",
+  "owned": "before=0 at_exit=0 after=0 escaped=0 released_empty=True",
+  "log": {
+   "path": "closure-evidence/v2/release/s5-rc1/suite-hermetic-529591e.txt",
+   "sha256": "a6d47e196371024eed27a04e1c9e5c192f733dcd529ad32aabcb1254182b41d8"
+  },
+  "owned_run": {
+   "path": "closure-evidence/v2/release/s5-rc1/owned-hermetic-529591e.json",
+   "sha256": "98519e1b62cef46c691dec0b79bd181f7fb0dcc962d8c4760e9fff7db4f99773"
+  }
+ },
+ "attempt4_machine_check": {
+  "test": "tests/v2/test_c2_delivery_experiment.py HistoricalAttempt4.test_the_machine_s_external_copies_are_checked_and_an_absent_copy_fails",
+  "hermetic_result": "PASS, exercised: the preserved attempt-4 copy exists outside HOME, so external_problems(4) checks the manifest, every checksum, git fsck and the journal's commits — [] — and the client store it reads (in the hermetic XDG_DATA_HOME) does not exist",
+  "record": {
+   "path": "closure-evidence/v2/release/s5-rc1/attempt4-hermetic.txt",
+   "sha256": "d1f5672786443e16a5a86d2e4c012d9eecda301c46161fd5b69018d4765f801c"
+  },
+  "conclusion": "the earlier failure came only from the operator's real store holding sessions after attempt 4 — the 14 fakeprov test sessions S2's escaped mutants wrote on 2026-10-04 (S2-REAL-CLIENT-RUN): confirmed machine contamination, closed for release purposes (S2-REAL-CLIENT-RUN/R2)"
+ },
+ "checks": {
+  "1_head_is_the_RC": {
+   "result": true,
+   "evidence": {
+    "path": "closure-evidence/v2/release/s5-rc1/rc-identity.txt",
+    "sha256": "6549d4436204d88d85dc28490c2500d8561e8579643caa597e6fec52651e937c"
+   },
+   "after_the_suite": "529591e4f2aeaa1ec621d624ef223e77ec9ff603"
+  },
+  "2_working_tree_clean": {
+   "result": true,
+   "before": "0 status lines (rc-identity.txt)",
+   "after": "0 status lines",
+   "record": {
+    "path": "closure-evidence/v2/release/s5-rc1/rc-status-after.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  "3_kernel_tree_and_digest": {
+   "result": true,
+   "tree": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
+   "digest": "b93d4c08ae2e392de9c6e6083a39625c936c8935481a4dfa1a44dff2824e77fd",
+   "shipped_trees_equal_the_freeze_record": true
+  },
+  "4_frozen_hashes": {
+   "result": true,
+   "wheel": "a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7",
+   "sdist": "7cf8d07ef29577ad56e7d3a852c5da14436126d842a1dccbad79eca4e16e234d",
+   "freeze_record": {
+    "path": "closure-evidence/v2/release/V2.0-RC1-FREEZE.json",
+    "sha256": "ffec0092a88e93f7ee645861c90e6b58d5d51bddbf4f41d364ccde851a7d0c6e"
+   }
+  },
+  "5_rebuild_byte_for_byte": {
+   "result": true,
+   "run": "staging 37256508105 attempt 2 (re-run of the RC's own staging run: same commit 529591e, same workflow file, epoch = the RC's commit time)",
+   "build_job": 111646344626,
+   "sha256sums": {
+    "path": "closure-evidence/v2/release/s5-rc1/SHA256SUMS-rebuild-529591e",
+    "sha256": "459e2496df1cdaea80082911d3ab16477ecbaf0733998692f1d5c72af1719768"
+   },
+   "log": {
+    "path": "closure-evidence/v2/release/s5-rc1/staging-rerun-build-111646344626.log",
+    "sha256": "5c3bddc86ccd148269931a77949374aecb0039794b3cab2df8da15fcd914b994"
+   },
+   "equal_to_frozen": true
+  },
+  "6_clean_install_smoke_from_the_rebuilt_wheel": {
+   "result": true,
+   "ubuntu": {
+    "job": 111646431329,
+    "sums_reverified": true,
+    "smokes": "installed smoke: PASS (aisef 2.0.0); installed product smoke: PASS (`aisef run` --check, run, --verify from the installed artifact)",
+    "log": {
+     "path": "closure-evidence/v2/release/s5-rc1/staging-rerun-install-ubuntu-111646431329.log",
+     "sha256": "afcb5942a62afa0c10315d4bfd7eda8df2723a1408b45239413631ef0aecd210"
+    }
+   },
+   "windows": {
+    "job": 111646431382,
+    "sums_reverified": true,
+    "smokes": "installed smoke: PASS (aisef 2.0.0); product smoke POSIX only by design",
+    "log": {
+     "path": "closure-evidence/v2/release/s5-rc1/staging-rerun-install-windows-111646431382.log",
+     "sha256": "73afb6149a30aaf7a462d1730a1876ac6335ca4a123133f62526f54de80487a6"
+    }
+   }
+  },
+  "7_no_post_RC_commit_in_the_package": {
+   "result": true,
+   "why": "the rebuild is of 529591e itself; every commit after it changes only closure-evidence/ (git diff --name-only), which the package does not hold (packaging_check --artifacts: exactly aisef + aisef2)"
+  },
+  "8_real_opencode_store_unchanged": {
+   "result": true,
+   "how": "os.stat metadata only (size, mtime, inode of the database files; entry counts and mtimes of the session folders) — nothing opened, read or modified",
+   "before": {
+    "path": "closure-evidence/v2/release/s5-rc1/real-store-before.json",
+    "sha256": "d6a699f57082ac08b82c4382ffae44e8ecdbd964f94e3a27d7184cdfb94e047e"
+   },
+   "after": {
+    "path": "closure-evidence/v2/release/s5-rc1/real-store-after.json",
+    "sha256": "d6a699f57082ac08b82c4382ffae44e8ecdbd964f94e3a27d7184cdfb94e047e"
+   }
+  },
+  "9_no_external_action": {
+   "result": true,
+   "provider_calls": 0,
+   "q4_q5": "not run",
+   "paid_smoke": "not run",
+   "tags": "none (no v2* tag on origin)",
+   "testpypi_pypi": "no upload"
+  }
+ },
+ "charter_S5_items": {
+  "1 full suite": "PASS (hermetic, 0 failed)",
+  "2 lint/static": "PASS (CI lint job on 529591e, run 37256508108)",
+  "3 CI on claimed platforms": "PASS (run 37256508108 on 529591e, 8/8)",
+  "4-7 Q0-Q3": "next: fresh, release mode, Linux and Windows",
+  "8 Q4 fresh": "NOT RUN — owner: not yet",
+  "9 Q5 fresh/reproduction": "NOT RUN — owner: not yet",
+  "10 clean wheel build": "PASS (rebuild byte-identical)",
+  "11 wheel digest binding": "PASS (V2.0-RC1-FREEZE.json; rebuild equal)"
+ },
+ "files": {
+  "SHA256SUMS-rebuild-529591e": {
+   "path": "closure-evidence/v2/release/s5-rc1/SHA256SUMS-rebuild-529591e",
+   "sha256": "459e2496df1cdaea80082911d3ab16477ecbaf0733998692f1d5c72af1719768"
+  },
+  "attempt4-hermetic.txt": {
+   "path": "closure-evidence/v2/release/s5-rc1/attempt4-hermetic.txt",
+   "sha256": "d1f5672786443e16a5a86d2e4c012d9eecda301c46161fd5b69018d4765f801c"
+  },
+  "env.sh": {
+   "path": "closure-evidence/v2/release/s5-rc1/env.sh",
+   "sha256": "249147ab818b6722f713948ff248ed95b9134b2e89490d30955e71d8889893a0"
+  },
+  "guarded-path.txt": {
+   "path": "closure-evidence/v2/release/s5-rc1/guarded-path.txt",
+   "sha256": "303b014c1b17c198668c128bde60a01448993a179b241656d479694193c688a1"
+  },
+  "hermetic-proof-after.json": {
+   "path": "closure-evidence/v2/release/s5-rc1/hermetic-proof-after.json",
+   "sha256": "5aaea33a4d2f97063421baeec68789cefc09379cc99805322a91c5ae05b30b95"
+  },
+  "hermetic-proof-before.json": {
+   "path": "closure-evidence/v2/release/s5-rc1/hermetic-proof-before.json",
+   "sha256": "5aaea33a4d2f97063421baeec68789cefc09379cc99805322a91c5ae05b30b95"
+  },
+  "hermetic_proof.py": {
+   "path": "closure-evidence/v2/release/s5-rc1/hermetic_proof.py",
+   "sha256": "ab22b5d5de16c6bff7d44f06e1faecd99a3ae2bb24087266d8ba67e920db80ef"
+  },
+  "owned-hermetic-529591e.json": {
+   "path": "closure-evidence/v2/release/s5-rc1/owned-hermetic-529591e.json",
+   "sha256": "98519e1b62cef46c691dec0b79bd181f7fb0dcc962d8c4760e9fff7db4f99773"
+  },
+  "provenance-tools.txt": {
+   "path": "closure-evidence/v2/release/s5-rc1/provenance-tools.txt",
+   "sha256": "b9e8397651d677c5c18887a37269833de7225e59fa818bab9be1387ada6af3bb"
+  },
+  "rc-head-after.txt": {
+   "path": "closure-evidence/v2/release/s5-rc1/rc-head-after.txt",
+   "sha256": "fada160b00ec3fdf5fd4c0111c3a7be13710b20b4694fbdf185a74461466b23d"
+  },
+  "rc-identity.txt": {
+   "path": "closure-evidence/v2/release/s5-rc1/rc-identity.txt",
+   "sha256": "6549d4436204d88d85dc28490c2500d8561e8579643caa597e6fec52651e937c"
+  },
+  "rc-status-after.txt": {
+   "path": "closure-evidence/v2/release/s5-rc1/rc-status-after.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "real-store-after.json": {
+   "path": "closure-evidence/v2/release/s5-rc1/real-store-after.json",
+   "sha256": "d6a699f57082ac08b82c4382ffae44e8ecdbd964f94e3a27d7184cdfb94e047e"
+  },
+  "real-store-before.json": {
+   "path": "closure-evidence/v2/release/s5-rc1/real-store-before.json",
+   "sha256": "d6a699f57082ac08b82c4382ffae44e8ecdbd964f94e3a27d7184cdfb94e047e"
+  },
+  "run-suite.sh": {
+   "path": "closure-evidence/v2/release/s5-rc1/run-suite.sh",
+   "sha256": "cade5cd2317e63953c6e393d0f4230d004ba75c609f60d081d24e51ccb5fb233"
+  },
+  "staging-rerun-build-111646344626.log": {
+   "path": "closure-evidence/v2/release/s5-rc1/staging-rerun-build-111646344626.log",
+   "sha256": "5c3bddc86ccd148269931a77949374aecb0039794b3cab2df8da15fcd914b994"
+  },
+  "staging-rerun-install-ubuntu-111646431329.log": {
+   "path": "closure-evidence/v2/release/s5-rc1/staging-rerun-install-ubuntu-111646431329.log",
+   "sha256": "afcb5942a62afa0c10315d4bfd7eda8df2723a1408b45239413631ef0aecd210"
+  },
+  "staging-rerun-install-windows-111646431382.log": {
+   "path": "closure-evidence/v2/release/s5-rc1/staging-rerun-install-windows-111646431382.log",
+   "sha256": "73afb6149a30aaf7a462d1730a1876ac6335ca4a123133f62526f54de80487a6"
+  },
+  "store_stat.py": {
+   "path": "closure-evidence/v2/release/s5-rc1/store_stat.py",
+   "sha256": "38f31d0ad8243e5359cebc06bbe2f7b1cd76b45dc016f2066e51a45c44c6c955"
+  },
+  "suite-hermetic-529591e.txt": {
+   "path": "closure-evidence/v2/release/s5-rc1/suite-hermetic-529591e.txt",
+   "sha256": "a6d47e196371024eed27a04e1c9e5c192f733dcd529ad32aabcb1254182b41d8"
+  },
+  "suite.finished": {
+   "path": "closure-evidence/v2/release/s5-rc1/suite.finished",
+   "sha256": "d7a2ad2205474845ee192e9f2abeb11da662d35596f2272fad29b2538c2fc5d5"
+  },
+  "suite.started": {
+   "path": "closure-evidence/v2/release/s5-rc1/suite.started",
+   "sha256": "601693436694e1fa50e3020acd89383cd94b96a0a64dd24030227c713a155874"
+  }
+ }
+}

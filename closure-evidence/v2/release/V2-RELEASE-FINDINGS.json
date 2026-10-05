@@ -243,6 +243,14 @@
    "RELEASE_BLOCKER_RULE_3": "NO (no provider reached, nothing disclosed)",
    "V2_0_DISPOSITION": "NOT A V2.0 BLOCKER (owner). (1) Waiver: the S2 gate 'full local suite green' holds for 1ba5bde with exactly one failure waived — tests/v2/test_c2_delivery_experiment.py HistoricalAttempt4.test_the_machine_s_external_copies_are_checked_and_an_absent_copy_fails, failing only because of the 14 test sessions this incident left in the operator's store; the store is left untouched. (2) V2.1_BACKLOG as V21-36: the app tests isolate the client's data/state/cache directories and PATH as they isolate its configuration (tests/v2/test_app_run.py ProductBase, client_config, the client cases); its line in docs/v2/V2.1-BACKLOG.md lands with the next change to the tree (S4 preparation), so the frozen S2 candidate keeps the tree its suite and CI measured. (3) Env guard now: every later mutation worker starts through the controller's launcher with PATH stripped of each directory holding an `opencode` executable and XDG_DATA_HOME/XDG_STATE_HOME/XDG_CACHE_HOME in the worker's scratch; measured 2026-10-05: shutil.which('opencode') is None under it (directly and through aisef2.app.client.environment), git and python3 resolve, and the escape mutant run.py::execute 'L249 Or swapped' replayed under it against tests/v2/test_app_run.py is killed (failures=2, errors=11) while the operator's store stays at 1970 sessions, latest unchanged",
    "source": "owner answers 2026-10-05 to the controller's question after the S2 final candidate's full local suite"
+  },
+  {
+   "ID": "S2-REAL-CLIENT-RUN/R2",
+   "RECLASSIFIES": "S2-REAL-CLIENT-RUN/R1",
+   "OWNER_RULING": "owner ruling 2026-10-05 ('Proceed to S5 on the exact frozen RC 529591e'): the machine-state waiver does not carry forward as an S5 pass; in a hermetic environment the attempt-4 test must pass, else a genuine S5 blocker",
+   "MEASURED": "S5 hermetic full suite on exactly 529591e (closure-evidence/v2/release/S5-RC1-EXACT-RC.json): 5444 tests, 0 failed; the attempt-4 test PASSES there, exercised (the preserved copy checked in full; the client store absent)",
+   "V2_0_DISPOSITION": "CLOSED for release purposes: the earlier failure was confirmed machine contamination (the operator's real store, written by S2's escaped mutants on 2026-10-04); no waiver is used for S5. The operator's store is left untouched; V21-36 (test isolation) stays in the V2.1 backlog",
+   "source": "S5, 2026-10-05"
   }
  ],
  "v2_1_backlog": {
@@ -386,6 +394,18 @@
    "id": "OBS-S4-2",
    "what": "CI on the freeze commit 66067c0 (tests run 37263474461, attempt 1): 'unit (windows-latest, 3.11)' (job 111615315191, 04:25:50-05:12:50Z) ended with GitHub's annotation 'The hosted runner lost communication with the server'; its test step never concluded and its log is not available (the jobs/111615315191/logs API answers 404), so it gave no test verdict. Every other job of the run passed (ubuntu 3.11-3.14 and macos 3.12: 5444 OK; lint; wheel). Note: `gh run view --job 111615315191 --log` now serves attempt 2's log (it starts at 05:15:37Z, after attempt 1 ended) — it is not attempt 1's.",
    "disposition": "not a finding: classified ENVIRONMENT, as the same runner loss was at C2-P0-RUN-HISTORY seq 49; V2-RETRY-POLICY approves no CI retry count (phase-gate:ci null), so the re-run of that one job (attempt 2, job 111625731732: Ran 5441 tests, OK (skipped=173), owned processes 0/0/0) is DIAGNOSTIC ONLY and does not erase attempt 1. No gate rests on it: the RC gate is CI on the RC itself (run 37256508108 on 529591e, 8/8 green); run 37263474461 is the controller's release-mode cross-check of the freeze commit."
+  },
+  {
+   "id": "OBS-S4-1/R1",
+   "reclassifies": "OBS-S4-1",
+   "what": "owner ruling 2026-10-05 ('Proceed to S5 on the exact frozen RC 529591e')",
+   "disposition": "waived as a recorded process deviation; the prohibited read-only research swarm must not be used again and is not cited as release qualification evidence"
+  },
+  {
+   "id": "OBS-S4-2/R1",
+   "reclassifies": "OBS-S4-2",
+   "what": "owner ruling 2026-10-05 ('Proceed to S5 on the exact frozen RC 529591e')",
+   "disposition": "accepted as an infrastructure observation only; the diagnostic Windows rerun does not alter the frozen S4 gate result"
   }
  ],
  "reviews": [
