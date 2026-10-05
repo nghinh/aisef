@@ -1,0 +1,87 @@
+{
+ "record": "AISEF V2.0 — S5 FINAL DETERMINISTIC QUALIFICATION of RC1 (charter §12), owner rulings of 2026-10-05",
+ "rc": {
+  "sha": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+  "version": "2.0.0",
+  "kernel_tree": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
+  "kernel_digest": "b93d4c08ae2e392de9c6e6083a39625c936c8935481a4dfa1a44dff2824e77fd",
+  "wheel": "a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7",
+  "sdist": "7cf8d07ef29577ad56e7d3a852c5da14436126d842a1dccbad79eca4e16e234d",
+  "freeze_record": {
+   "path": "closure-evidence/v2/release/V2.0-RC1-FREEZE.json",
+   "sha256": "ffec0092a88e93f7ee645861c90e6b58d5d51bddbf4f41d364ccde851a7d0c6e"
+  }
+ },
+ "items": {
+  "1 full suite": {
+   "result": "PASS",
+   "detail": "hermetic, on exactly 529591e: 5444 tests, 0 failed (no waiver)",
+   "evidence": {
+    "path": "closure-evidence/v2/release/S5-RC1-EXACT-RC.json",
+    "sha256": "9433c5ce5620b7bcc3f0d5783c5ba39670118cef377ea1f99fc845cd06d9e1ff"
+   }
+  },
+  "2 lint/static checks": {
+   "result": "PASS",
+   "detail": "CI lint job on 529591e (tests run 37256508108); Q0 static integrity GREEN"
+  },
+  "3 CI on claimed release platforms": {
+   "result": "PASS",
+   "detail": "tests run 37256508108 on 529591e: ubuntu 3.11-3.14 and macos 3.12 5444 OK, windows 3.11 5441 OK, lint, wheel"
+  },
+  "4-7 Q0, Q1, Q2, Q3": {
+   "result": "PASS",
+   "detail": "SUMMARY verdict GREEN on Linux 3.11-3.14 and Windows 3.11 (qualification run 37284946162, attempt 3; attempts 1-2 FAILED at Q0 on misplaced dry-run records, OBS-S5-2, kept in Q0-Q3-RC1/attempts/)",
+   "evidence": {
+    "path": "closure-evidence/v2/release/Q0-Q3-RC1/SUMMARY.json",
+    "sha256": "84330a5f12e9f35335454a2067604a0cc5b63cbe15f0c1415cec2a37e499682c"
+   }
+  },
+  "8 Q4 fresh": {
+   "result": "PASS",
+   "detail": "status GREEN: 100,000 traces matched, divergence 0, invariant 0, exception 0, silent 0",
+   "evidence": {
+    "path": "closure-evidence/v2/release/Q4-RC1/DIFFERENTIAL.json",
+    "sha256": "50bef899d4bd9901cfc6a46483d43c6ba4d089a8a719587d6c8ca073b25a14af"
+   }
+  },
+  "9 Q5 fresh/reproduction": {
+   "result": "PASS",
+   "detail": "status GREEN: 12 corpus items reproduced, every diff and error class 0, socket attempts 0 (attempt 2; attempt 1 — all GREEN, aggregation before Q4 — kept)",
+   "evidence": {
+    "path": "closure-evidence/v2/release/Q5-RC1/REPRODUCTION.json",
+    "sha256": "bb4ba888180f74c5c15943777183f7e60cf23968681429dd0bd9dacbe4fc7037"
+   }
+  },
+  "10 clean wheel build": {
+   "result": "PASS",
+   "detail": "staging 37256508105 attempt 2: a rebuild of 529591e byte-identical to the frozen wheel and sdist; clean-install smokes PASS (ubuntu CLI + offline aisef run; windows CLI)"
+  },
+  "11 wheel digest binding": {
+   "result": "PASS",
+   "detail": "V2.0-RC1-FREEZE.json binds wheel a04c4eb9 and sdist 7cf8d07e; the rebuild equals them"
+  }
+ },
+ "go_criteria_G3": {
+  "full test suite 0 failed": true,
+  "lint/static gates green": true,
+  "release-blocking regression tests green": true,
+  "Q0-Q5 GREEN on the exact RC": true,
+  "zero unaudited mutation survivors in changed release-critical code": "S2-MUTATION record PASS (261/261, 6437/6437, 0 unaudited) bound to FINAL_HEAD 190b882 = the RC's tree"
+ },
+ "after_the_RC": {
+  "non_evidence_changes": [
+   "validation/qualification/q3.py — the owner-approved harness-only re-pin of one Q3 case id (29dbd0a; S5-Q3-STALE-CASE/R1)"
+  ],
+  "release_rc_check": "PASS (shipped files and kernel are the RC's)",
+  "s2_record_check": "PASS on an RC-tree commit (89f66bf); at heads after the re-pin it reports 'HEAD mismatch' — q3.py only, outside every kill-test closure — expected, the record not re-derived (S2 frozen)"
+ },
+ "hermetic": "the full suite, the Q0-Q3 dry runs, Q4 and Q5 ran under env -i with fresh HOME and XDG roots and PATH without the real client; Q4/Q5 in a fresh clone (the release worktree's shared .git config holds editor keys the kernel's B4 git wrapper refuses — OBS-S5-3)",
+ "real_opencode_store": "metadata unchanged from before S5 to its end (os.stat only)",
+ "external_actions": {
+  "provider_calls": 0,
+  "paid_smokes": 0,
+  "tags": 0,
+  "testpypi_or_pypi_uploads": 0
+ }
+}

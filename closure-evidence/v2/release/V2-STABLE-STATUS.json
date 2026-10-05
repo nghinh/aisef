@@ -6,7 +6,7 @@
  "S2_FIX_WINDOW": "PASS",
  "S3_PRODUCTIZED": "PASS",
  "S4_RC_FROZEN": "PASS",
- "S5_QUALIFIED": "RUNNING",
+ "S5_QUALIFIED": "PASS",
  "S6_RELEASE_SMOKE": "NOT_STARTED",
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
@@ -106,6 +106,12 @@
    "status": "RUNNING",
    "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
    "what": "owner approved the Q3 re-pin (29dbd0a) and authorized Q4/Q5; Q0-Q3 attempts 1-2 FAILED at Q0 on dry-run records placed outside the scanner's area (OBS-S5-2), moved; S5-Q3-STALE-CASE resolved by the re-pin"
+  },
+  {
+   "phase": "S5_QUALIFIED",
+   "status": "PASS",
+   "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+   "what": "S5 complete on exactly RC1 529591e: hermetic suite 5444/0; CI 8/8; Q0-Q3 GREEN on Linux/Windows; Q4 100,000/100,000 matched; Q5 12/12 reproduced; rebuild byte-identical; clean-install smokes PASS; no provider call, tag or upload"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
@@ -337,37 +343,47 @@
  "S5_DETAIL": {
   "rc": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
   "record": {
+   "path": "closure-evidence/v2/release/S5-RC1-QUALIFIED.json",
+   "sha256": "7c3091fd41bf60aa4575b873eeaef7f4986308ba3889ca39545ce0c5a57cd847"
+  },
+  "items": {
+   "1 full suite": "PASS",
+   "2 lint/static checks": "PASS",
+   "3 CI on claimed release platforms": "PASS",
+   "4-7 Q0, Q1, Q2, Q3": "PASS",
+   "8 Q4 fresh": "PASS",
+   "9 Q5 fresh/reproduction": "PASS",
+   "10 clean wheel build": "PASS",
+   "11 wheel digest binding": "PASS"
+  },
+  "exact_rc_checks": {
    "path": "closure-evidence/v2/release/S5-RC1-EXACT-RC.json",
    "sha256": "9433c5ce5620b7bcc3f0d5783c5ba39670118cef377ea1f99fc845cd06d9e1ff"
   },
-  "done": {
-   "1 full suite": "PASS (hermetic, 0 failed)",
-   "2 lint/static": "PASS (CI lint job on 529591e, run 37256508108)",
-   "3 CI on claimed platforms": "PASS (run 37256508108 on 529591e, 8/8)",
-   "4-7 Q0-Q3": "next: fresh, release mode, Linux and Windows",
-   "8 Q4 fresh": "NOT RUN — owner: not yet",
-   "9 Q5 fresh/reproduction": "NOT RUN — owner: not yet",
-   "10 clean wheel build": "PASS (rebuild byte-identical)",
-   "11 wheel digest binding": "PASS (V2.0-RC1-FREEZE.json; rebuild equal)"
+  "q0_q3": {
+   "path": "closure-evidence/v2/release/Q0-Q3-RC1/SUMMARY.json",
+   "sha256": "84330a5f12e9f35335454a2067604a0cc5b63cbe15f0c1415cec2a37e499682c"
   },
-  "hermetic_full_suite": "5444 tests, 0 failed (no waiver)",
-  "remaining": [
-   "Q0-Q3 attempt 3 (after the evidence move)",
-   "Q4 fresh",
-   "Q5 fresh/reproduction"
-  ],
-  "blocked_on": [],
-  "q0_q3_dry_runs_darwin": {
-   "as_frozen": "Q0 GREEN, Q1 GREEN, Q2 GREEN, Q3 FAILED (FM2-CLI-STREAM-2 case not found)",
-   "with_the_proposed_repin": "Q0-Q3 GREEN (non-gate; the gate platforms are Linux and Windows via [qualify])"
+  "q4": {
+   "path": "closure-evidence/v2/release/Q4-RC1/DIFFERENTIAL.json",
+   "sha256": "50bef899d4bd9901cfc6a46483d43c6ba4d089a8a719587d6c8ca073b25a14af"
   },
-  "owner_answers_2026_10_05": {
-   "Q3 re-pin": "Approve the one-line re-pin (Recommended) — applied 29dbd0a",
-   "Q4/Q5": "Authorize Q4 and Q5 (Recommended)"
+  "q5": {
+   "path": "closure-evidence/v2/release/Q5-RC1/REPRODUCTION.json",
+   "sha256": "bb4ba888180f74c5c15943777183f7e60cf23968681429dd0bd9dacbe4fc7037"
   },
-  "q0_q3_attempts": {
-   "1": "run 37281473872 at e9d5269 (accidental): Q0 FAILED (OBS-S5-2)",
-   "2": "run 37281662775 at 29dbd0a: Q0 FAILED (OBS-S5-2)"
+  "after_the_RC": {
+   "non_evidence_changes": [
+    "validation/qualification/q3.py — the owner-approved harness-only re-pin of one Q3 case id (29dbd0a; S5-Q3-STALE-CASE/R1)"
+   ],
+   "release_rc_check": "PASS (shipped files and kernel are the RC's)",
+   "s2_record_check": "PASS on an RC-tree commit (89f66bf); at heads after the re-pin it reports 'HEAD mismatch' — q3.py only, outside every kill-test closure — expected, the record not re-derived (S2 frozen)"
+  },
+  "external_actions": {
+   "provider_calls": 0,
+   "paid_smokes": 0,
+   "tags": 0,
+   "testpypi_or_pypi_uploads": 0
   }
  }
 }

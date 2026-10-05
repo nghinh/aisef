@@ -445,6 +445,16 @@
    "id": "OBS-S5-2",
    "what": "Q0 attempts 1 and 2 (runs 37281473872, 37281662775) FAILED on all five platforms with one problem — 'the old probe digest is named outside historical evidence' — naming the controller's darwin dry-run rung records committed in e9d5269 under closure-evidence/v2/release/s5-rc1/q0-q3-dryrun-darwin/*/records/ (Q0 and Q3 records list the digests they measured). Q0's scan exempts the scanner's own record areas (common.OUT_REL and the earlier rung output directories), not s5-rc1/. 58 checks PASS in every job; Q1-Q3 did not run.",
    "disposition": "not a finding (an evidence-placement error by the controller; no source, RC or product effect): the dry-run rung records moved by git into closure-evidence/v2/release/Q0-Q3-RC1/darwin-dry-runs/ (the scanner's own record area; summary.py reads only the rung directories and PLATFORMS/, so they stay non-gate observations, as C2's darwin dry-run records were); after the move no file outside the historical set names the old digest. Both failed attempts kept (attempts/ATTEMPTS.json, records decoded byte-for-byte)."
+  },
+  {
+   "id": "OBS-S5-3",
+   "what": "The release worktree shares the operator repository's .git/config, which holds VS Code's branch.*.vscode-merge-base keys; the kernel's B4 git wrapper (aisef2.orchestrate.workspace.git) refuses to run there (fail-closed, by design), so the first Q5 recording's git identity came out empty (the corpus items, in their own repositories, were unaffected).",
+   "disposition": "not a finding (operator-machine state; the shipped behaviour is right): Q4 and Q5 ran in a fresh clone of release/v2.0.0, whose configuration the wrapper accepts (git version 2.53.0); the first recording kept as Q5-RC1/attempts/record-1-operator-worktree/"
+  },
+  {
+   "id": "OBS-S5-4",
+   "what": "q5_run.sh reproduces before checking that Q4's differential exists; q5.py aggregate() binds it (P8 evidence), so Q5 reproduction attempt 1 — run before Q4 — reproduced all 12 items GREEN and then raised FileNotFoundError at aggregation.",
+   "disposition": "not a finding (run order; C2 ran Q4 before Q5): attempt 1 kept in Q5-RC1/attempts/reproduction-1-before-q4/; attempt 2 after Q4 GREEN. V2.1 note: q5_run.sh could refuse up front when Q4's record is absent"
   }
  ],
  "reviews": [
