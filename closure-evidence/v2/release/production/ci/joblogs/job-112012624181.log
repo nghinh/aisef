@@ -1,0 +1,41 @@
+stable-tag	UNKNOWN STEP	﻿2026-10-05T22:40:46.9365809Z Current runner version: '2.337.0'
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9385672Z ##[group]Runner Image Provisioner
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9386358Z Hosted Compute Agent
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9386934Z Version: 20260901.588
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9387579Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9388144Z Build Date: 2026-09-01T19:56:44Z
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9388781Z Worker ID: {5b9cb58f-c21b-49ef-979e-74fd9d719bce}
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9389367Z Azure Region: westus3
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9389864Z ##[endgroup]
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9391084Z ##[group]Operating System
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9391612Z Ubuntu
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9392109Z 24.04.5
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9392540Z LTS
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9393019Z ##[endgroup]
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9393486Z ##[group]Runner Image
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9393974Z Image: ubuntu-24.04
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9394478Z Version: 20260927.320.1
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9395541Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9396833Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9397872Z ##[endgroup]
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9398825Z ##[group]GITHUB_TOKEN Permissions
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9400340Z Contents: read
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9400923Z Metadata: read
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9401390Z ##[endgroup]
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9403052Z Secret source: Actions
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9404258Z Cache mode: write
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9404914Z Prepare workflow directory
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9656360Z Prepare all required actions
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:46.9744807Z Complete job name: stable-tag
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.0316846Z ##[group]Run set -eu
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.0318161Z ^[[36;1mset -eu^[[0m
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.0319109Z ^[[36;1mif [[ "$GITHUB_REF_TYPE" != "tag" || ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then^[[0m
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.0320111Z ^[[36;1m  echo "::error::$GITHUB_REF is not a stable vX.Y.Z tag: refusing to publish"^[[0m
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.0320907Z ^[[36;1m  exit 1^[[0m
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.0321426Z ^[[36;1mfi^[[0m
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.0321997Z ^[[36;1mecho "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"^[[0m
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.1298652Z shell: /usr/bin/bash -e {0}
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.1299481Z ##[endgroup]
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.1608407Z Evaluate and set job outputs
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.1635042Z Set output 'version'
+stable-tag	UNKNOWN STEP	2026-10-05T22:40:47.1636643Z Cleaning up orphan processes

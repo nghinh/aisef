@@ -1,0 +1,34 @@
+{
+ "files": {
+  "aisef-2.0.0-py3-none-any.whl": {
+   "kind": "wheel",
+   "sha256": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+   "frozen": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+   "match": true
+  },
+  "aisef-2.0.0.tar.gz": {
+   "kind": "sdist",
+   "sha256": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+   "frozen": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+   "match": true
+  }
+ },
+ "pypi_json": {
+  "aisef-2.0.0-py3-none-any.whl": {
+   "kind": "wheel",
+   "sha256": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+   "match": true,
+   "upload_time_iso_8601": "2026-10-05T23:49:43.303777Z",
+   "yanked": false
+  },
+  "aisef-2.0.0.tar.gz": {
+   "kind": "sdist",
+   "sha256": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+   "match": true,
+   "upload_time_iso_8601": "2026-10-05T23:49:44.855207Z",
+   "yanked": false
+  }
+ },
+ "release_files_on_pypi": 2,
+ "verdict": "PASS"
+}

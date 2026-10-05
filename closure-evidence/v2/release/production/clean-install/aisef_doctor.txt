@@ -1,0 +1,23 @@
+$ aisef doctor  (cwd /tmp/aisef-2.0.0-final-verify/work)
+Environment:
+  ✅ python >= 3.11 — 3.14.7
+  ✅ git
+  ✅ claude CLI — /opt/homebrew/bin/claude
+  ○ opencode CLI — not found
+  ✅ agent credential — none in the environment — the client uses its own login
+  ✅ docker daemon — running
+  ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts
+Project:
+  ✅ project directory — /private/tmp/aisef-2.0.0-final-verify/work
+  ✅ sandbox provider — docker — guarantees at WORKSPACE_WRITE: network_none, non_root, secrets_absent
+  ○ sandbox image — alpine:latest — no stack tools, tests will fail due to missing tools
+  ○ role test — auto: no tool runs — no stack profile matches this project (no marker file)
+  ○ role lint — auto: no tool runs — no stack profile matches this project (no marker file)
+  ○ role sast — auto: no tool runs — no stack profile matches this project (no marker file)
+  ✗ docs/requirements.md — /private/tmp/aisef-2.0.0-final-verify/work/docs/requirements.md
+  ✅ config — defaults
+Installed skills:
+  ○ setup completed — not yet — run: aisef setup
+
+✗ missing: docs/requirements.md
+exit 2

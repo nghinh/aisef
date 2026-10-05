@@ -1,0 +1,16 @@
+$ aisef run --help  (cwd /tmp/aisef-2.0.0-final-verify/work)
+usage: aisef run [-h] [--check | --verify] --project PROJECT
+                 [--settings SETTINGS] [--repo REPO] [--out OUT]
+
+Run a project's admitted plan under the AISEF V2 kernel.
+
+options:
+  -h, --help           show this help message and exit
+  --check              check the inputs and the plan's admission; no provider
+                       request
+  --verify             verify a finished run directory against its journal
+  --project PROJECT    the project bundle (aisef-v2-project/1)
+  --settings SETTINGS  the run settings (aisef-v2-run/1)
+  --repo REPO          the project's git repository (cloned; never written)
+  --out OUT            the run directory (must not exist)
+exit 0

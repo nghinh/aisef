@@ -1,0 +1,1354 @@
+tests / wheel	UNKNOWN STEP	﻿2026-10-05T22:40:54.3919960Z Current runner version: '2.337.0'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3945341Z ##[group]Runner Image Provisioner
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3946181Z Hosted Compute Agent
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3946936Z Version: 20260901.588
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3947833Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3948689Z Build Date: 2026-09-01T19:56:44Z
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3949411Z Worker ID: {772ff18d-ffd2-4072-9313-aa55c33f309b}
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3950148Z Azure Region: northcentralus
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3950889Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3952266Z ##[group]Operating System
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3952958Z Ubuntu
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3953526Z 24.04.5
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3954067Z LTS
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3954664Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3955282Z ##[group]Runner Image
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3955985Z Image: ubuntu-24.04
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3956598Z Version: 20260927.320.1
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3958269Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3959934Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3960974Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3962116Z ##[group]GITHUB_TOKEN Permissions
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3964543Z Contents: read
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3965226Z Metadata: read
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3965815Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3968600Z Secret source: Actions
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3969618Z Cache mode: write
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.3970758Z Prepare workflow directory
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.4306061Z Prepare all required actions
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.4353953Z Getting action download info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.7009805Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:54.8299354Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0169128Z Uses: nghinh/aisef/.github/workflows/tests.yml@refs/tags/v2.0.0 (ca2631374602da45dae75b7f6907ff4729d0b2f7)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0173569Z Complete job name: tests / wheel
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0929994Z ##[group]Run actions/checkout@v4
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0930813Z with:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0931257Z   repository: nghinh/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0935476Z   token: ***
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0935917Z   ssh-strict: true
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0936366Z   ssh-user: git
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0936818Z   persist-credentials: true
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0937483Z   clean: true
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0937933Z   sparse-checkout-cone-mode: true
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0938457Z   fetch-depth: 1
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0938888Z   fetch-tags: false
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0939336Z   show-progress: true
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0939774Z   lfs: false
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0940205Z   submodules: false
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0940659Z   set-safe-directory: true
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0941155Z   allow-unsafe-pr-checkout: false
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.0941857Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.1948558Z Syncing repository: nghinh/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.1951225Z ##[group]Getting Git version info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.1952416Z Working directory is '/home/runner/work/aisef/aisef'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.1954026Z [command]/usr/bin/git version
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2018258Z git version 2.55.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2040251Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2056268Z Temporarily overriding HOME='/home/runner/work/_temp/86b58a38-f7ad-41ad-afa9-54a0a24f93d7' before making global git config changes
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2058517Z Adding repository directory to the temporary git global config as a safe directory
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2061348Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2123537Z Deleting the contents of '/home/runner/work/aisef/aisef'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2128393Z ##[group]Initializing the repository
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2132141Z [command]/usr/bin/git init /home/runner/work/aisef/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2239719Z hint: Using 'master' as the name for the initial branch. This default branch name
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2241420Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2243241Z hint: to use in all of your new repositories, which will suppress this warning,
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2244516Z hint: call:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2245171Z hint:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2245964Z hint: 	git config --global init.defaultBranch <name>
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2246940Z hint:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2248063Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2249548Z hint: 'development'. The just-created branch can be renamed via this command:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2250733Z hint:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2251392Z hint: 	git branch -m <name>
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2252148Z hint:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2253122Z hint: Disable this message with "git config set advice.defaultBranchName false"
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2254648Z Initialized empty Git repository in /home/runner/work/aisef/aisef/.git/
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2258400Z [command]/usr/bin/git remote add origin https://github.com/nghinh/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2307761Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2309073Z ##[group]Disabling automatic garbage collection
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2311982Z [command]/usr/bin/git config --local gc.auto 0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2345673Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2347251Z ##[group]Setting up auth
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2353604Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2387227Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2750161Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.2795126Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.3040525Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.3079408Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.3318322Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.3359789Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.3360627Z ##[group]Fetching the repository
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:55.3369185Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ca2631374602da45dae75b7f6907ff4729d0b2f7:refs/tags/v2.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:58.9668266Z From https://github.com/nghinh/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:58.9670961Z  * [new ref]         ca2631374602da45dae75b7f6907ff4729d0b2f7 -> v2.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:58.9676895Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:58.9679338Z ##[group]Determining the checkout info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:58.9682047Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:58.9683950Z [command]/usr/bin/git sparse-checkout disable
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:58.9738999Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:58.9774738Z ##[group]Checking out the ref
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:58.9813189Z [command]/usr/bin/git checkout --progress --force refs/tags/v2.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6814823Z Note: switching to 'refs/tags/v2.0.0'.
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6816266Z 
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6816690Z You are in 'detached HEAD' state. You can look around, make experimental
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6817785Z changes and commit them, and you can discard any commits you make in this
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6818660Z state without impacting any branches by switching back to a branch.
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6819188Z 
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6819545Z If you want to create a new branch to retain commits you create, you may
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6820381Z do so (now or later) by using -c with the switch command. Example:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6820833Z 
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6821044Z   git switch -c <new-branch-name>
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6821735Z 
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6821978Z Or undo this operation with:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6822267Z 
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6822444Z   git switch -
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6822705Z 
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6823140Z Turn off this advice by setting config variable advice.detachedHead to false
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6823669Z 
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6825672Z HEAD is now at ca26313 RELEASE-DECISIONS seq 3: the owner's production-publish authorization for AISEF 2.0.0 (charter §19) — approver human:owner, decision {PRODUCTION_PUBLISH: AUTHORIZED, VERSION: 2.0.0}, on the frozen and qualified RC2 1565bcc. Decision record only.
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6890061Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6940146Z [command]/usr/bin/git log -1 --format=%H
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.6969090Z ca2631374602da45dae75b7f6907ff4729d0b2f7
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.7244259Z ##[group]Run actions/setup-python@v5
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.7244620Z with:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.7244899Z   python-version: 3.11
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.7245182Z   check-latest: false
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.7248094Z   token: ***
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.7248400Z   update-environment: true
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.7248709Z   allow-prereleases: false
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.7249028Z   freethreaded: false
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.7249298Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.8602793Z ##[group]Installed versions
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.8704899Z (node:2361) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.8706087Z (Use `node --trace-deprecation ...` to show where the warning was created)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.8706808Z Successfully set up CPython (3.11.16)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.8707794Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.8951933Z ##[group]Run pip install build twine
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.8952646Z ^[[36;1mpip install build twine^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.9244965Z shell: /usr/bin/bash -e {0}
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.9245376Z env:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.9245735Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.9246293Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.9246840Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.9247517Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.9247982Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.9248412Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+tests / wheel	UNKNOWN STEP	2026-10-05T22:40:59.9248786Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.7513848Z Collecting build
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.7972625Z   Downloading build-1.6.1-py3-none-any.whl.metadata (5.6 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8142180Z Collecting twine
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8178036Z   Downloading twine-7.0.0-py3-none-any.whl.metadata (3.5 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8317334Z Collecting packaging>=24.0 (from build)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8352723Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8448598Z Collecting pyproject_hooks (from build)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8483642Z   Downloading pyproject_hooks-1.3.3-py3-none-any.whl.metadata (1.3 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8601871Z Collecting readme-renderer>=35.0 (from twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8635887Z   Downloading readme_renderer-46.0-py3-none-any.whl.metadata (3.0 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8836089Z Collecting requests>=2.20 (from twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8872149Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.8987524Z Collecting requests-toolbelt!=0.9.0,>=0.8.0 (from twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.9022428Z   Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl.metadata (14 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.9331221Z Collecting urllib3>=1.26.0 (from twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.9366827Z   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.9600698Z Collecting keyring>=21.2.0 (from twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.9634581Z   Downloading keyring-25.7.0-py3-none-any.whl.metadata (21 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.9767623Z Collecting rfc3986>=1.4.0 (from twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:00.9800993Z   Downloading rfc3986-2.0.0-py2.py3-none-any.whl.metadata (6.6 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0036684Z Collecting rich>=14.3.3 (from twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0070018Z   Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0182401Z Collecting id (from twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0215304Z   Downloading id-1.6.1-py3-none-any.whl.metadata (5.1 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0327868Z Collecting SecretStorage>=3.2 (from keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0361555Z   Downloading secretstorage-3.5.0-py3-none-any.whl.metadata (4.0 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0465876Z Collecting jeepney>=0.4.2 (from keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0501135Z   Downloading jeepney-0.9.0-py3-none-any.whl.metadata (1.2 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0695916Z Collecting importlib_metadata>=4.11.4 (from keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0731925Z   Downloading importlib_metadata-9.0.1-py3-none-any.whl.metadata (4.5 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0852597Z Collecting jaraco.classes (from keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.0886556Z   Downloading jaraco.classes-3.4.0-py3-none-any.whl.metadata (2.6 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1033717Z Collecting jaraco.functools (from keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1067647Z   Downloading jaraco_functools-4.6.0-py3-none-any.whl.metadata (2.9 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1186629Z Collecting jaraco.context (from keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1222513Z   Downloading jaraco_context-6.1.2-py3-none-any.whl.metadata (4.2 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1367311Z Collecting zipp>=3.20 (from importlib_metadata>=4.11.4->keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1405040Z   Downloading zipp-4.1.1-py3-none-any.whl.metadata (3.6 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1755677Z Collecting nh3>=0.2.14 (from readme-renderer>=35.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1789568Z   Downloading nh3-0.3.7-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.0 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1910313Z Collecting docutils>=0.21.2 (from readme-renderer>=35.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.1943922Z   Downloading docutils-0.23-py3-none-any.whl.metadata (15 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.2110669Z Collecting Pygments>=2.5.1 (from readme-renderer>=35.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.2144692Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.3227523Z Collecting charset_normalizer<4,>=2 (from requests>=2.20->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.3265986Z   Downloading charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.3414326Z Collecting idna<4,>=2.5 (from requests>=2.20->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.3448620Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.3615263Z Collecting certifi>=2023.5.7 (from requests>=2.20->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.3649532Z   Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.3842160Z Collecting markdown-it-py>=2.2.0 (from rich>=14.3.3->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.3878216Z   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.4004550Z Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=14.3.3->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.4040162Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.5788931Z Collecting cryptography>=2.0 (from SecretStorage>=3.2->keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.5826616Z   Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.4 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.6683467Z Collecting cffi>=2.0.0 (from cryptography>=2.0->SecretStorage>=3.2->keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.6722838Z   Downloading cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.6831509Z Collecting pycparser (from cffi>=2.0.0->cryptography>=2.0->SecretStorage>=3.2->keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.6864876Z   Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7033663Z Collecting more-itertools (from jaraco.classes->keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7075683Z   Downloading more_itertools-11.1.0-py3-none-any.whl.metadata (41 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7186361Z Collecting backports.tarfile (from jaraco.context->keyring>=21.2.0->twine)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7225408Z   Downloading backports.tarfile-1.2.0-py3-none-any.whl.metadata (2.0 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7307465Z Downloading build-1.6.1-py3-none-any.whl (31 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7359238Z Downloading twine-7.0.0-py3-none-any.whl (43 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7412855Z Downloading keyring-25.7.0-py3-none-any.whl (39 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7463685Z Downloading importlib_metadata-9.0.1-py3-none-any.whl (27 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7515674Z Downloading jeepney-0.9.0-py3-none-any.whl (49 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7566454Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7632804Z Downloading readme_renderer-46.0-py3-none-any.whl (14 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7682094Z Downloading docutils-0.23-py3-none-any.whl (634 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7756289Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 634.7/634.7 kB 105.0 MB/s  0:00:00
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7794999Z Downloading nh3-0.3.7-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (832 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7854965Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 832.2/832.2 kB 145.0 MB/s  0:00:00
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.7933237Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8009958Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 172.5 MB/s  0:00:00
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8045108Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8098264Z Downloading charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (269 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8154152Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8205987Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8256694Z Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8313831Z Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8364374Z Downloading rfc3986-2.0.0-py2.py3-none-any.whl (31 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8414620Z Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8471820Z Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8521902Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8569825Z Downloading secretstorage-3.5.0-py3-none-any.whl (15 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8619626Z Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl (4.8 MB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8812833Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.8/4.8 MB 279.2 MB/s  0:00:00
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8848646Z Downloading cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (217 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8904139Z Downloading zipp-4.1.1-py3-none-any.whl (10 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.8953920Z Downloading id-1.6.1-py3-none-any.whl (14 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.9003054Z Downloading jaraco.classes-3.4.0-py3-none-any.whl (6.8 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.9056900Z Downloading jaraco_context-6.1.2-py3-none-any.whl (7.9 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.9104658Z Downloading backports.tarfile-1.2.0-py3-none-any.whl (30 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.9153990Z Downloading jaraco_functools-4.6.0-py3-none-any.whl (11 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.9204346Z Downloading more_itertools-11.1.0-py3-none-any.whl (72 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.9258053Z Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:01.9307549Z Downloading pyproject_hooks-1.3.3-py3-none-any.whl (10 kB)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:02.0619824Z Installing collected packages: zipp, urllib3, rfc3986, pyproject_hooks, Pygments, pycparser, packaging, nh3, more-itertools, mdurl, jeepney, idna, docutils, charset_normalizer, certifi, backports.tarfile, requests, readme-renderer, markdown-it-py, jaraco.functools, jaraco.context, jaraco.classes, importlib_metadata, id, cffi, build, rich, requests-toolbelt, cryptography, SecretStorage, keyring, twine
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.0967316Z 
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.0985618Z Successfully installed Pygments-2.21.0 SecretStorage-3.5.0 backports.tarfile-1.2.0 build-1.6.1 certifi-2026.7.22 cffi-2.1.1 charset_normalizer-3.5.2 cryptography-50.0.2 docutils-0.23 id-1.6.1 idna-3.20 importlib_metadata-9.0.1 jaraco.classes-3.4.0 jaraco.context-6.1.2 jaraco.functools-4.6.0 jeepney-0.9.0 keyring-25.7.0 markdown-it-py-4.2.0 mdurl-0.1.2 more-itertools-11.1.0 nh3-0.3.7 packaging-26.3 pycparser-3.0 pyproject_hooks-1.3.3 readme-renderer-46.0 requests-2.34.2 requests-toolbelt-1.0.0 rfc3986-2.0.0 rich-15.0.0 twine-7.0.0 urllib3-2.8.0 zipp-4.1.1
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1863782Z ##[group]Run set -eu
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1864076Z ^[[36;1mset -eu^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1864647Z ^[[36;1mexport SOURCE_DATE_EPOCH="$(python -P validation/qualification/release_rc.py --epoch)"   # the frozen RC's once frozen^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1865232Z ^[[36;1mpython -m build^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1865575Z ^[[36;1mpython -P validation/qualification/repro_dist.py dist/*.tar.gz^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1865949Z ^[[36;1msha256sum dist/*^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1939248Z shell: /usr/bin/bash -e {0}
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1939513Z env:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1939804Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1940277Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1940704Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1941084Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1941458Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1941885Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.1942207Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.4054456Z * Creating isolated environment: venv+pip...
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.4922518Z * Installing packages in isolated environment:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:04.4923137Z   - setuptools==84.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.2857781Z * Getting build dependencies for sdist...
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7757643Z running egg_info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7767388Z creating aisef.egg-info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7768498Z writing aisef.egg-info/PKG-INFO
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7773455Z writing dependency_links to aisef.egg-info/dependency_links.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7775669Z writing entry points to aisef.egg-info/entry_points.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7778119Z writing top-level names to aisef.egg-info/top_level.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7779584Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7864458Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7865652Z reading manifest template 'MANIFEST.in'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.7888206Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.8151009Z * Installed build dependency versions:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.8151499Z   - setuptools==84.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.8151848Z * Building sdist...
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9717862Z running sdist
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9718665Z running egg_info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9736344Z writing aisef.egg-info/PKG-INFO
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9741847Z writing dependency_links to aisef.egg-info/dependency_links.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9745208Z writing entry points to aisef.egg-info/entry_points.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9748208Z writing top-level names to aisef.egg-info/top_level.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9834642Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9854248Z reading manifest template 'MANIFEST.in'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9882557Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9885558Z running check
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9908577Z creating aisef-2.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9913571Z creating aisef-2.0.0/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9914439Z creating aisef-2.0.0/aisef.egg-info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9915885Z creating aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9917393Z creating aisef-2.0.0/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9918907Z creating aisef-2.0.0/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9920278Z creating aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9921596Z creating aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9922928Z creating aisef-2.0.0/aisef/harness/assets
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9924185Z creating aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9925444Z creating aisef-2.0.0/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9926725Z creating aisef-2.0.0/aisef/kit/rules
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9928359Z creating aisef-2.0.0/aisef/kit/skills/aisef-mockup-html
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9930314Z creating aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9931539Z creating aisef-2.0.0/aisef2
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9932791Z creating aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9934018Z creating aisef-2.0.0/aisef2/arch
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9935483Z creating aisef-2.0.0/aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9936508Z creating aisef-2.0.0/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9937970Z creating aisef-2.0.0/aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9939233Z creating aisef-2.0.0/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9940518Z creating aisef-2.0.0/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9941657Z creating aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9942872Z creating aisef-2.0.0/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9944053Z creating aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9945254Z creating aisef-2.0.0/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9946430Z creating aisef-2.0.0/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9947802Z creating aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9948779Z copying files to aisef-2.0.0...
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9949520Z copying MANIFEST.in -> aisef-2.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9951279Z copying README.md -> aisef-2.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9953307Z copying pyproject.toml -> aisef-2.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9954801Z copying aisef/__init__.py -> aisef-2.0.0/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9956416Z copying aisef/__main__.py -> aisef-2.0.0/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9958279Z copying aisef/_compat.py -> aisef-2.0.0/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9959799Z copying aisef/config.py -> aisef-2.0.0/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9962123Z copying aisef/memory.py -> aisef-2.0.0/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9963811Z copying aisef/memory_bench.py -> aisef-2.0.0/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9965524Z copying aisef.egg-info/PKG-INFO -> aisef-2.0.0/aisef.egg-info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9967399Z copying aisef.egg-info/SOURCES.txt -> aisef-2.0.0/aisef.egg-info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9969081Z copying aisef.egg-info/dependency_links.txt -> aisef-2.0.0/aisef.egg-info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9970496Z copying aisef.egg-info/entry_points.txt -> aisef-2.0.0/aisef.egg-info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9971920Z copying aisef.egg-info/top_level.txt -> aisef-2.0.0/aisef.egg-info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9973303Z copying aisef/cli/__init__.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9974759Z copying aisef/cli/__main__.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9976232Z copying aisef/cli/_common.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9977990Z copying aisef/cli/closure.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9979545Z copying aisef/cli/dashboard.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9981126Z copying aisef/cli/doctor.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9982731Z copying aisef/cli/harness.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9984423Z copying aisef/cli/implement.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9986474Z copying aisef/cli/memory.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9987926Z copying aisef/cli/parser.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9989871Z copying aisef/cli/plan.py -> aisef-2.0.0/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9991459Z copying aisef/clients/__init__.py -> aisef-2.0.0/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9992790Z copying aisef/clients/base.py -> aisef-2.0.0/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9994563Z copying aisef/clients/claude_code.py -> aisef-2.0.0/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9996109Z copying aisef/clients/compile.py -> aisef-2.0.0/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9997898Z copying aisef/clients/opencode.py -> aisef-2.0.0/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:05.9999472Z copying aisef/clients/stream.py -> aisef-2.0.0/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0001164Z copying aisef/clients/synthetic.py -> aisef-2.0.0/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0002850Z copying aisef/codebase/__init__.py -> aisef-2.0.0/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0004318Z copying aisef/codebase/baseline.py -> aisef-2.0.0/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0005979Z copying aisef/codebase/basic.py -> aisef-2.0.0/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0007692Z copying aisef/codebase/detect.py -> aisef-2.0.0/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0009319Z copying aisef/codebase/graphify.py -> aisef-2.0.0/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0010816Z copying aisef/codebase/provider.py -> aisef-2.0.0/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0012431Z copying aisef/control/__init__.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0013515Z copying aisef/control/acceptance.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0028136Z copying aisef/control/approvals.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0028906Z copying aisef/control/attribution.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0029579Z copying aisef/control/bmad_status.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0030213Z copying aisef/control/budget.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0030813Z copying aisef/control/change.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0031427Z copying aisef/control/closure.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0032034Z copying aisef/control/cohort.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0032451Z copying aisef/control/complexity.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0032864Z copying aisef/control/conformance.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0033270Z copying aisef/control/defects.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0033693Z copying aisef/control/design_contract.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0047917Z copying aisef/control/experience.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0048554Z copying aisef/control/findings.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0049163Z copying aisef/control/gate.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0049576Z copying aisef/control/identity.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0050095Z copying aisef/control/impact.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0050605Z copying aisef/control/invariants.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0051020Z copying aisef/control/journal.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0051400Z copying aisef/control/ledger.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0052026Z copying aisef/control/machine_gate.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0052457Z copying aisef/control/normalize.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0052863Z copying aisef/control/obligation.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0053388Z copying aisef/control/onboarding.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0053872Z copying aisef/control/outcome.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0054253Z copying aisef/control/planes.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0054664Z copying aisef/control/preflight.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0055266Z copying aisef/control/proof.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0055690Z copying aisef/control/qualification.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0056113Z copying aisef/control/replay.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0056739Z copying aisef/control/replay_manifest.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0057406Z copying aisef/control/reviewer_qual.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0058570Z copying aisef/control/scheduler.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0060191Z copying aisef/control/security.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0061755Z copying aisef/control/state.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0063427Z copying aisef/control/tdd.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0064894Z copying aisef/control/worktree.py -> aisef-2.0.0/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0066543Z copying aisef/harness/__init__.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0067778Z copying aisef/harness/aria.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0069368Z copying aisef/harness/browser.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0070697Z copying aisef/harness/capabilities.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0072463Z copying aisef/harness/context.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0074038Z copying aisef/harness/guardrails.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0075816Z copying aisef/harness/mockup_map.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0077481Z copying aisef/harness/mockup_verify.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0079159Z copying aisef/harness/observe.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0080737Z copying aisef/harness/ownership.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0082079Z copying aisef/harness/process_owner.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0083756Z copying aisef/harness/prompts.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0085243Z copying aisef/harness/routing.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0086879Z copying aisef/harness/runlog.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0088360Z copying aisef/harness/sandbox.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0090185Z copying aisef/harness/server_identity.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0091667Z copying aisef/harness/testlog.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0093331Z copying aisef/harness/tools.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0095002Z copying aisef/harness/verify_image.py -> aisef-2.0.0/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0096647Z copying aisef/harness/assets/render.mjs -> aisef-2.0.0/aisef/harness/assets
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0098311Z copying aisef/kit/__init__.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0099437Z copying aisef/kit/catalog.json -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0100932Z copying aisef/kit/catalog.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0102196Z copying aisef/kit/constitution.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0103752Z copying aisef/kit/detect_stack.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0105485Z copying aisef/kit/docs.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0106807Z copying aisef/kit/fetch.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0108572Z copying aisef/kit/install.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0110122Z copying aisef/kit/registry.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0111800Z copying aisef/kit/router.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0113352Z copying aisef/kit/security_filter.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0114895Z copying aisef/kit/skill_scan.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0116380Z copying aisef/kit/skills.py -> aisef-2.0.0/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0118153Z copying aisef/kit/prompts/devsecops.md -> aisef-2.0.0/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0119655Z copying aisef/kit/prompts/mockup-screen.md -> aisef-2.0.0/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0121118Z copying aisef/kit/prompts/story-implement.md -> aisef-2.0.0/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0122666Z copying aisef/kit/prompts/story-review.md -> aisef-2.0.0/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0124258Z copying aisef/kit/prompts/story-security-review.md -> aisef-2.0.0/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0125642Z copying aisef/kit/rules/must_never.md -> aisef-2.0.0/aisef/kit/rules
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0127282Z copying aisef/kit/rules/principles.md -> aisef-2.0.0/aisef/kit/rules
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0128994Z copying aisef/kit/skills/aisef-mockup-html/SKILL.md -> aisef-2.0.0/aisef/kit/skills/aisef-mockup-html
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0130300Z copying aisef/phases/__init__.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0131820Z copying aisef/phases/deploy.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0133503Z copying aisef/phases/implement.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0136713Z copying aisef/phases/improve.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0138406Z copying aisef/phases/mockup.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0140018Z copying aisef/phases/plan.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0141676Z copying aisef/phases/qa.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0143508Z copying aisef/phases/report.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0145052Z copying aisef/phases/run.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0147207Z copying aisef/phases/story_split.py -> aisef-2.0.0/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0148844Z copying aisef2/__init__.py -> aisef-2.0.0/aisef2
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0150185Z copying aisef2/errors.py -> aisef-2.0.0/aisef2
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0151665Z copying aisef2/app/__init__.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0153135Z copying aisef2/app/adapters.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0154579Z copying aisef2/app/bundle.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0156079Z copying aisef2/app/calibrations.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0157685Z copying aisef2/app/cli.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0159152Z copying aisef2/app/client.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0160768Z copying aisef2/app/feedback.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0162265Z copying aisef2/app/preflight.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0163734Z copying aisef2/app/run.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0165430Z copying aisef2/app/settings.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0166874Z copying aisef2/app/verify.py -> aisef-2.0.0/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0168572Z copying aisef2/arch/__init__.py -> aisef-2.0.0/aisef2/arch
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0169986Z copying aisef2/arch/enums.py -> aisef-2.0.0/aisef2/arch
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0171511Z copying aisef2/cohort/__init__.py -> aisef-2.0.0/aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0172928Z copying aisef2/cohort/lifecycle.py -> aisef-2.0.0/aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0174563Z copying aisef2/cohort/preregistration.py -> aisef-2.0.0/aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0176041Z copying aisef2/control/__init__.py -> aisef-2.0.0/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0177530Z copying aisef2/control/budget.py -> aisef-2.0.0/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0179167Z copying aisef2/control/owner.py -> aisef-2.0.0/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0180737Z copying aisef2/control/routing.py -> aisef-2.0.0/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0182248Z copying aisef2/invariants/__init__.py -> aisef-2.0.0/aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0183679Z copying aisef2/invariants/evidence.py -> aisef-2.0.0/aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0185076Z copying aisef2/invariants/registry.py -> aisef-2.0.0/aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0186808Z copying aisef2/journal/__init__.py -> aisef-2.0.0/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0188415Z copying aisef2/journal/compat.py -> aisef-2.0.0/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0189841Z copying aisef2/journal/event.py -> aisef-2.0.0/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0191398Z copying aisef2/journal/fold.py -> aisef-2.0.0/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0192868Z copying aisef2/journal/format2.py -> aisef-2.0.0/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0194467Z copying aisef2/journal/format3.py -> aisef-2.0.0/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0196054Z copying aisef2/journal/writer.py -> aisef-2.0.0/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0197898Z copying aisef2/journal/projections/__init__.py -> aisef-2.0.0/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0199427Z copying aisef2/journal/projections/budgets.py -> aisef-2.0.0/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0200966Z copying aisef2/journal/projections/failure_owner.py -> aisef-2.0.0/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0202439Z copying aisef2/journal/projections/qualification_counters.py -> aisef-2.0.0/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0203785Z copying aisef2/journal/projections/retry_target.py -> aisef-2.0.0/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0205194Z copying aisef2/journal/projections/story_state.py -> aisef-2.0.0/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0206667Z copying aisef2/journal/projections/terminal_state.py -> aisef-2.0.0/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0208243Z copying aisef2/orchestrate/__init__.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0209711Z copying aisef2/orchestrate/adapters.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0211140Z copying aisef2/orchestrate/gate.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0212550Z copying aisef2/orchestrate/merge.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0214119Z copying aisef2/orchestrate/proof.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0215467Z copying aisef2/orchestrate/quality.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0216867Z copying aisef2/orchestrate/review.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0218505Z copying aisef2/orchestrate/seam.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0219947Z copying aisef2/orchestrate/security.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0221370Z copying aisef2/orchestrate/story_runner.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0223139Z copying aisef2/orchestrate/workspace.py -> aisef-2.0.0/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0224604Z copying aisef2/plan/__init__.py -> aisef-2.0.0/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0225828Z copying aisef2/plan/drift.py -> aisef-2.0.0/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0227470Z copying aisef2/plan/obligation.py -> aisef-2.0.0/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0229093Z copying aisef2/plan/static_admission.py -> aisef-2.0.0/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0230685Z copying aisef2/plan/story_admission.py -> aisef-2.0.0/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0232155Z copying aisef2/probe/__init__.py -> aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0233394Z copying aisef2/probe/calibration.py -> aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0234836Z copying aisef2/probe/catalog.py -> aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0236391Z copying aisef2/probe/cli_invocation.py -> aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0238962Z copying aisef2/probe/file_artifact.py -> aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0240497Z copying aisef2/probe/process_effect.py -> aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0242294Z copying aisef2/probe/protocol.py -> aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0243911Z copying aisef2/probe/python_callable.py -> aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0245579Z copying aisef2/probe/python_callable_v2.py -> aisef-2.0.0/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0247414Z copying aisef2/product/__init__.py -> aisef-2.0.0/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0248985Z copying aisef2/product/approval.py -> aisef-2.0.0/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0250456Z copying aisef2/product/compiler.py -> aisef-2.0.0/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0251890Z copying aisef2/product/contract.py -> aisef-2.0.0/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0253359Z copying aisef2/product/outcome.py -> aisef-2.0.0/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0254776Z copying aisef2/product/spec.py -> aisef-2.0.0/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0256241Z copying aisef2/quality/__init__.py -> aisef-2.0.0/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0257885Z copying aisef2/quality/adequacy.py -> aisef-2.0.0/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0259482Z copying aisef2/quality/relevance.py -> aisef-2.0.0/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0261128Z copying aisef2/quality/test_execution.py -> aisef-2.0.0/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0262799Z copying aisef2/quality/vacuity.py -> aisef-2.0.0/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0264395Z copying aisef2/runtime/__init__.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0265639Z copying aisef2/runtime/capability.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0267262Z copying aisef2/runtime/process_range.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0269049Z copying aisef2/runtime/range_anchor.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0270477Z copying aisef2/runtime/repair.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0271970Z copying aisef2/runtime/run_scope.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0273589Z copying aisef2/runtime/runspec.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0275066Z copying aisef2/runtime/sentinel.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0276555Z copying aisef2/runtime/story_scope.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0278240Z copying aisef2/runtime/tool.py -> aisef-2.0.0/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0285497Z Writing aisef-2.0.0/setup.cfg
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.0287236Z Creating tar archive
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.3292372Z removing 'aisef-2.0.0' (and everything under it)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.4634399Z * Building wheel from sdist
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.4683306Z * Creating isolated environment: venv+pip...
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.4702576Z * Installing packages in isolated environment:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:06.4703102Z   - setuptools==84.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.1037320Z * Getting build dependencies for wheel...
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5122981Z running egg_info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5134452Z writing aisef.egg-info/PKG-INFO
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5140459Z writing dependency_links to aisef.egg-info/dependency_links.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5143462Z writing entry points to aisef.egg-info/entry_points.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5146414Z writing top-level names to aisef.egg-info/top_level.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5223435Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5244461Z reading manifest template 'MANIFEST.in'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5248624Z no previously-included directories found matching 'tests'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5273029Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5562198Z * Installed build dependency versions:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5562711Z   - setuptools==84.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.5562997Z * Building wheel...
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.6972049Z running bdist_wheel
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7008419Z running build
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7008852Z running build_py
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7020193Z creating build/lib/aisef2
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7022724Z copying aisef2/errors.py -> build/lib/aisef2
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7025339Z copying aisef2/__init__.py -> build/lib/aisef2
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7029113Z creating build/lib/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7030568Z copying aisef/__main__.py -> build/lib/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7033126Z copying aisef/config.py -> build/lib/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7035529Z copying aisef/memory.py -> build/lib/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7038489Z copying aisef/__init__.py -> build/lib/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7040152Z copying aisef/_compat.py -> build/lib/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7042370Z copying aisef/memory_bench.py -> build/lib/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7045419Z creating build/lib/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7046934Z copying aisef2/control/budget.py -> build/lib/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7049145Z copying aisef2/control/routing.py -> build/lib/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7051120Z copying aisef2/control/owner.py -> build/lib/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7053206Z copying aisef2/control/__init__.py -> build/lib/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7056232Z creating build/lib/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7057857Z copying aisef2/journal/format2.py -> build/lib/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7060062Z copying aisef2/journal/writer.py -> build/lib/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7061993Z copying aisef2/journal/compat.py -> build/lib/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7063803Z copying aisef2/journal/fold.py -> build/lib/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7065742Z copying aisef2/journal/format3.py -> build/lib/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7068000Z copying aisef2/journal/__init__.py -> build/lib/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7069891Z copying aisef2/journal/event.py -> build/lib/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7073294Z creating build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7074750Z copying aisef2/probe/process_effect.py -> build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7077464Z copying aisef2/probe/calibration.py -> build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7079443Z copying aisef2/probe/file_artifact.py -> build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7081481Z copying aisef2/probe/protocol.py -> build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7083559Z copying aisef2/probe/cli_invocation.py -> build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7085970Z copying aisef2/probe/python_callable_v2.py -> build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7088288Z copying aisef2/probe/__init__.py -> build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7090002Z copying aisef2/probe/python_callable.py -> build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7092274Z copying aisef2/probe/catalog.py -> build/lib/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7094786Z creating build/lib/aisef2/arch
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7096186Z copying aisef2/arch/__init__.py -> build/lib/aisef2/arch
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7098335Z copying aisef2/arch/enums.py -> build/lib/aisef2/arch
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7101063Z creating build/lib/aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7102444Z copying aisef2/invariants/registry.py -> build/lib/aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7104532Z copying aisef2/invariants/evidence.py -> build/lib/aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7106417Z copying aisef2/invariants/__init__.py -> build/lib/aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7109849Z creating build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7111190Z copying aisef2/app/preflight.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7113204Z copying aisef2/app/bundle.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7115055Z copying aisef2/app/cli.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7116855Z copying aisef2/app/adapters.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7119037Z copying aisef2/app/feedback.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7120900Z copying aisef2/app/calibrations.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7122699Z copying aisef2/app/run.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7124755Z copying aisef2/app/verify.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7126555Z copying aisef2/app/client.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7128821Z copying aisef2/app/__init__.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7155518Z copying aisef2/app/settings.py -> build/lib/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7156178Z creating build/lib/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7156762Z copying aisef2/plan/story_admission.py -> build/lib/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7157678Z copying aisef2/plan/static_admission.py -> build/lib/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7158373Z copying aisef2/plan/obligation.py -> build/lib/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7159014Z copying aisef2/plan/drift.py -> build/lib/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7159605Z copying aisef2/plan/__init__.py -> build/lib/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7160142Z creating build/lib/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7160692Z copying aisef2/product/compiler.py -> build/lib/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7161331Z copying aisef2/product/spec.py -> build/lib/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7161976Z copying aisef2/product/outcome.py -> build/lib/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7162631Z copying aisef2/product/approval.py -> build/lib/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7163274Z copying aisef2/product/contract.py -> build/lib/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7163907Z copying aisef2/product/__init__.py -> build/lib/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7167912Z creating build/lib/aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7178124Z copying aisef2/cohort/preregistration.py -> build/lib/aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7178863Z copying aisef2/cohort/lifecycle.py -> build/lib/aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7179499Z copying aisef2/cohort/__init__.py -> build/lib/aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7180030Z creating build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7180553Z copying aisef2/runtime/capability.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7181207Z copying aisef2/runtime/repair.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7181838Z copying aisef2/runtime/sentinel.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7182464Z copying aisef2/runtime/runspec.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7183111Z copying aisef2/runtime/range_anchor.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7183793Z copying aisef2/runtime/process_range.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7184462Z copying aisef2/runtime/run_scope.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7185351Z copying aisef2/runtime/tool.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7185953Z copying aisef2/runtime/__init__.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7186600Z copying aisef2/runtime/story_scope.py -> build/lib/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7187319Z creating build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7188061Z copying aisef2/orchestrate/quality.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7188801Z copying aisef2/orchestrate/adapters.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7189534Z copying aisef2/orchestrate/workspace.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7191012Z copying aisef2/orchestrate/proof.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7192723Z copying aisef2/orchestrate/review.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7194259Z copying aisef2/orchestrate/gate.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7195978Z copying aisef2/orchestrate/security.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7197785Z copying aisef2/orchestrate/merge.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7199725Z copying aisef2/orchestrate/story_runner.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7201603Z copying aisef2/orchestrate/seam.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7203456Z copying aisef2/orchestrate/__init__.py -> build/lib/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7205930Z creating build/lib/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7207288Z copying aisef2/quality/test_execution.py -> build/lib/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7209390Z copying aisef2/quality/vacuity.py -> build/lib/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7211318Z copying aisef2/quality/__init__.py -> build/lib/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7213105Z copying aisef2/quality/relevance.py -> build/lib/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7214947Z copying aisef2/quality/adequacy.py -> build/lib/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7217957Z creating build/lib/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7219251Z copying aisef2/journal/projections/retry_target.py -> build/lib/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7221199Z copying aisef2/journal/projections/qualification_counters.py -> build/lib/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7223006Z copying aisef2/journal/projections/budgets.py -> build/lib/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7224846Z copying aisef2/journal/projections/failure_owner.py -> build/lib/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7226692Z copying aisef2/journal/projections/story_state.py -> build/lib/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7228736Z copying aisef2/journal/projections/__init__.py -> build/lib/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7230577Z copying aisef2/journal/projections/terminal_state.py -> build/lib/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7234706Z creating build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7236217Z copying aisef/control/preflight.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7238989Z copying aisef/control/invariants.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7240805Z copying aisef/control/closure.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7243751Z copying aisef/control/design_contract.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7245459Z copying aisef/control/acceptance.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7247794Z copying aisef/control/conformance.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7249937Z copying aisef/control/outcome.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7251671Z copying aisef/control/replay.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7253675Z copying aisef/control/budget.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7255514Z copying aisef/control/approvals.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7258023Z copying aisef/control/worktree.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7260423Z copying aisef/control/findings.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7262393Z copying aisef/control/impact.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7264478Z copying aisef/control/proof.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7266452Z copying aisef/control/journal.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7268629Z copying aisef/control/identity.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7270681Z copying aisef/control/tdd.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7272375Z copying aisef/control/gate.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7275161Z copying aisef/control/machine_gate.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7277413Z copying aisef/control/defects.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7279277Z copying aisef/control/security.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7281534Z copying aisef/control/normalize.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7283841Z copying aisef/control/complexity.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7285739Z copying aisef/control/cohort.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7288057Z copying aisef/control/onboarding.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7289854Z copying aisef/control/state.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7292229Z copying aisef/control/qualification.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7294053Z copying aisef/control/experience.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7296384Z copying aisef/control/replay_manifest.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7298499Z copying aisef/control/planes.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7300704Z copying aisef/control/obligation.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7302473Z copying aisef/control/scheduler.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7304348Z copying aisef/control/ledger.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7306799Z copying aisef/control/__init__.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7308583Z copying aisef/control/change.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7310750Z copying aisef/control/reviewer_qual.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7312910Z copying aisef/control/attribution.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7314812Z copying aisef/control/bmad_status.py -> build/lib/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7318468Z creating build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7347891Z copying aisef/phases/deploy.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7348619Z copying aisef/phases/implement.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7349324Z copying aisef/phases/story_split.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7349987Z copying aisef/phases/improve.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7350624Z copying aisef/phases/run.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7351244Z copying aisef/phases/report.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7351846Z copying aisef/phases/mockup.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7352443Z copying aisef/phases/plan.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7353073Z copying aisef/phases/__init__.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7353686Z copying aisef/phases/qa.py -> build/lib/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7354196Z creating build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7354671Z copying aisef/cli/closure.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7355276Z copying aisef/cli/parser.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7355867Z copying aisef/cli/__main__.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7356450Z copying aisef/cli/implement.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7357240Z copying aisef/cli/dashboard.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7357828Z copying aisef/cli/_common.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7358395Z copying aisef/cli/doctor.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7358944Z copying aisef/cli/harness.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7359505Z copying aisef/cli/memory.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7360063Z copying aisef/cli/plan.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7360870Z copying aisef/cli/__init__.py -> build/lib/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7361383Z creating build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7362579Z copying aisef/kit/registry.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7364950Z copying aisef/kit/install.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7366747Z copying aisef/kit/skills.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7369139Z copying aisef/kit/router.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7370808Z copying aisef/kit/fetch.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7372882Z copying aisef/kit/security_filter.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7374677Z copying aisef/kit/constitution.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7376756Z copying aisef/kit/skill_scan.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7378660Z copying aisef/kit/docs.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7380598Z copying aisef/kit/__init__.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7382073Z copying aisef/kit/detect_stack.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7384037Z copying aisef/kit/catalog.py -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7387944Z creating build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7389179Z copying aisef/harness/testlog.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7391840Z copying aisef/harness/process_owner.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7393649Z copying aisef/harness/browser.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7395813Z copying aisef/harness/tools.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7397868Z copying aisef/harness/capabilities.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7400057Z copying aisef/harness/ownership.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7401790Z copying aisef/harness/prompts.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7403560Z copying aisef/harness/runlog.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7405338Z copying aisef/harness/mockup_map.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7407354Z copying aisef/harness/verify_image.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7409510Z copying aisef/harness/observe.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7411688Z copying aisef/harness/routing.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7413432Z copying aisef/harness/sandbox.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7415771Z copying aisef/harness/server_identity.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7417555Z copying aisef/harness/mockup_verify.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7419957Z copying aisef/harness/context.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7421699Z copying aisef/harness/aria.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7423904Z copying aisef/harness/__init__.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7425417Z copying aisef/harness/guardrails.py -> build/lib/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7429256Z creating build/lib/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7430416Z copying aisef/clients/stream.py -> build/lib/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7432889Z copying aisef/clients/opencode.py -> build/lib/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7434711Z copying aisef/clients/compile.py -> build/lib/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7436820Z copying aisef/clients/__init__.py -> build/lib/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7438461Z copying aisef/clients/base.py -> build/lib/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7440817Z copying aisef/clients/claude_code.py -> build/lib/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7442555Z copying aisef/clients/synthetic.py -> build/lib/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7445628Z creating build/lib/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7446790Z copying aisef/codebase/basic.py -> build/lib/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7449263Z copying aisef/codebase/detect.py -> build/lib/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7451497Z copying aisef/codebase/provider.py -> build/lib/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7453127Z copying aisef/codebase/baseline.py -> build/lib/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7455240Z copying aisef/codebase/graphify.py -> build/lib/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7457341Z copying aisef/codebase/__init__.py -> build/lib/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7461888Z running egg_info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7471585Z writing aisef.egg-info/PKG-INFO
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7478961Z writing dependency_links to aisef.egg-info/dependency_links.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7483439Z writing entry points to aisef.egg-info/entry_points.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7486881Z writing top-level names to aisef.egg-info/top_level.txt
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7545071Z reading manifest file 'aisef.egg-info/SOURCES.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7564599Z reading manifest template 'MANIFEST.in'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7568411Z no previously-included directories found matching 'tests'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7592525Z writing manifest file 'aisef.egg-info/SOURCES.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7617489Z creating build/lib/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7618986Z copying aisef/kit/prompts/devsecops.md -> build/lib/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7621724Z copying aisef/kit/prompts/story-implement.md -> build/lib/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7623745Z copying aisef/kit/prompts/mockup-screen.md -> build/lib/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7626083Z copying aisef/kit/prompts/story-review.md -> build/lib/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7628563Z copying aisef/kit/prompts/story-security-review.md -> build/lib/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7630310Z creating build/lib/aisef/kit/rules
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7631733Z copying aisef/kit/rules/principles.md -> build/lib/aisef/kit/rules
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7634195Z copying aisef/kit/rules/must_never.md -> build/lib/aisef/kit/rules
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7635964Z creating build/lib/aisef/kit/skills/aisef-mockup-html
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7638466Z copying aisef/kit/skills/aisef-mockup-html/SKILL.md -> build/lib/aisef/kit/skills/aisef-mockup-html
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7640314Z copying aisef/kit/catalog.json -> build/lib/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7642456Z creating build/lib/aisef/harness/assets
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7643778Z copying aisef/harness/assets/render.mjs -> build/lib/aisef/harness/assets
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7686306Z installing to build/bdist.linux-x86_64/wheel
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7686830Z running install
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7741527Z running install_lib
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7750519Z creating build/bdist.linux-x86_64/wheel
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7753231Z creating build/bdist.linux-x86_64/wheel/aisef2
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7755082Z creating build/bdist.linux-x86_64/wheel/aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7756526Z copying build/lib/aisef2/control/budget.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7758588Z copying build/lib/aisef2/control/routing.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7760360Z copying build/lib/aisef2/control/owner.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7762129Z copying build/lib/aisef2/control/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7764087Z creating build/bdist.linux-x86_64/wheel/aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7765750Z copying build/lib/aisef2/journal/format2.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7767779Z copying build/lib/aisef2/journal/writer.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7769473Z copying build/lib/aisef2/journal/compat.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7770905Z copying build/lib/aisef2/journal/fold.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7772615Z copying build/lib/aisef2/journal/format3.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7774434Z copying build/lib/aisef2/journal/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7775820Z copying build/lib/aisef2/journal/event.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7778347Z creating build/bdist.linux-x86_64/wheel/aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7779797Z copying build/lib/aisef2/journal/projections/retry_target.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7781457Z copying build/lib/aisef2/journal/projections/qualification_counters.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7783136Z copying build/lib/aisef2/journal/projections/budgets.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7784643Z copying build/lib/aisef2/journal/projections/failure_owner.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7786205Z copying build/lib/aisef2/journal/projections/story_state.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7787895Z copying build/lib/aisef2/journal/projections/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7789510Z copying build/lib/aisef2/journal/projections/terminal_state.py -> build/bdist.linux-x86_64/wheel/./aisef2/journal/projections
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7791495Z creating build/bdist.linux-x86_64/wheel/aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7792819Z copying build/lib/aisef2/probe/process_effect.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7794877Z copying build/lib/aisef2/probe/calibration.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7796349Z copying build/lib/aisef2/probe/file_artifact.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7798369Z copying build/lib/aisef2/probe/protocol.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7800100Z copying build/lib/aisef2/probe/cli_invocation.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7802067Z copying build/lib/aisef2/probe/python_callable_v2.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7803733Z copying build/lib/aisef2/probe/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7805131Z copying build/lib/aisef2/probe/python_callable.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7807179Z copying build/lib/aisef2/probe/catalog.py -> build/bdist.linux-x86_64/wheel/./aisef2/probe
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7809176Z creating build/bdist.linux-x86_64/wheel/aisef2/arch
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7810482Z copying build/lib/aisef2/arch/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/arch
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7812192Z copying build/lib/aisef2/arch/enums.py -> build/bdist.linux-x86_64/wheel/./aisef2/arch
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7814141Z creating build/bdist.linux-x86_64/wheel/aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7815759Z copying build/lib/aisef2/invariants/registry.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7817546Z copying build/lib/aisef2/invariants/evidence.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7819392Z copying build/lib/aisef2/invariants/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/invariants
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7821194Z creating build/bdist.linux-x86_64/wheel/aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7822576Z copying build/lib/aisef2/app/preflight.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7824344Z copying build/lib/aisef2/app/bundle.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7825816Z copying build/lib/aisef2/app/cli.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7827503Z copying build/lib/aisef2/app/adapters.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7829320Z copying build/lib/aisef2/app/feedback.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7830769Z copying build/lib/aisef2/app/calibrations.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7832495Z copying build/lib/aisef2/app/run.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7834191Z copying build/lib/aisef2/app/verify.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7835574Z copying build/lib/aisef2/app/client.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7837345Z copying build/lib/aisef2/app/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7838872Z copying build/lib/aisef2/app/settings.py -> build/bdist.linux-x86_64/wheel/./aisef2/app
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7841054Z creating build/bdist.linux-x86_64/wheel/aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7842626Z copying build/lib/aisef2/plan/story_admission.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7844139Z copying build/lib/aisef2/plan/static_admission.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7845939Z copying build/lib/aisef2/plan/obligation.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7847393Z copying build/lib/aisef2/plan/drift.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7849220Z copying build/lib/aisef2/plan/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/plan
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7850968Z creating build/bdist.linux-x86_64/wheel/aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7852341Z copying build/lib/aisef2/product/compiler.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7853869Z copying build/lib/aisef2/product/spec.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7855543Z copying build/lib/aisef2/product/outcome.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7857133Z copying build/lib/aisef2/product/approval.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7858943Z copying build/lib/aisef2/product/contract.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7860384Z copying build/lib/aisef2/product/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/product
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7862398Z creating build/bdist.linux-x86_64/wheel/aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7863849Z copying build/lib/aisef2/cohort/preregistration.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7865551Z copying build/lib/aisef2/cohort/lifecycle.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7867203Z copying build/lib/aisef2/cohort/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/cohort
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7868841Z copying build/lib/aisef2/errors.py -> build/bdist.linux-x86_64/wheel/./aisef2
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7870867Z creating build/bdist.linux-x86_64/wheel/aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7872260Z copying build/lib/aisef2/runtime/capability.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7874048Z copying build/lib/aisef2/runtime/repair.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7875406Z copying build/lib/aisef2/runtime/sentinel.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7877250Z copying build/lib/aisef2/runtime/runspec.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7878732Z copying build/lib/aisef2/runtime/range_anchor.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7880316Z copying build/lib/aisef2/runtime/process_range.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7882201Z copying build/lib/aisef2/runtime/run_scope.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7883681Z copying build/lib/aisef2/runtime/tool.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7885467Z copying build/lib/aisef2/runtime/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7886840Z copying build/lib/aisef2/runtime/story_scope.py -> build/bdist.linux-x86_64/wheel/./aisef2/runtime
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7888541Z copying build/lib/aisef2/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7890696Z creating build/bdist.linux-x86_64/wheel/aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7892261Z copying build/lib/aisef2/orchestrate/quality.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7893922Z copying build/lib/aisef2/orchestrate/adapters.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7895505Z copying build/lib/aisef2/orchestrate/workspace.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7897349Z copying build/lib/aisef2/orchestrate/proof.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7899148Z copying build/lib/aisef2/orchestrate/review.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7900516Z copying build/lib/aisef2/orchestrate/gate.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7902074Z copying build/lib/aisef2/orchestrate/security.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7903634Z copying build/lib/aisef2/orchestrate/merge.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7905166Z copying build/lib/aisef2/orchestrate/story_runner.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7906833Z copying build/lib/aisef2/orchestrate/seam.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7908584Z copying build/lib/aisef2/orchestrate/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/orchestrate
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7910480Z creating build/bdist.linux-x86_64/wheel/aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7912324Z copying build/lib/aisef2/quality/test_execution.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7914169Z copying build/lib/aisef2/quality/vacuity.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7915859Z copying build/lib/aisef2/quality/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7917571Z copying build/lib/aisef2/quality/relevance.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7919294Z copying build/lib/aisef2/quality/adequacy.py -> build/bdist.linux-x86_64/wheel/./aisef2/quality
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7921679Z creating build/bdist.linux-x86_64/wheel/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7923936Z creating build/bdist.linux-x86_64/wheel/aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7925444Z copying build/lib/aisef/control/preflight.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7927725Z copying build/lib/aisef/control/invariants.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7929467Z copying build/lib/aisef/control/closure.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7932294Z copying build/lib/aisef/control/design_contract.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7933762Z copying build/lib/aisef/control/acceptance.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7935412Z copying build/lib/aisef/control/conformance.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7937161Z copying build/lib/aisef/control/outcome.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7938792Z copying build/lib/aisef/control/replay.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7940418Z copying build/lib/aisef/control/budget.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7942121Z copying build/lib/aisef/control/approvals.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7943805Z copying build/lib/aisef/control/worktree.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7945549Z copying build/lib/aisef/control/findings.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7947393Z copying build/lib/aisef/control/impact.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7949082Z copying build/lib/aisef/control/proof.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7950737Z copying build/lib/aisef/control/journal.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7952445Z copying build/lib/aisef/control/identity.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7954028Z copying build/lib/aisef/control/tdd.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7955590Z copying build/lib/aisef/control/gate.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7958239Z copying build/lib/aisef/control/machine_gate.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7960145Z copying build/lib/aisef/control/defects.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7961572Z copying build/lib/aisef/control/security.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7963160Z copying build/lib/aisef/control/normalize.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7965216Z copying build/lib/aisef/control/complexity.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7966898Z copying build/lib/aisef/control/cohort.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7968964Z copying build/lib/aisef/control/onboarding.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7970652Z copying build/lib/aisef/control/state.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7972483Z copying build/lib/aisef/control/qualification.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7974131Z copying build/lib/aisef/control/experience.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7975820Z copying build/lib/aisef/control/replay_manifest.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7977495Z copying build/lib/aisef/control/planes.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7979384Z copying build/lib/aisef/control/obligation.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7980946Z copying build/lib/aisef/control/scheduler.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7982487Z copying build/lib/aisef/control/ledger.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7984371Z copying build/lib/aisef/control/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7985670Z copying build/lib/aisef/control/change.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7987470Z copying build/lib/aisef/control/reviewer_qual.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7989401Z copying build/lib/aisef/control/attribution.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7991059Z copying build/lib/aisef/control/bmad_status.py -> build/bdist.linux-x86_64/wheel/./aisef/control
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7992571Z copying build/lib/aisef/__main__.py -> build/bdist.linux-x86_64/wheel/./aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7994919Z creating build/bdist.linux-x86_64/wheel/aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7996378Z copying build/lib/aisef/phases/deploy.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.7998634Z copying build/lib/aisef/phases/implement.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8001968Z copying build/lib/aisef/phases/story_split.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8003414Z copying build/lib/aisef/phases/improve.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8005283Z copying build/lib/aisef/phases/run.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8007357Z copying build/lib/aisef/phases/report.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8009084Z copying build/lib/aisef/phases/mockup.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8010743Z copying build/lib/aisef/phases/plan.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8012550Z copying build/lib/aisef/phases/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8014030Z copying build/lib/aisef/phases/qa.py -> build/bdist.linux-x86_64/wheel/./aisef/phases
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8015858Z copying build/lib/aisef/config.py -> build/bdist.linux-x86_64/wheel/./aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8017866Z copying build/lib/aisef/memory.py -> build/bdist.linux-x86_64/wheel/./aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8020508Z creating build/bdist.linux-x86_64/wheel/aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8022091Z copying build/lib/aisef/cli/closure.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8023612Z copying build/lib/aisef/cli/parser.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8025451Z copying build/lib/aisef/cli/__main__.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8027183Z copying build/lib/aisef/cli/implement.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8029173Z copying build/lib/aisef/cli/dashboard.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8030862Z copying build/lib/aisef/cli/_common.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8032416Z copying build/lib/aisef/cli/doctor.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8034093Z copying build/lib/aisef/cli/harness.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8035840Z copying build/lib/aisef/cli/memory.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8037533Z copying build/lib/aisef/cli/plan.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8039272Z copying build/lib/aisef/cli/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/cli
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8041591Z creating build/bdist.linux-x86_64/wheel/aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8043048Z copying build/lib/aisef/kit/registry.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8044883Z copying build/lib/aisef/kit/install.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8046508Z copying build/lib/aisef/kit/skills.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8048291Z copying build/lib/aisef/kit/router.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8049856Z copying build/lib/aisef/kit/fetch.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8052052Z creating build/bdist.linux-x86_64/wheel/aisef/kit/rules
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8053534Z copying build/lib/aisef/kit/rules/principles.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/rules
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8055203Z copying build/lib/aisef/kit/rules/must_never.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/rules
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8056766Z copying build/lib/aisef/kit/security_filter.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8058633Z copying build/lib/aisef/kit/constitution.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8060174Z copying build/lib/aisef/kit/skill_scan.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8062403Z creating build/bdist.linux-x86_64/wheel/aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8063903Z copying build/lib/aisef/kit/prompts/devsecops.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8065603Z copying build/lib/aisef/kit/prompts/story-implement.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8067346Z copying build/lib/aisef/kit/prompts/mockup-screen.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8069036Z copying build/lib/aisef/kit/prompts/story-review.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8070663Z copying build/lib/aisef/kit/prompts/story-security-review.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/prompts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8072451Z creating build/bdist.linux-x86_64/wheel/aisef/kit/skills
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8074287Z creating build/bdist.linux-x86_64/wheel/aisef/kit/skills/aisef-mockup-html
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8075937Z copying build/lib/aisef/kit/skills/aisef-mockup-html/SKILL.md -> build/bdist.linux-x86_64/wheel/./aisef/kit/skills/aisef-mockup-html
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8077510Z copying build/lib/aisef/kit/docs.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8079236Z copying build/lib/aisef/kit/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8080594Z copying build/lib/aisef/kit/detect_stack.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8082330Z copying build/lib/aisef/kit/catalog.json -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8083739Z copying build/lib/aisef/kit/catalog.py -> build/bdist.linux-x86_64/wheel/./aisef/kit
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8085379Z copying build/lib/aisef/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8087677Z creating build/bdist.linux-x86_64/wheel/aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8089248Z copying build/lib/aisef/harness/testlog.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8091189Z copying build/lib/aisef/harness/process_owner.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8092743Z copying build/lib/aisef/harness/browser.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8094302Z copying build/lib/aisef/harness/tools.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8096065Z copying build/lib/aisef/harness/capabilities.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8097928Z copying build/lib/aisef/harness/ownership.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8099524Z copying build/lib/aisef/harness/prompts.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8101057Z copying build/lib/aisef/harness/runlog.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8102986Z creating build/bdist.linux-x86_64/wheel/aisef/harness/assets
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8104582Z copying build/lib/aisef/harness/assets/render.mjs -> build/bdist.linux-x86_64/wheel/./aisef/harness/assets
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8106222Z copying build/lib/aisef/harness/mockup_map.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8108021Z copying build/lib/aisef/harness/verify_image.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8109680Z copying build/lib/aisef/harness/observe.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8111478Z copying build/lib/aisef/harness/routing.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8113105Z copying build/lib/aisef/harness/sandbox.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8114848Z copying build/lib/aisef/harness/server_identity.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8116429Z copying build/lib/aisef/harness/mockup_verify.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8118357Z copying build/lib/aisef/harness/context.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8120025Z copying build/lib/aisef/harness/aria.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8121644Z copying build/lib/aisef/harness/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8122993Z copying build/lib/aisef/harness/guardrails.py -> build/bdist.linux-x86_64/wheel/./aisef/harness
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8125714Z creating build/bdist.linux-x86_64/wheel/aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8127229Z copying build/lib/aisef/clients/stream.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8129173Z copying build/lib/aisef/clients/opencode.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8130845Z copying build/lib/aisef/clients/compile.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8132473Z copying build/lib/aisef/clients/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8133771Z copying build/lib/aisef/clients/base.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8135539Z copying build/lib/aisef/clients/claude_code.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8137324Z copying build/lib/aisef/clients/synthetic.py -> build/bdist.linux-x86_64/wheel/./aisef/clients
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8139137Z copying build/lib/aisef/_compat.py -> build/bdist.linux-x86_64/wheel/./aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8140728Z copying build/lib/aisef/memory_bench.py -> build/bdist.linux-x86_64/wheel/./aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8143267Z creating build/bdist.linux-x86_64/wheel/aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8144511Z copying build/lib/aisef/codebase/basic.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8146603Z copying build/lib/aisef/codebase/detect.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8148433Z copying build/lib/aisef/codebase/provider.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8149963Z copying build/lib/aisef/codebase/baseline.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8151569Z copying build/lib/aisef/codebase/graphify.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8153120Z copying build/lib/aisef/codebase/__init__.py -> build/bdist.linux-x86_64/wheel/./aisef/codebase
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8154496Z running install_egg_info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8164485Z Copying aisef.egg-info to build/bdist.linux-x86_64/wheel/./aisef-2.0.0-py3.11.egg-info
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8172045Z running install_scripts
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8181728Z creating build/bdist.linux-x86_64/wheel/aisef-2.0.0.dist-info/WHEEL
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8186300Z creating '/home/runner/work/aisef/aisef/dist/.tmp-tx2cnk8x/aisef-2.0.0-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8190022Z adding 'aisef/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8192443Z adding 'aisef/__main__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8195836Z adding 'aisef/_compat.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8205699Z adding 'aisef/config.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8215535Z adding 'aisef/memory.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8219587Z adding 'aisef/memory_bench.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8222712Z adding 'aisef/cli/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8224923Z adding 'aisef/cli/__main__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8228106Z adding 'aisef/cli/_common.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8231151Z adding 'aisef/cli/closure.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8236619Z adding 'aisef/cli/dashboard.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8244082Z adding 'aisef/cli/doctor.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8253106Z adding 'aisef/cli/harness.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8266332Z adding 'aisef/cli/implement.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8269157Z adding 'aisef/cli/memory.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8278010Z adding 'aisef/cli/parser.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8283998Z adding 'aisef/cli/plan.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8286167Z adding 'aisef/clients/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8296838Z adding 'aisef/clients/base.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8301650Z adding 'aisef/clients/claude_code.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8307553Z adding 'aisef/clients/compile.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8313956Z adding 'aisef/clients/opencode.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8321211Z adding 'aisef/clients/stream.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8326296Z adding 'aisef/clients/synthetic.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8328881Z adding 'aisef/codebase/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8333157Z adding 'aisef/codebase/baseline.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8336011Z adding 'aisef/codebase/basic.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8338994Z adding 'aisef/codebase/detect.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8341765Z adding 'aisef/codebase/graphify.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8344403Z adding 'aisef/codebase/provider.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8346744Z adding 'aisef/control/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8350458Z adding 'aisef/control/acceptance.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8357239Z adding 'aisef/control/approvals.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8363489Z adding 'aisef/control/attribution.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8366826Z adding 'aisef/control/bmad_status.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8372231Z adding 'aisef/control/budget.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8375838Z adding 'aisef/control/change.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8415256Z adding 'aisef/control/closure.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8421212Z adding 'aisef/control/cohort.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8430089Z adding 'aisef/control/complexity.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8434533Z adding 'aisef/control/conformance.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8438516Z adding 'aisef/control/defects.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8442289Z adding 'aisef/control/design_contract.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8447593Z adding 'aisef/control/experience.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8453930Z adding 'aisef/control/findings.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8486266Z adding 'aisef/control/gate.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8491294Z adding 'aisef/control/identity.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8496861Z adding 'aisef/control/impact.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8500879Z adding 'aisef/control/invariants.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8505990Z adding 'aisef/control/journal.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8520816Z adding 'aisef/control/ledger.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8532424Z adding 'aisef/control/machine_gate.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8550623Z adding 'aisef/control/normalize.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8555181Z adding 'aisef/control/obligation.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8559620Z adding 'aisef/control/onboarding.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8563093Z adding 'aisef/control/outcome.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8567817Z adding 'aisef/control/planes.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8582966Z adding 'aisef/control/preflight.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8588491Z adding 'aisef/control/proof.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8594824Z adding 'aisef/control/qualification.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8599012Z adding 'aisef/control/replay.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8603118Z adding 'aisef/control/replay_manifest.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8617264Z adding 'aisef/control/reviewer_qual.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8621900Z adding 'aisef/control/scheduler.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8625225Z adding 'aisef/control/security.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8632641Z adding 'aisef/control/state.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8636116Z adding 'aisef/control/tdd.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8645152Z adding 'aisef/control/worktree.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8647645Z adding 'aisef/harness/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8651852Z adding 'aisef/harness/aria.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8654976Z adding 'aisef/harness/browser.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8660927Z adding 'aisef/harness/capabilities.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8666423Z adding 'aisef/harness/context.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8690034Z adding 'aisef/harness/guardrails.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8693754Z adding 'aisef/harness/mockup_map.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8700400Z adding 'aisef/harness/mockup_verify.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8707478Z adding 'aisef/harness/observe.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8710798Z adding 'aisef/harness/ownership.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8714895Z adding 'aisef/harness/process_owner.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8717656Z adding 'aisef/harness/prompts.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8720953Z adding 'aisef/harness/routing.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8723188Z adding 'aisef/harness/runlog.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8731531Z adding 'aisef/harness/sandbox.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8735733Z adding 'aisef/harness/server_identity.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8743593Z adding 'aisef/harness/testlog.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8755041Z adding 'aisef/harness/tools.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8760902Z adding 'aisef/harness/verify_image.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8765229Z adding 'aisef/harness/assets/render.mjs'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8767471Z adding 'aisef/kit/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8770197Z adding 'aisef/kit/catalog.json'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8772920Z adding 'aisef/kit/catalog.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8775976Z adding 'aisef/kit/constitution.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8779444Z adding 'aisef/kit/detect_stack.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8782240Z adding 'aisef/kit/docs.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8785349Z adding 'aisef/kit/fetch.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8789470Z adding 'aisef/kit/install.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8796101Z adding 'aisef/kit/registry.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8800484Z adding 'aisef/kit/router.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8804228Z adding 'aisef/kit/security_filter.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8808577Z adding 'aisef/kit/skill_scan.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8811283Z adding 'aisef/kit/skills.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8814029Z adding 'aisef/kit/prompts/devsecops.md'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8815814Z adding 'aisef/kit/prompts/mockup-screen.md'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8819848Z adding 'aisef/kit/prompts/story-implement.md'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8823905Z adding 'aisef/kit/prompts/story-review.md'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8827508Z adding 'aisef/kit/prompts/story-security-review.md'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8830367Z adding 'aisef/kit/rules/must_never.md'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8832833Z adding 'aisef/kit/rules/principles.md'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8837438Z adding 'aisef/kit/skills/aisef-mockup-html/SKILL.md'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8839104Z adding 'aisef/phases/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8848801Z adding 'aisef/phases/deploy.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8933785Z adding 'aisef/phases/implement.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8949089Z adding 'aisef/phases/improve.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8955317Z adding 'aisef/phases/mockup.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8967561Z adding 'aisef/phases/plan.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8983474Z adding 'aisef/phases/qa.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.8990438Z adding 'aisef/phases/report.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9009346Z adding 'aisef/phases/run.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9015596Z adding 'aisef/phases/story_split.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9019435Z adding 'aisef2/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9021266Z adding 'aisef2/errors.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9023981Z adding 'aisef2/app/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9027374Z adding 'aisef2/app/adapters.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9057745Z adding 'aisef2/app/bundle.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9068214Z adding 'aisef2/app/calibrations.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9068803Z adding 'aisef2/app/cli.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9069307Z adding 'aisef2/app/client.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9069816Z adding 'aisef2/app/feedback.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9070334Z adding 'aisef2/app/preflight.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9070851Z adding 'aisef2/app/run.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9071326Z adding 'aisef2/app/settings.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9071832Z adding 'aisef2/app/verify.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9072335Z adding 'aisef2/arch/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9072851Z adding 'aisef2/arch/enums.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9073342Z adding 'aisef2/cohort/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9073887Z adding 'aisef2/cohort/lifecycle.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9074458Z adding 'aisef2/cohort/preregistration.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9075031Z adding 'aisef2/control/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9075506Z adding 'aisef2/control/budget.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9080951Z adding 'aisef2/control/owner.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9084075Z adding 'aisef2/control/routing.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9086337Z adding 'aisef2/invariants/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9089021Z adding 'aisef2/invariants/evidence.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9097418Z adding 'aisef2/invariants/registry.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9099218Z adding 'aisef2/journal/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9101885Z adding 'aisef2/journal/compat.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9108398Z adding 'aisef2/journal/event.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9111901Z adding 'aisef2/journal/fold.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9120483Z adding 'aisef2/journal/format2.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9129043Z adding 'aisef2/journal/format3.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9131792Z adding 'aisef2/journal/writer.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9134491Z adding 'aisef2/journal/projections/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9137448Z adding 'aisef2/journal/projections/budgets.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9139791Z adding 'aisef2/journal/projections/failure_owner.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9142278Z adding 'aisef2/journal/projections/qualification_counters.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9144033Z adding 'aisef2/journal/projections/retry_target.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9146259Z adding 'aisef2/journal/projections/story_state.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9148868Z adding 'aisef2/journal/projections/terminal_state.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9151191Z adding 'aisef2/orchestrate/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9154223Z adding 'aisef2/orchestrate/adapters.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9156006Z adding 'aisef2/orchestrate/gate.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9158722Z adding 'aisef2/orchestrate/merge.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9162306Z adding 'aisef2/orchestrate/proof.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9164912Z adding 'aisef2/orchestrate/quality.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9167289Z adding 'aisef2/orchestrate/review.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9169642Z adding 'aisef2/orchestrate/seam.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9172085Z adding 'aisef2/orchestrate/security.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9179373Z adding 'aisef2/orchestrate/story_runner.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9184881Z adding 'aisef2/orchestrate/workspace.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9186442Z adding 'aisef2/plan/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9190263Z adding 'aisef2/plan/drift.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9193391Z adding 'aisef2/plan/obligation.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9199718Z adding 'aisef2/plan/static_admission.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9203719Z adding 'aisef2/plan/story_admission.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9205670Z adding 'aisef2/probe/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9209511Z adding 'aisef2/probe/calibration.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9213471Z adding 'aisef2/probe/catalog.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9237825Z adding 'aisef2/probe/cli_invocation.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9248542Z adding 'aisef2/probe/file_artifact.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9267588Z adding 'aisef2/probe/process_effect.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9274567Z adding 'aisef2/probe/protocol.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9284098Z adding 'aisef2/probe/python_callable.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9294542Z adding 'aisef2/probe/python_callable_v2.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9296462Z adding 'aisef2/product/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9299340Z adding 'aisef2/product/approval.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9301918Z adding 'aisef2/product/compiler.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9305670Z adding 'aisef2/product/contract.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9308766Z adding 'aisef2/product/outcome.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9311381Z adding 'aisef2/product/spec.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9313475Z adding 'aisef2/quality/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9319294Z adding 'aisef2/quality/adequacy.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9324950Z adding 'aisef2/quality/relevance.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9334951Z adding 'aisef2/quality/test_execution.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9340861Z adding 'aisef2/quality/vacuity.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9343087Z adding 'aisef2/runtime/__init__.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9346033Z adding 'aisef2/runtime/capability.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9353081Z adding 'aisef2/runtime/process_range.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9356467Z adding 'aisef2/runtime/range_anchor.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9359800Z adding 'aisef2/runtime/repair.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9428712Z adding 'aisef2/runtime/run_scope.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9429236Z adding 'aisef2/runtime/runspec.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9429698Z adding 'aisef2/runtime/sentinel.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9430154Z adding 'aisef2/runtime/story_scope.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9430580Z adding 'aisef2/runtime/tool.py'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9430992Z adding 'aisef-2.0.0.dist-info/METADATA'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9431428Z adding 'aisef-2.0.0.dist-info/WHEEL'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9431884Z adding 'aisef-2.0.0.dist-info/entry_points.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9432380Z adding 'aisef-2.0.0.dist-info/top_level.txt'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9432849Z adding 'aisef-2.0.0.dist-info/RECORD'
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9433271Z removing build/bdist.linux-x86_64/wheel
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:07.9984218Z Successfully built aisef-2.0.0.tar.gz and aisef-2.0.0-py3-none-any.whl
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.3924892Z a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d  aisef-2.0.0.tar.gz
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4013456Z 5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b  dist/aisef-2.0.0-py3-none-any.whl
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4019900Z a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d  dist/aisef-2.0.0.tar.gz
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4056120Z ##[group]Run twine check dist/*
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4056439Z ^[[36;1mtwine check dist/*^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4125341Z shell: /usr/bin/bash -e {0}
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4125599Z env:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4125875Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4126318Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4126745Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4127401Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4127783Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4128356Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.4128692Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.7983361Z Checking dist/aisef-2.0.0-py3-none-any.whl: ^[[32mPASSED^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8227964Z Checking dist/aisef-2.0.0.tar.gz: ^[[32mPASSED^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8598576Z ##[group]Run python -P validation/v2/packaging_check.py --artifacts dist
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8599461Z ^[[36;1mpython -P validation/v2/packaging_check.py --artifacts dist^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8700953Z shell: /usr/bin/bash -e {0}
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8701355Z env:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8701780Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8702534Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8703227Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8703824Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8704433Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8705067Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.8705590Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9424262Z packaging: PASS (exactly aisef + aisef2)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9521868Z ##[group]Run python -m venv /tmp/venv
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9522236Z ^[[36;1mpython -m venv /tmp/venv^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9522592Z ^[[36;1m/tmp/venv/bin/pip install --no-index --no-deps dist/*.whl^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9590327Z shell: /usr/bin/bash -e {0}
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9590588Z env:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9590859Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9591310Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9591739Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9592116Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9592507Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9592917Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:08.9593245Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.4025465Z Processing ./dist/aisef-2.0.0-py3-none-any.whl
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.4107606Z Installing collected packages: aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.8824180Z Successfully installed aisef-2.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9379927Z ##[group]Run set -eu
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9380253Z ^[[36;1mset -eu^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9380854Z ^[[36;1mwant=$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version'])")^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9381543Z ^[[36;1m/tmp/venv/bin/aisef --version^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9381896Z ^[[36;1m(cd /tmp && /tmp/venv/bin/python -I -c "import aisef2")^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9382342Z ^[[36;1m/tmp/venv/bin/python -I tests/installed_smoke.py "$want" --product^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9450941Z shell: /usr/bin/bash -e {0}
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9451225Z env:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9451497Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9451966Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9452392Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9452780Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9453223Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9453599Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:13.9453955Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.1262733Z aisef 2.0.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4628098Z installed smoke: PASS (aisef 2.0.0)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4836039Z ##[group]Run (cd /tmp && /tmp/venv/bin/python -I "$GITHUB_WORKSPACE/tests/installed_product_smoke.py")
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4836712Z ^[[36;1m(cd /tmp && /tmp/venv/bin/python -I "$GITHUB_WORKSPACE/tests/installed_product_smoke.py")^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4905773Z shell: /usr/bin/bash -e {0}
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4906049Z env:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4906530Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4907183Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4907668Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4908051Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4908434Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4908809Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:14.4909130Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8589058Z installed product smoke: PASS (`aisef run` --check, run, --verify from the installed artifact)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8841727Z ##[group]Run set -eu
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8842016Z ^[[36;1mset -eu^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8842308Z ^[[36;1mmkdir -p /tmp/proj && cd /tmp/proj && git init -q .^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8842673Z ^[[36;1m/tmp/venv/bin/aisef init --stack python^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8843024Z ^[[36;1mtest -f .ai/config.json^[[0m
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8911288Z shell: /usr/bin/bash -e {0}
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8911548Z env:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8911820Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8912265Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8912684Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8913065Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8913436Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8913805Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:18.8914124Z ##[endgroup]
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:21.9598151Z wrote /tmp/proj/.ai/config.json
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:21.9598970Z stack: python — test/lint/sandbox configured
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:21.9600230Z   ○ `sandbox.image` = `aisef-verify-python:84adf1d8eaf9` — built by the harness on the first `aisef doctor` or tool run (pinned base + the stack profile's pinned tools)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:21.9854561Z Post job cleanup.
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.1095208Z (node:2732) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.1212432Z (Use `node --trace-deprecation ...` to show where the warning was created)
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.1305216Z Post job cleanup.
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2197842Z [command]/usr/bin/git version
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2231131Z git version 2.55.0
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2273288Z Temporarily overriding HOME='/home/runner/work/_temp/1905bdb6-303f-47cf-92e5-e39e6965c0ca' before making global git config changes
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2274882Z Adding repository directory to the temporary git global config as a safe directory
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2279662Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2323517Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2364659Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2645301Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2672483Z http.https://github.com/.extraheader
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2683731Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.2726233Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.3017918Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.3079484Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.3496897Z Cleaning up orphan processes
+tests / wheel	UNKNOWN STEP	2026-10-05T22:41:22.3779421Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

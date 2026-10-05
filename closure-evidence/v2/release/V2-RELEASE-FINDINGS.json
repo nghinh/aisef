@@ -673,6 +673,16 @@
    "id": "OBS-S7-1",
    "what": "CI on 483ec1d (the evidence commit carrying FINAL_RELEASE_READY PASS), attempt 1: four jobs were cancelled with GitHub's annotation 'The job was not acquired by Runner of type hosted even after multiple attempts' — tests run 37367561320: lint, wheel, unit (ubuntu-latest, 3.14); staging run 37367561525: install (windows-latest). None of them started, so none gave a verdict. Every job that ran passed (unit ubuntu 3.11-3.13, macos 3.12, windows 3.11; staging build — wheel 5e840f7b and sdist a7a1a5fb, the frozen bytes — and the ubuntu install smokes).",
    "disposition": "not a finding: ENVIRONMENT (hosted-runner capacity), as OBS-S4-2. A recorded diagnostic re-run of the failed jobs (gh run rerun --failed, attempt 2 of both runs) passed every job: tests 37367561320 attempt 2 8/8 (lint, wheel, unit ubuntu 3.11-3.14, macos 3.12, windows 3.11); staging 37367561525 attempt 2: build (wheel 5e840f7b, sdist a7a1a5fb = the frozen digests), install ubuntu (installed smoke + installed product smoke PASS) and windows (installed smoke PASS). No code or qualification input involved."
+  },
+  {
+   "id": "OBS-PUB-1",
+   "what": "release run 37383985011: the publish job (environment pypi) ran without a manual approval step — the pypi GitHub environment has no protection rule, so there was no deployment to approve.",
+   "disposition": "not a finding: every automated control passed before the upload (owner decision seq 3, v2-gate PASS, sha256sum -c OK, release_rc --verify-dist PASS) and the published bytes equal the frozen RC2 digests. A required reviewer on the environment is the owner's decision."
+  },
+  {
+   "id": "OBS-PUB-2",
+   "what": "post-publication clean install: `aisef doctor` in a scratch directory exits 2 (EXIT_NOT_READY, '✗ missing: docs/requirements.md').",
+   "disposition": "not a finding: doctor checks a 1.x project and has returned EXIT_NOT_READY without docs/requirements.md since v1.1.0; it made no provider or model call."
   }
  ],
  "reviews": [

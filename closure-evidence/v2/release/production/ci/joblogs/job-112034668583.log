@@ -1,0 +1,407 @@
+publish	Set up job	﻿2026-10-05T23:49:23.7935409Z Current runner version: '2.337.0'
+publish	Set up job	2026-10-05T23:49:23.7968793Z ##[group]Runner Image Provisioner
+publish	Set up job	2026-10-05T23:49:23.7970125Z Hosted Compute Agent
+publish	Set up job	2026-10-05T23:49:23.7971256Z Version: 20260901.588
+publish	Set up job	2026-10-05T23:49:23.7972424Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+publish	Set up job	2026-10-05T23:49:23.7973671Z Build Date: 2026-09-01T19:56:44Z
+publish	Set up job	2026-10-05T23:49:23.7975048Z Worker ID: {c33f799d-2e22-4d0a-b5ca-48c923e29623}
+publish	Set up job	2026-10-05T23:49:23.7976439Z Azure Region: eastus2
+publish	Set up job	2026-10-05T23:49:23.7977365Z ##[endgroup]
+publish	Set up job	2026-10-05T23:49:23.7979940Z ##[group]Operating System
+publish	Set up job	2026-10-05T23:49:23.7981067Z Ubuntu
+publish	Set up job	2026-10-05T23:49:23.7982224Z 24.04.5
+publish	Set up job	2026-10-05T23:49:23.7983126Z LTS
+publish	Set up job	2026-10-05T23:49:23.7984125Z ##[endgroup]
+publish	Set up job	2026-10-05T23:49:23.7985151Z ##[group]Runner Image
+publish	Set up job	2026-10-05T23:49:23.7986188Z Image: ubuntu-24.04
+publish	Set up job	2026-10-05T23:49:23.7987675Z Version: 20260927.320.1
+publish	Set up job	2026-10-05T23:49:23.7989547Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+publish	Set up job	2026-10-05T23:49:23.7993222Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+publish	Set up job	2026-10-05T23:49:23.7994985Z ##[endgroup]
+publish	Set up job	2026-10-05T23:49:23.7997131Z ##[group]GITHUB_TOKEN Permissions
+publish	Set up job	2026-10-05T23:49:23.7999987Z Metadata: read
+publish	Set up job	2026-10-05T23:49:23.8001183Z ##[endgroup]
+publish	Set up job	2026-10-05T23:49:23.8004316Z Secret source: Actions
+publish	Set up job	2026-10-05T23:49:23.8005900Z Cache mode: write
+publish	Set up job	2026-10-05T23:49:23.8007712Z Prepare workflow directory
+publish	Set up job	2026-10-05T23:49:23.8494771Z Prepare all required actions
+publish	Set up job	2026-10-05T23:49:23.8567908Z Getting action download info
+publish	Set up job	2026-10-05T23:49:24.1777465Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+publish	Set up job	2026-10-05T23:49:24.4645381Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+publish	Set up job	2026-10-05T23:49:24.5000219Z Download action repository 'pypa/gh-action-pypi-publish@release/v1' (SHA:dc37677b2e1c63e2034f94d8a5b11f265b73ba33)
+publish	Set up job	2026-10-05T23:49:24.7140429Z Getting action download info
+publish	Set up job	2026-10-05T23:49:24.8016789Z Download action repository 'actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405' (SHA:a309ff8b426b58ec0e2a45f0f869d46889d02405)
+publish	Set up job	2026-10-05T23:49:24.9326692Z Complete job name: publish
+publish	Run actions/download-artifact@v4	﻿2026-10-05T23:49:25.0101625Z ##[group]Run actions/download-artifact@v4
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.0102735Z with:
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.0103208Z   name: dist
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.0103655Z   path: dist/
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.0104121Z   merge-multiple: false
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.0104636Z   repository: nghinh/aisef
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.0105164Z   run-id: 37383985011
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.0106018Z ##[endgroup]
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.1772724Z Downloading single artifact
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.1923618Z (node:2196) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.1925247Z (Use `node --trace-deprecation ...` to show where the warning was created)
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.2980972Z Preparing to download the following artifacts:
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.2982477Z - dist (ID: 11375269225, Size: 1769629, Expected Digest: sha256:754a6b9b5e24717fc0e3a9480879b3971f4037959c1f41718799a6af8d563f5b)
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.4345370Z Redirecting to blob download url: https://productionresultssa10.blob.core.windows.net/actions-results/8cfdcc66-49d7-8529-951a-b4bed871d5c2/workflow-job-run-d9a7ba16-9a95-5771-8c04-32ae705306d9/artifacts/bcae0416621b3db43d8cba1e4454a792c7af9e4b7287e51056efc5a215d95839.zip
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.4349424Z Starting download of artifact to: /home/runner/work/aisef/aisef/dist
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.5233025Z (node:2196) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.5778165Z SHA256 digest of downloaded artifact is 754a6b9b5e24717fc0e3a9480879b3971f4037959c1f41718799a6af8d563f5b
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.5780581Z Artifact download completed successfully.
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.5781443Z Total of 1 artifact(s) downloaded
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.5783200Z Download artifact has finished successfully
+publish	Run actions/download-artifact@v4	﻿2026-10-05T23:49:25.6058805Z ##[group]Run actions/download-artifact@v4
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.6059815Z with:
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.6060362Z   name: dist-sha256
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.6060991Z   path: .
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.6061587Z   merge-multiple: false
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.6062316Z   repository: nghinh/aisef
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.6063032Z   run-id: 37383985011
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.6063676Z ##[endgroup]
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.7556979Z Downloading single artifact
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.7762523Z (node:2208) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.7766950Z (Use `node --trace-deprecation ...` to show where the warning was created)
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.8712682Z Preparing to download the following artifacts:
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:25.8716723Z - dist-sha256 (ID: 11375224188, Size: 264, Expected Digest: sha256:776f9af0c8849aa94473d1b45d07d48099ae56fa34cacdd408ac0a6b76c4ce72)
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:26.0026464Z Redirecting to blob download url: https://productionresultssa10.blob.core.windows.net/actions-results/8cfdcc66-49d7-8529-951a-b4bed871d5c2/workflow-job-run-d9a7ba16-9a95-5771-8c04-32ae705306d9/artifacts/030ac884951a628a67088ac4ebdcc46452544c33186a71fffe72c620cffb2105.zip
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:26.0031460Z Starting download of artifact to: /home/runner/work/aisef/aisef
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:26.0441839Z (node:2208) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:26.0478281Z SHA256 digest of downloaded artifact is 776f9af0c8849aa94473d1b45d07d48099ae56fa34cacdd408ac0a6b76c4ce72
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:26.0480256Z Artifact download completed successfully.
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:26.0481266Z Total of 1 artifact(s) downloaded
+publish	Run actions/download-artifact@v4	2026-10-05T23:49:26.0484311Z Download artifact has finished successfully
+publish	publish exactly the files staging built and smoked	﻿2026-10-05T23:49:26.0635190Z ##[group]Run cd dist && sha256sum -c ../SHA256SUMS
+publish	publish exactly the files staging built and smoked	2026-10-05T23:49:26.0636685Z ^[[36;1mcd dist && sha256sum -c ../SHA256SUMS^[[0m
+publish	publish exactly the files staging built and smoked	2026-10-05T23:49:26.0918004Z shell: /usr/bin/bash -e {0}
+publish	publish exactly the files staging built and smoked	2026-10-05T23:49:26.0918843Z ##[endgroup]
+publish	publish exactly the files staging built and smoked	2026-10-05T23:49:26.1057764Z aisef-2.0.0-py3-none-any.whl: OK
+publish	publish exactly the files staging built and smoked	2026-10-05T23:49:26.1063672Z aisef-2.0.0.tar.gz: OK
+publish	Run actions/checkout@v4	﻿2026-10-05T23:49:26.1269668Z ##[group]Run actions/checkout@v4
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1270488Z with:
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1271020Z   path: repo
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1271611Z   repository: nghinh/aisef
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1279823Z   token: ***
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1280415Z   ssh-strict: true
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1281019Z   ssh-user: git
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1281646Z   persist-credentials: true
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1282360Z   clean: true
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1282986Z   sparse-checkout-cone-mode: true
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1283763Z   fetch-depth: 1
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1284366Z   fetch-tags: false
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1284986Z   show-progress: true
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1285617Z   lfs: false
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1286319Z   submodules: false
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1286991Z   set-safe-directory: true
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1287743Z   allow-unsafe-pr-checkout: false
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.1288509Z ##[endgroup]
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2213112Z Syncing repository: nghinh/aisef
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2216528Z ##[group]Getting Git version info
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2218252Z Working directory is '/home/runner/work/aisef/aisef/repo'
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2220825Z [command]/usr/bin/git version
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2271800Z git version 2.55.0
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2293772Z ##[endgroup]
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2309165Z Temporarily overriding HOME='/home/runner/work/_temp/f9563d64-21ec-4c44-a6ed-29f3315f4904' before making global git config changes
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2312915Z Adding repository directory to the temporary git global config as a safe directory
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2317653Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef/repo
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2376555Z ##[group]Initializing the repository
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2378962Z [command]/usr/bin/git init /home/runner/work/aisef/aisef/repo
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2515709Z hint: Using 'master' as the name for the initial branch. This default branch name
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2517944Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2519659Z hint: to use in all of your new repositories, which will suppress this warning,
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2521006Z hint: call:
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2521762Z hint:
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2537607Z hint: 	git config --global init.defaultBranch <name>
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2539545Z hint:
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2541418Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2544313Z hint: 'development'. The just-created branch can be renamed via this command:
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2546760Z hint:
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2547958Z hint: 	git branch -m <name>
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2549317Z hint:
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2557628Z hint: Disable this message with "git config set advice.defaultBranchName false"
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2560081Z Initialized empty Git repository in /home/runner/work/aisef/aisef/repo/.git/
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2578673Z [command]/usr/bin/git remote add origin https://github.com/nghinh/aisef
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2585225Z ##[endgroup]
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2587503Z ##[group]Disabling automatic garbage collection
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2589612Z [command]/usr/bin/git config --local gc.auto 0
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2620598Z ##[endgroup]
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2622812Z ##[group]Setting up auth
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2625062Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.2670823Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.3036022Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.3080506Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.3322389Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.3359034Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.3585254Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.3624234Z ##[endgroup]
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.3625401Z ##[group]Fetching the repository
+publish	Run actions/checkout@v4	2026-10-05T23:49:26.3634686Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ca2631374602da45dae75b7f6907ff4729d0b2f7:refs/tags/v2.0.0
+publish	Run actions/checkout@v4	2026-10-05T23:49:29.4993910Z From https://github.com/nghinh/aisef
+publish	Run actions/checkout@v4	2026-10-05T23:49:29.4995684Z  * [new ref]         ca2631374602da45dae75b7f6907ff4729d0b2f7 -> v2.0.0
+publish	Run actions/checkout@v4	2026-10-05T23:49:29.4998979Z ##[endgroup]
+publish	Run actions/checkout@v4	2026-10-05T23:49:29.5000061Z ##[group]Determining the checkout info
+publish	Run actions/checkout@v4	2026-10-05T23:49:29.5002380Z ##[endgroup]
+publish	Run actions/checkout@v4	2026-10-05T23:49:29.5010523Z [command]/usr/bin/git sparse-checkout disable
+publish	Run actions/checkout@v4	2026-10-05T23:49:29.5072969Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+publish	Run actions/checkout@v4	2026-10-05T23:49:29.5105188Z ##[group]Checking out the ref
+publish	Run actions/checkout@v4	2026-10-05T23:49:29.5109614Z [command]/usr/bin/git checkout --progress --force refs/tags/v2.0.0
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1711774Z Note: switching to 'refs/tags/v2.0.0'.
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1712357Z 
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1712626Z You are in 'detached HEAD' state. You can look around, make experimental
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1713203Z changes and commit them, and you can discard any commits you make in this
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1713792Z state without impacting any branches by switching back to a branch.
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1714430Z 
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1714903Z If you want to create a new branch to retain commits you create, you may
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1716657Z do so (now or later) by using -c with the switch command. Example:
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1717240Z 
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1717498Z   git switch -c <new-branch-name>
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1717852Z 
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1718072Z Or undo this operation with:
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1718392Z 
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1718609Z   git switch -
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1718885Z 
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1719296Z Turn off this advice by setting config variable advice.detachedHead to false
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1719897Z 
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1721968Z HEAD is now at ca26313 RELEASE-DECISIONS seq 3: the owner's production-publish authorization for AISEF 2.0.0 (charter §19) — approver human:owner, decision {PRODUCTION_PUBLISH: AUTHORIZED, VERSION: 2.0.0}, on the frozen and qualified RC2 1565bcc. Decision record only.
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1787241Z ##[endgroup]
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1838358Z [command]/usr/bin/git log -1 --format=%H
+publish	Run actions/checkout@v4	2026-10-05T23:49:30.1864880Z ca2631374602da45dae75b7f6907ff4729d0b2f7
+publish	the files to publish are the frozen RC's	﻿2026-10-05T23:49:30.1993435Z ##[group]Run python3 -P repo/validation/qualification/release_rc.py --verify-dist dist
+publish	the files to publish are the frozen RC's	2026-10-05T23:49:30.1994202Z ^[[36;1mpython3 -P repo/validation/qualification/release_rc.py --verify-dist dist^[[0m
+publish	the files to publish are the frozen RC's	2026-10-05T23:49:30.2060356Z shell: /usr/bin/bash -e {0}
+publish	the files to publish are the frozen RC's	2026-10-05T23:49:30.2060726Z ##[endgroup]
+publish	the files to publish are the frozen RC's	2026-10-05T23:49:30.2586488Z release candidate artifacts: PASS
+publish	Run pypa/gh-action-pypi-publish@release/v1	﻿2026-10-05T23:49:30.2822711Z ##[group]Run pypa/gh-action-pypi-publish@release/v1
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2823193Z with:
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2823609Z   user: __token__
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2823954Z   repository_url: https://upload.pypi.org/legacy/
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2824350Z   packages_dir: dist
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2824628Z   verify_metadata: true
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2824909Z   skip_existing: false
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2825177Z   verbose: true
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2825429Z   print_hash: true
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2825693Z   attestations: true
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2825957Z ##[endgroup]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2909568Z ##[start-action display=Fail-fast in unsupported environments;id=__pypa_gh-action-pypi-publish.__run]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2929378Z ##[end-action id=__pypa_gh-action-pypi-publish.__run;outcome=skipped;conclusion=skipped;duration_ms=0]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2932013Z ##[start-action display=Reset path if needed;id=__pypa_gh-action-pypi-publish.__run_2]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2960451Z ##[group]Run # Reset path if needed
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2960873Z ^[[36;1m# Reset path if needed^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2961329Z ^[[36;1m# https://github.com/pypa/gh-action-pypi-publish/issues/112^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2961820Z ^[[36;1mif [[ $PATH != *"/usr/bin"* ]]; then^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2962264Z ^[[36;1m  echo "\$PATH=$PATH. Resetting \$PATH for GitHub Actions."^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2962787Z ^[[36;1m  PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2963246Z ^[[36;1m  echo "PATH=$PATH" >>"$GITHUB_ENV"^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2963604Z ^[[36;1m  echo "$PATH" >>"$GITHUB_PATH"^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2963949Z ^[[36;1m  echo "\$PATH reset. \$PATH=$PATH"^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.2964296Z ^[[36;1mfi^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3031118Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3031539Z ##[endgroup]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3131003Z ##[end-action id=__pypa_gh-action-pypi-publish.__run_2;outcome=success;conclusion=success;duration_ms=19]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3133721Z ##[start-action display=Discover pre-installed Python;id=__pypa_gh-action-pypi-publish.pre-installed-python]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3154881Z ##[group]Run # 🔎 Discover pre-installed Python
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3155325Z ^[[36;1m# 🔎 Discover pre-installed Python^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3155815Z ^[[36;1mecho "python-path=$(command -v python3 || :)" | tee -a "${GITHUB_OUTPUT}"^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3220066Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3220485Z ##[endgroup]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3317812Z python-path=/usr/bin/python3
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3343385Z ##[end-action id=__pypa_gh-action-pypi-publish.pre-installed-python;outcome=success;conclusion=success;duration_ms=20]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3349156Z ##[start-action display=Install Python 3;id=__pypa_gh-action-pypi-publish.new-python]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3359471Z ##[end-action id=__pypa_gh-action-pypi-publish.new-python;outcome=skipped;conclusion=skipped;duration_ms=0]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3377226Z ##[start-action display=Create Docker container action;id=__pypa_gh-action-pypi-publish.__run_3]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3418857Z ##[group]Run # Create Docker container action
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3419286Z ^[[36;1m# Create Docker container action^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3419945Z ^[[36;1m/usr/bin/python3 '/home/runner/work/_actions/pypa/gh-action-pypi-publish/release/v1/create-docker-action.py'^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3485060Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3485482Z env:
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3485741Z   REF: release/v1
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3486065Z   REPO: pypa/gh-action-pypi-publish
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3486706Z   REPO_ID: 1358825357
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3487008Z ##[endgroup]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3862582Z ##[end-action id=__pypa_gh-action-pypi-publish.__run_3;outcome=success;conclusion=success;duration_ms=48]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3865533Z ##[start-action display=Run Docker container;id=__pypa_gh-action-pypi-publish.__self]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3970743Z ##[group]Run ./.github/.tmp/.generated-actions/run-pypi-publish-in-docker-container
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3971493Z with:
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3971754Z   user: __token__
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3972084Z   repository-url: https://upload.pypi.org/legacy/
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3972467Z   packages-dir: dist
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3972743Z   verify-metadata: true
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3973022Z   skip-existing: false
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3973295Z   verbose: true
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3973548Z   print-hash: true
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3973805Z   attestations: true
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.3974073Z ##[endgroup]
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.4117021Z ##[command]/usr/bin/docker run --name ghcriopypaghactionpypipublishreleasev1_65f165 --label bda32e --workdir /github/workspace --rm -e "INPUT_USER" -e "INPUT_PASSWORD" -e "INPUT_REPOSITORY-URL" -e "INPUT_PACKAGES-DIR" -e "INPUT_VERIFY-METADATA" -e "INPUT_SKIP-EXISTING" -e "INPUT_VERBOSE" -e "INPUT_PRINT-HASH" -e "INPUT_ATTESTATIONS" -e "HOME" -e "GITHUB_JOB" -e "GITHUB_REF" -e "GITHUB_SHA" -e "GITHUB_REPOSITORY" -e "GITHUB_REPOSITORY_OWNER" -e "GITHUB_REPOSITORY_OWNER_ID" -e "GITHUB_RUN_ID" -e "GITHUB_RUN_NUMBER" -e "GITHUB_RETENTION_DAYS" -e "GITHUB_RUN_ATTEMPT" -e "GITHUB_ACTOR_ID" -e "GITHUB_ACTOR" -e "GITHUB_WORKFLOW" -e "GITHUB_HEAD_REF" -e "GITHUB_BASE_REF" -e "GITHUB_EVENT_NAME" -e "GITHUB_SERVER_URL" -e "GITHUB_API_URL" -e "GITHUB_GRAPHQL_URL" -e "GITHUB_REF_NAME" -e "GITHUB_REF_PROTECTED" -e "GITHUB_REF_TYPE" -e "GITHUB_WORKFLOW_REF" -e "GITHUB_WORKFLOW_SHA" -e "GITHUB_REPOSITORY_ID" -e "GITHUB_TRIGGERING_ACTOR" -e "GITHUB_WORKSPACE" -e "GITHUB_ACTION" -e "GITHUB_EVENT_PATH" -e "GITHUB_ACTION_REPOSITORY" -e "GITHUB_ACTION_REF" -e "GITHUB_PATH" -e "GITHUB_ENV" -e "GITHUB_STEP_SUMMARY" -e "GITHUB_STATE" -e "GITHUB_OUTPUT" -e "GITHUB_ARTIFACTS" -e "GITHUB_ARTIFACTS_LIST" -e "GITHUB_ACTION_PATH" -e "RUNNER_OS" -e "RUNNER_ARCH" -e "RUNNER_NAME" -e "RUNNER_ENVIRONMENT" -e "RUNNER_TOOL_CACHE" -e "RUNNER_TEMP" -e "RUNNER_WORKSPACE" -e "ACTIONS_RUNTIME_URL" -e "ACTIONS_RUNTIME_TOKEN" -e "ACTIONS_CACHE_URL" -e "ACTIONS_ID_TOKEN_REQUEST_URL" -e "ACTIONS_ID_TOKEN_REQUEST_TOKEN" -e "ACTIONS_RESULTS_URL" -e "ACTIONS_CACHE_MODE" -e "ACTIONS_ORCHESTRATION_ID" -e GITHUB_ACTIONS=true -e CI=true -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work/_temp":"/github/runner_temp" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" -v "/home/runner/work/aisef/aisef":"/github/workspace" ghcr.io/pypa/gh-action-pypi-publish:release-v1
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.5074993Z Unable to find image 'ghcr.io/pypa/gh-action-pypi-publish:release-v1' locally
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7453019Z release-v1: Pulling from pypa/gh-action-pypi-publish
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7460571Z f96fde5c7579: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7461205Z cd384decb927: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7462190Z 463aa101532a: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7463287Z 4a633c382b06: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7463857Z 7d25e6ce522b: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7464376Z 73aa50089b2f: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7464915Z 3f44ba4af573: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7465415Z e7cfcb60dbfb: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7465910Z 7e9f24617b6b: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7466633Z 6d9fe5224b4e: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7467137Z 533ef6f9b8fa: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7467623Z 3441c4cce8f1: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7468127Z 70fcbeac8774: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7468623Z 4f4fb700ef54: Pulling fs layer
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7469096Z 4a633c382b06: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7469543Z 7d25e6ce522b: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7469984Z 73aa50089b2f: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7470403Z 7e9f24617b6b: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7470832Z 3f44ba4af573: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7471273Z 6d9fe5224b4e: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7471721Z e7cfcb60dbfb: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7472201Z 533ef6f9b8fa: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7472617Z 3441c4cce8f1: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7473049Z 70fcbeac8774: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.7473840Z 4f4fb700ef54: Waiting
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.8722171Z cd384decb927: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.8723063Z cd384decb927: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.8985583Z 463aa101532a: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.8989408Z 463aa101532a: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.9458886Z 4a633c382b06: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.9706105Z 4a633c382b06: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.9706945Z 7d25e6ce522b: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.9707855Z f96fde5c7579: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.9712034Z f96fde5c7579: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:30.9713260Z 7d25e6ce522b: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.0443062Z 3f44ba4af573: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.0443884Z 3f44ba4af573: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.0447300Z e7cfcb60dbfb: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.1404965Z 6d9fe5224b4e: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.1416404Z 7e9f24617b6b: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.1418820Z 7e9f24617b6b: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.1643602Z 73aa50089b2f: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.1645413Z 73aa50089b2f: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.2314437Z 3441c4cce8f1: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.2315526Z 3441c4cce8f1: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.2477677Z 70fcbeac8774: Verifying Checksum
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.2478111Z 70fcbeac8774: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.3047572Z 4f4fb700ef54: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:31.3215499Z 533ef6f9b8fa: Download complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:32.0559438Z f96fde5c7579: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:33.2104339Z cd384decb927: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:33.8073837Z 463aa101532a: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:33.8190160Z 4a633c382b06: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:33.8294519Z 7d25e6ce522b: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.2628843Z 73aa50089b2f: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.2721737Z 3f44ba4af573: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.2804974Z e7cfcb60dbfb: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.2907381Z 7e9f24617b6b: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.2980332Z 6d9fe5224b4e: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.3078628Z 533ef6f9b8fa: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.3168869Z 3441c4cce8f1: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.3271848Z 70fcbeac8774: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.3344098Z 4f4fb700ef54: Pull complete
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.3384826Z Digest: sha256:a68d05519f6d7e47372aeaddab80b851b69afa89be179ec41775c72c4e3ab2d5
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:35.3397226Z Status: Downloaded newer image for ghcr.io/pypa/gh-action-pypi-publish:release-v1
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:37.3837028Z Checking dist/aisef-2.0.0-py3-none-any.whl: ^[[32mPASSED^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:37.4094783Z Checking dist/aisef-2.0.0.tar.gz: ^[[32mPASSED^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:37.4402455Z ##[notice]Generating and uploading digital attestations
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.2658625Z TUF metadata: /root/.local/share/sigstore-python/tuf/https%3A%2F%2Ftuf-repo-cdn.sigstore.dev
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.2659543Z TUF targets cache: /root/.cache/sigstore-python/tuf/https%3A%2F%2Ftuf-repo-cdn.sigstore.dev
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.5427162Z Found and verified trusted root
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.5431069Z Found and verified signing config
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.5446036Z Fulcio client using URL: https://fulcio.sigstore.dev
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.5448112Z Generating ephemeral keys...
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.5454063Z Requesting ephemeral certificate...
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.5454620Z Retrieving signed certificate...
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.7398785Z Found <Name(O=sigstore.dev,CN=sigstore-intermediate)> as issuer, verifying if it is a ca
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.7399947Z attempting to verify SCT with key ID dd3d306ac6c7113263191e1c99673702a24a5eb8de3cadff878a72802f29ee8e
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.7400827Z Successfully verified SCT...
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:38.7406125Z DSSE PAE: b'DSSEv1 28 application/vnd.in-toto+json 253 {"_type":"https://in-toto.io/Statement/v1","subject":[{"name":"aisef-2.0.0.tar.gz","digest":{"sha256":"a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d"}}],"predicateType":"https://docs.pypi.org/attestations/publish/v1","predicate":null}'
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:39.0077988Z proposed: {"apiVersion": "0.0.1", "kind": "dsse", "spec": {"proposedContent": {"envelope": "{\"payload\":\"eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEiLCJzdWJqZWN0IjpbeyJuYW1lIjoiYWlzZWYtMi4wLjAudGFyLmd6IiwiZGlnZXN0Ijp7InNoYTI1NiI6ImE3YTFhNWZiOWJjNmQyMTFjYzIzMjlkYWIxMmY5NjJlZDI3ZGQ4MjY3NTRkYTg1MTFiMzVjM2VhMWJiYmVmMWQifX1dLCJwcmVkaWNhdGVUeXBlIjoiaHR0cHM6Ly9kb2NzLnB5cGkub3JnL2F0dGVzdGF0aW9ucy9wdWJsaXNoL3YxIiwicHJlZGljYXRlIjpudWxsfQ==\",\"payloadType\":\"application/vnd.in-toto+json\",\"signatures\":[{\"sig\":\"MEUCICRZ9Tw6WFQhujGCtMvuLGcBkHT74X5LRQr1Bhvk84vSAiEApgCxteSSXTYZPuSewMu3qta/iLt4xlgYlTi/Weic5BE=\"}]}", "verifiers": ["LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUd5VENDQmsrZ0F3SUJBZ0lVQ3h1U3ZobU5ITE50ZGExcWZVLzdpRkFoUnFFd0NnWUlLb1pJemowRUF3TXcKTnpFVk1CTUdBMVVFQ2hNTWMybG5jM1J2Y21VdVpHVjJNUjR3SEFZRFZRUURFeFZ6YVdkemRHOXlaUzFwYm5SbApjbTFsWkdsaGRHVXdIaGNOTWpZeE1EQTFNak0wT1RNNFdoY05Nall4TURBMU1qTTFPVE00V2pBQU1Ga3dFd1lICktvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUVSeWtaNE43d1FtQWNCMWRWdk55ZlAxNXJzcGZjbGlCOTYrYnQKblRRTG1lYWJhMTZxcFJaVEtwRWx2YjdGazVSSTV3TVM0US9FV21KL1pBN3gxS3FvS3FPQ0JXNHdnZ1ZxTUE0RwpBMVVkRHdFQi93UUVBd0lIZ0RBVEJnTlZIU1VFRERBS0JnZ3JCZ0VGQlFjREF6QWZCZ05WSFNNRUdEQVdnQlRmCjArblBWaVFSbHZtbzJPa29WYUxHTGhoa1B6QmNCZ05WSFJFQkFmOEVVakJRaGs1b2RIUndjem92TDJkcGRHaDEKWWk1amIyMHZibWRvYVc1b0wyRnBjMlZtTHk1bmFYUm9kV0l2ZDI5eWEyWnNiM2R6TDNKbGJHVmhjMlV1ZVcxcwpRSEpsWm5NdmRHRm5jeTkyTWk0d0xqQXdPUVlLS3dZQkJBR0R2ekFCQVFRcmFIUjBjSE02THk5MGIydGxiaTVoClkzUnBiMjV6TG1kcGRHaDFZblZ6WlhKamIyNTBaVzUwTG1OdmJUQVNCZ29yQmdFRUFZTy9NQUVDQkFSd2RYTm8KTURZR0Npc0dBUVFCZzc4d0FRTUVLR05oTWpZek1UTTNORFl3TW1SaE5EVmtZV1UzTldJM1pqWTVNRGRtWmpRMwpNamxrTUdJeVpqY3dGUVlLS3dZQkJBR0R2ekFCQkFRSGNtVnNaV0Z6WlRBYUJnb3JCZ0VFQVlPL01BRUZCQXh1CloyaHBibWd2WVdselpXWXdIZ1lLS3dZQkJBR0R2ekFCQmdRUWNtVm1jeTkwWVdkekwzWXlMakF1TURBN0Jnb3IKQmdFRUFZTy9NQUVJQkMwTUsyaDBkSEJ6T2k4dmRHOXJaVzR1WVdOMGFXOXVjeTVuYVhSb2RXSjFjMlZ5WTI5dQpkR1Z1ZEM1amIyMHdYZ1lLS3dZQkJBR0R2ekFCQ1FSUURFNW9kSFJ3Y3pvdkwyZHBkR2gxWWk1amIyMHZibWRvCmFXNW9MMkZwYzJWbUx5NW5hWFJvZFdJdmQyOXlhMlpzYjNkekwzSmxiR1ZoYzJVdWVXMXNRSEpsWm5NdmRHRm4KY3k5Mk1pNHdMakF3T0FZS0t3WUJCQUdEdnpBQkNnUXFEQ2hqWVRJMk16RXpOelEyTURKa1lUUTFaR0ZsTnpWaQpOMlkyT1RBM1ptWTBOekk1WkRCaU1tWTNNQjBHQ2lzR0FRUUJnNzh3QVFzRUR3d05aMmwwYUhWaUxXaHZjM1JsClpEQXZCZ29yQmdFRUFZTy9NQUVNQkNFTUgyaDBkSEJ6T2k4dloybDBhSFZpTG1OdmJTOXVaMmhwYm1ndllXbHoKWldZd09BWUtLd1lCQkFHRHZ6QUJEUVFxRENoallUSTJNekV6TnpRMk1ESmtZVFExWkdGbE56VmlOMlkyT1RBMwpabVkwTnpJNVpEQmlNbVkzTUNBR0Npc0dBUVFCZzc4d0FRNEVFZ3dRY21WbWN5OTBZV2R6TDNZeUxqQXVNREFhCkJnb3JCZ0VFQVlPL01BRVBCQXdNQ2pFek5UZzRNalV6TlRjd0tRWUtLd1lCQkFHRHZ6QUJFQVFiREJsb2RIUncKY3pvdkwyZHBkR2gxWWk1amIyMHZibWRvYVc1b01CZ0dDaXNHQVFRQmc3OHdBUkVFQ2d3SU16YzVORFU1TlRZdwpYZ1lLS3dZQkJBR0R2ekFCRWdSUURFNW9kSFJ3Y3pvdkwyZHBkR2gxWWk1amIyMHZibWRvYVc1b0wyRnBjMlZtCkx5NW5hWFJvZFdJdmQyOXlhMlpzYjNkekwzSmxiR1ZoYzJVdWVXMXNRSEpsWm5NdmRHRm5jeTkyTWk0d0xqQXcKT0FZS0t3WUJCQUdEdnpBQkV3UXFEQ2hqWVRJMk16RXpOelEyTURKa1lUUTFaR0ZsTnpWaU4yWTJPVEEzWm1ZMApOekk1WkRCaU1tWTNNQlFHQ2lzR0FRUUJnNzh3QVJRRUJnd0VjSFZ6YURCVEJnb3JCZ0VFQVlPL01BRVZCRVVNClEyaDBkSEJ6T2k4dloybDBhSFZpTG1OdmJTOXVaMmhwYm1ndllXbHpaV1l2WVdOMGFXOXVjeTl5ZFc1ekx6TTMKTXpnek9UZzFNREV4TDJGMGRHVnRjSFJ6THpFd0ZnWUtLd1lCQkFHRHZ6QUJGZ1FJREFad2RXSnNhV013RkFZSwpLd1lCQkFHRHZ6QUJGd1FHREFSd2VYQnBNRVlHQ2lzR0FRUUJnNzh3QVJnRU9BdzJjbVZ3YnpwdVoyaHBibWhBCk16YzVORFU1TlRZdllXbHpaV1pBTVRNMU9EZ3lOVE0xTnpwbGJuWnBjbTl1YldWdWREcHdlWEJwTUlHS0Jnb3IKQmdFRUFkWjVBZ1FDQkh3RWVnQjRBSFlBM1Qwd2FzYkhFVEpqR1I0Y21XYzNBcUpLWHJqZVBLMy9oNHB5Z0M4cAo3bzRBQUFHaERua1U2QUFBQkFNQVJ6QkZBaUVBbUJxUm4vc1ljN1loQ0I1QWIvckpMSXFpT3dVT0JSTURCMHJFCkdzblhvTmdDSUIyUWcvTWxXZ1dLcXlOR0lJNloyNUZCT0tBSnVxVzBwaDBMNis3TTI0clNNQW9HQ0NxR1NNNDkKQkFNREEyZ0FNR1VDTVFESjA2NDRpZXVHZG91bmRLRHJnbDlCQXUvTFkvNmx5YmF3QVd2cVFNTEVMNHZhN0hXdgorV3NKelM3a0ZERWx2V2NDTUEwOEF6ak9xMXEvc3RVWGZON0NKVFVNVjA5N1h3S3dzVkFrMUpKdDBoTUVEUHVkCnBLazFZaGNSRVJ4WDlMdWZNUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"]}, "signatures": null, "envelopeHash": null, "payloadHash": null}}
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:41.4890728Z integrated: {'108e9186e8c5677a616bb7267c07192bda50a0b6f7c019a280f89b723a39966b6c21a964cb7ada12': {'body': 'eyJhcGlWZXJzaW9uIjoiMC4wLjEiLCJraW5kIjoiZHNzZSIsInNwZWMiOnsiZW52ZWxvcGVIYXNoIjp7ImFsZ29yaXRobSI6InNoYTI1NiIsInZhbHVlIjoiZGYxOGNiNDEzMTVlODg2YzQ2NDNhZjQ0ZDczOGJiZDYxMmMyNDkwOTE4ZjEyNzE1NzAyODY0MjM0ZGYzMmM0NiJ9LCJwYXlsb2FkSGFzaCI6eyJhbGdvcml0aG0iOiJzaGEyNTYiLCJ2YWx1ZSI6IjI5OTdmMjE5YzZhMWE4MzM4NDAwMDMyOTk3MDhkYjM5N2NlOTczNDk0NmE3OTc1MWQxZWI2OWYzZDZiYjlkZWIifSwic2lnbmF0dXJlcyI6W3sic2lnbmF0dXJlIjoiTUVVQ0lDUlo5VHc2V0ZRaHVqR0N0TXZ1TEdjQmtIVDc0WDVMUlFyMUJodms4NHZTQWlFQXBnQ3h0ZVNTWFRZWlB1U2V3TXUzcXRhL2lMdDR4bGdZbFRpL1dlaWM1QkU9IiwidmVyaWZpZXIiOiJMUzB0TFMxQ1JVZEpUaUJEUlZKVVNVWkpRMEZVUlMwdExTMHRDazFKU1VkNVZFTkRRbXNyWjBGM1NVSkJaMGxWUTNoMVUzWm9iVTVJVEU1MFpHRXhjV1pWTHpkcFJrRm9VbkZGZDBObldVbExiMXBKZW1vd1JVRjNUWGNLVG5wRlZrMUNUVWRCTVZWRlEyaE5UV015Ykc1ak0xSjJZMjFWZFZwSFZqSk5ValIzU0VGWlJGWlJVVVJGZUZaNllWZGtlbVJIT1hsYVV6RndZbTVTYkFwamJURnNXa2RzYUdSSFZYZElhR05PVFdwWmVFMUVRVEZOYWswd1QxUk5ORmRvWTA1TmFsbDRUVVJCTVUxcVRURlBWRTAwVjJwQlFVMUdhM2RGZDFsSUNrdHZXa2w2YWpCRFFWRlpTVXR2V2tsNmFqQkVRVkZqUkZGblFVVlNlV3RhTkU0M2QxRnRRV05DTVdSV2RrNTVabEF4TlhKemNHWmpiR2xDT1RZclluUUtibFJSVEcxbFlXSmhNVFp4Y0ZKYVZFdHdSV3gyWWpkR2F6VlNTVFYzVFZNMFVTOUZWMjFLTDFwQk4zZ3hTM0Z2UzNGUFEwSlhOSGRuWjFaeFRVRTBSd3BCTVZWa1JIZEZRaTkzVVVWQmQwbElaMFJCVkVKblRsWklVMVZGUkVSQlMwSm5aM0pDWjBWR1FsRmpSRUY2UVdaQ1owNVdTRk5OUlVkRVFWZG5RbFJtQ2pBcmJsQldhVkZTYkhadGJ6SlBhMjlXWVV4SFRHaG9hMUI2UW1OQ1owNVdTRkpGUWtGbU9FVlZha0pSYUdzMWIyUklVbmRqZW05MlRESmtjR1JIYURFS1dXazFhbUl5TUhaaWJXUnZZVmMxYjB3eVJuQmpNbFp0VEhrMWJtRllVbTlrVjBsMlpESTVlV0V5V25OaU0yUjZURE5LYkdKSFZtaGpNbFYxWlZjeGN3cFJTRXBzV201TmRtUkhSbTVqZVRreVRXazBkMHhxUVhkUFVWbExTM2RaUWtKQlIwUjJla0ZDUVZGUmNtRklVakJqU0UwMlRIazVNR0l5ZEd4aWFUVm9DbGt6VW5CaU1qVjZURzFrY0dSSGFERlpibFo2V2xoS2FtSXlOVEJhVnpVd1RHMU9kbUpVUVZOQ1oyOXlRbWRGUlVGWlR5OU5RVVZEUWtGU2QyUllUbThLVFVSWlIwTnBjMGRCVVZGQ1p6YzRkMEZSVFVWTFIwNW9UV3BaZWsxVVRUTk9SRmwzVFcxU2FFNUVWbXRaVjFVelRsZEpNMXBxV1RWTlJHUnRXbXBSTXdwTmFteHJUVWRKZVZwcVkzZEdVVmxMUzNkWlFrSkJSMFIyZWtGQ1FrRlJTR050Vm5OYVYwWjZXbFJCWVVKbmIzSkNaMFZGUVZsUEwwMUJSVVpDUVhoMUNsb3lhSEJpYldkMldWZHNlbHBYV1hkSVoxbExTM2RaUWtKQlIwUjJla0ZDUW1kUlVXTnRWbTFqZVRrd1dWZGtla3d6V1hsTWFrRjFUVVJCTjBKbmIzSUtRbWRGUlVGWlR5OU5RVVZKUWtNd1RVc3lhREJrU0VKNlQyazRkbVJIT1hKYVZ6UjFXVmRPTUdGWE9YVmplVFZ1WVZoU2IyUlhTakZqTWxaNVdUSTVkUXBrUjFaMVpFTTFhbUl5TUhkWVoxbExTM2RaUWtKQlIwUjJla0ZDUTFGU1VVUkZOVzlrU0ZKM1kzcHZka3d5WkhCa1IyZ3hXV2sxYW1JeU1IWmliV1J2Q21GWE5XOU1Na1p3WXpKV2JVeDVOVzVoV0ZKdlpGZEpkbVF5T1hsaE1scHpZak5rZWt3elNteGlSMVpvWXpKVmRXVlhNWE5SU0Vwc1dtNU5kbVJIUm00S1kzazVNazFwTkhkTWFrRjNUMEZaUzB0M1dVSkNRVWRFZG5wQlFrTm5VWEZFUTJocVdWUkpNazE2UlhwT2VsRXlUVVJLYTFsVVVURmFSMFpzVG5wV2FRcE9NbGt5VDFSQk0xcHRXVEJPZWtrMVdrUkNhVTF0V1ROTlFqQkhRMmx6UjBGUlVVSm5OemgzUVZGelJVUjNkMDVhTW13d1lVaFdhVXhYYUhaak0xSnNDbHBFUVhaQ1oyOXlRbWRGUlVGWlR5OU5RVVZOUWtORlRVZ3lhREJrU0VKNlQyazRkbG95YkRCaFNGWnBURzFPZG1KVE9YVmFNbWh3WW0xbmRsbFhiSG9LV2xkWmQwOUJXVXRMZDFsQ1FrRkhSSFo2UVVKRVVWRnhSRU5vYWxsVVNUSk5la1Y2VG5wUk1rMUVTbXRaVkZFeFdrZEdiRTU2Vm1sT01sa3lUMVJCTXdwYWJWa3dUbnBKTlZwRVFtbE5iVmt6VFVOQlIwTnBjMGRCVVZGQ1p6YzRkMEZSTkVWRlozZFJZMjFXYldONU9UQlpWMlI2VEROWmVVeHFRWFZOUkVGaENrSm5iM0pDWjBWRlFWbFBMMDFCUlZCQ1FYZE5RMnBGZWs1VVp6Uk5hbFY2VGxSamQwdFJXVXRMZDFsQ1FrRkhSSFo2UVVKRlFWRmlSRUpzYjJSSVVuY0tZM3B2ZGt3eVpIQmtSMmd4V1drMWFtSXlNSFppYldSdllWYzFiMDFDWjBkRGFYTkhRVkZSUW1jM09IZEJVa1ZGUTJkM1NVMTZZelZPUkZVMVRsUlpkd3BZWjFsTFMzZFpRa0pCUjBSMmVrRkNSV2RTVVVSRk5XOWtTRkozWTNwdmRrd3laSEJrUjJneFdXazFhbUl5TUhaaWJXUnZZVmMxYjB3eVJuQmpNbFp0Q2t4NU5XNWhXRkp2WkZkSmRtUXlPWGxoTWxwellqTmtla3d6U214aVIxWm9ZekpWZFdWWE1YTlJTRXBzV201TmRtUkhSbTVqZVRreVRXazBkMHhxUVhjS1QwRlpTMHQzV1VKQ1FVZEVkbnBCUWtWM1VYRkVRMmhxV1ZSSk1rMTZSWHBPZWxFeVRVUkthMWxVVVRGYVIwWnNUbnBXYVU0eVdUSlBWRUV6V20xWk1BcE9la2sxV2tSQ2FVMXRXVE5OUWxGSFEybHpSMEZSVVVKbk56aDNRVkpSUlVKbmQwVmpTRlo2WVVSQ1ZFSm5iM0pDWjBWRlFWbFBMMDFCUlZaQ1JWVk5DbEV5YURCa1NFSjZUMms0ZGxveWJEQmhTRlpwVEcxT2RtSlRPWFZhTW1od1ltMW5kbGxYYkhwYVYxbDJXVmRPTUdGWE9YVmplVGw1WkZjMWVreDZUVE1LVFhwbmVrOVVaekZOUkVWNFRESkdNR1JIVm5SalNGSjZUSHBGZDBabldVdExkMWxDUWtGSFJIWjZRVUpHWjFGSlJFRmFkMlJYU25OaFYwMTNSa0ZaU3dwTGQxbENRa0ZIUkhaNlFVSkdkMUZIUkVGU2QyVllRbkJOUlZsSFEybHpSMEZSVVVKbk56aDNRVkpuUlU5QmR6SmpiVlozWW5wd2RWb3lhSEJpYldoQkNrMTZZelZPUkZVMVRsUlpkbGxYYkhwYVYxcEJUVlJOTVU5RVozbE9WRTB4VG5wd2JHSnVXbkJqYlRsMVlsZFdkV1JFY0hkbFdFSndUVWxIUzBKbmIzSUtRbWRGUlVGa1dqVkJaMUZEUWtoM1JXVm5RalJCU0ZsQk0xUXdkMkZ6WWtoRlZFcHFSMUkwWTIxWFl6TkJjVXBMV0hKcVpWQkxNeTlvTkhCNVowTTRjQW8zYnpSQlFVRkhhRVJ1YTFVMlFVRkJRa0ZOUVZKNlFrWkJhVVZCYlVKeFVtNHZjMWxqTjFsb1EwSTFRV0l2Y2twTVNYRnBUM2RWVDBKU1RVUkNNSEpGQ2tkemJsaHZUbWREU1VJeVVXY3ZUV3hYWjFkTGNYbE9SMGxKTmxveU5VWkNUMHRCU25WeFZ6QndhREJNTmlzM1RUSTBjbE5OUVc5SFEwTnhSMU5OTkRrS1FrRk5SRUV5WjBGTlIxVkRUVkZFU2pBMk5EUnBaWFZIWkc5MWJtUkxSSEpuYkRsQ1FYVXZURmt2Tm14NVltRjNRVmQyY1ZGTlRFVk1OSFpoTjBoWGRnb3JWM05LZWxNM2EwWkVSV3gyVjJORFRVRXdPRUY2YWs5eE1YRXZjM1JWV0daT04wTktWRlZOVmpBNU4xaDNTM2R6VmtGck1VcEtkREJvVFVWRVVIVmtDbkJMYXpGWmFHTlNSVko0V0RsTWRXWk5VVDA5Q2kwdExTMHRSVTVFSUVORlVsUkpSa2xEUVZSRkxTMHRMUzBLIn1dfX0=', 'integratedTime': 1791244180, 'logID': 'c0d23d6ad406973f9559f3ba2d1ca01f84147d8ffc5b8445c224f98b9591801d', 'logIndex': 3097588356, 'verification': {'inclusionProof': {'checkpoint': 'rekor.sigstore.dev - 1193050959916656506\n2975684445\n4IzFYPEolGUbMZPde9Lyu7C7JCL8u33rE09onuDONcQ=\n\n— rekor.sigstore.dev wNI9ajBFAiEA/7CNOVfYa20A+IEXCgRxGCvgHjltnaQxv5Q+TzNHo0ACIDP12gRtAFYIUmj75HLjhCEDc25E1P32ufvocvKGtiiF\n', 'hashes': ['59ef7cefac21251d27a80ec556e4fd76b953ae7dffbdd01b786a4cf4644b4fe9', '0cb034b26d16d90e03c162b2e7a0172646c3449c29409352d497cee6a38a5041', 'a5d76daa8e256a2fc1544d3555c1471aea9c604e5b89dfe2f1171346fc7e7ea7', '8ac154512d19a534d74cb578fae9f1859e418a1a9f47aeb6cb4c64fc53aeb620', '2b4d70a6ea9c8a0425a12f71726b342355c3996f1f16d02af9cb68dc4870eda8', '5d91d530a9f41c10a4da13dccc478237c1ef4e4e806c8598205464b100872cae', '16ca578a4d3e5bda61fb3cdd254a850a5ea25bf7e421d8e79169ddee1f466db3', '90c7c757c03b4f48e33ab340e45ae91930f26b7cc2ec70d3e8f82f4ab13a6f0b', '2c1f21474dc50024f89dde88f04dfdc88030eea51bf7830b402c76600da7082b', 'eb1b33eb19208a4b19ff18d07563b5ff3bc9cdd9d2b8b32799f732ddd1df1042', 'e979d238b49d81a484cb450100bbf5d27422d6229755ad50308924fdc45e7ff6', '09bc833f70ee0671cee3d46070feab8d893f3122b3d608d42915233d8ef5c0d8', '3b3c1115161c2669a08b033bc1942f2a3ca647972f45c955a35c22102fe04505', 'f3a77350fc6ff1b6d775f48d1b5d8441bfd39d3fcd2f540ecff81f0ed0bfb23f', '8329c4db882495bb1e3c364f04e231c3584b4999e53476c2511273f7532458eb', 'eed136bf681311e44b7e541c20a0c60763c9c3dc568f18e2790540e882c30e84', '363ece51d46821c07dd20939dd95a49ffc151920251e3835bc397caf92067ab9', 'f7b74cecb87e2ef72a6f0fa01c398183a68fcad5b2d7fcbd4dc7a56b7b74a34e', 'a9e60d322795c1c73c8b1ca1795565c568e2ff4727668d9b77ffae9aebb94c63', '36539c96576628f035b4c288b24a87030b900d81e9df5630a4af8e38cacc71c7', 'ab1cc76a7033cf9ed20dd9897b407b6c92bbd8d4c805bc043060412af0ce44ec', 'c47fc30ac78b1ebf5e2a8613f2ab0e4592bbcd5744198587b95b6c56b0fde706'], 'logIndex': 2975684094, 'rootHash': 'e08cc560f12894651b3193dd7bd2f2bbb0bb2422fcbb7deb134f689ee0ce35c4', 'treeSize': 2975684445}, 'signedEntryTimestamp': 'MEUCIBTokoFzSgUkQA9pXsU6yS6tmI49DcurLC670rzjZq9gAiEAid51YSkfrnsFb/fJMGPRYyyddCOiZ/HpaJ/sdrhmZ7c='}}}
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:41.5087229Z Transparency log entry created with index: 3097588356
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:41.5088833Z DSSE PAE: b'DSSEv1 28 application/vnd.in-toto+json 263 {"_type":"https://in-toto.io/Statement/v1","subject":[{"name":"aisef-2.0.0-py3-none-any.whl","digest":{"sha256":"5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b"}}],"predicateType":"https://docs.pypi.org/attestations/publish/v1","predicate":null}'
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:41.5218705Z proposed: {"apiVersion": "0.0.1", "kind": "dsse", "spec": {"proposedContent": {"envelope": "{\"payload\":\"eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEiLCJzdWJqZWN0IjpbeyJuYW1lIjoiYWlzZWYtMi4wLjAtcHkzLW5vbmUtYW55LndobCIsImRpZ2VzdCI6eyJzaGEyNTYiOiI1ZTg0MGY3Yjk2MGNiMjBlMGFkNjNiOTVlMjhjMDlmY2FmZWU2OTZiZjgzZTk3NzFjY2NkMDM0NzZmMGViNDBiIn19XSwicHJlZGljYXRlVHlwZSI6Imh0dHBzOi8vZG9jcy5weXBpLm9yZy9hdHRlc3RhdGlvbnMvcHVibGlzaC92MSIsInByZWRpY2F0ZSI6bnVsbH0=\",\"payloadType\":\"application/vnd.in-toto+json\",\"signatures\":[{\"sig\":\"MEQCICoZ5BoR/itZ5mRB44F+md/+oi47L2XHgK6Gj5VSV20EAiBjpq0ud9gPvRrWVij6SwcRHO7Y4fTMAR/dJh8vpEm2Qg==\"}]}", "verifiers": ["LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUd5VENDQmsrZ0F3SUJBZ0lVQ3h1U3ZobU5ITE50ZGExcWZVLzdpRkFoUnFFd0NnWUlLb1pJemowRUF3TXcKTnpFVk1CTUdBMVVFQ2hNTWMybG5jM1J2Y21VdVpHVjJNUjR3SEFZRFZRUURFeFZ6YVdkemRHOXlaUzFwYm5SbApjbTFsWkdsaGRHVXdIaGNOTWpZeE1EQTFNak0wT1RNNFdoY05Nall4TURBMU1qTTFPVE00V2pBQU1Ga3dFd1lICktvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUVSeWtaNE43d1FtQWNCMWRWdk55ZlAxNXJzcGZjbGlCOTYrYnQKblRRTG1lYWJhMTZxcFJaVEtwRWx2YjdGazVSSTV3TVM0US9FV21KL1pBN3gxS3FvS3FPQ0JXNHdnZ1ZxTUE0RwpBMVVkRHdFQi93UUVBd0lIZ0RBVEJnTlZIU1VFRERBS0JnZ3JCZ0VGQlFjREF6QWZCZ05WSFNNRUdEQVdnQlRmCjArblBWaVFSbHZtbzJPa29WYUxHTGhoa1B6QmNCZ05WSFJFQkFmOEVVakJRaGs1b2RIUndjem92TDJkcGRHaDEKWWk1amIyMHZibWRvYVc1b0wyRnBjMlZtTHk1bmFYUm9kV0l2ZDI5eWEyWnNiM2R6TDNKbGJHVmhjMlV1ZVcxcwpRSEpsWm5NdmRHRm5jeTkyTWk0d0xqQXdPUVlLS3dZQkJBR0R2ekFCQVFRcmFIUjBjSE02THk5MGIydGxiaTVoClkzUnBiMjV6TG1kcGRHaDFZblZ6WlhKamIyNTBaVzUwTG1OdmJUQVNCZ29yQmdFRUFZTy9NQUVDQkFSd2RYTm8KTURZR0Npc0dBUVFCZzc4d0FRTUVLR05oTWpZek1UTTNORFl3TW1SaE5EVmtZV1UzTldJM1pqWTVNRGRtWmpRMwpNamxrTUdJeVpqY3dGUVlLS3dZQkJBR0R2ekFCQkFRSGNtVnNaV0Z6WlRBYUJnb3JCZ0VFQVlPL01BRUZCQXh1CloyaHBibWd2WVdselpXWXdIZ1lLS3dZQkJBR0R2ekFCQmdRUWNtVm1jeTkwWVdkekwzWXlMakF1TURBN0Jnb3IKQmdFRUFZTy9NQUVJQkMwTUsyaDBkSEJ6T2k4dmRHOXJaVzR1WVdOMGFXOXVjeTVuYVhSb2RXSjFjMlZ5WTI5dQpkR1Z1ZEM1amIyMHdYZ1lLS3dZQkJBR0R2ekFCQ1FSUURFNW9kSFJ3Y3pvdkwyZHBkR2gxWWk1amIyMHZibWRvCmFXNW9MMkZwYzJWbUx5NW5hWFJvZFdJdmQyOXlhMlpzYjNkekwzSmxiR1ZoYzJVdWVXMXNRSEpsWm5NdmRHRm4KY3k5Mk1pNHdMakF3T0FZS0t3WUJCQUdEdnpBQkNnUXFEQ2hqWVRJMk16RXpOelEyTURKa1lUUTFaR0ZsTnpWaQpOMlkyT1RBM1ptWTBOekk1WkRCaU1tWTNNQjBHQ2lzR0FRUUJnNzh3QVFzRUR3d05aMmwwYUhWaUxXaHZjM1JsClpEQXZCZ29yQmdFRUFZTy9NQUVNQkNFTUgyaDBkSEJ6T2k4dloybDBhSFZpTG1OdmJTOXVaMmhwYm1ndllXbHoKWldZd09BWUtLd1lCQkFHRHZ6QUJEUVFxRENoallUSTJNekV6TnpRMk1ESmtZVFExWkdGbE56VmlOMlkyT1RBMwpabVkwTnpJNVpEQmlNbVkzTUNBR0Npc0dBUVFCZzc4d0FRNEVFZ3dRY21WbWN5OTBZV2R6TDNZeUxqQXVNREFhCkJnb3JCZ0VFQVlPL01BRVBCQXdNQ2pFek5UZzRNalV6TlRjd0tRWUtLd1lCQkFHRHZ6QUJFQVFiREJsb2RIUncKY3pvdkwyZHBkR2gxWWk1amIyMHZibWRvYVc1b01CZ0dDaXNHQVFRQmc3OHdBUkVFQ2d3SU16YzVORFU1TlRZdwpYZ1lLS3dZQkJBR0R2ekFCRWdSUURFNW9kSFJ3Y3pvdkwyZHBkR2gxWWk1amIyMHZibWRvYVc1b0wyRnBjMlZtCkx5NW5hWFJvZFdJdmQyOXlhMlpzYjNkekwzSmxiR1ZoYzJVdWVXMXNRSEpsWm5NdmRHRm5jeTkyTWk0d0xqQXcKT0FZS0t3WUJCQUdEdnpBQkV3UXFEQ2hqWVRJMk16RXpOelEyTURKa1lUUTFaR0ZsTnpWaU4yWTJPVEEzWm1ZMApOekk1WkRCaU1tWTNNQlFHQ2lzR0FRUUJnNzh3QVJRRUJnd0VjSFZ6YURCVEJnb3JCZ0VFQVlPL01BRVZCRVVNClEyaDBkSEJ6T2k4dloybDBhSFZpTG1OdmJTOXVaMmhwYm1ndllXbHpaV1l2WVdOMGFXOXVjeTl5ZFc1ekx6TTMKTXpnek9UZzFNREV4TDJGMGRHVnRjSFJ6THpFd0ZnWUtLd1lCQkFHRHZ6QUJGZ1FJREFad2RXSnNhV013RkFZSwpLd1lCQkFHRHZ6QUJGd1FHREFSd2VYQnBNRVlHQ2lzR0FRUUJnNzh3QVJnRU9BdzJjbVZ3YnpwdVoyaHBibWhBCk16YzVORFU1TlRZdllXbHpaV1pBTVRNMU9EZ3lOVE0xTnpwbGJuWnBjbTl1YldWdWREcHdlWEJwTUlHS0Jnb3IKQmdFRUFkWjVBZ1FDQkh3RWVnQjRBSFlBM1Qwd2FzYkhFVEpqR1I0Y21XYzNBcUpLWHJqZVBLMy9oNHB5Z0M4cAo3bzRBQUFHaERua1U2QUFBQkFNQVJ6QkZBaUVBbUJxUm4vc1ljN1loQ0I1QWIvckpMSXFpT3dVT0JSTURCMHJFCkdzblhvTmdDSUIyUWcvTWxXZ1dLcXlOR0lJNloyNUZCT0tBSnVxVzBwaDBMNis3TTI0clNNQW9HQ0NxR1NNNDkKQkFNREEyZ0FNR1VDTVFESjA2NDRpZXVHZG91bmRLRHJnbDlCQXUvTFkvNmx5YmF3QVd2cVFNTEVMNHZhN0hXdgorV3NKelM3a0ZERWx2V2NDTUEwOEF6ak9xMXEvc3RVWGZON0NKVFVNVjA5N1h3S3dzVkFrMUpKdDBoTUVEUHVkCnBLazFZaGNSRVJ4WDlMdWZNUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"]}, "signatures": null, "envelopeHash": null, "payloadHash": null}}
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.2535825Z integrated: {'108e9186e8c5677ae32188220675918e9a5df685a796900d6c590c8124004a8ad3beb6ba43f8fc66': {'body': 'eyJhcGlWZXJzaW9uIjoiMC4wLjEiLCJraW5kIjoiZHNzZSIsInNwZWMiOnsiZW52ZWxvcGVIYXNoIjp7ImFsZ29yaXRobSI6InNoYTI1NiIsInZhbHVlIjoiNTNmODZmNTI2MDFhNDNkNWJiMmUyZDY1YTU1MjJiY2RhZDQzYWFhZDI4YTY0MjQ2Yzg1ZmViMzZmMjFiZWE2ZSJ9LCJwYXlsb2FkSGFzaCI6eyJhbGdvcml0aG0iOiJzaGEyNTYiLCJ2YWx1ZSI6IjcxNzdhNjRhZjI5MGI5MGUzMWVlMmZmZWMzNGVkN2NlNmExN2E3ODMzNjNmN2RiY2EwNmM4N2U2N2E0OGUwNmMifSwic2lnbmF0dXJlcyI6W3sic2lnbmF0dXJlIjoiTUVRQ0lDb1o1Qm9SL2l0WjVtUkI0NEYrbWQvK29pNDdMMlhIZ0s2R2o1VlNWMjBFQWlCanBxMHVkOWdQdlJyV1ZpajZTd2NSSE83WTRmVE1BUi9kSmg4dnBFbTJRZz09IiwidmVyaWZpZXIiOiJMUzB0TFMxQ1JVZEpUaUJEUlZKVVNVWkpRMEZVUlMwdExTMHRDazFKU1VkNVZFTkRRbXNyWjBGM1NVSkJaMGxWUTNoMVUzWm9iVTVJVEU1MFpHRXhjV1pWTHpkcFJrRm9VbkZGZDBObldVbExiMXBKZW1vd1JVRjNUWGNLVG5wRlZrMUNUVWRCTVZWRlEyaE5UV015Ykc1ak0xSjJZMjFWZFZwSFZqSk5ValIzU0VGWlJGWlJVVVJGZUZaNllWZGtlbVJIT1hsYVV6RndZbTVTYkFwamJURnNXa2RzYUdSSFZYZElhR05PVFdwWmVFMUVRVEZOYWswd1QxUk5ORmRvWTA1TmFsbDRUVVJCTVUxcVRURlBWRTAwVjJwQlFVMUdhM2RGZDFsSUNrdHZXa2w2YWpCRFFWRlpTVXR2V2tsNmFqQkVRVkZqUkZGblFVVlNlV3RhTkU0M2QxRnRRV05DTVdSV2RrNTVabEF4TlhKemNHWmpiR2xDT1RZclluUUtibFJSVEcxbFlXSmhNVFp4Y0ZKYVZFdHdSV3gyWWpkR2F6VlNTVFYzVFZNMFVTOUZWMjFLTDFwQk4zZ3hTM0Z2UzNGUFEwSlhOSGRuWjFaeFRVRTBSd3BCTVZWa1JIZEZRaTkzVVVWQmQwbElaMFJCVkVKblRsWklVMVZGUkVSQlMwSm5aM0pDWjBWR1FsRmpSRUY2UVdaQ1owNVdTRk5OUlVkRVFWZG5RbFJtQ2pBcmJsQldhVkZTYkhadGJ6SlBhMjlXWVV4SFRHaG9hMUI2UW1OQ1owNVdTRkpGUWtGbU9FVlZha0pSYUdzMWIyUklVbmRqZW05MlRESmtjR1JIYURFS1dXazFhbUl5TUhaaWJXUnZZVmMxYjB3eVJuQmpNbFp0VEhrMWJtRllVbTlrVjBsMlpESTVlV0V5V25OaU0yUjZURE5LYkdKSFZtaGpNbFYxWlZjeGN3cFJTRXBzV201TmRtUkhSbTVqZVRreVRXazBkMHhxUVhkUFVWbExTM2RaUWtKQlIwUjJla0ZDUVZGUmNtRklVakJqU0UwMlRIazVNR0l5ZEd4aWFUVm9DbGt6VW5CaU1qVjZURzFrY0dSSGFERlpibFo2V2xoS2FtSXlOVEJhVnpVd1RHMU9kbUpVUVZOQ1oyOXlRbWRGUlVGWlR5OU5RVVZEUWtGU2QyUllUbThLVFVSWlIwTnBjMGRCVVZGQ1p6YzRkMEZSVFVWTFIwNW9UV3BaZWsxVVRUTk9SRmwzVFcxU2FFNUVWbXRaVjFVelRsZEpNMXBxV1RWTlJHUnRXbXBSTXdwTmFteHJUVWRKZVZwcVkzZEdVVmxMUzNkWlFrSkJSMFIyZWtGQ1FrRlJTR050Vm5OYVYwWjZXbFJCWVVKbmIzSkNaMFZGUVZsUEwwMUJSVVpDUVhoMUNsb3lhSEJpYldkMldWZHNlbHBYV1hkSVoxbExTM2RaUWtKQlIwUjJla0ZDUW1kUlVXTnRWbTFqZVRrd1dWZGtla3d6V1hsTWFrRjFUVVJCTjBKbmIzSUtRbWRGUlVGWlR5OU5RVVZKUWtNd1RVc3lhREJrU0VKNlQyazRkbVJIT1hKYVZ6UjFXVmRPTUdGWE9YVmplVFZ1WVZoU2IyUlhTakZqTWxaNVdUSTVkUXBrUjFaMVpFTTFhbUl5TUhkWVoxbExTM2RaUWtKQlIwUjJla0ZDUTFGU1VVUkZOVzlrU0ZKM1kzcHZka3d5WkhCa1IyZ3hXV2sxYW1JeU1IWmliV1J2Q21GWE5XOU1Na1p3WXpKV2JVeDVOVzVoV0ZKdlpGZEpkbVF5T1hsaE1scHpZak5rZWt3elNteGlSMVpvWXpKVmRXVlhNWE5SU0Vwc1dtNU5kbVJIUm00S1kzazVNazFwTkhkTWFrRjNUMEZaUzB0M1dVSkNRVWRFZG5wQlFrTm5VWEZFUTJocVdWUkpNazE2UlhwT2VsRXlUVVJLYTFsVVVURmFSMFpzVG5wV2FRcE9NbGt5VDFSQk0xcHRXVEJPZWtrMVdrUkNhVTF0V1ROTlFqQkhRMmx6UjBGUlVVSm5OemgzUVZGelJVUjNkMDVhTW13d1lVaFdhVXhYYUhaak0xSnNDbHBFUVhaQ1oyOXlRbWRGUlVGWlR5OU5RVVZOUWtORlRVZ3lhREJrU0VKNlQyazRkbG95YkRCaFNGWnBURzFPZG1KVE9YVmFNbWh3WW0xbmRsbFhiSG9LV2xkWmQwOUJXVXRMZDFsQ1FrRkhSSFo2UVVKRVVWRnhSRU5vYWxsVVNUSk5la1Y2VG5wUk1rMUVTbXRaVkZFeFdrZEdiRTU2Vm1sT01sa3lUMVJCTXdwYWJWa3dUbnBKTlZwRVFtbE5iVmt6VFVOQlIwTnBjMGRCVVZGQ1p6YzRkMEZSTkVWRlozZFJZMjFXYldONU9UQlpWMlI2VEROWmVVeHFRWFZOUkVGaENrSm5iM0pDWjBWRlFWbFBMMDFCUlZCQ1FYZE5RMnBGZWs1VVp6Uk5hbFY2VGxSamQwdFJXVXRMZDFsQ1FrRkhSSFo2UVVKRlFWRmlSRUpzYjJSSVVuY0tZM3B2ZGt3eVpIQmtSMmd4V1drMWFtSXlNSFppYldSdllWYzFiMDFDWjBkRGFYTkhRVkZSUW1jM09IZEJVa1ZGUTJkM1NVMTZZelZPUkZVMVRsUlpkd3BZWjFsTFMzZFpRa0pCUjBSMmVrRkNSV2RTVVVSRk5XOWtTRkozWTNwdmRrd3laSEJrUjJneFdXazFhbUl5TUhaaWJXUnZZVmMxYjB3eVJuQmpNbFp0Q2t4NU5XNWhXRkp2WkZkSmRtUXlPWGxoTWxwellqTmtla3d6U214aVIxWm9ZekpWZFdWWE1YTlJTRXBzV201TmRtUkhSbTVqZVRreVRXazBkMHhxUVhjS1QwRlpTMHQzV1VKQ1FVZEVkbnBCUWtWM1VYRkVRMmhxV1ZSSk1rMTZSWHBPZWxFeVRVUkthMWxVVVRGYVIwWnNUbnBXYVU0eVdUSlBWRUV6V20xWk1BcE9la2sxV2tSQ2FVMXRXVE5OUWxGSFEybHpSMEZSVVVKbk56aDNRVkpSUlVKbmQwVmpTRlo2WVVSQ1ZFSm5iM0pDWjBWRlFWbFBMMDFCUlZaQ1JWVk5DbEV5YURCa1NFSjZUMms0ZGxveWJEQmhTRlpwVEcxT2RtSlRPWFZhTW1od1ltMW5kbGxYYkhwYVYxbDJXVmRPTUdGWE9YVmplVGw1WkZjMWVreDZUVE1LVFhwbmVrOVVaekZOUkVWNFRESkdNR1JIVm5SalNGSjZUSHBGZDBabldVdExkMWxDUWtGSFJIWjZRVUpHWjFGSlJFRmFkMlJYU25OaFYwMTNSa0ZaU3dwTGQxbENRa0ZIUkhaNlFVSkdkMUZIUkVGU2QyVllRbkJOUlZsSFEybHpSMEZSVVVKbk56aDNRVkpuUlU5QmR6SmpiVlozWW5wd2RWb3lhSEJpYldoQkNrMTZZelZPUkZVMVRsUlpkbGxYYkhwYVYxcEJUVlJOTVU5RVozbE9WRTB4VG5wd2JHSnVXbkJqYlRsMVlsZFdkV1JFY0hkbFdFSndUVWxIUzBKbmIzSUtRbWRGUlVGa1dqVkJaMUZEUWtoM1JXVm5RalJCU0ZsQk0xUXdkMkZ6WWtoRlZFcHFSMUkwWTIxWFl6TkJjVXBMV0hKcVpWQkxNeTlvTkhCNVowTTRjQW8zYnpSQlFVRkhhRVJ1YTFVMlFVRkJRa0ZOUVZKNlFrWkJhVVZCYlVKeFVtNHZjMWxqTjFsb1EwSTFRV0l2Y2twTVNYRnBUM2RWVDBKU1RVUkNNSEpGQ2tkemJsaHZUbWREU1VJeVVXY3ZUV3hYWjFkTGNYbE9SMGxKTmxveU5VWkNUMHRCU25WeFZ6QndhREJNTmlzM1RUSTBjbE5OUVc5SFEwTnhSMU5OTkRrS1FrRk5SRUV5WjBGTlIxVkRUVkZFU2pBMk5EUnBaWFZIWkc5MWJtUkxSSEpuYkRsQ1FYVXZURmt2Tm14NVltRjNRVmQyY1ZGTlRFVk1OSFpoTjBoWGRnb3JWM05LZWxNM2EwWkVSV3gyVjJORFRVRXdPRUY2YWs5eE1YRXZjM1JWV0daT04wTktWRlZOVmpBNU4xaDNTM2R6VmtGck1VcEtkREJvVFVWRVVIVmtDbkJMYXpGWmFHTlNSVko0V0RsTWRXWk5VVDA5Q2kwdExTMHRSVTVFSUVORlVsUkpSa2xEUVZSRkxTMHRMUzBLIn1dfX0=', 'integratedTime': 1791244181, 'logID': 'c0d23d6ad406973f9559f3ba2d1ca01f84147d8ffc5b8445c224f98b9591801d', 'logIndex': 3097588822, 'verification': {'inclusionProof': {'checkpoint': 'rekor.sigstore.dev - 1193050959916656506\n2975684643\nmHJwdeyrrs+N59cSHpUYqBt2ZFMj9PAsJuomn0JBnpY=\n\n— rekor.sigstore.dev wNI9ajBFAiEA0JayqHoH0nInSb3P1cbzkLLQmcMep6Jsf5P4PyX9awgCIAedUqsiX8siMpv1xqT4HAIkdXqi0TnW49Y1Lkv7OnlP\n', 'hashes': ['0612378d1278f28b0bb5ba76f3a0bb62fb03c2ed736b31baad6adee1cfa6a2dc', 'f1da3a1d644efead272ab1752e04f0e4cbcc2741ba2b0031a778894909784701', 'b59d9333b0874d42f79397fbbdfe4e74829035425209cf08c67c3e15713268bd', '2220e9603a6d53731fe395340b468b3be04fe9d4f2d90d565b7826e252af36b9', 'c90855c37a982b80d615ceef8eae3dd8f4b942981f52c63a7604a3e3acf3a98b', 'c0e41b8f48e12baebdc011b7c558da25c866bd21892572592497b7f6df5feeec', '19dbb7d0ff6b06e9c00d0b668e55a2d0fa3eb1a7a5cb25c159aad285c11571af', '0b64d175812d9a7b6be6702db788c8adfd9796cb3be41f22f9eef5b0a84cc140', '5ec564083b189b012b62d4d07a0bc377510a55097203b5dfa673f2e96197de3a', 'c5230337f43f3baf1b0a5da7a788d262b129dea49f128c607adcf24ad6dc0d89', 'e979d238b49d81a484cb450100bbf5d27422d6229755ad50308924fdc45e7ff6', 'a0805aa6858c99e81132b9cc71359f993c2aa0b1acd5b98fcda64cc3091d9fdc', '09bc833f70ee0671cee3d46070feab8d893f3122b3d608d42915233d8ef5c0d8', '3b3c1115161c2669a08b033bc1942f2a3ca647972f45c955a35c22102fe04505', 'f3a77350fc6ff1b6d775f48d1b5d8441bfd39d3fcd2f540ecff81f0ed0bfb23f', '8329c4db882495bb1e3c364f04e231c3584b4999e53476c2511273f7532458eb', 'eed136bf681311e44b7e541c20a0c60763c9c3dc568f18e2790540e882c30e84', '363ece51d46821c07dd20939dd95a49ffc151920251e3835bc397caf92067ab9', 'f7b74cecb87e2ef72a6f0fa01c398183a68fcad5b2d7fcbd4dc7a56b7b74a34e', 'a9e60d322795c1c73c8b1ca1795565c568e2ff4727668d9b77ffae9aebb94c63', '36539c96576628f035b4c288b24a87030b900d81e9df5630a4af8e38cacc71c7', 'ab1cc76a7033cf9ed20dd9897b407b6c92bbd8d4c805bc043060412af0ce44ec', 'c47fc30ac78b1ebf5e2a8613f2ab0e4592bbcd5744198587b95b6c56b0fde706'], 'logIndex': 2975684560, 'rootHash': '98727075ecabaecf8de7d7121e9518a81b76645323f4f02c26ea269f42419e96', 'treeSize': 2975684643}, 'signedEntryTimestamp': 'MEUCIQDTttR0KT1olbW5THjhIRqLldsa/W3WGRIndOt5pQTNawIgGUvDWc6dZ8jF+nz/K2o8/JVmpyj4b9XPsEAfpFxUTX4='}}}
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.2730982Z Transparency log entry created with index: 3097588822
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3784492Z Showing hash values of files to be uploaded:
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3786792Z /github/workspace/dist/aisef-2.0.0-py3-none-any.whl
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3787341Z 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3825042Z SHA256: 5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3825863Z MD5: 4cb7f8614c83214fb7c2b6596861bc4a
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3827069Z BLAKE2-256: 441df1cad8fc19e64e2f6eb0c9da9e46d6d4a9bf1a327c1545a4cd601a1cd478
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3827515Z 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3827661Z /github/workspace/dist/aisef-2.0.0.tar.gz
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3827920Z 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3861011Z SHA256: a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3861845Z MD5: 805139260a569eb3e41bdd68d8bdbe0b
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3863586Z BLAKE2-256: 1467a29946884b1c2757c10fd607b5e3928451e195e42223fc7f13b2bbe17f63
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3864841Z 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3865201Z /github/workspace/dist/aisef-2.0.0-py3-none-any.whl.publish.attestation
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3866000Z 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3866394Z SHA256: 39079ffd4206aee0c0b7221af7847e6f294da4cc5f39461ce190a6db1b459225
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3867398Z MD5: 8568a998ab49bc5cc5596522d87b0c82
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3868105Z BLAKE2-256: c999b1f69cba1ae6e7d76c17d2f0893e3ddd4a0dbb646346fc20be308cb9ef3d
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3868675Z 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3868970Z /github/workspace/dist/aisef-2.0.0.tar.gz.publish.attestation
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3869435Z 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3869783Z SHA256: a69c5a0e8904c4f34c2a09653e7f5a359340750c6c13c24dc6536906ca2040a6
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3870458Z MD5: b14fe076daf94d5b8f879ce890a5a5e3
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3878503Z BLAKE2-256: 0b9bb8fdb696403e95dd86951f575c32b66bab8f1e876d79983d9e325c0eeca2
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:42.3878977Z 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:43.0269448Z Uploading distributions to https://upload.pypi.org/legacy/
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:43.0341967Z ^[[34mINFO    ^[[0m dist/aisef-2.0.0-py3-none-any.whl (934.7 KB)                           
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:43.0600621Z ^[[34mINFO    ^[[0m dist/aisef-2.0.0.tar.gz (806.9 KB)                                     
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:43.0605613Z ^[[34mINFO    ^[[0m username set by command options                                        
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:43.0611667Z ^[[34mINFO    ^[[0m password set by command options                                        
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:43.0621214Z ^[[34mINFO    ^[[0m username: __token__                                                    
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:43.0626564Z ^[[34mINFO    ^[[0m password: <hidden>                                                     
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:43.0628093Z Uploading aisef-2.0.0-py3-none-any.whl
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7230191Z ^[[34mINFO    ^[[0m Response from https://upload.pypi.org/legacy/:                         
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7230967Z          200 OK                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7239066Z ^[[34mINFO    ^[[0m <html>                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7239753Z           <head>                                                                
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7240395Z            <title>200 OK</title>                                                
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7240978Z           </head>                                                               
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7241506Z           <body>                                                                
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7242061Z            <h1>200 OK</h1>                                                      
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7242588Z            <br/><br/>                                                           
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7243098Z                                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7243590Z                                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7244090Z                                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7244615Z           </body>                                                               
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7245150Z          </html>                                                                
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:44.7248412Z Uploading aisef-2.0.0.tar.gz
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0234954Z ^[[34mINFO    ^[[0m Response from https://upload.pypi.org/legacy/:                         
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0235722Z          200 OK                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0242205Z ^[[34mINFO    ^[[0m <html>                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0242976Z           <head>                                                                
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0243463Z            <title>200 OK</title>                                                
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0243917Z           </head>                                                               
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0244579Z           <body>                                                                
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0245278Z            <h1>200 OK</h1>                                                      
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0245968Z            <br/><br/>                                                           
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0246793Z                                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0247436Z                                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0248133Z                                                                                 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0248739Z           </body>                                                               
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0249161Z          </html>                                                                
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0249441Z 
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0249618Z ^[[32mView at:^[[0m
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.0250098Z https://pypi.org/project/aisef/2.0.0/
+publish	Run pypa/gh-action-pypi-publish@release/v1	2026-10-05T23:49:46.1485195Z ##[end-action id=__pypa_gh-action-pypi-publish.__self;outcome=success;conclusion=success;duration_ms=15761]
+publish	Post Run pypa/gh-action-pypi-publish@release/v1	﻿2026-10-05T23:49:46.1656748Z Post job cleanup.
+publish	Post Run actions/checkout@v4	﻿2026-10-05T23:49:46.1722838Z Post job cleanup.
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.2553946Z [command]/usr/bin/git version
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.2599098Z git version 2.55.0
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.2642524Z Temporarily overriding HOME='/home/runner/work/_temp/0f25a2f7-ab4e-448c-8cc2-9f27b06d5e7e' before making global git config changes
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.2643872Z Adding repository directory to the temporary git global config as a safe directory
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.2649243Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/aisef/aisef/repo
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.2688295Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.2724930Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.2997654Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.3031653Z http.https://github.com/.extraheader
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.3048364Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.3087641Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.3362531Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+publish	Post Run actions/checkout@v4	2026-10-05T23:49:46.3409512Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+publish	Complete job	﻿2026-10-05T23:49:46.3872913Z Cleaning up orphan processes
+publish	Complete job	2026-10-05T23:49:46.4223557Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

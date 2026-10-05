@@ -1,0 +1,585 @@
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	﻿2026-10-05T22:40:55.7626348Z Current runner version: '2.337.0'
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7653248Z ##[group]Runner Image Provisioner
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7654544Z Hosted Compute Agent
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7655146Z Version: 20260901.588
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7655727Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7656463Z Build Date: 2026-09-01T19:56:44Z
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7657121Z Worker ID: {93e747ae-5a97-42ad-844c-15f55c58f67e}
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7657778Z Azure Region: westus
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7658330Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7659815Z ##[group]Operating System
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7660434Z Microsoft Windows Server 2025
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7661020Z 10.0.26100
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7661503Z Datacenter
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7661990Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7662488Z ##[group]Runner Image
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7663062Z Image: windows-2025-vs2026
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7663623Z Version: 20260925.250.1
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7665018Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260925.250/images/windows/Windows2025-VS2026-Readme.md
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7666631Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260925.250
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7667568Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7668641Z ##[group]GITHUB_TOKEN Permissions
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7670597Z Contents: read
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7671190Z Metadata: read
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7671716Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7674378Z Secret source: Actions
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7675320Z Cache mode: write
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.7676061Z Prepare workflow directory
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.8085625Z Prepare all required actions
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:55.8159852Z Getting action download info
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.1615704Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.2985338Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.6345408Z Uses: nghinh/aisef/.github/workflows/tests.yml@refs/tags/v2.0.0 (ca2631374602da45dae75b7f6907ff4729d0b2f7)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.6350733Z Complete job name: tests / unit (windows-latest, 3.11)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7814194Z ##[group]Run actions/checkout@v4
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7815223Z with:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7815729Z   fetch-depth: 0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7816295Z   repository: nghinh/aisef
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7820181Z   token: ***
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7820576Z   ssh-strict: true
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7820972Z   ssh-user: git
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7821385Z   persist-credentials: true
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7821823Z   clean: true
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7822233Z   sparse-checkout-cone-mode: true
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7822720Z   fetch-tags: false
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7823127Z   show-progress: true
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7823533Z   lfs: false
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7823900Z   submodules: false
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7824300Z   set-safe-directory: true
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7824759Z   allow-unsafe-pr-checkout: false
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.7825553Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.9424656Z Syncing repository: nghinh/aisef
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.9426499Z ##[group]Getting Git version info
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:56.9427174Z Working directory is 'D:\a\aisef\aisef'
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.0407218Z [command]"C:\Program Files\Git\bin\git.exe" version
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.4146878Z git version 2.55.0.windows.5
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.4202933Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.4225377Z Temporarily overriding HOME='D:\a\_temp\e785fa65-6251-49e0-a301-304de7e3f309' before making global git config changes
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.4228036Z Adding repository directory to the temporary git global config as a safe directory
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.4237397Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\aisef\aisef
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.4904066Z Deleting the contents of 'D:\a\aisef\aisef'
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.4910999Z ##[group]Initializing the repository
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.4919406Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\aisef\aisef
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.5790248Z Initialized empty Git repository in D:/a/aisef/aisef/.git/
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.5841850Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/nghinh/aisef
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.6493611Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.6495723Z ##[group]Disabling automatic garbage collection
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.6505008Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.6896157Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.6897666Z ##[group]Setting up auth
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.6909977Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:57.7236176Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:59.2002716Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:59.2332423Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:59.8028388Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:40:59.8364315Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:00.3995260Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:00.4341517Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:00.4342239Z ##[group]Fetching the repository
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:00.4361236Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3858862Z From https://github.com/nghinh/aisef
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3863168Z  * [new branch]        ci-windows              -> origin/ci-windows
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3864382Z  * [new branch]        cycle2/lane-a-file-artifact -> origin/cycle2/lane-a-file-artifact
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3865592Z  * [new branch]        cycle2/lane-b-cli-invocation -> origin/cycle2/lane-b-cli-invocation
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3867064Z  * [new branch]        cycle2/lane-c-python-callable-v2 -> origin/cycle2/lane-c-python-callable-v2
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3868385Z  * [new branch]        cycle2/lane-d-process-effect -> origin/cycle2/lane-d-process-effect
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3869244Z  * [new branch]        dogfood/ledgerlock-red  -> origin/dogfood/ledgerlock-red
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3869968Z  * [new branch]        hardening/systematic-v1 -> origin/hardening/systematic-v1
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3870395Z  * [new branch]        master                  -> origin/master
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3870834Z  * [new branch]        release/1.7.3           -> origin/release/1.7.3
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3871231Z  * [new branch]        release/1.7.4           -> origin/release/1.7.4
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3871622Z  * [new branch]        release/1.7.5           -> origin/release/1.7.5
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3872052Z  * [new branch]        release/1.7.6           -> origin/release/1.7.6
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3872484Z  * [new branch]        release/v2.0.0          -> origin/release/v2.0.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3872851Z  * [new tag]           v0.1.0                  -> v0.1.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3873143Z  * [new tag]           v0.2.0                  -> v0.2.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3873530Z  * [new tag]           v0.3.0                  -> v0.3.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3873837Z  * [new tag]           v0.3.1                  -> v0.3.1
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3874139Z  * [new tag]           v0.4.0                  -> v0.4.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3874456Z  * [new tag]           v0.4.1                  -> v0.4.1
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3875929Z  * [new tag]           v0.5.0                  -> v0.5.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3876482Z  * [new tag]           v0.5.1                  -> v0.5.1
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3877412Z  * [new tag]           v0.6.0                  -> v0.6.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3877722Z  * [new tag]           v0.7.0                  -> v0.7.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3878033Z  * [new tag]           v0.8.0                  -> v0.8.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3878332Z  * [new tag]           v1.0.0                  -> v1.0.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3878625Z  * [new tag]           v1.1.0                  -> v1.1.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3878904Z  * [new tag]           v1.1.1                  -> v1.1.1
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3879195Z  * [new tag]           v1.1.2                  -> v1.1.2
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3879481Z  * [new tag]           v1.1.3                  -> v1.1.3
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3879766Z  * [new tag]           v1.1.4                  -> v1.1.4
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3880056Z  * [new tag]           v1.1.5                  -> v1.1.5
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3880356Z  * [new tag]           v1.1.6                  -> v1.1.6
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3880655Z  * [new tag]           v1.1.7                  -> v1.1.7
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3880937Z  * [new tag]           v1.1.8                  -> v1.1.8
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3881225Z  * [new tag]           v1.1.9                  -> v1.1.9
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3881504Z  * [new tag]           v1.2.0                  -> v1.2.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3881788Z  * [new tag]           v1.2.1                  -> v1.2.1
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3882080Z  * [new tag]           v1.2.10                 -> v1.2.10
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3882372Z  * [new tag]           v1.2.11                 -> v1.2.11
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3882658Z  * [new tag]           v1.2.12                 -> v1.2.12
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3883066Z  * [new tag]           v1.2.13                 -> v1.2.13
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3883756Z  * [new tag]           v1.2.14                 -> v1.2.14
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3884053Z  * [new tag]           v1.2.15                 -> v1.2.15
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3884349Z  * [new tag]           v1.2.16                 -> v1.2.16
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3885269Z  * [new tag]           v1.2.19                 -> v1.2.19
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3885630Z  * [new tag]           v1.2.2                  -> v1.2.2
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3885940Z  * [new tag]           v1.2.20                 -> v1.2.20
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3886228Z  * [new tag]           v1.2.21                 -> v1.2.21
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3886511Z  * [new tag]           v1.2.22                 -> v1.2.22
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3886796Z  * [new tag]           v1.2.23                 -> v1.2.23
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3887082Z  * [new tag]           v1.2.24                 -> v1.2.24
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3887365Z  * [new tag]           v1.2.25                 -> v1.2.25
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3887643Z  * [new tag]           v1.2.26                 -> v1.2.26
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3887923Z  * [new tag]           v1.2.27                 -> v1.2.27
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3888232Z  * [new tag]           v1.2.28                 -> v1.2.28
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3888525Z  * [new tag]           v1.2.29                 -> v1.2.29
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3888921Z  * [new tag]           v1.2.3                  -> v1.2.3
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3889425Z  * [new tag]           v1.2.30                 -> v1.2.30
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3889965Z  * [new tag]           v1.2.31                 -> v1.2.31
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3890470Z  * [new tag]           v1.2.4                  -> v1.2.4
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3890953Z  * [new tag]           v1.2.5                  -> v1.2.5
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3891419Z  * [new tag]           v1.2.6                  -> v1.2.6
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3891891Z  * [new tag]           v1.2.7                  -> v1.2.7
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3892360Z  * [new tag]           v1.2.8                  -> v1.2.8
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3892826Z  * [new tag]           v1.2.9                  -> v1.2.9
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3893292Z  * [new tag]           v1.3.0                  -> v1.3.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3894071Z  * [new tag]           v1.3.1                  -> v1.3.1
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3894554Z  * [new tag]           v1.4.0                  -> v1.4.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3895023Z  * [new tag]           v1.5.0                  -> v1.5.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3895529Z  * [new tag]           v1.6.0                  -> v1.6.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3896017Z  * [new tag]           v1.7.0                  -> v1.7.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3896509Z  * [new tag]           v1.7.1                  -> v1.7.1
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3897046Z  * [new tag]           v1.7.2                  -> v1.7.2
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3897544Z  * [new tag]           v1.7.3                  -> v1.7.3
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3898055Z  * [new tag]           v1.7.4                  -> v1.7.4
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3898547Z  * [new tag]           v1.7.5                  -> v1.7.5
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3899041Z  * [new tag]           v1.7.6                  -> v1.7.6
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3899667Z  * [new tag]           v2.0.0                  -> v2.0.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.3927680Z [command]"C:\Program Files\Git\bin\git.exe" tag --list v2.0.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.4282763Z v2.0.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.4331239Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/tags/v2.0.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.4603871Z ca2631374602da45dae75b7f6907ff4729d0b2f7
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.4639401Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.4639822Z ##[group]Determining the checkout info
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.4640843Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.4650695Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.5081406Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.5387408Z ##[group]Checking out the ref
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:07.5397282Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force refs/tags/v2.0.0
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.5992276Z Updating files:  47% (2217/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.6138030Z Updating files:  48% (2238/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.6321523Z Updating files:  49% (2284/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.6677829Z Updating files:  50% (2331/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.6967459Z Updating files:  51% (2378/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.7076755Z Updating files:  52% (2424/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.7186814Z Updating files:  53% (2471/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.7328266Z Updating files:  54% (2517/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.7529591Z Updating files:  55% (2564/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.8555232Z Updating files:  56% (2611/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.9432964Z Updating files:  57% (2657/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:08.9650864Z Updating files:  58% (2704/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.0158406Z Updating files:  59% (2750/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.0338026Z Updating files:  60% (2797/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.0895289Z Updating files:  61% (2844/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.1321997Z Updating files:  62% (2890/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.1614004Z Updating files:  63% (2937/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.1872597Z Updating files:  64% (2984/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.2270492Z Updating files:  65% (3030/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.2985992Z Updating files:  66% (3077/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.3133203Z Updating files:  67% (3123/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.3330040Z Updating files:  68% (3170/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.3613530Z Updating files:  69% (3217/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.4170637Z Updating files:  70% (3263/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.4643143Z Updating files:  71% (3310/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.4752978Z Updating files:  72% (3356/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.4883761Z Updating files:  73% (3403/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.5012215Z Updating files:  74% (3450/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.5234088Z Updating files:  75% (3496/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.5371489Z Updating files:  76% (3543/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.5520558Z Updating files:  77% (3589/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.5699047Z Updating files:  78% (3636/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.5892620Z Updating files:  79% (3683/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.5926789Z Updating files:  80% (3729/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.6075232Z Updating files:  80% (3737/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.6242810Z Updating files:  81% (3776/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.6400293Z Updating files:  82% (3823/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.6554739Z Updating files:  83% (3869/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.6671184Z Updating files:  84% (3916/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.6790617Z Updating files:  85% (3962/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.6913299Z Updating files:  86% (4009/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.7038564Z Updating files:  87% (4056/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.7174173Z Updating files:  88% (4102/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.7331645Z Updating files:  89% (4149/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.7517825Z Updating files:  90% (4195/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.7669648Z Updating files:  91% (4242/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.7803910Z Updating files:  92% (4289/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.7890045Z Updating files:  93% (4335/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8033572Z Updating files:  94% (4382/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8171435Z Updating files:  95% (4428/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8327628Z Updating files:  96% (4475/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8482341Z Updating files:  97% (4522/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8643490Z Updating files:  98% (4568/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8789571Z Updating files:  99% (4615/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8793096Z Updating files: 100% (4661/4661)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8793519Z Updating files: 100% (4661/4661), done.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8950754Z Note: switching to 'refs/tags/v2.0.0'.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8951083Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8951367Z You are in 'detached HEAD' state. You can look around, make experimental
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8952662Z changes and commit them, and you can discard any commits you make in this
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8954157Z state without impacting any branches by switching back to a branch.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8954639Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8954927Z If you want to create a new branch to retain commits you create, you may
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8955433Z do so (now or later) by using -c with the switch command. Example:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8955717Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8955838Z   git switch -c <new-branch-name>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8956019Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8956119Z Or undo this operation with:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8956526Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8956621Z   git switch -
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8956748Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8956994Z Turn off this advice by setting config variable advice.detachedHead to false
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8957358Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.8958801Z HEAD is now at ca263137 RELEASE-DECISIONS seq 3: the owner's production-publish authorization for AISEF 2.0.0 (charter §19) — approver human:owner, decision {PRODUCTION_PUBLISH: AUTHORIZED, VERSION: 2.0.0}, on the frozen and qualified RC2 1565bcc. Decision record only.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.9143892Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.9559944Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:09.9840154Z ca2631374602da45dae75b7f6907ff4729d0b2f7
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.0398706Z ##[group]Run actions/setup-python@v5
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.0399030Z with:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.0399220Z   python-version: 3.11
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.0399460Z   check-latest: false
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.0401975Z   token: ***
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.0402165Z   update-environment: true
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.0402386Z   allow-prereleases: false
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.0402593Z   freethreaded: false
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.0402779Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.2100136Z ##[group]Installed versions
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.2306542Z (node:5736) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.2307543Z (Use `node --trace-deprecation ...` to show where the warning was created)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.2308710Z Successfully set up CPython (3.11.9)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.2309503Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.2624089Z ##[group]Run python -P validation/v2/owned_run.py -- python -m unittest discover -s tests -q
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.2624824Z ^[[36;1mpython -P validation/v2/owned_run.py -- python -m unittest discover -s tests -q^[[0m
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.3253950Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.3255539Z env:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.3255907Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.3256578Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.3257221Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.3257794Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.3258368Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:41:10.3258823Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:42:17.6211960Z   \u21bb STORY-01-01 claude l\u01b0\u1ee3t 1: infra � ch\u1ea1y l\u1ea1i (1/1)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:42:22.1477878Z   \u21bb STORY-01-01 claude l\u01b0\u1ee3t 1: infra � ch\u1ea1y l\u1ea1i (1/1)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:42:59.6049696Z   \u21bb bug-a2-multi-2 opencode l\u01b0\u1ee3t 1: infra � ch\u1ea1y l\u1ea1i (1/1)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:43:52.8610086Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=3 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:43:52.8611776Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:43:52.8612518Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:44:01.8504015Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:44:01.8504824Z ✗ post-check failed: write scope unconfigured
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:44:05.3140535Z budget: released reservation 1791240245251-0-S-killed of runnervmfi6oq:1040 (owner dead): $0.90
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:44:54.1759087Z error: read error while indexing .aisef/run.lock: Permission denied
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:47:46.3462668Z ✗ REPLAY_CONDITION_DRIFT: this run does not reproduce run-src — STOP — client: opencode → claude; model: mycombo →  (recorded at C:\Users\runneradmin\AppData\Local\Temp\tmpz2ge1kox\_bmad-output\replay\run-20261005T224746Z-7540.drift.json). Restore the conditions, or accept each field by name: --accept-drift client,model
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:48:25.3879193Z ◇ review block waived by unknown at candidate d2f1ef5 (1 item)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:48:25.3880128Z   - [block] a.txt:1 — wrong
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:48:25.3880689Z next: aisef legacy run --verify-only --story STORY-01-01
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:48:25.4554224Z ✗ config: C:\Users\runneradmin\AppData\Local\Temp\tmpqkv46hw2 is not an AISEF project (no .ai/config.json, docs/requirements.md, .aisef/ or _bmad-output/) and no --project was given — nothing is written here; pass --project
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:49:43.3993518Z ✗ REPLAY_CONDITION_DRIFT: this run does not reproduce run-src — STOP — client: opencode → claude; model: mycombo →  (recorded at C:\Users\runneradmin\AppData\Local\Temp\tmptfdvtiib\_bmad-output\replay\run-20261005T224943Z-7540.drift.json). Restore the conditions, or accept each field by name: --accept-drift client,model
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:54:34.8148899Z sổ rỗng — chưa có phiên tuyển nào
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:54:34.8173563Z đã ghi docs/BENCH-PAIR-QUALIFICATION.md
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:54:34.8198271Z TỪ CHỐI: sổ có phiên giả, mà docs/BENCH-PAIR-QUALIFICATION.md là bằng chứng của G5.3. Dùng `--out` khác để xem thử.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:54:34.8216567Z đã ghi docs/thu.md
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:54:35.4077948Z budget: released reservation r-dead of runnervmfi6oq:4194297 (owner dead): $1.50
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:54:35.4078975Z budget: released reservation r-old of other-host:1 (term expired): $2.00
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:54:36.3836857Z ⚠ ngân sách: đã dùng $0.09 / $0.10 (90% trần usd) — vượt trần sẽ **dừng trước khi gọi model**
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5060283Z Changes in tree: 0 files
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5061386Z   ⚠ no --write-scope given: the scope check is UNCONFIGURED (pass --write-scope, or --story for the story's declared scope); a check that cannot run is not a pass
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5065497Z replay of run-src: recorded — client: opencode → claude; model: mycombo → 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5066371Z ok
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5066745Z Environment:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5067346Z   ✅ python >= 3.11 — 3.11.9
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5067911Z   ✅ git
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5068429Z   ○ claude CLI — not found
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5069391Z   ○ opencode CLI — not found
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5070249Z   ✅ agent credential — none in the environment — the client uses its own login
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5071353Z   ○ docker daemon — not running — sandbox will degrade, lower guarantees
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5073299Z   ○ playwright + chromium — playwright not installed — run: npm i -D playwright && npx playwright install chromium — cannot extract mockup contracts
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5074531Z Project:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5075107Z   ✅ project directory — D:\a\aisef\aisef
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5076380Z   ✅ sandbox provider — host — guarantees at WORKSPACE_WRITE: network_none, no_host_mount, non_root, read_only_fs, secrets_absent
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5077957Z   · role test — auto: pytest (managed, pinned 9.1.1) → `pytest -q`
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5078935Z   · role lint — auto: ruff (managed, pinned 0.16.7) → `ruff check .`
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5079953Z   · role sast — auto: bandit (managed, pinned 1.9.4) → `bandit -q -r .`
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5081553Z   ✗ tool tools.test — `tools.test` = `pytest -q` — MISSING in aisef-verify-python:84adf1d8eaf9: [WinError 2] The system cannot find the file specified
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5083647Z   ✗ tool tools.lint — `tools.lint` = `ruff check .` — MISSING in aisef-verify-python:84adf1d8eaf9: [WinError 2] The system cannot find the file specified
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5085759Z   ✗ tool tools.sast — `tools.sast` = `bandit -q -r .` — MISSING in aisef-verify-python:84adf1d8eaf9: [WinError 2] The system cannot find the file specified
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5087293Z   ✗ docs/requirements.md — D:\a\aisef\aisef\docs\requirements.md
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5088126Z   ✅ config — defaults
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5088578Z Installed skills:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5089225Z   ○ setup completed — not yet — run: aisef setup
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5089637Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:41.5090235Z ✗ missing: tool tools.test, tool tools.lint, tool tools.sast, docs/requirements.md
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:42.1058765Z usage: aisef [-h] [-V] [--project PROJECT]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:42.1061771Z              {memory,setup,doctor,init,gates,status,change,baseline,doc,skill,review,approve,reject,compile,gate,guard,plan,mockup,run,legacy,verify,tool,qa,devsecops,pre-deploy,evidence,ctx,issues,report,cost,auto-approve,dashboard,closure,replay}
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:42.1065397Z              ...
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:55:42.1067793Z aisef: error: argument command: invalid choice: 'improve' (choose from 'memory', 'setup', 'doctor', 'init', 'gates', 'status', 'change', 'baseline', 'doc', 'skill', 'review', 'approve', 'reject', 'compile', 'gate', 'guard', 'plan', 'mockup', 'run', 'legacy', 'verify', 'tool', 'qa', 'devsecops', 'pre-deploy', 'evidence', 'ctx', 'issues', 'report', 'cost', 'auto-approve', 'dashboard', 'closure', 'replay')
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:57:14.8562484Z ✗ no evidence found — run `aisef legacy run` first
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T22:57:21.9589502Z budget: released reservation r-old of other-host:1 (term expired): $2.00
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5610240Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=51 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5611672Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5612319Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5613602Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=50 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5614741Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5615445Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5618040Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=49 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5619495Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5620126Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5621401Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=48 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5623321Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5623942Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5625315Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=47 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5626445Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5627059Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5628307Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=46 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5629368Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5630000Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5631228Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=45 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5632332Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5632945Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5634203Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=44 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5635266Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5635868Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5637141Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=43 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5638202Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5638813Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5640373Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=42 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5641441Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5642050Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5643290Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=41 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5644339Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5644940Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5646254Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=40 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5647378Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5648000Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5649292Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=39 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5650376Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5650985Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5652290Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=38 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5653466Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5654074Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5655328Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=37 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5656619Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5657252Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5658525Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=36 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5660089Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5660704Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5662024Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=35 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5663092Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5663726Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5665013Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=34 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5666113Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5666762Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5668014Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=33 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5669119Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5669742Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5671015Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=32 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5672078Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5672709Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5673970Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=31 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5675033Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5675666Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5677296Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=30 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5678371Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5679037Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5680518Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=29 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5681627Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5682317Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5683638Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=28 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5684775Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5685377Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5686607Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=27 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5687665Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5688276Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5689519Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=26 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5690616Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5691235Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5692557Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=25 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5693810Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5695326Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5696718Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=24 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5699083Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5699760Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5701014Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=23 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5702081Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5702692Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5703947Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=22 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5705048Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5705653Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5706889Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=21 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5707955Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5708566Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5709819Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=20 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5711033Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5711665Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5713050Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=19 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5714246Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5714891Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5716180Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=18 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5717528Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5718134Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5719365Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=17 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5720408Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5721008Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5722248Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=16 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5723330Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5723934Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5725170Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=15 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5726212Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5726801Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5728021Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=14 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5729062Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5729688Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5730957Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=13 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5731994Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5733439Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5734930Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=12 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5736370Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5737024Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5738614Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5739715Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5740332Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5741570Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5742622Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5743226Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5744530Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5745636Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5746263Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5747645Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=8 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5748781Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5749411Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5750708Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=7 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5751759Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5752384Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5753616Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=6 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5754703Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5755305Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5756536Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=5 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5757853Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5758464Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5759690Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=4 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5760731Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5761342Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5762624Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\unittest\case.py:579: ResourceWarning: unclosed file <_io.TextIOWrapper name=52 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5763673Z   if method() is not None:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:03:33.5764277Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:22.3482588Z guard could not run (argument kind: invalid choice: 'nonexistent-guard' (choose from 'completion', 'destructive', 'diff-scope', 'egress', 'git-stage', 'injection', 'process-ref', 'secret', 'tool-bypass', 'write-scope')) — blocking, not allowing
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:22.3844763Z usage: aisef init [-h] [--stack {react,python,go,node}]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:22.3845936Z aisef init: error: argument --stack: invalid choice: 'rust' (choose from 'react', 'python', 'go', 'node')
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:22.4184725Z usage: aisef [-h] [-V] [--project PROJECT]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:22.4187696Z              {memory,setup,doctor,init,gates,status,change,baseline,doc,skill,review,approve,reject,compile,gate,guard,plan,mockup,run,legacy,verify,tool,qa,devsecops,pre-deploy,evidence,ctx,issues,report,cost,auto-approve,dashboard,closure,replay}
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:22.4190435Z              ...
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:22.4193691Z aisef: error: argument command: invalid choice: 'zzz-no-such-cmd' (choose from 'memory', 'setup', 'doctor', 'init', 'gates', 'status', 'change', 'baseline', 'doc', 'skill', 'review', 'approve', 'reject', 'compile', 'gate', 'guard', 'plan', 'mockup', 'run', 'legacy', 'verify', 'tool', 'qa', 'devsecops', 'pre-deploy', 'evidence', 'ctx', 'issues', 'report', 'cost', 'auto-approve', 'dashboard', 'closure', 'replay')
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:24.6957807Z ✗ git user.name / user.email not configured for this repo.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:24.6958513Z   Run:  git config user.name 'Your Name'
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:04:24.6959373Z         git config user.email 'you@example.com'
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:07:02.6522860Z error: read error while indexing .aisef/run.lock: Permission denied
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:23:57.9054505Z D:\a\aisef\aisef\tests\v2\p5\test_adequacy.py:472: ResourceWarning: unclosed file <_io.TextIOWrapper name=5 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:23:57.9055570Z   rep, x = te.execute(story_runner, d, STORY, deps, targets=(*STORY.paths, te.MEASURE), timeout_s=120)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:23:58.0249843Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:23:58.0250893Z D:\a\aisef\aisef\aisef2\quality\vacuity.py:256: ResourceWarning: unclosed file <_io.TextIOWrapper name=5 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:23:58.0252409Z   report, execution = execute(runner, n.root, tests, deps, interpreter=interpreter, targets=targets,
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:23:58.0253336Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:23:58.1419267Z D:\a\aisef\aisef\tests\v2\p5\test_adequacy.py:477: ResourceWarning: unclosed file <_io.TextIOWrapper name=5 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:23:58.1420246Z   _, g = te.execute(regression_runner, d, REGRESSIONS, deps, timeout_s=120)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:23:58.1420871Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6307188Z Exception in thread release verifier-session-5.0:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6307993Z Traceback (most recent call last):
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6322937Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\threading.py", line 1045, in _bootstrap_inner
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6324050Z     self.run()
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6324840Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\threading.py", line 982, in run
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6325691Z     self._target(*self._args, **self._kwargs)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6326569Z   File "D:\a\aisef\aisef\aisef2\runtime\story_scope.py", line 157, in run
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6327361Z     resource.release()
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6328083Z   File "D:\a\aisef\aisef\tests\v2\p5\test_invariants.py", line 317, in release
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6329111Z     raise InvariantError("the verifier's session was not the verifier's")
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.6329707Z aisef2.errors.InvariantError: the verifier's session was not the verifier's
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.7509586Z D:\a\aisef\aisef\tests\v2\p5\test_relevance.py:282: ResourceWarning: unclosed file <_io.TextIOWrapper name=5 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.7510648Z   rep, x = te.execute(runner, d, story, Dependencies(frozenset(), te.project_top_level(d)), targets=targets, timeout_s=120)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:11.7511442Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:13.3707338Z D:\a\aisef\aisef\tests\v2\p5\test_test_execution.py:303: ResourceWarning: unclosed file <_io.TextIOWrapper name=5 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:13.3708219Z   return te.execute(runner, d, story, deps, **kw)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:13.3708772Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:15.9534947Z D:\a\aisef\aisef\tests\v2\p5\test_vacuity.py:69: ResourceWarning: unclosed file <_io.TextIOWrapper name=5 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:15.9535844Z   baseline = te.execute(runner, d, story, deps, timeout_s=120)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:15.9536438Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:17.6445220Z D:\a\aisef\aisef\tests\v2\p5\test_vacuity.py:206: ResourceWarning: unclosed file <_io.TextIOWrapper name=6 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:17.6447253Z   r2 = evaluate(te.UNITTEST, d2, patch(OLD, NEW, "app/calc.py"), STORY, deps, te.execute(te.UNITTEST, d2, STORY, deps, timeout_s=120),
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:24:17.6448161Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:31:23.1221785Z D:\a\aisef\aisef\aisef2\orchestrate\story_runner.py:126: ResourceWarning: unclosed file <_io.TextIOWrapper name=8 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:31:23.1223272Z   self._held.clear()
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:31:23.1223895Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:31:23.1225203Z D:\a\aisef\aisef\aisef2\orchestrate\story_runner.py:261: ResourceWarning: unclosed file <_io.TextIOWrapper name=7 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:31:23.1226238Z   tests_held.release()
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:31:23.1226892Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:31:26.7635080Z D:\a\aisef\aisef\aisef2\orchestrate\story_runner.py:126: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:31:26.7636148Z   self._held.clear()
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:31:26.7636757Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:35:46.3488780Z D:\a\aisef\aisef\aisef2\orchestrate\story_runner.py:126: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:35:46.3490107Z   self._held.clear()
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:35:46.3490711Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:35:46.3493047Z D:\a\aisef\aisef\aisef2\orchestrate\story_runner.py:126: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:35:46.3495056Z   self._held.clear()
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:35:46.3496246Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:35:46.3498620Z D:\a\aisef\aisef\aisef2\orchestrate\story_runner.py:261: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:35:46.3499499Z   tests_held.release()
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:35:46.3500023Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:05.2176480Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\tempfile.py:934: ResourceWarning: Implicitly cleaning up <TemporaryDirectory 'C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\aisef2-orch-vw3iu3se\\ws\\scratch-S1-kt1wpy95'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:05.2178538Z   _warnings.warn(warn_message, ResourceWarning)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:10.5991294Z D:\a\aisef\aisef\aisef2\orchestrate\quality.py:53: ResourceWarning: unclosed file <_io.TextIOWrapper name=7 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:10.5992300Z   report, execution = te.execute(runner, candidate_root, story_tests, deps, interpreter=interpreter,
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:10.5993035Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:10.7191070Z D:\a\aisef\aisef\aisef2\quality\vacuity.py:256: ResourceWarning: unclosed file <_io.TextIOWrapper name=7 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:10.7192054Z   report, execution = execute(runner, n.root, tests, deps, interpreter=interpreter, targets=targets,
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:10.7192770Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:10.8334797Z D:\a\aisef\aisef\aisef2\orchestrate\quality.py:60: ResourceWarning: unclosed file <_io.TextIOWrapper name=7 encoding='utf-8'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:10.8336464Z   _, regressions = te.execute(runner, candidate_root, regression_tests, deps, interpreter=interpreter,
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:10.8337673Z ResourceWarning: Enable tracemalloc to get the object allocation traceback
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:20.2738453Z C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\tempfile.py:934: ResourceWarning: Implicitly cleaning up <Stuck 'C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\aisef2-ws-5yqbl6bm\\tmps4vw53vd'>
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:44:20.2739618Z   _warnings.warn(warn_message, ResourceWarning)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:47:59.7141345Z repro_dist: SOURCE_DATE_EPOCH (the commit time) is required
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:47:59.7162008Z repro_dist: SOURCE_DATE_EPOCH (the commit time) is required
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.1215718Z ----------------------------------------------------------------------
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.1216272Z Ran 5451 tests in 4077.064s
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.1216474Z 
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.1216608Z OK (skipped=173)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.1240636Z   git init → C:\Users\RUNNER~1\AppData\Local\Temp\tmp5qqkrdbx
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.3146557Z owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=None->None (windows-job, 4082s)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4786452Z ##[group]Run python -P validation/v2/v1_evidence_guard.py --check
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4787140Z ^[[36;1mpython -P validation/v2/v1_evidence_guard.py --check^[[0m
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4880549Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4881001Z env:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4881364Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4881993Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4882548Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4883068Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4883502Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.4883882Z ##[endgroup]
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:14.9822419Z V1 evidence guard (DETECTIVE): PASS
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.1436997Z Post job cleanup.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.2963276Z (node:8736) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.2964540Z (Use `node --trace-deprecation ...` to show where the warning was created)
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.3314485Z Post job cleanup.
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.5247567Z [command]"C:\Program Files\Git\bin\git.exe" version
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.5557260Z git version 2.55.0.windows.5
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.5650489Z Temporarily overriding HOME='D:\a\_temp\3727a7ac-45ef-4738-a4c9-ae5ce2a6747b' before making global git config changes
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.5651905Z Adding repository directory to the temporary git global config as a safe directory
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.5662727Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\aisef\aisef
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.6015721Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:15.6352259Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:16.1865045Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:16.2125103Z http.https://github.com/.extraheader
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:16.2168780Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:16.2465556Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:16.7795787Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:16.8087168Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:17.3954379Z Cleaning up orphan processes
+tests / unit (windows-latest, 3.11)	UNKNOWN STEP	2026-10-05T23:49:17.4580500Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -172,6 +172,12 @@
    "status": "PASS",
    "on": "1565bccff66cda866820d5307a26de462e79e9a0",
    "what": "RELEASE_GO YES for RC2; held for the owner's production confirmation (charter §19)"
+  },
+  {
+   "phase": "PRODUCTION_PUBLISH",
+   "status": "COMPLETE",
+   "on": "ca2631374602da45dae75b7f6907ff4729d0b2f7",
+   "what": "tag v2.0.0 → ca26313; release run 37383985011 14/14 success (v2-gate PASS, verify-dist PASS); aisef 2.0.0 on PyPI; clean install from PyPI PASS; downloaded wheel and sdist equal the frozen RC2 digests; RELEASE_VERIFICATION PASS"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
@@ -669,5 +675,22 @@
   "next_action": "OWNER_CONFIRM_PRODUCTION_TAG_AND_PYPI (charter §19; docs/v2/RELEASE-PROCESS.md 'How the owner confirms'): the owner's RELEASE-DECISIONS entry (PRODUCTION_PUBLISH AUTHORIZED, VERSION 2.0.0), the v2.0.0 tag, the pypi environment approval",
   "held": "no tag, no TestPyPI or PyPI upload, no GitHub Release by the controller",
   "ci_on_the_ready_commit": "483ec1d: tests 37367561320 and staging 37367561525 green on attempt 2 after four jobs were never acquired by a hosted runner in attempt 1 (OBS-S7-1, ENVIRONMENT); staging rebuilt the frozen bytes"
+ },
+ "RELEASE_STATUS": "AISEF 2.0.0 RELEASED",
+ "PRODUCTION_PUBLISH": "COMPLETE",
+ "RELEASE_VERIFICATION": "PASS",
+ "PRODUCTION_DETAIL": {
+  "record": {
+   "path": "closure-evidence/v2/release/V2.0-PRODUCTION-RELEASE.json",
+   "sha256": "f8c7ca65994a0f02e100f5f16c0730cd2b45cf92567edf1b5d01c1b331ca1e13"
+  },
+  "tag": {
+   "v2.0.0": "ca2631374602da45dae75b7f6907ff4729d0b2f7"
+  },
+  "release_run": 37383985011,
+  "pypi": "https://pypi.org/project/aisef/2.0.0/",
+  "artifacts_equal_frozen": true,
+  "clean_install": "PASS",
+  "recorded_at": "2026-10-05T23:55:26Z"
  }
 }

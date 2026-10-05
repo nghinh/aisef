@@ -1,0 +1,15 @@
+$ aisef legacy --help  (cwd /tmp/aisef-2.0.0-final-verify/work)
+usage: aisef legacy [-h] [--project PROJECT] {run,improve} ...
+
+positional arguments:
+  {run,improve}
+    run              V1 (legacy): execute a wave: epics sequentially, stories
+                     in parallel
+    improve          V1 (legacy): evidence-driven improvement loop for an
+                     epic: QA → behaviour ledger → one fix story → run → QA;
+                     stops by code (ADR-004 R3)
+
+options:
+  -h, --help         show this help message and exit
+  --project PROJECT  project directory (also accepted before the command)
+exit 0

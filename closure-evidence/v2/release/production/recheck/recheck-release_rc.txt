@@ -1,0 +1,2 @@
+release candidate: PASS
+release_rc exit 0
