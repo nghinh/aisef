@@ -1,0 +1,206 @@
+{
+ "acceptance": {
+  "path": "closure-evidence/v2/release/V2-RELEASE-ACCEPTANCE.json",
+  "sha256": "fe941420605a5a0f41f8f22d5fb33267c61ef7fea422722057e5850bffeaafd4"
+ },
+ "client": {
+  "binary": "/Users/nghinh/.opencode/bin/opencode",
+  "binary_sha256": "16c960ba77421da11b53e785f359b73f328a86118b48feb4af143db5d9afb198",
+  "endpoint": "https://9router.vnteki.com/v1",
+  "key_present": true,
+  "resolved": "/Users/nghinh/.opencode/bin/opencode",
+  "routing_config_sha256": "89347da7c0056648b9cb18b8680d8a9e02ad404591bc7615834a86a27999e773"
+ },
+ "command": [
+  "<side>/venv/bin/aisef",
+  "run",
+  "--project",
+  "<side>/inputs/project.json",
+  "--settings",
+  "<side>/inputs/settings.json",
+  "--repo",
+  "/Users/nghinh/Downloads/projects/ledgerlock-v2-release-smoke",
+  "--out",
+  "<side>/run"
+ ],
+ "criteria": {
+  "BUDGET_ESTIMATE_WITHIN_OWNER_CEILING": "YES",
+  "RELEASE_SMOKE_DEPENDS_ON_MISSING_PRIVATE_DIAGNOSTIC": "NO",
+  "WORKLOAD_CONTEXT_SANITIZED": "PASS"
+ },
+ "envelope": {
+  "budget": {
+   "input_tokens": 60000000,
+   "output_tokens": 400000,
+   "provider_requests": 58,
+   "turns": 700
+  },
+  "ceilings": {
+   "input_tokens": 60000000,
+   "output_tokens": 400000,
+   "provider_requests": 60,
+   "turns": 700
+  },
+  "estimate": {
+   "provider_requests": 46,
+   "turns": 3360
+  },
+  "headroom": 1.25,
+  "rule": "min(ceil(structural estimate * 1.25), ceiling); tokens: the ceiling (no offline estimate)"
+ },
+ "identity_grade": "ATTESTED",
+ "max_turns_per_session": 80,
+ "phases": {
+  "S0_SCOPE_FREEZE": "PASS",
+  "S1_FAIL_CLOSED": "PASS",
+  "S2_FIX_WINDOW": "PASS",
+  "S3_PRODUCTIZED": "PASS",
+  "S4_RC_FROZEN": "PASS",
+  "S5_QUALIFIED": "PASS"
+ },
+ "plan": {
+  "bundle": "closure-evidence/v2/release/LEDGERLOCK-PROJECT.json",
+  "bundle_digest": "778e6b84afab76c8326a72c7b11291e3a5e195aacff7eee43d6630699bb8be0a",
+  "obligations": 67,
+  "plan_hash": "5eed537aaa4dde03653c6d779ec5d6ceb8c3869365e15b01dec00ffa7f5d3735",
+  "stories": [
+   "STORY-01-01",
+   "STORY-01-05",
+   "STORY-02-01",
+   "STORY-02-02",
+   "STORY-03-01",
+   "STORY-04-01",
+   "STORY-04-02"
+  ]
+ },
+ "preservation": "nothing under the side directory is ever removed: the venv, the inputs, stdout/stderr, the run directory (raw journal, RUN.json, the clone with every candidate and merge, session streams, preflight)",
+ "problems": [],
+ "productproof_set": [
+  "PPS-0a4fc49cfb33782c35f559cb3f77696134cc18bf5f2953427345171db2aa16e7",
+  "PPS-0e947245567c1dee1d575c822efa36a876525c75d1ee03bbabaf4778e77dd50c",
+  "PPS-0fefd4623ab39b9350534d2f184d94567ebb6dff022b73203238ca0ddefa2922",
+  "PPS-1ab92a3e7c51ca828a4547e339a7146031254f87db9f72ffc641aa83b8b770f8",
+  "PPS-21eb7a059f2540f2b6c93b9f4d9d226e7b25b039fba131dcd23b6858c1de377d",
+  "PPS-221372fd740b0f54d7ce436ccda384abfe39ee13bdb454a96e8d392ad26afb3a",
+  "PPS-27056269f7186a68dde5e95d77b8764027322ff5197c112311b40fae034cf097",
+  "PPS-2c1036786f9353092704ad6e2b8ba1d0a9ffe1023e63bc692878e2e2b265b8e1",
+  "PPS-2dd70bedca359fb2cc0e2373072367c7a95ea5826a23dafe70dc9fc2d0267f1d",
+  "PPS-3cb11949cd671b26d582a17b9423faaf9c4ebc831c0997c7da20d86d898d61fd",
+  "PPS-4cf7a489159ac6da2d0d79cb32bcc4c6f75caa6f2cafeeb79862ea33cc109da2",
+  "PPS-4ff82a4585dc90919df48a672040357d333fbab166661fa4de722750e9b21e8e",
+  "PPS-53e20b739fb281e1ea3ffe4e6fc9ec7a8fa887dfb3f9dc694a5edccc2bb0086d",
+  "PPS-54a03b9063ac639586b0931ede2a2e1ba2b67cdfed5d653a8fe0c98755c299f9",
+  "PPS-59f6f04aae5342f3d16bf337a1fdb2b53f03b070ed340868b9b4d3d7ea9b92ad",
+  "PPS-5ad003ff650f65c31f0bc89d6a566e5580a0c08b6df2d02813d727e33bc1a3b3",
+  "PPS-5e88e19d64fc9aa50dffea61352f7044b4f3d9ba5a71ff18c2b1c5c5f9cc502c",
+  "PPS-64c46ebaed2d255c26a9e79c34c803fe2609161938311dfb237f066b36a67867",
+  "PPS-6567a1c40273f8fa72b618f32d33eaf649fe0042936a0fce593e8fd1c4a44d9c",
+  "PPS-6843a9b53c313e37f60bdd8f969c6e3b167ae34282c13c82695bf64856339c57",
+  "PPS-6a4c2b5364c4ba048f0468d385369797b70a344babcaf2cb5f442ec3102ae673",
+  "PPS-6c72e0891d0db03594604ae71f100705e34ec6f21f42e8c9db272f9ad3b051c4",
+  "PPS-6fad81af3fb88f23f46277985272a49efae3b18886654f3b3ca2d0bbc80950a0",
+  "PPS-744aded9edd3854346d69c44419a98871fdcc54720601977665212c3a73f8a9d",
+  "PPS-74787e153dee89bf1989a3330595f4a41ec7bdcd841c75a2b6ed3de2fd50ecc5",
+  "PPS-77ba8cfefcaeb5b8c894ac9d828558e0e460b6c6775ccaee6383be0d6001d4f6",
+  "PPS-7c20cb281915e14c72652a9e6ea60b7158c1fff14ea7e6074eabf1fed463ec35",
+  "PPS-7e6bc9074931a57b35baddb8866f9d58e3b93f316ab4c169fc5c721bd32810e7",
+  "PPS-7e99202d7849d4f22d2a4da4728b0f9000ebdb5d8507e2dec7e03c38e3f7547e",
+  "PPS-82923f967807c583c9582e9b15e5c95735eff34c093733efacf1e99cc69b519b",
+  "PPS-82a57c52ecef2e178fd80e8636b9cd01d8aa1ad752e419590115a963b7f96a71",
+  "PPS-835b19e7e10f8d9d14af129cb7619ea7d104101ed586d1203ec217b8f20dc393",
+  "PPS-86ea3c3dabbb8a38f3f0f69f02883f7ed68d5929ad94d3fd04f61523e23ee2ef",
+  "PPS-8ab146580469d11dbb6c20443dd9c2070da4ecb2f7c2222f33ba127775898894",
+  "PPS-8d75389620f10e824a48138f8abf2d75d80cbdbd3cdb90535bef4df7ac71219a",
+  "PPS-98d742530e731fd750b4100e3515272ce6a23c9ad5578264fbb0bfc07d88eb03",
+  "PPS-9cc8e42134b41d39f3e9b94b976290ffb97c28384525cb18e210ca8ee8e574f6",
+  "PPS-a093d39cfc5a2062e08e7842e5c37c898bc02da8f38727539865958e528be0f5",
+  "PPS-a4ef67e2868735b9bb57631e5e5f7d6819472665a5f31a67b1a5c1729d1e847f",
+  "PPS-b2b2334768a7a21f6ce11617d4be9ac549482b800b3fda6298a2e0337f989630",
+  "PPS-b407af271716358fdf6176b67382a2a49179cf3a39edb092c21bca676d3e5129",
+  "PPS-b5eec6684bb16d2566e4ada46bd6f9c15b9101e1f47f470decb30a2d20694652",
+  "PPS-b6311fbd3c60003bb26a0dfc497eb5370bd538fcfe3788ed50f038d8a4750e75",
+  "PPS-b81e2a52685028d4e38b82399abe1849a2dfc35b0938a1a7cff2a59e913e9f31",
+  "PPS-bb7bde157098d5b82bddacbbe7a5283167e8f5f882f19333fd6ce38cc92f767e",
+  "PPS-bdf82c8704934408cd4cb57d8d6e7c642b0fedf5f8d3b42fbf7274fa5c252f78",
+  "PPS-c14a4598e4d4a246c4abdc1cc06e19988637900a3cc9b3f5db028588c341b933",
+  "PPS-c692deca361564a845cb92c6d0cf34219b5a00fa4b203bc66bdbe404d4b5dbc8",
+  "PPS-c70151a34378bac3b90ea06dc632037dd9908f97e0b5b9a9f94fea1f158a0292",
+  "PPS-c8e741a462c13c490383e56fc70e31790a5497a8009a679c48bbcb3365e77906",
+  "PPS-d0e057a7ff4b495cca2a81d9f4db48fe2e556eeed99bd25f27a266f27b63ea4e",
+  "PPS-d2de0d799e6b8cfd074c163cfb58fcec91e5b42fb6b067a86381102585d6282d",
+  "PPS-db989591efaa04eab0700c2d484067363eb502a368b44f16ab41bbb4a83b9130",
+  "PPS-e15441be654d820658a0a65318491a19b72e0868b62683c217bff439e36f90ff",
+  "PPS-ef563e01d42979017574fe01308a469a59c99b95ffb0cb5e128cf3811cf3c40b",
+  "PPS-f31c5846817d7a576d0969d6fb6aa7303e6366b1d935ad7f295cbae088fd27a3",
+  "PPS-f7b6d4bfcbd5f3b07433a03dac8c7217ab55de7987d516437446060a6f99322b",
+  "PPS-fe6b175030db9fb9f5630d1e184515ab792cd11b4a004627c0be52e76d176a5c",
+  "PPS-ff97cad5ca88f6e6189be216cc38b5553aa8d86bc4a7bd11181094e2358faddb"
+ ],
+ "prompts": "aisef2/app/feedback.py and aisef2/app/adapters.py of the RC, bound by its kernel digest",
+ "provider": {
+  "api_key_env": null,
+  "endpoint": "https://9router.vnteki.com/v1",
+  "listed_owner": "ds",
+  "model_limit": {
+   "context": 200000,
+   "output": 32768
+  },
+  "name": "9router",
+  "served_model": "deepseek-v4-pro"
+ },
+ "rc": {
+  "kernel_digest": "d1972a2ab89a6831c28af79ed9fda6ef207cecefe96db479dbe5f19ffb8b6a93",
+  "sha": "1565bccff66cda866820d5307a26de462e79e9a0",
+  "version": "2.0.0",
+  "wheel": {
+   "name": "aisef-2.0.0-py3-none-any.whl",
+   "sha256": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b"
+  }
+ },
+ "record": "AISEF V2.0 \u2014 RELEASE SMOKE #2 PREREGISTRATION (charter \u00a715, owner amendment 2026-10-05): bound before any provider call",
+ "rehearsal": {
+  "path": "closure-evidence/v2/release/smoke-2/REHEARSAL.json",
+  "sha256": "17263ab3416933ee78b2d3454dafdd1e3f76e6aab44ac789fd3f5c1161e91b1d"
+ },
+ "repository": {
+  "baseline": "6a8d60c0bd3d1fa47ed4e97dd80fc0f4b645332a",
+  "derivation": {
+   "path": "closure-evidence/v2/release/V2-RELEASE-WORKLOAD-DERIVATION.json",
+   "sha256": "5c078826f0f6ef6cfd803ab2811b5e26db58b3964a4429ccf255e39991d6946e"
+  },
+  "path": "/Users/nghinh/Downloads/projects/ledgerlock-v2-release-smoke",
+  "policy": {
+   "path": "closure-evidence/v2/release/V2-RELEASE-WORKLOAD-CONTEXT-POLICY.json",
+   "sha256": "8a26e2367e69c1a1eaa499acb024b0e03263164eb089af69388a9f59a56f5213"
+  }
+ },
+ "retry_policy": {
+  "DEVELOPER": 2,
+  "ENVIRONMENT": 1,
+  "INTEGRATION": 0,
+  "PLAN": 0,
+  "PROVIDER": 1,
+  "REVIEW": 1,
+  "SECURITY": 1
+ },
+ "route": "9router/ds/deepseek-v4-pro",
+ "run_directory": "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-2/run",
+ "settings": {
+  "path": "closure-evidence/v2/release/smoke-2/SETTINGS.json",
+  "sha256": "9f2f8f40111e9a0ccda4fe90d15c047ddaee258ffdf3be68ebf19aa99071c86b"
+ },
+ "side_directory": "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-2",
+ "stop_rules": [
+  "the preflight does not attest the route: identity stop, no session",
+  "a budget ceiling reached, or spend that cannot be accounted for: the run ends",
+  "a session at its turn cap ends; its story is judged by its proofs",
+  "no attempt beyond the retry policy; no third smoke; no repair, prompt, plan, budget or route change (\u00a716)"
+ ],
+ "timeouts_s": {
+  "developer": 2400,
+  "probe": 60,
+  "reviewer": 900,
+  "tool": 120
+ },
+ "verdict": "PREREGISTERED"
+}
