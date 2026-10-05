@@ -11,11 +11,11 @@
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
- "CURRENT_SHA": "1ba5bde6f7fb783a729e276b09629a773a138209",
+ "CURRENT_SHA": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
  "CURRENT_KERNEL_DIGEST": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
  "CURRENT_WHEEL_DIGEST": null,
  "OPEN_V2_0_BLOCKERS": [],
- "V2_1_BACKLOG_COUNT": 34,
+ "V2_1_BACKLOG_COUNT": 36,
  "PROVIDER_CALLS": 0,
  "PAID_RELEASE_SMOKES_USED": 0,
  "sources": {
@@ -76,39 +76,60 @@
    "status": "PASS",
    "on": "1ba5bde6f7fb783a729e276b09629a773a138209",
    "what": "S2 mutation final PASS (261/261 exactly once, 6437/6437 killed, 0 unaudited, 0 by the clock); full local suite 5440 with one owner-waived machine-state failure; CI 37229943538 green on Linux/macOS/Windows; candidate frozen"
+  },
+  {
+   "phase": "S2_FIX_WINDOW",
+   "status": "PASS",
+   "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+   "what": "OBS-S2-12 closed deterministically (dedicated kill file, 66/66 under 6 hash seeds); S2 re-frozen at 529591e (version 2.0.0, staging on release/** folded in by the owner): record PASS 261/261, 6437/6437, 0 by the clock, 0 unaudited; full local suite 5444 with the one owner-waived machine-state failure; CI 37256508108 8/8 green"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
  "S2_DETAIL": {
   "code": "B1 (+ B1-BLOCKS-STOP-001), B3, B4 (+ B4-OLD-GIT: aisef run refuses git < 2.31, 340b11c), B6, B7, B12, KA-09; review blockers B16-BUDGET-AT-CEILING, B13-RC-BINDING, G1-LEGACY-IMPROVE fixed",
   "exit": "V2.0-S2 mutation on the current snapshot 369c8ac (owner ruling MUTATION WORKER HANDOFF, 2026-10-04), at most 2 workers; then validation/qualification/s2_mutation_record.py --write (final record + summary), mutation.py --check, Q0 checker calibration regenerated, one full local suite",
-  "FROZEN_CANDIDATE": "1ba5bde6f7fb783a729e276b09629a773a138209",
-  "candidate_tree": "1ba5bde's tree outside closure-evidence/ is FINAL_HEAD 25e38f4b336fb49648b0ce7844fc269981efd586's (git diff --quiet)",
-  "kernel_tree": "aisef2 at 1ba5bde: c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
+  "FROZEN_CANDIDATE": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+  "supersedes_candidate": {
+   "sha": "1ba5bde6f7fb783a729e276b09629a773a138209",
+   "why": "owner, 2026-10-05: close OBS-S2-12 deterministically before S4 (OBS-S2-12/R1); the version 2.0.0 and the staging trigger folded in by the owner's answers of the same day"
+  },
+  "candidate_tree": "529591e's tree outside closure-evidence/ is FINAL_HEAD 190b882b591a01b07b2fac2cdd651fe0369f4254's (git diff --quiet)",
+  "kernel_tree": "aisef2 at 529591e: c6ddf5b9c0b436bcc3c882d9b303dd59b367141c (unchanged since 1ba5bde)",
+  "changes_since_previous_candidate": [
+   "tests/v2/test_s2_kills_deterministic.py (new; first in the kill sets of fingerprint_fields and Budget.spend only)",
+   "validation/v2/mutation.py (those two kill sets)",
+   "validation/qualification/s2_deterministic_kills.py (new)",
+   "docs/v2/V2.1-BACKLOG.md (V21-36)",
+   "pyproject.toml 1.7.6 -> 2.0.0",
+   "CHANGELOG.md (2.0.0 dated)",
+   ".github/workflows/staging.yml (also on pushes to release/**)",
+   "docs/v2/RELEASE-PROCESS.md (that trigger; 2.0.0 in an example)"
+  ],
   "mutation": {
-   "FINAL_HEAD": "25e38f4b336fb49648b0ce7844fc269981efd586",
+   "FINAL_HEAD": "190b882b591a01b07b2fac2cdd651fe0369f4254",
    "TOTAL_TARGETS": 261,
    "ACCOUNTED_EXACTLY_ONCE": true,
-   "measured_at_final_head": 3,
-   "reused_after_mechanical_proof": 258,
-   "stale_excluded": 245,
-   "CURRENT_SNAPSHOT_TARGETS": 3,
+   "measured_at_final_head": 2,
+   "reused_after_mechanical_proof": 259,
+   "stale_excluded": 247,
+   "CURRENT_SNAPSHOT_TARGETS": 2,
    "MUTANTS": 6437,
    "KILLED": 6437,
    "KILLED_BY_TIMEOUT": 0,
    "AUDITED_SURVIVORS": 0,
    "UNAUDITED_SURVIVORS": 0,
-   "STALE_RESULTS_EXCLUDED": 245,
+   "STALE_RESULTS_EXCLUDED": 247,
    "RERUN_TARGETS": 138,
    "S2_MUTATION_VERDICT": "PASS",
    "record": {
     "path": "closure-evidence/v2/release/S2-MUTATION.json",
-    "sha256": "e8b67eec84196120162e1bd34ac3519720226cb9bbc304df7ac2edbbfa26b0e4"
+    "sha256": "319a83207123edcb66b99f41b29810edc8c52c5691868079b04ffdb9581644ff"
    },
    "summary": {
     "path": "closure-evidence/v2/release/S2-MUTATION-SUMMARY.json",
-    "sha256": "9ada2e1e654ee267cd259ccf695fd624cd4e4e4ec31e9209868fecfb9d4155ba"
+    "sha256": "e90f6592fe9d33576893873880ef34caa82a7378c09d57731c92951a2df8f137"
    },
+   "blast_radius": "the frozen qualifier at fbebf81 refused exactly the two targets whose kill set changed; the other 259 stayed reused_after_mechanical_proof; K9 re-measured the two on 190b882",
    "checks": "s2_mutation_record.py --check PASS; validation/v2/mutation.py --check PASS",
    "qualifier": {
     "path": "validation/qualification/s2_mutation_record.py",
@@ -118,43 +139,51 @@
     "criteria_unchanged": true
    }
   },
+  "deterministic_kills": {
+   "path": "closure-evidence/v2/release/S2-DETERMINISTIC-KILLS.json",
+   "sha256": "3e1b58340862bd3df2cb23ddbda000a40aa025a8f93af6730b2f48ae86ab9457",
+   "verdict": "PASS",
+   "result": "aisef2/app/preflight.py::fingerprint_fields 22/22 by tests/v2/test_s2_kills_deterministic.py alone; aisef2/app/client.py::Budget.spend 44/44 by tests/v2/test_s2_kills_deterministic.py alone; the same verdict and failing tests under seeds 0, 1, 2, 4242, 2147483647, random",
+   "known_probabilistic_kills": "none"
+  },
   "q0_checker_calibration": {
    "path": "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json",
    "sha256": "be035016c42be0b78aac4f94c002505c93ae0aef1f7bf5fff513441120a55759",
-   "result": "calibrated 52/52; always-PASS mutants rejected 52/52"
+   "result": "calibrated 52/52; always-PASS mutants rejected 52/52 (regenerated byte-identical)"
   },
   "full_local_suite": {
-   "commit": "1ba5bde6f7fb783a729e276b09629a773a138209",
-   "command": "python3 -P validation/v2/owned_run.py -- python3 -m unittest discover -s tests (in a detached worktree of 1ba5bde, no mutation running)",
-   "result": "Ran 5440 tests in 2438 s; FAILED (failures=1, skipped=80); owned processes before=0 at_exit=0 after=0 escaped=0 released_empty=True",
-   "the_one_failure": "HistoricalAttempt4.test_the_machine_s_external_copies_are_checked_and_an_absent_copy_fails — machine state (S2-REAL-CLIENT-RUN), WAIVED by the owner (S2-REAL-CLIENT-RUN/R1)",
+   "commit": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+   "command": "python3 -P validation/v2/owned_run.py -- python3 -m unittest discover -s tests (detached worktree of 529591e, no mutation running)",
+   "result": "Ran 5444 tests in 2404 s; FAILED (failures=1, skipped=80); owned processes before=0 at_exit=0 after=0 escaped=0 released_empty=True",
+   "the_one_failure": "HistoricalAttempt4.test_the_machine_s_external_copies_are_checked_and_an_absent_copy_fails — the same cause as at 1ba5bde (the client's store has a session created after attempt 4 ended; the store unchanged since 2026-10-04 23:13, 1970 sessions): the failure the owner WAIVED (S2-REAL-CLIENT-RUN/R1)",
    "log": {
-    "path": "closure-evidence/v2/release/s2-final-suite/suite-1ba5bde.txt",
-    "sha256": "093b53b3f9e051c13607436a4ff0e81598479aefa26f9a10615577baa8a0fdc2"
+    "path": "closure-evidence/v2/release/s2-final-suite/suite-529591e.txt",
+    "sha256": "4c76d1ae6455d51046009ddc73b340b2a3eb1c77376bdf3e26f24d852aed5bbc"
    },
    "owned_run": {
-    "path": "closure-evidence/v2/release/s2-final-suite/owned-1ba5bde.json",
+    "path": "closure-evidence/v2/release/s2-final-suite/owned-529591e.json",
     "sha256": "45fa6b67db10cedae9d3c174a3fb44c2b5afce6122049b97b692ab5abe3c8acd"
    },
    "closure_evidence_after": "the suite's worktree had no change (git status empty)"
   },
   "ci": {
-   "run": 37229943538,
+   "run": 37256508108,
    "workflow": "tests",
-   "commit": "1ba5bde6f7fb783a729e276b09629a773a138209",
+   "commit": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
    "jobs": {
-    "unit (ubuntu-latest, 3.11)": "success, Ran 5440 OK (skipped=90)",
-    "unit (ubuntu-latest, 3.12)": "success, Ran 5440 OK (skipped=90)",
-    "unit (ubuntu-latest, 3.13)": "success, Ran 5440 OK (skipped=90)",
-    "unit (ubuntu-latest, 3.14)": "success, Ran 5440 OK (skipped=90)",
-    "unit (macos-latest, 3.12)": "success, Ran 5440 OK (skipped=92)",
-    "unit (windows-latest, 3.11)": "success, Ran 5437 OK (skipped=173)",
+    "unit (ubuntu-latest, 3.11)": "success, Ran 5444 OK (skipped=90)",
+    "unit (ubuntu-latest, 3.12)": "success, Ran 5444 OK (skipped=90)",
+    "unit (ubuntu-latest, 3.13)": "success, Ran 5444 OK (skipped=90)",
+    "unit (ubuntu-latest, 3.14)": "success, Ran 5444 OK (skipped=90)",
+    "unit (macos-latest, 3.12)": "success, Ran 5444 OK (skipped=92)",
+    "unit (windows-latest, 3.11)": "success, Ran 5441 OK (skipped=173)",
     "lint": "success",
     "wheel": "success"
    }
   },
-  "findings_this_window": "OBS-S2-10, OBS-S2-11, OBS-S2-12, S2-REAL-CLIENT-RUN (+ /R1)",
-  "not_started": "S4 (owner: do not begin S4 until S2's final candidate and evidence are frozen); no provider call, no Q4/Q5, no paid smoke"
+  "real_client_guard": "every mutation run of this closure (K8, K9) ran with PATH without an opencode executable and XDG data/state/cache in scratch; the operator's store stayed at 1970 sessions",
+  "findings_this_window": "OBS-S2-12/R1, OBS-S2-13, S2-VERIFY-2 (correction), OBS-S4-1 (§20 process deviation)",
+  "not_started": "no provider call, no Q4/Q5, no paid smoke"
  },
  "S3_DETAIL": {
   "done": [

@@ -282,9 +282,10 @@
    "V21-32",
    "V21-33",
    "V21-34",
-   "V21-35"
+   "V21-35",
+   "V21-36"
   ],
-  "count": 35
+  "count": 36
  },
  "risks_not_findings": [
   {
@@ -364,6 +365,22 @@
    "id": "OBS-S2-12",
    "what": "bundle.Project.order L64 'sorted() -> list()' survived in K5 although J and J2 had killed it: without sorted() the stories run in a set's iteration order, which string hashing randomizes per process, so the existing cases killed it only when that order happened not to be name order. Two kills written earlier in the campaign have the same shape with fixed names — preflight.fingerprint_fields L116/L117 (AppPreflightFingerprint, six names) and client.Budget.spend L74 (ClientBudget) — and miss their mutant only when the hash order of their names equals name order (about 1 run in 720 for six names); round K (K6) measured both killed.",
    "disposition": "not a finding: tests/v2/test_s2_kills_k.py AppProjectOrder picks story names whose set order differs from name order in the running process, then asserts name order (deterministic; 6 runs under 6 hash seeds, killed by assertion each time); K7 re-measured Project.order. The two fixed-name kills are left as measured: making them deterministic means editing tests/v2/test_s2_kills.py, which would stale every round-K result."
+  },
+  {
+   "id": "OBS-S2-12/R1",
+   "reclassifies": "OBS-S2-12",
+   "what": "Owner, 2026-10-05: 'A release qualification must not knowingly depend on random ordering/chance' — close OBS-S2-12 deterministically, without editing tests/v2/test_s2_kills.py. Measured before closing: the old fixed-name case AppPreflightFingerprint lets each of fingerprint_fields' 'sorted() -> list()' mutants (L116, L117) survive in 6 of 3000 PYTHONHASHSEED values (0-2999), about 1 run in 500.",
+   "disposition": "closed: tests/v2/test_s2_kills_deterministic.py (fbebf81), first in exactly the kill sets of preflight.fingerprint_fields and client.Budget.spend — str values whose hashes the case fixes (their set iterates in a known order, never name order; the premise asserted) and an in-memory listing with given readings (no hash order, clock, randomness or machine state). The frozen qualifier then refused exactly those two results ('its kill set is not the current one'), the other 259 stayed reused; K9 re-measured the two on 190b882: 22/22 and 44/44. closure-evidence/v2/release/S2-DETERMINISTIC-KILLS.json (validation/qualification/s2_deterministic_kills.py --check): all 66 mutants killed by the new file ALONE with the same verdict and failing tests under seeds 0, 1, 2, 4242, 2147483647 and random. Final record 529591e: 6437/6437, 0 by the clock, 0 unaudited, no known probabilistic kill."
+  },
+  {
+   "id": "OBS-S2-13",
+   "what": "validation/v2/mutation.py run merges into the record already present in its tree (it keeps the record's other targets). Worker K8 (fingerprint_fields and Budget.spend on fbebf81, 2026-10-05 09:10) was the first worker started on a commit that holds the committed final record, so its record holds the committed 259 other results beside its own two: it is not K8's own measurement.",
+   "disposition": "not a finding (the campaign's procedure, not the product): K8's record and log are kept unchanged in the controller's scratchpad and not imported; the launcher now sets the committed record aside inside a worker's scratch worktree before the run; K9 re-measured the same two targets with a record of its own (2 targets)."
+  },
+  {
+   "id": "OBS-S4-1",
+   "what": "Charter §20 ('Do NOT create another swarm of research agents'): before S4 the controller ran one read-only workflow of 6 agents (5 readers + 1 synthesis, 2026-10-05 ~08:45-09:00, run wf_19884141-613) to map what S4 requires from the charter, docs/v2/RELEASE-PROCESS.md, validation/qualification/release_rc.py, the CI workflows and the status file. They changed nothing and gave no review verdict; their output was a plan the controller then checked against the files itself (pyproject version rule, staging trigger, release_rc.freeze/check). It is still a research swarm the charter forbids.",
+   "disposition": "process deviation, recorded: no further agents for S2's closure or S4 (no implementation or adversarial reviewer was used: §20's two pre-freeze reviewers were spent in the pre-RC review); every S4 step is done and checked by the controller against the files."
   }
  ],
  "reviews": [
@@ -417,6 +434,17 @@
    ],
    "method_now": "verify2: the tree mutation.py builds (COPY), the unmutated baseline must pass, a kill counted only on a test failure, errors reported apart",
    "disposition": "the campaign measures each of these targets with its full kill set; survivors it reports are killed in tests/v2/test_s2_kills.py and re-measured"
+  },
+  {
+   "id": "S2-VERIFY-2",
+   "what": "OBS-S2-12 said that client.Budget.spend's 'L74 sorted() -> list()' kill (tests/v2/test_s2_kills.py ClientBudget) misses its mutant about 1 run in 720, like the fixed-name fingerprint case. That was wrong: ClientBudget gives Budget.spend a listing object whose glob always returns [b.jsonl, a.jsonl], so without sorted() the reasons come out b before a in every run — the kill depends on no hash order (measured: killed under PYTHONHASHSEED 0, 1, 4242 and random). The statement about fingerprint_fields stands (measured 6 of 3000 seeds).",
+   "corrects": [
+    {
+     "where": "V2-RELEASE-FINDINGS risks_not_findings OBS-S2-12; the controller's report of 2026-10-05",
+     "claimed": "Budget.spend L74's kill is probabilistic (about 1 in 720)",
+     "measured": "deterministic by construction (a fixed fake listing order); the deterministic file covers Budget.spend's 44 mutants anyway"
+    }
+   ]
   }
  ]
 }
