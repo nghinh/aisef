@@ -1,5 +1,9 @@
 # Participant quickstart — external validation (G6)
 
+> **AISEF 2.0 note.** This protocol validates the **1.x** framework at 1.7.6, so the install below is pinned to
+> `aisef==1.7.6`. On 2.0, `aisef run` is the V2 runtime and the 1.x execution is `aisef legacy run` —
+> see [v2/USAGE.md](v2/USAGE.md).
+
 You are about to run AISEF end to end on a small project you have never built,
 using only the public documentation. This page is the shortest path plus the
 outputs you should actually see, so you can tell "AISEF is broken" apart from
@@ -50,7 +54,7 @@ package, so that number can move independently of the release.
 ```bash
 python3 -m venv ~/.venvs/aisef
 source ~/.venvs/aisef/bin/activate
-pip install aisef
+pip install aisef==1.7.6
 ```
 
 Expect: `Successfully installed aisef-1.7.6`, and no other package pulled in —

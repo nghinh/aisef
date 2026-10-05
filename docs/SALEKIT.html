@@ -326,9 +326,9 @@ section { padding: 80px 0; }
 <!-- Hero -->
 <section class="hero">
   <div class="wrap">
-    <div class="hero-badge">Open Source Framework</div>
+    <div class="hero-badge">AISEF 2.0 &middot; Open Source</div>
     <h1>Your agent says <em>"done"</em>.<br>Can you prove it?</h1>
-    <p>AISEF is the engineering harness that turns coding agents from black boxes into auditable, evidence-producing systems. Zero dependencies. One input file. Every claim backed by a SHA.</p>
+    <p>AISEF 2.0 runs an owner-approved plan with a coding agent and decides delivery from harness-owned probes of the product &mdash; never from the agent's word. Every decision lands in a hash-chained journal you can re-verify. Zero dependencies.</p>
     <div class="hero-install">
       <span class="dollar">$</span> pip install aisef
     </div>
@@ -367,11 +367,57 @@ section { padding: 80px 0; }
   </div>
 </section>
 
-<!-- USPs -->
+<!-- 2.0 kernel -->
 <section class="usp">
   <div class="wrap">
-    <h2>What exists nowhere else</h2>
-    <p class="subtitle">Ten capabilities, each measured on real agents rather than theorized. The comparison further down is against publicly documented features of other frameworks; no claim of uniqueness is made beyond that table.</p>
+    <h2>What AISEF 2.0 guarantees</h2>
+    <p class="subtitle">The 2.0 kernel: deterministic, evidence-bound orchestration and product verification. Threat model: a trusted operator; generated code may be faulty or opportunistic.</p>
+    <div class="usp-grid">
+      <div class="usp-card">
+        <div class="usp-num">01</div>
+        <h3>Independent Evidence</h3>
+        <p>ProductProof checks every approved behaviour contract with probes the harness owns: a Python callable, a CLI invocation, a process effect, a file artifact. The developer's tests are evidence of engineering quality, never of product correctness.</p>
+        <span class="usp-tag">Kernel invariant</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">02</div>
+        <h3>A Verdict the Code Cannot Forge</h3>
+        <p>Candidate code runs only inside the probe's agent process; the verdict comes from a controller that never imports it, over an authenticated channel. The code under test cannot manufacture a passing result.</p>
+        <span class="usp-tag">Structural guarantee</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">03</div>
+        <h3>Admission Before Any Model Call</h3>
+        <p>Every hash in the project bundle is re-checked, every behaviour contract must carry the human approval binding it to its requirements, and the plan must pass nine static admission checks. Refused plans come back with their reasons.</p>
+        <span class="usp-tag">Nine checks</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">04</div>
+        <h3>The Model You Declared</h3>
+        <p>Preflight route attestation: the provider's model listing plus one-token probes. The route is accepted only if every answer was served by the declared model under one deployment fingerprint; anything else stops the run before a session starts.</p>
+        <span class="usp-tag">Identity stop</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">05</div>
+        <h3>Preservation and Typed Ownership</h3>
+        <p>Behaviour earlier stories proved is re-proved after every merge; a regression rolls the story back. Every failure has one of seven owners and consumes only that owner's retry budget, and a retry names the failed criterion in public facts, never the hidden stimulus.</p>
+        <span class="usp-tag">Fail closed</span>
+      </div>
+      <div class="usp-card">
+        <div class="usp-num">06</div>
+        <h3>Re-verifiable, Accounted Runs</h3>
+        <p>Requests, turns and tokens are re-derived from evidence before and during every session; unaccounted spend ends the run. The run directory keeps the raw hash-chained journal, and <code>aisef run --verify</code> re-derives the verdict from it alone.</p>
+        <span class="usp-tag">Re-derivable</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USPs (1.x) -->
+<section class="usp" style="background: var(--surface-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="wrap">
+    <h2>Still shipped from 1.x</h2>
+    <p class="subtitle">The 1.x planning pipeline, gates and guards are unchanged in 2.0; its execution runs behind <code>aisef legacy run</code>. Ten capabilities, each measured on real agents rather than theorized. The comparison further down is against publicly documented features of other frameworks; no claim of uniqueness is made beyond that table.</p>
     <div class="usp-grid">
       <div class="usp-card">
         <div class="usp-num">01</div>
@@ -441,7 +487,7 @@ section { padding: 80px 0; }
 <section class="compare">
   <div class="wrap">
     <h2>Compared to what exists</h2>
-    <p class="subtitle">Capabilities checked against publicly documented features of leading agent frameworks as of September 2026.</p>
+    <p class="subtitle">1.x capabilities checked against publicly documented features of leading agent frameworks as of September 2026. The 2.0 kernel guarantees above are not part of this comparison.</p>
     <div class="compare-table-wrap">
       <table class="compare-table">
         <thead>
@@ -553,82 +599,83 @@ section { padding: 80px 0; }
 <section class="evidence">
   <div class="wrap">
     <h2>Measured, not claimed</h2>
-    <p class="subtitle">Every number below comes from real agent runs on real codebases. Where something hasn't been measured, we say so — that's the whole point.</p>
+    <p class="subtitle">From the 2.0 release qualification: release candidate RC2, frozen with its wheel and sdist digests and qualified as shipped. Where something hasn't been measured, we say so &mdash; that's the whole point.</p>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-num">36,208</div>
-        <div class="stat-label">Lines of Python in the framework package, zero dependencies</div>
+        <div class="stat-num">5,454</div>
+        <div class="stat-label">Tests on the exact release candidate, hermetic, 0 failing; CI green on Linux, macOS and Windows</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num">3,122</div>
-        <div class="stat-label">Unit tests, no Docker required</div>
+        <div class="stat-num">6,463 / 6,463</div>
+        <div class="stat-label">Mutants of the release-critical code killed, 0 survivors</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num">188</div>
-        <div class="stat-label">Defects in the failure taxonomy — every one found by running, every one with a regression check</div>
+        <div class="stat-num">100,000</div>
+        <div class="stat-label">Generated traces matched against the kernel's reference model</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num">48</div>
-        <div class="stat-label">Gate checks (16 gates &times; 3 controls)</div>
+        <div class="stat-num">12 / 12</div>
+        <div class="stat-label">Recorded corpus items reproduced with no drift</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num">10/10</div>
-        <div class="stat-label">Client conformance probes passing, 2026-09-08 run</div>
+        <div class="stat-num">59 / 59</div>
+        <div class="stat-label">Acceptance specs satisfied by the delivered product in the live release smoke; 0 false acceptances</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num">11</div>
-        <div class="stat-label">Bug cause classes with regression tests</div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Independent rebuilds byte-identical to the frozen wheel and sdist</div>
       </div>
     </div>
+    <p class="subtitle" style="margin-top: 32px;">The live release smoke ran 7 stories and 67 proof obligations on a real model route: 6 stories were delivered, and one correct story was rolled back because a plan criterion read a docstring line as an import &mdash; the kernel failed closed. Not claimed in 2.0: generalisation across arbitrary workloads, model quality, superiority over 1.x, hostile multi-tenant isolation, a live run on Windows. The evidence is published in <code>closure-evidence/v2/release/</code>.</p>
   </div>
 </section>
 
 <!-- Harness groups -->
 <section class="harness" style="background: var(--surface-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
   <div class="wrap">
-    <h2>The six harness groups</h2>
-    <p class="subtitle">Everything in AISEF belongs to exactly one of these groups. This list is the acceptance yardstick for the framework itself.</p>
+    <h2>Four planes, nine invariants</h2>
+    <p class="subtitle">2.0 separates what 1.x conflated: who defines product truth, what proves it, who owns a story, and what records the run.</p>
     <div class="harness-list">
       <div class="harness-item">
         <span class="h-num">1</span>
         <div>
-          <h4>Instructions &amp; Rule Files</h4>
-          <p>Engineering constitution compiled into CLAUDE.md/AGENTS.md, pinned skill catalog, four agent roles each with its own fresh session, versioned prompts.</p>
+          <h4>Requirement Plane</h4>
+          <p>Human authority. The requirements document is sealed by hash; prose is never read by control.</p>
         </div>
       </div>
       <div class="harness-item">
         <span class="h-num">2</span>
         <div>
-          <h4>Tools</h4>
-          <p>Three evidence-producing tools the agent calls. Every tool carries prose on when to call it, how to read its result, and when not to call it.</p>
+          <h4>Product Plane</h4>
+          <p>Approved behaviour contracts compile to ProductProof specs, evaluated by harness-owned probes. Survives every re-plan.</p>
         </div>
       </div>
       <div class="harness-item">
         <span class="h-num">3</span>
         <div>
-          <h4>Sandboxes &amp; Execution</h4>
-          <p>Four permission levels, an ExecutionProvider contract, five named guarantees. A provider that can't offer one says which one is missing — degraded, never silent.</p>
+          <h4>Planning Plane</h4>
+          <p>Plan obligations (INTRODUCE, PRESERVE, VERIFY) and static admission. Revising a plan never invalidates product evidence.</p>
         </div>
       </div>
       <div class="harness-item">
         <span class="h-num">4</span>
         <div>
-          <h4>Orchestration Logic</h4>
-          <p>Role routing where reviewer &ne; developer, story state machine, wave scheduling by dependency and write scope, handoff packets with declared sources.</p>
+          <h4>Record Plane</h4>
+          <p>An append-only, hash-chained journal is the sole authority for run state; every read model is a pure fold of it.</p>
         </div>
       </div>
       <div class="harness-item">
         <span class="h-num">5</span>
         <div>
-          <h4>Guardrails &amp; Hooks</h4>
-          <p>Ten guards on three lifecycle moments, each a standalone command returning an exit code. Compiled into whatever the client supports, defined in one place.</p>
+          <h4>Nine Invariants</h4>
+          <p>Requirement Authority, Independent Evidence, Typed Ownership, Immutable Provenance, No Prose As Control State and four more, armed in every test tier.</p>
         </div>
       </div>
       <div class="harness-item">
         <span class="h-num">6</span>
         <div>
-          <h4>Observability</h4>
-          <p>Structured events with provenance, cost and latency per session, every check bound to the SHA of the candidate, behaviour ledger, benchmark corpus.</p>
+          <h4>The 1.x Harness, Still Shipped</h4>
+          <p>Instructions and rules, tools, sandboxes, orchestration, ten guards and observability &mdash; the six 1.x harness groups, behind <code>aisef legacy run</code>.</p>
         </div>
       </div>
     </div>
@@ -639,7 +686,7 @@ section { padding: 80px 0; }
 <section class="cta">
   <div class="wrap">
     <h2>Start building with evidence</h2>
-    <p>One file in, verified software out. AISEF is open source, zero dependencies, and installs in one command.</p>
+    <p>An approved bundle in, verified delivery out. AISEF is open source, zero dependencies, and installs in one command.</p>
     <div class="cta-buttons">
       <a class="btn btn-primary" href="https://pypi.org/project/aisef/" target="_blank" rel="noopener">Install from PyPI</a>
       <a class="btn btn-outline" href="https://github.com/nghinh/aisef" target="_blank" rel="noopener">View on GitHub</a>
@@ -649,6 +696,6 @@ section { padding: 80px 0; }
 
 <footer class="footer">
   <div class="wrap">
-    AISEF — AI Software Engineering Framework &middot; v1.7.2 &middot; Open Source
+    AISEF — AI Software Engineering Framework &middot; v2.0.0 &middot; Open Source
   </div>
 </footer>
