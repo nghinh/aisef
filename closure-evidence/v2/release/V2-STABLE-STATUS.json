@@ -667,6 +667,7 @@
   "rc": "1565bccff66cda866820d5307a26de462e79e9a0",
   "version": "2.0.0",
   "next_action": "OWNER_CONFIRM_PRODUCTION_TAG_AND_PYPI (charter §19; docs/v2/RELEASE-PROCESS.md 'How the owner confirms'): the owner's RELEASE-DECISIONS entry (PRODUCTION_PUBLISH AUTHORIZED, VERSION 2.0.0), the v2.0.0 tag, the pypi environment approval",
-  "held": "no tag, no TestPyPI or PyPI upload, no GitHub Release by the controller"
+  "held": "no tag, no TestPyPI or PyPI upload, no GitHub Release by the controller",
+  "ci_on_the_ready_commit": "483ec1d: tests 37367561320 and staging 37367561525 green on attempt 2 after four jobs were never acquired by a hosted runner in attempt 1 (OBS-S7-1, ENVIRONMENT); staging rebuilt the frozen bytes"
  }
 }

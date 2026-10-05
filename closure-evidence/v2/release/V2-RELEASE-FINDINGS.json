@@ -668,6 +668,11 @@
    "id": "OBS-S5-4",
    "what": "q5_run.sh reproduces before checking that Q4's differential exists; q5.py aggregate() binds it (P8 evidence), so Q5 reproduction attempt 1 — run before Q4 — reproduced all 12 items GREEN and then raised FileNotFoundError at aggregation.",
    "disposition": "not a finding (run order; C2 ran Q4 before Q5): attempt 1 kept in Q5-RC1/attempts/reproduction-1-before-q4/; attempt 2 after Q4 GREEN. V2.1 note: q5_run.sh could refuse up front when Q4's record is absent"
+  },
+  {
+   "id": "OBS-S7-1",
+   "what": "CI on 483ec1d (the evidence commit carrying FINAL_RELEASE_READY PASS), attempt 1: four jobs were cancelled with GitHub's annotation 'The job was not acquired by Runner of type hosted even after multiple attempts' — tests run 37367561320: lint, wheel, unit (ubuntu-latest, 3.14); staging run 37367561525: install (windows-latest). None of them started, so none gave a verdict. Every job that ran passed (unit ubuntu 3.11-3.13, macos 3.12, windows 3.11; staging build — wheel 5e840f7b and sdist a7a1a5fb, the frozen bytes — and the ubuntu install smokes).",
+   "disposition": "not a finding: ENVIRONMENT (hosted-runner capacity), as OBS-S4-2. A recorded diagnostic re-run of the failed jobs (gh run rerun --failed, attempt 2 of both runs) passed every job: tests 37367561320 attempt 2 8/8 (lint, wheel, unit ubuntu 3.11-3.14, macos 3.12, windows 3.11); staging 37367561525 attempt 2: build (wheel 5e840f7b, sdist a7a1a5fb = the frozen digests), install ubuntu (installed smoke + installed product smoke PASS) and windows (installed smoke PASS). No code or qualification input involved."
   }
  ],
  "reviews": [
