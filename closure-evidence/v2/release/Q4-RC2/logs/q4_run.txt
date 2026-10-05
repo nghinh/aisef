@@ -1,0 +1,28 @@
+[2026-10-05 21:30:08] Q4 (release): 10 x 10000 traces, 5 workers, attempt 1, kernel tree 12ef35b0b25fadc318ea18cb09419693ac65fa0a, HEAD 18cddad1, out closure-evidence/v2/release/Q4-RC2
+wrote /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s6rel/closure-evidence/v2/release/Q4-RC2/SUBJECT.json: unreached {} problems []
+conformance start: F1-F11 PASS, V1 guard PASS, W0 unchanged
+[2026-10-05 21:31:04] chunk 0 start (attempt 1)
+[2026-10-05 21:31:04] chunk 1 start (attempt 1)
+[2026-10-05 21:31:04] chunk 2 start (attempt 1)
+[2026-10-05 21:31:04] chunk 3 start (attempt 1)
+[2026-10-05 21:31:04] chunk 4 start (attempt 1)
+[2026-10-05 21:35:38] chunk 4 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 274s)
+[2026-10-05 21:35:39] chunk 5 start (attempt 1)
+[2026-10-05 21:35:41] chunk 3 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 277s)
+[2026-10-05 21:35:41] chunk 1 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 277s)
+[2026-10-05 21:35:42] chunk 0 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 278s)
+[2026-10-05 21:35:43] chunk 2 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 279s)
+[2026-10-05 21:35:44] chunk 6 start (attempt 1)
+[2026-10-05 21:35:44] chunk 7 start (attempt 1)
+[2026-10-05 21:35:44] chunk 8 start (attempt 1)
+[2026-10-05 21:35:44] chunk 9 start (attempt 1)
+[2026-10-05 21:40:22] chunk 6 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 277s)
+[2026-10-05 21:40:22] chunk 8 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 277s)
+[2026-10-05 21:40:22] chunk 5 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 282s)
+[2026-10-05 21:40:22] chunk 7 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 278s)
+[2026-10-05 21:40:23] chunk 9 end rc=0: owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 279s)
+conformance end: F1-F11 PASS, V1 guard PASS, W0 unchanged
+[2026-10-05 21:40:47] chunks finished: 0 non-zero exit(s); aggregating
+Q4 GREEN: matched 100000 divergence 0 invariant 0 exception 0 silent 0 of 100000; identities 1; zero-sample []
+[2026-10-05 21:40:57] aggregation rc=0
+exit 0
