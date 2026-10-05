@@ -1,0 +1,36 @@
+{
+ "record": "AISEF V2.0 — S5 Q0-Q3 qualification attempts on RC2 (qualification.yml; each run a recorded attempt, never a rerun-to-green)",
+ "attempts": [
+  {
+   "attempt": 1,
+   "run": 37320784000,
+   "commit": "088865b",
+   "trigger": "intended",
+   "subject": "V2.0-RC2 1565bcc (kernel tree 12ef35b0), from V2.0-RC2-FREEZE.json",
+   "harness": "b36907092fe7 (the RC2 candidate's)",
+   "result": "every job GREEN: Q0 58, Q1 401, Q2 191, Q3 565 + 1 N/A on linux 3.11-3.14 and windows 3.11; owned 0/0/0",
+   "records": {
+    "Q0-linux-py3.11.json": "5eca3697e28b54989dc46e69334d54cbff9a7544809c51e672271f3ded4a9a9f",
+    "Q0-linux-py3.12.json": "581a4eeafccfd18091066200b9e95069f6f8e83296f278be012bfc524c4fb73c",
+    "Q0-linux-py3.13.json": "acfa5e87c53a7c11463b93bad61a5b6e1523e8a3e7c4f7a99e9a281179adb961",
+    "Q0-linux-py3.14.json": "beb8ed7af9c470cd954ae23d87eceef5cc295d0d1759ae53bc18da5103e21907",
+    "Q0-windows-py3.11.json": "d2eb9ae62d03d1d157519cfec1a8e88d41fa80ed8c793ab84340245616279fd4",
+    "Q1-linux-py3.11.json": "5325ccfeccbc8deb957ad4bc48c4a4e36e6229b0125c92aa27b2573141771d42",
+    "Q1-linux-py3.12.json": "b068e39c8bc1b114f7f77e3890b853c9520e65e8e4a2f627322e25fafa9943b2",
+    "Q1-linux-py3.13.json": "039a3bfefe6b10b5be0de5dc216562f481038c7372f36a0cebd85392079f593d",
+    "Q1-linux-py3.14.json": "e8f7a6800770092e04adde94858d8417bfca02914eb82e150205d05b05e2652f",
+    "Q1-windows-py3.11.json": "894209dab6cc59560c6e1c0820028b322a7f9e69942568a7bab8b356de1f8df0",
+    "Q2-linux-py3.11.json": "9f5af1bc77ad39fd36cffada1323212fa0ca6e36c83363368d2fdec8ed38b35a",
+    "Q2-linux-py3.12.json": "151299c6730bbc74c87edb5ac470abaf2bcaa5d0939282f0aecd7bcd4abab5e8",
+    "Q2-linux-py3.13.json": "6f2eaf99b123d9d20c34bfd4ff047b3e10911977612cf7b8ac19296adebb73ab",
+    "Q2-linux-py3.14.json": "f1fda16965862337b409f07bf699f648ad5ff50f9e203810c21e21b184b0039b",
+    "Q2-windows-py3.11.json": "b6f1f99e327e1afd26d079c4ee5f1e9de321a80ac1e8e4cba94d5f2718971dd4",
+    "Q3-linux-py3.11.json": "94c2998297c5de2411c78bf6d9e1f4f80e2f1893c33c05100f4fb8a3fd14f43c",
+    "Q3-linux-py3.12.json": "d56a4608e4048eec2aef0eb5fcf47afb857dd1068fe804d2ad33741e8ce2e386",
+    "Q3-linux-py3.13.json": "bdd8696887daa40f44934d73f6ca6149591aea4e0209d88d125a73aa1a1182ea",
+    "Q3-linux-py3.14.json": "cf1dbb5b132466aa8e91aaf8d76d6577505a1f194794526f363e10cc284aa2b0",
+    "Q3-windows-py3.11.json": "2b9a4aa08e2e42fa57deda3ceba3d85db8e69c1998847bbd277334fa033c99c6"
+   }
+  }
+ ]
+}

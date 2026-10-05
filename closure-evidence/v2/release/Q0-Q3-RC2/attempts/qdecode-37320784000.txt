@@ -1,0 +1,146 @@
+qualify (ubuntu-latest, 3.14) (job 111798996515, success): closure-evidence/v2/release/Q0-Q3-RC2/Q0/Q0-linux-py3.14.json sha256 beb8ed7af9c4 verdict GREEN
+qualify (ubuntu-latest, 3.14) (job 111798996515, success): closure-evidence/v2/release/Q0-Q3-RC2/Q1/Q1-linux-py3.14.json sha256 e8f7a6800770 verdict GREEN
+qualify (ubuntu-latest, 3.14) (job 111798996515, success): closure-evidence/v2/release/Q0-Q3-RC2/Q2/Q2-linux-py3.14.json sha256 f1fda1696586 verdict GREEN
+qualify (ubuntu-latest, 3.14) (job 111798996515, success): closure-evidence/v2/release/Q0-Q3-RC2/Q3/Q3-linux-py3.14.json sha256 cf1dbb5b1324 verdict GREEN
+qualify (ubuntu-latest, 3.13) (job 111798996710, success): closure-evidence/v2/release/Q0-Q3-RC2/Q0/Q0-linux-py3.13.json sha256 acfa5e87c53a verdict GREEN
+qualify (ubuntu-latest, 3.13) (job 111798996710, success): closure-evidence/v2/release/Q0-Q3-RC2/Q1/Q1-linux-py3.13.json sha256 039a3bfefe6b verdict GREEN
+qualify (ubuntu-latest, 3.13) (job 111798996710, success): closure-evidence/v2/release/Q0-Q3-RC2/Q2/Q2-linux-py3.13.json sha256 6f2eaf99b123 verdict GREEN
+qualify (ubuntu-latest, 3.13) (job 111798996710, success): closure-evidence/v2/release/Q0-Q3-RC2/Q3/Q3-linux-py3.13.json sha256 bdd8696887da verdict GREEN
+qualify (ubuntu-latest, 3.11) (job 111798996738, success): closure-evidence/v2/release/Q0-Q3-RC2/Q0/Q0-linux-py3.11.json sha256 5eca3697e28b verdict GREEN
+qualify (ubuntu-latest, 3.11) (job 111798996738, success): closure-evidence/v2/release/Q0-Q3-RC2/Q1/Q1-linux-py3.11.json sha256 5325ccfeccbc verdict GREEN
+qualify (ubuntu-latest, 3.11) (job 111798996738, success): closure-evidence/v2/release/Q0-Q3-RC2/Q2/Q2-linux-py3.11.json sha256 9f5af1bc77ad verdict GREEN
+qualify (ubuntu-latest, 3.11) (job 111798996738, success): closure-evidence/v2/release/Q0-Q3-RC2/Q3/Q3-linux-py3.11.json sha256 94c2998297c5 verdict GREEN
+qualify (windows-latest, 3.11) (job 111798996775, success): closure-evidence/v2/release/Q0-Q3-RC2/Q0/Q0-windows-py3.11.json sha256 d2eb9ae62d03 verdict GREEN
+qualify (windows-latest, 3.11) (job 111798996775, success): closure-evidence/v2/release/Q0-Q3-RC2/Q1/Q1-windows-py3.11.json sha256 894209dab6cc verdict GREEN
+qualify (windows-latest, 3.11) (job 111798996775, success): closure-evidence/v2/release/Q0-Q3-RC2/Q2/Q2-windows-py3.11.json sha256 b6f1f99e327e verdict GREEN
+qualify (windows-latest, 3.11) (job 111798996775, success): closure-evidence/v2/release/Q0-Q3-RC2/Q3/Q3-windows-py3.11.json sha256 2b9a4aa08e2e verdict GREEN
+qualify (ubuntu-latest, 3.12) (job 111798997267, success): closure-evidence/v2/release/Q0-Q3-RC2/Q0/Q0-linux-py3.12.json sha256 581a4eeafccf verdict GREEN
+qualify (ubuntu-latest, 3.12) (job 111798997267, success): closure-evidence/v2/release/Q0-Q3-RC2/Q1/Q1-linux-py3.12.json sha256 b068e39c8bc1 verdict GREEN
+qualify (ubuntu-latest, 3.12) (job 111798997267, success): closure-evidence/v2/release/Q0-Q3-RC2/Q2/Q2-linux-py3.12.json sha256 151299c6730b verdict GREEN
+qualify (ubuntu-latest, 3.12) (job 111798997267, success): closure-evidence/v2/release/Q0-Q3-RC2/Q3/Q3-linux-py3.12.json sha256 d56a4608e404 verdict GREEN
+{
+ "run": "37320784000",
+ "records": 20,
+ "owned_runs": {
+  "qualify (ubuntu-latest, 3.14)": {
+   "command": [
+    "python",
+    "-P",
+    "validation/qualification/run.py",
+    "--rungs",
+    "q0",
+    "q1",
+    "q2",
+    "q3",
+    "--print"
+   ],
+   "exit": 0,
+   "mechanism": "posix-session-and-group",
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "residual": [],
+   "escaped": [],
+   "ladder": [],
+   "released_empty": true,
+   "harness_orphans_before": 0,
+   "harness_orphans_after": 0
+  },
+  "qualify (ubuntu-latest, 3.13)": {
+   "command": [
+    "python",
+    "-P",
+    "validation/qualification/run.py",
+    "--rungs",
+    "q0",
+    "q1",
+    "q2",
+    "q3",
+    "--print"
+   ],
+   "exit": 0,
+   "mechanism": "posix-session-and-group",
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "residual": [],
+   "escaped": [],
+   "ladder": [],
+   "released_empty": true,
+   "harness_orphans_before": 0,
+   "harness_orphans_after": 0
+  },
+  "qualify (ubuntu-latest, 3.11)": {
+   "command": [
+    "python",
+    "-P",
+    "validation/qualification/run.py",
+    "--rungs",
+    "q0",
+    "q1",
+    "q2",
+    "q3",
+    "--print"
+   ],
+   "exit": 0,
+   "mechanism": "posix-session-and-group",
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "residual": [],
+   "escaped": [],
+   "ladder": [],
+   "released_empty": true,
+   "harness_orphans_before": 0,
+   "harness_orphans_after": 0
+  },
+  "qualify (windows-latest, 3.11)": {
+   "command": [
+    "python",
+    "-P",
+    "validation/qualification/run.py",
+    "--rungs",
+    "q0",
+    "q1",
+    "q2",
+    "q3",
+    "--print"
+   ],
+   "exit": 0,
+   "mechanism": "windows-job",
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "residual": [],
+   "escaped": [],
+   "ladder": [],
+   "released_empty": true,
+   "harness_orphans_before": null,
+   "harness_orphans_after": null
+  },
+  "qualify (ubuntu-latest, 3.12)": {
+   "command": [
+    "python",
+    "-P",
+    "validation/qualification/run.py",
+    "--rungs",
+    "q0",
+    "q1",
+    "q2",
+    "q3",
+    "--print"
+   ],
+   "exit": 0,
+   "mechanism": "posix-session-and-group",
+   "owned_before": 0,
+   "owned_at_exit": 0,
+   "owned_after": 0,
+   "residual": [],
+   "escaped": [],
+   "ladder": [],
+   "released_empty": true,
+   "harness_orphans_before": 0,
+   "harness_orphans_after": 0
+  }
+ }
+}
