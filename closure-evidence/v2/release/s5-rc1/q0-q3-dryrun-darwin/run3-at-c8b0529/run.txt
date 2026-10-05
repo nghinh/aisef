@@ -1,0 +1,7 @@
+qualification subject (release): seal 529591e4f2ae candidate 529591e4f2ae kernel c6ddf5b9c0b4 | HEAD c8b052904b27 kernel c6ddf5b9c0b4 | harness ca2ce49b0e77 | platform darwin-py3.14
+Q0: GREEN in 225.6s — {'PASS': 58, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'NOT_APPLICABLE': 0} problems 0
+Q1: GREEN in 478.1s — {'PASS': 401, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'NOT_APPLICABLE': 0} problems 0
+Q2: GREEN in 159.4s — {'PASS': 191, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'NOT_APPLICABLE': 0} problems 0
+Q3: GREEN in 392.2s — {'PASS': 565, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'NOT_APPLICABLE': 1} problems 0
+owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 1257s)
+exit 0
