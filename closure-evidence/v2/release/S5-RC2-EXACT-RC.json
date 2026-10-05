@@ -1,0 +1,141 @@
+{
+ "record": "AISEF V2.0 — S5 exact-RC checks on V2.0-RC2 (owner ruling 2026-10-05: RC2 requalified at every invalidated stage)",
+ "rc": {
+  "sha": "1565bccff66cda866820d5307a26de462e79e9a0",
+  "version": "2.0.0",
+  "kernel_tree": "12ef35b0b25fadc318ea18cb09419693ac65fa0a",
+  "kernel_digest": "d1972a2ab89a6831c28af79ed9fda6ef207cecefe96db479dbe5f19ffb8b6a93",
+  "wheel": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+  "sdist": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+  "freeze_record": {
+   "path": "closure-evidence/v2/release/V2.0-RC2-FREEZE.json",
+   "sha256": "05338b7861a0f2a90ae7dca41409d1c5e953d45304c57d4ce22a1e6f63e59e21"
+  }
+ },
+ "hermetic_environment": {
+  "how": "env -i; fresh HOME and XDG_CONFIG/DATA/STATE/CACHE_HOME; PATH without any directory holding an opencode executable; TMPDIR, LANG, USER, LOGNAME only",
+  "env": {
+   "path": "closure-evidence/v2/release/s5-rc2/env.sh",
+   "sha256": "9e4ac0242b8e8009cb80c3709c86e88f303afa2ab41abfa631ab335f89ae8b59"
+  },
+  "proof_before": {
+   "path": "closure-evidence/v2/release/s5-rc2/hermetic-proof-before.json",
+   "sha256": "b4299327ebc3eed20674a532d9a56ffa7e5217e0e2a962007a92a3cd398d7a9b"
+  },
+  "proof_after": {
+   "path": "closure-evidence/v2/release/s5-rc2/hermetic-proof-after.json",
+   "sha256": "b4299327ebc3eed20674a532d9a56ffa7e5217e0e2a962007a92a3cd398d7a9b"
+  },
+  "runner": {
+   "path": "closure-evidence/v2/release/s5-rc2/run-suite.sh",
+   "sha256": "a3883c7f944469d87bf8f4c9842c33f92c4419c90b68dc00c403d2b7b62b746e"
+  }
+ },
+ "full_suite": {
+  "worktree": "a fresh detached worktree at 1565bccff66cda866820d5307a26de462e79e9a0",
+  "command": "python3 -P validation/v2/owned_run.py -- python3 -m unittest discover -s tests",
+  "started": "2026-10-05T12:54:22Z",
+  "finished": "2026-10-05T13:29:19Z",
+  "result": "Ran 5454 tests in 2095 s; OK (skipped=80); FAILED 0",
+  "owned": "before=0 at_exit=0 after=0 escaped=0 released_empty=True",
+  "log": {
+   "path": "closure-evidence/v2/release/s5-rc2/suite-hermetic-1565bcc.txt",
+   "sha256": "244a99b4b377d1175cf1e7bead5d84c039b31072ce901a0d1e558603f2b7fcdc"
+  },
+  "owned_run": {
+   "path": "closure-evidence/v2/release/s5-rc2/owned-hermetic-1565bcc.json",
+   "sha256": "98519e1b62cef46c691dec0b79bd181f7fb0dcc962d8c4760e9fff7db4f99773"
+  }
+ },
+ "checks": {
+  "1_head_is_the_RC": {
+   "result": true,
+   "before": "1565bccff66cda866820d5307a26de462e79e9a0",
+   "after_the_suite": "1565bccff66cda866820d5307a26de462e79e9a0"
+  },
+  "2_working_tree_clean": {
+   "result": true,
+   "after": "0 status lines",
+   "record": {
+    "path": "closure-evidence/v2/release/s5-rc2/rc-status-after.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  "3_kernel_tree_and_digest": {
+   "result": true,
+   "tree": "12ef35b0b25fadc318ea18cb09419693ac65fa0a",
+   "digest": "d1972a2ab89a6831c28af79ed9fda6ef207cecefe96db479dbe5f19ffb8b6a93",
+   "release_rc_check": "PASS"
+  },
+  "4_frozen_hashes": {
+   "result": true,
+   "wheel": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+   "sdist": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+   "source": "staging 37312767560 build of 1565bcc",
+   "sums": {
+    "path": "closure-evidence/v2/release/s4-rc2/SHA256SUMS-1565bcc",
+    "sha256": "98ca2dc936f7d7dc4387cbb86b0fc233bf5a797491484b003325938ad59a3ada"
+   }
+  },
+  "5_rebuild_byte_for_byte": {
+   "result": true,
+   "run": "staging 37317404055 on the freeze commit 7f5a6a0 (shipped files the RC's; epoch the frozen 1791204847)",
+   "build_job": 111787502976,
+   "sums": {
+    "path": "closure-evidence/v2/release/s4-rc2/SHA256SUMS-rebuild-7f5a6a0",
+    "sha256": "98ca2dc936f7d7dc4387cbb86b0fc233bf5a797491484b003325938ad59a3ada"
+   },
+   "log": {
+    "path": "closure-evidence/v2/release/s4-rc2/staging-build-111787502976.log",
+    "sha256": "6a05183e67ab6646a2301c92f73c182813ba2520c8ebdace41e751df5148756b"
+   },
+   "equal_to_frozen": true
+  },
+  "6_clean_install_smoke_from_the_rebuilt_wheel": {
+   "result": true,
+   "ubuntu": {
+    "job": 111787685676,
+    "smokes": "installed smoke PASS (aisef 2.0.0); installed product smoke PASS (aisef run --check, run, --verify)",
+    "log": {
+     "path": "closure-evidence/v2/release/s4-rc2/staging-install-111787685676.log",
+     "sha256": "0fbd7607a73c4fc9ea28e36d8e13d806291487490ebb6bb3d500ac0e34a4603e"
+    }
+   },
+   "windows": {
+    "job": 111787685675,
+    "smokes": "installed smoke PASS (aisef 2.0.0)",
+    "log": {
+     "path": "closure-evidence/v2/release/s4-rc2/staging-install-111787685675.log",
+     "sha256": "1565c96c3f12562a312037c687805e40aa7b6a2c6fb3e29673ba18652b3b1b62"
+    }
+   }
+  },
+  "7_no_post_RC_commit_in_the_package": {
+   "result": true,
+   "why": "every commit after 1565bcc changes only closure-evidence/ (136 files), which the package does not hold"
+  },
+  "8_real_opencode_store_unchanged": {
+   "result": true,
+   "how": "os.stat metadata only — nothing opened, read or modified",
+   "before_the_suite": {
+    "path": "closure-evidence/v2/release/s5-rc2/real-store-before.json",
+    "sha256": "d6a699f57082ac08b82c4382ffae44e8ecdbd964f94e3a27d7184cdfb94e047e"
+   },
+   "after_the_suite": {
+    "path": "closure-evidence/v2/release/s5-rc2/real-store-after.json",
+    "sha256": "d6a699f57082ac08b82c4382ffae44e8ecdbd964f94e3a27d7184cdfb94e047e"
+   },
+   "end_of_s5": {
+    "path": "closure-evidence/v2/release/s5-rc2/real-store-end-of-s5.json",
+    "sha256": "d6a699f57082ac08b82c4382ffae44e8ecdbd964f94e3a27d7184cdfb94e047e"
+   }
+  },
+  "9_no_external_action": {
+   "result": true,
+   "provider_calls_in_s5": 0,
+   "paid_smoke": "not run",
+   "tags": "none",
+   "testpypi_pypi": "no upload"
+  }
+ }
+}

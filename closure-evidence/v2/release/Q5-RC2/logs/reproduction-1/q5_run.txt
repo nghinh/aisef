@@ -1,0 +1,20 @@
+[2026-10-05 21:44:16] Q5 (release): reproduction attempt 1, kernel tree 12ef35b0b25fadc318ea18cb09419693ac65fa0a, HEAD fc519d3e, out closure-evidence/v2/release/Q5-RC2
+subject 0f1ea75b3f59 frozen; problems []
+conformance start: F1 PASS F9 PASS all PASS
+reproduced bytes-returning-python-callable: GREEN — journal {'expected': 63, 'observed': 63} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced cli-proved-story: GREEN — journal {'expected': 63, 'observed': 63} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced cli-refuted-then-commit: GREEN — journal {'expected': 91, 'observed': 91} diffs 0; tools 1 diffs 0; workspace MATCH; model 3/3 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced developer-outage-rollback: GREEN — journal {'expected': 51, 'observed': 51} diffs 0; tools 0 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced file-artifact-prohibition: GREEN — journal {'expected': 53, 'observed': 53} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced normal-completion: GREEN — journal {'expected': 63, 'observed': 63} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced post-merge-regression: GREEN — journal {'expected': 143, 'observed': 143} diffs 0; tools 2 diffs 0; workspace MATCH; model 4/4 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced pre-satisfied: GREEN — journal {'expected': 53, 'observed': 53} diffs 0; tools 1 diffs 0; workspace MATCH; model 1/1 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced retry-then-commit: GREEN — journal {'expected': 91, 'observed': 91} diffs 0; tools 1 diffs 0; workspace MATCH; model 3/3 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced review-finding-rollback: GREEN — journal {'expected': 89, 'observed': 89} diffs 0; tools 0 diffs 0; workspace MATCH; model 4/4 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced scenario-proved-story: GREEN — journal {'expected': 63, 'observed': 63} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced security-finding-rollback: GREEN — journal {'expected': 99, 'observed': 99} diffs 0; tools 2 diffs 0; workspace MATCH; model 4/4 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+Q5 GREEN: {'replay_request_mismatch': 0, 'assert_consumed_failure': 0, 'tool_diff': 0, 'subprocess_diff': 0, 'workspace_diff': 0, 'probe_product_diff': 0, 'control_diff': 0, 'capability_mismatch': 0, 'harness_error': 0, 'invariant_violation': 0, 'exception': 0, 'residual_process': 0, 'items': 12, 'green': 12, 'expected_model_calls': 31, 'consumed_model_calls': 31, 'missing_replay_calls': 0, 'extra_model_calls': 0, 'request_hash_mismatches': 0, 'drift_total': 0, 'tool_executions': 12, 'tool_result_replays': 0, 'tool_diffs': 0, 'subprocess_executions': 177, 'workspace_diffs': 0, 'socket_attempts': 0}
+owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 44s)
+[2026-10-05 21:45:10] reproduction rc=0
+conformance end: F1 PASS F9 PASS all PASS
+exit 0

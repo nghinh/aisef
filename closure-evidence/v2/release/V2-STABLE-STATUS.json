@@ -5,8 +5,8 @@
  "S1_FAIL_CLOSED": "PASS",
  "S2_FIX_WINDOW": "PASS",
  "S3_PRODUCTIZED": "PASS",
- "S4_RC_FROZEN": "RUNNING",
- "S5_QUALIFIED": "NOT_STARTED",
+ "S4_RC_FROZEN": "PASS",
+ "S5_QUALIFIED": "PASS",
  "S6_RELEASE_SMOKE": "NOT_STARTED",
  "S7_TESTPYPI": "NOT_STARTED",
  "FINAL_RELEASE_READY": "NOT_STARTED",
@@ -138,6 +138,18 @@
    "status": "RUNNING",
    "on": "1565bccff66cda866820d5307a26de462e79e9a0",
    "what": "V2.0-RC2 frozen (V2.0-RC2-FREEZE.json): wheel 5e840f7b, sdist a7a1a5fb, kernel tree 12ef35b0; CI + staging rebuild on the freeze commit pending"
+  },
+  {
+   "phase": "S4_RC_FROZEN",
+   "status": "PASS",
+   "on": "1565bccff66cda866820d5307a26de462e79e9a0",
+   "what": "CI 8/8 on 1565bcc and on the freeze commit 7f5a6a0; staging rebuild at the frozen epoch byte-identical; clean-install smokes PASS"
+  },
+  {
+   "phase": "S5_QUALIFIED",
+   "status": "PASS",
+   "on": "1565bccff66cda866820d5307a26de462e79e9a0",
+   "what": "S5 complete on exactly RC2 1565bcc: hermetic suite 5454/0; CI 8/8; Q0-Q3 GREEN on Linux/Windows (attempt 1); Q4 100,000/100,000 matched; Q5 12/12 reproduced; rebuild byte-identical; no provider call, tag or upload"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
@@ -506,7 +518,7 @@
    },
    "real_store_unchanged": true
   },
-  "ci": "tests 37312767577 on 1565bcc (recorded when complete); 3f3270c (the tree): only the 3 mutation-bound failures, 7/7 jobs"
+  "ci": "tests 37312767577 on 1565bcc: 8/8 PASS"
  },
  "S4_DETAIL": {
   "RC": "V2.0-RC2",
@@ -530,6 +542,46 @@
    "path": "closure-evidence/v2/release/s4-rc2/staging-build-111771979318.log",
    "sha256": "ca9f48df561fb0bcd26cc0238103723638a29223f45adf286d094ff37ae26446"
   },
-  "pending": "CI and the staging rebuild on the freeze commit (the frozen epoch)"
+  "pending": null,
+  "ci": "tests 37312767577 on 1565bcc 8/8; tests 37317404078 on the freeze commit 7f5a6a0 8/8; staging rebuild byte-identical (37317404055)"
+ },
+ "S5_DETAIL": {
+  "rc": "1565bccff66cda866820d5307a26de462e79e9a0",
+  "record": {
+   "path": "closure-evidence/v2/release/S5-RC2-QUALIFIED.json",
+   "sha256": "53fc252f27ed61614b9d12f60eff9d744b69953021b9d9f6993eec434d9c6834"
+  },
+  "items": {
+   "1 full suite": "PASS",
+   "2 lint/static checks": "PASS",
+   "3 CI on claimed release platforms": "PASS",
+   "4-7 Q0, Q1, Q2, Q3": "PASS",
+   "8 Q4 fresh": "PASS",
+   "9 Q5 fresh/reproduction": "PASS",
+   "10 clean wheel build": "PASS",
+   "11 wheel digest binding": "PASS"
+  },
+  "exact_rc_checks": {
+   "path": "closure-evidence/v2/release/S5-RC2-EXACT-RC.json",
+   "sha256": "20d8e2cbc1db572c092455790a9a00c231f8d47293210df9f3a0f37f8b70a156"
+  },
+  "q0_q3": {
+   "path": "closure-evidence/v2/release/Q0-Q3-RC2/SUMMARY.json",
+   "sha256": "d4ddcec0835d49a07c6d13a9841865ba9f9bb79c1a2d84ab9493f85469e03954"
+  },
+  "q4": {
+   "path": "closure-evidence/v2/release/Q4-RC2/DIFFERENTIAL.json",
+   "sha256": "d383d4d07d31f9fbd2246efeeec131e09f1a846cebc6ec8bdc970c167cebd61e"
+  },
+  "q5": {
+   "path": "closure-evidence/v2/release/Q5-RC2/REPRODUCTION.json",
+   "sha256": "3e6b5d63f2d69130f19ca408429e88d655e229d45bb8c63784f5a9d65573b74f"
+  },
+  "external_actions": {
+   "provider_calls_in_s5": 0,
+   "paid_smokes": 0,
+   "tags": 0,
+   "testpypi_or_pypi_uploads": 0
+  }
  }
 }

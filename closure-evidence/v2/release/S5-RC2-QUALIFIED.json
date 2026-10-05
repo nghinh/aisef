@@ -1,0 +1,84 @@
+{
+ "record": "AISEF V2.0 — S5 FINAL DETERMINISTIC QUALIFICATION of RC2 (charter §12; owner ruling 2026-10-05 for S6-SMOKE-1-PREFLIGHT-OPAQUE)",
+ "rc": {
+  "sha": "1565bccff66cda866820d5307a26de462e79e9a0",
+  "version": "2.0.0",
+  "kernel_tree": "12ef35b0b25fadc318ea18cb09419693ac65fa0a",
+  "kernel_digest": "d1972a2ab89a6831c28af79ed9fda6ef207cecefe96db479dbe5f19ffb8b6a93",
+  "wheel": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+  "sdist": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+  "freeze_record": {
+   "path": "closure-evidence/v2/release/V2.0-RC2-FREEZE.json",
+   "sha256": "05338b7861a0f2a90ae7dca41409d1c5e953d45304c57d4ce22a1e6f63e59e21"
+  }
+ },
+ "items": {
+  "1 full suite": {
+   "result": "PASS",
+   "detail": "hermetic, on exactly 1565bcc: 5454 tests, 0 failed",
+   "evidence": {
+    "path": "closure-evidence/v2/release/S5-RC2-EXACT-RC.json",
+    "sha256": "20d8e2cbc1db572c092455790a9a00c231f8d47293210df9f3a0f37f8b70a156"
+   }
+  },
+  "2 lint/static checks": {
+   "result": "PASS",
+   "detail": "CI lint on 1565bcc (tests 37312767577) and on every later commit; Q0 static integrity GREEN"
+  },
+  "3 CI on claimed release platforms": {
+   "result": "PASS",
+   "detail": "tests 37312767577 on 1565bcc 8/8 (ubuntu 3.11-3.14, macOS 3.12 5454 OK; windows 3.11 5451 OK; lint; wheel); tests 37317404078 on the freeze commit 7f5a6a0 (release mode) 8/8"
+  },
+  "4-7 Q0, Q1, Q2, Q3": {
+   "result": "PASS",
+   "detail": "SUMMARY GREEN on Linux 3.11-3.14 and Windows 3.11 (qualification run 37320784000, attempt 1)",
+   "evidence": {
+    "path": "closure-evidence/v2/release/Q0-Q3-RC2/SUMMARY.json",
+    "sha256": "d4ddcec0835d49a07c6d13a9841865ba9f9bb79c1a2d84ab9493f85469e03954"
+   }
+  },
+  "8 Q4 fresh": {
+   "result": "PASS",
+   "detail": "GREEN: 100,000 of 100,000 traces matched; divergence, invariant, exception, silent 0",
+   "evidence": {
+    "path": "closure-evidence/v2/release/Q4-RC2/DIFFERENTIAL.json",
+    "sha256": "d383d4d07d31f9fbd2246efeeec131e09f1a846cebc6ec8bdc970c167cebd61e"
+   }
+  },
+  "9 Q5 fresh/reproduction": {
+   "result": "PASS",
+   "detail": "GREEN: 12 of 12 corpus items reproduced; every diff and error class 0; socket attempts 0 (attempt 1)",
+   "evidence": {
+    "path": "closure-evidence/v2/release/Q5-RC2/REPRODUCTION.json",
+    "sha256": "3e6b5d63f2d69130f19ca408429e88d655e229d45bb8c63784f5a9d65573b74f"
+   }
+  },
+  "10 clean wheel build": {
+   "result": "PASS",
+   "detail": "staging 37317404055 on 7f5a6a0 rebuilt the frozen wheel and sdist byte for byte; clean-install smokes PASS"
+  },
+  "11 wheel digest binding": {
+   "result": "PASS",
+   "detail": "V2.0-RC2-FREEZE.json binds wheel 5e840f7b and sdist a7a1a5fb; the rebuild equals them"
+  }
+ },
+ "go_criteria_G3": {
+  "full test suite 0 failed": true,
+  "lint/static gates green": true,
+  "release-blocking regression tests green": true,
+  "Q0-Q5 GREEN on the exact RC": true,
+  "zero unaudited mutation survivors in changed release-critical code": "S2-MUTATION record PASS (261/261, 6463/6463, 0 unaudited) bound to FINAL_HEAD 3f3270c = the RC's tree"
+ },
+ "after_the_RC": {
+  "non_evidence_changes": [],
+  "release_rc_check": "PASS",
+  "s2_record_check": "PASS (HEAD's tree outside closure-evidence/ is 3f3270c's)"
+ },
+ "hermetic": "the full suite, the Q0-Q3 dry run, Q4 and Q5 ran under env -i with fresh HOME and XDG roots and PATH without the real client; Q4/Q5 in a fresh clone (OBS-S5-3)",
+ "external_actions": {
+  "provider_calls_in_s5": 0,
+  "paid_smokes": 0,
+  "tags": 0,
+  "testpypi_or_pypi_uploads": 0
+ }
+}
