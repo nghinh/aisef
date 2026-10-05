@@ -5,12 +5,14 @@
 # the source tree. This workflow has no publish step and no id-token permission: it cannot publish anything,
 # anywhere. release.yml calls it (workflow_call) so the files it publishes are the very files built and smoked here.
 #
-# Triggers: RC / prerelease tags and manual runs. A stable vX.Y.Z tag goes to release.yml instead.
+# Triggers: RC / prerelease tags, pushes to release/** (the V2.0-RC1 staging build of the exact candidate, no tag needed)
+# and manual runs. A stable vX.Y.Z tag goes to release.yml instead.
 # TestPyPI is not wired (an owner decision: account + trusted publisher, and TestPyPI never accepts a version twice).
 name: staging
 
 on:
   push:
+    branches: ["release/**"]
     tags: ["v*rc*", "v*-rc*", "v*.dev*"]
   workflow_dispatch:
   workflow_call:

@@ -37,6 +37,7 @@ metadata). It stays `1.7.6` until the V2.0-RC1 freeze, where it becomes `2.0.0` 
 |-------|----------|------------|
 | push to `master` or `release/**`, any pull request | `tests.yml` | no |
 | tag `v*rc*`, `v*-rc*`, `v*.dev*` (e.g. `v2.0.0rc1`, `v2.0.0-rc1`, `v2.0.0.dev1`) | `staging.yml` | **never** |
+| push to `release/**` (the staging build of the exact release candidate) | `staging.yml` | **never** |
 | manual run (workflow_dispatch) | `staging.yml` | **never** |
 | tag exactly `vX.Y.Z` (filter `v[0-9]+.[0-9]+.[0-9]+`, re-checked by `^v[0-9]+\.[0-9]+\.[0-9]+$`) | `release.yml` | production PyPI, only behind every gate below |
 | any other `v*` tag (`v2.0`, `v2.0.0-beta`, `v2.0.0.post1`) | none | no |
@@ -149,6 +150,6 @@ python -P validation/v2/packaging_check.py --check
 python -m build                                   # or any PEP 517 build of the sdist, then the wheel from it
 python -P validation/v2/packaging_check.py --artifacts dist
 python -m venv /path/outside/checkout/venv && /path/outside/checkout/venv/bin/pip install --no-index --no-deps dist/*.whl
-(cd /path/outside/checkout && venv/bin/python -I <checkout>/tests/installed_smoke.py 1.7.6 --product)
+(cd /path/outside/checkout && venv/bin/python -I <checkout>/tests/installed_smoke.py 2.0.0 --product)
 python -P validation/v2_release_gate.py 2.0.0     # fails until the owner authorizes
 ```

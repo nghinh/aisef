@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 2.0.0 — 2026-10-05
 
-**AISEF 2.0.0 (release candidate in preparation): `aisef run` is the V2 runtime.**
+**AISEF 2.0.0 (candidate V2.0-RC1): `aisef run` is the V2 runtime.**
 One distribution, `aisef`, now ships the V2 kernel and product runtime (`aisef2`) next to V1. `aisef run` runs an
 owner-approved V2 project bundle on a git repository: a fixed model route attested by a preflight, one developer
 session per story attempt, and the verdict of independent product probes — never the developer's word — written to
