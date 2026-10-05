@@ -1,0 +1,31 @@
+reproduced bytes-returning-python-callable: GREEN — journal {'expected': 63, 'observed': 63} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced cli-proved-story: GREEN — journal {'expected': 63, 'observed': 63} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced cli-refuted-then-commit: GREEN — journal {'expected': 91, 'observed': 91} diffs 0; tools 1 diffs 0; workspace MATCH; model 3/3 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced developer-outage-rollback: GREEN — journal {'expected': 51, 'observed': 51} diffs 0; tools 0 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced file-artifact-prohibition: GREEN — journal {'expected': 53, 'observed': 53} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced normal-completion: GREEN — journal {'expected': 63, 'observed': 63} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced post-merge-regression: GREEN — journal {'expected': 143, 'observed': 143} diffs 0; tools 2 diffs 0; workspace MATCH; model 4/4 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced pre-satisfied: GREEN — journal {'expected': 53, 'observed': 53} diffs 0; tools 1 diffs 0; workspace MATCH; model 1/1 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced retry-then-commit: GREEN — journal {'expected': 91, 'observed': 91} diffs 0; tools 1 diffs 0; workspace MATCH; model 3/3 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced review-finding-rollback: GREEN — journal {'expected': 89, 'observed': 89} diffs 0; tools 0 diffs 0; workspace MATCH; model 4/4 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced scenario-proved-story: GREEN — journal {'expected': 63, 'observed': 63} diffs 0; tools 1 diffs 0; workspace MATCH; model 2/2 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+reproduced security-finding-rollback: GREEN — journal {'expected': 99, 'observed': 99} diffs 0; tools 2 diffs 0; workspace MATCH; model 4/4 mismatches 0 consumed ok True; sockets {'guarded': True, 'socket_attempts': 0}
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5rel/validation/qualification/q5.py", line 1190, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5rel/validation/qualification/q5.py", line 1184, in main
+    return reproduce(out_dir)
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5rel/validation/qualification/q5.py", line 976, in reproduce
+    rec = aggregate(out_dir, subject, ident, verdicts, problems)
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5rel/validation/qualification/q5.py", line 1045, in aggregate
+    "p8_evidence": {p8: _sha((ROOT / p8).read_bytes()), f"{C.Q4_OUT_REL}/SUBJECT.json": _sha((ROOT / C.Q4_OUT_REL / "SUBJECT.json").read_bytes())},
+                             ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 777, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5rel/closure-evidence/v2/release/Q4-RC1/DIFFERENTIAL.json'
+owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 44s)
