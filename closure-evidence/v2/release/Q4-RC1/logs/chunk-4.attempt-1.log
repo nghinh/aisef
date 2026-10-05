@@ -1,0 +1,2 @@
+chunk 4 attempt 1: GREEN — attempted 10000 terminal 10000 {'MATCHED': 10000, 'DIVERGENCE': 0, 'INVARIANT_VIOLATION': 0, 'EXCEPTION': 0} refused-matches 0 prefix 1000 in 281.1 s
+owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 282s)
