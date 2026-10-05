@@ -82,6 +82,29 @@
     "sha256": "cd8833569fed317bb1ef20cb7bc997b6f7003218be1f5347bd53df001c04b58a",
     "machine_readable": "closure-evidence/v2/release/V2-STABLE-RELEASE-CHARTER.json"
    }
+  },
+  {
+   "seq": 3,
+   "id": "AISEF_V2_0_PRODUCTION_PUBLISH",
+   "authority": "owner final production-publish confirmation (charter §19), 2026-10-06: \"This is the owner's explicit authorization to publish AISEF 2.0.0 based on the already frozen and qualified RC2 1565bcc and the final RELEASE_GO = YES ruling.\"",
+   "approver": "human:owner",
+   "decision": {
+    "PRODUCTION_PUBLISH": "AUTHORIZED",
+    "VERSION": "2.0.0"
+   },
+   "basis": {
+    "rc": "V2.0-RC2",
+    "rc_source_sha": "1565bccff66cda866820d5307a26de462e79e9a0",
+    "freeze_record": {
+     "path": "closure-evidence/v2/release/V2.0-RC2-FREEZE.json",
+     "sha256": "05338b7861a0f2a90ae7dca41409d1c5e953d45304c57d4ce22a1e6f63e59e21"
+    },
+    "wheel_sha256": "5e840f7b960cb20e0ad63b95e28c09fcafee696bf83e9771cccd03476f0eb40b",
+    "sdist_sha256": "a7a1a5fb9bc6d211cc2329dab12f962ed27dd826754da8511b35c3ea1bbbef1d",
+    "status": "closure-evidence/v2/release/V2-STABLE-STATUS.json: FINAL_RELEASE_READY PASS, RELEASE_GO YES, OPEN_V2_0_BLOCKERS []",
+    "rulings": "RC1 rejected and the narrow smoke #2 amendment (2026-10-05); S6-SMOKE-2-FALSE-ROLLBACK-S10A waived, single case (2026-10-06) — V2-RELEASE-FINDINGS.json"
+   },
+   "not_authorized_by_this_entry": "creating the tag, approving the pypi deployment, any paid or provider smoke — each still the owner's own action"
   }
  ]
 }
