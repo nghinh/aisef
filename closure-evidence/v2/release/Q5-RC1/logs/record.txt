@@ -1,0 +1,15 @@
+recorded normal-completion: outcomes {'S1': ['COMMIT']} (expected {'S1': ['COMMIT']}) model calls 2 tool calls 1 events 63 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded retry-then-commit: outcomes {'S1': ['RETRY', 'COMMIT']} (expected {'S1': ['RETRY', 'COMMIT']}) model calls 3 tool calls 1 events 91 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded review-finding-rollback: outcomes {'S1': ['RETRY', 'ROLLBACK']} (expected {'S1': ['RETRY', 'ROLLBACK']}) model calls 4 tool calls 0 events 89 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded pre-satisfied: outcomes {'S1': ['COMMIT']} (expected {'S1': ['COMMIT']}) model calls 1 tool calls 1 events 53 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded security-finding-rollback: outcomes {'S1': ['RETRY', 'ROLLBACK']} (expected {'S1': ['RETRY', 'ROLLBACK']}) model calls 4 tool calls 2 events 99 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded developer-outage-rollback: outcomes {'S1': ['RETRY', 'ROLLBACK']} (expected {'S1': ['RETRY', 'ROLLBACK']}) model calls 2 tool calls 0 events 51 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded post-merge-regression: outcomes {'S0': ['COMMIT'], 'S2': ['ROLLBACK']} (expected {'S0': ['COMMIT'], 'S2': ['ROLLBACK']}) model calls 4 tool calls 2 events 143 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded cli-proved-story: outcomes {'S1': ['COMMIT']} (expected {'S1': ['COMMIT']}) model calls 2 tool calls 1 events 63 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded cli-refuted-then-commit: outcomes {'S1': ['RETRY', 'COMMIT']} (expected {'S1': ['RETRY', 'COMMIT']}) model calls 3 tool calls 1 events 91 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded file-artifact-prohibition: outcomes {'S1': ['COMMIT']} (expected {'S1': ['COMMIT']}) model calls 2 tool calls 1 events 53 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded scenario-proved-story: outcomes {'S1': ['COMMIT']} (expected {'S1': ['COMMIT']}) model calls 2 tool calls 1 events 63 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+recorded bytes-returning-python-callable: outcomes {'S1': ['COMMIT']} (expected {'S1': ['COMMIT']}) model calls 2 tool calls 1 events 63 errors 0 sockets {'guarded': True, 'socket_attempts': 0}
+corpus 667880b247e1 replay 7d9ecd4ab26e: 12 items
+owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 34s)
+exit 0

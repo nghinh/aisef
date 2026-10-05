@@ -1,0 +1,12 @@
+#!/bin/zsh
+# S5 Q5 (owner-authorized 2026-10-05): the corpus recorded once and the calibration, release mode, hermetic
+source /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/env.sh
+cd /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5rel || exit 2
+date -u +%FT%TZ > /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/record.started
+zsh /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/heavy.sh "S5 Q5 record" ${HENV[@]} /opt/homebrew/bin/python3 -P validation/v2/owned_run.py --out /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/owned-record.json -- /opt/homebrew/bin/python3 -P validation/qualification/q5.py --record > /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/record.txt 2>&1
+echo "exit $?" >> /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/record.txt
+zsh /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/heavy.sh "S5 Q5 calibrate" ${HENV[@]} /opt/homebrew/bin/python3 -P validation/v2/owned_run.py --out /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/owned-calibrate.json -- /opt/homebrew/bin/python3 -P validation/qualification/q5.py --calibrate > /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/calibrate.txt 2>&1
+echo "exit $?" >> /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/calibrate.txt
+date -u +%FT%TZ > /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/record.finished
+git status --porcelain > /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/status-after-record.txt
+echo done > /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/s5q5b/record.done
