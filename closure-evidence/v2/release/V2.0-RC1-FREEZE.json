@@ -1,0 +1,30 @@
+{
+ "artifacts": {
+  "sha256": {
+   "aisef-2.0.0-py3-none-any.whl": "a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7",
+   "aisef-2.0.0.tar.gz": "7cf8d07ef29577ad56e7d3a852c5da14436126d842a1dccbad79eca4e16e234d"
+  },
+  "source": "staging build of 529591e4f2aeaa1ec621d624ef223e77ec9ff603 (CI run 37256508105)"
+ },
+ "kernel": {
+  "digest": "b93d4c08ae2e392de9c6e6083a39625c936c8935481a4dfa1a44dff2824e77fd",
+  "tree": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c"
+ },
+ "problems": [],
+ "rc": {
+  "sha": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+  "shipped_trees": {
+   "MANIFEST.in": "e20357e77d9d8f0d413ddb8355498d6a410f9e91",
+   "README.md": "108df12187cacc139ad63985e49dc0f4a006d446",
+   "aisef": "49871d69e661f325c8c2b12748e7a1adada89c08",
+   "aisef2": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
+   "pyproject.toml": "c1eafb3c53437d079e71a2a1ee06d09bbec2756f"
+  },
+  "source_date_epoch": 1791168192,
+  "version": "2.0.0"
+ },
+ "record": "AISEF V2.0 \u2014 RELEASE CANDIDATE 1, FROZEN (charter G2, S4)",
+ "rule": "no source change after the freeze keeps this qualification (G2)",
+ "runspec": "resolved at the release smoke's preregistration (S6) from this kernel digest",
+ "verdict": "FROZEN"
+}
