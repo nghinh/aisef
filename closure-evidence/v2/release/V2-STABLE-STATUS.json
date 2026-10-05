@@ -7,17 +7,19 @@
  "S3_PRODUCTIZED": "PASS",
  "S4_RC_FROZEN": "PASS",
  "S5_QUALIFIED": "PASS",
- "S6_RELEASE_SMOKE": "NOT_STARTED",
- "S7_TESTPYPI": "NOT_STARTED",
- "FINAL_RELEASE_READY": "NOT_STARTED",
+ "S6_RELEASE_SMOKE": "FAIL",
+ "S7_TESTPYPI": "BLOCKED",
+ "FINAL_RELEASE_READY": "BLOCKED",
  "CURRENT_RELEASE_BRANCH": "release/v2.0.0",
  "CURRENT_SHA": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
  "CURRENT_KERNEL_DIGEST": "c6ddf5b9c0b436bcc3c882d9b303dd59b367141c",
  "CURRENT_WHEEL_DIGEST": "a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7",
- "OPEN_V2_0_BLOCKERS": [],
+ "OPEN_V2_0_BLOCKERS": [
+  "S6-SMOKE-1-PREFLIGHT-OPAQUE"
+ ],
  "V2_1_BACKLOG_COUNT": 36,
- "PROVIDER_CALLS": 0,
- "PAID_RELEASE_SMOKES_USED": 0,
+ "PROVIDER_CALLS": 4,
+ "PAID_RELEASE_SMOKES_USED": 1,
  "sources": {
   "release_branch_base": {
    "c2/bounded-corrective-patch": "faeb0166903dcc79c748ad6b67b2f8dee8fadbbb",
@@ -112,6 +114,12 @@
    "status": "PASS",
    "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
    "what": "S5 complete on exactly RC1 529591e: hermetic suite 5444/0; CI 8/8; Q0-Q3 GREEN on Linux/Windows; Q4 100,000/100,000 matched; Q5 12/12 reproduced; rebuild byte-identical; clean-install smokes PASS; no provider call, tag or upload"
+  },
+  {
+   "phase": "S6_RELEASE_SMOKE",
+   "status": "FAIL",
+   "on": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+   "what": "the one paid smoke: rehearsal clean, preregistered, started; the preflight stopped it (route listed, 3 chat probes HTTP 0, OPAQUE): no session, RELEASE_SMOKE_PASS NO, RELEASE_GO NO; stopped for the owner (S6-SMOKE-1-PREFLIGHT-OPAQUE)"
   }
  ],
  "UNAUTHORIZED_LIVE_RUN_POSSIBLE": "NO",
@@ -382,6 +390,51 @@
   "external_actions": {
    "provider_calls": 0,
    "paid_smokes": 0,
+   "tags": 0,
+   "testpypi_or_pypi_uploads": 0
+  }
+ },
+ "S6_DETAIL": {
+  "RELEASE_GO": "NO",
+  "RELEASE_SMOKE_PASS": "NO",
+  "rc": "529591e4f2aeaa1ec621d624ef223e77ec9ff603",
+  "wheel": "aisef-2.0.0-py3-none-any.whl a04c4eb952a6926f26659f91da7d1cb832259432844c1b6b2d2e2f59c4deb2a7 (staging run 37256508105 artifact; release_rc --verify-dist PASS)",
+  "rehearsal": {
+   "path": "closure-evidence/v2/release/smoke/REHEARSAL.json",
+   "sha256": "9841b25ff02b746ae1ce09919a2521a6b82a3dd36bd73d623ee5141cf1feb13c"
+  },
+  "preregistration": {
+   "path": "closure-evidence/v2/release/smoke/PREREGISTRATION.json",
+   "sha256": "d78978e7ecb756a6e12c4c14c004a0f6cfef0260a4a0b5584364f8f96c70217a"
+  },
+  "started": {
+   "path": "closure-evidence/v2/release/smoke/STARTED.json",
+   "sha256": "099b38b7bfa9dfe87903ad1db8e6979af1b1b046506becd02057ffeb19b2433c"
+  },
+  "result": {
+   "path": "closure-evidence/v2/release/smoke/RESULT.json",
+   "sha256": "89202a63b80ecc5aa4aa4d73d0dcef7d5912bbb344a9b5498293ad250cdb0abc"
+  },
+  "side_directory": "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-1 (preserved, nothing removed)",
+  "stage_reached": "preflight: IdentityStop (OPAQUE: probe 0/1/2 HTTP 0); sessions 0; journal none",
+  "STORIES": "0 of 7 committed (none started)",
+  "PRODUCT_PROOF": "0 of 67",
+  "ABSOLUTE_RELEASE_ACCEPTANCE": "0 of 59",
+  "FALSE_ACCEPTANCE": 0,
+  "FALSE_ROLLBACK_OR_BLOCK": "0 by the kernel's stories; the identity stop itself is UNDETERMINED (S6-SMOKE-1-PREFLIGHT-OPAQUE)",
+  "BUDGET_USED": {
+   "provider_requests": 4,
+   "turns": 0,
+   "input_tokens_recorded": 0,
+   "output_tokens_recorded": 0,
+   "note": "the 3 probes' tokens are unknown (their answers were not read); at most 3 x 16 output tokens"
+  },
+  "RAW_JOURNAL_VERIFIED": "NOT_APPLICABLE (the run ended before the journal began; aisef run --verify: REFUTED 'no journal')",
+  "blocker": "S6-SMOKE-1-PREFLIGHT-OPAQUE",
+  "owner_decision_required": true,
+  "external_actions": {
+   "provider_calls": 4,
+   "paid_smokes": 1,
    "tags": 0,
    "testpypi_or_pypi_uploads": 0
   }

@@ -1,0 +1,168 @@
+{
+ "modes": {
+  "html200": {
+   "problems": [
+    "probe 0: HTTP 0",
+    "probe 1: HTTP 0",
+    "probe 2: HTTP 0"
+   ],
+   "recorded_probes": [
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    }
+   ],
+   "transport_error_in_record_or_ledger": false,
+   "transport_returns": [
+    0,
+    {
+     "transport_error": "JSONDecodeError"
+    }
+   ],
+   "verdict": "OPAQUE"
+  },
+  "http400": {
+   "problems": [
+    "probe 0: HTTP 400",
+    "probe 1: HTTP 400",
+    "probe 2: HTTP 400"
+   ],
+   "recorded_probes": [
+    {
+     "http": 400,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 400,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 400,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    }
+   ],
+   "transport_error_in_record_or_ledger": false,
+   "transport_returns": [
+    400,
+    "<json body>"
+   ],
+   "verdict": "OPAQUE"
+  },
+  "json": {
+   "problems": [],
+   "recorded_probes": [
+    {
+     "http": 200,
+     "served_model": "deepseek-v4-pro",
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 200,
+     "served_model": "deepseek-v4-pro",
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 200,
+     "served_model": "deepseek-v4-pro",
+     "system_fingerprint": "NOT_EXPOSED"
+    }
+   ],
+   "transport_error_in_record_or_ledger": false,
+   "transport_returns": [
+    200,
+    "<json body>"
+   ],
+   "verdict": "ATTESTED"
+  },
+  "reset": {
+   "problems": [
+    "probe 0: HTTP 0",
+    "probe 1: HTTP 0",
+    "probe 2: HTTP 0"
+   ],
+   "recorded_probes": [
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    }
+   ],
+   "transport_error_in_record_or_ledger": false,
+   "transport_returns": [
+    0,
+    {
+     "transport_error": "RemoteDisconnected"
+    }
+   ],
+   "verdict": "OPAQUE"
+  },
+  "sse": {
+   "problems": [
+    "probe 0: HTTP 0",
+    "probe 1: HTTP 0",
+    "probe 2: HTTP 0"
+   ],
+   "recorded_probes": [
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    }
+   ],
+   "transport_error_in_record_or_ledger": false,
+   "transport_returns": [
+    0,
+    {
+     "transport_error": "JSONDecodeError"
+    }
+   ],
+   "verdict": "OPAQUE"
+  }
+ },
+ "sent_chat_body": {
+  "max_tokens": 16,
+  "messages": [
+   {
+    "content": "Reply with the single word: ok",
+    "role": "user"
+   }
+  ],
+  "model": "ds/deepseek-v4-pro",
+  "temperature": 0
+ },
+ "sent_chat_body_has_stream_key": false
+}

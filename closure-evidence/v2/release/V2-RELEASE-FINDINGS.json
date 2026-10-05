@@ -280,6 +280,63 @@
    "OWNER_RULING": "2026-10-05: 'Approve the one-line re-pin (Recommended)'",
    "V2_0_DISPOSITION": "RESOLVED by the harness-only re-pin commit 29dbd0a (validation/qualification/q3.py: one case id); the RC unchanged (release_rc --check PASS)",
    "source": "S5"
+  },
+  {
+   "ID": "S6-SMOKE-1-PREFLIGHT-OPAQUE",
+   "TITLE": "V2.0 RELEASE SMOKE #1 (the one paid smoke) ended at the provider preflight with an identity stop: the route 9router/ds/deepseek-v4-pro was listed (GET /models HTTP 200, owned_by ds) but each of the 3 chat probes (POST /chat/completions) is recorded as HTTP 0, so the preflight is OPAQUE and no session started; RELEASE_SMOKE_PASS = NO",
+   "REPRODUCER": "the run itself, preserved: side directory /Users/nghinh/Downloads/projects/aisef-v2-release-smoke-1 (nothing removed) and its records copied to closure-evidence/v2/release/smoke/run-1/ (RUN.json, preflight/LEDGER.jsonl, preflight/PREFLIGHT.json, stderr 'aisef run: refused: the route is not attested: probe 0: HTTP 0; probe 1: HTTP 0; probe 2: HTTP 0'). Offline mechanism (loopback, no provider): smoke/OBS-S6-1/transport_mechanism.py drives the RC's shipped aisef2/app/preflight.py — a 200 answer whose body is not JSON (an SSE stream, an HTML page) and a dropped connection are all recorded as HTTP 0 (the transport computes the error class, JSONDecodeError or RemoteDisconnected, and preflight.run never records it); a JSON 200 attests; an HTTP 400 is recorded as 400",
+   "MEASURED": [
+    "the 4 requests: listing 200; chat probes 0, 0, 0; the whole aisef run 12.1 s (each probe answered well inside its 60 s timeout: not a timeout)",
+    "the same process reached the endpoint (the listing) with the same transport, headers and key: not an absent network, proxy (none set) or key (a refused key is an HTTP 401, recorded as 401)",
+    "the shipped probe body is {model, messages, max_tokens 16, temperature 0} — no 'stream' key; the probe that attested this route at attempt 4 (closure-evidence/hardening/w1/provider_preflight.py chat_probe via c2_delivery_experiment, closure-evidence/v2/cycle2/P10/attempt-4/preflight/LEDGER.jsonl: 3 x HTTP 200) sent {model, messages, max_tokens 16, stream false} and no temperature",
+    "a rejection of 'temperature' alone would be an HTTP 4xx, recorded as such, not 0",
+    "the real OpenCode client was never started (sessions 0); its store and session folders' metadata are unchanged (os.stat before/after, smoke/run-1/store-*.json)"
+   ],
+   "CANDIDATE_CAUSES_NOT_DISCRIMINATED_BY_THE_RECORD": [
+    "A: without 'stream': false the router streams by default (200 + text/event-stream) -> JSONDecodeError -> HTTP 0 (the one request-body difference from the probe that attested at attempt 4 that can yield HTTP 0)",
+    "B: a 200 with another non-JSON body for these POSTs (e.g. an edge/challenge page) -> HTTP 0",
+    "C: the connection dropped on these POSTs (provider or edge, transient or since 2026-10-03) -> HTTP 0"
+   ],
+   "WHAT_DISCRIMINATES": "one request exactly as the shipped probe and one adding stream:false, each recording status, Content-Type and the first bytes of the body (a provider call: owner authorization needed); nothing offline can",
+   "AFFECTED_SHIPPED_PATH": "aisef2/app/preflight.py (kernel tree aisef2, in the wheel): the chat probe's request body (no stream:false) and the record (the transport error class is dropped, so an OPAQUE preflight cannot say why)",
+   "AFFECTED_V2_CLAIM": "charter §17 RELEASE_SMOKE_PASS (all of it: no session ran); §16 preflight 'refuse on identity mismatch' worked as specified — it failed closed, no spend beyond the 4 preflight requests",
+   "SEVERITY": "fails closed (no false PASS, no session, no budget use beyond the preflight); blocks the release: §17 'If release smoke FAILS: RELEASE_GO = NO, STOP'",
+   "RELEASE_BLOCKER_RULE_1": "YES for the dropped error class (deterministic loopback reproducer); the provider-side cause has no offline reproducer",
+   "RELEASE_BLOCKER_RULE_2": "YES (aisef run on the release route, the shipped path)",
+   "RELEASE_BLOCKER_RULE_3": "UNDETERMINED: under A it is a false block of every run on this route (P1); under C it is the provider, and the stop is correct",
+   "PROPOSED_REMEDY_NOT_APPLIED": "owner decisions, none taken: (1) authorize the two discriminating requests (≤ 32 output tokens); (2) if A: RC1 REJECTED (the charter: a true P0/P1 blocker that needs a kernel change), RC2 with the probe body of the attestation that held at attempt 4 (stream:false) and the transport error class + Content-Type recorded in the preflight, then S2 (preflight targets), S4, S5 again; (3) a second paid smoke needs an owner amendment of §16 ('NO second release smoke')",
+   "V2_0_DISPOSITION": "BLOCK: RELEASE_GO = NO; stopped for the owner (charter §17: no second paid attempt, no fix-to-green)",
+   "evidence": {
+    "preregistration": {
+     "path": "closure-evidence/v2/release/smoke/PREREGISTRATION.json",
+     "sha256": "d78978e7ecb756a6e12c4c14c004a0f6cfef0260a4a0b5584364f8f96c70217a"
+    },
+    "started": {
+     "path": "closure-evidence/v2/release/smoke/STARTED.json",
+     "sha256": "099b38b7bfa9dfe87903ad1db8e6979af1b1b046506becd02057ffeb19b2433c"
+    },
+    "result": {
+     "path": "closure-evidence/v2/release/smoke/RESULT.json",
+     "sha256": "89202a63b80ecc5aa4aa4d73d0dcef7d5912bbb344a9b5498293ad250cdb0abc"
+    },
+    "run_json": {
+     "path": "closure-evidence/v2/release/smoke/run-1/RUN.json",
+     "sha256": "b1b8fa802813137ad9474855ecd0c880278d33800ba767bb4c7f188821251aca"
+    },
+    "preflight": {
+     "path": "closure-evidence/v2/release/smoke/run-1/preflight/PREFLIGHT.json",
+     "sha256": "f1d819de48974192b32c1ae45b08267007ba0eba9c8ef8a0911905092bdd14d6"
+    },
+    "ledger": {
+     "path": "closure-evidence/v2/release/smoke/run-1/preflight/LEDGER.jsonl",
+     "sha256": "a52514c365bf9d840daa2342b0517807d981bbbd6bb636987b6b7ea873fda8e3"
+    },
+    "mechanism": {
+     "path": "closure-evidence/v2/release/smoke/OBS-S6-1/transport_mechanism.out.json",
+     "sha256": "2ee11a860ebbd8cc0b48137bf5d13ad5abb162b716c9cb1311989e2a9d87702f"
+    }
+   },
+   "source": "S6, 2026-10-05"
   }
  ],
  "v2_1_backlog": {

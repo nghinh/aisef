@@ -1,0 +1,21 @@
+{
+ "argv": [
+  "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-1/venv/bin/aisef",
+  "run",
+  "--project",
+  "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-1/inputs/project.json",
+  "--settings",
+  "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-1/inputs/settings.json",
+  "--repo",
+  "/Users/nghinh/Downloads/projects/ledgerlock-v2-release-smoke",
+  "--out",
+  "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-1/run"
+ ],
+ "exit": 2,
+ "record": "AISEF V2.0 \u2014 RELEASE SMOKE #1 RESULT (the run as it ended; evaluated by --evaluate)",
+ "run_json_sha256": "b1b8fa802813137ad9474855ecd0c880278d33800ba767bb4c7f188821251aca",
+ "seconds": 12.1,
+ "side_directory": "/Users/nghinh/Downloads/projects/aisef-v2-release-smoke-1",
+ "verify_exit": 1,
+ "verify_stdout_tail": "{\n \"delivery_verdict\": \"NOT_REACHED\",\n \"journal_events\": 0,\n \"problems\": [\n  \"the run has no journal (it ended before the run began)\"\n ],\n \"verdict\": \"REFUTED\"\n}\n"
+}

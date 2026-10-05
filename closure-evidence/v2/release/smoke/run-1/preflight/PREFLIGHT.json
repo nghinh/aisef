@@ -1,0 +1,44 @@
+{
+ "accounting": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "provider_requests": 4,
+  "turns": 0,
+  "unaccounted": []
+ },
+ "observation": {
+  "declared_model": "ds/deepseek-v4-pro",
+  "expected_listed_owner": "ds",
+  "expected_served_model": "deepseek-v4-pro",
+  "listing": {
+   "http": 200,
+   "id": "ds/deepseek-v4-pro",
+   "listed": true,
+   "owned_by": "ds"
+  },
+  "probes": [
+   {
+    "http": 0,
+    "served_model": null,
+    "system_fingerprint": "NOT_EXPOSED"
+   },
+   {
+    "http": 0,
+    "served_model": null,
+    "system_fingerprint": "NOT_EXPOSED"
+   },
+   {
+    "http": 0,
+    "served_model": null,
+    "system_fingerprint": "NOT_EXPOSED"
+   }
+  ],
+  "route": "9router/ds/deepseek-v4-pro"
+ },
+ "problems": [
+  "probe 0: HTTP 0",
+  "probe 1: HTTP 0",
+  "probe 2: HTTP 0"
+ ],
+ "verdict": "OPAQUE"
+}

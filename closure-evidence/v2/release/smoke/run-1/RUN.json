@@ -1,0 +1,125 @@
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+  "failed": [],
+  "result_digest": "190b605108465b92035f1c0e2a7f7f0fea75a3d2b2c3f7caa1f05a80a9e18aa9"
+ },
+ "budget": null,
+ "budget_stop": null,
+ "bundle_digest": "778e6b84afab76c8326a72c7b11291e3a5e195aacff7eee43d6630699bb8be0a",
+ "delivery_blocked_by": [
+  "7 of the plan's stories did not commit: ['STORY-01-01', 'STORY-01-05', 'STORY-02-01', 'STORY-02-02', 'STORY-03-01', 'STORY-04-01', 'STORY-04-02']"
+ ],
+ "delivery_verdict": "NOT_REACHED",
+ "failure": {
+  "detail": "the route is not attested: probe 0: HTTP 0; probe 1: HTTP 0; probe 2: HTTP 0",
+  "stage": "preflight",
+  "type": "IdentityStop"
+ },
+ "final_main": "6a8d60c0bd3d1fa47ed4e97dd80fc0f4b645332a",
+ "finished": 1791195267.162814,
+ "format": "aisef-v2-run-record/1",
+ "generalization_claim": "NONE",
+ "journal": null,
+ "kernel_digest": "b93d4c08ae2e392de9c6e6083a39625c936c8935481a4dfa1a44dff2824e77fd",
+ "plan_hash": "5eed537aaa4dde03653c6d779ec5d6ceb8c3869365e15b01dec00ffa7f5d3735",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "platform": {
+  "python": "3.14.7",
+  "system": "darwin"
+ },
+ "preflight": {
+  "accounting": {
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "observation": {
+   "declared_model": "ds/deepseek-v4-pro",
+   "expected_listed_owner": "ds",
+   "expected_served_model": "deepseek-v4-pro",
+   "listing": {
+    "http": 200,
+    "id": "ds/deepseek-v4-pro",
+    "listed": true,
+    "owned_by": "ds"
+   },
+   "probes": [
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 0,
+     "served_model": null,
+     "system_fingerprint": "NOT_EXPOSED"
+    }
+   ],
+   "route": "9router/ds/deepseek-v4-pro"
+  },
+  "problems": [
+   "probe 0: HTTP 0",
+   "probe 1: HTTP 0",
+   "probe 2: HTTP 0"
+  ],
+  "verdict": "OPAQUE"
+ },
+ "productproof": null,
+ "project": "LedgerLock",
+ "sessions": [],
+ "settings": {
+  "budget": {
+   "input_tokens": 60000000,
+   "output_tokens": 400000,
+   "provider_requests": 58,
+   "turns": 700
+  },
+  "client": "opencode",
+  "client_env": [],
+  "format": "aisef-v2-run/1",
+  "limits": {
+   "DEVELOPER": 2,
+   "ENVIRONMENT": 1,
+   "INTEGRATION": 0,
+   "PLAN": 0,
+   "PROVIDER": 1,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "max_turns_per_session": 80,
+  "preflight": {
+   "chat_probes": 3
+  },
+  "provider": {
+   "api_key_env": null,
+   "endpoint": "https://9router.vnteki.com/v1",
+   "listed_owner": "ds",
+   "model_limit": {
+    "context": 200000,
+    "output": 32768
+   },
+   "name": "9router",
+   "served_model": "deepseek-v4-pro"
+  },
+  "route": "9router/ds/deepseek-v4-pro",
+  "timeouts_s": {
+   "developer": 2400,
+   "probe": 60,
+   "reviewer": 900,
+   "tool": 120
+  }
+ },
+ "stage": "preflight",
+ "started": 1791195255.815428,
+ "story_errors": [],
+ "story_outcomes": {}
+}
