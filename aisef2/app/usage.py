@@ -127,3 +127,4 @@ def no_progress(events: list[dict]) -> list[dict]:
         if same:
             out.append({"story": sid, "attempts_repeating_the_one_before": [n + 1 for n in same], "failures": rows[same[0]]})
     return out
+

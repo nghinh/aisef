@@ -363,22 +363,34 @@ def init(example: str, out: pathlib.Path) -> None:
     _write_new(out / "authoring.json", doc["authoring"])
 
 
-def continue_from(data: Mapping, run_dir: pathlib.Path) -> tuple[dict, dict]:
-    """(the continuation bundle, the report) of `data`'s run in `run_dir` (module docstring)."""
+def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentified: bool = False) -> tuple[dict, dict]:
+    """(the continuation bundle, the report) of `data`'s run in `run_dir` (module docstring). What the run did that its
+    journal does not confirm is reconciled against git and the journal's operation identities (app/lineage); a commit
+    on main nothing identifies is refused unless `leave_out_unidentified` (the report names it either way)."""
+    from aisef2.app import lineage
     from aisef2.app import run as R
     from aisef2.journal import format3
     project = B.load(data)
+    child, state = lineage.continued_by(run_dir)
+    if state == lineage.BEGUN:
+        raise B.BundleError(f"{run_dir} is already continued by {child}, which began: continue the lineage from it")
+    recorded = True
     try:
         rec = json.loads((run_dir / "RUN.json").read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:
-        raise B.BundleError(f"{run_dir}: no run record ({type(e).__name__})") from e
+        try:    # V2.1: a run killed before its record still names its identities (RUN.started.json)
+            rec = json.loads((run_dir / R.STARTED).read_text(encoding="utf-8"))
+            rec["journal"], recorded = {"path": "run/journals/aisef-run.jsonl"}, False
+        except (OSError, ValueError):
+            raise B.BundleError(f"{run_dir}: no run record ({type(e).__name__})") from e
     if rec.get("bundle_digest") != project.digest:
         raise B.BundleError(f"{run_dir} is a run of another bundle: a continuation is of the same project")
     if rec.get("kernel_digest") != R.kernel_digest():
         raise B.BundleError(f"{run_dir} ran another kernel ({str(rec.get('kernel_digest'))[:12]}): a new project, "
                             "not a continuation")
     try:
-        events = format3.reconstruct((run_dir / rec["journal"]["path"]).read_text(encoding="utf-8")).events
+        journal = format3.reconstruct((run_dir / rec["journal"]["path"]).read_text(encoding="utf-8"))
+        events = journal.events
     except Exception as e:  # noqa: BLE001 — any refusal of the reader is the answer
         raise B.BundleError(f"{run_dir}: the journal does not reconstruct ({type(e).__name__}: {e})"[:400]) from e
     commits = [(e.data["story_id"], e.data["revision"]) for e in events if e.type == "story/commit"]
@@ -389,7 +401,11 @@ def continue_from(data: Mapping, run_dir: pathlib.Path) -> tuple[dict, dict]:
     repo = run_dir / "repo"
     if R.git(repo, "cat-file", "-e", f"{baseline}^{{commit}}").returncode != 0:
         raise B.BundleError(f"{repo} does not hold the journal's last commit {baseline[:12]}")
-    main = R.git(repo, "rev-parse", "main").stdout.strip()
+    reconciled = lineage.reconcile(run_dir, list(events), baseline, bool(journal.torn_tail))
+    if reconciled["unidentified"] and not leave_out_unidentified:
+        raise B.BundleError(f"{run_dir}: what the journal does not confirm includes commits nothing identifies — "
+                            f"{[(i['commit'][:12], i['why']) for i in reconciled['unidentified']][:5]}; inspect them, then "
+                            "--leave-out-unidentified to continue without them")
     blob = R.git(repo, "cat-file", "blob", f"{baseline}:{project.requirements_path}")
     if blob.returncode != 0 or R._sha(blob.stdout.encode("utf-8")) != project.requirements_sha256:
         raise B.BundleError(f"the requirements document at {baseline[:12]} is not the bundle's: a new project")
@@ -417,10 +433,17 @@ def continue_from(data: Mapping, run_dir: pathlib.Path) -> tuple[dict, dict]:
     out = {**dict(data), "plan": plain(new_plan), "stories": stories,
            "description": f"{data['description']} — continued from the run anchored {anchor or '(no manifest)'}"}
     B.load(out)
+    account = lineage.account_of(run_dir)
     report = {"carried": done, "carried_as": carried, "baseline": baseline, "run": str(run_dir), "evidence_anchor": anchor,
-              "in_flight": None if main == baseline else
-              f"the run's main {main[:12]} is not its journal's last commit {baseline[:12]}: what the journal did "
-              "not commit (a merge in flight) is left out",
+              "recorded": recorded, "already_continued_by": {"run": child, "state": state} if child else None,
+              # a torn last line is the reader's verified prefix; the torn event's EFFECTS are not assumed undone —
+              # they are among `unconfirmed`, reconciled against git (app/lineage)
+              "torn_tail": bool(journal.torn_tail), "cut_event": reconciled["cut_event"],
+              "unconfirmed": reconciled["items"], "left_out_unidentified": bool(reconciled["unidentified"]),
+              "unaccounted": account["unaccounted"],
+              "in_flight": None if not reconciled["items"] else
+              f"{len(reconciled['items'])} effect(s) the journal does not confirm are left out of the continuation's "
+              f"baseline {baseline[:12]} (each identified in `unconfirmed`); their stories run again",
               "remaining": [s for s in project.stories if s not in done],
               "next": f"aisef run --project <this bundle> --repo {repo} --parent {run_dir} --settings S --out NEW"}
     return out, report
@@ -461,6 +484,8 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("bundle", type=pathlib.Path)
     c.add_argument("--from-run", type=pathlib.Path, required=True)
     c.add_argument("--out", type=pathlib.Path, required=True)
+    c.add_argument("--leave-out-unidentified", action="store_true",
+                   help="continue although main holds commits no journaled operation identifies (they are left out)")
     m = sub.add_parser("migrate", help="re-bind an earlier release's bundle to this release's spec ids")
     m.add_argument("bundle", type=pathlib.Path)
     m.add_argument("--out", type=pathlib.Path, required=True, help="the migrated bundle (a new file; never the input)")
@@ -484,7 +509,7 @@ def main(argv: list[str] | None = None) -> int:
                               "still_to_approve": unapproved(doc)}, indent=1, sort_keys=True))
             return 0
         if a.command == "continue":
-            doc, report = continue_from(_read(a.bundle), a.from_run)
+            doc, report = continue_from(_read(a.bundle), a.from_run, leave_out_unidentified=a.leave_out_unidentified)
             _write_new(a.out, doc)
             print(json.dumps({"written": str(a.out), **report}, indent=1, sort_keys=True))
             return 0

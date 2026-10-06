@@ -50,12 +50,16 @@ def _runspec_problems(project: Project, rec: dict, events: list[dict]) -> tuple[
     return [], s
 
 
-def _spend(out: pathlib.Path, s: settings.Settings, events: list[dict]) -> tuple[dict, str | None]:
-    """What the evidence says was spent (the session streams, the preflight ledger, the journal's provider requests)
-    and whether it broke a ceiling or cannot be accounted for — the run's own Budget, re-derived."""
+def _spend(out: pathlib.Path, s: settings.Settings, events: list[dict], rec: dict) -> tuple[dict, str | None]:
+    """What the evidence says was spent (the session streams, the preflight ledger, the journal's provider requests,
+    and — V2.1, a continuation — the lineage's, re-derived from the predecessor's evidence as it is now) and whether it
+    broke a ceiling or cannot be accounted for — the run's own Budget, re-derived."""
+    from aisef2.app import lineage
     base = preflight.accounting(out / "preflight" / "LEDGER.jsonl")
     requests = sum(1 for e in events if e["type"] == "provider/request")
-    b = client.Budget(s.budget, base, out / "sessions", lambda: requests)
+    c = rec.get("continues") or {}
+    inherited = lineage.lineage_account(pathlib.Path(c["path"]), out) if c.get("account") else None
+    b = client.Budget(s.budget, base, out / "sessions", lambda: requests, inherited)
     return b.spend(), b.exceeded()
 
 
@@ -86,6 +90,10 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
             problems.append(f"the evidence manifest does not match the run directory: {changed[:5]}")
     if expect_anchor is not None and anchor != expect_anchor:
         problems.append(f"the evidence anchor is {anchor and anchor[:12]}, not the {expect_anchor[:12]} the run printed")
+    elif expect_anchor is not None:     # the match proves integrity against the value given, nothing about its source
+        notes.append("the anchor matches the expected value: authentic only as far as that value came from a store the "
+                     "developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as "
+                     "its journal says")
     if rec.get("bundle_digest") != project.digest:
         problems.append("the run is not of this project bundle")
     j = rec.get("journal")
@@ -117,7 +125,7 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
     problems += bound
     stop = None
     if s is not None:
-        spent, stop = _spend(out, s, events)
+        spent, stop = _spend(out, s, events, rec)
         claimed = (rec.get("budget") or {}).get("spent") or {}
         off = [k for k in client.Budget.KEYS if claimed.get(k) != spent[k]]
         if off:

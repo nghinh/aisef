@@ -8,8 +8,14 @@
                        test code writes into its own interpreter's tree (a `.pth`, the interpreter) reaches no proof
     <out>/preflight    the provider preflight's ledger and observation
     <out>/sessions     one event stream per model session
+    <out>/RUN.started.json  V2.1: the run's identities written once before anything runs (format, bundle and kernel
+                       digests, plan hash, the settings' digest, the lineage) — so a run the operating system killed (no
+                       `finally` runs on SIGKILL) still says what it was; never rewritten
     <out>/RUN.json     the record — written in a `finally`, so a run that breaks (an exception, an invariant failure,
                        a refused shutdown, an interruption) still leaves it beside its journal (B3)
+    <out>/CONTINUED-BY.json  V2.1: created (exclusively) in a run directory when another run continues it: one
+                       continuation per run, the claimant named; a later generation (CONTINUED-BY.<n>.json) only
+                       supersedes, with evidence, a claim whose child never began (app/lineage); nothing is deleted
     <out>/EVIDENCE.json the evidence manifest (V2.1): the sha256 of the record, the journal, every session stream and
                        the preflight's files, written after the record; its own digest is the run's evidence anchor,
                        printed for the operator to keep outside the run directory (`aisef run --verify --expect-anchor`)
@@ -35,7 +41,7 @@ import tempfile
 import time
 
 from aisef2.app import adapters as ad
-from aisef2.app import client, preflight, usage
+from aisef2.app import client, lineage, preflight, usage
 from aisef2.app.bundle import Project
 from aisef2.app.settings import Settings
 from aisef2.arch.enums import Enforcement
@@ -53,6 +59,7 @@ from aisef2.runtime.run_scope import RunScope, ShutdownRefused
 from aisef2.runtime.runspec import resolve
 
 FORMAT = "aisef-v2-run-record/1"
+STARTED, CLAIM = lineage.STARTED, lineage.CLAIM
 MANIFEST = "EVIDENCE.json"
 MANIFEST_FORMAT = "aisef-v2-evidence/1"
 
@@ -276,8 +283,8 @@ def _content_sha(p: pathlib.Path) -> str:
 def evidence_manifest(out: pathlib.Path) -> dict:
     """The sha256 of every file a verification re-derives from (the repository aside: `final_main` is checked in it):
     the record, the journal, each session stream, the preflight's ledger and observation."""
-    files = [out / "RUN.json", *sorted((out / "run" / "journals").glob("*.jsonl")), *sorted((out / "sessions").glob("*.jsonl")),
-             *sorted((out / "preflight").glob("*"))]
+    files = [out / "RUN.json", out / STARTED, *sorted((out / "run" / "journals").glob("*.jsonl")),
+             *sorted((out / "sessions").glob("*.jsonl")), *sorted((out / "preflight").glob("*"))]
     return {"format": MANIFEST_FORMAT,
             "files": {p.relative_to(out).as_posix(): _content_sha(p) for p in files if p.is_file()}}
 
@@ -307,22 +314,36 @@ def budget_stops(not_run: list[str], sessions: list[dict], budget) -> str | None
 
 def execute(project: Project, settings: Settings, source: pathlib.Path, out: pathlib.Path, *, transport=None,
             client_exe: str | None = None, cals: tuple | None = None, clock=time.time,
-            predecessor: pathlib.Path | None = None) -> dict:
+            predecessor: pathlib.Path | None = None, accept_unaccounted: bool = False,
+            supersede_claim: str | None = None) -> dict:
     """Run the project; the record (also written to <out>/RUN.json, whatever happens). `predecessor`: the run this one
-    continues (`aisef run --parent`, V2.1: its path and evidence anchor are recorded; nothing of it is read or
-    written — and it is a run, never a revision: nothing runs at it)."""
+    continues (`aisef run --parent`, V2.1, app/lineage): claimed before the first provider request, its path and
+    evidence anchor recorded, its lineage's spend counted against this run's ceilings; a lineage with unaccounted spend
+    starts nothing unless `accept_unaccounted`. Nothing of the predecessor's evidence is written — and it is a run,
+    never a revision: nothing runs at it."""
     if out.exists():
         raise RunRefused(f"{out} exists: a run directory is never reused or overwritten")
-    lineage = None
+    continues = None
     if predecessor is not None:
-        if not (predecessor / "RUN.json").is_file():
+        recorded = (predecessor / "RUN.json").is_file()
+        if not recorded and not (predecessor / STARTED).is_file():
             raise RunRefused(f"--parent {predecessor}: no run record there")
-        lineage = {"path": str(predecessor), "evidence_anchor": anchor_in(predecessor)}
+        continues = {"path": str(predecessor), "evidence_anchor": anchor_in(predecessor)}
+        if not recorded:    # killed before its record: what it spent is re-derived from its streams, marked so
+            continues["recorded"] = False
     out.mkdir(parents=True)
     rec: dict = {"format": FORMAT, "bundle_digest": project.digest, "project": project.name, "plan_hash": project.plan.plan_hash,
                  "settings": settings.content, "started": clock(), "stage": "repository", "kernel_digest": kernel_digest(),
                  "platform": {"system": platform.system().lower(), "python": platform.python_version()},
-                 **({"continues": lineage} if lineage else {})}
+                 **({"continues": continues} if continues else {})}
+    with (out / STARTED).open("x", encoding="utf-8") as f:
+        f.write(json.dumps({k: rec[k] for k in ("format", "bundle_digest", "project", "plan_hash", "started",
+                                                 "kernel_digest", "platform") if k in rec}
+                           | {"settings_sha256": _sha(json.dumps(settings.content, sort_keys=True).encode()),
+                              **({"continues": continues} if continues else {})}, indent=1, sort_keys=True) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
+    inherited = None
     run = None
     developer = reviewer = budget = None
     results: dict = {}
@@ -330,6 +351,21 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
     not_run: list[str] = []
     failure: BaseException | None = None
     try:
+        if predecessor is not None:     # V2.1: before any provider request — a run that loses the claim spends nothing
+            rec["stage"] = "claim"
+            try:
+                rec["continues"]["claim"] = lineage.claim(predecessor, out, clock(), supersede_claim)
+            except lineage.LineageRefused as e:
+                raise RunRefused(str(e)) from None
+            inherited = lineage.lineage_account(predecessor, out)
+            rec["continues"]["account"] = {k: inherited[k] for k in (*lineage.SPEND, "unaccounted")}
+            if inherited["unaccounted"]:
+                if not accept_unaccounted:
+                    raise RunRefused(f"the lineage of {predecessor} has spend no evidence accounts for — no paid work "
+                                     f"starts until it is reconciled or accepted (--accept-unaccounted): "
+                                     f"{'; '.join(inherited['unaccounted'])[:1500]}")
+                rec["continues"]["accepted_unaccounted"] = list(inherited["unaccounted"])
+        rec["stage"] = "repository"
         check_git()
         repo = out / "repo"
         cloned = git(out, "clone", "--quiet", "--no-hardlinks", str(source.resolve()), str(repo))
@@ -375,7 +411,7 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         ws, merger = GitWorkspace(repo, work / "ws"), GitMerger(repo, "main", work / "merge")
         logs = out / "sessions"
         budget = client.Budget(settings.budget, pre["accounting"], logs,
-                               lambda: sum(1 for e in run.events if e.type == "provider/request"))
+                               lambda: sum(1 for e in run.events if e.type == "provider/request"), inherited)
         kw = {"model": settings.route,
               "env": client.environment(settings.client_env, client.overlay(settings.route, settings.model_limit)),
               "budget": budget, "turn_cap": settings.max_turns_per_session, "exe": exe,
@@ -439,6 +475,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
                                                              "stage": rec.get("stage")})
             try:    # V2.1 (D): what the run used, from its evidence; a fault here never costs the record
                 rec["usage"], rec["no_progress"] = usage.usage(out, events, settings.prices, rec), usage.no_progress(events)
+                if continues:     # each run of the lineage once: the predecessor's lineage, then this run's own
+                    rec["lineage_usage"] = lineage.usage_lineage(predecessor, out, rec["usage"], settings.prices)
             except Exception as e:  # noqa: BLE001 — named in the record, re-derived by --verify
                 rec["usage"] = {"error": f"{type(e).__name__}: {e}"[:500]}
             (out / "RUN.json").write_text(json.dumps(rec, indent=1, sort_keys=True, default=str) + "\n", encoding="utf-8")
