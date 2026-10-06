@@ -2,13 +2,13 @@
 import hashlib, json, pathlib, sys
 I = pathlib.Path(sys.argv[1]); port = (I / "port").read_text().strip()
 req = "R-CLI"
-def contract(cid, argv, code):
+def contract(cid, argv, code, req=req):
     return {"id": cid, "requirement_ids": [req], "subject": {"kind": "cli_invocation", "locator": "app:__main__"},
             "stimulus": {"argv": argv}, "observable": {"exit_code": code, "within_s": 20}, "polarity": "MUST_HOLD",
             "subject_absence": "REQUIRES_SUBJECT", "rationale": "the requirement's own example"}
 SUM, USAGE = "exits with the sum of the integers A and B", "exit 2 on a usage error (any other number of arguments)"
-def crit(cid, con, clause, text):
-    return {"id": cid, "contract": con, "role": "INTRODUCE", "depends_on": [], "why": f"S1 introduces {clause}",
+def crit(cid, con, clause, text, req=req, story="S1"):
+    return {"id": cid, "contract": con, "role": "INTRODUCE", "depends_on": [], "why": f"{story} introduces {clause}",
             "facts": {"requirement": req, "section": "§1", "clause": clause, "clause_text": text, "subject": "python -m app"}}
 authoring = {"format": "aisef-v2-authoring/1", "name": "calc-cli", "description": "A calculator command.",
              "requirements_document": {"path": "docs/requirements.md"}, "product_roots": ["app", "tests"], "baseline": "HEAD",
@@ -18,6 +18,15 @@ authoring = {"format": "aisef-v2-authoring/1", "name": "calc-cli", "description"
                  crit("C-SUM", "BC-SUM", "1.1", SUM), crit("C-USAGE-0", "BC-USAGE-0", "1.2", USAGE),
                  crit("C-USAGE-1", "BC-USAGE-1", "1.2", USAGE)]}}}
 (I / "authoring.json").write_text(json.dumps(authoring, indent=1))
+# the continuation segment's project (repo2): S1 as above, then S2 — a non-integer argument exits 3
+NAN = "exits 3 when A or B is not an integer"
+two = json.loads(json.dumps(authoring))
+two["name"], two["requirements"] = "calc-cli-2", two["requirements"] + [
+    {"id": "R-NAN", "text": f"python -m app A B {NAN}", "source": "docs/requirements.md §1"}]
+two["contracts"].append(contract("BC-NAN", ["x", "1"], 3, req="R-NAN"))
+two["stories"]["S2"] = {"depends_on": ["S1"], "tests": ["tests/test_nan.py"],
+                        "criteria": [crit("C-NAN", "BC-NAN", "1.3", NAN, req="R-NAN", story="S2")]}
+(I / "authoring2.json").write_text(json.dumps(two, indent=1))
 ocr = pathlib.Path(sys.argv[2])
 settings = {"format": "aisef-v2-run/1", "client": "opencode", "route": "fakeprov/model-1",
             "provider": {"name": "fakeprov", "endpoint": f"http://127.0.0.1:{port}/v1", "api_key_env": "FAKE_PROVIDER_KEY",

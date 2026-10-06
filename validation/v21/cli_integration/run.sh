@@ -26,4 +26,27 @@ print "== lint"; A bundle lint approved.json
 print "== check"; A run --check --project approved.json --settings settings.json --repo repo
 print "== run"; A run --project approved.json --settings settings.json --repo repo --out run1 --anchor-out anchors/run1.anchor
 print "== verify"; A run --verify --project approved.json --out run1 --expect-anchor "$(head -c 64 anchors/run1.anchor)"
+# continuation: a run SIGKILLed once the S2 developer's usage is reported (its result never journaled) — then
+# `aisef bundle continue`, a refused --parent (unknown spend), an accepted one, and a second continue of the same run
+mkdir -p $I/repo2/app $I/repo2/docs && cd $I/repo2 && git init -q -b main && : > app/__init__.py
+printf '# Calc CLI\n\n## 1. Command line\n\n1.1 python -m app A B exits with the sum of the integers A and B.\n\n1.2 Exit 2 on a usage error (any other number of arguments).\n\n1.3 Exit 3 when A or B is not an integer.\n' > docs/requirements.md
+git add -A && git -c user.name=o -c user.email=o@o commit -qm baseline && cd $I
+print "== seal + approve x4 (two stories)"; A bundle seal authoring2.json --repo repo2 --out sealed2.json
+A bundle approve sealed2.json --contract BC-SUM --approver human:integration --out b1.json
+A bundle approve b1.json --contract BC-USAGE-0 --approver human:integration --out b2.json
+A bundle approve b2.json --contract BC-USAGE-1 --approver human:integration --out b3.json
+A bundle approve b3.json --contract BC-NAN --approver human:integration --out approved2.json
+print "== run2 (SIGKILLed in S2)"
+(cd $I && exec $PY -m aisef run --project approved2.json --settings settings.json --repo repo2 --out run2 \
+   --anchor-out anchors/run2.anchor) & print $! > $I/kill-run2.pid; wait $!; print "exit $? (137 = SIGKILL)"
+print "run2: RUN.json $([[ -e $I/run2/RUN.json ]] && print present || print absent); RUN.started.json $([[ -e $I/run2/RUN.started.json ]] && print present || print absent); kill: $(cat $I/kill-run2.done)"
+print "== continue"; A bundle continue approved2.json --from-run run2 --out cont.json
+print "== run3 --parent, unknown spend not accepted"
+A run --project cont.json --settings settings.json --repo run2/repo --parent run2 --out run3-refused
+print "== run3 --parent --accept-unaccounted"
+A run --project cont.json --settings settings.json --repo run2/repo --parent run2 --accept-unaccounted --out run3 \
+  --anchor-out anchors/run3.anchor
+print "== continue run2 again"; A bundle continue approved2.json --from-run run2 --out cont-again.json
+print "== verify run3"; A run --verify --project cont.json --out run3 --expect-anchor "$(head -c 64 anchors/run3.anchor)"
+print "== run3 record"; $PY -c 'import json,sys; r=json.load(open(sys.argv[1])); print(json.dumps({k: r.get(k) for k in ("delivery_verdict","story_outcomes","continues","lineage_usage")}, indent=1)[:3000])' $I/run3/RUN.json
 pkill -f "$HERE/fakeprov.py port provider.log"

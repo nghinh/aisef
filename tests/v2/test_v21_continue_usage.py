@@ -154,6 +154,21 @@ class Continue(ProductBase):
                          (str(self.tmp / "second"), []))
         self.assertEqual(hashlib.sha256((self.first / "RUN.json").read_bytes()).hexdigest(), before)   # untouched
 
+    def test_a_continuation_verifies_given_its_directory_relative_or_absolute(self):
+        """The CLI integration found it: `aisef run --verify --out run3` of a continuation was REFUTED ("the record's
+        spend is not what the evidence re-derives") — the claim names the run absolute, the verifier was given it
+        relative, so the lineage counted the run itself as a superseded sibling of it."""
+        import contextlib
+        from aisef2.app.verify import verify
+        doc, _ = bundle_cli.continue_from(self.doc, self.first)
+        self.project = bundle.load(doc)
+        rec = self.execute("second", source=self.first / "repo", predecessor=self.first)
+        self.assertEqual(rec["story_outcomes"]["CARRIED"], ["COMMIT"])
+        for given in (self.tmp / "second", pathlib.Path("second")):
+            with contextlib.chdir(self.tmp):
+                v = verify(self.project, given)
+            self.assertEqual((v["verdict"], v.get("problems")), ("VERIFIED", []), given)
+
     def test_a_merge_the_journal_never_committed_is_left_out(self):
         s1 = next(e.data["revision"] for e in self.journal("first").events if e.type == "story/commit")
         repo = self.first / "repo"

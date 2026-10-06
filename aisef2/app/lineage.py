@@ -274,9 +274,11 @@ def predecessor_of(run_dir: pathlib.Path) -> pathlib.Path | None:
 def lineage_account(predecessor: pathlib.Path, child: pathlib.Path | None = None) -> dict:
     """What the lineage ending at `predecessor` spent: every run of it once, and every child a superseded claim names
     (its preflight may have spent) but `child` (the run asking). Unknown spend is listed, never counted as 0."""
-    runs, seen, at = [], set(), predecessor
-    while at is not None and str(at) not in seen:
-        seen.add(str(at))
+    def key(p) -> str:      # a claim names a run absolute; a caller may give one relative (`--verify --out run3`)
+        return str(pathlib.Path(p).resolve())
+    runs, seen, at = [], {key(child)} if child is not None else set(), predecessor
+    while at is not None and key(at) not in seen:
+        seen.add(key(at))
         runs.append(account_of(at))
         nxt = predecessor_of(at)
         for _, path in claims(nxt) if nxt is not None else []:
@@ -284,8 +286,8 @@ def lineage_account(predecessor: pathlib.Path, child: pathlib.Path | None = None
                 sibling = json.loads(path.read_text(encoding="utf-8")).get("run")
             except (OSError, ValueError):
                 sibling = None
-            if sibling and str(sibling) != str(at) and str(sibling) not in seen and (child is None or str(sibling) != str(child)):
-                seen.add(str(sibling))
+            if sibling and key(sibling) not in seen:
+                seen.add(key(sibling))
                 runs.append(account_of(pathlib.Path(sibling)) | {"superseded": True})
         at = nxt
     for _, path in claims(predecessor):     # siblings of `child`: superseded children of the predecessor itself
@@ -293,8 +295,8 @@ def lineage_account(predecessor: pathlib.Path, child: pathlib.Path | None = None
             sibling = json.loads(path.read_text(encoding="utf-8")).get("run")
         except (OSError, ValueError):
             continue
-        if sibling and str(sibling) not in seen and (child is None or str(sibling) != str(child)):
-            seen.add(str(sibling))
+        if sibling and key(sibling) not in seen:
+            seen.add(key(sibling))
             runs.append(account_of(pathlib.Path(sibling)) | {"superseded": True})
     return {"runs": runs, **{k: sum(r[k] for r in runs) for k in SPEND},
             "unaccounted": [u for r in runs for u in r["unaccounted"]]}
