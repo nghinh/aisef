@@ -2,7 +2,8 @@
 closure-evidence/v2/cycle2/P5-FALSIFIABILITY.json (RFC §9.1.2, §27).
 
     python -P validation/qualification/p5_falsifiability.py --seal    # binds each P5 mutant's materialised digests
-    python -P validation/qualification/p5_falsifiability.py --run     # the evidence run
+    python -P validation/qualification/p5_falsifiability.py --run     # the evidence run (refuses an existing record)
+    python -P validation/qualification/p5_falsifiability.py --run-v21 # the run as the v2.1 record (`as_v21`), once
 
 **Its own witness per spec.** The P0 mutants (P0-REFERENCE-FIXTURE.json) prove the reference ACCEPTANCE falsifiable; they
 are not reused as this package's witnesses. Each retained spec has one controlled mutation of its own in the P5 corpus
@@ -37,6 +38,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 OUT_REL = "closure-evidence/v2/cycle2/P5-FALSIFIABILITY.json"
+#: V2.1 (owner B-03a): the behaviour evidence for the 2.1 spec identities — run() on this tree, every spec compiled under
+#: its probes and re-executed, pristine and witness; the 2.0 record (OUT_REL) stays byte-identical
+V21_OUT_REL = "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json"
+#: run()'s verdict when it found no problem
+COMPLETE = "COMPLETE — EVERY RETAINED SPEC QUALIFIED"
 PACKAGE = "WP-2.5.2"
 MECHANISM = "controlled_product_mutation"
 FIX_REL = "tests/v2/fixtures/workloads/ledgerlock-reference"
@@ -152,11 +158,15 @@ def tree_identity(tree: pathlib.Path) -> dict:
 
 
 def seal() -> dict:
+    """The corpus with each mutant's materialised digests bound. MUTANTS.json is a sealed C2-P5 input (the accepted
+    record and the v2.1 re-verification bind its sha): a seal that would change it is refused, never written."""
     doc = corpus()
     for m in doc["mutants"]:
         m["modules"] = mutant_digests(m)
     doc["corpus_sha256"] = _sha(json.dumps(doc["mutants"], sort_keys=True, ensure_ascii=False).encode("utf-8"))
-    (ROOT / MUTANTS_REL).write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    text = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
+    if (ROOT / MUTANTS_REL).read_bytes().replace(b"\r\n", b"\n") != text.encode("utf-8"):
+        raise SystemExit(f"refused: {MUTANTS_REL} is a sealed C2-P5 input and this seal would change it")
     return doc
 
 
@@ -351,18 +361,92 @@ def run(matrix: bool = True) -> dict:
     return body
 
 
+def v21_header() -> dict:
+    """What the v2.1 record states in place of run()'s 2.0 header (owner B-03a): a re-execution on 2.1 under the B-03a
+    decision that claims no approval and supersedes nothing — the 2.0 record (OUT_REL) is kept as history."""
+    from validation.qualification import p5_acceptance as pa
+    return {"record": "AISEF V2.1 — C2-P5 WP-2.5.2 SPEC FALSIFIABILITY RE-EXECUTED ON 2.1: every retained PLAN-V2.2 ProductProofSpec, "
+                      "compiled under this tree's probes, against the pristine reference and its own controlled witness",
+            "authority": pa.B03_REF,
+            "status": "RE-EXECUTION on 2.1 (owner B-03a) — no approval and no acceptance claimed",
+            "supersedes": None,
+            "history": {"path": OUT_REL, "blob_at_v2_0_0": _git("rev-parse", f"{pa.V2_0_0}:{OUT_REL}")}}
+
+
+def probe_execution_digests(probe_ids) -> dict[str, str]:
+    """The digest of the bytes each probe runs (V2-007: a spec's semantic hash binds the probe's capability, not these)."""
+    from aisef2.probe.calibration import executing
+    return {p: executing(_probe(p)) for p in sorted(set(probe_ids))}
+
+
+def as_v21(rec: dict) -> dict:
+    """run()'s record as the v2.1 record: `v21_header` over its 2.0 header, the v2.1 proposal as the proposal it
+    measured and the execution digests of the probes its specs ran — refused unless that proposal exists and its plan
+    is the run's."""
+    from validation.qualification import p5_acceptance as pa
+    prop = pa.v21_proposal_record()
+    if not prop or prop["plan"]["plan_hash"] != rec["identities"]["plan_hash"]:
+        raise SystemExit(f"refused: {pa.V21_PROPOSAL_REL} is missing or its plan is not the run's")
+    ids = {**rec["identities"], "proposal": pa._file(pa.V21_PROPOSAL_REL), "proposal_digest": prop["proposal_digest"],
+           "probe_execution_digests": probe_execution_digests(r["probe_id"] for r in rec["specs"])}
+    return {**rec, **v21_header(), "identities": ids}
+
+
+def _plan_hash() -> str:
+    from validation.qualification import p5_acceptance as pa
+    return pa._aid().build()["plan"].plan_hash
+
+
+def _write_new(rel: str, rec: dict) -> None:
+    with open(ROOT / rel, "x", encoding="utf-8", newline="\n") as f:   # a record is never rewritten
+        f.write(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
+
+
+def write_v21() -> dict:
+    """run() as the v2.1 record (`as_v21`) into V21_OUT_REL, written once and only without a problem (refused before
+    the run if the record exists, the kernel has uncommitted changes, or the v2.1 proposal does not exist or names
+    another plan than this tree's). A refused run is kept, never discarded: its full record goes outside the evidence
+    tree (`p5_acceptance.keep_failed_run`)."""
+    from validation.qualification import p5_acceptance as pa
+    if (ROOT / V21_OUT_REL).exists():
+        raise SystemExit(f"refused: {V21_OUT_REL} exists — a record is never rewritten")
+    pa.refuse_uncommitted_kernel()
+    prop = pa.v21_proposal_record()
+    if not prop:
+        raise SystemExit(f"refused: {pa.V21_PROPOSAL_REL} is missing")
+    if prop["plan"]["plan_hash"] != _plan_hash():
+        raise SystemExit(f"refused: {pa.V21_PROPOSAL_REL} names another plan than this tree's")
+    rec = run()
+    try:
+        rec = as_v21(rec)
+    except SystemExit as e:
+        rec = {**rec, "problems": [*rec["problems"], str(e)]}
+    if rec["problems"]:
+        raise SystemExit(f"refused: {'; '.join(rec['problems'])} — the run is kept at {pa.keep_failed_run(V21_OUT_REL, rec)}")
+    (ROOT / V21_OUT_REL).parent.mkdir(parents=True, exist_ok=True)
+    _write_new(V21_OUT_REL, rec)
+    return rec
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--seal", action="store_true")
     g.add_argument("--run", action="store_true")
+    g.add_argument("--run-v21", action="store_true")
     a = ap.parse_args(argv)
     if a.seal:
         doc = seal()
         print(f"{MUTANTS_REL}: {len(doc['mutants'])} mutants sealed, corpus {doc['corpus_sha256'][:12]}")
         return 0
+    if a.run_v21:
+        rec = write_v21()
+        print(f"{V21_OUT_REL}: {rec['verdict']}; {rec['summary']}; {rec['elapsed_s']} s")
+        return 0
+    if (ROOT / OUT_REL).exists():   # the 2.0 record is history (p5_acceptance): never rewritten
+        raise SystemExit(f"refused: {OUT_REL} exists — a record is never rewritten")
     rec = run()
-    (ROOT / OUT_REL).write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    _write_new(OUT_REL, rec)
     print(f"{OUT_REL}: {rec['verdict']}; {rec['summary']}; {rec['elapsed_s']} s")
     return 0 if not rec["problems"] else 1
 
