@@ -22,9 +22,11 @@ the contracts that already encode them (found mechanically below); none of them 
 **V2.1 (owner B-03a, RELEASE-DECISIONS seq 5).** The admission engine digest and the probe identities moved, and the
 owner chose new v2.1 records over any tolerance: the 2.0 acceptance and proposal are HISTORY (their blobs are v2.0.0's,
 their verdicts as recorded: `history_problems`, `proposal_history_problems`); the v2.1 proposal is the authoring aid's
-record on this tree, compared exactly; the v2.1 re-verification (`reverify`) re-derives the boundary with literal
-comparisons only — no rebind, no new owner acceptance, no new approval. `verify`, `record`, `check` and `--write` keep
-their 2.0 behaviour.
+record on this tree inside a v2.1 envelope that names the B-03a decision and claims no approval (`v21_proposal`),
+compared exactly; the v2.1 re-verification (`reverify`) re-derives the boundary with literal comparisons only — no
+rebind, no new owner acceptance, no new approval — and binds the v2.1 falsifiability record (its header, the v2.1
+proposal, this tree's corpus, kernel, plan and spec hashes). `verify`, `record`, `check` and `--write` keep their 2.0
+behaviour.
 """
 
 from __future__ import annotations
