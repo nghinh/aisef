@@ -61,6 +61,14 @@ class PlanCorrection(unittest.TestCase):
         self.assertEqual(pc.history_problems(), [])
         self.assertEqual(json.loads((ROOT / pc.OUT_REL).read_text(encoding="utf-8"))["verdict"], "PLAN CORRECTION ADMITTED STATICALLY")
 
+    def test_the_history_check_reports_a_2_0_blob_that_is_not_tag_v2_0_0_s(self):
+        """The 2.0 record's history check compares its blob with the tag's: against dbb6854, where the file is the
+        correction's first commit (another blob), it reports exactly that and nothing else."""
+        earlier = "dbb685485d67f6588f7e0b2c7c60dc3022329534"
+        self.assertNotIn(rebind.lf_sha_at(earlier, pc.OUT_REL), (None, c2_p9.C.lf_sha(ROOT / pc.OUT_REL)))
+        with mock.patch.object(pc, "V2_0_0", earlier):
+            self.assertEqual(pc.history_problems(), [f"{pc.OUT_REL} is not the record of tag v2.0.0"])
+
     def test_the_v2_1_record_states_literal_facts_and_labels_the_re_binding(self):
         """B-03a: no claim derived through the probe-identity re-binding is stated as a proof; the contracts are compared
         literally, this tree's spec identities are listed as they are (none equal to the accepted), and the mapping

@@ -263,6 +263,11 @@ def _bound() -> dict:
     return {rel: rp._lf((ROOT / rel).read_bytes()) if (ROOT / rel).exists() else None for rel in BOUND}
 
 
+def _missing(bound: dict) -> list[str]:
+    """The BOUND files not on this tree: write() refuses on them, check() reports each."""
+    return [rel for rel, sha in bound.items() if sha is None]
+
+
 def _history() -> dict:
     return {"path": OUT_REL, "sha256": _rp()._lf((ROOT / OUT_REL).read_bytes()),
             "rule": "the 2.0 record, made on the 2.0 release tree: kept byte for byte, its blob tag v2.0.0's (history_problems)"}
@@ -287,7 +292,7 @@ def write() -> dict:
     path = ROOT / V21_OUT_REL
     if path.resolve() == (ROOT / OUT_REL).resolve() or path.exists():
         raise SystemExit(f"refused: {V21_OUT_REL} exists or is the 2.0 record")
-    missing = [rel for rel, sha in _bound().items() if sha is None]
+    missing = _missing(_bound())
     if missing:
         raise SystemExit(f"refused: bound but not on this tree: {missing}")
     rp = _rp()
@@ -415,7 +420,7 @@ def history_problems() -> list[str]:
 
 
 def check() -> list[str]:
-    """The v2.1 record binds this tree — its files, its kernel digest, the B-03a authority; the 2.0 record holds as history."""
+    """The v2.1 record binds this tree — its files (each on the tree), its kernel digest, the B-03a authority; the 2.0 record holds as history."""
     from validation.qualification import c2_plan_correction as pc
     path = ROOT / V21_OUT_REL
     if not path.exists():
@@ -423,7 +428,9 @@ def check() -> list[str]:
     rec = json.loads(path.read_text(encoding="utf-8"))
     out = [] if rec.get("verdict") == "REPRODUCED AND CORRECTED" and not rec.get("problems") else [f"the record's verdict is {rec.get('verdict')}"]
     out += problems(rec)
-    out += [f"{rel} changed since the record" for rel, sha in _bound().items() if rec["bound"].get(rel) != sha]
+    bound = _bound()
+    out += [f"{rel} changed since the record" for rel, sha in bound.items() if rec["bound"].get(rel) != sha]
+    out += [f"{rel} is bound but not on this tree" for rel in _missing(bound)]
     if rec["measured_before_the_ruling"] != measured_before_the_ruling():
         out.append("the real run's rows differ from the record")
     if rec.get("history") != _history():
