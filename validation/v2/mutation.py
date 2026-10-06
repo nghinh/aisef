@@ -56,8 +56,10 @@ RECORDS = {"P1": "closure-evidence/v2/P1-MUTATION.json", "P2": "closure-evidence
 OUT_REL = RECORDS["P1"]
 #: per kill-test file. V2.0 S2: the B1 split runs a controller and an agent per evaluation, and the heaviest kill file
 #: (tests/v2/test_python_callable_v2.py) takes 96 s on an idle machine — 120 s would let two workers' load time out
-#: the unmutated baseline. A kill by timeout is still named in the record.
-TIMEOUT = 300
+#: the unmutated baseline. V2.1: tests/v2/test_v21_continue_integrity.py takes 257 s idle (real runs SIGKILLed at
+#: synchronisation points), so 300 s would time out its baseline under the campaign's load; 900 s is about 3x it.
+#: A kill by timeout is still named in the record, and the merge tools refuse a clock-only kill.
+TIMEOUT = 900
 
 #: target "path::function" -> the test files that must kill its mutants (semantic tests only; see module doc).
 _CONTRACT_TESTS = ["tests/v2/p1/test_contract.py"]
@@ -586,10 +588,104 @@ for _phase in (K_NOWORK_TARGETS, P6_TARGETS, C2P2_TARGETS, C2P3_TARGETS, C2_P4_T
         SUPERSEDED.setdefault(_t, "V2.0-S2")
         del _phase[_t]
 RECORDS["V2.0-S2"] = "closure-evidence/v2/release/S2-MUTATION.json"
+# V2.1 REQUALIFICATION ROUND, B-03b (owner directive 2026-10-06, closure-evidence/v2/cycle2/RELEASE-DECISIONS.json
+# seq 5). Every target of a module 2.1 changed is re-measured (the digest is whole-file), its kill set the earlier one
+# with the 2.1 regression files after its first file; the new 2.1 modules (lineage, usage, review_ocr, review_verify,
+# bundle_cli) and the names 2.1 added or changed in other modules are new targets. Not a target: names with no mutant,
+# and aisef2/app/calibrations.py::CALIBRATIONS — generated data (validation/qualification/release_calibration.py
+# rewrites it), proven by its calibration record and check 9, not by mutating its rows. S2_TARGETS stays whole (its
+# record's reuse proof and criteria read it); the V2.0-S2 phase keeps only what V2.1 does not take over.
+_V21_ID = "tests/v2/test_v21_identity.py"
+_V21_REG = {
+    "aisef2/plan/static_admission.py": [_V21_ID], "aisef2/probe/calibration.py": [_V21_ID],
+    "aisef2/orchestrate/review.py": ["tests/v2/test_v21_review.py"],
+    "aisef2/probe/file_artifact.py": ["tests/v2/test_v21_python_imports.py", _V21_ID],
+    **{f"aisef2/probe/{p}.py": [_V21_ID] for p in ("cli_invocation", "process_effect", "python_callable_v2")},
+    **{f"aisef2/orchestrate/{m}.py": ["tests/v2/test_v21_orchestration.py"] for m in ("story_runner", "workspace", "adapters")},
+    "aisef2/app/adapters.py": [_V21_ID, "tests/v2/test_v21_review_chain.py"],
+    "aisef2/app/bundle.py": ["tests/v2/test_v21_inputs.py", _V21_ID, "tests/v2/test_v21_review.py",
+                             "tests/v2/test_v21_bundle_tools.py", "tests/v2/test_v21_continue_usage.py",
+                             "tests/v2/test_v21_review_chain.py", "tests/v2/test_v21_continue_integrity.py"],
+    "aisef2/app/cli.py": ["tests/v2/test_v21_inputs.py", "tests/v2/test_v21_bundle_tools.py",
+                          "tests/v2/test_v21_continue_integrity.py"],
+    "aisef2/app/client.py": ["tests/v2/test_v21_transport.py"],
+    "aisef2/app/preflight.py": ["tests/v2/test_v21_transport.py", _V21_ID],
+    "aisef2/app/run.py": ["tests/v2/test_v21_inputs.py", _V21_ID, "tests/v2/test_v21_verify.py",
+                          "tests/v2/test_v21_continue_usage.py", "tests/v2/test_v21_review_chain.py",
+                          "tests/v2/test_v21_continue_integrity.py"],
+    "aisef2/app/settings.py": ["tests/v2/test_v21_inputs.py", _V21_ID, "tests/v2/test_v21_review.py",
+                               "tests/v2/test_v21_verify.py", "tests/v2/test_v21_continue_usage.py",
+                               "tests/v2/test_v21_review_chain.py", "tests/v2/test_v21_continue_integrity.py"],
+    "aisef2/app/verify.py": ["tests/v2/test_v21_verify.py", "tests/v2/test_v21_continue_usage.py",
+                             "tests/v2/test_v21_continue_integrity.py"],
+    "aisef2/app/feedback.py": ["tests/v2/test_v21_review_chain.py"],
+}
+
+
+def _v21_kill(module: str, kill: list[str]) -> list[str]:
+    """`kill` with the module's 2.1 regression files after its first file (each file once)."""
+    return list(dict.fromkeys([kill[0], *_V21_REG.get(module, []), *kill[1:]]))
+
+
+V21_TARGETS: dict[str, list[str]] = {
+    t: _v21_kill(t.split("::")[0], k) for phase in (P2_TARGETS, P6_TARGETS, C2_P1_TARGETS, S2_TARGETS)
+    for t, k in phase.items() if t.split("::")[0] in _V21_REG}
+_V21_NEW = {
+    "aisef2/app/lineage.py": (["tests/v2/test_v21_continue_usage.py", "tests/v2/test_v21_continue_integrity.py"], (
+        "JOURNAL", "SPEND", "_sha", "claims", "events_of", "child_state", "process_started", "claimant", "_gone", "claim",
+        "continued_by", "_git", "reconcile", "account_of", "predecessor_of", "lineage_account", "usage_lineage",
+        "ANCHOR_LINE", "write_anchor", "read_anchor")),
+    "aisef2/app/usage.py": (["tests/v2/test_v21_continue_usage.py", "tests/v2/test_v21_verify.py",
+                             "tests/v2/test_v21_continue_integrity.py"], (
+        "PRICE_KEYS", "CLASSES", "_DATE", "price_problem", "session_tokens", "_usd", "usage", "no_progress")),
+    "aisef2/app/review_ocr.py": (["tests/v2/test_v21_review_ocr.py", "tests/v2/test_v21_review_chain.py"], (
+        "OCR", "TERMINAL", "NOT_FULL", "SCRUB_PREFIXES", "NOT_REVIEWABLE", "REPRODUCER_FENCE", "item_id", "finding_id",
+        "coverage", "findings", "reproducer_of", "environment", "argv", "pinned", "read_output", "scrubbed_names")),
+    "aisef2/app/review_verify.py": (["tests/v2/test_v21_review.py", "tests/v2/test_v21_review_ocr.py",
+                                     "tests/v2/test_v21_review_chain.py"], (
+        "SEVERITIES", "POLICIES", "REPRODUCER_KEYS", "Verification.evidence", "severity_of", "reproducer_contract",
+        "verify", "_canon", "_stimulus", "_scalars", "_NUMBER", "_states", "_approved_by_clause", "anchor", "blocks",
+        "detail")),
+    "aisef2/app/bundle_cli.py": (["tests/v2/test_v21_bundle_tools.py", _V21_ID, "tests/v2/test_v21_review.py",
+                                  "tests/v2/test_v21_continue_usage.py", "tests/v2/test_v21_continue_integrity.py"], (
+        "AUTHORING_KEYS", "CONTRACT_KEYS", "CRITERION_KEYS", "EXAMPLES", "RELEASES", "_earlier", "migrate", "_mint",
+        "_refs", "_closed", "seal", "unapproved", "approve", "_spec_rows", "coverage", "lint", "explain", "init",
+        "continue_from", "_read", "_write_new", "main")),
+    # names 2.1 added, or whose body 2.1 changed, in modules that already had targets (or none, feedback.py)
+    **{f"aisef2/app/{m}.py": (["tests/v2/test_app_units.py", *_V21_REG[f"aisef2/app/{m}.py"], "tests/v2/test_app_run.py"], fs)
+       for m, fs in (("adapters", ("Reviewer._model", "Reviewer._ocr", "Reviewer._verify", "tree_of", "_unchanged",
+                                   "_bounded", "Reviewer.__init__")),
+                     ("bundle", ("_HEX64", "_strings", "shape_problems", "read")),
+                     ("run", ("layers_of", "outcomes_from", "unfinished", "_content_sha", "evidence_manifest",
+                              "anchor_in", "anchor_of")),
+                     ("settings", ("OPTIONAL", "REVIEW_ABSENT", "FINDERS", "OCR_KEYS", "LOOPBACK", "endpoint_problem",
+                                   "Settings.prices", "read")),
+                     ("verify", ("_runspec_problems", "_spend")),
+                     ("cli", ("_parser",)), ("client", ("Budget.account", "redact")), ("preflight", ("http_transport",)),
+                     ("feedback", ("retry_feedback",)))},
+}
+for _m, (_kill, _names) in _V21_NEW.items():
+    V21_TARGETS.update({f"{_m}::{n}": list(_kill) for n in _names})
+V21_TARGETS.update({
+    "aisef2/probe/calibration.py::executing": ["tests/v2/p2/test_calibration.py", _V21_ID],
+    "aisef2/probe/calibration.py::calibration_for": ["tests/v2/p2/test_calibration.py", _V21_ID],
+    **{f"aisef2/probe/file_artifact.py::{n}": [*_V21_REG["aisef2/probe/file_artifact.py"], *_FILE_ARTIFACT_TESTS]
+       for n in ("_MODULE_NAME", "import_facts", "DIGEST")},
+    # B-01 (ARCHITECTURE-EXCEPTION-V2-007): the capability digest, sha256 of [PROBE_ID, CAPABILITY_VERSION, CLASSES]
+    "aisef2/probe/cli_invocation.py::DIGEST": [_V21_ID, "tests/v2/test_c2_cli_calibration.py"],
+    "aisef2/probe/process_effect.py::DIGEST": [_V21_ID, "tests/v2/test_c2_effect_calibration.py"],
+    "aisef2/probe/python_callable_v2.py::DIGEST": [_V21_ID, *_C2_P4_TESTS],
+})
+SUPERSEDED.update({t: "V2.1" for t in V21_TARGETS})
+for _phase in (P2_TARGETS, P6_TARGETS, C2_P1_TARGETS):
+    for _t in [t for t in _phase if t in V21_TARGETS]:
+        del _phase[_t]
+RECORDS["V2.1"] = "closure-evidence/v2/v2.1/MUTATION.json"
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
                  "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS,
                  "C2-ORCH": C2_ORCH_TARGETS, "C2-P10": C2_P10_TARGETS, "K-PRESAT-001": K_PRESAT_TARGETS,
-                 "K-NOWORK-001": K_NOWORK_TARGETS, "V2.0-S2": S2_TARGETS}
+                 "K-NOWORK-001": K_NOWORK_TARGETS, "V2.0-S2": {t: k for t, k in S2_TARGETS.items() if t not in V21_TARGETS},
+                 "V2.1": V21_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.
 NO_AUDIT: set[str] = {"aisef2/product/outcome.py::contract_satisfaction"}
@@ -617,6 +713,7 @@ AUDITED: dict[tuple[str, str], str] = {
 }
 #: What a run copies into its scratch tree.
 COPY = ("aisef2", "tests/v2", "validation/v2", "docs/architecture", "docs/implementation/v2", "closure-evidence/v2",
+        "docs/v2.1",   # the bundle-authoring schema and the S-10-a drafts two V2.1 kill files read
         "aisef",   # the frozen V1 tree, read by the WIN-PID red-before reproducers; never a target
         "pyproject.toml")  # the console-script table the old-path audit inventories (tests/v2/test_no_dual_authority.py)
 
