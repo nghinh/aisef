@@ -65,10 +65,12 @@ def read_session(log: pathlib.Path) -> dict:
 class Budget:
     KEYS = ("provider_requests", "turns", "input_tokens", "output_tokens")
 
-    def __init__(self, limits: dict, base: dict, logs: pathlib.Path, requests=lambda: 0) -> None:
+    def __init__(self, limits: dict, base: dict, logs: pathlib.Path, requests=lambda: 0, inherited: dict | None = None) -> None:
         if sorted(limits) != sorted(self.KEYS) or sorted(k for k in base if k in self.KEYS) != sorted(self.KEYS):
             raise ValueError("a budget has the four ceilings, and a base that accounts for each of them")
         self.limits, self.base, self.logs, self.requests = dict(limits), {k: int(base[k]) for k in self.KEYS}, logs, requests
+        #: V2.1: what the lineage this run continues spent (app/lineage) — continuing never resets a ceiling
+        self.inherited = {k: int((inherited or {}).get(k, 0)) for k in self.KEYS}
 
     def spend(self, live: pathlib.Path | None = None) -> dict:
         logs = sorted(self.logs.glob("*.jsonl")) if self.logs.is_dir() else []
@@ -80,10 +82,11 @@ class Budget:
                 unaccounted.append(f"{p.name}: {x['steps_without_tokens']} finished steps report no tokens")
             if p != live and not x["turns"]:
                 unaccounted.append(f"{p.name}: a session that started finished no step — what it sent is unknown")
-        return {"provider_requests": self.base["provider_requests"] + recorded,
-                "turns": self.base["turns"] + sum(x["turns"] for x in seen.values()),
-                "input_tokens": self.base["input_tokens"] + sum(x["tokens"]["input"] for x in seen.values()),
-                "output_tokens": self.base["output_tokens"] + sum(x["tokens"]["output"] for x in seen.values()),
+        inh = self.inherited
+        return {"provider_requests": self.base["provider_requests"] + inh["provider_requests"] + recorded,
+                "turns": self.base["turns"] + inh["turns"] + sum(x["turns"] for x in seen.values()),
+                "input_tokens": self.base["input_tokens"] + inh["input_tokens"] + sum(x["tokens"]["input"] for x in seen.values()),
+                "output_tokens": self.base["output_tokens"] + inh["output_tokens"] + sum(x["tokens"]["output"] for x in seen.values()),
                 "sessions_started": len(logs), "requests_recorded": recorded, "unaccounted": unaccounted}
 
     def reached(self, live: pathlib.Path | None = None, in_progress: bool = False) -> str | None:
@@ -110,7 +113,7 @@ class Budget:
 
     def account(self) -> dict:
         return {"limits": dict(self.limits), "preflight": dict(self.base), "spent": self.spend(), "reached": self.reached(),
-                "limitation": LIMITATION}
+                "limitation": LIMITATION, **({"inherited": dict(self.inherited)} if any(self.inherited.values()) else {})}
 
 
 def environment(names: tuple[str, ...], overlay: dict) -> dict:

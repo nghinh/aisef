@@ -148,7 +148,10 @@ class Continue(ProductBase):
         events = self.journal("second").events
         self.assertEqual([e.data["budget_owner"] for e in events if e.type == "provider/request"
                           and e.data.get("story_id") == "CARRIED"], ["REVIEW"])      # no developer call; K-NOWORK-001's review
-        self.assertEqual(rec["continues"], {"path": str(self.first), "evidence_anchor": R.anchor_in(self.first)})
+        self.assertEqual({k: rec["continues"][k] for k in ("path", "evidence_anchor")},
+                         {"path": str(self.first), "evidence_anchor": R.anchor_in(self.first)})
+        self.assertEqual((rec["continues"]["claim"]["run"], rec["continues"]["account"]["unaccounted"]),
+                         (str(self.tmp / "second"), []))
         self.assertEqual(hashlib.sha256((self.first / "RUN.json").read_bytes()).hexdigest(), before)   # untouched
 
     def test_a_merge_the_journal_never_committed_is_left_out(self):
@@ -157,9 +160,14 @@ class Continue(ProductBase):
         (repo / "stray.txt").write_text("an in-flight merge\n")
         git(repo, "add", "-A")
         git(repo, "commit", "-q", "-m", "in flight")
-        _, report = bundle_cli.continue_from(self.doc, self.first)
+        with self.assertRaises(bundle.BundleError) as c:      # nothing identifies it: never left out silently
+            bundle_cli.continue_from(self.doc, self.first)
+        self.assertIn("nothing identifies", str(c.exception))
+        _, report = bundle_cli.continue_from(self.doc, self.first, leave_out_unidentified=True)
         self.assertEqual(report["baseline"], s1)
         self.assertIn("left out", report["in_flight"])
+        self.assertEqual([(i["operation"], i["identified"], i["subject"]) for i in report["unconfirmed"]],
+                         [("unknown", False, "in flight")])
 
     def test_refusals(self):
         other = dict(self.doc, description="another project")

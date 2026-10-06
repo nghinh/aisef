@@ -89,16 +89,32 @@ prompt retry. Settings **không có** `review` ⇒ luật 2.0.0 (advisory), ghi 
 OCR (v1.12.12, Apache-2.0) chỉ là bên tìm; coverage do AISEF kiểm. **Không tuyên bố:** xác nhận chứng minh candidate không
 làm điều finding nói — không chứng minh finding đọc đúng yêu cầu (đã đo trong test).
 
-## ADR-8 — Nối tiếp thay cho resume tại chỗ; chi phí không biết là `null`
+## ADR-8 — Nối tiếp thay cho resume tại chỗ; đối soát thay cho giả định; chi phí không biết là `null`
 
 Journal có schema đóng; resume tại chỗ cần đổi format. Thay vào đó `aisef bundle continue`: baseline = commit cuối journal
-xác nhận (merge chưa commit bị loại và báo); obligation đã giao thành story VERIFY mà kernel chứng minh lại, không gọi
-developer (một lượt review mà luật K-NOWORK-001 của chủ dự án giữ — không đổi); `aisef run --parent` ghi dòng dõi và
-**giữ quyền nối tiếp độc quyền** (`CONTINUED-BY.json`, tạo bằng O_EXCL: dòng dõi không bao giờ rẽ nhánh). Bằng chứng của
-lượt cũ không bị sửa (một tệp claim được thêm). `RUN.started.json` cho phép nối tiếp một lượt bị giết trước khi ghi record.
-`usage`: token theo lớp, request, retry, thời gian; tiền chỉ từ bảng giá trong settings; `lineage_usage` cộng mỗi run một
-lần, chi phí của run bị giết không bao giờ `known`. Đã đo bằng SIGKILL ở năm điểm (`test_v21_continue_integrity`).
-Mô hình đe doạ của anchor: [ANCHOR-THREAT-MODEL.md](ANCHOR-THREAT-MODEL.md).
+xác nhận; obligation đã giao thành story VERIFY mà kernel chứng minh lại, không gọi developer (một lượt review mà luật
+K-NOWORK-001 của chủ dự án giữ — không đổi); `aisef run --parent` ghi dòng dõi. Bằng chứng của lượt cũ không bị sửa (chỉ
+thêm tệp claim). Quy tắc (module `aisef2/app/lineage.py`):
+
+- **Journal hoàn tất ≠ bền ≠ nguyên tử ≠ tác dụng.** Một append là `write` + `fsync`: hoàn tất khi `write` trả về, bền khi
+  `fsync` trả về, *không* nguyên tử (lần ghi ngắn có thể để lại dòng cuối bị cắt). Một sự kiện ghi lại một tác dụng đã
+  xảy ra; thiếu nó không có nghĩa tác dụng chưa xảy ra. *(Rút lại nhận định trước đó — "SIGKILL không thể cắt giữa dòng" —
+  trong commit 7e0aac0: sai; một tín hiệu chết người có thể làm lần ghi ngắn, và nhận định ấy lẫn tính hoàn tất với tính
+  nguyên tử.)*
+- **Đối soát.** Mọi thứ journal không xác nhận được nhận diện với git và danh tính thao tác của journal (merge của kernel
+  cho candidate đã chứng minh; candidate trong worktree của kernel); không nhận diện được ⇒ từ chối trừ khi người vận hành
+  bỏ ra có tên. Request không có result mà luồng phiên tồn tại ⇒ chi phí unknown ⇒ không mở phiên trả tiền nào trừ khi
+  người vận hành chấp nhận (`--accept-unaccounted`, ghi lại). Chi tiêu đã biết của dòng dõi tính vào trần của run mới.
+- **Claim có thế hệ, quyết định bằng bằng chứng**, lấy trước request provider đầu tiên; child đã bắt đầu không bao giờ bị
+  thay thế; thay thế child chưa bắt đầu khi claimant chắc chắn đã mất hoặc khi người vận hành nêu sha256 của claim.
+- `RUN.started.json` cho phép nối tiếp một lượt bị giết trước khi ghi record. `usage` của mỗi run chỉ đếm luồng phiên của
+  nó; `lineage_usage` cộng mỗi run một lần; chi phí của run bị giết không bao giờ `known`.
+
+Đo bằng SIGKILL thật ở điểm đồng bộ xác định cho từng cửa sổ (request: trước khi client chạy / đã gửi chưa có usage / có
+usage chưa có result; commit: candidate / merge; append journal: trước write / ghi ngắn / sau write trước fsync / sau
+fsync; claim: trước / sau `run.begin`; claimant còn sống / ở máy khác / đã mất; hai run cùng lúc) —
+`test_v21_continue_integrity`. **Không đo:** mất điện hay OS sập (cửa sổ trước `fsync` chỉ khác biệt ở đó). Mô hình đe
+doạ của anchor: [ANCHOR-THREAT-MODEL.md](ANCHOR-THREAT-MODEL.md).
 
 ## ADR-9 — Thí nghiệm: niêm phong trước khi tiêu
 

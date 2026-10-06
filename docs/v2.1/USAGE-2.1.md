@@ -85,20 +85,45 @@ aisef run --project continued.json --repo run1/repo --parent run1 --settings set
 Baseline mới = commit cuối mà journal của `run1` xác nhận; các story đã giao thành story `CARRIED` (VERIFY) được kernel
 chứng minh lại mà không gọi developer. Bundle/kernel khác ⇒ từ chối (đó là dự án mới, không phải nối tiếp).
 
-Bảo đảm (đã đo bằng SIGKILL thật, `test_v21_continue_integrity`):
-- **Một run được nối tiếp đúng một lần.** `--parent` tạo độc quyền `run1/CONTINUED-BY.json` ngay trước khi run bắt đầu;
-  run thứ hai (đồng thời hay sau) bị từ chối, nêu tên run đã nối. Ngoài tệp đó, bằng chứng của `run1` giữ nguyên từng byte.
-- **Run bị giết vẫn nối được.** `RUN.started.json` được ghi một lần trước mọi việc (danh tính bundle/kernel/plan/settings);
-  thiếu `RUN.json` thì `continue` đọc nó, báo `recorded: false`.
-- **Không commit/merge lặp, không mất nghĩa vụ.** Merge mà journal chưa commit bị bỏ ra (báo `in_flight`); mỗi story được
-  commit đúng một lần trong cả dòng dõi; nghĩa vụ đã giao được chứng minh lại (CARRIED), phần còn lại được giao.
-- **Không mất, không đếm đôi chi phí.** `usage` của mỗi run chỉ đếm luồng phiên của chính nó; `run2/RUN.json` ghi
-  `lineage_usage` = dòng dõi của run trước + của mình, mỗi run một lần. Chi phí của một run bị giết không bao giờ là
-  `known` (bước đang chạy khi bị giết có thể thiếu): tổng dòng dõi khi đó là `null`.
-- **Đuôi journal bị cắt** (mất điện giữa một lần ghi; một tín hiệu không cắt được: mỗi sự kiện là một `write` + `fsync`):
-  dùng phần đầu đã kiểm chuỗi hash, báo `torn_tail: true`, sự kiện bị cắt coi như chưa xảy ra. Một dòng hỏng ở giữa ⇒ từ chối.
-- **Tiến trình của run bị giết.** Watchdog của mỗi process range giết cả nhóm khi controller mất (đo: 2 tiến trình probe
-  sống lúc kill, 0 còn lại sau 0,1 s).
+Bảo đảm — mỗi cửa sổ được đo bằng SIGKILL thật tại một điểm đồng bộ xác định (hàm được bọc, bước của client giả), không
+kill ngẫu nhiên (`test_v21_continue_integrity`):
+
+- **Journal, nói đúng.** Mỗi sự kiện là một `write` rồi một `fsync`. `write` trả về ⇒ lần ghi *hoàn tất* (tiến trình khác
+  thấy; tiến trình ghi bị giết không làm mất nó — đã đo: kill sau `write`, trước `fsync` ⇒ sự kiện còn). `fsync` trả về ⇒
+  *bền* trước mất điện/OS sập (không test nào ở đây mô phỏng điều đó). **Không** có tính *nguyên tử*: một lần ghi có thể
+  ngắn (mất điện, OS sập, hoặc tín hiệu chết người đến giữa một lần ghi nhiều trang) và writer chết trước khi cắt lại thì
+  để lại dòng cuối bị cắt — đã đo bằng một lần ghi nửa dòng. Reader trả phần đầu đã kiểm chuỗi hash cùng `torn_tail`;
+  báo cáo `continue` ghi `cut_event` (seq, số byte; nửa đầu một sự kiện chuẩn hoá thường **không** còn type lẫn story).
+- **Tác dụng bên ngoài không bao giờ bị coi là chưa xảy ra.** Một sự kiện ghi lại một tác dụng đã xảy ra (git đã dời
+  main; request đã tới provider). Thiếu hay cắt sự kiện ⇒ thiếu *bản ghi*, không phải thiếu *tác dụng*. `continue` đối
+  soát mọi thứ journal không xác nhận (`unconfirmed`) với git và với danh tính thao tác trong journal: merge của kernel cho
+  candidate đã được chứng minh (nhận ra qua cha thứ hai và thông điệp `merge <sha>`), candidate của developer trong
+  worktree `wt-<story>` của kernel. Mỗi mục được nêu danh tính; story của nó chạy lại từ baseline đã xác nhận, nên tác
+  dụng không lặp trên main của dòng dõi. Commit trên main mà không gì nhận ra ⇒ **từ chối**, trừ khi người vận hành nêu
+  `--leave-out-unidentified` (ghi vào báo cáo).
+- **Request chưa đối soát.** `provider/request` không có `provider/result`: client chưa từng chạy (không có luồng phiên)
+  ⇒ không gửi gì, chi phí 0 đã biết; luồng phiên tồn tại (request đã gửi, usage chưa có hoặc result chưa ghi) ⇒ chi phí
+  **unknown**. Khi dòng dõi có chi phí unknown, `aisef run --parent` không mở phiên trả tiền nào (từ chối trước preflight)
+  trừ khi người vận hành nêu `--accept-unaccounted` — danh sách được ghi vào `continues.accepted_unaccounted`; tổng chi
+  phí dòng dõi khi đó là `null`. Chi tiêu đã biết của dòng dõi tính vào trần ngân sách của run mới (nối tiếp không bao giờ
+  đặt lại ngân sách: muốn chạy tiếp một run đã chạm trần thì nâng trần trong settings — một quyết định tường minh).
+- **Một run được nối tiếp một lần — quyết định bằng bằng chứng.** `--parent` tạo độc quyền `CONTINUED-BY.json` *trước*
+  request provider đầu tiên (run thua cuộc đua không tiêu gì — đã đo). Tạo độc quyền chỉ chứng minh một tiến trình thắng
+  lúc tạo, nên một claim có sẵn được đối soát: child đã bắt đầu (journal có sự kiện) ⇒ từ chối, nối tiếp từ child, không
+  bao giờ thay thế kể cả khi người vận hành yêu cầu; child kết thúc mà chưa bắt đầu, hoặc chưa bắt đầu và claimant chắc
+  chắn đã mất (cùng máy, pid không còn hoặc là tiến trình khác theo thời điểm khởi động) ⇒ một thế hệ claim mới
+  (`CONTINUED-BY.<n>.json`) thay thế, ghi bằng chứng; claimant còn sống, ở máy khác, hoặc không đọc được ⇒ từ chối, chỉ
+  thay thế khi người vận hành nêu sha256 của claim (`--supersede-claim`, ghi là khẳng định của họ). Không xoá gì; không khoá
+  vĩnh viễn: luôn có một đường đi tiếp có ghi nhận.
+- **Run bị giết vẫn nối được.** `RUN.started.json` được ghi (fsync) một lần trước mọi việc; thiếu `RUN.json` thì
+  `continue` đọc nó, báo `recorded: false`.
+- **Không commit/merge lặp, không mất nghĩa vụ, chi phí mỗi run một lần.** Sau mỗi cửa sổ: mỗi story commit đúng một lần
+  trong dòng dõi, số merge trên main cuối = số story đã giao, mọi nghĩa vụ được giao hoặc chứng minh lại, `lineage_usage`
+  = mọi luồng phiên của dòng dõi đúng một lần (kể cả run bị thay thế), `usage` = chỉ của chính run.
+- **Tiến trình của run bị giết** (đo cho đúng trường hợp đã đo): các tiến trình probe được nhận diện theo process group
+  (và pid của chính candidate) — tất cả mất ngay sau kill: watchdog của range anchor giết cả nhóm khi controller mất. Một
+  hậu duệ **tự tách nhóm** (`setsid`) **không** bị kiểm soát: nó sống quá run bị giết (đã đo); trong một run bình thường nó
+  bị phát hiện là "escaped" (tests/v2/p4/test_process_range). Không có cách ly OS thì AISEF không tuyên bố kiểm soát nó.
 
 Khác với resume tại chỗ: không có gì của `run1` được chạy tiếp hay ghi thêm vào journal của nó; `run2` là một lượt chạy
 mới, journal mới, bắt đầu từ commit cuối đã xác nhận — công việc đang dở trong `run1` (một phiên, một merge chưa commit)
