@@ -4,6 +4,7 @@ import importlib.util
 import json
 import pathlib
 import shutil
+import subprocess
 import tempfile
 import unittest
 
@@ -66,6 +67,18 @@ class FreezeManifest(unittest.TestCase):
             p = root / fm.APPROVAL_REL
             p.write_text(p.read_text(encoding="utf-8").replace('"owner"', '"someone"', 1), encoding="utf-8")
         self.assertTrue(any("does not amend" in p for p in self._broken_lineage(edit)))
+
+    def test_the_2_0_manifest_is_history_and_an_edit_of_it_fails(self):
+        self.assertEqual(fm.history_problems(ROOT), [])
+        self.assertNotEqual(fm.MANIFEST_REL, fm.HISTORY_MANIFEST_REL)
+        tagged = subprocess.run(["git", "rev-parse", f"{fm.HISTORY_TAG}:{fm.HISTORY_MANIFEST_REL}"], cwd=ROOT,
+                                capture_output=True, encoding="utf-8", check=True).stdout.strip()
+        self.assertEqual(tagged, fm.HISTORY_BLOB)   # the pinned blob is the tag's
+
+        def edit(root):
+            p = root / fm.HISTORY_MANIFEST_REL
+            p.write_text(p.read_text(encoding="utf-8").replace('"WP-0.1"', '"WP-0.X"', 1), encoding="utf-8")
+        self.assertTrue(any("differs from its blob at v2.0.0" in p for p in self._broken_lineage(edit)))
 
     def test_exactly_F1_to_F11_enumerated(self):
         self.assertEqual([i["id"] for i in fm.freeze_items(self.text)], [f"F{i}" for i in range(1, 12)])

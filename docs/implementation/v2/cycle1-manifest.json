@@ -47,9 +47,15 @@
     "frozen_items_changed": [
      "F5"
     ]
+   },
+   {
+    "record": "closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json",
+    "sha256": "aa6ef86e014f55b19164f47df177b3213f43b598e0e6e6c715954d024e6aa335",
+    "exception": "closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json",
+    "frozen_items_changed": []
    }
   ],
-  "rfc_normative_digest": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+  "rfc_normative_digest": "4cc7867372536e2a0614a4a59dad418e3d8534c25a42ed3485f0b3af301915ea",
   "freeze_table_digest": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
   "original_rfc_normative_digest": "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f",
   "original_freeze_table_digest": "c4d9895f921b707cfeb423ade21b1c302c1fff5d154bc5818f4b03bfbd6e3b2a",

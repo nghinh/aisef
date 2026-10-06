@@ -6,8 +6,10 @@ PLANSEM-1 / PLANSEM-2 are the regressions that keep the 'missing subject => REFU
 
 import copy
 import importlib.util
+import json
 import pathlib
 import shutil
+import subprocess
 import tempfile
 import unittest
 
@@ -84,14 +86,19 @@ class ArchitectureBaseline(unittest.TestCase):
         m = pv.load()
         self.assertEqual(pv.check_g_baseline(m), [])
         ab = m["architecture_baseline"]
-        self.assertEqual([a["record"] for a in ab["amendments"]],
-                         ["closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
+        through_v2_006 = ["closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
                           "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
                           "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
                           "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",   # V2-004: superseded, never applied
-                          "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json"])
+                          "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json"]
+        self.assertEqual([a["record"] for a in ab["amendments"]],
+                         through_v2_006 + ["closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json"])   # 2.1
         self.assertEqual(ab["original_rfc_normative_digest"],
                          "8f0d522d9db0322c3aff5df2b5e0d568dce0a422f466dc610c7a6a9acdba8e3f")
+        # history: the 2.0.0 plan cited the lineage ending at V2-006
+        at_2_0_0 = json.loads(subprocess.run(["git", "show", "v2.0.0:docs/implementation/v2/cycle1-manifest.json"],
+                                             cwd=ROOT, capture_output=True, encoding="utf-8", check=True).stdout)
+        self.assertEqual([a["record"] for a in at_2_0_0["architecture_baseline"]["amendments"]], through_v2_006)
 
     def test_citing_the_pre_exception_baseline_fails(self):
         m = pv.load()

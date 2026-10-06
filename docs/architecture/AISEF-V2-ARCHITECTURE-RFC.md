@@ -25,6 +25,14 @@ ARCHITECTURE EXCEPTION V2-006 / PROBE HARNESS READY/EOF ORDERING*, 2026-09-26): 
 the process's lifecycle are independent facts (§9.4); an exit notice never ends the protocol. Approval lineage:
 [`closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json`](../../closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json).
 
+**Amended by `ARCHITECTURE-EXCEPTION-V2-007`** (owner decision *B-01 — Phê duyệt ba danh tính
+(ARCHITECTURE-EXCEPTION-V2-007)*, 2026-10-06; applied on `v2.1/foundation` in `919a271` **before** that approval and
+recorded after it): three identities instead of one probe digest — the contract's semantic identity (`contract_hash`),
+the probe's capability (`probe_digest`: its id, capability version and observation classes; §5.1, §8, §35) and the
+digest of the bytes that run (`execution_digest`), which calibration (§9.1.1, §12 check 9) and the RunSpec (§23) bind.
+No freeze-table row changes. Approval lineage:
+[`closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json`](../../closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json).
+
 **Supersedes** the proposal documents under [`docs/research/v2/`](../research/v2/) for all implementation
 decisions; those are retained as design history and are linked throughout.
 
@@ -187,10 +195,10 @@ Every product verdict **MUST** cite exactly four:
 
 | identity | answers | changes when |
 |---|---|---|
-| `semantic_hash` | what was proved | the contract's semantics, the probe, or its input change |
+| `semantic_hash` | what was proved | the contract's semantics, the probe's capability (§35), or its input change — never the bytes of an unchanged capability alone *(amended — ARCHITECTURE-EXCEPTION-V2-007)* |
 | `plan_hash` | why this story was asked to prove it | the plan is revised — **never** invalidates product evidence |
 | `parent_sha` / `candidate_sha` | about which revision | the code moves |
-| `runspec_hash` | under which resolved capabilities | any capability identity, grade or enforcement level changes |
+| `runspec_hash` | under which resolved capabilities | any capability identity, grade or enforcement level changes — for a probe, the digest of the bytes it runs (§23) *(amended — ARCHITECTURE-EXCEPTION-V2-007)* |
 
 ---
 
@@ -279,7 +287,7 @@ class ProductProofSpec:
     id: str                                  # "PPS-" + digest(canonical form)
     contract_id: str
     probe_id: str
-    probe_digest: str                        # content-addressed; §23
+    probe_digest: str                        # the probe's capability, not its bytes; §35 (V2-007)
     probe_input: Mapping[str, Any]
     candidate_expectation: BehaviorVerdict   # SATISFIED for MUST_HOLD, REFUTED for MUST_NOT_HOLD
     compiler_id: str
@@ -292,6 +300,10 @@ class ProductProofSpec:
 - The committed spec **MUST** be verified against a fresh derivation (`--check`) in Q0. Drift fails the build.
 - It **MUST NOT** contain a story id, a plan id, or any parent expectation.
 - A `ProductProofSpec` **MAY** be referenced by many `PlanObligation`s, in the same plan and across plans.
+- `probe_digest` **MUST** be the probe's capability digest (`Probe.digest`: over its id, its capability version and
+  its observation classes), never the digest of the bytes that run — those are the probe's `execution_digest`, which
+  calibration (§9.1.1) and the RunSpec (§23) bind. A probe without the split (the sealed Cycle-1 probe) has one digest
+  for both *(amended — ARCHITECTURE-EXCEPTION-V2-007)*.
 
 ---
 
@@ -344,7 +356,7 @@ Calibration must demonstrate **contrast to the candidate expectation**, not a fi
 @dataclass(frozen=True)
 class ProbeCapabilityCalibration:
     probe_id: str
-    probe_digest: str
+    probe_digest: str                       # the bytes that ran: the probe's execution_digest (V2-007)
     observation_class: str                  # the class of observation this record qualifies
     positive_fixture: str                   # committed fixture where the observable IS present  -> SATISFIED
     negative_fixture: str                   # committed fixture where the observable is ABSENT   -> REFUTED
@@ -354,6 +366,10 @@ class ProbeCapabilityCalibration:
 - Qualifies a **probe implementation at a given digest** against committed positive **and** negative fixtures
   for each observation class it supports. A probe that cannot produce **both** verdicts on those fixtures is not
   qualified for that class.
+- The digest it qualifies is the digest of the bytes that ran — the probe's `execution_digest` — not the capability
+  digest a spec binds (§8). A change to those bytes that leaves the capability unchanged keeps every spec, approval and
+  plan, and qualifies nothing until the calibration is demonstrated again at the new digest
+  *(amended — ARCHITECTURE-EXCEPTION-V2-007)*.
 - These records exist **before any project plan is written**, because they belong to the probe, not to a
   project. `StaticPlanAdmission` **MAY** therefore require them (§12, check 9).
 
@@ -630,11 +646,13 @@ The engine **MUST** execute no probes and **MUST NOT** invent a future story's p
 4. dependency DAG acyclic; every `depends_on` resolves;
 5. contradictions — no incompatible parent expectations for the same spec in one story; no `PRESERVE` ordered
    before its `INTRODUCE`;
-6. **proof-capability availability** — every `probe_id` resolves and its `probe_digest` matches;
+6. **proof-capability availability** — every `probe_id` resolves and its `probe_digest` matches the probe's
+   capability digest *(amended — ARCHITECTURE-EXCEPTION-V2-007)*;
 7. schema and traceability — every criterion reaches a `Requirement` through an approved contract;
 8. plan structure — an explicit order or DAG; no orphan obligations;
-9. **`ProbeCapabilityCalibration`** exists and is valid for every referenced probe digest, for the observation
-   class each spec uses (§9.1.1).
+9. **`ProbeCapabilityCalibration`** exists and is valid for every referenced probe — at the digest of the bytes the
+   probe runs (its `execution_digest`) — for the observation class each spec uses (§9.1.1)
+   *(amended — ARCHITECTURE-EXCEPTION-V2-007)*.
 
 `SpecFalsifiabilityEvidence` (§9.1.2) **MUST NOT** be a plan-freeze prerequisite. It is produced by
 qualification, not by admission, and requiring it here would demand an artefact that `StoryAdmission` — which
@@ -1469,14 +1487,19 @@ architecture exists to prevent.
 - **Journal format.** Adding a **required** event type or payload field is a **format version bump** and is a
   writer-side obligation. Adding an `ignorable` event type is not. A reader meeting an unknown required type
   **MUST** refuse to reconstruct.
-- **`semantic_hash` compatibility.** Changing a contract's semantics, a probe's identity, or a probe's input
+- **`semantic_hash` compatibility.** Changing a contract's semantics, a probe's capability, or a probe's input
   produces a new `ProductProofSpec` id. Evidence under the old id remains valid **for the old id** and
-  **MUST NOT** be silently reused for the new one.
+  **MUST NOT** be silently reused for the new one *(amended — ARCHITECTURE-EXCEPTION-V2-007)*.
 - **`plan_hash` compatibility.** A plan revision **MUST NOT** invalidate product evidence. This is the
   load-bearing compatibility property of the plane split.
-- **Probe versioning.** A probe change bumps `probe_digest` and therefore every dependent `semantic_hash`.
-  Accumulated evidence is preserved against the previous digest; re-proving is required for the new one. How to
-  make this affordable is an implementation question (§36, Q4).
+- **Probe versioning.** A probe has two digests. A change to what it observes — an observation class, a stimulus
+  grammar, a verdict rule — **MUST** bump its capability version, which changes `probe_digest` and therefore every
+  dependent `semantic_hash`; accumulated evidence is preserved against the previous digest, and re-proving is
+  required for the new one. A change to its bytes alone changes only its `execution_digest`: specs, approvals and
+  plans stay valid, and admission refuses (§12, check 9) until the calibration is demonstrated again at the new
+  bytes. Bumping the capability version is a review obligation that no check enforces, and a matching digest is not
+  evidence that two executions behave alike — the calibration contrast is. How to re-prove a capability change
+  affordably remains an implementation question (§36, Q4) *(amended — ARCHITECTURE-EXCEPTION-V2-007)*.
 - **Frozen artefacts.** A frozen artefact **MUST NOT** change without its manifest changing in the same commit,
   enforced by a commit-time guard and a CI check.
 - *(amended — ARCHITECTURE-EXCEPTION-V2-005)* **Journal format 3** (§20.1) is the third journal format. Every earlier format
@@ -1679,8 +1702,8 @@ No unresolved contradiction remains.
 | operation | prerequisite | exists because |
 |---|---|---|
 | compile `ProductProofSpec` | approved `BehaviorContract` incl. `SubjectAbsence` | §6 approval precedes §8 compile |
-| `StaticPlanAdmission` check 6 | probe resolves, `probe_digest` matches | probes are harness artefacts, committed |
-| `StaticPlanAdmission` check 9 | `ProbeCapabilityCalibration` | belongs to the probe, committed with its fixtures, exists before any plan |
+| `StaticPlanAdmission` check 6 | probe resolves, `probe_digest` matches its capability digest *(amended — ARCHITECTURE-EXCEPTION-V2-007)* | probes are harness artefacts, committed |
+| `StaticPlanAdmission` check 9 | `ProbeCapabilityCalibration` at the probe's `execution_digest` *(amended — ARCHITECTURE-EXCEPTION-V2-007)* | belongs to the probe, committed with its fixtures, exists before any plan; demonstrated again when the probe's bytes change |
 | plan freeze | `StaticPlanAdmissionResult` | produced by the project at plan time (§12) |
 | `StoryAdmission` | frozen plan, exact `parent_sha`, probes | §13 runs after §12 and after the story's parent is frozen (S7) |
 | `ContractSatisfaction` | `ProbeResult` + `spec.candidate_expectation` | both present at every routing site |

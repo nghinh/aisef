@@ -184,8 +184,8 @@ def subject_problems(ident: dict) -> list[str]:
             out.append(f"HEAD's {rel} tree {t['head']} is not the candidate's {t['frozen']}: a new candidate, restart from Q0")
     if not ident["v1_product_tree_unchanged"]:
         out.append("the V1 product tree changed")
-    if ident["rfc"]["broken_links"] or ident["rfc"]["lineage_end"] != "AISEF-V2-RFC-AMENDMENT-V2-006.json":
-        out.append("the effective RFC lineage does not end at V2-006 unbroken")
+    if ident["rfc"]["broken_links"] or ident["rfc"]["lineage_end"] != "AISEF-V2-RFC-AMENDMENT-V2-007.json":
+        out.append("the effective RFC lineage does not end at V2-007 unbroken")   # 2.1: V2-007 follows V2-006
     return out
 
 

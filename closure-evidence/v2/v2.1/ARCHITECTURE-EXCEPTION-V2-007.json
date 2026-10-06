@@ -1,0 +1,444 @@
+{
+ "record": "AISEF V2 — ARCHITECTURE EXCEPTION",
+ "id": "ARCHITECTURE-EXCEPTION-V2-007",
+ "status": "APPROVED — APPLIED",
+ "frozen_items_affected": [
+  "F4 — the inputs to semantic_hash: the probe input to a spec (`probe_digest`) is the probe's CAPABILITY digest (id, capability version, observation classes), no longer the digest of its source bytes; the compiler and the set of inputs are unchanged",
+  "F5 — the calibration contract: a ProbeCapabilityCalibration qualifies the bytes that ran (the probe's execution_digest, `calibration.executing(probe)`), so static admission check 9 refuses a byte change until the calibration is demonstrated again; the contrast rule and both dataclass shapes are unchanged",
+  "F9 — the cited identities: runspec_hash binds each active probe by the digest of the bytes it runs (`run.runspec_of`), semantic_hash by the capability; still four identities, the same RunSpec and CapabilityIdentity shapes"
+ ],
+ "consequential": [
+  "every 2.0.0 ProductProofSpec id changes once (the probe digest a spec binds moved from the source digest to the capability digest); a 2.0.0 bundle is refused on load and re-bound by `aisef bundle migrate` (bundle_cli.RELEASES holds the 2.0.0 digests)",
+  "the static admission engine digest moved (aisef2/plan/static_admission.py: check 9 reads executing(probe)), the cause of the B-03a re-records"
+ ],
+ "frozen_items_changed_mechanically": [],
+ "frozen_items_unchanged_mechanically": [
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "F6",
+  "F7",
+  "F8",
+  "F9",
+  "F10",
+  "F11"
+ ],
+ "frozen_rows_measured": {
+  "rule": "validation/v2/freeze_manifest.py freeze_items/freeze_table_digest on the RFC before and after this amendment; a row changes only if its text is false under the three-identity rule",
+  "why_no_row_changes": "F4 names the compiler contract and the inputs to semantic_hash including SubjectAbsence — still the inputs (probe_digest is still one of them); F5 names the probe protocol members, ProbeResult fields and the two calibration contracts demonstrating contrast — members, fields and contrast unchanged (F5.probe_protocol and F5.calibration_contracts PASS); F9 names the four cited identities with per-capability tuples, IdentityGrade and the aggregate minimum — unchanged in shape (F9 subchecks PASS). No row states that the probe digest is content-addressed; that rule lived in the normative prose amended here",
+  "row_sha256": {
+   "F1": "27c00d53fb8655a75666e34d3195570cb48c38d552b78c0264c02cca420617f0",
+   "F2": "d129883bfdf9ce3ab795efdaf144e3d3af231f128c73bc62f1b5de78f0ada803",
+   "F3": "a0b7f7a27f0a50b53b4efc16170f01116b07d93248771c07d33b1581cd6e5b12",
+   "F4": "fc637720bc589d6fd68939186e0003e3d97829119bff76b0f908055884d8e53e",
+   "F5": "05915110dcdc7f4f2b1effee5e4eb8ffbe1a04533ac1d0faa8ee8cc08bfb0f55",
+   "F6": "fb5010a330f858f439ea35b8a1f0e733f653cdc2d5aca43e16abd7640b8edab4",
+   "F7": "36dedf49f90886248be8e692974433619eb051ac34f8082194a88db3f93a61fa",
+   "F8": "0bc2a40b492b8d7b674d91d9e6d084295b843a15ce04e1865d72a90cebbeb91f",
+   "F9": "eab873cc50552e1aa1b7497edff78be3e95ea4cf7314645c24703e60dbc2c6ad",
+   "F10": "6046ef16c4c1c43e6bf2769f6bbba600d1c3abfc65a8c19d96b4882854da7f2e",
+   "F11": "51f57a2579541c96d54cb96655cc02a459c2674ece9ba461ab1ec92f5e2f5b37"
+  },
+  "measured_at": "dc9774f81abb6d3421beda5fb71e08abe69fbb4d"
+ },
+ "conformance_subchecks_mechanically": {
+  "added": [],
+  "removed": [],
+  "changed": [],
+  "rule": "every F1-F11 subcheck of F-CONFORMANCE.json at the base compared with this candidate's, state and detail: freeze_conformance --check PASS on the amended RFC, F-CONFORMANCE.json byte-identical (11/0/0, 42 subchecks)",
+  "why_none_added": "a V2-007 subcheck would change F-CONFORMANCE.json, a 2.0 record (its bytes are bound by the sealed closure-evidence/v2/P6-OLD-PATH-REMOVAL.json) that this round never rewrites; the rule is made mechanical by tests/v2/test_v21_identity.py ThreeIdentities (a spec binds the capability, the bytes are their own digest, calibrations of other bytes admit nothing, the RunSpec binds each probe's bytes) and enforced at runtime by static admission check 9"
+ },
+ "promoted_from": {
+  "path": "docs/v2.1/decisions/B-01-V2-007-THREE-IDENTITIES.md",
+  "sha256": "e0324223dce132eee549d752d8f8bfb09c96e07c25bcf563748461e9ed5d8989",
+  "note": "the dossier (option A recommended) is kept byte-identical, its header 'ĐỀ XUẤT, CHƯA DUYỆT' included, as the proposal it was when the owner decided (the V2-003 precedent); this record, not the dossier, carries the approval"
+ },
+ "adr": {
+  "path": "docs/v2.1/ADR-V2.1.md",
+  "section": "ADR-2 — Ba danh tính tách rời (ARCHITECTURE-EXCEPTION-V2-007)",
+  "sha256": "27ef63e6cdda9fa9f82de1d4ce868d972455ecc8d8d0e49bfaf43036f1410f98",
+  "note": "sha256 of the ADR with its ADR-2 status paragraph naming this record"
+ },
+ "contradiction_discovered": "2.0.0 bound two different facts to one digest: a probe's digest (sha256 over its source files) was both what a ProductProofSpec, its semantic_hash, the plan and approval-through-plan bind (what is proved) and what calibration and the RunSpec bind (what ran). A byte change that observes nothing differently — a comment, a launch flag — therefore changed every spec id, made every bundle re-bind and every derived record red, while RFC §5.1, §8 ('content-addressed'), §9.1.1, §12 check 6/9 and §35 ('a probe change bumps probe_digest and therefore every dependent semantic_hash') state exactly that single-digest rule.",
+ "concrete_reproducer": "tests/v2/test_v21_identity.py ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest; one contract compiled by compile_spec (COMPILER_DIGEST unchanged since 2.0.0) has semantic_hash d6a14f9c39a5… under the python_callable_v2 source digest 2.0.0 bound (b1f25878d350…) and 33d9a64dd084… under the capability digest this candidate binds (0821c14651a9…), measured at dc9774f (digests.semantic_hash_of_one_contract_by_probe_digest)",
+ "why_implementation_cannot_conform": "the implementation cannot keep the single-digest prose and still let a probe's bytes change without re-binding every spec: under §35 as written any byte change of a probe must change every dependent semantic_hash. Separating the capability from the executed bytes is a change of frozen semantics (F4 inputs, F5 calibration binding, F9 identities), so it needs this exception",
+ "measured": {
+  "at": {
+   "commit": "dc9774f81abb6d3421beda5fb71e08abe69fbb4d",
+   "aisef2_tree": "10def3c05009f96ce2033ff2a382b2ed1389c9dd",
+   "note": "the lane base (v2.1/foundation + the owner decisions); every value below is at this commit unless it names another"
+  },
+  "probes": {
+   "probe.python_callable_v2": {
+    "v2.0.0_source_digest": "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae",
+    "capability_version": 1,
+    "classes": [
+     "exists",
+     "returns",
+     "raises",
+     "blocks",
+     "returns_bytes",
+     "equals",
+     "raises_attrs"
+    ],
+    "capability_digest": "0821c14651a95494b2352ea0447e467595388fc713fd531ced6f75c7bcfa8aae",
+    "execution_digest": "e9f8dcdd6ec596627c0f8ae0371cac00ea954e1d7f6f7ca85cd3adb4835ba513",
+    "catalog_binds_capability": true,
+    "executing_is_execution_digest": true,
+    "capability_formula": "sha256(json([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]))",
+    "capability_formula_holds": true,
+    "execution_digest_is_the_2_0_0_formula": true
+   },
+   "probe.file_artifact": {
+    "v2.0.0_source_digest": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "capability_version": 2,
+    "classes": [
+     "exists",
+     "content",
+     "grep_count",
+     "python_imports"
+    ],
+    "capability_digest": "be1485d12a4dd02d32fe9ba9d44c37204346be42ae97856484dc67cae3be74fe",
+    "execution_digest": "833be030fb7f4d2c7d2000dd91dfed8953404ff5aa3028c91d1911b0c0e53dbd",
+    "catalog_binds_capability": true,
+    "executing_is_execution_digest": true,
+    "capability_formula": "sha256(json([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]))",
+    "capability_formula_holds": true,
+    "execution_digest_is_the_2_0_0_formula": true
+   },
+   "probe.cli_invocation": {
+    "v2.0.0_source_digest": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+    "capability_version": 1,
+    "classes": [
+     "exits",
+     "exits_streams",
+     "exits_files",
+     "blocks",
+     "equality"
+    ],
+    "capability_digest": "330ae4a88cc8ca58e66b462b9dc6ad9b4023e4b1dfebc8373c584eaa95e8de31",
+    "execution_digest": "ab0173818b697f5b78ff3cd07688c2ce6e90007d2cd0fbaac9ccec7c5d5ae7b1",
+    "catalog_binds_capability": true,
+    "executing_is_execution_digest": true,
+    "capability_formula": "sha256(json([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]))",
+    "capability_formula_holds": true,
+    "execution_digest_is_the_2_0_0_formula": true
+   },
+   "probe.process_effect": {
+    "v2.0.0_source_digest": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+    "capability_version": 1,
+    "classes": [
+     "scenario_returns",
+     "scenario_raises",
+     "scenario_files"
+    ],
+    "capability_digest": "409c41aea16f8ab2c83406e429fdaed565eaa8dadd945a78bd93ad617b8814f7",
+    "execution_digest": "3b39d380b3619d566dfb5216e7927b0360158527c6eaef9efa92f1b801e2d8c3",
+    "catalog_binds_capability": true,
+    "executing_is_execution_digest": true,
+    "capability_formula": "sha256(json([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]))",
+    "capability_formula_holds": true,
+    "execution_digest_is_the_2_0_0_formula": true
+   }
+  },
+  "bundle_cli_releases_2_0_0_equal_the_v2_0_0_source_digests": true,
+  "admission_engine_digest": {
+   "v2.0.0": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+   "dc9774f": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7"
+  },
+  "compiler_digest": {
+   "v2.0.0": "f31a4602a61d412d834890f46dcc9ca4d0ce240a106a4772dc9a1e8e7fb8ea76",
+   "dc9774f": "f31a4602a61d412d834890f46dcc9ca4d0ce240a106a4772dc9a1e8e7fb8ea76",
+   "unchanged": true
+  },
+  "shipped_calibrations": {
+   "path": "aisef2/app/calibrations.py",
+   "sha256": "259bf43a0def1c5c40a09c5c54ab50c3e8872654e4047df3e2a94d7f4243bac7",
+   "rows": 19,
+   "active_probe_classes": 19,
+   "every_active_class_at_its_execution_digest": true,
+   "record": {
+    "path": "closure-evidence/v2/release/V2.1.0.dev0-PROBE-CALIBRATIONS-2.json",
+    "sha256": "d004f8307bd5200e896cb776041cf05bd126c9bf05d41e48791c79e1abe2bf07"
+   }
+  },
+  "ledgerlock_migrate": {
+   "specs_rebound": 59,
+   "obligations": 67,
+   "from_release": "2.0.0",
+   "by": "tests/v2/test_v21_identity.py Migrate.test_migration_rebinds_the_plan_and_nothing_else (asserted; passed at dc9774f)"
+  },
+  "one_launch_flag_reddens_37_tests": {
+   "claim": "ADR-2 / the B-01 dossier: adding -S alone under the single digest made 37 tests red",
+   "status": "UNMEASURED",
+   "why": "no committed measurement artefact exists; re-measuring needs a full-suite run of 2.0.0 (610a593) with -S added, which this lane may not run"
+  },
+  "note": "values that later B-03 work may move (execution digests on a probe-byte change, the engine digest on a static_admission change, the shipped calibrations on recalibration) are labelled with the commit they were measured at; a later measurement is a new record, never an edit of this one"
+ },
+ "applied_before_approval": {
+  "commits": [
+   {
+    "commit": "919a271",
+    "date": "2026-10-06T11:27:09+07:00",
+    "what": "the three identities: CAPABILITY_VERSION/EXECUTION_DIGEST/DIGEST in the four Cycle-2 probes, calibration.executing, check 9 and runspec_of on the executed bytes, bundle migrate",
+    "file_artifact_at_this_commit": {
+     "capability_version": 1,
+     "capability_digest": "46737ca1c479b5d8732b5156d8d68fc90524ac3e4d23f0a69e969196867e0bcc",
+     "execution_digest": "065bd248df2e93d0c8d1fb113c18c325da76c327dff95608ff6aacc113e05dbc"
+    }
+   },
+   {
+    "commit": "06d4e62",
+    "date": "2026-10-06T11:42:58+07:00",
+    "what": "file_artifact CAPABILITY_VERSION 2 (class python_imports added)"
+   },
+   {
+    "commit": "4d4c53a",
+    "date": "2026-10-06T12:28:10+07:00",
+    "what": "tests"
+   }
+  ],
+  "approval": {
+   "date": "2026-10-06",
+   "ledger": {
+    "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+    "seq": 4,
+    "id": "AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007"
+   }
+  },
+  "rules_not_followed": [
+   "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json change_rule: no architecture exception is approved by default — the change was implemented before an exception record or an owner approval existed",
+   "the RFC preamble change rule: a contradiction in a frozen semantic is a STOP, any change requires an ARCHITECTURE_EXCEPTION record with owner approval",
+   "closure-evidence/v2/cycle2/OWNER-DECISIONS.json f5_hard_guard: STOP, produce an ARCHITECTURE_EXCEPTION proposal, do not implement around it",
+   "validation/v2/cycle2_baseline.py RULES R7: a change requiring a frozen-item edit is a STOP and an Architecture Exception draft; nothing is implemented around it"
+  ],
+  "nothing_backdated": "the code was applied on v2.1/foundation at 919a271 on 2026-10-06 11:27 +07; the dossier (2cad415) proposed it; the owner approved B-01 on 2026-10-06 after it; this record and the RFC amendment are written after the approval and present the 919a271 state as applied without approval at that time"
+ },
+ "discovered_in": {
+  "phase": "2.1 (v2.1/foundation)",
+  "base": "610a593 (2.0.0 + docs)",
+  "flagged_by": "the owner's directive of 2026-10-06 ('tách ba danh tính'), implemented before an exception was recorded"
+ },
+ "owner_decision": {
+  "decision": "B-01 — Phê duyệt ba danh tính (ARCHITECTURE-EXCEPTION-V2-007)",
+  "date": "2026-10-06",
+  "approved": "ARCHITECTURE-EXCEPTION-V2-007 APPROVED: the three identities — contract semantic identity, probe capability/API version, digest of the executed bytes",
+  "owner_text": "Tôi, chủ dự án AISEF, PHÊ DUYỆT B-01 và CHO PHÉP triển khai B-03 theo các khuyến nghị trong báo cáo ngày 06/10/2026, với phạm vi cụ thể sau.\n1. B-01 — Phê duyệt ba danh tính\nPhê duyệt ARCHITECTURE-EXCEPTION-V2-007, tách:\n\n* Danh tính ngữ nghĩa contract.\n* Phiên bản năng lực/API của probe.\n* Digest bản thực thi thực tế.\n\nGhi quyết định này vào sổ quyết định hiện có theo đúng schema, dẫn lại nguyên văn chỉ thị và gắn với hồ sơ ADR/implementation đang áp dụng. Giữ nguyên lịch sử phê duyệt cũ.\nPhê duyệt kiến trúc không đồng nghĩa xác nhận implementation đã đúng; vẫn phải kiểm chứng tương thích, migration và ràng buộc evidence.",
+  "ledger": {
+   "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+   "seq": 4,
+   "id": "AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007"
+  },
+  "conditions": "an architecture approval does not confirm the implementation: compatibility, migration and the evidence bindings are still to be verified (owner text) — that is B-03, not this record",
+  "recorded_by": "engineering, from the owner's text transcribed verbatim in the ledger entry; the owner did not sign this file"
+ },
+ "replacement": {
+  "summary": "Three identities, never collapsed. The contract's semantic identity is its contract_hash (approval binds it, unchanged). The probe's capability is Probe.digest = sha256(json([PROBE_ID, CAPABILITY_VERSION, CLASSES])): a spec, its semantic_hash and the plan bind it, and static admission check 6 compares it. The bytes that run are Probe.execution_digest (the 2.0.0 source-digest formula): a ProbeCapabilityCalibration, static admission check 9 (calibration.executing) and the run's RunSpec bind them. A byte change keeps every spec, approval and plan and needs its calibrations demonstrated again; a change to what a probe observes bumps CAPABILITY_VERSION by hand.",
+  "semantics": [
+   {
+    "identity": "contract semantic identity",
+    "definition": "contract_hash (unchanged)",
+    "bound_by": "ContractApproval"
+   },
+   {
+    "identity": "probe capability",
+    "definition": "Probe.digest = sha256(json([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]))",
+    "bound_by": "ProductProofSpec.probe_digest, semantic_hash, plan, static admission check 6"
+   },
+   {
+    "identity": "executed bytes",
+    "definition": "Probe.execution_digest = sha256 over the probe's PROBE_SOURCES (the 2.0.0 formula)",
+    "bound_by": "ProbeCapabilityCalibration.probe_digest, static admission check 9, RunSpec"
+   }
+  ],
+  "not_changed": [
+   "the Cycle-1 probe probe.python_callable: one digest for both, 1961e84d913e… (sealed history; aisef2/probe/python_callable.py and protocol.py byte-identical)",
+   "the compiler (COMPILER_DIGEST unchanged) and every dataclass shape the RFC freezes",
+   "journal format, failure taxonomy, owner routing, the decision path"
+  ],
+  "term_of_option_a": "a semantic change of a probe bumps CAPABILITY_VERSION: review discipline (RFC §35 as amended), enforced by no check; a change the calibration fixtures do not cover is not detected",
+  "code": {
+   "aisef2/probe/python_callable_v2.py": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+   "aisef2/probe/file_artifact.py": "21ac55fd79ae6a5f814044394ea0033445d73378e2c8f17ef16c4d32edf0583b",
+   "aisef2/probe/cli_invocation.py": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+   "aisef2/probe/process_effect.py": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+   "aisef2/probe/calibration.py": "ab47bbdee89157970b66e60425a160a7313cab5bb9f4a15f1f25ff0683ca2ef4",
+   "aisef2/plan/static_admission.py": "739a558cc6565f69045d274f312490892f63c8e43fcbc4389ff9eb6d5e695708",
+   "aisef2/app/run.py": "b70f25b5e898bbe38ee468d579ffe0fa47adaee4f7d8fc587a55c74909a49a84",
+   "aisef2/app/bundle_cli.py": "e3d08d0c9b55919d1aba4659439b7bc18755f1e5fb94a19758785bbee13330bf",
+   "aisef2/app/calibrations.py": "259bf43a0def1c5c40a09c5c54ab50c3e8872654e4047df3e2a94d7f4243bac7"
+  },
+  "code_measured_at": "dc9774f81abb6d3421beda5fb71e08abe69fbb4d",
+  "probe_digest": {
+   "probe.python_callable_v2": {
+    "v2.0.0_source": "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae",
+    "capability": "0821c14651a95494b2352ea0447e467595388fc713fd531ced6f75c7bcfa8aae",
+    "execution": "e9f8dcdd6ec596627c0f8ae0371cac00ea954e1d7f6f7ca85cd3adb4835ba513"
+   },
+   "probe.file_artifact": {
+    "v2.0.0_source": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "capability": "be1485d12a4dd02d32fe9ba9d44c37204346be42ae97856484dc67cae3be74fe",
+    "execution": "833be030fb7f4d2c7d2000dd91dfed8953404ff5aa3028c91d1911b0c0e53dbd"
+   },
+   "probe.cli_invocation": {
+    "v2.0.0_source": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+    "capability": "330ae4a88cc8ca58e66b462b9dc6ad9b4023e4b1dfebc8373c584eaa95e8de31",
+    "execution": "ab0173818b697f5b78ff3cd07688c2ce6e90007d2cd0fbaac9ccec7c5d5ae7b1"
+   },
+   "probe.process_effect": {
+    "v2.0.0_source": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+    "capability": "409c41aea16f8ab2c83406e429fdaed565eaa8dadd945a78bd93ad617b8814f7",
+    "execution": "3b39d380b3619d566dfb5216e7927b0360158527c6eaef9efa92f1b801e2d8c3"
+   }
+  },
+  "tests": [
+   "tests/v2/test_v21_identity.py ThreeIdentities (5: a spec binds the capability and the bytes are their own digest; the Cycle-1 probe keeps its one frozen digest; the shipped calibrations name every class at the bytes that run now; calibrations of other bytes admit nothing; the RunSpec binds each probe's bytes)",
+   "tests/v2/test_v21_identity.py Migrate (4: a 2.0.0 bundle is refused naming the command; migration re-binds the plan and nothing else, 59 specs / 67 obligations; a spec no release compiles is refused, not guessed; the command writes a new file, never the input)"
+  ],
+  "tests_sha256": {
+   "tests/v2/test_v21_identity.py": "a5f26022385a7bc4fe36172fa8b5e2f2b5918c9cc4c2c12f830aa170b95ae047"
+  },
+  "implementation_commits": [
+   "919a271",
+   "06d4e62",
+   "4d4c53a"
+  ],
+  "rfc_text": {
+   "path": "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md",
+   "edited": true,
+   "amended": [
+    "preamble: 'Amended by ARCHITECTURE-EXCEPTION-V2-007' (non-normative)",
+    "§5.1 change-when of semantic_hash and runspec_hash",
+    "§8 the probe_digest comment and a bullet: a spec binds the capability digest",
+    "§9.1.1 the probe_digest comment and a bullet: a calibration qualifies the execution digest",
+    "§12 checks 6 and 9",
+    "§35 semantic_hash compatibility and Probe versioning",
+    "Review 2 rows for checks 6 and 9"
+   ],
+   "markers": "*(amended — ARCHITECTURE-EXCEPTION-V2-007)*",
+   "marker_count": 10,
+   "kept": "no code-block field name, §5.1 row, section anchor, §12 numbering (9 checks), known-bad fixture anchor, *_REQUIRED/*_INVARIANT token or freeze-table row changed; the 18 V2-005 markers unchanged"
+  },
+  "no_new_plane_or_owner": true
+ },
+ "f4_impact": "F4's row and subchecks are unchanged; what the probe input to semantic_hash denotes changed (capability, not bytes), so every 2.0.0 spec id changes once and a byte change of an unchanged capability no longer changes any.",
+ "f5_impact": "F5's row and subchecks are unchanged; a calibration record's probe_digest is the execution digest, so a byte change makes check 9 refuse until recalibration (release_calibration.py --write).",
+ "f9_impact": "F9's row and subchecks are unchanged; runspec_hash binds each active probe's execution digest, so two runs on different bytes of one capability are not comparable.",
+ "evidence_compatibility_impact": "2.0.0 evidence is kept byte-identical and stays valid for its own ids (historical_files_kept_byte_identical). 2.0.0 bundles are refused on load and re-bound once by `aisef bundle migrate` (approvals bind contract_hash and are not re-approved). The engine digest moved, so the 2.0 records binding it get new v2.1 records under B-03a (closure-evidence/v2/v2.1/), never a tolerance; the current freeze manifest is closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json and the 2.0 one (the V2-006 freeze, Cycle-2 immutable) stays history.",
+ "digests": {
+  "rfc_normative_digest": {
+   "before": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+   "after": "4cc7867372536e2a0614a4a59dad418e3d8534c25a42ed3485f0b3af301915ea"
+  },
+  "freeze_table_digest": {
+   "before": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "after": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+   "unchanged": true
+  },
+  "probe_digest": {
+   "probe.python_callable_v2": {
+    "v2.0.0": "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae",
+    "capability": "0821c14651a95494b2352ea0447e467595388fc713fd531ced6f75c7bcfa8aae",
+    "execution": "e9f8dcdd6ec596627c0f8ae0371cac00ea954e1d7f6f7ca85cd3adb4835ba513"
+   },
+   "probe.file_artifact": {
+    "v2.0.0": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+    "capability": "be1485d12a4dd02d32fe9ba9d44c37204346be42ae97856484dc67cae3be74fe",
+    "execution": "833be030fb7f4d2c7d2000dd91dfed8953404ff5aa3028c91d1911b0c0e53dbd"
+   },
+   "probe.cli_invocation": {
+    "v2.0.0": "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f",
+    "capability": "330ae4a88cc8ca58e66b462b9dc6ad9b4023e4b1dfebc8373c584eaa95e8de31",
+    "execution": "ab0173818b697f5b78ff3cd07688c2ce6e90007d2cd0fbaac9ccec7c5d5ae7b1"
+   },
+   "probe.process_effect": {
+    "v2.0.0": "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273",
+    "capability": "409c41aea16f8ab2c83406e429fdaed565eaa8dadd945a78bd93ad617b8814f7",
+    "execution": "3b39d380b3619d566dfb5216e7927b0360158527c6eaef9efa92f1b801e2d8c3"
+   }
+  },
+  "admission_engine_digest": {
+   "before": "a33f2aeed06ea4e738d99979ae5e828d2999884ea699d9a7f152a2922a882c92",
+   "after": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+   "after_measured_at": "dc9774f81abb6d3421beda5fb71e08abe69fbb4d"
+  },
+  "semantic_hash_of_one_contract_by_probe_digest": {
+   "contract": "python_callable app.calc:add, exists within_s 10, MUST_HOLD, ABSENCE_IS_DECIDABLE (compile_spec at dc9774f)",
+   "b1f25878d350": "d6a14f9c39a5cd55fac7b8aa092421ae81118c5972c7b2f02f6c9c3e7e327349",
+   "0821c14651a9": "33d9a64dd084c170a43648430234ee7c69fa4d9e8a5281130ff0bf5dbbcca727",
+   "e9f8dcdd6ec5": "34a841138aa17399a698ef80f627bd58f804de3ddf548b8a15ed99b98228e94b",
+   "note": "b1f25878d350: the 2.0.0 source digest; 0821c14651a9: the capability a spec binds now; e9f8dcdd6ec5: the bytes, never a spec input"
+  }
+ },
+ "files_binding_the_old_probe_digest_at_the_base": {
+  "rule": "git grep at dc9774f for the four 2.0.0 source digests — the probe digests 2.0.0 specs bind; at this candidate no probe has one as its capability or its execution digest",
+  "total_files": 246,
+  "by_digest": {
+   "probe.python_callable_v2": 101,
+   "probe.file_artifact": 232,
+   "probe.cli_invocation": 105,
+   "probe.process_effect": 100
+  },
+  "in_qualification_and_P10_trees": {
+   "closure-evidence/v2/cycle2/P10": 4,
+   "closure-evidence/v2/cycle2/Q0-Q3": 25,
+   "closure-evidence/v2/cycle2/Q0-Q3-R2": 22,
+   "closure-evidence/v2/cycle2/Q0-Q3-R3": 22,
+   "closure-evidence/v2/cycle2/Q0-Q3-R4": 25,
+   "closure-evidence/v2/cycle2/Q4": 11,
+   "closure-evidence/v2/cycle2/Q4-FINAL": 11,
+   "closure-evidence/v2/cycle2/Q5": 2,
+   "closure-evidence/v2/cycle2/Q5-FINAL": 2,
+   "closure-evidence/v2/release/Q0-Q3-RC1": 43,
+   "closure-evidence/v2/release/Q0-Q3-RC2": 25,
+   "closure-evidence/v2/release/Q4-RC1": 11,
+   "closure-evidence/v2/release/Q4-RC2": 11,
+   "closure-evidence/v2/release/Q5-RC1": 11,
+   "closure-evidence/v2/release/Q5-RC2": 6
+  },
+  "outside_those_trees": [
+   "aisef2/app/bundle_cli.py",
+   "closure-evidence/v2/cycle2/C2-FINAL-INTEGRATION.json",
+   "closure-evidence/v2/cycle2/C2-FINAL-REPORT.json",
+   "closure-evidence/v2/cycle2/C2-INTEGRATION-R2.json",
+   "closure-evidence/v2/cycle2/C2-INTEGRATION.json",
+   "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+   "closure-evidence/v2/cycle2/C2-P5-ACCEPTANCE.json",
+   "closure-evidence/v2/cycle2/P1-FILE-ARTIFACT-CALIBRATION.json",
+   "closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json",
+   "closure-evidence/v2/release/LEDGERLOCK-REBIND.json",
+   "closure-evidence/v2/release/PROBE-CALIBRATIONS.json",
+   "closure-evidence/v2/release/V2-RELEASE-ACCEPTANCE.json",
+   "closure-evidence/v2/release/smoke-2/run-1/aisef-run.jsonl",
+   "closure-evidence/v2/release/smoke-2/run-1/sessions/STORY-04-02.developer.2.jsonl",
+   "closure-evidence/v2/release/smoke-2/run-1/sessions/STORY-04-02.developer.3.jsonl"
+  ]
+ },
+ "historical_files_kept_byte_identical": {
+  "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json": "10e2e163e2081081a787dd2dadcd4f0a1c5996007a694e2b8d04a185fdabcdba",
+  "closure-evidence/v2/F-CONFORMANCE.json": "3f7246d825edc4bc834796ea2ae62b262083fb46ae8e879906b4609e234b445a",
+  "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json": "c23191bd71bc299dba9df3f996f45b04ab82b6f113dd6629c62343d1776fe59a",
+  "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json": "09bb03a34f9b95083414625a4da46684d6d2319a5f6d52e54e1033d2bc33fb17",
+  "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json": "8036c7c73fd6e397af726309c89f7002025b34747ab65aac0e1d43e4ba4fa35a",
+  "closure-evidence/v2/cycle2/CYCLE2-FREEZE-MANIFEST.json": "edd6ec00d693fc81c2052aa103a40dac9b053d5b041c9faffd7e12e394c03fad",
+  "closure-evidence/v2/P2-CALIBRATION.json": "a8503695d023d5c6fb7eecaf3d762e46f8805254d239f9210d75846db657812c",
+  "closure-evidence/v2/release/PROBE-CALIBRATIONS.json": "09e11893b805fd372c4f6c574cd6631b8ee182e213b5b1f1e7e35924f5378c81",
+  "closure-evidence/v2/release/V2.1.0.dev0-PROBE-CALIBRATIONS.json": "e083faf34c11efc67b542736cd850bf716b80418a4573141ef77f593df0cbd0d",
+  "aisef2/probe/protocol.py": "9d7f556283d4486db6d83566f5080061e680c8d3d550e10e378dd72faca88b2a",
+  "aisef2/probe/python_callable.py": "6216e5e3a4d2da34fcf98be6cd359e6bc02dbb62fab256e3637ca33dbc587e06",
+  "docs/v2.1/decisions/B-01-V2-007-THREE-IDENTITIES.md": "e0324223dce132eee549d752d8f8bfb09c96e07c25bcf563748461e9ed5d8989"
+ },
+ "re_derived_at_this_candidate": [
+  "closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json (new: the lineage through V2-007; the 2.0 manifest stays history)",
+  "docs/implementation/v2/cycle1-manifest.json architecture_baseline and the generated plan-doc blocks",
+  "closure-evidence/v2/F-CONFORMANCE.json: re-evaluated on the amended RFC, byte-identical (not rewritten)",
+  "the B-03a v2.1 records of the artefacts the engine digest affected: later, under B-03, each a new record in closure-evidence/v2/v2.1/"
+ ],
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "B-01 — Phê duyệt ba danh tính (ARCHITECTURE-EXCEPTION-V2-007)",
+  "date": "2026-10-06"
+ }
+}

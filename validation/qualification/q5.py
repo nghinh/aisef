@@ -899,8 +899,8 @@ def subject_problems(ident: dict) -> list[str]:
         out.append(f"HEAD's aisef2 tree {ident['head_kernel_tree']} is not the candidate's {KERNEL_TREE}")
     if not ident["working_tree_clean"]:
         out.append(f"the working tree is dirty under aisef2, tests/v2 or validation: {ident['dirty'][:5]}")
-    if ident["rfc"]["broken_links"] or ident["rfc"]["lineage_end"] != "AISEF-V2-RFC-AMENDMENT-V2-006.json":
-        out.append("the effective RFC lineage does not end at V2-006 unbroken")
+    if ident["rfc"]["broken_links"] or ident["rfc"]["lineage_end"] != "AISEF-V2-RFC-AMENDMENT-V2-007.json":
+        out.append("the effective RFC lineage does not end at V2-007 unbroken")   # 2.1: V2-007 follows V2-006
     if not ident["probe"]["corrected"]:
         out.append(f"the probe digest is not the corrected {PROBE_DIGEST[:12]}")
     if not ident["corpus"]["items"]:

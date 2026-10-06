@@ -921,7 +921,12 @@ class Lineage(unittest.TestCase):
         self.assertEqual(names[:5], ["AISEF-V2-RFC-APPROVAL.json", "AISEF-V2-RFC-AMENDMENT-V2-001.json",
                                      "AISEF-V2-RFC-AMENDMENT-V2-002.json", "AISEF-V2-RFC-AMENDMENT-V2-003.json",
                                      "AISEF-V2-RFC-AMENDMENT-V2-005.json"])
-        self.assertEqual(names[5:], ["AISEF-V2-RFC-AMENDMENT-V2-006.json"])   # V2-006 (§9.4, F5) follows it
+        self.assertEqual(names[5:], ["AISEF-V2-RFC-AMENDMENT-V2-006.json",    # V2-006 (§9.4, F5) follows it,
+                                     "AISEF-V2-RFC-AMENDMENT-V2-007.json"])   # then V2-007 (2.1, changes no row)
+        # history: the 2.0 freeze manifest, byte-identical to v2.0.0's, froze the lineage ending at V2-006
+        frozen = json.loads((ROOT / fm.HISTORY_MANIFEST_REL).read_text(encoding="utf-8"))["approval_lineage"]
+        self.assertEqual([pathlib.Path(x["record"]).name for x in frozen][5:], ["AISEF-V2-RFC-AMENDMENT-V2-006.json"])
+        self.assertEqual(fm.history_problems(ROOT), [])
         self.assertEqual(links[4]["frozen_items_changed"], ["F1"])
         self.assertFalse((EVIDENCE / "AISEF-V2-RFC-AMENDMENT-V2-004.json").exists())
         self.assertFalse((EVIDENCE / "ARCHITECTURE-EXCEPTION-V2-004.json").exists())

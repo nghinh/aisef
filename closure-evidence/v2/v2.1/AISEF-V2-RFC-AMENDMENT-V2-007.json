@@ -1,0 +1,31 @@
+{
+ "record": "AISEF V2 — RFC AMENDMENT (approval lineage)",
+ "id": "AISEF-V2-RFC-AMENDMENT-V2-007",
+ "amends": {
+  "path": "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json",
+  "sha256": "09bb03a34f9b95083414625a4da46684d6d2319a5f6d52e54e1033d2bc33fb17"
+ },
+ "exception": {
+  "path": "closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json",
+  "sha256": "35f0370a2480be77d49032fbddb4b5d536e149feecc184ae495ea1906ed701f5"
+ },
+ "frozen_items_changed": [],
+ "rfc_normative_digest": {
+  "before": "84f3a85aa39e94e221ce07633ebe4261d3c3aafec87388ec6bd2b3ab694ff06f",
+  "after": "4cc7867372536e2a0614a4a59dad418e3d8534c25a42ed3485f0b3af301915ea"
+ },
+ "freeze_table_digest": {
+  "before": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831",
+  "after": "d71b958b5a0607840f9db67f5f075dc19c7963022b3d743b0e676d5a715b7831"
+ },
+ "frozen_rows": "no freeze-table row changes (F1-F11 row sha256 before == after; the exception's frozen_rows_measured); the normative body changes in §5.1, §8, §9.1.1, §12 checks 6 and 9, §35 and Review 2",
+ "v2_004": "SUPERSEDED — NEVER APPLIED: no AISEF-V2-RFC-AMENDMENT-V2-004 exists; the lineage goes V2-003 -> V2-005 -> V2-006 -> V2-007",
+ "placement": "closure-evidence/v2/v2.1/: the Cycle-2 freeze (validation/v2/cycle2_baseline.py) pins the closure-evidence/v2 root's AISEF-V2-RFC-*.json / ARCHITECTURE-EXCEPTION-*.json set and AISEF-V2-FREEZE-MANIFEST.json, which stay byte-identical as history; the current manifest is closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json",
+ "applied_before_approval": "919a271 (2026-10-06T11:27:09+07:00), 06d4e62, 4d4c53a implemented V2-007 before the owner's approval of 2026-10-06; recorded after it, nothing backdated (the exception's applied_before_approval)",
+ "owner_approval": {
+  "approver": "owner",
+  "decision": "B-01 — Phê duyệt ba danh tính (ARCHITECTURE-EXCEPTION-V2-007)",
+  "date": "2026-10-06"
+ },
+ "rule": "The original approval record and AMENDMENTS V2-001, V2-002, V2-003, V2-005 and V2-006 are unchanged. The effective approved digests are the 'after' digests of the last amendment in the lineage; validation/v2/freeze_manifest.py verifies every link (amended record sha256, exception sha256, before == previous after)."
+}
