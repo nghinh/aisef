@@ -25,8 +25,9 @@ their verdicts as recorded: `history_problems`, `proposal_history_problems`); th
 record on this tree inside a v2.1 envelope that names the B-03a decision and claims no approval (`v21_proposal`),
 compared exactly; the v2.1 re-verification (`reverify`) re-derives the boundary with literal comparisons only — no
 rebind, no new owner acceptance, no new approval — and binds the v2.1 falsifiability record (its header, the v2.1
-proposal, this tree's corpus, kernel, plan and spec hashes). `verify`, `record`, `check` and `--write` keep their 2.0
-behaviour.
+proposal, this tree's corpus, kernel, runner, authoring aid, probe execution digests, plan and spec hashes; its test
+runs and verdict). A refused v2.1 run is kept outside the evidence tree (`keep_failed_run`). `verify`, `record`,
+`check` and `--write` keep their 2.0 behaviour.
 """
 
 from __future__ import annotations
@@ -34,9 +35,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import pathlib
 import subprocess
 import sys
+import tempfile
 import time
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -542,9 +545,11 @@ def guards() -> dict:
     for name, argv in GUARDS.items():
         t = time.monotonic()
         r = subprocess.run([sys.executable, "-P", *argv], cwd=ROOT, capture_output=True, encoding="utf-8")
+        elapsed = time.monotonic() - t
         tail = (r.stdout + r.stderr).strip().splitlines()[-3:]
+        # a run took time: tested before rounding, so rounding never turns a real run into the 0 guard_problems refuses
         out[name] = {"command": "python -P " + " ".join(argv), "exit": r.returncode, "tail": tail,
-                     "seconds": round(time.monotonic() - t, 1)}
+                     "seconds": max(round(elapsed, 3), 0.001) if elapsed > 0 else 0}
     return out
 
 
@@ -640,11 +645,12 @@ def history_problems() -> list[str]:
     recorded, the closed C2-P5 history keeps its count, the approvals file was never rewritten. Nothing is re-derived
     on this tree (`reverification_problems` re-verifies the boundary on it)."""
     out = [f"{rel} is not its v2.0.0 blob (history)" for rel in (OUT_REL, APPROVALS_REL) if not _is_blob_at(rel, V2_0_0)]
-    doc = json.loads((ROOT / OUT_REL).read_text(encoding="utf-8"))
-    if doc["verdict"] != ACCEPTED_VERDICT:
-        out.append("the acceptance verdict is not recorded")
-    if len(json.loads((ROOT / HISTORY_REL).read_text(encoding="utf-8"))["entries"]) != doc["attempt_history"]["total_attempts"]:
-        out.append("the closed C2-P5 history changed")
+    doc, closed = _json_or_none(OUT_REL), _json_or_none(HISTORY_REL)
+    if doc is not None:   # a missing record is its blob problem above, never an exception
+        if doc["verdict"] != ACCEPTED_VERDICT:
+            out.append("the acceptance verdict is not recorded")
+        if closed is None or len(closed["entries"]) != doc["attempt_history"]["total_attempts"]:
+            out.append("the closed C2-P5 history changed")
     if not committed_versions_identical(APPROVALS_REL)["identical"]:
         out.append(f"{APPROVALS_REL} was rewritten")
     return out
@@ -657,8 +663,8 @@ def proposal_history_problems() -> list[str]:
     out = [f"{rel} is not its v2.0.0 blob (history)" for rel in (PROPOSAL_REL, aid.DOC_REL) if not _is_blob_at(rel, V2_0_0)]
     if not _is_blob_at(PROPOSAL_REL, ACCEPTED["candidate"]):
         out.append(f"{PROPOSAL_REL} is not the accepted candidate's")
-    prop = json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8"))
-    if prop["problems"] or prop["verdict"] != PROPOSAL_VERDICT:
+    prop = _json_or_none(PROPOSAL_REL)   # a missing record is its blob problem above, never an exception
+    if prop is not None and (prop["problems"] or prop["verdict"] != PROPOSAL_VERDICT):
         out.append(f"{PROPOSAL_REL} does not record its admission (history)")
     return out
 
@@ -687,6 +693,20 @@ def v21_proposal_record() -> dict:
     """The authoring aid's record inside the committed v2.1 proposal ({} when there is none)."""
     doc = _json_or_none(V21_PROPOSAL_REL) or {}
     return doc["record"] if isinstance(doc.get("record"), dict) else {}
+
+
+def keep_failed_run(rel: str, rec: dict) -> str:
+    """A refused v2.1 run is never discarded: its full record is written to a new file in $AISEF_FAILED_RUN_DIR (else
+    the system temp dir; never under closure-evidence, where only a problem-free record is written) — its path."""
+    base = pathlib.Path(os.environ.get("AISEF_FAILED_RUN_DIR") or tempfile.gettempdir()).resolve()
+    evidence = (ROOT / "closure-evidence").resolve()
+    if base == evidence or evidence in base.parents:
+        base = pathlib.Path(tempfile.gettempdir()).resolve()
+    base.mkdir(parents=True, exist_ok=True)
+    fd, path = tempfile.mkstemp(prefix=pathlib.Path(rel).stem + ".FAILED-", suffix=".json", dir=base)
+    with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
+    return path
 
 
 def _write_once(rel: str, doc: dict) -> None:
@@ -787,25 +807,39 @@ def reverify(run_guards: bool = True) -> dict:
                "p5_falsifiability_2_0_is_its_v2_0_0_blob": _is_blob_at(FALSIFIABILITY_REL, V2_0_0)}
     checks += [(v, f"{k} is false") for k, v in literal.items()]
     here_semantic = {r["spec_id"]: r["semantic_hash"] for r in rows}
-    f_rows, f_ids, f_header = fals.get("specs", []), fals.get("identities", {}), pf.v21_header()
+    f_rows, f_ids, f_header, f_tests = fals.get("specs", []), fals.get("identities", {}), pf.v21_header(), fals.get("tests", {})
     falsifiability = {
         "record": _file(pf.V21_OUT_REL) if fals else None, "verdict": fals.get("verdict"), "summary": fals.get("summary"),
+        "runner": f_ids.get("runner"), "authoring_aid": f_ids.get("authoring_aid"),
+        "probe_execution_digests": f_ids.get("probe_execution_digests"),
+        "tests": {m: {k: r.get(k) for k in ("status", "exit", "residual")} for m, r in f_tests.items()},
         "header_is_the_v21_one": bool(fals) and {k: fals.get(k) for k in f_header} == f_header,
         "names_the_v21_proposal": bool(v21) and (f_ids.get("proposal"), f_ids.get("proposal_digest"))
         == (_file(V21_PROPOSAL_REL), v21["proposal_digest"]),
         "p5_corpus_is_this_tree_s": f_ids.get("p5_mutants") == {**corpus["file"], "corpus_sha256": corpus["corpus_sha256"]},
         "kernel_is_this_tree_s": f_ids.get("aisef2_tree") == _git("rev-parse", "HEAD:aisef2"),
+        "runner_is_this_tree_s": f_ids.get("runner") == _file("validation/qualification/p5_falsifiability.py"),
+        "authoring_aid_is_this_tree_s": f_ids.get("authoring_aid") == _file("validation/qualification/p10_contracts.py"),
+        "probe_execution_digests_are_this_tree_s": f_ids.get("probe_execution_digests")
+        == pf.probe_execution_digests(r["probe_id"] for r in rows),
         "plan_hash_is_this_tree_s": f_ids.get("plan_hash") == plan.plan_hash,
         "semantic_hashes_are_this_tree_s": {r["spec_id"]: r["semantic_hash"] for r in f_rows} == here_semantic,
         "every_spec_qualified": bool(fals) and not fals.get("problems") and len(f_rows) == len(rows)
-        and all(r["status"] == "QUALIFIED" for r in f_rows),
+        and all(r["status"] == "QUALIFIED" == pf.classify(r["expectation"], r["pristine"], r["mutant_verdict"]) for r in f_rows),
+        "tests_all_ok": set(f_tests) == set(pf.TEST_MODULES)
+        and all((r.get("status"), r.get("exit"), r.get("residual")) == ("OK", 0, 0) for r in f_tests.values()),
+        "verdict_is_complete": fals.get("verdict") == pf.COMPLETE,
         "specs": [{k: r.get(k) for k in ("spec_id", "probe_id", "expectation", "pristine", "mutant_id", "mutant_verdict", "status")}
                   for r in f_rows],
         "rule": "the behaviour evidence for the 2.1 identities: p5_falsifiability.run() re-executed every retained spec, compiled "
-                "under this tree's probes, against the pristine reference and its own witness"}
+                "under this tree's probes, against the pristine reference and its own witness; a spec's semantic hash binds "
+                "the probe's capability (V2-007), so the record is current only with this tree's kernel, runner, authoring "
+                "aid, corpus and probe execution digests, compared literally"}
     checks += [(falsifiability[k], f"{pf.V21_OUT_REL}: {k} is false")
                for k in ("header_is_the_v21_one", "names_the_v21_proposal", "p5_corpus_is_this_tree_s", "kernel_is_this_tree_s",
-                         "plan_hash_is_this_tree_s", "semantic_hashes_are_this_tree_s", "every_spec_qualified")]
+                         "runner_is_this_tree_s", "authoring_aid_is_this_tree_s", "probe_execution_digests_are_this_tree_s",
+                         "plan_hash_is_this_tree_s", "semantic_hashes_are_this_tree_s", "every_spec_qualified", "tests_all_ok",
+                         "verdict_is_complete")]
     calibrations = {"shipped": _file(rc.SHIPPED_REL),
                     "newest_release_record": _file(rc.RECORD_REL) if (ROOT / rc.RECORD_REL).is_file() else None}
     checks.append((calibrations["newest_release_record"] is not None, f"{rc.RECORD_REL} is missing"))
@@ -871,12 +905,13 @@ def guard_problems(ran: dict) -> list[str]:
 
 
 def write_v21() -> dict:
-    """`reverify` with the guards into the v2.1 record, written once and only without a problem."""
+    """`reverify` with the guards into the v2.1 record, written once and only without a problem (a refused run is
+    kept: `keep_failed_run`)."""
     if (ROOT / V21_OUT_REL).exists():
         raise SystemExit(f"refused: {V21_OUT_REL} exists — a record is never rewritten")
     rec = reverify(run_guards=True)
     if rec["problems"]:
-        raise SystemExit("refused: " + "; ".join(rec["problems"]))
+        raise SystemExit(f"refused: {'; '.join(rec['problems'])} — the run is kept at {keep_failed_run(V21_OUT_REL, rec)}")
     _write_once(V21_OUT_REL, rec)
     return rec
 

@@ -7,14 +7,17 @@ witness, the evidence passing the frozen `falsifiability_problems` (one spec per
 cannot refute is classified NOT_QUALIFIED, never hidden; P5F-5 C2-P5-FINDING-001 stays reproducible; P5F-4 the committed
 record: every retained spec QUALIFIED, none NOT_QUALIFIED, none unsatisfied by the reference, none without a witness;
 P5F-4b (owner B-03a) the v2.1 record is the same measurement on 2.1, naming the v2.1 proposal and the B-03a decision; P5F-6
-the writers: the v2.1 record is run() under its own header, written once; the 2.0 record is never rewritten.
+the writers: the v2.1 record is run() under its own header, written once, a refused run kept outside the evidence
+tree; the 2.0 record and the sealed corpus are never rewritten.
 """
 
 import copy
 import hashlib
 import importlib.util
 import json
+import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -129,7 +132,7 @@ class Writers(unittest.TestCase):
         self.addCleanup(tmp.cleanup)
         self.root = pathlib.Path(tmp.name)
         for patch in (mock.patch.object(F, "ROOT", self.root), mock.patch.object(F, "_git", side_effect=_git),
-                      mock.patch.object(PA, "_file", return_value=self.FILE)):
+                      mock.patch.object(PA, "_file", return_value=self.FILE), mock.patch.object(F, "_plan_hash", return_value="p")):
             patch.start()
             self.addCleanup(patch.stop)
         self.PA = PA
@@ -144,7 +147,18 @@ class Writers(unittest.TestCase):
         self.assertIsNone(out["supersedes"])
         self.assertNotIn("NOT approved", out["status"])
         self.assertEqual(out["history"], {"path": F.OUT_REL, "blob_at_v2_0_0": _git("rev-parse", f"{self.PA.V2_0_0}:{F.OUT_REL}")})
-        self.assertEqual(out["identities"], {"plan_hash": "p", "proposal": self.FILE, "proposal_digest": "46a5"})
+        self.assertEqual(out["identities"], {"plan_hash": "p", "proposal": self.FILE, "proposal_digest": "46a5",
+                                             "probe_execution_digests": {}})
+        from aisef2.probe import catalog
+        from aisef2.probe.calibration import executing
+        active = {e.probe_id: e.probe_digest for e in catalog.CATALOG if e.active}
+        with self.proposal(self.PROPOSAL):          # the bytes each spec's probe runs (V2-007), one entry per probe
+            ran = F.as_v21({**copy.deepcopy(self.RUN), "specs": [{"probe_id": p} for p in [*active, *active][:len(active) + 1]]})
+        digests = ran["identities"]["probe_execution_digests"]
+        self.assertEqual(digests, {p: executing(F._probe(p)) for p in active})
+        self.assertEqual(len(set(digests.values())), len(active))
+        for p, capability in active.items():         # not the capability digest a spec binds
+            self.assertNotEqual(digests[p], capability, p)
         self.assertEqual({k: v for k, v in out.items() if k not in F.v21_header() and k != "identities"},
                          {k: v for k, v in self.RUN.items() if k not in F.v21_header() and k != "identities"})
         for prop in ({}, {"plan": {"plan_hash": "q"}, "proposal_digest": "46a5"}):   # missing, or another plan's proposal
@@ -155,10 +169,28 @@ class Writers(unittest.TestCase):
         path = self.root / F.V21_OUT_REL
         with self.proposal({}), mock.patch.object(F, "run", side_effect=AssertionError("run")), self.assertRaises(SystemExit):
             F.write_v21()                                     # no v2.1 proposal: refused before the run
-        with self.proposal(self.PROPOSAL), mock.patch.object(F, "run", return_value={**self.RUN, "problems": ["x"]}), \
-                self.assertRaises(SystemExit):
-            F.write_v21()                                     # a run with a problem is never written
-        self.assertFalse(path.exists())
+        with self.proposal({**self.PROPOSAL, "plan": {"plan_hash": "q"}}), mock.patch.object(F, "run", side_effect=AssertionError("run")), \
+                self.assertRaises(SystemExit) as refused:
+            F.write_v21()                                     # a v2.1 proposal of another plan than this tree's: before the run
+        self.assertIn("another plan than this tree's", str(refused.exception))
+        with tempfile.TemporaryDirectory() as kept:
+            kept = pathlib.Path(kept).resolve()
+            for name, ran, why in (("a problem", {**self.RUN, "problems": ["x"]}, "x"),
+                                   ("another plan", {**self.RUN, "identities": {**self.RUN["identities"], "plan_hash": "q"}},
+                                    "its plan is not the run's")):
+                before = set(kept.iterdir())
+                with self.subTest(name), self.proposal(self.PROPOSAL), mock.patch.object(F, "run", return_value=copy.deepcopy(ran)), \
+                        mock.patch.dict(os.environ, {"AISEF_FAILED_RUN_DIR": str(kept)}), self.assertRaises(SystemExit) as refused:
+                    F.write_v21()                             # a refused run is never written as evidence, and kept
+                self.assertFalse(path.exists())
+                (newest,) = set(kept.iterdir()) - before
+                self.assertIn(f"— the run is kept at {newest}", str(refused.exception))
+                self.assertIn(why, str(refused.exception))
+                doc = json.loads(newest.read_text(encoding="utf-8"))
+                self.assertEqual(doc["specs"], ran["specs"])
+                self.assertIn(why, "; ".join(doc["problems"]))
+            self.assertEqual(len(list(kept.iterdir())), 2)
+        self.assertEqual(list(self.root.rglob("*")), [])
         with self.proposal(self.PROPOSAL), mock.patch.object(F, "run", return_value=copy.deepcopy(self.RUN)):
             rec = F.write_v21()
         self.assertEqual(json.loads(path.read_text(encoding="utf-8")), rec)
@@ -166,6 +198,25 @@ class Writers(unittest.TestCase):
         with self.proposal(self.PROPOSAL), mock.patch.object(F, "run", side_effect=AssertionError("run")), self.assertRaises(SystemExit):
             F.write_v21()                                     # an existing record: refused before the run
         self.assertEqual(json.loads(path.read_text(encoding="utf-8")), rec)
+
+    def test_the_sealed_corpus_is_never_rewritten(self):
+        ref = f"{F.FIX_REL}/reference/ledgerlock"
+        shutil.copytree(ROOT / ref, self.root / ref)
+        sealed = (ROOT / F.MUTANTS_REL).read_bytes()
+        target = self.root / F.MUTANTS_REL
+        target.parent.mkdir(parents=True)
+        target.write_bytes(sealed)
+        with mock.patch("sys.stdout"):
+            self.assertEqual(F.main(["--seal"]), 0)           # the seal it already is: nothing to write
+        self.assertEqual(target.read_bytes(), sealed)
+        doc = json.loads(sealed)
+        doc["corpus_sha256"] = "0" * 64                        # a corpus this seal would change
+        changed = (json.dumps(doc, indent=1, ensure_ascii=False) + "\n").encode("utf-8")
+        target.write_bytes(changed)
+        with self.assertRaises(SystemExit) as refused:
+            F.main(["--seal"])
+        self.assertIn(f"{F.MUTANTS_REL} is a sealed C2-P5 input", str(refused.exception))
+        self.assertEqual(target.read_bytes(), changed)
 
     def test_the_2_0_record_is_never_rewritten(self):
         (self.root / F.OUT_REL).parent.mkdir(parents=True)

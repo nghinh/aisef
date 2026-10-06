@@ -1,8 +1,11 @@
 """WP-0.5 — every Q0 checker is observed saying NO, and calibration itself can say NO."""
 
+import contextlib
 import importlib.util
+import io
 import pathlib
 import sys
+import tempfile
 import unittest
 from dataclasses import replace
 from unittest import mock
@@ -79,6 +82,59 @@ class CheckerCalibration(unittest.TestCase):
         self.assertIn("validation/v2/packaging_check.py", cc.uncovered_checker_modules(dropped))
         bad = dict(self.result, uncovered_checker_modules=["validation/v2/packaging_check.py"])
         self.assertTrue(cc.problems_of(bad))
+
+
+class V21Writers(unittest.TestCase):
+    """V2.1 (owner B-03a): a 2.0 record is history and a writer writes only its v2.1 record, once — on a temporary
+    ROOT, never the real tree (no calibration run: setUpClass is CheckerCalibration's)."""
+
+    def test_the_2_0_p2_static_admission_record_is_history(self):
+        ev = cc._load("aisef_v2_p2_evidence", cc.V2 / "p2_evidence.py")
+        rel = ev.HISTORY["WP-2.3"]
+        self.assertNotEqual(rel, ev.BUILDERS["WP-2.3"][0])
+        self.assertEqual(ev.history_problems(), [])
+        tampered = (ROOT / rel).read_bytes() + b" "
+        with mock.patch.object(pathlib.Path, "read_bytes", return_value=tampered):
+            self.assertEqual(ev.history_problems(), [f"{rel} is not its v2.0.0 blob (history)"])
+        with mock.patch.object(ev, "problems_of", return_value=["WP-2.3: property p is false"]):
+            self.assertEqual(ev.history_problems(), [f"{rel} (history): WP-2.3: property p is false"])
+
+    def test_the_p2_writer_writes_only_the_v2_1_record_and_never_rewrites_it(self):
+        ev = cc._load("aisef_v2_p2_evidence", cc.V2 / "p2_evidence.py")
+        rel, _, needs = ev.BUILDERS["WP-2.3"]
+        first, second = ({"work_package": "WP-2.3", "properties": {"p": True}, "n": n} for n in (1, 2))
+        every_need = [b[2] for b in ev.BUILDERS.values()]
+
+        def builders(record):   # every builder buildable, each returning a clean record
+            return mock.patch.dict(ev.BUILDERS, {wp: (r, lambda: record, n) for wp, (r, _, n) in ev.BUILDERS.items()})
+
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(ev, "ROOT", pathlib.Path(tmp)), \
+                contextlib.redirect_stdout(io.StringIO()) as out:
+            root = pathlib.Path(tmp)
+            for n in every_need:
+                (root / n).parent.mkdir(parents=True, exist_ok=True)
+                (root / n).write_text("", encoding="utf-8")
+            with builders(first):
+                self.assertEqual(ev.main([]), 0)
+            with builders(second):
+                self.assertEqual(ev.main([]), 1)             # an existing record is never rewritten
+            self.assertIn(f"FAIL  refused: {rel} exists", out.getvalue())
+            self.assertEqual((root / rel).read_text(encoding="utf-8"), ev.render(first))
+            # the v2.1 WP-2.3 record only: never the 2.0 one, never the other four builders' records
+            self.assertIn(needs, every_need)
+            self.assertEqual(sorted(f.relative_to(root).as_posix() for f in root.rglob("*") if f.is_file()), sorted([*every_need, rel]))
+
+    def test_the_calibration_writer_writes_only_the_v2_1_record_and_never_rewrites_it(self):
+        first, second = ({"checkers": [], "uncovered_checker_modules": [], "checker_count": n, "calibrated_count": n,
+                          "always_pass_mutants_rejected": n} for n in (0, 1))
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(cc, "ROOT", pathlib.Path(tmp)), \
+                mock.patch.object(cc, "run", side_effect=[first, second]), contextlib.redirect_stdout(io.StringIO()) as out:
+            root = pathlib.Path(tmp)
+            self.assertEqual(cc.main([]), 0)
+            self.assertEqual(cc.main([]), 1)                 # an existing record is never rewritten
+            self.assertIn(f"FAIL  refused: {cc.OUT_REL} exists", out.getvalue())
+            self.assertEqual((root / cc.OUT_REL).read_text(encoding="utf-8"), cc.render(first))
+            self.assertEqual([f.relative_to(root).as_posix() for f in root.rglob("*") if f.is_file()], [cc.OUT_REL])
 
 
 if __name__ == "__main__":

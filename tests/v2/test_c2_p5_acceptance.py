@@ -2,9 +2,11 @@
 established owner identity; a tampered or synthetic approval is refused; the acceptance re-derives on this tree — on 2.1
 (owner B-03a) as the 2.0 record kept as history plus the v2.1 re-verification, compared exactly."""
 
+import contextlib
 import copy
 import dataclasses
 import json
+import os
 import pathlib
 import tempfile
 import unittest
@@ -16,6 +18,18 @@ from validation.qualification import p5_acceptance as A
 
 def _doc() -> dict:
     return json.loads((A.ROOT / A.APPROVALS_REL).read_text(encoding="utf-8"))
+
+
+def _set(doc, path, value):
+    """`doc` with the value at `path` (keys and indexes) replaced."""
+    at = doc
+    for k in path[:-1]:
+        at = at[k]
+    at[path[-1]] = value
+    return doc
+
+
+RUNNER, AID = "validation/qualification/p5_falsifiability.py", "validation/qualification/p10_contracts.py"
 
 
 class Approvals(unittest.TestCase):
@@ -79,6 +93,51 @@ class Acceptance(unittest.TestCase):
             self.assertEqual(json.loads((pathlib.Path(tmp) / A.V21_OUT_REL).read_text(encoding="utf-8")), {"a": 1})
             self.assertEqual([f.relative_to(tmp).as_posix() for f in pathlib.Path(tmp).rglob("*") if f.is_file()], [A.V21_OUT_REL])
 
+    def test_a_missing_2_0_record_is_a_history_problem_never_an_exception(self):
+        is_file = pathlib.Path.is_file
+        for rel, history, expected in ((A.OUT_REL, A.history_problems, [f"{A.OUT_REL} is not its v2.0.0 blob (history)"]),
+                                       (A.HISTORY_REL, A.history_problems, ["the closed C2-P5 history changed"]),
+                                       (A.PROPOSAL_REL, A.proposal_history_problems, [f"{A.PROPOSAL_REL} is not its v2.0.0 blob (history)",
+                                                                                      f"{A.PROPOSAL_REL} is not the accepted candidate's"])):
+            missing = (A.ROOT / rel).as_posix()
+            with self.subTest(rel), mock.patch.object(pathlib.Path, "is_file", autospec=True,
+                                                     side_effect=lambda p, m=missing: p.as_posix() != m and is_file(p)):
+                self.assertEqual(history(), expected)
+
+    def test_a_refused_re_verification_run_is_kept_outside_the_evidence_tree(self):
+        rec = {"problems": ["guard checker_calibration: exit 1"], "verdict": "PROBLEMS", "guards": {"checker_calibration": {"exit": 1}}}
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as kept, tempfile.TemporaryDirectory() as fallback, \
+                mock.patch.object(A, "ROOT", pathlib.Path(tmp)):                         # never the real tree
+            root, kept = pathlib.Path(tmp), pathlib.Path(kept).resolve()
+            with mock.patch.dict(os.environ, {"AISEF_FAILED_RUN_DIR": str(kept)}), mock.patch.object(A, "reverify", return_value=rec), \
+                    self.assertRaises(SystemExit) as refused:
+                A.write_v21()
+            files = sorted(kept.iterdir())
+            self.assertEqual(len(files), 1)
+            self.assertEqual(json.loads(files[0].read_text(encoding="utf-8")), rec)          # the full record, kept
+            self.assertIn(f"guard checker_calibration: exit 1 — the run is kept at {files[0]}", str(refused.exception))
+            self.assertEqual(list(root.rglob("*")), [])                                      # nothing under closure-evidence
+            for inside in (root / "closure-evidence", root / "closure-evidence" / "v2" / "v2.1"):  # never the evidence tree
+                with self.subTest(inside=inside), mock.patch.dict(os.environ, {"AISEF_FAILED_RUN_DIR": str(inside)}), \
+                        mock.patch.object(A.tempfile, "gettempdir", return_value=fallback):
+                    self.assertEqual(pathlib.Path(A.keep_failed_run(A.V21_OUT_REL, rec)).parent, pathlib.Path(fallback).resolve())
+            self.assertEqual(list(root.rglob("*")), [])
+            (root / A.V21_OUT_REL).parent.mkdir(parents=True)
+            (root / A.V21_OUT_REL).write_text("{}", encoding="utf-8")
+            with mock.patch.object(A, "reverify", side_effect=AssertionError("run")), self.assertRaises(SystemExit) as refused:
+                A.write_v21()                                                              # an existing record: before the run
+            self.assertIn("exists", str(refused.exception))
+
+    def test_a_guard_run_is_recorded_with_its_time_never_rounded_to_zero(self):
+        done = mock.Mock(returncode=0, stdout="PASS\n", stderr="")
+        for clock, seconds, problems in (([0.0, 0.0004], 0.001, []), ([0.0, 1.23456], 1.235, []),
+                                         ([1.0, 1.0], 0, [f"guard {k}: not a recorded run of its command" for k in A.GUARDS])):
+            with self.subTest(clock=clock), mock.patch.object(A.subprocess, "run", return_value=done), \
+                    mock.patch.object(A.time, "monotonic", side_effect=clock * len(A.GUARDS)):
+                ran = A.guards()
+                self.assertEqual({g["seconds"] for g in ran.values()}, {seconds})
+                self.assertEqual(A.guard_problems(ran), problems)
+
 
 class V21Records(unittest.TestCase):
     """The v2.1 proposal envelope, the recorded guard runs and the re-verification's binding of the v2.1 falsifiability
@@ -131,54 +190,169 @@ class V21Records(unittest.TestCase):
         self.assertEqual(A.guard_problems(bad), [f"the recorded guard runs are not exactly {sorted(A.GUARDS)}"])
         self.assertEqual(A.guard_problems({}), [f"the recorded guard runs are not exactly {sorted(A.GUARDS)}"])
 
-    def test_the_re_verification_binds_the_v2_1_falsifiability_record_to_2_1(self):
+    @contextlib.contextmanager
+    def on_2_1(self):
+        """This tree once its v2.1 records exist, served to the readers from memory or a temp file and never written into
+        the repository: the v2.1 proposal (the aid's record in its envelope, or state['proposal']), the falsifiability
+        record (2.0's run made this tree's — its plan, kernel, runner, aid and semantic hashes — then `as_v21`:
+        state['fals']) and the re-verification (the file state['reverification'] names)."""
         from validation.qualification import p5_falsifiability as pf
         derived = A._aid().record()
         written = {rel: {"path": rel, "sha256": c * 64} for rel, c in ((A.V21_PROPOSAL_REL, "f"), (pf.V21_OUT_REL, "e"))}
         files, docs = A._file, A._json_or_none
         two_oh = json.loads((A.ROOT / A.FALSIFIABILITY_REL).read_text(encoding="utf-8"))
-        state = {}
+        state = {"derived": derived, "two_oh": two_oh}
 
         def json_or_none(rel):
             if rel == A.V21_PROPOSAL_REL:
-                return A.v21_proposal(derived)
-            return state.get("fals") if rel == pf.V21_OUT_REL else docs(rel)
-
-        def problems(fals):
-            state["fals"] = fals
-            return [p for p in A.reverify(run_guards=False)["problems"] if p.startswith(pf.V21_OUT_REL)]
+                return state.get("proposal") or A.v21_proposal(derived)
+            if rel == pf.V21_OUT_REL:
+                return state.get("fals")
+            if rel == A.V21_OUT_REL:
+                return json.loads(state["reverification"].read_text(encoding="utf-8")) if state.get("reverification") else None
+            return docs(rel)
 
         with mock.patch.object(A, "_file", side_effect=lambda rel: written.get(rel) or files(rel)), \
                 mock.patch.object(A, "_json_or_none", side_effect=json_or_none):
-            # run() on 2.1 as recorded (2.0's run with this tree's plan, kernel and semantic hashes), made the v2.1 record
+            # run() on 2.1 as recorded (2.0's run with this tree's plan, kernel, runner, aid and semantic hashes), made the
+            # v2.1 record
             run = copy.deepcopy(two_oh)
-            run["identities"].update(plan_hash=derived["plan"]["plan_hash"], aisef2_tree=A._git("rev-parse", "HEAD:aisef2"))
+            run["identities"].update(plan_hash=derived["plan"]["plan_hash"], aisef2_tree=A._git("rev-parse", "HEAD:aisef2"),
+                                     runner=A._file(RUNNER), authoring_aid=A._file(AID))
             semantic = {s["spec_id"]: s["semantic_hash"] for s in derived["specs"]}
             for r in run["specs"]:
                 r["semantic_hash"] = semantic[r["spec_id"]]
-            good = pf.as_v21(run)
+            state["fals"] = pf.as_v21(run)
+            yield state
+
+    def test_the_re_verification_binds_the_v2_1_falsifiability_record_to_2_1(self):
+        from validation.qualification import p5_falsifiability as pf
+        with self.on_2_1() as state:
+            good, two_oh = state["fals"], state["two_oh"]
+
+            def problems(fals):
+                state["fals"] = fals
+                return [p for p in A.reverify(run_guards=False)["problems"] if p.startswith(pf.V21_OUT_REL)]
+
             self.assertEqual(problems(good), [])
-            # the 2.0 record verbatim (what run() alone gives): its header, its proposal, its kernel, its plan and hashes
+            self.assertEqual(good["identities"]["probe_execution_digests"],
+                             pf.probe_execution_digests(r["probe_id"] for r in state["derived"]["specs"]))
+            # the 2.0 record verbatim (what run() alone gives): its header, its proposal, its kernel, runner and aid, no
+            # execution digests, its plan and hashes
             self.assertEqual(problems(two_oh), [f"{pf.V21_OUT_REL}: {k} is false" for k in (
-                "header_is_the_v21_one", "names_the_v21_proposal", "kernel_is_this_tree_s", "plan_hash_is_this_tree_s",
+                "header_is_the_v21_one", "names_the_v21_proposal", "kernel_is_this_tree_s", "runner_is_this_tree_s",
+                "authoring_aid_is_this_tree_s", "probe_execution_digests_are_this_tree_s", "plan_hash_is_this_tree_s",
                 "semantic_hashes_are_this_tree_s")])
+            probe, module, row = next(iter(good["identities"]["probe_execution_digests"])), next(iter(good["tests"])), good["specs"][0]
             for name, path, value in (("header_is_the_v21_one", ("authority",), two_oh["authority"]),
                                       ("header_is_the_v21_one", ("supersedes",), two_oh["supersedes"]),
                                       ("names_the_v21_proposal", ("identities", "proposal"), two_oh["identities"]["proposal"]),
                                       ("names_the_v21_proposal", ("identities", "proposal_digest"), A.ACCEPTED["proposal_digest"]),
                                       ("p5_corpus_is_this_tree_s", ("identities", "p5_mutants", "corpus_sha256"), "0" * 64),
                                       ("kernel_is_this_tree_s", ("identities", "aisef2_tree"), two_oh["identities"]["aisef2_tree"]),
+                                      ("runner_is_this_tree_s", ("identities", "runner", "sha256"), "0" * 64),
+                                      ("authoring_aid_is_this_tree_s", ("identities", "authoring_aid", "sha256"), "0" * 64),
+                                      ("probe_execution_digests_are_this_tree_s", ("identities", "probe_execution_digests", probe), "0" * 64),
+                                      ("probe_execution_digests_are_this_tree_s", ("identities", "probe_execution_digests"), {}),
                                       ("plan_hash_is_this_tree_s", ("identities", "plan_hash"), A.ACCEPTED["plan_hash"]),
                                       ("semantic_hashes_are_this_tree_s", ("specs", 0, "semantic_hash"), "0" * 64),
-                                      ("every_spec_qualified", ("specs", 0, "status"), "NOT_QUALIFIED")):
-                with self.subTest(name=name, path=path):
-                    bad = copy.deepcopy(good)
-                    at = bad
-                    for k in path[:-1]:
-                        at = at[k]
-                    at[path[-1]] = value
-                    self.assertEqual(problems(bad), [f"{pf.V21_OUT_REL}: {name} is false"])
+                                      ("every_spec_qualified", ("specs", 0, "status"), "NOT_QUALIFIED"),
+                                      # QUALIFIED as written, but its verdicts are not a qualification
+                                      ("every_spec_qualified", ("specs", 0, "mutant_verdict"), row["expectation"]),
+                                      ("every_spec_qualified", ("specs", 0, "pristine"), row["mutant_verdict"]),
+                                      ("tests_all_ok", ("tests", module, "exit"), 1),
+                                      ("tests_all_ok", ("tests", module, "status"), "FAILED"),
+                                      ("tests_all_ok", ("tests", module, "residual"), 1),
+                                      ("tests_all_ok", ("tests", module, "residual"), None),
+                                      ("tests_all_ok", ("tests",), {module: good["tests"][module]}),
+                                      ("tests_all_ok", ("tests",), {}),
+                                      ("verdict_is_complete", ("verdict",), "PROBLEMS")):
+                with self.subTest(name=name, path=path, value=value):
+                    self.assertEqual(problems(_set(copy.deepcopy(good), path, value)), [f"{pf.V21_OUT_REL}: {name} is false"])
             self.assertIn(f"{pf.V21_OUT_REL}: every_spec_qualified is false", problems(None))
+
+    def test_the_committed_re_verification_is_current_only_exactly_with_every_guard_run(self):
+        from validation.qualification import p5_falsifiability as pf
+        ran = {k: {"command": "python -P " + " ".join(v), "exit": 0, "tail": ["PASS"], "seconds": 0.25} for k, v in A.GUARDS.items()}
+        with self.on_2_1() as state, tempfile.TemporaryDirectory() as tmp:
+            rec = A.reverify(run_guards=False)
+            self.assertEqual((rec["problems"], rec["verdict"], rec["claims_owner_acceptance"], rec["new_approvals"]),
+                             ([], A.V21_VERDICT, False, []))
+            state["reverification"] = at = pathlib.Path(tmp) / "C2-P5-ACCEPTANCE-REVERIFICATION.json"
+
+            def problems(change=lambda doc: None):
+                doc = copy.deepcopy({**rec, "guards": ran})
+                change(doc)
+                at.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+                return A.reverification_problems()
+
+            self.assertEqual(problems(), [])
+            k, stale = next(iter(A.GUARDS)), f"{A.V21_OUT_REL} is not what this tree re-verifies"
+            not_exactly = f"{A.V21_OUT_REL}: the recorded guard runs are not exactly {sorted(A.GUARDS)}"
+            for name, change, expected in (("a guard exit 1", lambda d: d["guards"][k].update(exit=1), [f"{A.V21_OUT_REL}: guard {k}: exit 1"]),
+                                           ("a guard missing", lambda d: d["guards"].pop(k), [not_exactly]),
+                                           ("no guard run", lambda d: d.pop("guards"), [not_exactly]),
+                                           ("a guard not run", lambda d: d["guards"][k].update(seconds=0),
+                                            [f"{A.V21_OUT_REL}: guard {k}: not a recorded run of its command"]),
+                                           ("claims_owner_acceptance", lambda d: d.update(claims_owner_acceptance=True), [stale]),
+                                           ("a new approval", lambda d: d["new_approvals"].append(A.OWNER), [stale]),
+                                           ("the owner's verdict", lambda d: d.update(verdict=A.ACCEPTED_VERDICT), [stale])):
+                with self.subTest(name):
+                    self.assertEqual(problems(change), expected)
+            # the falsifiability record changed after the re-verification was written: refused for its own reason too
+            fals = state["fals"]
+            for name, path, value, check in (("a NOT_QUALIFIED row", ("specs", 0, "status"), "NOT_QUALIFIED", "every_spec_qualified"),
+                                             ("a stale aisef2_tree", ("identities", "aisef2_tree"), "0" * 40, "kernel_is_this_tree_s"),
+                                             ("a changed runner", ("identities", "runner", "sha256"), "0" * 64, "runner_is_this_tree_s")):
+                with self.subTest(name):
+                    state["fals"] = _set(copy.deepcopy(fals), path, value)
+                    self.assertEqual(problems(), [f"{pf.V21_OUT_REL}: {check} is false", stale])
+            state["fals"] = fals
+            self.assertEqual(problems(), [])
+
+    def test_each_re_verification_check_refuses_for_its_own_reason(self):
+        from validation.qualification import release_calibration as rc
+        with self.on_2_1() as state, tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(A.reverify(run_guards=False)["problems"], [])
+            derived, ledger = state["derived"], json.loads((A.ROOT / A.DECISIONS_REL).read_text(encoding="utf-8"))
+            at = pathlib.Path(tmp) / "RELEASE-DECISIONS.json"
+
+            def decisions(change):
+                doc = copy.deepcopy(ledger)
+                change(next(e for e in doc["entries"] if e.get("id") == A.B03_ID))
+                at.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+                return mock.patch.object(A, "DECISIONS_REL", str(at))      # ROOT / an absolute path is that path
+
+            def proposal(path, value):
+                return mock.patch.dict(state, {"proposal": _set(A.v21_proposal(copy.deepcopy(derived)), path, value)})
+
+            sid, req = derived["specs"][0]["spec_id"], next(iter(derived["requirements"]))
+            current = f"{A.V21_PROPOSAL_REL} is not what the authoring aid derives from this tree"
+            missing = "closure-evidence/v2/v2.1/NO-RELEASE-CALIBRATION.json"
+            rewritten = {"commits": 2, "distinct_blobs": ["a", "b"], "identical": False}
+            for name, patch, expected in (   # each patch made when its case runs (one ledger file at a time)
+                    ("the 2.0 acceptance is not history", lambda: mock.patch.object(A, "history_problems", return_value=["h"]), [f"{A.OUT_REL}: ['h']"]),
+                    ("the 2.0 proposal is not history", lambda: mock.patch.object(A, "proposal_history_problems", return_value=["p"]),
+                     [f"{A.PROPOSAL_REL}: ['p']"]),
+                    ("the B-03a text is not the ledger's", lambda: decisions(lambda e: e.update(owner_text="x")),
+                     [f"the B-03a text is not in {at} entry {A.B03_ID}"]),
+                    ("the ledger entry is not the reference", lambda: decisions(lambda e: e.update(seq=4)), [f"{at} entry {A.B03_ID} is not {A.B03_REF}"]),
+                    ("the v2.1 proposal is not the aid's", lambda: proposal(("v2_1", "rule"), "x"), [current]),
+                    ("its engine digest", lambda: proposal(("record", "identities", "admission_engine_digest"), "0" * 64),
+                     [current, "admission: the engine digest is not the v2.1 proposal's"]),
+                    ("its spec identities", lambda: proposal(("record", "specs", 0, "semantic_hash"), "0" * 64),
+                     [f"{sid}: identities_are_the_v21_proposal_s is false", current]),
+                    ("its requirements", lambda: proposal(("record", "requirements", req, "hash"), "0" * 64),
+                     ["requirements: are_the_v21_proposal_s is false", current]),
+                    ("its plan", lambda: proposal(("record", "plan", "plan_hash"), "0" * 64), ["plan: is_the_v21_proposal_s is false", current]),
+                    ("the approvals rewritten", lambda: mock.patch.object(A, "committed_versions_identical", return_value=rewritten),
+                     [f"{A.APPROVALS_REL} was rewritten", f"{A.OUT_REL}: ['{A.APPROVALS_REL} was rewritten']"]),
+                    ("the admission", lambda: mock.patch.object(A, "_admission_problems", return_value=["not admitted"]), ["not admitted"]),
+                    ("a literal comparison", lambda: mock.patch.object(A, "_cycle1_drift", return_value={**A._cycle1_drift(), "ok": False}),
+                     ["cycle1_drift_is_the_accepted_record_s is false"]),
+                    ("the release calibration", lambda: mock.patch.object(rc, "RECORD_REL", missing), [f"{missing} is missing"])):
+                with self.subTest(name), patch():
+                    self.assertEqual(A.reverify(run_guards=False)["problems"], expected)
 
 
 
