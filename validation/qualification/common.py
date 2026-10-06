@@ -59,9 +59,9 @@ CYCLE2_Q4_OUT_REL, CYCLE2_Q5_OUT_REL = "closure-evidence/v2/cycle2/Q4-FINAL", "c
 #: closure-evidence/v2/release/ ("no historical c11615a qualification may be presented as current RC evidence");
 #: without the record, the Cycle-2 subject above, exactly
 RC_FREEZE = ROOT / release_rc.OUT_REL
-RELEASE_OUT_REL, RELEASE_Q4_OUT_REL, RELEASE_Q5_OUT_REL = (f"closure-evidence/v2/release/Q0-Q3-{release_rc.RC}",
-                                                           f"closure-evidence/v2/release/Q4-{release_rc.RC}",
-                                                           f"closure-evidence/v2/release/Q5-{release_rc.RC}")
+RELEASE_OUT_REL, RELEASE_Q4_OUT_REL, RELEASE_Q5_OUT_REL = (f"closure-evidence/v2/release/Q0-Q3-{release_rc.TAG}",
+                                                           f"closure-evidence/v2/release/Q4-{release_rc.TAG}",
+                                                           f"closure-evidence/v2/release/Q5-{release_rc.TAG}")
 G1_V1_NOTE = ("the release changed aisef/ for charter G1 ('legacy improve'): the V1 product tree the subject freezes is the RC's "
               "shipped aisef tree, not Cycle 2's")
 #: the platforms the qualification claims (§20); any other platform's record is kept as a non-gate observation

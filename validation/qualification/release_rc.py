@@ -2,7 +2,8 @@
 kernel digest, the build epoch, and the wheel and sdist digests of its reproducible build.
 
     python -P validation/qualification/release_rc.py --freeze RC_SHA --sums SHA256SUMS --ci-run RUN_ID
-        # -> closure-evidence/v2/release/V2.0-RC2-FREEZE.json (written once, in the harness-only commit after the RC)
+        # -> closure-evidence/v2/release/V<version>-RC<n>-FREEZE.json, the version's next candidate (written once, in
+        #    the harness-only commit after the RC; 2.0.0's records keep their names V2.0-RC1/RC2)
     python -P validation/qualification/release_rc.py --check
         # the record is what the RC's own git objects say (works on any later commit)
     python -P validation/qualification/release_rc.py --epoch
@@ -14,6 +15,9 @@ kernel digest, the build epoch, and the wheel and sdist digests of its reproduci
 SHA256SUMS is the file the staging build of the RC commit wrote (.github/workflows/staging.yml: SOURCE_DATE_EPOCH =
 the commit's time, the sdist re-packed by repro_dist.py); S7's rebuild must give the same digests. No source change
 after the freeze keeps the RC's qualification (G2): `--check` also says whether HEAD's shipped files still equal it.
+
+V2.1 (patch lane, 360° P0-3): the release is the version pyproject.toml says, and its candidate is the newest one frozen
+for that version — no constant to edit per release. 2.0.0 is read exactly as it was released (RC2, its records' names).
 """
 
 from __future__ import annotations
@@ -32,11 +36,40 @@ ROOT = HERE.parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-#: the candidate this harness freezes and qualifies: V2.0-RC1 (529591e) was REJECTED by the owner on 2026-10-05
-#: (S6-SMOKE-1-PREFLIGHT-OPAQUE); its records under closure-evidence/v2/release/ are history
-RC = "RC2"
-OUT_REL = f"closure-evidence/v2/release/V2.0-{RC}-FREEZE.json"
-VERSION = "2.0.0"
+RELEASE_DIR = "closure-evidence/v2/release"
+_RC_NUM = re.compile(r"RC([1-9][0-9]*)")
+
+
+def label(version: str, rc: str) -> str:
+    """The name a version's candidate is recorded under: 2.0.0's were written as V2.0-RC<n> and keep it."""
+    return f"V2.0-{rc}" if version == "2.0.0" else f"V{version}-{rc}"
+
+
+def freeze_rel(version: str, rc: str) -> str:
+    return f"{RELEASE_DIR}/{label(version, rc)}-FREEZE.json"
+
+
+def frozen_rcs(version: str, root: pathlib.Path | None = None) -> list[str]:
+    """The candidates frozen for `version`, oldest first (a rejected one stays, as history; the newest is current)."""
+    d = (root or ROOT) / RELEASE_DIR
+    found = []
+    for p in d.glob(f"{label(version, 'RC')}*-FREEZE.json") if d.is_dir() else ():
+        m = _RC_NUM.fullmatch(p.name.removeprefix(label(version, "")).removesuffix("-FREEZE.json"))
+        if m:
+            found.append((int(m.group(1)), f"RC{m.group(1)}"))
+    return [rc for _, rc in sorted(found)]
+
+
+def subject(root: pathlib.Path | None = None) -> tuple[str, str, str, str]:
+    """(VERSION, RC, TAG, OUT_REL) of this tree: the pyproject version, its newest frozen candidate (RC1 before any),
+    the tag the qualification output directories carry (2.0.0's: the bare RC) and the freeze record's path."""
+    version = tomllib.loads(((root or ROOT) / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+    rc = (frozen_rcs(version, root) or ["RC1"])[-1]
+    return version, rc, (rc if version == "2.0.0" else f"{version}-{rc}"), freeze_rel(version, rc)
+
+
+#: 2.0.0: V2.0-RC1 (529591e) was REJECTED by the owner on 2026-10-05 (S6-SMOKE-1-PREFLIGHT-OPAQUE); RC2 was released
+VERSION, RC, TAG, OUT_REL = subject()
 SHIPPED = ("aisef", "aisef2", "pyproject.toml", "MANIFEST.in", "README.md")
 _SUM = re.compile(r"([0-9a-f]{64})\s+\*?(\S+)")
 
@@ -58,7 +91,7 @@ def sums(text: str) -> dict[str, str]:
     return {name: digest for digest, name in _SUM.findall(text)}
 
 
-def freeze(sha: str, sums_text: str, ci_run: str) -> dict:
+def freeze(sha: str, sums_text: str, ci_run: str, rel: str | None = None) -> dict:
     full = _git("rev-parse", "--verify", f"{sha}^{{commit}}").decode().strip()
     version = tomllib.loads(_git("show", f"{full}:pyproject.toml").decode())["project"]["version"]
     artifacts = sums(sums_text)
@@ -66,7 +99,8 @@ def freeze(sha: str, sums_text: str, ci_run: str) -> dict:
     problems = [] if version == VERSION else [f"the candidate's version is {version}, not {VERSION}"]
     if set(artifacts) != want:
         problems.append(f"SHA256SUMS names {sorted(artifacts)}, not exactly {sorted(want)}")
-    return {"record": f"AISEF V2.0 — RELEASE CANDIDATE {RC[2:]}, FROZEN (charter G2, S4)",
+    rc = (rel or OUT_REL).rsplit("-", 2)[-2]
+    return {"record": f"AISEF {version} — RELEASE CANDIDATE {rc[2:]}, FROZEN (charter G2, S4)",
             "rc": {"sha": full, "version": version, "source_date_epoch": int(_git("log", "-1", "--format=%ct", full).decode()),
                    "shipped_trees": {rel: _git("rev-parse", f"{full}:{rel}").decode().strip() for rel in SHIPPED}},
             "kernel": {"tree": _git("rev-parse", f"{full}:aisef2").decode().strip(), "digest": kernel_digest_at(full)},
@@ -117,14 +151,17 @@ def main(argv: list[str] | None = None) -> int:
         print("release candidate artifacts: " + ("PASS" if not problems else "FAIL " + "; ".join(problems)))
         return 1 if problems else 0
     if a.freeze:
-        if (ROOT / OUT_REL).exists():
-            print(f"{OUT_REL} exists: a frozen candidate is never rewritten", file=sys.stderr)
-            return 1
         if not (a.sums and a.ci_run):
             ap.error("--freeze needs --sums and --ci-run")
-        rec = freeze(a.freeze, a.sums.read_text(encoding="utf-8"), a.ci_run)
-        (ROOT / OUT_REL).write_text(json.dumps(rec, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-        print(f"{OUT_REL}: {rec['verdict']} {rec['problems']}")
+        frozen = frozen_rcs(VERSION)    # the next candidate of this version; a frozen one is never rewritten
+        rel = freeze_rel(VERSION, f"RC{int(frozen[-1][2:]) + 1}" if frozen else "RC1")
+        if (ROOT / rel).exists():
+            print(f"{rel} exists: a frozen candidate is never rewritten", file=sys.stderr)
+            return 1
+        rec = freeze(a.freeze, a.sums.read_text(encoding="utf-8"), a.ci_run, rel)
+        (ROOT / rel).parent.mkdir(parents=True, exist_ok=True)
+        (ROOT / rel).write_text(json.dumps(rec, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+        print(f"{rel}: {rec['verdict']} {rec['problems']}")
         return 0 if not rec["problems"] else 1
     problems = check(json.loads((ROOT / OUT_REL).read_text(encoding="utf-8")))
     print("release candidate: " + ("PASS" if not problems else "FAIL " + "; ".join(problems)))

@@ -19,7 +19,12 @@ import sys
 import tomllib
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-STATUS_REL = "closure-evidence/v2/release/V2-STABLE-STATUS.json"      # charter §22
+STATUS_REL = "closure-evidence/v2/release/V2-STABLE-STATUS.json"      # charter §22 (2.0.0's)
+
+
+def status_rel(version: str) -> str:
+    """The release's phase checkpoints: 2.0.0's file keeps its name; a later release has its own, never 2.0.0's."""
+    return STATUS_REL if version == "2.0.0" else f"closure-evidence/v2/release/V{version}-STATUS.json"
 DECISIONS_REL = "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"   # append-only owner rulings (charter G9)
 STABLE = re.compile(r"\d+\.\d+\.\d+")
 
@@ -47,10 +52,12 @@ def problems(version: str, pyproject_version: str, status: dict, decisions: dict
         out.append(f"{version!r} is not a stable X.Y.Z version (RC and dev versions never reach production PyPI)")
     if pyproject_version != version:
         out.append(f"pyproject version is {pyproject_version!r}, the tag says {version!r}")
+    srel = status_rel(version)
     if status.get("FINAL_RELEASE_READY") != "PASS":
-        out.append(f"{STATUS_REL}: FINAL_RELEASE_READY is {status.get('FINAL_RELEASE_READY')!r}, not 'PASS'")
-    if status.get("OPEN_V2_0_BLOCKERS") != []:
-        out.append(f"{STATUS_REL}: OPEN_V2_0_BLOCKERS is {status.get('OPEN_V2_0_BLOCKERS')!r}, not []")
+        out.append(f"{srel}: FINAL_RELEASE_READY is {status.get('FINAL_RELEASE_READY')!r}, not 'PASS'")
+    blockers = "OPEN_V2_0_BLOCKERS" if version == "2.0.0" else "OPEN_BLOCKERS"
+    if status.get(blockers) != []:
+        out.append(f"{srel}: {blockers} is {status.get(blockers)!r}, not []")
     rulings = [e for e in decisions.get("entries", []) if "PRODUCTION_PUBLISH" in (e.get("decision") or {})]
     last = max(rulings, key=lambda e: e.get("seq", 0), default=None)
     if last is None:
@@ -77,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
     sys.path.insert(0, str(ROOT))
     from validation.qualification import release_rc
     rc = load(release_rc.OUT_REL) or None
-    found = problems(argv[0], pyproject, load(STATUS_REL), load(DECISIONS_REL), rc, release_rc.check(rc) if rc else [])
+    found = problems(argv[0], pyproject, load(status_rel(argv[0])), load(DECISIONS_REL), rc, release_rc.check(rc) if rc else [])
     for p in found:
         print(f"FAIL  {p}")
     print(f"V2 release gate for {argv[0]}: " + ("FAIL — production publication is not authorized" if found else "PASS"))
