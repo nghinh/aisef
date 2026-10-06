@@ -155,20 +155,43 @@ class V21Lineage(unittest.TestCase):
             mutate(bad["rfc"])
             self.assertTrue(any(p.startswith(reason) for p in subject_problems(bad)), name)
 
+    def _assert_wired(self, subject_problems, identity):
+        """identity() itself feeds subject_problems what freeze_manifest says: a history problem, a lineage that stops
+        at V2-006 and a broken link each reach the rung (an identity() reporting a constant would pass the clean tree only)."""
+        import freeze_manifest as fm
+        eff, links, broken = fm.lineage(C.ROOT)
+
+        def reasons(**patches):
+            with mock.patch.multiple(fm, **patches):
+                ident = identity()
+            return ident["rfc"], subject_problems(ident)
+        clean = subject_problems(identity())
+        self.assertFalse([p for p in clean if p == LINEAGE_FAILS or p.startswith(HISTORY_FAILS)], clean)
+        self.assertIn(f"{HISTORY_FAILS}: ['x']", reasons(history_problems=mock.Mock(return_value=["x"]))[1])
+        rfc, out = reasons(lineage=mock.Mock(return_value=(eff, links[:-1], broken)))
+        self.assertIn(LINEAGE_FAILS, out)
+        self.assertEqual((rfc["lineage_end"], rfc["lineage"][-1]), (V2_006, V2_006))
+        self.assertIn(LINEAGE_FAILS, reasons(lineage=mock.Mock(return_value=(eff, links, ["a broken link"])))[1])
+
     def test_common_subject_problems(self):
         with frozen(freeze_record(C.git("rev-parse", "HEAD"))):
             ident = C.identity()
+            self._assert_wired(C.subject_problems, C.identity)
         self._assert_kills(C.subject_problems, ident)
 
     def test_q5_subject_problems(self):
         from validation.qualification import q5
         import freeze_manifest as fm
         _, links, broken = fm.lineage(C.ROOT)
+        with tempfile.TemporaryDirectory() as t:   # an output directory with no corpus: q5.identity() only reads it
+            rfc = q5.identity(pathlib.Path(t))["rfc"]
+            self._assert_wired(q5.subject_problems, lambda: q5.identity(pathlib.Path(t)))
+        self.assertEqual((rfc["lineage_end"], rfc["broken_links"], rfc["lineage"], rfc["v2_0_manifest_history_problems"]),
+                         (pathlib.Path(links[-1]["record"]).name, broken, [pathlib.Path(x["record"]).name for x in links],
+                          fm.history_problems(C.ROOT)))
+        # the rung's non-RFC conditions pinned so the clean verdict is []; the rfc block is q5.identity()'s own
         ident = {"kernel_tree_is_the_candidates": True, "working_tree_clean": True, "dirty": [], "probe": {"corrected": True},
-                 "corpus": {"items": {"x": {}}},
-                 "rfc": {"lineage_end": pathlib.Path(links[-1]["record"]).name, "broken_links": broken,
-                         "lineage": [pathlib.Path(x["record"]).name for x in links],
-                         "v2_0_manifest_history_problems": fm.history_problems(C.ROOT)}}
+                 "corpus": {"items": {"x": {}}}, "rfc": rfc}
         self.assertEqual(q5.subject_problems(ident), [])
         self._assert_kills(q5.subject_problems, ident)
 
