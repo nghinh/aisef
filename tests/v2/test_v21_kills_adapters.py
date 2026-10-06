@@ -1,0 +1,54 @@
+"""V2.1 (owner B-03b): kill tests for the survivors of aisef2/app/adapters.py's V2.1 mutation targets, each class named
+by the target and the mutants it kills. In the kill set of exactly the targets it kills (validation/v2/mutation.py)."""
+
+from __future__ import annotations
+
+import pathlib
+import sys
+import tempfile
+import types
+import unittest
+from unittest import mock
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from aisef2.app import adapters as ad  # noqa: E402
+from aisef2.app import bundle, client  # noqa: E402
+from aisef2.arch.enums import ControlProjection  # noqa: E402
+from tests.v2 import test_app_run as e2e  # noqa: E402
+
+
+class ReviewerModel(unittest.TestCase):
+    """Reviewer._model — "L137 string 'reviewer ' emptied", "L138 string '.reviewer.' emptied", "L139 string 'reviewer'
+    emptied": the model review's session is the reviewer's by the title the client is run with (`--title`), by the name
+    of its evidence log (the run's sessions/ directory) and by the role its session record carries into RUN.json."""
+
+    def setUp(self) -> None:
+        t = tempfile.TemporaryDirectory()
+        self.addCleanup(t.cleanup)
+        self.tmp = pathlib.Path(t.name).resolve()
+        e2e.make_repo(self.tmp / "repo")
+        self.project = bundle.load(e2e.project_bundle("a" * 40))
+        self.run = types.SimpleNamespace(events=[], state=lambda proj: {"S1": {"attempt": 2}}
+                                         if proj is ControlProjection.STORY_STATE else None)
+
+    def test_the_review_session_is_titled_logged_and_recorded_as_the_reviewer_s(self):
+        calls = []
+
+        def fake(name, prompt, cwd, log, timeout_s, **kw):
+            calls.append((name, log.name))
+            return {"exit": 0, "timed_out": False, "stopped": None, "started": True, "error": None,
+                    "text": '{"findings": []}', "turns": 1, "tokens": {"input": 1, "output": 1}, "seconds": 0.0, "log": log.name}
+        rev = ad.Reviewer(self.run, self.project, self.tmp / "logs", {}, 5)
+        with mock.patch.object(client, "session", fake):
+            found, s, _ = rev._model(types.SimpleNamespace(story_id="S1", root=str(self.tmp / "repo")), 3)
+        self.assertEqual(found, [])
+        self.assertEqual(calls, [("reviewer S1", "S1.reviewer.3.jsonl")])
+        self.assertEqual((s["role"], s["story_id"], s["attempt"], s["log"]), ("reviewer", "S1", 3, "S1.reviewer.3.jsonl"))
+        self.assertEqual(rev.sessions, [s])
+
+
+if __name__ == "__main__":
+    unittest.main()
