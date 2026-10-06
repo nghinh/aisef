@@ -7,6 +7,7 @@ the product proof identical (R2); parent-side developer artefacts that explode n
 immutable reference selects evidence, whatever the timestamps say (R4); retry state is the journal and nothing beside
 it (R5); every control decision rests on journal facts that precede it (R6)."""
 
+import hashlib
 import importlib.util
 import importlib
 import json
@@ -195,20 +196,33 @@ class ReleaseInventory(unittest.TestCase):
         self.assertTrue(problems[0].startswith("the release inventory is not the content-addressed one"), problems)
 
     def test_the_2_0_release_inventory_is_history_byte_identical_to_its_pin_and_to_v2_0_0(self):
+        # no git here (this file is a P6 kill file; a mutation run's copy has no git objects): the blob at v2.0.0 is
+        # pinned (RELEASE_2_0_BLOB) and tests/v2/test_v21_authority_limits.py asserts the pin against the tag
         self.assertEqual((ri.RELEASE_2_0_REL, ri.INVENTORY_REL), (RELEASE_2_0_REL, RELEASE_INVENTORY_REL))
         self.assertEqual(ri.RELEASE_2_0_SHA256, "6dba7d62cae22d505033d09ca26fcb8ad4e79df49491a9aa519a6f75de51015c")
+        self.assertEqual(ri.RELEASE_2_0_BLOB, "97f680948a3c2d1553100130b299905f6dc5d942")
         self.assertEqual(ri.digest(ROOT / RELEASE_2_0_REL), ri.RELEASE_2_0_SHA256)
         self.assertEqual(ri.history_problems(), [])
-        with tempfile.TemporaryDirectory() as t:     # one byte changed: refused
+        changed = (ROOT / RELEASE_2_0_REL).read_bytes().replace(b"\r\n", b"\n").replace(b"judge_only", b"judge_onlx", 1)
+        sha, blob = hashlib.sha256(changed).hexdigest(), hashlib.sha1(b"blob %d\0" % len(changed) + changed).hexdigest()
+        changed_sha = (f"the 2.0 release inventory is history and was changed: {RELEASE_2_0_REL} has sha256 {sha}, "
+                       f"release_inventory.RELEASE_2_0_SHA256 pins {ri.RELEASE_2_0_SHA256}")
+        with tempfile.TemporaryDirectory() as t:     # one byte changed: refused by both pins
             d = pathlib.Path(t)
             (d / RELEASE_2_0_REL).parent.mkdir(parents=True)
-            (d / RELEASE_2_0_REL).write_bytes((ROOT / RELEASE_2_0_REL).read_bytes().replace(b"judge_only", b"judge_onlx", 1))
-            problems = ri.history_problems(d)
-            self.assertTrue(problems and problems[0].startswith("the 2.0 release inventory is history and was changed"), problems)
+            (d / RELEASE_2_0_REL).write_bytes(changed)
+            self.assertEqual(ri.history_problems(d), [changed_sha, f"{RELEASE_2_0_REL} is not its blob at v2.0.0 (ca2631374602): "
+                                                      f"git blob {blob}, release_inventory.RELEASE_2_0_BLOB pins {ri.RELEASE_2_0_BLOB}"])
             self.assertEqual(ri.history_problems(d / "none"), [f"{RELEASE_2_0_REL} (the 2.0 release inventory, history) is missing"])
-        with mock.patch.object(ri, "TAG_2_0", "0" * 40):    # the other half: the blob at the tagged commit
-            self.assertEqual(ri.history_problems(), [f"{RELEASE_2_0_REL} at v2.0.0 (000000000000) is not the pinned 2.0 "
-                                                     "inventory (git exit 128)"])
+        # each half alone: the released bytes against a pin that is not theirs
+        with mock.patch.object(ri, "RELEASE_2_0_BLOB", "0" * 40):
+            self.assertEqual(ri.history_problems(), [f"{RELEASE_2_0_REL} is not its blob at v2.0.0 (ca2631374602): git blob "
+                                                     f"97f680948a3c2d1553100130b299905f6dc5d942, release_inventory.RELEASE_2_0_BLOB "
+                                                     f"pins {'0' * 40}"])
+        with mock.patch.object(ri, "RELEASE_2_0_SHA256", "0" * 64):
+            self.assertEqual(ri.history_problems(), [f"the 2.0 release inventory is history and was changed: {RELEASE_2_0_REL} "
+                                                     "has sha256 6dba7d62cae22d505033d09ca26fcb8ad4e79df49491a9aa519a6f75de51015c, "
+                                                     f"release_inventory.RELEASE_2_0_SHA256 pins {'0' * 64}"])
 
     def test_the_sealed_p6_inventory_is_byte_identical_to_its_seal(self):
         seal = json.loads((ROOT / "closure-evidence/v2/P6-FINAL-SEAL.json").read_text(encoding="utf-8"))

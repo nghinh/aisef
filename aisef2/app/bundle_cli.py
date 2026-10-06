@@ -534,7 +534,7 @@ def main(argv: list[str] | None = None) -> int:
         if a.out.exists():      # refused before any work; the exclusive create below is what guarantees it
             raise MigrationError(f"{a.out} exists: migrate writes a new file and never overwrites one")
         out, report = migrate(_read(a.bundle))
-        _write_new(a.out, out)
+        _create(a.out, json.dumps(out, indent=1, sort_keys=True) + "\n")     # 2.0's bytes (non-ASCII escaped)
     except B.BundleError as e:
         print(f"refused: {e}", file=sys.stderr)
         return 2

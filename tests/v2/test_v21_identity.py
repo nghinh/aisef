@@ -154,7 +154,9 @@ class Migrate(unittest.TestCase):
         self.assertIn("aisef bundle migrate", str(c.exception))
 
     def test_migration_rebinds_the_plan_and_nothing_else(self):
-        out, report = bundle_cli.migrate(self.doc)
+        data = json.loads(json.dumps(self.doc))     # B-03c: a copy, so an in-place edit of the input shows below
+        out, report = bundle_cli.migrate(data)
+        self.assertEqual(data, self.doc)             # the input is read, never written
         self.assertEqual((report["specs_rebound"], report["obligations"]), (59, 67))
         self.assertEqual({v["from_release"] for v in report["mapping"].values()}, {"2.0.0"})
         for k in ("requirements", "contracts", "approvals", "facts", "stories", "requirements_document", "name"):
@@ -189,6 +191,19 @@ class Migrate(unittest.TestCase):
                 self.assertEqual(bundle_cli.main(["migrate", str(pathlib.Path(t) / "none.json"), "--out",
                                                   str(pathlib.Path(t) / "x.json")]), 2)
             self.assertIn("never overwrites", err.getvalue())
+
+    def test_the_written_file_keeps_the_2_0_bytes_non_ascii_escaped(self):
+        # B-03c: the exclusive create changed how migrate creates its file, not its bytes: json.dumps(indent=1,
+        # sort_keys=True) with the default ensure_ascii, as 2.0.0 wrote it (the 2.0.0 LedgerLock bundle holds non-ASCII)
+        self.assertFalse(LEDGERLOCK_2_0_0.read_bytes().isascii())
+        with tempfile.TemporaryDirectory() as t:
+            out = pathlib.Path(t) / "migrated.json"
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(bundle_cli.main(["migrate", str(LEDGERLOCK_2_0_0), "--out", str(out)]), 0)
+            self.assertEqual(out.read_text(encoding="utf-8"),
+                             json.dumps(bundle_cli.migrate(self.doc)[0], indent=1, sort_keys=True) + "\n")
+            self.assertTrue(out.read_bytes().isascii())
+            self.assertIn(b"\\u", out.read_bytes())
 
     def test_the_write_is_exclusive_so_a_file_that_appears_after_the_check_is_never_replaced(self):
         # B-03c: the exists() check only refuses early; the create itself is exclusive (O_EXCL), so a file created

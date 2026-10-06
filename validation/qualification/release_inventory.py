@@ -5,8 +5,9 @@ beside the release records instead of over the sealed P6 one or the released 2.0
     python -P validation/qualification/release_inventory.py --check   # both directions + the six static proofs + the 2.0 history
 
 closure-evidence/v2/P6-AUTHORITY-INVENTORY.json stays as sealed: it is the P6 tree's inventory. The 2.0 release's
-(RELEASE_2_0_REL) stays as released: history, byte-identical to its pin and to its blob at tag v2.0.0. Each release
-adds authorities (2.0 the product runtime, aisef2/app; 2.1 bundle_cli.migrate and review_verify.verify, whose limits
+(RELEASE_2_0_REL) stays as released: history, byte-identical to its pin and to its blob at tag v2.0.0 (pinned as
+well, so a tree without git objects, such as a mutation run's copy, checks the same history). Each release adds
+authorities (2.0 the product runtime, aisef2/app; 2.1 bundle_cli.migrate and review_verify.verify, whose limits
 validation/qualification/authority_limits.py enforces), so its tree is audited against its own inventory, by the same
 audit: `old_path_audit.compare` (reality vs the committed rows, both directions) and `old_path_audit.proofs`.
 
@@ -22,7 +23,6 @@ import hashlib
 import importlib.util
 import json
 import pathlib
-import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -33,6 +33,9 @@ INVENTORY_SHA256 = "9eaf87693c079b64fb7282a4459977d58ca120fb3569fa58a658fac3ff6e
 RELEASE_2_0_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"
 RELEASE_2_0_SHA256 = "6dba7d62cae22d505033d09ca26fcb8ad4e79df49491a9aa519a6f75de51015c"
 TAG_2_0 = "ca2631374602da45dae75b7f6907ff4729d0b2f7"     # tag v2.0.0, by its commit (a tag can be moved)
+#: its git blob at TAG_2_0 (`git rev-parse v2.0.0:<RELEASE_2_0_REL>`, asserted against the tag by
+#: tests/v2/test_v21_authority_limits.py, outside every mutation kill set): history_problems needs no git
+RELEASE_2_0_BLOB = "97f680948a3c2d1553100130b299905f6dc5d942"
 
 
 def digest(path: pathlib.Path) -> str:
@@ -65,18 +68,19 @@ def check(root: pathlib.Path = ROOT) -> list[str]:
 
 
 def history_problems(root: pathlib.Path = ROOT) -> list[str]:
-    """The 2.0 release inventory is history: its bytes (LF-normalised) are RELEASE_2_0_SHA256 and its blob at v2.0.0."""
+    """The 2.0 release inventory is history: its bytes (LF-normalised) are RELEASE_2_0_SHA256 and RELEASE_2_0_BLOB,
+    its blob at v2.0.0."""
     path = root / RELEASE_2_0_REL
     if not path.exists():
         return [f"{RELEASE_2_0_REL} (the 2.0 release inventory, history) is missing"]
+    data = path.read_bytes().replace(b"\r\n", b"\n")
     problems = []
-    if (got := digest(path)) != RELEASE_2_0_SHA256:
+    if (got := hashlib.sha256(data).hexdigest()) != RELEASE_2_0_SHA256:
         problems.append(f"the 2.0 release inventory is history and was changed: {RELEASE_2_0_REL} has sha256 {got}, "
                         f"release_inventory.RELEASE_2_0_SHA256 pins {RELEASE_2_0_SHA256}")
-    tagged = subprocess.run(["git", "cat-file", "blob", f"{TAG_2_0}:{RELEASE_2_0_REL}"], cwd=root, capture_output=True)
-    if tagged.returncode != 0 or hashlib.sha256(tagged.stdout.replace(b"\r\n", b"\n")).hexdigest() != RELEASE_2_0_SHA256:
-        problems.append(f"{RELEASE_2_0_REL} at v2.0.0 ({TAG_2_0[:12]}) is not the pinned 2.0 inventory "
-                        f"(git exit {tagged.returncode})")
+    if (blob := hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()) != RELEASE_2_0_BLOB:
+        problems.append(f"{RELEASE_2_0_REL} is not its blob at v2.0.0 ({TAG_2_0[:12]}): git blob {blob}, "
+                        f"release_inventory.RELEASE_2_0_BLOB pins {RELEASE_2_0_BLOB}")
     return problems
 
 
