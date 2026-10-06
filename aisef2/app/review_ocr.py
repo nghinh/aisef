@@ -11,21 +11,29 @@ What this module decides, and what it leaves to OCR:
   excluded or missing in the preview, and no `code_comment` call failed (a finding may have been dropped). Anything else is
   INDETERMINATE, with every reason — exit 0 is not a full review, and `files_reviewed` is never read as coverage.
 * **Findings are claims.** Each OCR comment becomes a finding with a stable id (OCR's own SARIF fingerprint: path, category,
-  trimmed existing code or the start line, with an occurrence index after a deterministic sort). OCR states no
-  observable behaviour, so a finding is UNVERIFIABLE by app/review_verify and goes to triage: it never blocks.
+  trimmed existing code or the start line, with an occurrence index after a deterministic sort; a comment repeated
+  word for word — OCR reviews a group once per round — is one finding). A comment states an observable behaviour only
+  through a reproducer block the controller's background asks for (`REPRODUCER_FENCE`): with one, app/review_verify
+  verifies and anchors it like any finding; without one it is UNVERIFIABLE and goes to triage — it never blocks.
+* **What a finder may skip.** A required path the preview excludes as `unsupported_ext` or `binary` is one this finder
+  cannot read (named in the coverage, not counted against it); any other exclusion of a required path — too large, a
+  default or user exclusion, a secret, a provider directory — is a gap: INDETERMINATE.
 * **The process is AISEF's.** The argv and environment are built here: an isolated HOME holding only a config this module
   writes, every OCR_/ANTHROPIC_/OTEL_ variable scrubbed, OCR_NO_UPDATE=1, a fresh --output file read instead of stdout,
   the binary by absolute path with its sha256 checked against the operator's pin before it runs.
 
-Code facts cite the upstream source at 182898c (research record: docs/v2.1/UPSTREAM-RESEARCH.md). Not yet exercised
-against the real binary (none installed, no approved provider budget): the fixtures are built from OCR's own structs.
-The rule file's shape (`include`) is INFERENCE from system_rules.go until a real run confirms it."""
+Code facts cite the upstream source at 182898c (research record: docs/v2.1/UPSTREAM-RESEARCH.md). Exercised against the
+real binary built from that commit (tests/v2/test_v21_review_chain.py RealBinary: `--preview`, and a full review whose
+model is a scripted OpenAI-compatible server on loopback); never against a real model. The endpoint reaches OCR only
+through its environment strategy (OCR_LLM_URL/TOKEN/MODEL/PROTOCOL, internal/llm/resolver.go): no `--provider`, so no
+configuration file is read, and HOME is a directory of the controller's own."""
 
 from __future__ import annotations
 
 import hashlib
 import json
 import pathlib
+import re
 from dataclasses import dataclass, field
 from typing import Iterable, Mapping
 
@@ -35,8 +43,11 @@ MANIFEST_SCHEMA = "ocr.run-manifest/v1"
 TERMINAL = ("complete", "partial", "failed", "skipped")
 #: warnings after which a complete manifest is still not a full review (llmloop/pool.go, output.go)
 NOT_FULL = ("review_round_failed", "token_threshold_exceeded", "token_budget_reached")
-SCRUB_PREFIXES = ("OCR_", "ANTHROPIC_", "OTEL_")
+SCRUB_PREFIXES = ("OCR_", "ANTHROPIC_", "OTEL_", "XDG_")
 COMPLETE, INDETERMINATE = "COMPLETE", "INDETERMINATE"
+#: preview exclusions that mean "this finder cannot read the file" rather than "it chose not to"
+NOT_REVIEWABLE = ("unsupported_ext", "binary")
+REPRODUCER_FENCE = re.compile(r"```aisef-reproducer\s*\n(\{.*?\})\s*\n```", re.S)
 
 
 def item_id(mode: str, old_path: str, new_path: str) -> str:
@@ -59,6 +70,8 @@ class Coverage:
     reasons: tuple[str, ...]
     terminal_state: str | None
     failed: tuple[dict, ...] = field(default_factory=tuple)
+    not_reviewable: tuple[str, ...] = ()
+    failure: str | None = None      # the manifest's run_failure.classification, when it names one
 
 
 def coverage(output: Mapping | None, exit_code: int, *, required: Iterable[str], base: str, head: str,
@@ -85,6 +98,13 @@ def coverage(output: Mapping | None, exit_code: int, *, required: Iterable[str],
     if version != OCR["version"]:
         reasons.append(f"OCR {version!r}, not the pinned {OCR['version']}")
     cov = m.get("coverage") or {}
+    failure = (m.get("run_failure") or {}).get("classification")
+    if failure:
+        reasons.append(f"run failure: {failure} ({str((m.get('run_failure') or {}).get('reason'))[:120]})")
+    files = {f.get("path"): f for f in (preview or {}).get("files") or []}
+    unreadable = tuple(p for p in required if p in files and not files[p].get("will_review")
+                       and files[p].get("exclude_reason") in NOT_REVIEWABLE)
+    required = [p for p in required if p not in unreadable]
     mode = inp.get("mode", "")
     done: dict[str, str] = {}
     for item in [*(cov.get("completed") or []), *(cov.get("reused") or [])]:
@@ -97,7 +117,6 @@ def coverage(output: Mapping | None, exit_code: int, *, required: Iterable[str],
     if missing:
         reasons.append(f"required paths not completed: {missing[:10]}")
     if preview is not None:
-        files = {f.get("path"): f for f in preview.get("files") or []}
         excluded = [f"{p} ({files[p].get('exclude_reason')})" for p in required if p in files and not files[p].get("will_review")]
         absent = [p for p in required if p not in files]
         if excluded:
@@ -110,7 +129,8 @@ def coverage(output: Mapping | None, exit_code: int, *, required: Iterable[str],
     for w in output.get("warnings") or []:
         if w.get("type") == "manifest_error" or w.get("type") in NOT_FULL:
             reasons.append(f"warning {w.get('type')}: {str(w.get('message'))[:120]}")
-    return Coverage(COMPLETE if not reasons else INDETERMINATE, tuple(reasons), state, tuple(cov.get("failed") or ()))
+    return Coverage(COMPLETE if not reasons else INDETERMINATE, tuple(reasons), state, tuple(cov.get("failed") or ()),
+                    unreadable, failure)
 
 
 def findings(output: Mapping | None, required: Iterable[str]) -> list[dict]:
@@ -119,32 +139,57 @@ def findings(output: Mapping | None, required: Iterable[str]) -> list[dict]:
     comments = [c for c in ((output or {}).get("comments") or []) if isinstance(c, Mapping)]
     comments.sort(key=lambda c: (str(c.get("path")), int(c.get("start_line") or 0), str(c.get("category")),
                                  str(c.get("content"))))
-    required, seen, out = set(required), {}, []
+    required, seen, said, out = set(required), {}, set(), []
     for c in comments:
         fid = finding_id(c)
+        content = str(c.get("content", ""))
+        if (fid, content) in said:      # the same comment again (another round over the same group)
+            continue
+        said.add((fid, content))
         n = seen[fid] = seen.get(fid, -1) + 1
+        rep, text = reproducer_of(content)
         out.append({"id": f"ocr-{fid[:12]}-{n}", "blocking": False, "severity": c.get("severity") or "low",
-                    "category": c.get("category") or "other", "summary": str(c.get("content", ""))[:400],
+                    "category": c.get("category") or "other", "summary": text[:400],
                     "path": c.get("path"), "start_line": c.get("start_line") or 0,
-                    "in_scope": c.get("path") in required, "source": f"ocr {OCR['version']}"})
+                    "in_scope": c.get("path") in required, "source": f"ocr {OCR['version']}",
+                    **({"reproducer": rep} if rep is not None else {})})
     return out
 
 
-def environment(base: Mapping[str, str], home: pathlib.Path) -> dict[str, str]:
-    """The process environment: the operator's minus every OCR, Anthropic and OpenTelemetry variable, an isolated home,
-    no self-update (bin/ocr.js) and no telemetry (telemetry/config.go)."""
+def reproducer_of(content: str) -> tuple[object, str]:
+    """(the reproducer a comment carries, the comment without it): the first fenced aisef-reproducer block holding one
+    JSON value, or None — a block that does not parse is kept as text and carries nothing."""
+    m = REPRODUCER_FENCE.search(content)
+    if m is None:
+        return None, content
+    try:
+        rep = json.loads(m.group(1))
+    except ValueError:
+        return None, content
+    return rep, (content[:m.start()] + content[m.end():]).strip()
+
+
+def environment(base: Mapping[str, str], home: pathlib.Path, endpoint: Mapping[str, str] | None = None) -> dict[str, str]:
+    """The process environment: the operator's minus every OCR, Anthropic, OpenTelemetry and XDG variable, an isolated
+    home, no self-update (bin/ocr.js) and no telemetry (telemetry/config.go); with `endpoint` ({url, token, model}) the
+    one route OCR's environment strategy resolves (resolver.go tryOCREnv: OpenAI chat completions)."""
     env = {k: v for k, v in base.items() if not k.startswith(SCRUB_PREFIXES)}
-    return env | {"HOME": str(home), "USERPROFILE": str(home), "OCR_NO_UPDATE": "1"}
+    env |= {"HOME": str(home), "USERPROFILE": str(home), "OCR_NO_UPDATE": "1"}
+    if endpoint:
+        env |= {"OCR_LLM_URL": endpoint["url"], "OCR_LLM_TOKEN": endpoint["token"], "OCR_LLM_MODEL": endpoint["model"],
+                "OCR_LLM_PROTOCOL": "openai"}
+    return env
 
 
-def argv(exe: str, *, repo: str, base: str, head: str, rule: str, output: str, provider: str, model: str,
+def argv(exe: str, *, repo: str, base: str, head: str, rule: str, output: str, model: str,
          max_tokens: int, budget_tokens: int, timeout_min: int, background_file: str, preview: bool = False) -> list[str]:
-    """`ocr review` on exactly base..head (full SHAs), the controller's rule and background, one fresh output file."""
+    """`ocr review` on exactly base..head (full SHAs), the controller's rule and background, one fresh output file. No
+    `--provider`: with one, OCR would read a configuration file instead of the environment's route."""
     out = [exe, "review", "--repo", repo, "--from", base, "--to", head, "--rule", rule, "--format", "json",
            "--output", output]
     if preview:
         return out + ["--preview"]
-    return out + ["--audience", "agent", "--provider", provider, "--model", model, "--effort", "high",
+    return out + ["--audience", "agent", "--model", model, "--effort", "high",
                   "--max-tokens", str(max_tokens), "--max-tokens-budget", str(budget_tokens), "--concurrency", "1",
                   "--timeout", str(timeout_min), "--no-filter", "--background-file", background_file]
 

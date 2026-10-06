@@ -94,7 +94,7 @@ class Findings(unittest.TestCase):
         for f in O.findings(A, REQUIRED) + O.findings(B, ["pkg/store/db.go"]):
             self.assertFalse(f["blocking"])
             v = review_verify.Verification(review_verify.UNVERIFIABLE, "no reproducer")
-            self.assertFalse(review_verify.blocks(v, f, "fix-loop", "low"))
+            self.assertFalse(review_verify.blocks(v, f, "fix-loop", "low", None))
         self.assertEqual([f["in_scope"] for f in O.findings(A, ["src/app/api.py"])], [False])   # out of AISEF's scope
 
 
@@ -104,18 +104,23 @@ class Process(unittest.TestCase):
                 "OCR_ENABLE_TELEMETRY": "1", "HOME": "/Users/me"}
         env = O.environment(base, pathlib.Path("/iso"))
         self.assertEqual(env, {"PATH": "/bin", "HOME": "/iso", "USERPROFILE": "/iso", "OCR_NO_UPDATE": "1"})
+        routed = O.environment({**base, "XDG_CONFIG_HOME": "/Users/me/.config"}, pathlib.Path("/iso"),
+                               {"url": "https://p.example/v1", "token": "k", "model": "m"})
+        self.assertEqual(routed, env | {"OCR_LLM_URL": "https://p.example/v1", "OCR_LLM_TOKEN": "k", "OCR_LLM_MODEL": "m",
+                                        "OCR_LLM_PROTOCOL": "openai"})    # the operator's token and XDG never pass
         self.assertEqual(O.scrubbed_names(base), ["ANTHROPIC_AUTH_TOKEN", "OCR_ENABLE_TELEMETRY", "OCR_LLM_TOKEN",
                                                   "OTEL_EXPORTER_OTLP_ENDPOINT"])
 
     def test_the_command_reviews_exactly_the_frozen_range_into_a_fresh_file(self):
         a = O.argv("/opt/ocr", repo="/r", base=BASE, head=HEAD, rule="/c/rule.json", output="/c/out.json",
-                   provider="p", model="m", max_tokens=8000, budget_tokens=200000, timeout_min=20,
+                   model="m", max_tokens=8000, budget_tokens=200000, timeout_min=20,
                    background_file="/c/bg.txt")
         self.assertEqual(a[:12], ["/opt/ocr", "review", "--repo", "/r", "--from", BASE, "--to", HEAD, "--rule",
                                   "/c/rule.json", "--format", "json"])
         self.assertIn("--no-filter", a)
         self.assertEqual(a[a.index("--output") + 1], "/c/out.json")
-        self.assertEqual(O.argv("/opt/ocr", repo="/r", base=BASE, head=HEAD, rule="r", output="o", provider="p",
+        self.assertNotIn("--provider", a)       # with one, OCR reads a configuration file, not the route given
+        self.assertEqual(O.argv("/opt/ocr", repo="/r", base=BASE, head=HEAD, rule="r", output="o",
                                 model="m", max_tokens=1, budget_tokens=1, timeout_min=1, background_file="b",
                                 preview=True)[-1], "--preview")
 
