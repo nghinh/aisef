@@ -1,0 +1,281 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://aisef.io/schemas/aisef-v2-authoring-1.json",
+ "title": "AISEF project bundle — authoring document (aisef-v2-authoring/1)",
+ "description": "What a person writes. `aisef bundle seal` derives every hash, spec id and the plan from it with the kernel's constructors; it never approves (`aisef bundle approve`, one contract at a time, human:<name>). This schema documents the shape; the tool decides (closed key sets, the kernel's own refusals).",
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "format",
+  "name",
+  "description",
+  "requirements_document",
+  "product_roots",
+  "baseline",
+  "requirements",
+  "contracts",
+  "stories"
+ ],
+ "properties": {
+  "format": {
+   "const": "aisef-v2-authoring/1"
+  },
+  "name": {
+   "type": "string",
+   "minLength": 1,
+   "description": "the plan id is PLAN-<name>"
+  },
+  "description": {
+   "type": "string"
+  },
+  "requirements_document": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "path"
+   ],
+   "properties": {
+    "path": {
+     "type": "string",
+     "description": "relative to the repository root"
+    },
+    "sha256": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$",
+     "description": "only without --repo; with it, read at the baseline"
+    }
+   }
+  },
+  "product_roots": {
+   "type": "array",
+   "items": {
+    "type": "string",
+    "minLength": 1
+   },
+   "minItems": 1,
+   "description": "top-level names of the project's own source tree"
+  },
+  "baseline": {
+   "type": "string",
+   "pattern": "^(HEAD|[0-9a-f]{40})$",
+   "description": "HEAD: resolved in --repo"
+  },
+  "requirements": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/requirement"
+   }
+  },
+  "contracts": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/contract"
+   }
+  },
+  "stories": {
+   "type": "object",
+   "minProperties": 1,
+   "additionalProperties": {
+    "$ref": "#/$defs/story"
+   }
+  }
+ },
+ "$defs": {
+  "requirement": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "text",
+    "source"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "text": {
+     "type": "string"
+    },
+    "source": {
+     "type": "string"
+    }
+   }
+  },
+  "contract": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "requirement_ids",
+    "subject",
+    "stimulus",
+    "observable",
+    "polarity",
+    "subject_absence",
+    "rationale"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "requirement_ids": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "minLength": 1
+     },
+     "minItems": 1
+    },
+    "subject": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "kind",
+      "locator"
+     ],
+     "properties": {
+      "kind": {
+       "enum": [
+        "python_callable",
+        "file_artifact",
+        "cli_invocation",
+        "process_effect"
+       ]
+      },
+      "locator": {
+       "type": "string",
+       "description": "python_callable: module:function; file_artifact: path:<relative path>; see each probe's module docstring"
+      }
+     }
+    },
+    "stimulus": {
+     "type": "object",
+     "description": "the probe class's grammar (aisef2/probe/<kind>.py)"
+    },
+    "observable": {
+     "type": "object",
+     "required": [
+      "within_s"
+     ],
+     "description": "the probe class's grammar; every observable declares its window within_s"
+    },
+    "polarity": {
+     "enum": [
+      "MUST_HOLD",
+      "MUST_NOT_HOLD"
+     ]
+    },
+    "subject_absence": {
+     "enum": [
+      "REQUIRES_SUBJECT",
+      "ABSENCE_IS_DECIDABLE"
+     ]
+    },
+    "rationale": {
+     "type": "string"
+    }
+   }
+  },
+  "story": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "depends_on",
+    "tests",
+    "criteria"
+   ],
+   "properties": {
+    "depends_on": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "minLength": 1
+     }
+    },
+    "tests": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "minLength": 1
+     },
+     "description": "the story's own tests, repo-relative"
+    },
+    "criteria": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "$ref": "#/$defs/criterion"
+     }
+    }
+   }
+  },
+  "criterion": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "contract",
+    "role",
+    "depends_on",
+    "why",
+    "facts"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "contract": {
+     "type": "string",
+     "description": "a contract id of this document"
+    },
+    "role": {
+     "enum": [
+      "INTRODUCE",
+      "PRESERVE",
+      "VERIFY"
+     ]
+    },
+    "depends_on": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "minLength": 1
+     },
+     "description": "criterion ids"
+    },
+    "why": {
+     "type": "string"
+    },
+    "facts": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "requirement",
+      "section",
+      "clause",
+      "clause_text",
+      "subject"
+     ],
+     "description": "public: what the developer may be told; never a stimulus or an expectation",
+     "properties": {
+      "requirement": {
+       "type": "string"
+      },
+      "section": {
+       "type": "string"
+      },
+      "clause": {
+       "type": "string"
+      },
+      "clause_text": {
+       "type": "string"
+      },
+      "subject": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -50,6 +50,8 @@ include = ["aisef", "aisef.*", "aisef2", "aisef2.*"]
 # Prompt, luật, skill và script trình duyệt là *dữ liệu chạy*, không phải tài
 # liệu: thiếu chúng thì `aisef run` chết ở lần gọi agent đầu tiên.
 "aisef" = ["kit/prompts/*", "kit/rules/*", "kit/skills/**/*", "kit/*.json", "harness/assets/*"]
+# V2.1: `aisef bundle init --example` writes these: the authoring document and its repository's files, as JSON
+"aisef2" = ["app/examples/*.json"]
 
 [tool.ruff]
 target-version = "py311"        # bản thấp nhất khai hỗ trợ, không phải bản của máy đo

@@ -1,8 +1,21 @@
 """`aisef bundle`: the project bundle's own tools — outside a run, no provider, no repository written.
 
+    aisef bundle init [--example NAME] --out DIR            an example to start from: DIR/authoring.json, DIR/repo/
+    aisef bundle seal AUTHORING.json --repo REPO --out B    every hash and spec id computed: the bundle, unapproved
+                     [--keep-approvals-from OLD]            (an earlier bundle's approvals that still bind are kept)
+    aisef bundle approve B --contract ID --approver human:NAME --out B2    one contract approved, by its human
+    aisef bundle lint B                                     approvals, admission (RFC §12), calibration, clause coverage
+    aisef bundle explain B                                  per story: each criterion, its contract, probe and class
     aisef bundle migrate IN --out OUT     a bundle of an earlier release, its plan re-bound to this release's spec ids
 
-V2.1 (ARCHITECTURE-EXCEPTION-V2-007): a ProductProofSpec binds its probe's capability (id, version, classes), no longer
+The authoring document (AUTHORING_FORMAT, schema: docs/v2.1/bundle-authoring.schema.json) is the bundle without what
+the kernel derives: no requirement, contract or plan hash, no spec id, no approval. `seal` derives them with the
+kernel's own constructors and this release's probe catalog; it never approves — an approval is a human's statement
+about one contract (`approve`, one contract per command, the approver named `human:<name>`). The tools cannot tell who
+types the command: keep the bundle and these commands away from the developer agent. Exit status: 0 done (lint:
+READY), 1 lint NOT_READY, 2 refused input.
+
+`migrate` — V2.1 (ARCHITECTURE-EXCEPTION-V2-007): a ProductProofSpec binds its probe's capability (id, version, classes), no longer
 the bytes of its source. A bundle written for 2.0.0 names spec ids compiled under 2.0.0's source digests, so its plan
 names specs this release does not compile; `migrate` re-binds each obligation to the spec its own approved contract
 compiles to now. The contracts, approvals, requirements and facts are untouched — nothing is re-approved, because the
@@ -19,13 +32,21 @@ import sys
 from typing import Mapping
 
 from aisef2.app import bundle as B
-from aisef2.arch.enums import SubjectKind
-from aisef2.plan.obligation import Plan
+from aisef2.arch.enums import ObligationRole, Polarity, SubjectAbsence, SubjectKind
+from aisef2.plan.obligation import EXPECTED_AT_PARENT, NOT_PREREGISTERED, Plan, PlanObligation
 from aisef2.probe import catalog
-from aisef2.product.approval import ContractApproval, Requirement
-from aisef2.product.compiler import ProbeRef, compile_spec
-from aisef2.product.contract import BehaviorContract, plain
+from aisef2.probe.calibration import calibration_for, executing
+from aisef2.product.approval import ContractApproval, Requirement, binding_problems
+from aisef2.product.compiler import COMPILER_DIGEST, COMPILER_ID, ProbeRef, compile_spec, expectation_for
+from aisef2.product.contract import BehaviorContract, Subject, plain
 from aisef2.product.spec import ProductProofSpec
+
+AUTHORING_FORMAT = "aisef-v2-authoring/1"
+AUTHORING_KEYS = ("format", "name", "description", "requirements_document", "product_roots", "baseline", "requirements",
+                  "contracts", "stories")
+CONTRACT_KEYS = ("id", "requirement_ids", "subject", "stimulus", "observable", "polarity", "subject_absence", "rationale")
+CRITERION_KEYS = ("id", "contract", "role", "depends_on", "why", "facts")
+EXAMPLES = pathlib.Path(__file__).resolve().parent / "examples"      # <name>.json: {readme, authoring, repo: {path: text}}
 
 #: what each earlier release compiled specs under: its active probes' digests and its compiler digest (2.0.0 =
 #: tag v2.0.0 at ca26313: the source digests its shipped calibrations name; the compiler is unchanged since)
@@ -103,23 +124,303 @@ def migrate(data: Mapping) -> tuple[dict, dict]:
     return out, report
 
 
+def _mint(contract: BehaviorContract, ref: ProbeRef, compiler_digest: str = COMPILER_DIGEST) -> ProductProofSpec:
+    """The spec `contract` compiles to under `ref`: compile_spec's mapping, without its approval gate — for ids only;
+    `B.load` compiles every spec again through compile_spec, so a drift between the two is refused at load."""
+    return ProductProofSpec.create(
+        contract_id=contract.id, probe_id=ref.probe_id, probe_digest=ref.probe_digest,
+        probe_input={"subject": {"kind": contract.subject.kind.value, "locator": contract.subject.locator},
+                     "stimulus": contract.stimulus, "observable": contract.observable,
+                     "subject_absence": contract.subject_absence.value},
+        candidate_expectation=expectation_for(contract.polarity), compiler_id=COMPILER_ID, compiler_digest=compiler_digest)
+
+
+def _refs() -> dict:
+    return {kind: ProbeRef(e.probe_id, e.probe_digest) for kind, e in catalog.active().items()}
+
+
+def _closed(obj, keys: tuple[str, ...], where: str) -> None:
+    if not isinstance(obj, Mapping) or sorted(obj) != sorted(keys):
+        held = sorted(obj) if isinstance(obj, Mapping) else type(obj).__name__
+        raise B.BundleError(f"{where}: an object of exactly {list(keys)} (it holds {held})")
+
+
+def seal(authoring: Mapping, *, repo: pathlib.Path | None = None, approvals=()) -> tuple[dict, dict]:
+    """(the sealed bundle, the report): every hash and spec id derived from the authoring document by the kernel's own
+    constructors; `approvals` (a bundle's) kept when they still bind both hashes, the others named as dropped.
+    The baseline "HEAD" and the requirements document's sha256 are read from `repo`."""
+    _closed(authoring, AUTHORING_KEYS, "$")
+    if authoring["format"] != AUTHORING_FORMAT:
+        raise B.BundleError(f"$.format: {AUTHORING_FORMAT}")
+    from aisef2.app import run as R
+    baseline = authoring["baseline"]
+    if baseline == "HEAD":
+        if repo is None:
+            raise B.BundleError("$.baseline: HEAD is resolved in --repo, and none was given")
+        head = R.git(repo, "rev-parse", "--verify", "HEAD^{commit}")
+        if head.returncode != 0:
+            raise B.BundleError(f"{repo}: not a git repository with a commit ({head.stderr.strip()[:200]})")
+        baseline = head.stdout.strip()
+    doc = authoring["requirements_document"]
+    if not isinstance(doc, Mapping) or not isinstance(doc.get("path"), str) or set(doc) - {"path", "sha256"}:
+        raise B.BundleError("$.requirements_document: an object of path and, without --repo, its sha256")
+    sha = doc.get("sha256")
+    if repo is not None:
+        blob = R.git(repo, "cat-file", "blob", f"{baseline}:{doc['path']}")
+        if blob.returncode != 0:
+            raise B.BundleError(f"$.requirements_document.path: {doc['path']} is not in {repo} at {baseline[:12]}")
+        sha = R._sha(blob.stdout.encode("utf-8"))      # exactly as the run checks it (run.check_repository)
+    try:
+        requirements = [Requirement.create(**r) for r in authoring["requirements"]]
+        contracts = []
+        for n, c in enumerate(authoring["contracts"]):
+            _closed(c, CONTRACT_KEYS, f"$.contracts[{n}]")
+            contracts.append(BehaviorContract.create(
+                id=c["id"], requirement_ids=tuple(c["requirement_ids"]),
+                subject=Subject(SubjectKind(c["subject"]["kind"]), c["subject"]["locator"]),
+                stimulus=c["stimulus"], observable=c["observable"], polarity=Polarity(c["polarity"]),
+                subject_absence=SubjectAbsence(c["subject_absence"]), rationale=c["rationale"]))
+    except (KeyError, TypeError, ValueError) as e:
+        raise B.BundleError(f"a requirement or contract does not hold: {type(e).__name__}: {e}") from e
+    by_id = {c.id: c for c in contracts}
+    refs = _refs()
+    obligations, facts, stories = [], {}, {}
+    if not isinstance(authoring["stories"], Mapping) or not authoring["stories"]:
+        raise B.BundleError("$.stories: an object of story id -> {depends_on, tests, criteria}")
+    for sid, s in authoring["stories"].items():
+        _closed(s, ("depends_on", "tests", "criteria"), f"$.stories.{sid}")
+        stories[sid] = {"depends_on": s["depends_on"], "tests": s["tests"]}
+        for n, cr in enumerate(s["criteria"]):
+            where = f"$.stories.{sid}.criteria[{n}]"
+            _closed(cr, CRITERION_KEYS, where)
+            contract = by_id.get(cr["contract"])
+            if contract is None:
+                raise B.BundleError(f"{where}.contract: {cr['contract']!r} is not a contract of the document")
+            ref = refs.get(contract.subject.kind)
+            if ref is None:
+                raise B.BundleError(f"{where}: no active probe observes {contract.subject.kind.value}")
+            try:
+                role = ObligationRole(cr["role"])
+                obligations.append(PlanObligation(cr["id"], _mint(contract, ref).id, sid, role, EXPECTED_AT_PARENT[role],
+                                                  tuple(cr["depends_on"]), cr["why"]))
+            except (KeyError, TypeError, ValueError) as e:
+                raise B.BundleError(f"{where}: {type(e).__name__}: {e}") from e
+            facts[cr["id"]] = cr["facts"]
+    try:
+        plan = Plan.create(id=f"PLAN-{authoring['name']}", baseline=baseline, obligations=tuple(obligations),
+                           plan_quality_policy=NOT_PREREGISTERED)
+    except ValueError as e:
+        raise B.BundleError(f"the plan does not hold: {e}") from e
+    reqs = {r.id: r for r in requirements}
+    kept, dropped = [], []
+    for a in approvals:
+        try:
+            ap = ContractApproval(**a)
+        except (TypeError, ValueError) as e:
+            raise B.BundleError(f"an approval to keep does not load: {e}") from e
+        c, r = by_id.get(ap.contract_id), reqs.get(ap.requirement_id)
+        (kept if c is not None and r is not None and not binding_problems(ap, r, c) else dropped).append(ap)
+    bundle = B.dump(name=authoring["name"], description=authoring["description"], requirements_path=doc["path"],
+                    requirements_sha256=sha or "", product_roots=authoring["product_roots"], requirements=requirements,
+                    contracts=contracts, approvals=kept, plan=plan, facts=facts, stories=stories)
+    B.shape_problems(bundle)
+    return bundle, {"plan_hash": plan.plan_hash, "specs": len({o.product_proof_spec_id for o in obligations}),
+                    "approvals_kept": len(kept), "approvals_dropped": [f"{a.contract_id}/{a.requirement_id}" for a in dropped],
+                    "to_approve": unapproved(bundle)}
+
+
+def unapproved(bundle: Mapping) -> list[dict]:
+    """Each (contract, requirement it cites) no approval of the bundle binds, with the two hashes an approval binds."""
+    reqs = {r["id"]: Requirement(**r) for r in bundle["requirements"]}
+    approvals = [ContractApproval(**a) for a in bundle["approvals"]]
+    out = []
+    for c in (BehaviorContract.from_json(x) for x in bundle["contracts"]):
+        for rid in c.requirement_ids:
+            r = reqs.get(rid)
+            if r is None or not any(not binding_problems(a, r, c) for a in approvals):
+                out.append({"contract": c.id, "requirement": rid, "contract_hash": c.contract_hash,
+                            "requirement_hash": r.requirement_hash if r else None})
+    return out
+
+
+def approve(bundle: Mapping, contract_id: str, approver: str, at: float) -> dict:
+    """The bundle with `approver`'s approval of `contract_id` against every requirement it cites (already binding
+    ones are not repeated). The kernel's ContractApproval refuses an approver that is not `human:<name>`."""
+    B.shape_problems(bundle)
+    c = next((BehaviorContract.from_json(x) for x in bundle["contracts"] if x["id"] == contract_id), None)
+    if c is None:
+        raise B.BundleError(f"no contract {contract_id!r} in the bundle")
+    reqs = {r["id"]: Requirement(**r) for r in bundle["requirements"]}
+    have = [ContractApproval(**a) for a in bundle["approvals"]]
+    new = []
+    for rid in c.requirement_ids:
+        if rid not in reqs:
+            raise B.BundleError(f"{contract_id} cites {rid}, which is not a requirement of the bundle")
+        if not any(not binding_problems(a, reqs[rid], c) for a in have):
+            try:
+                new.append(plain(ContractApproval(rid, reqs[rid].requirement_hash, c.id, c.contract_hash, approver, at, ())))
+            except ValueError as e:
+                raise B.BundleError(str(e)) from e
+    return {**dict(bundle), "approvals": [*bundle["approvals"], *new]}
+
+
+def _spec_rows(bundle: Mapping) -> dict[str, dict]:
+    """criterion -> what the plan's obligation proves, compiled without the approval gate (ids only)."""
+    contracts = {c["id"]: BehaviorContract.from_json(c) for c in bundle["contracts"]}
+    refs, registry, cals = _refs(), catalog.registry(), None
+    from aisef2.app import run as R
+    cals = R.calibrations()
+    spec_contract = {_mint(c, refs[c.subject.kind]).id: c for c in contracts.values() if c.subject.kind in refs}
+    rows = {}
+    for o in B._plan(bundle["plan"]).obligations:
+        c = spec_contract.get(o.product_proof_spec_id)
+        row = {"story": o.story_id, "role": o.role.value, "spec": o.product_proof_spec_id, "contract": c and c.id}
+        if c is not None:
+            spec = _mint(c, refs[c.subject.kind])
+            probe = next(e for e in catalog.CATALOG if e.active and e.probe_id == spec.probe_id)
+            cls = registry.observation_class(spec.probe_id, spec.probe_digest, spec)
+            row |= {"probe": spec.probe_id, "class": cls, "polarity": c.polarity.value,
+                    "subject": f"{c.subject.kind.value} {c.subject.locator}",
+                    "calibrated": cls is not None and calibration_for(cals, probe.probe_id, executing(probe.factory), cls) is not None}
+        rows[o.criterion_id] = row
+    return rows
+
+
+def coverage(bundle: Mapping) -> dict:
+    """Per requirement: the clauses the plan's criteria declare (facts.clause) and the criteria; a requirement no
+    criterion covers is UNCOVERED. Only the clauses an author declared are known here: a clause never written into a
+    criterion's facts is not seen, and the report says so."""
+    by_req: dict[str, dict] = {r["id"]: {"clauses": {}, "criteria": []} for r in bundle["requirements"]}
+    stray = []
+    for cid, f in bundle["facts"].items():
+        rec = by_req.get(f.get("requirement"))
+        if rec is None:
+            stray.append(cid)
+            continue
+        rec["criteria"].append(cid)
+        rec["clauses"].setdefault(f.get("clause"), []).append(cid)
+    return {"requirements": {rid: {"status": "COVERED" if v["criteria"] else "UNCOVERED", **v} for rid, v in by_req.items()},
+            "criteria_citing_no_requirement_of_the_bundle": stray,
+            "limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document"}
+
+
+def lint(bundle: Mapping) -> dict:
+    """READY when every contract is approved, the plan is admitted (the nine static checks, with this release's
+    calibrations) and every requirement is covered; otherwise NOT_READY and why."""
+    B.shape_problems(bundle)
+    out = {"to_approve": unapproved(bundle), "coverage": coverage(bundle)}
+    rows = _spec_rows(bundle)
+    out["criteria_without_calibration"] = sorted(c for c, r in rows.items() if r.get("calibrated") is False)
+    out["criteria_without_contract"] = sorted(c for c, r in rows.items() if r["contract"] is None)
+    if out["to_approve"]:
+        out["admission"] = "not run: an unapproved contract does not compile (approve it, then lint again)"
+    else:
+        from aisef2.app import run as R
+        try:
+            out["admission"] = R.admit(B.load(bundle), R.calibrations())
+        except B.BundleError as e:
+            out["admission"] = {"admitted": False, "failed": [{"check": "load", "problems": [str(e)]}]}
+    uncovered = [r for r, v in out["coverage"]["requirements"].items() if v["status"] == "UNCOVERED"]
+    ready = (not out["to_approve"] and isinstance(out["admission"], dict) and out["admission"]["admitted"]
+             and not uncovered and not out["coverage"]["criteria_citing_no_requirement_of_the_bundle"])
+    return {"verdict": "READY" if ready else "NOT_READY", **out}
+
+
+def explain(bundle: Mapping) -> dict:
+    """Per story, in plan order: each criterion with its role, requirement clause, contract, probe, class, polarity,
+    whether its class is calibrated at the bytes that run and whether its contract is approved."""
+    B.shape_problems(bundle)
+    pending = {x["contract"] for x in unapproved(bundle)}
+    rows = _spec_rows(bundle)
+    out: dict[str, list] = {}
+    for cid, row in rows.items():
+        f = bundle["facts"].get(cid, {})
+        out.setdefault(row["story"], []).append({"criterion": cid, **{k: v for k, v in row.items() if k != "story"},
+                                                 "requirement": f.get("requirement"), "clause": f.get("clause"),
+                                                 "clause_text": f.get("clause_text"), "approved": row["contract"] not in pending})
+    return {"project": bundle["name"], "stories": out}
+
+
+def init(example: str, out: pathlib.Path) -> None:
+    """`example`'s authoring document at out/authoring.json and its repository's files under out/repo/ (a new
+    directory: the operator makes it a git repository and commits it — the baseline `seal` reads)."""
+    doc = _read(EXAMPLES / f"{example}.json")
+    if out.exists():
+        raise B.BundleError(f"{out} exists: init writes a new directory and never into one")
+    for rel, text in doc["repo"].items():
+        (out / "repo" / rel).parent.mkdir(parents=True, exist_ok=True)
+        (out / "repo" / rel).write_text(text, encoding="utf-8")
+    _write_new(out / "authoring.json", doc["authoring"])
+
+
+def _read(path: pathlib.Path) -> dict:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, ValueError) as e:
+        raise B.BundleError(f"{path}: cannot be read as JSON ({type(e).__name__})") from e
+
+
+def _write_new(path: pathlib.Path, doc: dict) -> None:
+    if path.exists():
+        raise B.BundleError(f"{path} exists: the bundle tools write a new file and never overwrite one")
+    path.write_text(json.dumps(doc, indent=1, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="aisef bundle", description="The project bundle's own tools (no run, no provider).")
     sub = p.add_subparsers(dest="command", required=True)
+    i = sub.add_parser("init", help="write an example (authoring document + its repository's files) to start from")
+    i.add_argument("--example", default="calc-1-story", choices=sorted(p.stem for p in EXAMPLES.glob("*.json")))
+    i.add_argument("--out", type=pathlib.Path, required=True, help="a new directory")
+    s = sub.add_parser("seal", help="derive every hash and spec id: the bundle, unapproved")
+    s.add_argument("authoring", type=pathlib.Path)
+    s.add_argument("--repo", type=pathlib.Path, help="the project's repository: HEAD and the requirements document")
+    s.add_argument("--keep-approvals-from", type=pathlib.Path, help="an earlier bundle whose still-binding approvals stay")
+    s.add_argument("--out", type=pathlib.Path, required=True)
+    ap = sub.add_parser("approve", help="approve one contract as a named human")
+    ap.add_argument("bundle", type=pathlib.Path)
+    ap.add_argument("--contract", required=True)
+    ap.add_argument("--approver", required=True, help="human:<name> — the person approving")
+    ap.add_argument("--out", type=pathlib.Path, required=True)
+    for name, text in (("lint", "approvals, admission, calibration, clause coverage"), ("explain", "each criterion, plainly")):
+        sub.add_parser(name, help=text).add_argument("bundle", type=pathlib.Path)
     m = sub.add_parser("migrate", help="re-bind an earlier release's bundle to this release's spec ids")
     m.add_argument("bundle", type=pathlib.Path)
     m.add_argument("--out", type=pathlib.Path, required=True, help="the migrated bundle (a new file; never the input)")
     a = p.parse_args(argv)
     try:
+        if a.command == "init":
+            init(a.example, a.out)
+            print(json.dumps({"written": str(a.out), "next": _read(EXAMPLES / f"{a.example}.json")["readme"]}, indent=1))
+            return 0
+        if a.command == "seal":
+            keep = _read(a.keep_approvals_from)["approvals"] if a.keep_approvals_from else ()
+            doc, report = seal(_read(a.authoring), repo=a.repo, approvals=keep)
+            _write_new(a.out, doc)
+            print(json.dumps({"written": str(a.out), **report}, indent=1, sort_keys=True))
+            return 0
+        if a.command == "approve":
+            import time
+            doc = approve(_read(a.bundle), a.contract, a.approver, time.time())
+            _write_new(a.out, doc)
+            print(json.dumps({"written": str(a.out), "approved": a.contract, "by": a.approver,
+                              "still_to_approve": unapproved(doc)}, indent=1, sort_keys=True))
+            return 0
+        if a.command in ("lint", "explain"):
+            doc = _read(a.bundle)
+            if not isinstance(doc, Mapping) or doc.get("format") != B.FORMAT or sorted(doc) != sorted(B.KEYS):
+                raise B.BundleError(f"not a project bundle of format {B.FORMAT}")
+            report = lint(doc) if a.command == "lint" else explain(doc)
+            print(json.dumps(report, indent=1, sort_keys=True, default=str))
+            return 0 if a.command == "explain" or report["verdict"] == "READY" else 1
         if a.out.exists():
             raise MigrationError(f"{a.out} exists: migrate writes a new file and never overwrites one")
-        try:
-            data = json.loads(a.bundle.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, ValueError) as e:
-            raise MigrationError(f"{a.bundle}: cannot be read as JSON ({type(e).__name__})") from e
-        out, report = migrate(data)
+        out, report = migrate(_read(a.bundle))
     except B.BundleError as e:
         print(f"refused: {e}", file=sys.stderr)
+        return 2
+    except (KeyError, TypeError, ValueError) as e:     # a document whose kernel objects do not hold
+        print(f"refused: {type(e).__name__}: {e}"[:2000], file=sys.stderr)
         return 2
     a.out.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({"written": str(a.out), **report}, indent=1, sort_keys=True))

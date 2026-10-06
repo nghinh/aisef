@@ -1,0 +1,250 @@
+{
+ "example": "calc-3-stories",
+ "readme": "Three stories in dependency order, two probe kinds (python_callable, file_artifact python_imports) and two PRESERVE obligations (S1 keeps the package stdlib-only; S3 keeps S1's add). Same steps as calc-1-story, one approve per contract (BC-ADD, BC-MUL, BC-TOTAL, BC-STDLIB).",
+ "authoring": {
+  "format": "aisef-v2-authoring/1",
+  "name": "calc3",
+  "description": "A calculator: three stories, two probe kinds, a PRESERVE obligation (aisef bundle example).",
+  "requirements_document": {
+   "path": "docs/requirements.md"
+  },
+  "product_roots": [
+   "app",
+   "tests"
+  ],
+  "baseline": "HEAD",
+  "requirements": [
+   {
+    "id": "R-1",
+    "text": "`app.calc.add(a, b)` returns the sum of a and b.",
+    "source": "docs/requirements.md#1.1"
+   },
+   {
+    "id": "R-2",
+    "text": "`app.calc.mul(a, b)` returns the product of a and b.",
+    "source": "docs/requirements.md#2.1"
+   },
+   {
+    "id": "R-3",
+    "text": "`app.calc.total(xs)` returns the sum of the numbers in xs.",
+    "source": "docs/requirements.md#3.1"
+   },
+   {
+    "id": "R-4",
+    "text": "The `app` package imports nothing outside the Python standard library.",
+    "source": "docs/requirements.md#4.1"
+   }
+  ],
+  "contracts": [
+   {
+    "id": "BC-ADD",
+    "requirement_ids": [
+     "R-1"
+    ],
+    "subject": {
+     "kind": "python_callable",
+     "locator": "app.calc:add"
+    },
+    "stimulus": {
+     "args": [
+      2,
+      3
+     ]
+    },
+    "observable": {
+     "returns": 5,
+     "within_s": 10
+    },
+    "polarity": "MUST_HOLD",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "rationale": "2 + 3"
+   },
+   {
+    "id": "BC-MUL",
+    "requirement_ids": [
+     "R-2"
+    ],
+    "subject": {
+     "kind": "python_callable",
+     "locator": "app.calc:mul"
+    },
+    "stimulus": {
+     "args": [
+      4,
+      5
+     ]
+    },
+    "observable": {
+     "returns": 20,
+     "within_s": 10
+    },
+    "polarity": "MUST_HOLD",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "rationale": "4 * 5"
+   },
+   {
+    "id": "BC-TOTAL",
+    "requirement_ids": [
+     "R-3"
+    ],
+    "subject": {
+     "kind": "python_callable",
+     "locator": "app.calc:total"
+    },
+    "stimulus": {
+     "args": [
+      [
+       1,
+       2,
+       3,
+       4
+      ]
+     ]
+    },
+    "observable": {
+     "returns": 10,
+     "within_s": 10
+    },
+    "polarity": "MUST_HOLD",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "rationale": "1 + 2 + 3 + 4"
+   },
+   {
+    "id": "BC-STDLIB",
+    "requirement_ids": [
+     "R-4"
+    ],
+    "subject": {
+     "kind": "file_artifact",
+     "locator": "path:app"
+    },
+    "stimulus": {
+     "imports_outside": {
+      "stdlib": true,
+      "allowed": [
+       "app"
+      ]
+     }
+    },
+    "observable": {
+     "matches": 0,
+     "within_s": 30
+    },
+    "polarity": "MUST_HOLD",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "rationale": "no import statement names a module outside the stdlib"
+   }
+  ],
+  "stories": {
+   "S1": {
+    "depends_on": [],
+    "tests": [
+     "tests/test_add.py"
+    ],
+    "criteria": [
+     {
+      "id": "C-ADD",
+      "contract": "BC-ADD",
+      "role": "INTRODUCE",
+      "depends_on": [],
+      "why": "introduces 1.1",
+      "facts": {
+       "requirement": "R-1",
+       "section": "§1",
+       "clause": "1.1",
+       "clause_text": "`app.calc.add(a, b)` returns the sum of a and b.",
+       "subject": "app.calc:add"
+      }
+     },
+     {
+      "id": "C-STDLIB-1",
+      "contract": "BC-STDLIB",
+      "role": "PRESERVE",
+      "depends_on": [],
+      "why": "preserves 4.1",
+      "facts": {
+       "requirement": "R-4",
+       "section": "§4",
+       "clause": "4.1",
+       "clause_text": "The `app` package imports nothing outside the Python standard library.",
+       "subject": "app/"
+      }
+     }
+    ]
+   },
+   "S2": {
+    "depends_on": [
+     "S1"
+    ],
+    "tests": [
+     "tests/test_mul.py"
+    ],
+    "criteria": [
+     {
+      "id": "C-MUL",
+      "contract": "BC-MUL",
+      "role": "INTRODUCE",
+      "depends_on": [
+       "C-ADD"
+      ],
+      "why": "introduces 2.1",
+      "facts": {
+       "requirement": "R-2",
+       "section": "§2",
+       "clause": "2.1",
+       "clause_text": "`app.calc.mul(a, b)` returns the product of a and b.",
+       "subject": "app.calc:mul"
+      }
+     }
+    ]
+   },
+   "S3": {
+    "depends_on": [
+     "S2"
+    ],
+    "tests": [
+     "tests/test_total.py"
+    ],
+    "criteria": [
+     {
+      "id": "C-TOTAL",
+      "contract": "BC-TOTAL",
+      "role": "INTRODUCE",
+      "depends_on": [
+       "C-MUL"
+      ],
+      "why": "introduces 3.1",
+      "facts": {
+       "requirement": "R-3",
+       "section": "§3",
+       "clause": "3.1",
+       "clause_text": "`app.calc.total(xs)` returns the sum of the numbers in xs.",
+       "subject": "app.calc:total"
+      }
+     },
+     {
+      "id": "C-ADD-3",
+      "contract": "BC-ADD",
+      "role": "PRESERVE",
+      "depends_on": [
+       "C-ADD"
+      ],
+      "why": "S3's total reuses add: S1's behaviour must hold after it",
+      "facts": {
+       "requirement": "R-1",
+       "section": "§1",
+       "clause": "1.1",
+       "clause_text": "`app.calc.add(a, b)` returns the sum of a and b.",
+       "subject": "app.calc:add"
+      }
+     }
+    ]
+   }
+  }
+ },
+ "repo": {
+  "app/__init__.py": "",
+  "app/calc.py": "def sub(a, b):\n    return a - b\n",
+  "docs/requirements.md": "# Calc\n\n## 1. Addition\n\n1.1 `app.calc.add(a, b)` returns the sum of a and b.\n\n## 2. Multiplication\n\n2.1 `app.calc.mul(a, b)` returns the product of a and b.\n\n## 3. Totals\n\n3.1 `app.calc.total(xs)` returns the sum of the numbers in xs.\n\n## 4. Runtime\n\n4.1 The `app` package imports nothing outside the Python standard library.\n"
+ }
+}

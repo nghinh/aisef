@@ -1,0 +1,78 @@
+{
+ "example": "calc-1-story",
+ "readme": "One story, one python_callable contract. Steps: git init the repo/ directory and commit it; `aisef bundle seal authoring.json --repo repo --out bundle.json`; read `aisef bundle explain bundle.json`; `aisef bundle approve bundle.json --contract BC-ADD --approver human:<you> --out approved.json`; `aisef bundle lint approved.json` (READY); `aisef run --check --project approved.json --settings S --repo repo`.",
+ "authoring": {
+  "format": "aisef-v2-authoring/1",
+  "name": "calc",
+  "description": "A calculator: one story (aisef bundle example).",
+  "requirements_document": {
+   "path": "docs/requirements.md"
+  },
+  "product_roots": [
+   "app",
+   "tests"
+  ],
+  "baseline": "HEAD",
+  "requirements": [
+   {
+    "id": "R-1",
+    "text": "`app.calc.add(a, b)` returns the sum of a and b.",
+    "source": "docs/requirements.md#1.1"
+   }
+  ],
+  "contracts": [
+   {
+    "id": "BC-ADD",
+    "requirement_ids": [
+     "R-1"
+    ],
+    "subject": {
+     "kind": "python_callable",
+     "locator": "app.calc:add"
+    },
+    "stimulus": {
+     "args": [
+      2,
+      3
+     ]
+    },
+    "observable": {
+     "returns": 5,
+     "within_s": 10
+    },
+    "polarity": "MUST_HOLD",
+    "subject_absence": "REQUIRES_SUBJECT",
+    "rationale": "the requirement's own example: 2 + 3"
+   }
+  ],
+  "stories": {
+   "S1": {
+    "depends_on": [],
+    "tests": [
+     "tests/test_add.py"
+    ],
+    "criteria": [
+     {
+      "id": "C-ADD",
+      "contract": "BC-ADD",
+      "role": "INTRODUCE",
+      "depends_on": [],
+      "why": "introduces 1.1",
+      "facts": {
+       "requirement": "R-1",
+       "section": "§1",
+       "clause": "1.1",
+       "clause_text": "`app.calc.add(a, b)` returns the sum of a and b.",
+       "subject": "app.calc:add"
+      }
+     }
+    ]
+   }
+  }
+ },
+ "repo": {
+  "app/__init__.py": "",
+  "app/calc.py": "def sub(a, b):\n    return a - b\n",
+  "docs/requirements.md": "# Calc\n\n## 1. Addition\n\n1.1 `app.calc.add(a, b)` returns the sum of a and b.\n"
+ }
+}
