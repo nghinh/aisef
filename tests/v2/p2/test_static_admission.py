@@ -25,7 +25,7 @@ from aisef2.plan import static_admission as sa  # noqa: E402
 from aisef2.plan.obligation import (  # noqa: E402
     EXPECTED_AT_PARENT, NOT_PREREGISTERED, Plan, PlanError, PlanObligation, PlanQualityPolicy,
 )
-from aisef2.probe.calibration import ProbeCapabilityCalibration  # noqa: E402
+from aisef2.probe.calibration import ProbeCapabilityCalibration, executing  # noqa: E402
 from aisef2.probe.protocol import HarnessProbe, Probe, ProbeMetadata, ProbeRegistry  # noqa: E402
 from aisef2.probe.python_callable import METADATA, PythonCallableProbe, spec_class  # noqa: E402
 from aisef2.product.approval import ContractApproval, Requirement  # noqa: E402
@@ -235,7 +235,7 @@ class Admission(unittest.TestCase):
         inputs, _ = world(calibrated=("exists",))
         self.assertEqual(failing(ENGINE.admit(plan(), inputs)),
                          {"probe_calibration": [f"spec {SPEC['BC-ADD']}: no ProbeCapabilityCalibration for "
-                                                f"{P.id}@{P.digest[:12]} class 'returns'"]})
+                                                f"{P.id}@{P.digest[:12]} executing {executing(P)[:12]} class 'returns'"]})
         wrong_digest = dataclasses.replace(INPUTS, calibrations=tuple(
             dataclasses.replace(c, probe_digest="e" * 64) for c in INPUTS.calibrations))
         self.assertEqual(len(failing(ENGINE.admit(plan(), wrong_digest))["probe_calibration"]), 2)

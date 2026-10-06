@@ -25,7 +25,8 @@ from validation.qualification import release_rc  # noqa: E402
 C2_CANDIDATE, C2_KERNEL = "c11615aeb1dd9e6ff992b6190f8c39a272636742", "254d8f559b879c210c4936321022f1350c4b2f89"
 C2_TREES = {"validation/v2": "7686f004167fc5e940b06bf6ff0248f068d8d116", "tests/v2": "fb9d8e17728a893083575638d9bad3b4faa62196"}
 C2_OUTS = ("closure-evidence/v2/cycle2/Q0-Q3-R4", "closure-evidence/v2/cycle2/Q4-FINAL", "closure-evidence/v2/cycle2/Q5-FINAL")
-RELEASE_OUTS = ("closure-evidence/v2/release/Q0-Q3-RC2", "closure-evidence/v2/release/Q4-RC2", "closure-evidence/v2/release/Q5-RC2")
+#: V2.1: the release output directories carry the tree's own candidate tag (release_rc.TAG: 2.0.0's was the bare RC2)
+RELEASE_OUTS = tuple(f"closure-evidence/v2/release/{rung}-{release_rc.TAG}" for rung in ("Q0-Q3", "Q4", "Q5"))
 SUBJECT_NAMES = {"MODE", "SEMANTIC_CANDIDATE", "SEAL_COMMIT", "KERNEL_TREE", "SUBJECT_TREES", "V1_PRODUCT_TREE", "OUT_REL",
                  "Q4_OUT_REL", "Q5_OUT_REL"}
 
@@ -100,7 +101,7 @@ class Subject(unittest.TestCase):
         self.assertTrue(ident["v1_product_tree_unchanged"])
         rel = ident["release"]
         self.assertEqual(rel["freeze_record"], record_id)
-        self.assertEqual((rel["rc_version"], rel["kernel_digest"], rel["rc_check_problems"]), ("2.0.0", self.rec["kernel"]["digest"], []))
+        self.assertEqual((rel["rc_version"], rel["kernel_digest"], rel["rc_check_problems"]), (release_rc.VERSION, self.rec["kernel"]["digest"], []))
         self.assertIn("G1", rel["v1_product_tree"]["note"])
         self.assertEqual(rel["v1_product_tree"]["cycle2"], "4359f347378e84fcac2d213128c7c26f282c13c0")
         self.assertEqual(problems, [])
@@ -115,13 +116,14 @@ class Subject(unittest.TestCase):
         self.assertFalse(ident["kernel_tree_is_the_candidates"])
         self.assertTrue(any(p.startswith("HEAD's aisef2 tree") and C2_KERNEL in p for p in problems), problems)
         self.assertIn("the semantic candidate does not carry the frozen kernel tree", problems)
-        self.assertIn("the RC2 freeze record: the kernel identity is not the RC commit's", problems)
+        self.assertIn(f"the {release_rc.RC} freeze record: the kernel identity is not the RC commit's", problems)
 
     def test_release_q2_reads_the_calibrations_the_rc_ships(self):
         import importlib
         from aisef2.probe import catalog
         from validation.qualification import q2, release_calibration
-        declared = {(e.probe_id, e.probe_digest, cls) for e in catalog.CATALOG for cls in importlib.import_module(e.factory.__module__).CLASSES}
+        from aisef2.probe.calibration import executing     # V2.1 (V2-007): a calibration binds the bytes that run
+        declared = {(e.probe_id, executing(e.factory), cls) for e in catalog.CATALOG for cls in importlib.import_module(e.factory.__module__).CLASSES}
         with mock.patch.object(C, "MODE", "release"):
             self.assertEqual(q2._calibration_records(), (release_calibration.RECORD_REL,))
             self.assertEqual(q2._committed_calibration_keys(), declared)

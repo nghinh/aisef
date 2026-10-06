@@ -481,8 +481,8 @@ class Refusals(unittest.TestCase):
             with self.subTest(observable=dict(s.probe_input["observable"]), stimulus=dict(s.probe_input["stimulus"])):
                 o = P.observe(s, at(self.repo.path, self.rev), ENV)
                 self.assertEqual((o.kind, o.verdict), (K.UNSUPPORTED, None))
-                self.assertEqual(o.detail, "observable/stimulus is not a supported class ('exists', 'content', 'grep_count') "
-                                           "with a bounded window (within_s); refused, not degraded")
+                self.assertEqual(o.detail, "observable/stimulus is not a supported class ('exists', 'content', 'grep_count', "
+                                           "'python_imports') with a bounded window (within_s); refused, not degraded")
 
     def test_FM2_FILE_1_a_probe_constructed_without_git_refuses_every_observation(self):
         with mock.patch.object(fa.shutil, "which", return_value=None):
@@ -534,7 +534,7 @@ class Fixtures(unittest.TestCase):
         for cls in fa.CLASSES:
             with self.subTest(cls=cls):
                 rec = calibrate(P, cls, BASE / cls / "positive", BASE / cls / "negative", env, time.time, registry=REGISTRY)
-                self.assertEqual((rec.probe_id, rec.probe_digest, rec.observation_class), (P.id, P.digest, cls))
+                self.assertEqual((rec.probe_id, rec.probe_digest, rec.observation_class), (P.id, P.execution_digest, cls))  # V2.1 (V2-007): the bytes are EXECUTION_DIGEST; DIGEST is the capability
                 for side, want in (("positive", S), ("negative", R)):
                     d = BASE / cls / side
                     o = P.observe(fixture_spec(P, d), RevisionRef("0" * 40, str((d / "checkout").resolve())), env)
@@ -706,8 +706,8 @@ class Tables(unittest.TestCase):
     def test_declared_tables_identity_and_preconditions(self):
         self.assertEqual(fa.PROBE_ID, "probe.file_artifact")
         self.assertEqual(fa.PROBE_SOURCES, ("probe/protocol.py", "probe/file_artifact.py"))
-        self.assertEqual(fa.CLASSES, ("exists", "content", "grep_count"))
-        self.assertEqual(fa.ON_DEADLINE, {"exists": R, "content": R, "grep_count": R})
+        self.assertEqual(fa.CLASSES, ("exists", "content", "grep_count", "python_imports"))     # V2.1: + python_imports
+        self.assertEqual(fa.ON_DEADLINE, {"exists": R, "content": R, "grep_count": R, "python_imports": R})
         self.assertEqual(fa.NEWLINES, ("\n", "\r\n"))
         self.assertEqual(fa.MODES, ("100644", "100755", "120000", "040000"))
         self.assertIn("object store", fa.WEAKEST_PATH)
@@ -715,7 +715,10 @@ class Tables(unittest.TestCase):
         h = hashlib.sha256()
         for rel in fa.PROBE_SOURCES:
             h.update(rel.encode() + b"\0" + (ROOT / "aisef2" / rel).read_bytes().replace(b"\r\n", b"\n") + b"\0")
-        self.assertEqual((fa.DIGEST, fa._probe_digest(), fa.METADATA.probe_digest, P.digest), (h.hexdigest(),) * 4)
+        # V2.1 (V2-007): the source bytes are the EXECUTION_DIGEST; the spec-bound DIGEST is the capability's
+        self.assertEqual((fa.EXECUTION_DIGEST, fa._probe_digest(), P.execution_digest), (h.hexdigest(),) * 3)
+        capability = hashlib.sha256(json.dumps([fa.PROBE_ID, fa.CAPABILITY_VERSION, list(fa.CLASSES)]).encode()).hexdigest()
+        self.assertEqual((fa.DIGEST, fa.METADATA.probe_digest, P.digest), (capability,) * 3)
         self.assertEqual((fa.METADATA.probe_id, fa.METADATA.observation_class, P.id), (fa.PROBE_ID, fa.spec_class, fa.PROBE_ID))
         self.assertIs(P.enforcement(), Enforcement.FULL)
         pre = P.harness_preconditions()

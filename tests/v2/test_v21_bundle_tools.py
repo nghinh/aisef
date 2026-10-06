@@ -30,7 +30,7 @@ CONTRACTS = {"calc-1-story": ["BC-ADD"], "calc-3-stories": ["BC-ADD", "BC-MUL", 
 
 def git(cwd, *args):
     return subprocess.run(["git", "-C", str(cwd), "-c", "user.name=t", "-c", "user.email=t@t", *args],
-                          capture_output=True, text=True, check=True).stdout
+                          capture_output=True, text=True, encoding="utf-8", check=True).stdout
 
 
 class Tool(unittest.TestCase):

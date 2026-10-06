@@ -24,7 +24,7 @@ from tests.v2 import test_p7_finding_001 as p7  # noqa: E402
 
 CASE = re.compile(r"test_PYC_(\d+)(b?)_(.*)")
 #: the subject process's bytecode controls on its command line inside the controller script
-FLAGS = '"-I", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], '
+FLAGS = '"-I", "-S", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], '
 
 
 def _agent_line(flags: str):
@@ -37,8 +37,9 @@ class BytecodeV2(p7.Bytecode):
     def setUp(self):
         rebind = mock.patch.multiple(
             p7, pc=pc2, PythonCallableProbe=pc2.PythonCallableV2Probe,
-            WithoutB=lambda: _agent_line('"-I", "-X", "pycache_prefix=" + req["agent_pycache"], '),
-            WithoutPrefix=lambda keep_b: _agent_line('"-I", ' + ('"-B", ' if keep_b else "")))
+            WithoutB=lambda: _agent_line('"-I", "-S", "-X", "pycache_prefix=" + req["agent_pycache"], '),
+            WithoutPrefix=lambda keep_b: _agent_line('"-I", "-S", ' + ('"-B", ' if keep_b else "")),
+            LAUNCH_FLAGS=["-I", "-S", "-B"])      # V2.1: the active probe launches with -S (.pth channel)
         rebind.start()
         self.addCleanup(rebind.stop)
         super().setUp()

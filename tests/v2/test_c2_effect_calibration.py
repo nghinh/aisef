@@ -72,7 +72,7 @@ class Calibration(_Trees):
             pos, neg = FIX / cls / "positive", FIX / cls / "negative"
             with self.subTest(cls=cls):
                 rec = _calibrate(cls, pos, neg)
-                self.assertEqual((rec.probe_id, rec.probe_digest, rec.observation_class), (pe.PROBE_ID, pe.DIGEST, cls))
+                self.assertEqual((rec.probe_id, rec.probe_digest, rec.observation_class), (pe.PROBE_ID, pe.EXECUTION_DIGEST, cls))  # V2.1 (V2-007): the bytes are EXECUTION_DIGEST; DIGEST is the capability
                 for a, b in ((neg, neg), (pos, pos)):   # the same fixtures reject the probe once they stop contrasting
                     with self.assertRaises(NotQualified):
                         _calibrate(cls, a, b)
@@ -144,7 +144,7 @@ class Calibration(_Trees):
         self.assertEqual(problems, [])
         self.assertEqual({r["observation_class"]: r["mutant"] for r in records},
                          {cls: row["mutant"] for cls, row in B.LEDGERLOCK_CLASSES.items()})
-        self.assertTrue(all(r["non_contrasting_pair_rejected"] and r["probe_digest"] == pe.DIGEST for r in records))
+        self.assertTrue(all(r["non_contrasting_pair_rejected"] and r["probe_digest"] == pe.EXECUTION_DIGEST for r in records))  # V2.1 (V2-007): the bytes are EXECUTION_DIGEST; DIGEST is the capability
 
     def test_PECAL_4_a_spec_that_no_mutant_refutes_is_reported_NOT_QUALIFIED(self):
         always = {"id": "LL-ALWAYS-1", "family": "hash chain", "requirements": ["R-3.2"],

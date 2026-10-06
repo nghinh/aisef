@@ -370,6 +370,10 @@ aisef auto-approve all|<danh sách>   luôn ghi dấu `auto`
 # Bước 4 — hiện thực
 aisef run     <đối số V2>             từ 2.0 `aisef run` là runtime V2 (đường có thẩm quyền, charter G1):
                                       mọi đối số sau `run` chuyển nguyên cho aisef2.app.cli — xem docs/v2/USAGE.md
+aisef bundle  init|seal|approve|lint|explain|migrate|continue
+                                      (2.1) công cụ của bundle V2, không chạy, không gọi provider: soạn, niêm
+                                      phong, duyệt từng contract, kiểm, giải thích, chuyển từ 2.0.0, nối tiếp
+                                      một lượt chạy đã dừng — aisef2.app.bundle_cli
 # V1 chỉ còn ở bề mặt legacy đặt tên tường minh, không bao giờ là mặc định:
 aisef legacy run [--client c] [--epic E] [--sequential] [--no-isolate] [--force]
 aisef legacy run --verify-only --story S [--client c] [--repeat K]   kiểm lại ứng viên đã đóng băng (ADR-004 R13):

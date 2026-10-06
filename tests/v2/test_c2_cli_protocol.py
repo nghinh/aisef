@@ -529,18 +529,19 @@ class Identity(_Product):
                 h.update(rel.encode() + b"\0" + data + b"\0")
             return h.hexdigest()
         files = [(rel, (ROOT / "aisef2" / rel).read_bytes().replace(b"\r\n", b"\n")) for rel in ci.PROBE_SOURCES]
-        self.assertEqual(digest_of(files), P.digest)
+        self.assertEqual(digest_of(files), P.execution_digest)
         for i, (rel, data) in enumerate(files):
             with self.subTest(source=rel):
                 changed = list(files)
                 changed[i] = (rel, data + b"# changed\n")
-                self.assertNotEqual(digest_of(changed), P.digest)
-                self.assertNotEqual(digest_of(files[:i] + files[i + 1:]), P.digest)
+                self.assertNotEqual(digest_of(changed), P.execution_digest)
+                self.assertNotEqual(digest_of(files[:i] + files[i + 1:]), P.execution_digest)
         code = ("import sys; sys.path.insert(0, sys.argv[1]); import aisef2.probe.cli_invocation as m; "
-                "print(m.CliInvocationProbe.digest)")
+                "print(m.CliInvocationProbe.execution_digest)")
         out = subprocess.run([sys.executable, "-P", "-c", code, str(ROOT)], capture_output=True, encoding="utf-8", check=True)
-        self.assertEqual(out.stdout.strip(), P.digest)
-        self.assertNotEqual(P.digest, __import__("aisef2.probe.python_callable", fromlist=["DIGEST"]).DIGEST)
+        self.assertEqual(out.stdout.strip(), P.execution_digest)
+        self.assertNotEqual(P.execution_digest, __import__("aisef2.probe.python_callable", fromlist=["DIGEST"]).DIGEST)
+        self.assertNotEqual(P.digest, P.execution_digest)  # V2.1 (V2-007): the bytes are EXECUTION_DIGEST; DIGEST is the capability
 
     def test_the_catalog_entry_binds_this_probe_as_the_active_cli_invocation_probe(self):
         e = catalog.active()[SubjectKind.CLI_INVOCATION]

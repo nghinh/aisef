@@ -94,7 +94,7 @@ class Fixtures(unittest.TestCase):
                     self.assertEqual(names_test_artefact(json.loads((d / "request.json").read_text(encoding="utf-8"))), [])
                     self.assertFalse([p for p in (d / "checkout").rglob("*") if p.name.startswith("test")])
                 rec = calibrate(P, cls, pos, neg, ENV, time.time, registry=REGISTRY)
-                self.assertEqual((rec.probe_id, rec.probe_digest, rec.observation_class), (P.id, P.digest, cls))
+                self.assertEqual((rec.probe_id, rec.probe_digest, rec.observation_class), (P.id, P.execution_digest, cls))  # V2.1 (V2-007): the bytes are EXECUTION_DIGEST; DIGEST is the capability
                 self.assertEqual((rec.positive_fixture, rec.negative_fixture), (str(pos), str(neg)))
                 for a, b in ((neg, neg), (pos, pos), (neg, pos)):
                     with self.assertRaises(NotQualified):

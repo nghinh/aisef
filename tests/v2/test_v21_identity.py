@@ -108,7 +108,7 @@ class PthChannel(unittest.TestCase):
         self.tmp = pathlib.Path(self._tmp.name)
         self.python = R.probe_interpreter(self.tmp / "venv")
         site = subprocess.run([self.python, "-I", "-c", "import site; print(site.getsitepackages()[0])"],
-                              capture_output=True, text=True, check=True).stdout.strip()
+                              capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
         self.marker = self.tmp / "pth-ran"
         pathlib.Path(site, "zz_inject.pth").write_text(
             f"import pathlib; pathlib.Path({str(self.marker)!r}).write_text('ran')\n", encoding="utf-8")

@@ -282,7 +282,7 @@ class Calibration(unittest.TestCase):
         for cls in pc2.CLASSES:
             with self.subTest(cls=cls):
                 rec = calibrate(P, cls, BASE / cls / "positive", BASE / cls / "negative", ENV, time.time, registry=registry)
-                self.assertEqual((rec.probe_id, rec.probe_digest, rec.observation_class), (P.id, P.digest, cls))
+                self.assertEqual((rec.probe_id, rec.probe_digest, rec.observation_class), (P.id, P.execution_digest, cls))  # V2.1 (V2-007): the bytes are EXECUTION_DIGEST; DIGEST is the capability
                 self.assertNotEqual(rec.probe_digest, pc.DIGEST)   # the Cycle-1 classes too, at the NEW digest
 
     def test_PCV2_1_the_same_fixtures_reject_it_once_they_stop_contrasting(self):
@@ -482,15 +482,15 @@ class Identity(_Revisions):
                 h.update(rel.encode() + b"\0" + data + b"\0")
             return h.hexdigest()
         files = [(rel, (ROOT / "aisef2" / rel).read_bytes().replace(b"\r\n", b"\n")) for rel in pc2.PROBE_SOURCES]
-        self.assertEqual(digest_of(files), P.digest)
+        self.assertEqual(digest_of(files), P.execution_digest)
         for i, (rel, data) in enumerate(files):
             with self.subTest(source=rel):
-                self.assertNotEqual(digest_of(files[:i] + [(rel, data + b"# changed\n")] + files[i + 1:]), P.digest)
-                self.assertNotEqual(digest_of(files[:i] + files[i + 1:]), P.digest)
+                self.assertNotEqual(digest_of(files[:i] + [(rel, data + b"# changed\n")] + files[i + 1:]), P.execution_digest)
+                self.assertNotEqual(digest_of(files[:i] + files[i + 1:]), P.execution_digest)
         code = ("import sys; sys.path.insert(0, sys.argv[1]); import aisef2.probe.python_callable_v2 as m; "
-                "print(m.PythonCallableV2Probe.digest)")
+                "print(m.PythonCallableV2Probe.execution_digest)")
         out = subprocess.run([sys.executable, "-P", "-c", code, str(ROOT)], capture_output=True, encoding="utf-8", check=True)
-        self.assertEqual(out.stdout.strip(), P.digest)
+        self.assertEqual(out.stdout.strip(), P.execution_digest)
 
     def test_PCV2_6_a_cycle1_spec_still_resolves_and_runs_while_the_second_identity_is_the_active_one(self):
         registry = catalog.registry()

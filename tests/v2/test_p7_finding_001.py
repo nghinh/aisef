@@ -116,6 +116,11 @@ class Launch:
         return [a[a.index("-X") + 1].removeprefix("pycache_prefix=") for a in self.argv]
 
 
+#: the probe's launch controls as `run._argv[1:4]` shows them: the Cycle-1 probe's (frozen; V2.1's active probes add
+#: -S — test_python_callable_v2_bytecode rebinds this name with the rest)
+LAUNCH_FLAGS = ["-I", "-B", "-X"]
+
+
 class WithoutPrefix:
     """A controlled mutant: the harness command line without the external bytecode cache (the pre-correction line,
     plus -B when `keep_b`)."""
@@ -208,7 +213,7 @@ class Bytecode(unittest.TestCase):
             return real_start(run)
         with mock.patch.object(pc.ProcessRange, "start", start):
             self.assertEqual(verdict(self.observe(RETURNS_2)), V.SATISFIED)
-        self.assertEqual(seen["argv"][1:4], ["-I", "-B", "-X"])
+        self.assertEqual(seen["argv"][1:4], LAUNCH_FLAGS)
         self.assertEqual((seen["empty_at_launch"], seen["inside_checkout"]), (True, False))
         self.assertTrue(pathlib.Path(seen["prefix"]).parent.name.startswith("aisef2-probe-"), seen["prefix"])
         self.assertFalse(pathlib.Path(seen["prefix"]).exists())   # the probe's own temporary directory: gone with the evaluation

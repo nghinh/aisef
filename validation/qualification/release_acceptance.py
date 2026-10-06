@@ -133,7 +133,9 @@ def evaluate(project, run_dir: pathlib.Path, accepted: dict) -> dict:
     pp = R.productproof(project, events, committed) if events else {"total": len(project.plan.obligations), "delivered": 0, "obligations": []}
     with tempfile.TemporaryDirectory(prefix="aisef-acceptance-") as t:
         sha, tree = delivered_main(run_dir, pathlib.Path(t) / "main")
-        acc = acceptance(project, tree, sha, str(run_dir / "probe-python" / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")))
+        venv = run_dir / "probe-python" / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
+        # a 2.0.0 run's probes ran on its probe-python venv; from 2.1 they run on the kernel's own interpreter
+        acc = acceptance(project, tree, sha, str(venv) if venv.exists() else sys.executable)
     claimed = {r["spec"] for r in pp["obligations"] if r["delivered"]}
     false_acceptance = sorted(claimed & set(acc["not_satisfied"]))
     blocks = framework_blocks(events, committed, {s: v["depends_on"] for s, v in project.stories.items()})

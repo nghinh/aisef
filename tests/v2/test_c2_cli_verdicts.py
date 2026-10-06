@@ -354,7 +354,7 @@ class Protocol(unittest.TestCase):
 
     def test_the_harness_command_line_pins_every_control(self):
         argv = ci._harness_argv("/py", "/w/request.json", "/w/pycache")
-        self.assertEqual(argv, ["/py", "-I", "-B", "-X", "pycache_prefix=/w/pycache", "-X", "utf8=1", "-c", ci.HARNESS,
+        self.assertEqual(argv, ["/py", "-I", "-S", "-B", "-X", "pycache_prefix=/w/pycache", "-X", "utf8=1", "-c", ci.HARNESS,
                                 "/w/request.json"])
 
     def test_the_evaluation_directory_is_laid_out_byte_exactly(self):

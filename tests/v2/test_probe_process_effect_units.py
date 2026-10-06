@@ -459,11 +459,11 @@ class Request(_Checkout):
         self.assertEqual(captured["kw"]["cwd"], ws)
         self.assertEqual(captured["kw"]["env"], ci._child_env(ws))
         argv = captured["argv"]
-        self.assertEqual(argv[:4] + argv[5:9], [sys.executable, "-I", "-B", "-X", "-X", "utf8=1", "-c", pe.HARNESS])
-        self.assertEqual(argv[4], "pycache_prefix=" + os.path.join(captured["work"], "pycache"))
+        self.assertEqual(argv[:5] + argv[6:10], [sys.executable, "-I", "-S", "-B", "-X", "-X", "utf8=1", "-c", pe.HARNESS])
+        self.assertEqual(argv[5], "pycache_prefix=" + os.path.join(captured["work"], "pycache"))
         self.assertEqual(fake.name, f"probe {s.id}")
         self.assertTrue(fake.released)
-        self.assertEqual(pe._harness_argv("py", "ask", "pc"), ["py", "-I", "-B", "-X", "pycache_prefix=pc", "-X", "utf8=1",
+        self.assertEqual(pe._harness_argv("py", "ask", "pc"), ["py", "-I", "-S", "-B", "-X", "pycache_prefix=pc", "-X", "utf8=1",
                                                                 "-c", pe.HARNESS, "ask"])
 
 
@@ -628,19 +628,20 @@ class Identity(unittest.TestCase):
                 h.update(rel.encode() + b"\0" + data + b"\0")
             return h.hexdigest()
         files = [(rel, (ROOT / "aisef2" / rel).read_bytes().replace(b"\r\n", b"\n")) for rel in pe.PROBE_SOURCES]
-        self.assertEqual(digest_of(files), P.digest)
-        self.assertEqual(pe._probe_digest(), P.digest)
+        self.assertEqual(digest_of(files), P.execution_digest)
+        self.assertEqual(pe._probe_digest(), P.execution_digest)
         for i, (rel, data) in enumerate(files):
             with self.subTest(source=rel):
                 changed = list(files)
                 changed[i] = (rel, data + b"# changed\n")
-                self.assertNotEqual(digest_of(changed), P.digest)
-                self.assertNotEqual(digest_of(files[:i] + files[i + 1:]), P.digest)
+                self.assertNotEqual(digest_of(changed), P.execution_digest)
+                self.assertNotEqual(digest_of(files[:i] + files[i + 1:]), P.execution_digest)
         code = ("import sys; sys.path.insert(0, sys.argv[1]); import aisef2.probe.process_effect as m; "
-                "print(m.ProcessEffectProbe.digest)")
+                "print(m.ProcessEffectProbe.execution_digest)")
         out = subprocess.run([sys.executable, "-P", "-c", code, str(ROOT)], capture_output=True, encoding="utf-8", check=True)
-        self.assertEqual(out.stdout.strip(), P.digest)
-        self.assertNotIn(P.digest, (ci.DIGEST, __import__("aisef2.probe.python_callable", fromlist=["DIGEST"]).DIGEST))
+        self.assertEqual(out.stdout.strip(), P.execution_digest)
+        self.assertNotIn(P.execution_digest, (ci.EXECUTION_DIGEST, __import__("aisef2.probe.python_callable", fromlist=["DIGEST"]).DIGEST))
+        self.assertNotEqual(P.digest, P.execution_digest)  # V2.1 (V2-007): the bytes are EXECUTION_DIGEST; DIGEST is the capability
 
     def test_enforcement_preconditions_and_the_weakest_path_are_declared(self):
         self.assertIs(P.enforcement(), Enforcement.PARTIAL)

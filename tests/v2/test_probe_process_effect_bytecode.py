@@ -136,7 +136,7 @@ class Bytecode(unittest.TestCase):
                 self.assertEqual(verdict(self.observe(RETURNS_2, SUB_EXITS_2,
                                                       probe=ProcessEffectProbe(scratch=str(scratch)))), S)
         self.assertEqual(len({p for p, *_ in seen}), 3)
-        self.assertEqual([(empty, inside, flags) for _, empty, inside, flags in seen], [(True, False, ["-I", "-B", "-X"])] * 3)
+        self.assertEqual([(empty, inside, flags) for _, empty, inside, flags in seen], [(True, False, ["-I", "-S", "-B"])] * 3)   # V2.1: -S
         self.assertFalse(pathlib.Path(seen[0][0]).exists())   # the probe's own temporary directory: gone
         self.assertEqual({pathlib.Path(p).parent.parent for p, *_ in seen[1:]}, {scratch})
         # each subprocess step had a fresh prefix of its own in the evaluation directory; -B: nothing written
@@ -145,10 +145,10 @@ class Bytecode(unittest.TestCase):
 
     def test_FM2_PYC_EFFECT_5_without_the_external_cache_the_stale_bytecode_decides_the_reproducer_detects_it(self):
         # B1: the subject is imported in its own process (the shared agent): the controls are on its command line
-        flags = '"-I", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], '
+        flags = '"-I", "-S", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], '
         self.assertEqual(pe.HARNESS.count(flags), 1)
         for keep_b in (True, False):
-            harness = pe.HARNESS.replace(flags, '"-I", ' + ('"-B", ' if keep_b else ""))
+            harness = pe.HARNESS.replace(flags, '"-I", "-S", ' + ('"-B", ' if keep_b else ""))
             with self.subTest(keep_b=keep_b), mock.patch.object(pe, "HARNESS", harness):
                 self.assertEqual(verdict(self.observe(RETURNS_2)), R)   # the stale code's 1, not the source's 2
                 self.assertEqual(verdict(self.observe(RETURNS_1, expectation=R)), S)
@@ -156,7 +156,7 @@ class Bytecode(unittest.TestCase):
         scratch = self.tmp / "scratch"
         scratch.mkdir()
         before = snapshot(self.root)
-        with mock.patch.object(pe, "HARNESS", pe.HARNESS.replace(flags, '"-I", "-X", "pycache_prefix=" + req["agent_pycache"], ')):
+        with mock.patch.object(pe, "HARNESS", pe.HARNESS.replace(flags, '"-I", "-S", "-X", "pycache_prefix=" + req["agent_pycache"], ')):
             self.assertEqual(verdict(self.observe(RETURNS_2, probe=ProcessEffectProbe(scratch=str(scratch)))), S)
         self.assertEqual(snapshot(self.root), before)
         self.assertTrue(any(p.name.startswith("mod.") for p in scratch.rglob("*.pyc")))
