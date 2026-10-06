@@ -85,7 +85,9 @@ def coverage(output: Mapping | None, exit_code: int, *, required: Iterable[str],
     if m.get("schema_version") != MANIFEST_SCHEMA:
         return Coverage(INDETERMINATE, (f"manifest schema {m.get('schema_version')!r}, not {MANIFEST_SCHEMA}",), None)
     state = m.get("terminal_state")
-    if state != "complete":
+    # measured on the real binary: an empty range (a story with no change under the product roots) is `skipped`,
+    # exit 0, no model call — a complete review of nothing; `skipped` with anything required is not
+    if state != "complete" and not (state == "skipped" and not required):
         reasons.append(f"terminal state {state!r}")
     if exit_code != 0:
         reasons.append(f"exit status {exit_code}")

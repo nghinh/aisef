@@ -117,7 +117,7 @@ if kind == "sleep":
 def item(p):
     return {"item_id": hashlib.sha256("\x00".join(["review", "range", p, p]).encode("utf-8")).hexdigest(), "path": p}
 done = [item(p) for k, p in changed if k != "D"]
-manifest = {"schema_version": "ocr.run-manifest/v1", "operation": "review", "terminal_state": "complete",
+manifest = {"schema_version": "ocr.run-manifest/v1", "operation": "review", "terminal_state": "complete" if done else "skipped",
             "input": {"mode": "range", "resolved_base": base, "resolved_head": head},
             "execution": {"ocr_version": "v1.12.12"},
             "coverage": {"selected": done, "completed": done, "reused": [], "failed": [], "waived": []}}
@@ -369,6 +369,24 @@ class IncompleteReview(ChainBase):
         self.assertEqual([x["coverage"]["status"] for x in rec["sessions"] if x["role"] == "reviewer"], ["INDETERMINATE"])
 
 
+class NothingToReview(ChainBase):
+    def test_a_story_with_no_change_is_reviewed_as_nothing_and_commits(self):
+        """K-NOWORK-001 keeps a review for a story with no developer work; OCR's review of the empty range is `skipped`
+        (measured on the real binary: RealBinary.test_an_empty_range_is_skipped_without_a_model_call) — a complete
+        review of nothing, not a gap that blocks."""
+        src = self.tmp / "source"
+        for rel, text in answer(FIXED).items():
+            (src / rel).parent.mkdir(parents=True, exist_ok=True)
+            (src / rel).write_text(text)
+        git(src, "add", "-A")
+        git(src, "commit", "-q", "-m", "already there")
+        self.project = bundle.load(cli_bundle(git(src, "rev-parse", "HEAD")))
+        rec = self.run_with([FIXED], [{}])
+        self.assertEqual((rec["story_outcomes"], self.prompts()), ({"S1": ["COMMIT"]}, []))     # no developer call
+        s = [x for x in rec["sessions"] if x["role"] == "reviewer"]
+        self.assertEqual([(x["required"], x["coverage"]["status"]) for x in s], [([], "COMPLETE")])
+
+
 class CandidateChangedDuringReview(ChainBase):
     def test_a_file_edited_by_the_finder_discards_the_review_and_never_reaches_main(self):
         rec = self.run_with([FIXED], [{"kind": "tamper"}, {}])
@@ -476,6 +494,16 @@ class RealBinary(unittest.TestCase):
         self.assertEqual(files["notes.txt"]["exclude_reason"], "unsupported_ext")
         self.assertEqual(sorted(os.listdir(self.tmp / "home")), [])         # nothing written to its HOME by a preview
         self.assertEqual(git(self.repo, "status", "--porcelain", "--ignored"), "")
+
+    def test_an_empty_range_is_skipped_without_a_model_call(self):
+        self.head = self.base                                               # a story with no change
+        code = self.ocr("output.json", False, {"url": "http://127.0.0.1:9/v1", "token": "sk-none", "model": "model-1"})
+        output = review_ocr.read_output(self.tmp / "output.json")
+        self.assertEqual((code, output["manifest"]["terminal_state"], output["summary"]["input_tokens"]), (0, "skipped", 0))
+        cov = review_ocr.coverage(output, code, required=[], base=self.base, head=self.head, preview=None)
+        self.assertEqual(cov.status, review_ocr.COMPLETE)
+        self.assertEqual(review_ocr.coverage(output, code, required=["app/cli.py"], base=self.base, head=self.head).status,
+                         review_ocr.INDETERMINATE)
 
     def test_a_full_review_against_a_scripted_model(self):
         _ScriptedModel.seen = []

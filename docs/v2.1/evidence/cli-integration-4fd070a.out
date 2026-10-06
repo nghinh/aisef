@@ -1,0 +1,161 @@
+commit: 4fd070a7b019250eaa442fe95e3f033a500cb7b5 dirty: 0
+opencode on PATH: <out>/fakebin/opencode
+ocr: open-code-review v1.12.12 (182898c) darwin/arm64 sha256 bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7
+== seal
+{
+ "approvals_dropped": [],
+ "approvals_kept": 0,
+ "plan_hash": "5079bd74414eb78abe9348ed1d1ef765d04688f1fcceb74b7af699d993914f89",
+ "specs": 3,
+ "to_approve": [
+  {
+   "contract": "BC-SUM",
+   "contract_hash": "011f1b84ddd96bfb5f58bfe90a23c618f510dff691236a8faecde8dfa9c4ffee",
+   "requirement": "R-CLI",
+   "requirement_hash": "283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042"
+  },
+  {
+   "contract": "BC-USAGE-0",
+   "contract_hash": "4d23b941431f199b7bb33c0dfd403ed84987277425650c6816225bffc9316ff8",
+   "requirement": "R-CLI",
+   "requirement_hash": "283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042"
+  },
+  {
+   "contract": "BC-USAGE-1",
+   "contract_hash": "1441ed48fd12737ffac142904306c1eb10018072c9a289e65e4cde63dd2e470c",
+   "requirement": "R-CLI",
+   "requirement_hash": "283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042"
+  }
+ ],
+ "written": "sealed.json"
+}
+exit 0
+== approve x3
+{
+ "approved": "BC-SUM",
+ "by": "human:integration",
+ "still_to_approve": [
+  {
+   "contract": "BC-USAGE-0",
+   "contract_hash": "4d23b941431f199b7bb33c0dfd403ed84987277425650c6816225bffc9316ff8",
+   "requirement": "R-CLI",
+   "requirement_hash": "283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042"
+  },
+  {
+   "contract": "BC-USAGE-1",
+   "contract_hash": "1441ed48fd12737ffac142904306c1eb10018072c9a289e65e4cde63dd2e470c",
+   "requirement": "R-CLI",
+   "requirement_hash": "283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042"
+  }
+ ],
+ "written": "a1.json"
+}
+exit 0
+{
+ "approved": "BC-USAGE-0",
+ "by": "human:integration",
+ "still_to_approve": [
+  {
+   "contract": "BC-USAGE-1",
+   "contract_hash": "1441ed48fd12737ffac142904306c1eb10018072c9a289e65e4cde63dd2e470c",
+   "requirement": "R-CLI",
+   "requirement_hash": "283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042"
+  }
+ ],
+ "written": "a2.json"
+}
+exit 0
+{
+ "approved": "BC-USAGE-1",
+ "by": "human:integration",
+ "still_to_approve": [],
+ "written": "approved.json"
+}
+exit 0
+== lint
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+ },
+ "coverage": {
+  "criteria_citing_no_requirement_of_the_bundle": [],
+  "limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document",
+  "requirements": {
+   "R-CLI": {
+    "clauses": {
+     "1.1": [
+      "C-SUM"
+     ],
+     "1.2": [
+      "C-USAGE-0",
+      "C-USAGE-1"
+     ]
+    },
+    "criteria": [
+     "C-SUM",
+     "C-USAGE-0",
+     "C-USAGE-1"
+    ],
+    "status": "COVERED"
+   }
+  }
+ },
+ "criteria_without_calibration": [],
+ "criteria_without_contract": [],
+ "to_approve": [],
+ "verdict": "READY"
+}
+exit 0
+== check
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+ },
+ "plan_hash": "5079bd74414eb78abe9348ed1d1ef765d04688f1fcceb74b7af699d993914f89",
+ "project": "calc-cli",
+ "ready": true,
+ "route": "fakeprov/model-1"
+}
+exit 0
+== run
+{
+ "anchor_written_to": "anchors/run1.anchor",
+ "delivery_blocked_by": [],
+ "delivery_verdict": "PASS",
+ "evidence_anchor": "5348472d2f2ded42744e02a79eedafaee659e8d756c95a3bdbd352f264f4a7b0",
+ "final_main": "3d1969af3cbd11792eb1683105b9bcf4f5ae67e4",
+ "journal": {
+  "closed": "SHUTDOWN",
+  "lines": 167,
+  "path": "run/journals/aisef-run.jsonl",
+  "sha256": "7002504e0c11ccdba1be52e3ebbaeb34b5a9b7194666c2ebed0c909d7d335182"
+ },
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "project": "calc-cli",
+ "record": "run1/RUN.json",
+ "story_outcomes": {
+  "S1": [
+   "RETRY",
+   "COMMIT"
+  ]
+ }
+}
+exit 0
+== verify
+{
+ "delivery_verdict": "PASS",
+ "evidence_anchor": "5348472d2f2ded42744e02a79eedafaee659e8d756c95a3bdbd352f264f4a7b0",
+ "journal_events": 167,
+ "notes": [
+  "the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says"
+ ],
+ "problems": [],
+ "verdict": "VERIFIED"
+}
+exit 0
