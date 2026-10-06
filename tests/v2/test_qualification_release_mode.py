@@ -131,6 +131,100 @@ class Subject(unittest.TestCase):
             self.assertEqual(q2._calibration_records(), q2.CYCLE2_CALIBRATION_RECORDS)
 
 
+V2_006, V2_007 = "AISEF-V2-RFC-AMENDMENT-V2-006.json", "AISEF-V2-RFC-AMENDMENT-V2-007.json"
+LINEAGE_FAILS = "the effective RFC lineage does not end at V2-007 unbroken"
+HISTORY_FAILS = "the 2.0 freeze manifest is not intact history"
+
+
+class V21Lineage(unittest.TestCase):
+    """2.1: the rungs require the lineage to end at V2-007 with V2-006 the link before it, and the 2.0 freeze manifest
+    (history: the lineage up to V2-006) intact; q0 measures that V2-007 changes no freeze-table row."""
+
+    VARIANTS = (("the lineage skips V2-006", lambda r: r.__setitem__("lineage", r["lineage"][:-2] + [V2_007]), LINEAGE_FAILS),
+                ("the lineage ends at V2-006", lambda r: r.__setitem__("lineage_end", V2_006), LINEAGE_FAILS),
+                ("the 2.0 manifest is not history",
+                 lambda r: r.__setitem__("v2_0_manifest_history_problems", ["differs from its blob at v2.0.0"]), HISTORY_FAILS))
+
+    def _assert_kills(self, subject_problems, ident: dict):
+        self.assertEqual(ident["rfc"]["lineage"][-2:], [V2_006, V2_007])
+        self.assertEqual(ident["rfc"]["v2_0_manifest_history_problems"], [])
+        clean = subject_problems(ident)
+        self.assertFalse([p for p in clean if p == LINEAGE_FAILS or p.startswith(HISTORY_FAILS)], clean)
+        for name, mutate, reason in self.VARIANTS:
+            bad = json.loads(json.dumps(ident))
+            mutate(bad["rfc"])
+            self.assertTrue(any(p.startswith(reason) for p in subject_problems(bad)), name)
+
+    def _assert_wired(self, subject_problems, identity):
+        """identity() itself feeds subject_problems what freeze_manifest says: a history problem, a lineage that stops
+        at V2-006 and a broken link each reach the rung (an identity() reporting a constant would pass the clean tree only)."""
+        import freeze_manifest as fm
+        eff, links, broken = fm.lineage(C.ROOT)
+
+        def reasons(**patches):
+            with mock.patch.multiple(fm, **patches):
+                ident = identity()
+            return ident["rfc"], subject_problems(ident)
+        clean = subject_problems(identity())
+        self.assertFalse([p for p in clean if p == LINEAGE_FAILS or p.startswith(HISTORY_FAILS)], clean)
+        self.assertIn(f"{HISTORY_FAILS}: ['x']", reasons(history_problems=mock.Mock(return_value=["x"]))[1])
+        rfc, out = reasons(lineage=mock.Mock(return_value=(eff, links[:-1], broken)))
+        self.assertIn(LINEAGE_FAILS, out)
+        self.assertEqual((rfc["lineage_end"], rfc["lineage"][-1]), (V2_006, V2_006))
+        self.assertIn(LINEAGE_FAILS, reasons(lineage=mock.Mock(return_value=(eff, links, ["a broken link"])))[1])
+
+    def test_common_subject_problems(self):
+        with frozen(freeze_record(C.git("rev-parse", "HEAD"))):
+            ident = C.identity()
+            self._assert_wired(C.subject_problems, C.identity)
+        self._assert_kills(C.subject_problems, ident)
+
+    def test_q5_subject_problems(self):
+        from validation.qualification import q5
+        import freeze_manifest as fm
+        _, links, broken = fm.lineage(C.ROOT)
+        with tempfile.TemporaryDirectory() as t:   # an output directory with no corpus: q5.identity() only reads it
+            rfc = q5.identity(pathlib.Path(t))["rfc"]
+            self._assert_wired(q5.subject_problems, lambda: q5.identity(pathlib.Path(t)))
+        self.assertEqual((rfc["lineage_end"], rfc["broken_links"], rfc["lineage"], rfc["v2_0_manifest_history_problems"]),
+                         (pathlib.Path(links[-1]["record"]).name, broken, [pathlib.Path(x["record"]).name for x in links],
+                          fm.history_problems(C.ROOT)))
+        # the rung's non-RFC conditions pinned so the clean verdict is []; the rfc block is q5.identity()'s own
+        ident = {"kernel_tree_is_the_candidates": True, "working_tree_clean": True, "dirty": [], "probe": {"corrected": True},
+                 "corpus": {"items": {"x": {}}}, "rfc": rfc}
+        self.assertEqual(q5.subject_problems(ident), [])
+        self._assert_kills(q5.subject_problems, ident)
+
+    def test_q0_measures_the_rows_and_reads_the_2_0_lineage_as_history(self):
+        from validation.qualification import q0
+        import freeze_manifest as fm
+        latest = json.loads((C.ROOT / fm.AMENDMENTS[-1]).read_text(encoding="utf-8"))
+        self.assertEqual(q0.v21_lineage_history(C.ROOT, latest), {"lineage_ends_at_V2_006": True, "v2_007_changes_no_row": True})
+
+        def in_copy(edits=None, claim=None):
+            with tempfile.TemporaryDirectory() as t:
+                root = pathlib.Path(t)
+                for rel in (fm.HISTORY_MANIFEST_REL, fm.MANIFEST_REL):
+                    (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                    d = json.loads((C.ROOT / rel).read_text(encoding="utf-8"))
+                    (edits or {}).get(rel, lambda _: None)(d)
+                    (root / rel).write_text(json.dumps(d), encoding="utf-8")
+                return q0.v21_lineage_history(root, claim or latest)
+
+        def row(d):
+            d["frozen_items"][4]["row_sha256"] = "0" * 64
+
+        def drop_row(d):
+            d["frozen_items"].pop()
+        self.assertFalse(in_copy({fm.MANIFEST_REL: row})["v2_007_changes_no_row"])        # a changed row, the claim says []
+        self.assertFalse(in_copy({fm.HISTORY_MANIFEST_REL: row})["v2_007_changes_no_row"])
+        self.assertFalse(in_copy({fm.HISTORY_MANIFEST_REL: drop_row, fm.MANIFEST_REL: drop_row})["v2_007_changes_no_row"])  # not F1-F11
+        self.assertFalse(in_copy(claim={**latest, "frozen_items_changed": ["F5"]})["v2_007_changes_no_row"])
+        self.assertFalse(in_copy(claim={**latest, "freeze_table_digest": {"before": "a", "after": "b"}})["v2_007_changes_no_row"])
+        ends = in_copy({fm.HISTORY_MANIFEST_REL: lambda d: d["approval_lineage"].pop()})
+        self.assertEqual(ends, {"lineage_ends_at_V2_006": False, "v2_007_changes_no_row": True})
+
+
 class Cycle2History(unittest.TestCase):
     """The Cycle-2 history consumers read the CYCLE2_* names only, so they keep naming c11615a under a release subject."""
     HISTORY = ("validation/qualification/c2_p6_closure.py", "validation/qualification/c2_p9_preflight.py")

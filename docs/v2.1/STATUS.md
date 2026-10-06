@@ -33,7 +33,7 @@ cải tiến của chủ dự án.
 | B3 | contract regex từ chối sai (V21-37) | **đo** smoke #2; tái hiện trên reference | `test_v21_python_imports` | `06d4e62` | lớp mới **XONG**; contract sửa: **CHẶN** (chủ dự án chọn A/B và duyệt) |
 | B4 | không tạo bundle được nếu thiếu API nội bộ | 360 usability | `test_v21_bundle_tools` (init→seal→approve→lint→`--check` ready) | `620bde7` | **XONG** |
 | B5 | độ phủ theo mệnh đề | 360: 30/54 mệnh đề | `lint.coverage` | `620bde7` | **XONG**, giới hạn: chỉ mệnh đề tác giả khai |
-| B6 | ba danh tính | **đo**: một `-S` làm đỏ 37 test | `test_v21_identity` | `919a271`, `06d4e62` | **XONG**; phê chuẩn V2-007: **CHẶN** (chủ dự án) |
+| B6 | ba danh tính | **chưa đo** (tuyên bố: một `-S` làm đỏ 37 test; không có bản ghi đo đã commit) | `test_v21_identity` | `919a271`, `06d4e62` | **XONG**; V2-007 **ĐÃ DUYỆT** 2026-10-06 trong chat (kỹ thuật chép vào `RELEASE-DECISIONS.json` seq 4, chủ dự án không ký), áp dụng trước khi duyệt: `closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json` |
 | B7 | hash AST ≠ tương đương hành vi | thiết kế | test hiệu chuẩn theo byte | ADR-2 | **XONG** (không tuyên bố tương đương) |
 | C1 | finding của review không bao giờ được kiểm; 5 lỗi đã ship | **đo** session smoke #2 | `test_v21_review` (5 CONFIRMED trên dạng lỗi, NOT_REPRODUCED trên reference) | `e897437` | **XONG** |
 | C2 | bộ chuyển OCR có phiên bản | — | `test_v21_review_ocr` (10) | `e897437`, `390f07c`, `929598f`, `51f2eb5` | nối vào `aisef run` (`review.finder: "ocr"`); nhị phân thật v1.12.12 + mô hình kịch bản qua CLI thật: **M4**; mô hình thật: **CHƯA** (ngân sách) |
@@ -49,7 +49,7 @@ cải tiến của chủ dự án.
 
 | ID | Việc | Phụ thuộc | Nghiệm thu |
 |---|---|---|---|
-| B-01 | Chủ dự án phê chuẩn ARCHITECTURE-EXCEPTION-V2-007 (ADR-2) | — | bản ghi phê duyệt do chủ dự án ký |
+| B-01 | Chủ dự án phê chuẩn ARCHITECTURE-EXCEPTION-V2-007 (ADR-2) | — | bản ghi phê duyệt do chủ dự án ký — **không đạt nguyên văn**: chủ dự án duyệt trong chat 2026-10-06 và chỉ thị "Ghi quyết định này vào sổ quyết định hiện có"; kỹ thuật chép nguyên văn vào `RELEASE-DECISIONS.json` seq 4 (chủ dự án không ký) và ghi `closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json` + `AISEF-V2-RFC-AMENDMENT-V2-007.json` (áp dụng trước khi duyệt, `919a271`) |
 | B-02 | Phát hành 2.0.1: đẩy `release/v2.0.1-prep`, CI 14 job, staging SHA256SUMS, `release_rc --freeze`, Q0–Q5 theo charter, quyết định phát hành, tag (chủ dự án) | — | gate `v2_release_gate 2.0.1` PASS; byte PyPI = byte RC |
 | B-03 | Vòng tái thẩm định 2.1 (§4): inventory thẩm quyền 2.1, kiểm định checker, mutation có mục tiêu, acceptance 2.1 tiền đăng ký — **bản ghi mới**, không ghi đè | B-01 | suite đầy đủ xanh trên ứng viên 2.1 |
 | B-04 | Chọn bản nháp S-10-a (A hoặc B) và duyệt | — | LedgerLock không còn rollback sai trên dạng smoke #2 |

@@ -378,7 +378,8 @@ def gen_evidence_table(m: dict, phases: tuple[str, ...]) -> str:
 def gen_baseline(m: dict) -> str:
     ab = m["architecture_baseline"]
     amend = "; ".join(f"[`{a['record'].rsplit('/', 1)[-1]}`](../../../{a['record']}) (`{a['sha256'][:16]}…`, "
-                      f"changes {', '.join(a['frozen_items_changed'])})" for a in ab.get("amendments", []))
+                      f"changes {', '.join(a['frozen_items_changed']) or 'no freeze-table row'})"
+                      for a in ab.get("amendments", []))
     return (f"**Architecture baseline — frozen.**\n"
             f"[`{ab['rfc']}`](../../architecture/{ab['rfc'].rsplit('/', 1)[-1]}), approved at commit `2fe672c`. "
             f"Approval record\n[`{ab['approval_record']}`](../../../{ab['approval_record']}), content-addressed "

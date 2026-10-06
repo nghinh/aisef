@@ -4,7 +4,11 @@ Recomputes, from the RFC at HEAD, the two digests the owner approval record bind
 items F1-F11. Drift in the normative body or the freeze table fails; an edit to the non-normative status preamble
 does not, because the normative digest starts at the first normative heading.
 
-    python -P validation/v2/freeze_manifest.py            # write the manifest
+2.1 (ARCHITECTURE-EXCEPTION-V2-007): the lineage continues in closure-evidence/v2/v2.1/ and the current manifest is
+written there. The 2.0 manifest (the V2-006 freeze, pinned by the Cycle-2 baseline guard) is history: its bytes are its
+blob at v2.0.0 and the lineage it froze is the head of the current one.
+
+    python -P validation/v2/freeze_manifest.py            # write the 2.1 manifest (refuses an existing file)
     python -P validation/v2/freeze_manifest.py --check    # fail on any drift
 """
 
@@ -19,21 +23,28 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 RFC_REL = "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md"
 APPROVAL_REL = "closure-evidence/v2/AISEF-V2-RFC-APPROVAL.json"
-MANIFEST_REL = "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json"
+MANIFEST_REL = "closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json"
+#: The 2.0 manifest: history, never written here. HISTORY_BLOB is its git blob at HISTORY_TAG (`git rev-parse
+#: v2.0.0:<path>`, asserted against the tag by tests/v2/p0/test_freeze_manifest.py), pinned so that a tree without git
+#: objects — a mutation run's copy — checks the same history.
+HISTORY_MANIFEST_REL = "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json"
+HISTORY_TAG, HISTORY_BLOB = "v2.0.0", "cc609ebf5e0f961bccebbc943cc163d0fc9b838a"
 #: Approved amendments, oldest first — the architecture-exception mechanism. Each binds the record it amends (by
 #: sha256), its exception record (by sha256) and before/after digests. The original approval record never changes.
 AMENDMENTS = ("closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-001.json",
               "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json",
               "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json",
               "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-005.json",  # V2-004 was superseded, never applied
-              "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json")
+              "closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-006.json",
+              "closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json")
 EXCEPTIONS = ("closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-001.json",
               "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-002.json",
               "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-003.json",
               "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-005.json",
-              "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json")
+              "closure-evidence/v2/ARCHITECTURE-EXCEPTION-V2-006.json",
+              "closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json")
 #: Every file the baseline is identified from.
-BASELINE_FILES = (RFC_REL, APPROVAL_REL, MANIFEST_REL, *AMENDMENTS, *EXCEPTIONS)
+BASELINE_FILES = (RFC_REL, APPROVAL_REL, MANIFEST_REL, HISTORY_MANIFEST_REL, *AMENDMENTS, *EXCEPTIONS)
 
 # The digest rules are stated in the approval record; these constants must match them (asserted by the tests).
 NORMATIVE_MARK = "## 1. Executive architecture decision"
@@ -131,6 +142,9 @@ def build(root: pathlib.Path = ROOT) -> dict:
         "approved_rfc_normative_digest": effective["rfc_normative_digest"],
         "approved_freeze_table_digest": effective["freeze_table_digest"],
         "approval_lineage": links,
+        "history": {"path": HISTORY_MANIFEST_REL, "sha256": _lf_sha(root / HISTORY_MANIFEST_REL), "tag": HISTORY_TAG,
+                    "rule": f"the 2.0 manifest (the V2-006 freeze) is history: byte-identical to its blob at "
+                            f"{HISTORY_TAG}, its lineage the head of this one"},
         "reviewed_commit": approval["rfc"]["reviewed_commit"],
         "frozen_items": items,
         "rules": {
@@ -139,6 +153,36 @@ def build(root: pathlib.Path = ROOT) -> dict:
             "non_normative": "everything above the normative mark is status metadata and is not digested",
         },
     }
+
+
+def history_problems(root: pathlib.Path = ROOT) -> list[str]:
+    """The 2.0 manifest is history: its LF bytes are its blob at HISTORY_TAG, it recorded no drift, and the lineage it
+    froze is the head of the current one. Never raises: an unreadable file is a problem, not an exception."""
+    try:
+        data = (root / HISTORY_MANIFEST_REL).read_bytes().replace(b"\r\n", b"\n")
+    except OSError as exc:
+        return [f"{HISTORY_MANIFEST_REL} is missing or unreadable: {exc.strerror or exc}"]
+    out = []
+    if hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest() != HISTORY_BLOB:
+        out.append(f"{HISTORY_MANIFEST_REL} differs from its blob at {HISTORY_TAG}: the 2.0 freeze is history, "
+                   "never rewritten")
+    try:
+        old = json.loads(data)
+        drifted = (old.get("rfc_normative_digest"), old.get("freeze_table_digest")) \
+            != (old.get("approved_rfc_normative_digest"), old.get("approved_freeze_table_digest"))
+        frozen = old.get("approval_lineage")
+    except (ValueError, AttributeError) as exc:
+        return out + [f"{HISTORY_MANIFEST_REL} is not a readable manifest: {exc}"]
+    # implied by the blob pin today; kept so that a re-pinned HISTORY_BLOB that recorded drift still fails
+    if drifted:
+        out.append(f"{HISTORY_MANIFEST_REL} records a drifted baseline")
+    try:
+        current = lineage(root)[1]
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        return out + [f"the current lineage cannot be read: {exc!r}"]
+    if not isinstance(frozen, list) or not frozen or current[:len(frozen)] != frozen:
+        out.append(f"the lineage {HISTORY_MANIFEST_REL} froze is not the head of the current lineage")
+    return out
 
 
 def check(root: pathlib.Path = ROOT) -> list[str]:
@@ -155,12 +199,14 @@ def check(root: pathlib.Path = ROOT) -> list[str]:
     ids = [i["id"] for i in m["frozen_items"]]
     if ids != FROZEN_IDS:
         problems.append(f"frozen items must be exactly {FROZEN_IDS}, found {ids}")
-    committed = root / MANIFEST_REL
-    if not committed.exists():
+    try:   # bytes, never decoded: an unreadable or non-UTF-8 file is a problem, not an exception
+        stale = (root / MANIFEST_REL).read_bytes().replace(b"\r\n", b"\n") != render(m).encode("utf-8")
+    except OSError:
         problems.append(f"{MANIFEST_REL} is missing")
-    elif json.loads(committed.read_text(encoding="utf-8")) != m:
-        problems.append(f"{MANIFEST_REL} is stale: regenerate it")
-    return problems
+    else:
+        if stale:
+            problems.append(f"{MANIFEST_REL} is stale: regenerate it")
+    return problems + history_problems(root)
 
 
 def render(m: dict) -> str:
@@ -170,17 +216,31 @@ def render(m: dict) -> str:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     if "--check" in argv:
-        problems = check()
+        problems = check(ROOT)
         for p in problems:
             print(f"FAIL  {p}")
         print("freeze manifest: " + ("FAIL" if problems else "PASS"))
         return 1 if problems else 0
-    m = build()
+    m = build(ROOT)
     if m["rfc_normative_digest"] != m["approved_rfc_normative_digest"] \
             or m["freeze_table_digest"] != m["approved_freeze_table_digest"] or lineage(ROOT)[2]:
         print("REFUSED: the RFC at HEAD does not match the approval record; a manifest will not bless drift")
         return 1
-    (ROOT / MANIFEST_REL).write_text(render(m), encoding="utf-8")
+    history = history_problems(ROOT)
+    if history:
+        print("REFUSED: the 2.0 manifest is not intact history: " + "; ".join(history))
+        return 1
+    if MANIFEST_REL == HISTORY_MANIFEST_REL or not MANIFEST_REL.startswith("closure-evidence/v2/v2.1/"):
+        print(f"REFUSED: {MANIFEST_REL} is not a 2.1 path; a 2.0 record is never rewritten")
+        return 1
+    out = ROOT / MANIFEST_REL
+    out.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with open(out, "x", encoding="utf-8") as f:
+            f.write(render(m))
+    except FileExistsError:
+        print(f"REFUSED: {MANIFEST_REL} exists; a record is never overwritten")
+        return 1
     print(f"wrote {MANIFEST_REL}: {len(m['frozen_items'])} frozen items")
     return 0
 

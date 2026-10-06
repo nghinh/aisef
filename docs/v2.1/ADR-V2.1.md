@@ -28,7 +28,8 @@ máy hoặc gói aisef đã cài; sandbox OS (V2-05) là việc riêng.
 
 **Vấn đề.** 2.0.0: `probe_digest` = sha256 các tệp nguồn probe; spec id, semantic hash, plan, approval-qua-plan, bản ghi
 hiệu chuẩn đều buộc vào nó. Sửa một chú thích trong probe ⇒ đổi mọi spec id ⇒ mọi bundle phải buộc lại, mọi bản ghi phái
-sinh đỏ (đo: chỉ thêm `-S` làm đỏ 37 test).
+sinh đỏ (**chưa đo**: tuyên bố "chỉ thêm `-S` làm đỏ 37 test" không có bản ghi đo đã commit; bản ghi V2-007 ghi
+UNMEASURED).
 
 **Quyết định.** Ba danh tính:
 
@@ -49,9 +50,15 @@ tương phản hiệu chuẩn trên fixture đã commit. Kỷ luật tăng versi
 **Di trú:** spec id của 2.0.0 đổi một lần → `aisef bundle migrate` (LedgerLock: 59 spec, 67 obligation, admit 9/9, không
 duyệt lại). Bằng chứng cũ giữ nguyên byte.
 
-**Trạng thái của ngoại lệ:** ÁP DỤNG trên nhánh theo chỉ thị của chủ dự án ngày 2026-10-06 ("tách ba danh tính");
-**chưa có phê duyệt chính thức dạng bản ghi** — không tạo bản ghi phê duyệt giả. Chủ dự án cần phê chuẩn trước khi 2.1 phát
-hành (backlog B-01).
+**Trạng thái của ngoại lệ:** **ĐÃ DUYỆT** — chủ dự án phê duyệt B-01 trong chat ngày 2026-10-06; kỹ thuật chép nguyên
+văn vào `closure-evidence/v2/cycle2/RELEASE-DECISIONS.json` (seq 4) theo chỉ thị của chủ dự án "Ghi quyết định này vào sổ
+quyết định hiện có" — chủ dự án **không ký** sổ đó hay bản ghi ngoại lệ. Bản ghi:
+[`closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json`](../../closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json),
+nối vào lineage phê duyệt của RFC bằng
+[`AISEF-V2-RFC-AMENDMENT-V2-007.json`](../../closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json); RFC sửa ở
+§5.1, §8, §9.1.1, §12 (check 6, 9), §35 và Review 2, không đổi hàng nào của bảng đóng băng. **Áp dụng trước khi được
+duyệt** (`919a271` 2026-10-06 11:27 +07, `06d4e62`, `4d4c53a`): bản ghi nói rõ điều đó và không ghi lùi ngày. Phê duyệt
+kiến trúc không xác nhận implementation đã đúng — tương thích, migration và ràng buộc evidence vẫn phải kiểm chứng (B-03).
 
 ## ADR-3 — `--verify` dựng lại mọi trường có thể nâng verdict; manifest + anchor
 
