@@ -34,10 +34,10 @@ from validation.qualification import s2_mutation_record as S2  # noqa: E402
 PHASE = "V2.1"
 WORKERS_REL = "closure-evidence/v2/v2.1/mutation-workers"
 SUMMARY_REL = "closure-evidence/v2/v2.1/MUTATION-SUMMARY.json"
-SNAPSHOT = None     # the campaign's snapshot commit: set (with FROZEN_CRITERIA_SHA256) before any result is qualified
+SNAPSHOT = "cc5359699c057f666f1693b90f1beb4762676478"   # the campaign's snapshot (REQUALIFICATION-MANIFEST.json), frozen before any result
 EXCLUDED: dict[str, str] = {}
 CRITERIA = ("PHASE", "SNAPSHOT", "EXCLUDED", "proof", "_current")
-FROZEN_CRITERIA_SHA256 = None
+FROZEN_CRITERIA_SHA256 = "9e6f9d39bee3b76549071a326bd32dd85d50d705ed18c396c8764a4c10b3dbdf"
 
 
 def proof(root: pathlib.Path, result: dict, measured_on: str, head: str = "HEAD") -> tuple[list[str], list[str]]:

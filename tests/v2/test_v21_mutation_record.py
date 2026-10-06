@@ -34,6 +34,12 @@ class Phase(unittest.TestCase):
             self.assertTrue(any(t.startswith(rel + "::") for t in m.V21_TARGETS), rel)
         self.assertNotIn("aisef2/app/calibrations.py::CALIBRATIONS", m.TARGETS)
 
+    def test_the_criteria_and_the_snapshot_are_frozen_before_any_result(self):
+        import json
+        self.assertEqual(R.criteria_sha256(), R.FROZEN_CRITERIA_SHA256)
+        manifest = json.loads((ROOT / "closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST.json").read_text(encoding="utf-8"))
+        self.assertEqual(R.SNAPSHOT, manifest["snapshot"])
+
 
 class Proof(unittest.TestCase):
     TARGET = "aisef2/app/review_verify.py::blocks"
