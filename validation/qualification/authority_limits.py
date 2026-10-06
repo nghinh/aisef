@@ -8,23 +8,26 @@ violation reported as `RULE rel:line explanation`:
 
 * **MIGRATE_NEVER_APPROVES** — nothing migrate reaches in aisef2/app calls `bundle_cli.approve`, names ContractApproval
   (outside an annotation) other than to re-load one of the input's — `ContractApproval(**a)` as the element of a
-  one-loop comprehension `for a in data["approvals"]` (so `a` cannot be rebound) — copies one with changes
+  one-loop comprehension `for a in data["approvals"]`, `data` the function's first parameter and never rebound (so
+  `a` cannot be rebound) — copies one with changes
   (`dataclasses.replace`, `copy.replace`), or writes approvals: an `approvals` key or keyword, a store, delete or
-  mutating method call (update, append, ...; setattr) on the approvals, on a part of them, on a name bound to them or
+  mutating method call (update, append, ...; setattr, operator.setitem) on the approvals, on a part of them, on a name bound to them or
   to a part of them, or with the key "approvals" among its arguments. A parameter of a reached function is bound to the
   approvals when a call in the closure passes them (or a part of them) to it.
 * **NO_COMMIT_OR_MERGE** — module-based: nothing migrate or verify reaches in aisef2/app names (calls or not) anything
   of a deciding module — the kernel's git, merge, gate, review and story runner (aisef2.orchestrate), the owner's
   control (aisef2.control), the journal (aisef2.journal), story admission (aisef2.plan.story_admission) — or a control
-  event (aisef2.arch.enums.EventType), and nothing builds a `git` command. Fail-closed: what they name elsewhere in
-  aisef2 is the explicit list REACHES (data types, compile_spec, the probe protocol, the calibration lookup); a new
-  name fails until it is shown to decide nothing and listed.
+  event (aisef2.arch.enums.EventType), and no string holds `git` as a word (a command, a path to it, git.exe).
+  Fail-closed: what they name elsewhere in aisef2 is the explicit list REACHES (data types, compile_spec, the probe
+  protocol, the calibration lookup), in the standard library the modules STDLIB lists; a new name fails until it is
+  shown to decide nothing and listed, as do a module named as a value (what is called on it is not followed), a name
+  aisef2/app does not define and a DYNAMIC builtin (eval, exec, __import__, getattr, ...).
 * **VERIFY_THROUGH_BINDING_AND_CALIBRATION** — verify runs a probe, and every `run_probe(probe, spec, ...)` in it is the
   record `bound_result` binds (PROBE-BIND-1), after a lookup that refuses when the run is not calibrated — an earlier
   statement of the probe's block, `if calibration_for(calibrations(), E.probe_id, executing(E.factory), cls) is None:
   return Verification(UNVERIFIABLE, ...)`, where `probe = E.factory()` and `cls` is the observation class of `spec`,
   each name bound once; nothing verify reaches observes (`.observe`) outside run_probe.
-* **ONE_DECISION_PATH** — across aisef2, verify is named only by `Reviewer._verify` (aisef2/app/adapters.py),
+* **ONE_DECISION_PATH** — across aisef2 (the modules that define them never named as a value), verify is named only by `Reviewer._verify` (aisef2/app/adapters.py),
   `review_verify.blocks` only by `Reviewer.review` and migrate only by `bundle_cli.main`; in aisef2/app a Finding is
   built only by a Reviewer method, corroborated only as `(...) if N else ()` (or never) with every binding of N
   `N = review_verify.blocks(...)` and one an earlier statement of the Finding's block, or by `RuffScanner.read`,
@@ -36,9 +39,11 @@ violation reported as `RULE rel:line explanation`:
 (an alias `save = W.commit_all` or `save: object = W.commit_all` is followed like an import; any other binding, a
 store into it or a call on it at module level joins the closure with what it names), followed through every re-export (`from aisef2.app.adapters import
 commit_all` is workspace.commit_all) — inside aisef2/app. Known ceiling: a call through an object (`entry.factory()`,
-`self.x`) or through a value computed at run time (getattr) is not followed; the analysis is flow-insensitive except
+`self.x`) is not followed, nor what a reached class's `__init__` does with an argument (`K(out["approvals"])`); the
+analysis is flow-insensitive except
 that a binding of the corroboration name after its Finding counts only inside a loop that holds both; the behavioural
-tests (test_v21_identity Migrate, test_v21_review, test_v21_review_chain) cover what those do at run time.
+tests (test_v21_identity Migrate — `test_migration_rebinds_the_plan_and_nothing_else` asserts the input unchanged and
+the output's approvals equal to the input's —, test_v21_review, test_v21_review_chain) cover what those do at run time.
 
     python -P validation/qualification/authority_limits.py     # exit 1 on any violation
 """
@@ -76,7 +81,7 @@ EVENT_TYPE = "aisef2.arch.enums.EventType"
 REPLACE = {"dataclasses.replace", "copy.replace"}
 MUTATORS = {"update", "append", "extend", "insert", "pop", "popitem", "setdefault", "clear", "remove", "sort", "reverse",
             "__setitem__", "__delitem__", "__setattr__", "__delattr__", "__init__"}
-SETATTR = {"setattr", "delattr", "object.__setattr__", "object.__delattr__"}
+SETATTR = {"setattr", "delattr", "object.__setattr__", "object.__delattr__", "operator.setitem", "operator.delitem"}
 #: where deciding lives — a migration or a verification names nothing in these (module, or one definition)
 DECIDING = ("aisef2.orchestrate", "aisef2.control", "aisef2.journal", "aisef2.plan.story_admission", EVENT_TYPE)
 #: everything outside aisef2/app migrate and verify may name: each decides nothing (data types and their constructors,
@@ -97,7 +102,12 @@ REACHES = {
     "aisef2.product.contract.BehaviorContract", "aisef2.product.contract.ContractError", "aisef2.product.contract.Subject",
     "aisef2.product.contract.plain", "aisef2.product.outcome.Executed", "aisef2.product.spec.ProductProofSpec",
 }
-GIT_COMMAND = re.compile(r"git(\s|$)")
+#: the standard library migrate and verify may name — fail-closed like REACHES (subprocess, os, importlib, shutil fail)
+STDLIB = ("dataclasses", "hashlib", "json", "pathlib", "re", "typing")
+#: builtins that run code or reach a name computed at run time
+DYNAMIC = {"__import__", "eval", "exec", "compile", "globals", "locals", "vars", "getattr", "breakpoint"}
+#: `git` as a word anywhere in a string (`git`, `/usr/bin/git`, `git.exe`, `sh -c "cd x && git ..."`)
+GIT_COMMAND = re.compile(r"(^|[\s/\\&;|'\"])git(\.exe)?(\s|$|['\"])")
 
 
 def _top(body: list):
@@ -291,11 +301,15 @@ def _held(node: ast.AST, params=()) -> set[str]:
 
 def _reloads(node: ast.AST) -> set[int]:
     """The callees (by id) of the `ContractApproval(**a)` calls that re-load an approval of the input: each the element
-    of a comprehension whose one loop is `for a in X["approvals"]` — `a` is then the input's element and nothing
-    rebinds it."""
+    of a comprehension whose one loop is `for a in D["approvals"]`, D the function's first parameter and never rebound
+    in it — `a` is then the input's element and nothing rebinds it."""
+    first = _params(node)[:1] if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) else []
+    if first and any(isinstance(t, ast.Name) and t.id == first[0] and isinstance(t.ctx, ast.Store) for t in ast.walk(node)):
+        first = []
     return {id(c.elt.func) for c in ast.walk(node) if isinstance(c, (ast.ListComp, ast.GeneratorExp, ast.SetComp))
             and len(c.generators) == 1 and isinstance(g := c.generators[0], ast.comprehension)
-            and isinstance(g.target, ast.Name) and _is_approvals(g.iter) and isinstance(c.elt, ast.Call)
+            and isinstance(g.target, ast.Name) and _is_approvals(g.iter) and isinstance(g.iter, ast.Subscript)
+            and isinstance(g.iter.value, ast.Name) and g.iter.value.id in first and isinstance(c.elt, ast.Call)
             and not c.elt.args and len(c.elt.keywords) == 1 and c.elt.keywords[0].arg is None
             and isinstance(c.elt.keywords[0].value, ast.Name) and c.elt.keywords[0].value.id == g.target.id}
 
@@ -366,25 +380,35 @@ def _approves(m: _Module, n: ast.AST, held: set[str]) -> str | None:
     return None
 
 
-def _decides(m: _Module, node: ast.AST) -> list[tuple[int, str]]:
-    """(line, why) of each place in `node` that names a deciding module, a control event or what REACHES does not
-    list, or builds a git command."""
+def _decides(m: _Module, node: ast.AST, index: dict) -> list[tuple[int, str]]:
+    """(line, why) of each place in `node` that names a deciding module, a control event, what REACHES does not list,
+    a module as a value, a standard-library module STDLIB does not list or a DYNAMIC builtin, or builds a git
+    command."""
     calls = [n for n in ast.walk(node) if isinstance(n, ast.Call)]
     funcs = {id(n.func) for n in calls}
     appended = {id(a) for n in calls if isinstance(n.func, ast.Attribute) and n.func.attr == "append"
                 for a in (*n.args, *(k.value for k in n.keywords))}
     out = []
     for n, part, q in _refs(m, node):
-        if not q.startswith("aisef2.") or _under(q, ("aisef2.app",)):
-            continue     # what aisef2/app defines is followed by the closure; a module constant is data
+        head = (opa._dotted(n) or "").split(".")[0]
         if _under(q, (EVENT_TYPE,)) and id(n) in appended:
             out.append((n.lineno, f"appends the control event {getattr(n, 'attr', q)} to a journal"))
         elif _under(q, DECIDING):     # a method of GitMerger names GitMerger on its way
             out.append((n.lineno, f"{'calls' if id(part) in funcs else 'names'} {q}"))
+        elif q in m.world or q == "aisef2":
+            out.append((n.lineno, f"names the module {q} as a value: what is called on it is not followed"))
+        elif not q.startswith("aisef2."):
+            if head in m.imports and q.split(".")[0] not in STDLIB:
+                out.append((n.lineno, f"names {q}, outside the standard library STDLIB lists"))
+            elif head not in m.imports and q in DYNAMIC:
+                out.append((n.lineno, f"calls {q}: what it reaches is computed at run time"))
+        elif _under(q, ("aisef2.app",)):
+            if q not in index:     # what aisef2/app defines is followed by the closure
+                out.append((n.lineno, f"names {q}, which aisef2/app does not define"))
         elif q not in REACHES:
             out.append((n.lineno, f"names {q}, which REACHES does not list: list it only once it is shown to decide nothing"))
     out += [(n.lineno, "runs git") for n in ast.walk(node)
-            if isinstance(n, ast.Constant) and isinstance(n.value, str) and GIT_COMMAND.match(n.value)]
+            if isinstance(n, ast.Constant) and isinstance(n.value, str) and GIT_COMMAND.search(n.value)]
     return out
 
 
@@ -537,13 +561,16 @@ def check(root: pathlib.Path = ROOT, sources: dict[str, str] | None = None) -> l
                 "approves" for line, why in sorted(whys, key=lambda w: w[0])]
     for q, rel, node in _closure(mods, index, (MIGRATE, VERIFY)):
         out += [f"NO_COMMIT_OR_MERGE {rel}:{line} {_short(q)} {why}: what migrate or verify reaches never commits, "
-                "merges or decides" for line, why in _decides(mods[rel], node)]
+                "merges or decides" for line, why in _decides(mods[rel], node, index)]
     if VERIFY in index:
         rel, node = index[VERIFY]
         out += _verify_rule(mods[rel], node, _closure(mods, index, (VERIFY,)))
-    named = set()
+    named, holders = set(), {q.rsplit(".", 1)[0] for q in ONLY_NAMED_BY} | {FINDING.rsplit(".", 1)[0]}
     for rel, m in mods.items():
         for scope, node in m.scopes():
+            out += [f"ONE_DECISION_PATH {rel}:{n.lineno} {scope} names the module {_short(q)} as a value: what is called "
+                    "on it is not followed" for n, _, q in _refs(m, node) if q in holders
+                    and (rel.startswith(APP) or q != FINDING.rsplit(".", 1)[0])]
             for n in _loads(node):
                 q = m.name(n)
                 if q not in ONLY_NAMED_BY:

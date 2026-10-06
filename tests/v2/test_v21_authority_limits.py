@@ -145,12 +145,23 @@ class MigrateNeverApproves(unittest.TestCase):
                 (f'{reload}\n        CA = ContractApproval\n'
                  '        approvals = (*approvals, CA("r", "h", "c", "h", "human:migrate", 0.0, ()))', "CA = ContractApproval"),
                 (f"{reload}\n        x = ContractApproval.__new__(ContractApproval)", "__new__"),
-                (f'{reload}\n        make = getattr(ContractApproval, "__call__")', "make = getattr"),
                 (f"{reload}\n        from aisef2.app.bundle import ContractApproval as Again\n        x = Again(**{{}})", "x = Again"),
                 (f"{reload}\n        from aisef2.product import approval as AP\n        x = AP.ContractApproval(**{{}})", "x = AP.")):
             with self.subTest(edit=edit):
                 src = edited(BUNDLE_CLI, (reload, edit))
                 self.assertEqual(check(BUNDLE_CLI, src), [created.format(line_of(src, at))])
+        src = edited(BUNDLE_CLI, (reload, f'{reload}\n        make = getattr(ContractApproval, "__call__")'))
+        at = line_of(src, "make = getattr")     # getattr is also a DYNAMIC builtin: what it reaches is computed at run time
+        self.assertEqual(check(BUNDLE_CLI, src), [created.format(at), f"NO_COMMIT_OR_MERGE {BUNDLE_CLI}:{at} bundle_cli.migrate "
+                                                                      f"calls getattr: what it reaches is computed at run time{DECIDES}"])
+        # a re-load is of the function's own input: not of a document it built, not after its input is rebound
+        for edit, at in (
+                ('        mine = {"approvals": [{"approver": "human:migrate"}]}\n'
+                 '        approvals = tuple(ContractApproval(**a) for a in mine["approvals"])', 'for a in mine["approvals"]'),
+                (f'        data = {{**data, "approvals": []}}\n{reload}', reload.strip())):
+            with self.subTest(edit=edit):
+                src = edited(BUNDLE_CLI, (reload, edit))
+                self.assertIn(created.format(line_of(src, at)), check(BUNDLE_CLI, src))
         # an annotation names the type and builds nothing: the stated exemption, and the only one besides the re-load
         src = edited(BUNDLE_CLI, (reload, f"{reload}\n        first: ContractApproval | None = approvals[0] if approvals else None"))
         self.assertEqual(check(BUNDLE_CLI, src), [])
@@ -180,6 +191,15 @@ class MigrateNeverApproves(unittest.TestCase):
                 src = edited(BUNDLE_CLI, (self.OUT, f"{self.OUT}\n{write}"))
                 self.assertEqual(check(BUNDLE_CLI, src), [f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{line_of(src, write)} "
                                                           f"bundle_cli.migrate writes the approvals{APPROVES}"])
+
+    def test_operator_setitem_on_the_approvals_is_a_write(self):
+        out = self.OUT
+        for use in ('    import operator\n    operator.setitem(out, "approvals", [])',
+                    '    import operator\n    operator.setitem(out["approvals"], 0, {})'):
+            with self.subTest(use=use):
+                src = edited(BUNDLE_CLI, (out, f"{out}\n{use}"))
+                self.assertIn(f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{line_of(src, 'operator.setitem')} bundle_cli.migrate writes "
+                              f"the approvals{APPROVES}", check(BUNDLE_CLI, src))
 
     def test_calling_approve_is_caught_with_everything_approve_then_reaches(self):
         written = 'return {**dict(bundle), "approvals": [*bundle["approvals"], *new]}'
@@ -268,7 +288,13 @@ class NoCommitOrMerge(unittest.TestCase):
         self.assertEqual(check(BUNDLE_CLI, src), [     # a method of GitMerger names GitMerger on its way
             f"NO_COMMIT_OR_MERGE {BUNDLE_CLI}:{line_of(src, 'W.GitMerger.merge(')} bundle_cli.migrate names "
             f"aisef2.orchestrate.workspace.GitMerger{DECIDES}"])
-        src = edited(BUNDLE_CLI, (out, f'{out}\n    note = "github and gitignore are not git"'))
+        for cmd in ('    subprocess.run(["/usr/bin/git", "merge", "x"])', '    subprocess.run(["git.exe", "commit"])',
+                    '    subprocess.run("cd x && git commit -am m", shell=True)', '    note = "a migration is not git"'):
+            with self.subTest(cmd=cmd):     # git as a word anywhere: a path to it, git.exe, inside a shell line, prose
+                src = edited(BUNDLE_CLI, (out, f"{out}\n{cmd}"))
+                self.assertIn(f"NO_COMMIT_OR_MERGE {BUNDLE_CLI}:{line_of(src, cmd)} bundle_cli.migrate runs git{DECIDES}",
+                              check(BUNDLE_CLI, src))
+        src = edited(BUNDLE_CLI, (out, f'{out}\n    note = "github, gitignore, a digit and legit"'))
         self.assertEqual(check(BUNDLE_CLI, src), [])
 
     def test_anything_of_a_deciding_module_is_caught_not_only_a_listed_name(self):
@@ -321,6 +347,28 @@ class NoCommitOrMerge(unittest.TestCase):
                                    "except ImportError:\n    save = None\n"), (self.FACTORY, f"{self.FACTORY}\n    save(root, 'x')"))
         self.assertEqual(check(VERIFY, src), [f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(src, 'save(root')} review_verify.verify "
                                               f"calls aisef2.orchestrate.workspace.commit_all{DECIDES}"])
+
+    def test_a_module_value_the_standard_library_beyond_stdlib_or_a_dynamic_builtin_fails_closed(self):
+        for imp, use, why in (
+                ("from aisef2.app import run as R", "hooks = (R,)", "names the module aisef2.app.run as a value: what is called "
+                                                                    "on it is not followed"),
+                ("import aisef2", "pkg = aisef2", "names the module aisef2 as a value: what is called on it is not followed"),
+                ("from aisef2.app import run as R", "R.no_such_name()", "names aisef2.app.run.no_such_name, which aisef2/app "
+                                                                       "does not define"),
+                ("import subprocess", "subprocess.run(['/bin/true'])", "names subprocess, outside the standard library "
+                                                                       "STDLIB lists"),
+                ("import importlib", "importlib.import_module('aisef2.orchestrate.workspace')",
+                 "names importlib, outside the standard library STDLIB lists"),
+                ("from os import system", "system('true')", "names os.system, outside the standard library STDLIB lists"),
+                ("import json", "eval('1')", "calls eval: what it reaches is computed at run time"),
+                ("import json", "__import__('aisef2.orchestrate.workspace')", "calls __import__: what it reaches is computed at "
+                                                                              "run time")):
+            with self.subTest(imp=imp, use=use):
+                src = edited(VERIFY, (self.FACTORY, f"{self.FACTORY}\n    {imp}\n    {use}"))
+                self.assertEqual(check(VERIFY, src), [f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(src, use)} review_verify.verify "
+                                                      f"{why}{DECIDES}"])
+        src = edited(VERIFY, (self.FACTORY, f"{self.FACTORY}\n    import json\n    json.dumps({{}})"))
+        self.assertEqual(check(VERIFY, src), [])     # a module STDLIB lists
 
     def test_a_name_reaches_does_not_list_fails_closed_and_the_list_holds_nothing_deciding(self):
         use = "sa.StaticPlanAdmissionEngine()"
@@ -444,6 +492,19 @@ class OneDecisionPath(unittest.TestCase):
         src = edited(ADAPTERS, ("    def _verify(self, finding: dict, root: str, head: str)", "    def _probe(self, finding: dict, root: str, head: str)"))
         self.assertEqual(check(ADAPTERS, src), [f"{self.RULE} {ADAPTERS}:{line_of(src, 'return review_verify.verify(')} Reviewer._probe "
                                                 "names review_verify.verify: only aisef2/app/adapters.py::Reviewer._verify does"])
+
+    def test_the_module_that_defines_verify_blocks_migrate_or_finding_named_as_a_value_is_caught(self):
+        for rel, src, at, q in (
+                ("aisef2/app/second_gate.py", "from aisef2.app import review_verify as RV\n\n\ndef decide(v, f):\n"
+                 "    m = RV\n    return m.blocks(v, f, 'fix-loop', 'low', None)\n", "m = RV", "review_verify"),
+                ("aisef2/orchestrate/auto.py", "from aisef2.app import bundle_cli\n\n\ndef upgrade(doc):\n"
+                 "    t = (bundle_cli,)\n    return t[0].migrate(doc)[0]\n", "t = (bundle_cli,)", "bundle_cli"),
+                ("aisef2/app/forge.py", "from aisef2.orchestrate import adapters as OA\n\n\ndef forge():\n"
+                 "    k = OA\n    return k.Finding('x', True, ())\n", "k = OA", "aisef2.orchestrate.adapters")):
+            with self.subTest(rel=rel):
+                scope = src.split("def ")[1].split("(")[0]
+                self.assertIn(f"{self.RULE} {rel}:{line_of(src, at)} {scope} names the module {q} as a value: what is called "
+                              "on it is not followed", check(rel, src))
 
     def test_a_finding_corroborated_other_than_by_blocks_is_caught(self):
         src = edited(ADAPTERS, ("(v.evidence(),) if confirmed else ()", "(v.evidence(),) if v.status == review_verify.CONFIRMED else ()"))
