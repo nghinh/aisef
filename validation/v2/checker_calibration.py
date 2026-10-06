@@ -634,7 +634,7 @@ def main(argv: list[str] | None = None) -> int:
     if "--check" not in argv and not problems:
         (ROOT / OUT_REL).parent.mkdir(parents=True, exist_ok=True)
         try:
-            with open(ROOT / OUT_REL, "x", encoding="utf-8") as f:   # written once, never rewritten
+            with open(ROOT / OUT_REL, "x", encoding="utf-8", newline="\n") as f:   # written once, never rewritten
                 f.write(render(result))
         except FileExistsError:
             print(f"FAIL  refused: {OUT_REL} exists")

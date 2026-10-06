@@ -96,6 +96,8 @@ V21_VERDICT = "C2-P5 ACCEPTANCE BOUNDARY RE-VERIFIED ON 2.1 — NO NEW OWNER ACC
 V2_0_0 = "ca2631374602da45dae75b7f6907ff4729d0b2f7"
 DECISIONS_REL = f"{CYC}/RELEASE-DECISIONS.json"
 B03_ID = "AISEF_V2_1_B03_REQUALIFICATION_ROUND"
+#: the authority a v2.1 record names: the owner's B-03a decision, by its ledger entry
+B03_REF = {"path": DECISIONS_REL, "seq": 5, "id": B03_ID, "part": "B-03a"}
 #: the owner's B-03a text, verbatim from the decision ledger entry B03_ID
 V21_AUTHORITY = ("Chọn tạo bản ghi v2.1 mới cho các artifact bị ảnh hưởng. Không thêm luật dung sai engine digest chỉ vì verdict "
                  "không đổi. Không dùng ánh xạ rebind để che thay đổi hành vi chưa kiểm chứng.")
@@ -659,13 +661,30 @@ def proposal_history_problems() -> list[str]:
     return out
 
 
+def v21_proposal(record: dict) -> dict:
+    """The v2.1 proposal record: the authoring aid's `record` verbatim under 'record', beside what the v2.1 record says
+    of itself — the B-03a authority and the 2.0 record it replaces as current (kept as history). It claims no approval."""
+    return {"v2_1": {"authority": B03_REF,
+                     "derived_from": {"path": PROPOSAL_REL, "blob_at_v2_0_0": _git("rev-parse", f"{V2_0_0}:{PROPOSAL_REL}")},
+                     "rule": "'record' is the authoring aid's record() on this tree, verbatim: its status, authority, supersedes "
+                             "and verdict are the aid's 2.0 text and assert nothing at 2.1; this record approves and accepts "
+                             "nothing; it is compared exactly (no probe-identity re-binding, no provenance tolerance)"},
+            "record": record}
+
+
 def v21_proposal_currency() -> dict:
     """The v2.1 proposal record against the authoring aid on this tree: current iff EXACTLY equal — no probe-identity
     re-binding, no provenance tolerance."""
     from validation.qualification import rebind
-    derived, committed = _aid().record(), _json_or_none(V21_PROPOSAL_REL)
+    derived, committed = v21_proposal(_aid().record()), _json_or_none(V21_PROPOSAL_REL)
     return {"record": V21_PROPOSAL_REL, "current": committed == derived,
             "differing_paths": ["(no record)"] if committed is None else rebind.paths(derived, committed)}
+
+
+def v21_proposal_record() -> dict:
+    """The authoring aid's record inside the committed v2.1 proposal ({} when there is none)."""
+    doc = _json_or_none(V21_PROPOSAL_REL) or {}
+    return doc["record"] if isinstance(doc.get("record"), dict) else {}
 
 
 def _write_once(rel: str, doc: dict) -> None:
@@ -680,11 +699,11 @@ def _write_once(rel: str, doc: dict) -> None:
 
 
 def write_v21_proposal() -> dict:
-    """The v2.1 proposal record: the authoring aid's record() on this tree, verbatim (no document), written once."""
+    """The v2.1 proposal record (`v21_proposal`) of the authoring aid's record() on this tree (no document), written once."""
     rec = _aid().record()
     if rec["problems"]:
         raise SystemExit("refused: " + "; ".join(rec["problems"]))
-    _write_once(V21_PROPOSAL_REL, rec)
+    _write_once(V21_PROPOSAL_REL, v21_proposal(rec))
     return rec
 
 
@@ -703,7 +722,7 @@ def reverify(run_guards: bool = True) -> dict:
     checks: list[tuple[bool, str]] = []
     accepted = json.loads((ROOT / OUT_REL).read_text(encoding="utf-8"))
     prop = json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8"))
-    v21, fals = _json_or_none(V21_PROPOSAL_REL) or {}, _json_or_none(pf.V21_OUT_REL) or {}
+    v21, fals = v21_proposal_record(), _json_or_none(pf.V21_OUT_REL) or {}
     entry = next((e for e in json.loads((ROOT / DECISIONS_REL).read_text(encoding="utf-8"))["entries"] if e.get("id") == B03_ID), {})
     reqs, real, cs = aid.requirements(), load_approvals(), contracts()
     approved = {a.contract_id: a for a in real}
@@ -738,7 +757,7 @@ def reverify(run_guards: bool = True) -> dict:
                   "accepted_plan_hash": ACCEPTED["plan_hash"]}
     checks += [(plan_facts[k], f"plan: {k} is false") for k in ("is_the_v21_proposal_s", "every_spec_id_compiled_here_under_the_real_approvals")]
     proposal = {"v2_1": {"record": _file(V21_PROPOSAL_REL) if v21 else None, "proposal_digest": derived["proposal_digest"],
-                         "verdict": derived["verdict"], "current_exactly": derived == v21},
+                         "verdict": derived["verdict"], "current_exactly": v21_proposal(derived) == _json_or_none(V21_PROPOSAL_REL)},
                 "accepted": {"record": _file(PROPOSAL_REL), "proposal_digest": prop["proposal_digest"],
                              "history_problems": proposal_history_problems()}}
     checks += [(proposal["v2_1"]["current_exactly"], f"{V21_PROPOSAL_REL} is not what the authoring aid derives from this tree"),
@@ -766,10 +785,15 @@ def reverify(run_guards: bool = True) -> dict:
                "p5_falsifiability_2_0_is_its_v2_0_0_blob": _is_blob_at(FALSIFIABILITY_REL, V2_0_0)}
     checks += [(v, f"{k} is false") for k, v in literal.items()]
     here_semantic = {r["spec_id"]: r["semantic_hash"] for r in rows}
-    f_rows = fals.get("specs", [])
+    f_rows, f_ids, f_header = fals.get("specs", []), fals.get("identities", {}), pf.v21_header()
     falsifiability = {
         "record": _file(pf.V21_OUT_REL) if fals else None, "verdict": fals.get("verdict"), "summary": fals.get("summary"),
-        "plan_hash_is_this_tree_s": fals.get("identities", {}).get("plan_hash") == plan.plan_hash,
+        "header_is_the_v21_one": bool(fals) and {k: fals.get(k) for k in f_header} == f_header,
+        "names_the_v21_proposal": bool(v21) and (f_ids.get("proposal"), f_ids.get("proposal_digest"))
+        == (_file(V21_PROPOSAL_REL), v21["proposal_digest"]),
+        "p5_corpus_is_this_tree_s": f_ids.get("p5_mutants") == {**corpus["file"], "corpus_sha256": corpus["corpus_sha256"]},
+        "kernel_is_this_tree_s": f_ids.get("aisef2_tree") == _git("rev-parse", "HEAD:aisef2"),
+        "plan_hash_is_this_tree_s": f_ids.get("plan_hash") == plan.plan_hash,
         "semantic_hashes_are_this_tree_s": {r["spec_id"]: r["semantic_hash"] for r in f_rows} == here_semantic,
         "every_spec_qualified": bool(fals) and not fals.get("problems") and len(f_rows) == len(rows)
         and all(r["status"] == "QUALIFIED" for r in f_rows),
@@ -778,15 +802,18 @@ def reverify(run_guards: bool = True) -> dict:
         "rule": "the behaviour evidence for the 2.1 identities: p5_falsifiability.run() re-executed every retained spec, compiled "
                 "under this tree's probes, against the pristine reference and its own witness"}
     checks += [(falsifiability[k], f"{pf.V21_OUT_REL}: {k} is false")
-               for k in ("plan_hash_is_this_tree_s", "semantic_hashes_are_this_tree_s", "every_spec_qualified")]
+               for k in ("header_is_the_v21_one", "names_the_v21_proposal", "p5_corpus_is_this_tree_s", "kernel_is_this_tree_s",
+                         "plan_hash_is_this_tree_s", "semantic_hashes_are_this_tree_s", "every_spec_qualified")]
     calibrations = {"shipped": _file(rc.SHIPPED_REL),
                     "newest_release_record": _file(rc.RECORD_REL) if (ROOT / rc.RECORD_REL).is_file() else None}
     checks.append((calibrations["newest_release_record"] is not None, f"{rc.RECORD_REL} is missing"))
     authority = {"quote": V21_AUTHORITY, "decision": {"path": DECISIONS_REL, "id": B03_ID, "seq": entry.get("seq"),
                                                       "approver": entry.get("approver")},
                  "quoted_verbatim": V21_AUTHORITY in entry.get("owner_text", ""),
+                 "entry_is_the_reference": entry.get("seq") == B03_REF["seq"] and "B-03a" in entry.get("decision", {}),
                  "not_authorized_by_the_decision": entry.get("not_authorized_by_this_entry")}
-    checks.append((authority["quoted_verbatim"], f"the B-03a text is not in {DECISIONS_REL} entry {B03_ID}"))
+    checks += [(authority["quoted_verbatim"], f"the B-03a text is not in {DECISIONS_REL} entry {B03_ID}"),
+               (authority["entry_is_the_reference"], f"{DECISIONS_REL} entry {B03_ID} is not {B03_REF}")]
     history_now = history_problems()
     checks.append((not history_now, f"{OUT_REL}: {history_now}"))
     body = {
@@ -820,10 +847,25 @@ def reverify(run_guards: bool = True) -> dict:
     problems = [m for ok, m in checks if not ok]
     if run_guards:
         body["guards"] = guards()
-        problems += [f"guard {k}: exit {v['exit']}" for k, v in body["guards"].items() if v["exit"] != 0]
+        problems += guard_problems(body["guards"])
     body["problems"] = problems
     body["verdict"] = V21_VERDICT if not problems else "PROBLEMS"
     return json.loads(json.dumps(body))
+
+
+def guard_problems(ran: dict) -> list[str]:
+    """Guard runs as `guards` records them: exactly GUARDS, each with its own command, exit 0, a tail list and seconds > 0
+    (a hand-written guards block is refused)."""
+    if not isinstance(ran, dict) or set(ran) != set(GUARDS):
+        return [f"the recorded guard runs are not exactly {sorted(GUARDS)}"]
+    out = []
+    for k, g in ran.items():
+        if not (isinstance(g, dict) and g.get("command") == "python -P " + " ".join(GUARDS[k]) and isinstance(g.get("tail"), list)
+                and type(g.get("seconds")) in (int, float) and g["seconds"] > 0):
+            out.append(f"guard {k}: not a recorded run of its command")
+        elif g.get("exit") != 0:
+            out.append(f"guard {k}: exit {g.get('exit')}")
+    return out
 
 
 def write_v21() -> dict:
@@ -848,8 +890,7 @@ def reverification_problems() -> list[str]:
     out = list(fresh["problems"])
     if committed != fresh:
         out.append(f"{V21_OUT_REL} is not what this tree re-verifies")
-    if set(ran) != set(GUARDS) or any(g["exit"] != 0 for g in ran.values()):
-        out.append(f"{V21_OUT_REL}: the recorded guard runs did not all exit 0")
+    out += [f"{V21_OUT_REL}: {p}" for p in guard_problems(ran)]
     return out
 
 

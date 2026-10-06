@@ -136,8 +136,9 @@ def run(ident: dict) -> dict:
     if err:
         return {"record": "AISEF V2 — Q0 STATIC INTEGRITY", "rung": "Q0", "status": C.UNRUNNABLE, "subject": ident,
                 "platform": C.platform_id(), "harness_problems": [f"checker calibration could not run: {err}"], "problems": [], "cases": []}
-    cal_problems = cc.problems_of(calibration)
-    committed_current = (C.ROOT / cc.OUT_REL).read_text(encoding="utf-8") == cc.render(calibration)
+    # V2.1 (owner B-03a): the committed record is the v2.1 one (a missing record is a problem); 2.0's is history
+    cal_problems = cc.problems_of(calibration) + cc.history_problems()
+    committed_current = (C.ROOT / cc.OUT_REL).is_file() and (C.ROOT / cc.OUT_REL).read_text(encoding="utf-8") == cc.render(calibration)
     names = [r["checker"] for r in calibration["checkers"]]
     checkers = {r["checker"]: {"package": r["package"], "clean_passes": r["clean_passes"], "rejects_known_bad": r["rejects_known_bad"],
                                "rejects_for_the_expected_reason": r["rejects_for_the_expected_reason"], "calibrated": r["calibrated"],

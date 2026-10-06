@@ -916,7 +916,7 @@ def main(argv: list[str] | None = None) -> int:
                 if not problems_of(record):
                     (ROOT / rel).parent.mkdir(parents=True, exist_ok=True)
                     try:
-                        with open(ROOT / rel, "x", encoding="utf-8") as f:   # a record is never rewritten
+                        with open(ROOT / rel, "x", encoding="utf-8", newline="\n") as f:   # a record is never rewritten
                             f.write(render(record))
                         print(f"wrote {rel}")
                     except FileExistsError:

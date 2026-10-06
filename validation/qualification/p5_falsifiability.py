@@ -2,8 +2,8 @@
 closure-evidence/v2/cycle2/P5-FALSIFIABILITY.json (RFC §9.1.2, §27).
 
     python -P validation/qualification/p5_falsifiability.py --seal    # binds each P5 mutant's materialised digests
-    python -P validation/qualification/p5_falsifiability.py --run     # the evidence run
-    python -P validation/qualification/p5_falsifiability.py --run-v21 # the same run into closure-evidence/v2/v2.1/ (once)
+    python -P validation/qualification/p5_falsifiability.py --run     # the evidence run (refuses an existing record)
+    python -P validation/qualification/p5_falsifiability.py --run-v21 # the run as the v2.1 record (`as_v21`), once
 
 **Its own witness per spec.** The P0 mutants (P0-REFERENCE-FIXTURE.json) prove the reference ACCEPTANCE falsifiable; they
 are not reused as this package's witnesses. Each retained spec has one controlled mutation of its own in the P5 corpus
@@ -355,17 +355,48 @@ def run(matrix: bool = True) -> dict:
     return body
 
 
+def v21_header() -> dict:
+    """What the v2.1 record states in place of run()'s 2.0 header (owner B-03a): a re-execution on 2.1 under the B-03a
+    decision that claims no approval and supersedes nothing — the 2.0 record (OUT_REL) is kept as history."""
+    from validation.qualification import p5_acceptance as pa
+    return {"record": "AISEF V2.1 — C2-P5 WP-2.5.2 SPEC FALSIFIABILITY RE-EXECUTED ON 2.1: every retained PLAN-V2.2 ProductProofSpec, "
+                      "compiled under this tree's probes, against the pristine reference and its own controlled witness",
+            "authority": pa.B03_REF,
+            "status": "RE-EXECUTION on 2.1 (owner B-03a) — no approval and no acceptance claimed",
+            "supersedes": None,
+            "history": {"path": OUT_REL, "blob_at_v2_0_0": _git("rev-parse", f"{pa.V2_0_0}:{OUT_REL}")}}
+
+
+def as_v21(rec: dict) -> dict:
+    """run()'s record as the v2.1 record: `v21_header` over its 2.0 header, and the v2.1 proposal as the proposal it
+    measured — refused unless that proposal exists and its plan is the run's."""
+    from validation.qualification import p5_acceptance as pa
+    prop = pa.v21_proposal_record()
+    if not prop or prop["plan"]["plan_hash"] != rec["identities"]["plan_hash"]:
+        raise SystemExit(f"refused: {pa.V21_PROPOSAL_REL} is missing or its plan is not the run's")
+    ids = {**rec["identities"], "proposal": pa._file(pa.V21_PROPOSAL_REL), "proposal_digest": prop["proposal_digest"]}
+    return {**rec, **v21_header(), "identities": ids}
+
+
+def _write_new(rel: str, rec: dict) -> None:
+    with open(ROOT / rel, "x", encoding="utf-8", newline="\n") as f:   # a record is never rewritten
+        f.write(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
+
+
 def write_v21() -> dict:
-    """run() into V21_OUT_REL, written once and only without a problem (refused before the run if the record exists)."""
-    path = ROOT / V21_OUT_REL
-    if path.exists():
+    """run() as the v2.1 record (`as_v21`) into V21_OUT_REL, written once and only without a problem (refused before
+    the run if the record exists or the v2.1 proposal does not)."""
+    from validation.qualification import p5_acceptance as pa
+    if (ROOT / V21_OUT_REL).exists():
         raise SystemExit(f"refused: {V21_OUT_REL} exists — a record is never rewritten")
+    if not pa.v21_proposal_record():
+        raise SystemExit(f"refused: {pa.V21_PROPOSAL_REL} is missing")
     rec = run()
     if rec["problems"]:
         raise SystemExit("refused: " + "; ".join(rec["problems"]))
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "x", encoding="utf-8", newline="\n") as f:
-        f.write(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
+    rec = as_v21(rec)
+    (ROOT / V21_OUT_REL).parent.mkdir(parents=True, exist_ok=True)
+    _write_new(V21_OUT_REL, rec)
     return rec
 
 
@@ -384,8 +415,10 @@ def main(argv: list[str] | None = None) -> int:
         rec = write_v21()
         print(f"{V21_OUT_REL}: {rec['verdict']}; {rec['summary']}; {rec['elapsed_s']} s")
         return 0
+    if (ROOT / OUT_REL).exists():   # the 2.0 record is history (p5_acceptance): never rewritten
+        raise SystemExit(f"refused: {OUT_REL} exists — a record is never rewritten")
     rec = run()
-    (ROOT / OUT_REL).write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    _write_new(OUT_REL, rec)
     print(f"{OUT_REL}: {rec['verdict']}; {rec['summary']}; {rec['elapsed_s']} s")
     return 0 if not rec["problems"] else 1
 

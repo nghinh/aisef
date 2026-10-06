@@ -5,6 +5,8 @@ established owner identity; a tampered or synthetic approval is refused; the acc
 import copy
 import dataclasses
 import json
+import pathlib
+import tempfile
 import unittest
 from unittest import mock
 
@@ -65,9 +67,118 @@ class Acceptance(unittest.TestCase):
             self.assertEqual(A.history_problems(), [f"{A.OUT_REL} is not its v2.0.0 blob (history)",
                                                     f"{A.APPROVALS_REL} is not its v2.0.0 blob (history)"])
             self.assertIn(f"{A.PROPOSAL_REL} is not its v2.0.0 blob (history)", A.proposal_history_problems())
-        for rel in (A.OUT_REL, A.PROPOSAL_REL, "closure-evidence/v2/C2-P5-ACCEPTANCE-REVERIFICATION.json"):
-            with self.assertRaises(SystemExit):
-                A._write_once(rel, {})
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(A, "ROOT", pathlib.Path(tmp)):   # never the real tree
+            for rel in (A.OUT_REL, A.PROPOSAL_REL, "closure-evidence/v2/C2-P5-ACCEPTANCE-REVERIFICATION.json"):
+                with self.assertRaises(SystemExit):
+                    A._write_once(rel, {})
+            self.assertEqual(list(pathlib.Path(tmp).rglob("*")), [])
+            A._write_once(A.V21_OUT_REL, {"a": 1})                    # a v2.1 record is written once ...
+            with self.assertRaises(SystemExit) as refused:            # ... and an existing one is never rewritten
+                A._write_once(A.V21_OUT_REL, {"b": 2})
+            self.assertIn("exists", str(refused.exception))
+            self.assertEqual(json.loads((pathlib.Path(tmp) / A.V21_OUT_REL).read_text(encoding="utf-8")), {"a": 1})
+            self.assertEqual([f.relative_to(tmp).as_posix() for f in pathlib.Path(tmp).rglob("*") if f.is_file()], [A.V21_OUT_REL])
+
+
+class V21Records(unittest.TestCase):
+    """The v2.1 proposal envelope, the recorded guard runs and the re-verification's binding of the v2.1 falsifiability
+    record (owner B-03a), each failing for its own reason."""
+
+    def test_the_v2_1_proposal_is_the_aid_s_record_verbatim_and_claims_no_approval(self):
+        rec = {"verdict": "v", "plan": {"plan_hash": "p"}}
+        doc = A.v21_proposal(rec)
+        self.assertEqual(sorted(doc), ["record", "v2_1"])
+        self.assertIs(doc["record"], rec)
+        self.assertEqual(doc["v2_1"]["authority"], A.B03_REF)
+        self.assertEqual(doc["v2_1"]["derived_from"], {"path": A.PROPOSAL_REL,
+                                                        "blob_at_v2_0_0": A._git("rev-parse", f"{A.V2_0_0}:{A.PROPOSAL_REL}")})
+        self.assertEqual(sorted(doc["v2_1"]), ["authority", "derived_from", "rule"])     # no approval, no acceptance field
+        entry = next(e for e in json.loads((A.ROOT / A.DECISIONS_REL).read_text(encoding="utf-8"))["entries"] if e["id"] == A.B03_ID)
+        self.assertEqual((entry["seq"], "B-03a" in entry["decision"]), (A.B03_REF["seq"], True))
+
+    def test_the_v2_1_proposal_is_current_only_exactly(self):
+        derived = A._aid().record()
+        good = A.v21_proposal(copy.deepcopy(derived))
+        cases = {"exact": (good, True, []), "verbatim, no envelope": (derived, False, None)}
+        bad = copy.deepcopy(good)
+        bad["v2_1"]["authority"] = "owner ruling 2026-09-30"
+        cases["2.0 authority"] = (bad, False, ["v2_1.authority"])
+        bad = copy.deepcopy(good)
+        bad["record"]["identities"]["admission_engine_digest"] = "0" * 64
+        cases["engine digest"] = (bad, False, ["record.identities.admission_engine_digest"])
+        for name, (committed, current, paths) in cases.items():
+            with self.subTest(name), mock.patch.object(A, "_json_or_none", return_value=committed):
+                r = A.v21_proposal_currency()
+                self.assertEqual(r["current"], current)
+                if paths is not None:
+                    self.assertEqual(r["differing_paths"], paths)
+
+    def test_recorded_guard_runs_must_be_runs_of_their_commands(self):
+        good = {k: {"command": "python -P " + " ".join(v), "exit": 0, "tail": ["PASS"], "seconds": 0.1} for k, v in A.GUARDS.items()}
+        self.assertEqual(A.guard_problems(good), [])
+        k = next(iter(A.GUARDS))
+        for change, why in (({"command": "SCRATCH DEMO — not a guard run"}, "not a recorded run of its command"),
+                            ({"seconds": 0}, "not a recorded run of its command"),
+                            ({"seconds": True}, "not a recorded run of its command"),
+                            ({"tail": "PASS"}, "not a recorded run of its command"),
+                            ({"exit": 1}, "exit 1")):
+            with self.subTest(change):
+                bad = copy.deepcopy(good)
+                bad[k].update(change)
+                self.assertEqual(A.guard_problems(bad), [f"guard {k}: {why}"])
+        bad = copy.deepcopy(good)
+        del bad[k]
+        self.assertEqual(A.guard_problems(bad), [f"the recorded guard runs are not exactly {sorted(A.GUARDS)}"])
+        self.assertEqual(A.guard_problems({}), [f"the recorded guard runs are not exactly {sorted(A.GUARDS)}"])
+
+    def test_the_re_verification_binds_the_v2_1_falsifiability_record_to_2_1(self):
+        from validation.qualification import p5_falsifiability as pf
+        derived = A._aid().record()
+        written = {rel: {"path": rel, "sha256": c * 64} for rel, c in ((A.V21_PROPOSAL_REL, "f"), (pf.V21_OUT_REL, "e"))}
+        files, docs = A._file, A._json_or_none
+        two_oh = json.loads((A.ROOT / A.FALSIFIABILITY_REL).read_text(encoding="utf-8"))
+        state = {}
+
+        def json_or_none(rel):
+            if rel == A.V21_PROPOSAL_REL:
+                return A.v21_proposal(derived)
+            return state.get("fals") if rel == pf.V21_OUT_REL else docs(rel)
+
+        def problems(fals):
+            state["fals"] = fals
+            return [p for p in A.reverify(run_guards=False)["problems"] if p.startswith(pf.V21_OUT_REL)]
+
+        with mock.patch.object(A, "_file", side_effect=lambda rel: written.get(rel) or files(rel)), \
+                mock.patch.object(A, "_json_or_none", side_effect=json_or_none):
+            # run() on 2.1 as recorded (2.0's run with this tree's plan, kernel and semantic hashes), made the v2.1 record
+            run = copy.deepcopy(two_oh)
+            run["identities"].update(plan_hash=derived["plan"]["plan_hash"], aisef2_tree=A._git("rev-parse", "HEAD:aisef2"))
+            semantic = {s["spec_id"]: s["semantic_hash"] for s in derived["specs"]}
+            for r in run["specs"]:
+                r["semantic_hash"] = semantic[r["spec_id"]]
+            good = pf.as_v21(run)
+            self.assertEqual(problems(good), [])
+            # the 2.0 record verbatim (what run() alone gives): its header, its proposal, its kernel, its plan and hashes
+            self.assertEqual(problems(two_oh), [f"{pf.V21_OUT_REL}: {k} is false" for k in (
+                "header_is_the_v21_one", "names_the_v21_proposal", "kernel_is_this_tree_s", "plan_hash_is_this_tree_s",
+                "semantic_hashes_are_this_tree_s")])
+            for name, path, value in (("header_is_the_v21_one", ("authority",), two_oh["authority"]),
+                                      ("header_is_the_v21_one", ("supersedes",), two_oh["supersedes"]),
+                                      ("names_the_v21_proposal", ("identities", "proposal"), two_oh["identities"]["proposal"]),
+                                      ("names_the_v21_proposal", ("identities", "proposal_digest"), A.ACCEPTED["proposal_digest"]),
+                                      ("p5_corpus_is_this_tree_s", ("identities", "p5_mutants", "corpus_sha256"), "0" * 64),
+                                      ("kernel_is_this_tree_s", ("identities", "aisef2_tree"), two_oh["identities"]["aisef2_tree"]),
+                                      ("plan_hash_is_this_tree_s", ("identities", "plan_hash"), A.ACCEPTED["plan_hash"]),
+                                      ("semantic_hashes_are_this_tree_s", ("specs", 0, "semantic_hash"), "0" * 64),
+                                      ("every_spec_qualified", ("specs", 0, "status"), "NOT_QUALIFIED")):
+                with self.subTest(name=name, path=path):
+                    bad = copy.deepcopy(good)
+                    at = bad
+                    for k in path[:-1]:
+                        at = at[k]
+                    at[path[-1]] = value
+                    self.assertEqual(problems(bad), [f"{pf.V21_OUT_REL}: {name} is false"])
+            self.assertIn(f"{pf.V21_OUT_REL}: every_spec_qualified is false", problems(None))
 
 
 
@@ -158,6 +269,15 @@ class ProbeIdentityRebinding(unittest.TestCase):
         d["specs"][self.moved].update(fields)
         return d
 
+    def beyond_the_engine(self, r):
+        """What differs beyond the measured engine change: on 2.1 the injected change shows up here, refused."""
+        return sorted(set(r["differing_paths"]) - set(self.ENGINE_PATHS))
+
+    def unbound(self, field):
+        """The residue of one spec field changed: that field, the spec's identities (not re-bound) and the two hashes."""
+        m = self.moved
+        return sorted(["plan.plan_hash", "proposal_digest", f"specs[{m}].{field}", f"specs[{m}].semantic_hash", f"specs[{m}].spec_hash_id"])
+
     def test_the_re_binding_alone_is_current(self):
         # V2.1: what is left after the re-binding is exactly the engine change, so it is NOT current; the record it
         # compares with is history
@@ -170,17 +290,20 @@ class ProbeIdentityRebinding(unittest.TestCase):
     def test_a_contract_hash_change_is_refused(self):
         r = self.currency(self.changed(contract_hash="0" * 64))
         self.assertFalse(r["current"])
+        self.assertEqual(self.beyond_the_engine(r), self.unbound("contract_hash"))
         self.assertIn(f"specs[{self.moved}].contract_hash", r["differing_paths"])
         self.assertIn(f"specs[{self.moved}].spec_hash_id", r["differing_paths"])      # its identities are not re-bound
 
     def test_a_probe_id_change_is_refused(self):
         r = self.currency(self.changed(probe_id="probe.python_callable"))
         self.assertFalse(r["current"])
+        self.assertEqual(self.beyond_the_engine(r), self.unbound("probe_id"))
         self.assertIn(f"specs[{self.moved}].probe_id", r["differing_paths"])
 
     def test_a_re_derived_digest_that_is_not_this_tree_s_catalog_digest_is_refused(self):
         r = self.currency(self.changed(probe_digest="f" * 64))
         self.assertFalse(r["current"])
+        self.assertEqual(self.beyond_the_engine(r), self.unbound("probe_digest"))
         self.assertIn(f"specs[{self.moved}].semantic_hash", r["differing_paths"])
 
     def test_a_mapped_back_hash_that_is_not_the_committed_is_refused(self):
@@ -193,6 +316,7 @@ class ProbeIdentityRebinding(unittest.TestCase):
             with self.subTest(path=path):
                 r = self.currency(self.derived, committed)
                 self.assertFalse(r["current"])
+                self.assertEqual(self.beyond_the_engine(r), [".".join(path)])
                 self.assertIn(".".join(path), r["differing_paths"])
         # a plan that differs beyond its spec ids: mapped back, its hash is not the accepted plan's
         o = self.plan.obligations[0]
@@ -203,6 +327,7 @@ class ProbeIdentityRebinding(unittest.TestCase):
         derived["plan"]["plan_hash"] = plan.plan_hash
         r = self.currency(derived, plan=plan)
         self.assertFalse(r["current"])
+        self.assertEqual(self.beyond_the_engine(r), ["plan.plan_hash", "proposal_digest"])
         self.assertIn("plan.plan_hash", r["differing_paths"])
 
 
