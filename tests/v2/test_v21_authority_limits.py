@@ -137,6 +137,50 @@ class MigrateNeverApproves(unittest.TestCase):
                 src = edited(BUNDLE_CLI, (reload, edit))
                 self.assertEqual(check(BUNDLE_CLI, src), [created.format(line_of(src, at))])
 
+    def test_contract_approval_named_other_than_to_re_load_it_is_caught(self):
+        reload = '        approvals = tuple(ContractApproval(**a) for a in data["approvals"])'
+        created = f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{{}} bundle_cli.migrate creates a ContractApproval (a migration only " \
+                  f"re-loads the input's: ContractApproval(**a)){APPROVES}"
+        for edit, at in (     # module-based: any reference, not only a call written ContractApproval(...)
+                (f'{reload}\n        CA = ContractApproval\n'
+                 '        approvals = (*approvals, CA("r", "h", "c", "h", "human:migrate", 0.0, ()))', "CA = ContractApproval"),
+                (f"{reload}\n        x = ContractApproval.__new__(ContractApproval)", "__new__"),
+                (f'{reload}\n        make = getattr(ContractApproval, "__call__")', "make = getattr"),
+                (f"{reload}\n        from aisef2.app.bundle import ContractApproval as Again\n        x = Again(**{{}})", "x = Again"),
+                (f"{reload}\n        from aisef2.product import approval as AP\n        x = AP.ContractApproval(**{{}})", "x = AP.")):
+            with self.subTest(edit=edit):
+                src = edited(BUNDLE_CLI, (reload, edit))
+                self.assertEqual(check(BUNDLE_CLI, src), [created.format(line_of(src, at))])
+        # an annotation names the type and builds nothing: the stated exemption, and the only one besides the re-load
+        src = edited(BUNDLE_CLI, (reload, f"{reload}\n        first: ContractApproval | None = approvals[0] if approvals else None"))
+        self.assertEqual(check(BUNDLE_CLI, src), [])
+        src = edited(BUNDLE_CLI, (reload, f"{reload}\n        first = _first(approvals)"),
+                     ("def _mint(", "def _first(xs: tuple[ContractApproval, ...]) -> ContractApproval | None:\n"
+                                    "    return xs[0] if xs else None\n\n\ndef _mint("))
+        self.assertEqual(check(BUNDLE_CLI, src), [])     # a reached helper's parameter and return annotations
+
+    def test_a_helper_given_the_approvals_writes_them_and_one_that_reads_them_does_not(self):
+        touch = ("def _mint(", 'def _touch(xs):\n    xs[0]["approver"] = "human:migrate"\n\n\ndef _relay(ys):\n    _touch(ys)\n\n\n'
+                               "def _count(zs):\n    return len(zs)\n\n\ndef _mint(")
+        written = 'xs[0]["approver"] = "human:migrate"'
+        for call in ('    _touch(out["approvals"])', '    _touch(xs=out.get("approvals"))', '    _touch(*[out["approvals"]])',
+                     '    _touch(**{"xs": out["approvals"]})', '    _relay(out["approvals"])',
+                     '    held = out["approvals"]\n    _relay(held)'):
+            with self.subTest(call=call):
+                src = edited(BUNDLE_CLI, (self.OUT, f"{self.OUT}\n{call}"), touch)
+                self.assertEqual(check(BUNDLE_CLI, src), [f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{line_of(src, written)} "
+                                                          f"bundle_cli._touch writes the approvals{APPROVES}"])
+        src = edited(BUNDLE_CLI, (self.OUT, f'{self.OUT}\n    _count(out["approvals"])\n    _touch([{{}}])'), touch)
+        self.assertEqual(check(BUNDLE_CLI, src), [])     # a helper that reads them; a write into something else
+
+    def test_the_key_among_a_writing_calls_arguments_is_caught(self):
+        for write in ('    out.update(dict.fromkeys(["approvals"], []))', '    setattr(out, "approvals", [])',
+                      '    out.setdefault(*["approvals"])'):
+            with self.subTest(write=write):
+                src = edited(BUNDLE_CLI, (self.OUT, f"{self.OUT}\n{write}"))
+                self.assertEqual(check(BUNDLE_CLI, src), [f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{line_of(src, write)} "
+                                                          f"bundle_cli.migrate writes the approvals{APPROVES}"])
+
     def test_calling_approve_is_caught_with_everything_approve_then_reaches(self):
         written = 'return {**dict(bundle), "approvals": [*bundle["approvals"], *new]}'
         src = edited(BUNDLE_CLI, (self.OUT, self.OUT + '\n    out = approve(out, contracts[0].id, "human:migrate", 0.0)'))
@@ -192,6 +236,19 @@ class NoCommitOrMerge(unittest.TestCase):
                                 "save = W.commit_all\n"), (self.FACTORY, f"{self.FACTORY}\n    save(root, 'x')"))
         self.assertEqual(check(VERIFY, alias), [f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(alias, 'save(root')} review_verify.verify "
                                                 f"calls aisef2.orchestrate.workspace.commit_all{DECIDES}"])
+        annotated = edited(VERIFY, ("from aisef2.product.outcome import Executed\n",
+                                    "from aisef2.product.outcome import Executed\nfrom aisef2.orchestrate import workspace as W\n"
+                                    "save: object = W.commit_all\n"), (self.FACTORY, f"{self.FACTORY}\n    save(root, 'x')"))
+        self.assertEqual(check(VERIFY, annotated), [f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(annotated, 'save(root')} "
+                                                    f"review_verify.verify calls aisef2.orchestrate.workspace.commit_all{DECIDES}"])
+        # a module-level statement that mentions an imported name leaves it an import: the re-export is still followed
+        src = {ADAPTERS: edited(ADAPTERS, ("from aisef2.app import client, feedback, review_ocr, review_verify\n",
+                                           "from aisef2.app import client, feedback, review_ocr, review_verify\n"
+                                           "commit_all.__dict__.update({})\n")),
+               VERIFY: edited(VERIFY, (self.FACTORY, f"{self.FACTORY}\n    from aisef2.app.adapters import commit_all\n"
+                                                     "    commit_all(root, 'x')"))}
+        self.assertEqual(al.check(al.ROOT, src), [f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(src[VERIFY], 'commit_all(root')} "
+                                                  f"review_verify.verify calls aisef2.orchestrate.workspace.commit_all{DECIDES}"])
         src = edited(ADAPTERS, ("from aisef2.app import client, feedback, review_ocr, review_verify\n",
                                 "from aisef2.app import client, feedback, review_ocr, review_verify\nkeep = commit_all\n"))
         src = {ADAPTERS: src, VERIFY: edited(VERIFY, (self.FACTORY, f"{self.FACTORY}\n    from aisef2.app.adapters import keep\n"
@@ -213,6 +270,74 @@ class NoCommitOrMerge(unittest.TestCase):
             f"aisef2.orchestrate.workspace.GitMerger{DECIDES}"])
         src = edited(BUNDLE_CLI, (out, f'{out}\n    note = "github and gitignore are not git"'))
         self.assertEqual(check(BUNDLE_CLI, src), [])
+
+    def test_anything_of_a_deciding_module_is_caught_not_only_a_listed_name(self):
+        for imp, use, why in (     # app/run re-exports GitWorkspace next to GitMerger
+                ("from aisef2.app.run import GitWorkspace", "GitWorkspace(root, root).checkout('x', revision)",
+                 "calls aisef2.orchestrate.workspace.GitWorkspace"),
+                ("from aisef2.orchestrate.workspace import _sha", "_sha(root, 'HEAD')", "calls aisef2.orchestrate.workspace._sha"),
+                ("from aisef2.orchestrate.workspace import config_problems", "config_problems(root)",
+                 "calls aisef2.orchestrate.workspace.config_problems"),
+                ("from aisef2.orchestrate import workspace as W", "W.Checkout.release(None)", "names aisef2.orchestrate.workspace.Checkout"),
+                ("from aisef2.plan.story_admission import classify", "classify(None, None, None, revision=revision)",
+                 "calls aisef2.plan.story_admission.classify"),
+                ("from aisef2.control import owner", "owner.classify(None)", "calls aisef2.control.owner.classify"),
+                ("from aisef2.journal import writer", "w = writer", "names aisef2.journal.writer"),
+                ("from aisef2.orchestrate import workspace as W", "hooks = (W,)", "names aisef2.orchestrate.workspace")):
+            with self.subTest(imp=imp, use=use):
+                src = edited(VERIFY, (self.FACTORY, f"{self.FACTORY}\n    {imp}\n    {use}"))
+                self.assertEqual(check(VERIFY, src), [f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(src, use)} review_verify.verify "
+                                                      f"{why}{DECIDES}"])
+
+    def test_a_control_event_named_in_any_form_is_caught(self):
+        imp = ("SubjectAbsence, SubjectKind\n", "SubjectAbsence, SubjectKind, EventType\n")
+        for use, at, why in (
+                ('finding["run"].append(event_type=EventType.STORY_COMMIT, data={})', "STORY_COMMIT",
+                 "appends the control event STORY_COMMIT to a journal"),
+                ('ev = EventType.STORY_COMMIT\n    finding["run"].append(ev, {})', "ev = EventType", "names aisef2.arch.enums.EventType"),
+                ('finding["run"].event(EventType.GATE_DECISION)', "GATE_DECISION", "names aisef2.arch.enums.EventType")):
+            with self.subTest(use=use):
+                src = edited(VERIFY, imp, (self.FACTORY, f"{self.FACTORY}\n    {use}"))
+                self.assertEqual(check(VERIFY, src), [f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(src, at)} review_verify.verify "
+                                                      f"{why}{DECIDES}"])
+
+    def test_a_module_level_binding_is_followed_into_what_its_value_names(self):
+        imp = "from aisef2.product.outcome import Executed\n"
+        for binding, use, names in (
+                ("HOOKS = {'save': W.commit_all}", "HOOKS['save'](root, 'x')", ["commit_all"]),
+                ("save, keep = W.commit_all, W.git", "save(root, 'x')", ["commit_all", "git"]),
+                ("HOOKS = {}\nHOOKS['save'] = W.commit_all", "HOOKS['save'](root, 'x')", ["commit_all"]),
+                ("HOOKS = {}\nHOOKS.update(save=W.commit_all)", "HOOKS['save'](root, 'x')", ["commit_all"]),
+                ("HOOKS = {}\nHOOKS |= {'save': W.commit_all}", "HOOKS['save'](root, 'x')", ["commit_all"])):
+            with self.subTest(binding=binding):
+                src = edited(VERIFY, (imp, f"{imp}from aisef2.orchestrate import workspace as W\n{binding}\n"),
+                             (self.FACTORY, f"{self.FACTORY}\n    {use}"))
+                scope = binding.split(" ")[0].rstrip(",")
+                at = line_of(src, binding.splitlines()[-1])
+                self.assertEqual(check(VERIFY, src), [f"NO_COMMIT_OR_MERGE {VERIFY}:{at} review_verify.{scope} "
+                                                      f"names aisef2.orchestrate.workspace.{n}{DECIDES}" for n in names])
+        # an alias inside a module-level block (try/if) is an alias too
+        src = edited(VERIFY, (imp, f"{imp}from aisef2.orchestrate import workspace as W\ntry:\n    save = W.commit_all\n"
+                                   "except ImportError:\n    save = None\n"), (self.FACTORY, f"{self.FACTORY}\n    save(root, 'x')"))
+        self.assertEqual(check(VERIFY, src), [f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(src, 'save(root')} review_verify.verify "
+                                              f"calls aisef2.orchestrate.workspace.commit_all{DECIDES}"])
+
+    def test_a_name_reaches_does_not_list_fails_closed_and_the_list_holds_nothing_deciding(self):
+        use = "sa.StaticPlanAdmissionEngine()"
+        src = edited(VERIFY, (self.FACTORY, f"{self.FACTORY}\n    from aisef2.plan import static_admission as sa\n    {use}"))
+        self.assertEqual(check(VERIFY, src), [
+            f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(src, use)} review_verify.verify names "
+            "aisef2.plan.static_admission.StaticPlanAdmissionEngine, which REACHES does not list: list it only once it is "
+            f"shown to decide nothing{DECIDES}"])
+        self.assertEqual(sorted(r for r in al.REACHES if al._under(r, al.DECIDING) or not r.startswith("aisef2.")
+                                or al._under(r, ("aisef2.app",))), [])
+        # a module whose name only starts like aisef2.app (or a deciding one) is neither: listed or refused
+        tools = "aisef2/apptools.py"
+        src = {tools: "def commit(root):\n    return root\n",
+               VERIFY: edited(VERIFY, (self.FACTORY, f"{self.FACTORY}\n    from aisef2.apptools import commit\n    commit(root)"))}
+        self.assertEqual(al.check(al.ROOT, src), [
+            f"NO_COMMIT_OR_MERGE {VERIFY}:{line_of(src[VERIFY], 'commit(root)')} review_verify.verify names aisef2.apptools.commit, "
+            f"which REACHES does not list: list it only once it is shown to decide nothing{DECIDES}"])
 
 
 class VerifyThroughBindingAndCalibration(unittest.TestCase):
@@ -271,6 +396,30 @@ class VerifyThroughBindingAndCalibration(unittest.TestCase):
         src = edited(VERIFY, (guard, ""), (bound, bound + guard))     # the refusal after the run: too late
         self.assertEqual(check(VERIFY, src), [f"{self.RULE} {VERIFY}:{line_of(src, 'run_probe(probe, spec')} {UNCALIBRATED}"])
 
+    def test_a_refusal_that_returns_anything_but_unverifiable_is_caught(self):
+        refusal = '        return Verification(UNVERIFIABLE, f"{entry.probe_id} is not calibrated'
+        for edit in ('        return Verification(CONFIRMED, f"{entry.probe_id} is not calibrated',
+                     '        return Verification(NOT_REPRODUCED, f"{entry.probe_id} is not calibrated',
+                     '        return Anchor(UNVERIFIABLE, f"{entry.probe_id} is not calibrated'):
+            with self.subTest(edit=edit):
+                src = edited(VERIFY, (refusal, edit))
+                self.assertEqual(check(VERIFY, src), [f"{self.RULE} {VERIFY}:{line_of(src, 'run_probe(probe, spec')} {UNCALIBRATED}"])
+
+    def test_an_observation_outside_run_probe_is_caught_in_verify_and_what_it_reaches(self):
+        executed, factory = "    if not isinstance(result, Executed):", NoCommitOrMerge.FACTORY
+        observes = ("observes outside run_probe: the probe's observation is only the record run_probe returns and "
+                    "bound_result binds")
+        for edit, at, scope in (
+                ((executed, "    result = probe.observe(spec, RevisionRef(revision, root))\n" + executed), "probe.observe(", "verify"),
+                ((executed, "    look = probe.observe\n" + executed), "look = probe.observe", "verify")):
+            with self.subTest(edit=edit):
+                src = edited(VERIFY, edit)
+                self.assertEqual(check(VERIFY, src), [f"{self.RULE} {VERIFY}:{line_of(src, at)} review_verify.{scope} {observes}"])
+        src = edited(VERIFY, (factory, f"{factory}\n    _peek(probe, spec)"),
+                     ("def verify(", "def _peek(p, s):\n    return p.observe(s, None)\n\n\ndef verify("))
+        self.assertEqual(check(VERIFY, src), [f"{self.RULE} {VERIFY}:{line_of(src, 'return p.observe(')} review_verify._peek "
+                                              f"{observes}"])
+
     def test_a_verification_that_runs_no_probe_is_caught(self):
         src = edited(VERIFY, ("run_probe(probe, spec, RevisionRef", "probe.observe(spec, RevisionRef"))
         self.assertEqual(check(VERIFY, src), [f"{self.RULE} {VERIFY}:{line_of(src, 'def verify(')} verify runs no probe: a "
@@ -318,12 +467,57 @@ class OneDecisionPath(unittest.TestCase):
     def test_what_blocks_answered_rebound_or_not_asked_on_every_path_is_caught(self):
         typed = "            typed.append(Finding("
         asked = "            confirmed = review_verify.blocks("
+        whole = ('            typed.append(Finding(str(f.get("id")), confirmed or bool(f.get("blocking")),\n'
+                 '                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a)))')
+        inner = ('            for g in (f, f):\n'
+                 '                typed.append(Finding(str(g.get("id")), confirmed or bool(g.get("blocking")),\n'
+                 '                                     (v.evidence(),) if confirmed else (), review_verify.detail(g, v, a)))\n'
+                 '                confirmed = True')
         for edit in ((typed, "            confirmed |= True\n" + typed), (typed, "            confirmed = True\n" + typed),
-                     (typed, "            confirmed, _ = True, 0\n" + typed), (asked, "            if a:\n    " + asked)):
+                     (typed, "            confirmed, _ = True, 0\n" + typed), (asked, "            if a:\n    " + asked),
+                     # after the Finding, inside a loop that holds it: the next one sees it (the real tree's rebinding
+                     # after the loop, `confirmed = sum(...)`, is outside it: RealTree)
+                     (whole, inner), (whole, whole + "\n            confirmed = True")):
             with self.subTest(edit=edit):
                 src = edited(ADAPTERS, edit)
                 self.assertEqual(check(ADAPTERS, src), [f"{self.RULE} {ADAPTERS}:{line_of(src, 'typed.append(Finding(')} "
                                                         f"Reviewer.review{CORROBORATES}"])
+        after = '        _unchanged(scope.root, head, before, "the verification")'
+        src = edited(ADAPTERS, (after, f"        for t in typed:\n            confirmed = t.blocks\n{after}"))
+        self.assertEqual(check(ADAPTERS, src), [])     # a loop after every Finding is built: none of them sees it
+
+    def test_a_finding_built_outside_the_reviewer_or_a_scanner_finding_that_may_block_is_caught(self):
+        typed = "            typed.append(Finding("
+        only = "a Finding: only Reviewer's methods (corroborated by blocks()) and RuffScanner.read (never blocking) build one"
+        src = edited(ADAPTERS, (typed, "            typed.append(_forged(f, v))\n" + typed),
+                     ("class Reviewer:", "def _forged(f, v):\n    return Finding(str(f.get('id')), True, (v.evidence(),))\n\n\n"
+                                         "class Reviewer:"))
+        self.assertEqual(check(ADAPTERS, src), [f"{self.RULE} {ADAPTERS}:{line_of(src, 'return Finding(str')} _forged builds {only}"])
+        src = edited(ADAPTERS, (typed, "            F = Finding\n            typed.append(F('x', True, (v.evidence(),)))\n" + typed))
+        self.assertEqual(check(ADAPTERS, src), [f"{self.RULE} {ADAPTERS}:{line_of(src, 'F = Finding')} Reviewer.review names {only}"])
+        other = "aisef2/app/second_finder.py"
+        text = "from aisef2.orchestrate.adapters import Finding\n\n\ndef find(v):\n    return Finding('x', True, (v.evidence(),))\n"
+        self.assertEqual(check(other, text), [f"{self.RULE} {other}:5 find builds {only}"])
+        for blocking in ('bool(r), ("scanner:ruff",))', 'True, ("scanner:ruff",))'):
+            with self.subTest(blocking=blocking):
+                src = edited(ADAPTERS, ('False, ("scanner:ruff",))', blocking))
+                self.assertEqual(check(ADAPTERS, src), [
+                    f"{self.RULE} {ADAPTERS}:{line_of(src, 'return Scanned(True, tuple(Finding(')} RuffScanner.read builds a "
+                    "Finding that may block: a scanner's finding is informational and never blocks"])
+        review = "    def review(self, scope, criteria: tuple[str, ...]) -> Reviewed:"
+        src = edited(ADAPTERS, (review, f"    DEFAULT = Finding('x', True, ())\n\n{review}"))     # the class body: no method
+        self.assertEqual(check(ADAPTERS, src), [f"{self.RULE} {ADAPTERS}:{line_of(src, 'DEFAULT = Finding(')} Reviewer builds {only}"])
+        src = edited(ADAPTERS, ("class Reviewer:", "def _kept(f: Finding) -> Finding:\n    return f\n\n\nclass Reviewer:"))
+        self.assertEqual(check(ADAPTERS, src), [])     # an annotation names the type and builds nothing
+        copies = "a Finding with another blocking or corroboration: " + only.removeprefix("a Finding: ")
+        after = '        _unchanged(scope.root, head, before, "the verification")'
+        for copy in ("            typed[-1] = dataclasses.replace(typed[-1], corroborated_by=('forged',))",
+                     "            object.__setattr__(typed[-1], 'blocking', True)"):
+            with self.subTest(copy=copy):
+                src = edited(ADAPTERS, ("import hashlib\n", "import dataclasses\nimport hashlib\n"),
+                             (after, f"{copy}\n{after}"))
+                self.assertEqual(check(ADAPTERS, src), [f"{self.RULE} {ADAPTERS}:{line_of(src, copy.strip())} Reviewer.review "
+                                                        f"copies {copies}"])
 
     def test_a_path_that_is_gone_fails_closed(self):
         src = edited(BUNDLE_CLI, ("        out, report = migrate(_read(a.bundle))", "        out, report = _read(a.bundle), {}"))

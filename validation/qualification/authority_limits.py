@@ -6,30 +6,39 @@ under the policy; neither commits or merges the product, nor makes a second fina
 inventory (release_inventory.py) names both PRODUCT_TRUTH authorities; these rules keep them inside those limits, each
 violation reported as `RULE rel:line explanation`:
 
-* **MIGRATE_NEVER_APPROVES** — nothing migrate reaches in aisef2/app calls `bundle_cli.approve`, constructs a
-  ContractApproval other than by re-loading one of the input's — `ContractApproval(**a)` as the element of a one-loop
-  comprehension `for a in data["approvals"]` (so `a` cannot be rebound) — copies one with changes
+* **MIGRATE_NEVER_APPROVES** — nothing migrate reaches in aisef2/app calls `bundle_cli.approve`, names ContractApproval
+  (outside an annotation) other than to re-load one of the input's — `ContractApproval(**a)` as the element of a
+  one-loop comprehension `for a in data["approvals"]` (so `a` cannot be rebound) — copies one with changes
   (`dataclasses.replace`, `copy.replace`), or writes approvals: an `approvals` key or keyword, a store, delete or
-  mutating method call (update, append, ...; setattr) on the approvals, on a part of them, or on a name bound to them
-  or to a part of them.
-* **NO_COMMIT_OR_MERGE** — nothing migrate or verify reaches in aisef2/app calls or names git, a commit, a merge, a
-  gate row or decision, a classification, a review or a story run, builds a `git` command, or appends a control event
-  to a journal.
+  mutating method call (update, append, ...; setattr) on the approvals, on a part of them, on a name bound to them or
+  to a part of them, or with the key "approvals" among its arguments. A parameter of a reached function is bound to the
+  approvals when a call in the closure passes them (or a part of them) to it.
+* **NO_COMMIT_OR_MERGE** — module-based: nothing migrate or verify reaches in aisef2/app names (calls or not) anything
+  of a deciding module — the kernel's git, merge, gate, review and story runner (aisef2.orchestrate), the owner's
+  control (aisef2.control), the journal (aisef2.journal), story admission (aisef2.plan.story_admission) — or a control
+  event (aisef2.arch.enums.EventType), and nothing builds a `git` command. Fail-closed: what they name elsewhere in
+  aisef2 is the explicit list REACHES (data types, compile_spec, the probe protocol, the calibration lookup); a new
+  name fails until it is shown to decide nothing and listed.
 * **VERIFY_THROUGH_BINDING_AND_CALIBRATION** — verify runs a probe, and every `run_probe(probe, spec, ...)` in it is the
-  record `bound_result` binds (PROBE-BIND-1), after a lookup that returns when the run is not calibrated — an earlier
+  record `bound_result` binds (PROBE-BIND-1), after a lookup that refuses when the run is not calibrated — an earlier
   statement of the probe's block, `if calibration_for(calibrations(), E.probe_id, executing(E.factory), cls) is None:
-  return ...`, where `probe = E.factory()` and `cls` is the observation class of `spec`, each name bound once.
+  return Verification(UNVERIFIABLE, ...)`, where `probe = E.factory()` and `cls` is the observation class of `spec`,
+  each name bound once; nothing verify reaches observes (`.observe`) outside run_probe.
 * **ONE_DECISION_PATH** — across aisef2, verify is named only by `Reviewer._verify` (aisef2/app/adapters.py),
-  `review_verify.blocks` only by `Reviewer.review` and migrate only by `bundle_cli.main`; every Finding the Reviewer
-  builds is corroborated only as `(...) if N else ()` (or never), N bound only by `N = review_verify.blocks(...)`, an
-  earlier statement of the Finding's block: a finding blocks only when blocks() said so, through the kernel's review
-  gate row and its one decision (story_runner._attempt).
+  `review_verify.blocks` only by `Reviewer.review` and migrate only by `bundle_cli.main`; in aisef2/app a Finding is
+  built only by a Reviewer method, corroborated only as `(...) if N else ()` (or never) with every binding of N
+  `N = review_verify.blocks(...)` and one an earlier statement of the Finding's block, or by `RuffScanner.read`,
+  never blocking (its `blocking` a false constant); nothing in aisef2/app copies one with another `blocking` or
+  `corroborated_by` (dataclasses.replace, setattr): a finding blocks only when blocks() said so, through the kernel's
+  review gate row and its one decision (story_runner._attempt).
 
-"Reaches" is the static closure over names that resolve — imports, module definitions and module-level aliases,
-followed through every re-export (`from aisef2.app.adapters import commit_all` is workspace.commit_all) — inside
-aisef2/app. Known ceiling: a call through an object (`entry.factory()`, `self.x`) or through a value computed at run
-time (getattr, a table of functions) is not followed; the behavioural tests (test_v21_identity Migrate,
-test_v21_review, test_v21_review_chain) cover what those do at run time.
+"Reaches" is the static closure over names that resolve — imports, module definitions and module-level bindings
+(an alias `save = W.commit_all` or `save: object = W.commit_all` is followed like an import; any other binding, a
+store into it or a call on it at module level joins the closure with what it names), followed through every re-export (`from aisef2.app.adapters import
+commit_all` is workspace.commit_all) — inside aisef2/app. Known ceiling: a call through an object (`entry.factory()`,
+`self.x`) or through a value computed at run time (getattr) is not followed; the analysis is flow-insensitive except
+that a binding of the corroboration name after its Finding counts only inside a loop that holds both; the behavioural
+tests (test_v21_identity Migrate, test_v21_review, test_v21_review_chain) cover what those do at run time.
 
     python -P validation/qualification/authority_limits.py     # exit 1 on any violation
 """
@@ -55,22 +64,49 @@ MIGRATE, VERIFY, BLOCKS = "aisef2.app.bundle_cli.migrate", "aisef2.app.review_ve
 ONLY_NAMED_BY = {VERIFY: ("aisef2/app/adapters.py", "Reviewer._verify"), BLOCKS: ("aisef2/app/adapters.py", "Reviewer.review"),
                  MIGRATE: ("aisef2/app/bundle_cli.py", "main")}
 REVIEWER, FINDING = ("aisef2/app/adapters.py", "Reviewer"), "aisef2.orchestrate.adapters.Finding"
+SCANNER = ("aisef2/app/adapters.py", "RuffScanner.read")
+FINDING_FIELDS = ("blocking", "corroborated_by")     # what a copy with changes must not set
 APPROVE, APPROVAL = "aisef2.app.bundle_cli.approve", "aisef2.product.approval.ContractApproval"
 RUN_PROBE, BOUND, CALIBRATION_FOR = ("aisef2.probe.protocol.run_probe", "aisef2.probe.protocol.bound_result",
                                      "aisef2.probe.calibration.calibration_for")
 EXECUTING, CALIBRATIONS = "aisef2.probe.calibration.executing", "aisef2.app.run.calibrations"
+VERIFICATION, UNVERIFIABLE = "aisef2.app.review_verify.Verification", "aisef2.app.review_verify.UNVERIFIABLE"
 EVENT_TYPE = "aisef2.arch.enums.EventType"
 #: an approval copied with changes is a new approval; a method or builtin that changes what it is called on
 REPLACE = {"dataclasses.replace", "copy.replace"}
 MUTATORS = {"update", "append", "extend", "insert", "pop", "popitem", "setdefault", "clear", "remove", "sort", "reverse",
             "__setitem__", "__delitem__", "__setattr__", "__delattr__", "__init__"}
 SETATTR = {"setattr", "delattr", "object.__setattr__", "object.__delattr__"}
-#: what a migration or a verification never reaches
-DECIDING = {"aisef2.orchestrate.workspace.git", "aisef2.orchestrate.workspace.commit_all", "aisef2.orchestrate.workspace.GitMerger",
-            "aisef2.orchestrate.merge.merge", "aisef2.orchestrate.merge.reprove", "aisef2.orchestrate.gate.check",
-            "aisef2.orchestrate.gate.decision", "aisef2.control.owner.classify", "aisef2.plan.story_admission.classify",
-            "aisef2.orchestrate.review.review", "aisef2.orchestrate.story_runner.run_story"}
+#: where deciding lives — a migration or a verification names nothing in these (module, or one definition)
+DECIDING = ("aisef2.orchestrate", "aisef2.control", "aisef2.journal", "aisef2.plan.story_admission", EVENT_TYPE)
+#: everything outside aisef2/app migrate and verify may name: each decides nothing (data types and their constructors,
+#: the compiler, the probe protocol and catalog, the calibration lookup). Fail-closed: anything else is a violation
+REACHES = {
+    "aisef2.arch.enums.BehaviorVerdict", "aisef2.arch.enums.Enforcement", "aisef2.arch.enums.ObligationRole",
+    "aisef2.arch.enums.ParentExpectation", "aisef2.arch.enums.Polarity", "aisef2.arch.enums.SubjectAbsence",
+    "aisef2.arch.enums.SubjectKind",
+    "aisef2.plan.obligation.Plan", "aisef2.plan.obligation.PlanObligation", "aisef2.plan.obligation.PlanQualityPolicy",
+    "aisef2.probe.calibration.ProbeCapabilityCalibration", "aisef2.probe.calibration.calibration_for",
+    "aisef2.probe.calibration.executing", "aisef2.probe.catalog.active", "aisef2.probe.catalog.registry",
+    "aisef2.probe.protocol.ExecutionEnv", "aisef2.probe.protocol.RevisionRef", "aisef2.probe.protocol.bound_result",
+    "aisef2.probe.protocol.run_probe",
+    "aisef2.product.approval.ContractApproval", "aisef2.product.approval.Requirement",
+    "aisef2.product.approval.binding_problems",     # a pure check of an approval's binding (approve, a known-bad edit)
+    "aisef2.product.compiler.COMPILER_DIGEST", "aisef2.product.compiler.COMPILER_ID", "aisef2.product.compiler.ProbeRef",
+    "aisef2.product.compiler.compile_spec", "aisef2.product.compiler.expectation_for",
+    "aisef2.product.contract.BehaviorContract", "aisef2.product.contract.ContractError", "aisef2.product.contract.Subject",
+    "aisef2.product.contract.plain", "aisef2.product.outcome.Executed", "aisef2.product.spec.ProductProofSpec",
+}
 GIT_COMMAND = re.compile(r"git(\s|$)")
+
+
+def _top(body: list):
+    """Every statement of a module's level, inside its if/try/with/loop blocks too (not inside a def or a class)."""
+    for n in body:
+        if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            yield n
+            for field in ("body", "orelse", "finalbody", "handlers"):
+                yield from _top(getattr(n, field, []))
 
 
 class _Module:
@@ -79,10 +115,22 @@ class _Module:
         self.imports = opa._imports(self.tree, rel)
         self.defs = opa._defs(self.tree)
         self.local = {name for name, _ in self.defs if "." not in name}
-        for n in self.tree.body:     # a module-level alias (`git = W.git`) binds and re-exports like an import
-            if isinstance(n, ast.Assign) and len(n.targets) == 1 and isinstance(n.targets[0], ast.Name) \
-                    and n.targets[0].id not in self.local and (dotted := opa._dotted(n.value)):
-                self.imports[n.targets[0].id] = opa._qualify(dotted, self.imports, rel, self.local)
+        #: a module-level name -> every module-level statement that binds it to, stores into or calls on a value that
+        #: is not an alias (`T = {...}`, `T["k"] = ...`, `T |= ...`, `T.update(...)`)
+        self.bound: dict[str, list[ast.stmt]] = {}
+        for n in _top(self.tree.body):
+            targets = n.targets if isinstance(n, ast.Assign) else [n.target] if isinstance(n, (ast.AnnAssign, ast.AugAssign)) \
+                and n.value else [n.value.func] if isinstance(n, ast.Expr) and isinstance(n.value, ast.Call) else []
+            dotted = opa._dotted(n.value) if isinstance(n, (ast.Assign, ast.AnnAssign)) else None
+            for t in dict.fromkeys(t.id for target in targets for t in ast.walk(target) if isinstance(t, ast.Name)):
+                if t in self.local or t in self.imports:     # a definition or an import (first, as _qualify reads it)
+                    continue
+                if dotted and isinstance(targets[0], ast.Name) and len(targets) == 1:
+                    # an alias (`git = W.git`, `save: object = W.commit_all`) binds and re-exports like an import
+                    self.imports[t] = opa._qualify(dotted, self.imports, rel, self.local)
+                else:
+                    self.bound.setdefault(t, []).append(n)
+        self.local |= set(self.bound)
         self.world: dict[str, _Module] = {}     # module name -> _Module, every module of the tree (set by _modules)
 
     def name(self, node: ast.AST) -> str | None:
@@ -129,6 +177,43 @@ def _modules(root: pathlib.Path, sources: dict[str, str]) -> dict[str, _Module]:
 
 def _loads(node: ast.AST):
     return (n for n in ast.walk(node) if isinstance(n, (ast.Name, ast.Attribute)) and isinstance(n.ctx, ast.Load))
+
+
+def _refs(m: _Module, node: ast.AST):
+    """(reference, the part of it that names, what that resolves to) for each whole Load reference in `node` — a Name
+    or an Attribute chain not inside a longer one. The part is its shortest prefix that is not a module (`W.GitMerger`
+    of `W.GitMerger.merge`, `EventType` of `EventType.X`), or the whole when every prefix is a module."""
+    inner = {id(n.value) for n in _loads(node) if isinstance(n, ast.Attribute)}
+    for n in _loads(node):
+        if id(n) in inner:
+            continue
+        chain, x = [], n
+        while isinstance(x, ast.Attribute):
+            chain.append(x)
+            x = x.value
+        chain.append(x)
+        for part in reversed(chain):
+            if (q := m.name(part)) is None or q not in m.world:
+                break
+        if q is not None:
+            yield n, part, q
+
+
+def _under(q: str, prefixes) -> bool:
+    return any(q == p or q.startswith(p + ".") for p in prefixes)
+
+
+def _annotations(node: ast.AST) -> set[int]:
+    """The ids of every node inside an annotation in `node` (an annotation names a type; it builds nothing)."""
+    anns = []
+    for n in ast.walk(node):
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            a = n.args
+            anns += [x.annotation for x in (*a.posonlyargs, *a.args, *a.kwonlyargs, a.vararg, a.kwarg) if x is not None]
+            anns.append(n.returns)
+        elif isinstance(n, ast.AnnAssign):
+            anns.append(n.annotation)
+    return {id(x) for ann in anns if ann is not None for x in ast.walk(ann)}
 
 
 # ponytail: names only, no points-to analysis; an object's method is not followed (module docstring)
@@ -192,10 +277,10 @@ def _bindings(node: ast.AST):
             yield n.target, n.iter
 
 
-def _held(node: ast.AST) -> set[str]:
+def _held(node: ast.AST, params=()) -> set[str]:
     """Every name `node` binds to the approvals or to a part of them, an approval among them (a write through one is a
-    write of the approvals) — to a fixed point."""
-    held: set[str] = set()
+    write of the approvals), `params` (its parameters a call passes them to) among them — to a fixed point."""
+    held: set[str] = set(params)
     while True:
         more = {t.id for target, source in _bindings(node) if _holds(source, held)
                 for t in ast.walk(target) if isinstance(t, ast.Name) and isinstance(t.ctx, ast.Store)}
@@ -205,28 +290,71 @@ def _held(node: ast.AST) -> set[str]:
 
 
 def _reloads(node: ast.AST) -> set[int]:
-    """The `ContractApproval(**a)` calls (by id) that re-load an approval of the input: each the element of a
-    comprehension whose one loop is `for a in X["approvals"]` — `a` is then the input's element and nothing rebinds it."""
-    return {id(c.elt) for c in ast.walk(node) if isinstance(c, (ast.ListComp, ast.GeneratorExp, ast.SetComp))
+    """The callees (by id) of the `ContractApproval(**a)` calls that re-load an approval of the input: each the element
+    of a comprehension whose one loop is `for a in X["approvals"]` — `a` is then the input's element and nothing
+    rebinds it."""
+    return {id(c.elt.func) for c in ast.walk(node) if isinstance(c, (ast.ListComp, ast.GeneratorExp, ast.SetComp))
             and len(c.generators) == 1 and isinstance(g := c.generators[0], ast.comprehension)
             and isinstance(g.target, ast.Name) and _is_approvals(g.iter) and isinstance(c.elt, ast.Call)
             and not c.elt.args and len(c.elt.keywords) == 1 and c.elt.keywords[0].arg is None
             and isinstance(c.elt.keywords[0].value, ast.Name) and c.elt.keywords[0].value.id == g.target.id}
 
 
-def _approves(m: _Module, n: ast.AST, reloads: set[int], held: set[str]) -> str | None:
+def _params(fn: ast.AST) -> list[str]:
+    a = fn.args
+    return [x.arg for x in (*a.posonlyargs, *a.args, *a.kwonlyargs, a.vararg, a.kwarg) if x is not None]
+
+
+def _passed(mods: dict[str, _Module], closure: list[tuple[str, str, ast.AST]]) -> dict[str, set[str]]:
+    """Each reached function's parameters that a call in the closure passes the approvals (or a part of them) to — a
+    starred or `**` argument that holds them reaches every parameter — to a fixed point."""
+    fns = {q: node for q, _, node in closure if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    passed: dict[str, set[str]] = {q: set() for q in fns}
+    while True:
+        more = False
+        for q, rel, node in closure:
+            held = _held(node, passed.get(q, ()))
+            for c in ast.walk(node):
+                if not (isinstance(c, ast.Call) and (callee := mods[rel].name(c.func)) in fns):
+                    continue
+                params = _params(fns[callee])
+                spread = any(isinstance(a, ast.Starred) for a in c.args) or any(k.arg is None for k in c.keywords)
+                given = [*c.args, *(k.value for k in c.keywords)]
+                got = set(params) if spread and any(_holds(a, held) for a in given) else \
+                    {p for p, a in zip(params, c.args, strict=False) if _holds(a, held)} | \
+                    {k.arg for k in c.keywords if k.arg in params and _holds(k.value, held)}
+                if not got <= passed[callee]:
+                    passed[callee] |= got
+                    more = True
+        if not more:
+            return passed
+
+
+def _names_key(n: ast.Call) -> bool:
+    """A call given the key "approvals" among its arguments (`out.update(dict.fromkeys(["approvals"]))`)."""
+    return any(isinstance(x, ast.Constant) and x.value == "approvals"
+               for a in (*n.args, *(k.value for k in n.keywords)) for x in ast.walk(a))
+
+
+def _created(m: _Module, node: ast.AST) -> list[int]:
+    """The lines where `node` names ContractApproval (a call, an alias, `ContractApproval.__new__`, ...) other than in an
+    annotation or as the callee of a re-load."""
+    skip = _reloads(node) | _annotations(node)
+    return [n.lineno for n, _, q in _refs(m, node) if _under(q, (APPROVAL,)) and id(n) not in skip]
+
+
+def _approves(m: _Module, n: ast.AST, held: set[str]) -> str | None:
     if isinstance(n, ast.Call):
         callee = m.name(n.func)
         if callee == APPROVE:
             return "calls bundle_cli.approve"
-        if callee == APPROVAL and id(n) not in reloads or callee in REPLACE and n.args and _holds(n.args[0], held):
+        if callee in REPLACE and n.args and _holds(n.args[0], held):
             return "creates a ContractApproval (a migration only re-loads the input's: ContractApproval(**a))"
         if any(k.arg == "approvals" for k in n.keywords) and (callee == "dict" or getattr(n.func, "attr", None) == "update"):
             return "writes the approvals"
-        if isinstance(n.func, ast.Attribute) and n.func.attr in MUTATORS and (
-                _holds(n.func.value, held) or n.args and isinstance(n.args[0], ast.Constant) and n.args[0].value == "approvals"):
+        if isinstance(n.func, ast.Attribute) and n.func.attr in MUTATORS and (_holds(n.func.value, held) or _names_key(n)):
             return "writes the approvals"
-        if callee in SETATTR and n.args and _holds(n.args[0], held):
+        if callee in SETATTR and (n.args and _holds(n.args[0], held) or _names_key(n)):
             return "writes the approvals"
     if isinstance(n, ast.Dict) and any(isinstance(k, ast.Constant) and k.value == "approvals" for k in n.keys):
         return "writes an 'approvals' key"
@@ -239,24 +367,37 @@ def _approves(m: _Module, n: ast.AST, reloads: set[int], held: set[str]) -> str 
 
 
 def _decides(m: _Module, node: ast.AST) -> list[tuple[int, str]]:
-    """(line, why) of each place in `node` that reaches a commit, a merge or a decision."""
-    funcs = {id(n.func) for n in ast.walk(node) if isinstance(n, ast.Call)}
+    """(line, why) of each place in `node` that names a deciding module, a control event or what REACHES does not
+    list, or builds a git command."""
+    calls = [n for n in ast.walk(node) if isinstance(n, ast.Call)]
+    funcs = {id(n.func) for n in calls}
+    appended = {id(a) for n in calls if isinstance(n.func, ast.Attribute) and n.func.attr == "append"
+                for a in (*n.args, *(k.value for k in n.keywords))}
     out = []
-    for n in ast.walk(node):
-        if isinstance(n, (ast.Name, ast.Attribute)) and isinstance(n.ctx, ast.Load):
-            if (q := m.name(n)) in DECIDING:     # a method of GitMerger names GitMerger on its way
-                out.append((n.lineno, f"{'calls' if id(n) in funcs else 'names'} {q}"))
-        elif isinstance(n, ast.Constant) and isinstance(n.value, str) and GIT_COMMAND.match(n.value):
-            out.append((n.lineno, "runs git"))
-        elif isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "append" and n.args \
-                and isinstance(n.args[0], ast.Attribute) and m.name(n.args[0].value) == EVENT_TYPE:
-            out.append((n.lineno, f"appends the control event {n.args[0].attr} to a journal"))
+    for n, part, q in _refs(m, node):
+        if not q.startswith("aisef2.") or _under(q, ("aisef2.app",)):
+            continue     # what aisef2/app defines is followed by the closure; a module constant is data
+        if _under(q, (EVENT_TYPE,)) and id(n) in appended:
+            out.append((n.lineno, f"appends the control event {getattr(n, 'attr', q)} to a journal"))
+        elif _under(q, DECIDING):     # a method of GitMerger names GitMerger on its way
+            out.append((n.lineno, f"{'calls' if id(part) in funcs else 'names'} {q}"))
+        elif q not in REACHES:
+            out.append((n.lineno, f"names {q}, which REACHES does not list: list it only once it is shown to decide nothing"))
+    out += [(n.lineno, "runs git") for n in ast.walk(node)
+            if isinstance(n, ast.Constant) and isinstance(n.value, str) and GIT_COMMAND.match(n.value)]
     return out
+
+
+def _refuses(m: _Module, s: ast.stmt) -> bool:
+    """`s` is `return Verification(UNVERIFIABLE, ...)`: the run is refused, never confirmed."""
+    v = s.value if isinstance(s, ast.Return) else None
+    return isinstance(v, ast.Call) and m.name(v.func) == VERIFICATION and bool(v.args) and m.name(v.args[0]) == UNVERIFIABLE
 
 
 def _calibrated_before(m: _Module, fn: ast.AST, probe: ast.Call) -> bool:
     """`probe` (`run_probe(P, S, ...)`, `P = E.factory()`) comes after the refusal `if calibration_for(calibrations(),
-    E.probe_id, executing(E.factory), C) is None: return ...` (or `if not calibration_for(...)`), an earlier statement of
+    E.probe_id, executing(E.factory), C) is None: return Verification(UNVERIFIABLE, ...)` (or `if not
+    calibration_for(...)`), an earlier statement of
     its block, with C bound to the observation class of S — every one of those names bound once."""
     if len(probe.args) < 2 or not all(isinstance(a, ast.Name) and _only(fn, a.id) is not None for a in probe.args[:2]):
         return False
@@ -266,7 +407,7 @@ def _calibrated_before(m: _Module, fn: ast.AST, probe: ast.Call) -> bool:
         return False
     entry = made.func.value.id
     for g in ast.walk(fn):
-        if not (isinstance(g, ast.If) and any(isinstance(s, ast.Return) for s in g.body) and _precedes(fn, g, probe)):
+        if not (isinstance(g, ast.If) and any(_refuses(m, s) for s in g.body) and _precedes(fn, g, probe)):
             continue
         t = g.test
         look = (t.left if isinstance(t, ast.Compare) and len(t.ops) == 1 and isinstance(t.ops[0], ast.Is)
@@ -286,7 +427,7 @@ def _calibrated_before(m: _Module, fn: ast.AST, probe: ast.Call) -> bool:
     return False
 
 
-def _verify_rule(m: _Module, node: ast.AST) -> list[str]:
+def _verify_rule(m: _Module, node: ast.AST, closure: list[tuple[str, str, ast.AST]]) -> list[str]:
     rule = "VERIFY_THROUGH_BINDING_AND_CALIBRATION"
     calls = [n for n in ast.walk(node) if isinstance(n, ast.Call)]
     bound = {id(n.args[0]) for n in calls if n.args and m.name(n.func) == BOUND}
@@ -301,6 +442,9 @@ def _verify_rule(m: _Module, node: ast.AST) -> list[str]:
         if not _calibrated_before(m, node, n):
             out.append(f"{rule} {m.rel}:{n.lineno} verify runs the probe with no calibration lookup before it that "
                        "returns when the class is not calibrated at the bytes that run")
+    out += [f"{rule} {rel}:{n.lineno} {_short(q)} observes outside run_probe: the probe's observation is only the record "
+            "run_probe returns and bound_result binds" for q, rel, fn in closure for n in _loads(fn)
+            if isinstance(n, ast.Attribute) and n.attr == "observe"]
     return out
 
 
@@ -309,34 +453,63 @@ def _empty(node: ast.AST | None) -> bool:
 
 
 def _gated(m: _Module, meth: ast.AST, finding: ast.Call, arg: ast.AST | None) -> bool:
-    """`arg` is `()`, or `(...) if N else ()` where every binding of N up to `finding` is `N = review_verify.blocks(...)`
-    and one is an earlier statement of the Finding's block."""
+    """`arg` is `()`, or `(...) if N else ()` where every binding of N up to `finding`, and every one in a loop that holds
+    `finding` (it runs before the next), is `N = review_verify.blocks(...)` and one is an earlier statement of the
+    Finding's block."""
     if _empty(arg):
         return True
     if not (isinstance(arg, ast.IfExp) and _empty(arg.orelse) and isinstance(arg.test, ast.Name)):
         return False
+    looped = {id(x) for loop in ast.walk(meth) if isinstance(loop, (ast.For, ast.AsyncFor, ast.While))
+              and any(x is finding for x in ast.walk(loop)) for x in ast.walk(loop)}
     binds = [t for t in ast.walk(meth) if isinstance(t, ast.Name) and t.id == arg.test.id and isinstance(t.ctx, ast.Store)
-             and t.lineno <= finding.end_lineno]
+             and (t.lineno <= finding.end_lineno or id(t) in looped)]
     asked = [a for a in ast.walk(meth) if isinstance(a, ast.Assign) and len(a.targets) == 1
              and any(a.targets[0] is t for t in binds) and isinstance(a.value, ast.Call) and m.name(a.value.func) == BLOCKS]
     return bool(asked) and len(asked) == len(binds) and any(_precedes(meth, a, finding) for a in asked)
 
 
+def _arg(call: ast.Call, i: int, name: str) -> ast.AST | None:
+    return call.args[i] if len(call.args) > i else next((k.value for k in call.keywords if k.arg == name), None)
+
+
 def _corroboration(mods: dict[str, _Module]) -> list[str]:
+    """Every Finding aisef2/app builds: a Reviewer method's, gated by blocks(); RuffScanner.read's, never blocking;
+    none elsewhere."""
     rule, (rel, cls) = "ONE_DECISION_PATH", REVIEWER
     m = mods.get(rel)
     node = next((n for n in m.tree.body if isinstance(n, ast.ClassDef) and n.name == cls), None) if m else None
     if node is None:
         return [f"{rule} {rel}:1 {cls} is missing"]
     out, built = [], 0
-    for meth in (f for f in node.body if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef))):
-        for n in ast.walk(meth):
-            if isinstance(n, ast.Call) and m.name(n.func) == FINDING:
-                built += 1
-                arg = n.args[2] if len(n.args) > 2 else next((k.value for k in n.keywords if k.arg == "corroborated_by"), None)
-                if not _gated(m, meth, n, arg):
-                    out.append(f"{rule} {rel}:{n.lineno} {cls}.{meth.name} corroborates a Finding other than by what "
-                               "review_verify.blocks answered: a finding blocks only when blocks() says so")
+    for r, mod in mods.items():
+        if not r.startswith(APP):
+            continue
+        skip = _annotations(mod.tree)
+        calls = {id(c.func): c for c in ast.walk(mod.tree) if isinstance(c, ast.Call)}
+        for scope, top in mod.scopes():
+            out += [f"{rule} {r}:{c.lineno} {scope} copies a Finding with another blocking or corroboration: only {cls}'s "
+                    f"methods (corroborated by blocks()) and {SCANNER[1]} (never blocking) build one"
+                    for c in ast.walk(top) if isinstance(c, ast.Call) and mod.name(c.func) in REPLACE | SETATTR
+                    and (any(k.arg in FINDING_FIELDS for k in c.keywords)
+                         or any(isinstance(a, ast.Constant) and a.value in FINDING_FIELDS for a in c.args))]
+            for n, _, q in _refs(mod, top):
+                if q != FINDING or id(n) in skip:
+                    continue
+                call = calls.get(id(n))
+                if call is not None and r == rel and scope.startswith(f"{cls}.") and scope != cls:
+                    built += 1
+                    if not _gated(mod, top, call, _arg(call, 2, "corroborated_by")):
+                        out.append(f"{rule} {r}:{n.lineno} {scope} corroborates a Finding other than by what "
+                                   "review_verify.blocks answered: a finding blocks only when blocks() says so")
+                elif call is not None and (r, scope) == SCANNER:
+                    blocking = _arg(call, 1, "blocking")
+                    if not (isinstance(blocking, ast.Constant) and not blocking.value):
+                        out.append(f"{rule} {r}:{n.lineno} {scope} builds a Finding that may block: a scanner's finding "
+                                   "is informational and never blocks")
+                else:
+                    out.append(f"{rule} {r}:{n.lineno} {scope} {'builds' if call is not None else 'names'} a Finding: only "
+                               f"{cls}'s methods (corroborated by blocks()) and {SCANNER[1]} (never blocking) build one")
     if not built:
         out.append(f"{rule} {rel}:{node.lineno} {cls} builds no Finding: the review's one path is gone (re-aim the rule)")
     return out
@@ -346,22 +519,28 @@ def check(root: pathlib.Path = ROOT, sources: dict[str, str] | None = None) -> l
     """Every violation of the four rules over aisef2 at `root`, `sources` (rel -> text) read in place of those files."""
     mods = _modules(root, sources or {})
     index = {f"{opa._module_name(rel)}.{name}": (rel, node) for rel, m in mods.items() for name, node in m.defs}
+    for rel, m in mods.items():     # a module-level binding joins the closure with what its value names
+        for name, stmts in m.bound.items():
+            index.setdefault(f"{opa._module_name(rel)}.{name}", (rel, ast.Module(body=stmts, type_ignores=[])))
     out = []
     for q in (MIGRATE, VERIFY):
         if q not in index:
             out.append(f"{'MIGRATE_NEVER_APPROVES' if q == MIGRATE else 'VERIFY_THROUGH_BINDING_AND_CALIBRATION'} "
                        f"{q.rsplit('.', 1)[0].replace('.', '/')}.py:1 {_short(q)} is missing")
-    for q, rel, node in _closure(mods, index, (MIGRATE,)):
-        m = mods[rel]
-        reloads, held = _reloads(node), _held(node)
-        out += [f"MIGRATE_NEVER_APPROVES {rel}:{n.lineno} {_short(q)} {why}: what migrate reaches re-binds the plan "
-                "and never approves" for n in ast.walk(node) if (why := _approves(m, n, reloads, held))]
+    migrate = _closure(mods, index, (MIGRATE,))
+    passed = _passed(mods, migrate)
+    for q, rel, node in migrate:
+        m, held = mods[rel], _held(node, passed.get(q, ()))
+        whys = [(line, "creates a ContractApproval (a migration only re-loads the input's: ContractApproval(**a))")
+                for line in _created(m, node)] + [(n.lineno, why) for n in ast.walk(node) if (why := _approves(m, n, held))]
+        out += [f"MIGRATE_NEVER_APPROVES {rel}:{line} {_short(q)} {why}: what migrate reaches re-binds the plan and never "
+                "approves" for line, why in sorted(whys, key=lambda w: w[0])]
     for q, rel, node in _closure(mods, index, (MIGRATE, VERIFY)):
         out += [f"NO_COMMIT_OR_MERGE {rel}:{line} {_short(q)} {why}: what migrate or verify reaches never commits, "
                 "merges or decides" for line, why in _decides(mods[rel], node)]
     if VERIFY in index:
         rel, node = index[VERIFY]
-        out += _verify_rule(mods[rel], node)
+        out += _verify_rule(mods[rel], node, _closure(mods, index, (VERIFY,)))
     named = set()
     for rel, m in mods.items():
         for scope, node in m.scopes():
