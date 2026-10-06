@@ -285,9 +285,13 @@ def write(out: pathlib.Path) -> int:
     if why:
         print(f"REFUSED: {why}")
         return 2
+    head = C.git("rev-parse", "HEAD")
     rec = derive()
     if why := _dirty_why(rec["tree_dirty"]):   # the tree moved while it was measured
         print(f"REFUSED: {why}")
+        return 2
+    if rec["execution_commit"] != head:        # a commit landed while it was measured: the record would name code that did not run
+        print(f"REFUSED: HEAD moved from {head[:12]} to {rec['execution_commit'][:12]} while the items were measured")
         return 2
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("x", encoding="utf-8", newline="\n") as f:

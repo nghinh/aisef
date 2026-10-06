@@ -361,9 +361,14 @@ class KernelComparison(unittest.TestCase):
                 with mock.patch.object(M, "derive", return_value={"tree_dirty": ["?? validation/x.py"], "summary": {}}):
                     self.assertEqual(M.write(fresh), 2)                       # the tree moved while measured: nothing written
                 self.assertFalse(fresh.exists())
-                with mock.patch.object(M, "derive", return_value={"tree_dirty": [], "summary": {}}):
+                head = M.C.git("rev-parse", "HEAD")
+                with mock.patch.object(M, "derive", return_value={"tree_dirty": [], "summary": {}, "execution_commit": "0" * 40}):
+                    self.assertEqual(M.write(fresh), 2)                       # HEAD moved while measured: nothing written
+                self.assertFalse(fresh.exists())
+                with mock.patch.object(M, "derive", return_value={"tree_dirty": [], "summary": {}, "execution_commit": head}):
                     self.assertEqual(M.write(fresh), 0)                       # clean: written once
-                self.assertEqual(json.loads(fresh.read_text(encoding="utf-8")), {"tree_dirty": [], "summary": {}})
+                self.assertEqual(json.loads(fresh.read_text(encoding="utf-8")),
+                                 {"tree_dirty": [], "summary": {}, "execution_commit": head})
                 self.assertIn("exists", M.refused(fresh))
         with mock.patch.object(M.C, "git", return_value=" M aisef2/x.py\n?? validation/y.py") as g:
             self.assertEqual(M.dirty(), [" M aisef2/x.py", "?? validation/y.py"])
@@ -437,6 +442,9 @@ class KernelComparison(unittest.TestCase):
             self.assertEqual(check(lambda r: r["items"][ident["items"][0]]["2.1"]["probe_digests"].update({"probe.cli_invocation": ["f" * 64]})),
                              [f"probe.cli_invocation: measured {cli['v2.0.0']['probe_digests']['probe.cli_invocation']} -> {['f' * 64]}, "
                               "v21_q5_changes states d42449fd8e3a -> 330ae4a88cc8"])
+            self.assertEqual(check(lambda r: r["items"][ident["items"][0]]["v2.0.0"]["probe_digests"].update({"probe.cli_invocation": ["0" * 64]})),
+                             [f"probe.cli_invocation: measured {['0' * 64]} -> {cli['2.1']['probe_digests']['probe.cli_invocation']}, "
+                              "v21_q5_changes states d42449fd8e3a -> 330ae4a88cc8"])   # the v2.0.0 side's own prefix is checked
             self.assertEqual(len(check(lambda r: r["items"][ident["items"][0]]["v2.0.0"]["probe_digests"]["probe.cli_invocation"].append("d42449fd8e3a" + "1" * 52))), 1)
             self.assertEqual(len(check(lambda r: r["items"][ident["items"][1]]["2.1"]["probe_digests"].update({"probe.file_artifact": []}))), 1)
             self.assertEqual(check(lambda r: [r["items"][ident["items"][3]][side].pop("probe_digests") for side in ("v2.0.0", "2.1")]),
