@@ -668,7 +668,8 @@ def release_differences() -> list[str]:
 
     V2.1 (owner B-03d, RELEASE-DECISIONS seq 5): the 2.1 changes are named by the committed ruling
     closure-evidence/v2/v2.1/CONFORMANCE-RULING.json (v21_conformance_ruling.py), each BY CONTENT — a file is accepted
-    through it only while its LF sha256 is the ruling's sha256_2_1; no ruling, nothing new accepted. B-03a: the (e) gate
+    through it only while its LF sha256 is the ruling's sha256_2_1; no ruling, nothing new accepted. A file `changed`
+    names is accepted by name only while it has its v2.0.0 bytes: one that 2.1 changed again needs the ruling too. B-03a: the (e) gate
     is the 2.0 acceptance kept as history and its literal v2.1 re-verification (p5_acceptance.history_problems,
     reverification_problems), never p5_acceptance.check's probe-identity re-binding, never an engine-digest rule."""
     from validation.qualification import p5_acceptance as pa
@@ -684,6 +685,10 @@ def release_differences() -> list[str]:
     def ruled(rel: str) -> bool:   # content-bound: the ruling names the file at the bytes it has now
         f = ROOT / rel
         return rel in named and f.is_file() and _lf(f.read_bytes()) == named[rel]
+
+    def kept(rel: str) -> bool:   # V2.0's tolerance while the file has its v2.0.0 bytes; once 2.1 changed it, the ruling's
+        f = ROOT / rel
+        return rel in changed and f.is_file() and _lf(f.read_bytes()) == rebind.lf_sha_at(ruling.V2_0_0, rel) or ruled(rel)
     probe_moved = ("all_equal_to_accepted", "contract_spec_semantic_digest", "plan_hash", "plan_ok", "catalog",
                    "catalog_matches_the_brief", "probe_sources_vs_6311254", "probe_sources_identical_to_6311254")
     me = "validation/qualification/c2_orchestration_repair.py"
@@ -696,11 +701,10 @@ def release_differences() -> list[str]:
     for x in check(now):
         parts = x.split(" ", 2)
         if parts[0] == "(d)" and parts[2] in ("changed since the record", "changed since the base and is not in the record") and (
-                parts[1] in changed or ruled(parts[1])
-                or parts[1] == me and rebind.code_moved(me, "4f6dfc1", ("check", "release_differences"))):
+                kept(parts[1]) or parts[1] == me and rebind.code_moved(me, "4f6dfc1", ("check", "release_differences"))):
             continue
         if x == "(e) the identities differ from the record":
-            stray = [k for k in moved if k not in probe_moved] + [r for r in sources if r not in changed and not ruled(r)]
+            stray = [k for k in moved if k not in probe_moved] + [r for r in sources if not kept(r)]
             if not stray and not pa.history_problems() and not pa.reverification_problems():
                 continue
             x += (f": beyond the V2.0 release's and the 2.1 ruling's probe changes {stray}, or the C2-P5 acceptance is not "

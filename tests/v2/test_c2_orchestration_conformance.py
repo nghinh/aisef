@@ -758,13 +758,17 @@ class Record(unittest.TestCase):
         stray = {"a file the release did not name": "(d) aisef2/orchestrate/proof.py changed since the record",
                  "a verdict problem of the record": "(c) the test matrix: exit 1"}
 
-        def left(found, now=rec, history=(), reverification=(), mutation=(), named=None):
+        # story_runner.py is a V2.0 change that 2.1 changed again: on this tree it is accepted only through the ruling
+        sr = "aisef2/orchestrate/story_runner.py"
+        at21 = {sr: rp._lf((ROOT / sr).read_bytes())}
+
+        def left(found, now=rec, history=(), reverification=(), mutation=(), named=at21):
             with mock.patch.object(rp, "identities", return_value=now), mock.patch.object(rp, "check", return_value=found), \
                     mock.patch.object(pa, "history_problems", return_value=list(history)), \
                     mock.patch.object(pa, "reverification_problems", return_value=list(reverification)), \
                     mock.patch.object(pa, "check", side_effect=AssertionError("p5_acceptance.check is not the (e) gate")), \
                     mock.patch.object(mu, "check", return_value=list(mutation)), \
-                    mock.patch.object(ruling, "tolerated", return_value=dict(named or {})):
+                    mock.patch.object(ruling, "tolerated", return_value=dict(named)):
                 return rp.release_differences()
         self.assertEqual(left(released), [])
         for name, x in stray.items():
@@ -782,15 +786,17 @@ class Record(unittest.TestCase):
         # V2.1 (owner B-03d): three files no V2.0 change named, each accepted only through the ruling at its bytes
         review, cal, fa = "aisef2/orchestrate/review.py", "aisef2/probe/calibration.py", "aisef2/probe/file_artifact.py"
         v21 = {rel: f"(d) {rel} changed since the base and is not in the record" for rel in (review, cal, fa)}
-        named = {rel: rp._lf((ROOT / rel).read_bytes()) for rel in v21}
+        named = {**at21, **{rel: rp._lf((ROOT / rel).read_bytes()) for rel in v21}}
         with self.subTest("2.1's changes the ruling names at their bytes"):
             self.assertEqual(left(released + list(v21.values()), named=named), [])
         with self.subTest("a 2.1 file the ruling does not name"):
             self.assertEqual(left(released + list(v21.values()), named={k: v for k, v in named.items() if k != review}), [v21[review]])
         with self.subTest("a named file whose bytes are not the ruling's"):
             self.assertEqual(left(released + list(v21.values()), named={**named, review: "0" * 64}), [v21[review]])
-        with self.subTest("a missing ruling tolerates nothing new"):
-            self.assertEqual(left(released + list(v21.values())), list(v21.values()))
+        with self.subTest("a missing ruling tolerates nothing new"):     # not even a V2.0 file 2.1 changed again
+            self.assertEqual(left(released + list(v21.values()), named={}), [released[1], *v21.values()])
+        with self.subTest("a V2.0 change 2.1 changed again, the ruling naming it at other bytes"):
+            self.assertEqual(left(released, named={sr: "0" * 64}), [released[1]])
         with self.subTest("a C2-P5 acceptance boundary not re-verified on 2.1"):
             self.assertEqual(len(left(released, reverification=["x"], named=named)), 1)
         moves = {**rec["probe_sources_vs_6311254"], **{rel: {"6311254": "a", "now": "b"} for rel in (cal, fa)}}
@@ -801,6 +807,12 @@ class Record(unittest.TestCase):
             self.assertEqual(len(left(released, now=moved)), 1)
         with self.subTest("the calibration.py and file_artifact.py source moves, the ruling naming other bytes"):
             self.assertEqual(len(left(released, now=moved, named={**named, cal: "0" * 64})), 1)
+        cli = "aisef2/probe/cli_invocation.py"     # a V2.0 probe change (B1) that 2.1 changed again (V2-007)
+        moved_cli = {**rec, "probe_sources_vs_6311254": {**rec["probe_sources_vs_6311254"], cli: {"6311254": "a", "now": "b"}}}
+        with self.subTest("a V2.0 probe source 2.1 changed again, through the ruling"):
+            self.assertEqual(left(released, now=moved_cli, named={**at21, cli: rp._lf((ROOT / cli).read_bytes())}), [])
+        with self.subTest("a V2.0 probe source 2.1 changed again, without the ruling"):
+            self.assertEqual(len(left(released, now=moved_cli)), 1)
 
 
 if __name__ == "__main__":
