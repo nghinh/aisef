@@ -1,0 +1,105 @@
+{
+ "_provenance": "Built from OCR v1.12.12 (182898c) structs by the V2.1 upstream research (docs/v2.1/UPSTREAM-RESEARCH.md): item_id and source_artifact recomputed with OCR's algorithms; other hashes and SHAs synthetic. Not output of a real run.",
+ "status": "complete",
+ "llm": {
+  "provider": "anthropic",
+  "model": "model-x"
+ },
+ "message": "Review complete: 1 finding(s) across 2 selected item(s).",
+ "summary": {
+  "files_reviewed": 2,
+  "comments": 1,
+  "total_tokens": 48210,
+  "input_tokens": 45100,
+  "output_tokens": 3110,
+  "elapsed": "41s"
+ },
+ "tool_calls": {
+  "total": 6,
+  "by_tool": {
+   "code_comment": 1,
+   "file_read": 5
+  },
+  "failure": 0,
+  "failure_by_tool": {},
+  "failure_details": []
+ },
+ "comments": [
+  {
+   "path": "src/app/limits.py",
+   "content": "The limit check now admits limit+1 requests.",
+   "suggestion_code": "    if count >= limit:",
+   "existing_code": "    if count > limit:",
+   "start_line": 41,
+   "end_line": 41,
+   "category": "bug",
+   "severity": "high"
+  }
+ ],
+ "groups": [
+  {
+   "label": "small change set",
+   "files": [
+    "src/app/limits.py",
+    "src/app/api.py"
+   ]
+  }
+ ],
+ "session_id": "6f1d2c3e-0000-4000-8000-00000000000a",
+ "manifest": {
+  "schema_version": "ocr.run-manifest/v1",
+  "run_id": "6f1d2c3e-0000-4000-8000-00000000000a",
+  "operation": "review",
+  "terminal_state": "complete",
+  "repository": {
+   "identity_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "input": {
+   "mode": "range",
+   "requested_from": "1111111111111111111111111111111111111111",
+   "requested_head": "2222222222222222222222222222222222222222",
+   "resolved_base": "1111111111111111111111111111111111111111",
+   "resolved_head": "2222222222222222222222222222222222222222",
+   "exact_range": "1111111111111111111111111111111111111111..2222222222222222222222222222222222222222",
+   "source_artifact_sha256": "aae1130de02c1cf860faab6a9923ea7850cb980df5463d4de0eb901a348b47af"
+  },
+  "execution": {
+   "ocr_version": "v1.12.12",
+   "provider": "anthropic",
+   "model": "model-x",
+   "configured_concurrency": 8,
+   "rule_config_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "runtime_config_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "coverage": {
+   "selected": [
+    {
+     "item_id": "1d3cf7f6b9f9795c6cf4811f7be410e64f1f97559d7b91e99172fe89e20fbb7e",
+     "path": "src/app/limits.py",
+     "fingerprint": "544b405c6bd248da8824e72e372488ac97798a71a682a1d5568d0b3f65d7d424"
+    },
+    {
+     "item_id": "ca183224327844f57b781ea50085ce964b59ad689774b134c014963ec7b23dc4",
+     "path": "src/app/api.py",
+     "fingerprint": "d9503b2927ac39fbcd906eb2c07f03a14f73e89144029a18a29f2f25ddc60231"
+    }
+   ],
+   "completed": [
+    {
+     "item_id": "1d3cf7f6b9f9795c6cf4811f7be410e64f1f97559d7b91e99172fe89e20fbb7e",
+     "path": "src/app/limits.py",
+     "fingerprint": "544b405c6bd248da8824e72e372488ac97798a71a682a1d5568d0b3f65d7d424"
+    },
+    {
+     "item_id": "ca183224327844f57b781ea50085ce964b59ad689774b134c014963ec7b23dc4",
+     "path": "src/app/api.py",
+     "fingerprint": "d9503b2927ac39fbcd906eb2c07f03a14f73e89144029a18a29f2f25ddc60231"
+    }
+   ],
+   "reused": [],
+   "failed": [],
+   "waived": []
+  },
+  "elapsed_ms": 41380
+ }
+}

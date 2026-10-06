@@ -681,8 +681,8 @@ class AppSettingsLoad(unittest.TestCase):
         data["extra"] = 1
         with self.assertRaises(settings.SettingsError) as c:
             settings.load(data)
-        self.assertEqual(str(c.exception), f"run settings hold exactly {sorted(settings.KEYS)}; these hold {sorted(data)} — "
-                                           "nothing is defaulted")
+        self.assertEqual(str(c.exception), f"run settings hold exactly {sorted(settings.KEYS)} (and optionally "
+                                           f"{list(settings.OPTIONAL)}); these hold {sorted(data)} — nothing is defaulted")
         with self.assertRaises(settings.SettingsError) as c:
             settings.load({**e2e.SETTINGS, "provider": {**e2e.SETTINGS["provider"], "name": "other"}})
         self.assertEqual(str(c.exception), "provider is {api_key_env, endpoint, listed_owner, model_limit, name, served_model}, "
@@ -876,7 +876,9 @@ class AppAdapters(unittest.TestCase):
         with self.session(text='{"findings": [{"id": "F1", "blocking": true}]}'):
             r = rev.review(scope, ("C-ADD",))
         self.assertEqual(self.calls[-1][0::2], ("reviewer S1", self.tmp / "logs" / "S1.reviewer.2.jsonl"))
-        self.assertEqual((rev.sessions[-1]["role"], rev.sessions[-1]["findings"]), ("reviewer", [{"id": "F1", "blocking": True}]))
+        self.assertEqual((rev.sessions[-1]["role"], rev.sessions[-1]["findings"]), ("reviewer", [{   # V2.1: + its verification
+            "id": "F1", "blocking": True, "verification": {"status": "UNVERIFIABLE", "probe": None, "observed": None,
+                                                           "why": "no reproducer: the finding states no observable behaviour"}}]))
         self.assertIs(type(r.findings), tuple)
 
 

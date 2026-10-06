@@ -55,7 +55,8 @@ if title.startswith("developer") and mode == "write":
     (cwd / "tests" / "test_add.py").write_text(TEST)
 if mode == "interrupt" and title.startswith("developer"):
     raise SystemExit(3)
-text = '{"findings": []}' if title.startswith("reviewer") else "done"
+review = pathlib.Path(__file__).with_name("review.json")    # V2.1: a test may give the reviewer its answer
+text = (review.read_text() if review.exists() else '{"findings": []}') if title.startswith("reviewer") else "done"
 if os.environ.get("AISEF_TEST_SECRET"):     # a tool that prints the environment
     print(json.dumps({"type": "text", "part": {"text": "env: AISEF_TEST_SECRET=" + os.environ["AISEF_TEST_SECRET"]}}))
 print(json.dumps({"type": "text", "part": {"text": text}}))

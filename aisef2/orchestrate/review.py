@@ -41,9 +41,9 @@ def review(run, story_id: str, scope: ReadOnlyScope, reviewer: Reviewer, criteri
     if reviewed.outcome is not O.COMPLETED:
         return Review(request, seq, (), classify(FailureCode.PROVIDER_UNAVAILABLE))
     checks = [gate.check(run, story_id, f"review:{f.id}", not f.blocks,
-                         ("blocking, corroborated by " + ", ".join(f.corroborated_by)) if f.blocks
-                         else "advisory: a model review alone is never the sole blocking authority (D-002)" if f.blocking
-                         else "informational") for f in reviewed.findings]
+                         (("blocking, corroborated by " + ", ".join(f.corroborated_by)) if f.blocks
+                          else "advisory: a model review alone is never the sole blocking authority (D-002)" if f.blocking
+                          else "informational") + (f" — {f.detail}" if f.detail else "")) for f in reviewed.findings]
     if not checks:
         checks.append(gate.check(run, story_id, "review", True, "reviewed: no finding"))
     failure = classify(FailureCode.REVIEW_FINDING) if any(f.blocks for f in reviewed.findings) else None

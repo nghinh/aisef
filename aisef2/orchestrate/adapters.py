@@ -58,6 +58,7 @@ class Finding:
     id: str
     blocking: bool
     corroborated_by: tuple[str, ...]
+    detail: str = ""     # V2.1: what the finding states, journaled on its gate row (what a retry is told); never decides
 
     @property
     def blocks(self) -> bool:

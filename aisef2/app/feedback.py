@@ -68,6 +68,11 @@ def retry_feedback(events, story_id: str, project: Project) -> str:
         proof = next((e for e in reversed(about) if e[0] < seq and e[1] == "proof/verified"), None)
         if proof is None:
             rows.append(f"- {code} (owner {owner}): {detail}")
+            if code == "REVIEW_FINDING":    # V2.1: the confirmed findings that blocked this attempt, as journaled
+                since = max((q for q, k, d in events if q < seq and d.get("story_id") == story_id
+                             and k in ("failure/observed", "story/begin")), default=0)
+                rows += [f"  {d['detail']}" for q, k, d in events if since < q < seq and k == "gate/check"
+                         and d.get("check", "").startswith(f"{story_id}:review:") and d.get("passed") is False]
             continue
         f, spec = project.facts[o.criterion_id], project.specs[o.product_proof_spec_id]
         expected = spec.candidate_expectation.value

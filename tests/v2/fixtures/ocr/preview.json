@@ -1,0 +1,64 @@
+{
+ "_provenance": "Built from OCR v1.12.12 (182898c) structs by the V2.1 upstream research (docs/v2.1/UPSTREAM-RESEARCH.md): item_id and source_artifact recomputed with OCR's algorithms; other hashes and SHAs synthetic. Not output of a real run.",
+ "files": [
+  {
+   "path": "src/app/limits.py",
+   "status": "modified",
+   "insertions": 1,
+   "deletions": 1,
+   "will_review": true
+  },
+  {
+   "path": "src/app/api.py",
+   "status": "modified",
+   "insertions": 1,
+   "deletions": 0,
+   "will_review": true
+  },
+  {
+   "path": "tests/test_limits.py",
+   "status": "modified",
+   "insertions": 12,
+   "deletions": 0,
+   "will_review": false,
+   "exclude_reason": "default_path"
+  },
+  {
+   "path": "docs/limits.md",
+   "status": "added",
+   "insertions": 30,
+   "deletions": 0,
+   "will_review": false,
+   "exclude_reason": "unsupported_ext"
+  },
+  {
+   "path": ".env",
+   "status": "modified",
+   "insertions": 1,
+   "deletions": 1,
+   "will_review": false,
+   "exclude_reason": "secret_exclude"
+  },
+  {
+   "path": "vendor/lib/x.go",
+   "status": "modified",
+   "insertions": 3,
+   "deletions": 3,
+   "will_review": false,
+   "exclude_reason": "provider_directory"
+  },
+  {
+   "path": "src/app/old.py",
+   "status": "deleted",
+   "insertions": 0,
+   "deletions": 20,
+   "will_review": false,
+   "exclude_reason": "deleted"
+  }
+ ],
+ "total_insertions": 48,
+ "total_deletions": 25,
+ "total_files": 7,
+ "reviewable_count": 2,
+ "excluded_count": 5
+}

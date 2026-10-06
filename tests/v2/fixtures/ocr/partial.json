@@ -1,0 +1,124 @@
+{
+ "_provenance": "Built from OCR v1.12.12 (182898c) structs by the V2.1 upstream research (docs/v2.1/UPSTREAM-RESEARCH.md): item_id and source_artifact recomputed with OCR's algorithms; other hashes and SHAs synthetic. Not output of a real run.",
+ "status": "partial",
+ "llm": {
+  "model": "model-x"
+ },
+ "message": "Review partially complete: 1 finding(s); 2 of 3 selected item(s) failed.",
+ "summary": {
+  "files_reviewed": 3,
+  "comments": 1,
+  "total_tokens": 120400,
+  "input_tokens": 114000,
+  "output_tokens": 6400,
+  "cache_read_tokens": 30000,
+  "elapsed": "2m5s",
+  "budget_exceeded": true
+ },
+ "tool_calls": {
+  "total": 9,
+  "by_tool": {
+   "code_comment": 3,
+   "file_read": 6
+  },
+  "failure": 1,
+  "failure_by_tool": {
+   "code_comment": 1
+  },
+  "failure_details": [
+   {
+    "tool_call_number": 4,
+    "tool_name": "code_comment",
+    "file_path": "pkg/store/db.go",
+    "arguments": "{\"comments\":\"[{\\\"content\\\":\\\"unterminated\"}",
+    "error": "Error: failed to parse 'comments' JSON string: unexpected end of JSON input"
+   }
+  ]
+ },
+ "comments": [
+  {
+   "path": "pkg/store/db.go",
+   "content": "Transaction is not rolled back on the error path.",
+   "existing_code": "tx, err := db.Begin()",
+   "start_line": 0,
+   "end_line": 0,
+   "category": "bug",
+   "severity": "medium"
+  }
+ ],
+ "warnings": [
+  {
+   "file": "cmd/tool/main.go",
+   "message": "stopped dispatch: used 120400 tokens + group estimate 15600 = projected 136000 exceeds budget 130000",
+   "type": "token_budget_reached"
+  }
+ ],
+ "session_id": "6f1d2c3e-0000-4000-8000-00000000000b",
+ "manifest": {
+  "schema_version": "ocr.run-manifest/v1",
+  "run_id": "6f1d2c3e-0000-4000-8000-00000000000b",
+  "operation": "review",
+  "terminal_state": "partial",
+  "repository": {},
+  "input": {
+   "mode": "commit",
+   "requested_head": "4444444444444444444444444444444444444444",
+   "resolved_base": "3333333333333333333333333333333333333333",
+   "resolved_head": "4444444444444444444444444444444444444444",
+   "exact_range": "3333333333333333333333333333333333333333..4444444444444444444444444444444444444444",
+   "source_artifact_sha256": "b638a2eaa1825b00fef5220a3a8685531fd9dca3454f3accee2bc7e0b77d0692"
+  },
+  "execution": {
+   "ocr_version": "v1.12.12",
+   "model": "model-x",
+   "configured_concurrency": 8,
+   "rule_config_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "runtime_config_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  },
+  "coverage": {
+   "selected": [
+    {
+     "item_id": "0ca7ac579ffde3ed49b935ab023b74ef18a37e96ad5080ac497fb078cc961d5d",
+     "path": "pkg/store/db.go",
+     "fingerprint": "fa98a538ac3919f9a3aa13ded461606d7d3e07d7efdd8de64c6eaeac43f6fb3f"
+    },
+    {
+     "item_id": "550740780ac606d39aabc59886ecd1d721feb70183458b76e73652a6361aec36",
+     "path": "pkg/store/cache.go",
+     "fingerprint": "b21e9efa1e65798660d6fe834c575e4810e9433b3e576f36b58338de6655fe6d"
+    },
+    {
+     "item_id": "df2430899809115350e42e46605f67e8b40a980dabbeebfb609e4486e7f2d4b6",
+     "path": "cmd/tool/main.go",
+     "fingerprint": "096a8cfb1eb322cf2115548ae57572f80d479955f98f4ea3df3c83e44c95eda3"
+    }
+   ],
+   "completed": [
+    {
+     "item_id": "0ca7ac579ffde3ed49b935ab023b74ef18a37e96ad5080ac497fb078cc961d5d",
+     "path": "pkg/store/db.go",
+     "fingerprint": "fa98a538ac3919f9a3aa13ded461606d7d3e07d7efdd8de64c6eaeac43f6fb3f"
+    }
+   ],
+   "reused": [],
+   "failed": [
+    {
+     "item_id": "550740780ac606d39aabc59886ecd1d721feb70183458b76e73652a6361aec36",
+     "path": "pkg/store/cache.go",
+     "fingerprint": "b21e9efa1e65798660d6fe834c575e4810e9433b3e576f36b58338de6655fe6d",
+     "classification": "provider",
+     "reason": "provider or subtask request failed"
+    },
+    {
+     "item_id": "df2430899809115350e42e46605f67e8b40a980dabbeebfb609e4486e7f2d4b6",
+     "path": "cmd/tool/main.go",
+     "fingerprint": "096a8cfb1eb322cf2115548ae57572f80d479955f98f4ea3df3c83e44c95eda3",
+     "classification": "budget",
+     "reason": "aggregate token budget reached before dispatch completed"
+    }
+   ],
+   "waived": []
+  },
+  "elapsed_ms": 125020
+ }
+}

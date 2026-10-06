@@ -176,7 +176,10 @@ def layers_of(project: Project, settings: Settings) -> dict:
             "limits": {"value": {k.value: v for k, v in settings.limits.items()}, "layer": "settings"},
             "budget": {"value": settings.budget, "layer": "settings"},
             "max_turns_per_session": {"value": settings.max_turns_per_session, "layer": "settings"},
-            "timeouts_s": {"value": settings.timeouts_s, "layer": "settings"}}
+            "timeouts_s": {"value": settings.timeouts_s, "layer": "settings"},
+            # V2.1: bound only when the settings name it, so a 2.0.0 run's RunSpec re-derives unchanged
+            **({"review": {"value": {k: settings.review[k] for k in ("policy", "min_severity")}, "layer": "settings"}}
+               if settings.review and settings.review.get("given") else {})}
 
 
 def runspec_of(project: Project, settings: Settings, pre: dict, client_id: str, python: str, scanner):
@@ -369,7 +372,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
               # the operator's values the client receives, and the provider key: never left in a session's evidence
               "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8)}
         developer = ad.Developer(run, project, logs, kw, settings.timeouts_s["developer"])
-        reviewer = ad.Reviewer(run, project, logs, kw, settings.timeouts_s["reviewer"])
+        reviewer = ad.Reviewer(run, project, logs, kw, settings.timeouts_s["reviewer"], review=settings.review,
+                               probe_timeout_s=settings.timeouts_s["probe"])
         adapters = sr.Adapters(developer, reviewer, scanner, merger, ws)
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch))
                      for e in catalog.CATALOG}

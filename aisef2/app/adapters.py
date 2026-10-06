@@ -14,7 +14,7 @@ import re
 import shutil
 import sys
 
-from aisef2.app import client, feedback
+from aisef2.app import client, feedback, review_verify
 from aisef2.app.bundle import Project
 from aisef2.arch.enums import ControlProjection
 from aisef2.journal.format2 import OperationOutcome as O
@@ -23,7 +23,13 @@ from aisef2.orchestrate.workspace import commit_all, git
 
 REVIEW_PROMPT = ("Review the implementation of story {story} of {name} in this read-only checkout against {requirements} "
                  "and these clauses:\n{clauses}\nDo not modify any file. Answer with ONLY one JSON object: "
-                 '{{"findings": [{{"id": "short-id", "blocking": true or false, "summary": "one line"}}]}}')
+                 '{{"findings": [{{"id": "short-id", "blocking": true or false, "severity": "low|medium|high|critical", '
+                 '"summary": "one line", "reproducer": null or {{"clause": "<requirement id>/<n>", "subject": '
+                 '{{"kind": "cli_invocation|python_callable|file_artifact|process_effect", "locator": "..."}}, '
+                 '"stimulus": {{...}}, "observable": {{..., "within_s": 10}}}}}}]}}\n'
+                 "A finding is acted on only when its reproducer — the behaviour the cited clause demands, in the probe's "
+                 "grammar — is observed NOT to hold when the kernel runs it; one without a reproducer is recorded for a "
+                 "person to triage.")
 
 
 def _sha(data: bytes) -> str:
@@ -66,9 +72,13 @@ class Developer:
 
 
 class Reviewer:
-    def __init__(self, run, project: Project, logs: pathlib.Path, session_kw: dict, timeout_s: float) -> None:
+    def __init__(self, run, project: Project, logs: pathlib.Path, session_kw: dict, timeout_s: float,
+                 review: dict | None = None, probe_timeout_s: float = 60.0) -> None:
         self.run, self.project, self.logs, self.kw, self.timeout_s = run, project, logs, session_kw, timeout_s
         self.sessions: list[dict] = []
+        from aisef2.app.settings import REVIEW_ABSENT
+        self.review_policy = review or REVIEW_ABSENT     # V2.1 (app/review_verify): what a confirmed finding does
+        self.probe_timeout_s = probe_timeout_s
 
     def review(self, scope, criteria: tuple[str, ...]) -> Reviewed:
         attempt, _ = attempt_of(self.run, scope.story_id)
@@ -87,9 +97,27 @@ class Reviewer:
         except (ValueError, KeyError):  # a {...} match loads as an object or not at all: no TypeError is possible
             found = []
         found = [f for f in found if isinstance(f, dict)] if isinstance(found, list) else []
+        typed = []
+        for f in found:     # V2.1: a finding is evidence only when the kernel's probe reproduces it (review_verify)
+            v = self._verify(f, scope.root)
+            f["verification"] = {"status": v.status, "why": v.reason, "probe": v.probe, "observed": v.observed}
+            confirmed = review_verify.blocks(v, f, self.review_policy["policy"], self.review_policy["min_severity"])
+            typed.append(Finding(str(f.get("id")), confirmed or bool(f.get("blocking")),
+                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v)))
         s["findings"] = found
-        return Reviewed(O.COMPLETED, tuple(Finding(str(f.get("id")), bool(f.get("blocking")), ()) for f in found),
-                        f"{len(found)} findings, parsed={m is not None}")
+        confirmed = sum(1 for t in typed if t.blocks)
+        return Reviewed(O.COMPLETED, tuple(typed), f"{len(found)} findings, parsed={m is not None}"
+                        + (f", confirmed={confirmed}" if confirmed else ""))
+
+    def _verify(self, finding: dict, root: str) -> review_verify.Verification:
+        if not isinstance(finding.get("reproducer"), dict):
+            return review_verify.Verification(review_verify.UNVERIFIABLE, "no reproducer: the finding states no observable behaviour")
+        head = git(root, "rev-parse", "HEAD")
+        if head.returncode != 0:
+            return review_verify.Verification(review_verify.UNVERIFIABLE, "the reviewed checkout has no revision")
+        return review_verify.verify(finding, requirements=self.project.requirements,
+                                    product_roots=self.project.product_roots, root=root, revision=head.stdout.strip(),
+                                    timeout_s=self.probe_timeout_s, interpreter=sys.executable)
 
 
 class RuffScanner:

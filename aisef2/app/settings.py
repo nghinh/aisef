@@ -35,6 +35,11 @@ BUDGET_KEYS = ("provider_requests", "turns", "input_tokens", "output_tokens")
 PROVIDER_KEYS = ("api_key_env", "endpoint", "listed_owner", "model_limit", "name", "served_model")
 KEYS = ("format", "client", "route", "provider", "client_env", "budget", "max_turns_per_session", "limits", "timeouts_s",
         "preflight")
+#: V2.1: optional keys. Absent, the run is exactly a 2.0.0 run and the record says which rule applied:
+#: review — {"policy": "fix-loop" | "advisory", "min_severity": "low" | "medium" | "high" | "critical"} (app/review_verify)
+OPTIONAL = ("review",)
+#: what an absent `review` means: 2.0.0's rule (no finding blocks), named, never a silent default
+REVIEW_ABSENT = {"policy": "advisory", "min_severity": "critical", "given": False}
 
 
 class SettingsError(ValueError):
@@ -82,6 +87,7 @@ class Settings:
     timeouts_s: dict[str, float]
     chat_probes: int
     content: dict           # the settings as given, for the RunSpec and the record
+    review: dict = None     # V2.1: the review policy; REVIEW_ABSENT when the settings name none
 
     @property
     def model(self) -> str:
@@ -97,8 +103,17 @@ def _count(v, name: str, minimum: int = 1) -> int:
 def load(data: Mapping) -> Settings:
     if not isinstance(data, Mapping) or data.get("format") != FORMAT:
         raise SettingsError(f"not run settings of format {FORMAT}")
-    if sorted(data) != sorted(KEYS):
-        raise SettingsError(f"run settings hold exactly {sorted(KEYS)}; these hold {sorted(data)} — nothing is defaulted")
+    if sorted(k for k in data if k not in OPTIONAL) != sorted(KEYS):
+        raise SettingsError(f"run settings hold exactly {sorted(KEYS)} (and optionally {list(OPTIONAL)}); these hold "
+                            f"{sorted(data)} — nothing is defaulted")
+    review = dict(REVIEW_ABSENT)
+    if "review" in data:
+        from aisef2.app.review_verify import POLICIES, SEVERITIES
+        r = data["review"]
+        if not isinstance(r, Mapping) or sorted(r) != ["min_severity", "policy"] or r["policy"] not in POLICIES \
+                or r["min_severity"] not in SEVERITIES:
+            raise SettingsError(f"review is {{policy: one of {list(POLICIES)}, min_severity: one of {list(SEVERITIES)}}}")
+        review = {"policy": r["policy"], "min_severity": r["min_severity"], "given": True}
     if data["client"] not in CLIENTS:
         raise SettingsError(f"client is one of {CLIENTS}")
     route = data["route"]
@@ -148,7 +163,7 @@ def load(data: Mapping) -> Settings:
     return Settings(data["client"], route, p["name"], str(p["endpoint"]).rstrip("/"), p["api_key_env"], p["served_model"],
                     p["listed_owner"], model_limit, tuple(env),
                     budget, _count(data["max_turns_per_session"], "max_turns_per_session"), limits, timeouts, probes,
-                    dict(data))
+                    dict(data), review)
 
 
 def read(path: str | pathlib.Path) -> Settings:
