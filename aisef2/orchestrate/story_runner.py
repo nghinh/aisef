@@ -252,17 +252,23 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                 # §14 (K-PRESAT-001, K-NOWORK-001): a story with no developer work — every obligation PRE_SATISFIED, or
                 # nothing READY to introduce — made no developer call: there is no developer work for engineering
                 # adequacy to judge, so it is not run and can neither fail nor charge it
-                tests_held = _Held(scope, "tests")
                 try:
-                    q = assess(run, story_id, str(verifier_wt.path), ws.diff(base, candidate), inputs.story_tests,
-                               inputs.regression_tests, inputs.deps, inputs.runner, policy.tests,
-                               interpreter=inputs.env.interpreter, timeout_s=policy.tool_timeout_s, on_range=tests_held)
-                finally:
-                    tests_held.release()
-                checks.append(gate.check(run, story_id, "quality", q.failure is None,
-                                         q.assembly.outcome.value if q.assembly.outcome else "no AdequacyOutcome"))
-                if q.failure is not None:
-                    failure, detail = q.failure, f"engineering quality: {q.failure.code.value}"
+                    diff = ws.diff(base, candidate)
+                except ResourceUnavailable as e:
+                    failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"candidate diff: {e}"
+                    checks.append(gate.check(run, story_id, "quality", False, detail))
+                else:
+                    tests_held = _Held(scope, "tests")
+                    try:
+                        q = assess(run, story_id, str(verifier_wt.path), diff, inputs.story_tests,
+                                   inputs.regression_tests, inputs.deps, inputs.runner, policy.tests,
+                                   interpreter=inputs.env.interpreter, timeout_s=policy.tool_timeout_s, on_range=tests_held)
+                    finally:
+                        tests_held.release()
+                    checks.append(gate.check(run, story_id, "quality", q.failure is None,
+                                             q.assembly.outcome.value if q.assembly.outcome else "no AdequacyOutcome"))
+                    if q.failure is not None:
+                        failure, detail = q.failure, f"engineering quality: {q.failure.code.value}"
             if failure is None:
                 confined = confine(story_id, str(verifier_wt.path))   # derived from the story's own checkout (§25)
                 try:

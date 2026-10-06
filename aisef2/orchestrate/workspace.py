@@ -155,8 +155,8 @@ class GitWorkspace:
 
     def diff(self, base: str, candidate: str) -> str:
         p = git(self.repo, "diff", "--no-color", f"{base}..{candidate}")
-        if p.returncode != 0:
-            raise InvariantError(f"git diff {base[:12]}..{candidate[:12]} exited {p.returncode}")
+        if p.returncode != 0:   # V2.1: git failing here is the environment's (the candidate is already checked out)
+            raise ResourceUnavailable(f"git diff {base[:12]}..{candidate[:12]} exited {p.returncode}")
         return p.stdout
 
 

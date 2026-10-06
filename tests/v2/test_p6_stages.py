@@ -340,7 +340,7 @@ class Workspace(unittest.TestCase):
         diff = self.ws.diff(self.base, new)
         self.assertIn("+def add(a, b):", diff)
         self.assertEqual(self.ws.diff(new, new), "")
-        with self.assertRaisesRegex(InvariantError, r"^git diff [0-9a-f]{12}\.\.000000000000 exited [1-9]\d*$"):
+        with self.assertRaisesRegex(adapters.ResourceUnavailable, r"^git diff [0-9a-f]{12}\.\.000000000000 exited [1-9]\d*$"):
             self.ws.diff(self.base, "0" * 40)
         c.release()
         self.assertFalse(c.path.exists())
